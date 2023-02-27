@@ -7,7 +7,6 @@ import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.intf.dto.AccioParam;
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
@@ -31,9 +30,8 @@ import es.caib.notib.logic.wsdl.adviser.Acuse;
 import es.caib.notib.logic.wsdl.adviser.AdviserWsV2PortType;
 import es.caib.notib.logic.wsdl.adviser.Opciones;
 import es.caib.notib.logic.wsdl.adviser.Receptor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +51,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Service
 @WebService(
 		name = "adviserWs",
@@ -112,19 +111,19 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			
 			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm");
 			
-			logger.info("[ADV] Inici sincronització enviament Adviser [");
-			logger.info("        Id: " + (identificador != null ? identificador : ""));
-			logger.info("        OrganismoEmisor: " + organismoEmisor);
-			logger.info("        TipoEntrega: " + tipoEntrega);
-			logger.info("        ModoNotificacion: " + modoNotificacion);
-			logger.info("        Estat: " + estado);
+			log.info("[ADV] Inici sincronització enviament Adviser [");
+			log.info("        Id: " + (identificador != null ? identificador : ""));
+			log.info("        OrganismoEmisor: " + organismoEmisor);
+			log.info("        TipoEntrega: " + tipoEntrega);
+			log.info("        ModoNotificacion: " + modoNotificacion);
+			log.info("        Estat: " + estado);
 			if (fechaEstado != null) {
-				logger.info("        FechaEstado: " + sdf.format(fechaEstado.toGregorianCalendar().getTime()));
+				log.info("        FechaEstado: " + sdf.format(fechaEstado.toGregorianCalendar().getTime()));
 			}
-			logger.info("        Receptor: " + (receptor != null ? receptor.getNifReceptor() : "") + "]");
+			log.info("        Receptor: " + (receptor != null ? receptor.getNifReceptor() : "") + "]");
 			
-			logger.debug("--------------------------------------------------------------");
-			logger.debug("Processar petició dins l'Adviser...");
+			log.debug("--------------------------------------------------------------");
+			log.debug("Processar petició dins l'Adviser...");
 			
 			IntegracioInfo info = new IntegracioInfo(
 					IntegracioHelper.INTCODI_NOTIFICA, 
@@ -182,7 +181,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		try {
 			enviament = notificacioEnviamentRepository.findByNotificaIdentificador(identificador);
 			if (enviament == null) {
-				logger.error(
+				log.error(
 						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
 								"identificadorDestinatario=" + identificador + "): " +
 								"No s'ha trobat cap enviament amb l'identificador especificat (" + identificador + ").");
@@ -199,7 +198,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			}
 			if (enviament.isNotificaEstatFinal()) {
 				if (tipoEntrega.equals(BigInteger.valueOf(1L))) { //if datado (1L)
-					logger.warn("Error al processar petició datadoOrganismo dins el callback de Notifica (" +
+					log.warn("Error al processar petició datadoOrganismo dins el callback de Notifica (" +
 							"L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
 					//Crea un nou event builder
 					createEvent = true;
@@ -213,7 +212,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					descripcionRespuesta.value = "OK";
 					integracioHelper.addAccioError(info, "L'enviament ja es troba en un estat final");
 				} else if (tipoEntrega.equals(BigInteger.valueOf(3L))) { //if certificació (3L)
-					logger.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
+					log.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
 					certificacionOrganismo(
 							acusePDF,
 							organismoEmisor,
@@ -222,7 +221,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 							codigoRespuesta,
 							descripcionRespuesta,
 							enviament);
-					logger.debug("Certificació guardada correctament.");
+					log.debug("Certificació guardada correctament.");
 				}
 			} else {
 				String receptorNombre = null;
@@ -244,7 +243,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						null,
 						null,
 						enviament);
-				logger.debug("Registrant event callbackdatat de l'Adviser...");
+				log.debug("Registrant event callbackdatat de l'Adviser...");
 				//Crea un nou event builder
 				createEvent = true;
 				eventInitialitzaCallback = true;
@@ -255,7 +254,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 
 				//if (datado + certificació) or (certificació)
 				if (tipoEntrega.equals(BigInteger.valueOf(2L)) || tipoEntrega.equals(BigInteger.valueOf(3L))) {
-					logger.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
+					log.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
 					certificacionOrganismo(
 							acusePDF,
 							organismoEmisor,
@@ -264,12 +263,12 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 							codigoRespuesta,
 							descripcionRespuesta,
 							enviament);
-					logger.debug("Certificació guardada correctament.");
+					log.debug("Certificació guardada correctament.");
 				}
 				integracioHelper.addAccioOk(info);
 
 //					if ("expirada".equals(estado) && acusePDF == null && enviament.getNotificaCertificacioData() == null) {
-//						logger.debug("Consultant la certificació de l'enviament expirat...");
+//						log.debug("Consultant la certificació de l'enviament expirat...");
 //						notificaHelper.enviamentRefrescarEstat(enviament.getId());
 //					}
 			}
@@ -279,13 +278,13 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			descripcionRespuesta.value = "Fecha incorrecta";
 			integracioHelper.addAccioError(info, "La data de l'estat no té un format vàlid");
 		} catch (Exception ex) {
-			logger.error(
+			log.error(
 					"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
 					"identificadorDestinatario=" + identificador + ")",
 					ex);
 			if (enviament != null) {
 				//Crea un nou event
-				logger.debug(
+				log.debug(
 						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
 								"identificadorDestinatario=" + identificador + ")");
 				createEvent = true;
@@ -299,13 +298,15 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		}
 
 		if (enviament != null && !createEvent && !tipoEntrega.equals(BigInteger.valueOf(3L))) {
-			logger.debug("L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null");
+			var msg = "L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null";
+			log.debug(msg);
 			createEvent = true;
 			eventInitialitzaCallback = true;
-			eventErrorDescripcio = "Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value;
+			eventErrorDescripcio = "Error retornat cap a Notifica: " + (!Strings.isNullOrEmpty(codigoRespuesta.value) ?  "[" + codigoRespuesta.value + "] " : "")
+					+ (!Strings.isNullOrEmpty(descripcionRespuesta.value) ? descripcionRespuesta.value : msg);
 		}
 
-		logger.debug("Peticició processada correctament.");
+		log.debug("Peticició processada correctament.");
 
 		if (enviament != null && createEvent) { // si no hi ha cap errada enviament mai serà null quan createEvent es true
 			notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
@@ -315,9 +316,9 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					eventInitialitzaCallback
 			);
 
-			logger.debug("Event callbackdatat registrat correctament: " + NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT.name());
+			log.debug("Event callbackdatat registrat correctament: " + NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT.name());
 		}
-		logger.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");
+		log.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");
 		return enviament;
 	}
 
@@ -384,27 +385,27 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			if (acusePDF != null && acusePDF.getContenido() != null && acusePDF.getContenido().length > 0) {
 				//si hi ha una certificació
 				if (enviament.getNotificaCertificacioArxiuId() != null) {
-					logger.debug("Esborrant certificació antiga...");
+					log.debug("Esborrant certificació antiga...");
 					pluginHelper.gestioDocumentalDelete(
 							enviament.getNotificaCertificacioArxiuId(),
 							PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
 				}
-				logger.debug("Nou estat enviament: " + enviament.getNotificaEstatDescripcio());
+				log.debug("Nou estat enviament: " + enviament.getNotificaEstatDescripcio());
 				
 				if (enviament.getNotificacio() != null)
-					logger.debug("Nou estat notificació: " + enviament.getNotificacio().getEstat().name());
+					log.debug("Nou estat notificació: " + enviament.getNotificacio().getEstat().name());
 				// Hash document certificacio
 //				if (acusePDF.getContenido() != null && acusePDF.getContenido().length > 0) {
 				try {
-					logger.info("Guardant certificació acusament de rebut...");
+					log.info("Guardant certificació acusament de rebut...");
 					gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
 							PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
 							acusePDF.getContenido());
 				} catch (Exception ex) {
-					logger.error("No s'ha pogut guardar la certificació a la gestió documental", ex);
+					log.error("No s'ha pogut guardar la certificació a la gestió documental", ex);
 				}
 //				}
-				logger.debug("Actualitzant enviament amb la certificació. ID gestió documental: " + gestioDocumentalId);
+				log.debug("Actualitzant enviament amb la certificació. ID gestió documental: " + gestioDocumentalId);
 				enviament.updateNotificaCertificacio(
 						new Date(),
 						gestioDocumentalId,
@@ -417,7 +418,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						NotificaCertificacioTipusEnumDto.ACUSE,
 						NotificaCertificacioArxiuTipusEnumDto.PDF,
 						null); // núm. seguiment
-				logger.debug("Registrant event callbackcertificacio de l'Adviser...");
+				log.debug("Registrant event callbackcertificacio de l'Adviser...");
 				eventCert = notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
 						null,
@@ -427,9 +428,9 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 				
 				codigoRespuesta.value = "000";
 				descripcionRespuesta.value = "OK";
-				logger.debug("Event callbackcertificacio registrat correctament: " + eventCert.getTipus().name());
+				log.debug("Event callbackcertificacio registrat correctament: " + eventCert.getTipus().name());
 			} else {
-				logger.error(
+				log.error(
 						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
 						"identificadorDestinatario=" + identificador + "): " +
 						"No s'ha trobat el camp amb l'acús PDF a dins la petició rebuda.");
@@ -437,11 +438,11 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 				descripcionRespuesta.value = "Organismo Desconocido";
 			}
 		} catch (Exception ex) {
-			logger.error(
+			log.error(
 					"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
 					"identificadorDestinatario=" + identificador + ")",
 					ex);
-			logger.debug(
+			log.debug(
 					"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
 					"identificadorDestinatario=" + identificador + ")");
 			eventCert = notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
@@ -454,16 +455,15 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			descripcionRespuesta.value = "Error procesando peticion";
 		}
 		if (eventCert == null) {
-			logger.debug("L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null (certificació).");
-			notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
-					NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-					null,
-					"Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value,
-					true
-			);
+			var msg = "L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null (certificació).";
+			log.debug(msg);
+			String error = "Error retornat cap a Notifica: " + (!Strings.isNullOrEmpty(codigoRespuesta.value) ?  "[" + codigoRespuesta.value + "] " : "")
+					+ (!Strings.isNullOrEmpty(descripcionRespuesta.value) ? descripcionRespuesta.value : msg);
+			NotificacioEventTipusEnumDto eventTipus = NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO;
+			notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament, eventTipus, null, error, true);
 		}
 
-		logger.debug("Sortint de la certificació...");
+		log.debug("Sortint de la certificació...");
 	}
 
 	private String getModoNotificacion(BigInteger modo) {
@@ -494,7 +494,5 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		}
 		return calendar.toGregorianCalendar().getTime();
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(NotificaAdviserWsV2Impl.class);
-
+	
 }
