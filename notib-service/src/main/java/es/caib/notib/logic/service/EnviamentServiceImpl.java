@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import es.caib.notib.client.domini.EnviamentEstat;
@@ -321,17 +322,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 		try {
 			log.debug("Consulta de destinatari donat el seu id (destinatariId=" + enviamentId + ")");
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+			// #779: Obtenim la certificació de forma automàtica
 			if (enviament.getNotificaCertificacioArxiuId() == null &&
 					( EnviamentEstat.REBUTJADA.equals(enviament.getNotificaEstat()) ||
 							EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat()) )) {
 				try {
 					notificaHelper.enviamentRefrescarEstat(enviamentId);
-					var opt = notificacioEnviamentRepository.findById(enviamentId);
-					if (opt.isEmpty()) {
-						log.error("L'enviament amb id " + enviamentId + " no existeix");
-						return null;
-					}
-					enviament = opt.get();
+					notificacioEnviamentRepository.flush();
+					enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 				} catch (Exception ex) {
 					log.error("No s'ha pogut actualitzar la certificació de l'enviament amb id: " + enviamentId, ex);
 				}
@@ -1038,23 +1036,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private NotificacioEnviamentDto enviamentToDto(NotificacioEnviamentEntity enviament) {
 
 		//		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
-		var enviamentDto = conversioTipusHelper.convertir(enviament, NotificacioEnviamentDto.class);
+		NotificacioEnviamentDto enviamentDto = conversioTipusHelper.convertir(enviament, NotificacioEnviamentDto.class);
 		enviamentDto.setRegistreNumeroFormatat(enviament.getRegistreNumeroFormatat());
 		enviamentDto.setRegistreData(enviament.getRegistreData());
-		destinatariCalcularCampsAddicionals(enviament, enviamentDto);
-		return enviamentDto;
-	}
-
-	private void destinatariCalcularCampsAddicionals(NotificacioEnviamentEntity enviament, NotificacioEnviamentDto enviamentDto) {
-
-		if (enviament.isNotificaError()) {
-			var event = enviament.getNotificacioErrorEvent();
-			if (event != null) {
-				enviamentDto.setNotificaErrorData(event.getData());
-				enviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
-			}
-		}
 		enviamentDto.setNotificaCertificacioArxiuNom(calcularNomArxiuCertificacio(enviament));
+		return enviamentDto;
 	}
 
 	private String calcularNomArxiuCertificacio(NotificacioEnviamentEntity enviament) {

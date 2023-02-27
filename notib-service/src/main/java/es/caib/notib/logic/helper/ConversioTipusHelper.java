@@ -473,14 +473,15 @@ public class ConversioTipusHelper {
 	public class NotificacioEnviamentEntitytoMapper extends CustomMapper<NotificacioEnviamentEntity, NotificacioEnviamentDto> {
 		@Override
 		public void mapAtoB(NotificacioEnviamentEntity notificacioEnviamentEntity, NotificacioEnviamentDto notificacioEnviamentDto, MappingContext context) {
+
 			if (!notificacioEnviamentEntity.isNotificaError()) {
 				return;
 			}
-			var event = notificacioEnviamentEntity.getNotificacioErrorEvent();
-			if (event == null) {
-				return;
-			}
 			try {
+				NotificacioEventEntity event = notificacioEnviamentEntity.getNotificacioErrorEvent();
+				if (event == null) {
+					return;
+				}
 				notificacioEnviamentDto.setNotificaErrorData(event.getData());
 				notificacioEnviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
 			} catch (Exception ex) {
