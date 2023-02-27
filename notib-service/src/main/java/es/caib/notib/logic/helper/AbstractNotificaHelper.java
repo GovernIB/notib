@@ -6,6 +6,7 @@ package es.caib.notib.logic.helper;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
@@ -99,7 +100,8 @@ public abstract class AbstractNotificaHelper {
 			}
 		}
 		log.info("Estat final: " + estatsEnviamentsFinals);
-		if (!estatsEnviamentsNotificaFinals) {
+		var notificacioEstat = enviament.getNotificacio().getEstat();
+		if (!estatsEnviamentsNotificaFinals || NotificacioEstatEnumDto.PROCESSADA.equals(notificacioEstat)) {
 			return enviament;
 		}
 		if (estatsEnviamentsFinals) {

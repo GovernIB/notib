@@ -111,12 +111,12 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					+ "Si l'error es continua donant en properes intents, posis en contacte amb els administradors de l'aplicació.", ex);
         	valid = false;
         }
-		if (!valid) {
-			var msg = TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())
-					? "notificacio.form.errors.validacio.notificacio" : "notificacio.form.errors.validacio.comunicacio";
-			msg = MessageHelper.getInstance().getMessage(msg, null, locale) + (!Strings.isNullOrEmpty(maxSizeError) ? " - " + maxSizeError : "");
-			context.buildConstraintViolationWithTemplate(msg).addConstraintViolation();
-		}
+//		if (!valid) {
+//			var msg = TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())
+//					? "notificacio.form.errors.validacio.notificacio" : "notificacio.form.errors.validacio.comunicacio";
+//			msg = MessageHelper.getInstance().getMessage(msg, null, locale) + (!Strings.isNullOrEmpty(maxSizeError) ? " - " + maxSizeError : "");
+//			context.buildConstraintViolationWithTemplate(msg).addConstraintViolation();
+//		}
 		return valid;
 	}
 

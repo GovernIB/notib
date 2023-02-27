@@ -321,6 +321,9 @@ public class NotificacioFormController extends BaseUserController {
             log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Processant dades del formulari. ");
             updateDocuments(notificacioCommand, bindingResult);
             if (bindingResult.hasErrors()) {
+                var msg = TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacioCommand.getEnviamentTipus())
+                        ? "notificacio.form.errors.validacio.notificacio" : "notificacio.form.errors.validacio.comunicacio";
+                MissatgesHelper.error(request, getMessage(request, msg));
                 relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
                 return "notificacioForm";
             }

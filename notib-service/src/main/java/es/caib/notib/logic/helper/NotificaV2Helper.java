@@ -286,6 +286,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		var dataUltimaCertificacio = enviament.getNotificaCertificacioData();
 		var certificacio = resultadoInfoEnvio.getCertificacion();
 		var dataCertificacio = toDate(certificacio.getFechaCertificacion());
+		configHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
 		if (dataCertificacio.equals(dataUltimaCertificacio) && enviament.getNotificaCertificacioArxiuId() != null) {
 			log.info(" [EST] El certificat de l'enviament ja estava actualitzat");
 			return;

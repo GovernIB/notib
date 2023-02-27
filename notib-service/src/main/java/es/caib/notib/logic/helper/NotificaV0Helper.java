@@ -12,7 +12,6 @@ import es.caib.notib.logic.aspect.UpdateNotificacioTable;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
-import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
@@ -43,8 +42,6 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 
 	@Autowired
 	private NotificacioRepository notificacioRepository;
-	@Autowired
-	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
@@ -88,6 +85,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					}
 				}
 				notificacioEventHelper.addEnviamentNotificaOKEvent(notificacio, identificadorsEnviaments);
+				integracioHelper.addAccioOk(info);
 			} else {
 				log.info(" >>> ... ERROR:");
 				//Crea un nou event
@@ -195,6 +193,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			if (resultadoInfoEnvio.getCertificacion() != null) {
 				log.info("Actualitzant informació enviament amb certificació...");
 				var certificacio = resultadoInfoEnvio.getCertificacion();
+				configHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
 				var dataCertificacio = toDate(certificacio.getFechaCertificacion());
 				if (!dataCertificacio.equals(dataUltimaCertificacio)) {
 					var decodificat = certificacio.getContenidoCertificacion();
