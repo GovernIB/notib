@@ -21,6 +21,7 @@ import es.caib.notib.logic.helper.FiltreHelper.StringField;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.helper.NotificaHelper;
 import es.caib.notib.logic.helper.NotificacioEventHelper;
 import es.caib.notib.logic.helper.OrganGestorHelper;
 import es.caib.notib.logic.helper.OrganigramaHelper;
@@ -152,6 +153,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
 	private AuditNotificacioHelper auditNotificacioHelper;
+	@Autowired
+	private NotificaHelper notificaHelper;
 	@Autowired
 	private ConfigHelper configHelper;
 	@Autowired
@@ -318,6 +321,15 @@ public class EnviamentServiceImpl implements EnviamentService {
 		try {
 			log.debug("Consulta de destinatari donat el seu id (destinatariId=" + enviamentId + ")");
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+			if (enviament.getNotificaCertificacioArxiuId() == null &&
+					( EnviamentEstat.REBUTJADA.equals(enviament.getNotificaEstat()) ||
+							EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat()) )) {
+				try {
+					enviament = notificaHelper.enviamentRefrescarEstat(enviamentId);
+				} catch (Exception ex) {
+					log.error("No s'ha pogut actualitzar la certificació de l'enviament amb id: " + enviamentId, ex);
+				}
+			}
 			//NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
 			entityComprovarHelper.comprovarPermisos(null, false, false, false);
 			return enviamentToDto(enviament);

@@ -979,6 +979,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+			// #779: Obtenim la certificació de forma automàtica
+			if (enviament.getNotificaCertificacioArxiuId() == null) {
+				enviament = notificaHelper.enviamentRefrescarEstat(enviamentId);
+			}
+			if (enviament.getNotificaCertificacioArxiuId() == null) {
+				throw new RuntimeException("No s'ha trobat la certificació de l'enviament amb id: " + enviamentId);
+			}
 			var output = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(enviament.getNotificaCertificacioArxiuId(), PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, output);
 			return new ArxiuDto(calcularNomArxiuCertificacio(enviament), enviament.getNotificaCertificacioMime(), output.toByteArray(), output.size());
