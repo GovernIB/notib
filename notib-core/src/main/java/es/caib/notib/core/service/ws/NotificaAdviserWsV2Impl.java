@@ -299,7 +299,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		}
 
 		if (enviament != null && !createEvent && !tipoEntrega.equals(BigInteger.valueOf(3L))) {
-			String msg = "L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null";
+			String msg = "L'enviament amb identificador " + enviament.getNotificaIdentificador() + " ha rebut un callback de l'adviser de tipus " + tipoEntrega + " quan ja es troba en estat final." ;
 			logger.debug(msg);
 			createEvent = true;
 			eventInitialitzaCallback = true;

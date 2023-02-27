@@ -457,7 +457,7 @@ public class ConversioTipusHelper {
 			}
 		}
 	}
-	
+
 	public class NotificacioEnviamentEntitytoMapper extends CustomMapper<NotificacioEnviamentEntity, NotificacioEnviamentDto> {
 		@Override
 		public void mapAtoB(
@@ -465,14 +465,14 @@ public class ConversioTipusHelper {
 				NotificacioEnviamentDto notificacioEnviamentDto, 
 				MappingContext context) {
 			if (notificacioEnviamentEntity.isNotificaError()) {
-				NotificacioEventEntity event = notificacioEnviamentEntity.getNotificacioErrorEvent();
-				if (event != null) {
-					try {
+				try {
+					NotificacioEventEntity event = notificacioEnviamentEntity.getNotificacioErrorEvent();
+					if (event != null) {
 						notificacioEnviamentDto.setNotificaErrorData(event.getData());
 						notificacioEnviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
-					} catch (Exception ex) {
-						log.error("[ConversioTipusHelper.NotificacioEnviamentDto] event no trobat.");
 					}
+				} catch (Exception ex) {
+					log.error("[ConversioTipusHelper.NotificacioEnviamentDto] event no trobat.");
 				}
 			}
 		}

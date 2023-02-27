@@ -388,6 +388,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat()) )) {
 				try {
 					notificaHelper.enviamentRefrescarEstat(enviamentId);
+					notificacioEnviamentRepository.flush();
 					enviament = notificacioEnviamentRepository.findById(enviamentId);
 				} catch (Exception ex) {
 					log.error("No s'ha pogut actualitzar la certificació de l'enviament amb id: " + enviamentId, ex);
@@ -1159,20 +1160,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 		NotificacioEnviamentDto enviamentDto = conversioTipusHelper.convertir(enviament, NotificacioEnviamentDto.class);
 		enviamentDto.setRegistreNumeroFormatat(enviament.getRegistreNumeroFormatat());
 		enviamentDto.setRegistreData(enviament.getRegistreData());
-		destinatariCalcularCampsAddicionals(enviament, enviamentDto);
-		return enviamentDto;
-	}
-
-	private void destinatariCalcularCampsAddicionals(NotificacioEnviamentEntity enviament, NotificacioEnviamentDto enviamentDto) {
-
-		if (enviament.isNotificaError()) {
-			NotificacioEventEntity event = enviament.getNotificacioErrorEvent();
-			if (event != null) {
-				enviamentDto.setNotificaErrorData(event.getData());
-				enviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
-			}
-		}
 		enviamentDto.setNotificaCertificacioArxiuNom(calcularNomArxiuCertificacio(enviament));
+		return enviamentDto;
 	}
 
 	private String calcularNomArxiuCertificacio(NotificacioEnviamentEntity enviament) {
