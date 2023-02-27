@@ -19,5 +19,6 @@ public class NotTableUpdate {
     private NotificacioEstatEnumDto estat;
     private Date estatDate;
     private Date estatProcessatDate;
+    private Integer reintentsRegistre;
 
 }

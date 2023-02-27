@@ -139,7 +139,7 @@ public class AuditNotificacioHelper {
 		for (var env: notificacio.getEnviaments()) {
 			enviamentTableHelper.actualitzarRegistre(env);
 		}
-		NotTableUpdate not = NotTableUpdate.builder().id(notificacio.getId()).estat(notificacio.getEstat()).build();
+		var not = NotTableUpdate.builder().id(notificacio.getId()).estat(notificacio.getEstat()).reintentsRegistre(notificacio.getRegistreEnviamentIntent()).build();
 		notificacioTableHelper.actualitzar(not);
 		return notificacio;
 	}

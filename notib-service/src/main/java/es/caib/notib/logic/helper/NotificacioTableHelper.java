@@ -93,7 +93,9 @@ public class NotificacioTableHelper {
             if (not.getEstatDate() != null) {
                 item.setEstatDate(not.getEstatDate());
             }
-
+            if (not.getReintentsRegistre() != null) {
+                item.setRegistreEnviamentIntent(not.getReintentsRegistre());
+            }
             if (not.getEstat() != null) {
                 // Estat de la notificacio
                 item.setEstatMask(item.getEstatMask() - item.getEstat().getMask() + not.getEstat().getMask());
