@@ -53,8 +53,9 @@ function initEvents($table, url_prefix, eventMessages) {
     $table.on('init.dt', function () {
         $('#seleccioAll').on('click', function() {
             $.get(
-                url_prefix + "/select",
-                function(data) {
+                url_prefix + "/seleccionar/all",
+                data => {
+                    console.log("success" + data);
                     $(".seleccioCount").html(data);
                     $table.webutilDatatable('refresh');
                 }

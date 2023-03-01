@@ -302,6 +302,13 @@
     });
 
     $(document).ready(function() {
+
+
+        $("#seleccioAll").on("click", e => {
+            e.preventDefault();
+            console.log("select all");
+        })
+
         let $taula = $('#notificacio');
         $taula.on('rowinfo.dataTable', function(e, td, rowData) {
             mostraEnviamentsNotificacio(td, rowData)

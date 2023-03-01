@@ -123,7 +123,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request) && entitatActual != null) {
             OrganGestorDto organGestorActual = getOrganGestorActual(request);
             organGestorCodi = organGestorActual.getCodi();
-
         }
         NotificacioFiltreDto filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE).asDto();
         assert entitatActual != null;

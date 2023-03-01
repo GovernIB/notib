@@ -731,22 +731,85 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<Long> findIdsAmbFiltre(Long entitatId,
-									   RolEnumDto rol,
-									   String organGestorCodi,
-									   String usuariCodi,
-									   NotificacioFiltreDto filtre) {
-		PaginacioParamsDto paginacioParamsDto = new PaginacioParamsDto();
-		paginacioParamsDto.setPaginaNum(0);
-		paginacioParamsDto.setPaginaTamany(notificacioEnviamentRepository.findAll().size());
-		PaginaDto<NotificacioTableItemDto> pagina = findAmbFiltrePaginat(entitatId, rol, organGestorCodi,
-				usuariCodi,
-				filtre,
-				paginacioParamsDto);
-		List<Long> idsNotificacions = new ArrayList<>();
-		for (NotificacioTableItemDto notificacio: pagina.getContingut()) {
-			idsNotificacions.add(notificacio.getId());
+	public List<Long> findIdsAmbFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioFiltreDto filtre) {
+
+
+		boolean isUsuari = RolEnumDto.tothom.equals(rol);
+		boolean isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
+		boolean isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
+		boolean isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat,false);
+		List<String> codisProcedimentsDisponibles = new ArrayList<>();
+		List<String> codisOrgansGestorsDisponibles = new ArrayList<>();
+		List<String> codisProcedimentsOrgans = new ArrayList<>();
+
+		if (isUsuari && entitatActual != null) {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
+			// Procediments accessibles per qualsevol òrgan gestor
+			codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
+
+			// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
+			codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
+
+			// Procediments comuns que es poden consultar per a òrgans gestors concrets
+			codisProcedimentsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitatActual.getId(), auth.getName(), PermisEnum.CONSULTA);
+
+		} else if (isAdminOrgan && entitatActual != null) {
+			codisProcedimentsDisponibles = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
 		}
+		boolean esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
+		boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+		boolean esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
+
+		List<EntitatEntity> entitatsActives = isSuperAdmin ? entitatRepository.findByActiva(true) : null;
+		List<String> organs = isAdminOrgan ? organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi) : null;
+		NotificacioListHelper.NotificacioFiltre f = notificacioListHelper.getFiltre(filtre);
+		Long entitatFiltre = isUsuariEntitat || isUsuari ? entitatId : f.getEntitatId().getField();
+		List<Long> idsNotificacions = notificacioTableViewRepository.findIdsAmbFiltre(
+				entitatFiltre == null,
+				entitatFiltre,
+				f.getEnviamentTipus().isNull(),
+				f.getEnviamentTipus().getField(),
+				f.getConcepte().isNull(),
+				f.getConcepte().getField(),
+				f.getEstat().isNull(),
+				f.getEstat().isNull() ? 0 : f.getEstat().getField().getMask(),
+				f.getDataInici().isNull(),
+				f.getDataInici().getField(),
+				f.getDataFi().isNull(),
+				f.getDataFi().getField(),
+				f.getTitular().isNull(),
+				f.getTitular().isNull() ? "" : f.getTitular().getField(),
+				f.getOrganGestor().isNull(),
+				f.getOrganGestor().isNull() ? "" : f.getOrganGestor().getField().getCodi(),
+				f.getProcediment().isNull(),
+				f.getProcediment().isNull() ? "" : f.getProcediment().getField().getCodi(),
+				f.getTipusUsuari().isNull(),
+				f.getTipusUsuari().getField(),
+				f.getNumExpedient().isNull(),
+				f.getNumExpedient().getField(),
+				f.getCreadaPer().isNull(),
+				f.getCreadaPer().getField(),
+				f.getIdentificador().isNull(),
+				f.getIdentificador().getField(),
+				f.getNomesAmbErrors().getField(),
+				f.getNomesSenseErrors().getField(),
+				f.getReferencia().isNull(),
+				f.getReferencia().getField(),
+				isUsuari,
+				esProcedimentsCodisNotibNull,
+				esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
+				aplicacioService.findRolsUsuariActual(),
+				esOrgansGestorsCodisNotibNull,
+				esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+				esProcedimentOrgansAmbPermisNull,
+				esProcedimentOrgansAmbPermisNull ?  null : codisProcedimentsOrgans,
+				usuariCodi,
+				isSuperAdmin,
+				entitatsActives,
+				isAdminOrgan,
+				organs);
 		return idsNotificacions;
 	}
 

@@ -39,9 +39,7 @@ public interface EnviamentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<Long> findIdsAmbFiltre(
-			Long entitatId,
-			NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException;
+	List<Long> findIdsAmbFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException;
 
 	/**
 	 * Consulta dels enviaments d'una entitat realitzats d'una notificació.

@@ -41,11 +41,23 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
     @Autowired
     private EnviamentService enviamentService;
 
+    @RequestMapping(value = {"/seleccionar/all"}, method = RequestMethod.GET)
+    @ResponseBody
+    public int select(HttpServletRequest request) {
+
+        Set<Long> seleccio = new HashSet<>();
+        try {
+            seleccio.addAll(getIdsElementsFiltrats(request));
+        } catch (NotFoundException | ParseException e) {
+            e.printStackTrace();
+        }
+        return seleccio.size();
+    }
+
     @RequestMapping(value = {"/select", "{notificacioId}/notificacio/select"}, method = RequestMethod.GET)
     @ResponseBody
-    public int select(
-            HttpServletRequest request,
-            @RequestParam(value="ids[]", required = false) Long[] ids) {
+    public int select(HttpServletRequest request, @RequestParam(value="ids[]", required = false) Long[] ids) {
+
         @SuppressWarnings("unchecked")
         Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, sessionAttributeSeleccio);
         if (seleccio == null) {
