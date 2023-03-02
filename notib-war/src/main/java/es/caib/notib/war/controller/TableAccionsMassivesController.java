@@ -43,15 +43,19 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
 
     @RequestMapping(value = {"/seleccionar/all"}, method = RequestMethod.GET)
     @ResponseBody
-    public int select(HttpServletRequest request) {
+    public Set<Long> select(HttpServletRequest request) {
 
-        Set<Long> seleccio = new HashSet<>();
+        Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, sessionAttributeSeleccio);
+        if (seleccio == null) {
+            seleccio = new HashSet<>();
+            RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, seleccio);
+        }
         try {
             seleccio.addAll(getIdsElementsFiltrats(request));
         } catch (NotFoundException | ParseException e) {
             e.printStackTrace();
         }
-        return seleccio.size();
+        return seleccio;
     }
 
     @RequestMapping(value = {"/select", "{notificacioId}/notificacio/select"}, method = RequestMethod.GET)

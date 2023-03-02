@@ -190,8 +190,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 organGestorCodi = organGestorActual.getCodi();
             }
             notificacions = notificacioService.findAmbFiltrePaginat(entitatActual != null ? entitatActual.getId() : null,
-                                                    RolEnumDto.valueOf(RolHelper.getRolActual(request)), organGestorCodi, getCodiUsuariActual(), filtre,
-                                                    DatatablesHelper.getPaginacioDtoFromRequest(request));
+                                                RolEnumDto.valueOf(RolHelper.getRolActual(request)), organGestorCodi, getCodiUsuariActual(), filtre,
+                                                DatatablesHelper.getPaginacioDtoFromRequest(request));
         } catch (SecurityException e) {
             MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
         }

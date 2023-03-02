@@ -39,6 +39,7 @@ function clearSeleccio() {
 function initEvents($table, url_prefix, eventMessages) {
 
     $table.on('selectionchange.dataTable', function (e, accio, ids) {
+        console.log(accio + " - " + ids);
         if (accio === "select" || accio === "deselect") {
             $.get(
                 url_prefix + "/" + accio,
@@ -56,7 +57,7 @@ function initEvents($table, url_prefix, eventMessages) {
                 url_prefix + "/seleccionar/all",
                 data => {
                     console.log("success" + data);
-                    $(".seleccioCount").html(data);
+                    $(".seleccioCount").html(data.length);
                     $table.webutilDatatable('refresh');
                 }
             );
