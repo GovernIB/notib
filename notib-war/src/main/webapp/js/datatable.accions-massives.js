@@ -39,11 +39,11 @@ let deseleccionar = () => {
     $(".seleccioCount").html(0);
 };
 
+let selectionAll = false;
 function initEvents($table, url_prefix, eventMessages) {
 
     $table.on('selectionchange.dataTable', function (e, accio, ids) {
-        console.log(accio + " - " + ids);
-        if (accio === "select" || accio === "deselect") {
+        if (!selectionAll && (accio === "select" || accio === "deselect")) {
             $.get(
                 url_prefix + "/" + accio,
                 {ids: ids},
@@ -54,18 +54,22 @@ function initEvents($table, url_prefix, eventMessages) {
         }
     });
 
+    $table.on("draw.dt", () => {
+        selectionAll = false;
+    });
+
     $table.on('init.dt', function () {
 
         $('#seleccioAll').on('click', function() {
-            console.log("dins")
             $('#seleccioAll').attr("disabled", true);
             $('#seleccioNone').attr("disabled", true);
             $('#cover-spin').show(0);
             $.get(
                 url_prefix + "/seleccionar/all",
-                data => {
-                    $(".seleccioCount").html(data);
-                    $table.webutilDatatable('refresh');
+                indexes => {
+                    $(".seleccioCount").html(indexes);
+                    // selectionAll = true;
+                    $table.webutilDatatable('select-all');
                     $('#seleccioAll').attr("disabled", false);
                     $('#seleccioNone').attr("disabled", false);
                     $('#cover-spin').hide();
