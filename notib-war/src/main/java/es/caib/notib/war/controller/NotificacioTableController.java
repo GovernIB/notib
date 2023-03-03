@@ -165,6 +165,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 //        notificacioListHelper.ompleProcediments(request, model);
         model.addAttribute("notificacioFiltreCommand", command);
         model.addAttribute("nomesAmbErrors", command.isNomesAmbErrors());
+//        deselect(request, null);
         return "notificacioList";
     }
 

@@ -34,7 +34,10 @@ function clearSeleccio() {
     sessionStorage.setItem('rowIdsStore', "{}");
 }
 
-
+let deseleccionar = () => {
+    $('#seleccioNone').click();
+    $(".seleccioCount").html(0);
+};
 
 function initEvents($table, url_prefix, eventMessages) {
 
@@ -52,24 +55,37 @@ function initEvents($table, url_prefix, eventMessages) {
     });
 
     $table.on('init.dt', function () {
+
         $('#seleccioAll').on('click', function() {
+            console.log("dins")
+            $('#seleccioAll').attr("disabled", true);
+            $('#seleccioNone').attr("disabled", true);
+            $('#cover-spin').show(0);
             $.get(
                 url_prefix + "/seleccionar/all",
                 data => {
-                    console.log("success" + data);
-                    $(".seleccioCount").html(data.length);
+                    $(".seleccioCount").html(data);
                     $table.webutilDatatable('refresh');
+                    $('#seleccioAll').attr("disabled", false);
+                    $('#seleccioNone').attr("disabled", false);
+                    $('#cover-spin').hide();
                 }
             );
             return false;
         });
         $('#seleccioNone').on('click', function() {
+            $('#seleccioAll').attr("disabled", true);
+            $('#seleccioNone').attr("disabled", true);
+            $('#cover-spin').show(0);
             $.get(
                 url_prefix + "/deselect",
                 function(data) {
                     $(".seleccioCount").html(data);
                     $table.webutilDatatable('select-none');
                     $table.webutilDatatable('refresh');
+                    $('#seleccioAll').attr("disabled", false);
+                    $('#seleccioNone').attr("disabled", false);
+                    $('#cover-spin').hide();
                 }
             );
             return false;

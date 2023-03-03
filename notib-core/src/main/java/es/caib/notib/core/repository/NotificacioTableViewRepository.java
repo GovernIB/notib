@@ -416,6 +416,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 //			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " +
 			"   or (ntf.organCodi is not null and ntf.organCodi in (:organs))" +
 			"	)) " +
+			"and (:isNullNotMassivaId = true or ntf.notificacioMassiva.id = :notMassivaId) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
 			"and (:isEstatNull = true or bitand(ntf.estatMask, :estatMask) <> 0) " +
@@ -477,5 +478,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("isSuperAdmin") boolean isSuperAdmin,
 			@Param("entitatsActives") List<EntitatEntity> entitatsActives,
 			@Param("isAdminOrgan") boolean isAdminOrgan,
-			@Param("organs") List<String> organs);
+			@Param("organs") List<String> organs,
+			@Param("isNullNotMassivaId") boolean isNullNotMassivaId,
+			@Param("notMassivaId") Long notMassivaId);
 }

@@ -52,10 +52,8 @@ public class OrganGestorHelper {
 			String canviOrgan = request.getParameter(REQUEST_PARAMETER_CANVI_ORGAN);
 			if (canviOrgan != null && !canviOrgan.isEmpty()) {
 				setOrganGestorUsuariActual(request, canviOrgan);
-			} else if (canviOrgan != null && (request.getSession().getAttribute(ORGAN_ACTUAL) == null || organsGestorsUsuariActual != null && !organsGestorsUsuariActual.isEmpty())) {
-				request.getSession().setAttribute(
-						ORGAN_ACTUAL,
-						organsGestorsUsuariActual.get(0));
+			} else if (request.getSession().getAttribute(ORGAN_ACTUAL) == null && organsGestorsUsuariActual != null && !organsGestorsUsuariActual.isEmpty()) {
+				request.getSession().setAttribute(ORGAN_ACTUAL, organsGestorsUsuariActual.get(0));
 			}
 		}
 		return organsGestorsUsuariActual;

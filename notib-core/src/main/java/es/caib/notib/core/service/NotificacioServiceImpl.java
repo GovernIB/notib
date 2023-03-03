@@ -809,7 +809,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 				isSuperAdmin,
 				entitatsActives,
 				isAdminOrgan,
-				organs);
+				organs,
+				filtre.getNotMassivaId() == null,
+				filtre.getNotMassivaId());
 		return idsNotificacions;
 	}
 

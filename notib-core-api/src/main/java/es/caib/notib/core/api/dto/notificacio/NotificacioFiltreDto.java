@@ -19,7 +19,8 @@ import java.util.Date;
  */
 @Getter @Setter
 public class NotificacioFiltreDto implements Serializable {
-	
+
+	private Long notMassivaId;
 	private Long entitatId;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
@@ -37,6 +38,7 @@ public class NotificacioFiltreDto implements Serializable {
 	private String identificador;
 	private String referencia;
 	private boolean nomesAmbErrors;
+
 
 	public boolean isEmpty() {
 

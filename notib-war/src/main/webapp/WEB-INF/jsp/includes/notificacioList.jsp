@@ -303,12 +303,6 @@
 
     $(document).ready(function() {
 
-
-        $("#seleccioAll").on("click", e => {
-            e.preventDefault();
-            console.log("select all");
-        })
-
         let $taula = $('#notificacio');
         $taula.on('rowinfo.dataTable', function(e, td, rowData) {
             mostraEnviamentsNotificacio(td, rowData)
@@ -343,6 +337,10 @@
             });
         });
 
+        $("#filtrar").click(() => {
+            deseleccionar()
+        });
+
         $('#btn-netejar-filtre').click(function() {
             $(':input', $('#form-filtre')).each (function() {
                 var type = this.type, tag = this.tagName.toLowerCase();
@@ -359,6 +357,7 @@
             $('#nomesAmbErrors').val(false);
             omplirProcediments();
             omplirServeis();
+            deseleccionar();
             $('#form-filtre').submit();
         });
         $('#nomesAmbErrorsBtn').click(function() {
@@ -578,7 +577,7 @@
             <button id="nomesAmbErrorsBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbErrors"/>" class="btn btn-default <c:if test="${nomesAmbErrors}">active</c:if>" data-toggle="button"><span class="fa fa-warning"></span></button>
             <not:inputHidden name="nomesAmbErrors"/>
             <button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-            <button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+            <button id="filtrar" type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
         </div>
     </div>
 </form:form>
@@ -617,6 +616,7 @@
 	</script>
 
 <script id="rowhrefTemplate" type="text/x-jsrender"><c:url value="/notificacio/{{:id}}/info"/></script>
+<div id="cover-spin"></div>
 <table
         id="notificacio"
         data-toggle="datatable"
