@@ -101,6 +101,11 @@ function initEvents($table, url_prefix, eventMessages) {
         });
 
         $('#reintentarNotificacio').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             if(confirm(eventMessages['confirm-reintentar-notificacio'])){
 
                 $.get(
@@ -118,6 +123,11 @@ function initEvents($table, url_prefix, eventMessages) {
         });
 
         $('#reintentarErrors').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             if(confirm(eventMessages['confirm-reintentar-errors'])){
 
                 $.get(
@@ -135,6 +145,11 @@ function initEvents($table, url_prefix, eventMessages) {
         });
 
         $('#reactivarConsulta').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             if(confirm(eventMessages['confirm-reintentar-consulta'])){
                 location.href = url_prefix + "/reactivar/consulta";
                 setTimeout(() => $table.DataTable().rows().deselect(), 100);
@@ -143,6 +158,11 @@ function initEvents($table, url_prefix, eventMessages) {
         });
 
         $('#reactivarSir').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             if(confirm(eventMessages['confirm-reintentar-sir'])){
                 $.get(
                     url_prefix + "/reactivar/sir",
@@ -157,6 +177,11 @@ function initEvents($table, url_prefix, eventMessages) {
             return false;
         });
         $('#updateEstat').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             if(confirm(eventMessages['confirm-update-estat'])){
                 $.get(
                     url_prefix + "/actualitzarestat",
@@ -172,6 +197,11 @@ function initEvents($table, url_prefix, eventMessages) {
         });
 
         $('#reactivarCallback').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             if(confirm(eventMessages['confirm-reactivar-callback'])){
                 location.href =  url_prefix + "/reactivar/callback";
                 setTimeout(() => $table.DataTable().rows().deselect(), 100);
@@ -180,6 +210,11 @@ function initEvents($table, url_prefix, eventMessages) {
         });
 
         $('#enviarCallback').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             if(confirm(eventMessages['confirm-enviar-callback'])){
                 location.href =  url_prefix + "/enviar/callback";
                 setTimeout(() => $table.DataTable().rows().deselect(), 100);
@@ -187,18 +222,34 @@ function initEvents($table, url_prefix, eventMessages) {
             return false;
         });
 
-        $("#exportarODS").on("click", () => {
+        $("#exportarODS").on("click", (e) => {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             // location.href = "notificacio/export/ODS";
             location.href = url_prefix + "/export/ODS";
             setTimeout(() => $table.DataTable().rows().deselect(), 100);
         });
 
         $("#eliminar").on("click", () => {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             location.href = url_prefix + "/eliminar";
         });
         $("#reintentarRegistre").on("click", () => {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             location.href =  url_prefix + "/reintentar/registre";
             setTimeout(() => $table.DataTable().rows().deselect(), 100);
         });
+
     });
 }

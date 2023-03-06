@@ -382,6 +382,7 @@
             'confirm-update-estat': "<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>",
             'confirm-reactivar-callback': "<spring:message code="enviament.list.user.reactivar.callback.misatge.avis"/>",
             'confirm-enviar-callback': "<spring:message code="enviament.list.user.enviar.callback.misatge.avis"/>",
+            'confirm-accio-massiva': "<spring:message code="enviament.list.user.confirm.accio.massiva"/>",
         };
         initEvents($('#notificacio'), 'notificacio', eventMessages)
     });
@@ -592,12 +593,14 @@
   						<span class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu">
-						<li><a style="cursor: pointer;" id="exportarODS"><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
-						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="notificacio.list.accio.massiva.reintentar.notificacions"/></a></li>
-						<li><a style="cursor: pointer;" id="reintentarErrors"><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
-						<li><a style="cursor: pointer;" id="updateEstat"><spring:message code="notificacio.list.accio.massiva.actualitzar.estat"/></a></li>
+						<li><a id="exportarODS" style="cursor: pointer;" ><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
+						<li><a id="reintentarNotificacio" style="cursor: pointer;" ><spring:message code="notificacio.list.accio.massiva.reintentar.notificacions"/></a></li>
+						<li><a id="reintentarErrors" style="cursor: pointer;" ><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
+						<li><a id="updateEstat" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.actualitzar.estat"/></a></li>
                         <li><a id="processarMassiu" href="<c:url value="/notificacio/processar/massiu"/>" data-toggle="modal" data-refresh-pagina="true"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>
-                        <li><a href="<c:url value="/notificacio/eliminar"/>"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
+<%--                        <li><a id="processarMassiu" style="cursor: pointer;" data-toggle="modal" data-refresh-pagina="true"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>--%>
+<%--                        <li><a href="<c:url value="/notificacio/eliminar"/>"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>--%>
+                        <li><a id="eliminar" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
 
                         <c:if test="${isRolActualAdministradorEntitat}">
                             <li><a style="cursor: pointer;" id="reintentarRegistre"><spring:message code="notificacio.list.accio.massiva.reintentar.registre"/></a></li>

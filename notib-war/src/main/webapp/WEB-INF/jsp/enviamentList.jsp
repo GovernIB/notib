@@ -109,6 +109,7 @@ $(document).ready(function() {
 		'confirm-reintentar-sir': "<spring:message code="enviament.list.user.reactivar.sir.misatge.avis"/>",
 		'confirm-update-estat': "<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>",
 		'confirm-reactivar-callback': "<spring:message code="enviament.list.user.reactivar.callback.misatge.avis"/>",
+		'confirm-accio-massiva': "<spring:message code="enviament.list.user.confirm.accio.massiva"/>",
 	};
 
 	initEvents($('#enviament'), 'enviament', eventMessages)
