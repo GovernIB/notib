@@ -123,7 +123,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public AppInfo getAppInfo() {
 		String urlAmbMetode = baseUrl + "/api/rest/appinfo";
 		try {
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
@@ -147,7 +147,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/alta";
 			ObjectMapper mapper  = getMapper();
 			String body = mapper.writeValueAsString(notificacio);
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			logger.debug("Missatge REST enviat: " + body);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
@@ -179,7 +179,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(String identificador) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
@@ -199,7 +199,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviament(String referencia) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
@@ -221,7 +221,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaDadesRegistre";
 			ObjectMapper mapper  = getMapper();
 			String body = mapper.writeValueAsString(dadesConsulta);
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
@@ -317,7 +317,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	}
 
 	private String getConsultaJsonString(Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida, String urlAmbMetode) throws Exception {
-		Client jerseyClient = generarClient(urlAmbMetode);
+		jerseyClient = generarClient(urlAmbMetode);
 		String json = jerseyClient.
 				resource(urlAmbMetode).
 				queryParam("dataInicial", dataInicial != null ? sdf.format(dataInicial) : "").
