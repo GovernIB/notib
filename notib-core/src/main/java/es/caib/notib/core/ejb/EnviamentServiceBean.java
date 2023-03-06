@@ -39,10 +39,8 @@ public class EnviamentServiceBean implements EnviamentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public List<Long> findIdsAmbFiltre(
-			Long entitatId, 
-			NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException {
-		return delegate.findIdsAmbFiltre(entitatId, filtre);
+	public List<Long> findIdsAmbFiltre(Long entitatId, RolEnumDto rol, String usuariCodi, String organGestorCodi, NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException {
+		return delegate.findIdsAmbFiltre(entitatId, rol, usuariCodi, organGestorCodi, filtre);
 	}
 
 	@Override

@@ -3,7 +3,6 @@ package es.caib.notib.core.service;
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.service.CallbackService;
 import es.caib.notib.core.clases.CallbackProcessarPendentsThread;
-import es.caib.notib.core.clases.RegistrarThread;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.helper.CallbackHelper;
 import es.caib.notib.core.helper.ConfigHelper;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +44,7 @@ public class CallbackServiceImpl implements CallbackService {
 	private ConfigHelper configHelper;
 
 	@Override
-	@Transactional(readOnly = true)
+//	@Transactional(readOnly = true)
 	public void processarPendents() {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -70,11 +68,13 @@ public class CallbackServiceImpl implements CallbackService {
 			Map<Long, Long> nots = new HashMap<>();
 			boolean multiThread = Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD));
 			for (NotificacioEventEntity e: pendentsIds) {
-				if (nots.get(e.getNotificacio().getId()) != null) {
+				// TODO: Això necessita la transacció, però la transacció espatlla la resta!
+				Long notificacioId = notificacioEventRepository.findNotificacioIdByEventId(e.getId());
+				if (nots.get(notificacioId) != null) {
 					continue;
 				}
 				logger.info("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + e.getId());
-				nots.put(e.getNotificacio().getId(), e.getId());
+				nots.put(notificacioId, e.getId());
 				try {
 					if (multiThread) {
 						thread = new CallbackProcessarPendentsThread(e.getId(), callbackHelper);

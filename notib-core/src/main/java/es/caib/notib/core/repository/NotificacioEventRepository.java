@@ -147,4 +147,9 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			"	   )" +
 			" order by ne.callbackData asc nulls first, data asc")
 	NotificacioEventEntity findUltimEventEmailByNotificacioId(@Param("notificacioId")Long notificacioId);
+
+	@Query("select ne.notificacio.id " +
+			"  from NotificacioEventEntity ne " +
+			" where ne.id = :eventId")
+	Long findNotificacioIdByEventId(@Param("eventId") Long eventId);
 }

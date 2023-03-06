@@ -306,8 +306,8 @@ public class NotificacioMassivaServiceTest {
 				Mockito.nullable(String.class),
 				Mockito.anyBoolean(),
 				Mockito.anyBoolean(),
-				Mockito.anyBoolean(),
-				Mockito.nullable(Boolean.class),
+//				Mockito.anyBoolean(),
+//				Mockito.nullable(Boolean.class),
 				Mockito.nullable(Pageable.class));
 
 		Mockito.verify(notificacioListHelper, Mockito.times(1)).complementaNotificacions(

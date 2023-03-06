@@ -617,10 +617,15 @@
 						inputElement.parent().append('<div id="document_err_' + indexId + '"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.document.inexistent"/></p></div>');
 					}
 					else if (!data.metadadesExistents){ //document pero sin metadades
+
 						inputElement.addClass('warningClass');
 						inputElement.parent().append('<div id="metadades_war_' + indexId + '"><p class="help-block" style="color: orange;"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.metadades.inexistent"/></p></div>');
-					}
-					else { //document y metadades
+						$("#documents\\[" +indexId+ "\\]\\.origen").val(null).trigger("change.select2");
+						$("#documents\\[" +indexId+ "\\]\\.validesa").val(null).trigger("change.select2");
+						$("#documents\\[" +indexId+ "\\]\\.tipoDocumental").val(null).trigger("change.select2");
+						$("#documents\\[" +indexId+ "\\]\\.modoFirma").prop('checked', false);
+
+					} else { //document y metadades
 						if (data.origen != null) {
 							$("#documents\\[" +indexId+ "\\]\\.origen").val(data.origen).trigger("change.select2");
 							$("#documents\\[" +indexId+ "\\]\\.origen").prop('disabled', true);

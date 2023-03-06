@@ -109,6 +109,7 @@ $(document).ready(function() {
 		'confirm-reintentar-sir': "<spring:message code="enviament.list.user.reactivar.sir.misatge.avis"/>",
 		'confirm-update-estat': "<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>",
 		'confirm-reactivar-callback': "<spring:message code="enviament.list.user.reactivar.callback.misatge.avis"/>",
+		'confirm-accio-massiva': "<spring:message code="enviament.list.user.confirm.accio.massiva"/>",
 	};
 
 	initEvents($('#enviament'), 'enviament', eventMessages)
@@ -161,6 +162,7 @@ function getCookie(cname) {
 </style>
 </head>
 <body>
+
 	<div id="loading-screen" class="loading-screen" >
 		<div id="processing-icon" class="processing-icon">
 			<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: dimgray;margin-top: 10px;"></span>
@@ -172,7 +174,7 @@ function getCookie(cname) {
 			<div class="btn-group">
 				<button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
 				<button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
-				<div class="btn-group">
+				<div id="seleccioCount" class="btn-group">
 					<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
   						<span class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
 					</button>
@@ -200,6 +202,7 @@ function getCookie(cname) {
 		</div>
 	</script>
 	<script id="rowhrefTemplate" type="text/x-jsrender">enviament/{{:id}}/detall</script>
+	<div id="cover-spin"></div>
 	<table
 		id="enviament"
 		data-toggle="datatable"

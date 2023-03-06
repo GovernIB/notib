@@ -38,10 +38,12 @@ public abstract class NotificacioBaseRestClient {
 	protected int connecTimeout = 20000;
 	protected int readTimeout = 120000;
 
+	protected Client jerseyClient;
+
 	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(String identificador, String serviceUrl) {
 		try {
 			String urlAmbMetode = baseUrl + serviceUrl + "/consultaJustificantNotificacio/" + identificador;
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
@@ -57,7 +59,7 @@ public abstract class NotificacioBaseRestClient {
 			String urlAmbMetode = baseUrl + serviceUrl + "/permisConsulta";
 			ObjectMapper mapper = getMapper();
 			String body = mapper.writeValueAsString(permisConsulta);
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			logger.debug("Missatge REST enviat: " + body);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
@@ -75,19 +77,20 @@ public abstract class NotificacioBaseRestClient {
 	}
 
 	protected Client generarClient(String urlAmbMetode) throws Exception {
-		Client jerseyClient = generarClient();
+
+		if (jerseyClient != null) {
+			return jerseyClient;
+		}
+		jerseyClient = generarClient();
 		if (username != null) {
-			autenticarClient(
-					jerseyClient,
-					urlAmbMetode,
-					username,
-					password);
+			autenticarClient(jerseyClient, urlAmbMetode, username, password);
 		}
 		return jerseyClient;
 	}
 
 	protected Client generarClient() {
-		Client jerseyClient = Client.create();
+
+		jerseyClient = Client.create();
 		jerseyClient.setConnectTimeout(connecTimeout);
 		jerseyClient.setReadTimeout(readTimeout);
 		//jerseyClient.addFilter(new LoggingFilter(System.out));

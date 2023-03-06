@@ -130,11 +130,12 @@ public class NotificacioListHelper {
             prepararColumnaEstat(notificacio, envs);
             fiPreparaEstat += System.currentTimeMillis() - iniciPreparaEstat;
 
-            env = envs.iterator().next();
-            cerData = envs != null && !envs.isEmpty() && env != null ? env.getNotificaCertificacioData() : null;
+            if (envs != null && !envs.isEmpty()) {
+                env = envs.iterator().next();
+                notificacio.setEnvCerData(env.getNotificaCertificacioData());
+            }
             id = not != null && not.getNotificacio().getDocument() != null ? not.getNotificacio().getDocument().getId() : null;
             notificacio.setDocumentId(id);
-            notificacio.setEnvCerData(cerData);
             notificacio.setOrganEstat(not.getNotificacio().getOrganGestor() != null ? not.getNotificacio().getOrganGestor().getEstat() : null);
             notificacio.setErrorLastCallback(not.getNotificacio().isErrorLastCallback());
             notificacionsDto.add(notificacio);

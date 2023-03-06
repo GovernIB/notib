@@ -186,8 +186,6 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("usuariCodi") String usuariCodi,
 			@Param("nomesAmbErrors") boolean nomesAmbErrors,
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
-//			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
-//			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			@Param("isReferenciaNull") boolean isReferenciaNull,
 			@Param("referencia") String referencia,
 			Pageable paginacio);
@@ -203,28 +201,12 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
 			"and (:isEstatNull = true or bitand(ntf.estatMask, :estatMask) <> 0) " +
-//			"and (:isEstatNull = true or ntf.estat = :estat  or (" +
-//			"    select count(env.id) " +
-//			"    from ntf.enviaments env " +
-//			"    where env.notificaEstat = :notificaEstat" +
-//			"    ) > 0 ) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
 			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
 			"and (:isOrganCodiNull = true or ntf.organCodi = :organCodi) " +
 			"and (:isProcedimentNull = true or ntf.procedimentCodi = :procedimentCodi) " +
 			"and (:isTitularNull = true or lower(ntf.titular) like concat('%', lower(:titular), '%'))" +
-//			"and (:isTitularNull = true or (" +
-//			"    select count(env.id) " +
-//			"    from ntf.enviaments env " +
-//			"    where " +
-//			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
-//			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
-//			"    ) > 0) " +
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
-//			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-//			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
-//			"	(:hasZeronotificaEnviamentIntent = false and ntf.registreEnviamentIntent > 0) " +
-//			") " +
 			"and (:isNumExpedientNull = true or lower(ntf.numExpedient) like concat('%', lower(:numExpedient), '%')) " +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
 			"and (:isIdentificadorNull = true or " +
@@ -264,8 +246,6 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("identificador") String identificador,
 			@Param("nomesAmbErrors") boolean nomesAmbErrors,
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
-//			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
-//			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			@Param("isReferenciaNull") boolean isReferenciaNull,
 			@Param("referencia") String referencia,
 			Pageable paginacio);
@@ -281,35 +261,18 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"     (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
 			"and (:entitat = ntf.entitat) " +
 			"and ((:isProcNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " +
-//			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " +
 			"   or (ntf.organCodi is not null and ntf.organCodi in (:organs))) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
 			"and (:isEstatNull = true or bitand(ntf.estatMask, :estatMask) <> 0) " +
-//			"and (:isEstatNull = true or ntf.estat = :estat or (" +
-//			"    select count(env.id) " +
-//			"    from ntf.enviaments env" +
-//			"    where env.notificaEstat = :notificaEstat" +
-//			"    ) > 0 ) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
 			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
 			"and (:isOrganCodiNull = true or ntf.organCodi = :organCodi) " +
 			"and (:isProcedimentCodiNull = true or ntf.procedimentCodi = :procedimentCodi) " +
 			"and (:isTitularNull = true or lower(ntf.titular) like concat('%', lower(:titular), '%'))" +
-//			"and (:isTitularNull = true or (" +
-//			"    select count(env.id) " +
-//			"    from ntf.enviaments env " +
-//			"    where " +
-//			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
-//			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
-//			"    ) > 0) " +
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
 			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
-//			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-//			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
-//			"	(:hasZeronotificaEnviamentIntent = false and ntf.registreEnviamentIntent > 0) " +
-//			") " +
 			"and (:nomesSenseErrors = false or ntf.notificaErrorData is null) " +
 			"and (:isIdentificadorNull = true or " +
 			"		(ntf.id in (select env.notificacio.id"
@@ -328,7 +291,6 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estatMask") Integer estatMask,
-//			@Param("notificaEstat") EnviamentEstat notificaEstat,
 			@Param("isDataIniciNull") boolean isDataIniciNull,
 			@Param("dataInici") Date dataInici,
 			@Param("isDataFiNull") boolean isDataFiNull,
@@ -367,28 +329,12 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
 			"and (:isEstatNull = true or bitand(ntf.estatMask, :estatMask) <> 0) " +
-//			"and (:isEstatNull = true or ntf.estat = :estat  or (" +
-//			"    select count(env.id) " +
-//			"    from ntf.enviaments env " +
-//			"    where env.notificaEstat = :notificaEstat" +
-//			"    ) > 0 ) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
 			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
 			"and (:isOrganCodiNull = true or ntf.organCodi = :organCodi) " +
 			"and (:isProcedimentNull = true or ntf.procedimentCodi = :procedimentCodi) " +
 			"and (:isTitularNull = true or lower(ntf.titular) like concat('%', lower(:titular), '%'))" +
-//			"and (:isTitularNull = true or (" +
-//			"    select count(env.id) " +
-//			"    from ntf.enviaments env " +
-//			"    where " +
-//			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
-//			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
-//			"    ) > 0) " +
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
-			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
-			"	(:hasZeronotificaEnviamentIntent = false and ntf.registreEnviamentIntent > 0) " +
-			") " +
 			"and (:isNumExpedientNull = true or lower(ntf.numExpedient) like concat('%', lower(:numExpedient), '%')) " +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
 			"and (:isIdentificadorNull = true or " +
@@ -428,8 +374,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("identificador") String identificador,
 			@Param("nomesAmbErrors") boolean nomesAmbErrors,
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
-			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
-			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
+//			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
+//			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable paginacio);
 
 	@Modifying
@@ -447,4 +393,92 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 	@Modifying
 	@Query("update NotificacioTableEntity nt set nt.organEstat = :estat where nt.organCodi = :organCodi")
 	void updateOrganEstat(@Param("organCodi") String organCodi, @Param("estat") OrganGestorEstatEnum estat);
+
+	@Query("select ntf.id from NotificacioTableEntity ntf " +
+			"where " +
+			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
+			" and  (:isUsuari = false or (" + // usuari
+			"		(:esProcedimentsCodisNotibNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib) and ntf.procedimentIsComu = false) " +	// Té permís sobre el procediment
+			"	or	(:esOrgansGestorsCodisNotibNull = false and ntf.organCodi is not null " +
+			"												and (ntf.procedimentCodiNotib is null or (ntf.procedimentIsComu = true and ntf.procedimentRequirePermission = false)) " + // comunicacions o procediments comuns
+			"												and ntf.organCodi in (:organsGestorsCodisNotib)) " +						// Té permís sobre l'òrgan
+			"   or 	((ntf.procedimentCodiNotib is null or ntf.procedimentIsComu = true) and ntf.usuariCodi = :usuariCodi) " +										// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
+			"   or 	(:esProcedimentOrgansIdsNotibNull = false and ntf.procedimentCodiNotib is not null and " +
+			"			CONCAT(ntf.procedimentCodiNotib, '-', ntf.organCodi) in (:procedimentOrgansIdsNotib)" +
+			"		) " +	// Procediment comú amb permís de procediment-òrgan
+			"	)" +
+			"	and (ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib)))" +
+			") " +
+			"and (:isSuperAdmin = false or ntf.entitat in (:entitatsActives)) " +
+			"and (:isAdminOrgan = false or " +
+			"   (" +
+			"	(:esProcedimentsCodisNotibNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
+//			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " +
+			"   or (ntf.organCodi is not null and ntf.organCodi in (:organs))" +
+			"	)) " +
+			"and (:isNullNotMassivaId = true or ntf.notificacioMassiva.id = :notMassivaId) " +
+			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
+			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
+			"and (:isEstatNull = true or bitand(ntf.estatMask, :estatMask) <> 0) " +
+			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
+			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
+			"and (:isOrganCodiNull = true or ntf.organCodi = :organCodi) " +
+			"and (:isProcedimentNull = true or ntf.procedimentCodi = :procedimentCodi) " +
+			"and (:isTitularNull = true or lower(ntf.titular) like concat('%', lower(:titular), '%'))" +
+			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
+			"and (:isNumExpedientNull = true or lower(ntf.numExpedient) like concat('%', lower(:numExpedient), '%')) " +
+			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
+			"and (:isIdentificadorNull = true or " +
+			"		(ntf.id in (select notificacio.id" +
+			"				from NotificacioEnviamentEntity env" +
+			"				where lower(env.notificaIdentificador) like concat('%', lower(:identificador), '%'))))" +
+			"and (:nomesSenseErrors = false or ntf.notificaErrorData is null) " +
+			"and (:isAdminOrgan = true or :nomesAmbErrors = false or ntf.notificaErrorData is not null) " +
+			"and (:isReferenciaNull = true or lower(ntf.referencia) like '%' || lower(:referencia) || '%')")
+    List<Long> findIdsAmbFiltre(
+			@Param("isEntitatIdNull") boolean isEntitatIdNull,
+			@Param("entitatId") Long entitatId,
+			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
+			@Param("enviamentTipus") NotificaEnviamentTipusEnumDto enviamentTipus,
+			@Param("isConcepteNull") boolean isConcepteNull,
+			@Param("concepte") String concepte,
+			@Param("isEstatNull") boolean isEstatNull,
+			@Param("estatMask") Integer estatMask,
+			@Param("isDataIniciNull") boolean isDataIniciNull,
+			@Param("dataInici") Date dataInici,
+			@Param("isDataFiNull") boolean isDataFiNull,
+			@Param("dataFi") Date dataFi,
+			@Param("isTitularNull") boolean isTitularNull,
+			@Param("titular") String titular,
+			@Param("isOrganCodiNull") boolean isOrganCodiNull,
+			@Param("organCodi") String organCodi,
+			@Param("isProcedimentNull") boolean isProcedimentNull,
+			@Param("procedimentCodi") String procedimentCodi,
+			@Param("isTipusUsuariNull") boolean isTipusUsuariNull,
+			@Param("tipusUsuari") TipusUsuariEnumDto tipusUsuari,
+			@Param("isNumExpedientNull") boolean isNumExpedientNull,
+			@Param("numExpedient") String numExpedient,
+			@Param("isCreadaPerNull") boolean isCreadaPerNull,
+			@Param("creadaPer") String creadaPer,
+			@Param("isIdentificadorNull") boolean isIdentificadorNull,
+			@Param("identificador") String identificador,
+			@Param("nomesAmbErrors") boolean nomesAmbErrors,
+			@Param("nomesSenseErrors") boolean nomesSenseErrors,
+			@Param("isReferenciaNull") boolean isReferenciaNull,
+			@Param("referencia") String referencia,
+			@Param("isUsuari") boolean isUsuari,
+			@Param("esProcedimentsCodisNotibNull") boolean esProcedimentsCodisNotibNull,
+			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
+			@Param("grupsProcedimentCodisNotib") List<? extends String> grupsProcedimentCodisNotib,
+			@Param("esOrgansGestorsCodisNotibNull") boolean esOrgansGestorsCodisNotibNull,
+			@Param("organsGestorsCodisNotib") List<? extends String> organsGestorsCodisNotib,
+			@Param("esProcedimentOrgansIdsNotibNull") boolean esProcedimentOrgansIdsNotibNull,
+			@Param("procedimentOrgansIdsNotib") List<String> procedimentOrgansIdsNotib,
+			@Param("usuariCodi") String usuariCodi,
+			@Param("isSuperAdmin") boolean isSuperAdmin,
+			@Param("entitatsActives") List<EntitatEntity> entitatsActives,
+			@Param("isAdminOrgan") boolean isAdminOrgan,
+			@Param("organs") List<String> organs,
+			@Param("isNullNotMassivaId") boolean isNullNotMassivaId,
+			@Param("notMassivaId") Long notMassivaId);
 }

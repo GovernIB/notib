@@ -20,6 +20,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -56,7 +57,7 @@ public class CallbackHelper {
 	@Autowired
 	private ConfigHelper configHelper;
 
-	@Transactional (rollbackFor = RuntimeException.class)
+	@Transactional (rollbackFor = RuntimeException.class, propagation = Propagation.REQUIRES_NEW)
 	public boolean notifica(@NonNull Long eventId) throws Exception {
 		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
 

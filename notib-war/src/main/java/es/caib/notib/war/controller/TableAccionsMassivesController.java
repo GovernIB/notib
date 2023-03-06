@@ -29,23 +29,49 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Slf4j
 public abstract class TableAccionsMassivesController extends BaseUserController {
 
     protected String sessionAttributeSeleccio;
+    protected Long notMassivaId;
+    protected final String notId = "notificacioId";
 
     @Autowired
     private NotificacioService notificacioService;
     @Autowired
     private EnviamentService enviamentService;
 
+    @RequestMapping(value = {"/seleccionar/all", "{notificacioId}/notificacio/seleccionar/all"}, method = RequestMethod.GET)
+    @ResponseBody
+    public int select(HttpServletRequest request,  @PathVariable Map<String, String> pathVarsMap) {
+
+        String id = pathVarsMap.get("notificacioId");
+        if (!Strings.isNullOrEmpty(id)) {
+            try {
+                notMassivaId = Long.valueOf(id);
+            } catch (Exception ex) {
+            }
+        }
+        Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, sessionAttributeSeleccio);
+        if (seleccio == null) {
+            seleccio = new HashSet<>();
+            RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, seleccio);
+        }
+        try {
+            seleccio.addAll(getIdsElementsFiltrats(request));
+        } catch (NotFoundException | ParseException e) {
+            e.printStackTrace();
+        }
+        return seleccio.size();
+    }
+
     @RequestMapping(value = {"/select", "{notificacioId}/notificacio/select"}, method = RequestMethod.GET)
     @ResponseBody
-    public int select(
-            HttpServletRequest request,
-            @RequestParam(value="ids[]", required = false) Long[] ids) {
+    public int select(HttpServletRequest request, @RequestParam(value="ids[]", required = false) Long[] ids) {
+
         @SuppressWarnings("unchecked")
         Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, sessionAttributeSeleccio);
         if (seleccio == null) {

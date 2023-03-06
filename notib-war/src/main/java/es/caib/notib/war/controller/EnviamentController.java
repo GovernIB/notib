@@ -61,8 +61,12 @@ public class EnviamentController extends TableAccionsMassivesController {
 	protected List<Long> getIdsElementsFiltrats(HttpServletRequest request) throws ParseException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		NotificacioEnviamentFiltreCommand filtreCommand = getFiltreCommand(request);
-
-		return enviamentService.findIdsAmbFiltre(entitatActual.getId(), NotificacioEnviamentFiltreCommand.asDto(filtreCommand));
+		String organGestorCodi = null;
+		if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request) && entitatActual != null) {
+			OrganGestorDto organGestorActual = getOrganGestorActual(request);
+			organGestorCodi = organGestorActual.getCodi();
+		}
+		return enviamentService.findIdsAmbFiltre(entitatActual.getId(), RolEnumDto.valueOf(RolHelper.getRolActual(request)), getCodiUsuariActual(), organGestorCodi, NotificacioEnviamentFiltreCommand.asDto(filtreCommand));
 	}
 
 	@RequestMapping(method = RequestMethod.GET)

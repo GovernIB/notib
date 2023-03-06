@@ -383,9 +383,11 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
             organGestorCodi = organGestorActual.getCodi();
 
         }
-        NotificacioFiltreDto filtre = notificacioListHelper.getFiltreCommand(request, TABLE_FILTRE).asDto();
+//        NotificacioFiltreDto filtre = notificacioListHelper.getFiltreCommand(request, TABLE_FILTRE).asDto();
+        NotificacioFiltreDto filtre = notificacioListHelper.getFiltreCommand(request, TABLE_NOTIFICACIONS_FILTRE).asDto();
+        filtre.setNotMassivaId(this.notMassivaId);
         assert entitatActual != null;
-        return notificacioService.findIdsAmbFiltre(entitatActual.getId(),
-                RolEnumDto.valueOf(RolHelper.getRolActual(request)), organGestorCodi, getCodiUsuariActual(), filtre);
+        RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        return notificacioService.findIdsAmbFiltre(entitatActual.getId(), rol, organGestorCodi, getCodiUsuariActual(), filtre);
     }
 }
