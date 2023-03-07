@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1671453604619-2
+      author: limit
+      changes:
+        - sql: "DELETE FROM NOT_CONFIG c WHERE c.\"KEY\" like '%unitats.fitxer%'"
