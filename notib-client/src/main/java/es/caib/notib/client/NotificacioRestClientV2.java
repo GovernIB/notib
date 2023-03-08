@@ -22,8 +22,8 @@ import java.util.Date;
  */
 public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
-	private static final String NOTIFICACIOV2_SERVICE_PATH = "/api/services/notificacioV22";
-	private static final String CONSULTAV2_SERVICE_PATH = "/api/consulta/v2";
+	private static final String NOTIFICACIOV2_SERVICE_PATH = "/interna/notificacio/v2";
+	private static final String CONSULTAV2_SERVICE_PATH = "/interna/consulta/v2";
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	/**

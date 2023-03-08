@@ -9,9 +9,13 @@ import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.util.UtilitatsNotib;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.ejb.EJBAccessException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.Date;
 
 /**
@@ -76,5 +80,23 @@ public abstract class NotificacioApiRestBaseController extends BaseController {
 			resposta = getErrorDescripcio(e);
 		}
 		return resposta;
+	}
+
+	protected void logout(HttpServletRequest request, HttpServletResponse response) {
+
+		HttpSession session = request.getSession(false);
+		SecurityContextHolder.clearContext();
+		// Només per Jboss
+		if (session != null) {
+			// Esborrar la sessió
+			session.invalidate();
+		}
+		// Es itera sobre totes les cookies
+		for(Cookie c : request.getCookies()) {
+			// Es sobre escriu el valor de cada cookie a NULL
+			Cookie ck = new Cookie(c.getName(), null);
+			ck.setPath(request.getContextPath());
+			response.addCookie(ck);
+		}
 	}
 }

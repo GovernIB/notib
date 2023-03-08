@@ -820,7 +820,7 @@ public class PluginHelper {
 		info.setCodiEntitat(getCodiEntitatActual());
 		List<ProcSerDto> procediments = new ArrayList<>();
 		try {
-			List<GcaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getProcedimentsByUnitat(codiDir3);
+		List<GcaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getProcedimentsByUnitat(codiDir3);
 			if (procs != null) {
 				for (GcaProcediment proc : procs) {
 					ProcSerDto dto = new ProcSerDto();

@@ -21,6 +21,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -31,7 +32,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.net.URI;
 import java.util.Date;
 
@@ -45,7 +49,7 @@ public class ConsultaApiRestV2Controller {
 	private EnviamentService enviamentService;
 	@Autowired
 	private NotificacioService notificacioService;
-	
+
 	@RequestMapping(value="/comunicacions/{dniTitular}", method = RequestMethod.GET, produces = "application/json")
 	@ApiOperation(value = "Consulta totes les comunicacions d'un titular donat el seu dni", position = 0, response = Resposta.class, tags = "Comunicacions",
 			notes = "Retorna informació de totes les comunicacions d'un titular, i el seu estat")

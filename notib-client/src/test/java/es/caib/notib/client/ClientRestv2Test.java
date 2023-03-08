@@ -27,8 +27,8 @@ import static org.junit.Assert.*;
 public class ClientRestv2Test extends ClientBaseTest {
 
 	
-	private static final String URL = "http://localhost:8080/notib";
-//	private static final String URL = "http://localhost:8280/notib";
+//	private static final String URL = "http://localhost:8080/notib";
+	private static final String URL = "http://localhost:8280/notibapi";
 	private static final String USERNAME = "admin";
 	private static final String PASSWORD = "admin";
 
@@ -58,7 +58,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 				URL,
 				USERNAME,
 				PASSWORD,
-				false); //tomcat = true jboss = false/true
+				true); //tomcat = true jboss = false/true
 	}
 
 	@Test
@@ -800,7 +800,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	public void consultaEstatEnviamentTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 //		String referencia = "a4256bed-292b-4ad1-bb84-05f8f14a7f1c";
-		String referencia = "8154b056-6458-4913-a5dd-248686846c1d";
+		String referencia = "8f7271df-e62a-4754-945c-9e52259f646e";
 
 		// When
 		RespostaConsultaEstatEnviamentV2 respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
@@ -813,13 +813,27 @@ public class ClientRestv2Test extends ClientBaseTest {
 		System.out.println(">>> Informació enviament: " + respostaConsultaEstatEnviament.toString());
 		assertFalse(respostaConsultaEstatEnviament.isError());
 		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
+
+		// SEGONA PETICIÓ AMB diferent sessió??
+		client = NotificacioRestClientFactory.getRestClientV2(
+				URL,
+				USERNAME,
+				PASSWORD,
+				true);
+		respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
+		if (respostaConsultaEstatEnviament.isError()) {
+			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
+		} else {
+			System.out.println(">>> Reposta Ok");
+		}
+
 	}
 
 	@Test
 	public void consultaDadesRegistreTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
-		dadesConsulta.setReferencia("03904df1-e899-45fb-bf76-58c6cb0777ec");
+		dadesConsulta.setReferencia("a1741ac2-066c-4b1c-8411-8a2e689f14b9");
 		dadesConsulta.setAmbJustificant(true);
 
 		// When
@@ -845,7 +859,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	@Test
 	public void consultaJustificantTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
-		String identificador = "6dff3c2e-a2bd-4774-a1a5-e557843817a7";
+		String identificador = "651cd3b5-562d-4323-bf33-85304c8b8fa6";
 
 		// When
 		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament(identificador);
