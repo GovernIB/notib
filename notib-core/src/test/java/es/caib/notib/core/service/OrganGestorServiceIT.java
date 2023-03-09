@@ -52,7 +52,7 @@ public class OrganGestorServiceIT extends BaseServiceTestV2 {
 	public void setUp() throws Exception {
 		addConfig("es.caib.notib.metriques.generar", "false");
 		addConfig("es.caib.notib.plugin.unitats.dir3.protocol", "REST");
-		addConfig("es.caib.notib.plugin.unitats.fitxer", "");
+//		addConfig("es.caib.notib.plugin.unitats.fitxer", "");
 		configureMockUnitatsOrganitzativesPlugin();
 
 		organVigent = new OrganGestorDto();

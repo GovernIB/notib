@@ -9,11 +9,15 @@ import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.ModalHelper;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.support.RequestContext;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
@@ -25,11 +29,40 @@ public class BaseController implements MessageSourceAware {
 
 	MessageSource messageSource;
 
+
 	protected String modalUrlTancar() {
 		return "redirect:" + ModalHelper.ACCIO_MODAL_TANCAR;
 	}
 	protected String ajaxUrlOk() {
 		return "redirect:" + AjaxHelper.ACCIO_AJAX_OK;
+	}
+
+	protected void logoutSession(HttpServletRequest request, HttpServletResponse response) {
+
+		HttpSession session = request.getSession(false);
+		SecurityContextHolder.clearContext();
+		// Només per Jboss
+		if (session != null) {
+			// Esborrar la sessió
+			session.invalidate();
+		}
+		// Es itera sobre totes les cookies
+		for(Cookie c : request.getCookies()) {
+			// Es sobre escriu el valor de cada cookie a NULL
+			Cookie ck = new Cookie(c.getName(), null);
+			ck.setPath(request.getContextPath());
+			response.addCookie(ck);
+		}
+	}
+
+	public String getCodiUsuariActual() {
+
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			return auth != null ? auth.getName() : null;
+		} catch (Exception ex) {
+			return null;
+		}
 	}
 
 	protected String getAjaxControllerReturnValueSuccess(

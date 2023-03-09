@@ -296,10 +296,12 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		}
 
 		if (enviament != null && !createEvent && !tipoEntrega.equals(BigInteger.valueOf(3L))) {
-			logger.debug("L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null");
+			String msg = "L'enviament amb identificador " + enviament.getNotificaIdentificador() + " ha rebut un callback de l'adviser de tipus " + tipoEntrega + " quan ja es troba en estat final." ;
+			logger.debug(msg);
 			createEvent = true;
 			eventInitialitzaCallback = true;
-			eventErrorDescripcio = "Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value;
+			eventErrorDescripcio = "Error retornat cap a Notifica: " + (!Strings.isNullOrEmpty(codigoRespuesta.value) ?  "[" + codigoRespuesta.value + "] " : "")
+					+ (!Strings.isNullOrEmpty(descripcionRespuesta.value) ? descripcionRespuesta.value : msg);
 		}
 
 		logger.debug("Peticició processada correctament.");
@@ -440,12 +442,14 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			descripcionRespuesta.value = "Error procesando peticion";
 		}
 		if (!ambAcuse) {
-			logger.debug("L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null (certificació).");
+			String msg = "L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null (certificació).";
+			logger.debug(msg);
 			notificacioEventHelper.addNotificaCertificacioEventError(
 					enviament.getNotificacio(),
 					enviament,
 					null,
-					"Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value,
+					"Error retornat cap a Notifica: " + (!Strings.isNullOrEmpty(codigoRespuesta.value) ? "[" + codigoRespuesta.value + "] " : "")
+							+ (!Strings.isNullOrEmpty(descripcionRespuesta.value) ? descripcionRespuesta.value : msg),
 					true);
 		}
 

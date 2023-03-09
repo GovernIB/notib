@@ -31,6 +31,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 /**
  * Controlador per el mantinement d'enviaments.
@@ -58,8 +61,12 @@ public class EnviamentController extends TableAccionsMassivesController {
 	protected List<Long> getIdsElementsFiltrats(HttpServletRequest request) throws ParseException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		NotificacioEnviamentFiltreCommand filtreCommand = getFiltreCommand(request);
-
-		return enviamentService.findIdsAmbFiltre(entitatActual.getId(), NotificacioEnviamentFiltreCommand.asDto(filtreCommand));
+		String organGestorCodi = null;
+		if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request) && entitatActual != null) {
+			OrganGestorDto organGestorActual = getOrganGestorActual(request);
+			organGestorCodi = organGestorActual.getCodi();
+		}
+		return enviamentService.findIdsAmbFiltre(entitatActual.getId(), RolEnumDto.valueOf(RolHelper.getRolActual(request)), getCodiUsuariActual(), organGestorCodi, NotificacioEnviamentFiltreCommand.asDto(filtreCommand));
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
@@ -67,7 +74,6 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
 		model.addAttribute("mantenirPaginacio", mantenirPaginacio != null ? mantenirPaginacio : false);
-		UsuariDto usuariAcutal = aplicacioService.getUsuariActual();
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		ColumnesDto columnes = null;
 
@@ -75,9 +81,10 @@ public class EnviamentController extends TableAccionsMassivesController {
 		model.addAttribute(filtreEnviaments);
 		model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
 		if(entitatActual != null) {
-			columnes = enviamentService.getColumnesUsuari(entitatActual.getId(), usuariAcutal);
+			String codiUsuari = getCodiUsuariActual();
+			columnes = enviamentService.getColumnesUsuari(entitatActual.getId(), codiUsuari);
 			if (columnes == null) {
-				enviamentService.columnesCreate(usuariAcutal, entitatActual.getId(), columnes);
+				enviamentService.columnesCreate(codiUsuari, entitatActual.getId(), columnes);
 			}
 		} else {
 			MissatgesHelper.error(request, getMessage(request, "enviament.controller.entitat.cap.creada"));
@@ -124,7 +131,6 @@ public class EnviamentController extends TableAccionsMassivesController {
 		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
 		PaginaDto<NotEnviamentTableItemDto> enviaments = new PaginaDto<>();
 		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
-		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		String organGestorCodi = null;
 		try {
 			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
@@ -140,11 +146,11 @@ public class EnviamentController extends TableAccionsMassivesController {
 					entitatActual.getId(),
 					RolEnumDto.valueOf(RolHelper.getRolActual(request)),
 					organGestorCodi,
-					usuariActual.getCodi(),
+					getCodiUsuariActual(),
 					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 
-		}catch(SecurityException e) {
+		} catch(SecurityException e) {
 			MissatgesHelper.error(request, getMessage(request, "enviament.controller.entitat.cap.assignada"));
 		}
 		return DatatablesHelper.getDatatableResponse(request, enviaments,"id", SESSION_ATTRIBUTE_SELECCIO);
@@ -153,9 +159,8 @@ public class EnviamentController extends TableAccionsMassivesController {
 	@RequestMapping(value = "/visualitzar", method = RequestMethod.GET)
 	public String visualitzar(HttpServletRequest request, Model model) {
 
-		UsuariDto usuari = aplicacioService.getUsuariActual();
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-		ColumnesDto columnes = enviamentService.getColumnesUsuari(entitat.getId(), usuari);
+		ColumnesDto columnes = enviamentService.getColumnesUsuari(entitat.getId(), getCodiUsuariActual());
 		model.addAttribute(columnes != null ? ColumnesCommand.asCommand(columnes) : new ColumnesCommand());
 		return "enviamentColumns";
 	}
@@ -176,13 +181,31 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 		NotificacioEnviamentFiltreCommand filtreCommand = (NotificacioEnviamentFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENTS_FILTRE);
 		if (filtreCommand != null) {
+			setDefaultFiltreData(filtreCommand);
 			return filtreCommand;
 		}
 		filtreCommand = new NotificacioEnviamentFiltreCommand();
+		setDefaultFiltreData(filtreCommand);
 		RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENTS_FILTRE, filtreCommand);
 		return filtreCommand;
 
 		/*Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);
 		filtreCommand.setMeusExpedients(cookie != null && "true".equals(cookie.getValue()));*/
+	}
+
+	private  void setDefaultFiltreData(NotificacioEnviamentFiltreCommand command) {
+
+		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		Date avui = new Date();
+		if (command.getDataEnviamentFi() == null) {
+			command.setDataEnviamentFi(df.format(avui));
+		}
+		if (command.getDataEnviamentInici() == null) {
+			Calendar c = Calendar.getInstance();
+			c.setTime(avui);
+			c.add(Calendar.MONTH, -3);
+			Date inici = c.getTime();
+			command.setDataEnviamentInici(df.format(inici));
+		}
 	}
 }

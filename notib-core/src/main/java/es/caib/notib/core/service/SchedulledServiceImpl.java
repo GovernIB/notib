@@ -12,10 +12,9 @@ import es.caib.notib.core.api.service.ServeiService;
 import es.caib.notib.core.clases.RegistrarThread;
 import es.caib.notib.core.config.SchedulingConfig;
 import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.SemaforNotificacio;
 import es.caib.notib.core.helper.EnviamentHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MetricsHelper;
@@ -24,8 +23,12 @@ import es.caib.notib.core.helper.NotificacioHelper;
 import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesConstants;
+import es.caib.notib.core.helper.SemaforNotificacio;
 import es.caib.notib.core.repository.EntitatRepository;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import es.caib.notib.core.repository.EnviamentTableRepository;
+import es.caib.notib.core.repository.NotificacioTableViewRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
+import es.caib.notib.core.repository.monitor.MonitorIntegracioRepository;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,13 +51,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import static java.util.Calendar.DAY_OF_MONTH;
 
@@ -68,6 +65,12 @@ public class SchedulledServiceImpl implements SchedulledService {
 
 	@Resource
 	private EntitatRepository entitatRepository;
+	@Resource
+	private OrganGestorRepository organRepository;
+	@Resource
+	private EnviamentTableRepository envTableRepository;
+	@Resource
+	private NotificacioTableViewRepository notTableRepository;
 	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
@@ -94,6 +97,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
+	@Autowired
+	private MonitorIntegracioRepository monitorRepository;
 
 	@Override
 	public void restartSchedulledTasks() {
@@ -376,7 +381,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
     }
 
-	@Transactional
 	@Override
 	public void monitorIntegracionsEliminarAntics() {
 
@@ -391,7 +395,39 @@ public class SchedulledServiceImpl implements SchedulledService {
 		Calendar c = Calendar.getInstance();
 		c.add(DAY_OF_MONTH, -d);
 		Date llindar = c.getTime();
-		integracioHelper.eliminarAntics(llindar);
+		try {
+			List<Long> ids;
+			while (monitorRepository.existeixenAntics(llindar) == 1) {
+				ids = monitorRepository.getNotificacionsAntigues(llindar);
+				integracioHelper.eliminarAntics(ids);
+			}
+		} catch (Exception ex) {
+			logger.error("Error esborrant les entrades del monitor d'integracions antigues.", ex);
+		}
+	}
+
+	@Transactional
+	@Override
+	public void actualitzarEstatOrgansEnviamentTable() {
+
+		List<EntitatEntity> entitats = entitatRepository.findAll();
+		List<OrganGestorEntity> organs;
+		Date ara = new Date();
+		long diferencia;
+		for (EntitatEntity e : entitats) {
+			if (e.getDataActualitzacio() == null) {
+				continue;
+			}
+			diferencia = ara.getTime() - e.getDataActualitzacio().getTime();
+			if (86400000 < diferencia) {
+				continue;
+			}
+			organs = organRepository.findByNoVigentIsTrue();
+			for (OrganGestorEntity o : organs) {
+				envTableRepository.updateOrganEstat(o.getCodi(), o.getEstat());
+				notTableRepository.updateOrganEstat(o.getCodi(), o.getEstat());
+			}
+		}
 	}
 
 	private void esborrarTemporals(String dir) throws Exception {

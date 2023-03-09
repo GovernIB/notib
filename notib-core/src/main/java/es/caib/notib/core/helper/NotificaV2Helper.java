@@ -77,7 +77,9 @@ import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -135,11 +137,14 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
  					auditNotificacioHelper.updateNotificacioEnviada(notificacio);
 				}
 				//Crea un nou event
+				List<Long> enviamentsActualitzats = new ArrayList<>();
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
 					for (NotificacioEnviamentEntity enviament: notificacio.getEnviamentsPerNotifica()) {
 						String nif = enviament.getTitular().getNif();
-						if (nif != null && nif.equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
+						if (nif != null && nif.equalsIgnoreCase(resultadoEnvio.getNifTitular()) && !enviamentsActualitzats.contains(enviament.getId())) {
+							enviamentsActualitzats.add(enviament.getId());
 							auditEnviamentHelper.updateEnviamentEnviat(enviament, resultadoEnvio.getIdentificador());
+							break;
 						}
 					}
 				}
@@ -310,8 +315,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();
 		Certificacion certificacio = resultadoInfoEnvio.getCertificacion();
 		Date dataCertificacio = toDate(certificacio.getFechaCertificacion());
-		if (dataCertificacio.equals(dataUltimaCertificacio)) {
-			logger.info(" [EST] El certificat de l'enviament ja esteia actualitzat");
+		configHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
+		if (dataCertificacio.equals(dataUltimaCertificacio) && enviament.getNotificaCertificacioArxiuId() != null) {
+			logger.info(" [EST] El certificat de l'enviament ja estava actualitzat");
 			return;
 		}
 		byte[] decodificat = certificacio.getContenidoCertificacion();

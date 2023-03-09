@@ -1877,14 +1877,25 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		if (!procedimentsDisponiblesIds.isEmpty())
 			organsGestorsProcediments = organGestorRepository.findByProcedimentIds(procedimentsDisponiblesIds);
 
-		// 2-recuperam els òrgans amb permís
 		List<OrganGestorEntity> organsGestorsAmbPermis = new ArrayList<>();
 		List<String> organsCodis = new ArrayList<>();
+
+		// 2-recuperam els òrgans de procediments comuns
+		List<String> procsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitat.getId(), usuari, permis);
+		for(String procOrgan: procsOrgans) {
+			if (!Strings.isNullOrEmpty(procOrgan)) {
+				String[] splProcOrgan = procOrgan.split("-");
+				if (splProcOrgan.length > 1)
+					organsCodis.add(procOrgan.split("-")[1]);
+			}
+		}
+
+		// 3-recuperam els òrgans amb permís
 		List<CodiValorDto> organsAmbPermisDirecte = permisosService.getOrgansAmbPermis(entitat.getId(), usuari, permis);
 		for (CodiValorDto org : organsAmbPermisDirecte) {
 			organsCodis.add(org.getCodi());
 		}
-		// Els òrgans ammb permís comú també es poden consultar
+		// 4-Els òrgans ammb permís comú també es poden consultar
 		List<CodiValorDto> organsAmbPermisComuns = permisosService.getOrgansAmbPermis(entitat.getId(), usuari, PermisEnum.COMUNS);
 		for (CodiValorDto org : organsAmbPermisComuns) {
 			organsCodis.add(org.getCodi());

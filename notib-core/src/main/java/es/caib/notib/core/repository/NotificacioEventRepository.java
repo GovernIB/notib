@@ -123,17 +123,17 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 		       " order by ne.callbackData asc nulls first, data asc")
 	NotificacioEventEntity findUltimEventRegistreByNotificacioId(@Param("notificacioId") Long notificacioId);
 
-	@Query( "select ne " +
-			"from " +
-			"	NotificacioEventEntity ne " +
-			"where ne.id = ( " +
-			"		select " +
-			"			max(e.id) " +
-			"		from " +
-			"			NotificacioEventEntity e left outer join e.notificacio n " +
-			"		where " +
-			"			n.id = :notificacioId and e.errorTipus is not null " +
-			"	   ) ")
+		@Query( "select ne " +
+				"from " +
+				"	NotificacioEventEntity ne " +
+				"where ne.id = ( " +
+				"		select " +
+				"			max(e.id) " +
+				"		from " +
+				"			NotificacioEventEntity e left outer join e.notificacio n " +
+				"		where " +
+				"			n.id = :notificacioId and e.errorTipus is not null " +
+				"	   ) ")
 	NotificacioEventEntity findLastErrorEventByNotificacioId(@Param("notificacioId") Long notificacioId);
 
 	@Query("select ne " +
@@ -147,4 +147,9 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			"	   )" +
 			" order by ne.callbackData asc nulls first, data asc")
 	NotificacioEventEntity findUltimEventEmailByNotificacioId(@Param("notificacioId")Long notificacioId);
+
+	@Query("select ne.notificacio.id " +
+			"  from NotificacioEventEntity ne " +
+			" where ne.id = :eventId")
+	Long findNotificacioIdByEventId(@Param("eventId") Long eventId);
 }

@@ -309,6 +309,9 @@ public class OrganGestorHelper {
 			OrganGestorEntity unitat = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodi());
 			sincronizarHistoricsUnitat(unitat, unitatWS, entitat);
 			progres.setProgres(12 + (nombreUnitatsProcessades++ * 10 / nombreUnitatsTotal));
+			if (unitat != null && !OrganGestorEstatEnum.V.equals(unitat.getEstat())) {
+				unitat.setNoVigent(true);
+			}
 		}
 		progres.setProgres(22);
 //		obsoleteUnitats.addAll(organGestorRepository.findByEntitatNoVigent(entitat));
@@ -316,7 +319,9 @@ public class OrganGestorHelper {
 		log.debug(prefix + "Sincronitzant unitats obsoletes");
 		nombreUnitatsProcessades = 0;
 		nombreUnitatsTotal = obsoleteUnitats.size();
+		Date ara = new Date();
 		for (OrganGestorEntity obsoleteUnitat : obsoleteUnitats) {
+
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.definir.transicio", new Object[] {obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom()}));
 			if (obsoleteUnitat.getNous() == null || obsoleteUnitat.getNous().isEmpty()) {
 				obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.EXTINCIO);
@@ -336,9 +341,9 @@ public class OrganGestorHelper {
 			}
 			log.debug(prefix + "Unitat extingida " + obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom());
 			obsoleteUnitat.setEstat(OrganGestorEstatEnum.E);
+
 			progres.setProgres(22 + (nombreUnitatsProcessades++ * 5 / nombreUnitatsTotal));
 		}
-
 		List<AvisEntity> avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitat.getId(), ORGAN_NO_SYNC);
 		log.debug(prefix + "Esborrant avisos ");
 		if (avisosSinc != null && !avisosSinc.isEmpty()) {
@@ -346,7 +351,7 @@ public class OrganGestorHelper {
 		}
 		progres.setProgres(27);
 
-		Date ara = new Date();
+		ara = new Date();
 		log.debug(prefix + "Data de sincronització " + ara);
 		// Si és la primera sincronització
 		if (entitat.getDataSincronitzacio() == null) {

@@ -29,7 +29,6 @@ public class PermisosHelper {
 		if (entitatActual == null || usuariActual == null || !RolHelper.isUsuariActualUsuari(request)) {
 			return;
 		}
-
 		request.setAttribute("permisNotificacioMenu", permisosService.hasPermisNotificacio(entitatActual.getId(), usuariActual.getCodi()));
 		request.setAttribute("permisComunicacioMenu", permisosService.hasPermisComunicacio(entitatActual.getId(), usuariActual.getCodi()));
 		request.setAttribute("permisComunicacioSirMenu", permisosService.hasPermisComunicacioSir(entitatActual.getId(), usuariActual.getCodi()));

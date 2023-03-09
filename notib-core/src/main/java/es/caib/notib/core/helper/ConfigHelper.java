@@ -111,15 +111,18 @@ public class ConfigHelper {
         }
     }
 
+    @Transactional(readOnly = true)
     public String getPrefix() {
 
         String prefix = getConfig(PropertiesConstants.CODI_ENTORN);
         return "[" + (!Strings.isNullOrEmpty(prefix) ? prefix : "NOTIB") + "]";
     }
 
+    @Transactional(readOnly = true)
     public boolean getAsBoolean(String key) {
         return Boolean.parseBoolean(getConfig(key));
     }
+    @Transactional(readOnly = true)
     public boolean getAsBoolean(String key, boolean defaultValue) {
         String value = getConfig(key);
         if (Strings.isNullOrEmpty(value)) {
@@ -128,17 +131,21 @@ public class ConfigHelper {
         return Boolean.parseBoolean(getConfig(key));
     }
 
+    @Transactional(readOnly = true)
     public int getAsInt(String key) {
         return new Integer(getConfig(key));
     }
 
+    @Transactional(readOnly = true)
     public long getAsLongByEntitat(String key) {
         return new Long(getConfig(key));
     }
 
+    @Transactional(readOnly = true)
     public long getAsLong(String key) {
         return new Long(getConfig(key));
     }
+    @Transactional(readOnly = true)
     public float getAsFloat(String key) {
         return new Float(getConfig(key));
     }
@@ -146,7 +153,7 @@ public class ConfigHelper {
     public String getJBossProperty(String key) {
         return JBossPropertiesHelper.getProperties().getProperty(key);
     }
-    public String getJBossProperty(String key, String defaultValue) {
+    @Transactional(readOnly = true)public String getJBossProperty(String key, String defaultValue) {
         return JBossPropertiesHelper.getProperties().getProperty(key, defaultValue);
     }
 

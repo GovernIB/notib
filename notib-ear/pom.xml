@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>es.caib.notib</groupId>
 		<artifactId>notib</artifactId>
-		<version>1.1.22</version>
+		<version>1.1.22.1</version>
 	</parent>
 	<artifactId>notib-ear</artifactId>
 	<packaging>ear</packaging>
@@ -56,6 +56,18 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>notib-war</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>notib-api-interna</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>notib-api-externa</artifactId>
 			<version>${project.version}</version>
 			<type>war</type>
 		</dependency>
@@ -185,6 +197,18 @@
 							<artifactId>notib-war</artifactId>
 							<contextRoot>/notib</contextRoot>
 							<bundleFileName>notib.war</bundleFileName>
+						</webModule>
+						<webModule>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>notib-api-interna</artifactId>
+							<contextRoot>/notibapi/interna</contextRoot>
+							<bundleFileName>notib-api-interna.war</bundleFileName>
+						</webModule>
+						<webModule>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>notib-api-externa</artifactId>
+							<contextRoot>/notibapi/externa</contextRoot>
+							<bundleFileName>notib-api-externa.war</bundleFileName>
 						</webModule>
 					</modules>
 					<defaultJavaBundleDir>lib/</defaultJavaBundleDir>

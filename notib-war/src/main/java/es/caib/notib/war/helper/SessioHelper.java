@@ -63,7 +63,7 @@ public class SessioHelper {
 	}
 	
 	public static String getIdioma(AplicacioService aplicacioService) {
-		return aplicacioService.getUsuariActual().getIdioma();
+		return aplicacioService.getIdiomaUsuariActual();
 	}
 
 }

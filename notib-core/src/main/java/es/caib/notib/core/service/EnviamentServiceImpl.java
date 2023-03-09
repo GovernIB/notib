@@ -1,6 +1,7 @@
 package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
@@ -9,7 +10,25 @@ import es.caib.notib.client.domini.consulta.GenericInfo;
 import es.caib.notib.client.domini.consulta.PersonaConsultaV2;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.client.domini.consulta.TransmissioV2;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.ApiConsulta;
+import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
+import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
+import es.caib.notib.core.api.dto.NotificacioEventDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioTipusEnviamentEnumDto;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.PersonaDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notenviament.ColumnesDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
@@ -48,6 +67,7 @@ import es.caib.notib.core.helper.FiltreHelper.StringField;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.NotificacioEventHelper;
 import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
@@ -160,6 +180,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Autowired
 	private AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
+	private NotificaHelper notificaHelper;
+	@Autowired
 	private ConfigHelper configHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
@@ -198,22 +220,133 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 
 	@Override
-	public List<Long> findIdsAmbFiltre(
-			Long entitatId, 
-			NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException  {
+	public List<Long> findIdsAmbFiltre(Long entitatId, RolEnumDto rol, String usuariCodi, String organGestorCodi, NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException  {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consultant els ids d'expedient segons el filtre ("
-					+ "entitatId=" + entitatId + ", "
-					+ "filtre=" + filtre + ")");
-			entityComprovarHelper.comprovarPermisos(
-					entitatId,
-					false,
-					false,
-					false);
-			return findIdsAmbFiltrePaginat(
-					entitatId,
-					filtre);
+			logger.debug("Consultant els ids d'expedient segons el filtre (entitatId=" + entitatId + ", filtre=" + filtre + ")");
+			entityComprovarHelper.comprovarPermisos(entitatId, false, false, false);
+
+			logger.debug("Consulta els enviaments de les notificacións que te una entitat");
+			boolean isUsuari = RolEnumDto.tothom.equals(rol);
+			boolean isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
+			boolean isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
+			boolean isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
+			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat, false);
+			Page<EnviamentTableEntity> pageEnviaments = null;
+			logger.info("Consulta ids d'enviament, accions massives");
+			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
+			mapeigPropietatsOrdenacio.put("enviamentDataProgramada", new String[] {"enviamentDataProgramada"});
+			mapeigPropietatsOrdenacio.put("notificaIdentificador", new String[] {"notificaIdentificador"});
+			mapeigPropietatsOrdenacio.put("procedimentCodiNotib", new String[] {"procedimentCodiNotib"});
+			mapeigPropietatsOrdenacio.put("grupCodi", new String[] {"grupCodi"});
+			mapeigPropietatsOrdenacio.put("emisorDir3Codi", new String[] {"emisorDir3Codi"});
+			mapeigPropietatsOrdenacio.put("usuariCodi", new String[] {"usuariCodi"});
+			mapeigPropietatsOrdenacio.put("concepte", new String[] {"concepte"});
+			mapeigPropietatsOrdenacio.put("descripcio", new String[] {"descripcio"});
+			mapeigPropietatsOrdenacio.put("titularNif", new String[] {"titularNif"});
+			mapeigPropietatsOrdenacio.put("titularNomLlinatge", new String[] {"concat(titularLlinatge1, titularLlinatge2, titularNom)"});
+			mapeigPropietatsOrdenacio.put("titularEmail", new String[] {"titularEmail"});
+			mapeigPropietatsOrdenacio.put("llibre", new String[] {"registreLlibreNom"});
+			mapeigPropietatsOrdenacio.put("registreNumero", new String[] {"registreNumero"});
+			mapeigPropietatsOrdenacio.put("notificaDataCaducitat", new String[] {"notificaDataCaducitat"});
+			mapeigPropietatsOrdenacio.put("notificaCertificacioNumSeguiment", new String[] {"notificaCertificacioNumSeguiment"});
+			mapeigPropietatsOrdenacio.put("csvUuid", new String[] {"csv_uuid"});
+			mapeigPropietatsOrdenacio.put("estat", new String[] {"estat"});
+			mapeigPropietatsOrdenacio.put("codiNotibEnviament", new String[] {"notificaReferencia"});
+			mapeigPropietatsOrdenacio.put("referenciaNotificacio", new String[] {"referenciaNotificacio"});
+			NotificacioEnviamentFiltre f = getFiltre(entitatId, filtre);
+
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
+
+			// Procediments accessibles per qualsevol òrgan gestor
+			List<String> codisProcedimentsDisponibles = isUsuari && entitatEntity != null ? procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatEntity, PermisEnum.CONSULTA) : null;
+
+			// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
+			List<String> codisOrgansGestorsDisponibles = isUsuari && entitatEntity != null ? organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, PermisEnum.CONSULTA) : null;
+
+			// Procediments comuns que es poden consultar per a òrgans gestors concrets
+			List<String> codisProcedimentsOrgans = isUsuari && entitatEntity != null ? permisosService.getProcedimentsOrgansAmbPermis(entitatEntity.getId(), auth.getName(), PermisEnum.CONSULTA) : null;
+
+			boolean esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
+			boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+			boolean esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
+			List<String> organs = isAdminOrgan ? organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatEntity.getDir3Codi(), organGestorCodi) : null;
+			if (isAdminOrgan && !Strings.isNullOrEmpty(organGestorCodi)) {
+				organs.add(organGestorCodi);
+			}
+			organs = organs != null && !organs.isEmpty() ? organs : null;
+			return enviamentTableRepository.findIdsAmbFiltre(
+					f.codiProcediment.isNull(),
+					f.codiProcediment.getField(),
+					f.grup.isNull(),
+					f.grup.getField(),
+					f.concepte.isNull(),
+					f.concepte.getField(),
+					f.descripcio.isNull(),
+					f.descripcio.getField(),
+					f.dataProgramadaDisposicioInici.isNull(),
+					f.dataProgramadaDisposicioInici.getField(),
+					f.dataProgramadaDisposicioFi.isNull(),
+					f.dataProgramadaDisposicioFi.getField(),
+					f.dataCaducitatInici.isNull(),
+					f.dataCaducitatInici.getField(),
+					f.dataCaducitatFi.isNull(),
+					f.dataCaducitatFi.getField(),
+					f.enviamentTipus.isNull(),
+					f.enviamentTipus.getField(),
+					f.csvUuid.isNull(),
+					f.csvUuid.getField(),
+					f.estat.isNull(),
+					f.estat.getField(),
+					!f.estat.isNull() ? EnviamentEstat.valueOf(f.estat.getField().toString()) : null,
+					entitatEntity,
+					f.dataEnviamentInici.isNull(),
+					f.dataEnviamentInici.getField(),
+					f.dataEnviamentFi.isNull(),
+					f.dataEnviamentFi.getField(),
+					f.codiNotifica.isNull(),
+					f.codiNotifica.getField(),
+					f.creadaPer.isNull(),
+					f.creadaPer.getField(),
+					f.nifTitular.isNull(),
+					f.nifTitular.getField(),
+					f.nomTitular.isNull(),
+					f.nomTitular.getField(),
+					f.emailTitular.isNull(),
+					f.emailTitular.getField(),
+					f.dir3Codi.isNull(),
+					f.dir3Codi.getField(),
+					f.numeroCertCorreus.isNull(),
+					f.numeroCertCorreus.getField(),
+					f.usuari.isNull(),
+					f.usuari.getField(),
+					f.registreNumero.isNull(),
+					f.registreNumero.getField(),
+					f.codiNotibEnviament.isNull(),
+					f.codiNotibEnviament.getField(),
+					f.dataRegistreInici.isNull(),
+					f.dataRegistreInici.getField(),
+					f.dataRegistreFi.isNull(),
+					f.dataRegistreFi.getField(),
+					f.nomesAmbErrors,
+					f.nomesSenseErrors,
+					f.hasZeronotificaEnviamentIntent.isNull(),
+					f.hasZeronotificaEnviamentIntent.getField(),
+					f.referenciaNotificacio.isNull(),
+					f.referenciaNotificacio.getField(),
+					esProcedimentsCodisNotibNull,
+					esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
+					esOrgansGestorsCodisNotibNull,
+					esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+					esProcedimentOrgansAmbPermisNull,
+					esProcedimentOrgansAmbPermisNull ? null : codisProcedimentsOrgans,
+					aplicacioService.findRolsUsuariActual(),
+					usuariCodi,
+					isUsuari,
+					isAdminOrgan,
+					organs 	);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -358,12 +491,24 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 	
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional
 	public NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta de destinatari donat el seu id (destinatariId=" + enviamentId + ")");
 			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
+			// #779: Obtenim la certificació de forma automàtica
+			if (enviament.getNotificaCertificacioArxiuId() == null &&
+					( EnviamentEstat.REBUTJADA.equals(enviament.getNotificaEstat()) ||
+					EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat()) )) {
+				try {
+					notificaHelper.enviamentRefrescarEstat(enviamentId);
+					notificacioEnviamentRepository.flush();
+					enviament = notificacioEnviamentRepository.findById(enviamentId);
+				} catch (Exception ex) {
+					log.error("No s'ha pogut actualitzar la certificació de l'enviament amb id: " + enviamentId, ex);
+				}
+			}
 			//NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
 			entityComprovarHelper.comprovarPermisos(null, false, false, false);
 			return enviamentToDto(enviament);
@@ -412,7 +557,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 			mapeigPropietatsOrdenacio.put("codiNotibEnviament", new String[] {"notificaReferencia"});
 			mapeigPropietatsOrdenacio.put("referenciaNotificacio", new String[] {"referenciaNotificacio"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
-
 			NotificacioEnviamentFiltre filtreFields = getFiltre(entitatId, filtre);
 
 
@@ -656,18 +800,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			if(pageEnviaments == null || !pageEnviaments.hasContent()) {
 				pageEnviaments = new PageImpl<>(new ArrayList<EnviamentTableEntity>());
 			}
-
 			PaginaDto<NotEnviamentTableItemDto> paginaDto = paginacioHelper.toPaginaDto(pageEnviaments, NotEnviamentTableItemDto.class);
-			for (NotEnviamentTableItemDto tableItem : paginaDto.getContingut()) {
-				if (entitatEntity.isLlibreEntitat()) {
-					tableItem.setLlibre(entitatEntity.getLlibre());
-				}
-				NotificacioEntity not = notificacioRepository.findById(tableItem.getNotificacioId());
-				if (not != null && not.getOrganGestor() != null) {
-					tableItem.setOrganEstat(not.getOrganGestor().getEstat());
-				}
-			}
-
 			return paginaDto;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -977,14 +1110,12 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 
 	@Override
-	public void columnesCreate(
-			UsuariDto usuari,
-			Long entitatId, 
-			ColumnesDto columnes) {
+	public void columnesCreate(String codiUsuari, Long entitatId, ColumnesDto columnes) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId);
-			UsuariEntity usuariEntity = usuariRepository.findByCodi(usuari.getCodi());
+			UsuariEntity usuariEntity = usuariRepository.findByCodi(codiUsuari);
 			
 			if (columnes == null) {
 				columnes = new ColumnesDto();
@@ -1072,12 +1203,12 @@ public class EnviamentServiceImpl implements EnviamentService {
 		
 	@Transactional(readOnly = true)	
 	@Override
-	public ColumnesDto getColumnesUsuari(Long entitatId, UsuariDto usuariDto) {
+	public ColumnesDto getColumnesUsuari(Long entitatId, String codiUsuari) {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			UsuariEntity usuari = usuariRepository.findByCodi(usuariDto.getCodi());
+			UsuariEntity usuari = usuariRepository.findByCodi(codiUsuari);
 			ColumnesEntity columnes = columnesRepository.findByEntitatAndUser(entitat, usuari);
 			return conversioTipusHelper.convertir(columnes, ColumnesDto.class);
 		} finally {
@@ -1162,20 +1293,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 		NotificacioEnviamentDto enviamentDto = conversioTipusHelper.convertir(enviament, NotificacioEnviamentDto.class);
 		enviamentDto.setRegistreNumeroFormatat(enviament.getRegistreNumeroFormatat());
 		enviamentDto.setRegistreData(enviament.getRegistreData());
-		destinatariCalcularCampsAddicionals(enviament, enviamentDto);
-		return enviamentDto;
-	}
-
-	private void destinatariCalcularCampsAddicionals(NotificacioEnviamentEntity enviament, NotificacioEnviamentDto enviamentDto) {
-
-		if (enviament.isNotificaError()) {
-			NotificacioEventEntity event = enviament.getNotificacioErrorEvent();
-			if (event != null) {
-				enviamentDto.setNotificaErrorData(event.getData());
-				enviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
-			}
-		}
 		enviamentDto.setNotificaCertificacioArxiuNom(calcularNomArxiuCertificacio(enviament));
+		return enviamentDto;
 	}
 
 	private String calcularNomArxiuCertificacio(NotificacioEnviamentEntity enviament) {

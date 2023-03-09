@@ -43,6 +43,8 @@ import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Helper MOCK de prova.
@@ -94,12 +96,13 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				//Crea un nou event
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
 					for (NotificacioEnviamentEntity enviament: notificacio.getEnviamentsPerNotifica()) {
-						if (enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
+						if (enviament.getTitular() != null && enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
 							auditEnviamentHelper.updateEnviamentEnviat(enviament, resultadoEnvio.getIdentificador());
 						}
 					}
 				}
 				notificacioEventHelper.addNotificaEnviamentEvent(notificacio);
+				integracioHelper.addAccioOk(info);
 			} else {
 				log.info(" >>> ... ERROR:");
 				//Crea un nou event
@@ -219,7 +222,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			if (resultadoInfoEnvio.getCertificacion() != null) {
 				log.info("Actualitzant informació enviament amb certificació...");
 				Certificacion certificacio = resultadoInfoEnvio.getCertificacion();
-
+				configHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
 				Date dataCertificacio = toDate(certificacio.getFechaCertificacion());
 				if (!dataCertificacio.equals(dataUltimaCertificacio)) {
 					byte[] decodificat = certificacio.getContenidoCertificacion();

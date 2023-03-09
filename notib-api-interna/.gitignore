@@ -1,0 +1,8 @@
+/target/
+/.classpath
+/.project
+/.settings/
+/.flattened-pom.xml
+/.attach_pid*
+/notib-api-interna.iml
+/pom.xml.versionsBackup

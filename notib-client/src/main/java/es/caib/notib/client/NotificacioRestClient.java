@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 @Deprecated
 public class NotificacioRestClient extends NotificacioBaseRestClient {
 
-	private static final String NOTIFICACIOV1_SERVICE_PATH = "/api/services/notificacioV2";
+	private static final String NOTIFICACIOV1_SERVICE_PATH = "/interna/notificacio/v1";
 
 	/**
 	 * Constructor per a crear un client per a connectar-se amb la API REST v1 de NOTIB.
@@ -136,7 +136,7 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/alta";
 			ObjectMapper mapper  = getMapper();
 			String body = mapper.writeValueAsString(notificacio);
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			logger.debug("Missatge REST enviat: " + body);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
@@ -168,7 +168,7 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(String identificador) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
@@ -188,7 +188,7 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(String referencia) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
@@ -210,7 +210,7 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/consultaDadesRegistre";
 			ObjectMapper mapper  = getMapper();
 			String body = mapper.writeValueAsString(dadesConsulta);
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").

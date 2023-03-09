@@ -1,11 +1,24 @@
 package es.caib.notib.war.controller;
 
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.NotificacioAuditDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
+import es.caib.notib.core.api.dto.NotificacioEventDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto;
+import es.caib.notib.core.api.dto.RegistreIdDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.missatges.Missatge;
 import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
-import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioInfoDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
@@ -36,7 +49,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -111,13 +123,11 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request) && entitatActual != null) {
             OrganGestorDto organGestorActual = getOrganGestorActual(request);
             organGestorCodi = organGestorActual.getCodi();
-
         }
-        UsuariDto usuariActual = aplicacioService.getUsuariActual();
         NotificacioFiltreDto filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE).asDto();
         assert entitatActual != null;
         return notificacioService.findIdsAmbFiltre(entitatActual.getId(), RolEnumDto.valueOf(RolHelper.getRolActual(request)),
-                                                    organGestorCodi, usuariActual.getCodi(), filtre);
+                                                    organGestorCodi, getCodiUsuariActual(), filtre);
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -155,6 +165,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 //        notificacioListHelper.ompleProcediments(request, model);
         model.addAttribute("notificacioFiltreCommand", command);
         model.addAttribute("nomesAmbErrors", command.isNomesAmbErrors());
+//        deselect(request, null);
         return "notificacioList";
     }
 
@@ -165,7 +176,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         NotificacioFiltreDto filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE).asDto();
         PaginaDto<NotificacioTableItemDto> notificacions = new PaginaDto<>();
-        UsuariDto usuariActual = aplicacioService.getUsuariActual();
         boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
         boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
         boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
@@ -181,83 +191,12 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 organGestorCodi = organGestorActual.getCodi();
             }
             notificacions = notificacioService.findAmbFiltrePaginat(entitatActual != null ? entitatActual.getId() : null,
-                                                    RolEnumDto.valueOf(RolHelper.getRolActual(request)), organGestorCodi, usuariActual.getCodi(), filtre,
-                                                    DatatablesHelper.getPaginacioDtoFromRequest(request));
-//            prepararColumnaEstat(request, notificacions.getContingut());
+                                                RolEnumDto.valueOf(RolHelper.getRolActual(request)), organGestorCodi, getCodiUsuariActual(), filtre,
+                                                DatatablesHelper.getPaginacioDtoFromRequest(request));
         } catch (SecurityException e) {
             MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
         }
         return DatatablesHelper.getDatatableResponse(request, notificacions, "id", SESSION_ATTRIBUTE_SELECCIO);
-    }
-
-    private void prepararColumnaEstat(HttpServletRequest request, List<NotificacioTableItemDto> items) {
-
-        for (NotificacioTableItemDto item : items) {
-            List<NotificacioEnviamentDatatableDto> enviaments = enviamentService.enviamentFindAmbNotificacio(item.getId());
-            String estat = item.isEnviant() ? "<span class=\"fa fa-clock-o\"></span>" :
-                    NotificacioEstatEnumDto.PENDENT.equals(item.getEstat()) ? "<span class=\"fa fa-clock-o\"></span>" :
-                    NotificacioEstatEnumDto.ENVIADA.equals(item.getEstat()) || NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(item.getEstat()) ? "<span class=\"fa fa-send-o\"></span>" :
-                    NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) ? "<span class=\"fa fa-check\"></span>" :
-                    NotificacioEstatEnumDto.REGISTRADA.equals(item.getEstat()) ? "<span class=\"fa fa-file-o\"></span>" :
-                    NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) ? "<span class=\"fa fa-check-circle\"></span>" : "";
-            String nomEstat = " " + getMessage(request, "es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto." + item.getEstat().name()) + "";
-            String error = item.isNotificaError() ? " <span class=\"fa fa-warning text-danger\" title=\"" + htmlEscape(item.getNotificaErrorDescripcio()) + " \"></span>" : "";
-            error += TipusUsuariEnumDto.APLICACIO.equals(item.getTipusUsuari()) && item.isErrorLastCallback() ?
-                    " <span class=\"fa fa-exclamation-circle text-primary\" title=\"<spring:message code=\"notificacio.list.client.error/>\"></span>" : "";
-            estat = "<span>" + estat + nomEstat + error + "</span>";
-            String data = "\n";
-            if ((NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat())) && item.getEstatDate() != null) {
-                SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-                String d = df.format(item.getEstatDate());
-                data += "<span class=\"horaProcessat\">" + d + "</span>\n";
-            } else if (NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) && item.getEstatProcessatDate() != null) {
-                SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-                String d = df.format(item.getEstatProcessatDate());
-                data += "<span class=\"horaProcessat\">" + d + "</span>\n";
-            }
-
-            String notificaEstat = "";
-            String registreEstat = "";
-            Map<String, Integer>  registres = new HashMap<>();
-            for (NotificacioEnviamentDatatableDto env : enviaments) {
-                item.updateEstatTipusCount(env.getNotificaEstat());
-//                if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat())) {
-//                    notificaEstat += getMessage(request, "es.caib.notib.client.domini.EnviamentEstat." + env.getNotificaEstat()) + ", ";
-//                }
-                if (env.getRegistreEstat() != null) {
-                    if (registres.containsKey(env.getRegistreEstat().name())) {
-                        Integer count = registres.get(env.getRegistreEstat().name());
-                        count = count + 1;
-                        registres.put(env.getRegistreEstat().name(), count);
-                    } else {
-                        registres.put(env.getRegistreEstat().name(), 1);
-                    }
-                }
-                if (item.isComunicacioSir()) {
-                    NotificacioRegistreEstatEnumDto r = env.getRegistreEstat();
-                    registreEstat += env.getRegistreEstat() != null ?  "<div><span style=\"padding-bottom:1px; background-color: " + r.getColor() + ";\" title=\"" +
-                            getMessage(request, "es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto." + r)
-                            + "\" class=\"label label-primary\">" + r.getBudget() + "</span></div>" : "";
-                }
-            }
-            notificaEstat = notificaEstat.length() > 0 ? notificaEstat.substring(0, notificaEstat.length()-2) : "";
-            estat = "<div class=\"flex-column\"><div style=\"display:flex; justify-content:space-between\">" + estat + (registreEstat.length() > 0 ? registreEstat : "")
-                    + "</div></div>" + data + notificaEstat;
-            String padding = "; padding-left: 5px;";
-            String boxShadow = "box-shadow: inset 3px 0px 0px ";
-
-            if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat())
-                || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) || notificaEstat.length() > 0 || item.getContadorEstat().size() > 1) {
-
-                for (Map.Entry<EnviamentEstat, Integer> entry : item.getContadorEstat().entrySet()) {
-                    estat += "<div style=\"font-size:11px;" + boxShadow + entry.getKey().getColor() + padding + "\">" +
-                            entry.getValue() + " " + getMessage(request, "es.caib.notib.client.domini.EnviamentEstat." + entry.getKey())
-                            + "</div>";
-                }
-            }
-
-            item.setEstatString(estat);
-        }
     }
 
 
@@ -437,7 +376,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             return "notificacioInfo";
         }
         for (RegistreIdDto registreIdDto : registresIdDto) {
-            if (registreIdDto.getNumero() != null) {
+            if (registreIdDto.getNumero() != null || registreIdDto.getNumeroRegistreFormat() != null) {
                 MissatgesHelper.success(request, "(" + registreIdDto.getNumeroRegistreFormat() + ")" + getMessage(request,"notificacio.controller.registrar.ok"));
                 continue;
             }

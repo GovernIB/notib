@@ -3,6 +3,7 @@ package es.caib.notib.core.api.service;
 import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -76,6 +77,9 @@ public interface PermisosService {
 
     @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
     List<CodiValorOrganGestorComuDto> getProcSersAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);
+
+    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    List<CodiValorOrganGestorComuDto> getProcSerComuns(Long entitatId, List<String> grups, boolean removeInactius, ProcSerTipusEnum tipus);
 
     @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
     List<CodiValorOrganGestorComuDto> getProcedimentsAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);

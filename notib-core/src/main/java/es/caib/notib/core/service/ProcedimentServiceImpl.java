@@ -11,6 +11,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
@@ -1091,19 +1092,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			}
 
 			if (RolEnumDto.tothom.equals(rol)) {
-				Set<CodiValorOrganGestorComuDto> setProcediments = new HashSet<>(recuperarProcedimentAmbPermis(entitat, permis, organFiltreCodi));
-				Set<ProcedimentEntity> auxSet = procedimentRepository.findByEntitatAndComuTrueAndRequireDirectPermissionIsFalse(entitat);
-				//TODO PREGUNTAR SI HAN DE SORTIR TOTS ELS COMUNS O NOMÉS ELS QUE TÉ PERMÍS
-				for (ProcedimentEntity procediment: auxSet) {
-					setProcediments.add(CodiValorOrganGestorComuDto.builder()
-							.id(procediment.getId())
-							.codi(procediment.getCodi())
-							.valor(procediment.getCodi() + ((procediment.getNom() != null && !procediment.getNom().isEmpty()) ? " - " + procediment.getNom() : ""))
-							.organGestor(procediment.getOrganGestor() != null ? procediment.getOrganGestor().getCodi() : "")
-							.comu(procediment.isComu())
-							.build());
+				procediments = recuperarProcedimentAmbPermis(entitat, permis, organFiltreCodi);
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				if (auth != null) {
+					List<String> grups = cacheHelper.findRolsUsuariAmbCodi(auth.getName());
+					procediments.addAll(permisosService.getProcSerComuns(entitat.getId(), grups, true, ProcSerTipusEnum.PROCEDIMENT));
 				}
-				procediments = new ArrayList<>(setProcediments);
 			} else {
 				List<ProcedimentEntity> procedimentsEntitat = new ArrayList<>();
 				if (organFiltreCodi != null) {

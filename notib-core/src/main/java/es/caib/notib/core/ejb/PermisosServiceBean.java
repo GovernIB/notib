@@ -6,6 +6,7 @@ package es.caib.notib.core.ejb;
 import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.PermisosService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +75,11 @@ public class PermisosServiceBean implements PermisosService {
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<CodiValorOrganGestorComuDto> getProcSersAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		return delegate.getProcSersAmbPermis(entitatId, usuariCodi, permis);
+	}
+
+	@Override
+	public List<CodiValorOrganGestorComuDto> getProcSerComuns(Long entitatId, List<String> grups, boolean removeInactius, ProcSerTipusEnum tipus) {
+		return delegate.getProcSerComuns(entitatId, grups, removeInactius, tipus);
 	}
 
 	@Override

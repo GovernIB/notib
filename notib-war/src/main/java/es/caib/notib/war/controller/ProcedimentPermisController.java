@@ -180,7 +180,7 @@ public class ProcedimentPermisController extends BaseUserController{
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
-					"entitat",
+					"procediment",
 					procedimentService.findById(
 							entitatActual.getId(),
 							isAdministrador(request),

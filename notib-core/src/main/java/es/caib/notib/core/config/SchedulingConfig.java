@@ -18,7 +18,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
-import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 
@@ -58,7 +57,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     	taskRegistrar.setScheduler(taskScheduler);
         this.taskRegistrar = taskRegistrar;
 
-        // 1. Enviament de notificacions pendents al registre y notific@
+        // 1. Enviament de notificacions pendents al registre i notific@
         ////////////////////////////////////////////////////////////////
         final String registrarEnviamentsPendents = "registrarEnviamentsPendents";
         monitorTasquesService.addTasca(registrarEnviamentsPendents);
@@ -530,7 +529,46 @@ public class SchedulingConfig implements SchedulingConfigurer {
             }
         );
         monitorTasquesService.addTasca(monitorIntegracionsEliminarAntics);
+
+
+        // 14. Actualitzar estat organs enviament table
+        /////////////////////////////////////////////////////////////////////////
+        final String actualitzarEstatOrgansEnviamentTable = "actualitzarEstatOrgansEnviamentTable";
+        monitorTasquesService.addTasca(actualitzarEstatOrgansEnviamentTable);
+        taskRegistrar.addTriggerTask(
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        try {
+                            monitorTasquesService.inici(actualitzarEstatOrgansEnviamentTable);
+                            schedulledService.actualitzarEstatOrgansEnviamentTable();
+                            monitorTasquesService.fi(actualitzarEstatOrgansEnviamentTable);
+                        } catch(Exception e) {
+                            monitorTasquesService.error(actualitzarEstatOrgansEnviamentTable);
+                        }
+                    }
+                },
+                new Trigger() {
+                    @Override
+                    public Date nextExecutionTime(TriggerContext triggerContext) {
+//                        String cron = configHelper.getConfig(PropertiesConstants.actualitzarEstatOrgansEnviamentTable);
+//                        if (cron == null) {
+                            String cron = "0 30 3 * * *";
+//                            String cron = "* * * * * *";
+//                        }
+                        CronTrigger trigger = new CronTrigger(cron);
+                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        Long millis = nextExecution.getTime() - System.currentTimeMillis();
+                        monitorTasquesService.updateProperaExecucio(actualitzarEstatOrgansEnviamentTable, millis);
+                        return nextExecution;
+                    }
+                }
+        );
+        monitorTasquesService.addTasca(actualitzarEstatOrgansEnviamentTable);
     }
+
+
 
     private long calcularDelay() {
 

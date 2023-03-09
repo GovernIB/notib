@@ -43,7 +43,7 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 		addConfig("es.caib.notib.metriques.generar", "false");
 		addConfig("es.caib.notib.plugin.unitats.dir3.protocol", "REST");
 		addConfig("es.caib.notib.plugin.registre.class", "es.caib.notib.plugin.registre.RegistrePluginMockImpl");
-		addConfig("es.caib.notib.plugin.unitats.fitxer", "");
+//		addConfig("es.caib.notib.plugin.unitats.fitxer", "");
 		entitatCreate = new EntitatDto();
 		entitatCreate.setCodi("LIMIT");
 		entitatCreate.setNom("Limit Tecnologies");

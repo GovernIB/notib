@@ -31,11 +31,32 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.PermisosService;
-import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.DocumentEntity;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.NotificacioTableEntity;
+import es.caib.notib.core.entity.PersonaEntity;
+import es.caib.notib.core.entity.ProcSerEntity;
+import es.caib.notib.core.entity.ProcSerOrganEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.helper.*;
-import es.caib.notib.core.repository.*;
+import es.caib.notib.core.repository.ColumnesRepository;
+import es.caib.notib.core.repository.DocumentRepository;
+import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.EnviamentTableRepository;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
+import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.NotificacioTableViewRepository;
+import es.caib.notib.core.repository.PersonaRepository;
+import es.caib.notib.core.repository.ProcSerOrganRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.repository.ProcessosInicialsRepository;
 import es.caib.notib.core.repository.auditoria.NotificacioAuditRepository;
 import es.caib.notib.core.repository.auditoria.NotificacioEnviamentAuditRepository;
 import es.caib.notib.plugin.unitat.CodiValor;
@@ -438,14 +459,18 @@ public class NotificacioServiceImpl implements NotificacioService {
 				dto.setCie(conversioTipusHelper.convertir(entregaCieEntity.getCie(), CieDataDto.class));
 			}
 
-			NotificacioTableEntity notificacioTableEntity = notificacioTableViewRepository.findOne(id);
-			dto.setNotificaErrorData(notificacioTableEntity.getNotificaErrorData());
-			dto.setNotificaErrorDescripcio(notificacioTableEntity.getNotificaErrorDescripcio());
-
 			NotificacioEventEntity lastErrorEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
 			dto.setNoticaErrorEventTipus(lastErrorEvent != null ? lastErrorEvent.getTipus() : null);
 			dto.setNotificaErrorTipus(lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null);
 			dto.setEnviadaDate(getEnviadaDate(notificacio));
+
+			// TODO RECUPERAR INFORMACIÓ DIRECTAMENT DE LES ENTITATS
+			NotificacioTableEntity notificacioTableEntity = notificacioTableViewRepository.findOne(id);
+			if (notificacioTableEntity == null) {
+				return dto;
+			}
+			dto.setNotificaErrorData(notificacioTableEntity.getNotificaErrorData());
+			dto.setNotificaErrorDescripcio(notificacioTableEntity.getNotificaErrorDescripcio());
 
 			return dto;
 		} finally {
@@ -569,7 +594,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				NotificacioListHelper.NotificacioFiltre filtreNetejat = notificacioListHelper.getFiltre(filtre);
 
 				if (isUsuari) {
-					long start = System.nanoTime();
 					notificacions = notificacioTableViewRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 							entitatActual,
 							filtreNetejat.getEntitatId().isNull(),
@@ -613,8 +637,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getReferencia().isNull(),
 							filtreNetejat.getReferencia().getField(),
 							pageable);
-						long elapsedTime = System.nanoTime() - start;
-						log.info(">>>>>>>>>>>>> Notificacions amb filtre: "  + elapsedTime);
 				} else if (isUsuariEntitat || isSuperAdmin) {
 					Long entitatFiltre;
 					if (isUsuariEntitat){
@@ -709,22 +731,87 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<Long> findIdsAmbFiltre(Long entitatId,
-									   RolEnumDto rol,
-									   String organGestorCodi,
-									   String usuariCodi,
-									   NotificacioFiltreDto filtre) {
-		PaginacioParamsDto paginacioParamsDto = new PaginacioParamsDto();
-		paginacioParamsDto.setPaginaNum(0);
-		paginacioParamsDto.setPaginaTamany(notificacioEnviamentRepository.findAll().size());
-		PaginaDto<NotificacioTableItemDto> pagina = findAmbFiltrePaginat(entitatId, rol, organGestorCodi,
-				usuariCodi,
-				filtre,
-				paginacioParamsDto);
-		List<Long> idsNotificacions = new ArrayList<>();
-		for (NotificacioTableItemDto notificacio: pagina.getContingut()) {
-			idsNotificacions.add(notificacio.getId());
+	public List<Long> findIdsAmbFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioFiltreDto filtre) {
+
+
+		boolean isUsuari = RolEnumDto.tothom.equals(rol);
+		boolean isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
+		boolean isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
+		boolean isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat,false);
+		List<String> codisProcedimentsDisponibles = new ArrayList<>();
+		List<String> codisOrgansGestorsDisponibles = new ArrayList<>();
+		List<String> codisProcedimentsOrgans = new ArrayList<>();
+
+		if (isUsuari && entitatActual != null) {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
+			// Procediments accessibles per qualsevol òrgan gestor
+			codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
+
+			// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
+			codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
+
+			// Procediments comuns que es poden consultar per a òrgans gestors concrets
+			codisProcedimentsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitatActual.getId(), auth.getName(), PermisEnum.CONSULTA);
+
+		} else if (isAdminOrgan && entitatActual != null) {
+			codisProcedimentsDisponibles = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
 		}
+		boolean esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
+		boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+		boolean esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
+
+		List<EntitatEntity> entitatsActives = isSuperAdmin ? entitatRepository.findByActiva(true) : null;
+		List<String> organs = isAdminOrgan ? organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi) : null;
+		NotificacioListHelper.NotificacioFiltre f = notificacioListHelper.getFiltre(filtre);
+		Long entitatFiltre = isUsuariEntitat || isUsuari ? entitatId : f.getEntitatId().getField();
+		List<Long> idsNotificacions = notificacioTableViewRepository.findIdsAmbFiltre(
+				entitatFiltre == null,
+				entitatFiltre,
+				f.getEnviamentTipus().isNull(),
+				f.getEnviamentTipus().getField(),
+				f.getConcepte().isNull(),
+				f.getConcepte().getField(),
+				f.getEstat().isNull(),
+				f.getEstat().isNull() ? 0 : f.getEstat().getField().getMask(),
+				f.getDataInici().isNull(),
+				f.getDataInici().getField(),
+				f.getDataFi().isNull(),
+				f.getDataFi().getField(),
+				f.getTitular().isNull(),
+				f.getTitular().isNull() ? "" : f.getTitular().getField(),
+				f.getOrganGestor().isNull(),
+				f.getOrganGestor().isNull() ? "" : f.getOrganGestor().getField().getCodi(),
+				f.getProcediment().isNull(),
+				f.getProcediment().isNull() ? "" : f.getProcediment().getField().getCodi(),
+				f.getTipusUsuari().isNull(),
+				f.getTipusUsuari().getField(),
+				f.getNumExpedient().isNull(),
+				f.getNumExpedient().getField(),
+				f.getCreadaPer().isNull(),
+				f.getCreadaPer().getField(),
+				f.getIdentificador().isNull(),
+				f.getIdentificador().getField(),
+				f.getNomesAmbErrors().getField(),
+				f.getNomesSenseErrors().getField(),
+				f.getReferencia().isNull(),
+				f.getReferencia().getField(),
+				isUsuari,
+				esProcedimentsCodisNotibNull,
+				esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
+				aplicacioService.findRolsUsuariActual(),
+				esOrgansGestorsCodisNotibNull,
+				esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+				esProcedimentOrgansAmbPermisNull,
+				esProcedimentOrgansAmbPermisNull ?  null : codisProcedimentsOrgans,
+				usuariCodi,
+				isSuperAdmin,
+				entitatsActives,
+				isAdminOrgan,
+				organs,
+				filtre.getNotMassivaId() == null,
+				filtre.getNotMassivaId());
 		return idsNotificacions;
 	}
 
@@ -1074,6 +1161,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+			// #779: Obtenim la certificació de forma automàtica
+			if (enviament.getNotificaCertificacioArxiuId() == null) {
+				enviament = notificaHelper.enviamentRefrescarEstat(enviamentId);
+			}
+			if (enviament.getNotificaCertificacioArxiuId() == null) {
+				throw new RuntimeException("No s'ha trobat la certificació de l'enviament amb id: " + enviamentId);
+			}
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(enviament.getNotificaCertificacioArxiuId(), PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, output);
 			return new ArxiuDto(calcularNomArxiuCertificacio(enviament), enviament.getNotificaCertificacioMime(), output.toByteArray(), output.size());
@@ -1650,8 +1744,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return configHelper.getAsInt("es.caib.notib.document.consulta.id.csv.mida.min");
 	}
 	
-	
-	private void estatCalcularCampsAddicionals(
+
+	@Transactional
+	public void estatCalcularCampsAddicionals(
 			NotificacioEnviamentEntity enviament,
 			NotificacioEnviamenEstatDto estatDto) {
 		if (enviament.isNotificaError()) {

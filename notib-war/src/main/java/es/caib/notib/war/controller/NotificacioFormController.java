@@ -293,8 +293,11 @@ public class NotificacioFormController extends BaseUserController {
         if (notificacioCommand.getProcedimentId() != null) {
             procedimentActual = procedimentService.findById(entitatActual.getId(), isAdministrador(request), notificacioCommand.getProcedimentId());
         }
-        notificacioCommand.setUsuariCodi(aplicacioService.getUsuariActual().getCodi());
+        notificacioCommand.setUsuariCodi(getCodiUsuariActual());
         if (bindingResult.hasErrors()) {
+            String msg = TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacioCommand.getEnviamentTipus())
+					? "notificacio.form.errors.validacio.notificacio" : "notificacio.form.errors.validacio.comunicacio";
+            MissatgesHelper.error(request, getMessage(request, msg));
             relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
             return "notificacioForm";
         }
@@ -495,7 +498,6 @@ public class NotificacioFormController extends BaseUserController {
     public DadesProcediment getDadesProcSer(HttpServletRequest request, @PathVariable Long procedimentId) {
 
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        UsuariDto usuariActual = aplicacioService.getUsuariActual();
         ProcSerDto procedimentActual = procedimentService.findById(entitatActual.getId(),false, procedimentId);
         TipusEnviamentEnumDto enviamentTipus = (TipusEnviamentEnumDto) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
         DadesProcediment dadesProcediment = new DadesProcediment();
@@ -519,7 +521,7 @@ public class NotificacioFormController extends BaseUserController {
             PermisEnum permis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
                                 TipusEnviamentEnumDto.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO :
                                 PermisEnum.NOTIFICACIO;
-            dadesProcediment.setOrgansDisponibles(permisosService.getOrgansCodisAmbPermisPerProcedimentComu(entitatActual.getId(), usuariActual.getCodi(), permis, procedimentActual));
+            dadesProcediment.setOrgansDisponibles(permisosService.getOrgansCodisAmbPermisPerProcedimentComu(entitatActual.getId(), getCodiUsuariActual(), permis, procedimentActual));
 //        	List<ProcSerOrganDto> procedimentsOrgansAmbPermis = new ArrayList<ProcSerOrganDto>();
 //        	if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus)) {
 //                procedimentsOrgansAmbPermis = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNICACIO_SIR);
@@ -610,8 +612,7 @@ public class NotificacioFormController extends BaseUserController {
     private void emplenarModelNotificacio(HttpServletRequest request, Model model, NotificacioCommand notificacioCommand) {
 
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        UsuariDto usuariActual = aplicacioService.getUsuariActual();
-        List<String> tipusDocumentEnumDto = new ArrayList<String>();
+        List<String> tipusDocumentEnumDto = new ArrayList<>();
         List<TipusDocumentDto> tipusDocuments = entitatService.findTipusDocumentByEntitat(entitatActual.getId());
         if (tipusDocuments != null) {
             for (TipusDocumentDto tipusDocument : tipusDocuments) {
@@ -621,7 +622,7 @@ public class NotificacioFormController extends BaseUserController {
         model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
         model.addAttribute("entitat", entitatActual);
         model.addAttribute(notificacioCommand);
-        fillNotificacioModel(request, entitatActual, model, usuariActual, notificacioCommand.getEnviamentTipus());
+        fillNotificacioModel(request, entitatActual, model, notificacioCommand.getEnviamentTipus());
         model.addAttribute("amagat", Boolean.FALSE);
         try {
             model.addAttribute("concepteSize", notificacioCommand.getConcepteDefaultSize());
@@ -681,7 +682,6 @@ public class NotificacioFormController extends BaseUserController {
     private void ompliModelFormulari(HttpServletRequest request, ProcSerDto procedimentActual, EntitatDto entitatActual, NotificacioCommand notificacioCommand,
                                     BindingResult bindingResult, List<String> tipusDocumentEnumDto, Model model) {
 
-        UsuariDto usuariActual = aplicacioService.getUsuariActual();
         List<TipusDocumentDto> tipusDocuments = entitatService.findTipusDocumentByEntitat(entitatActual.getId());
         TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
         if (tipusDocuments != null) {
@@ -695,7 +695,7 @@ public class NotificacioFormController extends BaseUserController {
         }
         model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
         model.addAttribute("dir3Codi", entitatActual.getId());
-        fillNotificacioModel(request, entitatActual, model, usuariActual, notificacioCommand.getEnviamentTipus());
+        fillNotificacioModel(request, entitatActual, model, notificacioCommand.getEnviamentTipus());
         if (procedimentActual != null) {
             model.addAttribute("grups", grupService.findByProcedimentAndUsuariGrups(procedimentActual.getId()));
         }
@@ -749,7 +749,7 @@ public class NotificacioFormController extends BaseUserController {
 
     }
 
-    private void fillNotificacioModel(HttpServletRequest request, EntitatDto entitatActual, Model model, UsuariDto usuariActual, TipusEnviamentEnumDto tipusEnviament) {
+    private void fillNotificacioModel(HttpServletRequest request, EntitatDto entitatActual, Model model, TipusEnviamentEnumDto tipusEnviament) {
 
         RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
         String organFiltreProcediments = null;

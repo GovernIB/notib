@@ -820,7 +820,7 @@ public class PluginHelper {
 		info.setCodiEntitat(getCodiEntitatActual());
 		List<ProcSerDto> procediments = new ArrayList<>();
 		try {
-			List<GcaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getProcedimentsByUnitat(codiDir3);
+		List<GcaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getProcedimentsByUnitat(codiDir3);
 			if (procs != null) {
 				for (GcaProcediment proc : procs) {
 					ProcSerDto dto = new ProcSerDto();
@@ -990,10 +990,10 @@ public class PluginHelper {
 
 		String protocol = configHelper.getConfig("es.caib.notib.plugin.unitats.dir3.protocol");
 		Map<String, NodeDir3> organigrama = null;
-		String filenameOrgans = getOrganGestorsFile();
-		if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
-			filenameOrgans = filenameOrgans + "_" + codiDir3Entitat + ".json";
-		}
+//		String filenameOrgans = getOrganGestorsFile();
+//		if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
+//			filenameOrgans = filenameOrgans + "_" + codiDir3Entitat + ".json";
+//		}
 		try {
 			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
 			if (entitat == null) {
@@ -1010,10 +1010,10 @@ public class PluginHelper {
 				logger.info("Obtenir l'organigrama per entitat REST");
 				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(codiDir3Entitat);
 			}
-			if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
-				ObjectMapper mapper = new ObjectMapper();
-				mapper.writeValue(new File(filenameOrgans), organigrama);
-			}
+//			if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
+//				ObjectMapper mapper = new ObjectMapper();
+//				mapper.writeValue(new File(filenameOrgans), organigrama);
+//			}
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			logger.info("Error al obtenir l'organigrama per entitat");
@@ -2272,9 +2272,9 @@ public class PluginHelper {
 	public int getSegonsEntreReintentRegistreProperty() {
 		return configHelper.getAsInt("es.caib.notib.plugin.registre.segons.entre.peticions");
 	}
-	public String getOrganGestorsFile() {
-		return configHelper.getConfig("es.caib.notib.plugin.unitats.fitxer");
-	}
+//	public String getOrganGestorsFile() {
+//		return configHelper.getConfig("es.caib.notib.plugin.unitats.fitxer");
+//	}
 
 	// PROPIETATS TASQUES EN SEGON PLA
 

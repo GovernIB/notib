@@ -34,9 +34,21 @@ public interface MonitorIntegracioRepository extends JpaRepository<MonitorIntegr
 
     List<MonitorIntegracioEntity> findByDataLessThan(@Param("llindar") Date llindar);
 
+
+//    @Query(value = "SELECT id FROM (SELECT n FROM not_mon_int n WHERE n.DATA < to_date(:llindar, 'dd-MM-yyyy')) WHERE rownum < 1000", nativeQuery = true)
+    @Query(value = "SELECT id FROM (SELECT n.id FROM not_mon_int n WHERE n.DATA < :llindar) WHERE rownum < 1000", nativeQuery = true)
+    List<Long> getNotificacionsAntigues(@Param("llindar") Date llindar);
+
+//    @Modifying
+//    @Query("DELETE from MonitorIntegracioEntity m WHERE m.data < :llindar")
+//    void eliminarAntics(@Param("llindar") Date llindar);
+
+    @Query(value = "SELECT count(id) FROM (SELECT * FROM not_mon_int n WHERE n.DATA < :llindar) WHERE rownum = 1", nativeQuery = true)
+    int existeixenAntics(@Param("llindar") Date llindar);
+
     @Modifying
-    @Query("DELETE from MonitorIntegracioEntity m WHERE m.data < :llindar")
-    void eliminarAntics(@Param("llindar") Date llindar);
+    @Query(value = "DELETE from not_mon_int m WHERE m.id in (:ids)", nativeQuery = true)
+    void eliminarAntics(@Param("ids") List<Long> ids);
 
 //    @Modifying
 //    @Query("DELETE from MonitorIntegracioParamEntity mp left outer join mp.monitorIntegracio m WHERE m.data < :llindar")

@@ -98,4 +98,9 @@ public class SchedulledServiceBean implements SchedulledService {
 		delegate.monitorIntegracionsEliminarAntics();
 	}
 
+	@Override
+	public void actualitzarEstatOrgansEnviamentTable() {
+		delegate.actualitzarEstatOrgansEnviamentTable();
+	}
+
 }

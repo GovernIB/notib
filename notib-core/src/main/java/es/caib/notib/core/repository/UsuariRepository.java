@@ -31,4 +31,7 @@ public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 			+ "    u.nom desc")
 	public List<UsuariEntity> findByText(@Param("text") String text);
 
+	@Query("select u.idioma from UsuariEntity u where u.codi = :codi")
+	String getIdiomaUsuari(@Param("codi") String codi);
+
 }

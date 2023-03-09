@@ -39,10 +39,8 @@ public class EnviamentServiceBean implements EnviamentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public List<Long> findIdsAmbFiltre(
-			Long entitatId, 
-			NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException {
-		return delegate.findIdsAmbFiltre(entitatId, filtre);
+	public List<Long> findIdsAmbFiltre(Long entitatId, RolEnumDto rol, String usuariCodi, String organGestorCodi, NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException {
+		return delegate.findIdsAmbFiltre(entitatId, rol, usuariCodi, organGestorCodi, filtre);
 	}
 
 	@Override
@@ -90,14 +88,8 @@ public class EnviamentServiceBean implements EnviamentService {
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public void columnesCreate(
-			UsuariDto usuaris, 
-			Long entitatId, 
-			ColumnesDto columnes) {
-		delegate.columnesCreate(
-				usuaris, 
-				entitatId, 
-				columnes);
+	public void columnesCreate(String codiUsuari, Long entitatId, ColumnesDto columnes) {
+		delegate.columnesCreate(codiUsuari, entitatId, columnes);
 	}
 
 	@Override
@@ -112,12 +104,8 @@ public class EnviamentServiceBean implements EnviamentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public ColumnesDto getColumnesUsuari(
-			Long entitatId, 
-			UsuariDto usuari) {
-		return delegate.getColumnesUsuari(
-				entitatId, 
-				usuari);
+	public ColumnesDto getColumnesUsuari(Long entitatId, String codiUsuari) {
+		return delegate.getColumnesUsuari(entitatId, codiUsuari);
 	}
 
 	@Override
