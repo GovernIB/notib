@@ -81,22 +81,4 @@ public abstract class NotificacioApiRestBaseController extends BaseController {
 		}
 		return resposta;
 	}
-
-	protected void logout(HttpServletRequest request, HttpServletResponse response) {
-
-		HttpSession session = request.getSession(false);
-		SecurityContextHolder.clearContext();
-		// Només per Jboss
-		if (session != null) {
-			// Esborrar la sessió
-			session.invalidate();
-		}
-		// Es itera sobre totes les cookies
-		for(Cookie c : request.getCookies()) {
-			// Es sobre escriu el valor de cada cookie a NULL
-			Cookie ck = new Cookie(c.getName(), null);
-			ck.setPath(request.getContextPath());
-			response.addCookie(ck);
-		}
-	}
 }

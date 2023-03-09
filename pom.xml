@@ -36,7 +36,7 @@
 	</properties>
 	<modules>
 		<module>notib-client</module>
-		<module>notib-client-j11</module>
+<!--		<module>notib-client-2</module>-->
 		<module>notib-core</module>
 		<module>notib-core-api</module>
 		<module>notib-ear</module>

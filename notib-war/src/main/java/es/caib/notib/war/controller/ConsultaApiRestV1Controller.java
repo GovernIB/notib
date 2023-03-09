@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.util.Date;
 
@@ -33,7 +34,7 @@ import java.util.Date;
 @Slf4j
 @RequestMapping("/api/consulta/v1")
 @Api(value = "/rest/consulta", description = "API de consulta de comunicacions i notificacions")
-public class ConsultaApiRestV1Controller {
+public class ConsultaApiRestV1Controller extends  BaseController {
 
 	@Autowired
 	private EnviamentService enviamentService;
@@ -45,7 +46,7 @@ public class ConsultaApiRestV1Controller {
 			notes = "Retorna informació de totes les comunicacions d'un titular, i el seu estat")
 	@ResponseBody
 	public Resposta comunicacionsByTitular(
-			HttpServletRequest request,
+			HttpServletRequest request, HttpServletResponse response,
 			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
 			@ApiParam(name = "dataInicial", value = "Data inicial d'enviament a consultar", required = false)
@@ -61,7 +62,10 @@ public class ConsultaApiRestV1Controller {
 		String basePath = location.toString();
 		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(null)
 													.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
-		return enviamentService.findEnviaments(consulta);
+		Resposta r = enviamentService.findEnviaments(consulta);
+		logoutSession(request, response);
+		return r;
+
 	}
 	
 	@RequestMapping(value="/notificacions/{dniTitular}", method = RequestMethod.GET, produces = "application/json")
@@ -70,7 +74,7 @@ public class ConsultaApiRestV1Controller {
 	@ApiParam(name = "dniTitular", value = "DNI del titular de les notificacions a consultar", required = true)
 	@ResponseBody
 	public Resposta notificacionsByTitular(
-			HttpServletRequest request,
+			HttpServletRequest request,HttpServletResponse response,
 			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
 			@ApiParam(name = "dataInicial", value = "Data inicial d'enviament a consultar", required = false)
@@ -86,7 +90,9 @@ public class ConsultaApiRestV1Controller {
 		String basePath = location.toString();
 		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(null)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
-		return enviamentService.findEnviaments(consulta);
+		Resposta r = enviamentService.findEnviaments(consulta);
+		logoutSession(request, response);
+		return r;
 	}
 
 	@RequestMapping(value="/comunicacions/{dniTitular}/pendents", method = RequestMethod.GET, produces = "application/json")
@@ -96,7 +102,7 @@ public class ConsultaApiRestV1Controller {
 	@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
 	@ResponseBody
 	public Resposta comunicacionsPendentsByTitular(
-			HttpServletRequest request,
+			HttpServletRequest request, HttpServletResponse response,
 			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
 			@ApiParam(name = "dataInicial", value = "Data inicial d'enviament a consultar", required = false)
@@ -112,7 +118,8 @@ public class ConsultaApiRestV1Controller {
 		String basePath = location.toString();
 		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(false)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
-		return enviamentService.findEnviaments(consulta);
+		Resposta r = enviamentService.findEnviaments(consulta);
+		return r;
 	}
 
 	@RequestMapping(value="/notificacions/{dniTitular}/pendents", method = RequestMethod.GET, produces = "application/json")
@@ -122,7 +129,7 @@ public class ConsultaApiRestV1Controller {
 	@ApiParam(name = "dniTitular", value = "DNI del titular de les notificacions a consultar", required = true)
 	@ResponseBody
 	public Resposta notificacionsPendentsByTitular(
-			HttpServletRequest request,
+			HttpServletRequest request, HttpServletResponse response,
 			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
 			@ApiParam(name = "dataInicial", value = "Data inicial d'enviament a consultar", required = false)
@@ -138,7 +145,9 @@ public class ConsultaApiRestV1Controller {
 		String basePath = location.toString();
 		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(false)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
-		return enviamentService.findEnviaments(consulta);
+		Resposta r = enviamentService.findEnviaments(consulta);
+		logoutSession(request, response);
+		return r;
 	}
 
 	@RequestMapping(value="/comunicacions/{dniTitular}/llegides", method = RequestMethod.GET, produces = "application/json")
@@ -147,7 +156,7 @@ public class ConsultaApiRestV1Controller {
 	@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
 	@ResponseBody
 	public Resposta comunicacionsLlegidesByTitular(
-			HttpServletRequest request,
+			HttpServletRequest request, HttpServletResponse response,
 			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
 			@ApiParam(name = "dataInicial", value = "Data inicial d'enviament a consultar", required = false)
@@ -163,7 +172,9 @@ public class ConsultaApiRestV1Controller {
 		String basePath = location.toString();
 		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(true)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
-		return enviamentService.findEnviaments(consulta);
+		Resposta r = enviamentService.findEnviaments(consulta);
+		logoutSession(request, response);
+		return r;
 	}
 
 	@RequestMapping(value="/notificacions/{dniTitular}/llegides", method = RequestMethod.GET, produces = "application/json")
@@ -172,7 +183,7 @@ public class ConsultaApiRestV1Controller {
 	@ApiParam(name = "dniTitular", value = "DNI del titular de les notificacions a consultar", required = true)
 	@ResponseBody
 	public Resposta notificacionsLlegidesByTitular(
-			HttpServletRequest request,
+			HttpServletRequest request, HttpServletResponse response,
 			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
 			@ApiParam(name = "dataInicial", value = "Data inicial d'enviament a consultar", required = false)
@@ -188,7 +199,8 @@ public class ConsultaApiRestV1Controller {
 		String basePath = location.toString();
 		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(true)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
-		return enviamentService.findEnviaments(consulta);
+		Resposta r = enviamentService.findEnviaments(consulta);
+		return r;
 	}
 
 	@RequestMapping(value="/document/{notificacioId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -196,7 +208,7 @@ public class ConsultaApiRestV1Controller {
 			notes = "Retorna el document de la notificació. El contingut del document està en Base64")
 	@ApiParam(name = "notificacioId", value = "Identificador de la notificació de la que es vol obtenir el document", required = true)
 	@ResponseBody
-	public ResponseEntity<Arxiu> getDocument(HttpServletRequest request, @PathVariable Long notificacioId) {
+	public ResponseEntity<Arxiu> getDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId) {
 
 		Arxiu document = null;
 		ArxiuDto arxiu = null;
@@ -218,11 +230,15 @@ public class ConsultaApiRestV1Controller {
 			}
 			String contingutDocumentBasse64 = Base64.encodeBase64String(arxiu.getContingut());
 			document = Arxiu.builder().nom(arxiu.getNom()).mediaType(arxiu.getContentType()).contingut(contingutDocumentBasse64).build();
-			return new ResponseEntity<Arxiu>(document, status);
+			ResponseEntity<Arxiu> r = new ResponseEntity<>(document, status);
+			logoutSession(request, response);
+			return r;
 		}
 		document = Arxiu.builder().error(true).missatgeError("No s'ha trobat el document.").build();
 		status = HttpStatus.BAD_REQUEST;
-		return new ResponseEntity<Arxiu>(document, status);
+		ResponseEntity<Arxiu> r = new ResponseEntity<>(document, status);
+		logoutSession(request, response);
+		return r;
 	}
 
 	@RequestMapping(value="/certificacio/{enviamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -230,7 +246,7 @@ public class ConsultaApiRestV1Controller {
 			notes = "Retorna el document de certificació de lectura de la notificació. El contingut del document està en Base64")
 	@ApiParam(name = "notificacioId", value = "Identificador de l'enviament de la que es vol obtenir la certificació", required = true)
 	@ResponseBody
-	public ResponseEntity<Arxiu> getCertificacio(HttpServletRequest request, @PathVariable Long enviamentId) {
+	public ResponseEntity<Arxiu> getCertificacio(HttpServletRequest request, HttpServletResponse response, @PathVariable Long enviamentId) {
 
 		Arxiu certificacio = null;
 		ArxiuDto arxiu = null;
@@ -243,11 +259,15 @@ public class ConsultaApiRestV1Controller {
 		if (arxiu != null && arxiu.getContingut() != null) {
 			String contingutCertificacioBasse64 = Base64.encodeBase64String(arxiu.getContingut());
 			certificacio = Arxiu.builder().nom(arxiu.getNom()).mediaType(arxiu.getContentType()).contingut(contingutCertificacioBasse64).build();
-			return new ResponseEntity<Arxiu>(certificacio, status);
+			ResponseEntity<Arxiu> r = new ResponseEntity<>(certificacio, status);
+			logoutSession(request, response);
+			return r;
 		}
 		certificacio = Arxiu.builder().error(true).missatgeError("No s'ha trobat la certificació.").build();
 		status = HttpStatus.BAD_REQUEST;
-		return new ResponseEntity<Arxiu>(certificacio, status);
+		ResponseEntity<Arxiu> r = new ResponseEntity<>(certificacio, status);
+		logoutSession(request, response);
+		return r;
 	}
 
 	@RequestMapping(value="/justificant/{enviamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -255,7 +275,7 @@ public class ConsultaApiRestV1Controller {
 			notes = "Retorna el document de justificant de entrega de la comunicació. El contingut del document està en Base64")
 	@ApiParam(name = "notificacioId", value = "Identificador de l'enviament de la que es vol obtenir el justificant", required = true)
 	@ResponseBody
-	public ResponseEntity<Arxiu> getJustificant(HttpServletRequest request, @PathVariable Long enviamentId) {
+	public ResponseEntity<Arxiu> getJustificant(HttpServletRequest request, HttpServletResponse response, @PathVariable Long enviamentId) {
 
 		Arxiu justificant = null;
 		byte[] contingutJustificant = null;
@@ -268,10 +288,14 @@ public class ConsultaApiRestV1Controller {
 		if (contingutJustificant != null) {
 			String contingutJustificantBasse64 = Base64.encodeBase64String(contingutJustificant);
 			justificant = Arxiu.builder().nom("Justificant").mediaType(com.google.common.net.MediaType.PDF.toString()).contingut(contingutJustificantBasse64).build();
-			return new ResponseEntity<>(justificant, status);
+			ResponseEntity<Arxiu> r = new ResponseEntity<>(justificant, status);
+			logoutSession(request, response);
+			return r;
 		}
 		justificant = Arxiu.builder().error(true).missatgeError("No s'ha trobat el justificant.").build();
 		status = HttpStatus.BAD_REQUEST;
-		return new ResponseEntity<>(justificant, status);
+		ResponseEntity<Arxiu> r = new ResponseEntity<>(justificant, status);
+		logoutSession(request, response);
+		return r;
 	}
 }
