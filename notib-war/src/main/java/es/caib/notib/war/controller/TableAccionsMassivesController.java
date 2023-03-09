@@ -37,13 +37,13 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
 
     protected String sessionAttributeSeleccio;
     protected Long notMassivaId;
-    protected final String notId = "notificacioId";
 
     @Autowired
     private NotificacioService notificacioService;
     @Autowired
     private EnviamentService enviamentService;
 
+    @SuppressWarnings("unchecked")
     @RequestMapping(value = {"/seleccionar/all", "{notificacioId}/notificacio/seleccionar/all"}, method = RequestMethod.GET)
     @ResponseBody
     public int select(HttpServletRequest request,  @PathVariable Map<String, String> pathVarsMap) {

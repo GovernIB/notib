@@ -11,6 +11,7 @@ import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.FlushAuthCacheHelper;
 import es.caib.notib.war.helper.SessioHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.Locale;
 
@@ -43,7 +45,12 @@ public class UsuariController extends BaseController {
 
 	@RequestMapping(value = "/logout", method = RequestMethod.GET)
 	public String logout(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession(false);
+		SecurityContextHolder.clearContext();
 		// Només per Jboss
+		if (session != null)
+			// Esborrar la sessió
+			session.invalidate();
 		// Es itera sobre totes les cookies
 		for(Cookie c : request.getCookies()) {
 			// Es sobre escriu el valor de cada cookie a NULL

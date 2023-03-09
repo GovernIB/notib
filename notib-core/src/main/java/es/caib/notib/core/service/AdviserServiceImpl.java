@@ -1,10 +1,11 @@
 package es.caib.notib.core.service;
 
+import es.caib.notib.core.api.dto.AdviserResponseDto;
 import es.caib.notib.core.api.dto.adviser.EnviamentAdviser;
-import es.caib.notib.core.wsdl.adviser.Opcion;
 import es.caib.notib.core.api.service.AdviserService;
 import es.caib.notib.core.wsdl.adviser.Acuse;
 import es.caib.notib.core.wsdl.adviser.AdviserWsV2PortType;
+import es.caib.notib.core.wsdl.adviser.Opcion;
 import es.caib.notib.core.wsdl.adviser.Opciones;
 import es.caib.notib.core.wsdl.adviser.Receptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,29 +21,52 @@ AdviserServiceImpl implements AdviserService {
     private AdviserWsV2PortType adviser;
 
     @Override
-    public void sincronitzarEnviament(EnviamentAdviser env) {
+    public AdviserResponseDto sincronitzarEnviament(EnviamentAdviser env) {
 
-        Receptor r = new Receptor();
-        r.setNifReceptor(env.getReceptor().getNifReceptor());
-        r.setNombreReceptor(env.getReceptor().getNombreReceptor());
-        r.setVinculoReceptor(env.getReceptor().getVinculoReceptor());
-        r.setNifRepresentante(env.getReceptor().getNifRepresentante());
-        r.setNombreRepresentante(env.getReceptor().getNombreRepresentante());
-        r.setCsvRepresetante(env.getReceptor().getCsvRepresetante());
+        Receptor receptor = new Receptor();
+        receptor.setNifReceptor(env.getReceptor().getNifReceptor());
+        receptor.setNombreReceptor(env.getReceptor().getNombreReceptor());
+        receptor.setVinculoReceptor(env.getReceptor().getVinculoReceptor());
+        receptor.setNifRepresentante(env.getReceptor().getNifRepresentante());
+        receptor.setNombreRepresentante(env.getReceptor().getNombreRepresentante());
+        receptor.setCsvRepresetante(env.getReceptor().getCsvRepresetante());
 
-        Acuse aPdf = new Acuse();
-        aPdf.setContenido(env.getAcusePDF().getContenido());
-        aPdf.setHash(env.getAcusePDF().getHash());
-        aPdf.setCsvResguardo(env.getAcusePDF().getCsvResguardo());
+        Acuse acusePdf = new Acuse();
+        acusePdf.setContenido(env.getAcusePDF().getContenido());
+        acusePdf.setHash(env.getAcusePDF().getHash());
+        acusePdf.setCsvResguardo(env.getAcusePDF().getCsvResguardo());
 
-        Acuse aXml = new Acuse();
-        aXml.setContenido(env.getAcusePDF().getContenido());
-        aXml.setHash(env.getAcusePDF().getHash());
-        aXml.setCsvResguardo(env.getAcusePDF().getCsvResguardo());
+        Acuse acuseXml = new Acuse();
+        acuseXml.setContenido(env.getAcusePDF().getContenido());
+        acuseXml.setHash(env.getAcusePDF().getHash());
+        acuseXml.setCsvResguardo(env.getAcusePDF().getCsvResguardo());
 
-        adviser.sincronizarEnvio(env.getOrganismoEmisor(), new Holder<>(env.getHIdentificador()), env.getTipoEntrega(), env.getModoNotificacion(), env.getEstado(),
-                env.getFechaEstado(), r, aPdf, aXml, getOpciones(env.getOpcionesSincronizarEnvio()), new Holder<>(env.getCodigoRespuesta()),
-                new Holder<>(env.getDescripcionRespuesta()), new Holder<>(getOpciones(env.getOpcionesResultadoSincronizarEnvio())));
+        Holder<String> identificador = new Holder<>(env.getHIdentificador());
+        Holder<String> codigoRespuesta = new Holder<>(env.getCodigoRespuesta());
+        Holder<String> descripcionRespuesta = new Holder<>(env.getDescripcionRespuesta());
+        Holder<Opciones> opciones = new Holder<>(getOpciones(env.getOpcionesResultadoSincronizarEnvio()));
+
+        adviser.sincronizarEnvio(
+                env.getOrganismoEmisor(),
+                identificador,
+                env.getTipoEntrega(),
+                env.getModoNotificacion(),
+                env.getEstado(),
+                env.getFechaEstado(),
+                receptor,
+                acusePdf,
+                acuseXml,
+                getOpciones(env.getOpcionesSincronizarEnvio()),
+                codigoRespuesta,
+                descripcionRespuesta,
+                opciones);
+
+        return AdviserResponseDto.builder()
+                .identificador(env.getHIdentificador())
+                .codigoRespuesta(codigoRespuesta.value)
+                .descripcionRespuesta(descripcionRespuesta.value)
+                .opcionesResultadoSincronizarEnvio(env.getOpcionesResultadoSincronizarEnvio())
+                .build();
     }
 
     private Opciones getOpciones(es.caib.notib.core.api.dto.adviser.Opciones opciones) {
