@@ -46,9 +46,10 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 
 		try {
 			RespostaAltaV2 resposta = notificacioServiceWsV2.altaV2(notificacio);
-			logout(request, response);
+			logoutSession(request, response);
 			return resposta;
 		} catch (Exception e) {
+			logoutSession(request, response);
 			return RespostaAltaV2.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
 		}
 	}
@@ -67,9 +68,10 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 				return RespostaConsultaEstatNotificacioV2.builder().error(true).errorDescripcio(err).errorData(new Date()).build();
 			}
 			RespostaConsultaEstatNotificacioV2 not =  notificacioServiceWsV2.consultaEstatNotificacioV2(identificador);
-			logout(request, response);
+			logoutSession(request, response);
 			return not;
 		} catch (Exception e) {
+			logoutSession(request, response);
 			return RespostaConsultaEstatNotificacioV2.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
 		}
 	}
@@ -88,9 +90,10 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 				return RespostaConsultaEstatEnviamentV2.builder().error(true).errorDescripcio(err).errorData(new Date()).build();
 			}
 			RespostaConsultaEstatEnviamentV2 resposta = notificacioServiceWsV2.consultaEstatEnviamentV2(referencia);
-			logout(request, response);
+			logoutSession(request, response);
 			return resposta;
 		} catch (Exception e) {
+			logoutSession(request, response);
 			return RespostaConsultaEstatEnviamentV2.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
 		}
 	}
@@ -105,9 +108,10 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 
 		try {
 			RespostaConsultaDadesRegistreV2 resposta = notificacioServiceWsV2.consultaDadesRegistreV2(dadesConsulta);
-			logout(request, response);
+			logoutSession(request, response);
 			return resposta;
 		} catch (Exception e) {
+			logoutSession(request, response);
 			return RespostaConsultaDadesRegistreV2.builder().error(true).errorDescripcio(getErrorDescripcio(e)).build();
 		}
 	}
@@ -129,7 +133,7 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 										@RequestBody PermisConsulta permisConsulta, HttpServletRequest request, HttpServletResponse response) {
 
 		String resposta = donarPermisConsulta(permisConsulta);
-		logout(request, response);
+		logoutSession(request, response);
 		return resposta;
 	}
 }
