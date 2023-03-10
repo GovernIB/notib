@@ -1,5 +1,6 @@
 package es.caib.notib.core.ejb;
 
+import es.caib.notib.core.api.dto.AdviserResponseDto;
 import es.caib.notib.core.api.dto.adviser.EnviamentAdviser;
 import es.caib.notib.core.api.service.AdviserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public class AdviserServiceBean implements AdviserService {
     AdviserService delegate;
 
     @Override
-    public void sincronitzarEnviament(EnviamentAdviser env) {
-        delegate.sincronitzarEnviament(env);
+    public AdviserResponseDto sincronitzarEnviament(EnviamentAdviser env) {
+        return delegate.sincronitzarEnviament(env);
     }
 }

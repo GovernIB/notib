@@ -18,7 +18,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
-import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 
@@ -58,7 +57,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     	taskRegistrar.setScheduler(taskScheduler);
         this.taskRegistrar = taskRegistrar;
 
-        // 1. Enviament de notificacions pendents al registre y notific@
+        // 1. Enviament de notificacions pendents al registre i notific@
         ////////////////////////////////////////////////////////////////
         final String registrarEnviamentsPendents = "registrarEnviamentsPendents";
         monitorTasquesService.addTasca(registrarEnviamentsPendents);
