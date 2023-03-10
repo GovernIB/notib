@@ -115,7 +115,7 @@ public class ClientRestCarpetav2Test {
 	@Test
 	public void testNotificacioPendentsByTitularVisibleCat() throws Exception {
 
-		RespostaConsultaV2 resposta = client.notificacionsPendentsByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, IdiomaEnumDto.CA, 0, 10);
+		RespostaConsultaV2 resposta = client.notificacionsPendentsByTitular("00000000T", sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, IdiomaEnumDto.CA, 0, 10);
 		assertNotNull(resposta);
 
 		assertTrue("No s'han trobat resultats", resposta.getNumeroElementsTotals() > 0);
