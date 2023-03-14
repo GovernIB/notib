@@ -28,6 +28,8 @@ public class CallbackEntity extends NotibAuditable<Long> {
 
     private static final int ERROR_DESC_MAX_LENGTH = 2048;
 
+    @Column(name = "aplicacio_id", nullable = false)
+    private Long aplicacioId;
     @Column(name = "notificacio_id", nullable = false)
     private Long notificacioId;
     @Column(name = "enviament_id", nullable = false)
