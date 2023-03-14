@@ -461,7 +461,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 			NotificacioEventEntity lastErrorEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
 			dto.setNoticaErrorEventTipus(lastErrorEvent != null ? lastErrorEvent.getTipus() : null);
-			dto.setNotificaErrorTipus(lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null);
+			// TODO EVENTS: Obtenir missatge d'error dels events
+//			dto.setNotificaErrorTipus(lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null);
 			dto.setEnviadaDate(getEnviadaDate(notificacio));
 
 			// TODO RECUPERAR INFORMACIÓ DIRECTAMENT DE LES ENTITATS
@@ -1103,7 +1104,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			logger.debug("Consulta dels events associats a un destinatari (notificacioId=" + notificacioId + ", enviamentId=" + enviamentId + ")");
 			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 			entityComprovarHelper.comprovarPermisos(enviament.getNotificacio().getId(), true, true, true);
-			return conversioTipusHelper.convertirList(notificacioEventRepository.findByNotificacioIdOrEnviamentIdOrderByDataAsc(notificacioId, enviamentId), NotificacioEventDto.class);
+			return conversioTipusHelper.convertirList(notificacioEventRepository.findByEnviamentIdOrderByDataAsc(enviamentId), NotificacioEventDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

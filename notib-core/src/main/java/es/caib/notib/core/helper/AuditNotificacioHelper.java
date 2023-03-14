@@ -150,7 +150,6 @@ public class AuditNotificacioHelper {
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioMixtaEnviadaNotifica(NotificacioEntity notificacio) {
-		notificacioEventHelper.clearOldNotificaUselessEvents(notificacio);
 		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
 	}

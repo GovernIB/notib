@@ -75,34 +75,27 @@ public class EmailNotificacioSenseNifHelper {
 		if (totsEmail) {
 			notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
 			notificacio.updateNotificaEnviamentData();
-		}
 
-		if (totsEmail && !NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
-			log.error(" [NOT] la notificació no té l'estat REGISTRADA o ENVIADA_AMB_ERRORS.");
-			throw new ValidationException(notificacio.getId(), NotificacioEntity.class,
-					"La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA + " o " + NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
+			if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
+				log.error(" [NOT] la notificació no té l'estat REGISTRADA o ENVIADA_AMB_ERRORS.");
+				throw new ValidationException(notificacio.getId(), NotificacioEntity.class,
+						"La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA + " o " + NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
+			}
 		}
-
 
 		boolean hasErrors = false;
 		for (NotificacioEnviamentEntity enviament : enviamentsSenseNif) {
 			String error = sendEmailInfoEnviamentSenseNif(enviament);
 			if (error == null) {
-				notificacioEventHelper.addEmailEnviamentEvent(notificacio, enviament);
 				auditEnviamentHelper.updateEnviamentEmailFinalitzat(enviament);
-			} else {
-				notificacioEventHelper.addEmailEnviamentEventError(notificacio, enviament, error);
 			}
+			notificacioEventHelper.addEmailEnviamentEvent(enviament, error != null, error);
 			hasErrors = hasErrors || error != null;
 		}
 
 		// Event Notificació x envaiment per email
 		if (hasErrors) {
-			notificacioEventHelper.addEmailEnviamentEventError(notificacio, null,
-					"S'ha produït algun error en l'enviament via email. Els errors es poden consultar en cada un dels enviaments.");
 			auditNotificacioHelper.updateNotificacioEnviadaAmbErrors(notificacio);
-		} else {
-			notificacioEventHelper.addEmailEnviamentEvent(notificacio, null);
 		}
 
 		// Estat de la notificació

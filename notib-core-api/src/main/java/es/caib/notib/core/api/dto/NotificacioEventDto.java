@@ -20,22 +20,24 @@ public class NotificacioEventDto extends AuditoriaDto {
 	private Long id;
 	private NotificacioEventTipusEnumDto tipus;
 	private Date data;
-	private String descripcio;
+//	private String descripcio;
 	private boolean error;
 	private String errorDescripcio;
-	private CallbackEstatEnumDto callbackEstat;
-	private String callbackError;
-	private Integer callbackIntents;
+	private Boolean fiReintents;
 
-	private NotificacioEventEnviamentDto enviament;
+//	private CallbackEstatEnumDto callbackEstat;
+//	private String callbackError;
+//	private Integer callbackIntents;
 
-	public boolean isEnviamentAssociat() {
-		return enviament != null;
-	}
+//	private NotificacioEventEnviamentDto enviament;
 
-	public String getCallbackError(){
-		return callbackError !=null ? callbackError : "";
-	}
+//	public boolean isEnviamentAssociat() {
+//		return enviament != null;
+//	}
+//
+//	public String getCallbackError(){
+//		return callbackError !=null ? callbackError : "";
+//	}
 
 	@Override
 	public String toString() {

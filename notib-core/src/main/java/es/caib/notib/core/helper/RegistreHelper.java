@@ -6,6 +6,7 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
@@ -49,54 +50,41 @@ public class RegistreHelper {
 	@UpdateEnviamentTable
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	public NotificacioEnviamentEntity enviamentRefrescarEstatRegistre(Long enviamentId) {
-		long startTime;
-		double elapsedTime;
+
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacio().getId());
-		logger.info(" [SIR] Inici actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 
-		String descripcio;
-		logger.debug("Comunicació SIR --> consular estat...");
+		LogTimeHelper log = new LogTimeHelper(logger);
+		log.info(" [SIR] Inici actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 
-		startTime = System.nanoTime();
-		enviament.updateSirNovaConsulta(pluginHelper.getConsultaSirReintentsPeriodeProperty());
-		elapsedTime = (System.nanoTime() - startTime) / 10e6;
-		logger.info(" [TIMER-SIR] Actualizar SIR nova consulta (updateSirNovaConsulta)  [Id: " + enviamentId + "]: " + elapsedTime + " ms");
-		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb Registre (" +
-				"notificacioId=" + notificacio.getId() + ", " +
-				"registreNumeroFormatat=" + enviament.getRegistreNumeroFormatat() + ")";
-		
+		boolean error = false;
+		String errorPrefix = "Error al consultar l'estat d'un Registre (" + "notificacioId=" + notificacio.getId() + ", " + "registreNumeroFormatat=" + enviament.getRegistreNumeroFormatat() + ")";
+		String errorDescripcio = null;
+
 		try {
+			// Validacions
 			if (enviament.getRegistreNumeroFormatat() == null) {
-				logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-				throw new ValidationException(
-						enviament,
-						NotificacioEnviamentEntity.class,
-						"L'enviament no té número de registre SIR");
+				log.infoWithoutTime(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]. L'enviament no té número de registre SIR");
+				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, "L'enviament no té número de registre SIR");
 			}
 
-			logger.debug("Comunicació SIR --> número registre formatat: " + enviament.getRegistreNumeroFormatat());
-			logger.debug("Comunicació SIR --> consulant estat...");
+			log.debugWithoutTime("Comunicació SIR --> número registre formatat: " + enviament.getRegistreNumeroFormatat());
 
-			startTime = System.nanoTime();
+			// Consulta al registre
 			RespostaConsultaRegistre resposta = pluginHelper.obtenerAsientoRegistral(
 					notificacio.getEntitat().getDir3Codi(),
 					enviament.getRegistreNumeroFormatat(),
 					2L,  //registre sortida
 					false);
-			elapsedTime = (System.nanoTime() - startTime) / 10e6;
-			logger.info(" [TIMER-SIR] Obtener asiento registral  [Id: " + enviamentId + "]: " + elapsedTime + " ms");
 
-			logger.debug("Comunicació SIR --> creació event...");
+			log.info(" [TIMER-SIR] Obtener asiento registral  [Id: " + enviamentId + "]");
+
+			// Consulta retorna error
 			if (resposta.getErrorCodi() != null && !resposta.getErrorCodi().isEmpty()) {
-				startTime = System.nanoTime();
-				//Crea un nou event
-				boolean errorMaxReintents = enviament.getSirConsultaIntent() >= pluginHelper.getConsultaSirReintentsMaxProperty();
-				notificacioEventHelper.addRegistreEnviamentEventError(notificacio, enviament, resposta.getErrorDescripcio(), errorMaxReintents);
-				elapsedTime = (System.nanoTime() - startTime) / 10e6;
-				logger.info(" [TIMER-SIR] Creació nou event error [Id: " + enviamentId + "]: " + elapsedTime + " ms");
+				throw new RegistreNotificaException(resposta.getErrorDescripcio());
+
+			// Consulta retorna correctement
 			} else {
-				startTime = System.nanoTime();
 				enviamentUpdateDatat(
 						resposta.getEstat(),
 						resposta.getRegistreData(),
@@ -104,38 +92,44 @@ public class RegistreHelper {
 						resposta.getSirRegistreDestiData(),
 						resposta.getRegistreNumeroFormatat(),
 						enviament);
-				elapsedTime = (System.nanoTime() - startTime) / 10e6;
-				logger.info(" [TIMER-SIR] Actualitzar estat comunicació SIR [Id: " + enviamentId + "]: " + elapsedTime + " ms");
+				log.info(" [TIMER-SIR] Actualitzar estat comunicació SIR [Id: " + enviamentId + "]: ");
 
-				logger.debug("Comunicació SIR --> nou estat: " + resposta.getEstat() != null ? resposta.getEstat().name() : "");
-				descripcio = resposta.getEstat() != null ? resposta.getEstat().name() : resposta.getRegistreNumeroFormatat();
-
-				//Crea un nou event
-				notificacioEventHelper.addRegistreEnviamentEvent(notificacio, enviament, descripcio);
-
-				logger.debug("Comunicació SIR --> enviar correu si és aplicació...");
 				if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
-					startTime = System.nanoTime();
 					emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
-					elapsedTime = (System.nanoTime() - startTime) / 10e6;
-					logger.info(" [TIMER-SIR] Preparar enviament mail notificació [Id: " + enviamentId + "]: " + elapsedTime + " ms");
+					log.info(" [TIMER-SIR] Preparar enviament mail notificació [Id: " + enviamentId + "]");
 				}
 				enviament.refreshSirConsulta();
 			}
-			logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
+			log.infoWithoutTime(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 
 		} catch (Exception ex) {
-			logger.error(
-					errorPrefix,
-					ex);
-			boolean errorMaxReintents = enviament.getSirConsultaIntent() >= pluginHelper.getConsultaSirReintentsMaxProperty();
-			notificacioEventHelper.addRegistreConsultaEventError(notificacio, enviament, ExceptionUtils.getStackTrace(ex), errorMaxReintents);
-			logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-//			return false;
+			error = true;
+			errorDescripcio = getErrorDescripcio(enviament.getSirConsultaIntent(), ex);
+			logger.error(errorPrefix, ex);
 		}
+
+		boolean errorMaxReintents = false;
+		if (error) {
+			enviament.updateSirNovaConsulta(pluginHelper.getConsultaSirReintentsPeriodeProperty());
+			errorMaxReintents = enviament.getSirConsultaIntent() >= pluginHelper.getConsultaSirReintentsMaxProperty();
+		}
+
+		notificacioEventHelper.addSirConsultaEvent(enviament, error, errorDescripcio, errorMaxReintents);
+		logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		return enviament;
 	}
 
+	private static String getErrorDescripcio(int intent, Exception ex) {
+		String errorDescripcio;
+		// Generam el missatge d'error
+		errorDescripcio = "Intent " + intent + "\n\n";
+		if (ex instanceof ValidationException || ex instanceof RegistreNotificaException) {
+			errorDescripcio += ex.getMessage();
+		} else {
+			errorDescripcio += ExceptionUtils.getStackTrace(ex);
+		}
+		return errorDescripcio;
+	}
 
 
 	public void enviamentUpdateDatat(

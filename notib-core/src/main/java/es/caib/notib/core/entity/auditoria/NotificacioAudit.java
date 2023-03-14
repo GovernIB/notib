@@ -112,9 +112,9 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 	private int notificaEnviamentIntent;
 	
 	// Errors
-	@Column(name = "not_error_tipus")
-	@Enumerated(EnumType.STRING)
-	private NotificacioErrorTipusEnumDto notificaErrorTipus;
+//	@Column(name = "not_error_tipus")
+//	@Enumerated(EnumType.STRING)
+//	private NotificacioErrorTipusEnumDto notificaErrorTipus;
 	@Column(name = "callback_error")
 	private boolean errorLastCallback;
 	@Column(name = "event_error")
@@ -158,7 +158,7 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 		this.registreData = notificacioEntity.getRegistreData();
 		this.notificaEnviamentData = notificacioEntity.getNotificaEnviamentData();
 		this.notificaEnviamentIntent = notificacioEntity.getNotificaEnviamentIntent();
-		this.notificaErrorTipus = lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null;
+//		this.notificaErrorTipus = lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null;
 		this.errorLastCallback = notificacioEntity.isErrorLastCallback();
 		this.errorEventId = lastErrorEvent != null ? lastErrorEvent.getId() : null;
 		this.referencia = notificacioEntity.getReferencia();

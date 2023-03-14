@@ -8,7 +8,6 @@ import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
@@ -22,7 +21,6 @@ import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.war.helper.CaducitatHelper;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.ValidNotificacio;
-import es.caib.notib.war.validation.ValidNotificacioValidator;
 import es.caib.notib.war.validation.ValidPersonaValidator;
 import lombok.Getter;
 import lombok.Setter;
@@ -86,7 +84,7 @@ public class NotificacioCommand {
 	private boolean eliminarLogoPeu;
 	private boolean eliminarLogoCap;
 	private ServeiTipusEnumDto serveiTipus;
-	protected NotificacioErrorTipusEnumDto notificaErrorTipus;
+//	protected NotificacioErrorTipusEnumDto notificaErrorTipus;
 	@Valid @NotEmpty
 	private List<EnviamentCommand> enviaments = new ArrayList<>();
 

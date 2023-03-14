@@ -320,7 +320,7 @@ public class NotificacioServiceWsV2Test {
 		Mockito.when(auditEnviamentHelper.desaEnviamentAmbReferencia(Mockito.any(EntitatEntity.class), 
 				Mockito.nullable(NotificacioEntity.class), Mockito.any(Enviament.class),
 				Mockito.any(ServeiTipusEnumDto.class), Mockito.any(PersonaEntity.class),
-				Mockito.anyListOf(PersonaEntity.class))).thenReturn(enviamentSavedMock);
+				Mockito.<PersonaEntity>anyList())).thenReturn(enviamentSavedMock);
 		Mockito.when(personaRepository.save(Mockito.any(PersonaEntity.class))).thenReturn(personaEntity);
 		Mockito.when(auditNotificacioHelper.desaNotificacio(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioGuardada);
 		Mockito.when(notificacioRepository.saveAndFlush(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioGuardada);
@@ -480,7 +480,7 @@ public class NotificacioServiceWsV2Test {
 			}
 			enviament.setTitular(titular);
 			if (destinatari == null) {
-				destinatari = crearPersona("18225486x","Jordi","Test1","Test1", "666020202","jordi@limit.es");;
+				destinatari = crearPersona("18225486x","Jordi","Test1","Test1", "666020202","jordi@limit.es");
 			}
 			enviament.setDestinataris(new ArrayList<Persona>());
 			enviament.getDestinataris().add(destinatari);

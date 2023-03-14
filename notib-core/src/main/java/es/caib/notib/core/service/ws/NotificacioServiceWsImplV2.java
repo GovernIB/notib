@@ -19,7 +19,6 @@ import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcSerTipusEnum;
@@ -57,7 +56,6 @@ import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.CaducitatHelper;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.SemaforNotificacio;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
@@ -68,6 +66,7 @@ import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.RegistreNotificaHelper;
+import es.caib.notib.core.helper.SemaforNotificacio;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.EntitatRepository;
@@ -91,7 +90,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sun.misc.BASE64Encoder;
 
 import javax.jws.WebService;
 import java.io.BufferedInputStream;
@@ -1169,7 +1167,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						.nom(justificantDto.getNom())
 						.contentType(justificantDto.getContentType())
 						.tamany(justificantDto.getTamany())
-						.contingut(new BASE64Encoder().encode(justificantDto.getContingut()).getBytes()).build());
+						.contingut(Base64.encodeBase64(justificantDto.getContingut())).build());
 				integracioHelper.addAccioOk(info);
 				return resposta;
 
@@ -1216,7 +1214,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		NotificacioEventEntity errorEvent = notificacioHelper.getNotificaErrorEvent(notificacioGuardada);
 		if (errorEvent != null) {
-			logger.debug(">> [ALTA] Event d'error de Notifica!: " + errorEvent.getDescripcio() + " - " + errorEvent.getErrorDescripcio());
+//			logger.debug(">> [ALTA] Event d'error de Notifica!: " + errorEvent.getDescripcio() + " - " + errorEvent.getErrorDescripcio());
 			info.setCodiEntitat(errorEvent.getNotificacio().getEntitat().getCodi());
 			resposta.setError(true);
 			resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
@@ -1233,14 +1231,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		logger.debug(">> [ALTA] notificació assíncrona");
 		List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioGuardada);
 		for (NotificacioEnviamentEntity enviament : enviamentsEntity) {
-			NotificacioEventEntity eventDatat = NotificacioEventEntity.getBuilder(
-					NotificacioEventTipusEnumDto.CALLBACK_CLIENT_PENDENT,
-					notificacioGuardada).
-					enviament(enviament).
-					callbackInicialitza().
-					build();
-			notificacioGuardada.updateEventAfegir(eventDatat);
-			notificacioEventRepository.saveAndFlush(eventDatat);
+//			NotificacioEventEntity eventDatat = NotificacioEventEntity.getBuilder(
+//					NotificacioEventTipusEnumDto.CALLBACK_CLIENT_PENDENT,
+//					notificacioGuardada).
+//					enviament(enviament).
+//					callbackInicialitza().
+//					build();
+//			notificacioGuardada.updateEventAfegir(eventDatat);
+//			notificacioEventRepository.saveAndFlush(eventDatat);
 		}
 		logger.debug(">> [ALTA] callbacks de client inicialitzats");
 	}

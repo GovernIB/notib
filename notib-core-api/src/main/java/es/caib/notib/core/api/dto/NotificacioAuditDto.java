@@ -44,7 +44,7 @@ public class NotificacioAuditDto {
     private Date registreData;
     private Date notificaEnviamentData;
     private int notificaEnviamentIntent;
-    private NotificacioErrorTipusEnumDto notificaErrorTipus;
+//    private NotificacioErrorTipusEnumDto notificaErrorTipus;
     private boolean errorLastCallback;
     private Long errorEventId;
 }

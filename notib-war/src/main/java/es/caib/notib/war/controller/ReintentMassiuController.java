@@ -120,23 +120,24 @@ public class ReintentMassiuController extends BaseUserController {
 					"accio.massiva.seleccio.buida");
 		}
 		for (Long notificacioId : seleccio) {
-			List<NotificacioEventDto> events = notificacioService.eventFindAmbNotificacio(null, notificacioId);
-			
-			if (events != null && events.size() > 0) {
-				NotificacioEventDto lastEvent = events.get(events.size() - 1);
-				
-				if(lastEvent.isError() && 
-							(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT) || 
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR) || 
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR) || 
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
-					enviamentService.reintentarCallback(lastEvent.getId());
-				}
-			}
+			// TODO:
+//			List<NotificacioEventDto> events = notificacioService.eventFindAmbNotificacio(null, notificacioId);
+//
+//			if (events != null && events.size() > 0) {
+//				NotificacioEventDto lastEvent = events.get(events.size() - 1);
+//
+//				if(lastEvent.isError() &&
+//							(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
+//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
+//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
+//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT) ||
+//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR) ||
+//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR) ||
+//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) ||
+//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
+//					enviamentService.reintentarCallback(lastEvent.getId());
+//				}
+//			}
 		}
 		RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
 		

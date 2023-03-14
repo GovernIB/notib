@@ -50,8 +50,12 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 </c:forEach>
 $(document).ready(function() {
 	$('#events').on('rowinfo.dataTable', function(e, td, rowData) {
+		let errorText = rowData['errorDescripcio'];
+		if (rowData['fiReintents']) {
+			errorText += "\n\nEsgotats els reintents.";
+		}
 		$(td).empty();
-    	$(td).append('<textarea style="width:100%" rows="10">' + rowData['errorDescripcio'] + '</textarea>');
+    	$(td).append('<textarea style="width:100%" rows="10">' + errorText + '</textarea>');
 	});
 	$('#events').on('draw.dt', function(e, settings) {
 		var api = new $.fn.dataTable.Api(settings);
@@ -93,6 +97,7 @@ $(document).ready(function() {
 </head>
 <body>
 <div id="contingut-missatges"></div>
+<%-- TODO EVENTS: mostrar missatges d'events
 	<c:if test="${enviament.notificacio.notificaError}">
 		<div class="alert alert-danger well-sm">
 			<span class="fa fa-warning text-danger"></span>
@@ -113,6 +118,7 @@ $(document).ready(function() {
 			</div>
 		</div>
 	</c:if>
+--%>
 	<ul class="nav nav-tabs" role="tablist">
 		<li role="presentation"<c:if test="${pipellaActiva == 'dades'}"> class="active"</c:if>>
 			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab">
@@ -633,15 +639,13 @@ $(document).ready(function() {
 			<thead>
 				<tr>
 					<th data-col-name="id" data-visible="false">#</th>
-					<th data-col-name="enviamentAssociat" data-visible="false"></th>
 					<th data-col-name="errorDescripcio" data-visible="false"></th>
-					<%--th data-col-name="createdBy.nom" data-orderable="false"><spring:message code="notificacio.event.list.columna.usuari"/></th--%>
+					<th data-col-name="fiReintents" data-visible="false"></th>
 					<th data-col-name="data" data-converter="datetime" data-orderable="false"><spring:message code="enviament.event.list.columna.data"/></th>
 					<th data-col-name="tipus" data-template="#cellTipus" data-orderable="false">
 						<spring:message code="enviament.event.list.columna.tipus"/>
 						<script id="cellTipus" type="text/x-jsrender">
 							{{:~eval('eventTipus["' + tipus + '"]')}}
-							{{if enviamentAssociat}}<span class="label label-default pull-right" title="<spring:message code="notificacio.event.list.info.associat"/>">E</span>{{/if}}
 						</script>
 					</th>
 					<th data-col-name="error" data-template="#cellResultat" data-orderable="false">

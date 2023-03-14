@@ -921,6 +921,7 @@ $(document).ready(function() {
 					</li>
 				</c:if>
 				<!-- Acció reprendre consulta d'estat  - Estat == ENVIADA && notificaErrorTipus == ERROR_REINTENTS_CONSULTA -->
+				<%-- TODO EVENTS: obtenir error reintents dels events
 				<c:if test="${notificacio.estat == 'ENVIADA' && notificacio.notificaErrorTipus == 'ERROR_REINTENTS_CONSULTA'}">
 					<c:set var="algunaAccioDisponible" value="${true}" />
 					<li class="list-group-item">
@@ -937,7 +938,9 @@ $(document).ready(function() {
 						</div>
 					</li>
 				</c:if>
+				--%>
 				<!-- Acció reprendre consulta d'estat SIR  - Estat == ENVIADA && notificaErrorTipus == ERROR_REINTENTS_SIR -->
+				<%-- TODO EVENTS: recuperar reintents de events
 				<c:if test="${notificacio.estat == 'ENVIADA' && notificacio.notificaErrorTipus == 'ERROR_REINTENTS_SIR'}">
 					<c:set var="algunaAccioDisponible" value="${true}" />
 					<li class="list-group-item">
@@ -954,6 +957,7 @@ $(document).ready(function() {
 						</div>
 					</li>
 				</c:if>
+				--%>
 				<c:if test="${notificacio.tipusUsuari == 'APLICACIO' && notificacio.errorLastCallback}">
 					<c:set var="algunaAccioDisponible" value="${true}" />
 					<li class="list-group-item">
@@ -1052,7 +1056,7 @@ $(document).ready(function() {
 					<th data-col-name="registreData" data-orderable="false" data-converter="datetime"><spring:message code="notificacio.historic.list.columna.registreData" /></th>
 					<th data-col-name="notificaEnviamentData" data-orderable="false" data-converter="datetime"><spring:message code="notificacio.historic.list.columna.notificaEnviamentData" /></th>
 					<th data-col-name="notificaEnviamentIntent" data-orderable="false"><spring:message code="notificacio.historic.list.columna.notificaEnviamentIntent" /></th>
-					<th data-col-name="notificaErrorTipus" data-orderable="false"><spring:message code="notificacio.historic.list.columna.notificaErrorTipus" /></th>
+<%--					<th data-col-name="notificaErrorTipus" data-orderable="false"><spring:message code="notificacio.historic.list.columna.notificaErrorTipus" /></th>--%>
 					<th data-col-name="errorLastCallback" data-orderable="false"><spring:message code="notificacio.historic.list.columna.errorLastCallback" /></th>
 					<th data-col-name="errorEventId" data-orderable="false"><spring:message code="notificacio.historic.list.columna.errorEventId" /></th>
 

@@ -10,6 +10,7 @@ import es.caib.notib.core.entity.config.ConfigGroupEntity;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.NotificacioEventHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.config.ConfigGroupRepository;
@@ -62,6 +63,7 @@ public class ConfigServiceImpl implements ConfigService {
         }
         configEntity.update(!"null".equals(property.getValue()) ? property.getValue() : null);
         pluginHelper.resetPlugins(configEntity.getGroupCode());
+        NotificacioEventHelper.clearNotificaConsultaActiva();
         cacheHelper.clearAllCaches();
         return conversioTipusHelper.convertir(configEntity, ConfigDto.class);
     }

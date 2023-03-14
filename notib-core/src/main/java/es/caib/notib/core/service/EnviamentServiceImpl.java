@@ -1545,7 +1545,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 		long numEventsCallbackPendent = notificacioEventRepository.countByEnviamentIdAndCallbackEstat(enviamentId, CallbackEstatEnumDto.PENDENT);
 		if (enviament.getNotificacio().isTipusUsuariAplicacio() && numEventsCallbackPendent == 0) {
 			logger.info(String.format("[callback] Reactivam callback de l'enviment [id=%d]", enviamentId));
-			notificacioEventHelper.addCallbackActivarEvent(enviament);
+			// TODO:
+//			notificacioEventHelper.addCallbackActivarEvent(enviament);
 			return;
 		}
 		logger.info(String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",
@@ -1575,11 +1576,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 
 		int maxPendents = configHelper.getAsInt("es.caib.notib.tasca.callback.pendents.processar.max");
-		Pageable page = new PageRequest(0, maxPendents);
+//		Pageable page = new PageRequest(0, maxPendents);
 		List<NotificacioEventEntity> events = notificacioEventRepository.findEventsAmbCallbackPendent();
 		for (NotificacioEventEntity event : events) {
-			int intents = event.getCallbackIntents() + 1;
-			event.updateCallbackClient(CallbackEstatEnumDto.NOTIFICAT,  intents, null, callbackHelper.getIntentsPeriodeProperty());
+//			int intents = event.getCallbackIntents() + 1;
+//			event.updateCallbackClient(CallbackEstatEnumDto.NOTIFICAT,  intents, null, callbackHelper.getIntentsPeriodeProperty());
 			auditNotificacioHelper.updateLastCallbackError(not, false);
 			IntegracioInfo info = new IntegracioInfo(
 					IntegracioHelper.INTCODI_CLIENT,

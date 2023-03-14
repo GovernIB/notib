@@ -101,7 +101,7 @@
 							<execution>
 								<phase>package</phase>
 								<configuration>
-									<tasks>
+									<target>
 <!-- 										<copy file="${basedir}/target/notib.ear" tofile="${jboss.directory}/notib.ear" /> -->
 										<echo> </echo>
 										<echo> </echo>
@@ -114,7 +114,7 @@
 										<echo>|                          | |                                                                               |</echo>                                                                            
 										<echo>|                          |_|                                                                               |</echo>   
 										<echo> </echo>                                                                         										
-									</tasks>
+									</target>
 								</configuration>
 								<goals>
 									<goal>run</goal>
@@ -149,7 +149,7 @@
 							<execution>
 								<phase>package</phase>
 								<configuration>
-									<tasks>
+									<target>
 										<echo> </echo>
 										<echo> </echo>
 										<echo>|      _____                      _ _          _     __                  _______ ____  __  __  _____       _______    |</echo>
@@ -161,7 +161,7 @@
 										<echo>|                          | |                                                                                        |</echo>
 										<echo>|                          |_|                                                                                        |</echo>
 										<echo> </echo>                                                                       										
-									</tasks>
+									</target>
 								</configuration>
 								<goals>
 									<goal>run</goal>

@@ -1,7 +1,6 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotTableUpdate;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -20,9 +19,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -346,17 +343,7 @@ public class NotificacioTableHelper {
     }
 
     private boolean isErrorLastEvent(NotificacioEntity notificacio, NotificacioEventEntity event) {
-        List<NotificacioEventTipusEnumDto> errorsTipus = Arrays.asList(
-                NotificacioEventTipusEnumDto.CALLBACK_CLIENT,
-                NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-                NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-                NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
-                NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-                NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
-                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR,
-                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR
-        );
-        return event != null && notificacio.isTipusUsuariAplicacio() && event.isError() && errorsTipus.contains(event.getTipus());
+        return event != null && notificacio.isTipusUsuariAplicacio() && event.isError();
     }
 
     /**

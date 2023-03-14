@@ -24,8 +24,10 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 
 	List<NotificacioEventEntity> findByNotificacioIdOrderByDataAsc(Long notificacioId);
 
-	List<NotificacioEventEntity> findByNotificacioIdOrEnviamentIdOrderByDataAsc(Long notificacioId,	Long enviamentId);
-	
+	List<NotificacioEventEntity> findByNotificacioIdOrEnviamentIdOrderByDataAsc(Long notificacioId, Long enviamentId);
+
+	List<NotificacioEventEntity> findByEnviamentIdOrderByDataAsc(Long enviamentId);
+
 	List<NotificacioEventEntity> findByEnviamentIdOrderByIdAsc(Long enviamentId);
 
 	long countByEnviamentIdAndCallbackEstat(Long enviamentId, CallbackEstatEnumDto callbackEstat);
@@ -152,4 +154,6 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			"  from NotificacioEventEntity ne " +
 			" where ne.id = :eventId")
 	Long findNotificacioIdByEventId(@Param("eventId") Long eventId);
+
+    List<NotificacioEventEntity> findByEnviamentAndTipusOrderByIdDesc(NotificacioEnviamentEntity enviament, NotificacioEventTipusEnumDto tipus);
 }

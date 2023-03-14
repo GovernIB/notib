@@ -122,6 +122,8 @@ public class RegistreNotificaHelper {
 			}
 		}
 
+		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity, pluginHelper.getRegistreReintentsPeriodeProperty());
+
 		if (enviamentsRegistrats(notificacioEntity.getEnviaments())) {
 			boolean isSir = notificacioEntity.isComunicacioSir();
 			notificacioEntity.updateEstat(isSir ? NotificacioEstatEnumDto.ENVIADA : NotificacioEstatEnumDto.REGISTRADA);
@@ -158,9 +160,14 @@ public class RegistreNotificaHelper {
 			arbResposta.setErrorDescripcio(e.getMessage());
 		}
 		//Registrar event
+		boolean error = false;
+		String errorDescripcio = null;
+		boolean errorMaxReintents = false;
 		if(arbResposta.getErrorCodi() != null) {
 			logger.info(" >>> ... ERROR: (" + arbResposta.getErrorCodi() + ") " + arbResposta.getErrorDescripcio());
-			updateEventWithError(arbResposta, notificacioEntity, enviament);
+			error = true;
+			errorDescripcio = getErrorDescripcio(arbResposta.getErrorCodi(), arbResposta.getErrorDescripcio(), notificacioEntity.getRegistreEnviamentIntent());
+			errorMaxReintents = notificacioEntity.getRegistreEnviamentIntent() >= pluginHelper.getRegistreReintentsMaxProperty();
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Hi ha hagut un error realitzant el procés de registre (temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
 		} else {
@@ -170,8 +177,10 @@ public class RegistreNotificaHelper {
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
 			info.getParams().add(new AccioParam("Procés descripció: ", " Procedim a enviar la notificació a Notific@"));
 		}
-		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity, pluginHelper.getRegistreReintentsPeriodeProperty());
+		notificacioEventHelper.addRegistreEnviamentEvent(enviament, error, errorDescripcio, errorMaxReintents);
 	}
+
+	// TODO: Reinitents per enviament, no per notificació!!--> Posar reintents de notificació després del for
 
 	private void crearAssentamentRegistralEnviamentComunicacioSIR(NotificacioEntity notificacioEntity, String dir3Codi, boolean totsAdministracio,
 															NotificacioEnviamentEntity enviament, IntegracioInfo info, long t0) throws RegistrePluginException {
@@ -189,9 +198,14 @@ public class RegistreNotificaHelper {
 			arbResposta.setErrorDescripcio(e.getMessage());
 		}
 		//Registrar event
+		boolean error = false;
+		String errorDescripcio = null;
+		boolean errorMaxReintents = false;
 		if(arbResposta.getErrorCodi() != null) {
 			logger.info(" >>> ... ERROR: (" + arbResposta.getErrorCodi() + ") " + arbResposta.getErrorDescripcio());
-			updateEventWithError(arbResposta, notificacioEntity, enviament);
+			error = true;
+			errorDescripcio = getErrorDescripcio(arbResposta.getErrorCodi(), arbResposta.getErrorDescripcio(), notificacioEntity.getRegistreEnviamentIntent());
+			errorMaxReintents = notificacioEntity.getRegistreEnviamentIntent() >= pluginHelper.getRegistreReintentsMaxProperty();
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Hi ha hagut un error realitzant el procés de registre " +
 					"(temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
@@ -209,7 +223,14 @@ public class RegistreNotificaHelper {
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
 		}
-		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity, pluginHelper.getRegistreReintentsPeriodeProperty());
+		notificacioEventHelper.addSirEnviamentEvent(enviament, error, errorDescripcio, errorMaxReintents);
+	}
+
+	private String getErrorDescripcio(String codi, String descripcio, int intent) {
+		String errorDescripcio = "intent " + intent + ": \n\n";
+		errorDescripcio += "Codi error: " + (codi != null ? codi : "Codi no proporcionat") + "\n";
+		errorDescripcio += descripcio != null ? descripcio : "El registre no aporta cap descripció de l'error";
+		return errorDescripcio;
 	}
 
 	private boolean isGenerarJustificant(boolean isComunicacio, boolean isSirActivat, boolean aAdministracio) {
@@ -240,17 +261,6 @@ public class RegistreNotificaHelper {
 		return false;
 	}
 	
-	private void updateEventWithError(RespostaConsultaRegistre arbResposta,NotificacioEntity notificacioEntity, NotificacioEnviamentEntity enviament) {
-
-		String errorDescripcio = "";
-		if (arbResposta != null) {
-			errorDescripcio = "intent " + notificacioEntity.getRegistreEnviamentIntent() + ": \n";
-			errorDescripcio += "Codi error: " + (arbResposta.getErrorCodi() != null ? arbResposta.getErrorCodi() : "Codi no proporcionat") + "\n";
-			errorDescripcio += arbResposta.getErrorDescripcio() != null ? arbResposta.getErrorDescripcio() : "El registre no aporta cap descripció de l'error";
-		}
-		notificacioEventHelper.addRegistreNotificaEventError(notificacioEntity, enviament, errorDescripcio);
-	}
-
 	private void finalitzaRegistre(RespostaConsultaRegistre arbResposta, NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, boolean totsAdministracio) {
 
 		if (arbResposta == null) {
@@ -260,9 +270,6 @@ public class RegistreNotificaHelper {
 		Date registreData = arbResposta.getRegistreData();
 		NotificacioRegistreEstatEnumDto registreEstat = arbResposta.getEstat();
 		auditEnviamentHelper.updateRegistreEnviament(notificacio, enviament, registreNum, registreData, registreEstat, totsAdministracio);
-		//Crea un nou event
-		String descripcio = arbResposta.getEstat() != null ? arbResposta.getEstat().name() : arbResposta.getRegistreNumeroFormatat();
-		notificacioEventHelper.addRegistreNotificaEvent(notificacio, enviament, descripcio);
 	}
 
 	private boolean enviamentsRegistrats(Set<NotificacioEnviamentEntity> enviaments) {

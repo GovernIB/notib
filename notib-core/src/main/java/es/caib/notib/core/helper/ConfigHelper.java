@@ -135,6 +135,14 @@ public class ConfigHelper {
     public int getAsInt(String key) {
         return new Integer(getConfig(key));
     }
+    @Transactional(readOnly = true)
+    public int getAsInt(String key, int defaultValue) {
+        String value = getConfig(key);
+        if (Strings.isNullOrEmpty(value)) {
+            return defaultValue;
+        }
+        return new Integer(value);
+    }
 
     @Transactional(readOnly = true)
     public long getAsLongByEntitat(String key) {

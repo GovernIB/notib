@@ -32,6 +32,7 @@ import static org.junit.Assert.*;
 @Transactional
 public class NotificacioEventHelperIT extends BaseServiceTestV2 {
 
+    // TODO EVENTS: Proves automatitzades dels events
 
     private static final String ENTITAT_DGTIC_DIR3CODI = "EA0004518";
     private static final String ENTITAT_DGTIC_KEY = "MjkwNTc3Mjk0MjkyNTU3OTkyNA==";
@@ -190,7 +191,7 @@ public class NotificacioEventHelperIT extends BaseServiceTestV2 {
 
                         for (int i = 0; i < 10; i++) {
                             NotificacioEventEntity event  = NotificacioEventEntity.builder()
-                                    .tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO)
+                                    .tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA)
                                     .notificacio(notificacioEntity)
                                     .enviament(enviament)
                                     .error(true)
@@ -200,16 +201,16 @@ public class NotificacioEventHelperIT extends BaseServiceTestV2 {
                             notificacioEventRepository.saveAndFlush(event);
                         }
                         List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(notificacioEntity,
-                                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
+                                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA,
                                 true);
                         assertEquals(events.size(), 10);
 
                         // When: clear all useless events
-                        notificacioEventHelper.addNotificaConsultaEventError(notificacioEntity, enviament, "DarrerErrorAfegit", false);
+                        notificacioEventHelper.addNotificaConsultaEvent(enviament, true, "DarrerErrorAfegit", false);
 
                         // Then
                         events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(notificacioEntity,
-                                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
+                                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA,
                                 true);
 
                         // Comprovar que s'han conservat dos events i que aquests són el primer i el darrer afegit

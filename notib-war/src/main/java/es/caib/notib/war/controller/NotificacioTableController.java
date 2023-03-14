@@ -642,17 +642,18 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         emplenarModelNotificacioInfo(entitatActual, notificacioId, request,"dades", model);
         if (events != null && events.size() > 0) {
-            NotificacioEventDto lastEvent = events.get(events.size() - 1);
-            NotificacioEventTipusEnumDto tipus = lastEvent.getTipus();
-            if (lastEvent.isError() &&
-                    (tipus.equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) || tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
-                    tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) || tipus.equals(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT) ||
-                    tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR) || tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR) ||
-                    tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
-
-                log.info("Preparant per notificar canvi del event : " + lastEvent.getId() + " de tipus " + lastEvent.getTipus().name());
-                notificat = enviamentService.reintentarCallback(lastEvent.getId());
-            }
+            // TODO:
+//            NotificacioEventDto lastEvent = events.get(events.size() - 1);
+//            NotificacioEventTipusEnumDto tipus = lastEvent.getTipus();
+//            if (lastEvent.isError() &&
+//                    (tipus.equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) || tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
+//                    tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) || tipus.equals(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT) ||
+//                    tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR) || tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR) ||
+//                    tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
+//
+//                log.info("Preparant per notificar canvi del event : " + lastEvent.getId() + " de tipus " + lastEvent.getTipus().name());
+//                notificat = enviamentService.reintentarCallback(lastEvent.getId());
+//            }
         }
         String msg = notificat ? "notificacio.controller.notificar.client.ok" : "notificacio.controller.notificar.client.error";
         MissatgesHelper.error(request, getMessage(request,msg));
