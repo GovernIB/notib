@@ -1,0 +1,66 @@
+databaseChangeLog:
+  - property:
+      dbms: oracle
+      name: type.pk
+      value: number(19,0)
+  - property:
+      dbms: postgresql
+      name: type.pk
+      value: SERIAL
+  - property:
+      name: long
+      value: number(19, 0)
+      dbms: oracle
+  - property:
+      name: long
+      value: numeric
+      dbms: postgresql
+  - changeSet:
+      id: 1634114082437-3
+      author: limit
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: NOT_CALLBACK_PK
+                  name: ID
+                  type: ${type.pk}
+              - column:
+                  constraints:
+                    nullable: false
+                  name: NOTIFICACIO_ID
+                  type: ${long}
+              - column:
+                  constraints:
+                    nullable: false
+                  name: ENVIAMENT_ID
+                  type: ${long}
+              - column:
+                  name: DATA
+                  type: TIMESTAMP(6)
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: false
+                  name: ERROR
+                  type: BOOLEAN
+              - column:
+                  name: ERROR_DESC
+                  type: VARCHAR2(2048)
+              - column:
+                  name: ESTAT
+                  type: VARCHAR2(10)
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: false
+                  name: INTENTS
+                  type: INTEGER
+            tableName: NOT_CALLBACK
+        - sql:
+            "INSERT INTO NOT_CALLBACK c (c.id, c.\"DATA\", c.ERROR_DESC, c.ESTAT, c.INTENTS, c.NOTIFICACIO_ID, c.ENVIAMENT_ID) SELECT id, CALLBACK_DATA, CALLBACK_ERROR_DESC, CALLBACK_ESTAT, CALLBACK_INTENTS, NOTIFICACIO_ID, NOTIFICACIO_ENV_ID
+              FROM NOT_NOTIFICACIO_EVENT nne
+              WHERE CALLBACK_ESTAT = 'PENDENT'"
