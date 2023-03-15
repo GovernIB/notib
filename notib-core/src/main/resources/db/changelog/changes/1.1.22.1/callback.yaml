@@ -49,7 +49,7 @@ databaseChangeLog:
               - column:
                   constraints:
                     nullable: false
-                  defaultValueBoolean: false
+                  defaultValue: 0
                   name: ERROR
                   type: BOOLEAN
               - column:
