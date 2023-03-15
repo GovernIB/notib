@@ -59,7 +59,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	@Autowired
 	private NotificacioRepository notificacioRepository;
 	@Autowired
-	private NotificacioEventRepository notificacioEventRepository;
+	private CallbackHelper callbackHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
@@ -82,6 +82,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			throw new ValidationException(notificacioId, NotificacioEntity.class, "La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
 		}
 		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
+		boolean isError = false;
+		String errorDescripcio = "";
 		try {
 			log.info(" >>> Enviant notificació...");
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);
@@ -107,15 +109,17 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				integracioHelper.addAccioOk(info);
 			} else {
 				log.info(" >>> ... ERROR:");
+				isError = true;
 				//Crea un nou event
-				String errorDescripcio = "[" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
+				errorDescripcio = "[" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
 				log.info(" >>> " + errorDescripcio);
 				updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_REMOT,true);
 				integracioHelper.addAccioError(info, errorDescripcio);
 			}
 		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
-			String errorDescripcio = ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
+			isError = true;
+			errorDescripcio = ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
 			updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_XARXA,true);
 			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 		}
@@ -123,6 +127,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())/* || NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())*/)) {
 			auditNotificacioHelper.updateNotificacioFinalitzadaAmbErrors(notificacio);
 		}
+		callbackHelper.updateCallbacks(notificacio, isError, errorDescripcio);
 		log.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		return notificacio;
 	}
@@ -254,6 +259,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					notificacioEventHelper.addNotificaCallbackEvent(notificacio, enviament,
 							NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
 							datatDarrer.getResultado());
+					callbackHelper.updateCallback(enviament, false, null);
 				}
 				log.info("Enviament actualitzat");
 			}
@@ -283,7 +289,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				notificacioEventHelper.addNotificaCallbackEvent(notificacio, enviament,
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
 						datatDarrer.getResultado());
-
+				callbackHelper.updateCallback(enviament, false, null);
 				log.info("Actualitzant Datat enviament...");
 				enviamentUpdateDatat(
 						estat,
@@ -324,6 +330,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				throw ex;
 			}
 		}
+		callbackHelper.updateCallback(enviament, false, null);
 		return enviament;
 	}
 

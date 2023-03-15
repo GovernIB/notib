@@ -17,6 +17,7 @@ import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.helper.CallbackHelper;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
@@ -80,7 +81,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 	@Autowired
 	private ConfigHelper configHelper;
 	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
+	private CallbackHelper callbackHelper;
 
 	private final Object lock = new Object();
 	
@@ -316,6 +317,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					eventErrorDescripcio,
 					eventInitialitzaCallback
 			);
+			callbackHelper.updateCallback(enviament, !Strings.isNullOrEmpty(eventErrorDescripcio), eventErrorDescripcio);
 
 			logger.debug("Event callbackdatat registrat correctament: " + NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT.name());
 		}
@@ -382,6 +384,8 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		}
 		NotificacioEventEntity eventCert = null;
 		String gestioDocumentalId = null;
+		boolean isError = false;
+		String errorDesc = "";
 		try {
 			if (acusePDF != null && acusePDF.getContenido() != null && acusePDF.getContenido().length > 0) {
 				//si hi ha una certificació
@@ -431,21 +435,17 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 				descripcionRespuesta.value = "OK";
 				logger.debug("Event callbackcertificacio registrat correctament: " + eventCert.getTipus().name());
 			} else {
-				logger.error(
-						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-						"identificadorDestinatario=" + identificador + "): " +
-						"No s'ha trobat el camp amb l'acús PDF a dins la petició rebuda.");
+				isError = true;
+				errorDesc = "Error al processar petició datadoOrganismo dins el callback de Notifica (identificadorDestinatario=" + identificador + "): " +
+							"No s'ha trobat el camp amb l'acús PDF a dins la petició rebuda.";
+				logger.error(errorDesc);
 				codigoRespuesta.value = "001";
 				descripcionRespuesta.value = "Organismo Desconocido";
 			}
 		} catch (Exception ex) {
-			logger.error(
-					"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-					"identificadorDestinatario=" + identificador + ")",
-					ex);
-			logger.debug(
-					"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-					"identificadorDestinatario=" + identificador + ")");
+			isError = true;
+			errorDesc = "Error al processar petició datadoOrganismo dins el callback de Notifica (identificadorDestinatario=" + identificador + ")";
+			logger.error(errorDesc, ex);
 			eventCert = notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
 					NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
 					null,
@@ -462,8 +462,10 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					+ (!Strings.isNullOrEmpty(descripcionRespuesta.value) ? descripcionRespuesta.value : msg);
 			NotificacioEventTipusEnumDto eventTipus = NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO;
 			notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament, eventTipus, null, error, true);
+			isError = true;
+			errorDesc = error;
 		}
-
+		callbackHelper.updateCallback(enviament, isError, errorDesc);
 		logger.debug("Sortint de la certificació...");
 	}
 

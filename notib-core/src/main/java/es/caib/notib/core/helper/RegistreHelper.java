@@ -39,6 +39,8 @@ public class RegistreHelper {
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private PluginHelper pluginHelper;
+	@Autowired
+	private CallbackHelper callbackHelper;
 	@Autowired 
 	private EmailNotificacioHelper emailNotificacioHelper;
 	@Autowired
@@ -65,7 +67,9 @@ public class RegistreHelper {
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb Registre (" +
 				"notificacioId=" + notificacio.getId() + ", " +
 				"registreNumeroFormatat=" + enviament.getRegistreNumeroFormatat() + ")";
-		
+
+		boolean isError = false;
+		String errorDesc = "";
 		try {
 			if (enviament.getRegistreNumeroFormatat() == null) {
 				logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
@@ -90,9 +94,10 @@ public class RegistreHelper {
 			logger.debug("Comunicació SIR --> creació event...");
 			if (resposta.getErrorCodi() != null && !resposta.getErrorCodi().isEmpty()) {
 				startTime = System.nanoTime();
+				isError = true;
+				errorDesc = resposta.getErrorDescripcio();
 				//Crea un nou event
 				notificacioEventHelper.addRegistreCallBackEstatEvent(notificacio, enviament, resposta.getErrorDescripcio(), true);
-
 				if (enviament.getSirConsultaIntent() >= pluginHelper.getConsultaSirReintentsMaxProperty()) {
 					notificacioEventHelper.addNotificaConsultaSirErrorEvent(notificacio, enviament);
 				}
@@ -127,19 +132,18 @@ public class RegistreHelper {
 				}
 				enviament.refreshSirConsulta();
 			}
-			logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 
 		} catch (Exception ex) {
-			logger.error(
-					errorPrefix,
-					ex);
+			logger.error(errorPrefix, ex);
+			isError = true;
+			errorDesc = ExceptionUtils.getStackTrace(ex);
 			notificacioEventHelper.addRegistreConsultaInfoErrorEvent(notificacio, enviament, ExceptionUtils.getStackTrace(ex));
 			if (enviament.getSirConsultaIntent() >= pluginHelper.getConsultaSirReintentsMaxProperty()) {
 				notificacioEventHelper.addNotificaConsultaSirErrorEvent(notificacio, enviament);
 			}
-			logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-//			return false;
 		}
+		callbackHelper.updateCallback(enviament, isError, errorDesc);
+		logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		return enviament;
 	}
 

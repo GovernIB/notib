@@ -1523,6 +1523,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		long numEventsCallbackPendent = notificacioEventRepository.countByEnviamentIdAndCallbackEstat(enviamentId, CallbackEstatEnumDto.PENDENT);
 		if (enviament.getNotificacio().isTipusUsuariAplicacio() && numEventsCallbackPendent == 0) {
 			logger.info(String.format("[callback] Reactivam callback de l'enviment [id=%d]", enviamentId));
+			callbackHelper.updateCallback(enviament, false, null);
 			notificacioEventHelper.addCallbackActivarEvent(enviament);
 			return;
 		}

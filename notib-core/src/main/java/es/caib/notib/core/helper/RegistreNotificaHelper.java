@@ -11,8 +11,10 @@ import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
+import es.caib.notib.core.entity.CallbackEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.plugin.registre.RegistrePluginException;
@@ -53,7 +55,7 @@ public class RegistreNotificaHelper {
 	@Autowired
 	private ConfigHelper configHelper;
 	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
+	private CallbackHelper callbackHelper;
 
 
 	public boolean realitzarProcesRegistrar(NotificacioEntity notificacioEntity) throws RegistreNotificaException {
@@ -158,18 +160,23 @@ public class RegistreNotificaHelper {
 			arbResposta.setErrorDescripcio(e.getMessage());
 		}
 		//Registrar event
+		String errorDesc = null;
+		boolean isError = false;
 		if(arbResposta.getErrorCodi() != null) {
 			logger.info(" >>> ... ERROR: (" + arbResposta.getErrorCodi() + ") " + arbResposta.getErrorDescripcio());
+			isError = true;
 			updateEventWithError(arbResposta, notificacioEntity, null);
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Hi ha hagut un error realitzant el procés de registre (temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
 		} else {
 			logger.info(" >>> ... OK");
+			errorDesc = crearErrorDesc(arbResposta, notificacioEntity);
 			finalitzaRegistre(arbResposta, notificacioEntity, new HashSet<>(Arrays.asList(enviament)), false);
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
 			info.getParams().add(new AccioParam("Procés descripció: ", " Procedim a enviar la notificació a Notific@"));
 		}
+		callbackHelper.crearCallback(notificacioEntity, enviament, isError, errorDesc);
 		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity, pluginHelper.getRegistreReintentsPeriodeProperty());
 	}
 
@@ -189,9 +196,13 @@ public class RegistreNotificaHelper {
 			arbResposta.setErrorDescripcio(e.getMessage());
 		}
 		//Registrar event
+		boolean isError = false;
+		String errorDesc = "";
 		if(arbResposta.getErrorCodi() != null) {
+			isError = true;
 			logger.info(" >>> ... ERROR: (" + arbResposta.getErrorCodi() + ") " + arbResposta.getErrorDescripcio());
 			updateEventWithError(arbResposta, notificacioEntity, enviament);
+			errorDesc = crearErrorDesc(arbResposta, notificacioEntity);
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Hi ha hagut un error realitzant el procés de registre " +
 					"(temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
@@ -209,6 +220,7 @@ public class RegistreNotificaHelper {
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
 		}
+		callbackHelper.crearCallback(notificacioEntity, enviament, isError, errorDesc);
 		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity, pluginHelper.getRegistreReintentsPeriodeProperty());
 	}
 
@@ -238,6 +250,17 @@ public class RegistreNotificaHelper {
 			}
 		}
 		return false;
+	}
+
+	private String crearErrorDesc(RespostaConsultaRegistre arbResposta, NotificacioEntity notificacioEntity) {
+
+		String error = "";
+		if (arbResposta != null) {
+			error = "intent " + notificacioEntity.getRegistreEnviamentIntent() + ": \n";
+			error += "Codi error: " + (arbResposta.getErrorCodi() != null ? arbResposta.getErrorCodi() : "Codi no proporcionat") + "\n";
+			error += arbResposta.getErrorDescripcio() != null ? arbResposta.getErrorDescripcio() : "El registre no aporta cap descripció de l'error";
+		}
+		return error;
 	}
 	
 	private void updateEventWithError(RespostaConsultaRegistre arbResposta,NotificacioEntity notificacioEntity, NotificacioEnviamentEntity enviament) {
