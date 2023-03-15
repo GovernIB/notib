@@ -59,12 +59,9 @@ public class ClientRestTest extends ClientBaseTest {
 
 	@Test
 	public void test() throws DatatypeConfigurationException, IOException, DecoderException {
+
 		String notificacioId = Long.toString(System.currentTimeMillis());
-		RespostaAlta respostaAlta = client.alta(
-				generarNotificacioV2(
-						notificacioId,
-						1,
-						false));
+		RespostaAlta respostaAlta = client.alta(generarNotificacioV2(notificacioId, 1, false));
 
 		assertNotNull(respostaAlta);
 		if (respostaAlta.isError()) {
@@ -80,24 +77,17 @@ public class ClientRestTest extends ClientBaseTest {
 		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertEquals(1, referencies.size());
 		assertNotNull(referencies.get(0).getReferencia());
-		assertEquals(
-				NotificacioEstatEnum.PENDENT,
-				respostaAlta.getEstat());
+		assertEquals(NotificacioEstatEnum.PENDENT, respostaAlta.getEstat());
 	}
 
 	@Test
 	public void testConsultaEstatEnviament() throws DatatypeConfigurationException, IOException, DecoderException {
+
 		// Given
 		String notificacioId = Long.toString(System.currentTimeMillis());
-		RespostaAlta respostaAlta = client.alta(
-				generarNotificacioV2(
-						notificacioId,
-						1,
-						false));
-
+		RespostaAlta respostaAlta = client.alta(generarNotificacioV2(notificacioId, 1, false));
 		// When
-		RespostaConsultaEstatEnviament respostaConsultaEstatEnviament = client.consultaEstatEnviament(
-				respostaAlta.getReferencies().get(0).getReferencia());
+		RespostaConsultaEstatEnviament respostaConsultaEstatEnviament = client.consultaEstatEnviament(respostaAlta.getReferencies().get(0).getReferencia());
 		assertNotNull(respostaConsultaEstatEnviament);
 		if (respostaConsultaEstatEnviament.isError()) {
 			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
@@ -119,6 +109,7 @@ public class ClientRestTest extends ClientBaseTest {
 
 //	@Test
 	public void testConsultaEstatEnviament_donadaReferencia() throws DatatypeConfigurationException, IOException, DecoderException {
+
 		// Given
 		String referencia = "8vzkicPP5FQ=";
 
@@ -137,6 +128,7 @@ public class ClientRestTest extends ClientBaseTest {
 
 //		@Test
 	public void testConsultaDadesRegistre() throws DatatypeConfigurationException, IOException, DecoderException {
+
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
 		dadesConsulta.setReferencia("8vzkicPP5FQ=");
@@ -156,6 +148,7 @@ public class ClientRestTest extends ClientBaseTest {
 
 //	@Test
 	public void testConsultaJustificant() throws DatatypeConfigurationException, IOException, DecoderException {
+
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
 		dadesConsulta.setReferencia("8vzkicPP5FQ=");
@@ -411,15 +404,14 @@ public class ClientRestTest extends ClientBaseTest {
 	}
 
 	private void realitzarIComprovarEmissio(NotificacioV2 notificacio) {
+
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertNotNull(respostaAlta);
 		assertFalse(respostaAlta.getErrorDescripcio(), respostaAlta.isError());
 
 		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
-		assertThat(
-				referencies.size(),
-				is(notificacio.getEnviaments().size()));
+		assertThat(referencies.size(), is(notificacio.getEnviaments().size()));
 
 		// Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
@@ -475,9 +467,7 @@ public class ClientRestTest extends ClientBaseTest {
 
 		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
-		assertThat(
-				referencies.size(),
-				is(numDestinataris));
+		assertThat(referencies.size(), is(numDestinataris));
 
 		// Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
@@ -531,9 +521,7 @@ public class ClientRestTest extends ClientBaseTest {
 
 		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
-		assertThat(
-				referencies.size(),
-				is(numDestinataris));
+		assertThat(referencies.size(), is(numDestinataris));
 
 		// Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
@@ -567,6 +555,7 @@ public class ClientRestTest extends ClientBaseTest {
 	// -------------------------------------------------------------------------------------
 	@Test
 	public void pruebaEmision07() throws Exception {
+
 		// Petició CON MAS DE UN DESTINATARIO
 
 		int numDestinataris = 3;
@@ -593,9 +582,7 @@ public class ClientRestTest extends ClientBaseTest {
 
 		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
-		assertThat(
-				referencies.size(),
-				is(numEnviaments));
+		assertThat(referencies.size(), is(numEnviaments));
 
 		// Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
@@ -618,6 +605,7 @@ public class ClientRestTest extends ClientBaseTest {
 	}
 
 	private void notifica(int i) {
+
 		try {
 			Long ti = System.currentTimeMillis();
 			System.out.println(i + ".");
@@ -740,6 +728,7 @@ public class ClientRestTest extends ClientBaseTest {
 
 	@Test
 	public void consultaEstatNotificacioTest() throws DatatypeConfigurationException, IOException, DecoderException {
+
 		// Given
 //		String referencia = "43573ddf-4f26-40d9-ae80-5bc9dcafbb96";
 //		String referencia = "8vzkicOY8Nc=";
@@ -760,6 +749,7 @@ public class ClientRestTest extends ClientBaseTest {
 
 	@Test
 	public void consultaEstatEnviamentTest() throws DatatypeConfigurationException, IOException, DecoderException {
+
 		// Given
 //		String referencia = "a4256bed-292b-4ad1-bb84-05f8f14a7f1c";
 //		String referencia = "8vzkicOY8NM=";
@@ -780,6 +770,7 @@ public class ClientRestTest extends ClientBaseTest {
 
 	@Test
 	public void consultaDadesRegistreTest() throws DatatypeConfigurationException, IOException, DecoderException {
+
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
 //		dadesConsulta.setReferencia("a4256bed-292b-4ad1-bb84-05f8f14a7f1c");
@@ -801,6 +792,7 @@ public class ClientRestTest extends ClientBaseTest {
 
 	@Test
 	public void consultaJustificantTest() throws DatatypeConfigurationException, IOException, DecoderException {
+
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
 //		dadesConsulta.setReferencia("2d991961-cb95-46d9-b74c-6472952b296c");

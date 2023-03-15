@@ -951,7 +951,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	public RespostaConsultaDadesRegistreV2 consultaDadesRegistreV2(DadesConsulta dadesConsulta) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			String json = "S'ha produït un error al intentar llegir la informació de les dades de la consulta";
+ 			String json = "S'ha produït un error al intentar llegir la informació de les dades de la consulta";
 			ObjectMapper mapper  = new ObjectMapper();
 			try {
 				json = mapper.writeValueAsString(dadesConsulta);
@@ -1078,7 +1078,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			if (dadesConsulta.isAmbJustificant()) {
 				RespostaJustificantRecepcio justificant = pluginHelper.obtenirJustificant(codiDir3Entitat, numeroRegistreFormatat);
 				integracioHelper.addAplicacioAccioParam(info, null);
-				if (justificant.getErrorCodi() == null) {
+				if (justificant.getErrorCodi() == null || "OK".equals(justificant.getErrorCodi())) {
 					resposta.setJustificant(justificant.getJustificant());
 				} else {
 					resposta.setError(true);

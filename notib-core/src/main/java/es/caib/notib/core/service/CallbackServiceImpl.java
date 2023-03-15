@@ -3,11 +3,13 @@ package es.caib.notib.core.service;
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.service.CallbackService;
 import es.caib.notib.core.clases.CallbackProcessarPendentsThread;
+import es.caib.notib.core.entity.CallbackEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.helper.CallbackHelper;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PropertiesConstants;
+import es.caib.notib.core.repository.CallbackRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -34,8 +36,8 @@ import java.util.concurrent.Future;
 @Service
 public class CallbackServiceImpl implements CallbackService {
 
-    @Autowired
-	private NotificacioEventRepository notificacioEventRepository;
+ 	@Autowired
+	private CallbackRepository callbackRepository;
     @Autowired
 	private CallbackHelper callbackHelper;
     @Autowired
@@ -55,42 +57,33 @@ public class CallbackServiceImpl implements CallbackService {
 			logger.info("[Callback] Cercant notificacions pendents d'enviar al client");
 			int maxPendents = getEventsProcessarMaxProperty();
 			Pageable page = new PageRequest(0, maxPendents);
-			List<NotificacioEventEntity> pendentsIds = notificacioEventRepository.findEventsAmbCallbackPendent(page);
-			if (pendentsIds.isEmpty()) {
+			List<Long> callbacks = callbackRepository.findPendents(page);
+			if (callbacks.isEmpty()) {
 				logger.info("[Callback] No hi ha notificacions pendents d'enviar. ");
 			}
 			logger.info("[Callback] Inici de les notificacions pendents cap a les aplicacions.");
 			int errors = 0;
-			ExecutorService executorService = Executors.newFixedThreadPool(pendentsIds.size());
+			ExecutorService executorService = Executors.newFixedThreadPool(callbacks.size());
 			Map<Long, Future<Boolean>> futurs = new HashMap<>();
 			CallbackProcessarPendentsThread thread;
 			Future<Boolean> futur;
-			Map<Long, Long> nots = new HashMap<>();
 			boolean multiThread = Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD));
-			for (NotificacioEventEntity e: pendentsIds) {
-				// TODO: Això necessita la transacció, però la transacció espatlla la resta!
-				Long notificacioId = notificacioEventRepository.findNotificacioIdByEventId(e.getId());
-				if (nots.get(notificacioId) != null) {
-					continue;
-				}
-				logger.info("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + e.getId());
-				nots.put(notificacioId, e.getId());
+			for (Long id: callbacks) {
+				logger.info("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + id);
 				try {
 					if (multiThread) {
-						thread = new CallbackProcessarPendentsThread(e.getId(), callbackHelper);
+						thread = new CallbackProcessarPendentsThread(id, callbackHelper);
 						futur = executorService.submit(thread);
-						futurs.put(e.getId(), futur);
+						futurs.put(id, futur);
 						continue;
 					}
-
-					if(!callbackHelper.notifica(e.getId())) {
-							errors++;
+					if(!callbackHelper.notifica(id)) {
+						errors++;
 					}
-
 				} catch (Exception ex) {
 					errors++;
-					logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", e.getId()), e);
-					callbackHelper.marcarEventNoProcessable(e.getId(), ex.getMessage(), ExceptionUtils.getStackTrace(ex));
+					logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", id), ex);
+					callbackHelper.marcarEventNoProcessable(id, ex.getMessage(), ExceptionUtils.getStackTrace(ex));
 				}
 			}
 			Set<Long> keys = futurs.keySet();
@@ -104,7 +97,7 @@ public class CallbackServiceImpl implements CallbackService {
 					callbackHelper.marcarEventNoProcessable(key, ex.getMessage(), ExceptionUtils.getStackTrace(ex));
 				}
 			}
-			logger.info("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");
+			logger.info("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + callbacks.size() + ", " + errors + " errors");
 
 		} finally {
 			metricsHelper.fiMetrica(timer);

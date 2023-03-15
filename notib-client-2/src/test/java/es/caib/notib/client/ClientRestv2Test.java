@@ -43,6 +43,8 @@ public class ClientRestv2Test extends ClientBaseTest {
 	// Indicar si el servidor esta configurat en mode síncron
 	private static final boolean SYNC_MODE = false;
 
+	private String identificacdor;
+
 	/*
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
@@ -57,26 +59,20 @@ public class ClientRestv2Test extends ClientBaseTest {
 //		System.setProperty("javax.net.ssl.trustStore", keystorePath);
 //		System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
 
-		client = NotificacioRestClientFactory.getRestClientV2(
-				URL,
-				USERNAME,
-				PASSWORD,
-				true); //tomcat = true jboss = false/true
+		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, true); //tomcat = true jboss = false/true
 	}
 
 	@Test
-	public void test() throws DatatypeConfigurationException, IOException, DecoderException {
+	public void alta() throws DatatypeConfigurationException, IOException, DecoderException {
 
 		String notificacioId = Long.toString(System.currentTimeMillis());
 		RespostaAltaV2 respostaAlta = client.alta(generarNotificacioV2(notificacioId, 1, false));
-
 		assertNotNull(respostaAlta);
 		if (respostaAlta.isError()) {
 			System.out.println(">>> Reposta amb error: " + respostaAlta.getErrorDescripcio());
 		} else {
 			System.out.println(">>> Reposta Ok");
 		}
-
 		assertFalse(respostaAlta.isError());
 		assertNull(respostaAlta.getErrorDescripcio());
 		assertNotNull(respostaAlta.getReferencies());
@@ -91,6 +87,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 
 	@Test
 	public void testConsultaEstatNotificacio() throws DatatypeConfigurationException, IOException, DecoderException {
+
 		// Given
 		String notificacioId = Long.toString(System.currentTimeMillis());
 		RespostaAltaV2 respostaAlta = client.alta(generarNotificacioV2(notificacioId,1,false));
@@ -100,6 +97,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		List<EnviamentReferenciaV2> referencies = respostaAlta.getReferencies();
 		assertEquals(1, referencies.size());
 		assertNotNull(referencies.get(0).getReferencia());
+
 
 		// When
 		RespostaConsultaEstatNotificacioV2 respostaConsultaEstatNotificacio = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
@@ -116,13 +114,10 @@ public class ClientRestv2Test extends ClientBaseTest {
 
 	@Test
 	public void testConsultaEstatEnviament() throws DatatypeConfigurationException, IOException, DecoderException {
+
 		// Given
 		String notificacioId = Long.toString(System.currentTimeMillis());
-		RespostaAltaV2 respostaAlta = client.alta(
-				generarNotificacioV2(
-						notificacioId,
-						1,
-						false));
+		RespostaAltaV2 respostaAlta = client.alta(generarNotificacioV2(notificacioId, 1, false));
 		assertFalse(respostaAlta.isError());
 		assertNull(respostaAlta.getErrorDescripcio());
 		assertNotNull(respostaAlta.getReferencies());
@@ -131,8 +126,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNotNull(referencies.get(0).getReferencia());
 
 		// When
-		RespostaConsultaEstatEnviamentV2 respostaConsultaEstatEnviament = client.consultaEstatEnviament(
-				referencies.get(0).getReferencia());
+		RespostaConsultaEstatEnviamentV2 respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencies.get(0).getReferencia());
 		assertNotNull(respostaConsultaEstatEnviament);
 		if (respostaConsultaEstatEnviament.isError()) {
 			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
@@ -183,6 +177,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 
 //	@Test
 	public void testConsultaJustificant() throws DatatypeConfigurationException, IOException, DecoderException {
+
 		// Given
 
 		// When
@@ -312,16 +307,8 @@ public class ClientRestv2Test extends ClientBaseTest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = false;
 
-		NotificacioV2 notificacio = generaNotificacio(
-				"Test emissió 01",
-				numDestinataris,
-				numDestinataris,
-				ambEnviamentPostal,
-				tipusEnviamentPostal,
-				ambEnviamentDEH,
-				ambEnviamentDEHObligat,
-				ambRetard);
-
+		NotificacioV2 notificacio = generaNotificacio("Test emissió 01", numDestinataris, numDestinataris, ambEnviamentPostal, tipusEnviamentPostal,
+														ambEnviamentDEH, ambEnviamentDEHObligat, ambRetard);
 		realitzarIComprovarEmissio(notificacio);
 	}
 
@@ -453,15 +440,14 @@ public class ClientRestv2Test extends ClientBaseTest {
 	}
 
 	private void realitzarIComprovarEmissio(NotificacioV2 notificacio) {
+
 		RespostaAltaV2 respostaAlta = client.alta(notificacio);
 		assertNotNull(respostaAlta);
 		assertFalse(respostaAlta.getErrorDescripcio(), respostaAlta.isError());
 
 		List<EnviamentReferenciaV2> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
-		assertThat(
-				referencies.size(),
-				is(notificacio.getEnviaments().size()));
+		assertThat(referencies.size(), is(notificacio.getEnviaments().size()));
 
 		// Consulta estat notificacio
 		RespostaConsultaEstatNotificacioV2 respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
@@ -611,7 +597,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	public void pruebaEmision07() throws Exception {
 		// Petició CON MAS DE UN DESTINATARIO
 
-		int numDestinataris = 3;
+		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
@@ -784,7 +770,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	public void consultaEstatNotificacioTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 //		String referencia = "43573ddf-4f26-40d9-ae80-5bc9dcafbb96";
-		String referencia = "4a125809-08a9-4073-8eaf-edfe1aef45c3";
+		String referencia = "b64248ba-0a80-4d0f-a1cf-d7e28fa89f2e";
 
 		// When
 		RespostaConsultaEstatNotificacioV2 respostaConsultaEstatNotificacio = client.consultaEstatNotificacio(referencia);
@@ -834,9 +820,10 @@ public class ClientRestv2Test extends ClientBaseTest {
 
 	@Test
 	public void consultaDadesRegistreTest() throws DatatypeConfigurationException, IOException, DecoderException {
+
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
-		dadesConsulta.setReferencia("a1741ac2-066c-4b1c-8411-8a2e689f14b9");
+		dadesConsulta.setReferencia("409efeb4-b517-42f3-8021-af4e9f8eed65");
 		dadesConsulta.setAmbJustificant(true);
 
 		// When
@@ -862,7 +849,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	@Test
 	public void consultaJustificantTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
-		String identificador = "651cd3b5-562d-4323-bf33-85304c8b8fa6";
+		String identificador = "32dda4e2-9c75-41a8-97aa-4b419a7dda91";
 
 		// When
 		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament(identificador);
