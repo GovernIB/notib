@@ -256,6 +256,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "per_email")
 	private boolean perEmail;
 
+	@Column(name = "callback_error")
+	protected boolean errorLastCallback;
+
 	@Transient
 	private String csvUuid;
 
@@ -288,6 +291,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
 		this.registreNumeroFormatat = registreNumeroFormatat;
+	}
+	public void updateLastCallbackError(boolean error) {
+		this.errorLastCallback = error;
 	}
 
 	public void updateRegistreEstat(
