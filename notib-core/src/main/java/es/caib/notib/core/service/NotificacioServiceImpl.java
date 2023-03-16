@@ -45,6 +45,7 @@ import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.helper.*;
+import es.caib.notib.core.repository.CallbackRepository;
 import es.caib.notib.core.repository.ColumnesRepository;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.EntitatRepository;
@@ -56,7 +57,6 @@ import es.caib.notib.core.repository.NotificacioTableViewRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcSerOrganRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.core.repository.ProcessosInicialsRepository;
 import es.caib.notib.core.repository.auditoria.NotificacioAuditRepository;
 import es.caib.notib.core.repository.auditoria.NotificacioEnviamentAuditRepository;
 import es.caib.notib.plugin.unitat.CodiValor;
@@ -180,7 +180,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private EmailNotificacioSenseNifHelper emailNotificacioSenseNifHelper;
 	@Autowired
-	private ProcessosInicialsRepository processosInicialsRepository;
+	private CallbackRepository callbackRepository;
 
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
 
@@ -448,8 +448,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 			NotificacioInfoDto dto = conversioTipusHelper.convertir(notificacio, NotificacioInfoDto.class);
 
-			List<Long> pendents = notificacioEventRepository.findEventsAmbCallbackPendentByNotificacioId(notificacio.getId());
-			dto.setEventsCallbackPendent(notificacio.isTipusUsuariAplicacio() && pendents != null && !pendents.isEmpty());
+			// TODO CALLBACKS:
+//			List<Long> pendents = notificacioEventRepository.findEventsAmbCallbackPendentByNotificacioId(notificacio.getId());
+//			List<Long> pendents = callbackRepository.findPendents(notificacio.getId());
+//			dto.setEventsCallbackPendent(notificacio.isTipusUsuariAplicacio() && pendents != null && !pendents.isEmpty());
 
 			// Emplena dades del procediment
 			ProcSerEntity procedimentEntity = notificacio.getProcediment();

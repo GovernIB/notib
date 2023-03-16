@@ -1,13 +1,10 @@
 package es.caib.notib.core.repository;
 
-import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -30,39 +27,39 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 
 	List<NotificacioEventEntity> findByEnviamentIdOrderByIdAsc(Long enviamentId);
 
-	long countByEnviamentIdAndCallbackEstat(Long enviamentId, CallbackEstatEnumDto callbackEstat);
+//	long countByEnviamentIdAndCallbackEstat(Long enviamentId, CallbackEstatEnumDto callbackEstat);
 
-	@Modifying
-	@Query( " delete from " +
-			"	NotificacioEventEntity ne " +
-			" where " +
-			"		ne.notificacio = :notificacio " +
-			"	and ((ne.error = true and ne.tipus != es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT) " +
-			"  		 or (ne.tipus not in (es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, " +
-			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT," +
-			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO," +
-			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT)" +
-			"			)" +
-			"		  or ne.callbackEstat <> es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
-			") "
-	)
-	void deleteOldUselessEvents(@Param("notificacio") NotificacioEntity notificacio);
+//	@Modifying
+//	@Query( " delete from " +
+//			"	NotificacioEventEntity ne " +
+//			" where " +
+//			"		ne.notificacio = :notificacio " +
+//			"	and ((ne.error = true and ne.tipus != es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT) " +
+//			"  		 or (ne.tipus not in (es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, " +
+//			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT," +
+//			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO," +
+//			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT)" +
+//			"			)" +
+//			"		  or ne.callbackEstat <> es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
+//			") "
+//	)
+//	void deleteOldUselessEvents(@Param("notificacio") NotificacioEntity notificacio);
 
-	@Modifying
-	@Query( " delete from " +
-			"	NotificacioEventEntity ne " +
-			" where " +
-			"		ne.notificacio = :notificacio " +
-			"	and (ne.error = true " +
-			"  		 or (ne.tipus not in (es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, " +
-			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT," +
-			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO," +
-			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT)" +
-			"			)" +
-			"		  or ne.callbackEstat <> es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
-			") "
-	)
-	void deleteOldNotificaUselessEvents(@Param("notificacio") NotificacioEntity notificacio);
+//	@Modifying
+//	@Query( " delete from " +
+//			"	NotificacioEventEntity ne " +
+//			" where " +
+//			"		ne.notificacio = :notificacio " +
+//			"	and (ne.error = true " +
+//			"  		 or (ne.tipus not in (es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, " +
+//			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT," +
+//			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO," +
+//			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT)" +
+//			"			)" +
+//			"		  or ne.callbackEstat <> es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
+//			") "
+//	)
+//	void deleteOldNotificaUselessEvents(@Param("notificacio") NotificacioEntity notificacio);
 
 	void deleteByEnviament(NotificacioEnviamentEntity enviament);
 
@@ -79,27 +76,27 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 	List<NotificacioEventEntity> findByNotificacio(NotificacioEntity notificacio);
 
 	/** Recupera la llista de notificacions pendents */
-	@Query("select ne.id " + 
-		   "  from NotificacioEventEntity ne " +
-	       " where ne.callbackEstat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
-	       " order by ne.callbackData asc nulls first, data asc")
-	List<Long> findEventsAmbCallbackPendentIds(Pageable page);
-
-	@Query("  from NotificacioEventEntity ne " +
-			" where ne.callbackEstat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
-			" order by ne.callbackData asc nulls first, data asc")
-	List<NotificacioEventEntity> findEventsAmbCallbackPendent(Pageable page);
-
-	@Query("  from NotificacioEventEntity ne " +
-			" where ne.callbackEstat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
-			" order by ne.callbackData asc nulls first, data asc")
-	List<NotificacioEventEntity> findEventsAmbCallbackPendent();
-
-	@Query(" select ne.id from NotificacioEventEntity ne " +
-			" where ne.callbackEstat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
-			"and ne.notificacio.id = :notificacioId " +
-			"order by ne.callbackData asc nulls first, data asc")
-	List<Long> findEventsAmbCallbackPendentByNotificacioId(@Param("notificacioId") Long notificacioId);
+//	@Query("select ne.id " +
+//		   "  from NotificacioEventEntity ne " +
+//	       " where ne.callbackEstat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
+//	       " order by ne.callbackData asc nulls first, data asc")
+//	List<Long> findEventsAmbCallbackPendentIds(Pageable page);
+//
+//	@Query("  from NotificacioEventEntity ne " +
+//			" where ne.callbackEstat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
+//			" order by ne.callbackData asc nulls first, data asc")
+//	List<NotificacioEventEntity> findEventsAmbCallbackPendent(Pageable page);
+//
+//	@Query("  from NotificacioEventEntity ne " +
+//			" where ne.callbackEstat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
+//			" order by ne.callbackData asc nulls first, data asc")
+//	List<NotificacioEventEntity> findEventsAmbCallbackPendent();
+//
+//	@Query(" select ne.id from NotificacioEventEntity ne " +
+//			" where ne.callbackEstat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
+//			"and ne.notificacio.id = :notificacioId " +
+//			"order by ne.callbackData asc nulls first, data asc")
+//	List<Long> findEventsAmbCallbackPendentByNotificacioId(@Param("notificacioId") Long notificacioId);
 
 	@Query("select ne " + 
 			   "  from NotificacioEventEntity ne " +
@@ -108,9 +105,7 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			   "		from NotificacioEventEntity e " +
 			   "			left outer join e.notificacio n " +
 			   "		where n.id = :notificacioId " +
-			   "		  and e.tipus = es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_CLIENT" +
-		       "	   )" +
-		       " order by ne.callbackData asc nulls first, data asc")
+			   "		  and e.tipus = es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT)")
 	NotificacioEventEntity findUltimEventByNotificacioId(@Param("notificacioId") Long notificacioId);
 	
 	@Query("select ne " + 
@@ -120,9 +115,8 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			   "		from NotificacioEventEntity e " +
 			   "			left outer join e.notificacio n " +
 			   "		where n.id = :notificacioId " +
-			   "		  and e.tipus = es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE" +
-		       "	   )" +
-		       " order by ne.callbackData asc nulls first, data asc")
+			   "		  and (e.tipus = es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT or " +
+			   "			   e.tipus = es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.SIR_ENVIAMENT))")
 	NotificacioEventEntity findUltimEventRegistreByNotificacioId(@Param("notificacioId") Long notificacioId);
 
 		@Query( "select ne " +
@@ -134,7 +128,7 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 				"		from " +
 				"			NotificacioEventEntity e left outer join e.notificacio n " +
 				"		where " +
-				"			n.id = :notificacioId and e.errorTipus is not null " +
+				"			n.id = :notificacioId and e.tipus != es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT " +
 				"	   ) ")
 	NotificacioEventEntity findLastErrorEventByNotificacioId(@Param("notificacioId") Long notificacioId);
 
@@ -145,9 +139,7 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			"		from NotificacioEventEntity e " +
 			"			left outer join e.notificacio n " +
 			"		where n.id = :notificacioId " +
-			"		  and e.tipus = es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT" +
-			"	   )" +
-			" order by ne.callbackData asc nulls first, data asc")
+			"		  and e.tipus = es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT)")
 	NotificacioEventEntity findUltimEventEmailByNotificacioId(@Param("notificacioId")Long notificacioId);
 
 	@Query("select ne.notificacio.id " +

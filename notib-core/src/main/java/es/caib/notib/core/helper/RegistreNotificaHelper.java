@@ -127,9 +127,9 @@ public class RegistreNotificaHelper {
 		if (enviamentsRegistrats(notificacioEntity.getEnviaments())) {
 			boolean isSir = notificacioEntity.isComunicacioSir();
 			notificacioEntity.updateEstat(isSir ? NotificacioEstatEnumDto.ENVIADA : NotificacioEstatEnumDto.REGISTRADA);
-			notificacioTableHelper.actualitzarRegistre(notificacioEntity);
 			enviarANotifica = !isSir;
 		}
+		notificacioTableHelper.actualitzarRegistre(notificacioEntity);
 		integracioHelper.addAccioOk(info);
 		return enviarANotifica;
 	}

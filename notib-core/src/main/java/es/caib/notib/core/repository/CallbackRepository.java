@@ -13,4 +13,10 @@ public interface CallbackRepository extends JpaRepository<CallbackEntity, Long> 
     @Query("select c.id from CallbackEntity c order by c.data asc nulls first")
     List<Long> findPendents(Pageable page);
 
+//	@Query(" select ce.id from CallbackEntity ce " +
+//			" where ce.estat = PENDENT " +
+//			"and ce.notificacio.id = :notificacioId " +
+//			"order by ce.data asc nulls first")
+//	List<Long> findPendentByNotificacioId(@Param("notificacioId") Long notificacioId);
+//	List<Long> findPendentByEnviamentId(@Param("enviamentId") Long enviamentId);
 }
