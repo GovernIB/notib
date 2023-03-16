@@ -162,4 +162,6 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	@Column(name = "NOTIFICA_REF", length = 36)
 	protected String notificaReferencia;
 
+	@Column(name = "callback_error")
+	protected boolean errorLastCallback;
 }

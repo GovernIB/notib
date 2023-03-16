@@ -73,6 +73,24 @@ databaseChangeLog:
                   name: INTENTS
                   type: INTEGER
             tableName: NOT_CALLBACK
+        - addColumn:
+            tableName: not_notificacio_env
+            columns:
+              - column:
+                  name: callback_error
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+        - addColumn:
+            tableName: not_notificacio_env_table
+            columns:
+              - column:
+                  name: callback_error
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
         - sql:
             "INSERT INTO NOT_CALLBACK c (c.id, c.\"DATA\", c.ERROR_DESC, c.ESTAT, c.INTENTS, c.NOTIFICACIO_ID, c.ENVIAMENT_ID, c.USUARI_CODI)
               SELECT nne.id, nne.CALLBACK_DATA, nne.CALLBACK_ERROR_DESC, nne.CALLBACK_ESTAT, nne.CALLBACK_INTENTS, nne.NOTIFICACIO_ID, nne.NOTIFICACIO_ENV_ID, e.CREATEDBY_CODI
