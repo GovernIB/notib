@@ -35,6 +35,7 @@ import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NoMetadadesException;
 import es.caib.notib.core.api.exception.SignatureValidationException;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.JustificantService;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsException;
@@ -52,17 +53,18 @@ import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcSerEntity;
 import es.caib.notib.core.entity.ProcSerOrganEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.helper.AuditEnviamentHelper;
-import es.caib.notib.core.helper.AuditNotificacioHelper;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.CaducitatHelper;
 import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.EnviamentHelper;
+import es.caib.notib.core.helper.EnviamentTableHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NifHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.NotificacioHelper;
+import es.caib.notib.core.helper.NotificacioTableHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.RegistreNotificaHelper;
@@ -164,6 +166,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
+	private EnviamentHelper enviamentHelper;
+	@Autowired
+	private EnviamentTableHelper enviamentTableHelper;
+	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
 	private GrupService grupService;
@@ -176,9 +182,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	@Autowired
 	private MetricsHelper metricsHelper;
 	@Autowired
-	private AuditNotificacioHelper auditNotificacioHelper;
-	@Autowired
-	private AuditEnviamentHelper auditEnviamentHelper;
+	private NotificacioTableHelper notificacioTableHelper;
 	@Autowired
 	private OrganGestorCachable organGestorCachable;
 	@Autowired
@@ -489,7 +493,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						.document5(document5Entity)
 						.build();
 				
-				NotificacioEntity notificacioGuardada = auditNotificacioHelper.desaNotificacio(notificacioEntity);
+				NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioEntity);
+				notificacioTableHelper.crearRegistre(notificacioEntity);
+				notificacioHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceWsImplV2.altaV2");
+
 				logger.debug(">> [ALTA] notificacio guardada");
 				
 				// Enviaments
@@ -1254,7 +1261,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		PersonaEntity titular = saveTitular(enviament);
 		List<PersonaEntity> destinataris = getDestinataris(enviament);
 
-		NotificacioEnviamentEntity enviamentSaved = auditEnviamentHelper.desaEnviamentAmbReferencia(entitat, notificacioGuardada, enviament, serveiTipus, titular, destinataris);
+		NotificacioEnviamentEntity enviamentSaved = notificacioEnviamentRepository.saveAndFlush(
+				NotificacioEnviamentEntity.getBuilderV2(
+						enviament,
+						entitat.isAmbEntregaDeh(),
+						serveiTipus,
+						notificacioGuardada,
+						titular,
+						destinataris,
+						UUID.randomUUID().toString()).build());
+		enviamentTableHelper.crearRegistre(enviamentSaved);
+		enviamentHelper.auditaEnviament(enviamentSaved, AuditService.TipusOperacio.CREATE, "NotificacioServiceWsImplV2.altaV2");
+		logger.debug(">> [ALTA] enviament creat");
+
+
 		EnviamentReferenciaV2 enviamentReferencia = new EnviamentReferenciaV2();
 		enviamentReferencia.setReferencia(enviamentSaved.getNotificaReferencia());
 		String titularNif = !FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) ?

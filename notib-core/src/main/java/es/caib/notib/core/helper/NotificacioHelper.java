@@ -19,13 +19,27 @@ import es.caib.notib.core.api.exception.NoDocumentException;
 import es.caib.notib.core.api.exception.NoMetadadesException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
-import es.caib.notib.core.entity.*;
+import es.caib.notib.core.api.service.AuditService.TipusOperacio;
+import es.caib.notib.core.entity.DocumentEntity;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.GrupEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.NotificacioMassivaEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.PersonaEntity;
+import es.caib.notib.core.entity.ProcSerEntity;
+import es.caib.notib.core.entity.ProcSerOrganEntity;
+import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.GrupRepository;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcSerOrganRepository;
+import es.caib.notib.core.repository.auditoria.NotificacioAuditRepository;
 import es.caib.plugins.arxiu.api.ArxiuException;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
@@ -59,6 +73,8 @@ public class NotificacioHelper {
 	@Autowired
 	private GrupRepository grupRepository;
 	@Autowired
+	private NotificacioAuditRepository notificacioAuditRepository;
+	@Autowired
 	private DocumentRepository documentRepository;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
@@ -67,9 +83,9 @@ public class NotificacioHelper {
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
-	private AuditNotificacioHelper auditNotificacioHelper;
-	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
+	@Autowired
+	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
 
@@ -78,11 +94,15 @@ public class NotificacioHelper {
 	@Autowired
 	private PersonaHelper personaHelper;
 	@Autowired
-	private AuditEnviamentHelper auditEnviamentHelper;
-	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
 	private EmailNotificacioSenseNifHelper emailNotificacioSenseNifHelper;
+	@Autowired
+	private NotificacioTableHelper notificacioTableHelper;
+	@Autowired
+	private EnviamentTableHelper enviamentTableHelper;
+	@Autowired
+	private EnviamentHelper enviamentHelper;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -197,13 +217,20 @@ public class NotificacioHelper {
 					}
 				}
 				// Rellenar dades enviament titular
-				enviamentsCreats.add(auditEnviamentHelper.desaEnviament(
-						entitat,
-						notificacioEntity,
-						enviament,
-						serveiTipus,
-						titular,
-						destinataris));
+				NotificacioEnviamentEntity nouEnviament = notificacioEnviamentRepository.saveAndFlush(NotificacioEnviamentEntity.
+						getBuilderV2(
+								enviament,
+								entitat.isAmbEntregaDeh(),
+								serveiTipus,
+								notificacioEntity,
+								titular,
+								destinataris,
+								UUID.randomUUID().toString())
+						.build());
+				enviamentsCreats.add(nouEnviament);
+
+				enviamentTableHelper.crearRegistre(nouEnviament);
+				enviamentHelper.auditaEnviament(nouEnviament, TipusOperacio.CREATE, "NotificacioHelper.altaEnviamentsWeb");
 			}
 		}
 		notificacioEntity.getEnviaments().addAll(enviamentsCreats);
@@ -235,8 +262,7 @@ public class NotificacioHelper {
 	}
 
 	public NotificacioEntity saveNotificacio(NotificacioHelper.NotificacioData data) {
-		return 	auditNotificacioHelper.desaNotificacio(NotificacioEntity.
-				getBuilderV2(
+		NotificacioEntity notificacio = NotificacioEntity.getBuilderV2(
 						data.getEntitat(),
 						data.getNotificacio().getEmisorDir3Codi(),
 						data.getOrganGestor(),
@@ -262,7 +288,10 @@ public class NotificacioHelper {
 				.document4(data.getDocument4Entity())
 				.document5(data.getDocument5Entity())
 				.notificacioMassiva(data.getNotificacioMassivaEntity())
-				.build());
+				.build();
+		notificacio = notificacioRepository.saveAndFlush(notificacio);
+		notificacioTableHelper.crearRegistre(notificacio);
+		return notificacio;
 	}
 	public NotificacioData buildNotificacioData(EntitatEntity entitat,
 												NotificacioDatabaseDto notificacio,
@@ -565,6 +594,18 @@ public class NotificacioHelper {
 		}
 		return notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
 	}
+
+	public void auditaNotificacio(NotificacioEntity notificacio, TipusOperacio tipusOperacio, String metode) {
+		NotificacioEventEntity lastErrorEvent = getNotificaErrorEvent(notificacio);
+		NotificacioAudit audit = new NotificacioAudit(notificacio, lastErrorEvent, tipusOperacio, metode);
+		NotificacioAudit lastAudit = notificacioAuditRepository.findLastAudit(notificacio.getId());
+		if (lastAudit == null || !tipusOperacio.equals(lastAudit.getTipusOperacio()) || !audit.equals(lastAudit)) {
+			notificacioAuditRepository.saveAndFlush(audit);
+		} else {
+			audit = null;
+		}
+	}
+
 	@Getter
 	@Builder
 	public static class NotificacioData {

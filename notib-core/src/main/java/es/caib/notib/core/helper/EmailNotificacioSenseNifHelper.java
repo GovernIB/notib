@@ -4,17 +4,17 @@ import com.google.common.base.Strings;
 import es.caib.notib.client.domini.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotTableUpdate;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AuditService;
-import es.caib.notib.core.aspect.Audita;
-import es.caib.notib.core.aspect.UpdateNotificacioTable;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.helper.EmailHelper.Attachment;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -49,11 +49,9 @@ public class EmailNotificacioSenseNifHelper {
 	@Autowired
 	NotificacioRepository notificacioRepository;
 	@Autowired
+	private NotificacioEnviamentRepository notificacioEnviamentRepository;
+	@Autowired
 	PluginHelper pluginHelper;
-	@Autowired
-	AuditNotificacioHelper auditNotificacioHelper;
-	@Autowired
-	AuditEnviamentHelper auditEnviamentHelper;
 	@Autowired
 	NotificacioEventHelper notificacioEventHelper;
 	@Autowired
@@ -65,11 +63,15 @@ public class EmailNotificacioSenseNifHelper {
 	@Resource
 	protected JavaMailSender mailSender;
 	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
+	private NotificacioTableHelper notificacioTableHelper;
+	@Autowired
+	private NotificacioHelper notificacioHelper;
+	@Autowired
+	private EnviamentHelper enviamentHelper;
+	@Autowired
+	private EnviamentTableHelper enviamentTableHelper;
 
 
-	@UpdateNotificacioTable
-	@Audita(entityType = AuditService.TipusEntitat.NOTIFICACIO, operationType = AuditService.TipusOperacio.UPDATE)
 	public NotificacioEntity notificacioEnviarEmail(List<NotificacioEnviamentEntity> enviamentsSenseNif, boolean totsEmail) {
 
 		NotificacioEntity notificacio = notificacioRepository.findById(enviamentsSenseNif.get(0).getNotificacio().getId());
@@ -90,40 +92,54 @@ public class EmailNotificacioSenseNifHelper {
 		for (NotificacioEnviamentEntity enviament : enviamentsSenseNif) {
 			String error = sendEmailInfoEnviamentSenseNif(enviament);
 			if (error == null) {
-				auditEnviamentHelper.updateEnviamentEmailFinalitzat(enviament);
+				enviament.updateNotificaEnviadaEmail();
+				notificacioEnviamentRepository.saveAndFlush(enviament);
+				enviamentTableHelper.actualitzarRegistre(enviament);
+				enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "EmailNotificacioSenseNifHelper.notificacioEnviarEmail");
 			}
 			notificacioEventHelper.addEmailEnviamentEvent(enviament, error != null, error);
 			callbackHelper.updateCallback(enviament, Strings.isNullOrEmpty(error), error);
 			hasErrors = hasErrors || error != null;
 		}
 
+		NotificacioEstatEnumDto estatActualitzar = null;
+
 		// Event Notificació x envaiment per email
 		if (hasErrors) {
-			auditNotificacioHelper.updateNotificacioEnviadaAmbErrors(notificacio);
+			estatActualitzar = NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS;
 		}
 
 		// Estat de la notificació
 		boolean notificacioMixta = notificacio.hasEnviamentsNotifica();
 		boolean totsElsEnviamentsEnviats = !notificacio.hasEnviamentsNoEnviats();
 
+
 		if (totsElsEnviamentsEnviats) {
 			if (notificacioMixta) {
-				auditNotificacioHelper.updateNotificacioEnviada(notificacio);
+				estatActualitzar = NotificacioEstatEnumDto.ENVIADA;
 			} else {
-				auditNotificacioHelper.updateNotificacioEnviadaEmail(notificacio);
+				estatActualitzar = NotificacioEstatEnumDto.FINALITZADA;
+
 			}
 		} else {
 			if (notificacio.hasEnviamentsEnviats()) {
 				boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
 				// Si tots els enviaments son via email, o tots els enviats a notifica s'han finalitzat --> la marcam com a Finalitzada amb errors
 				if (fiReintents && (!notificacioMixta || notificacio.allEnviamentsNotificaFinalitzats())) {
-					auditNotificacioHelper.updateNotificacioFinalitzadaAmbErrors(notificacio);
+					estatActualitzar = NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS;
 				} else {
-					auditNotificacioHelper.updateNotificacioEnviadaAmbErrors(notificacio);
+					estatActualitzar = NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS;
 				}
 			}
 		}
 
+		if (estatActualitzar != null) {
+			notificacio.updateEstat(estatActualitzar);
+			notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(notificacio.getId()).estat(estatActualitzar).build());
+		}
+
+		notificacioTableHelper.actualitzarRegistre(notificacio);
+		notificacioHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "EmailNotificacioSenseNifHelper.notificacioEnviarEmail");
 		return notificacio;
 	}
 

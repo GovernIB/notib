@@ -6,8 +6,10 @@ package es.caib.notib.core.helper;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotTableUpdate;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.repository.NotificacioRepository;
@@ -49,15 +51,15 @@ import java.util.TreeSet;
 public abstract class AbstractNotificaHelper {
 	
 	@Autowired
-	protected AuditNotificacioHelper auditNotificacioHelper;
-	@Autowired
-	protected AuditEnviamentHelper auditEnviamentHelper;
-	@Autowired
 	protected ConfigHelper configHelper;
 	@Autowired
 	protected NotificacioRepository notificacioRepository;
 	@Autowired 
 	private EmailNotificacioHelper emailNotificacioHelper;
+	@Autowired
+	protected NotificacioTableHelper notificacioTableHelper;
+	@Autowired
+	protected NotificacioHelper notificacioHelper;
 
 	private boolean modeTest;
 	
@@ -124,23 +126,26 @@ public abstract class AbstractNotificaHelper {
 		}
 		logger.info("Estat final: " + estatsEnviamentsFinals);
 		NotificacioEstatEnumDto notificacioEstat = enviament.getNotificacio().getEstat();
+		NotificacioEntity notificacio = enviament.getNotificacio();
+
 		if (estatsEnviamentsNotificaFinals && !NotificacioEstatEnumDto.PROCESSADA.equals(notificacioEstat)) {
-			if (estatsEnviamentsFinals) {
-				auditNotificacioHelper.updateEstatAFinalitzada(notificaEstat.name(), enviament.getNotificacio());
-			} else {
-				auditNotificacioHelper.updateEstatAFinalitzadaAmbError(notificaEstat.name(), enviament.getNotificacio());
+			NotificacioEstatEnumDto nouEstat = NotificacioEstatEnumDto.FINALITZADA;
+			if (!estatsEnviamentsFinals) {
+				nouEstat = NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS;
 			}
+			notificacio.updateEstat(nouEstat);
+			notificacio.updateMotiu(notificaEstat.name());
+			notificacio.updateEstatDate(new Date());
+			notificacioHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "AbstractNotificaHelper.enviamentUpdateDatat");
+
 			logger.info("Envio correu en cas d'usuaris no APLICACIÓ");
-			NotificacioEntity notificacio = enviament.getNotificacio();
 			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
 				long startTime = System.nanoTime();
-				
 				try {
 					emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
 				} catch (Exception ex) {
 					throw new Exception("Hi ha hagut un error preparant mail notificació (prepararEnvioEmailNotificacio) [Id: " + enviament.getId() + "]", ex);
 				}
-				
 				double elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				logger.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
 			}
@@ -152,10 +157,9 @@ public abstract class AbstractNotificaHelper {
 //				enviament.getNotificacio().updateMotiu(notificaEstat.name());
 //				enviament.getNotificacio().updateEstatDate(new Date());
 //			}
-		} else {
-			// Actualitzar màscara d'estats
-			auditNotificacioHelper.updateMascaraEstats(enviament.getNotificacio());
 		}
+		// Actualitzar màscara d'estats
+		notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(notificacio.getId()).estat(notificacio.getEstat()).build());
 		return enviament;
 	}
 

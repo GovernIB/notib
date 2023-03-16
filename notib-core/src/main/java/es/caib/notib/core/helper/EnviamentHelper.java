@@ -5,8 +5,11 @@ import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
+import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.auditoria.NotificacioEnviamentAudit;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
+import es.caib.notib.core.repository.auditoria.NotificacioEnviamentAuditRepository;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,8 @@ public class EnviamentHelper {
 	private NotificaHelper notificaHelper;
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
+	@Autowired
+	private NotificacioEnviamentAuditRepository notificacioEnviamentAuditRepository;
 	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired
@@ -92,6 +97,16 @@ public class EnviamentHelper {
 	public void updateCIECertNovaConsulta(Long enviamentId) {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		enviament.updateCIECertNovaConsulta(configHelper.getAsInt(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE));
+	}
+
+	public void auditaEnviament(NotificacioEnviamentEntity enviament, AuditService.TipusOperacio tipusOperacio, String metode) {
+		NotificacioEnviamentAudit audit = NotificacioEnviamentAudit.getBuilder(enviament, tipusOperacio, metode).build();
+		NotificacioEnviamentAudit lastAudit = notificacioEnviamentAuditRepository.findLastAudit(enviament.getId());
+		if (lastAudit == null || !tipusOperacio.equals(lastAudit.getTipusOperacio()) || !audit.equals(lastAudit)) {
+			notificacioEnviamentAuditRepository.saveAndFlush(audit);
+		} else {
+			audit = null;
+		}
 	}
 
 	private void enviamentRefrescarEstat(

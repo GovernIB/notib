@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.helper;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
@@ -10,10 +11,9 @@ import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
-import es.caib.notib.core.entity.CallbackEntity;
+import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.plugin.registre.RegistrePluginException;
@@ -41,17 +41,17 @@ public class RegistreNotificaHelper {
 	@Autowired
 	private RegistreHelper registreHelper;
 	@Autowired
-	private AuditNotificacioHelper auditNotificacioHelper;
-	@Autowired
-	private AuditEnviamentHelper auditEnviamentHelper;
-	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
+	private NotificacioHelper notificacioHelper;
+	@Autowired
 	private NotificacioTableHelper notificacioTableHelper;
-//	@Autowired
-//	private NotificacioMassivaHelper notificacioMassivaHelper;
+	@Autowired
+	private EnviamentHelper enviamentHelper;
+	@Autowired
+	private EnviamentTableHelper enviamentTableHelper;
 	@Autowired
 	private ConfigHelper configHelper;
 	@Autowired
@@ -124,14 +124,19 @@ public class RegistreNotificaHelper {
 			}
 		}
 
-		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity, pluginHelper.getRegistreReintentsPeriodeProperty());
+		notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
+		for (NotificacioEnviamentEntity env: notificacioEntity.getEnviaments()) {
+			enviamentTableHelper.actualitzarRegistre(env);
+		}
 
 		if (enviamentsRegistrats(notificacioEntity.getEnviaments())) {
 			boolean isSir = notificacioEntity.isComunicacioSir();
 			notificacioEntity.updateEstat(isSir ? NotificacioEstatEnumDto.ENVIADA : NotificacioEstatEnumDto.REGISTRADA);
 			enviarANotifica = !isSir;
 		}
+
 		notificacioTableHelper.actualitzarRegistre(notificacioEntity);
+		notificacioHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.UPDATE, "RegistreNotificaHelper.realitzarProcesRegistrar");
 		integracioHelper.addAccioOk(info);
 		return enviarANotifica;
 	}
@@ -174,7 +179,7 @@ public class RegistreNotificaHelper {
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Hi ha hagut un error realitzant el procés de registre (temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
 		} else {
 			logger.info(" >>> ... OK");
-			finalitzaRegistre(arbResposta, notificacioEntity, enviament, false);
+			finalitzaRegistre(arbResposta, enviament, false);
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
 			info.getParams().add(new AccioParam("Procés descripció: ", " Procedim a enviar la notificació a Notific@"));
@@ -214,12 +219,12 @@ public class RegistreNotificaHelper {
 					"(temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
 		} else {
 			logger.info(" >>> ... OK");
-			finalitzaRegistre(arbResposta, notificacioEntity, enviament, totsAdministracio);
+			finalitzaRegistre(arbResposta, enviament, totsAdministracio);
 
 			//Comunicació + administració (SIR)
 			if (totsAdministracio) {
 				logger.debug("Comunicació SIR --> actualitzar estat...");
-				auditNotificacioHelper.updateNotificacioEnviada(notificacioEntity);
+				notificacioEntity.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 				registreHelper.enviamentUpdateDatat(arbResposta.getEstat(), arbResposta.getRegistreData(), arbResposta.getSirRecepecioData(),
 													arbResposta.getSirRegistreDestiData(), arbResposta.getRegistreNumeroFormatat(), enviament);
 			}
@@ -265,7 +270,7 @@ public class RegistreNotificaHelper {
 		return false;
 	}
 	
-	private void finalitzaRegistre(RespostaConsultaRegistre arbResposta, NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, boolean totsAdministracio) {
+	private void finalitzaRegistre(RespostaConsultaRegistre arbResposta, NotificacioEnviamentEntity enviament, boolean totsAdministracio) {
 
 		if (arbResposta == null) {
 			return;
@@ -273,7 +278,18 @@ public class RegistreNotificaHelper {
 		String registreNum = arbResposta.getRegistreNumeroFormatat();
 		Date registreData = arbResposta.getRegistreData();
 		NotificacioRegistreEstatEnumDto registreEstat = arbResposta.getEstat();
-		auditEnviamentHelper.updateRegistreEnviament(notificacio, enviament, registreNum, registreData, registreEstat, totsAdministracio);
+
+		enviament.setRegistreNumeroFormatat(registreNum);
+		enviament.setRegistreData(registreData);
+		enviament.updateRegistreEstat(registreEstat);
+
+		//Comunicació + administració (SIR)
+		if (totsAdministracio) {
+			enviament.setNotificaEstat(EnviamentEstat.ENVIAT_SIR);
+		}
+
+		enviamentTableHelper.actualitzarRegistre(enviament);
+		enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "RegistreNotificaHelper.realitzarProcesRegistrar");
 	}
 
 	private boolean enviamentsRegistrats(Set<NotificacioEnviamentEntity> enviaments) {

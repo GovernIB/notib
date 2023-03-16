@@ -5,13 +5,11 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotTableUpdate;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
-import es.caib.notib.core.aspect.Audita;
-import es.caib.notib.core.aspect.UpdateEnviamentTable;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
@@ -47,10 +45,14 @@ public class RegistreHelper {
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
-	private AuditNotificacioHelper auditNotificacioHelper;
+	private NotificacioHelper notificacioHelper;
+	@Autowired
+	private NotificacioTableHelper notificacioTableHelper;
+	@Autowired
+	private EnviamentTableHelper enviamentTableHelper;
+	@Autowired
+	private EnviamentHelper enviamentHelper;
 
-	@UpdateEnviamentTable
-	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	public NotificacioEnviamentEntity enviamentRefrescarEstatRegistre(Long enviamentId) {
 
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
@@ -119,6 +121,9 @@ public class RegistreHelper {
 		notificacioEventHelper.addSirConsultaEvent(enviament, error, errorDescripcio, errorMaxReintents);
 		callbackHelper.updateCallback(enviament, error, errorDescripcio);
 		logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
+
+		enviamentTableHelper.actualitzarRegistre(enviament);
+		enviamentHelper.auditaEnviament(enviament, TipusOperacio.UPDATE, "RegistreHelper.enviamentRefrescarEstatRegistre");
 		return enviament;
 	}
 
@@ -163,14 +168,17 @@ public class RegistreHelper {
 		}
 		logger.debug("Estat final: " + estatsEnviamentsFinals);
 		if (estatsEnviamentsFinals) {
-			auditNotificacioHelper.updateEstatAFinalitzada(registreEstat.name(), enviament.getNotificacio());
-
+			NotificacioEstatEnumDto nouEstat = NotificacioEstatEnumDto.FINALITZADA;
 			//Marcar com a processada si la notificació s'ha fet des de una aplicació
 			if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {
-				enviament.getNotificacio().updateEstat(NotificacioEstatEnumDto.PROCESSADA);
-				enviament.getNotificacio().updateMotiu(registreEstat.name());
-				enviament.getNotificacio().updateEstatDate(new Date());
+				nouEstat = NotificacioEstatEnumDto.PROCESSADA;
 			}
+
+			enviament.getNotificacio().updateEstat(nouEstat);
+			enviament.getNotificacio().updateMotiu(registreEstat.name());
+			enviament.getNotificacio().updateEstatDate(new Date());
+			notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(enviament.getNotificacio().getId()).estat(nouEstat).estatDate(new Date()).build());
+			notificacioHelper.auditaNotificacio(enviament.getNotificacio(), TipusOperacio.UPDATE, "RegistreHelper.enviamentUpdateDatat");
 		}
 		logger.debug("L'estat de la comunicació SIR s'ha actualitzat correctament.");
 	}

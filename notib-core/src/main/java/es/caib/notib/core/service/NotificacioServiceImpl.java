@@ -16,6 +16,7 @@ import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActIn
 import es.caib.notib.core.api.dto.cie.CieDataDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
+import es.caib.notib.core.api.dto.notificacio.NotTableUpdate;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDto;
@@ -29,6 +30,7 @@ import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.entity.DocumentEntity;
@@ -89,6 +91,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -148,10 +151,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private RegistreHelper registreHelper;
 	@Autowired
-	private AuditNotificacioHelper auditNotificacioHelper;
-	@Autowired
-	private AuditEnviamentHelper auditEnviamentHelper;
-	@Autowired
 	private AplicacioService aplicacioService;
 	@Resource
 	private CacheHelper cacheHelper;
@@ -163,6 +162,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private NotificacioTableHelper notificacioTableHelper;
 	@Autowired
 	private EnviamentHelper enviamentHelper;
+	@Autowired
+	private EnviamentTableHelper enviamentTableHelper;
 	@Autowired
 	private NotificacioListHelper notificacioListHelper;
 	@Autowired
@@ -195,6 +196,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			// Dades generals de la notificació
 			NotificacioEntity notificacioEntity = notificacioHelper.saveNotificacio(notData);
 			notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
+
+			notificacioHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceImpl.create");
 			return conversioTipusHelper.convertir(notificacioEntity, NotificacioDatabaseDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -228,11 +231,19 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (HibernateHelper.isProxy(titular)) {
 					titular = HibernateHelper.deproxy(titular);
 				}
-				auditEnviamentHelper.deleteEnviament(enviament);
+				enviamentTableRepository.delete(enviament.getId());
+				notificacioEventRepository.deleteByEnviament(enviament);
+				notificacioEnviamentRepository.delete(enviament);
+				notificacioEnviamentRepository.flush();
+				enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.DELETE, "NotificacioServiceImpl.delete");
 				personaRepository.delete(titular);
 			}
 
-			auditNotificacioHelper.deleteNotificacio(notificacio);
+			notificacioTableHelper.eliminarRegistre(notificacio);
+			notificacioRepository.delete(notificacio);
+			notificacioRepository.flush();
+			notificacioHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.DELETE, "NotificacioServiceImpl.delete");
+
 			logger.debug("La notificació s'ha esborrat correctament (notificacioId=" + notificacioId + ")");
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -262,8 +273,31 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio, false); //!isAdministradorEntitat);
 
 			// Actualitzar notificació existent
-			auditNotificacioHelper.updateNotificacio(notificacioEntity, notData);
-				
+			notificacioEntity.update(
+					notData.getEntitat(),
+					notData.getNotificacio().getEmisorDir3Codi(),
+					notData.getOrganGestor(),
+					pluginHelper.getNotibTipusComunicacioDefecte(),
+					notData.getNotificacio().getEnviamentTipus(),
+					notData.getNotificacio().getConcepte(),
+					notData.getNotificacio().getDescripcio(),
+					notData.getNotificacio().getEnviamentDataProgramada(),
+					notData.getNotificacio().getRetard(),
+					notData.getNotificacio().getCaducitat(),
+					notData.getNotificacio().getUsuariCodi(),
+					notData.getProcSer() != null ? notData.getProcSer().getCodi() : null,
+					notData.getProcSer(),
+					notData.getGrupNotificacio() != null ? notData.getGrupNotificacio().getCodi() : null,
+					notData.getNotificacio().getNumExpedient(),
+					TipusUsuariEnumDto.INTERFICIE_WEB,
+					notData.getDocumentEntity(),
+					notData.getDocument2Entity(),
+					notData.getDocument3Entity(),
+					notData.getDocument4Entity(),
+					notData.getDocument5Entity(),
+					notData.getProcedimentOrgan(),
+					notData.getNotificacio().getIdioma());
+
 			// Esbo
 			if (notificacioEntity.getDocument2() != null && notificacio.getDocument2() == null)
 				documentRepository.delete(notData.getDocument2Entity());
@@ -332,25 +366,31 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 //					### Actualitzar les dades d'un enviament existent o crear un de nou
 				if (enviament.getId() != null) {
-					NotificacioEnviamentEntity enviamentEntity = auditEnviamentHelper.updateEnviament(
-							entitat,
-							notificacioEntity,
+					NotificacioEnviamentEntity enviamentEntity = notificacioEnviamentRepository.findOne(enviament.getId());
+					enviamentEntity.update(
 							enviament,
+							entitat.isAmbEntregaDeh(),
 							serveiTipus,
-//							numeracioTipus,
-//							tipusConcret,
+							notificacioEntity,
 							titular);
 					enviamentEntity.getDestinataris().addAll(nousDestinataris);
+					enviamentTableHelper.actualitzarRegistre(enviamentEntity);
+					enviamentHelper.auditaEnviament(enviamentEntity, AuditService.TipusOperacio.UPDATE, "NotificacioServiceImpl.update");
 				} else {
-					NotificacioEnviamentEntity nouEnviament = auditEnviamentHelper.desaEnviament(
-							entitat,
-							notificacioEntity,
-							enviament,
-							serveiTipus,
-							titular,
-							nousDestinataris);
+					NotificacioEnviamentEntity nouEnviament = notificacioEnviamentRepository.saveAndFlush(NotificacioEnviamentEntity.
+							getBuilderV2(
+									enviament,
+									entitat.isAmbEntregaDeh(),
+									serveiTipus,
+									notificacioEntity,
+									titular,
+									nousDestinataris,
+									UUID.randomUUID().toString())
+							.build());
 					nousEnviaments.add(nouEnviament);
 					enviamentsIds.add(nouEnviament.getId());
+					enviamentTableHelper.crearRegistre(nouEnviament);
+					enviamentHelper.auditaEnviament(nouEnviament, AuditService.TipusOperacio.CREATE, "NotificacioServiceImpl.update");
 				}
 			}
 			notificacioEntity.getEnviaments().addAll(nousEnviaments);
@@ -362,7 +402,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 				if (! enviamentsIds.contains(enviament.getId())) {
 					notificacioEntity.getEnviaments().remove(enviament);
-					auditEnviamentHelper.deleteEnviament(enviament);
+					enviamentTableRepository.delete(enviament.getId());
+					notificacioEventRepository.deleteByEnviament(enviament);
+					notificacioEnviamentRepository.delete(enviament);
+					notificacioEnviamentRepository.flush();
+					enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.DELETE, "NotificacioServiceImpl.delete");
 				}
 
 //				### Destinataris esborrats
@@ -388,6 +432,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 				SemaforNotificacio.alliberar(notificacioEntity.getId());
 			}
+
+			notificacioTableHelper.actualitzarRegistre(notificacioEntity);
+			notificacioHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.UPDATE, "NotificacioServiceImpl.update");
 
 			return conversioTipusHelper.convertir(
 					notificacioRepository.getOne(notificacio.getId()),
@@ -1239,7 +1286,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 				throw new Exception("La notificació no es pot marcar com a processada, l'usuari no té els permisos requerits.");
 			}
 
-			notificacioEntity = auditNotificacioHelper.updateNotificacioProcessada(notificacioEntity, motiu);
+			notificacioEntity.updateEstat(NotificacioEstatEnumDto.PROCESSADA);
+			notificacioEntity.updateEstatProcessatDate(new Date());
+			notificacioEntity.updateMotiu(motiu);
+			notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(notificacioEntity.getId()).estat(NotificacioEstatEnumDto.PROCESSADA).estatProcessatDate(new Date()).build());
+
 			UsuariEntity usuari = usuariHelper.getUsuariAutenticat();
 			if(usuari != null && notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
 //				if(!usuari.isRebreEmailsNotificacioCreats() || usuari.getCodi() == notificacioEntity.getCreatedBy().getCodi()) {
@@ -1248,7 +1299,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 			
 			notificacioRepository.saveAndFlush(notificacioEntity);
-			
+			notificacioHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.UPDATE, "NotificacioService.marcarComProcessada");
+
 			return resposta;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1301,7 +1353,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					notificacioId);
 	//			List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacio);
 			for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-				auditEnviamentHelper.resetConsultaNotifica(enviament);
+				enviament.refreshNotificaConsulta();
 			}
 			notificacioTableHelper.actualitzarRegistre(notificacio);
 			notificacioRepository.saveAndFlush(notificacio);
@@ -1325,7 +1377,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 					null,
 					notificacioId);
 			for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-				auditEnviamentHelper.resetConsultaSir(enviament);
+				enviament.refreshSirConsulta();
+//				enviamentTableHelper.actualitzarRegistre(enviament);
+				enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificacioServiceImpl.reactivarSir");
 			}
 			notificacioTableHelper.actualitzarRegistre(notificacio);
 			notificacioRepository.saveAndFlush(notificacio);
@@ -1582,7 +1636,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
 					null,
 					notificacioId);
-			auditNotificacioHelper.updateNotificacioRefreshRegistreNotificacio(notificacio);
+			notificacio.refreshRegistre();
+			notificacioRepository.saveAndFlush(notificacio);
+			notificacioTableHelper.actualitzarRegistre(notificacio);
+			notificacioHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "NotificacioServiceImpl.reactivarRegistre");
 		} catch (Exception e) {
 			logger.debug("Error reactivant consultes d'estat de la notificació (notificacioId=" + notificacioId + ")", e);
 		} finally {
@@ -1616,11 +1673,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public boolean reactivarNotificacioAmbErrors(Long notificacioId) {
 			Timer.Context timer = metricsHelper.iniciMetrica();
 			try {
-				NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
-						null,
-						notificacioId);
+				NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 				if (NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
-					auditNotificacioHelper.updateNotificacioReintentaFinalitzadaAmbErrors(notificacio);
+					notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
+					notificacio.resetIntentsNotificacio();
+					NotTableUpdate not = NotTableUpdate.builder().estat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS).build();
+					notificacioTableHelper.actualitzar(not);
+					notificacioHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "NotificacioServiceImpl.reactivarNotificacioAmbErrors");
 					return true;
 				}
 			} catch (Exception e) {

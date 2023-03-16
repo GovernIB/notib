@@ -44,13 +44,21 @@ public class NotificaV2HelperTest {
     @Mock
     private NotificacioEventHelper notificacioEventHelper;
     @Mock
-    protected AuditNotificacioHelper auditNotificacioHelper;
-    @Mock
     protected ConfigHelper configHelper;
     @Mock
     private EmailNotificacioHelper emailNotificacioHelper;
     @Mock
     private NotificacioRepository notificacioRepository;
+    @Mock
+    private NotificacioHelper notificacioHelper;
+    @Mock
+    private NotificacioTableHelper notificacioTableHelper;
+    @Mock
+    private EnviamentHelper enviamentHelper;
+    @Mock
+    private EnviamentTableHelper enviamentTableHelper;
+    @Mock
+    private CallbackHelper callbackHelper;
     @InjectMocks
     private NotificaV2Helper notificaV2Helper;
 
@@ -190,6 +198,11 @@ public class NotificaV2HelperTest {
 
         Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS),
                 Mockito.any(byte[].class))).thenReturn("ArxiuId");
+//        Mockito.doNothing().when(notificacioHelper).auditaNotificacio(Mockito.any(NotificacioEntity.class), Mockito.<AuditService.TipusOperacio>any(), Mockito.anyString());
+//        Mockito.doNothing().when(notificacioTableHelper).actualitzarRegistre(Mockito.any(NotificacioEntity.class));
+//        Mockito.doNothing().when(enviamentHelper).auditaEnviament(Mockito.any(NotificacioEnviamentEntity.class), Mockito.<AuditService.TipusOperacio>any(), Mockito.anyString());
+//        Mockito.doNothing().when(enviamentTableHelper).actualitzarRegistre(Mockito.any(NotificacioEnviamentEntity.class));
+//        Mockito.doNothing().when(callbackHelper).crearCallback(Mockito.any(NotificacioEntity.class), Mockito.any(NotificacioEnviamentEntity.class), Mockito.anyBoolean(), Mockito.anyString());
 
         Assert.assertNull(enviamentMock.getNotificaCertificacioData());
         Assert.assertNull(enviamentMock.getNotificaCertificacioArxiuId());

@@ -12,14 +12,12 @@ import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.service.AuditService.TipusEntitat;
-import es.caib.notib.core.api.service.AuditService.TipusOperacio;
-import es.caib.notib.core.aspect.Audita;
+import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.helper.CallbackHelper;
 import es.caib.notib.core.helper.ConfigHelper;
-import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.EnviamentHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NotificaHelper;
@@ -77,6 +75,8 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 	private ConfigHelper configHelper;
 	@Autowired
 	private CallbackHelper callbackHelper;
+	@Autowired
+	private EnviamentHelper enviamentHelper;
 
 	private final Object lock = new Object();
 	
@@ -156,7 +156,6 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 	}
 
 	// TODO: Arreglar això --> No es crida AOP en crides dins la mateixa classe
-	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	private NotificacioEnviamentEntity updateEnviament(
 			String organismoEmisor,
 			String identificador,
@@ -310,6 +309,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			callbackHelper.updateCallback(enviament, !Strings.isNullOrEmpty(eventErrorDescripcio), eventErrorDescripcio);
 			logger.debug("Event callbackdatat registrat correctament: " + NotificacioEventTipusEnumDto.ADVISER_DATAT.name());
 		}
+		enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaAdviserWsV2Impl.sincronizarEnvio");
 		logger.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");
 		return enviament;
 	}

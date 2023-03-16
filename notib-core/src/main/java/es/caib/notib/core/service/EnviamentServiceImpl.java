@@ -38,6 +38,7 @@ import es.caib.notib.core.api.rest.consulta.Resposta;
 import es.caib.notib.core.api.rest.consulta.SubEstat;
 import es.caib.notib.core.api.rest.consulta.Transmissio;
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.PermisosService;
@@ -49,12 +50,11 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.UsuariEntity;
-import es.caib.notib.core.helper.AuditEnviamentHelper;
-import es.caib.notib.core.helper.AuditNotificacioHelper;
 import es.caib.notib.core.helper.CallbackHelper;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
+import es.caib.notib.core.helper.EnviamentHelper;
 import es.caib.notib.core.helper.FiltreHelper;
 import es.caib.notib.core.helper.FiltreHelper.FiltreField;
 import es.caib.notib.core.helper.FiltreHelper.StringField;
@@ -62,7 +62,6 @@ import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NotificaHelper;
-import es.caib.notib.core.helper.NotificacioEventHelper;
 import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
@@ -157,19 +156,15 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Autowired
 	private MetricsHelper metricsHelper;
 	@Autowired
-	private AuditEnviamentHelper auditEnviamentHelper;
-	@Autowired
 	private NotificacioService notificacioService;
 	@Autowired
-	private NotificacioEventHelper notificacioEventHelper;
+	private EnviamentHelper enviamentHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private ProcSerHelper procedimentHelper;
 	@Autowired
 	private AplicacioRepository aplicacioRepository;
-	@Autowired
-	private AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
@@ -1239,7 +1234,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			for (Long enviamentId: enviaments) {
-				auditEnviamentHelper.resetConsultaNotifica(notificacioEnviamentRepository.findById(enviamentId));
+				NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
+				enviament.refreshNotificaConsulta();
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1252,7 +1248,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			for (Long enviamentId: enviaments) {
-				auditEnviamentHelper.resetConsultaSir(notificacioEnviamentRepository.findById(enviamentId));
+				NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
+				enviament.refreshSirConsulta();
+				enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "EnviamentServiceImpl.reactivaSir");
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1493,8 +1491,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	public void actualitzarEstat(Long enviamentId) {
 
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
-		auditEnviamentHelper.resetConsultaNotifica(enviament);
-		auditEnviamentHelper.resetConsultaSir(enviament);
+		enviament.refreshNotificaConsulta();
+		enviament.refreshSirConsulta();
 
 		if (enviament.getNotificacio().isComunicacioSir()) {
 			// si l'enviament esta pendent de refrescar l'estat enviat SIR
@@ -1507,6 +1505,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				notificacioService.enviamentRefrescarEstat(enviamentId);
 			}
 		}
+
 	}
 
 	@Transactional

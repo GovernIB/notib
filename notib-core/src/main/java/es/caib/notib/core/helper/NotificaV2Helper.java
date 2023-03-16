@@ -9,11 +9,8 @@ import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.service.AuditService.TipusEntitat;
+import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
-import es.caib.notib.core.aspect.Audita;
-import es.caib.notib.core.aspect.UpdateEnviamentTable;
-import es.caib.notib.core.aspect.UpdateNotificacioTable;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.PersonaEntity;
@@ -102,10 +99,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
+	@Autowired
+	private EnviamentTableHelper enviamentTableHelper;
+	@Autowired
+	private EnviamentHelper enviamentHelper;
 
 
-	@UpdateNotificacioTable
-	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
@@ -138,10 +137,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				startTime = System.nanoTime();
 				logger.info(" >>> ... OK");
-				if (ambEnviamentPerEmail) {
-					auditNotificacioHelper.updateNotificacioMixtaEnviadaNotifica(notificacio);
-				} else {
- 					auditNotificacioHelper.updateNotificacioEnviada(notificacio);
+				if (!ambEnviamentPerEmail) {
+					notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 				}
 				List<Long> enviamentsActualitzats = new ArrayList<>();
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
@@ -149,7 +146,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						String nif = enviament.getTitular().getNif();
 						if (nif != null && nif.equalsIgnoreCase(resultadoEnvio.getNifTitular()) && !enviamentsActualitzats.contains(enviament.getId())) {
 							enviamentsActualitzats.add(enviament.getId());
-							auditEnviamentHelper.updateEnviamentEnviat(enviament, resultadoEnvio.getIdentificador());
+							enviament.updateNotificaEnviada(resultadoEnvio.getIdentificador());
+							enviamentTableHelper.actualitzarRegistre(enviament);
+							enviamentHelper.auditaEnviament(enviament, TipusOperacio.UPDATE, "NotificaV2Helper.notificacioEnviar");
 							break;
 						}
 					}
@@ -172,12 +171,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 		boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
 		if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat()) /*|| NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())*/)) {
-			auditNotificacioHelper.updateNotificacioFinalitzadaAmbErrors(notificacio);
+			notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
 		}
 
 		notificacioEventHelper.addNotificaEnviamentEvent(notificacio, error, errorDescripcio, fiReintents);
 		callbackHelper.updateCallbacks(notificacio, error, errorDescripcio);
 		logger.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
+
+		notificacioTableHelper.actualitzarRegistre(notificacio);
+		notificacioHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "NotificaV2Helper.notificacioEnviar");
 		return notificacio;
 	}
 
@@ -203,8 +205,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return enviamentRefrescarEstat(enviament, raiseExceptions);
 	}
 
-	@UpdateEnviamentTable
-	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	private NotificacioEnviamentEntity enviamentRefrescarEstat(@NonNull NotificacioEnviamentEntity enviament, boolean raiseExceptions) throws Exception {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA,"Consultar estat d'un enviament", IntegracioAccioTipusEnumDto.ENVIAMENT,
@@ -271,6 +271,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 		}
 		notificacioEventHelper.addNotificaConsultaEvent(enviament, error, errorDescripcio, errorMaxReintents);
+		enviamentTableHelper.actualitzarRegistre(enviament);
+		enviamentHelper.auditaEnviament(enviament, TipusOperacio.UPDATE, "NotificaV2Helper.enviamentRefrescarEstat");
+
 		if (error && raiseExceptions){
 			throw excepcio;
 		}

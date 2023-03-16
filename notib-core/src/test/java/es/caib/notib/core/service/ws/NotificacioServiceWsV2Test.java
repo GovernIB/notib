@@ -19,9 +19,9 @@ import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
@@ -34,16 +34,17 @@ import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcSerOrganEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.helper.AuditEnviamentHelper;
-import es.caib.notib.core.helper.AuditNotificacioHelper;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.EnviamentHelper;
+import es.caib.notib.core.helper.EnviamentTableHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.NotificacioHelper;
+import es.caib.notib.core.helper.NotificacioTableHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.RegistreNotificaHelper;
@@ -149,9 +150,7 @@ public class NotificacioServiceWsV2Test {
 	@Mock
 	private MetricsHelper metricsHelper;
 	@Mock
-	private AuditNotificacioHelper auditNotificacioHelper;
-	@Mock
-	private AuditEnviamentHelper auditEnviamentHelper;
+	private NotificacioTableHelper notificacioTableHelper;
 	@Mock
 	private OrganGestorCachable organGestorCachable;
 	@Mock
@@ -174,6 +173,10 @@ public class NotificacioServiceWsV2Test {
 	private ConfigHelper configHelper;
 	@Mock
 	private MessageHelper messageHelper;
+	@Mock
+	private EnviamentTableHelper enviamentTableHelper;
+	@Mock
+	private EnviamentHelper enviamentHelper;
 
 	private AplicacioEntity aplicacio;
 	
@@ -317,12 +320,14 @@ public class NotificacioServiceWsV2Test {
 //		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(false)))
 //		.thenReturn(documentArxiuCsv);
 		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class))).thenReturn(Long.toString(new Random().nextLong()));
-		Mockito.when(auditEnviamentHelper.desaEnviamentAmbReferencia(Mockito.any(EntitatEntity.class), 
-				Mockito.nullable(NotificacioEntity.class), Mockito.any(Enviament.class),
-				Mockito.any(ServeiTipusEnumDto.class), Mockito.any(PersonaEntity.class),
-				Mockito.<PersonaEntity>anyList())).thenReturn(enviamentSavedMock);
+//		Mockito.when(auditEnviamentHelper.desaEnviamentAmbReferencia(Mockito.any(EntitatEntity.class),
+//				Mockito.nullable(NotificacioEntity.class), Mockito.any(Enviament.class),
+//				Mockito.any(ServeiTipusEnumDto.class), Mockito.any(PersonaEntity.class),
+//				Mockito.<PersonaEntity>anyList())).thenReturn(enviamentSavedMock);
+		Mockito.when(notificacioEnviamentRepository.saveAndFlush(Mockito.<NotificacioEnviamentEntity>any())).thenReturn(enviamentSavedMock);
 		Mockito.when(personaRepository.save(Mockito.any(PersonaEntity.class))).thenReturn(personaEntity);
-		Mockito.when(auditNotificacioHelper.desaNotificacio(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioGuardada);
+		Mockito.doNothing().when(notificacioTableHelper).crearRegistre(Mockito.any(NotificacioEntity.class));
+		Mockito.doNothing().when(notificacioHelper).auditaNotificacio(Mockito.any(NotificacioEntity.class), Mockito.<AuditService.TipusOperacio>any(), Mockito.anyString());
 		Mockito.when(notificacioRepository.saveAndFlush(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioGuardada);
 		Mockito.when(pluginHelper.getNotibTipusComunicacioDefecte()).thenReturn(NotificacioComunicacioTipusEnumDto.ASINCRON);
 		Mockito.when(notificacioEnviamentRepository.findByNotificacio(Mockito.any(NotificacioEntity.class))).thenReturn(listaNotificacioGuardada);
