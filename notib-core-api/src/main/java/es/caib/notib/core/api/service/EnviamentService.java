@@ -100,16 +100,7 @@ public interface EnviamentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	List<NotificacioEventDto> eventFindAmbNotificacio(Long notificacioId);
-	
-	/**
-	 * Reintenta un callback fallat
-	 * 
-	 * @param eventId
-	 *            Atribut id de la notificació.
-	 * @return els events trobats.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	boolean reintentarCallback(Long eventId);
+
 
 	/**
 	 * Genera un fitxer d'exportació amb la informació dels expedients.
@@ -220,6 +211,6 @@ public interface EnviamentService {
 	 *            id de l'enviament.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	void enviarCallback(Long enviamentId) throws Exception;
+	List<Long> enviarCallback(Set<Long> enviaments) throws Exception;
 
 }

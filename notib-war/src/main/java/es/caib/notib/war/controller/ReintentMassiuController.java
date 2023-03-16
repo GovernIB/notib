@@ -4,6 +4,7 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.service.CallbackService;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
@@ -41,6 +42,8 @@ public class ReintentMassiuController extends BaseUserController {
 	private EnviamentService enviamentService;
 	@Autowired
 	private NotificacioService notificacioService;
+	@Autowired
+	private CallbackService callbackService;
 	@Autowired
 	private ProcedimentService procedimentService;
 	
@@ -106,45 +109,17 @@ public class ReintentMassiuController extends BaseUserController {
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/notificacions/reintentar", method = RequestMethod.GET)
-	public String reintentar(
-			HttpServletRequest request,
-			Model model) {
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO);
+	public String reintentar(HttpServletRequest request, Model model) {
 
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
 		if (seleccio == null || seleccio.isEmpty()) {
-			return getModalControllerReturnValueError(
-					request,
-					"redirect:/massiu/notificacions",
-					"accio.massiva.seleccio.buida");
+			return getModalControllerReturnValueError(request, "redirect:/massiu/notificacions", "accio.massiva.seleccio.buida");
 		}
 		for (Long notificacioId : seleccio) {
-			// TODO:
-//			List<NotificacioEventDto> events = notificacioService.eventFindAmbNotificacio(null, notificacioId);
-//
-//			if (events != null && events.size() > 0) {
-//				NotificacioEventDto lastEvent = events.get(events.size() - 1);
-//
-//				if(lastEvent.isError() &&
-//							(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
-//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
-//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
-//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT) ||
-//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR) ||
-//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR) ||
-//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) ||
-//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
-//					enviamentService.reintentarCallback(lastEvent.getId());
-//				}
-//			}
+			callbackService.reintentarCallback(notificacioId);
 		}
 		RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
-		
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../../massiu/notificacions",
-				"accio.massiva.creat.ok");
+		return getModalControllerReturnValueSuccess(request, "redirect:../../massiu/notificacions", "accio.massiva.creat.ok");
 	}
 	
 	@RequestMapping(value = "/select", method = RequestMethod.GET)

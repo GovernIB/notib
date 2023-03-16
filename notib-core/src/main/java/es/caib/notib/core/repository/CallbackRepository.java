@@ -7,19 +7,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Set;
 
 public interface CallbackRepository extends JpaRepository<CallbackEntity, Long>  {
 
 
-    @Query("select c.id from CallbackEntity c order by c.data asc nulls first")
-    List<Long> findPendents(Pageable page);
+    @Query("select c.enviamentId from CallbackEntity c order by c.data asc nulls first")
+    List<Long> findEnviamentIdPendents(Pageable page);
 
     CallbackEntity findByEnviamentId(Long envId);
 
-//	@Query(" select ce.id from CallbackEntity ce " +
-//			" where ce.estat = PENDENT " +
-//			"and ce.notificacio.id = :notificacioId " +
-//			"order by ce.data asc nulls first")
-//	List<Long> findPendentByNotificacioId(@Param("notificacioId") Long notificacioId);
-//	List<Long> findPendentByEnviamentId(@Param("enviamentId") Long enviamentId);
+    List<CallbackEntity> findByEnviamentIdIn(Set<Long> envId);
+
 }

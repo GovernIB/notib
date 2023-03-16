@@ -27,4 +27,9 @@ public class CallbackServiceBean implements CallbackService {
 		delegate.processarPendents();
 	}
 
+	@Override
+	public boolean reintentarCallback(Long notId) {
+		return false;
+	}
+
 }

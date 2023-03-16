@@ -3,6 +3,10 @@ package es.caib.notib.core.helper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.EntitatRepository;
@@ -21,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
@@ -99,6 +105,8 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
         );
     }
 
+    // TODO:
+
 //    @Test
 //    public void whenNotificaCorrecte_thenEstatIsNotifica() throws Exception {
 //        // Given
@@ -123,7 +131,7 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
 //        Assert.assertEquals(0, eventsCallback.size());
 //
 //        // When
-//        callbackHelper.notifica(eventNotificar);
+//        callbackHelper.notifica(enviament);
 //
 //        // Then
 //        eventNotificar = eventRepository.findOne(eventNotificar.getId());
@@ -172,8 +180,7 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
 //        Assert.assertEquals(0, eventsCallback.size());
 //
 //        // When
-//        callbackHelper.notifica(eventNotificar);
-//        callbackHelper.notifica(eventNotificarDarrerIntent);
+//        callbackHelper.notifica(enviament);
 //
 //        // Then
 //        eventNotificar = eventRepository.findOne(eventNotificar.getId());

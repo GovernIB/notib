@@ -12,6 +12,7 @@ import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -84,8 +85,8 @@ public class CallbackHelperTest {
     }
 
 //    @Test
-//    public void whenNotificaACallbackInactiu_ThenCallBackEstatIsPROCESSAT() throws Exception {
-//        // Given
+    public void whenNotificaACallbackInactiu_ThenCallBackEstatIsPROCESSAT() throws Exception {
+        // Given
 //        aplicacio.updateActiva(false);
 //
 //        NotificacioEventEntity event = NotificacioEventEntity.builder()
@@ -102,14 +103,15 @@ public class CallbackHelperTest {
 //        Assert.assertEquals(CallbackEstatEnumDto.PROCESSAT, event.getCallbackEstat());
 //
 //        // Verificam que no s'ha asociat cap event
-//        Mockito.verify(notificacioEventHelper, Mockito.times(0)).addCallbackEnviamentEvent(
-//                Mockito.any(NotificacioEnviamentEntity.class),
-//                Mockito.anyBoolean(),
-//                Mockito.anyString());
-//    }
+//        Mockito.verify(notificacioEventHelper, Mockito.times(0)).addCallbackEvent(
+//                Mockito.any(NotificacioEntity.class),
+//                Mockito.eq(event),
+//                Mockito.anyBoolean()
+//                );
+    }
 
 //    @Test
-//    public void whenNotificaCorrecte_ThenCallBackEstatIsNOTIFICAT() throws Exception {
+    public void whenNotificaCorrecte_ThenCallBackEstatIsNOTIFICAT() throws Exception {
 //        // Given
 //        NotificacioEventEntity event = NotificacioEventEntity.builder()
 //                .callbackIntents(0)
@@ -125,19 +127,20 @@ public class CallbackHelperTest {
 //        Assert.assertEquals(CallbackEstatEnumDto.NOTIFICAT, event.getCallbackEstat());
 //
 //        // Verificam que s'ha asociat un event i no és d'error
-//        Mockito.verify(notificacioEventHelper).addCallbackEnviamentEvent(
-//                Mockito.any(NotificacioEnviamentEntity.class),
-//                Mockito.anyBoolean(),
-//                Mockito.anyString());
-//
-//    }
+//        Mockito.verify(notificacioEventHelper).addCallbackEvent(
+//                Mockito.any(NotificacioEntity.class),
+//                Mockito.eq(event),
+//                Mockito.eq(false)
+//        );
+
+    }
 
 //    @Test
-//    public void whenNotificaTipusEventIncorrecte_ThenCallBackEstatIsERROR() throws Exception {
+    public void whenNotificaTipusEventIncorrecte_ThenCallBackEstatIsERROR() throws Exception {
 //        // Given
 //        NotificacioEventEntity event = NotificacioEventEntity.builder()
 //                .callbackIntents(0)
-//                .tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA)
+//                .tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO)
 //                .enviament(enviamentMock)
 //                .notificacio(notificacioMock)
 //                .build();
@@ -149,15 +152,16 @@ public class CallbackHelperTest {
 //        Assert.assertEquals(CallbackEstatEnumDto.ERROR, event.getCallbackEstat());
 //
 //        // Verificam que s'ha asociat un event i que és d'error
-//        Mockito.verify(notificacioEventHelper).addCallbackEnviamentEvent(
-//                Mockito.any(NotificacioEnviamentEntity.class),
-//                Mockito.anyBoolean(),
-//                Mockito.anyString());
-//    }
+//        Mockito.verify(notificacioEventHelper).addCallbackEvent(
+//                Mockito.any(NotificacioEntity.class),
+//                Mockito.eq(event),
+//                Mockito.eq(true)
+//        );
+    }
 
 //    @Test
-//    public void whenNotificaRaiseExceptionAndIntentsPendents_ThenCallBackEstatIsPENDENT() throws Exception {
-//        // Given
+    public void whenNotificaRaiseExceptionAndIntentsPendents_ThenCallBackEstatIsPENDENT() throws Exception {
+        // Given
 //        ClientResponse responseMock = Mockito.mock(ClientResponse.class);
 //        Mockito.when(responseMock.getStatusInfo()).thenReturn(Statuses.from(404, "Not found"));
 //        Mockito.when(requestsHelper.callbackAplicacioNotificaCanvi(
@@ -178,15 +182,16 @@ public class CallbackHelperTest {
 //        Assert.assertEquals(CallbackEstatEnumDto.PENDENT, event.getCallbackEstat());
 //
 //        // Verificam que s'ha asociat un event i que és d'error
-//        Mockito.verify(notificacioEventHelper).addCallbackEnviamentEvent(
-//                Mockito.any(NotificacioEnviamentEntity.class),
-//                Mockito.anyBoolean(),
-//                Mockito.anyString());
-//    }
+//        Mockito.verify(notificacioEventHelper).addCallbackEvent(
+//                Mockito.any(NotificacioEntity.class),
+//                Mockito.eq(event),
+//                Mockito.eq(true)
+//        );
+    }
 
 //    @Test
-//    public void whenNotificaRaiseExceptionAndIsLastIntent_ThenCallBackEstatIsERROR() throws Exception {
-//        // Given
+    public void whenNotificaRaiseExceptionAndIsLastIntent_ThenCallBackEstatIsERROR() throws Exception {
+        // Given
 //        ClientResponse responseMock = Mockito.mock(ClientResponse.class);
 //        Mockito.when(responseMock.getStatusInfo()).thenReturn(Statuses.from(404, "Not found"));
 //        Mockito.when(requestsHelper.callbackAplicacioNotificaCanvi(
@@ -207,15 +212,16 @@ public class CallbackHelperTest {
 //        Assert.assertEquals(CallbackEstatEnumDto.ERROR, event.getCallbackEstat());
 //
 //        // Verificam que s'ha asociat un event i que és d'error
-//        Mockito.verify(notificacioEventHelper).addCallbackEnviamentEvent(
-//                Mockito.any(NotificacioEnviamentEntity.class),
-//                Mockito.anyBoolean(),
-//                Mockito.anyString());
-//    }
+//        Mockito.verify(notificacioEventHelper).addCallbackEvent(
+//                Mockito.any(NotificacioEntity.class),
+//                Mockito.eq(event),
+//                Mockito.eq(true)
+//        );
+    }
 
 //    @Test
-//    public void whenAplicacioNull_thenAddErrorIntegracioAndRaiseException() throws Exception {
-//        // Given
+    public void whenAplicacioNull_thenAddErrorIntegracioAndRaiseException() throws Exception {
+        // Given
 //        Mockito.when(aplicacioRepository.findByUsuariCodiAndEntitatId(Mockito.anyString(),
 //                Mockito.anyLong())).thenReturn(null);
 //
@@ -236,20 +242,20 @@ public class CallbackHelperTest {
 //        Assert.assertEquals(CallbackEstatEnumDto.ERROR, event.getCallbackEstat());
 //
 //        // Verificam que s'ha asociat un event i que és d'error
-//        Mockito.verify(notificacioEventHelper).addCallbackEnviamentEvent(
-//                Mockito.any(NotificacioEnviamentEntity.class),
-//                Mockito.anyBoolean(),
-//                Mockito.anyString());
+//        Mockito.verify(notificacioEventHelper).addCallbackEvent(
+//                Mockito.any(NotificacioEntity.class),
+//                Mockito.eq(event),
+//                Mockito.eq(true)
+//        );
 //
 //        Mockito.verify(integracioHelper).addAccioError(
 //                Mockito.any(IntegracioInfo.class),
 //                Mockito.anyString()
 //        );
-//    }
-
+    }
 //    @Test
-//    public void whenAplicacioCallbackUrlNull_thenAddErrorIntegracioAndRaiseException() throws Exception {
-//        // Given
+    public void whenAplicacioCallbackUrlNull_thenAddErrorIntegracioAndRaiseException() throws Exception {
+        // Given
 //       aplicacio.update("", null);
 //
 //        NotificacioEventEntity event = NotificacioEventEntity.builder()
@@ -269,14 +275,15 @@ public class CallbackHelperTest {
 //        Assert.assertEquals(CallbackEstatEnumDto.ERROR, event.getCallbackEstat());
 //
 //        // Verificam que s'ha asociat un event i que és d'error
-//        Mockito.verify(notificacioEventHelper).addCallbackEnviamentEvent(
-//                Mockito.any(NotificacioEnviamentEntity.class),
-//                Mockito.anyBoolean(),
-//                Mockito.anyString());
+//        Mockito.verify(notificacioEventHelper).addCallbackEvent(
+//                Mockito.any(NotificacioEntity.class),
+//                Mockito.eq(event),
+//                Mockito.eq(true)
+//        );
 //
 //        Mockito.verify(integracioHelper).addAccioError(
 //                Mockito.any(IntegracioInfo.class),
 //                Mockito.anyString()
 //        );
-//    }
+    }
 }
