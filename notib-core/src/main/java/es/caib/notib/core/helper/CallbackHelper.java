@@ -18,6 +18,7 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.CallbackRepository;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.service.ws.NotificacioServiceWsImplV2;
 import lombok.NonNull;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.security.auth.callback.Callback;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -53,6 +55,8 @@ public class CallbackHelper {
 	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
 	private AplicacioRepository aplicacioRepository;
+	@Autowired
+	private NotificacioEnviamentRepository enviamentRepository;
 	@Autowired
 	private CallbackRepository callbackRepository;
 	@Autowired
@@ -113,119 +117,95 @@ public class CallbackHelper {
 	}
 
 	@Transactional (rollbackFor = RuntimeException.class, propagation = Propagation.REQUIRES_NEW)
-	public boolean notifica(@NonNull Long eventId) throws Exception {
-		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
+	public boolean notifica(@NonNull Long enviamentId) throws Exception {
 
-		if (event == null)
-			return false;
-
-		NotificacioEntity notificacioProcessada = notifica(event);
-		if (notificacioProcessada != null && notificacioProcessada.isErrorLastCallback()) {
+		NotificacioEnviamentEntity env = enviamentRepository.findOne(enviamentId);
+		if (env == null) {
 			return false;
 		}
-
-		return true;
+		NotificacioEntity notificacioProcessada = notifica(env);
+		return notificacioProcessada == null || notificacioProcessada.isErrorLastCallback();
 	}
 
 	@Transactional (rollbackFor = RuntimeException.class)
-	public NotificacioEntity notifica(@NonNull NotificacioEventEntity event) throws Exception{
-		log.trace("[Callback] Consultant aplicació de l'event. ");
-		AplicacioEntity aplicacio = getAplicacio(event);
+	public NotificacioEntity notifica(@NonNull NotificacioEnviamentEntity env) throws Exception{
 
-		NotificacioEntity notificacio = event.getNotificacio();
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_CLIENT,
-				String.format("Enviament d'avís de canvi d'estat (%s)", aplicacio.getCallbackUrl()),
-				IntegracioAccioTipusEnumDto.ENVIAMENT,
-				new AccioParam("Identificador de l'event", String.valueOf(event.getId())),
-				new AccioParam("Identificador de la notificació", String.valueOf(notificacio.getId())),
-				new AccioParam("Codi aplicació", aplicacio.getUsuariCodi()),
-				new AccioParam("Callback", aplicacio.getCallbackUrl())
-		);
+		CallbackEntity callback = callbackRepository.findByEnviamentId(env.getId());
+		NotificacioEntity notificacio = env.getNotificacio();
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_CLIENT, String.format("Enviament d'avís de canvi d'estat"), IntegracioAccioTipusEnumDto.ENVIAMENT,
+				new AccioParam("Identificador de l'enviament", String.valueOf(env.getId())),
+				new AccioParam("Identificador de la notificació", String.valueOf(notificacio.getId())));
+
+		if (callback == null) {
+			integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat. No existeix un callback per l'enviament " + env.getId());
+			return notificacio;
+		}
+		log.trace("[Callback] Consultant aplicació de l'event. ");
+		AplicacioEntity aplicacio = getAplicacio(callback, env);
+		info.addParam("Codi aplicació", aplicacio.getUsuariCodi());
+		info.addParam("Callback id", callback.getId() + "");
+		info.addParam("Callback URL", aplicacio.getCallbackUrl());
 		info.setAplicacio(aplicacio != null ? aplicacio.getUsuariCodi() : "Sense aplicació");
 		info.setCodiEntitat(notificacio.getEntitat() != null ? notificacio.getEntitat().getCodi() : null);
-		int intents = event.getCallbackIntents() + 1;
-		log.info(String.format("[Callback] Intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]",
-				intents, event.getId(), notificacio.getId()));
+		int intents = callback.getIntents() + 1;
+		log.info(String.format("[Callback] Intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]", intents, callback.getId(), notificacio.getId()));
 		boolean isError = false;
 		try {
 
-			if (event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT
-					|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT
-					|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO
-					|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE
-					|| event.getTipus() == NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT
-					|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR
-					|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR
-					|| event.getTipus() == NotificacioEventTipusEnumDto.CALLBACK_ACTIVAR
-					|| (event.isError() && event.getTipus() == NotificacioEventTipusEnumDto.CALLBACK_CLIENT)
-			) {
-				// Avisa al client que hi ha hagut una modificació a l'enviament
-				NotificacioEnviamentEntity enviament = event.getEnviament();
-				long start = System.nanoTime();
-				notificaCanvi(enviament, aplicacio.getCallbackUrl());
-				long elapsedTime = System.nanoTime() - start;
-				log.info("notificaCanvi "  + elapsedTime);
+			// Avisa al client que hi ha hagut una modificació a l'enviament
+//			NotificacioEnviamentEntity enviament = event.getEnviament();
+			long start = System.nanoTime();
+			notificaCanvi(env, aplicacio.getCallbackUrl());
+			long elapsedTime = System.nanoTime() - start;
+			log.info("notificaCanvi "  + elapsedTime);
 
-				//Marcar com a processada si la notificació s'ha fet des de una aplicació
-				if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.APLICACIO && isAllEnviamentsEstatFinal(notificacio)) {
-					log.info("[Callback] Marcant notificació com processada per ser usuari aplicació...");
-					start = System.nanoTime();
-					auditNotificacioHelper.updateNotificacioProcessada(notificacio, "Notificació processada de forma automàtica. Estat final: " + enviament.getNotificaEstat());
-					elapsedTime = System.nanoTime() - start;
-					log.info("marca processada: "  + elapsedTime);
-				}
-
-				// TODO: Això no hauria d'estar abans de la crida a notificaCanvi?
-				if (!aplicacio.isActiva()) {
-					// No s'ha d'enviar. El callback està inactiu
-					log.info(String.format("[Callback] No s'ha enviat el callback [Id: %d], el callback està inactiu.", event.getId()));
-					start = System.nanoTime();
-					event.updateCallbackClient(CallbackEstatEnumDto.PROCESSAT, intents, null, getIntentsPeriodeProperty());
-					auditNotificacioHelper.updateLastCallbackError(notificacio, false);
-					elapsedTime = System.nanoTime() - start;
-					log.info("el callback esta inactiu: "  + elapsedTime);
-					return notificacio;
-				}
-
-				// Marca l'event com a notificat
+			//Marcar com a processada si la notificació s'ha fet des de una aplicació
+			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.APLICACIO && isAllEnviamentsEstatFinal(notificacio)) {
+				log.info("[Callback] Marcant notificació com processada per ser usuari aplicació...");
 				start = System.nanoTime();
-				event.updateCallbackClient(CallbackEstatEnumDto.NOTIFICAT, intents, null, getIntentsPeriodeProperty());
-				auditNotificacioHelper.updateLastCallbackError(notificacio, false);
-				integracioHelper.addAccioOk(info);
-				log.info(String.format("[Callback] Enviament del callback [Id: %d] de la notificacio [Id: %d] exitós", event.getId(), notificacio.getId()));
+				auditNotificacioHelper.updateNotificacioProcessada(notificacio, "Notificació processada de forma automàtica. Estat final: " + env.getNotificaEstat());
 				elapsedTime = System.nanoTime() - start;
-				log.info("marcar com a notificat: "  + elapsedTime);
-			} else {
-				isError = true;
-				// És un event pendent de notificar que no és del tipus esperat
-				long start = System.nanoTime();
-				log.info(String.format("[Callback] No s'ha pogut enviar el callback [Id: %d], el tipus d'event és incorrecte.",event.getId()));
-				String errorDescripcio = "L'event id=" + event.getId() + " és del tipus " + event.getTipus() + " i no es pot notificar a l'aplicació client.";
-				event.updateCallbackClient(CallbackEstatEnumDto.ERROR, intents, errorDescripcio, getIntentsPeriodeProperty());
-				auditNotificacioHelper.updateLastCallbackError(notificacio, true);
-				integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat: " + errorDescripcio);
-				long elapsedTime = System.nanoTime() - start;
-				log.info("event pendent notifica no tipus esperat: "  + elapsedTime);
+				log.info("marca processada: "  + elapsedTime);
 			}
+
+			// TODO: Això no hauria d'estar abans de la crida a notificaCanvi?
+			if (!aplicacio.isActiva()) {
+				// No s'ha d'enviar. El callback està inactiu
+				log.info(String.format("[Callback] No s'ha enviat el callback [Id: %d], el callback està inactiu.", callback.getId()));
+				start = System.nanoTime();
+				callback.update(CallbackEstatEnumDto.PROCESSAT, intents, null, getIntentsPeriodeProperty());
+				auditNotificacioHelper.updateLastCallbackError(notificacio, false);
+				elapsedTime = System.nanoTime() - start;
+				log.info("el callback esta inactiu: "  + elapsedTime);
+				return notificacio;
+			}
+
+			// Marca l'event com a notificat
+			start = System.nanoTime();
+			callback.update(CallbackEstatEnumDto.NOTIFICAT, intents, null, getIntentsPeriodeProperty());
+			auditNotificacioHelper.updateLastCallbackError(notificacio, false);
+			integracioHelper.addAccioOk(info);
+			log.info(String.format("[Callback] Enviament del callback [Id: %d] de la notificacio [Id: %d] exitós", callback.getId(), notificacio.getId()));
+			elapsedTime = System.nanoTime() - start;
+			log.info("marcar com a notificat: "  + elapsedTime);
 		} catch (Exception ex) {
 			long start = System.nanoTime();
 			isError = true;
-			log.info(String.format("[Callback] Excepció notificant l'event [Id: %d]: %s", event.getId(), ex.getMessage()));
+			log.info(String.format("[Callback] Excepció notificant l'event [Id: %d]: %s", callback.getId(), ex.getMessage()));
 			ex.printStackTrace();
 			// Marca un error a l'event
 			Integer maxIntents = this.getEventsIntentsMaxProperty();
 			CallbackEstatEnumDto estatNou = maxIntents == null || intents < maxIntents ? CallbackEstatEnumDto.PENDENT : CallbackEstatEnumDto.ERROR;
-			log.info(String.format("[Callback] Actualitzam la base de dades amb l'error de l'event [Id: %d]", event.getId()));
-			event.updateCallbackClient(estatNou, intents, "Error notificant l'event al client: " + ex.getMessage(), getIntentsPeriodeProperty());
+			log.info(String.format("[Callback] Actualitzam la base de dades amb l'error de l'event [Id: %d]", callback.getId()));
+			callback.update(estatNou, intents, "Error notificant l'event al client: " + ex.getMessage(), getIntentsPeriodeProperty());
 			auditNotificacioHelper.updateLastCallbackError(notificacio, true);
 			integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat", ex);
 			long elapsedTime = System.nanoTime() - start;
 			log.info("excepcio: "  + elapsedTime);
 		}
 		long start = System.nanoTime();
-		notificacioEventHelper.addCallbackEvent(notificacio, event, isError);
-		log.info(String.format("[Callback] Fi intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]", intents, event.getId(), notificacio.getId()));
+//		notificacioEventHelper.addCallbackEvent(notificacio, callback, isError);
+		log.info(String.format("[Callback] Fi intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]", intents, callback.getId(), notificacio.getId()));
 		long elapsedTime = System.nanoTime() - start;
 		log.info("addCallbackEvent: "  + elapsedTime);
 		return notificacio;
@@ -249,40 +229,28 @@ public class CallbackHelper {
 		return response.getEntity(String.class);
 	}
 
-	private AplicacioEntity getAplicacio(@NonNull NotificacioEventEntity event) throws Exception {
-		// Resol si hi ha una aplicació pel codi d'usuari que ha creat l'enviament
-		NotificacioEnviamentEntity enviament = event.getEnviament();
-		UsuariEntity usuari = enviament.getCreatedBy();
+	private AplicacioEntity getAplicacio(CallbackEntity callback, @NonNull NotificacioEnviamentEntity enviament) throws Exception {
 
+		// Resol si hi ha una aplicació pel codi d'usuari que ha creat l'enviament
+		UsuariEntity usuari = enviament.getCreatedBy();
 		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuari.getCodi(), enviament.getNotificacio().getEntitat().getId());
 		String errorMessage = null;
-		if (aplicacio == null)
-			errorMessage = String.format("No s'ha trobat l'aplicació: codi usuari: %s, EntitatId: %d", usuari.getCodi(),
-					enviament.getNotificacio().getEntitat().getId());
-		else if (aplicacio.getCallbackUrl() == null)
+		if (aplicacio == null) {
+			errorMessage = String.format("No s'ha trobat l'aplicació: codi usuari: %s, EntitatId: %d", usuari.getCodi(), enviament.getNotificacio().getEntitat().getId());
+		} else if (aplicacio.getCallbackUrl() == null) {
 			errorMessage = "La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada";
-
+		}
 		if (errorMessage != null) {
-
-			IntegracioInfo info = new IntegracioInfo(
-					IntegracioHelper.INTCODI_CLIENT,
-					"Enviament d'avís de canvi d'estat",
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					new AccioParam("Identificador de l'event", String.valueOf(event.getId())),
+			IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_CLIENT, "Enviament d'avís de canvi d'estat", IntegracioAccioTipusEnumDto.ENVIAMENT,
+					new AccioParam("Identificador del callback", String.valueOf(callback.getId())),
 					new AccioParam("Codi aplicació", aplicacio != null ? aplicacio.getUsuariCodi() : ""),
 					new AccioParam("Identificador de la notificacio", String.valueOf(enviament.getNotificacio().getId()))
 			);
+			String msg = "Error notificant el callback al client: " + errorMessage;
 			info.setAplicacio(aplicacio != null ? aplicacio.getUsuariCodi() : "Sense aplicació");
-			event.updateCallbackClient(
-					CallbackEstatEnumDto.ERROR,
-					getEventsIntentsMaxProperty(),
-					"Error notificant l'event al client: " + errorMessage,
-					getIntentsPeriodeProperty());
-
-
-			integracioHelper.addAccioError(info, "Error consultant l'aplicació: " + errorMessage);
-			notificacioEventHelper.addCallbackEvent(enviament.getNotificacio(), event, true);
-
+			callback.update(CallbackEstatEnumDto.ERROR, getEventsIntentsMaxProperty(), msg, getIntentsPeriodeProperty());
+			integracioHelper.addAccioError(info, msg);
+//			notificacioEventHelper.addCallbackEvent(enviament.getNotificacio(), event, true);
 			throw new Exception(errorMessage);
 		}
 		return aplicacio;

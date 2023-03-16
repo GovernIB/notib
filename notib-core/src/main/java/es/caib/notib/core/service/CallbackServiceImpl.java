@@ -3,14 +3,14 @@ package es.caib.notib.core.service;
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.service.CallbackService;
 import es.caib.notib.core.clases.CallbackProcessarPendentsThread;
-import es.caib.notib.core.entity.CallbackEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.helper.CallbackHelper;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PropertiesConstants;
 import es.caib.notib.core.repository.CallbackRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,8 @@ public class CallbackServiceImpl implements CallbackService {
 
  	@Autowired
 	private CallbackRepository callbackRepository;
+	@Autowired
+	private NotificacioRepository notificacioRepository;
     @Autowired
 	private CallbackHelper callbackHelper;
     @Autowired
@@ -99,6 +102,35 @@ public class CallbackServiceImpl implements CallbackService {
 			}
 			logger.info("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + callbacks.size() + ", " + errors + " errors");
 
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	@Transactional
+	public boolean reintentarCallback(Long notificacioId) {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.info("Notificant canvi al client...");
+			// Recupera l'event
+			boolean isError = false;
+			NotificacioEntity not = notificacioRepository.findOne(notificacioId);
+			for (NotificacioEnviamentEntity env : not.getEnviaments()) {
+				try {
+					NotificacioEntity notificacio = callbackHelper.notifica(env);
+					isError = (notificacio != null && !notificacio.isErrorLastCallback());
+				} catch (Exception e) {
+					logger.error(String.format("[Callback]L'enviament [Id: %d] ha provocat la següent excepcio:", env.getId()), e);
+					e.printStackTrace();
+					isError = true;
+					// Marcam a l'event que ha causat un error no controlat  i el treiem de la cola
+//				callbackHelper.marcarEventNoProcessable(eventId, e.getMessage(), ExceptionUtils.getStackTrace(e));
+//					return false;
+				}
+			}
+			return isError;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

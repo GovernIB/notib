@@ -26,6 +26,7 @@ import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.CallbackService;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.JustificantService;
@@ -111,6 +112,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private NotificacioListHelper notificacioListHelper;
     @Autowired
     private PermisosService permisService;
+    @Autowired
+    private CallbackService callbackService;
 
     public NotificacioTableController() {
         super.sessionAttributeSeleccio = SESSION_ATTRIBUTE_SELECCIO;
@@ -637,23 +640,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @RequestMapping(value = "/{notificacioId}/refrescarEstatClient", method = RequestMethod.GET)
     public String refrescarEstatClient(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId) throws IOException {
 
-        List<NotificacioEventDto> events = enviamentService.eventFindAmbNotificacio(notificacioId);
-        boolean notificat = false;
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        emplenarModelNotificacioInfo(entitatActual, notificacioId, request,"dades", model);
-        if (events != null && events.size() > 0) {
-            NotificacioEventDto lastEvent = events.get(events.size() - 1);
-            NotificacioEventTipusEnumDto tipus = lastEvent.getTipus();
-            if (lastEvent.isError() &&
-                    (tipus.equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) || tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
-                    tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) || tipus.equals(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT) ||
-                    tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR) || tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR) ||
-                    tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
-
-                log.info("Preparant per notificar canvi del event : " + lastEvent.getId() + " de tipus " + lastEvent.getTipus().name());
-                notificat = enviamentService.reintentarCallback(lastEvent.getId());
-            }
-        }
+        boolean notificat = callbackService.reintentarCallback(notificacioId);
         String msg = notificat ? "notificacio.controller.notificar.client.ok" : "notificacio.controller.notificar.client.error";
         MissatgesHelper.error(request, getMessage(request,msg));
         return "notificacioInfo";

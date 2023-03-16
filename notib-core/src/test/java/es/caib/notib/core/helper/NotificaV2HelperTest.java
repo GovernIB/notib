@@ -44,6 +44,8 @@ public class NotificaV2HelperTest {
     @Mock
     private NotificacioEventHelper notificacioEventHelper;
     @Mock
+    private CallbackHelper callbackHelper;
+    @Mock
     protected AuditNotificacioHelper auditNotificacioHelper;
     @Mock
     protected ConfigHelper configHelper;

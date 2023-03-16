@@ -37,6 +37,8 @@ public class RegistreNotificaHelperTest {
 	@Mock
 	private ConfigHelper configHelper;
 	@Mock
+	private CallbackHelper callbackHelper;
+	@Mock
 	private ConversioTipusHelper conversioTipusHelper;
 
 	@Mock

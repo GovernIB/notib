@@ -135,12 +135,6 @@ public class EnviamentServiceBean implements EnviamentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public boolean reintentarCallback(Long eventId) {
-		return delegate.reintentarCallback(eventId);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public void reactivaConsultes(Set<Long> enviaments) {
 		delegate.reactivaConsultes(enviaments);
 	}
@@ -174,7 +168,7 @@ public class EnviamentServiceBean implements EnviamentService {
 	}
 
 	@Override
-	public void enviarCallback(Long enviamentId) throws Exception {
-		delegate.enviarCallback(enviamentId);
+	public List<Long> enviarCallback(Set<Long> enviaments) throws Exception {
+		return delegate.enviarCallback(enviaments);
 	}
 }

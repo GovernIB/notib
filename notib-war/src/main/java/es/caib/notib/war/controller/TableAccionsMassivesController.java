@@ -410,17 +410,20 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         seleccio = notificacioId != null ? new HashSet<>(Arrays.asList(notificacioId)) : seleccio;
         log.info("Reactivam callback dels enviaments: " + StringUtils.join(seleccio, ", "));
         boolean hasErrors = false;
-        for(Long enviamentId : seleccio) {
-            try {
-                enviamentService.enviarCallback(enviamentId);
-            } catch (Exception e) {
+        try {
+            List<Long> enviamentsAmbError = enviamentService.enviarCallback(seleccio);
+            if (!enviamentsAmbError.isEmpty()) {
                 hasErrors = true;
-                MissatgesHelper.error(request, getMessage(request, "enviament.controller.enviar.callback.KO"));
+                MissatgesHelper.error(request, getMessage(request, "enviament.controller.enviar.callback.KO") + " " + enviamentsAmbError);
             }
+        } catch (Exception e) {
+            hasErrors = true;
+            MissatgesHelper.error(request, getMessage(request, "enviament.controller.enviar.callback.KO"));
         }
         if (!hasErrors) {
             MissatgesHelper.info(request, getMessage(request,"enviament.controller.enviar.callback.OK"));
         }
+
         return "redirect:" + request.getHeader("Referer");
     }
 

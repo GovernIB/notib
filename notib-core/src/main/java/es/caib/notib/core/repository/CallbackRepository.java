@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Set;
 
 public interface CallbackRepository extends JpaRepository<CallbackEntity, Long>  {
 
@@ -15,5 +16,7 @@ public interface CallbackRepository extends JpaRepository<CallbackEntity, Long> 
     List<Long> findPendents(Pageable page);
 
     CallbackEntity findByEnviamentId(Long envId);
+
+    List<CallbackEntity> findByEnviamentIdIn(Set<Long> envId);
 
 }

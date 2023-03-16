@@ -126,7 +126,7 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
         Assert.assertEquals(0, eventsCallback.size());
 
         // When
-        callbackHelper.notifica(eventNotificar);
+        callbackHelper.notifica(enviament);
 
         // Then
         eventNotificar = eventRepository.findOne(eventNotificar.getId());
@@ -175,8 +175,7 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
         Assert.assertEquals(0, eventsCallback.size());
 
         // When
-        callbackHelper.notifica(eventNotificar);
-        callbackHelper.notifica(eventNotificarDarrerIntent);
+        callbackHelper.notifica(enviament);
 
         // Then
         eventNotificar = eventRepository.findOne(eventNotificar.getId());
