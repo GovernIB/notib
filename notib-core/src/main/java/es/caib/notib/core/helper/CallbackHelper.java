@@ -81,8 +81,14 @@ public class CallbackHelper {
 				return;
 			}
 			log.debug("[CALLBACK_CLIENT] Afegint callback per l'enviament " + env.getId());
-			CallbackEntity c = CallbackEntity.builder().usuariCodi(env.getCreatedBy().getCodi()).notificacioId(not.getId()).enviamentId(env.getId())
-					.estat(CallbackEstatEnumDto.PENDENT).data(new Date()).error(isError).errorDesc(errorDesc).build();
+			CallbackEntity c = callbackRepository.findByEnviamentId(env.getId());
+			if (c == null) {
+				c = CallbackEntity.builder().usuariCodi(env.getCreatedBy().getCodi()).notificacioId(not.getId()).enviamentId(env.getId()).build();
+			}
+			c.setData(new Date());
+			c.setError(isError);
+			c.setErrorDesc(errorDesc);
+			c.setEstat(CallbackEstatEnumDto.PENDENT);
 			callbackRepository.save(c);
 		} catch (Exception ex) {
 			log.error("Error creant el callback per l'enviamnet " + env.getId());
@@ -191,7 +197,7 @@ public class CallbackHelper {
 		} catch (Exception ex) {
 			long start = System.nanoTime();
 			isError = true;
-			log.info(String.format("[Callback] Excepció notificant l'event [Id: %d]: %s", callback.getId(), ex.getMessage()));
+			log.info(String.format("[Callback] Excepció notificant el callback [Id: %d]: %s", callback.getId(), ex.getMessage()));
 			ex.printStackTrace();
 			// Marca un error a l'event
 			Integer maxIntents = this.getEventsIntentsMaxProperty();

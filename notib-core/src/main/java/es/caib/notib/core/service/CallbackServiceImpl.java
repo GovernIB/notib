@@ -85,7 +85,7 @@ public class CallbackServiceImpl implements CallbackService {
 					}
 				} catch (Exception ex) {
 					errors++;
-					logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", id), ex);
+					logger.error(String.format("[Callback] L'enviament [Id: %d] ha provocat la següent excepcio:", id), ex);
 					callbackHelper.marcarEventNoProcessable(id, ex.getMessage(), ExceptionUtils.getStackTrace(ex));
 				}
 			}
@@ -96,7 +96,7 @@ public class CallbackServiceImpl implements CallbackService {
 					errors = err ? errors + 1 : errors;
 				} catch (Exception ex) {
 					errors++;
-					logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", key), ex);
+					logger.error(String.format("[Callback] L'enviament [Id: %d] ha provocat la següent excepcio:", key), ex);
 					callbackHelper.marcarEventNoProcessable(key, ex.getMessage(), ExceptionUtils.getStackTrace(ex));
 				}
 			}

@@ -16,7 +16,6 @@ public interface CallbackService {
 	/**
 	 * Processa els callbacks pendents d'enviar als clients. 
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	void processarPendents();
 
 	/**
