@@ -60,18 +60,18 @@ public class CallbackServiceImpl implements CallbackService {
 			logger.info("[Callback] Cercant notificacions pendents d'enviar al client");
 			int maxPendents = getEventsProcessarMaxProperty();
 			Pageable page = new PageRequest(0, maxPendents);
-			List<Long> callbacks = callbackRepository.findPendents(page);
-			if (callbacks.isEmpty()) {
+			List<Long> pendents = callbackRepository.findEnviamentIdPendents(page);
+			if (pendents.isEmpty()) {
 				logger.info("[Callback] No hi ha notificacions pendents d'enviar. ");
 			}
 			logger.info("[Callback] Inici de les notificacions pendents cap a les aplicacions.");
 			int errors = 0;
-			ExecutorService executorService = Executors.newFixedThreadPool(callbacks.size());
+			ExecutorService executorService = Executors.newFixedThreadPool(pendents.size());
 			Map<Long, Future<Boolean>> futurs = new HashMap<>();
 			CallbackProcessarPendentsThread thread;
 			Future<Boolean> futur;
 			boolean multiThread = Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD));
-			for (Long id: callbacks) {
+			for (Long id: pendents) {
 				logger.info("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + id);
 				try {
 					if (multiThread) {
@@ -100,7 +100,7 @@ public class CallbackServiceImpl implements CallbackService {
 					callbackHelper.marcarEventNoProcessable(key, ex.getMessage(), ExceptionUtils.getStackTrace(ex));
 				}
 			}
-			logger.info("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + callbacks.size() + ", " + errors + " errors");
+			logger.info("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + pendents.size() + ", " + errors + " errors");
 
 		} finally {
 			metricsHelper.fiMetrica(timer);

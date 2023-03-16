@@ -12,27 +12,26 @@ import java.util.concurrent.Callable;
 @Slf4j
 public class CallbackProcessarPendentsThread implements Callable<Boolean> {
 
-    protected Long eventId;
+    protected Long enviamentId;
     protected CallbackHelper callbackHelper;
     @Getter
     public boolean error;
 
-    public CallbackProcessarPendentsThread(Long eventId, CallbackHelper callbackHelper) {
-        this.eventId = eventId;
+    public CallbackProcessarPendentsThread(Long enviamentId, CallbackHelper callbackHelper) {
+        this.enviamentId = enviamentId;
         this.callbackHelper= callbackHelper;
     }
 
     @Override
     public Boolean call() throws Exception {
 
-        log.info("[REG] >>> Realitzant registre de la notificació amb id " + eventId);
+        log.info("[REG] >>> Realitzant registre de la notificació amb id enviamentId");
         try {
-            return callbackHelper.notifica(eventId);
+            return callbackHelper.notifica(enviamentId);
         } catch (Exception e) {
             error = true;
-            log.error("Error registrant la notificació amb id " + eventId, e);
-            log.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", eventId), e);
-            callbackHelper.marcarEventNoProcessable(eventId, e.getMessage(), ExceptionUtils.getStackTrace(e));
+            log.error(String.format("[Callback] L'enviament [Id: %d] ha provocat la següent excepcio:", enviamentId), e);
+            callbackHelper.marcarEventNoProcessable(enviamentId, e.getMessage(), ExceptionUtils.getStackTrace(e));
             return error;
         }
     }

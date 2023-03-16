@@ -12,8 +12,8 @@ import java.util.Set;
 public interface CallbackRepository extends JpaRepository<CallbackEntity, Long>  {
 
 
-    @Query("select c.id from CallbackEntity c order by c.data asc nulls first")
-    List<Long> findPendents(Pageable page);
+    @Query("select c.enviamentId from CallbackEntity c order by c.data asc nulls first")
+    List<Long> findEnviamentIdPendents(Pageable page);
 
     CallbackEntity findByEnviamentId(Long envId);
 
