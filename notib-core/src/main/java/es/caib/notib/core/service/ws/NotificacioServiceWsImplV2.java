@@ -1213,7 +1213,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		NotificacioEventEntity errorEvent = notificacioHelper.getNotificaErrorEvent(notificacioGuardada);
 		if (errorEvent != null) {
-			logger.debug(">> [ALTA] Event d'error de Notifica!: " + errorEvent.getDescripcio() + " - " + errorEvent.getErrorDescripcio());
+//			logger.debug(">> [ALTA] Event d'error de Notifica!: " + errorEvent.getErrorDescripcio());
 			info.setCodiEntitat(errorEvent.getNotificacio().getEntitat().getCodi());
 			resposta.setError(true);
 			resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
@@ -1232,13 +1232,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		for (NotificacioEnviamentEntity enviament : enviamentsEntity) {
 			// TODO CALLBACK: Només si no n'hi ha algun
 			CallbackEntity c = CallbackEntity.builder()
-					.usuariCodi(enviament.getCreatedBy().getCodi())
+ 		.usuariCodi(enviament.getCreatedBy().getCodi())
 					.notificacioId(notificacioGuardada.getId())
 					.enviamentId(enviament.getId())
 					.estat(CallbackEstatEnumDto.PENDENT)
 					.data(new Date())
 					.error(false)
-					.errorDesc(null).build();
+ .errorDesc(null).build();
 			callbackRepository.saveAndFlush(c);
 		}
 		logger.debug(">> [ALTA] callbacks de client inicialitzats");

@@ -117,7 +117,7 @@ public class RegistreHelper {
 		}
 
 		notificacioEventHelper.addSirConsultaEvent(enviament, error, errorDescripcio, errorMaxReintents);
-		callbackHelper.updateCallback(enviament, isError, errorDesc);
+		callbackHelper.updateCallback(enviament, error, errorDescripcio);
 		logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		return enviament;
 	}

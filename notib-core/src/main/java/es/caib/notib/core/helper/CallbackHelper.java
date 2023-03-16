@@ -1,8 +1,8 @@
 package es.caib.notib.core.helper;
 
-import com.google.common.base.Strings;
 import com.sun.jersey.api.client.ClientResponse;
 import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
@@ -10,7 +10,6 @@ import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.ws.callback.NotificacioCanviClient;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.CallbackEntity;
-import es.caib.notib.core.entity.EnviamentTableEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
