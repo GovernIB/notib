@@ -49,6 +49,7 @@ databaseChangeLog:
               - column:
                   constraints:
                     nullable: false
+                    unique: true
                   name: ENVIAMENT_ID
                   type: ${long}
               - column:
