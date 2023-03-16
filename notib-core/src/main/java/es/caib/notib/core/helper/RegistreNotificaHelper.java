@@ -10,8 +10,10 @@ import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
+import es.caib.notib.core.entity.CallbackEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.plugin.registre.RegistrePluginException;
@@ -53,7 +55,7 @@ public class RegistreNotificaHelper {
 	@Autowired
 	private ConfigHelper configHelper;
 	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
+	private CallbackHelper callbackHelper;
 
 
 	public boolean realitzarProcesRegistrar(NotificacioEntity notificacioEntity) throws RegistreNotificaException {
@@ -178,6 +180,7 @@ public class RegistreNotificaHelper {
 			info.getParams().add(new AccioParam("Procés descripció: ", " Procedim a enviar la notificació a Notific@"));
 		}
 		notificacioEventHelper.addRegistreEnviamentEvent(enviament, error, errorDescripcio, errorMaxReintents);
+		callbackHelper.crearCallback(notificacioEntity, enviament, error, errorDescripcio);
 	}
 
 	// TODO: Reinitents per enviament, no per notificació!!--> Posar reintents de notificació després del for
@@ -224,6 +227,7 @@ public class RegistreNotificaHelper {
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
 		}
 		notificacioEventHelper.addSirEnviamentEvent(enviament, error, errorDescripcio, errorMaxReintents);
+		callbackHelper.crearCallback(notificacioEntity, enviament, error, errorDescripcio);
 	}
 
 	private String getErrorDescripcio(String codi, String descripcio, int intent) {

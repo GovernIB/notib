@@ -55,6 +55,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	@Autowired
 	private NotificacioRepository notificacioRepository;
 	@Autowired
+	private CallbackHelper callbackHelper;
+	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
@@ -81,7 +83,6 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 
 		boolean error = false;
 		String errorDescripcio = null;
-//		NotificacioErrorTipusEnumDto errorTipus = null;
 		try {
 			log.info(" >>> Enviant notificació...");
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);
@@ -104,18 +105,15 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				}
 				integracioHelper.addAccioOk(info);
 			} else {
-				log.info(" >>> ... ERROR:");
 				error = true;
-				errorDescripcio = "Intent " + notificacio.getNotificaEnviamentIntent() + "\n\nError retornat per Notifica: [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
-//				errorTipus = NotificacioErrorTipusEnumDto.ERROR_REMOT;
-				log.info(" >>> " + errorDescripcio);
+				errorDescripcio = "Intent " + notificacio.getNotificaEnviamentIntent() + " \n\nError retornat per Notifica: [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
+				log.info(" >>> ... ERROR: " + errorDescripcio);
 				integracioHelper.addAccioError(info, errorDescripcio);
 			}
 		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
 			error = true;
-			errorDescripcio = "Intent " + notificacio.getNotificaEnviamentIntent() + "\n\n" + (ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex));
-//			errorTipus = NotificacioErrorTipusEnumDto.ERROR_XARXA;
+			errorDescripcio = "Intent " + notificacio.getNotificaEnviamentIntent() + " \n\n" + (ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex));
 			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 		}
 		boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
@@ -124,6 +122,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		}
 
 		notificacioEventHelper.addNotificaEnviamentEvent(notificacio, error, errorDescripcio, fiReintents);
+		callbackHelper.updateCallbacks(notificacio, error, errorDescripcio);
 		log.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		return notificacio;
 	}
@@ -254,6 +253,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					log.info("Fi actualització certificació. Creant nou event per certificació...");
 					//Crea un nou event
 					notificacioEventHelper.addAdviserCertificacioEvent(enviament, false, null);
+					callbackHelper.updateCallback(enviament, false, null);
 				}
 				log.info("Enviament actualitzat");
 			}
@@ -280,7 +280,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				//Crea un nou event
 				log.info("Creant nou event per Datat...");
 				notificacioEventHelper.addAdviserDatatEvent(enviament, false, null);
-
+				callbackHelper.updateCallback(enviament, false, null);
 				log.info("Actualitzant Datat enviament...");
 				enviamentUpdateDatat(
 						estat,
@@ -316,6 +316,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		if (error && raiseExceptions){
 			throw excepcio;
 		}
+		callbackHelper.updateCallback(enviament, false, null);
 		return enviament;
 	}
 
@@ -330,7 +331,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		}
 		return errorDescripcio;
 	}
-	
+
 	public ResultadoInfoEnvioV2 infoEnviament(
 			NotificacioEnviamentEntity enviament) throws SistemaExternException {
 		ResultadoInfoEnvioV2 resultat = new ResultadoInfoEnvioV2();

@@ -1,5 +1,6 @@
 package es.caib.notib.core.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
@@ -59,6 +60,8 @@ public class EmailNotificacioSenseNifHelper {
 	private DocumentHelper documentHelper;
 	@Autowired
 	protected ConfigHelper configHelper;
+	@Autowired
+	protected CallbackHelper callbackHelper;
 	@Resource
 	protected JavaMailSender mailSender;
 	@Autowired
@@ -90,6 +93,7 @@ public class EmailNotificacioSenseNifHelper {
 				auditEnviamentHelper.updateEnviamentEmailFinalitzat(enviament);
 			}
 			notificacioEventHelper.addEmailEnviamentEvent(enviament, error != null, error);
+			callbackHelper.updateCallback(enviament, Strings.isNullOrEmpty(error), error);
 			hasErrors = hasErrors || error != null;
 		}
 

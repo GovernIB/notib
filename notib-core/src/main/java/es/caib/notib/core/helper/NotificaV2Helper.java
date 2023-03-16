@@ -95,6 +95,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
+	private CallbackHelper callbackHelper;
+	@Autowired
 	private ProcSerRepository procSerRepository;
 	@Autowired
 	private IntegracioHelper integracioHelper;
@@ -123,7 +125,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 		boolean error = false;
 		String errorDescripcio = null;
-//		NotificacioErrorTipusEnumDto errorTipus = null;
 		try {
 			logger.info(" >>> Enviant notificació...");
 
@@ -133,6 +134,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			elapsedTime = (System.nanoTime() - startTime) / 10e6;
 			logger.info(" [TIMER-NOT] Notificació enviar (enviaNotificacio SOAP-QUERY)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
 			notificacio.updateNotificaEnviamentData();
+
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				startTime = System.nanoTime();
 				logger.info(" >>> ... OK");
@@ -157,18 +159,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				logger.info(" [TIMER-NOT] Notificació enviar (Preparar events)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
 				integracioHelper.addAccioOk(info);
 			} else {
-				logger.info(" >>> ... ERROR:");
 				error = true;
-				errorDescripcio = "Intent " + notificacio.getNotificaEnviamentIntent() + "\n\nError retornat per Notifica: [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
-//				errorTipus = NotificacioErrorTipusEnumDto.ERROR_REMOT;
-				logger.info(" >>> " + errorDescripcio);
+				errorDescripcio = "Intent " + notificacio.getNotificaEnviamentIntent() + " \n\nError retornat per Notifica: [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
+				logger.info(" >>> ... ERROR: " + errorDescripcio);
 				integracioHelper.addAccioError(info, errorDescripcio);
 			}
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			error = true;
 			errorDescripcio = "Intent " + notificacio.getNotificaEnviamentIntent() + "\n\n" + (ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex));
-//			errorTipus = NotificacioErrorTipusEnumDto.ERROR_XARXA;
 			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 		}
 		boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
@@ -177,6 +176,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 
 		notificacioEventHelper.addNotificaEnviamentEvent(notificacio, error, errorDescripcio, fiReintents);
+		callbackHelper.updateCallbacks(notificacio, error, errorDescripcio);
 		logger.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		return notificacio;
 	}
@@ -370,6 +370,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		logger.info(" [EST] Fi actualització certificació. Creant nou event per certificació...");
 		//Crea un nou event
 		notificacioEventHelper.addAdviserCertificacioEvent(enviament, false, null);
+		callbackHelper.updateCallback(enviament, false, null);
 	}
 
 	private void actualitzaDatatEnviament(ResultadoInfoEnvioV2 resultadoInfoEnvio,
@@ -395,6 +396,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		//Crea un nou event
 		logger.info(" [EST] Creant nou event per Datat...");
 		notificacioEventHelper.addAdviserDatatEvent(enviament, false, null);
+		callbackHelper.updateCallback(enviament, false, null);
 		logger.info(" [EST] L'event s'ha guardat correctament...");
 
 		logger.info(" [EST] Actualitzant Datat enviament...");
@@ -748,7 +750,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 		return envios;
 	}
-	
+
 	private NotificaWsV2PortType getNotificaWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
 
 		return new WsClientHelper<NotificaWsV2PortType>().generarClientWs(

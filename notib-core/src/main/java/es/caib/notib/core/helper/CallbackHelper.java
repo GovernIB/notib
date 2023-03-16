@@ -1,5 +1,6 @@
 package es.caib.notib.core.helper;
 
+import com.google.common.base.Strings;
 import com.sun.jersey.api.client.ClientResponse;
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
@@ -8,11 +9,14 @@ import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.ws.callback.NotificacioCanviClient;
 import es.caib.notib.core.entity.AplicacioEntity;
+import es.caib.notib.core.entity.CallbackEntity;
+import es.caib.notib.core.entity.EnviamentTableEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
+import es.caib.notib.core.repository.CallbackRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.service.ws.NotificacioServiceWsImplV2;
 import lombok.NonNull;
@@ -22,6 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Classe per englobar la tasca de notificar l'estat o la certificació a l'aplicació
@@ -45,6 +54,8 @@ public class CallbackHelper {
 	@Autowired
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
+	private CallbackRepository callbackRepository;
+	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
@@ -56,6 +67,50 @@ public class CallbackHelper {
 	private RequestsHelper requestsHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+
+
+	@Transactional
+	public void crearCallback(NotificacioEntity not, NotificacioEnviamentEntity env, boolean isError, String errorDesc) {
+
+		try {
+			if (not.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
+				return;
+			}
+			log.debug("[CALLBACK_CLIENT] Afegint callback per l'enviament " + env.getId());
+			CallbackEntity c = CallbackEntity.builder().usuariCodi(env.getCreatedBy().getCodi()).notificacioId(not.getId()).enviamentId(env.getId())
+					.estat(CallbackEstatEnumDto.PENDENT).data(new Date()).error(isError).errorDesc(errorDesc).build();
+			callbackRepository.save(c);
+		} catch (Exception ex) {
+			log.error("Error creant el callback per l'enviamnet " + env.getId());
+		}
+ 	}
+
+	@Transactional
+	public CallbackEntity updateCallback(NotificacioEnviamentEntity env, boolean isError, String errorDesc) {
+
+		CallbackEntity callback = callbackRepository.findByEnviamentId(env.getId());
+		if (callback == null) {
+			callback = CallbackEntity.builder().usuariCodi(env.getCreatedBy().getCodi()).notificacioId(env.getNotificacio().getId()).enviamentId(env.getId()).build();
+		}
+		callback.setData(new Date());
+		callback.setError(isError);
+		callback.setErrorDesc(errorDesc);
+		callback.setEstat(CallbackEstatEnumDto.PENDENT);
+		return callback;
+	}
+
+	@Transactional
+	public void updateCallbacks(NotificacioEntity not, boolean isError, String errorDesc) {
+
+		Set<NotificacioEnviamentEntity> enviaments = not.getEnviaments();
+		CallbackEntity callback;
+		List<CallbackEntity> callbacks = new ArrayList<>();
+		for(NotificacioEnviamentEntity env : enviaments) {
+			callback = updateCallback(env, isError, errorDesc);
+			callbacks.add(callback);
+		}
+		callbackRepository.save(callbacks);
+	}
 
 	@Transactional (rollbackFor = RuntimeException.class, propagation = Propagation.REQUIRES_NEW)
 	public boolean notifica(@NonNull Long eventId) throws Exception {

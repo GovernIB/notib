@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.*;
 import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.GrupDto;
@@ -40,6 +41,7 @@ import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.AplicacioEntity;
+import es.caib.notib.core.entity.CallbackEntity;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -55,19 +57,18 @@ import es.caib.notib.core.helper.AuditNotificacioHelper;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.CaducitatHelper;
 import es.caib.notib.core.helper.ConfigHelper;
-import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NifHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.NotificacioHelper;
-import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.RegistreNotificaHelper;
 import es.caib.notib.core.helper.SemaforNotificacio;
 import es.caib.notib.core.repository.AplicacioRepository;
+import es.caib.notib.core.repository.CallbackRepository;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
@@ -159,6 +160,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	@Autowired 
 	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
+	private CallbackRepository callbackRepository;
+	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
@@ -181,15 +184,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	@Autowired
 	private NotificacioHelper notificacioHelper;
 	@Autowired
-	private OrganGestorHelper organGestorHelper;
-	@Autowired
 	private JustificantService justificantService;
 	@Autowired
 	private ConfigHelper configHelper;
 	@Autowired
 	private MessageHelper messageHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
 
 	private static final String COMUNICACIOAMBADMINISTRACIO = "comunicacioAmbAdministracio";
 
@@ -1214,7 +1213,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		NotificacioEventEntity errorEvent = notificacioHelper.getNotificaErrorEvent(notificacioGuardada);
 		if (errorEvent != null) {
-//			logger.debug(">> [ALTA] Event d'error de Notifica!: " + errorEvent.getDescripcio() + " - " + errorEvent.getErrorDescripcio());
+			logger.debug(">> [ALTA] Event d'error de Notifica!: " + errorEvent.getDescripcio() + " - " + errorEvent.getErrorDescripcio());
 			info.setCodiEntitat(errorEvent.getNotificacio().getEntitat().getCodi());
 			resposta.setError(true);
 			resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
@@ -1231,14 +1230,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		logger.debug(">> [ALTA] notificació assíncrona");
 		List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioGuardada);
 		for (NotificacioEnviamentEntity enviament : enviamentsEntity) {
-//			NotificacioEventEntity eventDatat = NotificacioEventEntity.getBuilder(
-//					NotificacioEventTipusEnumDto.CALLBACK_CLIENT_PENDENT,
-//					notificacioGuardada).
-//					enviament(enviament).
-//					callbackInicialitza().
-//					build();
-//			notificacioGuardada.updateEventAfegir(eventDatat);
-//			notificacioEventRepository.saveAndFlush(eventDatat);
+			// TODO CALLBACK: Només si no n'hi ha algun
+			CallbackEntity c = CallbackEntity.builder()
+					.usuariCodi(enviament.getCreatedBy().getCodi())
+					.notificacioId(notificacioGuardada.getId())
+					.enviamentId(enviament.getId())
+					.estat(CallbackEstatEnumDto.PENDENT)
+					.data(new Date())
+					.error(false)
+					.errorDesc(null).build();
+			callbackRepository.saveAndFlush(c);
 		}
 		logger.debug(">> [ALTA] callbacks de client inicialitzats");
 	}

@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Column;
@@ -19,17 +21,18 @@ import javax.persistence.TemporalType;
 import java.util.Date;
 
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @Entity
 @Table(name="not_callback")
 @EntityListeners(AuditingEntityListener.class)
-public class CallbackEntity extends NotibAuditable<Long> {
+public class CallbackEntity extends AbstractPersistable<Long> {
 
     private static final int ERROR_DESC_MAX_LENGTH = 2048;
 
-    @Column(name = "aplicacio_id", nullable = false)
-    private Long aplicacioId;
+    @Column(name = "usuari_codi", length = 64, nullable = false)
+    private String usuariCodi;
     @Column(name = "notificacio_id", nullable = false)
     private Long notificacioId;
     @Column(name = "enviament_id", nullable = false)

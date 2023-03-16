@@ -40,7 +40,9 @@ public class RegistreHelper {
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private PluginHelper pluginHelper;
-	@Autowired 
+	@Autowired
+	private CallbackHelper callbackHelper;
+	@Autowired
 	private EmailNotificacioHelper emailNotificacioHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
@@ -115,6 +117,7 @@ public class RegistreHelper {
 		}
 
 		notificacioEventHelper.addSirConsultaEvent(enviament, error, errorDescripcio, errorMaxReintents);
+		callbackHelper.updateCallback(enviament, isError, errorDesc);
 		logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		return enviament;
 	}
