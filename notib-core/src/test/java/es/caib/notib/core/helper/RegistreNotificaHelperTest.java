@@ -47,8 +47,6 @@ public class RegistreNotificaHelperTest {
 	private EnviamentTableHelper enviamentTableHelper;
 	@Mock
 	private NotificacioTableHelper notificacioTableHelper;
-	@Mock
-	private CallbackHelper callbackHelper;
 
 	@Mock
 	EntitatEntity entitatMock;

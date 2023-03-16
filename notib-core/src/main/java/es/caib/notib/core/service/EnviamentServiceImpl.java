@@ -69,6 +69,8 @@ import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NotificaHelper;
+import es.caib.notib.core.helper.NotificacioHelper;
+import es.caib.notib.core.helper.NotificacioTableHelper;
 import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
@@ -87,7 +89,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,6 +178,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private CallbackRepository callbackRepository;
 	@Autowired
 	private NotificaHelper notificaHelper;
+	@Autowired
+	private NotificacioHelper notificacioHelper;
+	@Autowired
+	private NotificacioTableHelper notificacioTableHelper;
 	@Autowired
 	private ConfigHelper configHelper;
 	@Autowired
@@ -1524,12 +1529,15 @@ public class EnviamentServiceImpl implements EnviamentService {
 				//Marcar com a processada si la notificació s'ha fet des de una aplicació
 				if (not.getTipusUsuari() == TipusUsuariEnumDto.APLICACIO && callbackHelper.isAllEnviamentsEstatFinal(not)) {
 					log.info("[Callback] Marcant notificació com processada per ser usuari aplicació...");
-					auditNotificacioHelper.updateNotificacioProcessada(not, "Notificació processada de forma automàtica. Estat final: " + enviament.getNotificaEstat());
+					not.updateEstat(NotificacioEstatEnumDto.PROCESSADA);
+					not.updateEstatProcessatDate(new Date());
+					not.updateMotiu("Notificació processada de forma automàtica. Estat final: " + enviament.getNotificaEstat());
+//					notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(not.getId()).estat(NotificacioEstatEnumDto.PROCESSADA).estatProcessatDate(new Date()).build());
 				}
 
 				int intents = callback.getIntents() + 1;
 				callback.update(CallbackEstatEnumDto.NOTIFICAT, intents, null, callbackHelper.getIntentsPeriodeProperty());
-				auditNotificacioHelper.updateLastCallbackError(not, false);
+				not.updateLastCallbackError(false);
 				IntegracioInfo info = new IntegracioInfo(
 						IntegracioHelper.INTCODI_CLIENT,
 						String.format("Enviament d'avís de canvi d'estat (%s)", aplicacio.getCallbackUrl()),
@@ -1543,6 +1551,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 				}
 				integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
 				integracioHelper.addAccioOk(info);
+
+				notificacioTableHelper.actualitzarRegistre(not);
+				notificacioHelper.auditaNotificacio(not, AuditService.TipusOperacio.UPDATE, "EnviamentServiceImpl.enviarCallback");
+
 				log.info(String.format("[Callback] Enviament del callback [Id: %d] de la notificacio [Id: %d] exitós", callback.getId(), not.getId()));
 			} catch (Exception ex) {
 				enviamentsAmbError.add(callback.getEnviamentId());
