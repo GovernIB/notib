@@ -5,7 +5,6 @@ import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotTableUpdate;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
@@ -15,7 +14,6 @@ import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.CallbackEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.CallbackRepository;
@@ -168,7 +166,7 @@ public class CallbackHelper {
 				start = System.nanoTime();
 				notificacio.updateEstat(NotificacioEstatEnumDto.PROCESSADA);
 				notificacio.updateEstatProcessatDate(new Date());
-				notificacio.updateMotiu("Notificació processada de forma automàtica. Estat final: " + enviament.getNotificaEstat());
+				notificacio.updateMotiu("Notificació processada de forma automàtica. Estat final: " + env.getNotificaEstat());
 				notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(notificacio.getId()).estat(NotificacioEstatEnumDto.PROCESSADA).estatProcessatDate(new Date()).build());
 				elapsedTime = System.nanoTime() - start;
 				log.info("marca processada: "  + elapsedTime);
@@ -265,21 +263,22 @@ public class CallbackHelper {
 		return aplicacio;
 	}
 
+	// TODO CALLBACK:
 	@Transactional
-	public void marcarEventNoProcessable(@NonNull Long eventId,
+	public void marcarEventNoProcessable(@NonNull Long enviamentId,
 										 String errorDescripcio,
 										 String longErrorMessage){
-		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
-		if (event == null) {
-			log.info(String.format("[Callback] Event [Id: %d] a eliminar de la coa d'events no trobat a la base de dades. " +
-					"Error: %s", eventId, errorDescripcio));
+		NotificacioEnviamentEntity enviament = enviamentRepository.findOne(enviamentId);
+		if (enviament == null) {
+			log.info(String.format("[Callback] Enviament [Id: %d] no trobat a la base de dades. Error: %s", enviamentId, errorDescripcio));
 			return;
 		}
 		errorDescripcio = errorDescripcio == null ? "" : errorDescripcio;
 		longErrorMessage = longErrorMessage == null ? "" : longErrorMessage;
-		// TODO CALLBACK:
+
+		CallbackEntity callback = callbackRepository.findByEnviamentId(enviamentId);
 		callback.update(CallbackEstatEnumDto.ERROR, getEventsIntentsMaxProperty(), "Error fatal: " + errorDescripcio + "\n" + longErrorMessage, getIntentsPeriodeProperty());
-		log.info(String.format("[Callback] Event [Id: %d] eliminat de la coa d'events per error fatal. Error: %s", event.getId(), errorDescripcio));
+		log.info(String.format("[Callback] Enviament [Id: %d] eliminat de la coa de callback per error fatal. Error: %s", enviamentId, errorDescripcio));
 	}
 
 	public boolean isAllEnviamentsEstatFinal(NotificacioEntity notificacio) {
