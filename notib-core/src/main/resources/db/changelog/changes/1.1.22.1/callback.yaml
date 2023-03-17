@@ -94,7 +94,11 @@ databaseChangeLog:
                     nullable: false
         - sql:
             "INSERT INTO NOT_CALLBACK c (c.id, c.\"DATA\", c.ERROR_DESC, c.ESTAT, c.INTENTS, c.NOTIFICACIO_ID, c.ENVIAMENT_ID, c.USUARI_CODI)
-              SELECT nne.id, nne.CALLBACK_DATA, nne.CALLBACK_ERROR_DESC, nne.CALLBACK_ESTAT, nne.CALLBACK_INTENTS, nne.NOTIFICACIO_ID, nne.NOTIFICACIO_ENV_ID, e.CREATEDBY_CODI
-              FROM NOT_NOTIFICACIO_EVENT nne
+              SELECT id, CALLBACK_DATA, CALLBACK_ERROR_DESC, CALLBACK_ESTAT, CALLBACK_INTENTS, NOTIFICACIO_ID, NOTIFICACIO_ENV_ID, CREATEDBY_CODI
+              FROM (
+              select row_number() over (PARTITION BY nne.NOTIFICACIO_ENV_ID  order by CALLBACK_DATA ) as rnum
+              , nne.id, nne.CALLBACK_DATA, nne.CALLBACK_ERROR_DESC, nne.CALLBACK_ESTAT, nne.CALLBACK_INTENTS, nne.NOTIFICACIO_ID, nne.NOTIFICACIO_ENV_ID, e.CREATEDBY_CODI
+              from NOT_NOTIFICACIO_EVENT nne
               JOIN NOT_NOTIFICACIO_ENV e ON nne.NOTIFICACIO_ENV_ID  = e.id
-              WHERE CALLBACK_ESTAT = 'PENDENT'"
+              WHERE CALLBACK_ESTAT = 'PENDENT'
+              ) WHERE rnum = 1"
