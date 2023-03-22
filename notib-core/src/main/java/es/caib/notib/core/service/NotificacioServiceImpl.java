@@ -33,6 +33,7 @@ import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.PermisosService;
+import es.caib.notib.core.entity.CallbackEntity;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -82,6 +83,7 @@ import javax.annotation.Resource;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -495,10 +497,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 			NotificacioInfoDto dto = conversioTipusHelper.convertir(notificacio, NotificacioInfoDto.class);
 
-			// TODO CALLBACKS:
-//			List<Long> pendents = notificacioEventRepository.findEventsAmbCallbackPendentByNotificacioId(notificacio.getId());
-//			List<Long> pendents = callbackRepository.findPendents(notificacio.getId());
-//			dto.setEventsCallbackPendent(notificacio.isTipusUsuariAplicacio() && pendents != null && !pendents.isEmpty());
+			//CALLBACKS
+			List<CallbackEntity> pendents = callbackRepository.findByNotificacioIdAndEstatOrderByDataDesc(notificacio.getId(), CallbackEstatEnumDto.PENDENT);
+			dto.setEventsCallbackPendent(notificacio.isTipusUsuariAplicacio() && pendents != null && !pendents.isEmpty());
+			SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			String data = pendents != null && !pendents.isEmpty() && pendents.get(0).getData() != null ? df.format(pendents.get(0).getData()) : null;
+			dto.setDataCallbackPendent(data);
 
 			// Emplena dades del procediment
 			ProcSerEntity procedimentEntity = notificacio.getProcediment();

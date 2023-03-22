@@ -1255,6 +1255,13 @@ public class EnviamentServiceImpl implements EnviamentService {
 		enviamentDto.setRegistreNumeroFormatat(enviament.getRegistreNumeroFormatat());
 		enviamentDto.setRegistreData(enviament.getRegistreData());
 		enviamentDto.setNotificaCertificacioArxiuNom(calcularNomArxiuCertificacio(enviament));
+		CallbackEntity callback = callbackRepository.findByEnviamentIdAndEstat(enviament.getId(), CallbackEstatEnumDto.PENDENT);
+		if (callback == null) {
+			return enviamentDto;
+		}
+		enviamentDto.setCallbackPendent(callback != null);
+		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		enviamentDto.setCallbackData(callback.getData() != null ? df.format(callback.getData()) : null);
 		return enviamentDto;
 	}
 

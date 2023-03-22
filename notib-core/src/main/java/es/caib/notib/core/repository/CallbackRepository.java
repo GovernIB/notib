@@ -1,5 +1,6 @@
 package es.caib.notib.core.repository;
 
+import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
 import es.caib.notib.core.entity.CallbackEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,6 +18,10 @@ public interface CallbackRepository extends JpaRepository<CallbackEntity, Long> 
 
     CallbackEntity findByEnviamentId(Long envId);
 
+    CallbackEntity findByEnviamentIdAndEstat(Long envId, CallbackEstatEnumDto estat);
+
     List<CallbackEntity> findByEnviamentIdIn(Set<Long> envId);
+
+    List<CallbackEntity> findByNotificacioIdAndEstatOrderByDataDesc(Long notId, CallbackEstatEnumDto estat);
 
 }

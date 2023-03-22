@@ -89,6 +89,7 @@ public class CallbackHelper {
 			c.setError(isError);
 			c.setErrorDesc(errorDesc);
 			c.setEstat(CallbackEstatEnumDto.PENDENT);
+			notificacioEventHelper.addCallbackEnviamentEvent(env, isError, errorDesc);
 			callbackRepository.save(c);
 		} catch (Exception ex) {
 			log.error("Error creant el callback per l'enviamnet " + env.getId());
@@ -263,7 +264,7 @@ public class CallbackHelper {
 			info.setAplicacio(aplicacio != null ? aplicacio.getUsuariCodi() : "Sense aplicació");
 			callback.update(CallbackEstatEnumDto.ERROR, getEventsIntentsMaxProperty(), msg, getIntentsPeriodeProperty());
 			integracioHelper.addAccioError(info, msg);
-//			notificacioEventHelper.addCallbackEvent(enviament.getNotificacio(), event, true);
+			notificacioEventHelper.addCallbackEnviamentEvent(enviament, true, msg);
 			throw new Exception(errorMessage);
 		}
 		return aplicacio;

@@ -661,6 +661,10 @@ $(document).ready(function() {
 				</tr>
 			</thead>
 			</table>
+			<c:if test="${enviament.callbackPendent}">
+				<br>
+				<div><span><spring:message code="callback.pendent.enviament"/> ${enviament.callbackData}</span></div>
+			</c:if>
 		</div>
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'historic'}"> active</c:if>" id="historic">
 			<table id="historic"
