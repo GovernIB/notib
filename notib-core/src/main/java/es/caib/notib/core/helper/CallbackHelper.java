@@ -51,8 +51,6 @@ public class CallbackHelper {
 
 	private static final String NOTIFICACIO_CANVI = "notificaCanvi";
 	@Autowired
-	private NotificacioEventRepository notificacioEventRepository;
-	@Autowired
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
 	private NotificacioEnviamentRepository enviamentRepository;
@@ -89,7 +87,6 @@ public class CallbackHelper {
 			c.setError(isError);
 			c.setErrorDesc(errorDesc);
 			c.setEstat(CallbackEstatEnumDto.PENDENT);
-			notificacioEventHelper.addCallbackEnviamentEvent(env, isError, errorDesc);
 			callbackRepository.save(c);
 		} catch (Exception ex) {
 			log.error("Error creant el callback per l'enviamnet " + env.getId());
