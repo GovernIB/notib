@@ -170,27 +170,27 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			IntegracioInfo info) {
 		NotificacioEnviamentEntity enviament = null;
 
-		boolean createEvent =false;
-		boolean eventInitialitzaCallback=false;
+		boolean createEvent = false;
 		String eventErrorDescripcio = null;
 		try {
 			enviament = notificacioEnviamentRepository.findByNotificaIdentificador(identificador);
 			if (enviament == null) {
 				logger.error(
-						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-								"identificadorDestinatario=" + identificador + "): " +
+						"Error al processar petició datadoOrganismo dins el callback de Notifica (identificadorDestinatario=" + identificador + "): " +
 								"No s'ha trobat cap enviament amb l'identificador especificat (" + identificador + ").");
 				codigoRespuesta.value = "002";
 				descripcionRespuesta.value = "Identificador no encontrado";
 				integracioHelper.addAccioError(info, "No s'ha trobat cap enviament amb l'identificador especificat");
 				return enviament;
 			}
+
 			if (Strings.isNullOrEmpty(configHelper.getEntitatActualCodi())) {
 				ConfigHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
 			}
 			if (enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null) {
 				info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 			}
+
 			if (enviament.isNotificaEstatFinal()) {
 				if (tipoEntrega.equals(BigInteger.valueOf(1L))) { //if datado (1L)
 					logger.warn(
@@ -198,7 +198,6 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 							"L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
 					//Crea un nou event builder
 					createEvent = true;
-					eventInitialitzaCallback = false;
 
 					if (receptor != null && !isBlank(receptor.getNifReceptor())) {
 						enviament.updateReceptorDatat(receptor.getNifReceptor(), receptor.getNombreReceptor());
@@ -242,7 +241,6 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 				logger.debug("Registrant event callbackdatat de l'Adviser...");
 				//Crea un nou event builder
 				createEvent = true;
-				eventInitialitzaCallback = true;
 
 				codigoRespuesta.value = "000";
 				descripcionRespuesta.value = "OK";
@@ -284,7 +282,6 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
 								"identificadorDestinatario=" + identificador + ")");
 				createEvent = true;
-				eventInitialitzaCallback = true;
 				eventErrorDescripcio = ExceptionUtils.getStackTrace(ex);
 
 			}
@@ -293,18 +290,17 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			integracioHelper.addAccioError(info, "Error processant la petició", ex);
 		}
 
-		if (enviament != null && !createEvent && !tipoEntrega.equals(BigInteger.valueOf(3L))) {
+		if (!createEvent && !tipoEntrega.equals(BigInteger.valueOf(3L))) {
 			String msg = "L'enviament amb identificador " + enviament.getNotificaIdentificador() + " ha rebut un callback de l'adviser de tipus " + tipoEntrega + " quan ja es troba en estat final." ;
 			logger.debug(msg);
 			createEvent = true;
-			eventInitialitzaCallback = true;
 			eventErrorDescripcio = "Error retornat cap a Notifica: " + (!Strings.isNullOrEmpty(codigoRespuesta.value) ?  "[" + codigoRespuesta.value + "] " : "")
 					+ (!Strings.isNullOrEmpty(descripcionRespuesta.value) ? descripcionRespuesta.value : msg);
 		}
 
 		logger.debug("Peticició processada correctament.");
 
-		if (enviament != null && createEvent) { // si no hi ha cap errada enviament mai serà null quan createEvent es true
+		if (createEvent) { // si no hi ha cap errada enviament mai serà null quan createEvent es true
 			notificacioEventHelper.addAdviserDatatEvent(enviament, eventErrorDescripcio != null, eventErrorDescripcio);
 			callbackHelper.updateCallback(enviament, !Strings.isNullOrEmpty(eventErrorDescripcio), eventErrorDescripcio);
 			logger.debug("Event callbackdatat registrat correctament: " + NotificacioEventTipusEnumDto.ADVISER_DATAT.name());
@@ -312,52 +308,6 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaAdviserWsV2Impl.sincronizarEnvio");
 		logger.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");
 		return enviament;
-	}
-
-	private EnviamentEstat getNotificaEstat(String estado) {
-		EnviamentEstat notificaEstat = null;
-		if ("pendiente_envio".equals(estado)) {
-			notificaEstat = EnviamentEstat.PENDENT_ENVIAMENT;
-		} else if ("enviado_ci".equals(estado)) {
-			notificaEstat = EnviamentEstat.ENVIADA_CI;
-		} else if ("notificada".equals(estado)) {
-			notificaEstat = EnviamentEstat.NOTIFICADA;
-		} else if ("extraviada".equals(estado)) {
-			notificaEstat = EnviamentEstat.EXTRAVIADA;
-		} else if ("rehusada".equals(estado)) {
-			notificaEstat = EnviamentEstat.REBUTJADA;
-		} else if ("desconocido".equals(estado)) {
-			notificaEstat = EnviamentEstat.DESCONEGUT;
-		} else if ("fallecido".equals(estado)) {
-			notificaEstat = EnviamentEstat.MORT;
-		} else if ("ausente".equals(estado)) {
-			notificaEstat = EnviamentEstat.ABSENT;
-		} else if ("direccion_incorrecta".equals(estado)) {
-			notificaEstat = EnviamentEstat.ADRESA_INCORRECTA;
-		} else if ("sin_informacion".equals(estado)) {
-			notificaEstat = EnviamentEstat.SENSE_INFORMACIO;
-		} else if ("error".equals(estado)) {
-			notificaEstat = EnviamentEstat.ERROR_ENTREGA;
-		} else if ("pendiente_sede".equals(estado)) {
-			notificaEstat = EnviamentEstat.PENDENT_SEU;
-		} else if ("enviado_deh".equals(estado)) {
-			notificaEstat = EnviamentEstat.ENVIADA_DEH;
-		} else if ("leida".equals(estado)) {
-			notificaEstat = EnviamentEstat.LLEGIDA;
-		} else if ("envio_programado".equals(estado)) {
-			notificaEstat = EnviamentEstat.ENVIAMENT_PROGRAMAT;
-		} else if ("pendiente_cie".equals(estado)) {
-			notificaEstat = EnviamentEstat.PENDENT_CIE;
-		} else if ("pendiente_deh".equals(estado)) {
-			notificaEstat = EnviamentEstat.PENDENT_DEH;
-		} else if ("entregado_op".equals(estado)) {
-			notificaEstat = EnviamentEstat.ENTREGADA_OP;
-		} else if ("expirada".equals(estado)) {
-			notificaEstat = EnviamentEstat.EXPIRADA;
-		} else if ("anulada".equals(estado)) {
-			notificaEstat = EnviamentEstat.ANULADA;
-		}
-		return notificaEstat;
 	}
 
 	private void certificacionOrganismo(
@@ -439,6 +389,52 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 
 		callbackHelper.updateCallback(enviament, isError, errorDesc);
 		logger.debug("Sortint de la certificació...");
+	}
+
+	private EnviamentEstat getNotificaEstat(String estado) {
+		EnviamentEstat notificaEstat = null;
+		if ("pendiente_envio".equals(estado)) {
+			notificaEstat = EnviamentEstat.PENDENT_ENVIAMENT;
+		} else if ("enviado_ci".equals(estado)) {
+			notificaEstat = EnviamentEstat.ENVIADA_CI;
+		} else if ("notificada".equals(estado)) {
+			notificaEstat = EnviamentEstat.NOTIFICADA;
+		} else if ("extraviada".equals(estado)) {
+			notificaEstat = EnviamentEstat.EXTRAVIADA;
+		} else if ("rehusada".equals(estado)) {
+			notificaEstat = EnviamentEstat.REBUTJADA;
+		} else if ("desconocido".equals(estado)) {
+			notificaEstat = EnviamentEstat.DESCONEGUT;
+		} else if ("fallecido".equals(estado)) {
+			notificaEstat = EnviamentEstat.MORT;
+		} else if ("ausente".equals(estado)) {
+			notificaEstat = EnviamentEstat.ABSENT;
+		} else if ("direccion_incorrecta".equals(estado)) {
+			notificaEstat = EnviamentEstat.ADRESA_INCORRECTA;
+		} else if ("sin_informacion".equals(estado)) {
+			notificaEstat = EnviamentEstat.SENSE_INFORMACIO;
+		} else if ("error".equals(estado)) {
+			notificaEstat = EnviamentEstat.ERROR_ENTREGA;
+		} else if ("pendiente_sede".equals(estado)) {
+			notificaEstat = EnviamentEstat.PENDENT_SEU;
+		} else if ("enviado_deh".equals(estado)) {
+			notificaEstat = EnviamentEstat.ENVIADA_DEH;
+		} else if ("leida".equals(estado)) {
+			notificaEstat = EnviamentEstat.LLEGIDA;
+		} else if ("envio_programado".equals(estado)) {
+			notificaEstat = EnviamentEstat.ENVIAMENT_PROGRAMAT;
+		} else if ("pendiente_cie".equals(estado)) {
+			notificaEstat = EnviamentEstat.PENDENT_CIE;
+		} else if ("pendiente_deh".equals(estado)) {
+			notificaEstat = EnviamentEstat.PENDENT_DEH;
+		} else if ("entregado_op".equals(estado)) {
+			notificaEstat = EnviamentEstat.ENTREGADA_OP;
+		} else if ("expirada".equals(estado)) {
+			notificaEstat = EnviamentEstat.EXPIRADA;
+		} else if ("anulada".equals(estado)) {
+			notificaEstat = EnviamentEstat.ANULADA;
+		}
+		return notificaEstat;
 	}
 
 	private String getModoNotificacion(BigInteger modo) {

@@ -390,7 +390,7 @@ public class NotificacioValidatorHelper {
 
 	private boolean isFormatValid(String docBase64) {
 		boolean valid = true;
-		String[] formatsValids = {"JVBERi0","UEsDBBQAAAAIA"}; //PDF / ZIP
+		String[] formatsValids = {"JVBERi0","UEsDBB"}; //PDF / ZIP
 
 		if (!(docBase64.startsWith(formatsValids[0]) || docBase64.startsWith(formatsValids[1])))
 			valid = false;
