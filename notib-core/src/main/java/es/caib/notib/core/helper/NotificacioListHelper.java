@@ -18,12 +18,14 @@ import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.NotificacioTableEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcSerEntity;
 import es.caib.notib.core.helper.FiltreHelper.FiltreField;
 import es.caib.notib.core.helper.FiltreHelper.StringField;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
+import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
@@ -65,6 +67,8 @@ public class NotificacioListHelper {
     private ServeiRepository serveiRepository;
     @Autowired
     private OrganGestorRepository organGestorRepository;
+    @Autowired
+    private NotificacioEventRepository eventRepository;
 
     public Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
         Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
@@ -189,7 +193,15 @@ public class NotificacioListHelper {
         String error = item.isNotificaError() ? " <span class=\"fa fa-warning text-danger\" title=\"" + htmlEscape(item.getNotificaErrorDescripcio()) + " \"></span>" : "";
         error += TipusUsuariEnumDto.APLICACIO.equals(item.getTipusUsuari()) && item.isErrorLastCallback() ?
                 " <span class=\"fa fa-exclamation-circle text-primary\" title=\"<spring:message code=\"notificacio.list.client.error/>\"></span>" : "";
-        estat = "<span>" + estat + nomEstat + error + "</span>";
+
+        NotificacioEventEntity lastErrorEvent = eventRepository.findLastErrorEventByNotificacioId(item.getId());
+        String fiReintents = "";
+        if (lastErrorEvent != null && lastErrorEvent.getFiReintents()) {
+            String msg = messageHelper.getMessage("notificacio.event.fi.reintents");
+            String tipus = messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto." + lastErrorEvent.getTipus());
+            fiReintents = "<span class=\"fa fa-warning text-warning\" title=\"" + msg + " -> " + tipus + "\"></span>";
+        }
+        estat = "<span>" + estat + nomEstat + error + "  " + fiReintents + "</span>";
         String data = "\n";
         if ((NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat())) && item.getEstatDate() != null) {
             SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");

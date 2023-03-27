@@ -168,7 +168,7 @@ public class EnviamentServiceBean implements EnviamentService {
 	}
 
 	@Override
-	public List<Long> enviarCallback(Set<Long> enviaments) throws Exception {
-		return delegate.enviarCallback(enviaments);
+	public List<Long> enviarCallback(Set<Long> notificacions) throws Exception {
+		return delegate.enviarCallback(notificacions);
 	}
 }

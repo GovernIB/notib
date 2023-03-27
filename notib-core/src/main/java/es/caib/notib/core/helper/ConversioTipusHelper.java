@@ -13,6 +13,7 @@ import es.caib.notib.core.api.dto.NotificacioAuditDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentAuditDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.UsuariDto;
@@ -94,6 +95,8 @@ public class ConversioTipusHelper {
 	private MapperFactory mapperFactory;
 	@Autowired
 	private CacheHelper cacheHelper;
+	@Autowired
+	private MessageHelper messageHelper;
 
 
 	public ConversioTipusHelper() {
@@ -400,8 +403,12 @@ public class ConversioTipusHelper {
 		mapperFactory.classMap(OficinaEntity.class, OficinaDto.class).
 				field("organGestor.codi", "organCodi").
 				byDefault().
-				register();;
+				register();
 
+		mapperFactory.classMap(NotificacioEventEntity.class, NotificacioEventDto.class).
+				field("enviament.id", "enviamentId").
+				byDefault().
+				register();
 		defineConverters();
 	}
 
@@ -493,6 +500,13 @@ public class ConversioTipusHelper {
 			}
 			dto.setNotificacioErrorData(event.getData());
 			dto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
+			if (!event.getFiReintents()) {
+				return;
+			}
+			String msg = messageHelper.getMessage("notificacio.event.fi.reintents");
+			String tipus = messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto." + event.getTipus());
+			dto.setFiReintentsDesc(msg + " -> " + tipus);
+			dto.setFiReintents(event.getFiReintents());
 		}
 	}
 	public class NotificacioEnviamentEntitytoInfoMapper extends CustomMapper<NotificacioEnviamentEntity, EnviamentInfoDto> {

@@ -18,12 +18,14 @@ import java.util.Date;
 public class NotificacioEventDto extends AuditoriaDto {
 
 	private Long id;
+	private Long enviamentId;
 	private NotificacioEventTipusEnumDto tipus;
 	private Date data;
 //	private String descripcio;
 	private boolean error;
 	private String errorDescripcio;
 	private Boolean fiReintents;
+	private int intents;
 
 //	private CallbackEstatEnumDto callbackEstat;
 //	private String callbackError;

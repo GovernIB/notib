@@ -211,6 +211,6 @@ public interface EnviamentService {
 	 *            id de l'enviament.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	List<Long> enviarCallback(Set<Long> enviaments) throws Exception;
+	List<Long> enviarCallback(Set<Long> notificacions) throws Exception;
 
 }

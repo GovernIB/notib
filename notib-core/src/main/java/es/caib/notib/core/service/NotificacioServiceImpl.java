@@ -117,6 +117,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
+	private MessageHelper messageHelper;
+	@Autowired
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEnviamentRepository enviamentRepository;
@@ -513,6 +515,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 
 			NotificacioEventEntity lastErrorEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
+			if (lastErrorEvent != null && lastErrorEvent.getFiReintents()) {
+				String msg = messageHelper.getMessage("notificacio.event.fi.reintents");
+				String tipus = messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto." + lastErrorEvent.getTipus());
+				dto.setFiReintentsDesc(msg + " -> " + tipus);
+				dto.setFiReintents(lastErrorEvent.getFiReintents());
+			}
 			dto.setNoticaErrorEventTipus(lastErrorEvent != null ? lastErrorEvent.getTipus() : null);
 			// TODO EVENTS: Obtenir missatge d'error dels events
 //			dto.setNotificaErrorTipus(lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null);

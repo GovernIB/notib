@@ -276,6 +276,9 @@
                     }
                     contingutTbody += ' <span class="fa fa-warning text-danger" title="' + errorTitle + '"></span>';
                 }
+                if (data[i].fiReintents) {
+                    contingutTbody += ' <span class="fa fa-warning text-warning" title="' + data[i].fiReintentsDesc + '"></span>';
+                }
                 contingutTbody += '</td>';
                 contingutTbody += '<td width="114px">';
                 if (data[i].notificaCertificacioData != null) {

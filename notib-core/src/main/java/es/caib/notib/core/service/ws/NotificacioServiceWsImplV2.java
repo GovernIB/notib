@@ -527,9 +527,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						}
 					}
 					SemaforNotificacio.alliberar(notificacioGuardada.getId());
-				} else {
-					inicialitzaCallbacks(notificacioGuardada);
 				}
+//				else {
+//					inicialitzaCallbacks(notificacioGuardada);
+//				}
 				
 				return generaResposta(info, notificacioGuardada, referencies);
 			} catch (Exception ex) {

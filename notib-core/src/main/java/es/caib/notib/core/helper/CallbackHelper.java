@@ -93,6 +93,13 @@ public class CallbackHelper {
 		}
  	}
 
+ 	@Transactional
+	public void reactivarCallback(NotificacioEnviamentEntity env) {
+
+		CallbackEntity c = updateCallback(env, false, null);
+		c.setIntents(0);
+	}
+
 	@Transactional
 	public CallbackEntity updateCallback(NotificacioEnviamentEntity env, boolean isError, String errorDesc) {
 

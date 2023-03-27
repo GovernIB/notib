@@ -52,7 +52,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 //		}
 //		System.out.println(">>> FIIIIIIII  DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		DatosInteresadoWsDto interesado = arb.getInteresados().get(0).getInteresado();
-		if (arb.getResumen().toUpperCase().contains("ERROR") || interesado.getApellido1() != null && interesado.getApellido1().equals("error")) {
+ 		if (arb.getResumen().toUpperCase().contains("ERROR") || interesado.getApellido1() != null && interesado.getApellido1().equals("error")) {
 			resposta.setErrorCodi("3");
 			resposta.setErrorDescripcio("Error de registre MOCK (" + System.currentTimeMillis() + ")");
 			return resposta;

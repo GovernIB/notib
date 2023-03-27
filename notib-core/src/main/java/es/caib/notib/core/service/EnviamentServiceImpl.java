@@ -69,6 +69,7 @@ import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NotificaHelper;
+import es.caib.notib.core.helper.NotificacioEventHelper;
 import es.caib.notib.core.helper.NotificacioHelper;
 import es.caib.notib.core.helper.NotificacioTableHelper;
 import es.caib.notib.core.helper.OrganGestorHelper;
@@ -183,7 +184,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Autowired
 	private NotificacioTableHelper notificacioTableHelper;
 	@Autowired
-	private ConfigHelper configHelper;
+	private NotificacioEventHelper eventHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
 
@@ -1262,6 +1263,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 		enviamentDto.setCallbackPendent(callback != null);
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		enviamentDto.setCallbackData(callback.getData() != null ? df.format(callback.getData()) : null);
+		NotificacioEventEntity event = enviament.getNotificacioErrorEvent();
+		if (event == null || !event.getFiReintents()) {
+			return enviamentDto;
+		}
+		enviamentDto.setFiReintents(event.getFiReintents());
+		String msg = messageHelper.getMessage("notificacio.event.fi.reintents");
+		String tipus = messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto." + event.getTipus());
+		enviamentDto.setFiReintentsDesc(msg + " -> " + tipus);
 		return enviamentDto;
 	}
 
@@ -1513,7 +1522,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		if (enviament.getNotificacio().isTipusUsuariAplicacio()) {
 			logger.info(String.format("[callback] Reactivam callback de l'enviment [id=%d]", enviamentId));
-			callbackHelper.updateCallback(enviament, false, null);
+			callbackHelper.reactivarCallback(enviament);
 			return;
 		}
 		logger.info(String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",
@@ -1522,9 +1531,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 	@Transactional
 	@Override
-	public List<Long> enviarCallback(Set<Long> enviaments) throws Exception {
+	public List<Long> enviarCallback(Set<Long> notificacions) throws Exception {
 
-		List<CallbackEntity> callbacks = callbackRepository.findByEnviamentIdIn(enviaments);
+		List<CallbackEntity> callbacks = callbackRepository.findByNotificacioIdIn(notificacions);
 		List<Long> enviamentsAmbError = new ArrayList<>();
 		for (CallbackEntity callback : callbacks) {
 			logger.info(String.format("[callback] Enviar callback de l'enviment [id=%d]", callback.getEnviamentId()));
@@ -1558,7 +1567,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				}
 				integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
 				integracioHelper.addAccioOk(info);
-
+				eventHelper.addCallbackEnviamentEvent(enviament, false, null);
 				notificacioTableHelper.actualitzarRegistre(not);
 				notificacioHelper.auditaNotificacio(not, AuditService.TipusOperacio.UPDATE, "EnviamentServiceImpl.enviarCallback");
 

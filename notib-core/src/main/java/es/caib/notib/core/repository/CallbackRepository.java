@@ -20,6 +20,8 @@ public interface CallbackRepository extends JpaRepository<CallbackEntity, Long> 
 
     CallbackEntity findByEnviamentIdAndEstat(Long envId, CallbackEstatEnumDto estat);
 
+    List<CallbackEntity> findByNotificacioIdIn(Set<Long> notId);
+
     List<CallbackEntity> findByEnviamentIdIn(Set<Long> envId);
 
     List<CallbackEntity> findByNotificacioIdAndEstatOrderByDataDesc(Long notId, CallbackEstatEnumDto estat);
