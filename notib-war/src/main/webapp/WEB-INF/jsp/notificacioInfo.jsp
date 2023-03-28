@@ -69,13 +69,18 @@ let count = 1;
 </c:forEach>
 $(document).ready(function() {
 
-
 	let $tableEvents = $('#table-events');
 	$tableEvents.on('rowinfo.dataTable', function(e, td, rowData) {
 
-			$(td).empty();
+			// $(td).empty();
 			let data = rowData["errorDescripcio"];
 			data = data ? data : "";
+			// $(td).append('<textarea style="width:100%" rows="10">' + data + '</textarea>');
+			if (rowData["fiReintents"]) {
+				data += "\n\nEsgotats els reintents.";
+			}
+			console.log(rowData["fiReintents"]);
+			$(td).empty();
 			$(td).append('<textarea style="width:100%" rows="10">' + data + '</textarea>');
 	});
 	$tableEvents.on('draw.dt', function(e, settings) {

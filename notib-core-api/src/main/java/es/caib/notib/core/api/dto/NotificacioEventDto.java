@@ -24,7 +24,7 @@ public class NotificacioEventDto extends AuditoriaDto {
 //	private String descripcio;
 	private boolean error;
 	private String errorDescripcio;
-	private Boolean fiReintents;
+	private boolean fiReintents;
 	private int intents;
 
 //	private CallbackEstatEnumDto callbackEstat;
