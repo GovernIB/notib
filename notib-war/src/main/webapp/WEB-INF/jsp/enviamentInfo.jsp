@@ -214,7 +214,15 @@ $(document).ready(function() {
 					</tr>
 					<tr>
 						<td width="30%"><strong><spring:message code="enviament.info.dada.estat"/></strong></td>
-						<td colspan="4"><spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.${enviament.notificacio.estat}"/></td>
+						<td colspan="4">
+							<spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/>
+							<c:if test="${enviament.notificaError}">
+								<span class="fa fa-warning text-danger" title="<c:out value='${enviament.notificaErrorDescripcio}' escapeXml='true'/>"></span>
+							</c:if>
+							<c:if test="${enviament.fiReintents}">
+								<span class="fa fa-warning text-warning" title="<c:out value='${enviament.fiReintentsDesc}' escapeXml='true'/>"></span>
+							</c:if>
+						</td>
 					</tr>
 				</tbody>
 				</table>
@@ -658,9 +666,14 @@ $(document).ready(function() {
 							{{/if}}
 						</script>
 					</th>
+					<th data-col-name="intents" data-orderable="false"><spring:message code="notificacio.event.list.columna.intents"/></th>
 				</tr>
 			</thead>
 			</table>
+			<c:if test="${enviament.callbackPendent}">
+				<br>
+				<div class="alert alert-info well-sm"><span class="fa fa-clock-o"></span> <span><spring:message code="callback.pendent.enviament"/> ${enviament.callbackData}</span></div>
+			</c:if>
 		</div>
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'historic'}"> active</c:if>" id="historic">
 			<table id="historic"

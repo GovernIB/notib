@@ -20,6 +20,15 @@ databaseChangeLog:
       author: limit
       changes:
         - addColumn:
+            tableName: not_notificacio_event
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: intents
+                  type: number(10,0)
+                  defaultValue: 1
+        - addColumn:
               tableName: not_notificacio_event
               columns:
                 - column:

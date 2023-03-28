@@ -54,6 +54,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private String numExpedient;
 
 	private boolean eventsCallbackPendent;
+	private String dataCallbackPendent;
 	private boolean errorLastCallback;
 	private TipusUsuariEnumDto tipusUsuari;
 	private IdiomaEnumDto idioma;
@@ -85,6 +86,8 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private String notificaErrorDescripcio;
 //	private NotificacioErrorTipusEnumDto notificaErrorTipus;
 	private	NotificacioEventTipusEnumDto noticaErrorEventTipus;
+	private boolean fiReintents;
+	private String fiReintentsDesc;
 
 	private Date enviadaDate;
 

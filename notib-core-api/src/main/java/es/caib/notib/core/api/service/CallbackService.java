@@ -26,4 +26,7 @@ public interface CallbackService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
     boolean reintentarCallback(Long notId);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	boolean findByNotificacio(Long notId);
 }

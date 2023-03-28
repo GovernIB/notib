@@ -16,6 +16,7 @@ import java.util.Date;
 @Getter @Setter
 public class EnviamentInfoDto extends NotificacioEnviamentDatatableDto{
 
+	private Long id;
 	private EntregaPostalDto entregaPostal;
 	private EntregaDehDto entregaDeh;
 	private ServeiTipusEnumDto serveiTipus;

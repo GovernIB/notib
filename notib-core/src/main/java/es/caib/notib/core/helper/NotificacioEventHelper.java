@@ -92,6 +92,7 @@ public class NotificacioEventHelper {
                     .enviament(eventInfo.getEnviament())
                     .tipus(eventInfo.getTipus())
                     .error(eventInfo.isError())
+                    .intents(1)
                     .fiReintents(eventInfo.isFiReintents())
                     .errorDescripcio(eventInfo.getErrorDescripcio()).build();
         }

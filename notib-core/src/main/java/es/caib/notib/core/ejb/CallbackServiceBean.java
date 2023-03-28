@@ -32,4 +32,9 @@ public class CallbackServiceBean implements CallbackService {
 		return false;
 	}
 
+	@Override
+	public boolean findByNotificacio(Long notId) {
+		return false;
+	}
+
 }

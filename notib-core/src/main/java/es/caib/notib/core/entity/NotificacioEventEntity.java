@@ -64,6 +64,9 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	@Column(name = "fi_reintents")
 	protected Boolean fiReintents;
 
+	@Column(name = "intents")
+	protected int intents;
+
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "NOT_NOTIFICACIO_NOTEVENT_FK")
@@ -103,6 +106,7 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 		this.error = error;
 		this.errorDescripcio = errorDescripcio;
 		this.fiReintents = fiReintents;
+		this.intents++;
 	}
 
 

@@ -51,8 +51,6 @@ public class CallbackHelper {
 
 	private static final String NOTIFICACIO_CANVI = "notificaCanvi";
 	@Autowired
-	private NotificacioEventRepository notificacioEventRepository;
-	@Autowired
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
 	private NotificacioEnviamentRepository enviamentRepository;
@@ -94,6 +92,13 @@ public class CallbackHelper {
 			log.error("Error creant el callback per l'enviamnet " + env.getId());
 		}
  	}
+
+ 	@Transactional
+	public void reactivarCallback(NotificacioEnviamentEntity env) {
+
+		CallbackEntity c = updateCallback(env, false, null);
+		c.setIntents(0);
+	}
 
 	@Transactional
 	public CallbackEntity updateCallback(NotificacioEnviamentEntity env, boolean isError, String errorDesc) {
@@ -263,7 +268,7 @@ public class CallbackHelper {
 			info.setAplicacio(aplicacio != null ? aplicacio.getUsuariCodi() : "Sense aplicació");
 			callback.update(CallbackEstatEnumDto.ERROR, getEventsIntentsMaxProperty(), msg, getIntentsPeriodeProperty());
 			integracioHelper.addAccioError(info, msg);
-//			notificacioEventHelper.addCallbackEvent(enviament.getNotificacio(), event, true);
+			notificacioEventHelper.addCallbackEnviamentEvent(enviament, true, msg);
 			throw new Exception(errorMessage);
 		}
 		return aplicacio;

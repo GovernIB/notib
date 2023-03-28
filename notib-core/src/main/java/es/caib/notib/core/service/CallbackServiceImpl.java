@@ -136,7 +136,10 @@ public class CallbackServiceImpl implements CallbackService {
 		}
 	}
 
-
+	@Override
+	public boolean findByNotificacio(Long notId) {
+		return false;
+	}
 
 	private boolean isTasquesActivesProperty() {
 		return configHelper.getAsBoolean("es.caib.notib.tasques.actives");
