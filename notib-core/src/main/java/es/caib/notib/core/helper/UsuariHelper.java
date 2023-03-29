@@ -114,8 +114,7 @@ public class UsuariHelper {
 			return null;
 		UsuariEntity usuari = usuariRepository.findOne(auth.getName());
 		if (usuari == null) {
-			logger.debug("Consultant plugin de dades d'usuari (" +
-					"usuariCodi=" + auth.getName() + ")");
+			logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 			String idioma = configHelper.getConfig("es.caib.notib.default.user.language");
 			if (dadesUsuari != null) {

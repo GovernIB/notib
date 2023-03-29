@@ -481,6 +481,10 @@ $(document).ready(function() {
 									<td><strong><spring:message code="enviament.info.notifica.estat.data"/></strong></td>
 									<td><fmt:formatDate value="${enviament.notificaEstatData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 								</tr>
+								<tr>
+									<td><strong><spring:message code="notificacio.list.filtre.camp.identificador"/></strong></td>
+									<td>${enviament.notificaIdentificador}</td>
+								</tr>
 								<c:if test="${not empty enviament.notificaDatatErrorDescripcio}">
 									<tr>
 										<td><strong><spring:message code="enviament.info.notifica.estat.descripcio"/></strong></td>
