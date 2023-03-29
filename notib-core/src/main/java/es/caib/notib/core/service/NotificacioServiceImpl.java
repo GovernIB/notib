@@ -538,6 +538,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (notificacioTableEntity == null) {
 				return dto;
 			}
+			NotificacioEventEntity e = notificacioEventRepository.findLastErrorEventByNotificacioId(id);
+//			dto.notificaError(e != null);
 			dto.setNotificaErrorData(notificacioTableEntity.getNotificaErrorData());
 			dto.setNotificaErrorDescripcio(notificacioTableEntity.getNotificaErrorDescripcio());
 
@@ -643,6 +645,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			boolean esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
 
 			if (filtre == null || filtre.isEmpty()) {
+
 				//Consulta les notificacions sobre les quals té permis l'usuari actual
 				if (isUsuari) {
 					long start = System.nanoTime();
@@ -677,7 +680,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			} else {
 				NotificacioListHelper.NotificacioFiltre filtreNetejat = notificacioListHelper.getFiltre(filtre);
-
 				if (isUsuari) {
 					notificacions = notificacioTableViewRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 							entitatActual,

@@ -129,7 +129,9 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			"		from " +
 			"			NotificacioEventEntity e left outer join e.notificacio n " +
 			"		where " +
-			"			n.id = :notificacioId and e.tipus != es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT " +
+			"			n.id = :notificacioId " +
+			"			and e.error = true " +
+			"			and e.tipus != es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT " +
 			"	   ) ")
 	NotificacioEventEntity findLastErrorEventByNotificacioId(@Param("notificacioId") Long notificacioId);
 

@@ -143,7 +143,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 //			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
 //			"	(:hasZeronotificaEnviamentIntent = false and ntf.registreEnviamentIntent > 0) " +
 //			") " +
-			"and (:isIdentificadorNull = true or lower(ntf.notificaIds) like concat('%', lower(:identificador), '%'))" +
+			"and (:isIdentificadorNull = true or ntf.notificaIds like concat('%', :identificador, '%')) " +
 			"and (:nomesSenseErrors = false or ntf.notificaErrorData is null) " +
 			"and (:nomesAmbErrors = false or ntf.notificaErrorData is not null) " +
 			"and (:isReferenciaNull = true or lower(ntf.referencia) like concat('%', lower(:referencia), '%'))")
@@ -209,10 +209,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
 			"and (:isNumExpedientNull = true or lower(ntf.numExpedient) like concat('%', lower(:numExpedient), '%')) " +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
-			"and (:isIdentificadorNull = true or " +
-			"		(ntf.id in (select notificacio.id" +
-			"				from NotificacioEnviamentEntity env" +
-			"				where lower(env.notificaIdentificador) like concat('%', lower(:identificador), '%'))))" +
+			"and (:isIdentificadorNull = true or ntf.notificaIds like concat('%', :identificador, '%')) " +
 			"and (:nomesSenseErrors = false or ntf.notificaErrorData is null) " +
 			"and (:nomesAmbErrors = false or ntf.notificaErrorData is not null) " +
 			"and (:isReferenciaNull = true or lower(ntf.referencia) like '%' || lower(:referencia) || '%')")
@@ -274,10 +271,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
 			"and (:nomesSenseErrors = false or ntf.notificaErrorData is null) " +
-			"and (:isIdentificadorNull = true or " +
-			"		(ntf.id in (select env.notificacio.id"
-			+ "				from NotificacioEnviamentEntity env"
-			+ "				where env.notificaIdentificador = :identificador))) " +
+			"and (:isIdentificadorNull = true or ntf.notificaIds like concat('%', :identificador, '%')) " +
 			" and (:isReferenciaNull = true or lower(ntf.referencia) like '%' || lower(:referencia) || '%')")
 	Page<NotificacioTableEntity> findAmbFiltreAndProcedimentCodiNotib(
 			@Param("entitat") EntitatEntity entitat,
@@ -337,10 +331,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
 			"and (:isNumExpedientNull = true or lower(ntf.numExpedient) like concat('%', lower(:numExpedient), '%')) " +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
-			"and (:isIdentificadorNull = true or " +
-			"		(ntf.id in (select notificacio.id" +
-			"				from NotificacioEnviamentEntity env" +
-			"				where lower(env.notificaIdentificador) like concat('%', lower(:identificador), '%'))))" +
+			"and (:isIdentificadorNull = true or ntf.notificaIds like concat('%', :identificador, '%')) " +
 			"and (:nomesSenseErrors = false or ntf.notificaErrorData is null) " +
 			"and (:nomesAmbErrors = false or ntf.notificaErrorData is not null)")
 	Page<NotificacioTableEntity> findAmbFiltreByNotificacioMassiva(
@@ -428,10 +419,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
 			"and (:isNumExpedientNull = true or lower(ntf.numExpedient) like concat('%', lower(:numExpedient), '%')) " +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
-			"and (:isIdentificadorNull = true or " +
-			"		(ntf.id in (select notificacio.id" +
-			"				from NotificacioEnviamentEntity env" +
-			"				where lower(env.notificaIdentificador) like concat('%', lower(:identificador), '%'))))" +
+			"and (:isIdentificadorNull = true or ntf.notificaIds like concat('%', :identificador, '%')) " +
 			"and (:nomesSenseErrors = false or ntf.notificaErrorData is null) " +
 			"and (:isAdminOrgan = true or :nomesAmbErrors = false or ntf.notificaErrorData is not null) " +
 			"and (:isReferenciaNull = true or lower(ntf.referencia) like '%' || lower(:referencia) || '%')")
@@ -481,4 +469,5 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("organs") List<String> organs,
 			@Param("isNullNotMassivaId") boolean isNullNotMassivaId,
 			@Param("notMassivaId") Long notMassivaId);
+
 }
