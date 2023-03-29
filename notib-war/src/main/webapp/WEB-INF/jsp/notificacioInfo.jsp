@@ -948,7 +948,6 @@ $(document).ready(function() {
 					</li>
 				</c:if>
 				<!-- Acció reprendre consulta d'estat  - Estat == ENVIADA && notificaErrorTipus == ERROR_REINTENTS_CONSULTA -->
-				<%-- TODO EVENTS: obtenir error reintents dels events
 				<c:if test="${notificacio.estat == 'ENVIADA' && notificacio.notificaErrorTipus == 'ERROR_REINTENTS_CONSULTA'}">
 					<c:set var="algunaAccioDisponible" value="${true}" />
 					<li class="list-group-item">
@@ -965,9 +964,8 @@ $(document).ready(function() {
 						</div>
 					</li>
 				</c:if>
-				--%>
+
 				<!-- Acció reprendre consulta d'estat SIR  - Estat == ENVIADA && notificaErrorTipus == ERROR_REINTENTS_SIR -->
-				<%-- TODO EVENTS: recuperar reintents de events
 				<c:if test="${notificacio.estat == 'ENVIADA' && notificacio.notificaErrorTipus == 'ERROR_REINTENTS_SIR'}">
 					<c:set var="algunaAccioDisponible" value="${true}" />
 					<li class="list-group-item">
@@ -984,7 +982,7 @@ $(document).ready(function() {
 						</div>
 					</li>
 				</c:if>
-				--%>
+
 				<c:if test="${notificacio.tipusUsuari == 'APLICACIO' && notificacio.errorLastCallback}">
 					<c:set var="algunaAccioDisponible" value="${true}" />
 					<li class="list-group-item">

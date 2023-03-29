@@ -92,12 +92,28 @@ $(document).ready(function() {
 			error: err => console.error(err)
 		});
 	});
+
+	$("#refrescarEstatSir").click(e => {
+		$("#refrescarEstatSir").prop("disabled", true);
+		e.preventDefault();
+		$.ajax({
+			url: "/notib/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatSir",
+			success: data => {
+				$("#refrescarEstatSir").prop("disabled", false);
+				let classe = data.ok ? "alert-success" : "alert-danger";
+				let div = '<div class="alert ' + classe +'"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +
+						'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
+				$("#contingut-missatges").append(div);
+			},
+			error: err => console.error(err)
+		});
+	});
 });
 </script>
 </head>
 <body>
 <div id="contingut-missatges"></div>
-<%-- TODO EVENTS: mostrar missatges d'events
+<%-- TODO EVENTS: mostrar missatges d'events --%>
 	<c:if test="${enviament.notificacio.notificaError}">
 		<div class="alert alert-danger well-sm">
 			<span class="fa fa-warning text-danger"></span>
@@ -118,7 +134,7 @@ $(document).ready(function() {
 			</div>
 		</div>
 	</c:if>
---%>
+
 	<ul class="nav nav-tabs" role="tablist">
 		<li role="presentation"<c:if test="${pipellaActiva == 'dades'}"> class="active"</c:if>>
 			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab">
@@ -424,7 +440,15 @@ $(document).ready(function() {
 			</c:if>
 			<c:if test="${enviament.notificacio.estat != 'PENDENT'}">
 				<c:choose>
-					<c:when test="${(notificacio.enviamentTipus == 'COMUNICACIO' && enviament.titular.interessatTipus == 'ADMINISTRACIO') || enviament.perEmail}">
+					<c:when test="${(notificacio.enviamentTipus == 'COMUNICACIO' && enviament.titular.interessatTipus == 'ADMINISTRACIO')}">
+						<p class="text-right" style="margin-top: 1em">
+							<button id="refrescarEstatSir" class="btn btn-default">
+								<span class="fa fa-refresh"></span>
+								<spring:message code="enviament.info.accio.refrescar.estat"/>
+							</button>
+						</p>
+					</c:when>
+					<c:when test="${enviament.perEmail}">
 						<br/>
 					</c:when>
 					<c:otherwise>

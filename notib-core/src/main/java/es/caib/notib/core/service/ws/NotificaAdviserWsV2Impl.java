@@ -35,7 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.jws.WebService;
-import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
 import java.math.BigInteger;
@@ -106,7 +105,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			
 			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm");
 			Date dataEstat = toDate(fechaEstado);
-			
+
 			logger.info("[ADV] Inici sincronització enviament Adviser [");
 			logger.info("        Id: " + (identificador != null ? identificador : ""));
 			logger.info("        OrganismoEmisor: " + organismoEmisor);
@@ -270,10 +269,10 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 //					}
 			}
 
-		} catch (DatatypeConfigurationException ex) {
-			codigoRespuesta.value = "004";
-			descripcionRespuesta.value = "Fecha incorrecta";
-			integracioHelper.addAccioError(info, "La data de l'estat no té un format vàlid");
+//		} catch (DatatypeConfigurationException ex) {
+//			codigoRespuesta.value = "004";
+//			descripcionRespuesta.value = "Fecha incorrecta";
+//			integracioHelper.addAccioError(info, "La data de l'estat no té un format vàlid");
 		} catch (Exception ex) {
 			codigoRespuesta.value = "666";
 			descripcionRespuesta.value = "Error procesando peticion";
@@ -285,7 +284,9 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 
 		logger.debug("Peticició processada correctament.");
 
-		notificacioEventHelper.addAdviserDatatEvent(enviament, eventErrorDescripcio != null, eventErrorDescripcio);
+		if (tipoEntrega.equals(BigInteger.valueOf(1L)) || tipoEntrega.equals(BigInteger.valueOf(2L))) {
+			notificacioEventHelper.addAdviserDatatEvent(enviament, eventErrorDescripcio != null, eventErrorDescripcio);
+		}
 		callbackHelper.updateCallback(enviament, !Strings.isNullOrEmpty(eventErrorDescripcio), eventErrorDescripcio);
 		enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaAdviserWsV2Impl.sincronizarEnvio");
 		logger.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");

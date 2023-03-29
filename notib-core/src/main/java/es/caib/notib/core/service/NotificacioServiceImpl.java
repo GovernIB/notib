@@ -522,8 +522,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 				dto.setFiReintents(lastErrorEvent.getFiReintents());
 			}
 			dto.setNoticaErrorEventTipus(lastErrorEvent != null ? lastErrorEvent.getTipus() : null);
-			// TODO EVENTS: Obtenir missatge d'error dels events
+			// Obtenir error dels events
 //			dto.setNotificaErrorTipus(lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null);
+			dto.setNotificaErrorTipus(getErrorTipus(lastErrorEvent));
 			dto.setEnviadaDate(getEnviadaDate(notificacio));
 
 			// TODO RECUPERAR INFORMACIÓ DIRECTAMENT DE LES ENTITATS
@@ -538,6 +539,22 @@ public class NotificacioServiceImpl implements NotificacioService {
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	private NotificacioErrorTipusEnumDto getErrorTipus(NotificacioEventEntity lastErrorEvent) {
+		if (lastErrorEvent == null)
+			return null;
+
+		if (NotificacioEstatEnumDto.ENVIADA.equals(lastErrorEvent.getNotificacio().getEstat())) {
+			if (NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(lastErrorEvent.getTipus()) && lastErrorEvent.getFiReintents()) {
+				return NotificacioErrorTipusEnumDto.ERROR_REINTENTS_SIR;
+			}
+			if (NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA.equals(lastErrorEvent.getTipus()) && lastErrorEvent.getFiReintents()) {
+				return NotificacioErrorTipusEnumDto.ERROR_REINTENTS_CONSULTA;
+			}
+		}
+
+		return null;
 	}
 
 	private Date getEnviadaDate(NotificacioEntity notificacio) {
@@ -1515,6 +1532,21 @@ public class NotificacioServiceImpl implements NotificacioService {
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	@Transactional
+	@Override
+	public boolean enviamentRefrescarEstatSir(Long enviamentId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		boolean totBe = false;
+		try {
+			registreHelper.enviamentRefrescarEstatRegistre(enviamentId);
+			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
+			totBe = enviament.getSirConsultaIntent() == 0;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+		return totBe;
 	}
 
 	@Transactional(readOnly = true)

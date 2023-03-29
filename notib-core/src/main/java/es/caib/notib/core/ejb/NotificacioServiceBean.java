@@ -261,7 +261,12 @@ public class NotificacioServiceBean implements NotificacioService {
 		delegate.enviamentRefrescarEstatRegistre(notificacioId);		
 	}
 
-	@Override
+    @Override
+    public boolean enviamentRefrescarEstatSir(Long enviamentId) {
+        return delegate.enviamentRefrescarEstatSir(enviamentId);
+    }
+
+    @Override
 	@RolesAllowed({"NOT_SUPER"})
 	public PaginaDto<NotificacioDto> findWithCallbackError(
 			NotificacioErrorCallbackFiltreDto filtre,

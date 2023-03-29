@@ -13,7 +13,9 @@ import es.caib.notib.core.api.dto.NotificacioAuditDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentAuditDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.UsuariDto;
@@ -477,6 +479,9 @@ public class ConversioTipusHelper {
 					if (event != null) {
 						notificacioEnviamentDto.setNotificaErrorData(event.getData());
 						notificacioEnviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
+						if (NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT.equals(event.getTipus()) || NotificacioEventTipusEnumDto.SIR_ENVIAMENT.equals(event.getTipus())) {
+							notificacioEnviamentDto.getNotificacio().setNotificaErrorTipus(NotificacioErrorTipusEnumDto.ERROR_REGISTRE);
+						}
 					}
 				} catch (Exception ex) {
 					log.error("[ConversioTipusHelper.NotificacioEnviamentDto] event no trobat.");

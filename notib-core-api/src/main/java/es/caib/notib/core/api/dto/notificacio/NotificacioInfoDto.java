@@ -5,6 +5,7 @@ import es.caib.notib.core.api.dto.AuditoriaDto;
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.cie.CieDataDto;
@@ -84,7 +85,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
-//	private NotificacioErrorTipusEnumDto notificaErrorTipus;
+	private NotificacioErrorTipusEnumDto notificaErrorTipus;
 	private	NotificacioEventTipusEnumDto noticaErrorEventTipus;
 	private boolean fiReintents;
 	private String fiReintentsDesc;

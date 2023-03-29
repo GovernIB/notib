@@ -9,7 +9,6 @@ import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.NotificacioAuditDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
-import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PermisEnum;
@@ -449,6 +448,16 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         NotificacioEnviamenEstatDto enviamentEstat = notificacioService.enviamentRefrescarEstat(entitatActual.getId(), enviamentId);
         boolean totbe = !enviamentEstat.isNotificaError();
+        String msg = totbe ? "notificacio.controller.refrescar.estat.ok" : "notificacio.controller.refrescar.estat.error";
+        return Missatge.builder().ok(totbe).msg(getMessage(request, msg)).build();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/refrescarEstatSir", method = RequestMethod.GET)
+    public Missatge refrescarEstatSir(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId, Model model) {
+
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        boolean totbe = notificacioService.enviamentRefrescarEstatSir(enviamentId);
         String msg = totbe ? "notificacio.controller.refrescar.estat.ok" : "notificacio.controller.refrescar.estat.error";
         return Missatge.builder().ok(totbe).msg(getMessage(request, msg)).build();
     }

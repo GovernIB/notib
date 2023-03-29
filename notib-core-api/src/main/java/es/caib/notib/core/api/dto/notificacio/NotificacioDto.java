@@ -56,7 +56,7 @@ public class NotificacioDto extends AuditoriaDto {
 //	private EnviamentEstat notificaEstat;
 	private Date estatDate;
 	private Date notificaErrorData;
-//	private NotificacioErrorTipusEnumDto notificaErrorTipus;
+	private NotificacioErrorTipusEnumDto notificaErrorTipus;
 	private String notificaErrorDescripcio;
 	private EntitatDto entitat;
 	private ProcSerDto procediment;
