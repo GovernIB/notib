@@ -81,7 +81,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 			String numeroRegistreFormatat,
 			Long tipusOperacio,
 			boolean ambAnnexos) {
-		boolean respostaAmbError = true;
+		boolean respostaAmbError = false;
 		RespostaConsultaRegistre respostaConsultaRegistre = new RespostaConsultaRegistre();
 		Date data = new Date();
 		Integer[] registre = readRegistreFile(data, true);

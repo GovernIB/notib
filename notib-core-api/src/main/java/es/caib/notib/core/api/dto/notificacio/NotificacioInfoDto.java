@@ -95,6 +95,14 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private boolean justificantCreat;
 
 	public boolean isNotificaError() {
+
+//		for (EnviamentInfoDto e : enviaments) {
+//			if (e.isNotificacioError()) {
+//				e.get
+//				notificaErrorDescripcio = e.getNotificacioErrorDescripcio();
+//				return true;
+//			}
+//		}
 		return notificaErrorData != null;
 	}
 
