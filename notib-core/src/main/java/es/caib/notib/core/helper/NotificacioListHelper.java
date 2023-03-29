@@ -1,5 +1,6 @@
 package es.caib.notib.core.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
@@ -194,13 +195,19 @@ public class NotificacioListHelper {
         error += TipusUsuariEnumDto.APLICACIO.equals(item.getTipusUsuari()) && item.isErrorLastCallback() ?
                 " <span class=\"fa fa-exclamation-circle text-primary\" title=\"<spring:message code=\"notificacio.list.client.error/>\"></span>" : "";
 
-        NotificacioEventEntity lastErrorEvent = eventRepository.findLastErrorEventByNotificacioId(item.getId());
         String fiReintents = "";
-        if (lastErrorEvent != null && lastErrorEvent.getFiReintents()) {
-            String msg = messageHelper.getMessage("notificacio.event.fi.reintents");
-            String tipus = messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto." + lastErrorEvent.getTipus());
-            fiReintents = "<span class=\"fa fa-warning text-warning\" title=\"" + msg + " -> " + tipus + "\"></span>";
+        List<NotificacioEventEntity> lastErrorEvent = eventRepository.findEventsAmbFiReintentsByNotificacioId(item.getId());
+        String m = "";
+        if (lastErrorEvent != null && !lastErrorEvent.isEmpty()) {
+            String msg = "";
+            String tipus = "";
+            for (NotificacioEventEntity event : lastErrorEvent) {
+                msg = messageHelper.getMessage("notificacio.event.fi.reintents");
+                tipus = messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto." + event.getTipus());
+                m += msg + " -> " + tipus + "\n";
+            }
         }
+        fiReintents = !Strings.isNullOrEmpty(m) ? "<span class=\"fa fa-warning text-warning\" title=\"" + m + "\"></span>" : "";
         estat = "<span>" + estat + nomEstat + error + "  " + fiReintents + "</span>";
         String data = "\n";
         if ((NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat())) && item.getEstatDate() != null) {
