@@ -34,6 +34,7 @@ import java.util.Date;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @Entity

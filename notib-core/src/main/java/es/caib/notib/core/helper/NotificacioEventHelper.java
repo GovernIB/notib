@@ -1,5 +1,6 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.EventException;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -145,7 +146,11 @@ public class NotificacioEventHelper {
     // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void addNotificaEnviamentEvent(NotificacioEntity notificacio, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+
         for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+            if (InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+                continue;
+            }
             addEvent(EventInfo.builder()
                     .enviament(enviament)
                     .tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT)

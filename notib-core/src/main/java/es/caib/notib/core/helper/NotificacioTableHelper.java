@@ -176,9 +176,9 @@ public class NotificacioTableHelper {
                 tableViewItem.setNotificaErrorData(lastEvent != null ? lastEvent.getData() : null);
                 if (tableViewItem.getNotificaErrorDescripcio() == null) {
                     // TODO MISSATGE MULTIDIOMA
-//                String desc = notificacio.hasEnviamentsPerEmail() ? messageHelper.getMessage("error.notificacio.enviaments")
-                    String desc = notificacio.hasEnviamentsPerEmail() ?
-                            "S'ha produït algun error en els enviaments. Els errors es poden consultar en cada un dels enviaments."
+                String desc = notificacio.hasEnviamentsPerEmail() ? messageHelper.getMessage("error.notificacio.enviaments")
+//                    String desc = notificacio.hasEnviamentsPerEmail() ?
+//                            "S'ha produït algun error en els enviaments. Els errors es poden consultar en cada un dels enviaments."
                             : (lastEvent != null ? lastEvent.getErrorDescripcio() : null);
                     tableViewItem.setNotificaErrorDescripcio(desc);
                 }

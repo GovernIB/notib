@@ -5,6 +5,7 @@ import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -119,18 +120,29 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			   "			   e.tipus = es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.SIR_ENVIAMENT))")
 	NotificacioEventEntity findUltimEventRegistreByNotificacioId(@Param("notificacioId") Long notificacioId);
 
-		@Query( "select ne " +
-				"from " +
-				"	NotificacioEventEntity ne " +
-				"where ne.id = ( " +
-				"		select " +
-				"			max(e.id) " +
-				"		from " +
-				"			NotificacioEventEntity e left outer join e.notificacio n " +
-				"		where " +
-				"			n.id = :notificacioId and e.tipus != es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT " +
-				"	   ) ")
+	@Query( "select ne " +
+			"from " +
+			"	NotificacioEventEntity ne " +
+			"where ne.id = ( " +
+			"		select " +
+			"			max(e.id) " +
+			"		from " +
+			"			NotificacioEventEntity e left outer join e.notificacio n " +
+			"		where " +
+			"			n.id = :notificacioId and e.tipus != es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT " +
+			"	   ) ")
 	NotificacioEventEntity findLastErrorEventByNotificacioId(@Param("notificacioId") Long notificacioId);
+
+	@Query( "select ne from NotificacioEventEntity ne " +
+			" where ne.notificacio.id = :notificacioId " +
+			" and ne.fiReintents = true " +
+			" and ne.tipus != es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT")
+	List<NotificacioEventEntity> findEventsAmbFiReintentsByNotificacioId(@Param("notificacioId") Long notificacioId);
+
+	@Modifying
+	@Query("update NotificacioEventEntity n set n.fiReintents = false, n.intents = 0" +
+			" where n.id = :notId and n.fiReintents = true and n.tipus != es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT ")
+	void resetIntentsByNotId(@Param("notId") Long notId);
 
 	@Query("select ne " +
 			"  from NotificacioEventEntity ne " +

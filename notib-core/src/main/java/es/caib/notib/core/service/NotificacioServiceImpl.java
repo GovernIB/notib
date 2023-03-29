@@ -514,17 +514,23 @@ public class NotificacioServiceImpl implements NotificacioService {
 				dto.setCie(conversioTipusHelper.convertir(entregaCieEntity.getCie(), CieDataDto.class));
 			}
 
-			NotificacioEventEntity lastErrorEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
-			if (lastErrorEvent != null && lastErrorEvent.getFiReintents()) {
-				String msg = messageHelper.getMessage("notificacio.event.fi.reintents");
-				String tipus = messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto." + lastErrorEvent.getTipus());
-				dto.setFiReintentsDesc(msg + " -> " + tipus);
-				dto.setFiReintents(lastErrorEvent.getFiReintents());
+			List<NotificacioEventEntity> lastErrorEvent = notificacioEventRepository.findEventsAmbFiReintentsByNotificacioId(notificacio.getId());
+			if (lastErrorEvent != null && !lastErrorEvent.isEmpty()) {
+				String msg = "";
+				String tipus = "";
+				String m = "";
+				for (NotificacioEventEntity event : lastErrorEvent) {
+					msg = messageHelper.getMessage("notificacio.event.fi.reintents");
+					tipus = messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto." + event.getTipus());
+					m += msg + " -> " + tipus + "\n";
+				}
+				dto.setFiReintentsDesc(m);
+				dto.setFiReintents(true);
+				dto.setNoticaErrorEventTipus(lastErrorEvent.get(0).getTipus());
+				// Obtenir error dels events
+				dto.setNotificaErrorTipus(getErrorTipus(lastErrorEvent.get(0)));
 			}
-			dto.setNoticaErrorEventTipus(lastErrorEvent != null ? lastErrorEvent.getTipus() : null);
-			// Obtenir error dels events
 //			dto.setNotificaErrorTipus(lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null);
-			dto.setNotificaErrorTipus(getErrorTipus(lastErrorEvent));
 			dto.setEnviadaDate(getEnviadaDate(notificacio));
 
 			// TODO RECUPERAR INFORMACIÓ DIRECTAMENT DE LES ENTITATS
@@ -1694,12 +1700,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional
 	@Override
 	public boolean reenviarNotificacioAmbErrors(Long notificacioId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
-					null,
-					notificacioId);
-			if (NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
+			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			if ((NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())
+				|| NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) && !notificacio.isJustificantCreat()) {
 				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
 				notificacioEnviar(notificacioId);
 				return true;
@@ -1715,23 +1721,32 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional
 	@Override
 	public boolean reactivarNotificacioAmbErrors(Long notificacioId) {
-			Timer.Context timer = metricsHelper.iniciMetrica();
-			try {
-				NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
-				if (NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
-					notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
-					notificacio.resetIntentsNotificacio();
-					NotTableUpdate not = NotTableUpdate.builder().estat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS).build();
-					notificacioTableHelper.actualitzar(not);
-					notificacioHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "NotificacioServiceImpl.reactivarNotificacioAmbErrors");
-					return true;
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			if ((NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())
+					|| NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat()))) {
+				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
+				notificacio.resetIntentsNotificacio();
+				// TODO VEURE PERQUE EL MÈTODE UPDATE DEL REPOSITORY NO FUNCIONA
+				List<NotificacioEventEntity> events = notificacioEventRepository.findEventsAmbFiReintentsByNotificacioId(notificacioId);
+				for (NotificacioEventEntity e : events) {
+					e.setIntents(0);
+					e.setFiReintents(false);
 				}
-			} catch (Exception e) {
-				logger.debug("Error reactivant notificació amb errors (notificacioId=" + notificacioId + ")", e);
-			} finally {
-				metricsHelper.fiMetrica(timer);
+				// D'ALGUNA FORMA NO ESTÀ QUADRAN ELS REINTENTS DE LA NOTIFICACIO AMB LA DELS EVENTS
+				NotTableUpdate not = NotTableUpdate.builder().id(notificacioId).estat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS).build();
+				notificacioTableHelper.actualitzar(not);
+				notificacioHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "NotificacioServiceImpl.reactivarNotificacioAmbErrors");
+				return true;
 			}
-			return false;
+		} catch (Exception e) {
+			logger.debug("Error reactivant notificació amb errors (notificacioId=" + notificacioId + ")", e);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+		return false;
 	}
 
     @Override

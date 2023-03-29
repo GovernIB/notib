@@ -651,6 +651,9 @@ $(document).ready(function() {
 													</c:set>
 													<span class="fa fa-warning text-danger" title="${errorTitle}"></span>
 												</c:if>
+												<c:if test="${enviament.fiReintents}">
+													<span class="fa fa-warning text-warning" title="${enviament.fiReintentsDesc}"></span>
+												</c:if>
 											</td>
 										</tr>
 						    			<tr>
