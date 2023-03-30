@@ -79,7 +79,7 @@ $(document).ready(function() {
 			if (rowData["fiReintents"]) {
 				data += "\n\nEsgotats els reintents.";
 			}
-			console.log(rowData["fiReintents"]);
+			// console.log(rowData["fiReintents"]);
 			$(td).empty();
 			$(td).append('<textarea style="width:100%" rows="10">' + data + '</textarea>');
 	});
@@ -88,6 +88,7 @@ $(document).ready(function() {
 		api.rows().every(function(rowIdx, tableLoop, rowLoop) {
 			let data = this.data();
 			if (!data.error || data.errorDescripcio == null) {
+				// console.log(data);
 				$('td:last-child', this.node()).empty();
 			}
 		});

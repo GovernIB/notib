@@ -78,7 +78,7 @@ $(document).ready(function() {
 			$("#enviament").dataTable().api().ajax.reload();
 		});
 		$selector.on('change', function () {
-			console.log($selector.val());
+			// console.log($selector.val());
 			$selector.val($selector.val());
 			$("#btnFiltrar").first().click();
 		});

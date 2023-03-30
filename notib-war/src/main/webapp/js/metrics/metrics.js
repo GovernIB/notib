@@ -1,5 +1,5 @@
 function drawLlegendaGraph(missatges) {
-	console.log(missatges);
+	// console.log(missatges);
 	var ctx_timer = document.getElementsByClassName('llegendaChart')[0];
 	var frequecyChart = new Chart(ctx_timer, {
 	    type: 'horizontalBar',

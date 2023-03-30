@@ -72,7 +72,7 @@
 
 		$("#organ-boto-update-oficines").on("click", () => {
 			bloquejar();
-			console.log("bloquejant");
+			// console.log("bloquejant");
 		});
 	});
 	// Bloquejar la pantalla

@@ -286,7 +286,7 @@
 			$(".entrega-inactiva").show();
 			console.debug("Oculta formulari entrega cie");
 		}
-		console.log(val);
+		// console.log(val);
 		if (val) {
 			console.debug("Entrega CIE activa");
 			$(".entrega-cie-activa").show();
@@ -596,7 +596,7 @@
 			}
 
 			let url = esCsv ? "consultaDocumentIMetadadesCsv" : "consultaDocumentIMetadadesUuid";
-			console.log("<c:url value="/notificacio/"/>" + url + "/" + inputElementValue);
+			<%--console.log("<c:url value="/notificacio/"/>" + url + "/" + inputElementValue);--%>
 			$.ajax({
 				type: 'POST',
 				contentType: "application/json",
@@ -1098,7 +1098,7 @@
 				$(raoSocialInput).hide();
 				$(nomInput).show();
 			} else {
-				console.log("juridica");
+				// console.log("juridica");
 				$(llinatge1).addClass('hidden');
 				$(llinatge2).addClass('hidden');
 				$(nif).removeClass('hidden');
@@ -1315,7 +1315,7 @@
 	}
 
 	function loadServeis(organ, carregaInicial) {
-		console.log("loadServeis");
+		// console.log("loadServeis");
 		$.ajax({
 			type: 'GET',
 			url: "<c:url value="/notificacio/organ/"/>" + organ + "/serveis",

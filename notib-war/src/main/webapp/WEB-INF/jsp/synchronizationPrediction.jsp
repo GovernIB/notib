@@ -34,7 +34,7 @@
 		var isUpdating = false;
 		$(document).ready(function() {
 			$('#formSync').on("submit", function(){
-				console.log("submitting...");
+				// console.log("submitting...");
 				$('.loading').fadeIn();
 				$('#actualitzacioInfo').fadeIn();
 				$('.prediccio').fadeOut();
@@ -70,19 +70,19 @@
 		});
 		</c:if>
 		function refreshProgres() {
-			console.log("refreshProgres");
+			// console.log("refreshProgres");
 			itervalProgres =  setInterval(function(){ getProgres(); }, 500);
 		}
 
 		function getProgres() {
-			console.log("getProgres");
+			// console.log("getProgres");
 			$('.close', parent.document).prop('disabled', true);
 			$.ajax({
 				type: 'GET',
 				url: "<c:url value='/organgestor/update/auto/progres'/>",
 				success: function(data) {
 					if (data) {
-						console.log("Progres:", data);
+						// console.log("Progres:", data);
 						writeInfo(data);
 						$('#cancelbtn', parent.document).toggle(true);
 						if (data.progres == 100) {
@@ -121,7 +121,7 @@
 			let info = data.info;
 			let index;
 			let scroll = writtenLines < info.length;
-			console.log("Scrol?: ", writtenLines, info.length, scroll);
+			// console.log("Scrol?: ", writtenLines, info.length, scroll);
 			for (index = writtenLines; index < info.length; index++) {
 				$("#bcursor").before("<p class='info-" + info[index].tipus + "'>" + info[index].text + "</p>");
 			}

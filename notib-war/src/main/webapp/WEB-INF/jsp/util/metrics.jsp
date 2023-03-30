@@ -103,7 +103,7 @@ $(document).ready(function() {
 		"<spring:message code="metriques.timers.duracio"/>",//Duració
 		"<spring:message code="metriques.timers.percentils"/>",//Percentils
 	];
-	console.log(missatges[0]);
+	// console.log(missatges[0]);
 	// Event del botó exportar: desa les mètriques en un fitxer de text (metrics.json)
 	$('#exportar').click(function() {
 		var blob = new Blob([JSON.stringify(metricsData)], {type: "text/plain;charset=utf-8"});

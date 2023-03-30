@@ -596,7 +596,7 @@ function setPersonaAdministracio (from, index, codi, denominacio, ocodi, cif) {
         dir3CodiDesc =  document.getElementById("searchOrgan" + from + index);
         organCif = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].nif");
     }
-    console.log("denominacio: " + denominacio);
+    // console.log("denominacio: " + denominacio);
     dir3Codi.value = codi;
     raoSocial.value = denominacio;
     dir3CodiDesc.value = ocodi;
