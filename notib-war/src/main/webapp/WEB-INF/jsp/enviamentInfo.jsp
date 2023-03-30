@@ -692,6 +692,9 @@ $(document).ready(function() {
 							{{else}}
 								<span class="fa fa-check text-success" title="<spring:message code="enviament.event.list.processat.ok"/>"></span>
 							{{/if}}
+							{{if fiReintents}}
+									<span class="fa fa-warning text-warning" title="<spring:message code="enviament.event.list.fi.reintents"/>"></span>
+							{{/if}}
 						</script>
 					</th>
 					<th data-col-name="intents" data-orderable="false"><spring:message code="notificacio.event.list.columna.intents"/></th>
