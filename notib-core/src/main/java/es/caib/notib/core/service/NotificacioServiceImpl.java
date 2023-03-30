@@ -1420,11 +1420,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Reactivant consultes d'estat de SIR (notificacioId=" + notificacioId + ")");
-			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
-					null,
-					notificacioId);
+			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			NotificacioEventEntity event;
 			for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 				enviament.refreshSirConsulta();
+				event = enviament.getNotificacioErrorEvent();
+				event.setIntents(0);
+				event.setFiReintents(false);
 //				enviamentTableHelper.actualitzarRegistre(enviament);
 				enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificacioServiceImpl.reactivarSir");
 			}

@@ -839,6 +839,7 @@ $(document).ready(function() {
 						</th>
 <%--						<th data-col-name="enviamentAssociat" data-visible="false"></th>--%>
 						<th data-col-name="errorDescripcio" data-visible="false"></th>
+						<th data-col-name="fiReintents" data-visible="false"></th>
 <%--						<th data-col-name="callbackEstat" data-visible="false"></th>--%>
 						<th data-col-name="createdBy.nom" data-orderable="false"><spring:message
 								code="notificacio.event.list.columna.usuari" /></th>
@@ -887,7 +888,7 @@ $(document).ready(function() {
 									<span class="fa fa-check text-success" title="<spring:message code="enviament.event.list.processat.ok"/>"></span>
 								{{/if}}
 								{{if fiReintents}}
-									{{notificacio.fiReintentsDesc}}
+									<span class="fa fa-warning text-warning" title="<spring:message code="enviament.event.list.fi.reintents"/>"></span>
 								{{/if}}
 							</script>
 						</th>

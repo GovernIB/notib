@@ -477,14 +477,30 @@ $(document).ready(function() {
 									<td width="30%"><strong><spring:message code="enviament.info.notifica.estat"/></strong></td>
 									<td><spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/></td>
 								</tr>
-								<tr>
-									<td><strong><spring:message code="enviament.info.notifica.estat.data"/></strong></td>
-									<td><fmt:formatDate value="${enviament.notificaEstatData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-								</tr>
-								<tr>
-									<td><strong><spring:message code="notificacio.list.filtre.camp.identificador"/></strong></td>
-									<td>${enviament.notificaIdentificador}</td>
-								</tr>
+								<c:if test="${not empty enviament.sirRecepcioData}">
+									<tr>
+										<td><strong><spring:message code="enviament.info.sir.recepcio.data"/></strong></td>
+										<td><fmt:formatDate value="${enviament.sirRecepcioData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+									</tr>
+								</c:if>
+								<c:if test="${not empty enviament.sirRegDestiData}">
+									<tr>
+										<td><strong><spring:message code="enviament.info.sir.registre.desti.data"/></strong></td>
+										<td><fmt:formatDate value="${enviament.sirRegDestiData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+									</tr>
+								</c:if>
+								<c:if test="${not empty enviament.notificaEstatData}">
+									<tr>
+										<td><strong><spring:message code="enviament.info.notifica.estat.data"/></strong></td>
+										<td><fmt:formatDate value="${enviament.notificaEstatData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+									</tr>
+								</c:if>
+								<c:if test="${not empty enviament.notificaIdentificador}">
+									<tr>
+										<td><strong><spring:message code="notificacio.list.filtre.camp.identificador"/></strong></td>
+										<td>${enviament.notificaIdentificador}</td>
+									</tr>
+								</c:if>
 								<c:if test="${not empty enviament.notificaDatatErrorDescripcio}">
 									<tr>
 										<td><strong><spring:message code="enviament.info.notifica.estat.descripcio"/></strong></td>
@@ -691,6 +707,9 @@ $(document).ready(function() {
 								<span class="fa fa-warning text-danger" title="<spring:message code="enviament.event.list.processat.error"/>"></span>
 							{{else}}
 								<span class="fa fa-check text-success" title="<spring:message code="enviament.event.list.processat.ok"/>"></span>
+							{{/if}}
+							{{if fiReintents}}
+									<span class="fa fa-warning text-warning" title="<spring:message code="enviament.event.list.fi.reintents"/>"></span>
 							{{/if}}
 						</script>
 					</th>

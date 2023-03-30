@@ -802,7 +802,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             notificacio.setGrup(grup);
         }
         if (!Strings.isNullOrEmpty(notificacio.getNotificaErrorDescripcio())) {
-            notificacio.setNotificaErrorDescripcio(htmlEscape(notificacio.getNotificaErrorDescripcio()));
+            notificacio.setNotificaErrorDescripcio(notificacio.getNotificaErrorDescripcio());
         }
         model.addAttribute("pipellaActiva", pipellaActiva);
         model.addAttribute("notificacio", notificacio);
