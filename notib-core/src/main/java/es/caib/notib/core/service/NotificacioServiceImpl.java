@@ -1311,15 +1311,20 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public String marcarComProcessada(Long notificacioId, String motiu, boolean isAdministrador) throws Exception {
 
+		log.info("PRC >> notificacioId=" + notificacioId + ", motiu=" + motiu + ", isAdmin=" + isAdministrador + ")");
 		Timer.Context timer = metricsHelper.iniciMetrica();
+		String resposta = null;
 		try {
-			logger.debug("Refrescant l'estat de la notificació a PROCESSAT (notificacioId=" + notificacioId + ")");
-			String resposta = null;
+//			logger.debug("Refrescant l'estat de la notificació a PROCESSAT (notificacioId=" + notificacioId + ")");
 			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			configHelper.setEntitatCodi(notificacioEntity.getEntitat().getCodi());
+			log.info("PRC >> Notificacio trobada");
 			if (!NotificacioEstatEnumDto.FINALITZADA.equals(notificacioEntity.getEstat())) {
+				log.info("PRC >> Notificacio no finalitzada");
 				throw new Exception("La notificació no es pot marcar com a processada, no esta en estat finalitzada.");
 			}
 			if (!isAdministrador && !permisosService.hasNotificacioPermis(notificacioId, notificacioEntity.getEntitat().getId(), notificacioEntity.getUsuariCodi(), PermisEnum.PROCESSAR)) {
+				log.info("PRC >> Sense permisos");
 				throw new Exception("La notificació no es pot marcar com a processada, l'usuari no té els permisos requerits.");
 			}
 
@@ -1327,21 +1332,26 @@ public class NotificacioServiceImpl implements NotificacioService {
 			notificacioEntity.updateEstatProcessatDate(new Date());
 			notificacioEntity.updateMotiu(motiu);
 			notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(notificacioEntity.getId()).estat(NotificacioEstatEnumDto.PROCESSADA).estatProcessatDate(new Date()).build());
+			log.info("PRC >> Notificacio table actualitzada");
 
 			UsuariEntity usuari = usuariHelper.getUsuariAutenticat();
-			if(usuari != null && notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
+			if (usuari != null && notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
 //				if(!usuari.isRebreEmailsNotificacioCreats() || usuari.getCodi() == notificacioEntity.getCreatedBy().getCodi()) {
-					resposta = emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacioEntity);
+				resposta = emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacioEntity);
 //				}
 			}
-			
+			log.info("PRC >> Email enviat si s'escau");
+
 			notificacioRepository.saveAndFlush(notificacioEntity);
 			notificacioHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.UPDATE, "NotificacioService.marcarComProcessada");
-
-			return resposta;
+			log.info("PRC >> auditat");
+		} catch (Exception ex) {
+			log.error("Excepció al marcarComProcessada (notificacioId=" + notificacioId + ", motiu=" + motiu + ", isAdmin=" + isAdministrador + ")", ex);
+			throw ex;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+		return resposta;
 	}
 
 	/**

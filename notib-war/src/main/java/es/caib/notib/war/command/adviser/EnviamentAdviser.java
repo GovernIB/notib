@@ -2,6 +2,7 @@ package es.caib.notib.war.command.adviser;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -49,7 +50,8 @@ public class EnviamentAdviser implements Serializable {
         es.caib.notib.core.api.dto.adviser.Acuse aPdf = null;
         if (acusePDF != null) {
             aPdf = new es.caib.notib.core.api.dto.adviser.Acuse();
-            aPdf.setContenido(acusePDF.getContenido());
+            if (acusePDF.getContenido() != null)
+                aPdf.setContenido(Base64.decodeBase64(acusePDF.getContenido()));
             aPdf.setHash(acusePDF.getHash());
             aPdf.setCsvResguardo(acusePDF.getCsvResguardo());
         }
@@ -57,7 +59,8 @@ public class EnviamentAdviser implements Serializable {
         es.caib.notib.core.api.dto.adviser.Acuse aXml = null;
         if (acuseXML != null) {
             aXml = new es.caib.notib.core.api.dto.adviser.Acuse();
-            aXml.setContenido(acuseXML.getContenido());
+            if (acuseXML.getContenido() != null)
+                aXml.setContenido(Base64.decodeBase64(acuseXML.getContenido()));
             aXml.setHash(acuseXML.getHash());
             aXml.setCsvResguardo(acuseXML.getCsvResguardo());
         }
