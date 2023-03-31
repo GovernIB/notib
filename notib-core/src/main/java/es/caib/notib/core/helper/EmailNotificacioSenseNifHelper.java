@@ -119,7 +119,6 @@ public class EmailNotificacioSenseNifHelper {
 				estatActualitzar = NotificacioEstatEnumDto.ENVIADA;
 			} else {
 				estatActualitzar = NotificacioEstatEnumDto.FINALITZADA;
-
 			}
 		} else {
 			if (notificacio.hasEnviamentsEnviats()) {

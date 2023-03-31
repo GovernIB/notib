@@ -206,12 +206,13 @@ public class NotificacioEventHelper {
     // Enviament de Callback
     // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void addCallbackEnviamentEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio) {
+    public void addCallbackEnviamentEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
         NotificacioEventEntity event = addEvent(EventInfo.builder()
                 .enviament(enviament)
                 .tipus(NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT)
                 .error(error)
                 .errorDescripcio(errorDescripcio)
+                .fiReintents(errorMaxReintents)
                 .build());
     }
 

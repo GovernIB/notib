@@ -105,7 +105,7 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	public void update(boolean error, String errorDescripcio, Boolean fiReintents) {
 		this.data = new Date();
 		this.error = error;
-		this.errorDescripcio = errorDescripcio;
+		this.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH/2);;
 		this.fiReintents = fiReintents;
 		this.intents++;
 	}

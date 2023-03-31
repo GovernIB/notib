@@ -905,7 +905,8 @@ $(document).ready(function() {
 			<c:set var="algunaAccioDisponible" value="${false}" />
 			<ul class="list-group">
 
-				<c:if test="${notificacio.eventsCallbackPendent}">
+				<c:if test="${notificacio.tipusUsuari == 'APLICACIO' && (notificacio.errorLastCallback || notificacio.eventsCallbackPendent)}">
+					<c:set var="algunaAccioDisponible" value="${true}" />
 					<li class="list-group-item">
 						<div class="row">
 							<div class="col-sm-6" style="height: 100%">
@@ -920,7 +921,6 @@ $(document).ready(function() {
 						</div>
 					</li>
 				</c:if>
-
 				<c:if test="${notificacio.estat == 'PENDENT'}">
 					<c:set var="algunaAccioDisponible" value="${true}" />
 					<li class="list-group-item">
@@ -991,24 +991,8 @@ $(document).ready(function() {
 					</li>
 				</c:if>
 
-				<c:if test="${notificacio.tipusUsuari == 'APLICACIO' && notificacio.errorLastCallback}">
-					<c:set var="algunaAccioDisponible" value="${true}" />
-					<li class="list-group-item">
-						<div class="row">
-							<div class="col-sm-6" style="height: 100%">
-								<strong><spring:message code="notificacio.info.accio.reintent" /></strong>
-							</div>
-							<div class="col-sm-6 text-right">
-								<a
-									href="<not:modalUrl value="/notificacio/${notificacio.id}/refrescarEstatClient"/>"
-									class="btn btn-default btn-sm"> <span class="fa fa-undo"></span>
-									<spring:message code="notificacio.info.accio.reintent.boto" />
-								</a>
-							</div>
-						</div>
-					</li>
-				</c:if>
 				<c:if test="${(notificacio.estat == 'ENVIADA_AMB_ERRORS' || notificacio.estat == 'FINALITZADA_AMB_ERRORS') && !notificacio.justificantCreat}">
+					<c:set var="algunaAccioDisponible" value="${true}" />
 					<li class="list-group-item">
 						<div class="row">
 							<div class="col-sm-6" style="height: 100%">

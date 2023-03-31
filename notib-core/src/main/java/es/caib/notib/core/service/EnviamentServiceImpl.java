@@ -10,12 +10,9 @@ import es.caib.notib.client.domini.consulta.GenericInfo;
 import es.caib.notib.client.domini.consulta.PersonaConsultaV2;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.client.domini.consulta.TransmissioV2;
-import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.ApiConsulta;
 import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
 import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
@@ -28,7 +25,6 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.RolEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notenviament.ColumnesDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
@@ -47,7 +43,6 @@ import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.PermisosService;
-import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.CallbackEntity;
 import es.caib.notib.core.entity.ColumnesEntity;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -58,7 +53,6 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.CallbackHelper;
-import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.EnviamentHelper;
@@ -1529,7 +1523,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					enviamentId, enviament.getNotificacio().getTipusUsuari().toString()));
 	}
 
-	@Transactional
+//	@Transactional
 	@Override
 	public List<Long> enviarCallback(Set<Long> notificacions) throws Exception {
 
@@ -1537,44 +1531,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 		List<Long> enviamentsAmbError = new ArrayList<>();
 		for (CallbackEntity callback : callbacks) {
 			logger.info(String.format("[callback] Enviar callback de l'enviment [id=%d]", callback.getEnviamentId()));
-			try {
-				NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(callback.getEnviamentId());
-				AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(callback.getUsuariCodi(), enviament.getNotificacio().getEntitat().getId());
-				callbackHelper.notificaCanvi(enviament, aplicacio.getCallbackUrl());
-				NotificacioEntity not = enviament.getNotificacio();
-				//Marcar com a processada si la notificació s'ha fet des de una aplicació
-				if (not.getTipusUsuari() == TipusUsuariEnumDto.APLICACIO && callbackHelper.isAllEnviamentsEstatFinal(not)) {
-					log.info("[Callback] Marcant notificació com processada per ser usuari aplicació...");
-					not.updateEstat(NotificacioEstatEnumDto.PROCESSADA);
-					not.updateEstatProcessatDate(new Date());
-					not.updateMotiu("Notificació processada de forma automàtica. Estat final: " + enviament.getNotificaEstat());
-//					notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(not.getId()).estat(NotificacioEstatEnumDto.PROCESSADA).estatProcessatDate(new Date()).build());
-				}
-
-				int intents = callback.getIntents() + 1;
-				callback.update(CallbackEstatEnumDto.NOTIFICAT, intents, null, callbackHelper.getIntentsPeriodeProperty());
-				not.updateLastCallbackError(false);
-				IntegracioInfo info = new IntegracioInfo(
-						IntegracioHelper.INTCODI_CLIENT,
-						String.format("Enviament d'avís de canvi d'estat (%s)", aplicacio.getCallbackUrl()),
-						IntegracioAccioTipusEnumDto.ENVIAMENT,
-						new AccioParam("Identificador del callback", String.valueOf(callback.getId())),
-						new AccioParam("Identificador de la notificacio", String.valueOf(not.getId())),
-						new AccioParam("Callback", aplicacio.getCallbackUrl())
-				);
-				if (enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null) {
-					info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
-				}
-				integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
-				integracioHelper.addAccioOk(info);
-				eventHelper.addCallbackEnviamentEvent(enviament, false, null);
-				notificacioTableHelper.actualitzarRegistre(not);
-				notificacioHelper.auditaNotificacio(not, AuditService.TipusOperacio.UPDATE, "EnviamentServiceImpl.enviarCallback");
-
-				log.info(String.format("[Callback] Enviament del callback [Id: %d] de la notificacio [Id: %d] exitós", callback.getId(), not.getId()));
-			} catch (Exception ex) {
+			boolean isError = callbackHelper.notifica(callback.getEnviamentId());
+			if (isError)
 				enviamentsAmbError.add(callback.getEnviamentId());
-			}
+			else
+				log.info(String.format("[Callback] Enviament del callback [Id: %d] de l''enviament [Id: %d] exitós", callback.getId(), callback.getEnviamentId()));
 		}
 		return enviamentsAmbError;
 	}

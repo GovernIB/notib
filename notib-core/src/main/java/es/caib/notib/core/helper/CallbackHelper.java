@@ -18,7 +18,6 @@ import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.CallbackRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.service.ws.NotificacioServiceWsImplV2;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -162,10 +161,8 @@ public class CallbackHelper {
 		log.info(String.format("[Callback] Intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]", intents, callback.getId(), notificacio.getId()));
 		boolean isError = false;
 		String errorDescripcio = null;
+		boolean errorMaxReintents = false;
 		try {
-
-			// Avisa al client que hi ha hagut una modificació a l'enviament
-//			NotificacioEnviamentEntity enviament = event.getEnviament();
 			long start = System.nanoTime();
 			notificaCanvi(env, aplicacio.getCallbackUrl());
 			long elapsedTime = System.nanoTime() - start;
@@ -183,18 +180,6 @@ public class CallbackHelper {
 				log.info("marca processada: "  + elapsedTime);
 			}
 
-			// TODO: Això no hauria d'estar abans de la crida a notificaCanvi?
-			if (!aplicacio.isActiva()) {
-				// No s'ha d'enviar. El callback està inactiu
-				log.info(String.format("[Callback] No s'ha enviat el callback [Id: %d], el callback està inactiu.", callback.getId()));
-				start = System.nanoTime();
-				callback.update(CallbackEstatEnumDto.PROCESSAT, intents, null, getIntentsPeriodeProperty());
-				notificacio.updateLastCallbackError(false);
-				elapsedTime = System.nanoTime() - start;
-				log.info("el callback esta inactiu: "  + elapsedTime);
-				return notificacio;
-			}
-
 			// Marca l'event com a notificat
 			start = System.nanoTime();
 			callback.update(CallbackEstatEnumDto.NOTIFICAT, intents, null, getIntentsPeriodeProperty());
@@ -210,6 +195,7 @@ public class CallbackHelper {
 			ex.printStackTrace();
 			// Marca un error a l'event
 			Integer maxIntents = this.getEventsIntentsMaxProperty();
+			errorMaxReintents = intents >= maxIntents;
 			CallbackEstatEnumDto estatNou = maxIntents == null || intents < maxIntents ? CallbackEstatEnumDto.PENDENT : CallbackEstatEnumDto.ERROR;
 			log.info(String.format("[Callback] Actualitzam la base de dades amb l'error de l'event [Id: %d]", callback.getId()));
 			errorDescripcio = "Error notificant canvis al client: " + ex.getMessage() + "\n" + ExceptionUtils.getStackTrace(ex);
@@ -220,7 +206,7 @@ public class CallbackHelper {
 			log.info("excepcio: "  + elapsedTime);
 		}
 		long start = System.nanoTime();
-		notificacioEventHelper.addCallbackEnviamentEvent(env, isError, errorDescripcio);
+		notificacioEventHelper.addCallbackEnviamentEvent(env, isError, errorDescripcio, errorMaxReintents);
 		log.info(String.format("[Callback] Fi intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]", intents, callback.getId(), notificacio.getId()));
 		long elapsedTime = System.nanoTime() - start;
 		log.info("addCallbackEvent: "  + elapsedTime);
@@ -257,6 +243,8 @@ public class CallbackHelper {
 			errorMessage = String.format("No s'ha trobat l'aplicació: codi usuari: %s, EntitatId: %d", usuari.getCodi(), enviament.getNotificacio().getEntitat().getId());
 		} else if (aplicacio.getCallbackUrl() == null) {
 			errorMessage = "La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada";
+		} else if (!aplicacio.isActiva()) {
+			errorMessage = "La aplicació " + aplicacio.getUsuariCodi() + " no està activa";
 		}
 		if (errorMessage != null) {
 			IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_CLIENT, "Enviament d'avís de canvi d'estat", IntegracioAccioTipusEnumDto.ENVIAMENT,
@@ -266,9 +254,15 @@ public class CallbackHelper {
 			);
 			String msg = "Error notificant el callback al client: " + errorMessage;
 			info.setAplicacio(aplicacio != null ? aplicacio.getUsuariCodi() : "Sense aplicació");
-			callback.update(CallbackEstatEnumDto.ERROR, getEventsIntentsMaxProperty(), msg, getIntentsPeriodeProperty());
+
+			int intents = callback.getIntents() + 1;
+			Integer maxIntents = this.getEventsIntentsMaxProperty();
+			CallbackEstatEnumDto estatNou = maxIntents == null || intents < maxIntents ? CallbackEstatEnumDto.PENDENT : CallbackEstatEnumDto.ERROR;
+			boolean errorMaxReintents = intents >= maxIntents;
+
+			callback.update(estatNou, intents, msg, getIntentsPeriodeProperty());
 			integracioHelper.addAccioError(info, msg);
-			notificacioEventHelper.addCallbackEnviamentEvent(enviament, true, msg);
+			notificacioEventHelper.addCallbackEnviamentEvent(enviament, true, msg, errorMaxReintents);
 			throw new Exception(errorMessage);
 		}
 		return aplicacio;
