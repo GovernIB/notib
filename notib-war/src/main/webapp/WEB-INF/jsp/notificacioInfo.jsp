@@ -348,6 +348,9 @@ $(document).ready(function() {
 								<c:if test="${notificacio.fiReintents}">
 									<span class="fa fa-warning text-warning" title="<c:out value='${notificacio.fiReintentsDesc}' escapeXml='true'/>"></span>
 								</c:if>
+								<c:if test="${notificacio.callbackFiReintents}">
+									<span class="fa fa-warning text-info" title="<c:out value='${notificacio.callbackFiReintentsDesc}' escapeXml='true'/>"></span>
+								</c:if>
 <%--								<c:if test="${notificacio.tipusUsuari == 'APLICACIO' and notificacio.errorLastEvent}">--%>
 <%--									<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>--%>
 <%--								</c:if>--%>
@@ -654,6 +657,9 @@ $(document).ready(function() {
 												</c:if>
 												<c:if test="${enviament.fiReintents}">
 													<span class="fa fa-warning text-warning" title="${enviament.fiReintentsDesc}"></span>
+												</c:if>
+												<c:if test="${enviament.callbackFiReintents}">
+													<span class="fa fa-warning text-warning" title="${enviament.callbackFiReintentsDesc}"></span>
 												</c:if>
 											</td>
 										</tr>

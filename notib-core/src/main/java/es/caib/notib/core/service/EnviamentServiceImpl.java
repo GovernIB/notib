@@ -1251,20 +1251,25 @@ public class EnviamentServiceImpl implements EnviamentService {
 		enviamentDto.setRegistreData(enviament.getRegistreData());
 		enviamentDto.setNotificaCertificacioArxiuNom(calcularNomArxiuCertificacio(enviament));
 		CallbackEntity callback = callbackRepository.findByEnviamentIdAndEstat(enviament.getId(), CallbackEstatEnumDto.PENDENT);
+		if (callback != null) {
+			enviamentDto.setCallbackPendent(callback != null);
+			SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			enviamentDto.setCallbackData(callback.getData() != null ? df.format(callback.getData()) : null);
+		}
+		NotificacioEventEntity event = enviament.getNotificacioErrorEvent();
+		if (event != null && event.getFiReintents()) {
+			enviamentDto.setFiReintents(event.getFiReintents());
+			String msg = messageHelper.getMessage("notificacio.event.fi.reintents");
+			String tipus = messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto." + event.getTipus());
+			enviamentDto.setFiReintentsDesc(msg + " -> " + tipus);
+		}
+
+		callback = callbackRepository.findByEnviamentIdAndEstat(enviament.getId(), CallbackEstatEnumDto.ERROR);
 		if (callback == null) {
 			return enviamentDto;
 		}
-		enviamentDto.setCallbackPendent(callback != null);
-		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		enviamentDto.setCallbackData(callback.getData() != null ? df.format(callback.getData()) : null);
-		NotificacioEventEntity event = enviament.getNotificacioErrorEvent();
-		if (event == null || !event.getFiReintents()) {
-			return enviamentDto;
-		}
-		enviamentDto.setFiReintents(event.getFiReintents());
-		String msg = messageHelper.getMessage("notificacio.event.fi.reintents");
-		String tipus = messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto." + event.getTipus());
-		enviamentDto.setFiReintentsDesc(msg + " -> " + tipus);
+		enviamentDto.setCallbackFiReintents(true);
+		enviamentDto.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
 		return enviamentDto;
 	}
 

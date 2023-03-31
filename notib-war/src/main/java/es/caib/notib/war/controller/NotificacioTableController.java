@@ -683,8 +683,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     ////
     // ACCIONS MASSIVES PER NOTIFICACIONS
     ////
-    @RequestMapping(value = "/reintentar/registre", method = RequestMethod.GET)
-    public String registreReintentar(HttpServletRequest request, Model model) {
+    @RequestMapping(value = "/reactivar/registre", method = RequestMethod.GET)
+    public String reactivarReintentar(HttpServletRequest request, Model model) {
 
         // identificadors de les notificacions, no dels enviaments.
         Set<Long> seleccio = getIdsSeleccionats(request);

@@ -5,6 +5,7 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.client.domini.EntregaPostal;
 import es.caib.notib.core.api.dto.AplicacioDto;
+import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
 import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
@@ -42,6 +43,7 @@ import es.caib.notib.core.api.dto.organisme.UnitatOrganitzativaDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.core.entity.AplicacioEntity;
+import es.caib.notib.core.entity.CallbackEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.EnviamentTableEntity;
 import es.caib.notib.core.entity.GrupEntity;
@@ -63,6 +65,7 @@ import es.caib.notib.core.entity.cie.PagadorCieEntity;
 import es.caib.notib.core.entity.cie.PagadorCieFormatFullaEntity;
 import es.caib.notib.core.entity.cie.PagadorCieFormatSobreEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
+import es.caib.notib.core.repository.CallbackRepository;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
@@ -99,6 +102,8 @@ public class ConversioTipusHelper {
 	private CacheHelper cacheHelper;
 	@Autowired
 	private MessageHelper messageHelper;
+	@Autowired
+	private CallbackRepository callbackRepository;
 
 
 	public ConversioTipusHelper() {
@@ -516,16 +521,19 @@ public class ConversioTipusHelper {
 	}
 	public class NotificacioEnviamentEntitytoInfoMapper extends CustomMapper<NotificacioEnviamentEntity, EnviamentInfoDto> {
 		@Override
-		public void mapAtoB(
-				NotificacioEnviamentEntity notificacioEnviamentEntity,
-				EnviamentInfoDto notificacioEnviamentDto,
-				MappingContext context) {
+		public void mapAtoB(NotificacioEnviamentEntity notificacioEnviamentEntity, EnviamentInfoDto notificacioEnviamentDto, MappingContext context) {
+
 			if (notificacioEnviamentEntity.isNotificaError()) {
 				NotificacioEventEntity event = notificacioEnviamentEntity.getNotificacioErrorEvent();
 				if (event != null) {
 					notificacioEnviamentDto.setNotificacioErrorData(event.getData());
 					notificacioEnviamentDto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
 				}
+			}
+			CallbackEntity count = callbackRepository.findByEnviamentIdAndEstat(notificacioEnviamentEntity.getId(), CallbackEstatEnumDto.ERROR);
+			if (count != null) {
+				notificacioEnviamentDto.setCallbackFiReintents(true);
+				notificacioEnviamentDto.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
 			}
 		}
 	}

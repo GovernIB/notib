@@ -211,8 +211,10 @@ public class NotificacioListHelper {
                 m += msg + " -> " + tipus + "\n";
             }
         }
+        int callbackFiReintents = eventRepository.countEventCallbackAmbFiReintentsByNotificacioId(item.getId());
+        String callbackMsg = callbackFiReintents > 0 ? "<span class=\"fa fa-warning text-info\" title=\"" + messageHelper.getMessage("callback.fi.reintents") + "\"></span>" : "";
         fiReintents = !Strings.isNullOrEmpty(m) ? "<span class=\"fa fa-warning text-warning\" title=\"" + m + "\"></span>" : "";
-        estat = "<span>" + estat + nomEstat + error + "  " + fiReintents + "</span>";
+        estat = "<span>" + estat + nomEstat + error + "  " + fiReintents + callbackMsg + "</span>";
         String data = "\n";
         if ((NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat())) && item.getEstatDate() != null) {
             SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");

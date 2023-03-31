@@ -59,4 +59,7 @@ public class EnviamentInfoDto extends NotificacioEnviamentDatatableDto{
 	private String notificaIdentificador;
 	private boolean notificaError;
 
+	private boolean callbackFiReintents;
+	private String callbackFiReintentsDesc;
+
 }

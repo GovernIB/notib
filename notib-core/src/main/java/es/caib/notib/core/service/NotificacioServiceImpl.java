@@ -506,6 +506,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 			String data = pendents != null && !pendents.isEmpty() && pendents.get(0).getData() != null ? df.format(pendents.get(0).getData()) : null;
 			dto.setDataCallbackPendent(data);
 
+			int callbackFiReintents = notificacioEventRepository.countEventCallbackAmbFiReintentsByNotificacioId(notificacio.getId());
+			if (callbackFiReintents > 0) {
+				dto.setCallbackFiReintents(true);
+				dto.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
+			}
 			// Emplena dades del procediment
 			ProcSerEntity procedimentEntity = notificacio.getProcediment();
 			if (procedimentEntity != null && procedimentEntity.isEntregaCieActivaAlgunNivell()) {
@@ -1694,18 +1699,22 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional
 	@Override
 	public void reactivarRegistre(Long notificacioId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Reactivant registre de la notificació (notificacioId=" + notificacioId + ")");
-			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
-					null,
-					notificacioId);
+			log.debug("Reactivant registre de la notificació (notificacioId=" + notificacioId + ")");
+			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			notificacio.refreshRegistre();
 			notificacioRepository.saveAndFlush(notificacio);
 			notificacioTableHelper.actualitzarRegistre(notificacio);
+			List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(notificacio, NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT, true);
+			for (NotificacioEventEntity event : events) {
+				event.setFiReintents(false);
+				event.setIntents(1); // Es posa 1 i no 0 ja que el mètode refresh registre també es posa a 1 perque no surti amb estat Enviada
+			}
 			notificacioHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "NotificacioServiceImpl.reactivarRegistre");
 		} catch (Exception e) {
-			logger.debug("Error reactivant consultes d'estat de la notificació (notificacioId=" + notificacioId + ")", e);
+			log.debug("Error reactivant consultes d'estat de la notificació (notificacioId=" + notificacioId + ")", e);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}		

@@ -606,7 +606,7 @@
                         <li><a id="eliminar" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
 
                         <c:if test="${isRolActualAdministradorEntitat}">
-                            <li><a style="cursor: pointer;" id="reintentarRegistre"><spring:message code="notificacio.list.accio.massiva.reintentar.registre"/></a></li>
+                            <li><a style="cursor: pointer;" id="reactivarRegistre"><spring:message code="notificacio.list.accio.massiva.reactivar.registre"/></a></li>
                             <li><a style="cursor: pointer;" id="reactivarConsulta"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica"/></a></li>
                             <li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir"/></a></li>
                             <li><a style="cursor: pointer;" id="reactivarCallback"><spring:message code="notificacio.list.accio.massiva.reactivar.callbacks"/></a></li>

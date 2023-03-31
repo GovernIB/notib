@@ -45,6 +45,10 @@ public class NotificacioEnviamentDatatableDto {
 	private boolean fiReintents;
 	private String fiReintentsDesc;
 
+	private boolean callbackFiReintents;
+	private String callbackFiReintentsDesc;
+
+
 	public boolean isNotificacioError() {
 		return notificacioErrorData != null;
 	}

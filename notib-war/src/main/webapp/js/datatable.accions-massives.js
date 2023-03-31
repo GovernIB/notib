@@ -241,13 +241,13 @@ function initEvents($table, url_prefix, eventMessages) {
             }
             location.href = url_prefix + "/eliminar";
         });
-        $("#reintentarRegistre").on("click", () => {
+        $("#reactivarRegistre").on("click", () => {
 
             let count = Number($(".seleccioCount").html());
             if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
                 return;
             }
-            location.href =  url_prefix + "/reintentar/registre";
+            location.href =  url_prefix + "/reactivar/registre";
             setTimeout(() => $table.DataTable().rows().deselect(), 100);
         });
 
