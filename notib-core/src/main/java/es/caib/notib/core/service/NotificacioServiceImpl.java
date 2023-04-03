@@ -15,6 +15,7 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
 import es.caib.notib.core.api.dto.cie.CieDataDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDataDto;
+import es.caib.notib.core.api.dto.notenviament.EnviamentInfoDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotTableUpdate;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
@@ -506,7 +507,20 @@ public class NotificacioServiceImpl implements NotificacioService {
 			String data = pendents != null && !pendents.isEmpty() && pendents.get(0).getData() != null ? df.format(pendents.get(0).getData()) : null;
 			dto.setDataCallbackPendent(data);
 
-			int callbackFiReintents = notificacioEventRepository.countEventCallbackAmbFiReintentsByNotificacioId(notificacio.getId());
+
+			int callbackFiReintents = 0;
+			CallbackEntity callback;
+			for (EnviamentInfoDto env : dto.getEnviaments()) {
+				callback = callbackRepository.findByEnviamentIdAndEstat(env.getId(), CallbackEstatEnumDto.ERROR);
+				if (callback == null) {
+					continue;
+				}
+				env.setCallbackFiReintents(true);
+				env.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
+				callbackFiReintents++;
+
+			}
+//			int callbackFiReintents = notificacioEventRepository.countEventCallbackAmbFiReintentsByNotificacioId(notificacio.getId());
 			if (callbackFiReintents > 0) {
 				dto.setCallbackFiReintents(true);
 				dto.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));

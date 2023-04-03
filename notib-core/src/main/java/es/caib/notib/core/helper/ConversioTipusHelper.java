@@ -505,18 +505,22 @@ public class ConversioTipusHelper {
 				return;
 			}
 			NotificacioEventEntity event = entity.getNotificacioErrorEvent();
-			if (event == null) {
+			if (event != null) {
+				dto.setNotificacioErrorData(event.getData());
+				dto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
+				if (event.getFiReintents()) {
+					String msg = messageHelper.getMessage("notificacio.event.fi.reintents");
+					String tipus = messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto." + event.getTipus());
+					dto.setFiReintents(event.getFiReintents());
+					dto.setFiReintentsDesc(msg + " -> " + tipus);
+				}
+			}
+			CallbackEntity callback = callbackRepository.findByEnviamentIdAndEstat(dto.getId(), CallbackEstatEnumDto.ERROR);
+			if (callback == null) {
 				return;
 			}
-			dto.setNotificacioErrorData(event.getData());
-			dto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
-			if (!event.getFiReintents()) {
-				return;
-			}
-			String msg = messageHelper.getMessage("notificacio.event.fi.reintents");
-			String tipus = messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto." + event.getTipus());
-			dto.setFiReintentsDesc(msg + " -> " + tipus);
-			dto.setFiReintents(event.getFiReintents());
+			dto.setCallbackFiReintents(true);
+			dto.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
 		}
 	}
 	public class NotificacioEnviamentEntitytoInfoMapper extends CustomMapper<NotificacioEnviamentEntity, EnviamentInfoDto> {
