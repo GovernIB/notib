@@ -659,7 +659,7 @@ $(document).ready(function() {
 													<span class="fa fa-warning text-warning" title="${enviament.fiReintentsDesc}"></span>
 												</c:if>
 												<c:if test="${enviament.callbackFiReintents}">
-													<span class="fa fa-warning text-warning" title="${enviament.callbackFiReintentsDesc}"></span>
+													<span class="fa fa-warning text-info" title="${enviament.callbackFiReintentsDesc}"></span>
 												</c:if>
 											</td>
 										</tr>
@@ -894,7 +894,7 @@ $(document).ready(function() {
 									<span class="fa fa-check text-success" title="<spring:message code="enviament.event.list.processat.ok"/>"></span>
 								{{/if}}
 								{{if fiReintents}}
-									<span class="fa fa-warning text-warning" title="<spring:message code="enviament.event.list.fi.reintents"/>"></span>
+									<span class="fa fa-warning text-info" title="<spring:message code="enviament.event.list.fi.reintents"/>"></span>
 								{{/if}}
 							</script>
 						</th>

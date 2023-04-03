@@ -279,6 +279,10 @@
                 if (data[i].fiReintents) {
                     contingutTbody += ' <span class="fa fa-warning text-warning" title="' + data[i].fiReintentsDesc + '"></span>';
                 }
+                console.log(data[i]);
+                if (data[i].callbackFiReintents) {
+                    contingutTbody += ' <span class="fa fa-warning text-info" title="' + data[i].callbackFiReintentsDesc + '"></span>';
+                }
                 contingutTbody += '</td>';
                 contingutTbody += '<td width="114px">';
                 if (data[i].notificaCertificacioData != null) {
