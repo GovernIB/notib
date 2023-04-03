@@ -57,6 +57,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.mail.MessagingException;
@@ -77,8 +78,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import static org.springframework.web.util.HtmlUtils.htmlEscape;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.
@@ -421,8 +420,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     }
 
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}", method = RequestMethod.GET)
-    public String enviamentInfo(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId, Model model) {
-        emplenarModelEnviamentInfo(notificacioId, enviamentId,"dades", model, request);
+    public String enviamentInfo(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId, @RequestParam(required = false) String pipellaActiva, Model model) {
+        emplenarModelEnviamentInfo(notificacioId, enviamentId, pipellaActiva != null ? pipellaActiva : "dades", model, request);
         return "enviamentInfo";
     }
 
@@ -448,8 +447,15 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         NotificacioEnviamenEstatDto enviamentEstat = notificacioService.enviamentRefrescarEstat(entitatActual.getId(), enviamentId);
         boolean totbe = !enviamentEstat.isNotificaError();
-        String msg = totbe ? "notificacio.controller.refrescar.estat.ok" : "notificacio.controller.refrescar.estat.error";
-        return Missatge.builder().ok(totbe).msg(getMessage(request, msg)).build();
+        String msg = null;
+        if (totbe) {
+            msg = getMessage(request, "notificacio.controller.refrescar.estat.ok");
+            MissatgesHelper.success(request, msg);
+        } else {
+            msg = getMessage(request, "notificacio.controller.refrescar.estat.error");
+            MissatgesHelper.error(request, msg);
+        }
+        return Missatge.builder().ok(totbe).msg(msg).build();
     }
 
     @ResponseBody
@@ -458,8 +464,16 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         boolean totbe = notificacioService.enviamentRefrescarEstatSir(enviamentId);
-        String msg = totbe ? "notificacio.controller.refrescar.estat.ok" : "notificacio.controller.refrescar.estat.error";
-        return Missatge.builder().ok(totbe).msg(getMessage(request, msg)).build();
+        String msg = null;
+        if (totbe) {
+            msg = getMessage(request, "notificacio.controller.refrescar.estat.ok");
+            MissatgesHelper.success(request, msg);
+        } else {
+            msg = getMessage(request, "notificacio.controller.refrescar.estat.error");
+            MissatgesHelper.error(request, msg);
+        }
+
+        return Missatge.builder().ok(totbe).msg(msg).build();
     }
 
     @RequestMapping(value = "/{notificacioId}/documentDescarregar/{documentId}", method = RequestMethod.GET)
