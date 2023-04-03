@@ -18,6 +18,7 @@ import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioTipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -1217,12 +1218,18 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Override
 	@Transactional
 	public void reactivaConsultes(Set<Long> enviaments) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			for (Long enviamentId: enviaments) {
 				NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
 				enviament.refreshNotificaConsulta();
+				List<NotificacioEventEntity> events = notificacioEventRepository.findByEnviamentAndTipusAndError(enviament, NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, true);
+				for (NotificacioEventEntity event : events) {
+					event.setFiReintents(false);
+				}
 			}
+
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

@@ -1411,22 +1411,21 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional
 	@Override
 	public boolean reactivarConsulta(Long notificacioId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Reactivant consultes d'estat de la notificació (notificacioId=" + notificacioId + ")");
-			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
-					null,
-					notificacioId);
+			log.debug("Reactivant consultes d'estat de la notificació (notificacioId=" + notificacioId + ")");
+			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 	//			List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacio);
 			for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 				enviament.refreshNotificaConsulta();
 			}
+
 			notificacioTableHelper.actualitzarRegistre(notificacio);
 			notificacioRepository.saveAndFlush(notificacio);
-			
 			return true;
 		} catch (Exception e) {
-			logger.debug("Error reactivant consultes d'estat de la notificació (notificacioId=" + notificacioId + ")", e);
+			log.debug("Error reactivant consultes d'estat de la notificació (notificacioId=" + notificacioId + ")", e);
 			return false;	
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1724,7 +1723,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(notificacio, NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT, true);
 			for (NotificacioEventEntity event : events) {
 				event.setFiReintents(false);
-				event.setIntents(1); // Es posa 1 i no 0 ja que el mètode refresh registre també es posa a 1 perque no surti amb estat Enviada
 			}
 			notificacioHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "NotificacioServiceImpl.reactivarRegistre");
 		} catch (Exception e) {
