@@ -88,6 +88,7 @@ $(document).ready(function() {
 				let div = '<div class="alert ' + classe +'"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +
 						'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
 				$("#contingut-missatges").append(div);
+				window.location.href = '<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}?pipellaActiva=estatNotifica"/>';
 			},
 			error: err => console.error(err)
 		});
@@ -104,6 +105,7 @@ $(document).ready(function() {
 				let div = '<div class="alert ' + classe +'"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +
 						'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
 				$("#contingut-missatges").append(div);
+				window.location.href = '<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}?pipellaActiva=estatNotifica"/>';
 			},
 			error: err => console.error(err)
 		});

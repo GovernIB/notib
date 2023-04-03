@@ -980,7 +980,7 @@ $(document).ready(function() {
 				</c:if>
 
 				<!-- Acció reprendre consulta d'estat SIR  - Estat == ENVIADA && notificaErrorTipus == ERROR_REINTENTS_SIR -->
-				<c:if test="${notificacio.estat == 'ENVIADA' && notificacio.notificaErrorTipus == 'ERROR_REINTENTS_SIR'}">
+				<c:if test="${notificacio.estat == 'ENVIAT_SIR' && notificacio.notificaErrorTipus == 'ERROR_REINTENTS_SIR'}">
 					<c:set var="algunaAccioDisponible" value="${true}" />
 					<li class="list-group-item">
 						<div class="row">
