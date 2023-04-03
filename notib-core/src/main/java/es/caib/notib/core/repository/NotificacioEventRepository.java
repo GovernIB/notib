@@ -147,6 +147,12 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			" and ne.tipus = es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT")
 	int countEventCallbackAmbFiReintentsByNotificacioId(@Param("notificacioId") Long notificacioId);
 
+	@Query( "from NotificacioEventEntity ne " +
+			" where ne.enviament.id = :enviamentId " +
+			" and ne.fiReintents = true " +
+			" and ne.tipus = es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT")
+	NotificacioEventEntity findEventCallbackAmbFiReintentsByEnviamentId(@Param("enviamentId") Long enviamentId);
+
 	@Modifying
 	@Query("update NotificacioEventEntity n set n.fiReintents = false, n.intents = 0" +
 			" where n.id = :notId and n.fiReintents = true and n.tipus != es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT ")

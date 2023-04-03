@@ -332,6 +332,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
 
 
     @RequestMapping(value = "/reactivar/sir", method = RequestMethod.GET)
+    @ResponseBody
     public String reactivarSir(
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
@@ -362,7 +363,8 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
                             "enviament.controller.reactivar.sir.KO"));
         }
 
-        return "redirect:" + request.getHeader("Referer");
+//        return "redirect:" + request.getHeader("Referer");
+        return "Done";
     }
 
     @RequestMapping(value = {"/actualitzarestat", "{notificacioId}/notificacio/actualitzarestat"}, method = RequestMethod.GET)
@@ -401,7 +403,8 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
 
 
         String[] path = request.getServletPath().split("/");
-        Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
+//        Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
+        Set<Long> seleccio = getIdsSeleccionats(request);
         if ((seleccio == null || seleccio.isEmpty()) && (path.length == 0 || Strings.isNullOrEmpty(path[2]))) {
             MissatgesHelper.error(request, getMessage(request,"enviament.controller.enviar.callback.buida"));
             return "redirect:" + request.getHeader("Referer");

@@ -1444,8 +1444,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 				enviament.refreshSirConsulta();
 				event = enviament.getNotificacioErrorEvent();
-				event.setIntents(0);
-				event.setFiReintents(false);
+				if (event != null) {
+//					event.setIntents(0);
+					event.setFiReintents(false);
+				}
 //				enviamentTableHelper.actualitzarRegistre(enviament);
 				enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificacioServiceImpl.reactivarSir");
 			}

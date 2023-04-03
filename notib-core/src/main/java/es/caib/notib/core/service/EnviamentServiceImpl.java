@@ -1236,6 +1236,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 			for (Long enviamentId: enviaments) {
 				NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
 				enviament.refreshSirConsulta();
+				NotificacioEventEntity event = enviament.getNotificacioErrorEvent();
+				if (event != null) {
+//					event.setIntents(0);
+					event.setFiReintents(false);
+				}
 				enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "EnviamentServiceImpl.reactivaSir");
 			}
 		} finally {
@@ -1522,6 +1527,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 		if (enviament.getNotificacio().isTipusUsuariAplicacio()) {
 			logger.info(String.format("[callback] Reactivam callback de l'enviment [id=%d]", enviamentId));
 			callbackHelper.reactivarCallback(enviament);
+			NotificacioEventEntity event = notificacioEventRepository.findEventCallbackAmbFiReintentsByEnviamentId(enviamentId);
+			event.setFiReintents(false);
 			return;
 		}
 		logger.info(String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",

@@ -501,9 +501,9 @@ public class ConversioTipusHelper {
 
 			dto.setEstatColor(entity.getNotificaEstat().getColor());
 			dto.setEstatIcona(entity.getNotificaEstat().getIcona());
-			if (!entity.isNotificaError()) {
-				return;
-			}
+//			if (!entity.isNotificaError()) {
+//				return;
+//			}
 			NotificacioEventEntity event = entity.getNotificacioErrorEvent();
 			if (event != null) {
 				dto.setNotificacioErrorData(event.getData());
