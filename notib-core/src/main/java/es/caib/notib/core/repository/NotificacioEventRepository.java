@@ -69,6 +69,7 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 	void deleteByNotificacio(NotificacioEntity notificacio);
 
 	List<NotificacioEventEntity> findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(NotificacioEntity notificacio, NotificacioEventTipusEnumDto tipus, boolean error);
+	List<NotificacioEventEntity> findByEnviamentAndTipusAndError(NotificacioEnviamentEntity enviament, NotificacioEventTipusEnumDto tipus, boolean error);
 
 	List<NotificacioEventEntity> findByNotificacioAndTipusAndErrorAndEnviamentIsNullOrderByDataDescIdDesc(NotificacioEntity notificacio, NotificacioEventTipusEnumDto tipus, boolean error);
 
@@ -98,6 +99,7 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 //			"and ne.notificacio.id = :notificacioId " +
 //			"order by ne.callbackData asc nulls first, data asc")
 //	List<Long> findEventsAmbCallbackPendentByNotificacioId(@Param("notificacioId") Long notificacioId);
+
 
 	@Query("select ne " + 
 			   "  from NotificacioEventEntity ne " +
