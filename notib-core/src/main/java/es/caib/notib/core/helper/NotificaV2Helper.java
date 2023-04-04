@@ -11,6 +11,7 @@ import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
+import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.PersonaEntity;
@@ -39,6 +40,7 @@ import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.CodigoDIR;
 import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datado;
 import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.InfoEnvioV2;
 import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
+import es.caib.notib.plugin.carpeta.MissatgeCarpetaParams;
 import lombok.NonNull;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
@@ -104,11 +106,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Autowired
 	private EnviamentHelper enviamentHelper;
 
-
 	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
-												new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
+				new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
 
 		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 		logger.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
@@ -153,7 +154,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						}
 					}
 				}
-
+				MissatgeCarpetaParams params = crearMissatgeCarpetaParams(enviament);
+				pluginHelper.enviarNotificacioMobil(params);
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				logger.info(" [TIMER-NOT] Notificació enviar (Preparar events)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
 				integracioHelper.addAccioOk(info);
@@ -183,6 +185,23 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return notificacio;
 	}
 
+	private MissatgeCarpetaParams crearMissatgeCarpetaParams(NotificacioEnviamentEntity enviament) {
+
+		NotificacioEntity not = enviament.getNotificacio();
+		EntitatEntity entitat = not.getEntitat();
+		return MissatgeCarpetaParams.builder()
+				.nifDestinatari().nomCompletDestinatari()
+				.codiDir3Entitat(entitat.getDir3Codi()).nomEntitat(entitat.getNom())
+				.codiOrganEmisor(not.getEmisorDir3Codi()).concepteNotificacio(not.getConcepte())
+				.descNotificacio(not.getDescripcio()).uuIdNotificacio(not.getReferencia())
+				.tipus(not.getEnviamentTipus()).vincleInteressat()
+				.codiSiaProcediment(not.getProcediment().getCodi())
+				.nomProcediment(not.getProcediment().getNom())
+				.caducitatNotificacio(not.getCaducitat())
+				.dataDisponibleCompareixenca()
+				.numExpedient(not.getNumExpedient())
+				.build();
+	}
 
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
@@ -208,7 +227,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private NotificacioEnviamentEntity enviamentRefrescarEstat(@NonNull NotificacioEnviamentEntity enviament, boolean raiseExceptions) throws Exception {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA,"Consultar estat d'un enviament", IntegracioAccioTipusEnumDto.ENVIAMENT,
-												new AccioParam("Identificador de l'enviament", String.valueOf(enviament.getId())));
+				new AccioParam("Identificador de l'enviament", String.valueOf(enviament.getId())));
 
 		logger.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		info.setCodiEntitat(enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null ?  enviament.getNotificacio().getEntitat().getCodi() : null);
@@ -266,7 +285,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			integracioHelper.addAccioError(info, "Error consultat l'estat de l'enviament", ex);
 			excepcio = ex;
 			logger.error("Error al consultar l'estat d'un enviament fet amb NotificaV2 (notificacioId=" + enviament.getNotificacio().getId() + ", "
-					+ "notificaIdentificador=" + enviament.getNotificaIdentificador() + ")",
+							+ "notificaIdentificador=" + enviament.getNotificaIdentificador() + ")",
 					ex);
 
 		}
@@ -440,14 +459,14 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		Integer retardPostal = null;
 		try {
 //			envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
-			if (!isCodiDir3Entitat() && notificacio.getOrganGestor() != null) { 
+			if (!isCodiDir3Entitat() && notificacio.getOrganGestor() != null) {
 				envios.setCodigoOrganismoEmisor(notificacio.getOrganGestor().getCodi());
 			} else if(!isCodiDir3Entitat() && notificacio.getProcediment() != null && notificacio.getProcediment().getOrganGestor() != null) {
 				envios.setCodigoOrganismoEmisor(notificacio.getProcediment().getOrganGestor().getCodi());
 			} else {
 				envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
 			}
-			
+
 			switch (notificacio.getEnviamentTipus()) {
 				case COMUNICACIO:
 					envios.setTipoEnvio(new BigInteger("1"));
@@ -457,11 +476,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					break;
 			}
 			if (notificacio.getEnviamentDataProgramada() != null) {
-	 			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 				Date today = new Date();
 				Date todayWithZeroTime = formatter.parse(formatter.format(today));
 				Date DataProgramadaWithZeroTime = formatter.parse(formatter.format(notificacio.getEnviamentDataProgramada()));
-				
+
 				if (DataProgramadaWithZeroTime.after(todayWithZeroTime)) {
 					envios.setFechaEnvioProgramado(toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
 				}
@@ -490,69 +509,69 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(baos.toByteArray()).toCharArray()));
 					//Hash a enviar
 					documento.setHash(hash256);
-				}			
+				}
 				envios.setDocumento(documento);
 			} else if (notificacio.getDocument() != null && notificacio.getDocument().getCsv() != null) {
 				byte[] contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
-	            documento.setContenido(contingut);       
-	            if(contingut != null) {
+				documento.setContenido(contingut);
+				if(contingut != null) {
 					String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
 					//Hash a enviar
 					documento.setHash(hash256);
 				}
-	            Opciones opcionesDocumento = new Opciones();
-	            Opcion opcionNormalizado = new Opcion();
-	            opcionNormalizado.setTipo("normalizado");
-	            opcionNormalizado.setValue(
-	                    notificacio.getDocument().getNormalitzat()  ? "si" : "no");
-	            opcionesDocumento.getOpcion().add(opcionNormalizado);
-	            Opcion opcionGenerarCsv = new Opcion();
-	            opcionGenerarCsv.setTipo("generarCsv");
-	            opcionGenerarCsv.setValue("no");
-	            opcionesDocumento.getOpcion().add(opcionGenerarCsv);
-	            documento.setOpcionesDocumento(opcionesDocumento);
-	            envios.setDocumento(documento);
-	        } else if (notificacio.getDocument() != null && notificacio.getDocument().getUrl() != null) {
-	        	String url = notificacio.getDocument().getUrl();
-	            documento.setEnlaceDocumento(url);           
-	            String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(url).toCharArray()));
+				Opciones opcionesDocumento = new Opciones();
+				Opcion opcionNormalizado = new Opcion();
+				opcionNormalizado.setTipo("normalizado");
+				opcionNormalizado.setValue(
+						notificacio.getDocument().getNormalitzat()  ? "si" : "no");
+				opcionesDocumento.getOpcion().add(opcionNormalizado);
+				Opcion opcionGenerarCsv = new Opcion();
+				opcionGenerarCsv.setTipo("generarCsv");
+				opcionGenerarCsv.setValue("no");
+				opcionesDocumento.getOpcion().add(opcionGenerarCsv);
+				documento.setOpcionesDocumento(opcionesDocumento);
+				envios.setDocumento(documento);
+			} else if (notificacio.getDocument() != null && notificacio.getDocument().getUrl() != null) {
+				String url = notificacio.getDocument().getUrl();
+				documento.setEnlaceDocumento(url);
+				String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(url).toCharArray()));
 				//Hash a enviar
 				documento.setHash(hash256);
-	            Opciones opcionesDocumento = new Opciones();
-	            Opcion opcionNormalizado = new Opcion();
-	            opcionNormalizado.setTipo("normalizado");
-	            opcionNormalizado.setValue(notificacio.getDocument().getNormalitzat()  ? "si" : "no");
-	            opcionesDocumento.getOpcion().add(opcionNormalizado);
-	            Opcion opcionGenerarCsv = new Opcion();
-	            opcionGenerarCsv.setTipo("generarCsv");
-	            opcionGenerarCsv.setValue("no");
-	            opcionesDocumento.getOpcion().add(opcionGenerarCsv);
-	            documento.setOpcionesDocumento(opcionesDocumento);
-	            envios.setDocumento(documento);
-	        } else if (notificacio.getDocument() != null && notificacio.getDocument().getUuid() != null) {
-	            byte[] contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
-	        	documento.setContenido(contingut);
-	            if(contingut != null) {
+				Opciones opcionesDocumento = new Opciones();
+				Opcion opcionNormalizado = new Opcion();
+				opcionNormalizado.setTipo("normalizado");
+				opcionNormalizado.setValue(notificacio.getDocument().getNormalitzat()  ? "si" : "no");
+				opcionesDocumento.getOpcion().add(opcionNormalizado);
+				Opcion opcionGenerarCsv = new Opcion();
+				opcionGenerarCsv.setTipo("generarCsv");
+				opcionGenerarCsv.setValue("no");
+				opcionesDocumento.getOpcion().add(opcionGenerarCsv);
+				documento.setOpcionesDocumento(opcionesDocumento);
+				envios.setDocumento(documento);
+			} else if (notificacio.getDocument() != null && notificacio.getDocument().getUuid() != null) {
+				byte[] contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
+				documento.setContenido(contingut);
+				if(contingut != null) {
 					String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
 					//Hash a enviar
 					documento.setHash(hash256);
 				}
-	            Opciones opcionesDocumento = new Opciones();
-	            Opcion opcionNormalizado = new Opcion();
-	            opcionNormalizado.setTipo("normalizado");
-	            opcionNormalizado.setValue(notificacio.getDocument().getNormalitzat()  ? "si" : "no");
-	            opcionesDocumento.getOpcion().add(opcionNormalizado);
-	            Opcion opcionGenerarCsv = new Opcion();
-	            opcionGenerarCsv.setTipo("generarCsv");
-	            opcionGenerarCsv.setValue("no");
-	            opcionesDocumento.getOpcion().add(opcionGenerarCsv);
-	            documento.setOpcionesDocumento(opcionesDocumento);
-	            envios.setDocumento(documento);
-	        } else if(notificacio.getDocument() != null) {
+				Opciones opcionesDocumento = new Opciones();
+				Opcion opcionNormalizado = new Opcion();
+				opcionNormalizado.setTipo("normalizado");
+				opcionNormalizado.setValue(notificacio.getDocument().getNormalitzat()  ? "si" : "no");
+				opcionesDocumento.getOpcion().add(opcionNormalizado);
+				Opcion opcionGenerarCsv = new Opcion();
+				opcionGenerarCsv.setTipo("generarCsv");
+				opcionGenerarCsv.setValue("no");
+				opcionesDocumento.getOpcion().add(opcionGenerarCsv);
+				documento.setOpcionesDocumento(opcionesDocumento);
+				envios.setDocumento(documento);
+			} else if(notificacio.getDocument() != null) {
 				documento.setHash(notificacio.getDocument().getHash());
 				if(notificacio.getDocument().getContingutBase64() != null) {
-		        	byte[] contingut = notificacio.getDocument().getContingutBase64().getBytes();
-					documento.setContenido(contingut);	
+					byte[] contingut = notificacio.getDocument().getContingutBase64().getBytes();
+					documento.setContenido(contingut);
 					String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
 					//Hash a enviar
 					documento.setHash(hash256);
@@ -579,7 +598,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				ProcSerEntity procSer = procSerRepository.findOne(notificacio.getProcediment().getId());
 				retardPostal = procSer != null ? procSer.getRetard() : null;
 			}
-			
+
 			if (retardPostal != null) {
 				Opcion opcionRetardo = new Opcion();
 				opcionRetardo.setTipo("retardo");
@@ -680,18 +699,18 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				EntregaPostalEntity entregaPostalEntity = enviament.getEntregaPostal();
 				if (entregaPostalEntity.getDomiciliConcretTipus() != null) {
 					switch (entregaPostalEntity.getDomiciliConcretTipus())  {
-					case NACIONAL:
-						entregaPostal.setTipoDomicilio(new BigInteger("1"));
-						break;
-					case ESTRANGER:
-						entregaPostal.setTipoDomicilio(new BigInteger("2"));
-						break;
-					case APARTAT_CORREUS:
-						entregaPostal.setTipoDomicilio(new BigInteger("3"));
-						break;
-					case SENSE_NORMALITZAR:
-						entregaPostal.setTipoDomicilio(new BigInteger("4"));
-						break;
+						case NACIONAL:
+							entregaPostal.setTipoDomicilio(new BigInteger("1"));
+							break;
+						case ESTRANGER:
+							entregaPostal.setTipoDomicilio(new BigInteger("2"));
+							break;
+						case APARTAT_CORREUS:
+							entregaPostal.setTipoDomicilio(new BigInteger("3"));
+							break;
+						case SENSE_NORMALITZAR:
+							entregaPostal.setTipoDomicilio(new BigInteger("4"));
+							break;
 					}
 				}
 				if (!NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR.equals(entregaPostalEntity.getDomiciliConcretTipus())) {
@@ -764,9 +783,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	private static class ApiKeySOAPHandlerV2 implements SOAPHandler<SOAPMessageContext> {
 		private final String apiKey;
+
 		public ApiKeySOAPHandlerV2(String apiKey) {
 			this.apiKey = apiKey;
 		}
+
 		@Override
 		public boolean handleMessage(SOAPMessageContext context) {
 
@@ -801,15 +822,18 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			} catch (SOAPException ex) {
 				logger.error("No s'ha pogut afegir l'API key a la petició SOAP per Notifica", ex);
 			}
-	        return true;
-	    }
+			return true;
+		}
+
 		@Override
 		public boolean handleFault(SOAPMessageContext context) {
 			return false;
 		}
+
 		@Override
 		public void close(MessageContext context) {
 		}
+
 		@Override
 		public Set<QName> getHeaders() {
 			return new TreeSet<QName>();
@@ -819,6 +843,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private boolean isCodiDir3Entitat() {
 		return configHelper.getAsBoolean("es.caib.notib.plugin.codi.dir3.entitat");
 	}
+
 	private static final Logger logger = LoggerFactory.getLogger(NotificaV2Helper.class);
 
 }

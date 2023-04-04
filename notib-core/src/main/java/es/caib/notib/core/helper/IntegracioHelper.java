@@ -65,6 +65,7 @@ public class IntegracioHelper {
 //	public static final String INTCODI_CONVERT = "CONVERT";
 	public static final String INTCODI_FIRMASERV = "FIRMASERV";
 	public static final String INTCODI_VALIDASIG = "VALIDASIG";
+	public static final String CARPETA = "CARPETA";
 
 	public List<IntegracioDto> findAll() {
 		List<IntegracioDto> integracions = new ArrayList<>();

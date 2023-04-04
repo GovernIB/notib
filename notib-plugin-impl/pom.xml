@@ -131,6 +131,14 @@
 		</dependency>
 
 		<!-- Fi signatura en el servidor amb PortaFib -->
+
+		<!-- Carpeta - API Rest - Interna- Client -->
+		<dependency>
+			<artifactId>carpeta-api-interna-client</artifactId>
+			<groupId>es.caib.carpeta</groupId>
+			<version>1.1</version>
+		</dependency>
+		<!-- Fi Carpeta - API Rest - Interna- Client -->
 	</dependencies>
 	<build>
 		<plugins>
