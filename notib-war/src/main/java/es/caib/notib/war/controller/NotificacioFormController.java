@@ -37,6 +37,7 @@ import es.caib.notib.war.command.PersonaCommand;
 import es.caib.notib.war.helper.CaducitatHelper;
 import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.EnumHelper;
+import es.caib.notib.war.helper.FileHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
 import es.caib.notib.war.helper.RolHelper;
@@ -213,7 +214,7 @@ public class NotificacioFormController extends BaseUserController {
     @RequestMapping(value = "/organ/{organId}/serveis", method = RequestMethod.GET)
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getServeisOrgan(HttpServletRequest request, @PathVariable String organId) {
-    	TipusEnviamentEnumDto enviamentTipus = (TipusEnviamentEnumDto) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
+        TipusEnviamentEnumDto enviamentTipus = (TipusEnviamentEnumDto) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         return serveiService.getServeisOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId,
                                                             RolEnumDto.valueOf(RolHelper.getRolActual(request)), enviamentTipus);
@@ -296,7 +297,7 @@ public class NotificacioFormController extends BaseUserController {
         notificacioCommand.setUsuariCodi(getCodiUsuariActual());
         if (bindingResult.hasErrors()) {
             String msg = TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacioCommand.getEnviamentTipus())
-					? "notificacio.form.errors.validacio.notificacio" : "notificacio.form.errors.validacio.comunicacio";
+                    ? "notificacio.form.errors.validacio.notificacio" : "notificacio.form.errors.validacio.comunicacio";
             MissatgesHelper.error(request, getMessage(request, msg));
             relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
             return "notificacioForm";
@@ -416,28 +417,32 @@ public class NotificacioFormController extends BaseUserController {
         String nom = fitxer.getOriginalFilename();
         byte[] content = fitxer.getBytes();
         String contentType = fitxer.getContentType();
-//        String contingutBase64 = Base64.encodeBase64String(content);
+        String contingutBase64 = Base64.encodeBase64String(content);
 //        String arxiuGestdocId = gestioDocumentalService.guardarArxiuTemporal(contingutBase64);
+
+        FirmaValidDto firma = FirmaValidDto.builder().nom(nom).mida(fitxer.getSize()).mediaType(fitxer.getContentType()).build();
+        if (!FileHelper.isPdf(contingutBase64)) {
+            return firma;
+        }
         SignatureInfoDto signatureInfo = notificacioService.checkIfSignedAttached(content, nom, contentType);
-        return FirmaValidDto.builder()
-//                .arxiuGestdocId(arxiuGestdocId)
-                .nom(nom)
-                .mida(fitxer.getSize())
-                .mediaType(fitxer.getContentType())
-                .signed(signatureInfo.isSigned())
-                .error(signatureInfo.isError())
-                .errorMsg(signatureInfo.getErrorMsg())
-                .build();
+        firma.setSigned(signatureInfo.isSigned());
+        firma.setError(signatureInfo.isError());
+        firma.setErrorMsg(signatureInfo.getErrorMsg());
+        return firma;
     }
 
     private void validaFirma(String nom, String mediaType, BindingResult bindingResult, int position, byte[] content) {
-        if (isValidaFirmaWebEnabled()) {
-            SignatureInfoDto signatureInfoDto = notificacioService.checkIfSignedAttached(content, nom, mediaType);
-            if (signatureInfoDto.isError()) {
-                String[] codes = bindingResult.resolveMessageCodes("notificacio.form.valid.document.firma", "arxiu[" + position + "]");
-                bindingResult.addError(new FieldError(bindingResult.getObjectName(), "arxiu[" + position + "]", "", true, codes, null, "La firma del document no és vàlida"));
-            }
+
+        String contingutBase64 = Base64.encodeBase64String(content);
+        if (!FileHelper.isPdf(contingutBase64) || !isValidaFirmaWebEnabled()) {
+            return;
         }
+        SignatureInfoDto signatureInfoDto = notificacioService.checkIfSignedAttached(content, nom, mediaType);
+        if (!signatureInfoDto.isError()) {
+            return;
+        }
+        String[] codes = bindingResult.resolveMessageCodes("notificacio.form.valid.document.firma", "arxiu[" + position + "]");
+        bindingResult.addError(new FieldError(bindingResult.getObjectName(), "arxiu[" + position + "]", "", true, codes, null, "La firma del document no és vàlida"));
     }
 
     @RequestMapping(value = "/{notificacioId}/edit", method = RequestMethod.GET)
@@ -470,28 +475,28 @@ public class NotificacioFormController extends BaseUserController {
         return "notificacioForm";
     }
 
-	@RequestMapping(value = "/nivellsAdministracions", method = RequestMethod.GET)
-	@ResponseBody
-	private List<CodiValorDto> getNivellsAdministracions(
-		HttpServletRequest request, Model model) {
-		return notificacioService.llistarNivellsAdministracions();
-	}
+    @RequestMapping(value = "/nivellsAdministracions", method = RequestMethod.GET)
+    @ResponseBody
+    private List<CodiValorDto> getNivellsAdministracions(
+            HttpServletRequest request, Model model) {
+        return notificacioService.llistarNivellsAdministracions();
+    }
 
 
-	@RequestMapping(value = "/comunitatsAutonomes", method = RequestMethod.GET)
-	@ResponseBody
-	private List<CodiValorDto> getComunitatsAutonomess(
-		HttpServletRequest request, Model model) {
-		return notificacioService.llistarComunitatsAutonomes();
-	}
+    @RequestMapping(value = "/comunitatsAutonomes", method = RequestMethod.GET)
+    @ResponseBody
+    private List<CodiValorDto> getComunitatsAutonomess(
+            HttpServletRequest request, Model model) {
+        return notificacioService.llistarComunitatsAutonomes();
+    }
 
-	@RequestMapping(value = "/provincies/{codiCA}", method = RequestMethod.GET)
-	@ResponseBody
-	private List<ProvinciesDto> getProvinciesPerCA(
-		HttpServletRequest request, Model model,
-		@PathVariable String codiCA) {
-		return notificacioService.llistarProvincies(codiCA);
-	}
+    @RequestMapping(value = "/provincies/{codiCA}", method = RequestMethod.GET)
+    @ResponseBody
+    private List<ProvinciesDto> getProvinciesPerCA(
+            HttpServletRequest request, Model model,
+            @PathVariable String codiCA) {
+        return notificacioService.llistarProvincies(codiCA);
+    }
 
     @RequestMapping(value = "/procediment/{procedimentId}/dades", method = RequestMethod.GET)
     @ResponseBody
@@ -555,14 +560,14 @@ public class NotificacioFormController extends BaseUserController {
     @ResponseBody
     public RespostaConsultaArxiuDto consultaDocumentIMetadadesCsv(HttpServletRequest request, @RequestBody String csv) {
 
-    	DocumentDto doc = null;
-    	Boolean validacioIdCsv = notificacioService.validarIdCsv(csv);
+        DocumentDto doc = null;
+        Boolean validacioIdCsv = notificacioService.validarIdCsv(csv);
 //        Boolean formatCsvValid = notificacioService.validarFormatCsv(csv); //TODO AQUEST VALIDACIO NOSE SI FUNCIONA
-    	if (validacioIdCsv) {
+        if (validacioIdCsv) {
             doc = notificacioService.consultaDocumentIMetadades(csv, false);
         }
 //    	return prepararResposta(validacioIdCsv && formatCsvValid, doc, request);
-    	return prepararResposta(validacioIdCsv, doc, request);
+        return prepararResposta(validacioIdCsv, doc, request);
     }
 
     @RequestMapping(value = "/consultaDocumentIMetadadesUuid/consulta", method = RequestMethod.POST, headers="Content-Type=application/json" )
@@ -702,7 +707,7 @@ public class NotificacioFormController extends BaseUserController {
         model.addAttribute("enviosGuardats", notificacioCommand.getEnviaments());
         model.addAttribute("tipusDocument", notificacioCommand.getTipusDocument());
         if(procedimentActual != null) {
-        	model.addAttribute("procedimentId", procedimentActual.getId());
+            model.addAttribute("procedimentId", procedimentActual.getId());
         }
         model.addAttribute("errors", bindingResult.getAllErrors());
         for (int i = 0; i < 5; i++) {
