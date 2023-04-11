@@ -176,8 +176,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         .codigoProcedimiento(linea[16])
                         .fechaEnvioProgramado(linea[17]);
 
-            if (linea.length >=23) { // si hi ha les metadades
-                builder.origen(linea[18]).estadoElaboracion(linea[19]).tipoDocumental(linea[20]).pdfFirmado(linea[21]).errores(linea[22]);
+            if (linea.length >=24) { // si hi ha les metadades
+                builder.origen(linea[18]).estadoElaboracion(linea[19]).tipoDocumental(linea[20]).pdfFirmado(linea[21]).errores(linea[23]);
             } else {
                 builder.errores(linea.length == 21 ? linea[20] : linea[18]);
             }
@@ -603,7 +603,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     }
 
     public int numberRequiredColumns() {
-        return registreNotificaHelper.isSendDocumentsActive() ? 22 : 18;
+        return registreNotificaHelper.isSendDocumentsActive() ? 23 : 19;
     }
 
     private void crearNotificacio(EntitatEntity entitat, NotificacioDatabaseDto notificacio, NotificacioMassivaEntity notMassiva, Map<String, Long> documentsProcessatsMassiu) throws RegistreNotificaException {
@@ -726,9 +726,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.concepte.missatge");
             notificacio.setConcepte(linia[1]);
 
-            // Descripció
-            notificacio.setDescripcio(null);
-
             // Tipus enviament
             columna = messageHelper.getMessage("error.csv.to.notificacio.tipus.enviament.columna");
             missatge = messageHelper.getMessage("error.csv.to.notificacio.tipus.enviament.missatge");
@@ -778,6 +775,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.pdf.firmat.missatge");
                 setModeFirma(notificacio, linia[21]);
             }
+
+            // Descripció
+            notificacio.setDescripcio(linia.length > 19 ? linia[22] : linia[18]);
 
             // Enviaments ////////////////
 
