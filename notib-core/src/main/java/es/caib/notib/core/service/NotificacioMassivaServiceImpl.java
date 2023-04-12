@@ -159,6 +159,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     NotificacioMassivaInfoDto.NotificacioInfo.builder()
                         .codiDir3UnidadRemisora(linea[0])
                         .concepto(linea[1])
+                        .concepto(linea[1])
                         .enviamentTipus(linea[2])
                         .referenciaEmisor(linea[3])
                         .nombreFichero(linea[4])
@@ -175,6 +176,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         .retardoPostal(linea[15])
                         .codigoProcedimiento(linea[16])
                         .fechaEnvioProgramado(linea[17]);
+
+            builder.descripcio(linea.length > 19 ? linea[22] : linea[18]);
 
             if (linea.length >=24) { // si hi ha les metadades
                 builder.origen(linea[18]).estadoElaboracion(linea[19]).tipoDocumental(linea[20]).pdfFirmado(linea[21]).errores(linea[23]);

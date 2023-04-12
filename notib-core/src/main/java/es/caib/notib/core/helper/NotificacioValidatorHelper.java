@@ -1,5 +1,6 @@
 package es.caib.notib.core.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
@@ -59,8 +60,8 @@ public class NotificacioValidatorHelper {
 		if (entitat == null) {
 			errors.add(
 					messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.a")
-					+ emisorDir3Codi +
-					messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.b"));
+							+ emisorDir3Codi +
+							messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.b"));
 		} else if (!entitat.isActiva()) {
 			errors.add(messageHelper.getMessage("error.validacio.entitat.desactivada.per.enviament.notificacions"));
 		}
@@ -77,6 +78,20 @@ public class NotificacioValidatorHelper {
 				errors.add(messageHelper.getMessage("error.validacio.concepte.format.invalid.a") +
 						StringUtils.join(caractersNoValids, ',')
 						+ messageHelper.getMessage("error.validacio.concepte.format.invalid.b"));
+			}
+		}
+
+		// Descripció
+		String desc = notificacio.getDescripcio();
+		if (!Strings.isNullOrEmpty(desc)) {
+			if (desc.length() > 1000) {
+				errors.add(messageHelper.getMessage("error.validacio.descripcio.notificacio.longitud.max"));
+			}
+			List<Character> caractersNoValids = validFormat(notificacio.getConcepte());
+			if (!caractersNoValids.isEmpty()) {
+				errors.add(messageHelper.getMessage("error.validacio.descripcio.invalid.a") +
+						StringUtils.join(caractersNoValids, ',')
+						+ messageHelper.getMessage("error.validacio.descripcio.invalid.b"));
 			}
 		}
 
