@@ -177,14 +177,15 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         .codigoProcedimiento(linea[16])
                         .fechaEnvioProgramado(linea[17]);
 
-            builder.descripcio(linea.length > 19 ? linea[22] : linea[18]);
+            builder.descripcio(linea.length > 20 ? linea[22] : linea[17]);
 
             if (linea.length >=24) { // si hi ha les metadades
-                builder.origen(linea[18]).estadoElaboracion(linea[19]).tipoDocumental(linea[20]).pdfFirmado(linea[21]).errores(linea[23]);
+                builder.origen(linea[18]).estadoElaboracion(linea[19]).tipoDocumental(linea[20]).pdfFirmado(linea[21]);
+//            .errores(linea[23]);
             } else {
-                builder.errores(linea.length == 21 ? linea[20] : linea[18]);
+//                builder.errores(linea.length == 21 ? linea[20] : linea[19]);
             }
-
+            builder.errores(linea[linea.length - 1]);
             if (messageHelper.getMessage("notificacio.massiva.cancelada").equals(linea[linea.length - 1])) {
                 builder.cancelada(true);
             }
