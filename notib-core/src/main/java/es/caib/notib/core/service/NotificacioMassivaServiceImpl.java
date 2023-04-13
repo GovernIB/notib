@@ -188,6 +188,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     NotificacioMassivaInfoDto.NotificacioInfo.builder()
                         .codiDir3UnidadRemisora(linea[0])
                         .concepto(linea[1])
+                        .concepto(linea[1])
                         .enviamentTipus(linea[2])
                         .referenciaEmisor(linea[3])
                         .nombreFichero(linea[4])
@@ -205,12 +206,15 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         .codigoProcedimiento(linea[16])
                         .fechaEnvioProgramado(linea[17]);
 
-            if (linea.length >=23) { // si hi ha les metadades
-                builder.origen(linea[18]).estadoElaboracion(linea[19]).tipoDocumental(linea[20]).pdfFirmado(linea[21]).errores(linea[22]);
-            } else {
-                builder.errores(linea.length == 21 ? linea[20] : linea[18]);
-            }
+            builder.descripcio(linea.length > 20 ? linea[22] : linea[18]);
 
+            if (linea.length >=24) { // si hi ha les metadades
+                builder.origen(linea[18]).estadoElaboracion(linea[19]).tipoDocumental(linea[20]).pdfFirmado(linea[21]);
+//            .errores(linea[23]);
+            } else {
+//                builder.errores(linea.length == 21 ? linea[20] : linea[19]);
+            }
+            builder.errores(linea[linea.length - 1]);
             if (messageHelper.getMessage("notificacio.massiva.cancelada").equals(linea[linea.length - 1])) {
                 builder.cancelada(true);
             }
@@ -632,7 +636,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     }
 
     public int numberRequiredColumns() {
-        return registreNotificaHelper.isSendDocumentsActive() ? 22 : 18;
+        return registreNotificaHelper.isSendDocumentsActive() ? 23 : 19;
     }
 
     private void crearNotificacio(EntitatEntity entitat, NotificacioDatabaseDto notificacio, NotificacioMassivaEntity notMassiva, Map<String, Long> documentsProcessatsMassiu) throws RegistreNotificaException {
@@ -756,9 +760,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.concepte.missatge");
             notificacio.setConcepte(linia[1]);
 
-            // Descripció
-            notificacio.setDescripcio(null);
-
             // Tipus enviament
             columna = messageHelper.getMessage("error.csv.to.notificacio.tipus.enviament.columna");
             missatge = messageHelper.getMessage("error.csv.to.notificacio.tipus.enviament.missatge");
@@ -808,6 +809,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.pdf.firmat.missatge");
                 setModeFirma(notificacio, linia[21]);
             }
+
+            // Descripció
+            notificacio.setDescripcio(linia.length > 19 ? linia[22] : linia[18]);
 
             // Enviaments ////////////////
 

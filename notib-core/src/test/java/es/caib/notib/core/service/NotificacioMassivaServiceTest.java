@@ -77,8 +77,8 @@ public class NotificacioMassivaServiceTest {
 
 	String entitatCodiDir3 = "A000000";
 
-	private static String csvNom = "csv_test.csv";
-	private static String zipNom = "zip_test.zip";
+	private static String csvNom = "test1.csv";
+	private static String zipNom = "test1.zip";
 	private static String email = "test@limit.com";
 	private static String codiUsuari = "CODI_USER";
 
@@ -188,8 +188,8 @@ public class NotificacioMassivaServiceTest {
 		String usuariCodi = "CODI_USER";
 		NotificacioMassivaTests.TestMassiusFiles test1Data = NotificacioMassivaTests.getTest1Files();
 		NotificacioMassivaDto notificacioMassiu = NotificacioMassivaDto.builder()
-				.ficheroCsvNom("csv_test.csv")
-				.ficheroZipNom("zip_test.zip")
+				.ficheroCsvNom("test1.csv")
+				.ficheroZipNom("test1.zip")
 				.ficheroCsvBytes(test1Data.getCsvContent())
 				.ficheroZipBytes(test1Data.getZipContent())
 				.caducitat(new Date())
