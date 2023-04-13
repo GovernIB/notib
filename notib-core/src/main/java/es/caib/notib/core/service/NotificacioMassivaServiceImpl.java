@@ -177,7 +177,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         .codigoProcedimiento(linea[16])
                         .fechaEnvioProgramado(linea[17]);
 
-            builder.descripcio(linea.length > 20 ? linea[22] : linea[17]);
+            builder.descripcio(linea.length > 20 ? linea[22] : linea[18]);
 
             if (linea.length >=24) { // si hi ha les metadades
                 builder.origen(linea[18]).estadoElaboracion(linea[19]).tipoDocumental(linea[20]).pdfFirmado(linea[21]);
