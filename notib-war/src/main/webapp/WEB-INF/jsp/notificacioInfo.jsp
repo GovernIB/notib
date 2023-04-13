@@ -232,7 +232,7 @@ $(document).ready(function() {
 							<td><strong><spring:message code="notificacio.info.dada.concepte" /></strong></td>
 							<td>${notificacio.concepte}</td>
 						</tr>
-						<c:if test="${notificacio.descripcio}">
+						<c:if test="${not empty notificacio.descripcio}">
 							<tr>
 								<td><strong><spring:message code="notificacio.info.dada.descripcio" /></strong></td>
 								<td>${notificacio.descripcio}</td>
