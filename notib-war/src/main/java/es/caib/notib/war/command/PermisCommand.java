@@ -8,6 +8,7 @@ import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Getter @Setter
 public class PermisCommand {
 
@@ -31,7 +33,6 @@ public class PermisCommand {
 		PROCEDIMENT,
 		SERVEI
 	}
-
 
 	private Long id;
 	@NotEmpty @Size(max=100)
@@ -60,28 +61,22 @@ public class PermisCommand {
 	private boolean comunicacioSir;
 	private boolean comunicacioSenseProcediment;
 
-	public static List<PermisCommand> toPermisCommands(
-			List<PermisDto> dtos) {
-		List<PermisCommand> commands = new ArrayList<PermisCommand>();
+	public static List<PermisCommand> toPermisCommands(List<PermisDto> dtos) {
+
+		List<PermisCommand> commands = new ArrayList<>();
 		for (PermisDto dto: dtos) {
-			commands.add(
-					ConversioTipusHelper.convertir(
-							dto,
-							PermisCommand.class));
+			commands.add(ConversioTipusHelper.convertir(dto, PermisCommand.class));
 		}
 		return commands;
 	}
 
 	public static PermisCommand asCommand(PermisDto dto) {
-		PermisCommand command = ConversioTipusHelper.convertir(
-				dto,
-				PermisCommand.class);
-		return command;		
+		return ConversioTipusHelper.convertir(dto, PermisCommand.class);
 	}
+
 	public static PermisCommand asCommand(PermisDto dto, EntitatPermis entitatPermis) {
-		PermisCommand command = ConversioTipusHelper.convertir(
-				dto,
-				PermisCommand.class);
+
+		PermisCommand command = ConversioTipusHelper.convertir(dto, PermisCommand.class);
 		switch (entitatPermis) {
 			case ORGAN:
 				command.setSelectAll(dto.isRead() && dto.isProcessar() && dto.isAdministration() && dto.isComuns() && dto.isNotificacio() && dto.isComunicacio() && dto.isComunicacioSir() && dto.isComunicacioSenseProcediment());
@@ -93,20 +88,19 @@ public class PermisCommand {
 		}
 		return command;
 	}
+
 	public static PermisDto asDto(PermisCommand command) {
-		PermisDto dto = ConversioTipusHelper.convertir(
-				command,
-				PermisDto.class);
-		return dto;
+		return ConversioTipusHelper.convertir(command, PermisDto.class);
 	}
 
 	public int getPrincipalDefaultSize() {
+
 		int principalSize = 0;
 		try {
 			Field principal = this.getClass().getDeclaredField("principal");
 			principalSize = principal.getAnnotation(Size.class).max();
 		} catch (Exception ex) {
-			logger.error("No s'ha pogut recuperar la longitud de principal: " + ex.getMessage());
+			log.error("No s'ha pogut recuperar la longitud de principal: " + ex.getMessage());
 		}
 		return principalSize;
 	}
@@ -115,6 +109,4 @@ public class PermisCommand {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(PermisCommand.class);
 }

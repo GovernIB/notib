@@ -49,6 +49,7 @@ public class EnviamentHelper {
 	}
 
 	public void refrescarEnviamentsExpirats(@NonNull ProgresActualitzacioCertificacioDto progres) {
+
 		log.info("[EXPIRATS] Execució procés actualització enviaments expirats");
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String username = auth == null ? "schedulled" : auth.getName();
@@ -73,10 +74,7 @@ public class EnviamentHelper {
 			for (Long enviamentId : enviamentsIds) {
 				progres.incrementProcedimentsActualitzats();
 				try {
-					enviamentRefrescarEstat(
-							enviamentId,
-							progres,
-							info);
+					enviamentRefrescarEstat(enviamentId, progres, info);
 				} catch (Exception ex) {
 					progres.addInfo(TipusActInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant.ko", new Object[] {enviamentId}));
 					log.error("No s'ha pogut refrescar l'estat de l'enviament (enviamentId=" + enviamentId + ")", ex);

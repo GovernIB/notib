@@ -12,7 +12,7 @@
 %>
 
 <c:choose>
-	<c:when test="${empty permisCommand.id}"><c:set var="titol"><spring:message code="procediment.permis.form.titol.crear"/></c:set></c:when>
+	<c:when test="${empty procSerPermisCommand.id}"><c:set var="titol"><spring:message code="procediment.permis.form.titol.crear"/></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="procediment.permis.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <html>
@@ -54,8 +54,8 @@
 
 	$(document).ready(function() {
 		$("#modal-botons button[type='submit']").on('click', function() {
-			$("form#permisCommand *:disabled").attr('readonly', 'readonly');
-			$("form#permisCommand *:disabled").removeAttr('disabled');
+			$("form#procSerPermisCommand *:disabled").attr('readonly', 'readonly');
+			$("form#procSerPermisCommand *:disabled").removeAttr('disabled');
 		});
 
 		$("#selectAll").on('change', function() {
@@ -105,21 +105,21 @@
 		var isRolActualAdministradorOrgan = ${isRolActualAdministradorOrgan};
 	</script>
 	<c:set var="formAction"><not:modalUrl value="/servei/${servei.id}/permis"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="procSerPermisCommand">
 		<form:hidden path="id"/>
-		<not:inputSelect name="tipus" textKey="procediment.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="TipusEnumDto"/>
-		<not:inputText name="principal" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"
+		<not:inputSelect name="tipus" textKey="procediment.permis.form.camp.tipus" disabled="${not empty procSerPermisCommand.id}" optionEnum="TipusEnumDto"/>
+		<not:inputText name="principal" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty procSerPermisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"
 			inputMaxLength="${principalSize}" showsize="true"/>
 		<c:if test="${servei.comu}">
 			<not:inputSelect
 				name="organ"
 				textKey="entitat.permis.form.camp.organ"
-				disabled="${not empty permisCommand.id}"
+				disabled="${not empty procSerPermisCommand.id}"
 				optionItems="${organs}"
 				optionTextAttribute="nomComplet"
 				optionValueAttribute="codi"
 				optionMinimumResultsForSearch="5"
-				emptyOption="false"/>
+				emptyOption="true"/>
 		</c:if>
 
 		<div class="row" style="margin-right: 0px; margin-left: 0px;">

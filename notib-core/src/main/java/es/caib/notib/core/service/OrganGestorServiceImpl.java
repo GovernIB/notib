@@ -1459,16 +1459,15 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrganismeDto> findOrganismes(EntitatDto entitat) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			List<OrganismeDto> organismes = new ArrayList<OrganismeDto>();
+			List<OrganismeDto> organismes = new ArrayList<>();
 			try {
 				organismes = organGestorCachable.findOrganismesByEntitat(entitat.getDir3Codi());
 			} catch (Exception e) {
 				String errorMessage = "No s'han pogut recuperar els organismes de l'entitat: " + entitat.getDir3Codi();
-				logger.error(
-						errorMessage, 
-						e.getMessage());
+				logger.error(errorMessage, e.getMessage());
 			}
 			return organismes;
 		} finally {
