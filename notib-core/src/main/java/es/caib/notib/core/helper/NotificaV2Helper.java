@@ -41,6 +41,7 @@ import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datado;
 import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.InfoEnvioV2;
 import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
 import es.caib.notib.plugin.carpeta.MissatgeCarpetaParams;
+import es.caib.notib.plugin.carpeta.VincleInteressat;
 import lombok.NonNull;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
@@ -154,8 +155,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						}
 					}
 				}
-				MissatgeCarpetaParams params = crearMissatgeCarpetaParams(enviament);
-				pluginHelper.enviarNotificacioMobil(params);
+				for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
+					MissatgeCarpetaParams params = crearMissatgeCarpetaParams(e);
+					pluginHelper.enviarNotificacioMobil(params);
+				}
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				logger.info(" [TIMER-NOT] Notificació enviar (Preparar events)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
 				integracioHelper.addAccioOk(info);
@@ -187,18 +190,20 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	private MissatgeCarpetaParams crearMissatgeCarpetaParams(NotificacioEnviamentEntity enviament) {
 
+		// TODO PARAMETRES nifDestinatari nomCompletDestinatari VincleInteressat i dataDisponibleCompareixenca s'han de posar bé abans de pujar
 		NotificacioEntity not = enviament.getNotificacio();
 		EntitatEntity entitat = not.getEntitat();
+		PersonaEntity titular = enviament.getTitular();
 		return MissatgeCarpetaParams.builder()
-				.nifDestinatari().nomCompletDestinatari()
+				.nifDestinatari(titular.getNif()).nomCompletDestinatari(titular.getNomSencer())
 				.codiDir3Entitat(entitat.getDir3Codi()).nomEntitat(entitat.getNom())
 				.codiOrganEmisor(not.getEmisorDir3Codi()).concepteNotificacio(not.getConcepte())
 				.descNotificacio(not.getDescripcio()).uuIdNotificacio(not.getReferencia())
-				.tipus(not.getEnviamentTipus()).vincleInteressat()
+				.tipus(not.getEnviamentTipus()).vincleInteressat(VincleInteressat.TITULAR)
 				.codiSiaProcediment(not.getProcediment().getCodi())
 				.nomProcediment(not.getProcediment().getNom())
 				.caducitatNotificacio(not.getCaducitat())
-				.dataDisponibleCompareixenca()
+				.dataDisponibleCompareixenca(new Date()) // TODO VEURE TODO ANTERIOR
 				.numExpedient(not.getNumExpedient())
 				.build();
 	}
