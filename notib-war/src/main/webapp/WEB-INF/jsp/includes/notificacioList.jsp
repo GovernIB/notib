@@ -687,6 +687,7 @@
  					</script>
         </th>
         <th data-col-name="procedimentTipus" data-visible="false"></th>
+        <th data-col-name="estat" data-visible="false"></th>
         <th data-col-name="procedimentDesc" data-template="#cellProcedimentTemplate" width="200px"><spring:message code="notificacio.list.columna.procediment"/>
             <script id="cellProcedimentTemplate" type="text/x-jsrender">
                 {{if procedimentTipus == 'PROCEDIMENT'}}<span class="label label-primary">P</span>{{/if}}

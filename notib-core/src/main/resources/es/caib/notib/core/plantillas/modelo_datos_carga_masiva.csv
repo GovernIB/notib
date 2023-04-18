@@ -1,5 +1,5 @@
-Codigo Unidad Remisora;Concepto;Tipo de Envio;Referencia Emisor;Nombre Fichero;Normalizado;Prioridad Servicio;Nombre;APELLIDOS;CIF/NIF;Email;Codigo destino;Línea 1;Línea 2;Codigo Postal;Retardo Postal;Código Procedimiento;Fecha Envio Programado
-E04975701;Concepto 1;Notificacion;NOTIF2103021;prueba.pdf;Si;Normal;ANF;RODRIGUEZ SANCHEZ;12345678Z;mail@mail.com;L01280796;Castelló 115;28016 Madrid;37891;0;101310;
-E04975701;Concepto 2;Notificacion;NOTIF2103022;prueba.pdf;Si;Normal;ANF;DELGADO Y DELGADO;12345678Z;mail@mail.com;L01280796;Castelló 115;28016 Madrid;49419;0;101310;
-E04975701;Concepto 3;Notificacion;NOTIF2103023;prueba.pdf;Si;Normal;ANF;DELGADO Y DELGADO;12345678Z;mail@mail.com;L01280796;Castelló 115;28016 Madrid;49419;0;101310;
-E04975701;Concepto 4;Notificacion;NOTIF2103024;prueba.pdf;Si;Normal;ANF;GUISASOLA BERDUGO;12345678Z;mail@mail.com;L01280796;Castelló 115;28016 Madrid;28003;0;101310;
+Codigo Unidad Remisora;Concepto;Tipo de Envio;Referencia Emisor;Nombre Fichero;Normalizado;Prioridad Servicio;Nombre;APELLIDOS;CIF/NIF;Email;Codigo destino;Línea 1;Línea 2;Codigo Postal;Retardo Postal;Código Procedimiento;Fecha Envio Programado;Descripción
+E04975701;Concepto 1;Notificacion;NOTIF2103021;prueba.pdf;Si;Normal;ANF;RODRIGUEZ SANCHEZ;12345678Z;mail@mail.com;L01280796;Castelló 115;28016 Madrid;37891;0;101310;;Descripción Test
+E04975701;Concepto 2;Notificacion;NOTIF2103022;prueba.pdf;Si;Normal;ANF;DELGADO Y DELGADO;12345678Z;mail@mail.com;L01280796;Castelló 115;28016 Madrid;49419;0;101310;;Descripción Test
+E04975701;Concepto 3;Notificacion;NOTIF2103023;prueba.pdf;Si;Normal;ANF;DELGADO Y DELGADO;12345678Z;mail@mail.com;L01280796;Castelló 115;28016 Madrid;49419;0;101310;;Descripción Test
+E04975701;Concepto 4;Notificacion;NOTIF2103024;prueba.pdf;Si;Normal;ANF;GUISASOLA BERDUGO;12345678Z;mail@mail.com;L01280796;Castelló 115;28016 Madrid;28003;0;101310;;Descripción Test

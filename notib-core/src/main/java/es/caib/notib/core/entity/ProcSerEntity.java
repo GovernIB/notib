@@ -93,9 +93,12 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
         if (entregaCie != null && entregaCie.getOperadorPostal() != null && entregaCie.getCie() != null) {
             return checkEntregaCieProcSer();
         }
-        EntregaCieEntity entrega = organGestor.getEntregaCie();
-        if (entrega != null && entrega.getOperadorPostal() != null && entrega.getCie() != null) {
-            return checkEntregaCieOrgan();
+        EntregaCieEntity entrega;
+        if (organGestor != null) {
+            entrega = organGestor.getEntregaCie();
+            if (entrega != null && entrega.getOperadorPostal() != null && entrega.getCie() != null) {
+                return checkEntregaCieOrgan();
+            }
         }
         entrega = entitat.getEntregaCie();
         if (entrega != null && entrega.getOperadorPostal() != null && entrega.getCie() != null) {

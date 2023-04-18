@@ -47,8 +47,8 @@ public class ClientBaseTest {
 	protected static final String ENTITAT_DIR3CODI = "A04003003";
 	protected static final String ORGAN_CODI = "A04013529";
 	protected static final String ORGAN_CODI_CIE = "A04013529";
-//	protected static final String IDENTIFICADOR_PROCEDIMENT = "874105"; // DEV
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "207982"; // LOCAL
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "874105"; // DEV
+//	protected static final String IDENTIFICADOR_PROCEDIMENT = "207982"; // LOCAL
 	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "874106"; // DEV
 
 

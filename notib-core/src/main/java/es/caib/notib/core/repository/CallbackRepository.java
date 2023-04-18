@@ -13,7 +13,7 @@ import java.util.Set;
 public interface CallbackRepository extends JpaRepository<CallbackEntity, Long>  {
 
 
-    @Query("select c.enviamentId from CallbackEntity c order by c.data asc nulls first")
+    @Query("select c.enviamentId from CallbackEntity c where c.estat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT order by c.data asc nulls first")
     List<Long> findEnviamentIdPendents(Pageable page);
 
     CallbackEntity findByEnviamentId(Long envId);

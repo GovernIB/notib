@@ -151,22 +151,16 @@ $(document).ready(function() {
 				style="width: 100%">
 				<thead>
 					<tr>
-						<th><strong><spring:message
-								code="notificacio.massiva.info.resum.enviament.tipus" /></strong></th>
-						<th><strong><spring:message
-								code="notificacio.massiva.info.resum.unitat.remisora" /></strong></th>
-						<th><strong><spring:message
-								code="notificacio.massiva.info.resum.concepte" /></strong></th>
-						<th><strong><spring:message
-								code="notificacio.massiva.info.resum.prioritat" /></strong></th>
-						<th><strong><spring:message
-								code="notificacio.massiva.info.resum.titular" /></strong></th>
+						<th><strong><spring:message code="notificacio.massiva.info.resum.enviament.tipus" /></strong></th>
+						<th><strong><spring:message code="notificacio.massiva.info.resum.unitat.remisora" /></strong></th>
+						<th><strong><spring:message code="notificacio.massiva.info.resum.concepte" /></strong></th>
+						<th><strong><spring:message code="notificacio.massiva.info.resum.descripcio" /></strong></th>
+						<th><strong><spring:message code="notificacio.massiva.info.resum.prioritat" /></strong></th>
+						<th><strong><spring:message code="notificacio.massiva.info.resum.titular" /></strong></th>
 <%--						<th><strong><spring:message--%>
 <%--								code="notificacio.massiva.info.resum.origen" /></strong></th>--%>
-						<th><strong><spring:message
-								code="notificacio.massiva.info.resum.errors" /></strong></th>
-						<th><strong><spring:message
-								code="notificacio.massiva.list.accio.errors.execucio.download" /></strong></th>
+						<th><strong><spring:message code="notificacio.massiva.info.resum.errors" /></strong></th>
+						<th><strong><spring:message code="notificacio.massiva.list.accio.errors.execucio.download" /></strong></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -175,6 +169,7 @@ $(document).ready(function() {
 						<td>${notInfo.enviamentTipus}</td>
 						<td>${notInfo.codiDir3UnidadRemisora}</td>
 						<td>${notInfo.concepto}</td>
+						<td>${notInfo.descripcio}</td>
 						<td>${notInfo.prioridadServicio}</td>
 						<td>${notInfo.nombre} ${notInfo.apellidos}
 						<c:choose>

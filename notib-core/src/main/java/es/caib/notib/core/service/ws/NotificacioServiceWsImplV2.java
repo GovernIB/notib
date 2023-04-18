@@ -58,6 +58,9 @@ import es.caib.notib.core.helper.CaducitatHelper;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.EnviamentHelper;
 import es.caib.notib.core.helper.EnviamentTableHelper;
+import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.NotificacioValidatorHelper;
+import es.caib.notib.core.helper.SemaforNotificacio;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
@@ -193,6 +196,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private ConfigHelper configHelper;
 	@Autowired
 	private MessageHelper messageHelper;
+	@Autowired
+	private NotificacioValidatorHelper notificacioValidatorHelper;
+
 
 	private static final String COMUNICACIOAMBADMINISTRACIO = "comunicacioAmbAdministracio";
 
@@ -531,7 +537,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 //				else {
 //					inicialitzaCallbacks(notificacioGuardada);
 //				}
-				
+
 				return generaResposta(info, notificacioGuardada, referencies);
 			} catch (Exception ex) {
 				logger.error("Error creant notificació", ex);
@@ -1441,8 +1447,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if(documentV2.getContingutBase64() != null) {
 			logger.debug(">> [ALTA] document contingut Base64");
 			byte[] contingut = Base64.decodeBase64(documentV2.getContingutBase64());
+			boolean isPdf = NotificacioValidatorHelper.isPdf(Base64.encodeBase64String(contingut));
 			String mediaType = getMimeTypeFromContingut(contingut);
-			if (isValidaFirmaRestEnabled()) {
+			if (isPdf && isValidaFirmaRestEnabled()) {
 				SignatureInfoDto signatureInfo = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, documentV2.getArxiuNom(), mediaType);
 				if (signatureInfo.isError()) {
 					throw new SignatureValidationException(documentV2.getArxiuNom(), signatureInfo.getErrorMsg());
