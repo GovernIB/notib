@@ -114,14 +114,12 @@ public class ProcedimentPermisController extends BaseUserController{
 				}
 			}
 		}
-		if (permis != null) {
-			model.addAttribute(ProcSerPermisCommand.asCommand(permis, ProcSerPermisCommand.EntitatPermis.PROCEDIMENT));
-		} else {
-			model.addAttribute(new ProcSerPermisCommand());
-		}
 		if (procediment.isComu()) {
 			model.addAttribute("organs", getOrganismes(request));
 		}
+		ProcSerPermisCommand command = permis != null ? ProcSerPermisCommand.asCommand(permis, ProcSerPermisCommand.EntitatPermis.PROCEDIMENT) : new ProcSerPermisCommand();
+		command.setOrgan(procediment.getOrganGestor());
+		model.addAttribute(command);
 		return "procedimentAdminPermisForm";
 	}
 

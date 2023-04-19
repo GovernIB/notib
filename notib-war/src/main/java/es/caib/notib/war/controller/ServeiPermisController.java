@@ -112,14 +112,13 @@ public class ServeiPermisController extends BaseUserController{
 				}
 			}
 		}
-		if (permis != null) {
-			model.addAttribute(ProcSerPermisCommand.asCommand(permis, ProcSerPermisCommand.EntitatPermis.SERVEI));
-		} else {
-			model.addAttribute(new ProcSerPermisCommand());
-		}
 		if (servei.isComu()) {
 			model.addAttribute("organs", getOrganismes(request));
 		}
+
+		ProcSerPermisCommand command = permis != null ? ProcSerPermisCommand.asCommand(permis, ProcSerPermisCommand.EntitatPermis.SERVEI) : new ProcSerPermisCommand();
+		command.setOrgan(servei.getOrganGestor());
+		model.addAttribute(command);
 		return "serveiAdminPermisForm";
 	}
 	
