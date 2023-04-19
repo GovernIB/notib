@@ -97,7 +97,9 @@ public class NotificacioEventHelper {
                     .fiReintents(eventInfo.isFiReintents())
                     .errorDescripcio(eventInfo.getErrorDescripcio()).build();
         }
-
+        if (!eventInfo.isError() && event.getFiReintents()) {
+            event.setFiReintents(false);
+        }
         notificacioEventRepository.saveAndFlush(event);
 
         // Actualitzar l'error de la notificació i enviament
