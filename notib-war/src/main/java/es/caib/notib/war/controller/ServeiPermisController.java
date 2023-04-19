@@ -117,7 +117,9 @@ public class ServeiPermisController extends BaseUserController{
 		}
 
 		ProcSerPermisCommand command = permis != null ? ProcSerPermisCommand.asCommand(permis, ProcSerPermisCommand.EntitatPermis.SERVEI) : new ProcSerPermisCommand();
-		command.setOrgan(servei.getOrganGestor());
+		if (!servei.isComu()) {
+			command.setOrgan(servei.getOrganGestor());
+		}
 		model.addAttribute(command);
 		return "serveiAdminPermisForm";
 	}

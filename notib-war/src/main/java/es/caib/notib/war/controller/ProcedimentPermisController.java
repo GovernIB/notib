@@ -118,7 +118,9 @@ public class ProcedimentPermisController extends BaseUserController{
 			model.addAttribute("organs", getOrganismes(request));
 		}
 		ProcSerPermisCommand command = permis != null ? ProcSerPermisCommand.asCommand(permis, ProcSerPermisCommand.EntitatPermis.PROCEDIMENT) : new ProcSerPermisCommand();
-		command.setOrgan(procediment.getOrganGestor());
+		if (!procediment.isComu()) {
+			command.setOrgan(procediment.getOrganGestor());
+		}
 		model.addAttribute(command);
 		return "procedimentAdminPermisForm";
 	}
