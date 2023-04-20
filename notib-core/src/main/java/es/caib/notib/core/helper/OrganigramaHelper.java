@@ -30,10 +30,9 @@ public class OrganigramaHelper {
 	private OrganGestorCachable organGestorCachable;
 	
 	public List<OrganismeDto> getOrganismesFillsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
+
 		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(codiDir3Entitat);
-		
 		String codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
-		
 		List<OrganismeDto> organismes= new ArrayList<OrganismeDto>();
 		organismes.addAll(getOrgansGestorsFills(organigramaEntitat, codiDir3));
 		return organismes;

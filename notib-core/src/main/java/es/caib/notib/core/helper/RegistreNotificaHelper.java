@@ -78,7 +78,7 @@ public class RegistreNotificaHelper {
 		boolean totsAdministracio = isAllEnviamentsAAdministracio(notificacioEntity);
 		long startTime;
 		double elapsedTime;
-
+		notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
 		for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments() ) {
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Realitzant nou assentament registral de l'enviament: " + enviament.getId()));
 			startTime = System.nanoTime();
@@ -124,7 +124,7 @@ public class RegistreNotificaHelper {
 			}
 		}
 
-		notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
+
 		for (NotificacioEnviamentEntity env: notificacioEntity.getEnviaments()) {
 			enviamentTableHelper.actualitzarRegistre(env);
 		}

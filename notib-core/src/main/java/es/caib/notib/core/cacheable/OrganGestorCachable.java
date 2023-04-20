@@ -72,11 +72,12 @@ public class OrganGestorCachable {
 
     @Cacheable(value = "organismes", key="#entitatcodi")
     public List<OrganismeDto> findOrganismesByEntitat(String entitatcodi) {
+
         List<OrganismeDto> organismes = new ArrayList<>();
         Map<String, OrganismeDto> organigramaDir3 = cacheHelper.findOrganigramaNodeByEntitat(entitatcodi);
-        if (organigramaDir3 == null || organigramaDir3.isEmpty())
+        if (organigramaDir3 == null || organigramaDir3.isEmpty()) {
             return organismes;
-
+        }
         organismes = new ArrayList<>(organigramaDir3.values());
         Collections.sort(organismes, new Comparator<OrganismeDto>() {
             @Override
@@ -87,9 +88,8 @@ public class OrganGestorCachable {
         return organismes;
     }
 
-    private List<String> getCodisOrgansGestorsFills(
-            Map<String, OrganismeDto> organigrama,
-            String codiDir3) {
+    private List<String> getCodisOrgansGestorsFills(Map<String, OrganismeDto> organigrama, String codiDir3) {
+
         List<String> unitats = new ArrayList<String>();
         unitats.add(codiDir3);
         OrganismeDto organisme = organigrama.get(codiDir3);

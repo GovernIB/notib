@@ -1,6 +1,5 @@
 package es.caib.notib.core.helper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.PdfReader;
@@ -40,6 +39,8 @@ import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.exception.DocumentNotFoundException;
 import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.plugin.carpeta.CarpetaPlugin;
+import es.caib.notib.plugin.carpeta.MissatgeCarpetaParams;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.gesconadm.GcaProcediment;
@@ -74,6 +75,7 @@ import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import lombok.Synchronized;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -118,6 +120,7 @@ import java.util.concurrent.TimeUnit;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class PluginHelper {
 
@@ -137,6 +140,7 @@ public class PluginHelper {
 	private Map<String, GestorContingutsAdministratiuPlugin> gestorDocumentalAdministratiuPlugin = new HashMap<>();
 	private Map<String, FirmaServidorPlugin> firmaServidorPlugin = new HashMap<>();
 	private Map<String, IValidateSignaturePlugin> validaSignaturaPlugins = new HashMap<>();
+	private Map<String, CarpetaPlugin> carpetaPlugin = new HashMap<>();
 
 	@Autowired
 	private IntegracioHelper integracioHelper;
@@ -1898,6 +1902,22 @@ public class PluginHelper {
 //		return SignatureInfoDto.builder().signed(isSigned).error(validationError).errorMsg(validationErrorMsg).build();
 //	}
 
+	// CARPETA
+
+	public void enviarNotificacioMobil(MissatgeCarpetaParams params) {
+
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.CARPETA, "Enviar notificació mòvil", IntegracioAccioTipusEnumDto.ENVIAMENT);
+//				new AccioParam("Nom del document", params.), new AccioParam("ContentType", firmaContentType));
+		try {
+			getCarpetaPlugin().enviarNotificacioMobil(params);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String msg = "Error al enviar notificació mòvil";
+			log.error(msg, ex);
+			integracioHelper.addAccioError(info, msg, ex);
+		}
+	}
+
 	private boolean isFitxerSigned(byte[] contingut, String contentType) {
 
 		if (contentType.equals("application/pdf")) {
@@ -2205,6 +2225,35 @@ public class PluginHelper {
 		}
 	}
 
+	public CarpetaPlugin getCarpetaPlugin() {
+
+		String entitatCodi = configHelper.getEntitatActualCodi();
+		if (Strings.isNullOrEmpty(entitatCodi)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
+		CarpetaPlugin plugin = carpetaPlugin.get(entitatCodi);
+		if (plugin != null) {
+			return plugin;
+		}
+		String pluginClass = getPropertyPluginCarpetaClass();
+		if (Strings.isNullOrEmpty(pluginClass)) {
+			String error = "No està configurada la classe per al plugin de CARPETA";
+			logger.error(error);
+			throw new SistemaExternException(IntegracioHelper.CARPETA, error);
+//			return null;
+		}
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			plugin = (CarpetaPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
+					.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+
+			carpetaPlugin.put(entitatCodi, plugin);
+			return plugin;
+		} catch (Exception ex) {
+			throw new SistemaExternException(IntegracioHelper.CARPETA, "Error al crear la instància del plugin de validació de signatures", ex);
+		}
+	}
+
 	public void resetPlugins(String grup) {
 		switch (grup) {
 			case "ARXIU":
@@ -2268,6 +2317,10 @@ public class PluginHelper {
 	}
 	private String getPropertyPluginValidaSignatura() {
 		return configHelper.getConfig("es.caib.notib.plugin.validatesignature.class");
+	}
+
+	private String getPropertyPluginCarpetaClass() {
+		return configHelper.getConfig("es.caib.notib.plugin.carpeta.class");
 	}
 	public int getSegonsEntreReintentRegistreProperty() {
 		return configHelper.getAsInt("es.caib.notib.plugin.registre.segons.entre.peticions");

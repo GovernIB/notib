@@ -32,11 +32,11 @@ import static org.junit.Assert.*;
 public class ClientRestValidacionsV2Test extends ClientBaseTest {
 
 	
-	private static final String URL = "http://localhost:8280/notib";
+	private static final String URL = "http://localhost:8280/notibapi";
 	private static final String USERNAME = "admin";
 	private static final String PASSWORD = "admin";
 
-//	private static final String URL = "https://dev.caib.es/notib";
+//	private static final String URL = "https://dev.caib.es/notibapi";
 //	private static final String USERNAME = "$ripea_notib";
 //	private static final String PASSWORD = "ripea_notib";
 
@@ -49,11 +49,7 @@ public class ClientRestValidacionsV2Test extends ClientBaseTest {
 
 	@Before
 	public void setUp() throws IOException, DecoderException, DatatypeConfigurationException {
-		client = NotificacioRestClientFactory.getRestClientV2(
-				URL,
-				USERNAME,
-				PASSWORD,
-				false);
+		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, true);
 	}
 
 	@Test

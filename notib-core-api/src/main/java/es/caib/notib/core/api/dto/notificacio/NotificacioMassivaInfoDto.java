@@ -19,6 +19,7 @@ public class NotificacioMassivaInfoDto extends NotificacioMassivaDataDto {
 
         private String codiDir3UnidadRemisora;
         private String concepto;
+        private String descripcio;
         private String enviamentTipus;
         private String referenciaEmisor;
         private String nombreFichero;

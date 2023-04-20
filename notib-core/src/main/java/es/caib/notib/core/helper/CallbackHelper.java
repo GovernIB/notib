@@ -70,11 +70,15 @@ public class CallbackHelper {
 	@Autowired
 	private NotificacioTableHelper notificacioTableHelper;
 
+	private boolean isInterficieWeb(NotificacioEntity not) {
+		return not.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB;
+	}
+
 	@Transactional
 	public void crearCallback(NotificacioEntity not, NotificacioEnviamentEntity env, boolean isError, String errorDesc) {
 
 		try {
-			if (not.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
+			if (isInterficieWeb(not)) {
 				return;
 			}
 			log.debug("[CALLBACK_CLIENT] Afegint callback per l'enviament " + env.getId());
@@ -96,12 +100,18 @@ public class CallbackHelper {
 	public void reactivarCallback(NotificacioEnviamentEntity env) {
 
 		CallbackEntity c = updateCallback(env, false, null);
+		if (c == null) {
+			return;
+		}
 		c.setIntents(0);
 	}
 
 	@Transactional
 	public CallbackEntity updateCallback(NotificacioEnviamentEntity env, boolean isError, String errorDesc) {
 
+		if (isInterficieWeb(env.getNotificacio())) {
+			return null;
+		}
 		CallbackEntity callback = callbackRepository.findByEnviamentId(env.getId());
 		if (callback == null) {
 			callback = CallbackEntity.builder().usuariCodi(env.getCreatedBy().getCodi()).notificacioId(env.getNotificacio().getId()).enviamentId(env.getId()).build();
@@ -121,6 +131,9 @@ public class CallbackHelper {
 		List<CallbackEntity> callbacks = new ArrayList<>();
 		for(NotificacioEnviamentEntity env : enviaments) {
 			callback = updateCallback(env, isError, errorDesc);
+			if (callback == null) {
+				continue;
+			}
 			callbacks.add(callback);
 		}
 		callbackRepository.save(callbacks);
