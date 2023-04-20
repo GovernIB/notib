@@ -20,11 +20,9 @@
 	<title>${titol}</title>
 	<link href="<c:url value="/webjars/select2/4.0.5/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
-	<link href="<c:url value="/css/iosCheckbox.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
-	<script src="<c:url value="/js/iosCheckbox.js"/>"></script>
 	<not:modalHead/>
 <script>
 
