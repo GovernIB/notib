@@ -107,7 +107,9 @@
 	<c:set var="formAction"><not:modalUrl value="/servei/${servei.id}/permis"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="procSerPermisCommand">
 		<form:hidden path="id"/>
-		<form:hidden path="organ"/>
+		<c:if test="${not servei.comu}">
+			<form:hidden path="organ"/>
+		</c:if>
 		<not:inputSelect name="tipus" textKey="procediment.permis.form.camp.tipus" disabled="${not empty procSerPermisCommand.id}" optionEnum="TipusEnumDto"/>
 		<not:inputText name="principal" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty procSerPermisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"
 			inputMaxLength="${principalSize}" showsize="true"/>
