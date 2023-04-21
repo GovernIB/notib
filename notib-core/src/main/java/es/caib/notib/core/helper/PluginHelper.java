@@ -2250,7 +2250,7 @@ public class PluginHelper {
 			carpetaPlugin.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
-			throw new SistemaExternException(IntegracioHelper.CARPETA, "Error al crear la instància del plugin de validació de signatures", ex);
+			throw new SistemaExternException(IntegracioHelper.CARPETA, "Error al crear la instància del plugin de CARPETA", ex);
 		}
 	}
 

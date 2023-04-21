@@ -188,7 +188,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return notificacio;
 	}
 
-	private MissatgeCarpetaParams crearMissatgeCarpetaParams(NotificacioEnviamentEntity enviament) {
+	public static MissatgeCarpetaParams crearMissatgeCarpetaParams(NotificacioEnviamentEntity enviament) {
 
 		// TODO PARAMETRES nifDestinatari nomCompletDestinatari VincleInteressat i dataDisponibleCompareixenca s'han de posar bé abans de pujar
 		NotificacioEntity not = enviament.getNotificacio();

@@ -23,6 +23,7 @@ import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datado;
 import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datados;
 import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.InfoEnvioV2;
 import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
+import es.caib.notib.plugin.carpeta.MissatgeCarpetaParams;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -102,6 +103,10 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 							enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaV0Helper.notificacioEnviar");
 						}
 					}
+				}
+				for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
+					MissatgeCarpetaParams params = NotificaV2Helper.crearMissatgeCarpetaParams(e);
+					pluginHelper.enviarNotificacioMobil(params);
 				}
 				integracioHelper.addAccioOk(info);
 			} else {
