@@ -174,13 +174,12 @@ public class NotificacioTableHelper {
 
                 NotificacioEventEntity lastEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
                 tableViewItem.setNotificaErrorData(lastEvent != null ? lastEvent.getData() : null);
-                if (tableViewItem.getNotificaErrorDescripcio() == null) {
-//                String desc = notificacio.hasEnviamentsPerEmail() ? messageHelper.getMessage("error.notificacio.enviaments")
-                    String desc = notificacio.hasEnviamentsPerEmail() ?
-                            "S'ha produït algun error en els enviaments. Els errors es poden consultar en cada un dels enviaments."
-                            : (lastEvent != null ? lastEvent.getErrorDescripcio() : null);
-                    tableViewItem.setNotificaErrorDescripcio(desc);
+                String desc = null;
+                if (lastEvent != null && lastEvent.isError()) {
+                    desc = notificacio.hasEnviamentsPerEmail() ? "S'ha produït algun error en els enviaments. Els errors es poden consultar en cada un dels enviaments."
+                            :  lastEvent.getErrorDescripcio();
                 }
+                tableViewItem.setNotificaErrorDescripcio(desc);
                 tableViewItem.setErrorLastEvent(isErrorLastEvent(notificacio, lastEvent));
             }
 
