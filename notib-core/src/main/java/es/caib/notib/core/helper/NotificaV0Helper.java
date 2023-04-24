@@ -105,8 +105,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					}
 				}
 				for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
-					MissatgeCarpetaParams params = NotificaV2Helper.crearMissatgeCarpetaParams(e);
-					pluginHelper.enviarNotificacioMobil(params);
+					pluginHelper.enviarNotificacioMobil(e);
 				}
 				integracioHelper.addAccioOk(info);
 			} else {

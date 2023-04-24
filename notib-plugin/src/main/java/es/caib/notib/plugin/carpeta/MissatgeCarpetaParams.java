@@ -32,4 +32,15 @@ public class MissatgeCarpetaParams {
     private Date dataDisponibleCompareixenca;
     private String numExpedient;
 
+    public String getParams() {
+
+        return "&notificationParameters=" + nomCompletDestinatari + "&notificationParameters=" + codiDir3Entitat + "&notificationParameters=" + nomEntitat +
+                "&notificationParameters=" + codiOrganEmisor + "&notificationParameters=" + concepteNotificacio + "&notificationParameters=" + descNotificacio +
+                "&notificationParameters=" + tipus + "&notificationParameters=" + vincleInteressat + "&notificationParameters=" + codiSiaProcediment +
+                "&notificationParameters=" + nomProcediment + "&notificationParameters=" + caducitatNotificacio + "&notificationParameters=" + dataDisponibleCompareixenca +
+                "&notificationParameters=" + numExpedient;
+
+    }
+
+
 }

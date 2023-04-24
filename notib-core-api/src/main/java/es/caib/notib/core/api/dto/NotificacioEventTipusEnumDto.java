@@ -16,7 +16,8 @@ public enum NotificacioEventTipusEnumDto implements Serializable {
 	ADVISER_CERTIFICACIO,
 	ADVISER_DATAT,
 	EMAIL_ENVIAMENT,
-	CALLBACK_ENVIAMENT
+	CALLBACK_ENVIAMENT,
+	API_CARPETA
 //	NOTIFICA_ENVIAMENT,  // 0			// Enviar notificacions a Notifica
 //	NOTIFICA_CALLBACK_DATAT,			// Rebre adviser amb datat
 //	NOTIFICA_CALLBACK_CERTIFICACIO,		// Rebre adviser amb certificació

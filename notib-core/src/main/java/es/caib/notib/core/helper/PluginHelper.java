@@ -17,6 +17,7 @@ import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.InteresadoWsDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.RegistreAnnexDto;
 import es.caib.notib.core.api.dto.RegistreModeFirmaDtoEnum;
@@ -41,6 +42,7 @@ import es.caib.notib.core.exception.DocumentNotFoundException;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.plugin.carpeta.CarpetaPlugin;
 import es.caib.notib.plugin.carpeta.MissatgeCarpetaParams;
+import es.caib.notib.plugin.carpeta.VincleInteressat;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.gesconadm.GcaProcediment;
@@ -144,6 +146,8 @@ public class PluginHelper {
 
 	@Autowired
 	private IntegracioHelper integracioHelper;
+	@Autowired
+	private NotificacioEventHelper eventHelper;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -1904,18 +1908,43 @@ public class PluginHelper {
 
 	// CARPETA
 
-	public void enviarNotificacioMobil(MissatgeCarpetaParams params) {
+	public void enviarNotificacioMobil(NotificacioEnviamentEntity e) {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.CARPETA, "Enviar notificació mòvil", IntegracioAccioTipusEnumDto.ENVIAMENT);
 //				new AccioParam("Nom del document", params.), new AccioParam("ContentType", firmaContentType));
+		NotificacioEventHelper.EventInfo event = NotificacioEventHelper.EventInfo.builder().enviament(e).tipus(NotificacioEventTipusEnumDto.API_CARPETA).build();
+
 		try {
-			getCarpetaPlugin().enviarNotificacioMobil(params);
+			getCarpetaPlugin().enviarNotificacioMobil(crearMissatgeCarpetaParams(e));
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String msg = "Error al enviar notificació mòvil";
 			log.error(msg, ex);
+			event.setError(true);
+			event.setErrorDescripcio(msg);
 			integracioHelper.addAccioError(info, msg, ex);
 		}
+		eventHelper.addEvent(event);
+	}
+
+	public static MissatgeCarpetaParams crearMissatgeCarpetaParams(NotificacioEnviamentEntity enviament) {
+
+		// TODO PARAMETRES nifDestinatari nomCompletDestinatari VincleInteressat i dataDisponibleCompareixenca s'han de posar bé abans de pujar
+		NotificacioEntity not = enviament.getNotificacio();
+		EntitatEntity entitat = not.getEntitat();
+		PersonaEntity titular = enviament.getTitular();
+		return MissatgeCarpetaParams.builder()
+				.nifDestinatari(titular.getNif()).nomCompletDestinatari(titular.getNomSencer())
+				.codiDir3Entitat(entitat.getDir3Codi()).nomEntitat(entitat.getNom())
+				.codiOrganEmisor(not.getEmisorDir3Codi()).concepteNotificacio(not.getConcepte())
+				.descNotificacio(not.getDescripcio()).uuIdNotificacio(not.getReferencia())
+				.tipus(not.getEnviamentTipus()).vincleInteressat(VincleInteressat.TITULAR)
+				.codiSiaProcediment(not.getProcediment().getCodi())
+				.nomProcediment(not.getProcediment().getNom())
+				.caducitatNotificacio(not.getCaducitat())
+				.dataDisponibleCompareixenca(new Date()) // TODO VEURE TODO ANTERIOR
+				.numExpedient(not.getNumExpedient())
+				.build();
 	}
 
 	private boolean isFitxerSigned(byte[] contingut, String contentType) {
@@ -2240,12 +2269,11 @@ public class PluginHelper {
 			String error = "No està configurada la classe per al plugin de CARPETA";
 			logger.error(error);
 			throw new SistemaExternException(IntegracioHelper.CARPETA, error);
-//			return null;
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (CarpetaPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-					.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+			plugin = (CarpetaPlugin)clazz.getDeclaredConstructor(Properties.class)
+					.newInstance(configHelper.getAllEntityProperties(entitatCodi));
 
 			carpetaPlugin.put(entitatCodi, plugin);
 			return plugin;
