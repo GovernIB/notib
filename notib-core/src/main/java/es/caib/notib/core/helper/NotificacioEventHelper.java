@@ -48,8 +48,7 @@ public class NotificacioEventHelper {
         return notificaConsultaActiva;
     }
 
-    public NotificacioEventEntity getEvent(NotificacioEnviamentEntity enviament, NotificacioEventTipusEnumDto tipus) {
-
+    public List<NotificacioEventEntity> getEvent(NotificacioEnviamentEntity enviament, NotificacioEventTipusEnumDto tipus) {
         return eventRepository.findByEnviamentIdAndTipus(enviament.getId(), tipus);
     }
 
@@ -69,23 +68,22 @@ public class NotificacioEventHelper {
                 NotificacioEventTipusEnumDto.SIR_ENVIAMENT.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT.equals(eventInfo.getTipus()) ||
-                NotificacioEventTipusEnumDto.API_CARPETA.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(eventInfo.getTipus()) ||       // Per consulta Sir activa
                 (isNotificaConsultaActiva() && NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA.equals(eventInfo.getTipus()));    // Per consulta notifica activa
 
         // Si es tracta d'un event de Callback, si ja n'existeix un, i aquest és amb error l'actualitzarem. Si no el crearem nou
-        boolean eventCallback = NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT.equals(eventInfo.getTipus());
+        boolean eventNoUnic = NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT.equals(eventInfo.getTipus()) ||  NotificacioEventTipusEnumDto.API_CARPETA.equals(eventInfo.getTipus());
         boolean crearNouEvent = true;
 
         // Si es tracta d'un event únic o de callback comprovam si ja existeix un event del mateixtipus.
         // En aquest cas, si és un event únic s'actualitzarà, si és de callback, s'actualitzarà si l'existent és amb error
-        if (eventUnic || eventCallback) {
+        if (eventUnic || eventNoUnic) {
             // Obtenim una llista per compatibilitat amb els events existents
             List<NotificacioEventEntity> events = eventRepository.findByEnviamentAndTipusOrderByIdDesc(eventInfo.getEnviament(), eventInfo.getTipus());
             if (events != null && !events.isEmpty()) {
                 event = events.get(0);
                 // Actualitza event
-                if (!eventCallback || eventCallback && event.isError()) {
+                if (!eventNoUnic || eventNoUnic && event.isError()) {
                     event.update(eventInfo.isError(), eventInfo.errorDescripcio, eventInfo.isFiReintents());
                     crearNouEvent = false;
                 }
@@ -110,7 +108,7 @@ public class NotificacioEventHelper {
 
         // Actualitzar l'error de la notificació i enviament
         eventInfo.getEnviament().getNotificacio().updateEventAfegir(event);
-        if (!eventCallback) {
+        if (!eventNoUnic) {
             eventInfo.getEnviament().updateNotificaError(eventInfo.isError(), eventInfo.isError() ? event : null);
         }
         return event;

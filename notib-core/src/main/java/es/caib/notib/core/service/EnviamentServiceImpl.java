@@ -193,7 +193,15 @@ public class EnviamentServiceImpl implements EnviamentService {
 			entityComprovarHelper.comprovarPermisos(null,true,true,true);
 			NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 			List<NotificacioEnviamentEntity> enviaments = notificacioEnviamentRepository.findByNotificacio(notificacio);
-			return conversioTipusHelper.convertirList(enviaments, NotificacioEnviamentDatatableDto.class);
+			List<NotificacioEnviamentDatatableDto> envs = conversioTipusHelper.convertirList(enviaments, NotificacioEnviamentDatatableDto.class);
+			NotificacioEventEntity event;
+			for (NotificacioEnviamentDatatableDto env : envs) {
+				event = notificacioEventRepository.findLastApiCarpetaByEnviamentId(env.getId());
+				if (event != null && event.isError()) {
+					env.setNotificacioMovilErrorDesc(event.getErrorDescripcio());
+				}
+			}
+			return envs;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

@@ -279,9 +279,11 @@
                 if (data[i].fiReintents) {
                     contingutTbody += ' <span class="fa fa-warning text-warning" title="' + data[i].fiReintentsDesc + '"></span>';
                 }
-                console.log(data[i]);
                 if (data[i].callbackFiReintents) {
                     contingutTbody += ' <span class="fa fa-warning text-info" title="' + data[i].callbackFiReintentsDesc + '"></span>';
+                }
+                if (data[i].notificacioMovilErrorDesc) {
+                    contingutTbody += ' <span style="color:#8a6d3b;" class="fa fa-mobile fa-lg" title="' + data[i].notificacioMovilErrorDesc + '"></span>';
                 }
                 contingutTbody += '</td>';
                 contingutTbody += '<td width="114px">';

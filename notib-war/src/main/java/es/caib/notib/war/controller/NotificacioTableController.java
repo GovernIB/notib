@@ -694,15 +694,17 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return notificacioService.actualitzacioEnviamentsEstat();
     }
 
+    // ACCIONS MASSIVES PER NOTIFICACIONS
     ////
+
     @RequestMapping(value = "/enviar/notificacio/movil", method = RequestMethod.GET)
     public String enviarNotificacioMovil(HttpServletRequest request, Model model) {
 
         // identificadors de les notificacions, no dels enviaments.
         Set<Long> seleccio = getIdsSeleccionats(request);
-
+        String redirect = "redirect:../../..";
         if (seleccio == null || seleccio.isEmpty()) {
-            return getModalControllerReturnValueError(request,"redirect:../..","accio.massiva.seleccio.buida");
+            return getModalControllerReturnValueError(request,redirect,"accio.massiva.seleccio.buida");
         }
         List<String> notificacionsError = new ArrayList<String>();
         for (Long notificacioId : seleccio) {
@@ -712,22 +714,18 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 notificacionsError.add("[" + notificacioId + "]: " + e.getMessage());
             }
         }
-
-        if (!notificacionsError.isEmpty()) {
-            if (notificacionsError.size() == seleccio.size()) {
-                getModalControllerReturnValueError(request,"redirect:../..","accio.massiva.creat.ko");
-            } else {
-                String desc = "";
-                for (String err: notificacionsError) {
-                    desc = desc + err + " \n";
-                }
-                return getModalControllerReturnValueErrorWithDescription(request,"redirect:../..","accio.massiva.creat.part", desc);
-            }
+        if (notificacionsError.isEmpty()) {
+            return getModalControllerReturnValueSuccess(request, redirect,"accio.massiva.creat.ok");
         }
-        return getModalControllerReturnValueSuccess(request,"redirect:../..","accio.massiva.creat.ok");
+        if (notificacionsError.size() == seleccio.size()) {
+            return getModalControllerReturnValueError(request, redirect,"accio.massiva.creat.ko");
+        }
+        String desc = "";
+        for (String err: notificacionsError) {
+            desc += err + " \n";
+        }
+        return getModalControllerReturnValueErrorWithDescription(request,redirect,"accio.massiva.creat.part", desc);
     }
-    // ACCIONS MASSIVES PER NOTIFICACIONS
-    ////
 
     @RequestMapping(value = "/reactivar/registre", method = RequestMethod.GET)
     public String reactivarReintentar(HttpServletRequest request, Model model) {

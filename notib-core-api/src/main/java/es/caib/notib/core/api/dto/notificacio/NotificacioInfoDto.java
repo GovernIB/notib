@@ -91,6 +91,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private String fiReintentsDesc;
 	private boolean callbackFiReintents;
 	private String callbackFiReintentsDesc;
+	private List<String> notificacionsMovilErrorDesc = new ArrayList<>();
 
 	private Date enviadaDate;
 

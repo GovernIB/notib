@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class NotificacioEnviamentDatatableDto {
 
 	private boolean callbackFiReintents;
 	private String callbackFiReintentsDesc;
+	private String  notificacioMovilErrorDesc;
 
 
 	public boolean isNotificacioError() {

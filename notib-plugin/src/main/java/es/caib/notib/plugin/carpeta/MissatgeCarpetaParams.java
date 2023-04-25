@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.ws.rs.core.MultivaluedMap;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,49 +39,26 @@ public class MissatgeCarpetaParams {
     private Date dataDisponibleCompareixenca;
     private String numExpedient;
 
-    public List<String> getParams() {
+    public void setQueryParams(MultivaluedMap<String, String> params) {
 
         SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         String caducitat = caducitatNotificacio != null ? df.format(caducitatNotificacio) : "";
         String compareixenca = dataDisponibleCompareixenca != null ? df.format(dataDisponibleCompareixenca) : "";
-        List<String> params = new ArrayList<>();
-        params.add(nomCompletDestinatari != null ? nomCompletDestinatari : "");
-        params.add(codiDir3Entitat != null ? codiDir3Entitat : "");
-        params.add(nomEntitat != null ? nomEntitat : "") ;
-        params.add(nomOrganEmisor != null ? nomOrganEmisor : "");
-        params.add(codiOrganEmisor != null ? codiOrganEmisor : "");
-        params.add(concepteNotificacio != null ? concepteNotificacio : "");
-        params.add(descNotificacio != null ? descNotificacio : "");
-        params.add(uuIdNotificacio != null ? uuIdNotificacio : "");
-        params.add(tipus != null ? tipus.name() : "");
-        params.add(vincleInteressat != null ? vincleInteressat.name() : "");
-        params.add(codiSiaProcediment != null ? codiSiaProcediment : "");
-        params.add(nomProcediment != null ? nomProcediment : "");
-        params.add(caducitat);
-        params.add(compareixenca);
-        params.add(numExpedient != null ? numExpedient : "");
-        return  params;
-//        resource.queryParam("notificationParameters", nomCompletDestinatari != null ? nomCompletDestinatari : "");
-//        resource.queryParam("notificationParameters", codiDir3Entitat != null ? codiDir3Entitat : "");
-//        resource.queryParam("notificationParameters", nomEntitat != null ? nomEntitat : "") ;
-//        resource.queryParam("notificationParameters", nomOrganEmisor != null ? nomOrganEmisor : "");
-//        resource.queryParam("notificationParameters", codiOrganEmisor != null ? codiOrganEmisor : "");
-//        resource.queryParam("notificationParameters", concepteNotificacio != null ? concepteNotificacio : "");
-//        resource.queryParam("notificationParameters", descNotificacio != null ? descNotificacio : "");
-//        resource.queryParam("notificationParameters", uuIdNotificacio != null ? uuIdNotificacio : "");
-//        resource.queryParam("notificationParameters", tipus != null ? tipus.name() : "");
-//        resource.queryParam("notificationParameters", vincleInteressat != null ? vincleInteressat.name() : "");
-//        resource.queryParam("notificationParameters", codiSiaProcediment != null ? codiSiaProcediment : "");
-//        resource.queryParam("notificationParameters", nomProcediment != null ? nomProcediment : "");
-//        resource.queryParam("notificationParameters", caducitat);
-//        resource.queryParam("notificationParameters", compareixenca);
-//        resource.queryParam("notificationParameters", numExpedient != null ? numExpedient : "");
 
-//        return "&notificationParameters=" + nomCompletDestinatari + "&notificationParameters=" + codiDir3Entitat + "&notificationParameters=" + nomEntitat
-//                + "&notificationParameters=" + nomOrganEmisor + "&notificationParameters=" + codiOrganEmisor + "&notificationParameters=" + concepteNotificacio
-//                + "&notificationParameters=" + descNotificacio + "&notificationParameters=" + uuIdNotificacio
-//                + "&notificationParameters=" + tipus + "&notificationParameters=" + vincleInteressat + "&notificationParameters=" + codiSiaProcediment
-//                + "&notificationParameters=" + nomProcediment + "&notificationParameters=" + caducitat
-//                + "&notificationParameters=" + compareixenca + "&notificationParameters=" + numExpedient;
+        params.add("notificationParameters", nomCompletDestinatari != null ? nomCompletDestinatari : "");
+        params.add("notificationParameters", codiDir3Entitat != null ? codiDir3Entitat : "");
+        params.add("notificationParameters", nomEntitat != null ? nomEntitat : "") ;
+        params.add("notificationParameters", nomOrganEmisor != null ? nomOrganEmisor : "");
+        params.add("notificationParameters", codiOrganEmisor != null ? codiOrganEmisor : "");
+        params.add("notificationParameters", concepteNotificacio != null ? concepteNotificacio : "");
+        params.add("notificationParameters", descNotificacio != null ? descNotificacio : "");
+        params.add("notificationParameters", uuIdNotificacio != null ? uuIdNotificacio : "");
+        params.add("notificationParameters", tipus != null ? tipus.name() : "");
+        params.add("notificationParameters", vincleInteressat != null ? vincleInteressat.name() : "");
+        params.add("notificationParameters", codiSiaProcediment != null ? codiSiaProcediment : "");
+        params.add("notificationParameters", nomProcediment != null ? nomProcediment : "");
+        params.add("notificationParameters", caducitat);
+        params.add("notificationParameters", compareixenca);
+        params.add("notificationParameters", numExpedient != null ? numExpedient : "");
     }
 }

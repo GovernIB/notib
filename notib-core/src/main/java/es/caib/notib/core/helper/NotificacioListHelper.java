@@ -186,14 +186,15 @@ public class NotificacioListHelper {
 
 //        List<NotificacioEnviamentDatatableDto> enviaments = enviamentService.enviamentFindAmbNotificacio(item.getId());
         String estat = item.isEnviant() ? "<span class=\"fa fa-clock-o\"></span>" :
-                NotificacioEstatEnumDto.PENDENT.equals(item.getEstat()) ? "<span class=\"fa fa-clock-o\"></span>" :
+                        NotificacioEstatEnumDto.PENDENT.equals(item.getEstat()) ? "<span class=\"fa fa-clock-o\"></span>" :
                         NotificacioEstatEnumDto.ENVIADA.equals(item.getEstat()) || NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(item.getEstat()) ? "<span class=\"fa fa-send-o\"></span>" :
-                                NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) ? "<span class=\"fa fa-check\"></span>" :
-                                        NotificacioEstatEnumDto.REGISTRADA.equals(item.getEstat()) ? "<span class=\"fa fa-file-o\"></span>" :
-                                                NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) ? "<span class=\"fa fa-check-circle\"></span>" : "";
+                        NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) ? "<span class=\"fa fa-check\"></span>" :
+                        NotificacioEstatEnumDto.REGISTRADA.equals(item.getEstat()) ? "<span class=\"fa fa-file-o\"></span>" :
+                        NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) ? "<span class=\"fa fa-check-circle\"></span>" : "";
         String nomEstat = " " + messageHelper.getMessage("es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto." + (item.isEnviant() ? NotificacioEstatEnumDto.ENVIANT.name() : item.getEstat().name())) + "";
 
         NotificacioEventEntity e = eventRepository.findLastErrorEventByNotificacioId(item.getId());
+
         String error = item.isNotificaError() ? " <span class=\"fa fa-warning text-danger\" title=\"" + htmlEscape(item.getNotificaErrorDescripcio()) + " \"></span>"
                         : e != null ? " <span class=\"fa fa-warning text-danger\" title=\"" + htmlEscape(e.getErrorDescripcio()) + " \"></span>" : "";
 //        String error = e != null && !Strings.isNullOrEmpty(e.getErrorDescripcio()) ? " <span class=\"fa fa-warning text-danger\" title=\"" + htmlEscape(e.getErrorDescripcio()) + " \"></span>" : "";
@@ -215,7 +216,7 @@ public class NotificacioListHelper {
         int callbackFiReintents = eventRepository.countEventCallbackAmbFiReintentsByNotificacioId(item.getId());
         String callbackMsg = callbackFiReintents > 0 ? "<span class=\"fa fa-warning text-info\" title=\"" + messageHelper.getMessage("callback.fi.reintents") + "\"></span>" : "";
         fiReintents = !Strings.isNullOrEmpty(m) ? "<span class=\"fa fa-warning text-warning\" title=\"" + m + "\"></span>" : "";
-        estat = "<span>" + estat + nomEstat + error + "  " + fiReintents + callbackMsg + "</span>";
+
         String data = "\n";
         if ((NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat())) && item.getEstatDate() != null) {
             SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
@@ -232,6 +233,7 @@ public class NotificacioListHelper {
         Map<String, Integer>  registres = new HashMap<>();
         boolean hasEnviamentsPendents = false;
         boolean isError = false;
+        String notificacioMovilMsg = "";
         for (NotificacioEnviamentEntity env : enviaments) {
             item.updateEstatTipusCount(env.getNotificaEstat());
 //                if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat())) {
@@ -255,9 +257,18 @@ public class NotificacioListHelper {
             if (!env.isNotificaEstatFinal() && EnviamentEstat.NOTIB_PENDENT.equals(env.getNotificaEstat())) {
                 hasEnviamentsPendents = true;
             }
+            if (env.isPerEmail() || env.getNotificaEstat() == null) {
+                continue;
+            }
+            NotificacioEventEntity eventCarpeta = eventRepository.findLastApiCarpetaByEnviamentId(env.getId());
+            if (eventCarpeta != null && eventCarpeta.isError()) {
+                notificacioMovilMsg += "<span style=\"color:#8a6d3b;\" class=\"fa fa-mobile fa-lg\" title=\"" + eventCarpeta.getErrorDescripcio() + "\"></span>\n";
+            }
         }
         item.setHasEnviamentsPendentsRegistre(hasEnviamentsPendents);
         notificaEstat = notificaEstat.length() > 0 ? notificaEstat.substring(0, notificaEstat.length()-2) : "";
+
+        estat = "<span>" + estat + nomEstat + error + "  " + fiReintents + callbackMsg + notificacioMovilMsg + "</span>";
         estat = "<div class=\"flex-column\"><div style=\"display:flex; justify-content:space-between\">" + estat + (registreEstat.length() > 0 ? registreEstat : "")
                 + "</div></div>" + data + notificaEstat;
         String padding = "; padding-left: 5px;";

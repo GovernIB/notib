@@ -351,6 +351,9 @@ $(document).ready(function() {
 								<c:if test="${notificacio.callbackFiReintents}">
 									<span class="fa fa-warning text-info" title="<c:out value='${notificacio.callbackFiReintentsDesc}' escapeXml='true'/>"></span>
 								</c:if>
+								<c:forEach var="error" items="${notificacio.notificacionsMovilErrorDesc}">
+									<span style="color:#8a6d3b;" class="fa fa-mobile fa-lg" title="<c:out value='${error}' escapeXml="true"/>"></span>
+								</c:forEach>
 <%--								<c:if test="${notificacio.tipusUsuari == 'APLICACIO' and notificacio.errorLastEvent}">--%>
 <%--									<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>--%>
 <%--								</c:if>--%>

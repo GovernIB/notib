@@ -42,6 +42,7 @@ import es.caib.notib.core.exception.DocumentNotFoundException;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.plugin.carpeta.CarpetaPlugin;
 import es.caib.notib.plugin.carpeta.MissatgeCarpetaParams;
+import es.caib.notib.plugin.carpeta.RespostaSendNotificacioMovil;
 import es.caib.notib.plugin.carpeta.VincleInteressat;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
@@ -1911,12 +1912,16 @@ public class PluginHelper {
 	public void enviarNotificacioMobil(NotificacioEnviamentEntity e) {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.CARPETA, "Enviar notificació mòvil", IntegracioAccioTipusEnumDto.ENVIAMENT);
-//				new AccioParam("Nom del document", params.), new AccioParam("ContentType", firmaContentType));
 		NotificacioEventHelper.EventInfo eventInfo = NotificacioEventHelper.EventInfo.builder().enviament(e).tipus(NotificacioEventTipusEnumDto.API_CARPETA).build();
-
 		try {
-			getCarpetaPlugin().enviarNotificacioMobil(crearMissatgeCarpetaParams(e));
-			integracioHelper.addAccioOk(info);
+			RespostaSendNotificacioMovil res = getCarpetaPlugin().enviarNotificacioMobil(crearMissatgeCarpetaParams(e));
+			if (!Strings.isNullOrEmpty(res.getCode()) && "OK".equalsIgnoreCase(res.getCode())) {
+				integracioHelper.addAccioOk(info);
+			} else {
+				eventInfo.setError(true);
+				eventInfo.setErrorDescripcio(res.getMessage());
+				integracioHelper.addAccioError(info, res.getMessage());
+			}
 		} catch (Exception ex) {
 			String msg = "Error al enviar notificació mòvil";
 			log.error(msg, ex);

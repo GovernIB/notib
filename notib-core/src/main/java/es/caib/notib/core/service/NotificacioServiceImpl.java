@@ -507,10 +507,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 			String data = pendents != null && !pendents.isEmpty() && pendents.get(0).getData() != null ? df.format(pendents.get(0).getData()) : null;
 			dto.setDataCallbackPendent(data);
 
-
 			int callbackFiReintents = 0;
 			CallbackEntity callback;
+			NotificacioEventEntity eventNotMovil;
 			for (EnviamentInfoDto env : dto.getEnviaments()) {
+
+				eventNotMovil = notificacioEventRepository.findLastApiCarpetaByEnviamentId(env.getId());
+				if (eventNotMovil != null && eventNotMovil.isError()) {
+					dto.getNotificacionsMovilErrorDesc().add(eventNotMovil.getErrorDescripcio());
+				}
 				callback = callbackRepository.findByEnviamentIdAndEstat(env.getId(), CallbackEstatEnumDto.ERROR);
 				if (callback == null) {
 					continue;
