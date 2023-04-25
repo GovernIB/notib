@@ -315,6 +315,12 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public void reenviarNotificaionsMovil(Long notificacioId) {
+			delegate.reenviarNotificaionsMovil(notificacioId);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public NotificacioEventDto findUltimEventRegistreByNotificacio(Long notificacioId) {
 		return delegate.findUltimEventRegistreByNotificacio(notificacioId);

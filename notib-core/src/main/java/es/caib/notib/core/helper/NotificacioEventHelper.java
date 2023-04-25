@@ -25,7 +25,7 @@ import java.util.List;
 public class NotificacioEventHelper {
 
     @Autowired
-    private NotificacioEventRepository notificacioEventRepository;
+    private NotificacioEventRepository eventRepository;
     @Autowired
     private ConfigHelper configHelper;
 
@@ -48,6 +48,11 @@ public class NotificacioEventHelper {
         return notificaConsultaActiva;
     }
 
+    public NotificacioEventEntity getEvent(NotificacioEnviamentEntity enviament, NotificacioEventTipusEnumDto tipus) {
+
+        return eventRepository.findByEnviamentIdAndTipus(enviament.getId(), tipus);
+    }
+
     public NotificacioEventEntity addEvent(EventInfo eventInfo) {
 
         NotificacioEventEntity event = null;
@@ -64,6 +69,7 @@ public class NotificacioEventHelper {
                 NotificacioEventTipusEnumDto.SIR_ENVIAMENT.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT.equals(eventInfo.getTipus()) ||
+                NotificacioEventTipusEnumDto.API_CARPETA.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(eventInfo.getTipus()) ||       // Per consulta Sir activa
                 (isNotificaConsultaActiva() && NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA.equals(eventInfo.getTipus()));    // Per consulta notifica activa
 
@@ -75,7 +81,7 @@ public class NotificacioEventHelper {
         // En aquest cas, si és un event únic s'actualitzarà, si és de callback, s'actualitzarà si l'existent és amb error
         if (eventUnic || eventCallback) {
             // Obtenim una llista per compatibilitat amb els events existents
-            List<NotificacioEventEntity> events = notificacioEventRepository.findByEnviamentAndTipusOrderByIdDesc(eventInfo.getEnviament(), eventInfo.getTipus());
+            List<NotificacioEventEntity> events = eventRepository.findByEnviamentAndTipusOrderByIdDesc(eventInfo.getEnviament(), eventInfo.getTipus());
             if (events != null && !events.isEmpty()) {
                 event = events.get(0);
                 // Actualitza event
@@ -100,7 +106,7 @@ public class NotificacioEventHelper {
         if (!eventInfo.isError() && event.getFiReintents()) {
             event.setFiReintents(false);
         }
-        notificacioEventRepository.saveAndFlush(event);
+        eventRepository.saveAndFlush(event);
 
         // Actualitzar l'error de la notificació i enviament
         eventInfo.getEnviament().getNotificacio().updateEventAfegir(event);

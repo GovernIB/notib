@@ -1735,6 +1735,24 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
+	public void reenviarNotificaionsMovil(Long notificacioId) {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			log.debug("Reenviarr notificació movil pels enviaments de la notificació " + notificacioId );
+			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
+				pluginHelper.enviarNotificacioMobil(e);
+			}
+		} catch (Exception e) {
+			log.debug("Error reenviant la notifciació mòvil pels enviaments de la notificació " + notificacioId, e);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Transactional
+	@Override
 	public boolean reenviarNotificacioAmbErrors(Long notificacioId) {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();

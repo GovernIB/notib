@@ -615,6 +615,7 @@
                             <li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir"/></a></li>
                             <li><a style="cursor: pointer;" id="reactivarCallback"><spring:message code="notificacio.list.accio.massiva.reactivar.callbacks"/></a></li>
                             <li><a style="cursor: pointer;" id="enviarCallback"><spring:message code="notificacio.list.accio.massiva.enviar.callbacks"/></a></li>
+                            <li><a style="cursor: pointer;" id="enviarNotificacionsMovil"><spring:message code="notificacio.list.accio.massiva.enviar.notificacions.movil"/></a></li>
                         </c:if>
 					</ul>
 				</div>

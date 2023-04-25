@@ -367,6 +367,9 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	void reactivarRegistre(Long notificacioId);
 
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	void reenviarNotificaionsMovil(Long notificacioId);
+
 	/**
 	 * Consulta les administracions disponibles dins DIR3 a partir del codi.
 	 * 

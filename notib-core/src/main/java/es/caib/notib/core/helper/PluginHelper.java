@@ -1912,7 +1912,7 @@ public class PluginHelper {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.CARPETA, "Enviar notificació mòvil", IntegracioAccioTipusEnumDto.ENVIAMENT);
 //				new AccioParam("Nom del document", params.), new AccioParam("ContentType", firmaContentType));
-		NotificacioEventHelper.EventInfo event = NotificacioEventHelper.EventInfo.builder().enviament(e).tipus(NotificacioEventTipusEnumDto.API_CARPETA).build();
+		NotificacioEventHelper.EventInfo eventInfo = NotificacioEventHelper.EventInfo.builder().enviament(e).tipus(NotificacioEventTipusEnumDto.API_CARPETA).build();
 
 		try {
 			getCarpetaPlugin().enviarNotificacioMobil(crearMissatgeCarpetaParams(e));
@@ -1920,11 +1920,11 @@ public class PluginHelper {
 		} catch (Exception ex) {
 			String msg = "Error al enviar notificació mòvil";
 			log.error(msg, ex);
-			event.setError(true);
-			event.setErrorDescripcio(msg);
+			eventInfo.setError(true);
+			eventInfo.setErrorDescripcio(ex.getMessage());
 			integracioHelper.addAccioError(info, msg, ex);
 		}
-		eventHelper.addEvent(event);
+		eventHelper.addEvent(eventInfo);
 	}
 
 	public static MissatgeCarpetaParams crearMissatgeCarpetaParams(NotificacioEnviamentEntity enviament) {
@@ -1932,13 +1932,14 @@ public class PluginHelper {
 		// TODO PARAMETRES nifDestinatari nomCompletDestinatari VincleInteressat i dataDisponibleCompareixenca s'han de posar bé abans de pujar
 		NotificacioEntity not = enviament.getNotificacio();
 		EntitatEntity entitat = not.getEntitat();
-		PersonaEntity titular = enviament.getTitular();
+		boolean isRepresentant = enviament.getDestinataris() != null && !enviament.getDestinataris().isEmpty();
+		PersonaEntity interessat = isRepresentant ? enviament.getDestinataris().get(0) : enviament.getTitular();
 		return MissatgeCarpetaParams.builder()
-				.nifDestinatari(titular.getNif()).nomCompletDestinatari(titular.getNomSencer())
+				.nifDestinatari(interessat.getNif()).nomCompletDestinatari(interessat.getNomSencer())
 				.codiDir3Entitat(entitat.getDir3Codi()).nomEntitat(entitat.getNom())
 				.codiOrganEmisor(not.getEmisorDir3Codi()).concepteNotificacio(not.getConcepte())
 				.descNotificacio(not.getDescripcio()).uuIdNotificacio(not.getReferencia())
-				.tipus(not.getEnviamentTipus()).vincleInteressat(VincleInteressat.TITULAR)
+				.tipus(not.getEnviamentTipus()).vincleInteressat(isRepresentant ? VincleInteressat.REPRESENTANT :VincleInteressat.TITULAR)
 				.codiSiaProcediment(not.getProcediment().getCodi())
 				.nomProcediment(not.getProcediment().getNom())
 				.caducitatNotificacio(not.getCaducitat())

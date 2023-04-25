@@ -28,6 +28,8 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 
 	List<NotificacioEventEntity> findByEnviamentIdOrderByIdAsc(Long enviamentId);
 
+	NotificacioEventEntity findByEnviamentIdAndTipus(Long enviamentId, NotificacioEventTipusEnumDto tipus);
+
 //	long countByEnviamentIdAndCallbackEstat(Long enviamentId, CallbackEstatEnumDto callbackEstat);
 
 //	@Modifying

@@ -695,8 +695,40 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     }
 
     ////
+    @RequestMapping(value = "/enviar/notificacio/movil", method = RequestMethod.GET)
+    public String enviarNotificacioMovil(HttpServletRequest request, Model model) {
+
+        // identificadors de les notificacions, no dels enviaments.
+        Set<Long> seleccio = getIdsSeleccionats(request);
+
+        if (seleccio == null || seleccio.isEmpty()) {
+            return getModalControllerReturnValueError(request,"redirect:../..","accio.massiva.seleccio.buida");
+        }
+        List<String> notificacionsError = new ArrayList<String>();
+        for (Long notificacioId : seleccio) {
+            try {
+                notificacioService.reenviarNotificaionsMovil(notificacioId);
+            } catch (Exception e) {
+                notificacionsError.add("[" + notificacioId + "]: " + e.getMessage());
+            }
+        }
+
+        if (!notificacionsError.isEmpty()) {
+            if (notificacionsError.size() == seleccio.size()) {
+                getModalControllerReturnValueError(request,"redirect:../..","accio.massiva.creat.ko");
+            } else {
+                String desc = "";
+                for (String err: notificacionsError) {
+                    desc = desc + err + " \n";
+                }
+                return getModalControllerReturnValueErrorWithDescription(request,"redirect:../..","accio.massiva.creat.part", desc);
+            }
+        }
+        return getModalControllerReturnValueSuccess(request,"redirect:../..","accio.massiva.creat.ok");
+    }
     // ACCIONS MASSIVES PER NOTIFICACIONS
     ////
+
     @RequestMapping(value = "/reactivar/registre", method = RequestMethod.GET)
     public String reactivarReintentar(HttpServletRequest request, Model model) {
 

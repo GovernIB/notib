@@ -251,5 +251,15 @@ function initEvents($table, url_prefix, eventMessages) {
             setTimeout(() => $table.DataTable().rows().deselect(), 100);
         });
 
+        $("#enviarNotificacionsMovil").on("click", () => {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
+            location.href =  url_prefix + "/enviar/notificacio/movil";
+            setTimeout(() => $table.DataTable().rows().deselect(), 100);
+        });
+
     });
 }
