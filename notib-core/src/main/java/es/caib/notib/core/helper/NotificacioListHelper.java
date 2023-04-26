@@ -234,6 +234,7 @@ public class NotificacioListHelper {
         boolean hasEnviamentsPendents = false;
         boolean isError = false;
         String notificacioMovilMsg = "";
+        int multipleApiCarpetaError = 0;
         for (NotificacioEnviamentEntity env : enviaments) {
             item.updateEstatTipusCount(env.getNotificaEstat());
 //                if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat())) {
@@ -262,8 +263,12 @@ public class NotificacioListHelper {
             }
             NotificacioEventEntity eventCarpeta = eventRepository.findLastApiCarpetaByEnviamentId(env.getId());
             if (eventCarpeta != null && eventCarpeta.isError()) {
+                multipleApiCarpetaError++;
                 notificacioMovilMsg += "<span style=\"color:#8a6d3b;\" class=\"fa fa-mobile fa-lg\" title=\"" + eventCarpeta.getErrorDescripcio() + "\"></span>\n";
             }
+        }
+        if (multipleApiCarpetaError > 1) {
+            notificacioMovilMsg = "<span style=\"color:#8a6d3b;\" class=\"fa fa-mobile fa-lg\" title=\"" + messageHelper.getMessage("api.carpeta.send.notificacio.movil.error") + "\"></span>\n";
         }
         item.setHasEnviamentsPendentsRegistre(hasEnviamentsPendents);
         notificaEstat = notificaEstat.length() > 0 ? notificaEstat.substring(0, notificaEstat.length()-2) : "";

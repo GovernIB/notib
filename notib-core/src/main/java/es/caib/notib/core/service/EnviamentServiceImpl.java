@@ -498,8 +498,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Override
 	@Transactional
 	public NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			entityComprovarHelper.comprovarPermisos(null, false, false, false);
 			logger.debug("Consulta de destinatari donat el seu id (destinatariId=" + enviamentId + ")");
 			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
 			// #779: Obtenim la certificació de forma automàtica
@@ -514,8 +516,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 					log.error("No s'ha pogut actualitzar la certificació de l'enviament amb id: " + enviamentId, ex);
 				}
 			}
-			//NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
-			entityComprovarHelper.comprovarPermisos(null, false, false, false);
 			return enviamentToDto(enviament);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1282,6 +1282,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 			String msg = messageHelper.getMessage("notificacio.event.fi.reintents");
 			String tipus = messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto." + event.getTipus());
 			enviamentDto.setFiReintentsDesc(msg + " -> " + tipus);
+		}
+
+		NotificacioEventEntity e = notificacioEventRepository.findLastApiCarpetaByEnviamentId(enviament.getId());
+		if (e != null && e.isError()) {
+			enviamentDto.setNotificacioMovilErrorDesc(e.getErrorDescripcio());
 		}
 
 		callback = callbackRepository.findByEnviamentIdAndEstat(enviament.getId(), CallbackEstatEnumDto.ERROR);

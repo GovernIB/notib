@@ -515,6 +515,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				eventNotMovil = notificacioEventRepository.findLastApiCarpetaByEnviamentId(env.getId());
 				if (eventNotMovil != null && eventNotMovil.isError()) {
 					dto.getNotificacionsMovilErrorDesc().add(eventNotMovil.getErrorDescripcio());
+					env.setNotificacioMovilErrorDesc(eventNotMovil.getErrorDescripcio());
 				}
 				callback = callbackRepository.findByEnviamentIdAndEstat(env.getId(), CallbackEstatEnumDto.ERROR);
 				if (callback == null) {
@@ -524,6 +525,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 				env.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
 				callbackFiReintents++;
 
+			}
+			if (dto.getNotificacionsMovilErrorDesc().size() > 1) {
+				List<String> foo = new ArrayList<>();
+				foo.add(messageHelper.getMessage("api.carpeta.send.notificacio.movil.error"));
+				dto.setNotificacionsMovilErrorDesc(foo);
 			}
 //			int callbackFiReintents = notificacioEventRepository.countEventCallbackAmbFiReintentsByNotificacioId(notificacio.getId());
 			if (callbackFiReintents > 0) {

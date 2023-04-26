@@ -243,6 +243,12 @@ $(document).ready(function() {
 							<c:if test="${enviament.callbackFiReintents}">
 								<span class="fa fa-warning text-info" title="<c:out value='${enviament.callbackFiReintentsDesc}' escapeXml='true'/>"></span>
 							</c:if>
+							<c:if test="${enviament.callbackFiReintents}">
+								<span class="fa fa-warning text-info" title="<c:out value='${enviament.callbackFiReintentsDesc}' escapeXml='true'/>"></span>
+							</c:if>
+							<c:if test="${not empty enviament.notificacioMovilErrorDesc}">
+								<span style="color:#8a6d3b;  cursor:pointer;" class="fa fa-mobile fa-lg" title="<c:out value='${enviament.notificacioMovilErrorDesc}' escapeXml='true'/>"></span>
+							</c:if>
 						</td>
 					</tr>
 				</tbody>

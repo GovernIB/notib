@@ -67,6 +67,7 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	private boolean perEmail;
 	private Date sirRecepcioData;
 	private Date sirRegDestiData;
+	private String notificacioMovilErrorDesc;
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
