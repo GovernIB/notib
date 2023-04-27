@@ -66,17 +66,12 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			byte[] response = IOUtils.toByteArray(httpConnection.getInputStream());
 			if (response != null && response.length > 0) {
-				NodeDir3 arrel = mapper.readValue(
-					response, 
-					NodeDir3.class);
+				NodeDir3 arrel = mapper.readValue(response, NodeDir3.class);
 				nodeToOrganigrama(arrel, organigrama);
 			}
 			return organigrama;
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'ha pogut consultar l'organigrama de unitats organitzatives via REST (" +
-					"codiEntitat=" + codiEntitat + ")",
-					ex);
+			throw new SistemaExternException("No s'ha pogut consultar l'organigrama de unitats organitzatives via REST (codiEntitat=" + codiEntitat + ")", ex);
 		}
 	}
 	

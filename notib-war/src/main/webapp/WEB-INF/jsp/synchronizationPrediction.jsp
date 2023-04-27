@@ -350,18 +350,30 @@
 						<c:forEach var="splitMap" items="${splitMap}">
 							<c:set var="key" value="${splitMap.key}" />
 							<c:set var="values" value="${splitMap.value}" />
+							<c:choose>
+								<c:when test="${not empty key.denominacioCooficial}">
+									<c:set var="denominacio" value="${key.denominacioCooficial}" />
+								</c:when>
+								<c:otherwise>
+									<c:set var="denominacio" value="${key.denominacio}" />
+								</c:otherwise>
+							</c:choose>
+
 							<div class=horizontal-left>
 								<div id="wrapper">
-									<span class="label bg-danger border-red overflow-ellipsis"
-										title="${key.codi} - ${key.denominacio}"> ${key.codi} -
-										${key.denominacio} </span>
+									<span class="label bg-danger border-red overflow-ellipsis" title="${key.codi} - ${denominacio}"> ${key.codi} - ${denominacio} </span>
 									<div class="branch lv1">
 										<c:forEach var="value" items="${values}">
+											<c:choose>
+												<c:when test="${not empty value.denominacioCooficial}">
+													<c:set var="den" value="${value.denominacioCooficial}" />
+												</c:when>
+												<c:otherwise>
+													<c:set var="den" value="${value.denominacio}" />
+												</c:otherwise>
+											</c:choose>
 											<div class="entry">
-												<span
-													class="label bg-success border-green overflow-ellipsis"
-													title="${value.codi} - ${value.denominacio}">${value.codi}
-													- ${value.denominacio}</span>
+												<span class="label bg-success border-green overflow-ellipsis" title="${value.codi} - ${den}">${value.codi}- ${den}</span>
 											</div>
 										</c:forEach>
 									</div>
@@ -383,18 +395,29 @@
 						<c:forEach var="mergeMap" items="${mergeMap}">
 							<c:set var="key" value="${mergeMap.key}" />
 							<c:set var="values" value="${mergeMap.value}" />
+							<c:choose>
+								<c:when test="${not empty key.denominacioCooficial}">
+									<c:set var="denominacio" value="${key.denominacioCooficial}" />
+								</c:when>
+								<c:otherwise>
+									<c:set var="denominacio" value="${key.denominacio}" />
+								</c:otherwise>
+							</c:choose>
 							<div class=horizontal-right>
 								<div id="wrapper">
-									<span
-										class="label bg-success border-green right-postion-20 overflow-ellipsis"
-										title="${key.codi} - ${key.denominacio}"> ${key.codi} -
-										${key.denominacio} </span>
+									<span class="label bg-success border-green right-postion-20 overflow-ellipsis" title="${key.codi} - ${denominacio}"> ${key.codi} -${denominacio} </span>
 									<div class="branch lv1">
 										<c:forEach var="value" items="${values}">
+											<c:choose>
+												<c:when test="${not empty value.denominacioCooficial}">
+													<c:set var="den" value="${value.denominacioCooficial}" />
+												</c:when>
+												<c:otherwise>
+													<c:set var="den" value="${value.denominacio}" />
+												</c:otherwise>
+											</c:choose>
 											<div class="entry">
-												<span class="label bg-danger border-red overflow-ellipsis"
-													title="${value.codi} - ${value.denominacio}">
-													${value.codi} - ${value.denominacio} </span>
+												<span class="label bg-danger border-red overflow-ellipsis" title="${value.codi} - ${den}">${value.codi} - ${den} </span>
 											</div>
 										</c:forEach>
 									</div>
@@ -416,19 +439,29 @@
 						<c:forEach var="substMap" items="${substMap}">
 							<c:set var="key" value="${substMap.key}" />
 							<c:set var="values" value="${substMap.value}" />
+							<c:choose>
+								<c:when test="${not empty key.denominacioCooficial}">
+									<c:set var="denominacio" value="${key.denominacioCooficial}" />
+								</c:when>
+								<c:otherwise>
+									<c:set var="denominacio" value="${key.denominacio}" />
+								</c:otherwise>
+							</c:choose>
 							<div class=horizontal-right>
 								<div id="wrapper">
-									<span
-										class="label bg-success border-green right-postion-20 overflow-ellipsis"
-										title="${key.codi} - ${key.denominacio}"> ${key.codi} -
-										${key.denominacio} </span>
+									<span class="label bg-success border-green right-postion-20 overflow-ellipsis" title="${key.codi} - ${denominacio}"> ${key.codi} -${denominacio} </span>
 									<div class="branch lv1">
 										<c:forEach var="value" items="${values}">
+											<c:choose>
+												<c:when test="${not empty value.denominacioCooficial}">
+													<c:set var="den" value="${value.denominacioCooficial}" />
+												</c:when>
+												<c:otherwise>
+													<c:set var="den" value="${value.denominacio}" />
+												</c:otherwise>
+											</c:choose>
 											<div class="entry sole">
-												<span class="label bg-danger border-red overflow-ellipsis"
-													title="${value.codi} - ${value.denominacio}">
-													${value.codi} - ${value.denominacio} </span>
-											</div>
+												<span class="label bg-danger border-red overflow-ellipsis" title="${value.codi} - ${den}">${value.codi} - ${den} </span></div>
 										</c:forEach>
 									</div>
 								</div>
@@ -452,23 +485,38 @@
 						</c:choose>
 
 					</div>
+
 					<div class="panel-body">
 						<c:forEach var="unitatVigent" items="${unitatsVigents}">
-
+							<c:choose>
+								<c:when test="${not empty unitatVigent.denominacioCooficial}">
+									<c:set var="denominacio" value="${unitatVigent.denominacioCooficial}" />
+								</c:when>
+								<c:otherwise>
+									<c:set var="denominacio" value="${unitatVigent.denominacio}" />
+								</c:otherwise>
+							</c:choose>
 							<div class=horizontal-left>
 								<div id="wrapper">
-									<span class="label bg-success border-green overflow-ellipsis" title="${unitatVigent.codi} - <c:choose><c:when test="${not empty unitatVigent.oldDenominacio}">${unitatVigent.oldDenominacio}</c:when><c:otherwise>${unitatVigent.denominacio}</c:otherwise></c:choose>">
-<%--										<span class="label bg-success border-green overflow-ellipsis" title="${unitatVigent.codi} - ${unitatVigent.denominacio}">--%>
+									<span class="label bg-success border-green overflow-ellipsis" title="${unitatVigent.codi} -
+												<c:choose>
+													<c:when test="${not empty unitatVigent.oldDenominacio}">
+														${unitatVigent.oldDenominacio}
+													</c:when>
+													<c:otherwise>
+														${denominacio}
+													</c:otherwise>
+												</c:choose>">
 										${unitatVigent.codi} -
 										<c:choose>
 											<c:when test="${not empty unitatVigent.oldDenominacio}">${unitatVigent.oldDenominacio}</c:when>
-											<c:otherwise>${unitatVigent.denominacio}</c:otherwise>
+											<c:otherwise>${denominacio}</c:otherwise>
 										</c:choose>
 									</span>
 									<div class="branch lv1">
 										<div class="entry sole">
-											<span class="label bg-warning border-yellow overflow-ellipsis" title="${unitatVigent.codi} - ${unitatVigent.denominacio}">
-												${unitatVigent.codi} - ${unitatVigent.denominacio}
+											<span class="label bg-warning border-yellow overflow-ellipsis" title="${unitatVigent.codi} - ${denominacio}">
+												${unitatVigent.codi} - ${denominacio}
 											</span>
 										</div>
 									</div>
@@ -488,13 +536,21 @@
 					</div>
 					<div class="panel-body">
 						<c:forEach var="unitatNew" items="${unitatsNew}">
+							<c:choose>
+								<c:when test="${not empty unitatNew.denominacioCooficial}">
+									<c:set var="denominacio" value="${unitatNew.denominacioCooficial}" />
+								</c:when>
+								<c:otherwise>
+									<c:set var="denominacio" value="${unitatNew.denominacio}" />
+								</c:otherwise>
+							</c:choose>
 							<div class=horizontal-left>
 								<div id="wrapper">
 									<span class="label bg-success border-green overflow-ellipsis create-label"></span>
 									<div class="branch lv1">
 										<div class="entry sole">
-											<span class="label bg-success border-green overflow-ellipsis" title="${unitatNew.codi} - ${unitatNew.denominacio}">
-												${unitatNew.codi} - ${unitatNew.denominacio}
+											<span class="label bg-success border-green overflow-ellipsis" title="${unitatNew.codi} - ${denominacio}">
+												${unitatNew.codi} - ${denominacio}
 											</span>
 										</div>
 									</div>
@@ -513,10 +569,18 @@
 					</div>
 					<div class="panel-body">
 						<c:forEach var="unitatExtingida" items="${unitatsExtingides}">
+							<c:choose>
+								<c:when test="${not empty unitatExtingida.denominacioCooficial}">
+									<c:set var="denominacio" value="${unitatExtingida.denominacioCooficial}" />
+								</c:when>
+								<c:otherwise>
+									<c:set var="denominacio" value="${unitatExtingida.denominacio}" />
+								</c:otherwise>
+							</c:choose>
 							<div class=horizontal-left>
 								<div id="wrapper">
-									<span class="label bg-danger border-red right-postion-20 overflow-ellipsis" title="${unitatExtingida.codi} - ${unitatExtingida.denominacio}">
-										${unitatExtingida.codi} - ${unitatExtingida.denominacio}
+									<span class="label bg-danger border-red right-postion-20 overflow-ellipsis" title="${unitatExtingida.codi} - ${denominacio}">
+										${unitatExtingida.codi} - ${denominacio}
 									</span>
 									<div class="branch lv1">
 										<div class="entry sole remove">

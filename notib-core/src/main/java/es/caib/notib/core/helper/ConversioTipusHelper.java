@@ -354,7 +354,8 @@ public class ConversioTipusHelper {
 				.byDefault()
 				.register();
 		mapperFactory.classMap(NodeDir3.class, OrganGestorDto.class).
-			field("denominacio", "nom").
+			field("denominacio", "nomEs").
+			field("denominacionCooficial", "nom").
 			field("tieneOficinaSir", "sir").
 			byDefault().
 			register();
@@ -401,7 +402,19 @@ public class ConversioTipusHelper {
 						new CustomMapper<OrganGestorEntity, UnitatOrganitzativaDto>() {
 							public void mapAtoB(OrganGestorEntity a, UnitatOrganitzativaDto b, MappingContext context) {
 								// add your custom mapping code here
-								b.setDenominacio(a.getNom());
+								b.setDenominacio(a.getNomEs());
+								b.setDenominacioCooficial(a.getNom());
+							}
+						})
+				.byDefault()
+				.register();
+		mapperFactory.classMap(NodeDir3.class, UnitatOrganitzativaDto.class)
+				.customize(
+						new CustomMapper<NodeDir3, UnitatOrganitzativaDto>() {
+							public void mapAtoB(NodeDir3 a, UnitatOrganitzativaDto b, MappingContext context) {
+								// add your custom mapping code here
+								b.setDenominacio(a.getDenominacio());
+								b.setDenominacioCooficial(a.getDenominacionCooficial());
 							}
 						})
 				.byDefault()

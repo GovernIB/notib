@@ -24,6 +24,7 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 	private String codiPare;
 	private String nomPare;
 	private String nom;
+	private String nomEs;
 	private Long entitatId;
 	private String entitatNom;
 	private String llibre;

@@ -143,7 +143,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 	public List<NodeDir3> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 		try {
 			List<NodeDir3> unitats = new ArrayList<NodeDir3>();
-			List<UnidadTF> unidades = getObtenerUnidadesService().obtenerArbolUnidades(
+				List<UnidadTF> unidades = getObtenerUnidadesService().obtenerArbolUnidades(
 					pareCodi,
 					dataActualitzacio != null ? new Timestamp(dataActualitzacio.getTime()) : null,
 					dataSincronitzacio != null ? new Timestamp(dataSincronitzacio.getTime()) : null);
