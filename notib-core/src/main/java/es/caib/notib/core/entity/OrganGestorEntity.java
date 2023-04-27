@@ -42,6 +42,9 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 	
 	@Column(name = "nom", length = 1000)
 	protected String nom;
+
+	@Column(name = "nom_es", length = 1000)
+	protected String nomEs;
 	
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat")

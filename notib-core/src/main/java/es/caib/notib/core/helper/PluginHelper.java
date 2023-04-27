@@ -3,6 +3,7 @@ package es.caib.notib.core.helper;
 import com.google.common.base.Strings;
 import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.PdfReader;
+import es.caib.notib.client.domini.IdiomaEnumDto;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
@@ -1033,6 +1034,10 @@ public class PluginHelper {
 		return organigrama;
 	}
 
+	public List<NodeDir3> getOrganNomMultidioma(EntitatEntity entitat) {
+		return unitatsOrganitzativesFindByPare(entitat.getCodi(), entitat.getDir3Codi(), null, null);
+	}
+
 	public List<NodeDir3> unitatsOrganitzativesFindByPare(String entitatCodi, String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) {
 
 		IntegracioInfo info = new IntegracioInfo(
@@ -1934,21 +1939,22 @@ public class PluginHelper {
 
 	public static MissatgeCarpetaParams crearMissatgeCarpetaParams(NotificacioEnviamentEntity enviament) {
 
-		// TODO PARAMETRES nifDestinatari nomCompletDestinatari VincleInteressat i dataDisponibleCompareixenca s'han de posar bé abans de pujar
+		// TODO PARAMETRES dataDisponibleCompareixenca s'han de posar bé abans de pujar
 		NotificacioEntity not = enviament.getNotificacio();
 		EntitatEntity entitat = not.getEntitat();
 		boolean isRepresentant = enviament.getDestinataris() != null && !enviament.getDestinataris().isEmpty();
 		PersonaEntity interessat = isRepresentant ? enviament.getDestinataris().get(0) : enviament.getTitular();
-		return MissatgeCarpetaParams.builder()
-				.nifDestinatari(interessat.getNif()).nomCompletDestinatari(interessat.getNomSencer())
+		IdiomaEnumDto idioma = not.getIdioma();
+		OrganGestorEntity organ = not.getOrganGestor();
+		String nomOrgan = IdiomaEnumDto.ES.equals(idioma) && !Strings.isNullOrEmpty(organ.getNomEs()) ? organ.getNomEs() : organ.getNom();
+		return MissatgeCarpetaParams.builder().nifDestinatari(interessat.getNif()).nomCompletDestinatari(interessat.getNomSencer())
 				.codiDir3Entitat(entitat.getDir3Codi()).nomEntitat(entitat.getNom())
-				.codiOrganEmisor(not.getEmisorDir3Codi()).concepteNotificacio(not.getConcepte())
-				.descNotificacio(not.getDescripcio()).uuIdNotificacio(not.getReferencia())
+				.codiOrganEmisor(not.getEmisorDir3Codi()).nomOrganEmisor(nomOrgan)
+				.concepteNotificacio(not.getConcepte()).descNotificacio(not.getDescripcio()).uuIdNotificacio(not.getReferencia())
 				.tipus(not.getEnviamentTipus()).vincleInteressat(isRepresentant ? VincleInteressat.REPRESENTANT :VincleInteressat.TITULAR)
-				.codiSiaProcediment(not.getProcediment().getCodi())
-				.nomProcediment(not.getProcediment().getNom())
+				.codiSiaProcediment(not.getProcediment().getCodi()).nomProcediment(not.getProcediment().getNom())
 				.caducitatNotificacio(not.getCaducitat())
-				.dataDisponibleCompareixenca(new Date()) // TODO VEURE TODO ANTERIOR
+				.dataDisponibleCompareixenca(new Date()) // TODO DETERMINAR ATRIBUT
 				.numExpedient(not.getNumExpedient())
 				.build();
 	}

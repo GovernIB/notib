@@ -2,6 +2,7 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.service.ConfigService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.entity.ProcesosInicialsEntity;
 import es.caib.notib.core.repository.ProcessosInicialsRepository;
 import lombok.Synchronized;
@@ -27,14 +28,12 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 
     @Autowired
     private NotificacioService notificacioService;
-
     @Autowired
     private ConfigService configService;
-
     @Autowired
     private ProcessosInicialsRepository processosInicialsRepository;
     @Autowired
-    private NotificacioTableHelper notificacioTableHelper;
+    private OrganGestorService organService;
 
     public static int counter = 0;
 
@@ -47,6 +46,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
         log.info("Executant processos inicials. Counter: " + counter++);
         addCustomAuthentication();
         try {
+
             List<ProcesosInicialsEntity> processos = processosInicialsRepository.findProcesosInicialsEntityByInitTrue();
             for (ProcesosInicialsEntity proces : processos) {
                 log.info("Executant procés inicial: {}",  proces.getCodi());
@@ -57,8 +57,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                     case PROPIETATS_CONFIG_ENTITATS:
                         configService.crearPropietatsConfigPerEntitats();
                         break;
-//                    case ACTUALITZAR_NOT_NOTIFICACIO_TABLE:
-//                        notificacioTableHelper.actualitzarTaula();
+                    case SINCRONITZAR_ORGANS_NOMS_MULTIDIOMA:
+                        organService.sincronitzarOrganNomMultidioma();
                     default:
                         log.error("Procés inicial no definit");
                         break;

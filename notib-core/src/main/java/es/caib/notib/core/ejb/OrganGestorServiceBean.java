@@ -269,6 +269,11 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
+	public void sincronitzarOrganNomMultidioma() {
+		delegate.sincronitzarOrganNomMultidioma();
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public OrganGestorDto update(OrganGestorDto dto) {
 		return delegate.update(dto);

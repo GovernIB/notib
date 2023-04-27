@@ -96,7 +96,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			Date fechaSincronizacion) throws SistemaExternException {
 		Map<String, NodeDir3> organigrama = new HashMap<>();
 		try {
-			List<UnidadTF> arbol = new ArrayList<>();
+			List<UnitatOrganitzativa> arbol = new ArrayList<>();
 
 			DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			URL url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerArbolUnidades?codigo=" + pareCodi +
@@ -110,7 +110,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 				arbol = mapper.readValue(response, new TypeReference<List<UnidadTF>>() {});
 			}
 
-			for(UnidadTF unidadTF: arbol){
+			for(UnitatOrganitzativa unidadTF: arbol){
 				if ("V".equals(unidadTF.getCodigoEstadoEntidad()) || "T".equals(unidadTF.getCodigoEstadoEntidad())) {	// Unitats Vigents o Transitòries 
 					NodeDir3 node = toNodeDir3(unidadTF);
 					NodeDir3 pare = organigrama.get(node.getSuperior());
@@ -142,19 +142,19 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 		try {
 			DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			List<NodeDir3> unitats = new ArrayList<>();
-			List<UnidadTF> unidades = new ArrayList<>();
-			URL url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerArbolUnidades?codigo=" + pareCodi +
+			List<UnitatOrganitzativa> unidades = new ArrayList<>();
+			URL url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerArbolUnidades?codigo=" + pareCodi + "&denominacionCooficial=false" +
 					(dataActualitzacio != null ? "&fechaActualizacion=" + sdf.format(dataActualitzacio) : "") +
 					(dataSincronitzacio != null ? "&fechaSincronizacion=" + sdf.format(dataSincronitzacio) : ""));
 			byte[] response = getResponse(url);
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			if (response != null && response.length > 0) {
-				unidades = mapper.readValue(response, new TypeReference<List<UnidadTF>>() {});
+				unidades = mapper.readValue(response, new TypeReference<List<UnitatOrganitzativa>>() {});
 			}
 
 			if (unidades != null) {
-				for (UnidadTF unidad : unidades) {
+				for (UnitatOrganitzativa unidad : unidades) {
 					unitats.add(toNodeDir3(unidad));
 				}
 			}
@@ -169,7 +169,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	public NodeDir3 findAmbCodi(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 		DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		try {
-			UnidadTF unidad = null;
+			UnitatOrganitzativa unidad = null;
 			URL url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerUnidad?codigo=" + pareCodi +
 					(dataActualitzacio != null ? "&fechaActualizacion=" + dataActualitzacio : "") +
 					(dataSincronitzacio != null ? "&fechaSincronizacion=" + dataSincronitzacio : ""));
@@ -177,7 +177,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			if (response != null && response.length > 0) {
-				unidad = mapper.readValue(response, UnidadTF.class);
+				unidad = mapper.readValue(response, UnitatOrganitzativa.class);
 			}
 			return unidad != null ? toNodeDir3(unidad) : null;
 		} catch (Exception ex) {
@@ -186,10 +186,11 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 		}
 	}
 
-	private NodeDir3 toNodeDir3(UnidadTF unidadTF) {
+	private NodeDir3 toNodeDir3(UnitatOrganitzativa unidadTF) {
 		NodeDir3 node = NodeDir3.builder()
 				.codi(unidadTF.getCodigo())
 				.denominacio(unidadTF.getDenominacion())
+				.denominacionCooficial(unidadTF.getDenominacionCooficial())
 				.estat(unidadTF.getCodigoEstadoEntidad())
 				.arrel(unidadTF.getCodUnidadRaiz())
 				.superior(unidadTF.getCodUnidadSuperior())

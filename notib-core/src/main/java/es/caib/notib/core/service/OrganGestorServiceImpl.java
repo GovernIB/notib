@@ -34,7 +34,6 @@ import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.cacheable.PermisosCacheable;
-import es.caib.notib.core.cacheable.ProcSerCacheable;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.OficinaEntity;
@@ -71,8 +70,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -100,7 +97,8 @@ import java.util.Set;
 
 @Slf4j
 @Service
-public class OrganGestorServiceImpl implements OrganGestorService{
+public class OrganGestorServiceImpl implements OrganGestorService {
+
 	@Autowired
 	private EntitatRepository entitatRepository;
 
@@ -142,8 +140,6 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private OrganGestorCachable organGestorCachable;
 	@Resource
 	private PermisosCacheable permisosCacheable;
-	@Resource
-	private ProcSerCacheable procedimentsCacheable;
 	@Resource
 	private ConfigHelper configHelper;
 	@Autowired
@@ -241,38 +237,25 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Override
 	@Transactional
 	public OrganGestorDto update(OrganGestorDto dto) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarEntitat(
-					dto.getEntitatId(), 
-					false, 
-					true, 
-					false);
-			
+			entityComprovarHelper.comprovarEntitat(dto.getEntitatId(), false, true, false);
 			OrganGestorEntity organGestor = organGestorRepository.findOne(dto.getId());
-			organGestor.updateOficina(
-					dto.getOficina().getCodi(),
-					dto.getOficina().getNom());
-
+			organGestor.updateOficina(dto.getOficina().getCodi(), dto.getOficina().getNom());
 			EntregaCieEntity entregaCie = organGestor.getEntregaCie();
 			if (dto.isEntregaCieActiva()) {
 				if (entregaCie == null) {
-					entregaCie = entregaCieRepository.save(
-							new EntregaCieEntity(dto.getCieId(), dto.getOperadorPostalId())
-					);
+					entregaCie = entregaCieRepository.save(new EntregaCieEntity(dto.getCieId(), dto.getOperadorPostalId()));
 				} else {
 					entregaCie.update(dto.getCieId(), dto.getOperadorPostalId());
 				}
 			}
-
 			organGestor.updateEntregaCie(dto.isEntregaCieActiva() ? entregaCie : null);
 			if (!dto.isEntregaCieActiva() && entregaCie != null) {
 				entregaCieRepository.delete(entregaCie);
 			}
-
-			return conversioTipusHelper.convertir(
-					organGestor,
-					OrganGestorDto.class);
+			return conversioTipusHelper.convertir(organGestor, OrganGestorDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -454,7 +437,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 	private Page<OrganGestorEntity> findAmbFiltrePaginatByAdminEntitat(EntitatEntity entitat, OrganGestorFiltreDto filtre, Pageable pageable) {
 
-		logger.debug("Consulta taula òrgans gestors per administrador d'entitat");
+		log.debug("Consulta taula òrgans gestors per administrador d'entitat");
 		if (filtre == null) {
 			return organGestorRepository.findByEntitat(entitat, pageable);
 		}
@@ -478,7 +461,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 	private Page<OrganGestorEntity> findAmbFiltrePaginatByAdminOrgan(EntitatEntity entitat, String organActualCodiDir3, OrganGestorFiltreDto filtre, Pageable pageable) {
 
-		logger.debug("Consulta taula òrgans gestors per administrador d'òrgan");
+		log.debug("Consulta taula òrgans gestors per administrador d'òrgan");
 		//Comprovació permisos organ
 		entityComprovarHelper.comprovarPermisosOrganGestor(organActualCodiDir3);
 		//OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(entitat,organActualId);
@@ -516,7 +499,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 //				throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, "No s'ha pogut obtenir la denominació de l'organ gestor");
 //			}
 //			if (!updateLlibre(entitat, organGestor)) {
-//				logger.debug(String.format(
+//				log.debug(String.format(
 //						"No s'ha pogut actualitzar el llibre de l'òrgan gestor %s, segurament l'òrgan no estigui donat d'alta al registre",
 //						organGestorCodi));
 //			}
@@ -556,7 +539,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		ProgresActualitzacioDto progres = progresActualitzacio.get(entitat.getDir3Codi());
 		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
 			msg = "[ORGANS GESTORS] Ja existeix un altre procés que està executant l'actualització";
-			logger.debug(prefix + msg);
+			log.debug(prefix + msg);
 			return null;	// Ja existeix un altre procés que està executant l'actualització.
 		}
 
@@ -743,9 +726,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 			// Obtenir els òrgans vigents a la BBDD
 			List<OrganGestorEntity> organsVigents = organGestorRepository.findByEntitatIdAndEstat(entitat.getId(), OrganGestorEstatEnum.V);
-			logger.debug("Consulta d'unitats vigents a DB");
+			log.debug("Consulta d'unitats vigents a DB");
 			for(OrganGestorEntity organVigent: organsVigents){
-				logger.debug(organVigent.toString());
+				log.debug(organVigent.toString());
 			}
 
 			// Obtenir unitats actualment vigents en BBDD, però marcades com a obsoletes en la sincronització
@@ -915,9 +898,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				}
 			}
 		}
-		logger.debug("Consulta unitats obsolete ");
+		log.debug("Consulta unitats obsolete ");
 		for (NodeDir3 vigentObsolete : organsVigentObsolete) {
-			logger.debug(vigentObsolete.getCodi()+" "+vigentObsolete.getEstat()+" "+vigentObsolete.getHistoricosUO());
+			log.debug(vigentObsolete.getCodi()+" "+vigentObsolete.getEstat()+" "+vigentObsolete.getHistoricosUO());
 		}
 		for (NodeDir3 vigentObsolete : organsVigentObsolete) {
 
@@ -1043,7 +1026,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			List<NodeDir3> unitatsFromWebService,
 			List<NodeDir3> lastHistorics) {
 
-		logger.info("Coloca historics recursiu(" + "unitatCodi=" + unitat.getCodi() + ")");
+		log.info("Coloca historics recursiu(" + "unitatCodi=" + unitat.getCodi() + ")");
 
 		if (unitat.getHistoricosUO() == null || unitat.getHistoricosUO().isEmpty()) {
 			lastHistorics.add(unitat);
@@ -1094,7 +1077,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 //	public void updateAll(Long entitatId, String organActualCodiDir3) {
 //		Timer.Context timer = metricsHelper.iniciMetrica();
 //		try {
-//			logger.info("Actualitzant noms dels òrgans gestors");
+//			log.info("Actualitzant noms dels òrgans gestors");
 //
 //			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
 //			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
@@ -1102,7 +1085,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 //			// Comprova si hi ha una altre instància del procés en execució
 //			ProgresActualitzacioDto progres = progresActualitzacio.get(entitat.getDir3Codi());
 //			if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
-//				logger.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
+//				log.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
 //				return;	// Ja existeix un altre procés que està executant l'actualització.
 //			}
 //
@@ -1128,29 +1111,29 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 //				progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO,
 //						messageHelper.getMessage("organgestor.actualitzacio.organ.actual") + " " + organGestor.getCodi());
 //				boolean status = updateNom(entitat, organGestor);
-//				logger.info("Fi - updateNom del òrgan gestor: " + organGestor);
+//				log.info("Fi - updateNom del òrgan gestor: " + organGestor);
 //				if (!status) {
-//					logger.error(String.format("Actualització òrgan (%s): Error actualitzant nom ", organGestor.getCodi()));
+//					log.error(String.format("Actualització òrgan (%s): Error actualitzant nom ", organGestor.getCodi()));
 //					progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.organ.error.actualtizar.nom"));
 //				}
 //				status = updateLlibre(entitat, organGestor);
-//				logger.info("Fi - updateLlibre del òrgan gestor: " + organGestor);
+//				log.info("Fi - updateLlibre del òrgan gestor: " + organGestor);
 //				if (!status) {
-//					logger.error(String.format("Actualització òrgan (%s): Error actualitzant llibre ", organGestor.getCodi()));
+//					log.error(String.format("Actualització òrgan (%s): Error actualitzant llibre ", organGestor.getCodi()));
 //					progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.organ.error.actualtizar.llibre"));
 //				}
 //
 //				status = updateOficina(entitat, organGestor, arbreUnitats);
-//				logger.info("Fi - updateOficina del òrgan gestor: " + organGestor);
+//				log.info("Fi - updateOficina del òrgan gestor: " + organGestor);
 //				if (!status) {
-//					logger.error(String.format("Actualització òrgan (%s): Error actualitzant oficina ", organGestor.getCodi()));
+//					log.error(String.format("Actualització òrgan (%s): Error actualitzant oficina ", organGestor.getCodi()));
 //					progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.organ.error.actualtizar.oficina"));
 //				}
 //
 //				status = updateEstat(organGestor, arbreUnitats);
-//				logger.info("Fi - updateEstat del òrgan gestor: " + organGestor);
+//				log.info("Fi - updateEstat del òrgan gestor: " + organGestor);
 //				if (!status) {
-//					logger.error(String.format("Actualització òrgan (%s): Error actualitzant estat ", organGestor.getCodi()));
+//					log.error(String.format("Actualització òrgan (%s): Error actualitzant estat ", organGestor.getCodi()));
 //					progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.organ.error.actualtizar.estat"));
 //				}
 //				NodeDir3 node = arbreUnitats.get(organGestor.getCodi());
@@ -1162,7 +1145,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 //			}
 //			progres.setProgres(100);
 //			progres.setFinished(true);
-//			logger.info("Antes de Update de las tablas correspondientes a las datatables");
+//			log.info("Antes de Update de las tablas correspondientes a las datatables");
 //			// Update de las tablas correspondientes a las datatables de notificaciones y envíos
 //			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.actualitzar.notificacions.enviaments"));
 //			notificacioTableViewRepository.updateOrganGestorEstat();
@@ -1183,7 +1166,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 //			else
 //				return false;
 //		} catch (Exception e) {
-//			logger.error(String.format("La denominacio de l'òrgan gestor %s de l'entitat %s no s'ha pogut actualitzar",
+//			log.error(String.format("La denominacio de l'òrgan gestor %s de l'entitat %s no s'ha pogut actualitzar",
 //					organGestor.getCodi(),
 //					entitat.getDir3Codi()));
 //			e.printStackTrace();
@@ -1203,7 +1186,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			else
 				return false;
 		} catch (Exception e) {
-			logger.error(String.format("El llibre de l'òrgan gestor %s de l'entitat %s no s'ha pogut actualitzar",
+			log.error(String.format("El llibre de l'òrgan gestor %s de l'entitat %s no s'ha pogut actualitzar",
 					organGestor.getCodi(),
 					entitat.getDir3Codi()));
 			e.printStackTrace();
@@ -1223,9 +1206,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			if (oficinesSIR != null && !oficinesSIR.isEmpty())
 				organGestor.updateOficina(oficinesSIR.get(0).getCodi(), oficinesSIR.get(0).getNom());
 			else
-				logger.debug(String.format("L'òrgan gestor %s no disposa de cap oficina", organGestor.getCodi()));
+				log.debug(String.format("L'òrgan gestor %s no disposa de cap oficina", organGestor.getCodi()));
 		} catch (Exception e) {
-			logger.error(String.format("L'oficina de l'òrgan gestor %s de l'entitat %s no s'ha pogut actualitzar",
+			log.error(String.format("L'oficina de l'òrgan gestor %s de l'entitat %s no s'ha pogut actualitzar",
 					organGestor.getCodi(),
 					entitat.getDir3Codi()));
 			e.printStackTrace();
@@ -1236,9 +1219,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 //	private boolean updateEstat(OrganGestorEntity organGestor, Map<String, OrganismeDto> arbreUnitats) {
 //
-//		logger.info("Ini - updateEstat del òrgan gestor: " + organGestor.getCodi() + "-" + organGestor.getNom());
+//		log.info("Ini - updateEstat del òrgan gestor: " + organGestor.getCodi() + "-" + organGestor.getNom());
 //		if (!arbreUnitats.containsKey(organGestor.getCodi())) {
-//			logger.trace(String.format("Organ Gestor (%s) no trobat a l'organigrama", organGestor.getCodi()));
+//			log.trace(String.format("Organ Gestor (%s) no trobat a l'organigrama", organGestor.getCodi()));
 //			organGestor.updateEstat(OrganGestorEstatEnum.E);
 //			return true;
 //		}
@@ -1254,7 +1237,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			Long id) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta de l'organ gestor ("
+			log.debug("Consulta de l'organ gestor ("
 					+ "entitatId=" + entitatId + ", "
 					+ "id=" + id + ")");
 			EntitatEntity entitat = null;
@@ -1285,7 +1268,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	public OrganGestorDto findByCodi(Long entitatId, String codi) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta de l'organ gestor (entitatId=" + entitatId + ", codi=" + codi + ")");
+			log.debug("Consulta de l'organ gestor (entitatId=" + entitatId + ", codi=" + codi + ")");
 //			EntitatEntity entitat = null;
 
 			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
@@ -1327,7 +1310,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			if (entitatId == null || id == null) {
 				return new ArrayList<>();
 			}
-			logger.debug("Consulta dels permisos de l'organ gestor (entitatId=" + entitatId +  ", id=" + id +  ")");
+			log.debug("Consulta dels permisos de l'organ gestor (entitatId=" + entitatId +  ", id=" + id +  ")");
 			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			entityComprovarHelper.comprovarOrganGestor(entitat, id);
@@ -1343,7 +1326,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta dels permisos de l'organ gestor ("
+			log.debug("Consulta dels permisos de l'organ gestor ("
 					+ "entitatId=" + entitatId +  ", "
 					+ "id=" + id +  ")");
 			EntitatEntity entitat = null;
@@ -1369,7 +1352,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			PermisDto permisDto) throws ValidationException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Modificació del permis de l'organ gestor ("
+			log.debug("Modificació del permis de l'organ gestor ("
 					+ "entitatId=" + entitatId +  ", "
 					+ "id=" + id + ", "
 					+ "permis=" + permisDto + ")");
@@ -1427,7 +1410,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			Long permisId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Eliminació del permis de l'organ gestor ("
+			log.debug("Eliminació del permis de l'organ gestor ("
 					+ "entitatId=" + entitatId +  ", "
 					+ "id=" + id + ", "
 					+ "permisId=" + permisId + ")");
@@ -1467,7 +1450,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				organismes = organGestorCachable.findOrganismesByEntitat(entitat.getDir3Codi());
 			} catch (Exception e) {
 				String errorMessage = "No s'han pogut recuperar els organismes de l'entitat: " + entitat.getDir3Codi();
-				logger.error(errorMessage, e.getMessage());
+				log.error(errorMessage, e.getMessage());
 			}
 			return organismes;
 		} finally {
@@ -1485,7 +1468,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				organismes = organigramaHelper.getOrganismesFillsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
 			} catch (Exception e) {
 				String errorMessage = "No s'han pogut recuperar els organismes de l'entitat: " + entitat.getDir3Codi() + " i òrgan gestor: " + organGestor.getCodi();
-				logger.error(errorMessage, e.getMessage());
+				log.error(errorMessage, e.getMessage());
 			}
 			return organismes;
 		} finally {
@@ -1506,7 +1489,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				llibre = cacheHelper.getLlibreOrganGestor(entitat.getDir3Codi(), organGestorDir3Codi);
 	 		} catch (Exception e) {
 	 			String errorMessage = "No s'ha pogut recuperar el llibre de l'òrgan gestor: " + organGestorDir3Codi;
-				logger.error(errorMessage, e.getMessage());
+				log.error(errorMessage, e.getMessage());
 			}
 			return llibre;
 		} finally {
@@ -1853,7 +1836,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				oficines = cacheHelper.getOficinesSIREntitat(dir3codi);
 			} catch (Exception e) {
 	 			String errorMessage = "No s'han pogut recuperar les oficines SIR [dir3codi=" + dir3codi + "]";
-				logger.error(errorMessage, e.getMessage());
+				log.error(errorMessage, e.getMessage());
 			}
 			return oficines;
 		} finally {
@@ -1930,12 +1913,43 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		return procedimentsDisponibles;
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(OrganGestorServiceImpl.class);
-
 	// Sync Testing:
 	@Override
 	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper) {
 		this.procSerSyncHelper = (ProcSerSyncHelper)procSerSyncHelper;
 		this.pluginHelper = (PluginHelper)pluginHelper;
 	}
+
+	@Override
+	@Transactional
+	public void sincronitzarOrganNomMultidioma() {
+
+		try {
+			List<EntitatEntity> entitats = entitatRepository.findAll();
+			List<NodeDir3> nodesDir3;
+			OrganGestorEntity organ;
+			for (EntitatEntity entitat : entitats) {
+				try {
+					nodesDir3 = pluginHelper.getOrganNomMultidioma(entitat);
+					if (nodesDir3 == null || nodesDir3.isEmpty()) {
+						continue;
+					}
+					for (NodeDir3 node : nodesDir3) {
+						organ = organGestorRepository.findByCodi(node.getCodi());
+						if (organ == null) {
+							continue;
+						}
+						organ.setNomEs(node.getDenominacio());
+						if (Strings.isNullOrEmpty(node.getDenominacionCooficial())) {
+							organ.setNom(node.getDenominacionCooficial());
+						}
+					}
+				} catch (Exception ex) {
+					log.error("Error sincronitzant els nom de l'entiat " + entitat.getCodi(), ex);
+				}
+			}
+		} catch (Exception ex) {
+			log.error("Error sincronitzant els noms dels òrgans gestors", ex);
+		}
+ 	}
 }

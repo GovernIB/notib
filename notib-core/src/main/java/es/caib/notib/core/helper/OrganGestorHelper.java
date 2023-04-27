@@ -246,7 +246,7 @@ public class OrganGestorHelper {
 //		}
 //		return denominacio;
 //	}
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(OrganGestorHelper.class);
 
 	public void consultaCanvisOrganigrama(EntitatEntity entitat) {
@@ -379,8 +379,10 @@ public class OrganGestorHelper {
 			return unitat;
 		}
 		// Venen les unitats ordenades, primer el pare i després els fills?
-		unitat = OrganGestorEntity.builder().codi(unitatWS.getCodi()).entitat(entitat).nom(unitatWS.getDenominacio()).codiPare(unitatWS.getSuperior())
-				.estat(unitatWS.getEstat()).build();
+
+		String nom = !Strings.isNullOrEmpty(unitatWS.getDenominacionCooficial()) ? unitatWS.getDenominacionCooficial() : unitatWS.getDenominacio();
+		unitat = OrganGestorEntity.builder().codi(unitatWS.getCodi()).entitat(entitat).nom(nom).nomEs(unitatWS.getDenominacio())
+				.codiPare(unitatWS.getSuperior()).estat(unitatWS.getEstat()).build();
 		updateLlibreAndOficina(unitat, entitat.getDir3Codi());
 		log.debug(prefix + "guardant nova unitat amb codi " + unitat.getCodi() + " - " + unitat.getNom());
 		organGestorRepository.save(unitat);

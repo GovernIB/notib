@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - property:
+      dbms: oracle
+      name: varcharUnit
+      value: CHAR
+  - property:
+      dbms: postgresql
+      name: varcharUnit
+      value: ''
+  - changeSet:
+      id: 1665140886761-1
+      author: limit
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: nom_es
+                  type: varchar(1000 ${varcharunit})
+            tableName: not_organ_gestor
+        - sql: "INSERT INTO NOT_PROCESSOS_INICIALS (codi, init, id) VALUES ('SINCRONITZAR_ORGANS_NOMS_MULTIDIOMA', 1, 4);"
