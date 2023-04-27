@@ -1,18 +1,38 @@
 # ![Logo notib](https://github.com/GovernIB/notib/raw/master/assets/logo2.png) Notib
 
-> - Versió Estable: __notib-1.1.21__ (tag [NOTIB 1.1.21.9](https://github.com/GovernIB/notib/releases/tag/v1.1.21.9))
-> - Versió Desenvolupament: __notib-1.1.22__ (branca [notib-dev](https://github.com/GovernIB/notib/tree/notib-dev))  
+**Versions**
+> - Versió Estable: __notib-1.1.22.1__ (tag [NOTIB 1.1.22.1](https://github.com/GovernIB/notib/releases/tag/v1.1.22.1))
+> - Versió Desenvolupament: __notib-1.1.23__ (branca [notib-dev](https://github.com/GovernIB/notib/tree/notib-dev))  
 >  
-> - Versió actual del client REST: __1.1.21__ ([notib-client-1.1.21.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client/1.1.21/notib-client-1.1.21.jar), [notib-client-intf-1.1.21.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.21/notib-client-intf-1.1.21.jar))  
+> - Versió actual del client REST: __1.1.22.1__
+>   - Java7: ([notib-client-1.1.22.1.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client/1.1.22.1/notib-client-1.1.22.1.jar), [notib-client-intf-1.1.22.1.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.22.1/notib-client-intf-1.1.22.1.jar))  
+>     ```
+>     <dependency>  
+>         <groupId>es.caib.notib</groupId>  
+>         <artifactId>notib-client</artifactId>  
+>         <version>1.1.22.1</version>  
+>     </dependency>
+>     ```
+>   - Java11: ([notib-client-2-1.1.22.1.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-2/1.1.22.1/notib-client-2-1.1.22.1.jar), [notib-client-intf-1.1.22.1.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.22.1/notib-client-intf-1.1.22.1.jar))  
 >  
->   - Ús amb maven:  
-> ```
-> <dependency>  
->     <groupId>es.caib.notib</groupId>  
->     <artifactId>notib-client</artifactId>  
->     <version>1.1.21</version>  
-> </dependency>
-> ```
+>     ```
+>     <dependency>  
+>         <groupId>es.caib.notib</groupId>  
+>         <artifactId>notib-client-2</artifactId>  
+>         <version>1.1.22.1</version>  
+>     </dependency>
+>     ```
+> - Configuració del client REST:
+>   - Adreça base del servei: https://SERVER/notibapi (substituïr SERVER per l'adreça que correspongui)
+>   - Tipus d'autenticació: BASIC
+>    ```
+>    private NotificacioRestClientV2 client = NotificacioRestClientFactory.getRestClientV2(
+>                https://SERVER/notibapi, // Adreça base
+>                USERNAME,
+>                PASSWORD,
+>                true); // Tipus autenticació BASIC?
+>    ```
+
 
 **Descripció**
 
