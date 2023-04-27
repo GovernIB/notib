@@ -1916,6 +1916,9 @@ public class PluginHelper {
 
 	public void enviarNotificacioMobil(NotificacioEnviamentEntity e) {
 
+		if (e.isPerEmail()) {
+			return;
+		}
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.CARPETA, "Enviar notificació mòvil", IntegracioAccioTipusEnumDto.ENVIAMENT);
 		NotificacioEventHelper.EventInfo eventInfo = NotificacioEventHelper.EventInfo.builder().enviament(e).tipus(NotificacioEventTipusEnumDto.API_CARPETA).build();
 		try {
@@ -1947,6 +1950,7 @@ public class PluginHelper {
 		IdiomaEnumDto idioma = not.getIdioma();
 		OrganGestorEntity organ = not.getOrganGestor();
 		String nomOrgan = IdiomaEnumDto.ES.equals(idioma) && !Strings.isNullOrEmpty(organ.getNomEs()) ? organ.getNomEs() : organ.getNom();
+		Date dataCompareixenca = not.getEnviamentDataProgramada() != null ? not.getEnviamentDataProgramada() : not.getNotificaEnviamentData();
 		return MissatgeCarpetaParams.builder().nifDestinatari(interessat.getNif()).nomCompletDestinatari(interessat.getNomSencer())
 				.codiDir3Entitat(entitat.getDir3Codi()).nomEntitat(entitat.getNom())
 				.codiOrganEmisor(not.getEmisorDir3Codi()).nomOrganEmisor(nomOrgan)
@@ -1954,7 +1958,7 @@ public class PluginHelper {
 				.tipus(not.getEnviamentTipus()).vincleInteressat(isRepresentant ? VincleInteressat.REPRESENTANT :VincleInteressat.TITULAR)
 				.codiSiaProcediment(not.getProcediment().getCodi()).nomProcediment(not.getProcediment().getNom())
 				.caducitatNotificacio(not.getCaducitat())
-				.dataDisponibleCompareixenca(new Date()) // TODO DETERMINAR ATRIBUT
+				.dataDisponibleCompareixenca(dataCompareixenca)
 				.numExpedient(not.getNumExpedient())
 				.build();
 	}
