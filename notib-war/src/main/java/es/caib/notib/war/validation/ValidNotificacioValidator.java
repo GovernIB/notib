@@ -99,12 +99,13 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(notificacio.getEnviamentTipus())) {
 				String organ = notificacio.getOrganGestor();
 				OrganGestorDto o = organService.findByCodi(null, organ);
-				EntitatDto entitat = entitatService.findById(o.getEntitatId());
-
-				valid = entitat.isOficinaEntitat() || o.getOficina() != null && !Strings.isNullOrEmpty(o.getOficina().getCodi());
-				if (!valid) {
-					String msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.sense.oficina", null, locale);
-					context.buildConstraintViolationWithTemplate(msg).addNode("organGestor").addConstraintViolation();
+				if (o != null) {
+					EntitatDto entitat = entitatService.findById(o.getEntitatId());
+					valid = entitat.isOficinaEntitat() || o.getOficina() != null && !Strings.isNullOrEmpty(o.getOficina().getCodi());
+					if (!valid) {
+						String msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.sense.oficina", null, locale);
+						context.buildConstraintViolationWithTemplate(msg).addNode("organGestor").addConstraintViolation();
+					}
 				}
 			}
 			if (comunicacioAmbAdministracio && comunicacioSenseAdministracio) {
