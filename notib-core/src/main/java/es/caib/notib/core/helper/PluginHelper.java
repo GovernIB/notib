@@ -1425,13 +1425,14 @@ public class PluginHelper {
 			}
 			
 			if (enviarTipoMIMEFicheroAnexado) {
-				try {
+//				try {
 					/*  TODO: Revisar perque amb els tests unitaris Files.exists(path) es false en Tomcat
 					 *	(Això causa que fallin els tests en Tomcat) */
-					annex.setTipoMIMEFicheroAnexado(Files.probeContentType(path));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+//					annex.setTipoMIMEFicheroAnexado(Files.probeContentType(path));
+					annex.setTipoMIMEFicheroAnexado(document.getMediaType());
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
 			}
 			annex.setTitulo("Annex " + idx);
 			annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
