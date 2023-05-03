@@ -234,7 +234,7 @@ $(document).ready(function() {
 						<td width="30%"><strong><spring:message code="enviament.info.dada.estat"/></strong></td>
 						<td colspan="4">
 							<spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/>
-							<c:if test="${enviament.notificaError}">
+							<c:if test="${enviament.notificaError and enviament.notificaEstat != 'FINALITZADA' and enviament.notificaEstat == 'PROCESSADA'}">
 								<span class="fa fa-warning text-danger" title="<c:out value='${enviament.notificaErrorDescripcio}' escapeXml='true'/>"></span>
 							</c:if>
 							<c:if test="${enviament.fiReintents}">
