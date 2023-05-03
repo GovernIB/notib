@@ -42,7 +42,7 @@ public class CarpetaRestClient {
 	private String username;
 	private String password;
 
-	private boolean autenticacioBasic = false;
+	private boolean autenticacioBasic = true;
 
 	public CarpetaRestClient() {}
 	public CarpetaRestClient(
