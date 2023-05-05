@@ -1,25 +1,25 @@
 # ![Logo notib](https://github.com/GovernIB/notib/raw/master/assets/logo2.png) Notib
 
 **Versions**
-> - Versió Estable: __notib-1.1.22.1__ (tag [NOTIB 1.1.22.1](https://github.com/GovernIB/notib/releases/tag/v1.1.22.1))
+> - Versió Estable: __notib-1.1.22.3__ (tag [NOTIB 1.1.22.3](https://github.com/GovernIB/notib/releases/tag/v1.1.22.3))
 > - Versió Desenvolupament: __notib-1.1.23__ (branca [notib-dev](https://github.com/GovernIB/notib/tree/notib-dev))  
 >  
-> - Versió actual del client REST: __1.1.22.1__
->   - Java7: ([notib-client-1.1.22.1.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client/1.1.22.1/notib-client-1.1.22.1.jar), [notib-client-intf-1.1.22.1.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.22.1/notib-client-intf-1.1.22.1.jar))  
+> - Versió actual del client REST: __1.1.22.3__
+>   - Java7: ([notib-client-1.1.22.3.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client/1.1.22.3/notib-client-1.1.22.3.jar), [notib-client-intf-1.1.22.3.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.22.3/notib-client-intf-1.1.22.3.jar))  
 >     ```
 >     <dependency>  
 >         <groupId>es.caib.notib</groupId>  
 >         <artifactId>notib-client</artifactId>  
->         <version>1.1.22.1</version>  
+>         <version>1.1.22.3</version>  
 >     </dependency>
 >     ```
->   - Java11: ([notib-client-2-1.1.22.1.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-2/1.1.22.1/notib-client-2-1.1.22.1.jar), [notib-client-intf-1.1.22.1.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.22.1/notib-client-intf-1.1.22.1.jar))  
+>   - Java11: ([notib-client-2-1.1.22.3.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-2/1.1.22.3/notib-client-2-1.1.22.3.jar), [notib-client-intf-1.1.22.3.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.22.3/notib-client-intf-1.1.22.3.jar))  
 >  
 >     ```
 >     <dependency>  
 >         <groupId>es.caib.notib</groupId>  
 >         <artifactId>notib-client-2</artifactId>  
->         <version>1.1.22.1</version>  
+>         <version>1.1.22.3</version>  
 >     </dependency>
 >     ```
 > - Configuració del client REST:
