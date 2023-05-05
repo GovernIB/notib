@@ -34,7 +34,7 @@ public abstract class NotificacioBaseRestClient {
 	protected String username;
 	protected String password;
 
-	protected boolean autenticacioBasic = false;
+	protected boolean autenticacioBasic = true;
 	protected int connecTimeout = 20000;
 	protected int readTimeout = 120000;
 
