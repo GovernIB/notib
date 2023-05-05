@@ -6,12 +6,14 @@ package es.caib.notib.core.service.ws;
 import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.NotificacioEstatEnum;
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.helper.CallbackHelper;
@@ -285,7 +287,9 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		logger.debug("Peticició processada correctament.");
 
 		if (tipoEntrega.equals(BigInteger.valueOf(1L)) || tipoEntrega.equals(BigInteger.valueOf(2L))) {
-			notificacioEventHelper.addAdviserDatatEvent(enviament, eventErrorDescripcio != null, eventErrorDescripcio);
+			NotificacioEstatEnumDto estat = enviament.getNotificacio().getEstat();
+			boolean isError = !NotificacioEstatEnumDto.FINALITZADA.equals(estat) && !NotificacioEstatEnumDto.PROCESSADA.equals(estat) && !Strings.isNullOrEmpty(eventErrorDescripcio);
+			notificacioEventHelper.addAdviserDatatEvent(enviament, isError, eventErrorDescripcio);
 		}
 		callbackHelper.updateCallback(enviament, !Strings.isNullOrEmpty(eventErrorDescripcio), eventErrorDescripcio);
 		enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaAdviserWsV2Impl.sincronizarEnvio");
