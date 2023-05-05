@@ -4,6 +4,8 @@ import com.google.common.io.Files;
 import es.caib.notib.core.api.dto.mime.MimeType;
 import joptsimple.internal.Strings;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +43,15 @@ public class MimeTypeTest {
         formats.add(MimeType.builder().extensio("txt").mimeType("text/plain").base64(txt).build());
         formats.add(MimeType.builder().extensio("xml").mimeType("application/xml").base64(xml).build());
         formats.add(MimeType.builder().extensio("xsig").mimeType("").base64(xsig).build());
+    }
+
+    @Test
+    public void testFileMimeType() throws IOException {
+
+        File f = new File("");
+        Tika t = new Tika();
+        String mimeType = t.detect(f);
+        System.out.println(mimeType);
     }
 
     @Test
