@@ -286,12 +286,12 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 
 		logger.debug("Peticició processada correctament.");
 
+		NotificacioEstatEnumDto estat = enviament.getNotificacio().getEstat();
+		boolean isError = !NotificacioEstatEnumDto.FINALITZADA.equals(estat) && !NotificacioEstatEnumDto.PROCESSADA.equals(estat) && !Strings.isNullOrEmpty(eventErrorDescripcio);
 		if (tipoEntrega.equals(BigInteger.valueOf(1L)) || tipoEntrega.equals(BigInteger.valueOf(2L))) {
-			NotificacioEstatEnumDto estat = enviament.getNotificacio().getEstat();
-			boolean isError = !NotificacioEstatEnumDto.FINALITZADA.equals(estat) && !NotificacioEstatEnumDto.PROCESSADA.equals(estat) && !Strings.isNullOrEmpty(eventErrorDescripcio);
 			notificacioEventHelper.addAdviserDatatEvent(enviament, isError, eventErrorDescripcio);
 		}
-		callbackHelper.updateCallback(enviament, !Strings.isNullOrEmpty(eventErrorDescripcio), eventErrorDescripcio);
+		callbackHelper.updateCallback(enviament, isError, eventErrorDescripcio);
 		enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaAdviserWsV2Impl.sincronizarEnvio");
 		logger.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");
 		return enviament;
