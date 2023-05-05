@@ -91,10 +91,14 @@ import es.caib.plugins.arxiu.api.DocumentContingut;
 import lombok.Builder;
 import lombok.Data;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.tika.Tika;
+import org.apache.tika.detect.DefaultDetector;
+import org.apache.tika.detect.Detector;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -1433,6 +1437,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	}
 
 	private DocumentDto comprovaDocument(DocumentV2 documentV2) {
+
 		DocumentDto document = new DocumentDto();
 		// -- Per compatibilitat amb versions anteriors, posam valors per defecte
 		boolean utilizarValoresPorDefecto = getUtilizarValoresPorDefecto();
@@ -1451,16 +1456,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			logger.debug(">> [ALTA] document contingut Base64");
 			byte[] contingut = Base64.decodeBase64(documentV2.getContingutBase64());
 			boolean isPdf = NotificacioValidatorHelper.isPdf(Base64.encodeBase64String(contingut));
-			String mediaType = getMimeTypeFromContingut(contingut);
+			String mediaType = getMimeTypeFromContingut(documentV2.getArxiuNom(), contingut);
 			if (isPdf && isValidaFirmaRestEnabled()) {
 				SignatureInfoDto signatureInfo = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, documentV2.getArxiuNom(), mediaType);
 				if (signatureInfo.isError()) {
 					throw new SignatureValidationException(documentV2.getArxiuNom(), signatureInfo.getErrorMsg());
 				}
 			}
-			String documentGesdocId = pluginHelper.gestioDocumentalCreate(
-					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-					contingut);
+			String documentGesdocId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, contingut);
 			document.setArxiuGestdocId(documentGesdocId);
 			document.setMida(Long.valueOf(contingut.length));
 			document.setMediaType(mediaType);
@@ -1469,7 +1472,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			document.setTipoDocumental(tipoDocumental);
 			document.setModoFirma(modoFirma);
 			logger.debug(">> [ALTA] documentId: " + documentGesdocId);
-		} else if (documentV2.getUuid() != null) {
+			return document;
+		}
+		if (documentV2.getUuid() != null) {
 			String arxiuUuid = documentV2.getUuid();
 			logger.debug(">> [ALTA] documentUuid: " + arxiuUuid);
 			DocumentContingut contingut = null;
@@ -1503,7 +1508,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				document.setTipoDocumental(tipoDocumental);
 				document.setModoFirma(modoFirma);
 			}
-		} else if (documentV2.getCsv() != null) {
+			return document;
+		}
+		if (documentV2.getCsv() != null) {
 			String arxiuCsv = documentV2.getCsv();
 			logger.debug(">> [ALTA] documentCsv: " + arxiuCsv);
 			DocumentContingut contingut = null;
@@ -1529,13 +1536,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				document.setTipoDocumental(tipoDocumental);
 				document.setModoFirma(modoFirma);
 			}
-
-		} else if (documentV2.getUrl() != null) {
+			return document;
+		}
+		if (documentV2.getUrl() != null) {
 			String arxiuUrl = documentV2.getUrl();
 			logger.debug(">> [ALTA] documentUrl: " + arxiuUrl);
 			byte[] contingut = pluginHelper.getUrlDocumentContent(arxiuUrl);
 			document.setMida(Long.valueOf(contingut.length));
-			document.setMediaType(getMimeTypeFromContingut(contingut));
+			document.setMediaType(getMimeTypeFromContingut(documentV2.getArxiuNom(), contingut));
 			document.setOrigen(origen);
 			document.setValidesa(validesa);
 			document.setTipoDocumental(tipoDocumental);
@@ -1544,20 +1552,27 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return document;
 	}
 
-	private String getMimeTypeFromContingut(byte[] contingut) {
-		String mimeType = null;
+	private String getMimeTypeFromContingut(String arxiuNom, byte[] contingut) {
 
 		try {
-			InputStream is = new BufferedInputStream(new ByteArrayInputStream(contingut));
-			File tmp = File.createTempFile("foo", "bar");
+			int lastIndex = arxiuNom.lastIndexOf(".");
+			if (lastIndex == 0 || lastIndex == -1) {
+				throw new RuntimeException("Nom de l'arxiu invàlid: " + arxiuNom);
+			}
+			String nom = arxiuNom.substring(0, lastIndex);
+			String ext = arxiuNom.substring(lastIndex, arxiuNom.length());
+			File tmp = File.createTempFile(nom, ext);
 			Files.write(contingut, tmp);
-			mimeType = URLConnection.guessContentTypeFromStream(is);
-			tmp.delete();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			Tika tika = new Tika();
+			String mimeType = tika.detect(tmp);
 
-		return mimeType;
+			tmp.delete();
+			return mimeType;
+		} catch (IOException ex) {
+			String err = "Error obtenint el tipus MIME del document " + arxiuNom;
+			logger.error(err, ex);
+			throw new RuntimeException(err);
+		}
 	}
 
 	private String getGrupNotificacio(NotificacioV2 notificacio, EntitatEntity entitat, ProcSerEntity procediment) {
