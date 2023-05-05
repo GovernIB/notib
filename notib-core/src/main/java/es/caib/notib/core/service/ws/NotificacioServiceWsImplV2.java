@@ -710,7 +710,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				resposta.setNumExpedient(notificacio.getNumExpedient());
 
 				resposta.setDataCreada(notificacio.getCreatedDate().toDate());
-				resposta.setDataEnviada(notificacio.getNotificaEnviamentData());
+				resposta.setDataEnviada(notificacio.getNotificaEnviamentNotificaData());
 				resposta.setDataFinalitzada(notificacio.getEstatDate());
 				resposta.setDataProcessada(notificacio.getEstatProcessatDate());
 
