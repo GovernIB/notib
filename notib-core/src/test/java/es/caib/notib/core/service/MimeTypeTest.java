@@ -1,20 +1,14 @@
 package es.caib.notib.core.service;
 
-import com.google.common.io.Files;
 import es.caib.notib.core.api.dto.mime.MimeType;
+import es.caib.notib.core.utils.MimeUtils;
 import joptsimple.internal.Strings;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +40,15 @@ public class MimeTypeTest {
     }
 
     @Test
+    public void testMimeValidSIR() throws Exception {
+
+        String mime = "foo";
+        boolean valid = MimeUtils.isMimeValidSIR(mime);
+        System.out.println(mime + " - " + valid);
+
+    }
+
+//    @Test
     public void testFileMimeType() throws IOException {
 
         File f = new File("");
@@ -54,7 +57,7 @@ public class MimeTypeTest {
         System.out.println(mimeType);
     }
 
-    @Test
+//    @Test
     public void testMimeType() throws IOException {
 
         String mime;
@@ -63,28 +66,13 @@ public class MimeTypeTest {
                 System.out.println(format.getExtensio() + "  no té contingut");
                 continue;
             }
-            mime = getMimeType(format.getBase64(), format.getExtensio());
+            mime = MimeUtils.getMimeTypeFromBase64(format.getBase64(), format.getExtensio());
             System.out.println(format.getExtensio() + " - " + mime);
         }
     }
 
 //    @Test
-    private String getMimeType(String base64, String extensio) throws IOException {
 
-        byte[] contingut = Base64.decodeBase64(base64);
-        InputStream is = new BufferedInputStream(new ByteArrayInputStream(contingut));
-        File tmp = File.createTempFile("foo", "." + extensio);
-        Files.write(contingut, tmp);
-        Tika tika = new Tika();
-        String mimeType = tika.detect(tmp);
-//        Detector detector = new DefaultDetector();
-//        Metadata metadata = new Metadata();
-
-//        MediaType mediaType = detector.detect(is, metadata);
-//        System.out.println(mediaType);
-        tmp.delete();
-        return mimeType;
-    }
 
     @Test
     public void printNomExtensio() {

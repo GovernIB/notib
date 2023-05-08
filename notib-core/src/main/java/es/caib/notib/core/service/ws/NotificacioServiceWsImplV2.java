@@ -84,6 +84,7 @@ import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcSerOrganRepository;
 import es.caib.notib.core.repository.ProcSerRepository;
+import es.caib.notib.core.utils.MimeUtils;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.plugins.arxiu.api.Document;
@@ -92,10 +93,6 @@ import lombok.Builder;
 import lombok.Data;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.tika.Tika;
-import org.apache.tika.detect.DefaultDetector;
-import org.apache.tika.detect.Detector;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.mime.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,13 +101,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.jws.WebService;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLConnection;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -376,6 +369,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					Long midaTotal = 0L;
 					try {
 						document = comprovaDocument(notificacio.getDocument()); //, !comunicacioAmbAdministracio);
+						if (!MimeUtils.isMimeValidSIR(document.getMediaType())) {
+							return setRespostaError(messageHelper.getMessage("error.validacio.document.format.invalid.comunicacions.administracio"));
+						}
 						documentEntity = getDocument(notificacio.getDocument(), document);
 						midaTotal = document.getMida();
 						numDoc++;
@@ -1259,7 +1255,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					.estat(CallbackEstatEnumDto.PENDENT)
 					.data(new Date())
 					.error(false)
- .errorDesc(null).build();
+ 					.errorDesc(null).build();
 			callbackRepository.saveAndFlush(c);
 		}
 		logger.debug(">> [ALTA] callbacks de client inicialitzats");
@@ -1456,7 +1452,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			logger.debug(">> [ALTA] document contingut Base64");
 			byte[] contingut = Base64.decodeBase64(documentV2.getContingutBase64());
 			boolean isPdf = NotificacioValidatorHelper.isPdf(Base64.encodeBase64String(contingut));
-			String mediaType = getMimeTypeFromContingut(documentV2.getArxiuNom(), contingut);
+			String mediaType = MimeUtils.getMimeTypeFromContingut(documentV2.getArxiuNom(), documentV2.getContingutBase64());
 			if (isPdf && isValidaFirmaRestEnabled()) {
 				SignatureInfoDto signatureInfo = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, documentV2.getArxiuNom(), mediaType);
 				if (signatureInfo.isError()) {
@@ -1543,7 +1539,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			logger.debug(">> [ALTA] documentUrl: " + arxiuUrl);
 			byte[] contingut = pluginHelper.getUrlDocumentContent(arxiuUrl);
 			document.setMida(Long.valueOf(contingut.length));
-			document.setMediaType(getMimeTypeFromContingut(documentV2.getArxiuNom(), contingut));
+			document.setMediaType(MimeUtils.getMimeTypeFromContingut(documentV2.getArxiuNom(), contingut));
 			document.setOrigen(origen);
 			document.setValidesa(validesa);
 			document.setTipoDocumental(tipoDocumental);
@@ -1552,28 +1548,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return document;
 	}
 
-	private String getMimeTypeFromContingut(String arxiuNom, byte[] contingut) {
 
-		try {
-			int lastIndex = arxiuNom.lastIndexOf(".");
-			if (lastIndex == 0 || lastIndex == -1) {
-				throw new RuntimeException("Nom de l'arxiu invàlid: " + arxiuNom);
-			}
-			String nom = arxiuNom.substring(0, lastIndex);
-			String ext = arxiuNom.substring(lastIndex, arxiuNom.length());
-			File tmp = File.createTempFile(nom, ext);
-			Files.write(contingut, tmp);
-			Tika tika = new Tika();
-			String mimeType = tika.detect(tmp);
-
-			tmp.delete();
-			return mimeType;
-		} catch (IOException ex) {
-			String err = "Error obtenint el tipus MIME del document " + arxiuNom;
-			logger.error(err, ex);
-			throw new RuntimeException(err);
-		}
-	}
 
 	private String getGrupNotificacio(NotificacioV2 notificacio, EntitatEntity entitat, ProcSerEntity procediment) {
 		String errorDescripcio = null;
