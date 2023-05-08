@@ -8,9 +8,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipFile;
 
 public class MimeTypeTest {
 
@@ -39,7 +41,22 @@ public class MimeTypeTest {
         formats.add(MimeType.builder().extensio("xsig").mimeType("").base64(xsig).build());
     }
 
-    @Test
+//    @Test
+    public void testValidZipFirmat() throws Exception {
+
+
+        try {
+            File f = new File("/home/salloza/Documentos/blankDocuments/notificacio_yGqixdQd_FIRMADA.zip");
+            FileInputStream fis = new FileInputStream(f);
+            ZipFile zip = new ZipFile(f);
+            System.out.println("creat " + zip.getName());
+            zip.close();
+        } catch (IOException ex) {
+             System.out.println(ex);
+        }
+    }
+
+//    @Test
     public void testMimeValidSIR() throws Exception {
 
         String mime = "foo";
@@ -74,7 +91,7 @@ public class MimeTypeTest {
 //    @Test
 
 
-    @Test
+//    @Test
     public void printNomExtensio() {
 
         String arxiuNom = ".foo";

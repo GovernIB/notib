@@ -43,14 +43,10 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 		try {
 			Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
 			// Validació del NIF/NIE/CIF
-			if (persona.getNif() != null && !persona.getNif().isEmpty() && !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(persona.getInteressatTipus())) {
-				if (!NifHelper.isvalid(persona.getNif())) {
-					valid = false;
-					context.buildConstraintViolationWithTemplate(
-							MessageHelper.getInstance().getMessage("notificacio.form.valid.persona.nif", null, locale))
-					.addNode("nif")
-					.addConstraintViolation();
-			    }
+			if (persona.getNif() != null && !persona.getNif().isEmpty() && !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(persona.getInteressatTipus()) && !NifHelper.isvalid(persona.getNif())) {
+				valid = false;
+				String msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.persona.nif", null, locale);
+				context.buildConstraintViolationWithTemplate(msg).addNode("nif").addConstraintViolation();
 			}
 			
 			// Validacions per tipus de persona

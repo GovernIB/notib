@@ -286,7 +286,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			if (notificacio.getEnviaments() != null) {
 				int envCount = 0;
 				List<String> nifs = new ArrayList<>();
-				for (EnviamentCommand enviament: notificacio.getEnviaments()) {
+ 				for (EnviamentCommand enviament: notificacio.getEnviaments()) {
 
 //					if (TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) && InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
 //						valid = false;

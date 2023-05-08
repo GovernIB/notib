@@ -7,7 +7,7 @@ public class NifHelper {
 
 	private static final String LLETRES_NIF = "TRWAGMYFPDXBNJZSQVHLCKE";
 	private static final String LLETRES_CIF = "ABCDEFGHJKLMNPQRSUVW";
-	private static final String LLETRES_NIE = "XYZ";
+	private static final String LLETRES_NIE = "XYZLM";
 	private static final String DIGIT_CONTRTOL_CIF = "JABCDEFGHI";
 	private static final String LLETRA_CIF = "KPQRSNW";
 	
@@ -19,13 +19,17 @@ public class NifHelper {
         nif = nif.toUpperCase();
         String primerCaracter = nif.substring(0, 1);
         boolean totNumeros = NumberUtils.isNumber(StringUtils.stripStart(nif.substring(1,nif.length()-1), "0"));
+        boolean valid = false;
         if (LLETRES_CIF.contains(primerCaracter) && totNumeros) {
-            return isCifValid(nif);
+            valid = isCifValid(nif);
+            if (valid) {
+                return true;
+            }
         }
         if (LLETRES_NIE.contains(primerCaracter) && totNumeros) {
             return isNieValid(nif);
         }
-        return NumberUtils.isNumber(nif.substring(0, nif.length()-1)) && isDniValid(nif);
+        return nif.substring(0,8).matches("-?\\d+") && isDniValid(nif);
     }
 	
 	public static boolean isValidNifNie(String nif) {
@@ -36,13 +40,13 @@ public class NifHelper {
         nif = nif.toUpperCase();
         String primerCaracter = nif.substring(0, 1);
 
-        if (LLETRES_CIF.contains(primerCaracter)) {
-            return false;
-        }
+//        if (LLETRES_CIF.contains(primerCaracter)) {
+//            return false;
+//        }
         if (LLETRES_NIE.contains(primerCaracter)) {
             return isNieValid(nif);
         }
-        return isDniValid(nif);
+        return nif.substring(0,8).matches("-?\\d+") && isDniValid(nif);
     }
 	
 	public static boolean isValidCif(String nif) {
@@ -128,6 +132,10 @@ public class NifHelper {
             str = nie.replace('Y', '1');
         } else if (nie.startsWith("Z")) {
             str = nie.replace('Z', '2');
+        } else if (nie.startsWith("M")) {
+            str = nie.replace('M', '0');
+        } else if (nie.startsWith("L")) {
+            str = nie.replace('L', '0');
         }
         return nie + calculaLletra(str);
     }
