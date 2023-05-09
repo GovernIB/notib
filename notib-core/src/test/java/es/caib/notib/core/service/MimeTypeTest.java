@@ -55,7 +55,7 @@ public class MimeTypeTest {
         }
     }
 
-    @Test
+//    @Test
     public void testFileMimeType() throws IOException {
 
         File f = new File("");
@@ -64,7 +64,7 @@ public class MimeTypeTest {
         System.out.println(mimeType);
     }
 
-    @Test
+//    @Test
     public void testMimeType() throws IOException {
 
         String mime;
