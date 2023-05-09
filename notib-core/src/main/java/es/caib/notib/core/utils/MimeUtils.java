@@ -8,7 +8,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.tika.Tika;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.zip.ZipFile;
 
@@ -62,8 +61,7 @@ public class MimeUtils {
 
     public static boolean isFormatValid(String mime, String docBase64) {
 
-
-        return docBase64.startsWith(formatsValidsNotCom[0]) || docBase64.startsWith(formatsValidsNotCom[1]) || isZipSigned(mime, docBase64);
+        return docBase64.startsWith(formatsValidsNotCom[0]) || docBase64.startsWith(formatsValidsNotCom[1]); //|| isZipSigned(mime, docBase64);
     }
 
     public static boolean isZipSigned(String mime, String base64) {

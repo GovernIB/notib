@@ -5,7 +5,6 @@ import es.caib.notib.core.utils.MimeUtils;
 import joptsimple.internal.Strings;
 import org.apache.tika.Tika;
 import org.junit.Before;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -77,9 +76,6 @@ public class MimeTypeTest {
             System.out.println(format.getExtensio() + " - " + mime);
         }
     }
-
-//    @Test
-
 
 //    @Test
     public void printNomExtensio() {

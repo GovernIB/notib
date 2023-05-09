@@ -452,7 +452,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 				} else {
 					try {
-						// TODO COMPROVAR ZIP SIGNED
+
 						document = comprovaDocument(notificacio.getDocument()); //, !comunicacioAmbAdministracio);
 						documentEntity = getDocument(notificacio.getDocument(), document);
 					} catch (SignatureValidationException sve) {
