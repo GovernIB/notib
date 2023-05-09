@@ -10,6 +10,7 @@ import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.utils.MimeUtils;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -344,7 +345,7 @@ public class NotificacioValidatorHelper {
 							documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
 
 				if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
-					if (!isFormatValid(document.getContingutBase64())) {
+					if (!MimeUtils.isFormatValid(document.getMediaType(), document.getContingutBase64())) {
 						errors.add(messageHelper.getMessage("error.validacio.document.format.invalid"));
 					}
 					if (document.getMida() > getMaxSizeFile()) {
@@ -403,15 +404,7 @@ public class NotificacioValidatorHelper {
 		return valid;
 	}
 
-	private boolean isFormatValid(String docBase64) {
-		boolean valid = true;
-		String[] formatsValids = {"JVBERi0","UEsDB"}; //PDF / ZIP
 
-		if (!(docBase64.startsWith(formatsValids[0]) || docBase64.startsWith(formatsValids[1])))
-			valid = false;
-
-		return valid;
-	}
 
 	public static boolean isPdf(String docBase64) {
 

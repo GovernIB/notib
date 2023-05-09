@@ -452,6 +452,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 				} else {
 					try {
+						// TODO COMPROVAR ZIP SIGNED
 						document = comprovaDocument(notificacio.getDocument()); //, !comunicacioAmbAdministracio);
 						documentEntity = getDocument(notificacio.getDocument(), document);
 					} catch (SignatureValidationException sve) {
@@ -2354,8 +2355,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			// Apanyo: Posam estat Registrada per a indicar que aquesta és una comunicació amb administració, i per tant va a registre i no a Notifica
 			resposta.setErrorDescripcio(COMUNICACIOAMBADMINISTRACIO);
 		} else {
+
 			if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
-				if (!isFormatValid(document.getContingutBase64())) {
+				if (!MimeUtils.isFormatValid(document)) {
 					return setRespostaError(messageHelper.getMessage("error.validacio.document.format.invalid"));
 				}
 			}
@@ -2608,16 +2610,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		} catch (Exception e) {
 			return false;
 		}
-	}
-
-	private boolean isFormatValid(String docBase64) {
-		boolean valid = true;
-		String[] formatsValids = {"JVBERi0","UEsDB"}; //PDF / ZIP
-
-		if (!(docBase64.startsWith(formatsValids[0]) || docBase64.startsWith(formatsValids[1])))
-			valid = false;
-
-		return valid;
 	}
 
 	private boolean isPDF(String docBase64) {
