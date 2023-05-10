@@ -6,6 +6,7 @@ package es.caib.notib.war.controller;
 import es.caib.notib.core.api.dto.AplicacioDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.UsuariAplicacioService;
 import es.caib.notib.war.command.AplicacioCommand;
@@ -13,6 +14,7 @@ import es.caib.notib.war.command.AplicacioFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.RequestSessionHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,12 +34,17 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Controller
 @RequestMapping("/entitat/{entitatId}/aplicacio")
 public class AplicacioController extends BaseController {
 
-	@Autowired private UsuariAplicacioService usuariAplicacioService;
-	@Autowired private EntitatService entitatService;
+	@Autowired
+	private UsuariAplicacioService usuariAplicacioService;
+	@Autowired
+	private AplicacioService aplicacioService;
+	@Autowired
+	private EntitatService entitatService;
 
 	private final static String APLICACIO_FILTRE = "aplicacio_filtre";
 
@@ -113,32 +120,28 @@ public class AplicacioController extends BaseController {
 	}
 
 	@RequestMapping(value = "newOrModify", method = RequestMethod.POST)
-	public String save(
-			HttpServletRequest request,
-			Model model,
-			@PathVariable Long entitatId,
-			@Valid AplicacioCommand command,
-			BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			model.addAttribute(
-					"entitat", 
-					entitatService.findById(entitatId));
-			return "aplicacioForm";
-		}
-		if (command.getId() == null) {
-			usuariAplicacioService.create(
-					AplicacioCommand.asDto(command));
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:aplicacio",
-					"aplicacio.controller.creada.ok");
-		} else {
-			usuariAplicacioService.update(
-					AplicacioCommand.asDto(command));
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:aplicacio",
-					"aplicacio.controller.modificada.ok");
+	public String save(HttpServletRequest request, Model model, @PathVariable Long entitatId, @Valid AplicacioCommand command, BindingResult bindingResult) {
+
+		String redirect = "redirect:aplicacio";
+		try {
+			if (bindingResult.hasErrors()) {
+				model.addAttribute("entitat", entitatService.findById(entitatId));
+				return "aplicacioForm";
+			}
+			AplicacioDto aplicacio = AplicacioCommand.asDto(command);
+			if (!aplicacioService.existeixUsuariNotib(aplicacio.getUsuariCodi())) {
+				aplicacioService.crearUsuari(aplicacio.getUsuariCodi());
+			}
+			if (command.getId() == null) {
+				usuariAplicacioService.create(aplicacio);
+				return getModalControllerReturnValueSuccess(request, redirect, "aplicacio.controller.creada.ok");
+			}
+			usuariAplicacioService.update(aplicacio);
+			return getModalControllerReturnValueSuccess(request, redirect, "aplicacio.controller.modificada.ok");
+		} catch (Exception ex) {
+			String msg = "Error creant l'aplicació d'usari";
+			log.error(msg, ex);
+			return getModalControllerReturnValueError(request, redirect, "aplicacio.controller.upsert.error");
 		}
 	}
 

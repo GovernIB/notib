@@ -80,34 +80,51 @@ public class AplicacioServiceImpl implements AplicacioService {
 			logger.debug("Processant autenticació (usuariCodi=" + auth.getName() + ")");
 			UsuariEntity usuari = usuariRepository.findOne(auth.getName());
 			if (usuari == null) {
-				logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
-				DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
-				String idioma = configHelper.getConfig("es.caib.notib.default.user.language");
-				if (dadesUsuari == null) {
-					throw new NotFoundException(auth.getName(), DadesUsuari.class);
-				}
-				usuari = usuariRepository.save(UsuariEntity.getBuilder(dadesUsuari.getCodi(), dadesUsuari.getEmail(), idioma).nom(dadesUsuari.getNom())
-						.llinatges(dadesUsuari.getLlinatges()).nomSencer(dadesUsuari.getNomSencer()).build());
-
-			} else {
-				logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
-				DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
-				if (dadesUsuari == null) {
-					throw new NotFoundException(auth.getName(), DadesUsuari.class);
-				}
-				if (dadesUsuari.getNomSencer() != null) {
-					usuari.update(dadesUsuari.getNomSencer(), dadesUsuari.getEmail());
-				} else {
-					usuari.update(dadesUsuari.getNom(), dadesUsuari.getLlinatges(), dadesUsuari.getEmail());
-				}
+				crearUsuari(auth.getName());
+				permisosCacheable.clearAuthenticationPermissionsCaches(auth);
+				procedimentsCacheable.clearAuthenticationProcedimentsCaches(auth);
+				return;
 			}
-
+			logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
+			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+			if (dadesUsuari == null) {
+				throw new NotFoundException(auth.getName(), DadesUsuari.class);
+			}
+			if (dadesUsuari.getNomSencer() != null) {
+				usuari.update(dadesUsuari.getNomSencer(), dadesUsuari.getEmail());
+			} else {
+				usuari.update(dadesUsuari.getNom(), dadesUsuari.getLlinatges(), dadesUsuari.getEmail());
+			}
 			permisosCacheable.clearAuthenticationPermissionsCaches(auth);
 			procedimentsCacheable.clearAuthenticationProcedimentsCaches(auth);
-
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	@Override
+	public boolean existeixUsuariNotib(String codi) {
+		return usuariRepository.findByCodi(codi) != null;
+	}
+
+	@Override
+	public boolean existeixUsuariSeycon(String codi) {
+		return cacheHelper.findUsuariAmbCodi(codi) != null;
+	}
+
+	@Transactional
+	@Override
+	public void crearUsuari(String codi) {
+
+		logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + codi + ")");
+		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(codi);
+		String idioma = configHelper.getConfig("es.caib.notib.default.user.language");
+		if (dadesUsuari == null) {
+			throw new NotFoundException(codi, DadesUsuari.class);
+		}
+		UsuariEntity u = UsuariEntity.getBuilder(dadesUsuari.getCodi(), dadesUsuari.getEmail(), idioma).nom(dadesUsuari.getNom())
+							.llinatges(dadesUsuari.getLlinatges()).nomSencer(dadesUsuari.getNomSencer()).build();
+		usuariRepository.save(u);
 	}
 
 	@Transactional

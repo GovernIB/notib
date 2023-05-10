@@ -123,6 +123,24 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public boolean existeixUsuariNotib(String codi) {
+		return delegate.existeixUsuariNotib(codi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public boolean existeixUsuariSeycon(String codi) {
+		return delegate.existeixUsuariSeycon(codi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public void crearUsuari(String codi) {
+		delegate.crearUsuari(codi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public UsuariDto updateUsuariActual(UsuariDto usuariDto) {
 		return delegate.updateUsuariActual(usuariDto);
 	}

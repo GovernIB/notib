@@ -43,10 +43,8 @@ public class AjaxUserController extends BaseUserController {
 	
 	@RequestMapping(value = "/usuariDades/{codi}", method = RequestMethod.GET)
 	@ResponseBody
-	public UsuariDto getByCodiPluginDadesUsuari(
-			HttpServletRequest request,
-			@PathVariable String codi,
-			Model model) {
+	public UsuariDto getByCodiPluginDadesUsuari(HttpServletRequest request, @PathVariable String codi, Model model) {
+
 		try {
 			return aplicacioService.findUsuariAmbCodi(codi);
 		} catch (Exception ex) {
@@ -57,10 +55,8 @@ public class AjaxUserController extends BaseUserController {
 
 	@RequestMapping(value = "/usuarisDades/{text}", method = RequestMethod.GET)
 	@ResponseBody
-	public List<UsuariDto> getPluginDadesUsuari(
-			HttpServletRequest request,
-			@PathVariable String text,
-			Model model) {
+	public List<UsuariDto> getPluginDadesUsuari(HttpServletRequest request, @PathVariable String text, Model model) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Set<UsuariDto> setUsuaris = new HashSet<UsuariDto>();
 		try {
@@ -74,18 +70,17 @@ public class AjaxUserController extends BaseUserController {
 				usuariAplciacio.setNom(aplicacio.getUsuariCodi());
 				setUsuaris.add(usuariAplciacio);
 			}
-			return new ArrayList<UsuariDto>(setUsuaris);
+			return new ArrayList<>(setUsuaris);
 		} catch (Exception ex) {
 			logger.error("Error al consultar la informació dels usuaris amb el filtre \"" + text + "\"", ex);
-			return new ArrayList<UsuariDto>();
+			return new ArrayList<>();
 		}
 	}
 	
 	@RequestMapping(value = "/enum/{enumClass}", method = RequestMethod.GET)
 	@ResponseBody
-	public List<HtmlOption> enumValorsAmbText(
-			HttpServletRequest request,
-			@PathVariable String enumClass) throws ClassNotFoundException {
+	public List<HtmlOption> enumValorsAmbText(HttpServletRequest request, @PathVariable String enumClass) throws ClassNotFoundException {
+
 		Class<?> enumeracio = Class.forName("es.caib.notib.core.api.dto." + enumClass);
 		StringBuilder textKeyPrefix = new StringBuilder();
 		String[] textKeys = StringUtils.splitByCharacterTypeCamelCase(enumClass);
@@ -98,12 +93,7 @@ public class AjaxUserController extends BaseUserController {
 		List<HtmlOption> resposta = new ArrayList<HtmlOption>();
 		if (enumeracio.isEnum()) {
 			for (Object e: enumeracio.getEnumConstants()) {
-				resposta.add(new HtmlOption( 
-						((Enum<?>)e).name(),
-						getMessage(
-								request,
-								textKeyPrefix.toString() + ((Enum<?>)e).name(),
-								null)));
+				resposta.add(new HtmlOption(((Enum<?>)e).name(), getMessage(request, textKeyPrefix.toString() + ((Enum<?>)e).name(), null)));
 			}
 		}
 		return resposta;

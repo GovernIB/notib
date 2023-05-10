@@ -30,16 +30,11 @@ public class AplicacioCommand {
 	private String callbackUrl;
 	private Long entitatId;
 
-	
 	public static AplicacioCommand asCommand(AplicacioDto dto) {
-		return ConversioTipusHelper.convertir(
-				dto,
-				AplicacioCommand.class);
+		return ConversioTipusHelper.convertir(dto, AplicacioCommand.class);
 	}
 	public static AplicacioDto asDto(AplicacioCommand command) {
-		return ConversioTipusHelper.convertir(
-				command,
-				AplicacioDto.class);
+		return ConversioTipusHelper.convertir(command, AplicacioDto.class);
 	}
 
 	@Override

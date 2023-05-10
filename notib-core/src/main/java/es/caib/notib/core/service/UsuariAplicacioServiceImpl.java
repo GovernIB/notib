@@ -57,23 +57,13 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	@Override
 	@Transactional
 	public AplicacioDto create(AplicacioDto aplicacio) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Creant una nova aplicació (aplicació=" + aplicacio.toString() + ")");
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					aplicacio.getEntitatId(),
-					true,
-					true,
-					false,
-					false);
-			AplicacioEntity entity = AplicacioEntity.getBuilder(
-					entitat,
-					aplicacio.getUsuariCodi(),
-					aplicacio.getCallbackUrl()).build();
-			
-			return conversioTipusHelper.convertir(
-					aplicacioRepository.save(entity),
-					AplicacioDto.class);
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(aplicacio.getEntitatId(), true, true, false, false);
+			AplicacioEntity entity = AplicacioEntity.getBuilder(entitat, aplicacio.getUsuariCodi(), aplicacio.getCallbackUrl()).build();
+			return conversioTipusHelper.convertir(aplicacioRepository.save(entity), AplicacioDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -202,20 +192,13 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	@Override
 	@Transactional(readOnly = true)
 	public AplicacioDto findByEntitatAndUsuariCodi(Long entitatId, String usuariCodi) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta una aplicació amb entitatId= " + entitatId + " i codi = " + usuariCodi);
-//			entityComprovarHelper.comprovarPermisos(
-//					null,
-//					true,
-//					false,
-//					false);
-			
+//			entityComprovarHelper.comprovarPermisos( null, true, false, false);
 			AplicacioEntity entity = aplicacioRepository.findByEntitatIdAndUsuariCodi(entitatId, usuariCodi);
-			
-			return conversioTipusHelper.convertir(
-					entity,
-					AplicacioDto.class);
+			return conversioTipusHelper.convertir(entity, AplicacioDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

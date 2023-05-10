@@ -42,18 +42,14 @@ public class CacheHelper {
 	private OrganGestorRepository organGestorRepository;
 	@Resource
 	private OficinaRepository oficinaRepository;
-//	@Resource
-//	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
-//	@Resource
-//	private PermisosHelper permisosHelper;
-
 	private PluginHelper pluginHelper;
 	@Resource
 	private CacheManager cacheManager;
 
 	public static String appVersion;
+
 
 	@Autowired
 	public void setPluginHelper(PluginHelper pluginHelper) {
@@ -61,54 +57,28 @@ public class CacheHelper {
 	}
 
 	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")
-	public DadesUsuari findUsuariAmbCodi(
-			String usuariCodi) {
-		return pluginHelper.dadesUsuariConsultarAmbCodi(
-				usuariCodi);
+	public DadesUsuari findUsuariAmbCodi(String usuariCodi) {
+		return pluginHelper.dadesUsuariConsultarAmbCodi(usuariCodi);
 	}
 
 	@Cacheable(value = "rolsAmbCodi", key="#usuariCodi")
-	public List<String> findRolsUsuariAmbCodi(
-			String usuariCodi) {
-		return pluginHelper.consultarRolsAmbCodi(
-				usuariCodi);
+	public List<String> findRolsUsuariAmbCodi(String usuariCodi) {
+		return pluginHelper.consultarRolsAmbCodi(usuariCodi);
 	}
-
-//	@Cacheable(value = "denominacioOrganisme", key="#codiDir3")
-//	public String findDenominacioOrganisme(
-//			String codiDir3) {
-//		return pluginHelper.getDenominacio(codiDir3);
-//	}
 	
 	@Cacheable(value = "findOficinesEntitat", key="#codiDir3")
-	public List<OficinaDto> llistarOficinesEntitat(
-			String codiDir3) {
-		return pluginHelper.llistarOficines(
-				codiDir3, 
-				AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
+	public List<OficinaDto> llistarOficinesEntitat(String codiDir3) {
+		return pluginHelper.llistarOficines(codiDir3, AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
 	}
 	
-//	@Cacheable(value = "findLlibresOficina", key="#codiDir3Oficina")
-//	public List<LlibreDto> llistarLlibresOficina(
-//			String codiDir3Entitat,
-//			String codiDir3Oficina) {
-//		return pluginHelper.llistarLlibres(
-//				codiDir3Entitat,
-//				codiDir3Oficina,
-//				AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
-//	}
-	
 	@Cacheable(value = "findLlibreOrganisme", key="#codiDir3Organ")
-	public LlibreDto getLlibreOrganGestor(
-			String codiDir3Entitat,
-			String codiDir3Organ) {
-		return pluginHelper.llistarLlibreOrganisme(
-				codiDir3Entitat,
-				codiDir3Organ);
+	public LlibreDto getLlibreOrganGestor(String codiDir3Entitat, String codiDir3Organ) {
+		return pluginHelper.llistarLlibreOrganisme(codiDir3Entitat, codiDir3Organ);
 	}
 	
 	@Cacheable(value = "oficinesSIRUnitat", key="#codiDir3Organ")
 	public List<OficinaDto> getOficinesSIRUnitat(Map<String, OrganismeDto> arbreUnitats, String codiDir3Organ) {
+
 		List<OficinaEntity> oficines = new ArrayList<>();
 		String organ = codiDir3Organ;
 		while (organ != null && !organ.isEmpty()) {
@@ -121,6 +91,7 @@ public class CacheHelper {
 
 	@Cacheable(value = "oficinesSIREntitat", key="#codiDir3Entitat")
 	public List<OficinaDto> getOficinesSIREntitat(String codiDir3Entitat) {
+
 		List<OficinaEntity> oficines = oficinaRepository.findByEntitat_Dir3CodiAndSirIsTrue(codiDir3Entitat);
 		return conversioTipusHelper.convertirList(oficines, OficinaDto.class);
 //		return pluginHelper.oficinesEntitat(codiDir3Entitat);
@@ -128,11 +99,9 @@ public class CacheHelper {
 
 	@Cacheable(value = "unitatPerCodi", key="#codi")
 	public OrganGestorDto unitatPerCodi(String codi) {
+
 		List<OrganGestorDto> organs = pluginHelper.unitatsPerCodi(codi);
-		if (organs != null && !organs.isEmpty()) {
-			return organs.get(0);
-		}
-		return null;
+		return organs != null && !organs.isEmpty() ? organs.get(0) : null;
 	}
 
 	@Cacheable(value = "organigramaOriginal", key="#entitatDir3Codi")

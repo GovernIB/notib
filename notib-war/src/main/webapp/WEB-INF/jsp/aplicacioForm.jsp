@@ -25,7 +25,17 @@
 	<form:form action="${createAplication}"  method="post" cssClass="form-horizontal" commandName="aplicacioCommand" role="form">
 		<form:hidden path="id"/>
 		<input type="hidden" name="entitatId" value="${entitat.id}"/>
-		<not:inputText name="usuariCodi" textKey="aplicacio.form.camp.codi" required="true" readonly="${!empty aplicacioCommand.id}"/>
+<%--		<c:choose>--%>
+<%--			<c:when test="${!empty aplicacioCommand.id}">--%>
+				<not:inputText name="usuariCodi" textKey="aplicacio.form.camp.codi" required="true" readonly="${!empty aplicacioCommand.id}"/>
+<%--			</c:when>--%>
+<%--			<c:otherwise>--%>
+<%--				<not:inputSuggest name="usuariCodi" inline="false" placeholderKey="aplicacio.form.camp.codi" textKey="aplicacio.form.camp.codi"--%>
+<%--								  urlConsultaInicial="../../../../userajax/usuariDades" urlConsultaLlistat="../../../../userajax/usuarisDades"--%>
+<%--								  suggestValue="codi" suggestText="codi" minimumInputLength="2" />--%>
+<%--			</c:otherwise>--%>
+<%--		</c:choose>--%>
+
 		<not:inputText name="callbackUrl" textKey="aplicacio.form.camp.callback.url" required="true"/>
 		<div id="modal-botons">
 			<button id="btnSubmit" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

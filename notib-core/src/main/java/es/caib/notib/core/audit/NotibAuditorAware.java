@@ -5,8 +5,7 @@ package es.caib.notib.core.audit;
 
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.UsuariRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +19,7 @@ import javax.annotation.Resource;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class NotibAuditorAware implements AuditorAware<UsuariEntity> {
 
 	@Resource
@@ -29,15 +29,12 @@ public class NotibAuditorAware implements AuditorAware<UsuariEntity> {
 	public UsuariEntity getCurrentAuditor() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String auditorActual = (auth != null) ? auth.getName() : null;
-		LOGGER.debug("Obtenint l'usuari auditor per a l'usuari (codi=" + auditorActual + ")");
+		log.debug("Obtenint l'usuari auditor per a l'usuari (codi=" + auditorActual + ")");
 		if (auditorActual == null) {
 			return null;
-		} else {
-			UsuariEntity usuari = usuariRepository.findOne(auditorActual);
-			return usuari;
 		}
+		UsuariEntity usuari = usuariRepository.findOne(auditorActual);
+		return usuari;
 	}
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(NotibAuditorAware.class);
 
 }
