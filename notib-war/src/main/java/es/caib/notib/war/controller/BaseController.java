@@ -46,6 +46,9 @@ public class BaseController implements MessageSourceAware {
 			// Esborrar la sessió
 			session.invalidate();
 		}
+		if (request.getCookies() == null) {
+			return;
+		}
 		// Es itera sobre totes les cookies
 		for(Cookie c : request.getCookies()) {
 			// Es sobre escriu el valor de cada cookie a NULL
