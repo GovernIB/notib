@@ -1212,6 +1212,15 @@
 					warning += subs  + " • " + per + " · ";
 					e.val(replaceChar(e.val(), "•", "·"));
 				}
+				if (/«/.test(e.val())) {
+					warning += subs  + " « " + per + " \" ";
+					e.val(replaceChar(e.val(), "«", "\""));
+				}
+				if (/»/.test(e.val())) {
+					warning += subs  + " » " + per + " \" ";
+					e.val(replaceChar(e.val(), "»", "\""));
+				}
+
 				if (warning) {
 					makeTooltip(warning);
 				}
