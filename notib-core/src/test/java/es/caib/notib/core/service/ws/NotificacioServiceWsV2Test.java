@@ -533,7 +533,7 @@ public class NotificacioServiceWsV2Test {
 
 		Persona persona = Persona.builder().nif(Strings.isNullOrEmpty(nif) ? "00000000T" : nif).nom(nom).llinatge1(llinatge1).llinatge2(llinatge2)
 						.telefon(Strings.isNullOrEmpty(telefon) ? "666010101" : telefon).email(Strings.isNullOrEmpty(email)  ? "test@limit.es" : email)
-						.interessatTipus(InteressatTipusEnumDto.ADMINISTRACIO).build();
+						.interessatTipus(InteressatTipusEnumDto.FISICA).build();
 		if (persona.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
 			persona.setDir3Codi(ENTITAT_DIR3CODI);
 		}
