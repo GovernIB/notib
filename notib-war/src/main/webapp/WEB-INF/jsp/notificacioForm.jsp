@@ -1173,16 +1173,52 @@
 			makeTooltip(warning);
 			return false;
 		});
-		$("#descripcio").on("change paste", function (e) {
-			var warning = "<spring:message code='notificacio.form.camp.descripcio.paste.validacio'/>";
-			var e = $(this);
+
+		$("#descripcio").on("change paste", function (x) {
+
+			replaceInvalidChars($(this));
+		});
+
+		$("#concepte").on("change paste", function (x) {
+
+			replaceInvalidChars($(this));
+		});
+
+		let replaceInvalidChars = e => {
+
 			setTimeout(function(){
-				while (/\r?\n|\r/.test($.trim(e.val()))) {
+
+				let warning = "";
+				let subs = "<spring:message code='notificacio.form.camp.descripcio.paste.validacio.substituit'/>";
+				let per = "<spring:message code='notificacio.form.camp.descripcio.paste.validacio.per'/>";
+				if (/\r?\n|\r/.test($.trim(e.val()))) {
+					warning += "<spring:message code='notificacio.form.camp.descripcio.paste.validacio.salts.linia'/>" + "<br>";
+					// e.val($.trim(e.val()).replace(/\r?\n|\r\r\n/, ' '));
+					e.val(replaceChar(e.val(), "\r?\n|\r\r\n", " "));
+				}
+				if (/`/.test(e.val())) {
+					warning += subs  + " ` " + per + " ' <br>";
+					e.val(replaceChar(e.val(), "`", "'"));
+				}
+				if (/´/.test(e.val())) {
+					warning += subs  + " ` " + per + " ' <br>";
+					e.val(replaceChar(e.val(), "´", "'"));
+				}
+				if (/’/.test(e.val())) {
+					warning += subs  + " ’ " + per + " ' <br>";
+					e.val(replaceChar(e.val(), "’", "'"));
+				}
+				if (/•/.test(e.val())) {
+					warning += subs  + " • " + per + " · ";
+					e.val(replaceChar(e.val(), "•", "·"));
+				}
+				if (warning) {
 					makeTooltip(warning);
-					e.val($.trim(e.val()).replace(/\r?\n|\r\r\n/, ' '));
 				}
 			}, 0);
-		});
+		};
+
+		let replaceChar = (text, char, replace) => text.replace(new RegExp(char, "g"), replace);
 
 		$("#o_provincia").select2({
 			theme: 'bootstrap',
@@ -1196,7 +1232,7 @@
 			allowClear: true,
 	        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
 		});
-		
+
 		$("input[name=idioma][value=" + locale.toUpperCase()+ "]").prop('checked', true);
 
 		// Data caducitat

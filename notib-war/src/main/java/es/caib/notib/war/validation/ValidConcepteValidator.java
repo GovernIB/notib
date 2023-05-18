@@ -47,8 +47,8 @@ public class ValidConcepteValidator implements ConstraintValidator<ValidConcepte
 	
 	@SuppressWarnings("deprecation")
 	private static boolean validacioConcepte(String concepte, final ConstraintValidatorContext context) {
+
 		char[] concepte_chars = concepte.toCharArray();
-		
 		boolean esCaracterValid = true;
 		for (int i = 0; esCaracterValid && i < concepte_chars.length; i++) {
 			esCaracterValid = !(CONTROL_CARACTERS.indexOf(concepte_chars[i]) < 0);

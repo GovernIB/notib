@@ -424,7 +424,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 		boolean esCaracterValid = true;
 		for (int i = 0; i < chars.length; i++) {
 			esCaracterValid = !(CONTROL_CARACTERS.indexOf(chars[i]) < 0);
-			if (!esCaracterValid) {
+			if (!esCaracterValid && !charsNoValids.contains(chars[i])) {
 				charsNoValids.add(chars[i]);
 			}
 	    }
