@@ -276,18 +276,18 @@ public class EmailNotificacioSenseNifHelper {
 
 		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
 		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-		String organNom = !Strings.isNullOrEmpty(organ.getNomEs()) ? organ.getNomEs() : organ.getNom();
+		String organNomEs = !Strings.isNullOrEmpty(organ.getNomEs()) ? organ.getNomEs() : organ.getNom();
 		IdiomaEnumDto idioma = enviament.getNotificacio().getIdioma();
 		String htmlText = "<div class=\"content\">" +
 				"<br/>" +
 				(IdiomaEnumDto.ES.equals(idioma) ?
 					"<h2>Aviso de nueva notificación</h2>" +
-							"<p>Le informamos que en breve recibirá una nueva notificación como INTERESADO, procedente del organismo <b>" + organNom + "</b> (" + entitat.getNom() + ")' con los siguientes datos:</p>" +
+							"<p>Le informamos que en breve recibirá una nueva notificación como INTERESADO, procedente del organismo <b>" + organNomEs + "</b> (" + entitat.getNom() + ")' con los siguientes datos:</p>" +
 							getInformacioEnviamentHtml(enviament, false) +
 							"<p>Usted recibirá esta notificación por vía postal en los próximos dias.</p>"
 					:
 					"<h2>Avís de nova notificació</h2>" +
-							"<p>L'informam que en breu rebrà una nova notificació com a INTERESSAT, procedent de l'organisme <b>" + organNom + "</b> (" + entitat.getNom() + ")' amb les següents dades:</p>" +
+							"<p>L'informam que en breu rebrà una nova notificació com a INTERESSAT, procedent de l'organisme <b>" + organ.getNom() + "</b> (" + entitat.getNom() + ")' amb les següents dades:</p>" +
 							getInformacioEnviamentHtml(enviament, true) +
 							"<p>Vosté rebrà aquesta notificació per via postal en els propers dies.</p>"
 					)
@@ -298,12 +298,12 @@ public class EmailNotificacioSenseNifHelper {
 
 		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
 		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-		String organNom = !Strings.isNullOrEmpty(organ.getNomEs()) ? organ.getNomEs() : organ.getNom();
+		String organNomEs = !Strings.isNullOrEmpty(organ.getNomEs()) ? organ.getNomEs() : organ.getNom();
 		IdiomaEnumDto idioma = enviament.getNotificacio().getIdioma();
 		String textBody = (IdiomaEnumDto.ES.equals(idioma) ?
 				"AVISO DE PRÓXIMA NOTIFICACIÓN\n" +
 				"\n" +
-				"Le informamos que en breve recibirá una nueva notificación como INTERESADO, procedente del organismo '" + organNom+ " (" + entitat.getNom() + ")' con los siguientes datos: \n" +
+				"Le informamos que en breve recibirá una nueva notificación como INTERESADO, procedente del organismo '" + organNomEs + " (" + entitat.getNom() + ")' con los siguientes datos: \n" +
 				"\n" +
 				getInformacioEnviamentPlainText(enviament, false) +
 				"\n" +
@@ -313,7 +313,7 @@ public class EmailNotificacioSenseNifHelper {
 				:
 				"AVÍS DE PROPERA NOTIFICACIÓ\n" +
 				"\n" +
-				"L'informam que en breu rebrà una nova notificació com a INTERESSAT, procedent de l'organisme '" + organNom + " (" + entitat.getNom() + ")' amb les següents dades: \n" +
+				"L'informam que en breu rebrà una nova notificació com a INTERESSAT, procedent de l'organisme '" + organ.getNom() + " (" + entitat.getNom() + ")' amb les següents dades: \n" +
 				"\n" +
 				getInformacioEnviamentPlainText(enviament, true) +
 				"\n" +
@@ -328,19 +328,19 @@ public class EmailNotificacioSenseNifHelper {
 
 		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
 		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-		String organNom = !Strings.isNullOrEmpty(organ.getNomEs()) ? organ.getNomEs() : organ.getNom();
+		String organNomEs = !Strings.isNullOrEmpty(organ.getNomEs()) ? organ.getNomEs() : organ.getNom();
 		IdiomaEnumDto idioma = enviament.getNotificacio().getIdioma();
 		String htmlText = "<div class=\"content\">" +
 				"<br/>" +
 				(IdiomaEnumDto.ES.equals(idioma) ?
 					"<h2>Aviso de nueva comunicación</h2>" +
-							"<p>Nos ponemos en contacto con usted para hacerle llegar una nueva comunicación como INTERESADO, procedente del organismo <b>" + organNom+ "</b> (" + entitat.getNom() + ")' con los siguientes datos:</p>" +
+							"<p>Nos ponemos en contacto con usted para hacerle llegar una nueva comunicación como INTERESADO, procedente del organismo <b>" + organNomEs+ "</b> (" + entitat.getNom() + ")' con los siguientes datos:</p>" +
 							getInformacioEnviamentHtml(enviament, false) +
 							"<p>La documentación de esta comunicación se ha adjuntado a este correo electrónico.</p>"
 
 					:
 					"<h2>Avís de nova comunicació</h2>" +
-							"<p>Ens posam en contacte amb vosté per fer-li arribar una nova comunicació com a INTERESSAT, procedent de l'organisme <b>" + organNom + "</b> (" + entitat.getNom() + ")' amb les següents dades:</p>" +
+							"<p>Ens posam en contacte amb vosté per fer-li arribar una nova comunicació com a INTERESSAT, procedent de l'organisme <b>" + organ.getNom() + "</b> (" + entitat.getNom() + ")' amb les següents dades:</p>" +
 							getInformacioEnviamentHtml(enviament, true) +
 							"<p>La documentació d'aquesta comunicació s'ha adjuntat a aquest correu electrònic.</p>")
 							+ "</div>";
@@ -351,12 +351,12 @@ public class EmailNotificacioSenseNifHelper {
 
 		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
 		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-		String organNom = !Strings.isNullOrEmpty(organ.getNomEs()) ? organ.getNomEs() : organ.getNom();
+		String organNomEs = !Strings.isNullOrEmpty(organ.getNomEs()) ? organ.getNomEs() : organ.getNom();
 		IdiomaEnumDto idioma = enviament.getNotificacio().getIdioma();
 		String textBody = (IdiomaEnumDto.ES.equals(idioma) ?
 				"NOVA COMUNICACIÓ\n" +
 				"\n" +
-				"Ens posam en contacte amb vosté per fer-li arribar una nova comunicació com a INTERESSAT, procedent de l'organisme '" + organNom + " (" + entitat.getNom() + ")' amb les següents dades: \n" +
+				"Ens posam en contacte amb vosté per fer-li arribar una nova comunicació com a INTERESSAT, procedent de l'organisme '" + organNomEs + " (" + entitat.getNom() + ")' amb les següents dades: \n" +
 				"\n" +
 				getInformacioEnviamentPlainText(enviament, true) +
 				"\n" +
@@ -366,7 +366,7 @@ public class EmailNotificacioSenseNifHelper {
 				:
 				"NUEVA COMUNICACIÓN\n" +
 				"\n" +
-				"Nos ponemos en contacto con usted para hacerle llegar una nueva comunicación como INTERESADO, procedente del organismo '" + organNom + " (" + entitat.getNom() + ")' con los siguientes datos: \n" +
+				"Nos ponemos en contacto con usted para hacerle llegar una nueva comunicación como INTERESADO, procedente del organismo '" + organ.getNom() + " (" + entitat.getNom() + ")' con los siguientes datos: \n" +
 				"\n" +
 				getInformacioEnviamentPlainText(enviament, false) +
 				"\n" +

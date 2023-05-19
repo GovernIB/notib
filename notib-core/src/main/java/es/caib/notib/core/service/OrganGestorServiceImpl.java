@@ -1940,9 +1940,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 							continue;
 						}
 						organ.setNomEs(node.getDenominacio());
-						if (Strings.isNullOrEmpty(node.getDenominacionCooficial())) {
-							organ.setNom(node.getDenominacionCooficial());
-						}
+						String nom = !Strings.isNullOrEmpty(node.getDenominacionCooficial()) ? node.getDenominacionCooficial() : node.getDenominacio();
+						organ.setNom(nom);
 					}
 				} catch (Exception ex) {
 					log.error("Error sincronitzant els nom de l'entiat " + entitat.getCodi(), ex);
