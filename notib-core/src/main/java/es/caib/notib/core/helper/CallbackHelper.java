@@ -117,8 +117,8 @@ public class CallbackHelper {
 			callback = CallbackEntity.builder().usuariCodi(env.getCreatedBy().getCodi()).notificacioId(env.getNotificacio().getId()).enviamentId(env.getId()).build();
 		}
 		callback.setData(new Date());
-		callback.setError(isError);
-		callback.setErrorDesc(errorDesc);
+//		callback.setError(isError);
+//		callback.setErrorDesc(errorDesc);
 		callback.setEstat(CallbackEstatEnumDto.PENDENT);
 		return callback;
 	}
