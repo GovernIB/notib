@@ -104,8 +104,10 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 						}
 					}
 				}
-				for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
-					pluginHelper.enviarNotificacioMobil(e);
+				if (pluginHelper.enviarCarpeta()) {
+					for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
+						pluginHelper.enviarNotificacioMobil(e);
+					}
 				}
 				integracioHelper.addAccioOk(info);
 			} else {

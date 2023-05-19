@@ -155,8 +155,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						}
 					}
 				}
-				for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
-					pluginHelper.enviarNotificacioMobil(e);
+				if (pluginHelper.enviarCarpeta()) {
+					for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
+						pluginHelper.enviarNotificacioMobil(e);
+					}
 				}
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				logger.info(" [TIMER-NOT] Notificació enviar (Preparar events)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");

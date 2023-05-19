@@ -36,10 +36,10 @@ public class CarpetaCaibImpl implements CarpetaPlugin {
         log.info("Enviant avís a CARPETA");
         RespostaSendNotificacioMovil resposta = null;
         try {
-            String url = properties.getProperty("es.caib.notib.plugin.carpeta.url");
             if (params.getTipus() == null) {
                 throw new Exception("No es pot enviar la notificació mòvil. Tipus = null");
             }
+            String url = properties.getProperty("es.caib.notib.plugin.carpeta.url");
             String key = "es.caib.notib.plugin.carpeta.missatge.codi." + params.getTipus().name().toLowerCase();
             String notCode = properties.getProperty(key);
             initClient();

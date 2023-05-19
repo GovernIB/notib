@@ -1917,12 +1917,16 @@ public class PluginHelper {
 
 	public void enviarNotificacioMobil(NotificacioEnviamentEntity e) {
 
-		if (e.isPerEmail()) {
+
+		if (e.isPerEmail() || InteressatTipusEnumDto.ADMINISTRACIO.equals(e.getTitular().getInteressatTipus())) {
 			return;
 		}
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.CARPETA, "Enviar notificació mòvil", IntegracioAccioTipusEnumDto.ENVIAMENT);
 		NotificacioEventHelper.EventInfo eventInfo = NotificacioEventHelper.EventInfo.builder().enviament(e).tipus(NotificacioEventTipusEnumDto.API_CARPETA).build();
 		try {
+			if (!enviarCarpeta()) {
+				throw new Exception("El plugin de CARPETA no està configurat");
+			}
 			RespostaSendNotificacioMovil res = getCarpetaPlugin().enviarNotificacioMobil(crearMissatgeCarpetaParams(e));
 			if (!Strings.isNullOrEmpty(res.getCode()) && "OK".equalsIgnoreCase(res.getCode())) {
 				integracioHelper.addAccioOk(info);
@@ -2366,6 +2370,17 @@ public class PluginHelper {
 
 	private String getPropertyPluginCarpetaClass() {
 		return configHelper.getConfig("es.caib.notib.plugin.carpeta.class");
+	}
+
+	public boolean enviarCarpeta() {
+
+		return !Strings.isNullOrEmpty(configHelper.getConfig("es.caib.notib.plugin.carpeta.usuari")) &&
+				!Strings.isNullOrEmpty(configHelper.getConfig("es.caib.notib.plugin.carpeta.contrasenya")) &&
+				!Strings.isNullOrEmpty(configHelper.getConfig("es.caib.notib.plugin.carpeta.missatge.codi.comunicacio")) &&
+				!Strings.isNullOrEmpty(configHelper.getConfig("es.caib.notib.plugin.carpeta.missatge.codi.notificacio")) &&
+				!Strings.isNullOrEmpty(configHelper.getConfig("es.caib.notib.plugin.carpeta.class")) &&
+				!Strings.isNullOrEmpty(configHelper.getConfig("es.caib.notib.plugin.carpeta.url")) &&
+				configHelper.getAsBoolean("es.caib.notib.plugin.carpeta.msg.actiu");
 	}
 	public int getSegonsEntreReintentRegistreProperty() {
 		return configHelper.getAsInt("es.caib.notib.plugin.registre.segons.entre.peticions");

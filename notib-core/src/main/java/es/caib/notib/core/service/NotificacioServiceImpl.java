@@ -1750,7 +1750,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Reenviarr notificació movil pels enviaments de la notificació " + notificacioId );
+
+			log.debug("Reenviar notificació movil pels enviaments de la notificació " + notificacioId );
 			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
 				pluginHelper.enviarNotificacioMobil(e);

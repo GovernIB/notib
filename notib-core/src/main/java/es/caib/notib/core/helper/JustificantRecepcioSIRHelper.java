@@ -33,7 +33,7 @@ public class JustificantRecepcioSIRHelper extends JustificantHelper<NotificacioE
 	@Autowired
 	private PluginHelper pluginHelper;
 
-	private SimpleDateFormat dt = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+	private SimpleDateFormat dt = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
 	public ListItem buildListRow(String text, String description) {
 		Paragraph paragraf = new Paragraph();
