@@ -720,7 +720,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 				NotificacioEventEntity errorEvent = notificacioHelper.getNotificaErrorEvent(notificacio);
 				if (errorEvent != null) {
-					resposta.setError(true);
+					NotificacioEstatEnumDto estat = notificacio.getEstat();
+					boolean isError = !NotificacioEstatEnumDto.FINALITZADA.equals(estat) && !NotificacioEstatEnumDto.PROCESSADA.equals(estat) && !Strings.isNullOrEmpty(errorEvent.getErrorDescripcio());
+					resposta.setError(isError);
 					resposta.setErrorData(errorEvent.getData());
 					resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
 					//				// Si l'error és de reintents de consulta o SIR, hem d'obtenir el missatge d'error de l'event que ha provocat la fallada
@@ -927,8 +929,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				}
 
 				if (enviament.getNotificacioErrorEvent() != null) {
-					resposta.setError(true);
+					NotificacioEstatEnumDto estat = enviament.getNotificacio().getEstat();
 					NotificacioEventEntity errorEvent = enviament.getNotificacioErrorEvent();
+					boolean isError = !NotificacioEstatEnumDto.FINALITZADA.equals(estat) && !NotificacioEstatEnumDto.PROCESSADA.equals(estat) && !Strings.isNullOrEmpty(errorEvent.getErrorDescripcio());
+					resposta.setError(isError);
 					resposta.setErrorData(errorEvent.getData());
 					resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
 					logger.debug("Notifica error de l'enviament amb referencia: " + referencia + ": " + enviament.isNotificaError());
