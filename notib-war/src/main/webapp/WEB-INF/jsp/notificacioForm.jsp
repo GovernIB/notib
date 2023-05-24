@@ -619,11 +619,12 @@
 					else if (!data.metadadesExistents){ //document pero sin metadades
 
 						inputElement.addClass('warningClass');
-						inputElement.parent().append('<div id="metadades_war_' + indexId + '"><p class="help-block" style="color: orange;"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.metadades.inexistent"/></p></div>');
-						$("#documents\\[" +indexId+ "\\]\\.origen").val(null).trigger("change.select2");
-						$("#documents\\[" +indexId+ "\\]\\.validesa").val(null).trigger("change.select2");
-						$("#documents\\[" +indexId+ "\\]\\.tipoDocumental").val(null).trigger("change.select2");
-						$("#documents\\[" +indexId+ "\\]\\.modoFirma").prop('checked', false);
+						inputElement.parent().append('<div id="metadades_war_' + indexId + '"><p class="help-block" style="color: orange;"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.metadades.inexistent.defecte"/></p></div>');
+						alert("<spring:message code="notificacio.form.camp.error.metadades.inexistent.defecte"/>");
+						// $("#documents\\[" +indexId+ "\\]\\.origen").val(null).trigger("change.select2");
+						// $("#documents\\[" +indexId+ "\\]\\.validesa").val(null).trigger("change.select2");
+						// $("#documents\\[" +indexId+ "\\]\\.tipoDocumental").val(null).trigger("change.select2");
+						// $("#documents\\[" +indexId+ "\\]\\.modoFirma").prop('checked', false);
 
 					} else { //document y metadades
 						if (data.origen != null) {
