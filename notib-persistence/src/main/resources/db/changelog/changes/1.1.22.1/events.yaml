@@ -1,0 +1,146 @@
+databaseChangeLog:
+  - property:
+      name: boolUnit
+      value: number(1,0)
+      dbms: oracle
+  - property:
+      name: boolUnit
+      value: bool
+      dbms: postgresql
+  - property:
+      name: booleanFalse
+      value: 0
+      dbms: oracle
+  - property:
+      name: booleanFalse
+      value: false
+      dbms: postgresql
+  - changeSet:
+      id: 1678691399590-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_notificacio_event
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: intents
+                  type: number(10,0)
+                  defaultValue: 1
+        - addColumn:
+              tableName: not_notificacio_event
+              columns:
+                - column:
+                    name: fi_reintents
+                    type: ${boolUnit}
+                    defaultValue: ${booleanFalse}
+        - update:
+            tableName: NOT_NOTIFICACIO_EVENT
+            columns:
+              - column:
+                  name: tipus
+                  value: 4
+            where: tipus = 3
+        - update:
+            tableName: NOT_NOTIFICACIO_EVENT
+            columns:
+              - column:
+                  name: tipus
+                  value: 4
+            where: tipus = 5
+        - update:
+            tableName: NOT_NOTIFICACIO_EVENT
+            columns:
+              - column:
+                  name: tipus
+                  value: 4
+            where: tipus = 6
+        - update:
+            tableName: NOT_NOTIFICACIO_EVENT
+            columns:
+              - column:
+                  name: tipus
+                  value: 4
+            where: tipus = 12
+        - update:
+            tableName: NOT_NOTIFICACIO_EVENT
+            columns:
+              - column:
+                  name: tipus
+                  value: 3
+            where: tipus = 0
+        - update:
+            tableName: NOT_NOTIFICACIO_EVENT
+            columns:
+              - column:
+                  name: tipus
+                  value: 6
+            where: tipus = 1
+        - update:
+            tableName: NOT_NOTIFICACIO_EVENT
+            columns:
+              - column:
+                  name: tipus
+                  value: 5
+            where: tipus = 2
+        - update:
+            tableName: NOT_NOTIFICACIO_EVENT
+            columns:
+              - column:
+                  name: tipus
+                  value: 0
+            where: tipus = 7
+        - update:
+            tableName: NOT_NOTIFICACIO_EVENT
+            columns:
+              - column:
+                  name: tipus
+                  value: 2
+            where: tipus = 10
+        - update:
+            tableName: NOT_NOTIFICACIO_EVENT
+            columns:
+              - column:
+                  name: tipus
+                  value: 2
+            where: tipus = 11
+        - update:
+            tableName: NOT_NOTIFICACIO_EVENT
+            columns:
+              - column:
+                  name: tipus
+                  value: 2
+            where: tipus = 13
+        - update:
+            tableName: NOT_NOTIFICACIO_EVENT
+            columns:
+              - column:
+                  name: tipus
+                  value: 7
+            where: tipus = 15
+        - update:
+            tableName: NOT_NOTIFICACIO_EVENT
+            columns:
+              - column:
+                  name: tipus
+                  value: 8
+            where: tipus = 9
+        - update:
+            tableName: NOT_NOTIFICACIO_EVENT
+            columns:
+              - column:
+                  name: tipus
+                  value: 8
+            where: tipus = 14
+
+
+
+
+
+
+
+
+
+
+

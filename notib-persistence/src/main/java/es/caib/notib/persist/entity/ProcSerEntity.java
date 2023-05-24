@@ -11,7 +11,21 @@ import org.hibernate.annotations.ForeignKey;
 import org.joda.time.DateTime;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -94,9 +108,12 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
         if (entregaCie != null && entregaCie.getOperadorPostal() != null && entregaCie.getCie() != null) {
             return checkEntregaCieProcSer();
         }
-        EntregaCieEntity entrega = organGestor.getEntregaCie();
-        if (entrega != null && entrega.getOperadorPostal() != null && entrega.getCie() != null) {
-            return checkEntregaCieOrgan();
+        EntregaCieEntity entrega;
+        if (organGestor != null) {
+            entrega = organGestor.getEntregaCie();
+            if (entrega != null && entrega.getOperadorPostal() != null && entrega.getCie() != null) {
+                return checkEntregaCieOrgan();
+            }
         }
         entrega = entitat.getEntregaCie();
         if (entrega != null && entrega.getOperadorPostal() != null && entrega.getCie() != null) {
@@ -132,36 +149,52 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
     }
 
     public boolean isEntregaCieActivaAlgunNivell() {
-
         if (entregaCie != null) {
             return true;
         }
+
         if (organGestor != null && organGestor.getEntregaCie() != null) {
             return true;
         }
+
         if (entitat != null && entitat.getEntregaCie() != null) {
             return true;
         }
+
         return false;
     }
 
     public EntregaCieEntity getEntregaCieEfectiva() {
-
         if (entregaCie != null) {
             return entregaCie;
         }
+
         if (organGestor != null && organGestor.getEntregaCie() != null) {
             return organGestor.getEntregaCie();
         }
+
         if (entitat != null && entitat.getEntregaCie() != null) {
             return entitat.getEntregaCie();
         }
+
         return null;
     }
 
-    public void update(String codi, String nom, EntitatEntity entitat, EntregaCieEntity entregaCie, int retard, int caducitat, boolean agrupar,
-                       OrganGestorEntity organGestor, String tipusAssumpte, String tipusAssumpteNom, String codiAssumpte, String codiAssumpteNom, boolean comu, boolean requireDirectPermission) {
-
+    public void update(
+            String codi,
+            String nom,
+            EntitatEntity entitat,
+            EntregaCieEntity entregaCie,
+            int retard,
+            int caducitat,
+            boolean agrupar,
+            OrganGestorEntity organGestor,
+            String tipusAssumpte,
+            String tipusAssumpteNom,
+            String codiAssumpte,
+            String codiAssumpteNom,
+            boolean comu,
+            boolean requireDirectPermission) {
         this.codi = codi;
         this.nom = nom;
         this.entitat = entitat;
@@ -178,8 +211,10 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
         this.requireDirectPermission = requireDirectPermission;
     }
 
-    public void update(String nom, OrganGestorEntity organGestor, boolean comu) {
-
+    public void update(
+            String nom,
+            OrganGestorEntity organGestor,
+            boolean comu) {
         this.nom = nom;
         this.organGestor = organGestor;
         this.comu= comu;
@@ -193,8 +228,8 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
             boolean actiu) {
         this.actiu = actiu;
     }
-    protected ProcSerEntity(ProcSerEntityBuilder<?, ?> b) {
 
+    protected ProcSerEntity(ProcSerEntityBuilder<?, ?> b) {
         this.setId(b.id);
         this.setCreatedBy(b.createdBy);
         if (b.createdDate != null) {
@@ -231,7 +266,6 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
     }
 
     public static abstract class ProcSerEntityBuilder<C extends ProcSerEntity, B extends ProcSerEntityBuilder<C, B>> {
-
         private String codi;
         private String nom;
         private Integer retard;

@@ -2,6 +2,7 @@ package es.caib.notib.back.command.adviser;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.tomcat.util.codec.binary.Base64;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -35,23 +36,34 @@ public class EnviamentAdviser implements Serializable {
 
     public es.caib.notib.logic.intf.dto.adviser.EnviamentAdviser asDto() {
 
-        es.caib.notib.logic.intf.dto.adviser.Receptor r = new es.caib.notib.logic.intf.dto.adviser.Receptor();
-        r.setNifReceptor(receptor.getNifReceptor());
-        r.setNombreReceptor(receptor.getNombreReceptor());
-        r.setVinculoReceptor(receptor.getVinculoReceptor());
-        r.setNifRepresentante(receptor.getNifRepresentante());
-        r.setNombreRepresentante(receptor.getNombreRepresentante());
-        r.setCsvRepresetante(receptor.getCsvRepresetante());
+        es.caib.notib.logic.intf.dto.adviser.Receptor r = null;
+        if (receptor != null) {
+            r = new es.caib.notib.logic.intf.dto.adviser.Receptor();
+            r.setNifReceptor(receptor.getNifReceptor());
+            r.setNombreReceptor(receptor.getNombreReceptor());
+            r.setVinculoReceptor(receptor.getVinculoReceptor());
+            r.setNifRepresentante(receptor.getNifRepresentante());
+            r.setNombreRepresentante(receptor.getNombreRepresentante());
+            r.setCsvRepresetante(receptor.getCsvRepresetante());
+        }
 
-        es.caib.notib.logic.intf.dto.adviser.Acuse aPdf = new es.caib.notib.logic.intf.dto.adviser.Acuse();
-        aPdf.setContenido(acusePDF.getContenido());
-        aPdf.setHash(acusePDF.getHash());
-        aPdf.setCsvResguardo(acusePDF.getCsvResguardo());
+        es.caib.notib.logic.intf.dto.adviser.Acuse aPdf = null;
+        if (acusePDF != null) {
+            aPdf = new es.caib.notib.logic.intf.dto.adviser.Acuse();
+            if (acusePDF.getContenido() != null)
+                aPdf.setContenido(Base64.decodeBase64(acusePDF.getContenido()));
+            aPdf.setHash(acusePDF.getHash());
+            aPdf.setCsvResguardo(acusePDF.getCsvResguardo());
+        }
 
-        es.caib.notib.logic.intf.dto.adviser.Acuse aXml = new es.caib.notib.logic.intf.dto.adviser.Acuse();
-        aXml.setContenido(acusePDF.getContenido());
-        aXml.setHash(acusePDF.getHash());
-        aXml.setCsvResguardo(acusePDF.getCsvResguardo());
+        es.caib.notib.logic.intf.dto.adviser.Acuse aXml = null;
+        if (acuseXML != null) {
+            aXml = new es.caib.notib.logic.intf.dto.adviser.Acuse();
+            if (acuseXML.getContenido() != null)
+                aXml.setContenido(Base64.decodeBase64(acuseXML.getContenido()));
+            aXml.setHash(acuseXML.getHash());
+            aXml.setCsvResguardo(acuseXML.getCsvResguardo());
+        }
 
         es.caib.notib.logic.intf.dto.adviser.EnviamentAdviser dto = new es.caib.notib.logic.intf.dto.adviser.EnviamentAdviser();
         dto.setOrganismoEmisor(organismoEmisor);
@@ -74,11 +86,13 @@ public class EnviamentAdviser implements Serializable {
 
         es.caib.notib.logic.intf.dto.adviser.Opciones  os = new es.caib.notib.logic.intf.dto.adviser.Opciones();
         es.caib.notib.logic.intf.dto.adviser.Opcion o;
-        for (es.caib.notib.back.command.adviser.Opcion op : opciones.getOpcion()) {
-            o = new es.caib.notib.logic.intf.dto.adviser.Opcion();
-            o.setTipo(op.getTipo());
-            o.setValue(o.getValue());
-            os.getOpcion().add(o);
+        if (opciones != null) {
+            for (es.caib.notib.back.command.adviser.Opcion op : opciones.getOpcion()) {
+                o = new es.caib.notib.logic.intf.dto.adviser.Opcion();
+                o.setTipo(op.getTipo());
+                o.setValue(o.getValue());
+                os.getOpcion().add(o);
+            }
         }
         return os;
     }

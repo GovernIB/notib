@@ -105,7 +105,6 @@ public class ConfigHelper {
 
     @Transactional(readOnly = true)
     public String getPrefix() {
-
         var prefix = getConfig(PropertiesConstants.CODI_ENTORN);
         return "[" + (!Strings.isNullOrEmpty(prefix) ? prefix : "NOTIB") + "]";
     }
@@ -160,24 +159,19 @@ public class ConfigHelper {
 
         var properties = new Properties();
         var configs = configRepository.findByEntitatCodiIsNull();
-        String value;
         for (var config: configs) {
-            value = !Strings.isNullOrEmpty(entitatCodi) ? getConfigByEntitat(entitatCodi, config.getKey()) : getConfig(config.getKey());
-            if (value == null) {
-                continue;
+            try {
+                var value = !Strings.isNullOrEmpty(entitatCodi) ? getConfigByEntitat(entitatCodi, config.getKey()) : getConfig(config.getKey());
+                if (value == null) {
+                    continue;
+                }
+                properties.put(config.getKey(), value);
+            } catch (NotDefinedConfigException dcex) {
+                log.warn("Propietat '" + config.getKey() + "' no definida.");
             }
-            properties.put(config.getKey(), value);
         }
         return properties;
     }
-
-//    private String getConfig(ConfigEntity configEntity) throws NotDefinedConfigException {
-//        if (configEntity.isJbossProperty()) {
-//            // Les propietats de Jboss es llegeixen del fitxer de properties i si no estan definides prenen el valor especificat per defecte a la base de dades.
-//            return getJBossProperty(configEntity.getKey(), configEntity.getValue());
-//        }
-//        return configEntity.getValue();
-//    }
 
     public void crearConfigsEntitat(String codiEntitat) {
 

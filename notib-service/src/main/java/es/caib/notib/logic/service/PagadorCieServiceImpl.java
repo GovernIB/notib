@@ -1,6 +1,12 @@
 package es.caib.notib.logic.service;
 
+import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
+import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.EntityComprovarHelper;
+import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.helper.OrganigramaHelper;
+import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
@@ -14,13 +20,15 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.intf.service.PermisosService;
+import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieEntity;
-import es.caib.notib.logic.helper.*;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.PagadorCieRepository;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,18 +45,17 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Slf4j
 @Service
-public class PagadorCieServiceImpl implements PagadorCieService{
+public class PagadorCieServiceImpl implements PagadorCieService {
 
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
 	private PagadorCieRepository pagadorCieReposity;
 	@Resource
-	private PaginacioHelper paginacioHelper;
-	@Resource
 	private OrganGestorRepository organGestorRepository;
+	@Resource
+	private PaginacioHelper paginacioHelper;
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
@@ -57,16 +64,17 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	private MetricsHelper metricsHelper;
 	@Resource
 	private PermisosService permisosService;
-
+	
 	@Override
 	@Transactional
 	public CieDto upsert(Long entitatId, CieDataDto cie) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Creant un nou pagador cie (pagador=" + cie + ")");
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			logger.debug("Creant un nou pagador cie (pagador=" + cie + ")");
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			OrganGestorEntity organGestor = null;
+
 			if (!Strings.isNullOrEmpty(cie.getOrganismePagadorCodi())) {
 				organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, cie.getOrganismePagadorCodi());
 			}
@@ -74,30 +82,58 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 			if (cie.getId() == null) {
 				p = PagadorCieEntity.builder().organGestor(organGestor).nom(cie.getNom()).contracteDataVig(cie.getContracteDataVig()).entitat(entitat).build();
 			} else {
-				log.debug("Actualitzant pagador cie (pagador=" + cie + ")");
+				logger.debug("Actualitzant pagador cie (pagador=" + cie + ")");
 				p = entityComprovarHelper.comprovarPagadorCie(cie.getId());
 				if (organGestor != null) {
 					p.setOrganGestor(organGestor);
 				}
 				p.setContracteDataVig(cie.getContracteDataVig());
 			}
-			var pagadorCieEntity = pagadorCieReposity.save(p);
+			PagadorCieEntity pagadorCieEntity = pagadorCieReposity.save(p);
 			return conversioTipusHelper.convertir(pagadorCieEntity, CieDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+//
+//	@Override
+//	@Transactional
+//	public CieDto update(CieDataDto cie) throws NotFoundException {
+//		Timer.Context timer = metricsHelper.iniciMetrica();
+//		try {
+//			logger.debug("Actualitzant pagador cie ("
+//					+ "pagador=" + cie + ")");
+//
+//			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al pagadorCIE i que es administrador de l'organ indicat
+//
+//			PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(cie.getId());
+//			pagadorCieEntity.update(
+//							cie.getOrganismePagadorCodi(),
+//							cie.getContracteDataVig());
+//
+//			pagadorCieReposity.save(pagadorCieEntity);
+//
+//			return conversioTipusHelper.convertir(
+//					pagadorCieEntity,
+//					CieDto.class);
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
+//	}
 
 	@Override
 	@Transactional
 	public CieDto delete(Long id) throws NotFoundException {
-
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			
 			//TODO: Si es tothom comprovar que és administrador d'Organ i que l'usuari es administrador de l'Organ associat al pagadorCIE a eliminar.
-			var pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(id);
+			
+			PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(id);
 			pagadorCieReposity.deleteById(id);
-			return conversioTipusHelper.convertir(pagadorCieEntity, CieDto.class);
+			return conversioTipusHelper.convertir(
+					pagadorCieEntity, 
+					CieDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -106,11 +142,13 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	@Override
 	@Transactional(readOnly = true)
 	public CieDto findById(Long id) {
-
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			var pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(id);
-			return conversioTipusHelper.convertir(pagadorCieEntity, CieDto.class);
+			PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(id);
+			
+			return conversioTipusHelper.convertir(
+					pagadorCieEntity, 
+					CieDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -118,34 +156,52 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<CieTableItemDto> findAmbFiltrePaginat(Long entitatId, CieFiltreDto filtre, PaginacioParamsDto paginacioParams) {
-
-		var timer = metricsHelper.iniciMetrica();
+	public PaginaDto<CieTableItemDto> findAmbFiltrePaginat(
+			Long entitatId, 
+			CieFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarPermisos(null, true, true, true);
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			Page<PagadorCieEntity> pagadorCie;
-			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<>();
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					true,
+					true);
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			Page<PagadorCieEntity> pagadorCie = null;
+
+			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("organismePagador", new String[] {"organismePagadorCodi"});
-			var pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
-			List<String> organsFills;
+			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
+
+			List<String> organsFills = null;
 			if (filtre.getOrganGestorId() != null) {
-				var organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, filtre.getOrganGestorId());
-				organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
+				OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(
+						entitat, 
+						filtre.getOrganGestorId());
+				organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+						entitat.getDir3Codi(), 
+						organGestor.getCodi());
+				
 				pagadorCie = pagadorCieReposity.findByCodiDir3NotNullFiltrePaginatAndEntitatWithOrgan(
 						filtre.getOrganismePagadorCodi() == null || filtre.getOrganismePagadorCodi().isEmpty(),
 						filtre.getOrganismePagadorCodi(),
 						organsFills,
 						entitat,
 						pageable);
-			} else {
+			}else{
 				pagadorCie = pagadorCieReposity.findByCodiDir3NotNullFiltrePaginatAndEntitat(
 						filtre.getOrganismePagadorCodi() == null || filtre.getOrganismePagadorCodi().isEmpty(),
 						filtre.getOrganismePagadorCodi(),
 						entitat,
 						pageable);
 			}
-			return paginacioHelper.toPaginaDto(pagadorCie, CieTableItemDto.class);
+			
+			
+			
+			return paginacioHelper.toPaginaDto(
+					pagadorCie,
+					CieTableItemDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -154,12 +210,17 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	@Override
 	@Transactional(readOnly = true)
 	public List<CieDto> findAll() {
-
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta de tots els pagadors cie");
-			entityComprovarHelper.comprovarPermisos(null, true, true, false);
-			return conversioTipusHelper.convertirList(pagadorCieReposity.findAll(), CieDto.class);
+			logger.debug("Consulta de tots els pagadors cie");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					true,
+					false);
+			return conversioTipusHelper.convertirList(
+						pagadorCieReposity.findAll(),
+						CieDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -167,13 +228,17 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	@Override
 	@Transactional(readOnly = true)
 	public List<IdentificadorTextDto> findAllIdentificadorText() {
-
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta de tots els pagadors cie");
-			entityComprovarHelper.comprovarPermisos(null, true, true, false);
-			var pagadors = pagadorCieReposity.findByContracteDataVigGreaterThanEqual(new Date());
-			return conversioTipusHelper.convertirList(pagadors, IdentificadorTextDto.class);
+			logger.debug("Consulta de tots els pagadors cie");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					true,
+					false);
+			return conversioTipusHelper.convertirList(
+					pagadorCieReposity.findByContracteDataVigGreaterThanEqual(new Date()),
+					IdentificadorTextDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -183,13 +248,13 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	@Transactional(readOnly = true)
 	public List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat) {
 
-		var pagadors = findNoCaducatsByEntitat(entitat);
-		var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-		var pagador = pagadorCieReposity.obtenirPagadorsEntitat(e);
+		EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		List<IdentificadorTextDto> pagadors = findNoCaducatsByEntitat(entitat);
+		PagadorCieEntity pagador = pagadorCieReposity.obtenirPagadorsEntitat(e);
 		if (pagador == null) {
 			return pagadors;
 		}
-		var i = conversioTipusHelper.convertir(pagador, IdentificadorTextDto.class);
+		IdentificadorTextDto i = conversioTipusHelper.convertir(pagador, IdentificadorTextDto.class);
 		if (!pagadors.contains(i)) {
 			i.setIcona("fa fa-warning text-danger");
 			pagadors.add(0, i);
@@ -201,12 +266,12 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	@Transactional(readOnly = true)
 	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta de tots els pagadors postals");
-			var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+			logger.debug("Consulta de tots els pagadors postals");
+			EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
 //			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
-			var p = pagadorCieReposity.findByEntitatAndContracteDataVigGreaterThanEqual(e, new Date());
+			List<PagadorCieEntity> p = pagadorCieReposity.findByEntitatAndContracteDataVigGreaterThanEqual(e, new Date());
 			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -217,25 +282,26 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	@Transactional(readOnly = true)
 	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitat, String organCodi, boolean isAdminOrgan) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta de tots els pagadors postals");
-			var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-			var o = organGestorRepository.findByCodi(organCodi);
+			logger.debug("Consulta de tots els pagadors postals");
+			EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+			OrganGestorEntity o = organGestorRepository.findByCodi(organCodi);
 //			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
-			var pagadors = pagadorCieReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
+			List<PagadorCieEntity> pagadors = pagadorCieReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
 			if (!e.getDir3Codi().equals(organCodi)) {
-				var pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
+				List<PagadorCieEntity> pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
 				pagadors.addAll(pagadorsPare);
 			}
-			var usr = SecurityContextHolder.getContext().getAuthentication().getName();
+			String usr = SecurityContextHolder.getContext().getAuthentication().getName();
 			List<PagadorCieEntity> p = new ArrayList<>();
-			for (var pagador : pagadors) {
+			for (PagadorCieEntity pagador : pagadors) {
 				if (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, pagador.getOrganGestor().getCodi(), PermisEnum.ADMIN)) {
 					continue;
 				}
 				p.add(pagador);
 			}
+
 			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -245,9 +311,9 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	private List<PagadorCieEntity> findOperadorsPare(EntitatDto entitat, String codi) {
 
 		List<PagadorCieEntity> operadors = new ArrayList<>();
-		var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-		var o = organGestorRepository.findByCodi(codi);
-		var p = pagadorCieReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
+		OrganGestorEntity o = organGestorRepository.findByCodi(codi);
+		EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		List<PagadorCieEntity> p = pagadorCieReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
 		if (!Strings.isNullOrEmpty(o.getCodiPare()) && !o.getCodi().equals(entitat.getDir3Codi()) && !"A99999999".equals(o.getCodiPare())) {
 			operadors = findOperadorsPare(entitat, o.getCodiPare());
 		}
@@ -258,13 +324,15 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	@Override
 	@Transactional(readOnly = true)
 	public List<CieDto> findByEntitat(Long entitatId) {
-
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta els pagadors postal de l'entitat: " + entitatId);
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			var pagadorsCie = pagadorCieReposity.findByEntitat(entitat);
-			return conversioTipusHelper.convertirList(pagadorsCie, CieDto.class);
+			logger.debug("Consulta els pagadors postal de l'entitat: " + entitatId);
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			List<PagadorCieEntity> pagadorsCie = pagadorCieReposity.findByEntitat(entitat);
+			
+			return conversioTipusHelper.convertirList(
+					pagadorsCie,
+					CieDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -273,13 +341,17 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	@Override
 	@Transactional(readOnly = true)
 	public Object findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor) {
-
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta els pagadors postal de l'entitat: " + entitat.getId() + " i òrgan gestor: " + organGestor.getCodi());
-			var organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
-			var pagadorsCie = pagadorCieReposity.findByEntitatIdAndOrganGestorCodiIn(entitat.getId(), organsFills);
-			return conversioTipusHelper.convertirList(pagadorsCie, CieDto.class);
+			logger.debug("Consulta els pagadors postal de l'entitat: " + entitat.getId() + " i òrgan gestor: " + organGestor.getCodi());
+			List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+					entitat.getDir3Codi(), 
+					organGestor.getCodi());
+			List<PagadorCieEntity> pagadorsCie = pagadorCieReposity.findByEntitatIdAndOrganGestorCodiIn(entitat.getId(), organsFills);
+			
+			return conversioTipusHelper.convertirList(
+					pagadorsCie,
+					CieDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -289,4 +361,7 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	public PaginaDto<CieDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return null;
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
+
 }

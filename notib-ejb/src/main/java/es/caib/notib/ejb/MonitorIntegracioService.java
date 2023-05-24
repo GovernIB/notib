@@ -9,7 +9,6 @@ import es.caib.notib.logic.intf.dto.IntegracioDto;
 import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
-import org.springframework.data.domain.Page;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -30,13 +29,13 @@ public class MonitorIntegracioService extends AbstractService<es.caib.notib.logi
 	public List<IntegracioDto> integracioFindAll() {
 		return getDelegateService().integracioFindAll();
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) {
 		return getDelegateService().integracioFindDarreresAccionsByCodi(codi, paginacio, filtre);
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public Map<String, Integer> countErrors() {

@@ -29,7 +29,7 @@ public class SchedulledService extends AbstractService<es.caib.notib.logic.intf.
 	public void notificaEnviamentsRegistrats() {
 		getDelegateService().notificaEnviamentsRegistrats();
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public void registrarEnviamentsPendents() throws RegistreNotificaException {
@@ -84,17 +84,20 @@ public class SchedulledService extends AbstractService<es.caib.notib.logic.intf.
 		getDelegateService().actualitzarServeis();
 	}
 
-    @Override
-    public void consultaCanvisOrganigrama() {
-        getDelegateService().consultaCanvisOrganigrama();
-    }
+	@Override
+	@PermitAll
+	public void consultaCanvisOrganigrama() {
+		getDelegateService().consultaCanvisOrganigrama();
+	}
 
 	@Override
+	@PermitAll
 	public void monitorIntegracionsEliminarAntics() {
 		getDelegateService().monitorIntegracionsEliminarAntics();
 	}
 
 	@Override
+	@PermitAll
 	public void actualitzarEstatOrgansEnviamentTable() {
 		getDelegateService().actualitzarEstatOrgansEnviamentTable();
 	}

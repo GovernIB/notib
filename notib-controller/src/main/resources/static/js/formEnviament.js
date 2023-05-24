@@ -179,8 +179,8 @@ function addContadorAddicionalEnviament(fieldId, inputMaxLength) {
     var p = '<p class="info-length text-success"> \
 				<span class="glyphicon glyphicon-info-sign"></span> \
 				<span class="inputCurrentLength_' + fieldId + '">0</span>'
-				    + textMessages['notificacio.form.camp.logitud'] +
-				'<span> ' + inputMaxLength + '</span> \
+        + textMessages['notificacio.form.camp.logitud'] +
+        '<span> ' + inputMaxLength + '</span> \
 			</p>';
     var inputField = $(document.getElementById(fieldId));
     $(p).insertAfter(inputField);
@@ -596,26 +596,12 @@ function setPersonaAdministracio (from, index, codi, denominacio, ocodi, cif) {
         dir3CodiDesc =  document.getElementById("searchOrgan" + from + index);
         organCif = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].nif");
     }
-    console.log("denominacio: " + denominacio);
+    // console.log("denominacio: " + denominacio);
     dir3Codi.value = codi;
     raoSocial.value = denominacio;
     dir3CodiDesc.value = ocodi;
     organCif.value = cif;
 }
-// function netejarFiltre(){
-// 	var searchCodi = $('#searchCodi');
-// 	var searchNom = $('#searchNom');
-// 	var selOrganismes = $('#selOrganismes');
-
-// 	searchCodi.removeAttr('disabled');
-// 	searchCodi.val('');
-// 	searchNom.removeAttr('disabled');
-// 	searchNom.val('');
-
-// 	selOrganismes.empty();
-// 	selOrganismes.append("<option value=\"\"></option>");
-
-// };
 
 
 function cercaCodiEnOrganigrama(fills){

@@ -10,7 +10,7 @@
 	<c:otherwise><c:set var="titol"><spring:message code="entitat.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <%
-	pageContext.setAttribute("tipusDocumentEnumDto", TipusDocumentEnumDto.values()); 
+	pageContext.setAttribute("tipusDocumentEnumDto", TipusDocumentEnumDto.values());
 	pageContext.setAttribute(
 			"isRolActualAdministrador",
 			es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(request));
@@ -83,7 +83,6 @@ operadorsCie.push({id:"${operadorsCie.id}", text:"${operadorsCie.text}", icona:"
 </c:forEach>
 
 $(document).ready(function() {
-
 
 	let entitatId = document.getElementById('id').value;
 	loadPagadorPostal($('#operadorPostalId'), operadorsPostal, "<spring:message code='operador.postal.obsolet'/>");

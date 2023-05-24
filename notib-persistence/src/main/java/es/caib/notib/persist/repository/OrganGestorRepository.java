@@ -77,7 +77,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"		  and g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
 	public List<OrganGestorEntity> findByEntitatAndGrup(@Param("entitat") EntitatEntity entitat, @Param("grups") List<String> grups);
-	
+
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
 			"where (og.entitat = :entitat)" +
@@ -102,13 +102,25 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("codiPare") String codiPare,
 			Pageable paginacio);
 	
-	@Query( "select distinct og from OrganGestorEntity og where (og.entitat = :entitat) and og.codi in (:organsIds)")
-	Page<OrganGestorEntity> findByEntitatAndOrganGestor(@Param("entitat") EntitatEntity entitat, @Param("organsIds") List<String> organs, Pageable paginacio);
+	@Query( "select distinct og " +
+			"from OrganGestorEntity og " +
+			"where (og.entitat = :entitat)" +
+			"and og.codi in (:organsIds)")
+	Page<OrganGestorEntity> findByEntitatAndOrganGestor(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("organsIds") List<String> organs,
+			Pageable paginacio);
 	
-	@Query( "select distinct og from OrganGestorEntity og where (og.entitat = :entitat) and og.codi in (:organsIds)")
-	List<OrganGestorEntity> findByEntitatAndOrgansGestors(@Param("entitat") EntitatEntity entitat, @Param("organsIds") List<String> organs);
+	@Query( "select distinct og " +
+			"from OrganGestorEntity og " +
+			"where (og.entitat = :entitat)" +
+			"and og.codi in (:organsIds)")
+	List<OrganGestorEntity> findByEntitatAndOrgansGestors(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("organsIds") List<String> organs);
 	
-	@Query(	"from OrganGestorEntity og " +
+	@Query(	"from " +
+			"    OrganGestorEntity og " +
 			"where (og.entitat = :entitat)" + 
 			"and og.codi in (:organsIds)" +
 			" and (:isCodiNull = true or lower(og.codi) like lower('%'||:codi||'%'))" +
@@ -131,19 +143,20 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("codiPare") String codiPare,
 			Pageable paginacio);
 	
-	@Query(	"select distinct og.codi from OrganGestorEntity og left outer join og.entitat e where e.dir3Codi = :entitatCodiDir3")
-	List<String> findCodisByEntitatDir3(@Param("entitatCodiDir3") String entitatCodiDir3);
+	@Query(	"select distinct og.codi " +
+			"from OrganGestorEntity og " +
+			"     left outer join og.entitat e " + 
+			"where e.dir3Codi = :entitatCodiDir3")
+	public List<String> findCodisByEntitatDir3(@Param("entitatCodiDir3") String entitatCodiDir3);
 
-	List<OrganGestorEntity> findByCodiIn(List<String> organs);
+	public List<OrganGestorEntity> findByCodiIn(List<String> organs);
 
 	List<OrganGestorEntity> findByEntitatCodiAndCodiIn(String entitatCodi, List<String> organs);
 
 	@Query(	"select distinct og.codi " +
 			"  from OrganGestorEntity og " +
 			" where og.entitat.codi = :entitatCodi and og.estat <> es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.V")
-	List<String> findCodiActiusByEntitat(@Param("entitatCodi") String entitatCodi);
-
-	List<OrganGestorEntity> findByCodiNotIn(List<String> organs);
+	public List<String> findCodiActiusByEntitat(@Param("entitatCodi") String entitatCodi);
 
 	@Query(	" select " +
 			"	CASE WHEN count(og) > 0 THEN true ELSE false END " +
@@ -152,9 +165,10 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			" where " +
 			"     og.id in (:organsIds) " +
 			" and e.id = :entitatId ")
-	boolean isAnyOfEntitat(@Param("organsIds") List<Long> organsIds, @Param("entitatId") Long entitatId);
+	boolean isAnyOfEntitat(@Param("organsIds") List<Long> organsIds,
+						   @Param("entitatId") Long entitatId);
 
-	List<OrganGestorEntity> findByEntitatIdAndEstat(Long entitatId, OrganGestorEstatEnum estat);
+	public List<OrganGestorEntity> findByEntitatIdAndEstat(Long entitatId, OrganGestorEstatEnum estat);
 
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
@@ -168,6 +182,5 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"where " +
 			"    og.entitat = :entitat " +
 			"and (og.oficina is null or og.oficina not in (select codi from OficinaEntity))")
-	List<OrganGestorEntity> findByEntitatAndOficinaInexistent(@Param("entitat") EntitatEntity entitat);
-
+    List<OrganGestorEntity> findByEntitatAndOficinaInexistent(@Param("entitat") EntitatEntity entitat);
 }

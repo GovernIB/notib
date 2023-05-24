@@ -25,13 +25,17 @@ public class EjbClientConfig {
 	private static final String EJB_JNDI_SUFFIX = "";
 
 	@Bean
+	public LocalStatelessSessionProxyFactoryBean adviserService() {
+		return getLocalEjbFactoyBean(AdviserService.class);
+	}
+	@Bean
 	public LocalStatelessSessionProxyFactoryBean aplicacioService() {
 		return getLocalEjbFactoyBean(AplicacioService.class);
 	}
-	@Bean
-	public LocalStatelessSessionProxyFactoryBean auditService() {
-		return getLocalEjbFactoyBean(AuditService.class);
-	}
+//	@Bean
+//	public LocalStatelessSessionProxyFactoryBean auditService() {
+//		return getLocalEjbFactoyBean(AuditService.class);
+//	}
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean avisService() {
 		return getLocalEjbFactoyBean(AvisService.class);
@@ -69,12 +73,24 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(JustificantService.class);
 	}
 	@Bean
+	public LocalStatelessSessionProxyFactoryBean monitorIntegracioService() {
+		return getLocalEjbFactoyBean(MonitorIntegracioService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean monitorTasquesService() {
+		return getLocalEjbFactoyBean(MonitorTasquesService.class);
+	}
+	@Bean
 	public LocalStatelessSessionProxyFactoryBean notificacioMassivaService() {
 		return getLocalEjbFactoyBean(NotificacioMassivaService.class);
 	}
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean notificacioService() {
 		return getLocalEjbFactoyBean(NotificacioService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean notificacioServiceWs() {
+		return getLocalEjbFactoyBean(NotificacioServiceWs.class);
 	}
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean operadorPostalService() {
@@ -97,17 +113,21 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(PagadorCieService.class);
 	}
 	@Bean
+	public LocalStatelessSessionProxyFactoryBean permisosService() {
+		return getLocalEjbFactoyBean(PermisosService.class);
+	}
+	@Bean
 	public LocalStatelessSessionProxyFactoryBean procedimentService() {
 		return getLocalEjbFactoyBean(ProcedimentService.class);
 	}
-	@Bean
-	public LocalStatelessSessionProxyFactoryBean registreService() {
-		return getLocalEjbFactoyBean(RegistreService.class);
-	}
-	@Bean
-	public LocalStatelessSessionProxyFactoryBean schedulledService() {
-		return getLocalEjbFactoyBean(SchedulledService.class);
-	}
+//	@Bean
+//	public LocalStatelessSessionProxyFactoryBean registreService() {
+//		return getLocalEjbFactoyBean(RegistreService.class);
+//	}
+//	@Bean
+//	public LocalStatelessSessionProxyFactoryBean schedulledService() {
+//		return getLocalEjbFactoyBean(SchedulledService.class);
+//	}
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean serveiService() {
 		return getLocalEjbFactoyBean(ServeiService.class);
@@ -115,11 +135,6 @@ public class EjbClientConfig {
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean usuariAplicacioService() {
 		return getLocalEjbFactoyBean(UsuariAplicacioService.class);
-	}
-
-	@Bean
-	public LocalStatelessSessionProxyFactoryBean monitorIntegracioService() {
-		return getLocalEjbFactoyBean(MonitorIntegracioService.class);
 	}
 
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {

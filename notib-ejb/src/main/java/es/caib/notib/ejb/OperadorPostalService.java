@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.dto.cie.OperadorPostalTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import java.util.List;
@@ -65,19 +66,19 @@ public class OperadorPostalService extends AbstractService<es.caib.notib.logic.i
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat) {
-		return getDelegateService().findPagadorsByEntitat(entitat);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitatId, String organCodi, boolean isAdminOrgan) {
-		return getDelegateService().findNoCaducatsByEntitatAndOrgan(entitatId, organCodi, isAdminOrgan);
+		return null;
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
 		return getDelegateService().findNoCaducatsByEntitat(entitat);
+	}
+
+	@Override
+	@PermitAll
+	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitatId, String organCodi, boolean isAdminOrgan) {
+		return getDelegateService().findNoCaducatsByEntitatAndOrgan(entitatId, organCodi, isAdminOrgan);
 	}
 
 	@Override

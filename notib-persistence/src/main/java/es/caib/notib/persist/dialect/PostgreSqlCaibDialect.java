@@ -4,7 +4,6 @@
 package es.caib.notib.persist.dialect;
 
 import es.caib.notib.persist.audit.AbstractAuditableEntity;
-import org.hibernate.Hibernate;
 import org.hibernate.dialect.PostgreSQL9Dialect;
 import org.hibernate.type.IntegerType;
 
@@ -18,7 +17,6 @@ import org.hibernate.type.IntegerType;
 public class PostgreSqlCaibDialect extends PostgreSQL9Dialect {
 
 	public PostgreSqlCaibDialect() {
-
 		super();
 		registerFunction("bitand", new PostgresBitwiseAndSQLFunction("bitand", IntegerType.INSTANCE));
 	}

@@ -3,7 +3,13 @@
  */
 package es.caib.notib.logic.intf.dto.notificacio;
 
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.intf.dto.AuditoriaDto;
+import es.caib.notib.logic.intf.dto.DocumentDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.logic.intf.dto.NotificacioErrorTipusEnumDto;
+import es.caib.notib.logic.intf.dto.PermisDto;
+import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notenviament.EnviamentDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import lombok.AllArgsConstructor;
@@ -25,8 +31,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Getter @Setter
 public class NotificacioDto extends AuditoriaDto {
 
 	private Long id;

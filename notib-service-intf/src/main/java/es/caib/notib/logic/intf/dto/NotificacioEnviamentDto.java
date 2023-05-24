@@ -58,8 +58,16 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	private Date registreData;
 	private String registreNumeroFormatat;
 	private NotificacioRegistreEstatEnumDto registreEstat;
-
+	private boolean isCallbackPendent;
+	private String callbackData;
+	private boolean fiReintents;
+	private String fiReintentsDesc;
+	private boolean callbackFiReintents;
+	private String callbackFiReintentsDesc;
 	private boolean perEmail;
+	private Date sirRecepcioData;
+	private Date sirRegDestiData;
+	private String notificacioMovilErrorDesc;
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;

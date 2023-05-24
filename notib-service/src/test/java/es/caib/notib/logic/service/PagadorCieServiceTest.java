@@ -39,18 +39,23 @@ public class PagadorCieServiceTest extends BaseServiceTestV2 {
 	
 	@Before
 	public void setUp() throws Exception {
-
 		addConfig("es.caib.notib.metriques.generar", "false");
+
 		createPagadorCie = CieItemTest.getRandomInstance();
 		cieCreator.addObject("cie", createPagadorCie);
-		database = createDatabase(EntitatItemTest.getRandomInstance(), cieCreator);
+		database = createDatabase(EntitatItemTest.getRandomInstance(),
+			cieCreator
+		);
+
 		updatePagadorCie = CieItemTest.getRandomInstance();
 	}
 
+
 	@After
 	public final void tearDown() {
-
-		destroyDatabase(database.getEntitat().getId(), cieCreator);
+		destroyDatabase(database.getEntitat().getId(),
+			cieCreator
+		);
 		log.info("-------------------------------------------------------------------");
 		log.info("-- ...test \"" + currentTestDescription + "\" executat.");
 		log.info("-------------------------------------------------------------------");
@@ -65,13 +70,14 @@ public class PagadorCieServiceTest extends BaseServiceTestV2 {
 		authenticationTest.autenticarUsuari("admin");
 		assertNotNull(pagadorCreateCie);
 		assertNotNull(pagadorCreateCie.getId());
+
 		compararPagadorCie(createPagadorCie, pagadorCreateCie);
 		assertEquals(entitatCreada.getId(), pagadorCreateCie.getEntitatId());
 	}
-
+	
+	
 	@Test
 	public void update() {
-
 		currentTestDescription = "Update PAGADOR CIE";
 		EntitatDto entitatCreada = database.getEntitat();
 		CieDto cieCreat = (CieDto) database.get("cie");
@@ -82,20 +88,28 @@ public class PagadorCieServiceTest extends BaseServiceTestV2 {
 
 		assertNotNull(pagadorCieModificat);
 		assertNotNull(pagadorCieModificat.getId());
-		assertEquals(cieCreat.getId(), pagadorCieModificat.getId());
-		compararPagadorCie(updatePagadorCie, pagadorCieModificat);
+
+		assertEquals(
+				cieCreat.getId(),
+				pagadorCieModificat.getId());
+		compararPagadorCie(
+				updatePagadorCie,
+				pagadorCieModificat);
 		assertEquals(entitatCreada.getId(), pagadorCieModificat.getEntitatId());
 	}
 	
+	
 	@Test
 	public void delete() {
-
 		currentTestDescription = "Delete PAGADOR CIE";
 		EntitatDto entitatCreada = database.getEntitat();
 		CieDto cieCreat = (CieDto) database.get("cie");
 		authenticationTest.autenticarUsuari("admin");
+
 		CieDto esborrada = pagadorCieService.delete(cieCreat.getId());
-		compararPagadorCie(createPagadorCie, esborrada);
+		compararPagadorCie(
+				createPagadorCie,
+				esborrada);
 		try{
 			pagadorCieService.findById(cieCreat.getId());
 			fail("El Pagador esborrat no s'hauria d'haver trobat");
@@ -105,40 +119,46 @@ public class PagadorCieServiceTest extends BaseServiceTestV2 {
 	
 	@Test
 	public void findById() {
-
 		currentTestDescription = "FindById PAGADOR CIE";
 		EntitatDto entitatCreada = database.getEntitat();
 		CieDto cieCreat = (CieDto) database.get("cie");
 		authenticationTest.autenticarUsuari("admin");
-		CieDto trobat= pagadorCieService.findById(cieCreat.getId());
+
+		CieDto trobat= pagadorCieService.findById(
+				cieCreat.getId());
+
 		assertNotNull(trobat);
 		assertNotNull(trobat.getId());
-		compararPagadorCie(createPagadorCie, trobat);
+		compararPagadorCie(
+				createPagadorCie,
+				trobat);
 	}
-
+	
+	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplCreate() {
-
 		authenticationTest.autenticarUsuari("apl");
 		pagadorCieService.upsert(1L, createPagadorCie);
 	}
-	
+//
 //	@Test(expected = AccessDeniedException.class)
 //	public void errorSiAccesAplUpdate() {
-//
 //		authenticationTest.autenticarUsuari("apl");
 //		pagadorCieService.update(createPagadorCie);
 //	}
 
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplDelete() {
-
 		authenticationTest.autenticarUsuari("apl");
 		pagadorCieService.delete(1L);
 	}
 	
-	private void compararPagadorCie(CieDataDto original, CieDataDto perComprovar) {
-		assertEquals(original.getOrganismePagadorCodi(), perComprovar.getOrganismePagadorCodi());
+	private void compararPagadorCie(
+			CieDataDto original,
+			CieDataDto perComprovar) {
+		assertEquals(
+				original.getOrganismePagadorCodi(),
+				perComprovar.getOrganismePagadorCodi());
 	}
 
 }

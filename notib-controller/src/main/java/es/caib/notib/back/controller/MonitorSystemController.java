@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.back.helper.MonitorHelper;
 import es.caib.notib.logic.intf.monitor.MonitorTascaEstat;
+import es.caib.notib.logic.intf.monitor.MonitorTascaInfo;
 import es.caib.notib.logic.intf.service.MonitorTasquesService;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,10 +26,11 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Controlador per la gestió d'perfils
- *
+ * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
@@ -37,7 +39,7 @@ public class MonitorSystemController extends BaseController {
 
 	@Autowired
 	private MonitorTasquesService monitortasquesService;
-
+	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
 		return "monitor";
@@ -53,7 +55,7 @@ public class MonitorSystemController extends BaseController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Map<String,List<String>> ejecutar(HttpServletRequest request) {
-
+		
 		Map<String, List<String>> mjson = new LinkedHashMap<>();
 		List<String> sistema = new ArrayList<>();
 		List<String> hilo = new ArrayList<>();
@@ -71,34 +73,34 @@ public class MonitorSystemController extends BaseController {
 		sistema.add(getMessage(request, "monitor.os-arch") + ": " + MonitorHelper.getArch());
 		sistema.add(getMessage(request, "monitor.os-version") + ": " + MonitorHelper.getVersion());
 		sistema.add(getMessage(request, "monitor.carga_cpu") + ": " + MonitorHelper.getCPULoad());
-
-		for (var root : File.listRoots()) {
+		
+		for (File root : File.listRoots()) {
 			sistema.add(getMessage(request, "monitor.space.total") + " " + root.getAbsolutePath()+": " + MonitorHelper.humanReadableByteCount(root.getTotalSpace()));
 			sistema.add(getMessage(request, "monitor.space.free") + " " + root.getAbsolutePath()+": " + MonitorHelper.humanReadableByteCount(root.getFreeSpace()));
 		}
-
-		var numDeadlocked = 0;
+        
+		int numDeadlocked = 0; 
 		if (bean.findMonitorDeadlockedThreads() != null) {
 			numDeadlocked = bean.findMonitorDeadlockedThreads().length;
 		}
 		sistema.add(getMessage(request, "monitor.deadlocked")+": " + numDeadlocked);
 		sistema.add(getMessage(request, "monitor.daemon_thread")+": " + bean.getDaemonThreadCount());
+		
 		bean.resetPeakThreadCount();
-
+		
 		if (bean.isThreadCpuTimeSupported()) {
-			var ids = bean.getAllThreadIds();
-			var info = bean.getThreadInfo(ids);
-			var hs = new HashSet();
-			for (var a = 0; a < ids.length; ++a) {
+			long[] ids = bean.getAllThreadIds();
+			ThreadInfo[] info = bean.getThreadInfo(ids);
+			Set hs = new HashSet();
+			for (int a = 0; a < ids.length; ++a) {
 				hs.add(bean.getThreadCpuTime(ids[a]));
 			}
-			var tiempoCPUTotal =  ((Long)Collections.max(hs)).longValue();
-			String nombre;
-			for (var a = 0; a < ids.length; ++a) {
-				nombre = (info[a].getLockName() == null ? info[a].getThreadName() : info[a].getLockName());
+			long tiempoCPUTotal =  ((Long)Collections.max(hs)).longValue();
+			for (int a = 0; a < ids.length; ++a) {
+				String nombre = (info[a].getLockName() == null ? info[a].getThreadName() : info[a].getLockName());
 				if (!"main".equals(nombre)) {
 					hilo.add(nombre);
-					var tiempoCPU = (long) ((float)100*((float) bean.getThreadCpuTime(ids[a]) / (float) tiempoCPUTotal));
+					long tiempoCPU = (long) ((float)100*((float) bean.getThreadCpuTime(ids[a]) / (float) tiempoCPUTotal));
 					cputime.add(((tiempoCPU>100)?100:tiempoCPU) + " %");
 					estado.add(getMessage(request, "monitor."+info[a].getThreadState()));
 					espera.add(((info[a].getWaitedTime() == -1)? 0:info[a].getWaitedTime()) + " ns");
@@ -106,7 +108,7 @@ public class MonitorSystemController extends BaseController {
 				}
 			}
 		}
-
+		
 		mjson.put("sistema", sistema);
 		mjson.put("hilo", hilo);
 		mjson.put("cputime", cputime);
@@ -122,39 +124,38 @@ public class MonitorSystemController extends BaseController {
 	public Map<String, JSONArray> getTasquesJson(HttpServletRequest request) {
 
 		Map<String, JSONArray> tasques = new HashMap<>();
-		var tasca = new JSONArray();
-		var estat = new JSONArray();
-		var iniciExecucio = new JSONArray();
-		var tempsExecucio = new JSONArray();
-		var properaExecucio = new JSONArray();
-		var observacions = new JSONArray();
-		var identificadors = new JSONArray();
+		JSONArray tasca = new JSONArray();
+		JSONArray estat = new JSONArray();
+		JSONArray iniciExecucio = new JSONArray();
+		JSONArray tempsExecucio = new JSONArray();
+		JSONArray properaExecucio = new JSONArray();
+		JSONArray observacions = new JSONArray();
+		JSONArray identificadors = new JSONArray();
 
-		var monitorTasques = monitortasquesService.findAll();
-		var sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		String strDataInici, difDataSegons, strProperaExecucio;
-		for(var monitorTasca : monitorTasques) {
+		List<MonitorTascaInfo> monitorTasques = monitortasquesService.findAll();
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		for(MonitorTascaInfo monitorTasca : monitorTasques) {
 
 			identificadors.put(monitorTasca.getCodi());
 			tasca.put(getMessage(request, "monitor.tasques.tasca") + ": " + getMessage(request, "monitor.tasques.tasca.codi." + monitorTasca.getCodi()));
 			estat.put(getMessage(request, "monitor.tasques.estat") + ": " + getMessage(request, "monitor.tasques.estat." + monitorTasca.getEstat()));
 
-			strDataInici = "-";
+			String strDataInici = "-";
 			if (monitorTasca.getDataInici() != null) {
 				strDataInici = sdf.format(monitorTasca.getDataInici());
 			}
 			iniciExecucio.put(getMessage(request, "monitor.tasques.darrer.inici") + ": " + strDataInici);
 
-
-			difDataSegons = "-";
+			@SuppressWarnings("unused")
+			String difDataSegons = "-";
 			if (monitorTasca.getDataInici() != null) {
 				long difDatas = System.currentTimeMillis() - monitorTasca.getDataInici().getTime();
 				difDataSegons = ((int) (difDatas / 1000) % 60) + "s";
 			}
 			tempsExecucio.put(getMessage(request, "monitor.tasques.temps.execucio") + ": " + monitorTasca.getTempsExecucio());
 
-			strProperaExecucio = !MonitorTascaEstat.EN_EXECUCIO.equals(monitorTasca.getEstat()) && monitorTasca.getProperaExecucio() != null
-					? sdf.format(monitorTasca.getProperaExecucio()) : "-";
+			String strProperaExecucio = !MonitorTascaEstat.EN_EXECUCIO.equals(monitorTasca.getEstat()) && monitorTasca.getProperaExecucio() != null
+										? sdf.format(monitorTasca.getProperaExecucio()) : "-";
 			properaExecucio.put(getMessage(request, "monitor.tasques.propera.execucio") + ": " + strProperaExecucio);
 			observacions.put(getMessage(request, "monitor.tasques.observacions") + ": " + monitorTasca.getObservacions());
 		}

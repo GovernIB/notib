@@ -24,4 +24,5 @@ public class RegistreIdDto {
 	private String descripcioError;
 	private String hora;
 	private String numeroRegistreFormat;
+
 }

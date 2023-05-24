@@ -28,46 +28,63 @@
 	</cache-template>
 
 	<cache alias="aclCache" uses-template="default"><expiry><ttl unit="seconds">600</ttl></expiry></cache>
-	<cache alias="entitatsUsuari" uses-template="default"><expiry><ttl unit="seconds">43200</ttl></expiry></cache>
+
+	<!-- USUARI -->
 	<cache alias="usuariAmbCodi" uses-template="default"/>
 	<cache alias="rolsAmbCodi" uses-template="default"/>
-	<cache alias="getPermisosEntitatsUsuariActual" uses-template="default"><expiry><ttl unit="seconds">604800</ttl></expiry><resources><heap unit="entries">300</heap></resources></cache>
-	<cache alias="denominacioOrganisme" uses-template="default"><expiry><ttl unit="seconds">604800</ttl></expiry><resources><heap unit="entries">300</heap></resources></cache>
-	<cache alias="findOficinesEntitat" uses-template="default"/>
-	<cache alias="findLlibresOficina" uses-template="default"/>
-	<cache alias="findLlibreOrganisme" uses-template="default"/>
-	<cache alias="oficinesSIRUnitat" uses-template="default"/>
-	<cache alias="unitatPerCodi" uses-template="default"/>
-	<cache alias="oficinesSIREntitat" uses-template="default"/>
+	<cache alias="entitatsUsuari" uses-template="default"><expiry><ttl unit="seconds">43200</ttl></expiry></cache>
+	<cache alias="organsGestorsUsuari" uses-template="default"/>
+	<cache alias="findUsuarisAmbPermis" uses-template="default"/>
+
+	<!-- ORGANIGRAMA -->
+	<cache alias="organismes" uses-template="default"><expiry><ttl unit="seconds">604800</ttl></expiry></cache>
+	<cache alias="organigrama" uses-template="default"><expiry><ttl unit="seconds">604800</ttl></expiry></cache>
 	<cache alias="organigramaOriginal" uses-template="default"><expiry><ttl unit="seconds">604800</ttl></expiry></cache>
+	<cache alias="codisOrgansFills" uses-template="default"/>
+	<cache alias="organCodisAncestors" uses-template="default"/>
+	<cache alias="unitatPerCodi" uses-template="default"/>
+
+	<!-- REGISTRE -->
+	<cache alias="findOficinesEntitat" uses-template="default"/>
+	<cache alias="findLlibreOrganisme" uses-template="default"/>
 	<cache alias="llistarNivellsAdministracions" uses-template="default"/>
 	<cache alias="llistarComunitatsAutonomes" uses-template="default"/>
 	<cache alias="llistarProvincies" uses-template="default"/>
 	<cache alias="llistarLocalitats" uses-template="default"/>
-	<cache alias="organigrama" uses-template="default"><expiry><ttl unit="seconds">604800</ttl></expiry></cache>
-	<cache alias="codisOrgansFills" uses-template="default"/>
-	<cache alias="organCodisAncestors" uses-template="default"/>
-	<cache alias="organismes" uses-template="default"><expiry><ttl unit="seconds">604800</ttl></expiry></cache>
-	<cache alias="organsGestorsUsuari" uses-template="default"/>
-	<cache alias="organsPermis" uses-template="default"/>
-	<cache alias="procedimentEntitiesPermis" uses-template="default"/>
-	<cache alias="procedimentEntitiesPermisMenu" uses-template="default"/>
-	<cache alias="procedimentEntitiessOrganPermis" uses-template="default"/>
-	<cache alias="organsEntitiesPermis" uses-template="default"/>
-	<cache alias="findUsuarisAmbPermis" uses-template="default"/>
-	<cache alias="procsersPermis" uses-template="default"/>
-	<cache alias="procsersPermisMenu" uses-template="default"/>
-	<cache alias="procedimentsOrganPermis" uses-template="default"/>
-	<cache alias="organigramaPlugin" uses-template="default"><expiry><ttl unit="seconds">604800</ttl></expiry></cache>
+	<cache alias="oficinesSIREntitat" uses-template="default"/>
+	<cache alias="oficinesSIRUnitat" uses-template="default"/>
 
+	<!-- PERMISOS -->
+	<!-- Entitat -->
+	<cache alias="getPermisosEntitatsUsuariActual" uses-template="default"><expiry><ttl unit="seconds">604800</ttl></expiry><resources><heap unit="entries">300</heap></resources></cache>
+
+	<!-- Procediments -->
 	<cache alias="procsersPermisNotificacioMenu" uses-template="default"/>
 	<cache alias="procsersPermisComunicacioMenu" uses-template="default" />
 	<cache alias="procsersPermisComunicacioSirMenu" uses-template="default" />
 	<cache alias="procserAmbPermis" uses-template="default" />
 	<cache alias="procedimentsAmbPermis" uses-template="default" />
 	<cache alias="serveisAmbPermis" uses-template="default" />
+
+	<!-- Òrgans -->
 	<cache alias="organsAmbPermis" uses-template="default" />
 	<cache alias="organsPermisPerProcedimentComu" uses-template="default" />
+
+	<!-- Procediment-òrgan -->
+	<cache alias="procserOrgansCodisAmbPermis" uses-template="default" />
+
+<!--	<cache alias="organsPermis" uses-template="default"/>-->
+<!--	<cache alias="denominacioOrganisme" uses-template="default"><expiry><ttl unit="seconds">604800</ttl></expiry><resources><heap unit="entries">300</heap></resources></cache>-->
+<!--	<cache alias="findLlibresOficina" uses-template="default"/>-->
+<!--	<cache alias="procedimentEntitiesPermis" uses-template="default"/>-->
+<!--	<cache alias="procedimentEntitiesPermisMenu" uses-template="default"/>-->
+<!--	<cache alias="procedimentEntitiessOrganPermis" uses-template="default"/>-->
+<!--	<cache alias="organsEntitiesPermis" uses-template="default"/>-->
+<!--	<cache alias="procsersPermis" uses-template="default"/>-->
+<!--	<cache alias="procsersPermisMenu" uses-template="default"/>-->
+<!--	<cache alias="procedimentsOrganPermis" uses-template="default"/>-->
+<!--	<cache alias="organigramaPlugin" uses-template="default"><expiry><ttl unit="seconds">604800</ttl></expiry></cache>-->
+
 <!--	<cache alias="procedimentEntitiessOrganPermis" uses-template="default" />-->
 <!--	<cache alias="organsEntitiesPermis" uses-template="default" />-->
 </config>

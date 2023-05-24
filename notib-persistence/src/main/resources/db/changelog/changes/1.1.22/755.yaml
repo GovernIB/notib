@@ -1,41 +1,41 @@
 databaseChangeLog:
-  - property:
-      dbms: oracle
-      name: type.pk
-      value: number(19,0)
-  - property:
-      dbms: postgresql
-      name: type.pk
-      value: SERIAL
-  - property:
-      name: varcharUnit
-      value: CHAR
-      dbms: oracle
-  - property:
-      name: varcharUnit
-      value: ''
-      dbms: postgresql
-  - property:
-      name: booleanTrue
-      value: 1
-      dbms: oracle
-  - property:
-      name: booleanTrue
-      value: true
-      dbms: postgresql
-  - property:
-      name: booleanFalse
-      value: 0
-      dbms: oracle
-  - property:
-      name: booleanFalse
-      value: false
-      dbms: postgresql
-  - changeSet:
-      id: 1665140886759-3
-      author: limit
-      changes:
-        - sql : "
+    - property:
+        dbms: oracle
+        name: type.pk
+        value: number(19,0)
+    - property:
+        dbms: postgresql
+        name: type.pk
+        value: SERIAL
+    - property:
+        name: varcharUnit
+        value: CHAR
+        dbms: oracle
+    - property:
+        name: varcharUnit
+        value: ''
+        dbms: postgresql
+    - property:
+        name: booleanTrue
+        value: 1
+        dbms: oracle
+    - property:
+        name: booleanTrue
+        value: true
+        dbms: postgresql
+    - property:
+          name: booleanFalse
+          value: 0
+          dbms: oracle
+    - property:
+          name: booleanFalse
+          value: false
+          dbms: postgresql
+    - changeSet:
+        id: 1665140886759-3
+        author: limit
+        changes:
+            - sql : "
                     INSERT INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('VALSIG_CLASS', 'org.fundaciobit.plugins.validatesignature.afirmacxf.AfirmaCxfValidateSignaturePlugin,es.caib.notib.plugin.valsig.ValidacioFirmesPluginMock');
                     
                     INSERT INTO NOT_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (1, 'FIRMA', 'VALIDATE_SIGNATURE', 'Configuració del plugin validació de firmes' );

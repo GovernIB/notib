@@ -1,16 +1,18 @@
 package es.caib.notib.back.controller;
 
-import es.caib.notib.logic.intf.dto.PermisDto;
-import es.caib.notib.logic.intf.dto.TipusEnumDto;
-import es.caib.notib.logic.intf.exception.NotFoundException;
-import es.caib.notib.logic.intf.service.EntitatService;
-import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.back.command.PermisCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RolHelper;
-import lombok.extern.slf4j.Slf4j;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.PermisDto;
+import es.caib.notib.logic.intf.dto.TipusEnumDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.exception.NotFoundException;
+import es.caib.notib.logic.intf.service.EntitatService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,7 +35,6 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  *
  */
-@Slf4j
 @Controller
 @RequestMapping("/organgestor")
 public class OrganGestorPermisController extends BaseUserController{
@@ -44,11 +45,20 @@ public class OrganGestorPermisController extends BaseUserController{
 	EntitatService entitatService;
 
 	@RequestMapping(value = "/{organGestorId}/permis", method = RequestMethod.GET)
-	public String get(HttpServletRequest request, @PathVariable Long organGestorId, Model model) {
-
-		var entitatActual = getEntitatActualComprovantPermisos(request);
-		var organGestor = organGestorService.findById(entitatActual.getId(), organGestorId);
-		model.addAttribute("organGestor", organGestor);
+	public String get(
+			HttpServletRequest request,
+			@PathVariable Long organGestorId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		OrganGestorDto organGestor = organGestorService.findById(
+				entitatActual.getId(),
+				organGestorId);
+					
+		model.addAttribute(
+				"organGestor",
+				organGestor);
+		
 		return "organGestorPermis";
 	}
 
@@ -60,13 +70,12 @@ public class OrganGestorPermisController extends BaseUserController{
 			return DatatablesHelper.getDatatableResponse(request, new ArrayList<PermisDto>(), "id");
 		}
 		try {
-			var entitatActual = getEntitatActualComprovantPermisos(request);
-			var paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-			var permisos = organGestorService.permisFind(entitatActual.getId(), organGestorId, paginacio);
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
+			List<PermisDto> permisos = organGestorService.permisFind(entitatActual.getId(), organGestorId, paginacio);
 			return DatatablesHelper.getDatatableResponse(request, permisos, "id");
 		} catch(Exception ex) {
-			log.error(ex.getMessage());
-			var msg = getMessage(request, "organgestor.permis.datatable.error", new Object[] {
+			String msg = getMessage(request, "organgestor.permis.datatable.error", new Object[] {
 					"<button class=\"btn btn-default btn-xs pull-right\" data-toggle=\"collapse\" data-target=\"#collapseError\" aria-expanded=\"false\" aria-controls=\"collapseError\">\n" +
 					"\t\t\t\t<span class=\"fa fa-bars\"></span>\n" +
 					"\t\t\t</button>\n" +
@@ -75,7 +84,9 @@ public class OrganGestorPermisController extends BaseUserController{
 					"\t\t\t\t<textarea rows=\"10\" style=\"width:100%\">" + ExceptionUtils.getStackTrace(ex) +"</textarea>\n" +
 					"\t\t\t</div>"});
 			MissatgesHelper.error(request, msg);
+
 		}
+
 		return DatatablesHelper.getDatatableResponse(request, new ArrayList<>(), "id");
 	}
 
@@ -83,37 +94,43 @@ public class OrganGestorPermisController extends BaseUserController{
 	@ResponseBody
 	public DatatablesResponse getPermisos(HttpServletRequest request, @PathVariable String codiSia, Model model) {
 
-		var entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (entitatActual == null) {
 			return DatatablesHelper.getDatatableResponse(request, new ArrayList<PermisDto>(), "id");
 		}
-		var paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		var organ = organGestorService.findByCodi(entitatActual.getId(), codiSia);
+		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		OrganGestorDto organ = organGestorService.findByCodi(entitatActual.getId(), codiSia);
 		if (organ == null) {
 			return DatatablesHelper.getDatatableResponse(request, new ArrayList<PermisDto>(), "id");
 		}
-		var permisos = organGestorService.permisFind(entitatActual.getId(), organ.getId(), paginacio);
+		List<PermisDto> permisos = organGestorService.permisFind(entitatActual.getId(), organ.getId(), paginacio);
 		return DatatablesHelper.getDatatableResponse(request, permisos, "id");
 	}
 
 	@RequestMapping(value = "/{organGestorId}/permis/new", method = RequestMethod.GET)
-	public String getNew(HttpServletRequest request, @PathVariable Long organGestorId, Model model) throws ValidationException {
-
-		var permisCommand = new PermisCommand();
+	public String getNew(
+			HttpServletRequest request,
+			@PathVariable Long organGestorId,
+			Model model) throws ValidationException {
+		PermisCommand permisCommand = new PermisCommand();
 		model.addAttribute("principalSize", permisCommand.getPrincipalDefaultSize());
 		return get(request, organGestorId, null, model);
 	}
 	
 	@RequestMapping(value = "/{organGestorId}/permis/{permisId}", method = RequestMethod.GET)
-	public String get(HttpServletRequest request, @PathVariable Long organGestorId, @PathVariable Long permisId, Model model) throws ValidationException {
+	public String get(
+			HttpServletRequest request,
+			@PathVariable Long organGestorId,
+			@PathVariable Long permisId,
+			Model model) throws ValidationException {
 
-		var entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		model.addAttribute("organGestor", organGestorService.findById(entitatActual.getId(), organGestorId));
 		PermisDto permis = null;
-		var isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		if (permisId != null) {
-			var permisos = organGestorService.permisFind(entitatActual.getId(), organGestorId, null);
-			for (var p: permisos) {
+			List<PermisDto> permisos = organGestorService.permisFind(entitatActual.getId(), organGestorId, null);
+			for (PermisDto p: permisos) {
 				if (p.getId().equals(permisId)) {
 					permis = p;
 					break;
@@ -128,35 +145,42 @@ public class OrganGestorPermisController extends BaseUserController{
 	}
 	
 	@RequestMapping(value = "/{organGestorId}/permis", method = RequestMethod.POST)
-	public String save(HttpServletRequest request, @PathVariable Long organGestorId, @Valid PermisCommand command, BindingResult bindingResult,
-						Model model) throws NotFoundException, ValidationException {
+	public String save(
+			HttpServletRequest request,
+			@PathVariable Long organGestorId,
+			@Valid PermisCommand command,
+			BindingResult bindingResult,
+			Model model) throws NotFoundException, ValidationException {
 
-		var entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("organGestor", organGestorService.findById(entitatActual.getId(), organGestorId));
 			model.addAttribute("principalSize", command.getPrincipalDefaultSize());
 			return "organGestorPermisForm";
 		}
 
-		var msg = command.getId() == null ? "creat" : "modificat";
+		String msg = command.getId() == null ? "creat" : "modificat";
 		if (TipusEnumDto.ROL.equals(command.getTipus()) && command.getPrincipal().equalsIgnoreCase("tothom") &&
 				RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
 
 			model.addAttribute("organGestor", organGestorService.findById(entitatActual.getId(), organGestorId));
-			return getModalControllerReturnValueError(request,"organGestorPermisForm","organgestor.controller.permis." + msg + ".ko");
+			return getModalControllerReturnValueError(request,"organGestorPermisForm",
+					"organgestor.controller.permis." + msg + ".ko");
 		}
-		var isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+
+
+		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		organGestorService.permisUpdate(entitatActual.getId(), organGestorId, isAdminOrgan, PermisCommand.asDto(command));
-		var url = "redirect:../../organgestor/" + organGestorId + "/permis";
-		return getModalControllerReturnValueSuccess(request, url,"organgestor.controller.permis." + msg + ".ok");
+		return getModalControllerReturnValueSuccess(request, "redirect:../../organgestor/" + organGestorId + "/permis",
+				"organgestor.controller.permis." + msg + ".ok");
 	}
 	
 	@RequestMapping(value = "/{organGestorId}/permis/{permisId}/delete", method = RequestMethod.GET)
 	public String delete(HttpServletRequest request, @PathVariable Long organGestorId, @PathVariable Long permisId, Model model) {
 
-		var entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		organGestorService.permisDelete(entitatActual.getId(), organGestorId, permisId);
-		var url = "redirect:../../../../organgestor/" + organGestorId + "/permis";
+		String url = "redirect:../../../../organgestor/" + organGestorId + "/permis";
 		return getAjaxControllerReturnValueSuccess(request, url, "organgestor.controller.permis.esborrat.ok");
 	}
 }

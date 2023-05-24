@@ -13,16 +13,31 @@ import es.caib.notib.back.helper.NotificacioBackHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.back.helper.SessioHelper;
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.intf.dto.ArxiuDto;
+import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.FitxerDto;
+import es.caib.notib.logic.intf.dto.GrupDto;
+import es.caib.notib.logic.intf.dto.NotificacioAuditDto;
+import es.caib.notib.logic.intf.dto.NotificacioEnviamenEstatDto;
+import es.caib.notib.logic.intf.dto.NotificacioEnviamentDto;
+import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.dto.PermisEnum;
+import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto;
+import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
+import es.caib.notib.logic.intf.dto.RegistreIdDto;
+import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.missatges.Missatge;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.CallbackService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.service.JustificantService;
@@ -42,6 +57,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.mail.MessagingException;
@@ -62,8 +78,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import static org.springframework.web.util.HtmlUtils.htmlEscape;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.
@@ -93,9 +107,11 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @Autowired
     private JustificantService justificantService;
     @Autowired
-    private NotificacioBackHelper notificacioBackHelper;
+    private NotificacioBackHelper notificacioListHelper;
     @Autowired
     private PermisosService permisService;
+    @Autowired
+    private CallbackService callbackService;
 
     public NotificacioTableController() {
         super.sessionAttributeSeleccio = SESSION_ATTRIBUTE_SELECCIO;
@@ -103,39 +119,38 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     protected List<Long> getIdsElementsFiltrats(HttpServletRequest request) throws ParseException {
 
-        var entitatActual = getEntitatActualComprovantPermisos(request);
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         String organGestorCodi = null;
         if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request) && entitatActual != null) {
             OrganGestorDto organGestorActual = getOrganGestorActual(request);
             organGestorCodi = organGestorActual.getCodi();
-
         }
-        var filtre = notificacioBackHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE).asDto();
+        NotificacioFiltreDto filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE).asDto();
         assert entitatActual != null;
-        var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
-        return notificacioService.findIdsAmbFiltre(entitatActual.getId(), rol, organGestorCodi, getCodiUsuariActual(), filtre);
+        return notificacioService.findIdsAmbFiltre(entitatActual.getId(), RolEnumDto.valueOf(RolHelper.getRolActual(request)),
+                                                    organGestorCodi, getCodiUsuariActual(), filtre);
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
 
-        var entitatActual = getEntitatActualComprovantPermisos(request);
-        var organGestorActual = getOrganGestorActual(request);
-        var notificacioFiltreCommand = notificacioBackHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        OrganGestorDto organGestorActual = getOrganGestorActual(request);
+        NotificacioFiltreCommand notificacioFiltreCommand = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
         model.addAttribute(notificacioFiltreCommand);
-        notificacioBackHelper.fillModel(entitatActual, organGestorActual, request, model);
+        notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
         return "notificacioList";
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/filtrades/{referencia}")
     public String getFiltrades(HttpServletRequest request, @PathVariable String referencia, Model model) {
 
-        var entitatActual = getEntitatActualComprovantPermisos(request);
-        var organGestorActual = getOrganGestorActual(request);
-        var filtre = notificacioBackHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        OrganGestorDto organGestorActual = getOrganGestorActual(request);
+        NotificacioFiltreCommand filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
         filtre.setReferencia(referencia);
         model.addAttribute(filtre);
-        notificacioBackHelper.fillModel(entitatActual, organGestorActual, request, model);
+        notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
         return "redirect:/notificacio";
     }
 
@@ -148,8 +163,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public String post(HttpServletRequest request, NotificacioFiltreCommand command, Model model) {
 
         RequestSessionHelper.actualitzarObjecteSessio(request, NOTIFICACIONS_FILTRE, command);
+//        notificacioListHelper.ompleProcediments(request, model);
         model.addAttribute("notificacioFiltreCommand", command);
         model.addAttribute("nomesAmbErrors", command.isNomesAmbErrors());
+//        deselect(request, null);
         return "notificacioList";
     }
 
@@ -157,26 +174,26 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @ResponseBody
     public DatatablesResponse datatable(HttpServletRequest request) {
 
-        var entitatActual = getEntitatActualComprovantPermisos(request);
-        var filtre = notificacioBackHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE).asDto();
-        var notificacions = new PaginaDto<NotificacioTableItemDto>();
-        var isUsuari = RolHelper.isUsuariActualUsuari(request);
-        var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
-        var isAdministrador = RolHelper.isUsuariActualAdministrador(request);
-        var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        NotificacioFiltreDto filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE).asDto();
+        PaginaDto<NotificacioTableItemDto> notificacions = new PaginaDto<>();
+        boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
+        boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
+        boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
+        boolean isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
         String organGestorCodi = null;
+
         try {
             if (isUsuariEntitat && filtre != null) {
                 filtre.setEntitatId(entitatActual.getId());
             }
             if (isAdminOrgan && entitatActual != null) {
-                var organGestorActual = getOrganGestorActual(request);
+                OrganGestorDto organGestorActual = getOrganGestorActual(request);
                 organGestorCodi = organGestorActual.getCodi();
             }
-            var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
-            var id = entitatActual != null ? entitatActual.getId() : null;
-            var params = DatatablesHelper.getPaginacioDtoFromRequest(request);
-            notificacions = notificacioService.findAmbFiltrePaginat(id, rol, organGestorCodi, getCodiUsuariActual(), filtre, params);
+            notificacions = notificacioService.findAmbFiltrePaginat(entitatActual != null ? entitatActual.getId() : null,
+                                                RolEnumDto.valueOf(RolHelper.getRolActual(request)), organGestorCodi, getCodiUsuariActual(), filtre,
+                                                DatatablesHelper.getPaginacioDtoFromRequest(request));
         } catch (SecurityException e) {
             MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
         }
@@ -272,13 +289,12 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         String referer = request.getHeader("Referer");
-        String url = "redirect:" + referer;
         try {
             notificacioService.delete(entitatActual.getId(), notificacioId);
-            return getModalControllerReturnValueSuccess(request, url,"notificacio.controller.esborrar.ok");
+            return getModalControllerReturnValueSuccess(request,"redirect:" + referer,"notificacio.controller.esborrar.ok");
         } catch (Exception ex) {
             log.error("Hi ha hagut un error esborrant la notificació", ex);
-            return getModalControllerReturnValueError(request, url, "notificacio.controller.esborrar.ko", new Object[]{ex.getMessage()});
+            return getModalControllerReturnValueError(request, "redirect:" + referer, "notificacio.controller.esborrar.ko", new Object[]{ex.getMessage()});
         }
     }
 
@@ -295,7 +311,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public String processarPost(HttpServletRequest request, @PathVariable Long notificacioId, @Valid MarcarProcessatCommand command,
                                 BindingResult bindingResult,Model model) throws MessagingException {
 
-        String url = "redirect:../../notificacio";
         try {
             if (bindingResult.hasErrors()) {
                 model.addAttribute("isMassiu", false);
@@ -305,19 +320,19 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             if (resposta != null) {
                 MissatgesHelper.warning(request, resposta);
             }
-            return getModalControllerReturnValueSuccess(request, url,"notificacio.controller.refrescar.estat.ok");
+            return getModalControllerReturnValueSuccess(request,"redirect:../../notificacio","notificacio.controller.refrescar.estat.ok");
         } catch (Exception ex) {
             log.error("Hi ha hagut un error processant la notificació", ex);
-            return getModalControllerReturnValueError(request, url,"notificacio.controller.processar.ko", new Object[]{ex.toString()});
+            return getModalControllerReturnValueError(request, "redirect:../../notificacio","notificacio.controller.processar.ko", new Object[]{ex.toString()}); //ex.getMessage()});
         }
+
     }
 
     @RequestMapping(value = "/{notificacioId}/event", method = RequestMethod.GET)
     public String eventList(HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
 
         model.addAttribute("notificacioId", notificacioId);
-        String prefix = "es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.";
-        model.addAttribute("eventTipus", EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class, prefix));
+        model.addAttribute("eventTipus", EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class,"es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto."));
         return "notificacioEvents";
     }
 
@@ -345,9 +360,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         boolean enviada = notificacioService.enviar(notificacioId);
         emplenarModelNotificacioInfo(entitatActual, notificacioId, request,"accions", model);
         model.addAttribute("pestanyaActiva", "accions");
-        String url = "notificacioInfo";
-        String msg = enviada ? "notificacio.controller.enviament.ok" : "notificacio.controller.enviament.error";
-        return  enviada ? getAjaxControllerReturnValueSuccess(request, url, msg) : getAjaxControllerReturnValueError(request, url, msg);
+        if (enviada) {
+            return getAjaxControllerReturnValueSuccess(request, "notificacioInfo", "notificacio.controller.enviament.ok");
+        }
+        return getAjaxControllerReturnValueError(request, "notificacioInfo", "notificacio.controller.enviament.error");
     }
 
     @RequestMapping(value = "/{notificacioId}/registrar", method = RequestMethod.GET)
@@ -356,9 +372,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         List<RegistreIdDto> registresIdDto = notificacioService.registrarNotificar(notificacioId);
         emplenarModelNotificacioInfo(entitatActual, notificacioId, request,"accions", model);
-        String msgError = "notificacio.controller.registrar.error";
         if (registresIdDto == null || registresIdDto.isEmpty()) {
-            MissatgesHelper.error(request, getMessage(request, msgError));
+            MissatgesHelper.error(request, getMessage(request, "notificacio.controller.registrar.error"));
             return "notificacioInfo";
         }
         for (RegistreIdDto registreIdDto : registresIdDto) {
@@ -366,7 +381,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 MissatgesHelper.success(request, "(" + registreIdDto.getNumeroRegistreFormat() + ")" + getMessage(request,"notificacio.controller.registrar.ok"));
                 continue;
             }
-            MissatgesHelper.error(request, getMessage(request, msgError));
+            MissatgesHelper.error(request, getMessage(request, "notificacio.controller.registrar.error"));
         }
         model.addAttribute("pestanyaActiva", "accions");
         return "notificacioInfo";
@@ -379,9 +394,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         boolean reactivat = notificacioService.reactivarConsulta(notificacioId);
         emplenarModelNotificacioInfo(entitatActual, notificacioId, request,"accions", model);
         model.addAttribute("pestanyaActiva", "accions");
-        String url = "notificacioInfo";
-        String msg = reactivat ? "notificacio.controller.reactivar.consulta.ok" : "notificacio.controller.reactivar.consulta.error";
-        return reactivat ? getAjaxControllerReturnValueSuccess(request, url,msg ) : getAjaxControllerReturnValueError(request, url, msg);
+        if (reactivat) {
+            return getAjaxControllerReturnValueSuccess(request, "notificacioInfo","notificacio.controller.reactivar.consulta.ok");
+        }
+        return getAjaxControllerReturnValueError(request, "notificacioInfo","notificacio.controller.reactivar.consulta.error");
     }
 
     @RequestMapping(value = "/{notificacioId}/reactivarsir", method = RequestMethod.GET)
@@ -391,9 +407,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         boolean reactivat = notificacioService.reactivarSir(notificacioId);
         emplenarModelNotificacioInfo(entitatActual, notificacioId, request,"accions", model);
         model.addAttribute("pestanyaActiva", "accions");
-        String url = "notificacioInfo";
-        String msg = reactivat ? "notificacio.controller.reactivar.sir.ok" : "notificacio.controller.reactivar.sir.error";
-        return  reactivat ? getAjaxControllerReturnValueSuccess(request, url, msg) : getAjaxControllerReturnValueError(request, url,msg);
+        if (reactivat) {
+            return getAjaxControllerReturnValueSuccess(request, "notificacioInfo","notificacio.controller.reactivar.sir.ok");
+        }
+        return getAjaxControllerReturnValueError(request, "notificacioInfo","notificacio.controller.reactivar.sir.error");
     }
 
     @RequestMapping(value = "/{notificacioId}/enviament", method = RequestMethod.GET)
@@ -403,16 +420,14 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     }
 
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}", method = RequestMethod.GET)
-    public String enviamentInfo(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId, Model model) {
-
-        emplenarModelEnviamentInfo(notificacioId, enviamentId,"dades", model, request);
+    public String enviamentInfo(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId, @RequestParam(required = false) String pipellaActiva, Model model) {
+        emplenarModelEnviamentInfo(notificacioId, enviamentId, pipellaActiva != null ? pipellaActiva : "dades", model, request);
         return "enviamentInfo";
     }
 
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/event/datatable", method = RequestMethod.GET)
     @ResponseBody
     public DatatablesResponse enviamentEventsDatatable(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId) {
-
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         return DatatablesHelper.getDatatableResponse(request, notificacioService.eventFindAmbEnviament(entitatActual.getId(), notificacioId, enviamentId));
     }
@@ -429,12 +444,36 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/refrescarEstatNotifica", method = RequestMethod.GET)
     public Missatge refrescarEstatNotifica(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId, Model model) {
 
-        var entitatActual = getEntitatActualComprovantPermisos(request);
-        var enviamentEstat = notificacioService.enviamentRefrescarEstat(entitatActual.getId(), enviamentId);
-        var totbe = !enviamentEstat.isNotificaError();
-        var msg = totbe ? "notificacio.controller.refrescar.estat.ok" : "notificacio.controller.refrescar.estat.error";
-        emplenarModelEnviamentInfo(notificacioId, enviamentId, "estatNotifica", model, request);
-        return Missatge.builder().ok(totbe).msg(getMessage(request, msg)).build();
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        NotificacioEnviamenEstatDto enviamentEstat = notificacioService.enviamentRefrescarEstat(entitatActual.getId(), enviamentId);
+        boolean totbe = !enviamentEstat.isNotificaError();
+        String msg = null;
+        if (totbe) {
+            msg = getMessage(request, "notificacio.controller.refrescar.estat.ok");
+            MissatgesHelper.success(request, msg);
+        } else {
+            msg = getMessage(request, "notificacio.controller.refrescar.estat.error");
+            MissatgesHelper.error(request, msg);
+        }
+        return Missatge.builder().ok(totbe).msg(msg).build();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/refrescarEstatSir", method = RequestMethod.GET)
+    public Missatge refrescarEstatSir(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId, Model model) {
+
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        boolean totbe = notificacioService.enviamentRefrescarEstatSir(enviamentId);
+        String msg = null;
+        if (totbe) {
+            msg = getMessage(request, "notificacio.controller.refrescar.estat.ok");
+            MissatgesHelper.success(request, msg);
+        } else {
+            msg = getMessage(request, "notificacio.controller.refrescar.estat.error");
+            MissatgesHelper.error(request, msg);
+        }
+
+        return Missatge.builder().ok(totbe).msg(msg).build();
     }
 
     @RequestMapping(value = "/{notificacioId}/documentDescarregar/{documentId}", method = RequestMethod.GET)
@@ -455,14 +494,14 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public void certificacioDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long enviamentId) throws IOException {
 
         try {
-            var arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
+            ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
             response.setHeader("Set-cookie", "fileDownload=true; path=/");
             writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
         } catch (Exception ex) {
             log.error("Error descarregant la certificacio", ex);
-            var entitatActual = getEntitatActualComprovantPermisos(request);
-            var enviamentEstat = notificacioService.enviamentRefrescarEstat(entitatActual.getId(), enviamentId);
-            var arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
+            EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+            NotificacioEnviamenEstatDto enviamentEstat = notificacioService.enviamentRefrescarEstat(entitatActual.getId(), enviamentId);
+            ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
             response.setHeader("Set-cookie", "fileDownload=true; path=/");
             writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
         }
@@ -523,9 +562,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         boolean enviada = notificacioService.reenviarNotificacioAmbErrors(notificacioId);
         emplenarModelNotificacioInfo(entitatActual, notificacioId, request,"accions", model);
         model.addAttribute("pestanyaActiva", "accions");
-        String url = "notificacioInfo";
-        String msg = enviada ? "notificacio.controller.reenviar.errors.ok" : "notificacio.controller.reenviar.errors.error";
-        return enviada ? getAjaxControllerReturnValueSuccess(request, url, msg) : getAjaxControllerReturnValueError(request, url, msg);
+        if (enviada) {
+            return getAjaxControllerReturnValueSuccess(request, "notificacioInfo", "notificacio.controller.reenviar.errors.ok");
+        }
+        return getAjaxControllerReturnValueError(request, "notificacioInfo", "notificacio.controller.reenviar.errors.error");
     }
 
     @RequestMapping(value = "/{notificacioId}/reactivarErrors", method = RequestMethod.GET)
@@ -535,9 +575,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         boolean reactivat = notificacioService.reactivarNotificacioAmbErrors(notificacioId);
         emplenarModelNotificacioInfo(entitatActual, notificacioId, request,"accions", model);
         model.addAttribute("pestanyaActiva", "accions");
-        String url = "notificacioInfo";
-        String msg =  reactivat ?  "notificacio.controller.reactivar.errors.ok" : "notificacio.controller.reactivar.errors.error";
-        return reactivat ? getAjaxControllerReturnValueSuccess(request, url, msg) : getAjaxControllerReturnValueError(request, url, msg);
+        if (reactivat) {
+            return getAjaxControllerReturnValueSuccess(request, "notificacioInfo", "notificacio.controller.reactivar.errors.ok");
+        }
+        return getAjaxControllerReturnValueError(request, "notificacioInfo", "notificacio.controller.reactivar.errors.error");
     }
 
 	/////
@@ -622,23 +663,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @RequestMapping(value = "/{notificacioId}/refrescarEstatClient", method = RequestMethod.GET)
     public String refrescarEstatClient(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId) throws IOException {
 
-        List<NotificacioEventDto> events = enviamentService.eventFindAmbNotificacio(notificacioId);
-        boolean notificat = false;
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        emplenarModelNotificacioInfo(entitatActual, notificacioId, request,"dades", model);
-        if (events != null && events.size() > 0) {
-            NotificacioEventDto lastEvent = events.get(events.size() - 1);
-            NotificacioEventTipusEnumDto tipus = lastEvent.getTipus();
-            if (lastEvent.isError() &&
-                    (tipus.equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) || tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
-                    tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) || tipus.equals(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT) ||
-                    tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR) || tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR) ||
-                    tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || tipus.equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
-
-                log.info("Preparant per notificar canvi del event : " + lastEvent.getId() + " de tipus " + lastEvent.getTipus().name());
-                notificat = enviamentService.reintentarCallback(lastEvent.getId());
-            }
-        }
+        boolean notificat = callbackService.reintentarCallback(notificacioId);
         String msg = notificat ? "notificacio.controller.notificar.client.ok" : "notificacio.controller.notificar.client.error";
         MissatgesHelper.error(request, getMessage(request,msg));
         return "notificacioInfo";
@@ -656,7 +681,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @RequestMapping(value = "/refrescarEstatNotifica", method = RequestMethod.POST)
     @ResponseBody
     public void refrescarEstatNotifica() {
-
         try {
             notificacioService.refrescarEnviamentsExpirats();
         } catch (Exception ex) {
@@ -670,11 +694,41 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return notificacioService.actualitzacioEnviamentsEstat();
     }
 
-    ////
     // ACCIONS MASSIVES PER NOTIFICACIONS
     ////
-    @RequestMapping(value = "/reintentar/registre", method = RequestMethod.GET)
-    public String registreReintentar(HttpServletRequest request, Model model) {
+
+    @RequestMapping(value = "/enviar/notificacio/movil", method = RequestMethod.GET)
+    public String enviarNotificacioMovil(HttpServletRequest request, Model model) {
+
+        // identificadors de les notificacions, no dels enviaments.
+        Set<Long> seleccio = getIdsSeleccionats(request);
+        String redirect = "redirect:../../..";
+        if (seleccio == null || seleccio.isEmpty()) {
+            return getModalControllerReturnValueError(request,redirect,"accio.massiva.seleccio.buida");
+        }
+        List<String> notificacionsError = new ArrayList<String>();
+        for (Long notificacioId : seleccio) {
+            try {
+                notificacioService.reenviarNotificaionsMovil(notificacioId);
+            } catch (Exception e) {
+                notificacionsError.add("[" + notificacioId + "]: " + e.getMessage());
+            }
+        }
+        if (notificacionsError.isEmpty()) {
+            return getModalControllerReturnValueSuccess(request, redirect,"accio.massiva.creat.ok");
+        }
+        if (notificacionsError.size() == seleccio.size()) {
+            return getModalControllerReturnValueError(request, redirect,"accio.massiva.creat.ko");
+        }
+        String desc = "";
+        for (String err: notificacionsError) {
+            desc += err + " \n";
+        }
+        return getModalControllerReturnValueErrorWithDescription(request,redirect,"accio.massiva.creat.part", desc);
+    }
+
+    @RequestMapping(value = "/reactivar/registre", method = RequestMethod.GET)
+    public String reactivarReintentar(HttpServletRequest request, Model model) {
 
         // identificadors de les notificacions, no dels enviaments.
         Set<Long> seleccio = getIdsSeleccionats(request);
@@ -691,19 +745,18 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             }
         }
 
-        String url = "redirect:../..";
         if (!notificacionsError.isEmpty()) {
             if (notificacionsError.size() == seleccio.size()) {
-                getModalControllerReturnValueError(request, url,"accio.massiva.creat.ko");
+                getModalControllerReturnValueError(request,"redirect:../..","accio.massiva.creat.ko");
             } else {
                 String desc = "";
                 for (String err: notificacionsError) {
                     desc = desc + err + " \n";
                 }
-                return getModalControllerReturnValueErrorWithDescription(request,url,"accio.massiva.creat.part", desc);
+                return getModalControllerReturnValueErrorWithDescription(request,"redirect:../..","accio.massiva.creat.part", desc);
             }
         }
-        return getModalControllerReturnValueSuccess(request,url,"accio.massiva.creat.ok");
+        return getModalControllerReturnValueSuccess(request,"redirect:../..","accio.massiva.creat.ok");
     }
 
     @RequestMapping(value = {"/processar/massiu", "{notificacioId}/notificacio/"}, method = RequestMethod.GET)
@@ -745,10 +798,12 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 MissatgesHelper.error(request, String.format(error + " (Id=%d): %s", notificacioId, ex.getMessage()));
             }
         }
+
         RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, new HashSet<>());
-        String url = "redirect:../..";
-        String msg = allOK ? "notificacio.controller.processar.massiu.ok" : "notificacio.controller.processar.massiu.ko";
-        return allOK ? getModalControllerReturnValueSuccess(request, url, msg) : getModalControllerReturnValueError(request, url, msg);
+        if (allOK) {
+            return getModalControllerReturnValueSuccess(request, "redirect:../..", "notificacio.controller.processar.massiu.ok");
+        }
+        return getModalControllerReturnValueError(request, "redirect:../..", "notificacio.controller.processar.massiu.ko");
     }
 
     @RequestMapping(value = {"/eliminar", "{notificacioId}/notificacio/eliminar/"} , method = RequestMethod.GET)
@@ -756,10 +811,12 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         String referer = request.getHeader("Referer");
+
         Set<Long> seleccio = getIdsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             return getModalControllerReturnValueError(request,"redirect:" + referer,"accio.massiva.seleccio.buida");
         }
+
         Set<Long> notificacionsNoEsborrades = new HashSet<>();
         for (Long notificacioId : seleccio) {
             try {
@@ -771,9 +828,11 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             }
         }
         RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, notificacionsNoEsborrades);
-        String url = "redirect:" + referer;
-        String msg = notificacionsNoEsborrades.isEmpty() ? "notificacio.controller.esborrar.massiu.ok" : "notificacio.controller.esborrar.massiu.ko";
-        return notificacionsNoEsborrades.isEmpty()  ? getModalControllerReturnValueSuccess(request, url, msg) : getModalControllerReturnValueError(request, url,msg);
+
+        if (notificacionsNoEsborrades.isEmpty()){
+            return getModalControllerReturnValueSuccess(request,"redirect:" + referer,"notificacio.controller.esborrar.massiu.ok");
+        }
+        return getModalControllerReturnValueError(request,"redirect:" + referer,"notificacio.controller.esborrar.massiu.ko");
     }
 
     private void emplenarModelNotificacioInfo(EntitatDto entitatActual, Long notificacioId, HttpServletRequest request, String pipellaActiva, Model model) {
@@ -787,16 +846,16 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             notificacio.setGrup(grup);
         }
         if (!Strings.isNullOrEmpty(notificacio.getNotificaErrorDescripcio())) {
-            notificacio.setNotificaErrorDescripcio(htmlEscape(notificacio.getNotificaErrorDescripcio()));
+            notificacio.setNotificaErrorDescripcio(notificacio.getNotificaErrorDescripcio());
         }
         model.addAttribute("pipellaActiva", pipellaActiva);
         model.addAttribute("notificacio", notificacio);
         String text = "es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.";
         model.addAttribute("eventTipus", EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class, text));
-        model.addAttribute("permisGestio", null);
         boolean permisGestio = false;
         if (notificacio != null && notificacio.getProcediment() != null && !notificacio.getProcedimentCodiNotib().isEmpty()) {
-            permisGestio = permisService.hasNotificacioPermis(notificacioId, entitatActual.getId(), notificacio.getUsuariCodi(), PermisEnum.GESTIO);
+//            permisGestio = permisService.hasNotificacioPermis(notificacioId, entitatActual.getId(), notificacio.getUsuariCodi(), PermisEnum.GESTIO);
+            permisGestio = permisService.hasNotificacioPermis(notificacioId, entitatActual.getId(), getCodiUsuariActual(), PermisEnum.GESTIO);
             permisGestio = permisGestio || procedimentService.hasPermisProcediment(notificacio.getProcediment().getId(), PermisEnum.GESTIO);
         }
         model.addAttribute("permisGestio", permisGestio);
@@ -823,4 +882,5 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
         binder.registerCustomEditor(Boolean.class, new CustomBooleanEditor("SI", "NO", false));
     }
+
 }

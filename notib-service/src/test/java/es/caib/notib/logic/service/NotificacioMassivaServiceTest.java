@@ -1,13 +1,34 @@
 package es.caib.notib.logic.service;
 
-import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.logic.intf.dto.*;
-import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
-import es.caib.notib.logic.intf.dto.notificacio.*;
-import es.caib.notib.logic.intf.service.NotificacioMassivaService;
-import es.caib.notib.logic.helper.*;
+import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.EntityComprovarHelper;
 import es.caib.notib.logic.helper.FiltreHelper.FiltreField;
 import es.caib.notib.logic.helper.FiltreHelper.StringField;
+import es.caib.notib.logic.helper.MessageHelper;
+import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.helper.NotificacioHelper;
+import es.caib.notib.logic.helper.NotificacioListHelper;
+import es.caib.notib.logic.helper.NotificacioMassivaHelper;
+import es.caib.notib.logic.helper.NotificacioValidatorHelper;
+import es.caib.notib.logic.helper.PaginacioHelper;
+import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.RegistreNotificaHelper;
+import es.caib.notib.logic.intf.dto.FitxerDto;
+import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
+import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaEstatDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaFiltreDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
+import es.caib.notib.logic.intf.service.NotificacioMassivaService;
+import es.caib.notib.logic.test.NotificacioMassivaTests;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioMassivaEntity;
@@ -17,7 +38,6 @@ import es.caib.notib.persist.entity.ProcSerEntity;
 import es.caib.notib.persist.repository.NotificacioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
-import es.caib.notib.logic.test.NotificacioMassivaTests;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +51,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NotificacioMassivaServiceTest {
@@ -82,8 +107,8 @@ public class NotificacioMassivaServiceTest {
 
 	String entitatCodiDir3 = "A000000";
 
-	private static String csvNom = "csv_test.csv";
-	private static String zipNom = "zip_test.zip";
+	private static String csvNom = "test1.csv";
+	private static String zipNom = "test1.zip";
 	private static String email = "test@limit.com";
 	private static String codiUsuari = "CODI_USER";
 
@@ -104,6 +129,7 @@ public class NotificacioMassivaServiceTest {
 		setUpNotificacioMassiva();
 //		setUpAuthentication();
 	}
+
 
 //	private void setUpAuthentication() {
 //		Authentication authentication = Mockito.mock(Authentication.class);
@@ -141,7 +167,7 @@ public class NotificacioMassivaServiceTest {
 		NotificacioMassivaTests.TestMassiusFiles test = NotificacioMassivaTests.getTestInteressatSenseNif();
 		NotificacioMassivaDto not = NotificacioMassivaDto.builder().build();
 		NotificacioMassivaDto notificacioMassiu = NotificacioMassivaDto.builder().ficheroCsvNom(csvNom).ficheroZipNom(zipNom).ficheroCsvBytes(test.getCsvContent())
-													.ficheroZipBytes(test.getZipContent()).caducitat(new Date()).email(email).build();
+				.ficheroZipBytes(test.getZipContent()).caducitat(new Date()).email(email).build();
 
 		// When
 		notificacioMassivaService.create(entitatId, codiUsuari, notificacioMassiu);
@@ -153,7 +179,6 @@ public class NotificacioMassivaServiceTest {
 
 	@Test
 	public void whenCreate_GivenNoErrors_ThenCallAltaNotificacioWeb() throws Exception {
-
 		// Given
 		Mockito.when(notificacioValidatorHelper.validarNotificacioMassiu(
 				Mockito.any(NotificacioDatabaseDto.class),
@@ -193,8 +218,8 @@ public class NotificacioMassivaServiceTest {
 		String usuariCodi = "CODI_USER";
 		NotificacioMassivaTests.TestMassiusFiles test1Data = NotificacioMassivaTests.getTest1Files();
 		NotificacioMassivaDto notificacioMassiu = NotificacioMassivaDto.builder()
-				.ficheroCsvNom("csv_test.csv")
-				.ficheroZipNom("zip_test.zip")
+				.ficheroCsvNom("test1.csv")
+				.ficheroZipNom("test1.zip")
 				.ficheroCsvBytes(test1Data.getCsvContent())
 				.ficheroZipBytes(test1Data.getZipContent())
 				.caducitat(new Date())

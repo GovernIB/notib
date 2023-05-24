@@ -128,14 +128,14 @@
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right"><a class="btn btn-default" href="<c:url value="/integracio/netejar"/>"><span class="fa fa-trash"></span>&nbsp;<spring:message code="integracio.netejar"/></a></p>
 	</script>
-<table id="missatges-integracions" data-toggle="datatable" data-url="<c:url value="/integracio/datatable"/>"
+	<table id="missatges-integracions" data-toggle="datatable" data-url="<c:url value="/integracio/datatable"/>"
 <%--		   data-filter="#filtre"--%>
 <%--			<c:if test="${codiActual == 'CALLBACK'}">--%>
 <%--			   data-search-enabled="true"--%>
 <%--			   data-info-type="search"--%>
 <%--			</c:if>--%>
-	   class="table table-striped table-bordered" style="width:100%"
-	   data-botons-template="#botonsTemplate">
+		   class="table table-striped table-bordered" style="width:100%"
+		   data-botons-template="#botonsTemplate">
 		<thead>
 			<tr>
 <%--				<th data-col-name="excepcioMessage" data-visible="false"></th>--%>

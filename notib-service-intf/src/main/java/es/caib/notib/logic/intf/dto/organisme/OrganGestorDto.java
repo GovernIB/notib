@@ -3,8 +3,11 @@ package es.caib.notib.logic.intf.dto.organisme;
 import es.caib.notib.logic.intf.dto.AuditoriaDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -15,15 +18,22 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter @Setter @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 public class OrganGestorDto extends AuditoriaDto implements Serializable {
-	
+
 	private Long id;
 	@EqualsAndHashCode.Include
 	private String codi;
 	private String codiPare;
 	private String nomPare;
 	private String nom;
+	private String nomEs;
 	private Long entitatId;
 	private String entitatNom;
 	private String llibre;
@@ -74,12 +84,12 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 		else
 			return permisos.size();
 	}
-	
+
 	public String getOrganGestorDesc() {
 		if (nom != null && !nom.isEmpty())
 			return codi + " - " + nom;
 		return codi;
 	}
-	
+
 	private static final long serialVersionUID = -2393511650074099319L;
 }

@@ -14,7 +14,18 @@ import org.hibernate.annotations.NaturalId;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +54,9 @@ public class OrganGestorEntity extends AbstractPersistable<Long> implements Seri
 	
 	@Column(name = "nom", length = 1000)
 	protected String nom;
+
+	@Column(name = "nom_es", length = 1000)
+	protected String nomEs;
 	
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat")
@@ -185,7 +199,6 @@ public class OrganGestorEntity extends AbstractPersistable<Long> implements Seri
 			nous.add(nou);
 		}
 	}
-
 	public void addAntic(OrganGestorEntity antic) {
 		if (antics == null) {
 			antics = new ArrayList<>();

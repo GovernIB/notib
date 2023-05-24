@@ -11,13 +11,10 @@ import java.math.BigInteger;
 @Setter
 public class Receptor {
 
-//    @XmlElement(required = true)
     @NotNull
     protected String nifReceptor;
-//    @XmlElement(required = true)
     @NotNull
     protected String nombreReceptor;
-//    @XmlElement(required = true)
     @NotNull
     protected BigInteger vinculoReceptor;
     protected String nifRepresentante;

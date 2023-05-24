@@ -1,17 +1,45 @@
 package es.caib.notib.logic.service.ws;
 
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.*;
+import es.caib.notib.client.domini.DocumentV2;
+import es.caib.notib.client.domini.EntregaDeh;
+import es.caib.notib.client.domini.EntregaPostal;
+import es.caib.notib.client.domini.EntregaPostalVia;
+import es.caib.notib.client.domini.Enviament;
+import es.caib.notib.client.domini.EnviamentReferencia;
+import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
+import es.caib.notib.client.domini.NotificaServeiTipusEnumDto;
+import es.caib.notib.client.domini.NotificacioEstatEnum;
+import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.client.domini.Persona;
+import es.caib.notib.client.domini.RespostaAlta;
+import es.caib.notib.logic.cacheable.OrganGestorCachable;
+import es.caib.notib.logic.helper.AuditHelper;
+import es.caib.notib.logic.helper.CacheHelper;
+import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.EnviamentHelper;
+import es.caib.notib.logic.helper.EnviamentTableHelper;
+import es.caib.notib.logic.helper.IntegracioHelper;
+import es.caib.notib.logic.helper.MessageHelper;
+import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.helper.NotificaHelper;
+import es.caib.notib.logic.helper.NotificacioHelper;
+import es.caib.notib.logic.helper.NotificacioTableHelper;
+import es.caib.notib.logic.helper.PermisosHelper;
+import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.RegistreNotificaHelper;
 import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
-import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
-import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -21,8 +49,16 @@ import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.entity.ProcSerOrganEntity;
 import es.caib.notib.persist.entity.ProcedimentEntity;
-import es.caib.notib.logic.helper.*;
-import es.caib.notib.persist.repository.*;
+import es.caib.notib.persist.repository.AplicacioRepository;
+import es.caib.notib.persist.repository.DocumentRepository;
+import es.caib.notib.persist.repository.EntitatRepository;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
+import es.caib.notib.persist.repository.NotificacioEventRepository;
+import es.caib.notib.persist.repository.NotificacioRepository;
+import es.caib.notib.persist.repository.OrganGestorRepository;
+import es.caib.notib.persist.repository.PersonaRepository;
+import es.caib.notib.persist.repository.ProcSerOrganRepository;
+import es.caib.notib.persist.repository.ProcSerRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
@@ -38,7 +74,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -70,7 +105,7 @@ public class NotificacioServiceWsV2Test {
 	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292";
 	protected static final String IDIOMA = "ca";
 	protected static final String USUARI_CODI = "e18225486x";
-//	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+//	protected static final NotificaDomiciliConcretTipus TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipus.NACIONAL;
 	protected static final NotificaDomiciliConcretTipus TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipus.SENSE_NORMALITZAR;
 
 	
@@ -103,6 +138,8 @@ public class NotificacioServiceWsV2Test {
 	@Mock
 	private NotificaHelper notificaHelper;
 	@Mock
+	private AuditHelper auditHelper;
+	@Mock
 	private PluginHelper pluginHelper;
 	@Mock
 	private GrupService grupService;
@@ -115,9 +152,7 @@ public class NotificacioServiceWsV2Test {
 	@Mock
 	private MetricsHelper metricsHelper;
 	@Mock
-	private AuditNotificacioHelper auditNotificacioHelper;
-	@Mock
-	private AuditEnviamentHelper auditEnviamentHelper;
+	private NotificacioTableHelper notificacioTableHelper;
 	@Mock
 	private OrganGestorCachable organGestorCachable;
 	@Mock
@@ -140,6 +175,10 @@ public class NotificacioServiceWsV2Test {
 	private ConfigHelper configHelper;
 	@Mock
 	private MessageHelper messageHelper;
+	@Mock
+	private EnviamentTableHelper enviamentTableHelper;
+	@Mock
+	private EnviamentHelper enviamentHelper;
 
 	private AplicacioEntity aplicacio;
 	
@@ -223,7 +262,7 @@ public class NotificacioServiceWsV2Test {
 //		DocumentV2 document = new DocumentV2();
 //		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 //		try {
-//			String arxiuB64 = Base64.getEncoder().encodeToString(IOUtils.toByteArray(getClass().getResourceAsStream(
+//			String arxiuB64 = Base64.encodeBase64String(IOUtils.toByteArray(getClass().getResourceAsStream(
 //					"/es/caib/notib/core/notificacio_adjunt.pdf")));		
 //			document.setContingutBase64(arxiuB64);
 //		} catch (IOException e) {
@@ -258,8 +297,9 @@ public class NotificacioServiceWsV2Test {
 				null, procedimentOrgan, null, UUID.randomUUID().toString()).build();
 		
 		List<NotificacioEnviamentEntity> listaNotificacioGuardada = new ArrayList<NotificacioEnviamentEntity>();
-		DadesUsuari dadesUsuari = DadesUsuari.builder().codi("codi").nom("Usuari").llinatges("Llinatge1 Llinatge2").nif("12345678Z").email("usuari@limit.es").build();
 
+		DadesUsuari dadesUsuari = DadesUsuari.builder().codi("codi").nom("Usuari").llinatges("Llinatge1 Llinatge2").nif("12345678Z").email("usuari@limit.es").build();
+		
 		// When	
 		Mockito.when(entitatRepository.findByDir3Codi(Mockito.anyString())).thenReturn(entitatMock);
 		Mockito.when(aplicacioRepository.findByEntitatIdAndUsuariCodi(Mockito.nullable(Long.class), Mockito.anyString())).thenReturn(aplicacio);
@@ -282,12 +322,14 @@ public class NotificacioServiceWsV2Test {
 //		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(false)))
 //		.thenReturn(documentArxiuCsv);
 		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class))).thenReturn(Long.toString(new Random().nextLong()));
-		Mockito.when(auditEnviamentHelper.desaEnviamentAmbReferencia(Mockito.any(EntitatEntity.class), 
-				Mockito.nullable(NotificacioEntity.class), Mockito.any(Enviament.class),
-				Mockito.any(ServeiTipusEnumDto.class), Mockito.any(PersonaEntity.class),
-				ArgumentMatchers.<PersonaEntity>anyList())).thenReturn(enviamentSavedMock);
+//		Mockito.when(auditEnviamentHelper.desaEnviamentAmbReferencia(Mockito.any(EntitatEntity.class),
+//				Mockito.nullable(NotificacioEntity.class), Mockito.any(Enviament.class),
+//				Mockito.any(ServeiTipusEnumDto.class), Mockito.any(PersonaEntity.class),
+//				Mockito.<PersonaEntity>anyList())).thenReturn(enviamentSavedMock);
+		Mockito.when(notificacioEnviamentRepository.saveAndFlush(Mockito.<NotificacioEnviamentEntity>any())).thenReturn(enviamentSavedMock);
 		Mockito.when(personaRepository.save(Mockito.any(PersonaEntity.class))).thenReturn(personaEntity);
-		Mockito.when(auditNotificacioHelper.desaNotificacio(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioGuardada);
+		Mockito.doNothing().when(notificacioTableHelper).crearRegistre(Mockito.any(NotificacioEntity.class));
+		Mockito.doNothing().when(auditHelper).auditaNotificacio(Mockito.any(NotificacioEntity.class), Mockito.<AuditService.TipusOperacio>any(), Mockito.anyString());
 		Mockito.when(notificacioRepository.saveAndFlush(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioGuardada);
 		Mockito.when(pluginHelper.getNotibTipusComunicacioDefecte()).thenReturn(NotificacioComunicacioTipusEnumDto.ASINCRON);
 		Mockito.when(notificacioEnviamentRepository.findByNotificacio(Mockito.any(NotificacioEntity.class))).thenReturn(listaNotificacioGuardada);
@@ -445,7 +487,7 @@ public class NotificacioServiceWsV2Test {
 			}
 			enviament.setTitular(titular);
 			if (destinatari == null) {
-				destinatari = crearPersona("18225486x","Jordi","Test1","Test1", "666020202","jordi@limit.es");;
+				destinatari = crearPersona("18225486x","Jordi","Test1","Test1", "666020202","jordi@limit.es");
 			}
 			enviament.setDestinataris(new ArrayList<Persona>());
 			enviament.getDestinataris().add(destinatari);
@@ -493,7 +535,7 @@ public class NotificacioServiceWsV2Test {
 
 		Persona persona = Persona.builder().nif(Strings.isNullOrEmpty(nif) ? "00000000T" : nif).nom(nom).llinatge1(llinatge1).llinatge2(llinatge2)
 						.telefon(Strings.isNullOrEmpty(telefon) ? "666010101" : telefon).email(Strings.isNullOrEmpty(email)  ? "test@limit.es" : email)
-						.interessatTipus(InteressatTipus.ADMINISTRACIO).build();
+						.interessatTipus(InteressatTipus.FISICA).build();
 		if (persona.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 			persona.setDir3Codi(ENTITAT_DIR3CODI);
 		}

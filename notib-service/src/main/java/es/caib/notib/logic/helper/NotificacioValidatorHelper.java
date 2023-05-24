@@ -1,9 +1,15 @@
 package es.caib.notib.logic.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
+import es.caib.notib.logic.intf.dto.DocumentDto;
+import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
+import es.caib.notib.logic.utils.MimeUtils;
 import es.caib.notib.persist.entity.EntitatEntity;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +31,6 @@ import java.util.Map;
 @Slf4j
 @Component
 public class NotificacioValidatorHelper {
-
 	@Resource
 	private CacheHelper cacheHelper;
 	@Autowired
@@ -40,10 +45,11 @@ public class NotificacioValidatorHelper {
 	public List<String> validarNotificacioMassiu(@NonNull NotificacioDatabaseDto notificacio, @NonNull EntitatEntity entitat, Map<String, Long> documentsProcessatsMassiu) {
 
 		log.info("[NOT-VALIDACIO] Validació notificació de nova notificacio massiva");
-		var errors = notificacio.getErrors();
-		var comunicacioSenseAdministracio = false;
-		var emisorDir3Codi = notificacio.getEmisorDir3Codi(); //entitat.getDir3Codi() entidad actual
-		var organigramaByEntitat = organGestorCachable.findOrganigramaByEntitat(emisorDir3Codi);
+		List<String> errors = notificacio.getErrors();
+		boolean comunicacioSenseAdministracio = false;
+		String emisorDir3Codi = notificacio.getEmisorDir3Codi(); //entitat.getDir3Codi() entidad actual
+		Map<String, OrganismeDto> organigramaByEntitat = organGestorCachable.findOrganigramaByEntitat(emisorDir3Codi);
+
 		// Emisor
 		if (emisorDir3Codi == null || emisorDir3Codi.isEmpty()) {
 			errors.add(messageHelper.getMessage("error.validacio.emisordir3codi.no.null"));
@@ -53,8 +59,10 @@ public class NotificacioValidatorHelper {
 
 		// Entitat
 		if (entitat == null) {
-			errors.add(messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.a") + emisorDir3Codi
-						+ messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.b"));
+			errors.add(
+					messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.a")
+							+ emisorDir3Codi +
+							messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.b"));
 		} else if (!entitat.isActiva()) {
 			errors.add(messageHelper.getMessage("error.validacio.entitat.desactivada.per.enviament.notificacions"));
 		}
@@ -66,10 +74,25 @@ public class NotificacioValidatorHelper {
 			if (notificacio.getConcepte().length() > 240) {
 				errors.add(messageHelper.getMessage("error.validacio.concepte.longitud.max"));
 			}
-			var caractersNoValids = validFormat(notificacio.getConcepte());
+			List<Character> caractersNoValids = validFormat(notificacio.getConcepte());
 			if (!caractersNoValids.isEmpty()) {
-				errors.add(messageHelper.getMessage("error.validacio.concepte.format.invalid.a") + StringUtils.join(caractersNoValids, ',')
-							+ messageHelper.getMessage("error.validacio.concepte.format.invalid.b"));
+				errors.add(messageHelper.getMessage("error.validacio.concepte.format.invalid.a") +
+						StringUtils.join(caractersNoValids, ',')
+						+ messageHelper.getMessage("error.validacio.concepte.format.invalid.b"));
+			}
+		}
+
+		// Descripció
+		String desc = notificacio.getDescripcio();
+		if (!Strings.isNullOrEmpty(desc)) {
+			if (desc.length() > 1000) {
+				errors.add(messageHelper.getMessage("error.validacio.descripcio.notificacio.longitud.max"));
+			}
+			List<Character> caractersNoValids = validFormat(notificacio.getConcepte());
+			if (!caractersNoValids.isEmpty()) {
+				errors.add(messageHelper.getMessage("error.validacio.descripcio.invalid.a") +
+						StringUtils.join(caractersNoValids, ',')
+						+ messageHelper.getMessage("error.validacio.descripcio.invalid.b"));
 			}
 		}
 
@@ -89,7 +112,7 @@ public class NotificacioValidatorHelper {
 		if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {
 			errors.add(messageHelper.getMessage("error.validacio.enviaments.no.null"));
 		} else {
-			for (var enviament : notificacio.getEnviaments()) {
+			for (NotEnviamentDatabaseDto enviament : notificacio.getEnviaments()) {
 				//Si és comunicació a administració i altres mitjans (persona física/jurídica) --> Excepció
 				if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO) {
 					if ((enviament.getTitular().getInteressatTipus() == InteressatTipus.FISICA) ||
@@ -97,7 +120,7 @@ public class NotificacioValidatorHelper {
 						comunicacioSenseAdministracio = true;
 					}
 				}
-				var senseNif = true;
+				boolean senseNif = true;
 
 				// Servei tipus
 				// Per defecte es posa a normal
@@ -132,7 +155,7 @@ public class NotificacioValidatorHelper {
 					if (!InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())
 							&& enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
 
-						var nif = enviament.getTitular().getNif();
+						String nif = enviament.getTitular().getNif();
 						if (NifHelper.isvalid(nif)) {
 							senseNif = false;
 							switch (enviament.getTitular().getInteressatTipus()) {
@@ -154,7 +177,7 @@ public class NotificacioValidatorHelper {
 						}
 					}
 					// - Email
-					var email = enviament.getTitular().getEmail();
+					String email = enviament.getTitular().getEmail();
 					if (email != null && email.length() > 160) {
 						errors.add(messageHelper.getMessage("error.validacio.email.titular.longitud.max"));
 					}
@@ -206,7 +229,7 @@ public class NotificacioValidatorHelper {
 							if (enviament.getTitular().getDir3Codi() == null) {
 								errors.add(messageHelper.getMessage("error.validacio.dir3codi.administracio.titular.enviament.no.null"));
 							}
-							var organDir3 = cacheHelper.unitatPerCodi(enviament.getTitular().getDir3Codi());
+							OrganGestorDto organDir3 = cacheHelper.unitatPerCodi(enviament.getTitular().getDir3Codi());
 							if (organDir3 == null) {
 								errors.add(messageHelper.getMessage("error.validacio.dir3codi.invalid.a")
 										+ enviament.getTitular().getDir3Codi()
@@ -298,7 +321,7 @@ public class NotificacioValidatorHelper {
 //		}
 
 		// Documents
-		var document = notificacio.getDocument();
+		DocumentDto document = notificacio.getDocument();
 		if (document == null) {
 			errors.add(messageHelper.getMessage("error.validacio.document.no.null"));
 		} else {
@@ -322,7 +345,7 @@ public class NotificacioValidatorHelper {
 							documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
 
 				if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
-					if (!isFormatValid(document.getContingutBase64())) {
+					if (!MimeUtils.isFormatValid(document.getMediaType(), document.getContingutBase64())) {
 						errors.add(messageHelper.getMessage("error.validacio.document.format.invalid"));
 					}
 					if (document.getMida() > getMaxSizeFile()) {
@@ -353,12 +376,13 @@ public class NotificacioValidatorHelper {
 		return errors;
 	}
 
-	private ArrayList<Character> validFormat(String value) {
 
-		var CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
-		ArrayList<Character> charsNoValids = new ArrayList<>();
-		var chars = value.replace("\n", "").replace("\r", "").toCharArray();
-		var esCaracterValid = true;
+	private ArrayList<Character> validFormat(String value) {
+		String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
+		ArrayList<Character> charsNoValids = new ArrayList<Character>();
+		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
+
+		boolean esCaracterValid = true;
 		for (int i = 0; i < chars.length; i++) {
 			esCaracterValid = !(CONTROL_CARACTERS.indexOf(chars[i]) < 0);
 			if (!esCaracterValid) {
@@ -368,11 +392,11 @@ public class NotificacioValidatorHelper {
 		return charsNoValids;
 	}
 
-	private boolean isEmailValid(String email) {
 
-		var valid = true;
+	private boolean isEmailValid(String email) {
+		boolean valid = true;
 		try {
-			var emailAddr = new InternetAddress(email);
+			InternetAddress emailAddr = new InternetAddress(email);
 			emailAddr.validate();
 		} catch (Exception e) {
 			valid = false; //no vàlid
@@ -380,14 +404,12 @@ public class NotificacioValidatorHelper {
 		return valid;
 	}
 
-	private boolean isFormatValid(String docBase64) {
 
-		var valid = true;
-		String[] formatsValids = {"JVBERi0","UEsDBBQAAAAIA"}; //PDF / ZIP
-		if (!(docBase64.startsWith(formatsValids[0]) || docBase64.startsWith(formatsValids[1]))) {
-			valid = false;
-		}
-		return valid;
+
+	public static boolean isPdf(String docBase64) {
+
+		String formatsPdf = "JVBERi0"; //PDF
+		return docBase64.startsWith(formatsPdf);
 	}
 
 	private Long getMaxSizeFile() {

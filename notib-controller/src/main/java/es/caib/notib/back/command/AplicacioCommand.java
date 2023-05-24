@@ -3,16 +3,15 @@
  */
 package es.caib.notib.back.command;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
-import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.back.helper.ConversioTipusHelper;
 import es.caib.notib.back.validation.CodiAplicacioNoRepetit;
+import es.caib.notib.logic.intf.dto.AplicacioDto;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 /**
  * Command per al manteniment d'aplicacions.
@@ -31,7 +30,6 @@ public class AplicacioCommand {
 	private String callbackUrl;
 	private Long entitatId;
 
-	
 	public static AplicacioCommand asCommand(AplicacioDto dto) {
 		return ConversioTipusHelper.convertir(dto, AplicacioCommand.class);
 	}

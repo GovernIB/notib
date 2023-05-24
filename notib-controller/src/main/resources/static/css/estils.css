@@ -62,9 +62,9 @@
 
 .container-nocappeus {
 	padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto;
+	padding-left: 15px;
+	margin-right: auto;
+	margin-left: auto;
 }
 
 .caret-white {
@@ -79,17 +79,17 @@
 	padding: 10px 15px !important;
 }
 #contingut-missatges button.close-alertes {
-    background: none repeat scroll 0 0 transparent;
-    border: 0 none;
-    cursor: pointer;
-    padding: 0;
+	background: none repeat scroll 0 0 transparent;
+	border: 0 none;
+	cursor: pointer;
+	padding: 0;
 }
 #contingut-missatges .close-alertes {
-    color: #000000;
-    float: right;
-    font-weight: bold;
-    opacity: 0.2;
-    text-shadow: 0 1px 0 #FFFFFF;
+	color: #000000;
+	float: right;
+	font-weight: bold;
+	opacity: 0.2;
+	text-shadow: 0 1px 0 #FFFFFF;
 }
 
 /*
@@ -131,11 +131,11 @@ table.dataTable tr.datatable-dades-carregant div {
 }
 
 .select2-container--default .select2-selection--single {
-  border: 1px solid #ccc!important; 
+	border: 1px solid #ccc!important;
 }
 
 .width50{
-	width: 50% !important;	
+	width: 50% !important;
 }
 
 .vt10 {
@@ -193,11 +193,11 @@ table.dataTable tr.datatable-dades-carregant div {
  * avisos
  */
 .avisCardHeader:first-child {
-    border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
-    border-top-left-radius: calc(0.25rem - 1px);
-    border-top-right-radius: calc(0.25rem - 1px);
-    border-bottom-right-radius: 0px;
-    border-bottom-left-radius: 0px;
+	border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+	border-top-left-radius: calc(0.25rem - 1px);
+	border-top-right-radius: calc(0.25rem - 1px);
+	border-bottom-right-radius: 0px;
+	border-bottom-left-radius: 0px;
 }
 .avisCard {
 	border-radius: 0.25rem;
@@ -215,8 +215,8 @@ table.dataTable tr.datatable-dades-carregant div {
 	border-color: #f5c6cb;
 }
 .avisCardHeader {
-    padding: 5px;
-    padding-left: 10px;
+	padding: 5px;
+	padding-left: 10px;
 }
 .avisCardBody {
 	padding-left: 15px;
@@ -430,3 +430,37 @@ input.entitat-no-configurada[type="checkbox"]  {
 .form-switch input:checked + input + i::before { transform: translate3d(18px, 2px, 0) scale3d(0, 0, 0); }
 
 .form-switch input:checked + input + i::after { transform: translate3d(22px, 2px, 0); }
+
+#cover-spin {
+	position:fixed;
+	width:100%;
+	left:0;right:0;top:0;bottom:0;
+	background-color: rgba(255,255,255,0.7);
+	z-index:9999;
+	display:none;
+}
+
+@-webkit-keyframes spin {
+	from {-webkit-transform:rotate(0deg);}
+	to {-webkit-transform:rotate(360deg);}
+}
+
+@keyframes spin {
+	from {transform:rotate(0deg);}
+	to {transform:rotate(360deg);}
+}
+
+#cover-spin::after {
+	content:'';
+	display:block;
+	position:absolute;
+	left:48%;top:40%;
+	width:40px;height:40px;
+	border-style:solid;
+	border-color:black;
+	border-top-color:transparent;
+	border-width: 4px;
+	border-radius:50%;
+	-webkit-animation: spin .8s linear infinite;
+	animation: spin .8s linear infinite;
+}

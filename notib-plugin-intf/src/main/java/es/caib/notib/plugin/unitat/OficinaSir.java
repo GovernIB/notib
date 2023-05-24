@@ -3,13 +3,13 @@
  */
 package es.caib.notib.plugin.unitat;
 
-import java.io.Serializable;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.io.Serializable;
 
 /**
  * Informació bàsica d'una oficina de registre
@@ -19,8 +19,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Getter @Setter
 public class OficinaSir implements Serializable, Comparable<OficinaSir> {
 
 	private String codi;

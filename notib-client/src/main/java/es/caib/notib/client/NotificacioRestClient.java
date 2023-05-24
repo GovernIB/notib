@@ -4,7 +4,6 @@
 package es.caib.notib.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import es.caib.notib.client.domini.DadesConsulta;
@@ -28,7 +27,7 @@ import org.slf4j.LoggerFactory;
 @Deprecated
 public class NotificacioRestClient extends NotificacioBaseRestClient {
 
-	private static final String NOTIFICACIOV1_SERVICE_PATH = "/api/services/notificacioV2";
+	private static final String NOTIFICACIOV1_SERVICE_PATH = "/interna/notificacio/v1";
 
 	/**
 	 * Constructor per a crear un client per a connectar-se amb la API REST v1 de NOTIB.
@@ -136,7 +135,7 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/alta";
 			ObjectMapper mapper  = getMapper();
 			String body = mapper.writeValueAsString(notificacio);
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			logger.debug("Missatge REST enviat: " + body);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
@@ -147,7 +146,7 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 		} catch (UniformInterfaceException ue) {
 			RespostaAlta respostaAlta = new RespostaAlta();
 			ClientResponse response = ue.getResponse();
-			
+
 			if (response != null && response.getStatus() == 401) {
 				respostaAlta.setError(true);
 				respostaAlta.setErrorDescripcio("[CLIENT] Hi ha hagut un problema d'autenticació: "  + ue.getMessage());
@@ -168,7 +167,7 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(String identificador) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
@@ -188,7 +187,7 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(String referencia) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
@@ -210,7 +209,7 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/consultaDadesRegistre";
 			ObjectMapper mapper  = getMapper();
 			String body = mapper.writeValueAsString(dadesConsulta);
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").

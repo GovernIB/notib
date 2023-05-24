@@ -39,7 +39,7 @@ public enum EnviamentEstat implements Serializable {
     ENVIAMENT_PROGRAMAT(EnviamentEstatGrup.TRAMITACIO.getColor(), EnviamentEstatGrup.TRAMITACIO.getIcona()),
     ENTREGADA_OP(EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getColor(), EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getIcona()),
     ERROR_ENTREGA(EnviamentEstatGrup.ERROR.getColor(), EnviamentEstatGrup.ERROR.getIcona()),
-    EXPIRADA(EnviamentEstatGrup.EXPIRADA.getColor(), EnviamentEstatGrup.EXPIRADA.getIcona()),// 10
+    EXPIRADA(EnviamentEstatGrup.EXPIRADA.getColor(), EnviamentEstatGrup.EXPIRADA.getIcona()), // 10
     EXTRAVIADA(EnviamentEstatGrup.ERROR.getColor(), EnviamentEstatGrup.ERROR.getIcona()),
     MORT(EnviamentEstatGrup.ERROR.getColor(), EnviamentEstatGrup.ERROR.getIcona()),
     LLEGIDA(EnviamentEstatGrup.LLEGIDA.getColor(), EnviamentEstatGrup.LLEGIDA.getIcona()),
@@ -58,7 +58,7 @@ public enum EnviamentEstat implements Serializable {
     ANULADA(EnviamentEstatGrup.ANULADA.getColor(), EnviamentEstatGrup.ANULADA.getIcona()),
     ENVIAT_SIR(EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getColor(), EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getIcona()),
     ENVIADA_AMB_ERRORS(EnviamentEstatGrup.ESTAT_FICTICI.getColor(), EnviamentEstatGrup.ESTAT_FICTICI.getIcona()),
-    FINALITZADA_AMB_ERRORS(EnviamentEstatGrup.ESTAT_FICTICI.getColor(), EnviamentEstatGrup.ESTAT_FICTICI.getIcona()); //29
+    FINALITZADA_AMB_ERRORS(EnviamentEstatGrup.ESTAT_FICTICI.getColor(), EnviamentEstatGrup.ESTAT_FICTICI.getIcona()); // 29
 
     private String color;
     private String icona;

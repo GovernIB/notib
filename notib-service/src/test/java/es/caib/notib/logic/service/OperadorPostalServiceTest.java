@@ -75,7 +75,6 @@ public class OperadorPostalServiceTest extends BaseServiceTestV2 {
 		EntitatDto entitatCreada = database.getEntitat();
 		OperadorPostalDto operadorPostalCreat = (OperadorPostalDto) database.get("operador1");
 		authenticationTest.autenticarUsuari("admin");
-
 		assertNotNull(operadorPostalCreat);
 		assertNotNull(operadorPostalCreat.getId());
 		comprobarPagadorPostal(crearPagadorPostal, operadorPostalCreat);
@@ -137,7 +136,7 @@ public class OperadorPostalServiceTest extends BaseServiceTestV2 {
 		authenticationTest.autenticarUsuari("apl");
 		operadorPostalService.upsert(database.getEntitat().getId(),crearPagadorPostal);
 	}
-	
+//
 //	@Test(expected = AccessDeniedException.class)
 //	public void errorSiAccesAplUpdate() {
 //		authenticationTest.autenticarUsuari("apl");
@@ -150,8 +149,14 @@ public class OperadorPostalServiceTest extends BaseServiceTestV2 {
 		operadorPostalService.delete(crearPagadorPostal.getId());
 	}
 
-	private void comprobarPagadorPostal(OperadorPostalDto original, OperadorPostalDto perComprovar) {
-		assertEquals(original.getOrganismePagadorCodi(), perComprovar.getOrganismePagadorCodi());
+	private void comprobarPagadorPostal(
+			OperadorPostalDto original,
+			OperadorPostalDto perComprovar) {
+
+		assertEquals(
+				original.getOrganismePagadorCodi(),
+				perComprovar.getOrganismePagadorCodi());
+				
 	}
 	
 }

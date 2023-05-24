@@ -131,33 +131,33 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	List<NotificacioEntity> findNotificacionsPendentsDeNotificarByProcedimentId(
 			@Param("procedimentId") Long procediment);
 
-	@Query("from NotificacioEntity n " +
+	@Query("  from NotificacioEntity n " +
 			" where n.tipusUsuari = es.caib.notib.logic.intf.dto.TipusUsuariEnumDto.APLICACIO " +
 			"   and n.errorLastCallback = true")
 	Page<NotificacioEntity> findNotificacioLastEventAmbError(Pageable pageable);
 	
-	@Query("from NotificacioEntity n " +
-		   "where n.tipusUsuari = es.caib.notib.logic.intf.dto.TipusUsuariEnumDto.APLICACIO " +
-		   "   and n.errorLastCallback = true " +
-		   " order by n.id")
+	@Query(    "  from NotificacioEntity n " +
+		       " where n.tipusUsuari = es.caib.notib.logic.intf.dto.TipusUsuariEnumDto.APLICACIO " +
+			   "   and n.errorLastCallback = true " +
+		       " order by n.id")
 	List<NotificacioEntity> findNotificacioLastEventAmbError();
 
-	@Query("from NotificacioEntity n " +
-		   " where n.tipusUsuari = es.caib.notib.logic.intf.dto.TipusUsuariEnumDto.APLICACIO " +
-		   "   and n.errorLastCallback = true " +
-		   "   and (:isProcedimentNull = true or n.procediment = :procediment) " +
-		   "   and (:isDataIniciNull = true or n.createdDate >= :dataInici) " +
-		   "   and (:isDataFiNull = true or n.createdDate <= :dataFi) " +
-		   "   and (:isConcepteNull = true or lower(n.concepte) like concat('%', lower(:concepte), '%')) " +
-		   "   and (:isEstatNull = true or n.estat = :estat or (" +
-		   "    select count(env.id) " +
-		   "    from n.enviaments env " +
-		   "    where env.notificaEstat = :notificaEstat" +
-		   "    ) > 0 ) " +
-		   "   and (:isUsuariNull = true or n.createdBy.codi = :usuariCodi)")
+	@Query(    "  from NotificacioEntity n " +
+		       " where n.tipusUsuari = es.caib.notib.logic.intf.dto.TipusUsuariEnumDto.APLICACIO " +
+			   "   and n.errorLastCallback = true " +
+			   "   and (:isProcedimentNull = true or n.procediment = :procediment) " +
+		       "   and (:isDataIniciNull = true or n.createdDate >= :dataInici) " +
+		       "   and (:isDataFiNull = true or n.createdDate <= :dataFi) " +
+		       "   and (:isConcepteNull = true or lower(n.concepte) like concat('%', lower(:concepte), '%')) " +
+		       "   and (:isEstatNull = true or n.estat = :estat or (" +
+			   "    select count(env.id) " +
+			   "    from n.enviaments env " +
+			   "    where env.notificaEstat = :notificaEstat" +
+			   "    ) > 0 ) " +
+			   "   and (:isUsuariNull = true or n.createdBy.codi = :usuariCodi)")
 	Page<NotificacioEntity> findNotificacioLastEventAmbErrorAmbFiltre(
 			@Param("isProcedimentNull") boolean isProcedimentNull,
-			@Param("procediment") ProcedimentEntity procediment, 
+			@Param("procediment") ProcedimentEntity procediment,
 			@Param("isDataIniciNull") boolean isDataIniciNull, 
 			@Param("dataInici") Date dataInici, 
 			@Param("isDataFiNull") boolean isDataFiNull, 
@@ -165,7 +165,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("isConcepteNull") boolean isConcepteNull, 
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull, 
-			@Param("estat") NotificacioEstatEnumDto estat, 
+			@Param("estat") NotificacioEstatEnumDto estat,
 			@Param("notificaEstat") EnviamentEstat notificaEstat,
 			@Param("isUsuariNull") boolean isUsuariNull, 
 			@Param("usuariCodi") String usuariCodi, 
@@ -175,25 +175,25 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	NotificacioEstatEnumDto getEstatNotificacio(@Param("id") Long id);
 	
 	@Query("from NotificacioEntity n " +
-			"where " +
-			" n.entitat.id = :entitatId " +
-			" and n.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PENDENT " +
-			" and n.registreEnviamentIntent >= :maxReintents ")
+			" where " +
+			"    n.entitat.id = :entitatId " +
+			"   and n.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PENDENT " +
+			"   and n.registreEnviamentIntent >= :maxReintents ")
 	Page<NotificacioEntity> findByNotificaEstatPendentSenseReintentsDisponibles(
 			@Param("entitatId")Long entitatId, 
 			@Param("maxReintents")Integer maxReintents, 
 			Pageable pageable);
 	
-	@Query("from NotificacioEntity n " +
-		   " where " +
-		   "    n.entitat.id = :entitatId " +
-		   "   and n.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PENDENT " +
-		   "   and n.registreEnviamentIntent >= :maxReintents " +
-		   "   and (:isProcedimentNull = true or n.procediment = :procediment) " +
-		   "   and (:isDataIniciNull = true or n.createdDate >= :dataInici) " +
-		   "   and (:isDataFiNull = true or n.createdDate <= :dataFi) " +
-		   "   and (:isConcepteNull = true or lower(n.concepte) like concat('%', lower(:concepte), '%')) " +
-		   "   and (:isUsuariNull = true or n.createdBy.codi = :usuariCodi)")
+	@Query(    "  from NotificacioEntity n " +
+		       " where " +
+		       "    n.entitat.id = :entitatId " +
+		       "   and n.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PENDENT " +
+		       "   and n.registreEnviamentIntent >= :maxReintents " +
+			   "   and (:isProcedimentNull = true or n.procediment = :procediment) " +
+		       "   and (:isDataIniciNull = true or n.createdDate >= :dataInici) " +
+		       "   and (:isDataFiNull = true or n.createdDate <= :dataFi) " +
+		       "   and (:isConcepteNull = true or lower(n.concepte) like concat('%', lower(:concepte), '%')) " +
+			   "   and (:isUsuariNull = true or n.createdBy.codi = :usuariCodi)")
 	Page<NotificacioEntity> findByNotificaEstatPendentSenseReintentsDisponiblesAmbFiltre(
 			@Param("entitatId")Long entitatId, 
 			@Param("isProcedimentNull") boolean isProcedimentNull,

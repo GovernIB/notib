@@ -3,13 +3,12 @@
  */
 package es.caib.notib.logic.intf.dto;
 
-import java.io.Serializable;
-import java.util.Comparator;
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  * Informació d'un permís.
@@ -43,28 +42,35 @@ public class PermisDto implements Serializable {
 	private boolean comunicacio;
 	private boolean comunicacioSir;
 	private boolean comunicacioSenseProcediment;
-	
+
 	// Booleà per a indicar si en cas de procediment comú, 
 	// l'usuari administrador d'òrgan pot editar el permís
 	private boolean permetEdicio;
 	
 	public String getOrganCodiNom() {
-		return organ != null && organNom != null ? organ + " - " + organNom : organ;
+		if (organ != null && organNom != null)
+			return organ + " - " + organNom;
+
+		return organ;
 	}
 
 	public void revocaPermisos() {
-
 		this.read = false;
 		this.write= false;
 		this.create= false;
 		this.delete= false;
 		this.administration= false;
+		
 		this.usuari= false;
 		this.administrador= false;
 		this.administradorEntitat= false;
 		this.aplicacio= false;
+		
 		this.processar= false;
 		this.notificacio= false;
+		this.comunicacio = false;
+		this.comunicacioSir = false;
+		this.comunicacioSenseProcediment = false;
 	}
 	
 	@Override
@@ -79,11 +85,13 @@ public class PermisDto implements Serializable {
 	private static Comparator<PermisDto> readComparator;
 	private static Comparator<PermisDto> processarComparator;
 	private static Comparator<PermisDto> notificacioComparator;
+	private static Comparator<PermisDto> comunicacioComparator;
 	private static Comparator<PermisDto> comunsComparator;
 	private static Comparator<PermisDto> administrationComparator;
 	private static Comparator<PermisDto> administradorComparator;
 	private static Comparator<PermisDto> comunicacioSirComparator;
-	
+	private static Comparator<PermisDto> comunicacioSenseProcedimentComparator;
+
 	public static Comparator<PermisDto> decending(final Comparator<PermisDto> other) {
         return new Comparator<PermisDto>() {
             public int compare(PermisDto o1, PermisDto o2) {
@@ -114,6 +122,10 @@ public class PermisDto implements Serializable {
 		return notificacioComparator != null ? notificacioComparator : new NotificacioComparator();
     }
 
+	public static Comparator<PermisDto> sortByComunicacio() {
+		return comunicacioComparator != null ? comunicacioComparator : new ComunicacioComparator();
+	}
+
     public static Comparator<PermisDto> sortByComuns() {
 		return comunsComparator != null ? comunsComparator : new ComunsComparator();
 	}
@@ -128,6 +140,10 @@ public class PermisDto implements Serializable {
 	public static Comparator<PermisDto> sortByComunicacioSir() {
 		return comunicacioSirComparator != null ? comunicacioSirComparator : new ComunicacioSirComparator();
     }
+
+	public static Comparator<PermisDto> sortByComunicacioSenseProcediment() {
+		return comunicacioSenseProcedimentComparator != null ? comunicacioSenseProcedimentComparator : new ComunicacioSenseProcedimentComparator();
+	}
 
 	private static class TipusComparator implements java.util.Comparator<PermisDto> {
 		public int compare(PermisDto p1, PermisDto p2) {
@@ -176,6 +192,11 @@ public class PermisDto implements Serializable {
         	return p1.isNotificacio() == p2.isNotificacio() ? 0 : (p1.isNotificacio() ? 1 : -1);
         }  
     }
+	private static class ComunicacioComparator implements java.util.Comparator<PermisDto> {
+		public int compare(PermisDto p1, PermisDto p2) {
+			return p1.isComunicacio() == p2.isComunicacio() ? 0 : (p1.isComunicacio() ? 1 : -1);
+		}
+	}
     private static class ComunsComparator implements Comparator<PermisDto> {
         public int compare(PermisDto p1, PermisDto p2) {
         	return p1.isComuns() == p2.isComuns() ? 0 : (p1.isComuns() ? 1 : -1);
@@ -198,6 +219,11 @@ public class PermisDto implements Serializable {
         	return p1.isComunicacioSir() == p2.isComunicacioSir() ? 0 : (p1.isComunicacioSir() ? 1 : -1);
         }  
     }
+	private static class ComunicacioSenseProcedimentComparator implements java.util.Comparator<PermisDto> {
+		public int compare(PermisDto p1, PermisDto p2) {
+			return p1.isComunicacioSenseProcediment() == p2.isComunicacioSenseProcediment() ? 0 : (p1.isComunicacioSenseProcediment() ? 1 : -1);
+		}
+	}
 	private static final long serialVersionUID = -139254994389509932L;
 
 }

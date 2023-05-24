@@ -1,16 +1,32 @@
 package es.caib.notib.logic.service.ws;
 
-import es.caib.notib.client.domini.*;
+import es.caib.notib.client.domini.DocumentV2;
+import es.caib.notib.client.domini.EntregaPostal;
+import es.caib.notib.client.domini.EntregaPostalVia;
+import es.caib.notib.client.domini.Enviament;
+import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
+import es.caib.notib.client.domini.NotificaServeiTipusEnumDto;
+import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.client.domini.Persona;
+import es.caib.notib.client.domini.RespostaAlta;
+import es.caib.notib.logic.helper.NotificaHelper;
+import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
+import es.caib.notib.logic.service.BaseServiceTestV2;
+import es.caib.notib.logic.test.data.ConfigTest;
+import es.caib.notib.logic.test.data.EntitatItemTest;
+import es.caib.notib.logic.test.data.NotificacioItemTest;
+import es.caib.notib.logic.test.data.ProcedimentItemTest;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.cie.EntregaPostalEntity;
-import es.caib.notib.logic.helper.NotificaHelper;
-import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.EnviamentTableRepository;
@@ -18,13 +34,9 @@ import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import es.caib.notib.persist.repository.PagadorCieRepository;
 import es.caib.notib.persist.repository.PagadorPostalRepository;
-import es.caib.notib.logic.service.BaseServiceTestV2;
-import es.caib.notib.logic.test.data.ConfigTest;
-import es.caib.notib.logic.test.data.EntitatItemTest;
-import es.caib.notib.logic.test.data.NotificacioItemTest;
-import es.caib.notib.logic.test.data.ProcedimentItemTest;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.registre.RegistrePluginException;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -39,7 +51,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
@@ -97,10 +108,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		entitatCreate = EntitatItemTest.getRandomInstance();
 
 //		PagadorCieEntity cie = cieRepository.save(PagadorCieEntity.builder("A04013511", "", new Date(0), null).build());
-//		PagadorPostalEntity operadorPostal = operadorPostalRepository.save(PagadorPostalEntity.builder("A04013511",
-//				"", "pccNum_" + 0, new Date(0), "ccFac_" + 0,
-//				null).build());
-
+//		PagadorPostalEntity operadorPostal = operadorPostalRepository.save(PagadorPostalEntity.builder("A04013511", "", "pccNum_" + 0, new Date(0), "ccFac_" + 0, null).build());
 		procedimentCreator.addObject("procediment", procedimentCreator.getRandomInstance());
 //		procedimentCreator.addObject("procedimentCIE", procedimentCreator.getRandomInstanceAmbEntregaCie(cie.getId(), operadorPostal.getId()));
 
@@ -382,9 +390,9 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		DocumentV2 document = new DocumentV2();
 		try {
 			byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
-			document.setContingutBase64(Base64.getEncoder().encodeToString(arxiuBytes));
+			document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
 //			document.setHash(
-//					Base64.getEncoder().encodeToString(
+//					Base64.encodeBase64String(
 //							Hex.decodeHex(
 //									DigestUtils.sha1Hex(arxiuBytes).toCharArray())));
 		} catch (IOException e) {

@@ -93,57 +93,57 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 		}
 	}
 
-//	@Override
-//	public Map<String, NodeDir3> organigramaPerEntitat(
-//			String pareCodi,
-//			Date fechaActualizacion,
-//			Date fechaSincronizacion) throws SistemaExternException {
-//		Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
-//		try {
-//			Timestamp tpActualizacion = null;
-//			Timestamp tpSincronizacion = null;
-//
-//			if (fechaActualizacion != null)
-//				tpActualizacion = new Timestamp(fechaActualizacion.getTime());
-//			if (fechaSincronizacion != null)
-//				tpSincronizacion = new Timestamp(fechaSincronizacion.getTime());
-//
-//			List<UnidadTF> arbol = getObtenerUnidadesService().obtenerArbolUnidades(
-//					pareCodi,
-//					tpActualizacion,
-//					tpSincronizacion);
-//
-//			for(UnidadTF unidadTF: arbol){
-//				if ("V".equals(unidadTF.getCodigoEstadoEntidad()) || "T".equals(unidadTF.getCodigoEstadoEntidad())) {	// Unitats Vigents o Transitòries
-//					NodeDir3 node = toNodeDir3(unidadTF);
-//					NodeDir3 pare = organigrama.get(node.getSuperior());
-//					if (node.getCodi().equalsIgnoreCase(pareCodi) || pare != null) {
-//						organigrama.put(node.getCodi(), node);
-//						if (pare != null) {
-//							List<NodeDir3> fills = pare.getFills();
-//							if (fills == null) {
-//								fills = new ArrayList<NodeDir3>();
-//								pare.setFills(fills);
-//							}
-//							fills.add(node);
-//						}
-//					}
-//				}
-//			}
-//			return organigrama;
-//		} catch (Exception ex) {
-//			throw new SistemaExternException(
-//					"No s'han pogut consultar les unitats organitzatives via WS (" +
-//							"pareCodi=" + pareCodi + ")",
-//					ex);
-//		}
-//	}
+	@Override
+	public Map<String, NodeDir3> organigramaPerEntitat(
+			String pareCodi,
+			Date fechaActualizacion,
+			Date fechaSincronizacion) throws SistemaExternException {
+		Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
+		try {
+			Timestamp tpActualizacion = null;
+			Timestamp tpSincronizacion = null;
+
+			if (fechaActualizacion != null)
+				tpActualizacion = new Timestamp(fechaActualizacion.getTime());
+			if (fechaSincronizacion != null)
+				tpSincronizacion = new Timestamp(fechaSincronizacion.getTime());
+
+			List<UnidadTF> arbol = getObtenerUnidadesService().obtenerArbolUnidades(
+					pareCodi,
+					tpActualizacion,
+					tpSincronizacion);
+
+			for(UnidadTF unidadTF: arbol){
+				if ("V".equals(unidadTF.getCodigoEstadoEntidad()) || "T".equals(unidadTF.getCodigoEstadoEntidad())) {	// Unitats Vigents o Transitòries
+					NodeDir3 node = toNodeDir3(unidadTF);
+					NodeDir3 pare = organigrama.get(node.getSuperior());
+					if (node.getCodi().equalsIgnoreCase(pareCodi) || pare != null) {
+						organigrama.put(node.getCodi(), node);
+						if (pare != null) {
+							List<NodeDir3> fills = pare.getFills();
+							if (fills == null) {
+								fills = new ArrayList<NodeDir3>();
+								pare.setFills(fills);
+							}
+							fills.add(node);
+						}
+					}
+				}
+			}
+			return organigrama;
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut consultar les unitats organitzatives via WS (" +
+							"pareCodi=" + pareCodi + ")",
+					ex);
+		}
+	}
 
 	@Override
 	public List<NodeDir3> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 		try {
 			List<NodeDir3> unitats = new ArrayList<NodeDir3>();
-			List<UnidadTF> unidades = getObtenerUnidadesService().obtenerArbolUnidades(
+				List<UnidadTF> unidades = getObtenerUnidadesService().obtenerArbolUnidades(
 					pareCodi,
 					dataActualitzacio != null ? new Timestamp(dataActualitzacio.getTime()) : null,
 					dataSincronitzacio != null ? new Timestamp(dataSincronitzacio.getTime()) : null);
@@ -536,13 +536,12 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 	@Override
 	public List<OficinaSir> getOficinesEntitat(String entitat) throws SistemaExternException {
 
-		List<OficinaSir> oficinesSIR = new ArrayList<>();
-		List<OficinaTF> oficinesWS = new ArrayList<>();
+		List<OficinaSir> oficinesSIR = new ArrayList<OficinaSir>();
+		List<OficinaTF> oficinesWS = new ArrayList<OficinaTF>();
 		try {
 			oficinesWS = getObtenerOficinasSIRUnidad().obtenerArbolOficinas(entitat, null, null);
-			OficinaSir oficinaSIR;
-			for (var oficinaTF : oficinesWS) {
-				oficinaSIR = new OficinaSir();
+			for (OficinaTF oficinaTF : oficinesWS) {
+				OficinaSir oficinaSIR = new OficinaSir();
 				oficinaSIR.setCodi(oficinaTF.getCodigo());
 				oficinaSIR.setNom(oficinaTF.getDenominacion());
 				oficinaSIR.setOrganCodi(oficinaTF.getCodUoResponsable());

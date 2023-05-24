@@ -1,9 +1,20 @@
 package es.caib.notib.logic.intf.service;
 
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.PermisEnum;
+import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
+import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
-import es.caib.notib.logic.intf.dto.procediment.*;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerDataDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerFiltreDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerFormDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerGrupDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerSimpleDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -16,26 +27,34 @@ import java.util.List;
  */
 public interface ServeiService {
 
-	public enum TipusPermis { PROCEDIMENT, PROCEDIMENT_ORGAN }
+//	public enum TipusPermis { PROCEDIMENT, PROCEDIMENT_ORGAN }
 	/**
 	 * Crea un nou servei.
 	 * 
-	 * @param servei Informació del servei a crear.
+	 * @param servei
+	 *            Informació del servei a crear.
 	 * @return El servei creat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	ProcSerDto create(Long entitatId, ProcSerDataDto servei);
+	ProcSerDto create(
+            Long entitatId,
+            ProcSerDataDto servei);
 
 	/**
 	 * Actualitza la informació del servei 
 	 * 
-	 * @param servei Informació del servei a modificar.
+	 * @param servei
+	 *            Informació del servei a modificar.
 	 * @return El servei modificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public ProcSerDto update(Long entitatId, ProcSerDataDto servei, boolean isAdmin, boolean isAdminEntitat) throws NotFoundException;
+	public ProcSerDto update(
+            Long entitatId,
+            ProcSerDataDto servei,
+            boolean isAdmin,
+            boolean isAdminEntitat) throws NotFoundException;
 
 	/**
 	 * Marca el servei amb l'id especificat com a actiu/inactiu.
@@ -56,34 +75,49 @@ public interface ServeiService {
 	/**
 	 * Esborra el servei amb el mateix id que l'especificat.
 	 * 
-	 * @param id Atribut id del servei a esborrar.
+	 * @param id
+	 *            Atribut id del servei a esborrar.
 	 * @return El servei esborrat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public ProcSerDto delete(Long entitatId, Long id, boolean isAdminEntitat) throws NotFoundException;
+	public ProcSerDto delete(
+            Long entitatId,
+            Long id,
+            boolean isAdminEntitat) throws NotFoundException;
 
 	/**
 	 * Consulta un servei donat el seu id.
 	 * 
-	 * @param entitatId Id de l'entitat.
-	 * @param id Atribut id del servei a trobar.
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param id
+	 *            Atribut id del servei a trobar.
 	 * @return El meta-expedient amb l'id especificat o null si no s'ha trobat.
-	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public ProcSerDto findById(Long entitatId, boolean isAdministrador, Long id) throws NotFoundException;
+	public ProcSerDto findById(
+            Long entitatId,
+            boolean isAdministrador,
+            Long id) throws NotFoundException;
 	
 	/**
 	 * Consulta un servei donat el seu codi i entitat.
 	 * 
-	 * @param entitatId Id de l'entitat.
-	 * @param codiServei Atribut codi del servei a trobar.
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param codiServei
+	 *            Atribut codi del servei a trobar.
 	 * @return El meta-expedient amb l'id especificat o null si no s'ha trobat.
-	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	public ProcSerDto findByCodi(Long entitatId, String codiServei) throws NotFoundException;
+	public ProcSerDto findByCodi(
+            Long entitatId,
+            String codiServei) throws NotFoundException;
 
 	/**
 	 * Consulta els serveis d'una entitat.
@@ -97,29 +131,47 @@ public interface ServeiService {
 	/**
 	 * Consulta els serveis d'un organ gestor i els seus organs gestors descendents.
 	 * 
-	 * @param entitatId Identificador de la entitat en la que s'està cercant
-	 * @param organGestor Òrgna gestor del que volem obtenir els serveis
+	 * @param entitatId
+	 *            Identificador de la entitat en la que s'està cercant
+	 * @param organGestor
+	 * 			  Òrgna gestor del que volem obtenir els serveis
 	 * @return Els serveis associats a l'òrgan gestor, o a algund els seus descendents.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ProcSerSimpleDto> findByOrganGestorIDescendents(Long entitatId, OrganGestorDto organGestor);
+	public List<ProcSerSimpleDto> findByOrganGestorIDescendents(
+            Long entitatId,
+            OrganGestorDto organGestor);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ProcSerDto> findByOrganGestorIDescendentsAndComu(Long entitatId, OrganGestorDto organGestor);
+	public List<ProcSerDto> findByOrganGestorIDescendentsAndComu(
+            Long entitatId,
+            OrganGestorDto organGestor);
+	
 	
 	/**
 	 * Consulta de les notificacions segons els paràmetres del filtre i permís actual.
 	 * 
-	 * @param isUsuari True si l'usuari actual està a la finestra de l'usuari
-	 * @param isUsuariEntitat True si l'usuari actual està a la finestra de l'usuari d'enitat
-	 * @param isAdministrador True si l'usuari actual està a la finestra de l'administrador
-	 * @param filtre Paràmetres per a filtrar els resultats.
-	 * @param paginacioParams Paràmetres per a dur a terme la paginació del resultats.
+	 * @param isUsuari
+	 * 			  True si l'usuari actual està a la finestra de l'usuari
+	 * @param isUsuariEntitat
+	 * 			  True si l'usuari actual està a la finestra de l'usuari d'enitat
+	 * @param isAdministrador
+	 * 			  True si l'usuari actual està a la finestra de l'administrador
+	 * @param filtre
+	 *            Paràmetres per a filtrar els resultats.
+	 * @param paginacioParams
+	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb les notificacions.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public PaginaDto<ProcSerFormDto> findAmbFiltrePaginat(Long entitatId, boolean isUsuari, boolean isUsuariEntitat, boolean isAdministrador,
-														  OrganGestorDto organGestorActual, ProcSerFiltreDto filtre, PaginacioParamsDto paginacioParams);
+	public PaginaDto<ProcSerFormDto> findAmbFiltrePaginat(
+            Long entitatId,
+            boolean isUsuari,
+            boolean isUsuariEntitat,
+            boolean isAdministrador,
+            OrganGestorDto organGestorActual,
+			ProcSerFiltreDto filtre,
+            PaginacioParamsDto paginacioParams);
 	
 	/**
 	 * Llistat amb tots els serveis.
@@ -182,23 +234,21 @@ public interface ServeiService {
 //	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 //	List<ServeiOrganDto> findServeisOrganWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
-//	/**
-//	 * Selecciona tots els serveis als que l'organ indicat té accés
-//	 *
-//	 * @param organId
-//	 * @param entitatCodi
-//	 * @param serveisOrgans
-//	 *
-//	 * @return
-//	 */
+	/**
+	 * Selecciona tots els serveis als que l'organ indicat té accés
+	 *
+	 * @param organGestorCodi
+	 *
+	 * @return
+	 */
 //	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 //	List<ProcSerOrganDto> findServeisOrganWithPermisByOrgan(String organId, String entitatCodi, List<ProcSerOrganDto> serveisOrgans);
-//
+
 //	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 //	public List<String> findServeisOrganCodiWithPermisByServei(ProcSerDto servei, String entitatCodi, List<ProcSerOrganDto> serveisOrgans);
-//
+
 //	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-//	public List<ProcSerCacheDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
+//	public List<ProcSerSimpleDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
 //	/**
 //	 * Recupera els tipus d'assumpte d'una entitat.
@@ -356,10 +406,19 @@ public interface ServeiService {
 	public List<ProcSerDto> findServeisByOrganGestor(String organGestorCodi);
 
 //	@PreAuthorize("hasRole('tothom')")
-//	public List<ProcSerDto> findServeisByOrganGestorWithPermis(Long entitatId, String organGestorCodi, List<String> grups, PermisEnum permis);
+//	public List<ProcSerDto> findServeisByOrganGestorWithPermis(
+//            Long entitatId,
+//            String organGestorCodi,
+//            List<String> grups,
+//            PermisEnum permis);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<CodiValorOrganGestorComuDto> getServeisOrgan(Long entitatId, String organCodi, Long organFiltre, RolEnumDto rol, PermisEnum permis);
+	List<CodiValorOrganGestorComuDto> getServeisOrgan(
+            Long entitatId,
+            String organCodi,
+            Long organFiltre,
+            RolEnumDto rol,
+            PermisEnum permis);
 
 	/**
 	 * Obté un llistat de tots els serveis notificables d'un organ gestor concret
@@ -373,7 +432,11 @@ public interface ServeiService {
 	 *
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol, TipusEnviamentEnumDto enviamentTipus);
+	List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(
+            Long entitatId,
+            String organCodi,
+            RolEnumDto rol,
+            TipusEnviamentEnumDto enviamentTipus);
 
 //	/**
 //	 * Consulta si l'usuari té permís de notificació a tots els serveis comuns per a algún òrgan gestor.
@@ -415,13 +478,18 @@ public interface ServeiService {
 	/**
 	 * Consulta un servei donat el seu nom i entitat.
 	 * 
-	 * @param entitatId Id de l'entitat.
-	 * @param nomServei Atribut nom del servei a trobar.
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param nomServei
+	 *            Atribut nom del servei a trobar.
 	 * @return El servei amb el nom especificat o null si no s'ha trobat.
-	 * @throws NotFoundException Si no s'ha trobat l'servei amb el nom especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'servei amb el nom especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	ProcSerDto findByNom(Long entitatId, String nomServei) throws NotFoundException;
+	ProcSerDto findByNom(
+            Long entitatId,
+            String nomServei) throws NotFoundException;
 
 	Integer getServeisAmbOrganNoSincronitzat(Long entitatId);
 }

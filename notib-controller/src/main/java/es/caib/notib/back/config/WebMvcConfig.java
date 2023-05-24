@@ -4,20 +4,29 @@
 package es.caib.notib.back.config;
 
 import com.opensymphony.sitemesh.webapp.SiteMeshFilter;
-import es.caib.notib.back.interceptor.*;
+import es.caib.notib.back.interceptor.AccesAdminInterceptor;
+import es.caib.notib.back.interceptor.AccesPagadorsInterceptor;
+import es.caib.notib.back.interceptor.AccesSuperInterceptor;
+import es.caib.notib.back.interceptor.AccesUsuariInterceptor;
+import es.caib.notib.back.interceptor.AjaxInterceptor;
+import es.caib.notib.back.interceptor.AplicacioInterceptor;
+import es.caib.notib.back.interceptor.AvisosInterceptor;
+import es.caib.notib.back.interceptor.LlistaEntitatsInterceptor;
+import es.caib.notib.back.interceptor.LlistaRolsInterceptor;
+import es.caib.notib.back.interceptor.ModalInterceptor;
+import es.caib.notib.back.interceptor.NodecoInterceptor;
+import es.caib.notib.back.interceptor.PermisosEntitatInterceptor;
+import es.caib.notib.back.interceptor.PermisosInterceptor;
+import es.caib.notib.back.interceptor.SessioInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableArgumentResolver;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolverSupport;
 import org.springframework.data.web.SortArgumentResolver;
@@ -30,14 +39,11 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
-import org.springframework.web.servlet.resource.WebJarsResourceResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
@@ -133,9 +139,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		return registrationBean;
 	}
 
-	private static final String[] PERMISOS_INTERCEPTOR_EXCLUSIONS = { "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/error", "/api/consulta/**", "/api/consulta/**" };
-	private static final String[] APLICACIO_INTERCEPTOR_EXCLUSIONS = { "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/notificacio/refrescarEstatNotifica/estat" };
-	private static final String[] INTERCEPTOR_EXCLUSIONS = { "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/error", "/notificacio/refrescarEstatNotifica/estat", "/**/monitor/tasques"};
+	private static final String[] PERMISOS_INTERCEPTOR_EXCLUSIONS = { "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/error", "/api/consulta/**", "/api/consulta/**", "/api/services/**" };
+	private static final String[] APLICACIO_INTERCEPTOR_EXCLUSIONS = { "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/api/services/**", "/notificacio/refrescarEstatNotifica/estat" };
+	private static final String[] INTERCEPTOR_EXCLUSIONS = { "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/api/services/**", "/error", "/notificacio/refrescarEstatNotifica/estat", "/**/monitor/tasques"};
 	private static final String[] USUARI_EXCLUSIONS = { "/entitat/organigrama/**", "/entitat/getEntitatLogoCap", "/entitat/getEntitatLogoPeu" };
 
 	private static final String[] PAGADORS_PATHS = { "/cie**", "/cie/**", "/operadorPostal**", "/operadorPostal/**" };

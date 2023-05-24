@@ -1,7 +1,11 @@
 package es.caib.notib.logic.intf.dto.notenviament;
 
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.intf.dto.EntregaDehDto;
+import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
+import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
 import es.caib.notib.logic.intf.dto.cie.EntregaPostalDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,12 +14,13 @@ import java.util.Date;
 
 /**
  * Informació d'un destinatari d'una anotació.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
 public class EnviamentInfoDto extends NotificacioEnviamentDatatableDto{
 
+	private Long id;
 	private EntregaPostalDto entregaPostal;
 	private EntregaDehDto entregaDeh;
 	private ServeiTipusEnumDto serveiTipus;
@@ -57,5 +62,9 @@ public class EnviamentInfoDto extends NotificacioEnviamentDatatableDto{
 
 	private String notificaIdentificador;
 	private boolean notificaError;
+
+	private boolean callbackFiReintents;
+	private String callbackFiReintentsDesc;
+	private String notificacioMovilErrorDesc;
 
 }

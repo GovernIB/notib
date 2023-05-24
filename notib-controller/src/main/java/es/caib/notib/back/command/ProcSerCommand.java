@@ -1,9 +1,9 @@
 package es.caib.notib.back.command;
 
-import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.back.helper.ConversioTipusHelper;
 import es.caib.notib.back.validation.ValidProcediment;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -29,8 +29,6 @@ public class ProcSerCommand {
 	private String nom;
 	private Long entitatId;
 	private String entitatNom;
-//	private Long pagadorPostalId;
-//	private Long pagadorCieId;
 	private boolean agrupar;
 	private boolean consulta;
 	private boolean processar;
@@ -55,26 +53,28 @@ public class ProcSerCommand {
 	private Long cieId;
 
 	public static ProcSerCommand asCommand(ProcSerDto dto) {
-
 		if (dto == null) {
 			return null;
 		}
-		var command = ConversioTipusHelper.convertir(dto, ProcSerCommand.class );
-		if (dto.getEntitat() != null) {
+		ProcSerCommand command = ConversioTipusHelper.convertir(
+				dto,
+				ProcSerCommand.class );
+		if (dto.getEntitat() != null)
 			command.setEntitatId(dto.getEntitat().getId());
-		}
 		return command;
 	}
-
 	public static ProcSerDto asDto(ProcSerCommand command) {
-
 		if (command == null) {
 			return null;
 		}
-		var dto = ConversioTipusHelper.convertir(command, ProcSerDto.class);
-		var entitatDto = new EntitatDto();
+		ProcSerDto dto = ConversioTipusHelper.convertir(
+				command,
+				ProcSerDto.class);
+		
+		EntitatDto entitatDto = new EntitatDto();
 		entitatDto.setId(command.getEntitatId());
 		dto.setEntitat(entitatDto);
+
 		return dto;
 	}
 

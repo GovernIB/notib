@@ -1,6 +1,12 @@
 package es.caib.notib.plugin.unitat;
 
-import static org.junit.Assert.assertNotNull;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.notib.plugin.SistemaExternException;
+import es.caib.notib.plugin.gesconadm.RestConsultaProcediments;
+import org.apache.commons.io.IOUtils;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -9,15 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import es.caib.notib.plugin.gesconadm.RestConsultaProcediments;
-import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import es.caib.notib.plugin.SistemaExternException;
+import static org.junit.Assert.assertNotNull;
 
 public class RestConsultaOrganigrama {
 
@@ -25,6 +23,7 @@ public class RestConsultaOrganigrama {
 	private static final String DIR3_USERNAME = "$notib_dir3caib";
 	private static final String DIR3_PASSWORD = "notib_dir3caib";
 	private static final String SERVEI_ORGANIGRAMA = "rest/organigrama";
+
 
 	UnitatsOrganitzativesPluginDir3 pluginDir3;
 
@@ -76,13 +75,17 @@ public class RestConsultaOrganigrama {
 		assertNotNull(oficines);
 	}
 
+
+
+
+	
 	@Test
 	public void obtenirOrganigrama() throws Exception {
-		
+
 		HashMap<String, NodeDir3> organigrama = organigramaPerEntitat("A04003003");
-		
+
 		assertNotNull(organigrama);
-		
+
 	}
 		
 	private HashMap<String, NodeDir3> organigramaPerEntitat(String codiEntitat) throws SistemaExternException {

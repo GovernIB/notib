@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
  * de dades del tipus pagador postal.
- *
+ * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEntity, Long> {
@@ -35,13 +35,13 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 	List<PagadorPostalEntity> findByContracteDataVigGreaterThanEqual(Date llindar);
 
 	List<PagadorPostalEntity> findByEntitatAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, Date llindar);
-//	List<PagadorPostalEntity> findByEntitatAndOrganismePagadorAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, OrganGestorEntity organ, Date llindar);
-	List<PagadorPostalEntity> findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, OrganGestorEntity organ, Date llindar);
 
+	List<PagadorPostalEntity> findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, OrganGestorEntity organ, Date llindar);
 	List<PagadorPostalEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsFills);
 	List<PagadorPostalEntity> findByOrganGestorId(Long organGestorId);
-
-	@Query(	"from PagadorPostalEntity b " +
+	
+	@Query(	"from " +
+			"    PagadorPostalEntity b " +
 			"where " +
 			"	 (:esNullFiltreOrganismePagador = true or lower(b.organGestor.codi) like lower('%'||:organismePagadorCodi||'%')) " +
 			"and (:esNullFiltreNumContracte = true or lower(b.contracteNum) like lower('%'||:numContracte||'%')) " +
@@ -53,8 +53,9 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 			@Param("numContracte") String filtreNumContracte,
 			@Param("entitat") EntitatEntity entitat,
 			Pageable paginacio);
-
-	@Query(	"from PagadorPostalEntity b " +
+	
+	@Query(	"from " +
+			"    PagadorPostalEntity b " +
 			"where " +
 			"	 (:esNullFiltreOrganismePagador = true or lower(b.organGestor.codi) like lower('%'||:organismePagadorCodi||'%')) " +
 			"and (:esNullFiltreNumContracte = true or lower(b.contracteNum) like lower('%'||:numContracte||'%')) " +

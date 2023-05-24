@@ -11,10 +11,8 @@ import java.io.Serializable;
 @Setter
 public class Acuse implements Serializable {
 
-//    @XmlElement(required = true)
     @NotNull
     protected byte[] contenido;
-//    @XmlElement(required = true)
     @NotNull
     protected String hash;
     protected String csvResguardo;

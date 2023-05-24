@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: Limit Tecnologies <limit@limit.es>
-  Date: 21/6/21
-  Time: 15:34
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -267,7 +260,7 @@
                         contingutTbody += " (<spring:message code="notificacio.list.enviament.list.finalitzat.email"/>)"
                     }
                 }
-                if (data[i].notificacioError) {
+                if (data[i].notificacioError && data[i].notificacioEstat !== "FINALITZADA" && data[i].notificacioEstat !== "PROCESSADA") {
                     var errorTitle = '';
                     if (data[i].notificacioErrorDescripcio) {
                         errorTitle = data[i].notificacioErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -275,6 +268,15 @@
                         errorTitle = "Descripció de l'error no registrada";
                     }
                     contingutTbody += ' <span class="fa fa-warning text-danger" title="' + errorTitle + '"></span>';
+                }
+                if (data[i].fiReintents) {
+                    contingutTbody += ' <span class="fa fa-warning text-warning" title="' + data[i].fiReintentsDesc + '"></span>';
+                }
+                if (data[i].callbackFiReintents) {
+                    contingutTbody += ' <span class="fa fa-warning text-info" title="' + data[i].callbackFiReintentsDesc + '"></span>';
+                }
+                if (data[i].notificacioMovilErrorDesc) {
+                    contingutTbody += ' <span style="color:#8a6d3b; cursor:pointer;" class="fa fa-mobile fa-lg" title="' + data[i].notificacioMovilErrorDesc + '"></span>';
                 }
                 contingutTbody += '</td>';
                 contingutTbody += '<td width="114px">';
@@ -302,6 +304,7 @@
     });
 
     $(document).ready(function() {
+
         let $taula = $('#notificacio');
         $taula.on('rowinfo.dataTable', function(e, td, rowData) {
             mostraEnviamentsNotificacio(td, rowData)
@@ -336,6 +339,10 @@
             });
         });
 
+        $("#filtrar").click(() => {
+            deseleccionar()
+        });
+
         $('#btn-netejar-filtre').click(function() {
             $(':input', $('#form-filtre')).each (function() {
                 var type = this.type, tag = this.tagName.toLowerCase();
@@ -352,6 +359,7 @@
             $('#nomesAmbErrors').val(false);
             omplirProcediments();
             omplirServeis();
+            deseleccionar();
             $('#form-filtre').submit();
         });
         $('#nomesAmbErrorsBtn').click(function() {
@@ -376,6 +384,7 @@
             'confirm-update-estat': "<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>",
             'confirm-reactivar-callback': "<spring:message code="enviament.list.user.reactivar.callback.misatge.avis"/>",
             'confirm-enviar-callback': "<spring:message code="enviament.list.user.enviar.callback.misatge.avis"/>",
+            'confirm-accio-massiva': "<spring:message code="enviament.list.user.confirm.accio.massiva"/>",
         };
         initEvents($('#notificacio'), 'notificacio', eventMessages)
     });
@@ -571,7 +580,7 @@
             <button id="nomesAmbErrorsBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbErrors"/>" class="btn btn-default <c:if test="${nomesAmbErrors}">active</c:if>" data-toggle="button"><span class="fa fa-warning"></span></button>
             <not:inputHidden name="nomesAmbErrors"/>
             <button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-            <button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+            <button id="filtrar" type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
         </div>
     </div>
 </form:form>
@@ -586,20 +595,23 @@
   						<span class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu">
-						<li><a style="cursor: pointer;" id="exportarODS"><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
-						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="notificacio.list.accio.massiva.reintentar.notificacions"/></a></li>
-						<li><a style="cursor: pointer;" id="reintentarErrors"><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
-						<li><a style="cursor: pointer;" id="updateEstat"><spring:message code="notificacio.list.accio.massiva.actualitzar.estat"/></a></li>
+						<li><a id="exportarODS" style="cursor: pointer;" ><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
+						<li><a id="reintentarNotificacio" style="cursor: pointer;" ><spring:message code="notificacio.list.accio.massiva.reintentar.notificacions"/></a></li>
+						<li><a id="reintentarErrors" style="cursor: pointer;" ><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
+						<li><a id="updateEstat" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.actualitzar.estat"/></a></li>
                         <li><a id="processarMassiu" href="<c:url value="/notificacio/processar/massiu"/>" data-toggle="modal" data-refresh-pagina="true"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>
-                        <li><a href="<c:url value="/notificacio/eliminar"/>"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
+<%--                        <li><a id="processarMassiu" style="cursor: pointer;" data-toggle="modal" data-refresh-pagina="true"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>--%>
+<%--                        <li><a href="<c:url value="/notificacio/eliminar"/>"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>--%>
+                        <li><a id="eliminar" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
 
                         <c:if test="${isRolActualAdministradorEntitat}">
-                            <li><a style="cursor: pointer;" id="reintentarRegistre"><spring:message code="notificacio.list.accio.massiva.reintentar.registre"/></a></li>
-                            <li><a style="cursor: pointer;" id="reactivarConsulta"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica"/></a></li>
-                            <li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir"/></a></li>
-                            <li><a style="cursor: pointer;" id="reactivarCallback"><spring:message code="notificacio.list.accio.massiva.reactivar.callbacks"/></a></li>
-                            <li><a style="cursor: pointer;" id="enviarCallback"><spring:message code="notificacio.list.accio.massiva.enviar.callbacks"/></a></li>
-                        </c:if>
+    <li><a style="cursor: pointer;" id="reactivarRegistre"><spring:message code="notificacio.list.accio.massiva.reactivar.registre"/></a></li>
+    <li><a style="cursor: pointer;" id="reactivarConsulta"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica"/></a></li>
+    <li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir"/></a></li>
+    <li><a style="cursor: pointer;" id="reactivarCallback"><spring:message code="notificacio.list.accio.massiva.reactivar.callbacks"/></a></li>
+    <li><a style="cursor: pointer;" id="enviarCallback"><spring:message code="notificacio.list.accio.massiva.enviar.callbacks"/></a></li>
+    <li><a style="cursor: pointer;" id="enviarNotificacionsMovil"><spring:message code="notificacio.list.accio.massiva.enviar.notificacions.movil"/></a></li>
+</c:if>
 					</ul>
 				</div>
 			</div>
@@ -610,6 +622,7 @@
 	</script>
 
 <script id="rowhrefTemplate" type="text/x-jsrender"><c:url value="/notificacio/{{:id}}/info"/></script>
+<div id="cover-spin"></div>
 <table
         id="notificacio"
         data-toggle="datatable"
@@ -670,6 +683,7 @@
  					</script>
         </th>
         <th data-col-name="procedimentTipus" data-visible="false"></th>
+        <th data-col-name="estat" data-visible="false"></th>
         <th data-col-name="procedimentDesc" data-template="#cellProcedimentTemplate" width="200px"><spring:message code="notificacio.list.columna.procediment"/>
             <script id="cellProcedimentTemplate" type="text/x-jsrender">
                 {{if procedimentTipus == 'PROCEDIMENT'}}<span class="label label-primary">P</span>{{/if}}
@@ -688,7 +702,7 @@
         <th data-col-name="createdByComplet" data-converter="String" width="150px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
         <th data-col-name="permisProcessar" data-visible="false">
         <th data-col-name="documentId" data-visible="false" style="visibility: hidden">
-<%--        <th data-col-name="enviamentId" data-visible="false" style="visibility: hidden">--%>
+            <%--        <th data-col-name="enviamentId" data-visible="false" style="visibility: hidden">--%>
         <th data-col-name="envCerData" data-visible="false" style="visibility: hidden">
         <th data-col-name="id" data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px" style="z-index:99999;">
             <script id="cellAccionsTemplate" type="text/x-jsrender">

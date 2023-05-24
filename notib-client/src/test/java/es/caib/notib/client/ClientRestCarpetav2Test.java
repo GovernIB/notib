@@ -2,10 +2,13 @@ package es.caib.notib.client;
 
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
+import es.caib.notib.client.domini.consulta.TransmissioV2;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -20,8 +23,8 @@ import static org.junit.Assert.*;
  */
 public class ClientRestCarpetav2Test {
 
-	
-	private static final String URL = "http://localhost:8080/notib";
+
+	private static final String URL = "http://localhost:8280/notibapi";
 	private static final String USERNAME = "admin";
 	private static final String PASSWORD = "admin";
 
@@ -45,11 +48,33 @@ public class ClientRestCarpetav2Test {
 //		System.setProperty("javax.net.ssl.trustStore", keystorePath);
 //		System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
 
-		client = NotificacioRestClientFactory.getRestClientV2(
-				URL,
-				USERNAME,
-				PASSWORD,
-				true); //tomcat = true jboss = false/true
+		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, true); //tomcat = true jboss = false/true
+	}
+
+	@Test
+	public void testPaginacio() throws Exception {
+
+		int mida = 10;
+		List<Long> respostes = new ArrayList<>();
+		RespostaConsultaV2 resposta = client.notificacionsByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, Idioma.CA, 0, mida);
+		assertNotNull(resposta);
+		int nElementsTotal = resposta.getNumeroElementsTotals();
+		int nPagines = nElementsTotal/10;
+		if (nElementsTotal%10 != 0) {
+			nPagines++;
+		}
+		for (int foo=0;foo<nPagines;foo++) {
+			resposta = client.notificacionsByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, Idioma.CA, foo, mida);
+			assertNotNull(resposta);
+			List<TransmissioV2> resultats = resposta.getResultat();
+			for (TransmissioV2 t : resultats) {
+				if (respostes.contains(t.getId())) {
+					throw new Exception("S'ha rebut contingut duplicat amb id " + t.getId() + " numPagina: " + foo);
+				}
+				respostes.add(t.getId());
+			}
+		}
+		assertEquals(respostes.size(), resposta.getNumeroElementsTotals());
 	}
 
 	@Test
@@ -62,7 +87,6 @@ public class ClientRestCarpetav2Test {
 		assertTrue("La pàgina és buida", resposta.getNumeroElementsRetornats() > 0);
 		assertNotNull("No ha retornat resultats", resposta.getResultat());
 		assertEquals("No coincideix el nombre de", resposta.getNumeroElementsRetornats(), resposta.getResultat().size());
-
 
 		System.out.println(">>> Resposta: " + resposta.toString());
 	}
@@ -78,8 +102,7 @@ public class ClientRestCarpetav2Test {
 		assertNotNull("No ha retornat resultats", resposta.getResultat());
 		assertEquals("No coincideix el nombre de", resposta.getNumeroElementsRetornats(), resposta.getResultat().size());
 
-
-		System.out.println(">>> Resposta: " + resposta.toString());
+		System.out.println(">>> Resposta: " + resposta);
 	}
 
 	@Test
@@ -93,8 +116,7 @@ public class ClientRestCarpetav2Test {
 		assertNotNull("No ha retornat resultats", resposta.getResultat());
 		assertEquals("No coincideix el nombre de", resposta.getNumeroElementsRetornats(), resposta.getResultat().size());
 
-
-		System.out.println(">>> Resposta: " + resposta.toString());
+		System.out.println(">>> Resposta: " + resposta);
 	}
 
 	@Test
@@ -108,8 +130,7 @@ public class ClientRestCarpetav2Test {
 		assertNotNull("No ha retornat resultats", resposta.getResultat());
 		assertEquals("No coincideix el nombre de", resposta.getNumeroElementsRetornats(), resposta.getResultat().size());
 
-
-		System.out.println(">>> Resposta: " + resposta.toString());
+		System.out.println(">>> Resposta: " + resposta);
 	}
 
 	@Test
@@ -123,8 +144,7 @@ public class ClientRestCarpetav2Test {
 		assertNotNull("No ha retornat resultats", resposta.getResultat());
 		assertEquals("No coincideix el nombre de", resposta.getNumeroElementsRetornats(), resposta.getResultat().size());
 
-
-		System.out.println(">>> Resposta: " + resposta.toString());
+		System.out.println(">>> Resposta: " + resposta);
 	}
 
 	@Test
@@ -138,8 +158,7 @@ public class ClientRestCarpetav2Test {
 		assertNotNull("No ha retornat resultats", resposta.getResultat());
 		assertEquals("No coincideix el nombre de", resposta.getNumeroElementsRetornats(), resposta.getResultat().size());
 
-
-		System.out.println(">>> Resposta: " + resposta.toString());
+		System.out.println(">>> Resposta: " + resposta);
 	}
 
 	@Test
@@ -153,8 +172,7 @@ public class ClientRestCarpetav2Test {
 		assertNotNull("No ha retornat resultats", resposta.getResultat());
 		assertEquals("No coincideix el nombre de", resposta.getNumeroElementsRetornats(), resposta.getResultat().size());
 
-
-		System.out.println(">>> Resposta: " + resposta.toString());
+		System.out.println(">>> Resposta: " + resposta);
 	}
 
 	@Test
@@ -168,8 +186,7 @@ public class ClientRestCarpetav2Test {
 		assertNotNull("No ha retornat resultats", resposta.getResultat());
 		assertEquals("No coincideix el nombre de", resposta.getNumeroElementsRetornats(), resposta.getResultat().size());
 
-
-		System.out.println(">>> Resposta: " + resposta.toString());
+		System.out.println(">>> Resposta: " + resposta);
 	}
 
 

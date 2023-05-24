@@ -3,12 +3,11 @@
  */
 package es.caib.notib.logic.intf.dto;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.Date;
 
 
 /**
@@ -34,7 +33,7 @@ public class IntegracioAccioDto implements Serializable {
 	private String aplicacio;
 //	private IntegracioDto integracio;
 //	private EntitatDto entitat;
-//
+
 //	public int getParametresCount() {
 //		if (parametres == null) {
 //			return 0;

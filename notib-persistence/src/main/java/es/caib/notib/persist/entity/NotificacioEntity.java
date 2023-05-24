@@ -17,7 +17,20 @@ import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.Index;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.PreRemove;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,6 +50,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @Entity
 @Table(name="not_notificacio", uniqueConstraints = @UniqueConstraint(columnNames={"REFERENCIA"}))
 @EntityListeners(AuditingEntityListener.class)
@@ -306,11 +320,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				value -> this.notificaEnviamentData = Date.from(value.atZone(ZoneId.systemDefault()).toInstant()),
 				() -> this.notificaEnviamentData = null
 		);
-//		this.notificaEnviamentData = this.getCreatedDate().ifPresentOrElse().toDate();
 	}
 
 	public void refreshRegistre() {
-		this.registreEnviamentIntent = 0;	
+		this.registreEnviamentIntent = 1;
 		Calendar cal = GregorianCalendar.getInstance();
 		this.registreData = cal.getTime();
 	}

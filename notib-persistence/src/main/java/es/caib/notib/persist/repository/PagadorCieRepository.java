@@ -3,7 +3,6 @@ package es.caib.notib.persist.repository;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieEntity;
-import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,9 +20,9 @@ import java.util.List;
  */
 public interface PagadorCieRepository extends JpaRepository<PagadorCieEntity, Long> {
 
-	List<PagadorPostalEntity> findByContracteDataVigGreaterThanEqual(Date llindar);
+	List<PagadorCieEntity> findByContracteDataVigGreaterThanEqual(Date llindar);
 
-	List<PagadorPostalEntity> findByEntitatAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, Date llindar);
+	List<PagadorCieEntity> findByEntitatAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, Date llindar);
 
 	List<PagadorCieEntity> findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, OrganGestorEntity organ, Date llindar);
 
@@ -34,9 +33,10 @@ public interface PagadorCieRepository extends JpaRepository<PagadorCieEntity, Lo
 	public List<PagadorCieEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsFills);
 	public List<PagadorCieEntity> findByOrganGestor(OrganGestorEntity organGestorId);
 	
-	@Query(	"from PagadorCieEntity b " +
+	@Query(	"from " +
+			"    PagadorCieEntity b " +
 			"where " +
-			"(:esNullFiltreOrganismePagador = true or b.organGestor.codi  = :organismePagador) " +
+			"(:esNullFiltreOrganismePagador = true or b.organGestor.codi = :organismePagador) " +
 			"and b.entitat = :entitat")
 	public Page<PagadorCieEntity> findByCodiDir3NotNullFiltrePaginatAndEntitat(
 			@Param("esNullFiltreOrganismePagador") boolean esNullFiltreOrganismePagador,

@@ -7,7 +7,7 @@
 <%
     pageContext.setAttribute(
             "isRolActualAdministradorOrgan",
-            es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+            es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
 %>
     <title>
         <c:choose>
@@ -58,6 +58,7 @@
         #permisos th {
             writing-mode:vertical-lr;
             text-orientation: upright;
+
         }
 
         .writing-horitzontal {
@@ -210,7 +211,7 @@
                 </c:when>
                 <c:otherwise>
                     <not:inputCheckbox disabled="true" info="true" messageInfo="organgestor.form.camp.entregacie.no.configurada" name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
-                    <%--                    <spring:message code="organgestor.form.camp.entregacie.no.configurada"></spring:message>--%>
+<%--                    <spring:message code="organgestor.form.camp.entregacie.no.configurada"></spring:message>--%>
                 </c:otherwise>
             </c:choose>
             <c:if test="${not empty operadorPostalList && not empty cieList}">
@@ -281,7 +282,7 @@
                     <th data-col-name="read" data-template="#cellPermisReadTemplate"
                         class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.consulta"/>: &#10;<spring:message code="organ.permis.consulta.info"/>">
                         <span class="fa fa-search padding-icon"></span>
-                        <%--                        <spring:message code="procediment.permis.columna.consulta"/>--%>
+<%--                        <spring:message code="procediment.permis.columna.consulta"/>--%>
                         <script id="cellPermisReadTemplate" type="text/x-jsrender">
                             {{if read}}<span class="fa fa-check"></span>{{/if}}
                         </script>
@@ -297,7 +298,7 @@
                     <th data-col-name="administration" data-template="#cellPermisGestioTemplate"
                         class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.gestio"/>: &#10;<spring:message code="organ.permis.gestio.info"/>">
                         <span class="fa fa-cog padding-icon"></span>
-                        <%--                        <spring:message code="procediment.permis.columna.gestio"/>--%>
+<%--                        <spring:message code="procediment.permis.columna.gestio"/>--%>
                         <script id="cellPermisGestioTemplate" type="text/x-jsrender">
                             {{if administration}}<span class="fa fa-check"></span>{{/if}}
                         </script>
@@ -305,7 +306,7 @@
                     <th data-col-name="comuns" data-template="#cellPermisComunsTemplate"
                         class="th-checkbox" title="<spring:message code="organgestor.permis.form.camp.comuns"/>: &#10;<spring:message code="organ.permis.comuns.info"/>">
                         <span class="fa fa-globe padding-icon"></span>
-                        <%--                        <spring:message code="organgestor.permis.columna.comuns.curt"/>--%>
+<%--                        <spring:message code="organgestor.permis.columna.comuns.curt"/>--%>
                         <script id="cellPermisComunsTemplate" type="text/x-jsrender">
                             {{if comuns}}<span class="fa fa-check"></span>{{/if}}
                         </script>
@@ -329,7 +330,7 @@
                     <th data-col-name="comunicacioSir" data-template="#comunicacioSirTemplate"
                         class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.comunicacio.sir"/>: &#10;<spring:message code="organ.permis.comunicacio.sir.info"/>">
                         <span class="fa fa-envelope padding-icon"></span>
-                        <%--                        <spring:message code="organgestor.permis.columna.coms.sir"/>--%>
+<%--                        <spring:message code="organgestor.permis.columna.coms.sir"/>--%>
                         <script id="comunicacioSirTemplate" type="text/x-jsrender">
                             {{if comunicacioSir}}<span class="fa fa-check"></span>{{/if}}
                         </script>

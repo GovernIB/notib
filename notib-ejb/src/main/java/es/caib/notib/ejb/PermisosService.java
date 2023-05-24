@@ -10,6 +10,7 @@ import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import java.util.List;
@@ -48,6 +49,7 @@ public class PermisosService extends AbstractService<es.caib.notib.logic.intf.se
 	}
 
 	@Override
+	@PermitAll
 	public boolean hasUsrPermisOrgan(Long entitatId, String usr, String organCodi, PermisEnum permis) {
 		return getDelegateService().hasUsrPermisOrgan(entitatId, usr, organCodi, permis);
 	}
@@ -58,11 +60,11 @@ public class PermisosService extends AbstractService<es.caib.notib.logic.intf.se
 		return getDelegateService().getOrgansCodisAmbPermisPerProcedimentComu(entitatId, usuariCodi, permis, procSetDto);
 	}
 
-    @Override
+	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-    public List<String> getProcedimentsOrgansAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
-        return getDelegateService().getProcedimentsOrgansAmbPermis(entitatId, usuariCodi, permis);
-    }
+	public List<String> getProcedimentsOrgansAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+		return getDelegateService().getProcedimentsOrgansAmbPermis(entitatId, usuariCodi, permis);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
@@ -71,7 +73,7 @@ public class PermisosService extends AbstractService<es.caib.notib.logic.intf.se
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@PermitAll
 	public List<CodiValorOrganGestorComuDto> getProcSerComuns(Long entitatId, List<String> grups, boolean removeInactius, ProcSerTipusEnum tipus) {
 		return getDelegateService().getProcSerComuns(entitatId, grups, removeInactius, tipus);
 	}
@@ -99,4 +101,5 @@ public class PermisosService extends AbstractService<es.caib.notib.logic.intf.se
 	public void evictGetOrgansAmbPermis() {
 
 	}
+
 }

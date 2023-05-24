@@ -4,6 +4,7 @@ import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
+import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
@@ -29,15 +30,23 @@ public class RegistreNotificaHelperTest {
 	@Mock
 	private RegistreHelper registreHelper;
 	@Mock
-	private AuditNotificacioHelper auditNotificacioHelper;
-	@Mock
 	private IntegracioHelper integracioHelper;
 	@Mock
 	private NotificacioEventHelper notificacioEventHelper;
 	@Mock
 	private ConfigHelper configHelper;
 	@Mock
+	private CallbackHelper callbackHelper;
+	@Mock
 	private ConversioTipusHelper conversioTipusHelper;
+	@Mock
+	private AuditHelper auditHelper;
+	@Mock
+	private EnviamentHelper enviamentHelper;
+	@Mock
+	private EnviamentTableHelper enviamentTableHelper;
+	@Mock
+	private NotificacioTableHelper notificacioTableHelper;
 
 	@Mock
 	EntitatEntity entitatMock;
@@ -73,6 +82,8 @@ public class RegistreNotificaHelperTest {
 		);
 		enviaments.add(enviament);
 		NotificacioEntity notificacio = initNotificacio(entidad, NotificaEnviamentTipusEnumDto.COMUNICACIO, enviaments);
+		Mockito.doNothing().when(auditHelper).auditaNotificacio(Mockito.any(NotificacioEntity.class), Mockito.<AuditService.TipusOperacio>any(), Mockito.anyString());
+		Mockito.doNothing().when(notificacioTableHelper).actualitzarRegistre(Mockito.any(NotificacioEntity.class));
 
 		// When
 		registreNotificaHelper.realitzarProcesRegistrar(notificacio);
@@ -103,11 +114,11 @@ public class RegistreNotificaHelperTest {
 		// Given
 		EntitatEntity entidad = initEntitat();
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
-		NotificacioEnviamentEntity enviament = initEnviament(
-				initPersonaAdministracio(InteressatTipus.ADMINISTRACIO)
-		);
+		NotificacioEnviamentEntity enviament = initEnviament(initPersonaAdministracio(InteressatTipus.ADMINISTRACIO));
 		enviaments.add(enviament);
 		NotificacioEntity notificacio = initNotificacio(entidad, NotificaEnviamentTipusEnumDto.NOTIFICACIO, enviaments);
+		Mockito.doNothing().when(auditHelper).auditaEnviament(Mockito.any(NotificacioEnviamentEntity.class), Mockito.<AuditService.TipusOperacio>any(), Mockito.anyString());
+		Mockito.doNothing().when(enviamentTableHelper).actualitzarRegistre(Mockito.any(NotificacioEnviamentEntity.class));
 
 		// When
 		registreNotificaHelper.realitzarProcesRegistrar(notificacio);
@@ -194,7 +205,6 @@ public class RegistreNotificaHelperTest {
 	public void tearDown() {
 		Mockito.reset(pluginHelper);
 		Mockito.reset(registreHelper);
-		Mockito.reset(auditNotificacioHelper);
 		Mockito.reset(integracioHelper);
 		Mockito.reset(notificacioEventHelper);
 	}

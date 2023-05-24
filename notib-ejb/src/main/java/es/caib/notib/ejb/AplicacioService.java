@@ -3,7 +3,6 @@
  */
 package es.caib.notib.ejb;
 
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 
@@ -44,7 +43,7 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 	public List<String> findRolsUsuariAmbCodi(String usuariCodi) {
 		return getDelegateService().findRolsUsuariAmbCodi(usuariCodi);
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public List<String> findRolsUsuariActual() {
@@ -59,7 +58,7 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
-		public String getIdiomaUsuariActual() {
+	public String getIdiomaUsuariActual() {
 		return getDelegateService().getIdiomaUsuariActual();
 	}
 
@@ -70,7 +69,6 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 	}
 
 	@Override
-	@PermitAll
 	public void excepcioSave(Throwable exception) {
 		getDelegateService().excepcioSave(exception);
 	}
@@ -88,7 +86,6 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 	}
 
 	@Override
-	@PermitAll
 	public List<String> permisosFindRolsDistinctAll() {
 		return getDelegateService().permisosFindRolsDistinctAll();
 	}
@@ -104,7 +101,7 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 	public String propertyGet(String property) {
 		return getDelegateService().propertyGet(property);
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public String propertyGet(String property, String defaultValue) {
@@ -119,6 +116,24 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public boolean existeixUsuariNotib(String codi) {
+		return getDelegateService().existeixUsuariNotib(codi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public boolean existeixUsuariSeycon(String codi) {
+		return getDelegateService().existeixUsuariSeycon(codi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public void crearUsuari(String codi) {
+		getDelegateService().crearUsuari(codi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public UsuariDto updateUsuariActual(UsuariDto usuariDto) {
 		return getDelegateService().updateUsuariActual(usuariDto);
 	}
@@ -128,13 +143,13 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 	public void updateRolUsuariActual(String rol) {
 		getDelegateService().updateRolUsuariActual(rol);
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public void updateEntitatUsuariActual(Long entitat) {
 		getDelegateService().updateEntitatUsuariActual(entitat);
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public String getMetrics() {

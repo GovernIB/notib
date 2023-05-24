@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.dto.cie.CieTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import java.util.List;
@@ -47,8 +48,14 @@ public class PagadorCieService extends AbstractService<es.caib.notib.logic.intf.
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public PaginaDto<CieTableItemDto> findAmbFiltrePaginat(Long entitatId, CieFiltreDto filtre, PaginacioParamsDto paginacioParams) {
-		return getDelegateService().findAmbFiltrePaginat(entitatId, filtre, paginacioParams);
+	public PaginaDto<CieTableItemDto> findAmbFiltrePaginat(
+			Long entitatId,
+			CieFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) {
+		return getDelegateService().findAmbFiltrePaginat(
+				entitatId,
+				filtre,
+				paginacioParams);
 	}
 
 	@Override
@@ -56,6 +63,7 @@ public class PagadorCieService extends AbstractService<es.caib.notib.logic.intf.
 	public List<CieDto> findAll() {
 		return getDelegateService().findAll();
 	}
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<IdentificadorTextDto> findAllIdentificadorText() {
@@ -63,7 +71,7 @@ public class PagadorCieService extends AbstractService<es.caib.notib.logic.intf.
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@PermitAll
 	public List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat) {
 		return getDelegateService().findPagadorsByEntitat(entitat);
 	}

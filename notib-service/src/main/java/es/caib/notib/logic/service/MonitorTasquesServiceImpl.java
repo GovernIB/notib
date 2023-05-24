@@ -12,99 +12,106 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * Implementació dels mètodes per a gestionar el monitor de tasques.
+ *
+ * @author Limit Tecnologies <limit@limit.es>
+ */
+
 @Slf4j
 @Service
 public class MonitorTasquesServiceImpl implements MonitorTasquesService {
 
-    private static Map<String, MonitorTascaInfo> tasques = new HashMap<>();
+	private static Map<String, MonitorTascaInfo> tasques = new HashMap<>();
 
-    @Override
-    public MonitorTascaInfo addTasca(String codiTasca) {
+	@Override
+	public MonitorTascaInfo addTasca(String codiTasca) {
 
-        var monitorTascaInfo = new MonitorTascaInfo();
-        monitorTascaInfo.setCodi(codiTasca);
-        monitorTascaInfo.setEstat(MonitorTascaEstat.EN_ESPERA);
-        MonitorTasquesServiceImpl.tasques.put(codiTasca, monitorTascaInfo);
-        return monitorTascaInfo;
-    }
+		MonitorTascaInfo monitorTascaInfo = new MonitorTascaInfo();
+		monitorTascaInfo.setCodi(codiTasca);
+		monitorTascaInfo.setEstat(MonitorTascaEstat.EN_ESPERA);
+		MonitorTasquesServiceImpl.tasques.put(codiTasca, monitorTascaInfo);
+		return monitorTascaInfo;
+	}
 
-    @Override
-    public void updateTasca(String codiTasca, MonitorTascaEstat estat, Date inici, Date fi, Date properaExecucio, String observacions) {
-        log.info("Actualitzant la tasca " + codiTasca);
-    }
+	@Override
+	public void updateTasca(String codiTasca, MonitorTascaEstat estat, Date inici, Date fi, Date properaExecucio, String observacions) {
+		log.info("Actualitzant la tasca " + codiTasca);
+	}
 
-    private void updateEstat(String codi, MonitorTascaEstat estat) {
+	private void updateEstat(String codi, MonitorTascaEstat estat) {
 
-        var monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
-        monitorTascaInfo.setEstat(estat);
-        MonitorTasquesServiceImpl.tasques.put(codi, monitorTascaInfo);
+		MonitorTascaInfo monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
+		monitorTascaInfo.setEstat(estat);
+		MonitorTasquesServiceImpl.tasques.put(codi, monitorTascaInfo);
 
-    }
+	}
 
-    private void updateDataInici(String codi) {
+	private void updateDataInici(String codi) {
 
-        var dataInici = updateData(0L);
-        var monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
-        monitorTascaInfo.setDataInici(dataInici);
-        MonitorTasquesServiceImpl.tasques.put(codi, monitorTascaInfo);
-    }
+		Date dataInici = updateData(0L);
+		MonitorTascaInfo monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
+		monitorTascaInfo.setDataInici(dataInici);
+		MonitorTasquesServiceImpl.tasques.put(codi, monitorTascaInfo);
+	}
 
-    private void updateDataFi(String codi, boolean iniciant) {
+	private void updateDataFi(String codi, boolean iniciant) {
 
-        var dataFi = updateData(0L);
-        var monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
-        monitorTascaInfo.setDataFi(iniciant ? null : dataFi);
-        MonitorTasquesServiceImpl.tasques.put(codi, monitorTascaInfo);
-    }
+		Date dataFi = updateData(0L);
+		MonitorTascaInfo monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
+		monitorTascaInfo.setDataFi(iniciant ? null : dataFi);
+		MonitorTasquesServiceImpl.tasques.put(codi, monitorTascaInfo);
+	}
 
-    @Override
-    public void updateProperaExecucio(String codi, Long plusValue) {
+	@Override
+	public void updateProperaExecucio(String codi, Long plusValue) {
 
-        var dataProperaExecucio = updateData(plusValue);
-        var monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
-        monitorTascaInfo.setProperaExecucio(dataProperaExecucio);
-        MonitorTasquesServiceImpl.tasques.put(codi, monitorTascaInfo);
-    }
+		Date dataProperaExecucio = updateData(plusValue);
+		MonitorTascaInfo monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
+		monitorTascaInfo.setProperaExecucio(dataProperaExecucio);
+		MonitorTasquesServiceImpl.tasques.put(codi, monitorTascaInfo);
+	}
 
-    private Date updateData(Long plusValue) {
-        return plusValue != null ? new Date(System.currentTimeMillis() + plusValue) : null;
-    }
+	private Date updateData(Long plusValue) {
+		return plusValue != null ? new Date(System.currentTimeMillis() + plusValue) : null;
+	}
 
-    @Override
-    public List<MonitorTascaInfo> findAll() {
+	@Override
+	public List<MonitorTascaInfo> findAll() {
 
-        List<MonitorTascaInfo> monitorTasques = new ArrayList<>();
-        for(var tasca : MonitorTasquesServiceImpl.tasques.entrySet()) {
-            monitorTasques.add(tasca.getValue());
-        }
-        return monitorTasques;
-    }
+		List<MonitorTascaInfo> monitorTasques = new ArrayList<>();
+		for(Map.Entry<String, MonitorTascaInfo> tasca : MonitorTasquesServiceImpl.tasques.entrySet()) {
+			monitorTasques.add(tasca.getValue());
+		}
+		return monitorTasques;
+	}
 
-    @Override
-    public MonitorTascaInfo findByCodi(String codi) {
-        return MonitorTasquesServiceImpl.tasques.get(codi);
-    }
+	@Override
+	public MonitorTascaInfo findByCodi(String codi) {
+		return MonitorTasquesServiceImpl.tasques.get(codi);
+	}
 
-    @Override
-    public void inici(String codiTasca) {
+	@Override
+	public void inici(String codiTasca) {
 
-        updateDataInici(codiTasca);
-        updateDataFi(codiTasca, true);
-        updateEstat(codiTasca, MonitorTascaEstat.EN_EXECUCIO);
-        updateProperaExecucio(codiTasca, null);
-    }
+    	updateDataInici(codiTasca);
+    	updateDataFi(codiTasca, true);
+    	updateEstat(codiTasca, MonitorTascaEstat.EN_EXECUCIO);
+    	updateProperaExecucio(codiTasca, null);
+	}
 
-    @Override
-    public void fi(String codiTasca) {
+	@Override
+	public void fi(String codiTasca) {
 
-        updateEstat(codiTasca, MonitorTascaEstat.EN_ESPERA);
-        updateDataFi(codiTasca, false);
-    }
+		updateEstat(codiTasca, MonitorTascaEstat.EN_ESPERA);
+		updateDataFi(codiTasca, false);
+	}
 
-    @Override
-    public void error(String codiTasca) {
+	@Override
+	public void error(String codiTasca) {
 
-        updateEstat(codiTasca, MonitorTascaEstat.ERROR);
-        updateDataFi(codiTasca, false);
-    }
+		updateEstat(codiTasca, MonitorTascaEstat.ERROR);
+		updateDataFi(codiTasca, false);
+	}
 }

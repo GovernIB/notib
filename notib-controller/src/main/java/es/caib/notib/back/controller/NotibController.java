@@ -3,9 +3,13 @@
  */
 package es.caib.notib.back.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import es.caib.notib.back.helper.AjaxHelper;
+import es.caib.notib.back.helper.EntitatHelper;
+import es.caib.notib.back.helper.ModalHelper;
+import es.caib.notib.back.helper.RolHelper;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.UsuariDto;
+import es.caib.notib.logic.intf.service.AplicacioService;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
@@ -21,17 +25,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.UsuariDto;
-import es.caib.notib.logic.intf.service.AplicacioService;
-import es.caib.notib.back.helper.AjaxHelper;
-import es.caib.notib.back.helper.EntitatHelper;
-import es.caib.notib.back.helper.ModalHelper;
-import es.caib.notib.back.helper.RolHelper;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -88,7 +85,7 @@ public class NotibController implements ErrorController {
 
 	@RequestMapping(value = "/desenv/usuariActual", method = RequestMethod.GET)
 	@ResponseBody
-	public UsuariDto desenvUsuariActual() { 
+	public UsuariDto desenvUsuariActual() {
 		return aplicacioService.getUsuariActual();
 	}
 

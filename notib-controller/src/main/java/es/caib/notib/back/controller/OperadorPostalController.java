@@ -1,25 +1,36 @@
 package es.caib.notib.back.controller;
 
-import es.caib.notib.logic.intf.dto.cie.OperadorPostalDto;
-import es.caib.notib.logic.intf.service.OperadorPostalService;
-import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.back.command.OperadorPostalCommand;
 import es.caib.notib.back.command.OperadorPostalFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.back.helper.RequestSessionHelper;
+import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.dto.cie.OperadorPostalDataDto;
+import es.caib.notib.logic.intf.dto.cie.OperadorPostalDto;
+import es.caib.notib.logic.intf.dto.cie.OperadorPostalTableItemDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.service.OperadorPostalService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Controlador per el mantinemnt de pagadors postals.
@@ -39,40 +50,62 @@ public class OperadorPostalController extends BaseUserController{
 	private OrganGestorService organGestorService;
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(HttpServletRequest request, Model model) {
-
-		var entitat = getEntitatActualComprovantPermisos(request);
-		var operadorPostalFiltreCommand = getFiltreCommand(request);
+	public String get(
+			HttpServletRequest request,
+			Model model) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		OperadorPostalFiltreCommand operadorPostalFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("operadorPostalFiltreCommand", operadorPostalFiltreCommand);
-		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
+		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
 		model.addAttribute("organsGestors", organsGestors);
 		return "operadorPostalList";
 	}
 	
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(HttpServletRequest request ) {
-
-		var entitat = getEntitatActualComprovantPermisos(request);
-		var organGestorActual = getOrganGestorActual(request);
-		var operadorPostalFiltreCommand = getFiltreCommand(request);
-		operadorPostalFiltreCommand.setOrganGestorId(organGestorActual != null ? organGestorActual.getId() : null) ;
-		var params = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		var pagadorsPostals = operadorPostalService.findAmbFiltrePaginat(entitat.getId(), operadorPostalFiltreCommand.asDto(), params);
-		return DatatablesHelper.getDatatableResponse(request, pagadorsPostals, "id");
+	public DatatablesResponse datatable(
+			HttpServletRequest request ) {
+		OperadorPostalFiltreCommand operadorPostalFiltreCommand = getFiltreCommand(request);
+		PaginaDto<OperadorPostalTableItemDto> pagadorsPostals = null;
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		if (organGestorActual != null) {
+			operadorPostalFiltreCommand.setOrganGestorId(organGestorActual.getId());
+		} else {
+			operadorPostalFiltreCommand.setOrganGestorId(null);
+		}
+		
+		pagadorsPostals = operadorPostalService.findAmbFiltrePaginat(
+							entitat.getId(),
+							operadorPostalFiltreCommand.asDto(),
+							DatatablesHelper.getPaginacioDtoFromRequest(request));
+		
+		return DatatablesHelper.getDatatableResponse(
+				request, 
+				pagadorsPostals, 
+				"id");
 	}
 	
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
-	public String newGet(HttpServletRequest request, Model model) {
+	public String newGet(
+			HttpServletRequest request,
+			Model model) {
 		return formGet(request, null, model);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public String post(HttpServletRequest request, OperadorPostalFiltreCommand command, Model model) {
+	public String post(	
+			HttpServletRequest request,
+			OperadorPostalFiltreCommand command,
+			Model model) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request, 
+				PAGADOR_POSTAL_FILTRE, 
+				command);
 
-		var entitat = getEntitatActualComprovantPermisos(request);
-		RequestSessionHelper.actualitzarObjecteSessio(request, PAGADOR_POSTAL_FILTRE, command);
-		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
+		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
 		model.addAttribute("organsGestors", organsGestors);
 		return "operadorPostalList";
 	}
@@ -80,60 +113,85 @@ public class OperadorPostalController extends BaseUserController{
 	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
 	public String save(HttpServletRequest request, @Valid OperadorPostalCommand operadorPostalCommand, BindingResult bindingResult, Model model) {
 
-		var entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
+			List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
 			model.addAttribute("organsGestors", organsGestors);
 			return "operadorPostalForm";
 		}
-		var msg = operadorPostalCommand.getId() != null ? "operadorpostal.controller.modificat.ok" : "operadorpostal.controller.creat.ok";
-		var dto = operadorPostalCommand.asDto();
+		String msg = operadorPostalCommand.getId() != null ? "operadorpostal.controller.modificat.ok" : "operadorpostal.controller.creat.ok";
+		OperadorPostalDataDto dto = operadorPostalCommand.asDto();
 		operadorPostalService.upsert(entitatActual.getId(), dto);
 		return getModalControllerReturnValueSuccess(request, "redirect:pagadorsPostals", msg);
 	}
 	
 	@RequestMapping(value = "/{operadorPostalId}", method = RequestMethod.GET)
-	public String formGet(HttpServletRequest request, @PathVariable Long operadorPostalId, Model model) {
-
-		var entitatActual = getEntitatActualComprovantPermisos(request);
+	public String formGet(
+			HttpServletRequest request,
+			@PathVariable Long operadorPostalId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		OperadorPostalCommand operadorPostalCommand = null;
 		OperadorPostalDto operadorPostal = null;
+		
 		if (operadorPostalId != null) {
 			operadorPostal = operadorPostalService.findById(operadorPostalId);
 			model.addAttribute(operadorPostal);
 		}
-		var operadorPostalCommand = operadorPostal != null ? OperadorPostalCommand.asCommand(operadorPostal) : new OperadorPostalCommand();
+		
+		if (operadorPostal != null)
+			operadorPostalCommand = OperadorPostalCommand.asCommand(operadorPostal);
+		else
+			operadorPostalCommand = new OperadorPostalCommand();
+		
 		model.addAttribute(operadorPostalCommand);
-		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
+		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
 		model.addAttribute("organsGestors", organsGestors);
 		return "operadorPostalForm";
 	}
 	
 	@RequestMapping(value = "/{operadorPostalId}/delete", method = RequestMethod.GET)
-	public String delete(HttpServletRequest request, @PathVariable Long operadorPostalId) {
-
+	public String delete(
+			HttpServletRequest request,
+			@PathVariable Long operadorPostalId) {
 		//EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		var url = "redirect:../../operadorPostal";
+		
 		try {
 			operadorPostalService.delete(operadorPostalId);
-			return getAjaxControllerReturnValueSuccess(request, url, "operadorpostal.controller.esborrat.ok");
 		} catch (Exception e) {
-			return getAjaxControllerReturnValueError(request, url, "operadorpostal.controller.esborrat.ora.ko");
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../operadorPostal",
+						"operadorpostal.controller.esborrat.ora.ko");
+			
 		}
+		
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../operadorPostal",
+				"operadorpostal.controller.esborrat.ok");
 	}
 
-	private OperadorPostalFiltreCommand getFiltreCommand(HttpServletRequest request) {
-
-		var operadorPostalFiltreCommand = (OperadorPostalFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, PAGADOR_POSTAL_FILTRE);
-		if (operadorPostalFiltreCommand != null) {
-			return operadorPostalFiltreCommand;
+	private OperadorPostalFiltreCommand getFiltreCommand(
+			HttpServletRequest request) {
+		OperadorPostalFiltreCommand operadorPostalFiltreCommand = (OperadorPostalFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				PAGADOR_POSTAL_FILTRE);
+		if (operadorPostalFiltreCommand == null) {
+			operadorPostalFiltreCommand = new OperadorPostalFiltreCommand();
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					PAGADOR_POSTAL_FILTRE,
+					operadorPostalFiltreCommand);
 		}
-		operadorPostalFiltreCommand = new OperadorPostalFiltreCommand();
-		RequestSessionHelper.actualitzarObjecteSessio(request, PAGADOR_POSTAL_FILTRE, operadorPostalFiltreCommand);
 		return operadorPostalFiltreCommand;
 	}
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
-		binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
+		binder.registerCustomEditor(
+				Date.class, 
+				new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
 	}
+	
 }

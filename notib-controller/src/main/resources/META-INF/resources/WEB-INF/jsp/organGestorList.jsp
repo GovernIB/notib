@@ -36,13 +36,13 @@
 					this.selectedIndex = this.name === "estat" ? 1 : 0;
 				}
 			});
+
 			$("#estat").change();
 			$('#btn-entregaCie').removeClass('active');
 			$('#entregaCieActiva').val(false);
 			$('#form-filtre').submit();
 		});
 		$('#btn-entregaCie').click(function() {
-			console.log("entrega cie list");
 			let entregaCie = !$(this).hasClass('active');
 			$('#entregaCie').val(entregaCie);
 		})
@@ -241,9 +241,9 @@
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right">
 			<c:if test="${setOficina}">
-				<a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines/LLISTA"  onClick="bloquejar()">
-							<span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
-				</a>
+			<a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines/LLISTA"  onClick="bloquejar()">
+					<span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
+			</a>
 			</c:if>
 			<a id="organ-boto-update"
 					class="btn btn-default" href="organgestor/sync/dir3"

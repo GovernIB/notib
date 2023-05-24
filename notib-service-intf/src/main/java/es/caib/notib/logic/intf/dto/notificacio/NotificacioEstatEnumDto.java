@@ -14,7 +14,6 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum NotificacioEstatEnumDto implements Serializable {
-
 	PENDENT(0, 1<<0), 		// 15, M=1				00000000000001
 	ENVIADA(1, 1<<1),		// 23, M=2				00000000000010
 	REGISTRADA(2, 1<<2),	// 24, M=4				00000000000100
@@ -30,7 +29,7 @@ public enum NotificacioEstatEnumDto implements Serializable {
 
 	private Integer numVal;
 	private Integer mask;
-
+	
 	NotificacioEstatEnumDto(int numVal, int mask) {
         this.numVal = numVal;
 		this.mask = mask;
@@ -39,7 +38,6 @@ public enum NotificacioEstatEnumDto implements Serializable {
 	public int getNumVal() {
 		return numVal;
 	}
-
 	public int getMask() {
 		return mask;
 	}

@@ -1,14 +1,13 @@
 package es.caib.notib.logic.intf.dto;
 
 public enum PermisEnum {
-
 	CONSULTA,
 	PROCESSAR,
-	NOTIFICACIO,
+	NOTIFICACIO, // Notificacions i comunicacions NO SIR
 	COMUNICACIO,
-	COMUNICACIO_SIR,
+	COMUNICACIO_SIR, // Comunicacions SIR
 	GESTIO,
-	COMUNS, // Procediments i serveis comun
+	COMUNS, // Procediments i serveis comuns
 	ADMIN;
 
 	public boolean isPermisNotCom() {

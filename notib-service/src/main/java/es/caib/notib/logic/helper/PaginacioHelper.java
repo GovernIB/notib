@@ -11,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Component;
 
@@ -54,15 +53,13 @@ public class PaginacioHelper {
 		if (ordres == null) {
 			return null;
 		}
-		Direction direccio;
-		String[] mapeig;
 		for (var ordre: ordres) {
-			direccio = OrdreDireccioDto.DESCENDENT.equals(ordre.getDireccio()) ? Sort.Direction.DESC : Sort.Direction.ASC;
+			var direccio = OrdreDireccioDto.DESCENDENT.equals(ordre.getDireccio()) ? Sort.Direction.DESC : Sort.Direction.ASC;
 			if (mapeigPropietatsOrdenacio == null) {
 				orders.add(new Order(direccio, ordre.getCamp()));
 				continue;
 			}
-			mapeig = mapeigPropietatsOrdenacio.get(ordre.getCamp());
+			var mapeig = mapeigPropietatsOrdenacio.get(ordre.getCamp());
 			if (mapeig == null) {
 				orders.add(new Order(direccio, ordre.getCamp()));
 				continue;

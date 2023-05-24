@@ -6,9 +6,7 @@ package es.caib.notib.logic.intf.dto.notificacio;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum TipusEnviamentEnumDto {
-
     NOTIFICACIO,
     COMUNICACIO,
-    COMUNICACIO_SIR;
-
+    COMUNICACIO_SIR,
 }

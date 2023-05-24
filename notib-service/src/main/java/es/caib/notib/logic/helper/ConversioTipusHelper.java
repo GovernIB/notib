@@ -3,9 +3,23 @@
  */
 package es.caib.notib.logic.helper;
 
-import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EntregaPostal;
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.intf.dto.AplicacioDto;
+import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
+import es.caib.notib.logic.intf.dto.CodiValorDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.GrupDto;
+import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
+import es.caib.notib.logic.intf.dto.NotificacioAuditDto;
+import es.caib.notib.logic.intf.dto.NotificacioEnviamentAuditDto;
+import es.caib.notib.logic.intf.dto.NotificacioEnviamentDto;
+import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.logic.intf.dto.NotificacioErrorTipusEnumDto;
+import es.caib.notib.logic.intf.dto.NotificacioEventDto;
+import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.logic.intf.dto.OficinaDto;
+import es.caib.notib.logic.intf.dto.TipusDocumentDto;
+import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatFullaDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatSobreDto;
@@ -28,7 +42,22 @@ import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.organisme.UnitatOrganitzativaDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
-import es.caib.notib.persist.entity.*;
+import es.caib.notib.persist.entity.AplicacioEntity;
+import es.caib.notib.persist.entity.CallbackEntity;
+import es.caib.notib.persist.entity.EntitatEntity;
+import es.caib.notib.persist.entity.EnviamentTableEntity;
+import es.caib.notib.persist.entity.GrupEntity;
+import es.caib.notib.persist.entity.NotificacioEntity;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.entity.NotificacioEventEntity;
+import es.caib.notib.persist.entity.NotificacioMassivaEntity;
+import es.caib.notib.persist.entity.NotificacioTableEntity;
+import es.caib.notib.persist.entity.OficinaEntity;
+import es.caib.notib.persist.entity.OrganGestorEntity;
+import es.caib.notib.persist.entity.ProcSerOrganEntity;
+import es.caib.notib.persist.entity.ProcedimentEntity;
+import es.caib.notib.persist.entity.ServeiEntity;
+import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.entity.auditoria.NotificacioAudit;
 import es.caib.notib.persist.entity.auditoria.NotificacioEnviamentAudit;
 import es.caib.notib.persist.entity.cie.EntregaPostalEntity;
@@ -36,6 +65,7 @@ import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieFormatFullaEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieFormatSobreEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
+import es.caib.notib.persist.repository.CallbackRepository;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
@@ -46,11 +76,11 @@ import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
+import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -68,49 +98,43 @@ import java.util.Set;
 public class ConversioTipusHelper {
 
 	private MapperFactory mapperFactory;
-	@Lazy
 	@Autowired
 	private CacheHelper cacheHelper;
+	@Autowired
+	private MessageHelper messageHelper;
+	@Autowired
+	private CallbackRepository callbackRepository;
 
 
 	public ConversioTipusHelper() {
-
 		mapperFactory = new DefaultMapperFactory.Builder().build();
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DateTime, Date>() {
 					public Date convert(
 							DateTime source,
 							Type<? extends Date> destinationClass,
-							MappingContext mappingContext) {
+							MappingContext context) {
 						return source.toDate();
 					}
 				});
-		
+
 		mapperFactory.classMap(EntitatEntity.class, EntitatDto.class)
-			.byDefault()
-			.customize(new EntitatEntitytoMapper())
-			.register();
-		
-//		mapperFactory.classMap(NotificacioEntity.class, NotificacioDto.class).
-//			field("notificaErrorEvent.data", "notificaErrorData").
-//			field("notificaErrorEvent.errorDescripcio", "notificaErrorDescripcio").
-//			field("organGestor.codi", "organGestor").
-//			field("organGestor.nom", "organGestorNom").
-//			exclude("destinataris").
-//			byDefault().
-//			register();
+				.byDefault()
+				.customize(new EntitatEntitytoMapper())
+				.register();
+
 		mapperFactory.classMap(NotificacioEntity.class, NotificacioInfoDto.class).
 				field("organGestor.codi", "organGestorCodi").
 				field("organGestor.nom", "organGestorNom")
 				.customize(
-				new CustomMapper<NotificacioEntity, NotificacioInfoDto>() {
-					public void mapAtoB(NotificacioEntity a, NotificacioInfoDto b, MappingContext context) {
-						DadesUsuari d = cacheHelper.findUsuariAmbCodi(a.getUsuariCodi());
-						if (d != null) {
-							b.setUsuariNom(d.getNomSencer());
-						}
-					}
-				}).byDefault().register();
+						new CustomMapper<NotificacioEntity, NotificacioInfoDto>() {
+							public void mapAtoB(NotificacioEntity a, NotificacioInfoDto b, MappingContext context) {
+								DadesUsuari d = cacheHelper.findUsuariAmbCodi(a.getUsuariCodi());
+								if (d != null)
+									b.setUsuariNom(d.getNomSencer());
+							}
+						})
+				.byDefault().register();
 
 		mapperFactory.classMap(EntregaPostalEntity.class, EntregaPostalDto.class).
 				field("domiciliViaTipus", "viaTipus").
@@ -127,7 +151,7 @@ public class ConversioTipusHelper {
 				field("domiciliComplement", "complement").
 				field("domiciliCodiPostal", "codiPostal").
 //				field("", "codiPostalNorm").
-				field("domiciliPoblacio", "poblacio").
+		field("domiciliPoblacio", "poblacio").
 				field("domiciliMunicipiCodiIne", "municipiCodi").
 				field("domiciliProvinciaCodi", "provincia").
 				field("domiciliPaisCodiIso", "paisCodi").
@@ -137,13 +161,13 @@ public class ConversioTipusHelper {
 				field("formatFulla", "formatFulla").
 				field("domiciliCie", "cie").
 //				field("", "activa").
-				byDefault().
+		byDefault().
 				register();
 		mapperFactory.classMap(NotificacioEntity.class, NotificacioDtoV2.class).
-			field("organGestor.codi", "organGestor").
-			field("organGestor.nom", "organGestorNom").
-			byDefault().
-			register();
+				field("organGestor.codi", "organGestor").
+				field("organGestor.nom", "organGestorNom").
+				byDefault().
+				register();
 
 		mapperFactory.classMap(NotificacioEntity.class, NotificacioDatabaseDto.class).
 				field("organGestor.codi", "organGestorCodi").
@@ -190,9 +214,9 @@ public class ConversioTipusHelper {
 				register();
 
 		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDto.class).
-			customize(new NotificacioEnviamentEntitytoMapper()).
-			byDefault().
-			register();
+				customize(new NotificacioEnviamentEntitytoMapper()).
+				byDefault().
+				register();
 
 		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDatatableDto.class).
 				field("notificacio.estat", "notificacioEstat").
@@ -211,49 +235,49 @@ public class ConversioTipusHelper {
 				register();
 
 		mapperFactory.classMap(AplicacioEntity.class, AplicacioDto.class).
-			field("entitat.id", "entitatId").
-			byDefault().
-			register();
-		
+				field("entitat.id", "entitatId").
+				byDefault().
+				register();
+
 		mapperFactory.classMap(UsuariEntity.class, UsuariDto.class).
-			customize(new UsuariEntitytoMapper()).
-			byDefault().
-			register();
-		
+				customize(new UsuariEntitytoMapper()).
+				byDefault().
+				register();
+
 		mapperFactory.classMap(OrganGestorEntity.class, OrganGestorDto.class).
-			field("entitat.id", "entitatId").
-			field("entitat.nom", "entitatNom").
-			field("entitat.oficina", "oficinaNom").
-			field("oficina", "oficina.codi").
-			field("oficinaNom", "oficina.nom")
-			.customize(
-				new CustomMapper<OrganGestorEntity, OrganGestorDto>() {
-					public void mapAtoB(OrganGestorEntity a, OrganGestorDto b, MappingContext context) {
-						// add your custom mapping code here
-						b.setEntregaCieActiva(a.getEntregaCie() != null);
-						if (a.getEntregaCie() != null) {
-							b.setOperadorPostalId(a.getEntregaCie().getOperadorPostalId());
-							b.setCieId(a.getEntregaCie().getCieId());
-						}
-					}
-				})
-			.byDefault()
-			.register();
-		
+				field("entitat.id", "entitatId").
+				field("entitat.nom", "entitatNom").
+				field("entitat.oficina", "oficinaNom").
+				field("oficina", "oficina.codi").
+				field("oficinaNom", "oficina.nom")
+				.customize(
+						new CustomMapper<OrganGestorEntity, OrganGestorDto>() {
+							public void mapAtoB(OrganGestorEntity a, OrganGestorDto b, MappingContext context) {
+								// add your custom mapping code here
+								b.setEntregaCieActiva(a.getEntregaCie() != null);
+								if (a.getEntregaCie() != null) {
+									b.setOperadorPostalId(a.getEntregaCie().getOperadorPostalId());
+									b.setCieId(a.getEntregaCie().getCieId());
+								}
+							}
+						})
+				.byDefault()
+				.register();
+
 		mapperFactory.classMap(ProcedimentEntity.class, ProcSerDto.class).
-			field("organGestor.codi", "organGestor")
+				field("organGestor.codi", "organGestor")
 				.field("organGestor.nom", "organGestorNom")
 				.customize(
-				new CustomMapper<ProcedimentEntity, ProcSerDto>() {
-					public void mapAtoB(ProcedimentEntity a, ProcSerDto b, MappingContext context) {
-						// add your custom mapping code here
-						b.setEntregaCieActiva(a.getEntregaCie() != null);
-						if (a.getEntregaCie() != null) {
-							b.setOperadorPostalId(a.getEntregaCie().getOperadorPostalId());
-							b.setCieId(a.getEntregaCie().getCieId());
-						}
-					}
-				})
+						new CustomMapper<ProcedimentEntity, ProcSerDto>() {
+							public void mapAtoB(ProcedimentEntity a, ProcSerDto b, MappingContext context) {
+								// add your custom mapping code here
+								b.setEntregaCieActiva(a.getEntregaCie() != null);
+								if (a.getEntregaCie() != null) {
+									b.setOperadorPostalId(a.getEntregaCie().getOperadorPostalId());
+									b.setCieId(a.getEntregaCie().getCieId());
+								}
+							}
+						})
 				.byDefault()
 				.register();
 
@@ -274,60 +298,60 @@ public class ConversioTipusHelper {
 				.byDefault()
 				.register();
 
-		mapperFactory.classMap(GrupEntity.class, GrupDto.class).
-			field("entitat.id", "entitatId").
-			field("organGestor.id", "organGestorId").
-			field("organGestor.codi", "organGestorCodi").
-			byDefault().
-			register();
+		mapperFactory.classMap(GrupEntity.class, GrupDto.class)
+				.field("entitat.id", "entitatId")
+				.field("organGestor.id", "organGestorId")
+				.field("organGestor.codi", "organGestorCodi")
+				.byDefault()
+				.register();
 
-		mapperFactory.classMap(PagadorCieEntity.class, CieDto.class).
-			field("entitat.id", "entitatId").
-			field("organGestor.id", "organGestorId")
-			.field("organGestor.codi", "organismePagadorCodi")
-			.byDefault().register();
+		mapperFactory.classMap(PagadorCieEntity.class, CieDto.class)
+				.field("entitat.id", "entitatId")
+				.field("organGestor.id", "organGestorId")
+				.field("organGestor.codi", "organismePagadorCodi")
+				.byDefault().register();
 
 		mapperFactory.classMap(PagadorCieEntity.class, CieTableItemDto.class)
-			.customize(
-				new CustomMapper<PagadorCieEntity, CieTableItemDto>() {
-					public void mapAtoB(PagadorCieEntity a, CieTableItemDto b, MappingContext context) {
-						b.setOrganismePagador(a.getOrganGestor() != null ? a.getOrganGestor().getCodi() + " - " + a.getOrganGestor().getNom() : "ORGAN GESTOR NO TROBAT");
-					}
-				})
-			.byDefault()
-			.register();
+				.customize(
+						new CustomMapper<PagadorCieEntity, CieTableItemDto>() {
+							public void mapAtoB(PagadorCieEntity a, CieTableItemDto b, MappingContext context) {
+								b.setOrganismePagador(a.getOrganGestor() != null ? a.getOrganGestor().getCodi() + " - " + a.getOrganGestor().getNom() : "ORGAN GESTOR NO TROBAT");
+							}
+						})
+				.byDefault()
+				.register();
 
 		mapperFactory.classMap(PagadorPostalEntity.class, OperadorPostalDto.class)
 				.field("entitat.id", "entitatId")
-				.field("organGestor.codi", "organismePagadorCodi").byDefault().register();
+				.field("organGestor.codi", "organismePagadorCodi")
+				.byDefault().register();
 
 		mapperFactory.classMap(PagadorPostalEntity.class, OperadorPostalTableItemDto.class)
-			.customize(
-				new CustomMapper<PagadorPostalEntity, OperadorPostalTableItemDto>() {
-					public void mapAtoB(PagadorPostalEntity a, OperadorPostalTableItemDto b, MappingContext context) {
-						b.setOrganismePagador(a.getOrganGestor() != null ? a.getOrganGestor().getCodi() + " - " + a.getOrganGestor().getNom() : "ORGAN GESTOR NO TROBAT");
-
-					}
-				})
-			.byDefault()
-			.register();
+				.customize(
+						new CustomMapper<PagadorPostalEntity, OperadorPostalTableItemDto>() {
+							public void mapAtoB(PagadorPostalEntity a, OperadorPostalTableItemDto b, MappingContext context) {
+								b.setOrganismePagador(a.getOrganGestor() != null ? a.getOrganGestor().getCodi() + " - " + a.getOrganGestor().getNom() : "ORGAN GESTOR NO TROBAT");
+							}
+						})
+				.byDefault()
+				.register();
 
 		mapperFactory.classMap(PagadorCieFormatFullaEntity.class, CieFormatFullaDto.class).
-			field("pagadorCie.id", "pagadorCieId").
-			byDefault().
-			register();
-		
+				field("pagadorCie.id", "pagadorCieId").
+				byDefault().
+				register();
+
 		mapperFactory.classMap(PagadorCieFormatSobreEntity.class, CieFormatSobreDto.class).
-			field("pagadorCie.id", "pagadorCieId").
-			byDefault().
-			register();
+				field("pagadorCie.id", "pagadorCieId").
+				byDefault().
+				register();
 		mapperFactory.classMap(PagadorPostalEntity.class, IdentificadorTextDto.class)
 				.customize(
-				new CustomMapper<PagadorPostalEntity, IdentificadorTextDto>() {
-					public void mapAtoB(PagadorPostalEntity a, IdentificadorTextDto b, MappingContext context) {
-						b.setText(a.getNom() + " - " + a.getContracteNum());
-					}
-				})
+						new CustomMapper<PagadorPostalEntity, IdentificadorTextDto>() {
+							public void mapAtoB(PagadorPostalEntity a, IdentificadorTextDto b, MappingContext context) {
+								b.setText(a.getNom() + " - " + a.getContracteNum());
+							}
+						})
 				.byDefault()
 				.register();
 		mapperFactory.classMap(PagadorCieEntity.class, IdentificadorTextDto.class)
@@ -341,26 +365,27 @@ public class ConversioTipusHelper {
 				.byDefault()
 				.register();
 		mapperFactory.classMap(NodeDir3.class, OrganGestorDto.class).
-			field("denominacio", "nom").
-			field("tieneOficinaSir", "sir").
-			byDefault().
-			register();
+				field("denominacio", "nomEs").
+				field("denominacionCooficial", "nom").
+				field("tieneOficinaSir", "sir").
+				byDefault().
+				register();
 
 		mapperFactory.classMap(OrganismeDto.class, OrganGestorDto.class).
 				field("pare", "codiPare").
 				byDefault().
 				register();
-		
+
 		mapperFactory.classMap(ObjetoDirectorio.class, OrganGestorDto.class).
-			field("denominacio", "nom").
-			byDefault().
-			register();
-		
+				field("denominacio", "nom").
+				byDefault().
+				register();
+
 		mapperFactory.classMap(CodiValor.class, CodiValorDto.class).
-			field("id", "codi").
-			field("descripcio", "valor").
-			byDefault().
-			register();
+				field("id", "codi").
+				field("descripcio", "valor").
+				byDefault().
+				register();
 		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDtoV2.class).
 				field("notificacio.id", "notificacioId").
 				customize(new NotificacioEnviamentEntitytoDtoV2Mapper()).
@@ -403,14 +428,26 @@ public class ConversioTipusHelper {
 
 		mapperFactory.classMap(ProcSerOrganEntity.class, ProcSerOrganDto.class).
 //				field("procser", "procSer").
-				byDefault().
+		byDefault().
 				register();
 		mapperFactory.classMap(OrganGestorEntity.class, UnitatOrganitzativaDto.class)
 				.customize(
 						new CustomMapper<OrganGestorEntity, UnitatOrganitzativaDto>() {
 							public void mapAtoB(OrganGestorEntity a, UnitatOrganitzativaDto b, MappingContext context) {
 								// add your custom mapping code here
-								b.setDenominacio(a.getNom());
+								b.setDenominacio(a.getNomEs());
+								b.setDenominacioCooficial(a.getNom());
+							}
+						})
+				.byDefault()
+				.register();
+		mapperFactory.classMap(NodeDir3.class, UnitatOrganitzativaDto.class)
+				.customize(
+						new CustomMapper<NodeDir3, UnitatOrganitzativaDto>() {
+							public void mapAtoB(NodeDir3 a, UnitatOrganitzativaDto b, MappingContext context) {
+								// add your custom mapping code here
+								b.setDenominacio(a.getDenominacio());
+								b.setDenominacioCooficial(a.getDenominacionCooficial());
 							}
 						})
 				.byDefault()
@@ -420,30 +457,41 @@ public class ConversioTipusHelper {
 				field("organGestor.codi", "organCodi").
 				byDefault().
 				register();
+
+		mapperFactory.classMap(NotificacioEventEntity.class, NotificacioEventDto.class).
+				field("enviament.id", "enviamentId").
+				byDefault().
+				register();
 		defineConverters();
 	}
 
 	private void defineConverters(){
-
-		var converterFactory = mapperFactory.getConverterFactory();
+		ConverterFactory converterFactory = mapperFactory.getConverterFactory();
 		converterFactory.registerConverter(new StringToOrganGestorEstatEnum());
 	}
 
 	public <T> T convertir(Object source, Class<T> targetType) {
-		return source != null ? getMapperFacade().map(source, targetType) : null;
+		if (source == null)
+			return null;
+		return getMapperFacade().map(source, targetType);
 	}
-
 	public <T> List<T> convertirList(List<?> items, Class<T> targetType) {
-		return items != null ? getMapperFacade().mapAsList(items, targetType) : null;
+		if (items == null)
+			return null;
+		return getMapperFacade().mapAsList(items, targetType);
 	}
 	public <T> Set<T> convertirSet(Set<?> items, Class<T> targetType) {
-		return items != null ? getMapperFacade().mapAsSet(items, targetType) : null;
+		if (items == null)
+			return null;
+		return getMapperFacade().mapAsSet(items, targetType);
 	}
 
 	public class UsuariEntitytoMapper extends CustomMapper<UsuariEntity, UsuariDto> {
 		@Override
-		public void mapAtoB(UsuariEntity usuariEntity, UsuariDto usuariDto, MappingContext context) {
-
+		public void mapAtoB(
+				UsuariEntity usuariEntity,
+				UsuariDto usuariDto,
+				MappingContext context) {
 			if (usuariEntity.getNomSencer() != null && !usuariEntity.getNomSencer().isEmpty() && usuariEntity.getNomSencer().trim().length() > 0) {
 				usuariDto.setNom(usuariEntity.getNomSencer());
 			} else if (usuariEntity.getLlinatges() != null && !usuariEntity.getLlinatges().isEmpty() && usuariEntity.getLlinatges().trim().length() > 0) {
@@ -451,13 +499,13 @@ public class ConversioTipusHelper {
 			}
 		}
 	}
-	
+
 	public class EntitatEntitytoMapper extends CustomMapper<EntitatEntity, EntitatDto> {
 		@Override
 		public void mapAtoB(EntitatEntity entitatEntity, EntitatDto entitatDto, MappingContext context) {
 
 			if (entitatEntity.getTipusDocDefault() != null) {
-				var tipusDocumentDto = new TipusDocumentDto();
+				TipusDocumentDto tipusDocumentDto = new TipusDocumentDto();
 				tipusDocumentDto.setEntitat(entitatEntity.getId());
 				tipusDocumentDto.setTipusDocEnum(entitatEntity.getTipusDocDefault());
 				entitatDto.setTipusDocDefault(tipusDocumentDto);
@@ -469,23 +517,26 @@ public class ConversioTipusHelper {
 			}
 		}
 	}
-	
+
 	public class NotificacioEnviamentEntitytoMapper extends CustomMapper<NotificacioEnviamentEntity, NotificacioEnviamentDto> {
 		@Override
-		public void mapAtoB(NotificacioEnviamentEntity notificacioEnviamentEntity, NotificacioEnviamentDto notificacioEnviamentDto, MappingContext context) {
-
-			if (!notificacioEnviamentEntity.isNotificaError()) {
-				return;
-			}
-			try {
-				NotificacioEventEntity event = notificacioEnviamentEntity.getNotificacioErrorEvent();
-				if (event == null) {
-					return;
+		public void mapAtoB(
+				NotificacioEnviamentEntity notificacioEnviamentEntity,
+				NotificacioEnviamentDto notificacioEnviamentDto,
+				MappingContext context) {
+			if (notificacioEnviamentEntity.isNotificaError()) {
+				try {
+					NotificacioEventEntity event = notificacioEnviamentEntity.getNotificacioErrorEvent();
+					if (event != null) {
+						notificacioEnviamentDto.setNotificaErrorData(event.getData());
+						notificacioEnviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
+						if (NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT.equals(event.getTipus()) || NotificacioEventTipusEnumDto.SIR_ENVIAMENT.equals(event.getTipus())) {
+							notificacioEnviamentDto.getNotificacio().setNotificaErrorTipus(NotificacioErrorTipusEnumDto.ERROR_REGISTRE);
+						}
+					}
+				} catch (Exception ex) {
+					log.error("[ConversioTipusHelper.NotificacioEnviamentDto] event no trobat.");
 				}
-				notificacioEnviamentDto.setNotificaErrorData(event.getData());
-				notificacioEnviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
-			} catch (Exception ex) {
-				log.error("[ConversioTipusHelper.NotificacioEnviamentDto] event no trobat.");
 			}
 		}
 	}
@@ -496,90 +547,107 @@ public class ConversioTipusHelper {
 
 			dto.setEstatColor(entity.getNotificaEstat().getColor());
 			dto.setEstatIcona(entity.getNotificaEstat().getIcona());
-			if (!entity.isNotificaError()) {
+//			if (!entity.isNotificaError()) {
+//				return;
+//			}
+			NotificacioEventEntity event = entity.getNotificacioErrorEvent();
+			if (event != null) {
+				dto.setNotificacioErrorData(event.getData());
+				dto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
+				if (event.getFiReintents()) {
+					String msg = messageHelper.getMessage("notificacio.event.fi.reintents");
+					String tipus = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + event.getTipus());
+					dto.setFiReintents(event.getFiReintents());
+					dto.setFiReintentsDesc(msg + " -> " + tipus);
+				}
+			}
+			CallbackEntity callback = callbackRepository.findByEnviamentIdAndEstat(dto.getId(), CallbackEstatEnumDto.ERROR);
+			if (callback == null) {
 				return;
 			}
-			var event = entity.getNotificacioErrorEvent();
-			if (event == null) {
-				return;
-			}
-			dto.setNotificacioErrorData(event.getData());
-			dto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
+			dto.setCallbackFiReintents(true);
+			dto.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
 		}
 	}
 	public class NotificacioEnviamentEntitytoInfoMapper extends CustomMapper<NotificacioEnviamentEntity, EnviamentInfoDto> {
 		@Override
 		public void mapAtoB(NotificacioEnviamentEntity notificacioEnviamentEntity, EnviamentInfoDto notificacioEnviamentDto, MappingContext context) {
 
-			if (!notificacioEnviamentEntity.isNotificaError()) {
-				return;
+			if (notificacioEnviamentEntity.isNotificaError()) {
+				NotificacioEventEntity event = notificacioEnviamentEntity.getNotificacioErrorEvent();
+				if (event != null) {
+					notificacioEnviamentDto.setNotificacioErrorData(event.getData());
+					notificacioEnviamentDto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
+				}
 			}
-			var event = notificacioEnviamentEntity.getNotificacioErrorEvent();
-			if (event == null) {
-				return;
+			CallbackEntity count = callbackRepository.findByEnviamentIdAndEstat(notificacioEnviamentEntity.getId(), CallbackEstatEnumDto.ERROR);
+			if (count != null) {
+				notificacioEnviamentDto.setCallbackFiReintents(true);
+				notificacioEnviamentDto.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
 			}
-			notificacioEnviamentDto.setNotificacioErrorData(event.getData());
-			notificacioEnviamentDto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
 		}
 	}
 	public class NotificacioEnviamentEntitytoDtoV2Mapper extends CustomMapper<NotificacioEnviamentEntity, NotificacioEnviamentDtoV2> {
 		@Override
-		public void mapAtoB(NotificacioEnviamentEntity notificacioEnviamentEntity, NotificacioEnviamentDtoV2 notificacioEnviamentDto, MappingContext context) {
-
-			var errorEvent = notificacioEnviamentEntity.getNotificacioErrorEvent();
-			var notificacio = notificacioEnviamentEntity.getNotificacio();
-			var enviant = errorEvent == null && notificacio.getRegistreEnviamentIntent() == 0 && notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT);
-			notificacioEnviamentDto.setEnviant(enviant);
+		public void mapAtoB(
+				NotificacioEnviamentEntity notificacioEnviamentEntity,
+				NotificacioEnviamentDtoV2 notificacioEnviamentDto,
+				MappingContext context) {
+			NotificacioEventEntity errorEvent = notificacioEnviamentEntity.getNotificacioErrorEvent();
+			NotificacioEntity notificacio = notificacioEnviamentEntity.getNotificacio();
+			if (errorEvent == null && notificacio.getRegistreEnviamentIntent() == 0 &&
+					notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)) {
+				notificacioEnviamentDto.setEnviant(true);
+			} else {
+				notificacioEnviamentDto.setEnviant(false);
+			}
 		}
 	}
 
 	public class EnviamentTableItemMapper extends CustomMapper<EnviamentTableEntity, NotEnviamentTableItemDto> {
 		@Override
-		public void mapAtoB(EnviamentTableEntity enviamentTableEntity, NotEnviamentTableItemDto notEnviamentTableItemDto, MappingContext context) {
-
-			if (Strings.isNullOrEmpty(enviamentTableEntity.getDestinataris())) {
-				return;
+		public void mapAtoB(
+				EnviamentTableEntity enviamentTableEntity,
+				NotEnviamentTableItemDto notEnviamentTableItemDto,
+				MappingContext context) {
+			if (enviamentTableEntity.getDestinataris() != null && !enviamentTableEntity.getDestinataris().isEmpty()) {
+				String[] destinataris = enviamentTableEntity.getDestinataris().split("<br>");
+				if (destinataris.length > 0 && !destinataris[0].isEmpty() && destinataris[0].contains(" - ")) {
+					String destinatarisFormat = "";
+					for(String destinatari: destinataris) {
+						destinatarisFormat += getNomLlinatgeNif(destinatari) + "<br>";
+					}
+					if (destinatarisFormat.length() > 4)
+						destinatarisFormat = destinatarisFormat.substring(0, destinatarisFormat.length() - 4);
+					enviamentTableEntity.setDestinataris(destinatarisFormat);
+					notEnviamentTableItemDto.setDestinataris(destinatarisFormat);
+				}
 			}
-			var destinataris = enviamentTableEntity.getDestinataris().split("<br>");
-			if (destinataris.length == 0 || destinataris[0].isEmpty() || !destinataris[0].contains(" - ")) {
-				return;
-			}
-			var destinatarisFormat = "";
-			for(var destinatari: destinataris) {
-				destinatarisFormat += getNomLlinatgeNif(destinatari) + "<br>";
-			}
-			if (destinatarisFormat.length() > 4) {
-				destinatarisFormat = destinatarisFormat.substring(0, destinatarisFormat.length() - 4);
-			}
-			enviamentTableEntity.setDestinataris(destinatarisFormat);
-			notEnviamentTableItemDto.setDestinataris(destinatarisFormat);
-
 		}
 
 		private String getNomLlinatgeNif(String destinatari) {
-
-			var idxSeparador = destinatari.indexOf(" - ");
-			if (idxSeparador == -1) {
-				return destinatari;
-			}
-			var destinatariFormat = destinatari;
-			String nif = null;
-			if (idxSeparador > 0) {
-				nif = destinatari.substring(0, idxSeparador);
-			}
-			if (destinatari.length() < idxSeparador + 4) {
-				return nif;
-			}
-			var llinatgeNom = destinatari.substring(idxSeparador + 3, destinatari.length() - 1);
-			var nomLlinatge = llinatgeNom;
-			if (llinatgeNom.contains(", ")) {
-				idxSeparador = llinatgeNom.indexOf(", ");
-				if (idxSeparador != -1) {
-					nomLlinatge = idxSeparador == 0 ? llinatgeNom.substring(2)
-								: llinatgeNom.substring(idxSeparador + 2) + " " + llinatgeNom.substring(0, idxSeparador);
+			int idxSeparador = destinatari.indexOf(" - ");
+			String destinatariFormat = destinatari;
+			if (idxSeparador != -1) {
+				String nif = null;
+				if (idxSeparador > 0)
+					nif = destinatari.substring(0, idxSeparador);
+				if (destinatari.length() < idxSeparador + 4)
+					return nif;
+				String llinatgeNom = destinatari.substring(idxSeparador + 3, destinatari.length() - 1);
+				String nomLlinatge = llinatgeNom;
+				if (llinatgeNom.contains(", ")) {
+					idxSeparador = llinatgeNom.indexOf(", ");
+					if (idxSeparador != -1) {
+						if (idxSeparador == 0) {
+							nomLlinatge = llinatgeNom.substring(2);
+						} else {
+							nomLlinatge = llinatgeNom.substring(idxSeparador + 2) + " " + llinatgeNom.substring(0, idxSeparador);
+						}
+					}
 				}
+				destinatariFormat = nomLlinatge + (nif != null ? " (" + nif + ")" : "");
 			}
-			destinatariFormat = nomLlinatge + (nif != null ? " (" + nif + ")" : "");
 			return destinatariFormat;
 		}
 	}
@@ -587,7 +655,7 @@ public class ConversioTipusHelper {
 	public static class StringToOrganGestorEstatEnum extends CustomConverter<String, OrganGestorEstatEnum> {
 
 		@Override
-		public OrganGestorEstatEnum convert(String source, Type<? extends OrganGestorEstatEnum> destinationType, MappingContext mappingContext) {
+		public OrganGestorEstatEnum convert(String source, Type<? extends OrganGestorEstatEnum> destinationType, MappingContext context) {
 			if (source == null){
 				return OrganGestorEstatEnum.E;
 			}
@@ -601,6 +669,7 @@ public class ConversioTipusHelper {
 			}
 		}
 	}
+
 	private MapperFacade getMapperFacade() {
 		return mapperFactory.getMapperFacade();
 	}

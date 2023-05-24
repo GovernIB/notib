@@ -2,7 +2,6 @@ package es.caib.notib.logic.service;
 
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
-import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.TipusEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
@@ -22,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -52,7 +50,7 @@ public class OrganGestorServiceIT extends BaseServiceTestV2 {
 	public void setUp() throws Exception {
 		addConfig("es.caib.notib.metriques.generar", "false");
 		addConfig("es.caib.notib.plugin.unitats.dir3.protocol", "REST");
-		addConfig("es.caib.notib.plugin.unitats.fitxer", "");
+//		addConfig("es.caib.notib.plugin.unitats.fitxer", "");
 		configureMockUnitatsOrganitzativesPlugin();
 
 		organVigent = new OrganGestorDto();

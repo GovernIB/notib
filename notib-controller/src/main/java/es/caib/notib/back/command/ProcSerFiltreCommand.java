@@ -1,12 +1,11 @@
 package es.caib.notib.back.command;
 
-import es.caib.notib.logic.intf.dto.procediment.ProcedimentEstat;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
-import es.caib.notib.logic.intf.dto.procediment.ProcSerFiltreDto;
 import es.caib.notib.back.helper.ConversioTipusHelper;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerFiltreDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcedimentEstat;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Command per al manteniment del filtre de procediments.
@@ -25,8 +24,10 @@ public class ProcSerFiltreCommand {
 	private boolean actiu;
 	private ProcedimentEstat estat;
 	
+	
 	public static ProcSerFiltreCommand asCommand(ProcSerFiltreDto dto) {
-		return dto != null ? ConversioTipusHelper.convertir(dto, ProcSerFiltreCommand.class) : null;
+
+		return dto != null ? ConversioTipusHelper.convertir(dto, ProcSerFiltreCommand.class ) : null;
 	}
 
 	public ProcSerFiltreDto asDto() {

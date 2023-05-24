@@ -3,14 +3,18 @@
  */
 package es.caib.notib.back.controller;
 
-import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
-import es.caib.notib.logic.intf.service.EntitatService;
-import es.caib.notib.logic.intf.service.UsuariAplicacioService;
 import es.caib.notib.back.command.AplicacioCommand;
 import es.caib.notib.back.command.AplicacioFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.back.helper.RequestSessionHelper;
+import es.caib.notib.logic.intf.dto.AplicacioDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.EntitatService;
+import es.caib.notib.logic.intf.service.UsuariAplicacioService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,25 +27,31 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controlador per al manteniment d'aplicacions.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Controller
 @RequestMapping("/entitat/{entitatId}/aplicacio")
 public class AplicacioController extends BaseController {
 
-	@Autowired private UsuariAplicacioService usuariAplicacioService;
-	@Autowired private EntitatService entitatService;
+	@Autowired
+	private UsuariAplicacioService usuariAplicacioService;
+	@Autowired
+	private AplicacioService aplicacioService;
+	@Autowired
+	private EntitatService entitatService;
 
 	private final static String APLICACIO_FILTRE = "aplicacio_filtre";
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, @PathVariable Long entitatId, Model model) {
 
-		var command = getFiltreCommand(request);
+		AplicacioFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute("aplicacioFiltreCommand", command);
 		model.addAttribute("entitat", entitatService.findById(entitatId));
 		return "aplicacioList";
@@ -61,19 +71,20 @@ public class AplicacioController extends BaseController {
 	public DatatablesResponse datatable(HttpServletRequest request, @PathVariable Long entitatId) {
 
 
-		var params = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		PaginacioParamsDto params = DatatablesHelper.getPaginacioDtoFromRequest(request);
 		prepararFiltres(request, params);
-		var apps = usuariAplicacioService.findPaginatByEntitat(entitatId, params);
+		PaginaDto<AplicacioDto> apps = usuariAplicacioService.findPaginatByEntitat(entitatId, params);
 		return DatatablesHelper.getDatatableResponse(request, apps);
 	}
 
 	private void prepararFiltres(HttpServletRequest request, PaginacioParamsDto params) {
 
-		var command = getFiltreCommand(request);
+		List<PaginacioParamsDto.FiltreDto> filtres = new ArrayList<>();
+		AplicacioFiltreCommand command = getFiltreCommand(request);
 		if (command == null) {
 			return;
 		}
-		params.setFiltres(new ArrayList<>());
+		params.setFiltres(new ArrayList<PaginacioParamsDto.FiltreDto>());
 		params.afegirFiltre("codiUsuari", command.getCodiUsuari());
 		params.afegirFiltre("callbackUrl", command.getCallbackUrl());
 		params.afegirFiltre("activa", command.getActiva());
@@ -88,53 +99,89 @@ public class AplicacioController extends BaseController {
 	}
 
 	@RequestMapping(value = "/{aplicacioId}", method = RequestMethod.GET)
-	public String update(HttpServletRequest request, Model model, @PathVariable Long entitatId, @PathVariable Long aplicacioId) {
-
-		var dto = aplicacioId != null ? usuariAplicacioService.findByEntitatAndId(entitatId, aplicacioId) : null;
-		model.addAttribute(dto != null ? AplicacioCommand.asCommand(dto) : new AplicacioCommand());
-		model.addAttribute("entitat", entitatService.findById(entitatId));
+	public String update(
+			HttpServletRequest request,
+			Model model,
+			@PathVariable Long entitatId,
+			@PathVariable Long aplicacioId) {
+		AplicacioDto dto = null;
+		if (aplicacioId != null) {
+			dto = usuariAplicacioService.findByEntitatAndId(entitatId, aplicacioId);
+		}
+		if (dto != null) {
+			model.addAttribute(AplicacioCommand.asCommand(dto));
+		} else {
+			model.addAttribute(new AplicacioCommand());
+		}
+		model.addAttribute(
+				"entitat", 
+				entitatService.findById(entitatId));
 		return "aplicacioForm";
 	}
 
 	@RequestMapping(value = "newOrModify", method = RequestMethod.POST)
 	public String save(HttpServletRequest request, Model model, @PathVariable Long entitatId, @Valid AplicacioCommand command, BindingResult bindingResult) {
 
-		if (bindingResult.hasErrors()) {model.addAttribute("entitat", entitatService.findById(entitatId));
-			return "aplicacioForm";
+		String redirect = "redirect:aplicacio";
+		try {
+			if (bindingResult.hasErrors()) {
+				model.addAttribute("entitat", entitatService.findById(entitatId));
+				return "aplicacioForm";
+			}
+			AplicacioDto aplicacio = AplicacioCommand.asDto(command);
+			if (!aplicacioService.existeixUsuariNotib(aplicacio.getUsuariCodi())) {
+				aplicacioService.crearUsuari(aplicacio.getUsuariCodi());
+			}
+			if (command.getId() == null) {
+				usuariAplicacioService.create(aplicacio);
+				return getModalControllerReturnValueSuccess(request, redirect, "aplicacio.controller.creada.ok");
+			}
+			usuariAplicacioService.update(aplicacio);
+			return getModalControllerReturnValueSuccess(request, redirect, "aplicacio.controller.modificada.ok");
+		} catch (Exception ex) {
+			String msg = "Error creant l'aplicació d'usari";
+			log.error(msg, ex);
+			return getModalControllerReturnValueError(request, redirect, "aplicacio.controller.upsert.error");
 		}
-		var url = "redirect:aplicacio";
-		var msg = command.getId() == null ? "aplicacio.controller.creada.ok" : "aplicacio.controller.modificada.ok";
-		if (command.getId() == null) {
-			usuariAplicacioService.create(AplicacioCommand.asDto(command));
-			return getModalControllerReturnValueSuccess(request, url, msg);
-		}
-		usuariAplicacioService.update(AplicacioCommand.asDto(command));
-		return getModalControllerReturnValueSuccess(request, url, msg);
 	}
 
 	@RequestMapping(value = "/{aplicacioId}/delete", method = RequestMethod.GET)
-	public String delete(HttpServletRequest request, Model model, @PathVariable Long entitatId, @PathVariable Long aplicacioId) {
-
+	public String delete(
+			HttpServletRequest request,
+			Model model,
+			@PathVariable Long entitatId,
+			@PathVariable Long aplicacioId) {
 		usuariAplicacioService.delete(aplicacioId, entitatId);
-		return getAjaxControllerReturnValueSuccess(request, "redirect:aplicacio", "aplicacio.controller.esborrada.ok");
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:aplicacio",
+				"aplicacio.controller.esborrada.ok");
 	}
 	
 	@RequestMapping(value = "/{aplicacioId}/enable", method = RequestMethod.GET)
-	public String enable(HttpServletRequest request, @PathVariable Long aplicacioId) {
-
+	public String enable(
+			HttpServletRequest request,
+			@PathVariable Long aplicacioId) {
 		usuariAplicacioService.updateActiva(aplicacioId, true);
-		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "aplicacio.controller.activada.ok");
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../entitat",
+				"aplicacio.controller.activada.ok");
 	}
 	@RequestMapping(value = "/{aplicacioId}/disable", method = RequestMethod.GET)
-	public String disable(HttpServletRequest request, @PathVariable Long aplicacioId) {
-
+	public String disable(
+			HttpServletRequest request,
+			@PathVariable Long aplicacioId) {
 		usuariAplicacioService.updateActiva(aplicacioId, false);
-		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "aplicacio.controller.desactivada.ok");
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../entitat",
+				"aplicacio.controller.desactivada.ok");
 	}
 
 	private AplicacioFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
-		var command = (AplicacioFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, APLICACIO_FILTRE);
+		AplicacioFiltreCommand command = (AplicacioFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, APLICACIO_FILTRE);
 		if (command != null) {
 			return command;
 		}

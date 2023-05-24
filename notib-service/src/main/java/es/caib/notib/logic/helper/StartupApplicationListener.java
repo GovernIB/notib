@@ -2,6 +2,7 @@ package es.caib.notib.logic.helper;
 
 import es.caib.notib.logic.intf.service.ConfigService;
 import es.caib.notib.logic.intf.service.NotificacioService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.persist.repository.ProcessosInicialsRepository;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +27,12 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 
     @Autowired
     private NotificacioService notificacioService;
-
     @Autowired
     private ConfigService configService;
-
     @Autowired
     private ProcessosInicialsRepository processosInicialsRepository;
-//    @Autowired
-//    private NotificacioTableHelper notificacioTableHelper;
+    @Autowired
+    private OrganGestorService organService;
 
     public static int counter = 0;
 
@@ -42,11 +41,11 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     @Synchronized
     @Transactional
     @Override public void onApplicationEvent(ContextRefreshedEvent event) {
-
-        log.info("Executant processos inicials. Counter: " + counter++);
-        // TODO:
-        addCustomAuthentication();
+// TODO: Executar processos inicials
+//        log.info("Executant processos inicials. Counter: " + counter++);
+//        addCustomAuthentication();
 //        try {
+//
 //            List<ProcesosInicialsEntity> processos = processosInicialsRepository.findProcesosInicialsEntityByInitTrue();
 //            for (ProcesosInicialsEntity proces : processos) {
 //                log.info("Executant procés inicial: {}",  proces.getCodi());
@@ -57,8 +56,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 //                    case PROPIETATS_CONFIG_ENTITATS:
 //                        configService.crearPropietatsConfigPerEntitats();
 //                        break;
-//                    case ACTUALITZAR_NOT_NOTIFICACIO_TABLE:
-//                        notificacioTableHelper.actualitzarTaula();
+//                    case SINCRONITZAR_ORGANS_NOMS_MULTIDIOMA:
+//                        organService.sincronitzarOrganNomMultidioma();
 //                    default:
 //                        log.error("Procés inicial no definit");
 //                        break;
@@ -69,13 +68,13 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 //        } catch (Exception ex) {
 //            log.error("Errror executant els processos inicials", ex);
 //        }
-        restoreAuthentication();
+//        restoreAuthentication();
     }
 
     private void addCustomAuthentication() {
 
         auth = SecurityContextHolder.getContext().getAuthentication();
-        var principal = new Principal() {
+        Principal principal = new Principal() {
             public String getName() {
                 return "INIT";
             }
@@ -84,7 +83,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
         rols.add(new SimpleGrantedAuthority("NOT_SUPER"));
         rols.add(new SimpleGrantedAuthority("NOT_ADMIN"));
         rols.add(new SimpleGrantedAuthority("tothom"));
-        var authentication =  new UsernamePasswordAuthenticationToken(principal, "N/A", rols);
+        Authentication authentication =  new UsernamePasswordAuthenticationToken(principal, "N/A", rols);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 

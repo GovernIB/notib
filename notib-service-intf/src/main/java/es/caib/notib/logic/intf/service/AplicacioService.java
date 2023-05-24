@@ -3,7 +3,6 @@
  */
 package es.caib.notib.logic.intf.service;
 
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
@@ -20,97 +19,81 @@ public interface AplicacioService {
 
 
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
-	void actualitzarEntitatThreadLocal(String entitatCodi);
+	void actualitzarEntitatThreadLocal(String entitat);
+
 	/**
 	 * Processa l'autenticació d'un usuari.
-	 * 
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'usuari amb el codi de l'usuari autenticat.
+	 * @throws NotFoundException Si no s'ha trobat l'usuari amb el codi de l'usuari autenticat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
-	public void processarAutenticacioUsuari() throws NotFoundException;
+	void processarAutenticacioUsuari() throws NotFoundException;
 
 	/**
 	 * Obté l'usuari actual.
-	 * 
 	 * @return L'usuari actual.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
-	public UsuariDto getUsuariActual();
+	UsuariDto getUsuariActual();
 
 	/**
 	 * Obté un usuari donat el seu codi.
-	 * 
-	 * @param codi
-	 *            Codi de l'usuari a cercar.
+	 * @param codi Codi de l'usuari a cercar.
 	 * @return L'usuari obtingut o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
-	public UsuariDto findUsuariAmbCodi(String codi);
+	UsuariDto findUsuariAmbCodi(String codi);
 
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
 	String getIdiomaUsuariActual();
 
 	/**
 	 * Obté els rols d'un usuari donat el seu codi.
-	 * 
-	 * @param codi
-	 *            Codi de l'usuari a cercar.
+	 * @param usuariCodi Codi de l'usuari a cercar.
 	 * @return L'usuari obtingut o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
-	public List<String> findRolsUsuariAmbCodi(String usuariCodi);
+	List<String> findRolsUsuariAmbCodi(String usuariCodi);
 	
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
-	public List<String> findRolsUsuariActual();
+	List<String> findRolsUsuariActual();
 	
 	/**
 	 * Consulta els usuaris donat un text.
-	 * 
-	 * @param text
-	 *            Text per a fer la consulta.
+	 * @param text Text per a fer la consulta.
 	 * @return La llista d'usuaris.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
-	public List<UsuariDto> findUsuariAmbText(String text);
+	List<UsuariDto> findUsuariAmbText(String text);
 
 	/**
 	 * Emmagatzema una excepció llençada per un servei.
-	 * 
-	 * @param exception
-	 *             L'excepció a emmagatzemar.
+	 * @param exception L'excepció a emmagatzemar.
 	 */
-	public void excepcioSave(Throwable exception);
+	void excepcioSave(Throwable exception);
 
 	/**
 	 * Consulta la informació d'una excepció donat el seu índex.
-	 * 
-	 * @param index
-	 *             L'index de l'excepció.
+	 * @param index L'index de l'excepció.
 	 * @return L'excepció.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	public ExcepcioLogDto excepcioFindOne(Long index);
+	ExcepcioLogDto excepcioFindOne(Long index);
 
 	/**
 	 * Retorna una llista amb les darreres excepcions emmagatzemades.
-	 * 
 	 * @return La llista amb les darreres excepcions.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	public List<ExcepcioLogDto> excepcioFindAll();
+	List<ExcepcioLogDto> excepcioFindAll();
 
 	/**
-	 * Retorna una llista amb els diferents rols els quals
-	 * tenen assignat algun permis.
-	 * 
+	 * Retorna una llista amb els diferents rols els quals tenen assignat algun permis.
 	 * @return La llista amb els rols.
 	 */
-	public List<String> permisosFindRolsDistinctAll();
+	List<String> permisosFindRolsDistinctAll();
 
 	/**
 	 * Retorna el valor d'un paràmetre de configuració per la entitat especificada
-	 *
 	 * @param property El codi del paràmetre
 	 * @return el valor del paràmetre
 	 */
@@ -119,21 +102,16 @@ public interface AplicacioService {
 
 	/**
 	 * Retorna el valor d'un paràmetre de configuració de l'aplicació.
-	 * 
-	 * @param property
-	 *             El codi del paràmetre
+	 * @param property El codi del paràmetre
 	 * @return el valor del paràmetre
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
-	public String propertyGet(String property);
+	String propertyGet(String property);
 	
 	/**
 	 * Retorna el valor d'un paràmetre de configuració de l'aplicació.
-	 * 
-	 * @param property
-	 *             El codi del paràmetre
-	 * @param defaultValue
-	 *             El valor per defecte en cas que el paràmetre no s'hagi definit
+	 * @param property El codi del paràmetre
+	 * @param defaultValue El valor per defecte en cas que el paràmetre no s'hagi definit
 	 * @return el valor del paràmetre
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
@@ -150,31 +128,51 @@ public interface AplicacioService {
 	String propertyGetByEntitat(String property, String defaultValue);
 
 	/**
+	 * @param codi Codi de l'usuari
+	 * @return true si existeix a la taula not_usuari
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
+	boolean existeixUsuariNotib(String codi);
+
+	/**
+	 * @param codi Codi de l'usuari
+	 * @return true si existeix Seycon
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
+	boolean existeixUsuariSeycon(String codi);
+
+	/**
+	 * Crea la configuració de l'usuari
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
+	void crearUsuari(String nom);
+
+	/**
 	 * Modifica la configuració de l'usuari actual
 	 * 
 	 * @return L'usuari actual.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('tothom') or hasRole('NOT_CARPETA')")
-	public UsuariDto updateUsuariActual(UsuariDto asDto);
+	UsuariDto updateUsuariActual(UsuariDto asDto);
 	
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('tothom') or hasRole('NOT_CARPETA')")
-	public void updateRolUsuariActual(String rol);
+	void updateRolUsuariActual(String rol);
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('tothom') or hasRole('NOT_CARPETA')")
-	public void updateEntitatUsuariActual(Long entitat);
+	void updateEntitatUsuariActual(Long entitat);
 	
 	/**
 	 * Recupera les mètriques de l'aplicació.
 	 * 
 	 * @return El registre de les mètriques.
 	 */
-	public String getMetrics();
+	String getMetrics();
 
-	public String getAppVersion();
-	public void setAppVersion(String appVersion);
+	String getAppVersion();
+	void setAppVersion(String appVersion);
 
 	String getMissatgeErrorAccesAdmin();
 
 	void restartSchedulledTasks();
 
-    public void propagateDbProperties();
+	public void propagateDbProperties();
 }

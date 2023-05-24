@@ -28,10 +28,10 @@
 							isOcultarCounts="${isOcultarCounts}" fullesAtributCssClassCondition="${fullesAtributCssClassCondition}"
 							fullesAtributDreta="${fullesAtributDreta}" fullesMissatgeDreta="${fullesMissatgeDreta}"
 							fullesIconaDreta="${fullesIconaDreta}" fullesCondicioDreta="${fullesCondicioDreta}"/>
-
 			<c:if test="${fullesCondicioDreta != fill.dades[fullesAtributDreta]}">
-				<span> </span><span class="${fullesIconaDreta}" <c:if test="${fill.dades[fullesAtributDreta]  != null}">title="<spring:message code="${fullesMissatgeDreta}${fill.dades[fullesAtributDreta]}"/>"</c:if>></span>
+				<span> </span><span class="${fullesIconaDreta}" <c:if test="${fill.dades[fullesAtributDreta] != null}">title="<spring:message code="${fullesMissatgeDreta}${fill.dades[fullesAtributDreta]}"/>"</c:if>></span>
 			</c:if>
+
 		</li>
 	</c:forEach>
 	<c:forEach var="fulla" items="${fulles}">
@@ -55,14 +55,14 @@
 			</li>
 		</c:if>
 	</c:forEach>
-<%--	<c:forEach var="fulla" items="${fulles}">--%>
-<%--		<c:if test="${fulla[fullesAtributPare] == pare.dades[atributId]}">--%>
-<%--			<li id="${fulla[fullesAtributId]}" data-jstree='{"icon":"${fullesIcona}"}'>--%>
-<%--					${fulla[fullesAtributNom]} ${fullesAtributInfoText}--%>
-<%--					&lt;%&ndash;					<a class="fullesAtributCssClass">${fulla[fullesAtributNom]}&ndash;%&gt;--%>
-<%--&lt;%&ndash;						<c:if test="${!empty fullesAtributInfoText && fulla[fullesAtributInfo]}">${fullesAtributInfoText}</c:if>&ndash;%&gt;--%>
-<%--&lt;%&ndash;					</a>&ndash;%&gt;--%>
-<%--			</li>--%>
-<%--		</c:if>--%>
-<%--	</c:forEach>--%>
+	<%--	<c:forEach var="fulla" items="${fulles}">--%>
+	<%--		<c:if test="${fulla[fullesAtributPare] == pare.dades[atributId]}">--%>
+	<%--			<li id="${fulla[fullesAtributId]}" data-jstree='{"icon":"${fullesIcona}"}'>--%>
+	<%--					${fulla[fullesAtributNom]} ${fullesAtributInfoText}--%>
+	<%--					&lt;%&ndash;					<a class="fullesAtributCssClass">${fulla[fullesAtributNom]}&ndash;%&gt;--%>
+	<%--&lt;%&ndash;						<c:if test="${!empty fullesAtributInfoText && fulla[fullesAtributInfo]}">${fullesAtributInfoText}</c:if>&ndash;%&gt;--%>
+	<%--&lt;%&ndash;					</a>&ndash;%&gt;--%>
+	<%--			</li>--%>
+	<%--		</c:if>--%>
+	<%--	</c:forEach>--%>
 </ul>

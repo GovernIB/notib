@@ -3,13 +3,12 @@
  */
 package es.caib.notib.back.controller;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-
+import es.caib.notib.back.helper.EnumHelper.HtmlOption;
+import es.caib.notib.logic.intf.dto.AplicacioDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.UsuariDto;
+import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.UsuariAplicacioService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.notib.logic.intf.dto.UsuariDto;
-import es.caib.notib.logic.intf.service.AplicacioService;
-import es.caib.notib.logic.intf.service.UsuariAplicacioService;
-import es.caib.notib.back.helper.EnumHelper.HtmlOption;
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 
 /**
  * Controlador per a les consultes ajax dels usuaris normals.
@@ -56,15 +57,15 @@ public class AjaxUserController extends BaseUserController {
 	@ResponseBody
 	public List<UsuariDto> getPluginDadesUsuari(HttpServletRequest request, @PathVariable String text, Model model) {
 
-		var entitatActual = getEntitatActualComprovantPermisos(request);
-		Set<UsuariDto> setUsuaris = new HashSet<>();
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		Set<UsuariDto> setUsuaris = new HashSet<UsuariDto>();
 		try {
-			var encoded = new String(text.getBytes("ISO-8859-1"), "UTF-8");
-			var usuarisWeb = aplicacioService.findUsuariAmbText(encoded);
+			String encoded = new String(text.getBytes("ISO-8859-1"), "UTF-8");
+			List<UsuariDto> usuarisWeb = aplicacioService.findUsuariAmbText(encoded);
 			setUsuaris.addAll(usuarisWeb);
-			var aplicacio = usuariAplicacioService.findByEntitatAndText(entitatActual.getId(), encoded);
+			AplicacioDto aplicacio = usuariAplicacioService.findByEntitatAndText(entitatActual.getId(), encoded);
 			if (aplicacio != null) {
-				var usuariAplciacio = new UsuariDto();
+				UsuariDto usuariAplciacio = new UsuariDto();
 				usuariAplciacio.setCodi(aplicacio.getUsuariCodi());
 				usuariAplciacio.setNom(aplicacio.getUsuariCodi());
 				setUsuaris.add(usuariAplciacio);
@@ -81,21 +82,21 @@ public class AjaxUserController extends BaseUserController {
 	public List<HtmlOption> enumValorsAmbText(HttpServletRequest request, @PathVariable String enumClass) throws ClassNotFoundException {
 
 		Class<?> enumeracio = Class.forName("es.caib.notib.logic.intf.dto." + enumClass);
-		var textKeyPrefix = new StringBuilder();
-		var textKeys = StringUtils.splitByCharacterTypeCamelCase(enumClass);
-		for (var textKey: textKeys) {
+		StringBuilder textKeyPrefix = new StringBuilder();
+		String[] textKeys = StringUtils.splitByCharacterTypeCamelCase(enumClass);
+		for (String textKey: textKeys) {
 			if (!"dto".equalsIgnoreCase(textKey)) {
 				textKeyPrefix.append(textKey.toLowerCase());
 				textKeyPrefix.append(".");
 			}
 		}
-		List<HtmlOption> resposta = new ArrayList<>();
-		if (!enumeracio.isEnum()) {
-			return resposta;
-		}
-		for (var e: enumeracio.getEnumConstants()) {
-			resposta.add(new HtmlOption(((Enum<?>)e).name(), getMessage(request, textKeyPrefix.toString() + ((Enum<?>)e).name(), null)));
+		List<HtmlOption> resposta = new ArrayList<HtmlOption>();
+		if (enumeracio.isEnum()) {
+			for (Object e: enumeracio.getEnumConstants()) {
+				resposta.add(new HtmlOption(((Enum<?>)e).name(), getMessage(request, textKeyPrefix.toString() + ((Enum<?>)e).name(), null)));
+			}
 		}
 		return resposta;
 	}
+
 }

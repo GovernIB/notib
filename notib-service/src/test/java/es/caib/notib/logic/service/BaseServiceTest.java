@@ -4,8 +4,25 @@
 package es.caib.notib.logic.service;
 
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.helper.CacheHelper;
+import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.PermisosHelper;
+import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.intf.dto.AplicacioDto;
+import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
+import es.caib.notib.logic.intf.dto.DocumentDto;
+import es.caib.notib.logic.intf.dto.EntitatDataDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.FitxerDto;
+import es.caib.notib.logic.intf.dto.GrupDto;
+import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto.OrdreDireccioDto;
+import es.caib.notib.logic.intf.dto.PermisDto;
+import es.caib.notib.logic.intf.dto.PersonaDto;
+import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatFullaDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatSobreDto;
@@ -16,17 +33,22 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
-import es.caib.notib.logic.intf.service.*;
+import es.caib.notib.logic.intf.service.EntitatService;
+import es.caib.notib.logic.intf.service.GrupService;
+import es.caib.notib.logic.intf.service.NotificacioService;
+import es.caib.notib.logic.intf.service.OperadorPostalService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
+import es.caib.notib.logic.intf.service.PagadorCieFormatFullaService;
+import es.caib.notib.logic.intf.service.PagadorCieFormatSobreService;
+import es.caib.notib.logic.intf.service.PagadorCieService;
+import es.caib.notib.logic.intf.service.ProcedimentService;
+import es.caib.notib.logic.intf.service.UsuariAplicacioService;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
 import es.caib.notib.persist.entity.config.ConfigEntity;
-import es.caib.notib.logic.helper.CacheHelper;
-import es.caib.notib.logic.helper.ConversioTipusHelper;
-import es.caib.notib.logic.helper.PermisosHelper;
-import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.EntregaCieRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
@@ -35,7 +57,16 @@ import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.persist.repository.config.ConfigRepository;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.notib.plugin.registre.*;
+import es.caib.notib.plugin.registre.CodiAssumpte;
+import es.caib.notib.plugin.registre.Llibre;
+import es.caib.notib.plugin.registre.LlibreOficina;
+import es.caib.notib.plugin.registre.Oficina;
+import es.caib.notib.plugin.registre.Organisme;
+import es.caib.notib.plugin.registre.RegistrePlugin;
+import es.caib.notib.plugin.registre.RegistrePluginException;
+import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
+import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
+import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
@@ -49,6 +80,7 @@ import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -71,7 +103,16 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.Assert.fail;
@@ -125,7 +166,7 @@ public class BaseServiceTest {
 	private CacheHelper cacheHelper;
 	
 	@Autowired
-	private  PluginHelper pluginHelper;
+	private PluginHelper pluginHelper;
 	@Autowired
 	protected ConfigRepository configRepository;
 	
@@ -671,9 +712,9 @@ public class BaseServiceTest {
 		notificacio.setCaducitat(new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
 		DocumentDto document = new DocumentDto();
 		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
-		document.setContingutBase64(Base64.getEncoder().encodeToString(arxiuBytes));
+		document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
 		document.setHash(
-				Base64.getEncoder().encodeToString(
+				Base64.encodeBase64String(
 						Hex.decodeHex(
 								DigestUtils.sha1Hex(arxiuBytes).toCharArray())));
 		document.setNormalitzat(false);

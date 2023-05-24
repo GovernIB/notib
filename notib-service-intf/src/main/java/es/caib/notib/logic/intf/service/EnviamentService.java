@@ -4,7 +4,15 @@
 package es.caib.notib.logic.intf.service;
 
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.intf.dto.ApiConsulta;
+import es.caib.notib.logic.intf.dto.FitxerDto;
+import es.caib.notib.logic.intf.dto.NotificacioEnviamentDto;
+import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.logic.intf.dto.NotificacioEnviamentFiltreDto;
+import es.caib.notib.logic.intf.dto.NotificacioEventDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
@@ -39,7 +47,7 @@ public interface EnviamentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<Long> findIdsAmbFiltre(Long entitatId, NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException;
+	List<Long> findIdsAmbFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException;
 
 	/**
 	 * Consulta dels enviaments d'una entitat realitzats d'una notificació.
@@ -54,8 +62,13 @@ public interface EnviamentService {
 	 * @throws ParseException
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi,
-																	   NotificacioEnviamentFiltreDto filtre, PaginacioParamsDto paginacio) throws ParseException;
+	PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(
+			Long entitatId,
+			RolEnumDto rol,
+			String organGestorCodi,
+			String usuariCodi,
+			NotificacioEnviamentFiltreDto filtre,
+			PaginacioParamsDto paginacio) throws ParseException;
 	
 	/**
 	 * Consulta dels enviaments d'una notificació.
@@ -95,16 +108,7 @@ public interface EnviamentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	List<NotificacioEventDto> eventFindAmbNotificacio(Long notificacioId);
-	
-	/**
-	 * Reintenta un callback fallat
-	 * 
-	 * @param eventId
-	 *            Atribut id de la notificació.
-	 * @return els events trobats.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	boolean reintentarCallback(Long eventId);
+
 
 	/**
 	 * Genera un fitxer d'exportació amb la informació dels expedients.
@@ -120,7 +124,10 @@ public interface EnviamentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	FitxerDto exportacio(Long entitatId, Collection<Long> enviamentIds, String format) throws IOException, NotFoundException, ParseException;
+	FitxerDto exportacio(
+			Long entitatId,
+			Collection<Long> enviamentIds,
+			String format) throws IOException, NotFoundException, ParseException;
 	
 	/**
 	 * Crea les columnes s'han de mostrar
@@ -130,7 +137,7 @@ public interface EnviamentService {
 	 * @return columnes que s'han de visualitzar.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public void columnesCreate(String codiUsuari, Long entitatId, ColumnesDto columnes);
+	void columnesCreate(String codiUsuari, Long entitatId, ColumnesDto columnes);
 	
 	/**
 	 * Actualitza les columnes s'han de mostrar
@@ -140,7 +147,9 @@ public interface EnviamentService {
 	 * @return columnes que s'han de visualitzar.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public void columnesUpdate(Long entitatId, ColumnesDto columnes);
+	public void columnesUpdate(
+			Long entitatId,
+			ColumnesDto columnes);
 	
 	/**
 	 * Obté les columnes visibles per un usuari i entitat
@@ -210,6 +219,6 @@ public interface EnviamentService {
 	 *            id de l'enviament.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	void enviarCallback(Long enviamentId) throws Exception;
+	List<Long> enviarCallback(Set<Long> notificacions) throws Exception;
 
 }

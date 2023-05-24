@@ -46,7 +46,7 @@ function refreshProgres() {
 }
 
 function getProgres() {
-	console.log("getProgres");
+	// console.log("getProgres");
 	$.ajax({
 		type: 'GET',
 		url: "<c:url value='/notificacio/${notificacioId}/justificant/estat/'/>" + sequence,

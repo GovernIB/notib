@@ -3,14 +3,13 @@
  */
 package es.caib.notib.back.interceptor;
 
-import es.caib.notib.logic.intf.service.AplicacioService;
-import es.caib.notib.logic.intf.service.OrganGestorService;
-import es.caib.notib.logic.intf.service.PermisosService;
-import es.caib.notib.logic.intf.service.ProcedimentService;
-import es.caib.notib.logic.intf.service.ServeiService;
 import es.caib.notib.back.helper.OrganGestorHelper;
 import es.caib.notib.back.helper.PermisosHelper;
 import es.caib.notib.back.helper.RolHelper;
+import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.PermisosService;
+import es.caib.notib.logic.intf.service.ProcedimentService;
+import es.caib.notib.logic.intf.service.ServeiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -31,8 +30,6 @@ public class PermisosInterceptor implements AsyncHandlerInterceptor {
 	private ProcedimentService procedimentService;
 	@Autowired @Lazy
 	private ServeiService serveiService;
-	@Autowired @Lazy
-	private OrganGestorService organGestorService;
 	@Autowired @Lazy
 	private PermisosService permisosService;
 	@Autowired @Lazy

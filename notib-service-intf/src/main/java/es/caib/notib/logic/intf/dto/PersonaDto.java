@@ -63,8 +63,9 @@ public class PersonaDto implements Serializable{
 
 	public String getNomFormatted() {
 
-		var llinatges = concatenarLlinatges();
-		var formatted = "";
+		String llinatges = concatenarLlinatges();
+		String formatted = "";
+//		if (InteressatTipusEnumDto.FISICA.equals(interessatTipus) || InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(interessatTipus)) {
 		if (raoSocial == null || raoSocial.isEmpty()) {
 			formatted = nom != null ? nom : "";
 			formatted += llinatges != null && !llinatges.isEmpty() ? " " + llinatges : "";

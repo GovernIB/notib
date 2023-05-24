@@ -18,24 +18,28 @@ import java.util.Date;
 public class NotificacioEventDto extends AuditoriaDto {
 
 	private Long id;
+	private Long enviamentId;
 	private NotificacioEventTipusEnumDto tipus;
 	private Date data;
-	private String descripcio;
+//	private String descripcio;
 	private boolean error;
 	private String errorDescripcio;
-	private CallbackEstatEnumDto callbackEstat;
-	private String callbackError;
-	private Integer callbackIntents;
+	private boolean fiReintents;
+	private int intents;
 
-	private NotificacioEventEnviamentDto enviament;
+//	private CallbackEstatEnumDto callbackEstat;
+//	private String callbackError;
+//	private Integer callbackIntents;
 
-	public boolean isEnviamentAssociat() {
-		return enviament != null;
-	}
+//	private NotificacioEventEnviamentDto enviament;
 
-	public String getCallbackError(){
-		return callbackError !=null ? callbackError : "";
-	}
+//	public boolean isEnviamentAssociat() {
+//		return enviament != null;
+//	}
+//
+//	public String getCallbackError(){
+//		return callbackError !=null ? callbackError : "";
+//	}
 
 	@Override
 	public String toString() {

@@ -4,7 +4,6 @@
 package es.caib.notib.ejb;
 
 import es.caib.notib.logic.intf.dto.Arbre;
-import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
@@ -37,24 +36,6 @@ import java.util.List;
 @Stateless
 public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf.service.OrganGestorService> implements es.caib.notib.logic.intf.service.OrganGestorService {
 
-//	@Override
-//	@RolesAllowed({"NOT_ADMIN", "tothom"})
-//	public OrganGestorDto create(OrganGestorDto dto) {
-//		return getDelegateService().create(dto);
-//	}
-//
-//	@Override
-//	@RolesAllowed({"NOT_ADMIN", "tothom"})
-//	public OrganGestorDto delete(Long entitatId, Long organId) {
-//		return getDelegateService().delete(entitatId, organId);
-//	}
-	
-//	@Override
-//	@RolesAllowed({"NOT_ADMIN", "tothom"})
-//	public void updateOne(Long entitatId, String organGestorCodi) {
-//		getDelegateService().updateOne(entitatId, organGestorCodi);
-//	}
-
 	@Override
 	@PermitAll
 	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi) {
@@ -85,54 +66,42 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 		getDelegateService().syncOficinesSIR(entitatId);
 	}
 
-//	@Override
-//	@RolesAllowed({"NOT_ADMIN", "tothom"})
-//	public void updateAll(Long entitatId, String organActualCodiDir3) {
-//		getDelegateService().updateAll(entitatId,organActualCodiDir3);
-//	}
-
-//	@Override
-//	@RolesAllowed({"NOT_ADMIN", "tothom"})
-//	public boolean organGestorEnUs(Long organId) {
-//		return getDelegateService().organGestorEnUs(organId);
-//	}
-
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public boolean organGestorEnUs(Long organId) {
 		return getDelegateService().organGestorEnUs(organId);
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public List<OrganGestorDto> findAll() {
 		return getDelegateService().findAll();
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public OrganGestorDto findById(Long entitatId, Long id) {
 		return getDelegateService().findById(entitatId, id);
 	}
-	
+
 	@Override
 	@PermitAll
 	public OrganGestorDto findByCodi(Long entitatId, String codi) {
 		return getDelegateService().findByCodi(entitatId, codi);
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public List<OrganGestorDto> findByEntitat(Long entitatId) {
 		return getDelegateService().findByEntitat(entitatId);
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<CodiValorEstatDto> findOrgansGestorsCodiByEntitat(Long entitatId) {
 		return getDelegateService().findOrgansGestorsCodiByEntitat(entitatId);
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<OrganGestorDto> findByProcedimentIds(List<Long> procedimentIds) {
@@ -150,10 +119,14 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 	public List<OrganGestorDto> findDescencentsByCodi(Long entitatId, String organCodi) {
 		return getDelegateService().findDescencentsByCodi(entitatId, organCodi);
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(Long entitatId, String organCodiDir3, OrganGestorFiltreDto filtre, PaginacioParamsDto paginacioParams) {
+	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
+			Long entitatId,
+			String organCodiDir3,
+			OrganGestorFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findAmbFiltrePaginat(entitatId, organCodiDir3,filtre, paginacioParams);
 	}
 
@@ -168,7 +141,7 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 	public List<OrganGestorDto> findAccessiblesByUsuariActual() {
 		return getDelegateService().findAccessiblesByUsuariActual();
 	}
-	
+
 	@Override
 	@PermitAll
 	public List<PermisDto> permisFind(Long entitatId, Long id, PaginacioParamsDto paginacioParams) throws NotFoundException {
@@ -192,7 +165,7 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 	public List<OrganismeDto> findOrganismes(EntitatDto entitat) {
 		return getDelegateService().findOrganismes(entitat);
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<OrganismeDto> findOrganismes(EntitatDto entitat, OrganGestorDto organGestor) {
@@ -205,17 +178,19 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 		return getDelegateService().getLlibreOrganisme(entitatId, organGestorDir3Codi);
 	}
 
-//	@Override
-//	@RolesAllowed({"tothom"})
-//	public List<OrganGestorDto> findOrgansGestorsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
-//		return getDelegateService().findOrgansGestorsWithPermis(entitatId, usuariCodi, permis);
-//	}
-
-    @Override
+	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-    public List<CodiValorEstatDto> getOrgansGestorsDisponiblesConsulta(Long entitatId, String usuari, RolEnumDto rol, String organ) {
-        return getDelegateService().getOrgansGestorsDisponiblesConsulta(entitatId, usuari, rol, organ);
-    }
+	public List<CodiValorEstatDto> getOrgansGestorsDisponiblesConsulta(
+			Long entitatId,
+			String usuari,
+			RolEnumDto rol,
+			String organ) {
+		return getDelegateService().getOrgansGestorsDisponiblesConsulta(
+				entitatId,
+				usuari,
+				rol,
+				organ);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
@@ -247,16 +222,16 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 		return getDelegateService().hasPermisOrgan(entitatId, organCodi, permis);
 	}
 
-//	@Override
-//	@RolesAllowed({"NOT_ADMIN", "tothom"})
-//	public List<CodiValorDto> getOrgansAmbPermis(Long entitatId, PermisEnum permis) {
-//		return getDelegateService().getOrgansAmbPermis(entitatId, permis);
-//	}
-
 	@Override
 	@PermitAll
 	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper) {
 		getDelegateService().setServicesForSynctest(procSerSyncHelper, pluginHelper);
+	}
+
+	@Override
+	@PermitAll
+	public void sincronitzarOrganNomMultidioma() {
+		getDelegateService().sincronitzarOrganNomMultidioma();
 	}
 
 	@Override

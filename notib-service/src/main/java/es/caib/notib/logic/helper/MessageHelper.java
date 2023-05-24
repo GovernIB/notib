@@ -4,7 +4,8 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
-import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.persist.repository.UsuariRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
@@ -19,12 +20,13 @@ import java.util.Locale;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class MessageHelper implements MessageSourceAware {
 
 	private MessageSource messageSource;
 	@Autowired
-	private AplicacioService aplicacioService;
+	private UsuariRepository usuariRepository;
 
 	public String getMessage(String[] keys, Object[] vars, Locale locale) {
 
@@ -52,16 +54,26 @@ public class MessageHelper implements MessageSourceAware {
 	public String getMessage(String key, Object[] vars, Locale locale) {
 
 		try {
-			if (locale != null) {
-				return messageSource.getMessage(key, vars, locale);
+			if (locale == null) {
+				String idioma = getIdiomaUsuariActual();
+				locale = new Locale(!Strings.isNullOrEmpty(idioma) ? idioma : "ca");
 			}
-			String idioma = aplicacioService.getIdiomaUsuariActual();
-			locale = new Locale(!Strings.isNullOrEmpty(idioma) ? idioma : "ca");
 			return messageSource.getMessage(key, vars, locale);
 		} catch (NoSuchMessageException ex) {
 			return key.startsWith("enum.") ? key.substring(key.lastIndexOf(".") + 1) :"???" + key + "???";
 		}
 	}
+
+	private String getIdiomaUsuariActual() {
+		try {
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			return auth != null ? usuariRepository.getIdiomaUsuari(auth.getName()) : null;
+		} catch (Exception ex) {
+			log.error("Error obtenint l'idioma de l'usuari actual ", ex);
+		}
+		return null;
+	}
+
 	public String getMessage(String key, Object[] vars) {
 		return getMessage(key, vars, null);
 	}

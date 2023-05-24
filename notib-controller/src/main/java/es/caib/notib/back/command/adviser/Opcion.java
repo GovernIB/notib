@@ -12,9 +12,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 public class Opcion {
 
-//    @XmlValue
     protected String value;
-//    @XmlAttribute(name = "tipo", required = true)
     @NotNull
     protected String tipo;
 

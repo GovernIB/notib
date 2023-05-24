@@ -49,7 +49,6 @@ public class NotificacioMassivaEntity extends NotibAuditable<Long> {
 
     @Builder.Default
     @Column(name = "PROGRESS", length = 20, nullable = false)
-//    @Enumerated(EnumType.STRING)
     private Integer progress = 0;
 
     @Column(name = "CSV_FILENAME", length = 200, nullable = false)
@@ -170,7 +169,6 @@ public class NotificacioMassivaEntity extends NotibAuditable<Long> {
         if (notificacionsValidades == null || notificacionsValidades == 0) {
             return;
         }
-
         this.progress = ((notificacionsProcessades + notificacionsProcessadesAmbError) * 100) / notificacionsValidades;
         log.info("[PROCES MASSIU] updateProgres (" + this.progress + ") - validades: " + notificacionsValidades + ", processades: " + notificacionsProcessades + ", error: " + notificacionsProcessadesAmbError);
 

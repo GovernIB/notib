@@ -1,6 +1,7 @@
 package es.caib.notib.logic.service;
 
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
+import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
@@ -14,13 +15,16 @@ import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
+import es.caib.notib.logic.test.data.ConfigTest;
+import es.caib.notib.logic.test.data.EntitatItemTest;
+import es.caib.notib.logic.test.data.NotificacioItemTest;
+import es.caib.notib.logic.test.data.ProcedimentItemTest;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.EnviamentTableEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioTableEntity;
 import es.caib.notib.persist.entity.cie.EntregaPostalEntity;
-import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.EnviamentTableRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
@@ -28,10 +32,6 @@ import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.PagadorCieRepository;
 import es.caib.notib.persist.repository.PagadorPostalRepository;
-import es.caib.notib.logic.test.data.ConfigTest;
-import es.caib.notib.logic.test.data.EntitatItemTest;
-import es.caib.notib.logic.test.data.NotificacioItemTest;
-import es.caib.notib.logic.test.data.ProcedimentItemTest;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.registre.RegistrePluginException;
 import org.apache.commons.lang3.SerializationUtils;
@@ -91,9 +91,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 
 		EntitatEntity entitatEntity = entitatRepository.findByCodi("ENTITAT_TESTS");
 //		PagadorCieEntity cie = cieRepository.save(PagadorCieEntity.builder("A04013511", "CIE NOM", new Date(0), entitatEntity).build());
-//		PagadorPostalEntity operadorPostal = operadorPostalRepository.save(PagadorPostalEntity.builder("A04013511",
-//				"", "pccNum_" + 0, new Date(0), "ccFac_" + 0,
-//				null).build());
+//		PagadorPostalEntity operadorPostal = operadorPostalRepository.save(PagadorPostalEntity.builder("A04013511", "", "pccNum_" + 0, new Date(0), "ccFac_" + 0, null).build());
 
 		procedimentCreator.addObject("procediment", procedimentCreator.getRandomInstance());
 //		procedimentCreator.addObject("procedimentCIE", procedimentCreator.getRandomInstanceAmbEntregaCie(cie.getId(), operadorPostal.getId()));

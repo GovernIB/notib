@@ -3,20 +3,19 @@
  */
 package es.caib.notib.back.command;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
-
+import es.caib.notib.back.helper.ConversioTipusHelper;
+import es.caib.notib.logic.intf.dto.PermisDto;
+import es.caib.notib.logic.intf.dto.TipusEnumDto;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import es.caib.notib.logic.intf.dto.PermisDto;
-import es.caib.notib.logic.intf.dto.TipusEnumDto;
-import es.caib.notib.back.helper.ConversioTipusHelper;
-import lombok.Getter;
-import lombok.Setter;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Command per al manteniment de permisos.
@@ -32,7 +31,6 @@ public class PermisCommand {
 		PROCEDIMENT,
 		SERVEI
 	}
-
 
 	private Long id;
 	@NotEmpty
@@ -65,7 +63,7 @@ public class PermisCommand {
 	public static List<PermisCommand> toPermisCommands(List<PermisDto> dtos) {
 
 		List<PermisCommand> commands = new ArrayList<>();
-		for (var dto: dtos) {
+		for (PermisDto dto: dtos) {
 			commands.add(ConversioTipusHelper.convertir(dto, PermisCommand.class));
 		}
 		return commands;
@@ -77,7 +75,7 @@ public class PermisCommand {
 
 	public static PermisCommand asCommand(PermisDto dto, EntitatPermis entitatPermis) {
 
-		var command = ConversioTipusHelper.convertir(dto, PermisCommand.class);
+		PermisCommand command = ConversioTipusHelper.convertir(dto, PermisCommand.class);
 		switch (entitatPermis) {
 			case ORGAN:
 				command.setSelectAll(dto.isRead() && dto.isProcessar() && dto.isAdministration() && dto.isComuns() && dto.isNotificacio() && dto.isComunicacio() && dto.isComunicacioSir() && dto.isComunicacioSenseProcediment());
@@ -96,9 +94,9 @@ public class PermisCommand {
 
 	public int getPrincipalDefaultSize() {
 
-		var principalSize = 0;
+		int principalSize = 0;
 		try {
-			var principal = this.getClass().getDeclaredField("principal");
+			Field principal = this.getClass().getDeclaredField("principal");
 			principalSize = principal.getAnnotation(Size.class).max();
 		} catch (Exception ex) {
 			log.error("No s'ha pogut recuperar la longitud de principal: " + ex.getMessage());

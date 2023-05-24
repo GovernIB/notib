@@ -7,7 +7,6 @@ import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.logic.intf.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import lombok.Getter;
@@ -45,7 +44,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private NotificacioEstatEnumDto estat;
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
-	private NotificacioErrorTipusEnumDto notificaErrorTipus;
+//	private NotificacioErrorTipusEnumDto notificaErrorTipus;
 	private String serveiTipus;
 	private List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<>();
 	private String usuariCodi;

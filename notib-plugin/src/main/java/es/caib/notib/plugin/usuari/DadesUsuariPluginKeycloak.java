@@ -34,7 +34,7 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 		log.debug("Consulta dels rols de l'usuari (usuariCodi=" + usuariCodi + ")");
 		try {
 			var rolesInfo = getRolesByUsername(usuariCodi);
-			return rolesInfo.getRoles() != null ? new ArrayList<>(Arrays.asList(rolesInfo.getRoles())) : new ArrayList<>();
+			return rolesInfo != null && rolesInfo.getRoles() != null ? new ArrayList<>(Arrays.asList(rolesInfo.getRoles())) : new ArrayList<>();
 		} catch (Exception ex) {
 			throw new SistemaExternException("Error al consultar els rols de l'usuari (usuariCodi=" + usuariCodi + ")", ex);
 		}

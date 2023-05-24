@@ -6,7 +6,11 @@ import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Subselect;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
 
 /**
  * Classe de model de dades que conté la informació dels procediments i pagadors.
@@ -72,7 +76,7 @@ public class ProcedimentFormEntity {
 	protected String organGestorNom;
 	
 	@Column(name = "organGestorEstat")
-	@Enumerated(EnumType.STRING)
+	@Enumerated(EnumType.ORDINAL)
 	protected OrganGestorEstatEnum organGestorEstat;
 	
 	@Column(name = "tipusassumpte")

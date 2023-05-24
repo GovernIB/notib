@@ -5,6 +5,9 @@ package es.caib.notib.plugin.unitat;
 
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.plugin.SistemaExternException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,9 +38,18 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 
 	@Override
 	public Map<String, NodeDir3> organigramaPerEntitat(String codiEntitat) throws SistemaExternException {
-
 		Map<String, NodeDir3>  organigrama = new HashMap<>();
 		organigrama.put("E04975701", new NodeDir3());
+
+		return organigrama;
+	}
+
+	@Override
+	public Map<String, NodeDir3> organigramaPerEntitat(
+			String pareCodi,
+			Date fechaActualizacion,
+			Date fechaSincronizacion) throws SistemaExternException {
+		Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
 		return organigrama;
 	}
 
@@ -53,8 +65,7 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 
 	@Override
 	public List<ObjetoDirectorio> unitatsPerEntitat(String codiEntitat, boolean inclourePare) throws SistemaExternException {
-
-		List<ObjetoDirectorio> unitats = new ArrayList<>();
+		List<ObjetoDirectorio> unitats = new ArrayList<ObjetoDirectorio>();
 		return unitats;
 	}
 	
@@ -64,7 +75,15 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 	}
 	
 	@Override
-	public List<NodeDir3> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma, Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi) throws SistemaExternException {
+	public List<NodeDir3> cercaUnitats(
+			String codi, 
+			String denominacio,
+			Long nivellAdministracio, 
+			Long comunitatAutonoma, 
+			Boolean ambOficines, 
+			Boolean esUnitatArrel,
+			Long provincia, 
+			String municipi) throws SistemaExternException {
 		return null;
 	}
 	
@@ -74,7 +93,13 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 	}
 	
 	@Override
-	public List<NodeDir3> cercaOficines(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma, Long provincia, String municipi) throws SistemaExternException {
+	public List<NodeDir3> cercaOficines(
+			String codi,
+			String denominacio,
+			Long nivellAdministracio,
+			Long comunitatAutonoma,
+			Long provincia,
+			String municipi) throws SistemaExternException {
 		return null;
 	}
 	
@@ -109,7 +134,9 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 	}
 	
 	@Override
-	public List<OficinaSir> oficinesSIRUnitat(String unitat, Map<String, OrganismeDto> arbreUnitats) throws SistemaExternException {
+	public List<OficinaSir> oficinesSIRUnitat(
+			String unitat,
+			Map<String, OrganismeDto> arbreUnitats) throws SistemaExternException {
 		return null;
 	}
 	
@@ -117,4 +144,6 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 	public List<OficinaSir> getOficinesEntitat(String entitat) throws SistemaExternException {
 		return null;
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(UnitatsOrganitzativesMock.class);
 }

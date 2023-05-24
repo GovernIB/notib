@@ -1,14 +1,15 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
+import es.caib.notib.logic.helper.CacheHelper;
+import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.NotificacioEventHelper;
+import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.dto.config.ConfigGroupDto;
 import es.caib.notib.logic.intf.service.ConfigService;
 import es.caib.notib.persist.entity.config.ConfigEntity;
-import es.caib.notib.logic.helper.CacheHelper;
-import es.caib.notib.logic.helper.ConfigHelper;
-import es.caib.notib.logic.helper.ConversioTipusHelper;
-import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.config.ConfigGroupRepository;
 import es.caib.notib.persist.repository.config.ConfigRepository;
@@ -59,6 +60,7 @@ public class ConfigServiceImpl implements ConfigService {
         configEntity.update(!"null".equals(property.getValue()) ? property.getValue() : null);
         configHelper.reloadDbProperties();
         pluginHelper.resetPlugins(configEntity.getGroupCode());
+        NotificacioEventHelper.clearNotificaConsultaActiva();
         cacheHelper.clearAllCaches();
         return conversioTipusHelper.convertir(configEntity, ConfigDto.class);
     }

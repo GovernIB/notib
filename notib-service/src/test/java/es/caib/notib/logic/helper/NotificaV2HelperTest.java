@@ -45,13 +45,21 @@ public class NotificaV2HelperTest {
     @Mock
     private NotificacioEventHelper notificacioEventHelper;
     @Mock
-    protected AuditNotificacioHelper auditNotificacioHelper;
-    @Mock
     protected ConfigHelper configHelper;
     @Mock
     private EmailNotificacioHelper emailNotificacioHelper;
     @Mock
     private NotificacioRepository notificacioRepository;
+    @Mock
+    private NotificacioHelper notificacioHelper;
+    @Mock
+    private NotificacioTableHelper notificacioTableHelper;
+    @Mock
+    private EnviamentHelper enviamentHelper;
+    @Mock
+    private EnviamentTableHelper enviamentTableHelper;
+    @Mock
+    private CallbackHelper callbackHelper;
     @InjectMocks
     private NotificaV2Helper notificaV2Helper;
 
@@ -246,7 +254,7 @@ public class NotificaV2HelperTest {
         // L'enviament tenia un certificat anterior al actual
         enviamentMock.updateNotificaCertificacio(
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2021-01-01 16:00:00"),
-                "ArxiuId",
+                null,
                 null,
                 null,
                 null,
@@ -303,7 +311,7 @@ public class NotificaV2HelperTest {
         // L'enviament tenia un certificat anterior al actual
         enviamentMock.updateNotificaCertificacio(
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2021-09-15 16:00:00"),
-                null,
+                "ArxiuId",
                 null,
                 null,
                 null,

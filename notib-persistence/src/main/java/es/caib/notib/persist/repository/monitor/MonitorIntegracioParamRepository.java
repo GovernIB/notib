@@ -8,12 +8,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Date;
 import java.util.List;
 
 public interface MonitorIntegracioParamRepository extends JpaRepository<MonitorIntegracioParamEntity, Long> {
 
-    List<MonitorIntegracioParamEntity> findByMonitorIntegracio(@Param("integracio") MonitorIntegracioEntity integracioEntity);
+    List<MonitorIntegracioParamEntity> findByMonitorIntegracio(@Param("integracio")MonitorIntegracioEntity integracioEntity);
 
     @Modifying
     @Query(value = "DELETE FROM NOT_MON_INT_PARAM p WHERE p.MON_INT_ID IN (:ids)", nativeQuery = true)

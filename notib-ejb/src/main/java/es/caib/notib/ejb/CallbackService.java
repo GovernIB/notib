@@ -19,4 +19,16 @@ public class CallbackService extends AbstractService<es.caib.notib.logic.intf.se
 		getDelegateService().processarPendents();
 	}
 
+	@Override
+	@PermitAll
+	public boolean reintentarCallback(Long notId) {
+		return false;
+	}
+
+	@Override
+	@PermitAll
+	public boolean findByNotificacio(Long notId) {
+		return false;
+	}
+
 }

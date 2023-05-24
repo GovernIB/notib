@@ -1,17 +1,22 @@
 package es.caib.notib.logic.service;
 
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.PermisosHelper;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.EntitatTipusEnumDto;
+import es.caib.notib.logic.intf.dto.PermisDto;
+import es.caib.notib.logic.intf.dto.TipusDocumentDto;
+import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
+import es.caib.notib.logic.intf.dto.TipusEnumDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.service.EnviamentService;
-import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
-import es.caib.notib.logic.helper.ConfigHelper;
-import es.caib.notib.logic.helper.PermisosHelper;
-import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.logic.test.data.ConfigTest;
 import es.caib.notib.logic.test.data.NotificacioItemTest;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.registre.RegistrePluginException;
 import org.apache.commons.codec.DecoderException;
@@ -115,7 +120,6 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
 
         System.setProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir", "/home/bgalmes/dades/notib-fs/");
     }
-
     @Test
     public void actualitzarEstat() {
         testCreantElements(

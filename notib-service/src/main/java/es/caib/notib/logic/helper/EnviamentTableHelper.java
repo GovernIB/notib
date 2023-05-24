@@ -1,27 +1,31 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EnviamentTableEntity;
+import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.repository.EnviamentTableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Component
 public class EnviamentTableHelper {
-
     @Autowired
     private EnviamentTableRepository enviamentTableRepository;
 
+
     @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEnviamentEntity enviament){
+        NotificacioEntity notificacio = enviament.getNotificacio();
+        PersonaEntity titular = enviament.getTitular();
+        DocumentEntity document = notificacio.getDocument();
 
-        var notificacio = enviament.getNotificacio();
-        var titular = enviament.getTitular();
-        var document = notificacio.getDocument();
-
-        var tableViewItem = EnviamentTableEntity.builder()
+        EnviamentTableEntity tableViewItem = EnviamentTableEntity.builder()
                 .enviament(enviament)
                 .notificacio(notificacio)
                 .entitat(notificacio.getEntitat())
@@ -63,6 +67,8 @@ public class EnviamentTableHelper {
                 .notificaCertificacioNumSeguiment(enviament.getNotificaCertificacioNumSeguiment())
                 .notificaEstat(enviament.getNotificaEstat())
                 .notificaReferencia(enviament.getNotificaReferencia())
+
+                .errorLastCallback(false)
                 .build();
 
         enviamentTableRepository.save(tableViewItem);
@@ -70,16 +76,15 @@ public class EnviamentTableHelper {
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void actualitzarRegistre(NotificacioEnviamentEntity enviament){
-
-        var tableViewItem = enviamentTableRepository.findById(enviament.getId()).orElse(null);
+        EnviamentTableEntity tableViewItem = enviamentTableRepository.findById(enviament.getId()).orElse(null);
         if (tableViewItem == null) {
             this.crearRegistre(enviament);
             return;
         }
 
-        var titular = enviament.getTitular();
-        var notificacio = enviament.getNotificacio();
-        var document = notificacio.getDocument();
+        PersonaEntity titular = enviament.getTitular();
+        NotificacioEntity notificacio = enviament.getNotificacio();
+        DocumentEntity document = notificacio.getDocument();
 
         tableViewItem.setEnviament(enviament);
         tableViewItem.setNotificacio(notificacio);
@@ -124,6 +129,8 @@ public class EnviamentTableHelper {
         tableViewItem.setNotificaReferencia(enviament.getNotificaReferencia());
         tableViewItem.setEntitat(notificacio.getEntitat());
 
+        tableViewItem.setErrorLastCallback(enviament.isErrorLastCallback());
+
         enviamentTableRepository.saveAndFlush(tableViewItem);
     }
 
@@ -132,15 +139,13 @@ public class EnviamentTableHelper {
     ////
 
     private String getEnviamentDestinataris(NotificacioEnviamentEntity enviament) {
-
-        var destinataris = enviament.getDestinataris();
-        var destinatarisNomLlinatges = new StringBuilder();
-        for(var destinatari: destinataris) {
+        List<PersonaEntity> destinataris = enviament.getDestinataris();
+        StringBuilder destinatarisNomLlinatges = new StringBuilder();
+        for(PersonaEntity destinatari: destinataris) {
             destinatarisNomLlinatges.append(destinatari.asDto().getNomFormatted()).append("<br>");
         }
-        if (destinatarisNomLlinatges.length() > 0) {
+        if (destinatarisNomLlinatges.length() > 0)
             destinatarisNomLlinatges.delete(destinatarisNomLlinatges.length() - 4, destinatarisNomLlinatges.length());
-        }
         return destinatarisNomLlinatges.toString();
     }
 }

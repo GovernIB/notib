@@ -3,21 +3,29 @@
  */
 package es.caib.notib.persist.entity;
 
-import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
-import es.caib.notib.logic.intf.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.persist.audit.NotibAuditable;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
-import java.util.Calendar;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PreRemove;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
  * Classe del model de dades que representa un event
@@ -26,6 +34,7 @@ import java.util.GregorianCalendar;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @Entity
@@ -43,16 +52,20 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date data = new Date();
 	
-	@Column(name = "descripcio", length = 256)
-	private String descripcio;
-	
+
 	@Column(name = "error", nullable = false)
 	@Builder.Default
 	private boolean error = false;
 	
 	@Column(name = "error_desc", length = ERROR_DESC_MAX_LENGTH)
 	private String errorDescripcio;
-	
+
+	@Column(name = "fi_reintents")
+	protected Boolean fiReintents;
+
+	@Column(name = "intents")
+	protected int intents;
+
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "NOT_NOTIFICACIO_NOTEVENT_FK")
@@ -65,95 +78,19 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "not_notenv_noteve_fk")
 	private NotificacioEnviamentEntity enviament;
 	
-	@Column(name = "callback_estat", length = 10, nullable = true)
-	@Enumerated(EnumType.STRING)
-	private CallbackEstatEnumDto callbackEstat;
-	
-	@Column(name = "callback_data")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date callbackData;
-
-	@Column(name = "callback_intents")
-	private Integer callbackIntents;
-	
-	@Column(name = "callback_error_desc", length = ERROR_DESC_MAX_LENGTH)
-	private String callbackError;
-
-	@Column(name = "NOTIFICA_ERROR_TIPUS")
-	protected NotificacioErrorTipusEnumDto errorTipus;
-
 	public NotificacioEventEntity() {
 		this.data = new Date();
 		this.error = false;
 	}
 
-	public int getCallbackIntents() {
-		return callbackIntents != null? callbackIntents : 0;
-	}
-	public void updateCallbackClient(
-			CallbackEstatEnumDto estat,
-			Integer intents,
-			String error,
-			int reintentsPeriode) {
-		this.callbackIntents = intents;
-		this.callbackEstat = estat;
-		Calendar cal = GregorianCalendar.getInstance();
-		cal.add(Calendar.SECOND, (int) ((reintentsPeriode/7200)*Math.pow(3, callbackIntents)));
-		this.callbackData = cal.getTime();
-		this.callbackError = StringUtils.abbreviate(error, ERROR_DESC_MAX_LENGTH - 5);
-	}
-	
-	public void callbackInicialitza() {
-		this.callbackEstat = CallbackEstatEnumDto.PENDENT;
-		this.callbackIntents = 0;
-		this.callbackData = new Date();
+	public void update(boolean error, String errorDescripcio, Boolean fiReintents) {
+		this.data = new Date();
+		this.error = error;
+		this.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH/2);;
+		this.fiReintents = fiReintents;
+		this.intents++;
 	}
 
-
-	public static BuilderOld getBuilder(
-			NotificacioEventTipusEnumDto tipus,
-			NotificacioEntity notificacio) {
-		return new BuilderOld(
-				tipus,
-				notificacio);
-	}
-	public static class BuilderOld {
-		NotificacioEventEntity built;
-		BuilderOld(
-				NotificacioEventTipusEnumDto tipus,
-				NotificacioEntity notificacio) {
-			built = new NotificacioEventEntity();
-			built.tipus = tipus;
-			built.notificacio = notificacio;
-		}
-		public BuilderOld descripcio(String descripcio) {
-			if (descripcio.length() > 256) {
-				descripcio = descripcio.substring(0, 256);
-			}
-			built.descripcio = descripcio;
-			return this;
-		}
-		public BuilderOld error(boolean error) {
-			built.error = error;
-			return this;
-		}
-		public BuilderOld errorDescripcio(String errorDescripcio) {
-			built.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH/2);
-			return this;
-		}
-		public BuilderOld enviament(NotificacioEnviamentEntity enviament) {
-			built.enviament = enviament;
-			return this;
-		}
-		/** Inicialitza els camps pel callback cap al client. */
-		public BuilderOld callbackInicialitza() {
-			this.built.callbackInicialitza();
-			return this;
-		}
-		public NotificacioEventEntity build() {
-			return built;
-		}
-	}
 
 	@Override
 	public int hashCode() {

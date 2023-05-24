@@ -54,7 +54,7 @@ public class NotEnviamentDatabaseDto extends AuditoriaDto {
 	private Long notificacioId;
 	private String csvUuid;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
-	
+
 	//Registre
 	private String registreNumeroFormatat;
 	private NotificacioRegistreEstatEnumDto registreEstat;

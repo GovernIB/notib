@@ -11,13 +11,12 @@ import java.util.List;
 @Setter
 public class Opciones {
 
-//    @XmlElement(required = true)
     @NotNull
     @Valid
     protected List<Opcion> opcion;
 
     public List<Opcion> getOpcion() {
 
-        return opcion != null ? this.opcion : new ArrayList<Opcion>();
+        return opcion != null ? this.opcion : new ArrayList<>();
     }
 }

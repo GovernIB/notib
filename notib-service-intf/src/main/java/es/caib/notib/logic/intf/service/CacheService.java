@@ -3,12 +3,9 @@
  */
 package es.caib.notib.logic.intf.service;
 
-import java.util.List;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import es.caib.notib.logic.intf.dto.CacheDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * Service per a la gestió de les cachés de l'aplicació
@@ -23,7 +20,7 @@ public interface CacheService {
 	 * @return una llista amb els codis de les caches
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	PaginaDto<CacheDto> getAllCaches();
+	public PaginaDto<CacheDto> getAllCaches();
 
 	/**
 	 * Esborra una cache donat el seu codi (value)
@@ -32,12 +29,12 @@ public interface CacheService {
 	 * 
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	void removeCache(String value);
+	public void removeCache(String value);
 
 	/**
 	 * Esborra totes les caches
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	void removeAllCaches();
+	public void removeAllCaches();
 	
 }

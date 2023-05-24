@@ -5,6 +5,7 @@ import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
+import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioEntity;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioParamEntity;
@@ -26,15 +27,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Mètodes per a la gestió d'integracions.
- *
+ * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
 @Component
 public class IntegracioHelper {
+
+//	@Resource
+//	private UsuariHelper usuariHelper;
 
 	@Autowired
 	private UsuariRepository usuariRepository;
@@ -44,8 +49,8 @@ public class IntegracioHelper {
 	private MonitorIntegracioRepository monitorRepository;
 	@Autowired
 	private MonitorIntegracioParamRepository monitorParamRepository;
-	@Autowired
-	private ConversioTipusHelper conversio;
+//	@Autowired
+//	private ConversioTipusHelper conversio;
 
 	public static final String INTCODI_USUARIS = "USUARIS";
 	public static final String INTCODI_REGISTRE = "REGISTRE";
@@ -59,9 +64,9 @@ public class IntegracioHelper {
 //	public static final String INTCODI_CONVERT = "CONVERT";
 	public static final String INTCODI_FIRMASERV = "FIRMASERV";
 	public static final String INTCODI_VALIDASIG = "VALIDASIG";
+	public static final String CARPETA = "CARPETA";
 
 	public List<IntegracioDto> findAll() {
-
 		List<IntegracioDto> integracions = new ArrayList<>();
 		integracions.add(novaIntegracio(INTCODI_USUARIS));
 		integracions.add(novaIntegracio(INTCODI_REGISTRE));
@@ -78,7 +83,6 @@ public class IntegracioHelper {
 	}
 
 	public Map<String, Integer> countErrorsGroupByCodi() {
-
 		Map<String ,Integer> errorsGroupByCodi = new HashMap<String, Integer>();
 		errorsGroupByCodi.put(INTCODI_USUARIS,countErrors(INTCODI_USUARIS));
 		errorsGroupByCodi.put(INTCODI_REGISTRE,countErrors(INTCODI_REGISTRE));
@@ -98,33 +102,53 @@ public class IntegracioHelper {
 		addAccioOk(info, true);
 	}
 
+//	@Transactional
 	public void addAccioOk(IntegracioInfo info, boolean obtenirUsuari) {
 
-		var accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio()).tipus(info.getTipus()).
-				codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.OK).aplicacio(info.getAplicacio()).build();
+		MonitorIntegracioEntity accio = MonitorIntegracioEntity.builder()
+				.codi(info.getCodi())
+				.data(new Date())
+				.descripcio(info.getDescripcio())
+				.tipus(info.getTipus())
+				.codiEntitat(info.getCodiEntitat())
+				.tempsResposta(info.getTempsResposta())
+				.estat(IntegracioAccioEstatEnumDto.OK)
+				.aplicacio(info.getAplicacio()).build();
 
 		assignarAccioAParams(info, accio);
 		addAccio(accio, obtenirUsuari);
+//		accio.setIntegracio(novaIntegracio(info.getCodi()));
 	}
 
 	public void addAccioError(IntegracioInfo info, String errorDescripcio) {
+
 		addAccioError(info, errorDescripcio, null,true);
 	}
 
 	public void addAccioError(IntegracioInfo info, String errorDescripcio, boolean obtenirUsuari) {
-		addAccioError(info, errorDescripcio, null, obtenirUsuari);
+
+		addAccioError(info, errorDescripcio, null,true);
 	}
 
 	public void addAccioError(IntegracioInfo info, String errorDescripcio, Throwable throwable) {
+
 		addAccioError(info, errorDescripcio, throwable,true);
 	}
 
+//	@Transactional
 	public void addAccioError(IntegracioInfo info, String errorDescripcio, Throwable throwable, boolean obtenirUsuari) {
 
-		var accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio()).tipus(info.getTipus())
-				.codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.ERROR).errorDescripcio(errorDescripcio)
+		MonitorIntegracioEntity accio = MonitorIntegracioEntity.builder()
+				.codi(info.getCodi())
+				.data(new Date())
+				.descripcio(info.getDescripcio())
+				.tipus(info.getTipus())
+				.codiEntitat(info.getCodiEntitat())
+				.tempsResposta(info.getTempsResposta())
+				.estat(IntegracioAccioEstatEnumDto.ERROR)
+				.errorDescripcio(errorDescripcio)
 				.aplicacio(info.getAplicacio()).build();
-
+//		accio.setIntegracio(novaIntegracio(info.getCodi()));
 		assignarAccioAParams(info, accio);
 		if (throwable != null) {
 			accio.setExcepcioMessage(ExceptionUtils.getMessage(throwable));
@@ -135,10 +159,11 @@ public class IntegracioHelper {
 				+ "parametres=" + info.getParams() + ", tipus=" + info.getTipus() + ", tempsResposta=" + info.getTempsResposta() + ")", throwable);
 	}
 
+
 	private void addAccio(MonitorIntegracioEntity accio, boolean obtenirUsuari) {
 
 		afegirParametreUsuari(accio, obtenirUsuari);
-		var st = accio.getExcepcioStacktrace();
+		String st = accio.getExcepcioStacktrace();
 		accio.setExcepcioStacktrace(st != null && st.getBytes().length > 2000 ? st.substring(0, 1997) + "..." : st);
 		try {
 			monitorRepository.save(accio);
@@ -155,10 +180,16 @@ public class IntegracioHelper {
 
 	private void assignarAccioAParams(IntegracioInfo info, MonitorIntegracioEntity accio) {
 
-		var params = conversio.convertirList(info.getParams(), MonitorIntegracioParamEntity.class);
-		for (var param : params) {
-			param.setMonitorIntegracio(accio);
-		}
+//		List<MonitorIntegracioParamEntity> params = conversio.convertirList(info.getParams(), MonitorIntegracioParamEntity.class);
+		var params = info.getParams().stream()
+				.map(p -> MonitorIntegracioParamEntity.builder()
+						.monitorIntegracio(accio)
+						.codi(p.getCodi())
+						.valor(p.getValor()).build())
+				.collect(Collectors.toList());
+//		for (var param : params) {
+//			param.setMonitorIntegracio(accio);
+//		}
 		accio.setParametres(params);
 	}
 
@@ -167,21 +198,24 @@ public class IntegracioHelper {
 		if (accio.getParametres() == null) {
 			accio.setParametres(new ArrayList<MonitorIntegracioParamEntity>());
 		}
-		accio.getParametres().add(MonitorIntegracioParamEntity.builder().monitorIntegracio(accio).codi("Usuari").valor(getUsuariNomCodi(obtenirUsuari)).build());
+		accio.getParametres().add(MonitorIntegracioParamEntity.builder()
+				.monitorIntegracio(accio)
+				.codi("Usuari")
+				.valor(getUsuariNomCodi(obtenirUsuari)).build());
 	}
 
 	private String getUsuariNomCodi(boolean obtenirUsuari) {
 
-		var auth = SecurityContextHolder.getContext().getAuthentication();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth == null || Strings.isNullOrEmpty(auth.getName())) {
 			return "";
 		}
-		var usuariNomCodi = auth.getName();
+		String usuariNomCodi = auth.getName();
 		if (!obtenirUsuari) {
 			return usuariNomCodi;
 		}
 		try {
-			var usuari = usuariRepository.findByCodi(auth.getName());
+			UsuariEntity usuari = usuariRepository.findById(auth.getName()).orElse(null);
 			if (usuari == null) {
 				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari no trobat a la bdd");
 				return usuariNomCodi;
@@ -195,7 +229,7 @@ public class IntegracioHelper {
 
 	private IntegracioDto novaIntegracio(String codi) {
 
-		var integracio = new IntegracioDto();
+		IntegracioDto integracio = new IntegracioDto();
 		integracio.setCodi(codi);
 		if (INTCODI_USUARIS.equals(codi)) {
 			integracio.setNom("Usuaris");
@@ -214,7 +248,7 @@ public class IntegracioHelper {
 		} else if (INTCODI_GESCONADM.equals(codi)) {
 			integracio.setNom("Rolsac");
 		} else if (INTCODI_PROCEDIMENT.equals(codi)) {
-			integracio.setNom("Procediments");
+				integracio.setNom("Procediments");
 		} else if (INTCODI_FIRMASERV.equals(codi)) {
 			integracio.setNom("Firma servidor");
 		} else if (INTCODI_VALIDASIG.equals(codi)) {
@@ -225,14 +259,14 @@ public class IntegracioHelper {
 
 	public void addAplicacioAccioParam(IntegracioInfo info, Long entitatId) {
 
-		var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+		String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
 		info.setAplicacio(usuariCodi);
 		if (entitatId == null) {
 			String msg = "No existeix una aplicació amb el codi '" + usuariCodi;
 			info.getParams().add(new AccioParam("Codi aplicació", msg));
 			return;
 		}
-		var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuariCodi, entitatId);
+		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuariCodi, entitatId);
 		info.getParams().add(new AccioParam("Codi aplicació", aplicacio != null ? aplicacio.getUsuariCodi() : ""));
 	}
 
@@ -254,7 +288,6 @@ public class IntegracioHelper {
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void eliminarAntics(List<Long> ids) {
-
 		monitorParamRepository.eliminarAntics(ids);
 		monitorRepository.eliminarAntics(ids);
 		monitorRepository.flush();

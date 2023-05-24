@@ -34,12 +34,16 @@ function clearSeleccio() {
     sessionStorage.setItem('rowIdsStore', "{}");
 }
 
+let deseleccionar = () => {
+    $('#seleccioNone').click();
+    $(".seleccioCount").html(0);
+};
 
-
+let selectionAll = false;
 function initEvents($table, url_prefix, eventMessages) {
 
     $table.on('selectionchange.dataTable', function (e, accio, ids) {
-        if (accio === "select" || accio === "deselect") {
+        if (!selectionAll && (accio === "select" || accio === "deselect")) {
             $.get(
                 url_prefix + "/" + accio,
                 {ids: ids},
@@ -50,24 +54,41 @@ function initEvents($table, url_prefix, eventMessages) {
         }
     });
 
+    $table.on("draw.dt", () => {
+        selectionAll = false;
+    });
+
     $table.on('init.dt', function () {
+
         $('#seleccioAll').on('click', function() {
+            $('#seleccioAll').attr("disabled", true);
+            $('#seleccioNone').attr("disabled", true);
+            $('#cover-spin').show(0);
             $.get(
-                url_prefix + "/select",
-                function(data) {
-                    $(".seleccioCount").html(data);
-                    $table.webutilDatatable('refresh');
+                url_prefix + "/seleccionar/all",
+                indexes => {
+                    $(".seleccioCount").html(indexes);
+                    $table.webutilDatatable('select-all');
+                    $('#seleccioAll').attr("disabled", false);
+                    $('#seleccioNone').attr("disabled", false);
+                    $('#cover-spin').hide();
                 }
             );
             return false;
         });
         $('#seleccioNone').on('click', function() {
+            $('#seleccioAll').attr("disabled", true);
+            $('#seleccioNone').attr("disabled", true);
+            $('#cover-spin').show(0);
             $.get(
                 url_prefix + "/deselect",
                 function(data) {
                     $(".seleccioCount").html(data);
                     $table.webutilDatatable('select-none');
                     $table.webutilDatatable('refresh');
+                    $('#seleccioAll').attr("disabled", false);
+                    $('#seleccioNone').attr("disabled", false);
+                    $('#cover-spin').hide();
                 }
             );
             return false;
@@ -79,6 +100,11 @@ function initEvents($table, url_prefix, eventMessages) {
         });
 
         $('#reintentarNotificacio').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             if(confirm(eventMessages['confirm-reintentar-notificacio'])){
 
                 $.get(
@@ -96,6 +122,11 @@ function initEvents($table, url_prefix, eventMessages) {
         });
 
         $('#reintentarErrors').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             if(confirm(eventMessages['confirm-reintentar-errors'])){
 
                 $.get(
@@ -113,6 +144,11 @@ function initEvents($table, url_prefix, eventMessages) {
         });
 
         $('#reactivarConsulta').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             if(confirm(eventMessages['confirm-reintentar-consulta'])){
                 location.href = url_prefix + "/reactivar/consulta";
                 setTimeout(() => $table.DataTable().rows().deselect(), 100);
@@ -121,6 +157,11 @@ function initEvents($table, url_prefix, eventMessages) {
         });
 
         $('#reactivarSir').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             if(confirm(eventMessages['confirm-reintentar-sir'])){
                 $.get(
                     url_prefix + "/reactivar/sir",
@@ -135,6 +176,11 @@ function initEvents($table, url_prefix, eventMessages) {
             return false;
         });
         $('#updateEstat').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             if(confirm(eventMessages['confirm-update-estat'])){
                 $.get(
                     url_prefix + "/actualitzarestat",
@@ -150,6 +196,11 @@ function initEvents($table, url_prefix, eventMessages) {
         });
 
         $('#reactivarCallback').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             if(confirm(eventMessages['confirm-reactivar-callback'])){
                 location.href =  url_prefix + "/reactivar/callback";
                 setTimeout(() => $table.DataTable().rows().deselect(), 100);
@@ -158,6 +209,11 @@ function initEvents($table, url_prefix, eventMessages) {
         });
 
         $('#enviarCallback').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             if(confirm(eventMessages['confirm-enviar-callback'])){
                 location.href =  url_prefix + "/enviar/callback";
                 setTimeout(() => $table.DataTable().rows().deselect(), 100);
@@ -165,18 +221,44 @@ function initEvents($table, url_prefix, eventMessages) {
             return false;
         });
 
-        $("#exportarODS").on("click", () => {
+        $("#exportarODS").on("click", (e) => {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             // location.href = "notificacio/export/ODS";
             location.href = url_prefix + "/export/ODS";
             setTimeout(() => $table.DataTable().rows().deselect(), 100);
         });
 
         $("#eliminar").on("click", () => {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
             location.href = url_prefix + "/eliminar";
         });
-        $("#reintentarRegistre").on("click", () => {
-            location.href =  url_prefix + "/reintentar/registre";
+        $("#reactivarRegistre").on("click", () => {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
+            location.href =  url_prefix + "/reactivar/registre";
             setTimeout(() => $table.DataTable().rows().deselect(), 100);
         });
+
+        $("#enviarNotificacionsMovil").on("click", () => {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
+            location.href =  url_prefix + "/enviar/notificacio/movil";
+            setTimeout(() => $table.DataTable().rows().deselect(), 100);
+        });
+
     });
 }

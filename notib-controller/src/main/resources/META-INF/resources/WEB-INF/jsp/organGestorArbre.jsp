@@ -90,6 +90,13 @@
                     $('#form-filtre').submit();
                 });
 
+                $(':input', $('#filtre')).keypress(key => {
+                    if (key.keyCode !== 13 || key.which !== 13) {
+                        return;
+                    }
+                    $('#isFiltre').val(true);
+                });
+
                 $("#btnFiltrar").click(() => {
                     $('#isFiltre').val(true);
                     $('#form-filtre').submit();
@@ -137,6 +144,7 @@
                 <span class="fa fa-spin fa-circle-o-notch  fa-3x"></span>
             </div>
         </div>
+
         <c:set var="formActionFiltre"><not:modalUrl value="/organgestorArbre"/></c:set>
         <form:form id="filtre" action="${formActionFiltre}" method="post" cssClass="well" modelAttribute="organGestorFiltreCommand">
             <not:inputHidden name="isFiltre"/>
@@ -172,7 +180,6 @@
                     </button>
                     <not:inputHidden name="entregaCie"/>
                 </div>
-
                 <div class="col-md-2 pull-right">
                     <div class="pull-right">
                         <button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -203,15 +210,15 @@
                 <div style="padding-bottom: 10px; text-align: right">
                     <c:if test="${setOficina}">
                         <a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines/ARBRE"
-                           data-refresh-pagina="true" data-maximized="false">
-                            <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
+                                data-refresh-pagina="true" data-maximized="false">
+                                <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
                         </a>
                     </c:if>
                     <a id="organ-boto-update"
-                        class="btn btn-default" href="organgestor/sync/dir3"
-                        data-toggle="modal"
-                        data-refresh-pagina="true"
-                        data-maximized="false">
+                       class="btn btn-default" href="organgestor/sync/dir3"
+                       data-toggle="modal"
+                       data-refresh-pagina="true"
+                       data-maximized="false">
                         <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.tots"/>
                     </a>
                 </div>

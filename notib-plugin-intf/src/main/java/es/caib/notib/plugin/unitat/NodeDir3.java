@@ -22,7 +22,7 @@ import java.util.List;
  */
 @Getter @Setter
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NodeDir3 implements Serializable, Comparable<NodeDir3> {
@@ -33,6 +33,8 @@ public class NodeDir3 implements Serializable, Comparable<NodeDir3> {
 	@NonNull
 	@JsonProperty("denominacion")
 	private String denominacio;
+	@JsonProperty("denominacionCooficial")
+	private String denominacionCooficial;
 	@JsonProperty("descripcionEstado")
 	private String estat;
 	@JsonProperty("raiz")
@@ -60,9 +62,8 @@ public class NodeDir3 implements Serializable, Comparable<NodeDir3> {
 	
 	@Override
 	public int hashCode() {
-
-		final var prime = 31;
-		var result = 1;
+		final int prime = 31;
+		int result = 1;
 		result = prime * result + ((codi == null) ? 0 : codi.hashCode());
 		result = prime * result + ((denominacio == null) ? 0 : denominacio.hashCode());
 		result = prime * result + ((estat == null) ? 0 : estat.hashCode());
@@ -71,41 +72,28 @@ public class NodeDir3 implements Serializable, Comparable<NodeDir3> {
 
 	@Override
 	public boolean equals(Object obj) {
-
-		if (this == obj) {
+		if (this == obj)
 			return true;
-		}
-		if (obj == null) {
+		if (obj == null)
 			return false;
-		}
-		if (getClass() != obj.getClass()) {
+		if (getClass() != obj.getClass())
 			return false;
-		}
-		var other = (NodeDir3) obj;
+		NodeDir3 other = (NodeDir3) obj;
 		if (codi == null) {
-			if (other.codi != null) {
+			if (other.codi != null)
 				return false;
-			}
-		}
-		if (!codi.equals(other.codi)) {
+		} else if (!codi.equals(other.codi))
 			return false;
-		}
 		if (denominacio == null) {
-			if (other.denominacio != null) {
+			if (other.denominacio != null)
 				return false;
-			}
-		}
-		if (!denominacio.equals(other.denominacio)) {
+		} else if (!denominacio.equals(other.denominacio))
 			return false;
-		}
 		if (estat == null) {
-			if (other.estat != null) {
+			if (other.estat != null)
 				return false;
-			}
-		}
-		if (!estat.equals(other.estat)) {
+		} else if (!estat.equals(other.estat))
 			return false;
-		}
 		return true;
 	}
 

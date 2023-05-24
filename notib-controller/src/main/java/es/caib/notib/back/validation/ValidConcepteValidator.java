@@ -1,12 +1,11 @@
 package es.caib.notib.back.validation;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
+import es.caib.notib.back.helper.MessageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 
-import es.caib.notib.back.helper.MessageHelper;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * Valida que el concepte d'una notificació sigui vàlid.
@@ -29,23 +28,21 @@ public class ValidConcepteValidator implements ConstraintValidator<ValidConcepte
 		boolean valid = true;
 		try {
 			var fieldValue = BeanUtils.getProperty(value,  fieldName);
-			if (fieldValue == null || fieldValue.isEmpty()) {
+			if (fieldValue == null || fieldValue.isEmpty())
 				valid = true;
-			}
 			valid = validacioConcepte(fieldValue,context);
 		} catch (final Exception ex) {
 			log.error("Error en la validació del concepte", ex);
 			valid = false;
 		}
-		if (!valid) {
+		if (!valid)
 			context.disableDefaultConstraintViolation();
-		}
+
 		return valid;
 	}
-
 	// Validació del concepte
 	private static final String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;";
-	
+
 	@SuppressWarnings("deprecation")
 	private static boolean validacioConcepte(String concepte, final ConstraintValidatorContext context) {
 
@@ -53,12 +50,12 @@ public class ValidConcepteValidator implements ConstraintValidator<ValidConcepte
 		var esCaracterValid = true;
 		for (var i = 0; esCaracterValid && i < concepte_chars.length; i++) {
 			esCaracterValid = !(CONTROL_CARACTERS.indexOf(concepte_chars[i]) < 0);
-			var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.concepte");
 			if (!esCaracterValid) {
+				var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.concepte");
 				context.buildConstraintViolationWithTemplate(msg).addNode("concepte").addConstraintViolation();
 				break;
 			}
-	    }
+		}
 		return esCaracterValid;
 	}
 }

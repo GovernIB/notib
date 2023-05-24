@@ -1,11 +1,9 @@
 package es.caib.notib.logic.intf.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
-@Getter
-@ToString(includeFieldNames = true)
+@Getter @ToString(includeFieldNames = true)
 public class AccioParam {
 
 	String codi;

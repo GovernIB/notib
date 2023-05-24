@@ -1,30 +1,52 @@
-
+/**
+ * 
+ */
 package es.caib.notib.logic.service;
 
-import es.caib.notib.logic.intf.dto.*;
+import com.codahale.metrics.Timer;
+import es.caib.notib.logic.aspect.Audita;
+import es.caib.notib.logic.cacheable.OrganGestorCachable;
+import es.caib.notib.logic.cacheable.PermisosCacheable;
+import es.caib.notib.logic.helper.CacheHelper;
+import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.EntityComprovarHelper;
+import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.helper.PaginacioHelper;
+import es.caib.notib.logic.helper.PermisosHelper;
+import es.caib.notib.logic.intf.acl.ExtendedPermission;
+import es.caib.notib.logic.intf.dto.EntitatDataDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.LlibreDto;
+import es.caib.notib.logic.intf.dto.OficinaDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.PermisDto;
+import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.TipusDocumentDto;
+import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
+import es.caib.notib.logic.intf.dto.TipusEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.service.AuditService.TipusEntitat;
 import es.caib.notib.logic.intf.service.AuditService.TipusObjecte;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
 import es.caib.notib.logic.intf.service.EntitatService;
-import es.caib.notib.logic.aspect.Audita;
-import es.caib.notib.logic.cacheable.PermisosCacheable;
-import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.EntitatTipusDocEntity;
+import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
-import es.caib.notib.logic.helper.*;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.ColumnesRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.EntitatTipusDocRepository;
 import es.caib.notib.persist.repository.EntregaCieRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
-import es.caib.notib.logic.intf.acl.ExtendedPermission;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +55,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +67,6 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Slf4j
 @Service
 public class EntitatServiceImpl implements EntitatService {
 
@@ -85,27 +107,28 @@ public class EntitatServiceImpl implements EntitatService {
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
 	public EntitatDto create(EntitatDataDto entitat) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Creant una nova entitat (entitat=" + entitat + ")");
+			logger.debug("Creant una nova entitat (entitat=" + entitat + ")");
 			entityComprovarHelper.comprovarPermisos(null,true,false,false);
 
-			var entitatBuilder = EntitatEntity.getBuilder(entitat.getCodi(), entitat.getNom(), entitat.getTipus(), entitat.getDir3Codi(),
+			EntitatEntity.EntitatEntityBuilder entitatBuilder = EntitatEntity.getBuilder(entitat.getCodi(), entitat.getNom(), entitat.getTipus(), entitat.getDir3Codi(),
 					entitat.getDir3CodiReg(), entitat.getApiKey(), entitat.isAmbEntregaDeh(), entitat.getLogoCapBytes(), entitat.getLogoPeuBytes(),
 					entitat.getColorFons(), entitat.getColorLletra(), entitat.getTipusDocDefault().getTipusDocEnum(), entitat.getOficina(), entitat.getNomOficinaVirtual(),
 					entitat.isLlibreEntitat(), entitat.getLlibre(), entitat.getLlibreNom(), entitat.isOficinaEntitat()).descripcio(entitat.getDescripcio());
 
 			if (entitat.isEntregaCieActiva()) {
-				var entregaCie = new EntregaCieEntity(entitat.getCieId(), entitat.getOperadorPostalId());
+				EntregaCieEntity entregaCie = new EntregaCieEntity(entitat.getCieId(), entitat.getOperadorPostalId());
 				entitatBuilder.entregaCie(entregaCieRepository.save(entregaCie));
 			}
-			var entitatSaved = entitatRepository.save(entitatBuilder.build());
+			EntitatEntity entitatSaved = entitatRepository.save(entitatBuilder.build());
 			if (entitat.getTipusDoc() != null) {
-				for (var tipusDocument : entitat.getTipusDoc()) {
+				for (TipusDocumentDto tipusDocument : entitat.getTipusDoc()) {
 					EntitatTipusDocEntity tipusDocEntity = EntitatTipusDocEntity.getBuilder(entitatSaved, tipusDocument.getTipusDocEnum()).build();
 					entitatTipusDocRepository.save(tipusDocEntity);
 				}
 			}
+
 			configHelper.crearConfigsEntitat(entitat.getCodi());
 			return conversioTipusHelper.convertir(entitatSaved, EntitatDto.class);
 		} finally {
@@ -118,16 +141,16 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public EntitatDto update(EntitatDataDto entitat) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Actualitzant entitat existent (entitat=" + entitat + ")");
+			logger.debug("Actualitzant entitat existent (entitat=" + entitat + ")");
 			entityComprovarHelper.comprovarEntitat(entitat.getId(),true,true,false,false);
 			byte[] logoCapActual = null;
 			byte[] logoPeuActual = null;
-			var entity = entitatRepository.findById(entitat.getId()).orElseThrow();
-			var tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entity);
+			EntitatEntity entity = entitatRepository.findById(entitat.getId()).orElseThrow();
+			List<EntitatTipusDocEntity> tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entity);
 			if (tipusDocsEntity != null && !tipusDocsEntity.isEmpty()) {
-				for (var tipusDocDto : entitat.getTipusDoc()) {
+				for (TipusDocumentDto tipusDocDto : entitat.getTipusDoc()) {
 					 entitatTipusDocRepository.deleteNotInList(entitat.getId(), tipusDocDto.getTipusDocEnum());
 				}
 			}
@@ -136,10 +159,10 @@ public class EntitatServiceImpl implements EntitatService {
 			}
 			
 			if ((entitat.getTipusDoc() != null && entitat.getTipusDoc().size() > 1) || tipusDocsEntity.isEmpty() && entitat.getTipusDoc() != null) {
-				for (var tipusDocument : entitat.getTipusDoc()) {
-					var tipusDocumentActual = entitatTipusDocRepository.findByEntitatAndTipus(entity.getId(), tipusDocument.getTipusDocEnum());
+				for (TipusDocumentDto tipusDocument : entitat.getTipusDoc()) {
+					EntitatTipusDocEntity tipusDocumentActual = entitatTipusDocRepository.findByEntitatAndTipus(entity.getId(), tipusDocument.getTipusDocEnum());
 					if (tipusDocumentActual == null) {
-						var tipusDocEntity = EntitatTipusDocEntity.getBuilder(entity, tipusDocument.getTipusDocEnum()).build();
+						EntitatTipusDocEntity tipusDocEntity = EntitatTipusDocEntity.getBuilder(entity, tipusDocument.getTipusDocEnum()).build();
 						entitatTipusDocRepository.save(tipusDocEntity);
 					}
 				}
@@ -151,7 +174,7 @@ public class EntitatServiceImpl implements EntitatService {
 			if (!entitat.isEliminarLogoPeu()) {
 				logoPeuActual = entitat.getLogoPeuBytes() != null && entitat.getLogoPeuBytes().length != 0 ? entitat.getLogoPeuBytes() : entity.getLogoPeuBytes();
 			}
-			var entregaCie = entity.getEntregaCie();
+			EntregaCieEntity entregaCie = entity.getEntregaCie();
 			if (entitat.isEntregaCieActiva()) {
 				if (entregaCie == null) {
 					entregaCie = entregaCieRepository.save(new EntregaCieEntity(entitat.getCieId(), entitat.getOperadorPostalId()));
@@ -180,11 +203,11 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public EntitatDto updateActiva(Long id,boolean activa) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Actualitzant propietat activa d'una entitat existent (id=" + id + ", activa=" + activa + ")");
+			logger.debug("Actualitzant propietat activa d'una entitat existent (id=" + id + ", activa=" + activa + ")");
 			entityComprovarHelper.comprovarPermisos(null,true,false,false);
-			var entitat = entitatRepository.findById(id).orElseThrow();
+			EntitatEntity entitat = entitatRepository.findById(id).orElseThrow();
 			entitat.updateActiva(activa);
 			return conversioTipusHelper.convertir(entitat, EntitatDto.class);
 		} finally {
@@ -198,17 +221,17 @@ public class EntitatServiceImpl implements EntitatService {
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
 	public EntitatDto delete(Long id) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Esborrant entitat (id=" + id +  ")");
+			logger.debug("Esborrant entitat (id=" + id +  ")");
 			entityComprovarHelper.comprovarPermisos(null, true,false,false );
-			var entitat = entitatRepository.findById(id).orElseThrow();
-			var notificacions = notificacioRepository.findByEntitatId(entitat.getId());
+			EntitatEntity entitat = entitatRepository.findById(id).orElseThrow();
+			List<NotificacioEntity> notificacions = notificacioRepository.findByEntitatId(entitat.getId());
 			if (!notificacions.isEmpty()) {
 				return null;
 			}
 			aplicacioRepository.deleteAplicacioEntityByEntitat(entitat);
-			var tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entitat);
+			List<EntitatTipusDocEntity> tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entitat);
 			if (!tipusDocsEntity.isEmpty()) {
 				entitatTipusDocRepository.deleteAll(tipusDocsEntity);
 			}
@@ -225,12 +248,15 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public List<TipusDocumentDto> findTipusDocumentByEntitat(Long entitatId) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			List<TipusDocumentDto> tipusDocumentsDto = new ArrayList<>();
-			var entitat = entitatRepository.findById(entitatId).orElseThrow();
-			var tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entitat);
-			for (var entitatTipusDocEntity : tipusDocsEntity) {
+			List<TipusDocumentDto> tipusDocumentsDto = new ArrayList<TipusDocumentDto>();
+			
+			EntitatEntity entitat = entitatRepository.findById(entitatId).orElseThrow();
+			
+			List<EntitatTipusDocEntity> tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entitat);
+			
+			for (EntitatTipusDocEntity entitatTipusDocEntity : tipusDocsEntity) {
 				TipusDocumentDto tipusDocumentDto = new TipusDocumentDto();
 				tipusDocumentDto.setTipusDocEnum(entitatTipusDocEntity.getTipusDocEnum());
 				tipusDocumentsDto.add(tipusDocumentDto);
@@ -243,10 +269,9 @@ public class EntitatServiceImpl implements EntitatService {
 	
 	@Override
 	public TipusDocumentEnumDto findTipusDocumentDefaultByEntitat(Long entitatId) {
-
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			var entitat = entitatRepository.findById(entitatId).orElseThrow();
+			EntitatEntity entitat = entitatRepository.findById(entitatId).orElseThrow();
 			return entitat.getTipusDocDefault();
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -257,10 +282,10 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public EntitatDto findById(Long entitatId) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta de l'entitat (id=" + entitatId + ")");
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			logger.debug("Consulta de l'entitat (id=" + entitatId + ")");
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			return conversioTipusHelper.convertir(entitat, EntitatDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -271,13 +296,11 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public EntitatDto findByCodi(String codi) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta de l'entitat amb codi (codi=" + codi + ")");
-			var entitat = entitatRepository.findByCodi(codi);
-			if (entitat == null)  {
-				return null;
-			}
+			logger.debug("Consulta de l'entitat amb codi (codi=" + codi + ")");
+			EntitatEntity entitat = entitatRepository.findByCodi(codi);
+			if (entitat == null) return null;
 			entityComprovarHelper.comprovarPermisos(null,true,true,true);
 			return conversioTipusHelper.convertir(entitat, EntitatDto.class);
 		} finally {
@@ -289,10 +312,10 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public EntitatDto findByDir3codi(String dir3codi) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta de l'entitat amb codi DIR3 (dir3codi=" + dir3codi + ")");
-			var dto = conversioTipusHelper.convertir(entitatRepository.findByDir3Codi(dir3codi), EntitatDto.class);
+			logger.debug("Consulta de l'entitat amb codi DIR3 (dir3codi=" + dir3codi + ")");
+			EntitatDto dto = conversioTipusHelper.convertir(entitatRepository.findByDir3Codi(dir3codi), EntitatDto.class);
 			return dto;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -303,9 +326,9 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public List<EntitatDto> findAll() {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta de totes les entitats");
+			logger.debug("Consulta de totes les entitats");
 			entityComprovarHelper.comprovarPermisos(null,true,false,false);
 			return conversioTipusHelper.convertirList(entitatRepository.findAll(), EntitatDto.class);
 		} finally {
@@ -316,16 +339,15 @@ public class EntitatServiceImpl implements EntitatService {
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<EntitatDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
-		
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta de totes les entitats paginades (paginacioParams=" + paginacioParams + ")");
+			logger.debug("Consulta de totes les entitats paginades (paginacioParams=" + paginacioParams + ")");
 			entityComprovarHelper.comprovarPermisos(null,true,false,false);
-			var entitats = entitatRepository.findByFiltre(paginacioParams.getFiltre(), paginacioHelper.toSpringDataPageable(paginacioParams));
-			var resposta = paginacioHelper.toPaginaDto(entitats, EntitatDto.class);
-			for (var entitat: resposta.getContingut()) {
+			PaginaDto<EntitatDto> resposta = paginacioHelper.toPaginaDto(entitatRepository.findByFiltre(paginacioParams.getFiltre(),
+								paginacioHelper.toSpringDataPageable(paginacioParams)), EntitatDto.class);
+			for (EntitatDto entitat: resposta.getContingut()) {
 				// Permisos
-				var permisos = permisosHelper.findPermisos(entitat.getId(), EntitatEntity.class);
+				List<PermisDto> permisos = permisosHelper.findPermisos(entitat.getId(), EntitatEntity.class);
 				entitat.setPermisos(permisos);
 				// Aplicacions
 				entitat.setNumAplicacions(aplicacioRepository.countByEntitatId(entitat.getId()));
@@ -340,10 +362,10 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public List<EntitatDto> findAccessiblesUsuariActual(String rolActual) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			var auth = SecurityContextHolder.getContext().getAuthentication();
-			log.debug("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")");
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			logger.debug("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")");
 			return permisosCacheable.findEntitatsAccessiblesUsuari(auth.getName(), rolActual);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -354,11 +376,11 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public List<PermisDto> permisFindByEntitatId(Long entitatId, PaginacioParamsDto paginacioParams) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta dels permisos de l'entitat (entitatId=" + entitatId + ")");
+			logger.debug("Consulta dels permisos de l'entitat (entitatId=" + entitatId + ")");
 			entityComprovarHelper.comprovarPermisos(null,true,true,true);
-			var permisos = permisosHelper.findPermisos(entitatId, EntitatEntity.class);
+			List<PermisDto> permisos = permisosHelper.findPermisos(entitatId, EntitatEntity.class);
 			permisosHelper.ordenarPermisos(paginacioParams, permisos);
 			return permisos;
 		} finally {
@@ -371,12 +393,22 @@ public class EntitatServiceImpl implements EntitatService {
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
 	public void permisUpdate(Long entitatId, PermisDto permis) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Modificació com a superusuari del permis de l'entitat (entitatId=" + entitatId + ", permis=" + permis + ")");
-			permis.setPrincipal(TipusEnumDto.ROL.equals(permis.getTipus()) ? 
-					(permis.getPrincipal().equalsIgnoreCase("tothom") ? permis.getPrincipal().toLowerCase() : permis.getPrincipal().toUpperCase())	
-					: (TipusEnumDto.USUARI.equals(permis.getTipus()) ? permis.getPrincipal().toLowerCase() : permis.getPrincipal()));
+			logger.debug("Modificació com a superusuari del permis de l'entitat (entitatId=" + entitatId + ", permis=" + permis + ")");
+			
+			if (TipusEnumDto.ROL.equals(permis.getTipus())) {
+				if (permis.getPrincipal().equalsIgnoreCase("tothom")) {
+					permis.setPrincipal(permis.getPrincipal().toLowerCase());					
+				} else {
+					permis.setPrincipal(permis.getPrincipal().toUpperCase());
+				}
+			} else {
+				if (TipusEnumDto.USUARI.equals(permis.getTipus())) {
+					permis.setPrincipal(permis.getPrincipal().toLowerCase());
+				}
+			}
+			
 			entityComprovarHelper.comprovarEntitat(entitatId,true,true,false,false);
 			permisosHelper.updatePermis(entitatId, EntitatEntity.class, permis);
 		} finally {
@@ -389,22 +421,23 @@ public class EntitatServiceImpl implements EntitatService {
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
 	public void permisDelete(Long entitatId, Long permisId) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Eliminació com a superusuari del permis de l'entitat (entitatId=" + entitatId + ", permisId=" + permisId + ")");
+			logger.debug("Eliminació com a superusuari del permis de l'entitat (entitatId=" + entitatId + ", permisId=" + permisId + ")");
 			entityComprovarHelper.comprovarEntitat(entitatId,true,true,false,false);
 			permisosHelper.deletePermis(entitatId, EntitatEntity.class, permisId);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
+
 	@Override
 	public boolean hasPermisUsuariEntitat() {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			var resposta = entityComprovarHelper.findPermisEntitat(new Permission[] {ExtendedPermission.USUARI});
+			List<EntitatDto> resposta = entityComprovarHelper.findPermisEntitat(new Permission[] {ExtendedPermission.USUARI});
 			return (resposta.isEmpty()) ? false : true;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -414,9 +447,9 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public boolean hasPermisAdminEntitat() {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			var resposta = entityComprovarHelper.findPermisEntitat(new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT});
+			List<EntitatDto> resposta = entityComprovarHelper.findPermisEntitat(new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT});
 			return (resposta.isEmpty()) ? false : true;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -426,9 +459,9 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public boolean hasPermisAplicacioEntitat() {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			var resposta = entityComprovarHelper.findPermisEntitat(new Permission[] {ExtendedPermission.APLICACIO});
+			List<EntitatDto> resposta = entityComprovarHelper.findPermisEntitat(new Permission[] {ExtendedPermission.APLICACIO});
 			return (resposta.isEmpty()) ? false : true;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -438,16 +471,16 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual() {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			var auth = SecurityContextHolder.getContext().getAuthentication();
-			Map<RolEnumDto, Boolean> hasPermisos = new HashMap<>();
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			Map<RolEnumDto, Boolean> hasPermisos = new HashMap<RolEnumDto, Boolean>();
 			if (auth != null) {
 				try {
 					hasPermisos = permisosCacheable.getPermisosEntitatsUsuariActual(auth);
 					return hasPermisos;
 				} catch (Exception ex) {
-					log.error("Error obtenint els permisos de l'usuari " + auth.getName(), ex);
+					logger.error("Error obtenint els permisos de l'usuari " + auth.getName(), ex);
 				}
 			}
 			hasPermisos.put(RolEnumDto.tothom, false);
@@ -455,6 +488,7 @@ public class EntitatServiceImpl implements EntitatService {
 			hasPermisos.put(RolEnumDto.NOT_APL, false);
 			hasPermisos.put(RolEnumDto.NOT_ADMIN_ORGAN, false);
 			return hasPermisos;
+
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -463,16 +497,15 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<OficinaDto> findOficinesEntitat(String dir3codi) {
-
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			List<OficinaDto> oficines = new ArrayList<>();
+			List<OficinaDto> oficines = new ArrayList<OficinaDto>();
 			try {
 				//Recupera les oficines d'una entitat
 				oficines = cacheHelper.llistarOficinesEntitat(dir3codi);
 			} catch (Exception e) {
 				String errorMessage = "No s'han pogut recuperar les oficines de l'entitat amb codi: " + dir3codi;
-				log.error(errorMessage, e.getMessage());
+				logger.error(errorMessage, e.getMessage());
 			}
 			return oficines;	
 		} finally {
@@ -484,10 +517,10 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public byte[] getCapLogo() throws NoSuchFileException, IOException{
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			var filePath = configHelper.getConfig("es.caib.notib.capsalera.logo");
-			var path = Paths.get(filePath);
+			String filePath = configHelper.getConfig("es.caib.notib.capsalera.logo");
+			Path path = Paths.get(filePath);
 			return Files.readAllBytes(path);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -498,10 +531,10 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public byte[] getPeuLogo() throws NoSuchFileException, IOException{
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			var filePath = configHelper.getConfig("es.caib.notib.peu.logo");
-			var path = Paths.get(filePath);
+			String filePath = configHelper.getConfig("es.caib.notib.peu.logo");
+			Path path = Paths.get(filePath);
 			return Files.readAllBytes(path);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -512,14 +545,14 @@ public class EntitatServiceImpl implements EntitatService {
 	@Transactional(readOnly = true)
 	public LlibreDto getLlibreEntitat(String dir3Codi) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			var llibre = new LlibreDto();
+			LlibreDto llibre = new LlibreDto();
 			try {
 				llibre = cacheHelper.getLlibreOrganGestor(dir3Codi, dir3Codi);
 	 		} catch (Exception e) {
-	 			var errorMessage = "No s'ha pogut recuperar el llibre de l'entitat amb codi Dir3: " + dir3Codi;
-				log.error(errorMessage, e.getMessage());
+	 			String errorMessage = "No s'ha pogut recuperar el llibre de l'entitat amb codi Dir3: " + dir3Codi;
+				logger.error(errorMessage, e.getMessage());
 			}
 			return llibre;
 		} finally {
@@ -531,7 +564,7 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatCodi) {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			return organGestorCachable.findOrganigramaByEntitat(entitatCodi);
 		} finally {
@@ -542,10 +575,10 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public boolean existeixPermis(Long entitatId, String principal) throws Exception {
 
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			var permisos = permisosHelper.findPermisos(entitatId, EntitatEntity.class);
-			for (var permis : permisos) {
+			List<PermisDto> permisos = permisosHelper.findPermisos(entitatId, EntitatEntity.class);
+			for (PermisDto permis : permisos) {
 				if (permis.getPrincipal().equals(principal)) {
 					return true;
 				}
@@ -565,11 +598,11 @@ public class EntitatServiceImpl implements EntitatService {
 	@Transactional
 	public void resetActualitzacioOrgans(Long id) {
 
-		var opt = entitatRepository.findById(id);
-		if (opt.isEmpty()) {
-			return;
-		}
-		opt.get().setDataActualitzacio(null);
-		opt.get().setDataSincronitzacio(null);
+		EntitatEntity entitat = entitatRepository.findById(id).orElseThrow();
+		entitat.setDataActualitzacio(null);
+		entitat.setDataSincronitzacio(null);
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
+
 }

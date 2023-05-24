@@ -4,16 +4,26 @@
 package es.caib.notib.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import es.caib.notib.client.domini.*;
+import es.caib.notib.client.domini.AppInfo;
+import es.caib.notib.client.domini.DadesConsulta;
+import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.client.domini.PermisConsulta;
+import es.caib.notib.client.domini.RespostaAltaV2;
+import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
+import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
+import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
+import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-;import java.text.SimpleDateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+
+;
 
 /**
  * Client REST v2 per al servei de notificacions de NOTIB.
@@ -22,8 +32,8 @@ import java.util.Date;
  */
 public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
-	private static final String NOTIFICACIOV2_SERVICE_PATH = "/api/services/notificacioV22";
-	private static final String CONSULTAV2_SERVICE_PATH = "/api/consulta/v2";
+	private static final String NOTIFICACIOV2_SERVICE_PATH = "/interna/notificacio/v2";
+	private static final String CONSULTAV2_SERVICE_PATH = "/interna/consulta/v2";
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	/**
@@ -123,7 +133,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public AppInfo getAppInfo() {
 		String urlAmbMetode = baseUrl + "/api/rest/appinfo";
 		try {
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
@@ -147,7 +157,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/alta";
 			ObjectMapper mapper  = getMapper();
 			String body = mapper.writeValueAsString(notificacio);
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			logger.debug("Missatge REST enviat: " + body);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
@@ -179,7 +189,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(String identificador) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
@@ -199,7 +209,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviament(String referencia) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
@@ -221,7 +231,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaDadesRegistre";
 			ObjectMapper mapper  = getMapper();
 			String body = mapper.writeValueAsString(dadesConsulta);
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
@@ -317,7 +327,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	}
 
 	private String getConsultaJsonString(Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida, String urlAmbMetode) throws Exception {
-		Client jerseyClient = generarClient(urlAmbMetode);
+		jerseyClient = generarClient(urlAmbMetode);
 		String json = jerseyClient.
 				resource(urlAmbMetode).
 				queryParam("dataInicial", dataInicial != null ? sdf.format(dataInicial) : "").

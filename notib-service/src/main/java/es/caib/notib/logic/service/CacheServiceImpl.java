@@ -3,18 +3,21 @@
  */
 package es.caib.notib.logic.service;
 
-import es.caib.notib.logic.intf.dto.CacheDto;
-import es.caib.notib.logic.intf.dto.PaginaDto;
-import es.caib.notib.logic.intf.service.CacheService;
+import com.codahale.metrics.Timer;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
-import lombok.extern.slf4j.Slf4j;
+import es.caib.notib.logic.intf.dto.CacheDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.service.CacheService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -26,7 +29,6 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Slf4j
 @Service
 public class CacheServiceImpl implements CacheService {
 
@@ -38,7 +40,6 @@ public class CacheServiceImpl implements CacheService {
 	private MessageHelper messageHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
-
 
 	public static Map<String, Integer> ordreCaches;
 
@@ -75,19 +76,18 @@ public class CacheServiceImpl implements CacheService {
 		ordreCaches.put("organsPermisPerProcedimentComu", 28);
 		ordreCaches.put("procserOrgansCodisAmbPermis", 29);
 	}
-	
+
+
 	@Override
 	public PaginaDto<CacheDto> getAllCaches() {
-
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Recuperant el llistat de les caches disponibles");
+			logger.debug("Recuperant el llistat de les caches disponibles");
 			List<CacheDto> caches = new ArrayList<>();
-			var cachesValues = cacheHelper.getAllCaches();
-			CacheDto cache;
-			for (var cacheValue : cachesValues) {
+			Collection<String> cachesValues = cacheHelper.getAllCaches();
+			for (String cacheValue : cachesValues) {
 //				if (!cacheValue.equals("aclCache")) {
-					 cache = new CacheDto();
+					CacheDto cache = new CacheDto();
 					cache.setCodi(cacheValue);
 					cache.setDescripcio(messageHelper.getMessage("es.caib.notib.ehcache." + cacheValue));
 					cache.setLocalHeapSize(cacheHelper.getCacheSize(cacheValue));
@@ -98,13 +98,11 @@ public class CacheServiceImpl implements CacheService {
 				@Override
 				public int compare(CacheDto c1, CacheDto c2) {
 					Integer c1Pos = ordreCaches.get(c1.getCodi());
-					if (c1Pos == null) {
+					if (c1Pos == null)
 						c1Pos = 1000;
-					}
 					Integer c2Pos = ordreCaches.get(c2.getCodi());
-					if (c2Pos == null) {
+					if (c2Pos == null)
 						c2Pos = 1001;
-					}
 					return c1Pos.compareTo(c2Pos);
 				}
 			});
@@ -116,25 +114,26 @@ public class CacheServiceImpl implements CacheService {
 
 	@Override
 	public void removeCache(String value) {
-
-		var timer = metricsHelper.iniciMetrica();
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Esborrant la cache (value=" + value + ")");
+			logger.debug("Esborrant la cache (value=" + value + ")");
 			cacheHelper.clearCache(value);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
 
-	@Override
-	public void removeAllCaches() {
-
-		var timer = metricsHelper.iniciMetrica();
+    @Override
+    public void removeAllCaches() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Esborrant totes les caches");
+			logger.debug("Esborrant totes les caches");
 			cacheHelper.clearAllCaches();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
-	}
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
+
 }

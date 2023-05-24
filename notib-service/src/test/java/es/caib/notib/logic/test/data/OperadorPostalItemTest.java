@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class OperadorPostalItemTest extends DatabaseItemTest<OperadorPostalDto>{
-
     @Autowired
     protected OperadorPostalService operadorPostalService;
     @Autowired
@@ -22,7 +21,9 @@ public class OperadorPostalItemTest extends DatabaseItemTest<OperadorPostalDto>{
 
     @Override
     public OperadorPostalDto create(Object element, Long entitatId) throws Exception{
-        return operadorPostalService.upsert(entitatId, (OperadorPostalDto) element);
+        return operadorPostalService.upsert(
+                entitatId,
+                (OperadorPostalDto) element);
     }
 
     @Override

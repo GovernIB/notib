@@ -1,6 +1,12 @@
 package es.caib.notib.logic.intf.dto.notificacio;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -19,6 +25,7 @@ public class NotificacioMassivaInfoDto extends NotificacioMassivaDataDto {
 
         private String codiDir3UnidadRemisora;
         private String concepto;
+        private String descripcio;
         private String enviamentTipus;
         private String referenciaEmisor;
         private String nombreFichero;

@@ -34,7 +34,7 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 
 	@Column(name = "notificacio_id")
 	private Long notificacioId;
-	
+
 	@Column(name = "sincron")
 	@Enumerated(EnumType.STRING)
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
@@ -49,7 +49,7 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 	@Column(name = "tipus")
 	@Enumerated(EnumType.STRING)
 	private NotificaEnviamentTipusEnumDto tipus;
-	
+
 	@Column(name = "entitat_id")
 	private Long entitatId;
 	@Column(name = "organ", length = 64)
@@ -58,7 +58,7 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 	private String procediment;
 	@Column(name = "grup", length = 64)
 	private String grup;
-	
+
 	@Column(name = "concepte", length = 255)
 	private String concepte;
 	@Column(name = "descripcio", length = 1000)
@@ -74,10 +74,10 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 	@Column(name = "caducitat")
 	@Temporal(TemporalType.DATE)
 	private Date caducitat;
-	
+
 	@Column(name = "document_id")
 	private Long documentId;
-	
+
 	@Column(name = "estat", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private NotificacioEstatEnumDto estat;
@@ -87,7 +87,7 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 	private Date estatProcessatDate;
 	@Column(name = "motiu")
 	private String motiu;
-	
+
 //	@Column(name = "pagador_postal_id")
 //	private Long pagadorPostalId;
 //	@Column(name = "pagador_cie_id")
@@ -110,11 +110,11 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 	private Date notificaEnviamentData;
 	@Column(name = "not_env_intent")
 	private int notificaEnviamentIntent;
-	
+
 	// Errors
-	@Column(name = "not_error_tipus")
-	@Enumerated(EnumType.STRING)
-	private NotificacioErrorTipusEnumDto notificaErrorTipus;
+//	@Column(name = "not_error_tipus")
+//	@Enumerated(EnumType.STRING)
+//	private NotificacioErrorTipusEnumDto notificaErrorTipus;
 	@Column(name = "callback_error")
 	private boolean errorLastCallback;
 	@Column(name = "event_error")
@@ -122,7 +122,12 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 	@Column(name = "referencia", length = 36)
 	protected String referencia;
 
-	public NotificacioAudit (NotificacioEntity notificacioEntity, NotificacioEventEntity lastErrorEvent, TipusOperacio tipusOperacio, String joinPoint) {
+	public NotificacioAudit (
+			NotificacioEntity notificacioEntity,
+			NotificacioEventEntity lastErrorEvent,
+			TipusOperacio tipusOperacio,
+			String joinPoint
+	) {
 		this.tipusOperacio = tipusOperacio;
 		this.joinPoint = joinPoint;
 		this.notificacioId = notificacioEntity.getId();
@@ -153,7 +158,7 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 		this.registreData = notificacioEntity.getRegistreData();
 		this.notificaEnviamentData = notificacioEntity.getNotificaEnviamentData();
 		this.notificaEnviamentIntent = notificacioEntity.getNotificaEnviamentIntent();
-		this.notificaErrorTipus = lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null;
+//		this.notificaErrorTipus = lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null;
 		this.errorLastCallback = notificacioEntity.isErrorLastCallback();
 		this.errorEventId = lastErrorEvent != null ? lastErrorEvent.getId() : null;
 		this.referencia = notificacioEntity.getReferencia();

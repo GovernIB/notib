@@ -248,6 +248,7 @@
 	display: none;
 	margin-top:15px;
 }
+.highlight {background-color: #de7b7b; color: black; padding:1px 2px;}
 </style>
 </head>
 <body>
@@ -283,7 +284,7 @@
 			$(".entrega-inactiva").show();
 			console.debug("Oculta formulari entrega cie");
 		}
-		console.log(val);
+		// console.log(val);
 		if (val) {
 			console.debug("Entrega CIE activa");
 			$(".entrega-cie-activa").show();
@@ -291,12 +292,6 @@
 			$(".entrega-cie-activa").hide();
 		}
 	};
-
-	// valors inicials
-	$(document).ready(function() {
-		viewModel.ambEntregaCIE = false;
-	});
-
 
 	//////
 	//////
@@ -479,6 +474,9 @@
 
 
 	$(document).ready(function() {
+
+		viewModel.ambEntregaCIE = false;
+
 		$(document).on('change','select.paisos', function() {
 			var provincia = $(this).closest("#entregaPostal").find("select[class*='provincies']");
 			var poblacioSelect = $(this).closest("#entregaPostal").find("div[class*='poblacioSelect']");
@@ -555,7 +553,6 @@
 
 					},
 					error: function (e) {
-
 						console.error("ERROR : ", e);
 						$file.prop("disabled", false);
 
@@ -564,7 +561,7 @@
 
 			});
 		}
-		
+
 		//Consulta al arxiu de los identificadores CSV o Uuid 
 		//para comprobar si existe el documento y sus metadatos	
 		$(".docArxiu").focusout(function() {
@@ -594,7 +591,7 @@
 			}
 
 			let url = esCsv ? "consultaDocumentIMetadadesCsv" : "consultaDocumentIMetadadesUuid";
-			console.log("<c:url value="/notificacio/"/>" + url + "/" + inputElementValue);
+			<%--console.log("<c:url value="/notificacio/"/>" + url + "/" + inputElementValue);--%>
 			$.ajax({
 				type: 'POST',
 				contentType: "application/json",
@@ -615,10 +612,16 @@
 						inputElement.parent().append('<div id="document_err_' + indexId + '"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.document.inexistent"/></p></div>');
 					}
 					else if (!data.metadadesExistents){ //document pero sin metadades
+
 						inputElement.addClass('warningClass');
-						inputElement.parent().append('<div id="metadades_war_' + indexId + '"><p class="help-block" style="color: orange;"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.metadades.inexistent"/></p></div>');
-					}
-					else { //document y metadades
+						inputElement.parent().append('<div id="metadades_war_' + indexId + '"><p class="help-block" style="color: orange;"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.metadades.inexistent.defecte"/></p></div>');
+						alert("<spring:message code="notificacio.form.camp.error.metadades.inexistent.defecte"/>");
+						// $("#documents\\[" +indexId+ "\\]\\.origen").val(null).trigger("change.select2");
+						// $("#documents\\[" +indexId+ "\\]\\.validesa").val(null).trigger("change.select2");
+						// $("#documents\\[" +indexId+ "\\]\\.tipoDocumental").val(null).trigger("change.select2");
+						// $("#documents\\[" +indexId+ "\\]\\.modoFirma").prop('checked', false);
+
+					} else { //document y metadades
 						if (data.origen != null) {
 							$("#documents\\[" +indexId+ "\\]\\.origen").val(data.origen).trigger("change.select2");
 							$("#documents\\[" +indexId+ "\\]\\.origen").prop('disabled', true);
@@ -1045,6 +1048,7 @@
 			let nomInput = closest.find(".nomInput");
 			let dir3Label = dir3codi.find('label');
 			let dir3LabelText = "<spring:message code='notificacio.form.camp.titular.dir3codi'/>";
+			// console.log($(this));
 			if ($(this).val() == 'ADMINISTRACIO') {
 				$(llinatge1).addClass('hidden');
 				$(llinatge2).addClass('hidden');
@@ -1054,10 +1058,10 @@
 				$(raoSocial).addClass('hidden');
 				$(docTipus).addClass('hidden');
 				if(enviamentTipus == 'COMUNICACIO_SIR'){
-					$(nifLabel).text(nifLabelText);
+					$(nifLabel).text(administracioLabelText);
 					$(nif).addClass('hidden');
 				}else{
-					$(nifLabel).text(nifLabelText + " *");
+					$(nifLabel).text(administracioLabelText + " *");
 					$(nif).removeClass('hidden');
 				}
 				$(emailLabel).text(emailLabelText);
@@ -1090,13 +1094,14 @@
 				$(raoSocialInput).hide();
 				$(nomInput).show();
 			} else {
+				// console.log("juridica");
 				$(llinatge1).addClass('hidden');
 				$(llinatge2).addClass('hidden');
 				$(nif).removeClass('hidden');
 				$(nifAlert).hide();
 				$(docTipus).addClass('hidden');
 				$(dir3codi).addClass('hidden');
-				$(nifLabel).text(nifLabelText + " *");
+				$(nifLabel).text(cifLabelText + " *");
 				$(incapacitat).removeClass('hidden');
 				$(raoSocial).removeClass('hidden');
 				$(emailLabel).text(emailLabelText);
@@ -1164,16 +1169,61 @@
 			makeTooltip(warning);
 			return false;
 		});
-		$("#descripcio").on("change paste", function (e) {
-			var warning = "<spring:message code='notificacio.form.camp.descripcio.paste.validacio'/>";
-			var e = $(this);
+
+		$("#descripcio").on("change paste", function (x) {
+
+			replaceInvalidChars($(this));
+		});
+
+		$("#concepte").on("change paste", function (x) {
+
+			replaceInvalidChars($(this));
+		});
+
+		let replaceInvalidChars = e => {
+
 			setTimeout(function(){
-				while (/\r?\n|\r/.test($.trim(e.val()))) {
+
+				let warning = "";
+				let subs = "<spring:message code='notificacio.form.camp.descripcio.paste.validacio.substituit'/>";
+				let per = "<spring:message code='notificacio.form.camp.descripcio.paste.validacio.per'/>";
+				if (/\r?\n|\r/.test($.trim(e.val()))) {
+					warning += "<spring:message code='notificacio.form.camp.descripcio.paste.validacio.salts.linia'/>" + "<br>";
+					// e.val($.trim(e.val()).replace(/\r?\n|\r\r\n/, ' '));
+					e.val(replaceChar(e.val(), "\r?\n|\r\r\n", " "));
+				}
+				if (/`/.test(e.val())) {
+					warning += subs  + " ` " + per + " ' <br>";
+					e.val(replaceChar(e.val(), "`", "'"));
+				}
+				if (/´/.test(e.val())) {
+					warning += subs  + " ` " + per + " ' <br>";
+					e.val(replaceChar(e.val(), "´", "'"));
+				}
+				if (/’/.test(e.val())) {
+					warning += subs  + " ’ " + per + " ' <br>";
+					e.val(replaceChar(e.val(), "’", "'"));
+				}
+				if (/•/.test(e.val())) {
+					warning += subs  + " • " + per + " · ";
+					e.val(replaceChar(e.val(), "•", "·"));
+				}
+				if (/«/.test(e.val())) {
+					warning += subs  + " « " + per + " \" ";
+					e.val(replaceChar(e.val(), "«", "\""));
+				}
+				if (/»/.test(e.val())) {
+					warning += subs  + " » " + per + " \" ";
+					e.val(replaceChar(e.val(), "»", "\""));
+				}
+
+				if (warning) {
 					makeTooltip(warning);
-					e.val($.trim(e.val()).replace(/\r?\n|\r\r\n/, ' '));
 				}
 			}, 0);
-		});
+		};
+
+		let replaceChar = (text, char, replace) => text.replace(new RegExp(char, "g"), replace);
 
 		$("#o_provincia").select2({
 			theme: 'bootstrap',
@@ -1187,7 +1237,7 @@
 			allowClear: true,
 	        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
 		});
-		
+
 		$("input[name=idioma][value=" + locale.toUpperCase()+ "]").prop('checked', true);
 
 		// Data caducitat
@@ -1306,7 +1356,7 @@
 	}
 
 	function loadServeis(organ, carregaInicial) {
-		console.log("loadServeis");
+		// console.log("loadServeis");
 		$.ajax({
 			type: 'GET',
 			url: "<c:url value="/notificacio/organ/"/>" + organ + "/serveis",
@@ -1642,11 +1692,11 @@
 						<div class="controls col-xs-8">
 							<div class="col-xs-6">
 								<form:radiobutton path="idioma" value="CA" checked="checked"/>
-								<spring:message code="es.caib.notib.logic.intf.dto.idiomaEnumDto.CA" />
+								<spring:message code="es.caib.notib.logic.intf.dto.Idioma.CA" />
 							</div>
 							<div class="col-xs-6">
 								<form:radiobutton path="idioma" value="ES" />
-								<spring:message code="es.caib.notib.logic.intf.dto.idiomaEnumDto.ES" />
+								<spring:message code="es.caib.notib.logic.intf.dto.Idioma.ES" />
 							</div>
 						</div>
 					</div>

@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  * Informació d'un destinatari d'una anotació.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
@@ -41,6 +41,14 @@ public class NotificacioEnviamentDatatableDto {
 	private Date registreData;
 	private String registreNumeroFormatat;
 	private boolean perEmail;
+
+	private boolean fiReintents;
+	private String fiReintentsDesc;
+
+	private boolean callbackFiReintents;
+	private String callbackFiReintentsDesc;
+	private String  notificacioMovilErrorDesc;
+
 
 	public boolean isNotificacioError() {
 		return notificacioErrorData != null;

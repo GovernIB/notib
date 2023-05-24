@@ -1,17 +1,16 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
+import es.caib.notib.logic.cacheable.ProcSerCacheable;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDataDto;
 import es.caib.notib.logic.intf.dto.procediment.ProgresActualitzacioProcSer;
 import es.caib.notib.logic.intf.service.OrganGestorService;
-import es.caib.notib.logic.cacheable.ProcSerCacheable;
+import es.caib.notib.logic.test.data.ConfigTest;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcedimentEntity;
 import es.caib.notib.persist.repository.GrupProcSerRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.ProcedimentRepository;
-import es.caib.notib.logic.test.data.ConfigTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,13 +80,28 @@ public class ProcedimentHelperTest {
 
     @Test
     public void givenProcedimentSenseOrgan_whenActualitzarProcedimentFromGda_ThenReturn() throws Exception {
-
         // Given
-        ProcSerDataDto procedimentGda = ProcSerDataDto.builder().organGestor(ORGAN_CODI).codi("codiSIA").nom("nom vell").build();
-        ProcedimentEntity procedimentDB = ProcedimentEntity.builder().organGestor(null).codi("codiSIA").nom("nom nou").entitat(entitatEntity).build();
-        Mockito.when(procedimentRepository.findByCodiAndEntitat(Mockito.eq("codiSIA"), Mockito.eq(entitatEntity))).thenReturn(procedimentDB);
+        ProcSerDataDto procedimentGda = ProcSerDataDto.builder()
+                .organGestor(ORGAN_CODI)
+                .codi("codiSIA")
+                .nom("nom vell")
+                .build();
+        ProcedimentEntity procedimentDB = ProcedimentEntity.builder()
+                .organGestor(null)
+                .codi("codiSIA")
+                .nom("nom nou")
+                .entitat(entitatEntity)
+                .build();
+        Mockito.when(procedimentRepository.findByCodiAndEntitat(
+                Mockito.eq("codiSIA"),
+                Mockito.eq(entitatEntity)
+        )).thenReturn(procedimentDB);
 
-        Mockito.when(procedimentUpdateHelper.updateProcediment(Mockito.<ProcSerDataDto>any(), Mockito.<ProcedimentEntity>any(), Mockito.<OrganGestorEntity>any())).thenReturn(procedimentDB);
+        Mockito.when(procedimentUpdateHelper.updateProcediment(
+                Mockito.<ProcSerDataDto>any(),
+                Mockito.<ProcedimentEntity>any(),
+                Mockito.<OrganGestorEntity>any()
+        )).thenReturn(procedimentDB);
 //        Mockito.when(procedimentRepository.save(
 //                Mockito.<ProcedimentEntity>any()
 //        )).thenReturn(procedimentDB);
@@ -97,10 +111,17 @@ public class ProcedimentHelperTest {
         codiOrgansGda.add(ORGAN_CODI);
 
         // When
-        var progres = new ProgresActualitzacioProcSer();
+        ProgresActualitzacioProcSer progres = new ProgresActualitzacioProcSer();
         progres.setNumOperacions(1);
         Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
-        procedimentHelper.actualitzarProcedimentFromGda(progres, procedimentGda, entitatEntity, codiOrgansGda, true, new ArrayList<>(), avisosProcedimentsOrgans);
+        procedimentHelper.actualitzarProcedimentFromGda(
+                progres,
+                procedimentGda,
+                entitatEntity,
+                codiOrgansGda,
+                true,
+                new ArrayList<OrganGestorEntity>(),
+                avisosProcedimentsOrgans);
 
         // Then
     }

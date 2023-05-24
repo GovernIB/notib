@@ -26,16 +26,15 @@ import static org.junit.Assert.*;
  */
 public class ClientRestv2Test extends ClientBaseTest {
 
-	
-	private static final String URL = "http://localhost:8080/notib";
-//	private static final String URL = "http://localhost:8280/notib";
-	private static final String USERNAME = "admin";
-	private static final String PASSWORD = "admin";
+	//	private static final String URL = "http://localhost:8080/notib";
+//	private static final String URL = "http://localhost:8280/notibapi";
+//	private static final String USERNAME = "admin";
+//	private static final String PASSWORD = "admin";
 
 
-//	private static final String URL = "https://dev.caib.es/notib";
-//	private static final String USERNAME = "$ripea_notib";
-//	private static final String PASSWORD = "ripea_notib";
+	private static final String URL = "https://dev.caib.es/notibapi";
+	private static final String USERNAME = "$ripea_notib";
+	private static final String PASSWORD = "ripea_notib";
 
 	// Indicar si el servidor esta configurat en mode síncron
 	private static final boolean SYNC_MODE = false;
@@ -141,7 +140,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
 	}
 
-//	@Test
+	//	@Test
 	public void testConsultaEstatEnviament_donadaReferencia() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		String referencia = "8vzkicPP5FQ=";
@@ -159,7 +158,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
 	}
 
-//	@Test
+	//	@Test
 	public void testConsultaDadesRegistre() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
@@ -178,7 +177,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNull(resposta.getErrorDescripcio());
 	}
 
-//	@Test
+	//	@Test
 	public void testConsultaJustificant() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 
@@ -212,7 +211,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNotNull(resposta.getVersio());
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga1() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 1");
@@ -220,7 +219,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga2() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 2");
@@ -228,7 +227,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga3() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 3");
@@ -236,7 +235,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga4() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 4");
@@ -244,7 +243,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga5() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 5");
@@ -252,7 +251,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga6() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 6");
@@ -260,7 +259,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga7() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 7");
@@ -268,7 +267,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga8() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 8");
@@ -276,7 +275,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga9() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 9");
@@ -284,7 +283,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga10() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 10");
@@ -781,7 +780,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	public void consultaEstatNotificacioTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 //		String referencia = "43573ddf-4f26-40d9-ae80-5bc9dcafbb96";
-		String referencia = "4a125809-08a9-4073-8eaf-edfe1aef45c3";
+		String referencia = "02c8c4fb-d83d-4686-a21b-ddb30d43c5bf";
 
 		// When
 		RespostaConsultaEstatNotificacioV2 respostaConsultaEstatNotificacio = client.consultaEstatNotificacio(referencia);
@@ -800,7 +799,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	public void consultaEstatEnviamentTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 //		String referencia = "a4256bed-292b-4ad1-bb84-05f8f14a7f1c";
-		String referencia = "8154b056-6458-4913-a5dd-248686846c1d";
+		String referencia = "f791cfe9-8e79-4af0-9935-0b72d1a6b6cb";
 
 		// When
 		RespostaConsultaEstatEnviamentV2 respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
@@ -813,13 +812,27 @@ public class ClientRestv2Test extends ClientBaseTest {
 		System.out.println(">>> Informació enviament: " + respostaConsultaEstatEnviament.toString());
 		assertFalse(respostaConsultaEstatEnviament.isError());
 		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
+
+		// SEGONA PETICIÓ AMB diferent sessió??
+		client = NotificacioRestClientFactory.getRestClientV2(
+				URL,
+				USERNAME,
+				PASSWORD,
+				true);
+		respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
+		if (respostaConsultaEstatEnviament.isError()) {
+			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
+		} else {
+			System.out.println(">>> Reposta Ok");
+		}
+
 	}
 
 	@Test
 	public void consultaDadesRegistreTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
-		dadesConsulta.setReferencia("03904df1-e899-45fb-bf76-58c6cb0777ec");
+		dadesConsulta.setReferencia("a1741ac2-066c-4b1c-8411-8a2e689f14b9");
 		dadesConsulta.setAmbJustificant(true);
 
 		// When
@@ -844,9 +857,8 @@ public class ClientRestv2Test extends ClientBaseTest {
 
 	@Test
 	public void consultaJustificantTest() throws DatatypeConfigurationException, IOException, DecoderException {
-
 		// Given
-		String identificador = "6dff3c2e-a2bd-4774-a1a5-e557843817a7";
+		String identificador = "651cd3b5-562d-4323-bf33-85304c8b8fa6";
 
 		// When
 		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament(identificador);

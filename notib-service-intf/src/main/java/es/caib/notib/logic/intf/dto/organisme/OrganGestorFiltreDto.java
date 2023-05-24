@@ -16,13 +16,14 @@ import java.util.List;
  */
 @Getter @Setter
 public class OrganGestorFiltreDto extends AuditoriaDto implements Serializable {
-	
+
 	private String codi;
 	private String codiPare;
 	private String nom;
 	private String oficina;
 	private OrganGestorEstatEnum estat;
 	private boolean entregaCie;
+
 	private boolean isFiltre;
 
 	private static final long serialVersionUID = -2393511650074099319L;
@@ -101,5 +102,5 @@ public class OrganGestorFiltreDto extends AuditoriaDto implements Serializable {
 			arrel.setFills(fillsFiltrats);
 		}
 		return ok;
- 	}
+	}
 }

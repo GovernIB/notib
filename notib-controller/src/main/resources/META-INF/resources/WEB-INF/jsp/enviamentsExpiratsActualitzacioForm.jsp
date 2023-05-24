@@ -55,7 +55,7 @@ function getProgres() {
 		url: "<c:url value='/notificacio/refrescarEstatNotifica/estat'/>",
 		success: function(data) {
 			if (data) {
-				console.log(data);
+				// console.log(data);
 				let info = data.info;
 				let index;
 				for (index = writtenLines; index < info.length; index++) {

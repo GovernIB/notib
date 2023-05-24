@@ -1,11 +1,18 @@
 package es.caib.notib.logic.service;
 
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.helper.PermisosHelper;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.EntitatTipusEnumDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.PermisDto;
+import es.caib.notib.logic.intf.dto.TipusDocumentDto;
+import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
+import es.caib.notib.logic.intf.dto.TipusEnumDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerFiltreDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerFormDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
-import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.plugin.SistemaExternException;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +50,7 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 		addConfig("es.caib.notib.metriques.generar", "false");
 		addConfig("es.caib.notib.plugin.unitats.dir3.protocol", "REST");
 		addConfig("es.caib.notib.plugin.registre.class", "es.caib.notib.plugin.registre.RegistrePluginMockImpl");
-		addConfig("es.caib.notib.plugin.unitats.fitxer", "");
+//		addConfig("es.caib.notib.plugin.unitats.fitxer", "");
 		entitatCreate = new EntitatDto();
 		entitatCreate.setCodi("LIMIT");
 		entitatCreate.setNom("Limit Tecnologies");
@@ -139,7 +146,7 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 		testCreantElements(
 			new TestAmbElementsCreats() {
 				@Override
-				public void executar(List<Object> elementsCreats) throws NotFoundException{
+				public void executar(List<Object> elementsCreats) throws NotFoundException {
 					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);	
 					ProcSerDto procedimentCreat = (ProcSerDto)elementsCreats.get(1);
 					autenticarUsuari("admin");

@@ -55,6 +55,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private String numExpedient;
 
 	private boolean eventsCallbackPendent;
+	private String dataCallbackPendent;
 	private boolean errorLastCallback;
 	private TipusUsuariEnumDto tipusUsuari;
 	private Idioma idioma;
@@ -85,13 +86,27 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
 	private NotificacioErrorTipusEnumDto notificaErrorTipus;
-	private	NotificacioEventTipusEnumDto noticaErrorEventTipus;
+	private NotificacioEventTipusEnumDto noticaErrorEventTipus;
+	private boolean fiReintents;
+	private String fiReintentsDesc;
+	private boolean callbackFiReintents;
+	private String callbackFiReintentsDesc;
+	private List<String> notificacionsMovilErrorDesc = new ArrayList<>();
 
 	private Date enviadaDate;
 
 	private boolean justificantCreat;
 
 	public boolean isNotificaError() {
+
+		if (comunicacioSir) {
+			for (EnviamentInfoDto e : enviaments) {
+				if (e.isNotificacioError()) {
+					notificaErrorDescripcio = e.getNotificacioErrorDescripcio();
+					return true;
+				}
+			}
+		}
 		return notificaErrorData != null;
 	}
 

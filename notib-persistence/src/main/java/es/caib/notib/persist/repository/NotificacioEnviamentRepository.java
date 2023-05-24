@@ -5,7 +5,10 @@ package es.caib.notib.persist.repository;
 
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.persist.entity.*;
+import es.caib.notib.persist.entity.EntitatEntity;
+import es.caib.notib.persist.entity.NotificacioEntity;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.entity.UsuariEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -40,16 +43,21 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	List<Long> findIdByNotificacioIdIn(@Param("notificacioIdList")  Collection<Long> notificacioIdList);
 
 	@Query(value = "FROM NotificacioEnviamentEntity n WHERE n.id = :notificacioId ORDER BY n.notificaEstatData DESC, n.notificaEstatDataActualitzacio DESC")
-	List<NotificacioEnviamentEntity> findByNotificacioIdOrderByNotificaEstatDataAndOrderByNotificaEstatDataActualitzacioDesc(@Param("notificacioId")  Long notificacioId);
+	List<NotificacioEnviamentEntity> findByNotificacioIdOrderByNotificaEstatDataAndOrderByNotificaEstatDataActualitzacioDesc(
+			@Param("notificacioId")  Long notificacioId);
 	
 //	NotificacioEnviamentEntity findById(Long id);
 	
 	@Query(value = "FROM NotificacioEnviamentEntity n WHERE n.notificacio = :notificacio")
-	List<NotificacioEnviamentEntity> findByNotificacio(@Param("notificacio") NotificacioEntity notificacio);
+	List<NotificacioEnviamentEntity> findByNotificacio(
+			@Param("notificacio") NotificacioEntity notificacio);
 
-	NotificacioEnviamentEntity findByNotificaReferencia(String notificaReferencia);
+	NotificacioEnviamentEntity findByNotificaReferencia(
+			String notificaReferencia);
 
-	NotificacioEnviamentEntity findByNotificacioAndNotificaReferencia(NotificacioEntity notificacio, String notificaReferencia);
+	NotificacioEnviamentEntity findByNotificacioAndNotificaReferencia(
+			NotificacioEntity notificacio,
+			String notificaReferencia);
 	
 //	@Query(	" from NotificacioEnviamentEntity " +
 //			" where	notificacio = :notificacio " + 
@@ -78,9 +86,12 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"   		and notificaEstat = es.caib.notib.client.domini.EnviamentEstat.NOTIB_PENDENT)")
 	boolean hasEnviamentsPendentsByNotificacioId(@Param("notificacioId") Long notificacioId);
 
-	NotificacioEnviamentEntity findByNotificacioEntitatAndNotificaIdentificador(EntitatEntity entitat, String notificaIdentificador);
+	NotificacioEnviamentEntity findByNotificacioEntitatAndNotificaIdentificador(
+			EntitatEntity entitat,
+			String notificaIdentificador);
 	
-	NotificacioEnviamentEntity findByNotificaIdentificador(String notificaIdentificador);
+	NotificacioEnviamentEntity findByNotificaIdentificador(
+			String notificaIdentificador);
 	
 	@Query(	" select id from NotificacioEnviamentEntity " +
 			" where	notificaEstat = es.caib.notib.client.domini.EnviamentEstat.EXPIRADA " +
@@ -170,17 +181,22 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 
 
 
-	@Query(	"from NotificacioEnviamentEntity n " +
-			"where (:esNullCodiNotifica = true or n.notificaIdentificador = :notificaIdentificador) " +
-			"	and n.notificacio = :notificacio")
+	@Query(	"from" +
+			"    NotificacioEnviamentEntity n " +
+			"where " +
+			"	 (:esNullCodiNotifica = true or n.notificaIdentificador = :notificaIdentificador) " +
+			"and n.notificacio = :notificacio")
 	List<Long> findIdByEntitatAndFiltre (
 			@Param("esNullCodiNotifica") boolean esNullCodiNotifica,
 			@Param("notificaIdentificador") String codiNotifica,
 			@Param("notificacio") NotificacioEntity notificacio);
 
-	List<NotificacioEnviamentEntity>findByNotificacioAndIdInOrderByIdAsc(NotificacioEntity notificacio, Collection<Long> id);
+	List<NotificacioEnviamentEntity>findByNotificacioAndIdInOrderByIdAsc (
+			NotificacioEntity notificacio,
+			Collection<Long> id);
 	
-	@Query(	"select id from	NotificacioEnviamentEntity " +
+	@Query(	"select id " +
+			"  from	NotificacioEnviamentEntity " +
 			" where	(notificaEstatFinal = false " +
 			"   	and notificaEstat != es.caib.notib.client.domini.EnviamentEstat.NOTIB_PENDENT " +
 			"   	and notificaEstat != es.caib.notib.client.domini.EnviamentEstat.REGISTRADA " +
@@ -192,36 +208,49 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"		and notificaCertificacioData is null)" +
 			"   and notificaIntentNum < :maxReintents " +
 			" order by notificaEstatDataActualitzacio asc nulls first")
-	List<Long> findByNotificaRefresc(@Param("maxReintents")Integer maxReintents, Pageable pageable);
-
-	@Query(	" select id from NotificacioEnviamentEntity " +
+	List<Long> findByNotificaRefresc(
+			@Param("maxReintents")Integer maxReintents,
+			Pageable pageable);
+	
+	@Query(	"select id " +
+			"  from	NotificacioEnviamentEntity " +
 			" where	registreEstatFinal = false " +
 			"   and registreEstat != es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT " +
 			"   and registreEstat != es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto.REBUTJAT " +
 			"   and notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ENVIAT_SIR " +
 			"   and sirConsultaIntent < :maxReintents " +
 			" order by sirConsultaData asc nulls first")
-	List<Long> findByRegistreRefresc(@Param("maxReintents")Integer maxReintents, Pageable pageable);
-
+	List<Long> findByRegistreRefresc(
+			@Param("maxReintents")Integer maxReintents,
+			Pageable pageable);
+	
+	
 	// Recupera enviaments amb DEH finalitzats sense certificació
-	@Query(	"select id from NotificacioEnviamentEntity " +
+	@Query(	"select id " +
+			"from NotificacioEnviamentEntity " +
 			" where	notificaEstatFinal = true " + 
 			"	and notificaCertificacioData is null" +
 			"	and dehNif is not null" +
 			"	and dehCertIntentNum < :maxReintents " +
 			" order by notificaEstatDataActualitzacio asc nulls first")
-	List<Long> findByDEHAndEstatFinal(@Param("maxReintents")Integer maxReintents, Pageable pageable);
+	List<Long> findByDEHAndEstatFinal(
+			@Param("maxReintents")Integer maxReintents,
+			Pageable pageable);
 	
 	// Recupera enviaments a CIE finalitzats sense certificació
-	@Query(	"select id from NotificacioEnviamentEntity " +
+	@Query(	"select id " +
+			"from NotificacioEnviamentEntity " +
 			" where	notificaEstatFinal = true " + 
 			"	and notificaCertificacioData is null" +
 			"	and entregaPostal is not null" +
 			"	and entregaPostal.domiciliCodiPostal is not null" +
 			"	and cieCertIntentNum < :maxReintents " +
 			" order by notificaEstatDataActualitzacio asc nulls first")
-	List<Long> findByCIEAndEstatFinal(@Param("maxReintents")Integer maxReintents, Pageable pageable);
+	List<Long> findByCIEAndEstatFinal(
+			@Param("maxReintents")Integer maxReintents,
+			Pageable pageable);
 
+	
 	
 	// API CARPETA
 	// --------------------------------------------------------------------------------------------------------------------
@@ -229,14 +258,14 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	@Query( " select count(distinct ne) " +
 			" from NotificacioEnviamentEntity ne " +
 			" left outer join ne.destinataris d " +
-			" where ne.notificacio.enviamentTipus = :tipus " +
+		    " where ne.notificacio.enviamentTipus = :tipus " +
 			"   and (ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
-			"   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
-			"   and ne.notificaEstat <> es.caib.notib.client.domini.EnviamentEstat.REGISTRADA " +
+		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
+		    "   and ne.notificaEstat <> es.caib.notib.client.domini.EnviamentEstat.REGISTRADA " +
 			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = upper(:dniTitular)) or (upper(d.nif) = upper(:dniTitular)))" +
 			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +
 			"	and (:esDataFinalNull = true or ne.notificacio.notificaEnviamentData <= :dataFinal) " +
@@ -275,13 +304,13 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	@Query( " select distinct ne " +
 			" from NotificacioEnviamentEntity ne " +
 			" left outer join ne.destinataris d " +
-			" where ne.notificacio.enviamentTipus =  :tipus " +
+		    " where ne.notificacio.enviamentTipus =  :tipus " +
 			"   and (ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
-			"   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
+		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
 			"   and ne.notificaEstat <> es.caib.notib.client.domini.EnviamentEstat.REGISTRADA " +
 			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = upper(:dniTitular)) or (upper(d.nif) = upper(:dniTitular))) " +
 			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +

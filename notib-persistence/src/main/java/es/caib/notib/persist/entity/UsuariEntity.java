@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.Column;
@@ -23,7 +24,7 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Getter
+@Getter @Setter
 @Builder(builderMethodName = "hiddenBuilder")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

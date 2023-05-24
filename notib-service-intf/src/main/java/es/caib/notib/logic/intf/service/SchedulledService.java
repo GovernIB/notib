@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.intf.service;
 
+
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 
 /**
@@ -24,7 +25,7 @@ public interface SchedulledService {
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
 	 * al registre.
-	 * @throws RegistreNotificaException 
+	 * @throws RegistreNotificaException
 	 */
 	void registrarEnviamentsPendents() throws RegistreNotificaException;
 

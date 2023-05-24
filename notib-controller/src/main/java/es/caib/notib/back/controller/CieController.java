@@ -1,25 +1,36 @@
 package es.caib.notib.back.controller;
 
-import es.caib.notib.logic.intf.dto.cie.CieDto;
-import es.caib.notib.logic.intf.service.OrganGestorService;
-import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.back.command.CieCommand;
 import es.caib.notib.back.command.CieFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.back.helper.RequestSessionHelper;
+import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.dto.cie.CieDataDto;
+import es.caib.notib.logic.intf.dto.cie.CieDto;
+import es.caib.notib.logic.intf.dto.cie.CieTableItemDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.service.OrganGestorService;
+import es.caib.notib.logic.intf.service.PagadorCieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Controlador per el mantinemnt de pagadors cie.
@@ -38,40 +49,61 @@ public class CieController extends BaseUserController{
 	private OrganGestorService organGestorService;
 	
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(HttpServletRequest request, Model model) {
-
-		var entitat = getEntitatActualComprovantPermisos(request);
-		var cieFiltreCommand = getFiltreCommand(request);
+	public String get(
+			HttpServletRequest request,
+			Model model) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		CieFiltreCommand cieFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("cieFiltreCommand", cieFiltreCommand);
-		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
+		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
 		model.addAttribute("organsGestors", organsGestors);
 		return "cieList";
 	}
 	
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(HttpServletRequest request ) {
+	public DatatablesResponse datatable(
+			HttpServletRequest request ) {
+		CieFiltreCommand cieFiltreCommand = getFiltreCommand(request);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		if (organGestorActual != null) {
+			cieFiltreCommand.setOrganGestorId(organGestorActual.getId());
+		} else {
+			cieFiltreCommand.setOrganGestorId(null);
+		}
 
-		var cieFiltreCommand = getFiltreCommand(request);
-		var entitat = getEntitatActualComprovantPermisos(request);
-		var organGestorActual = getOrganGestorActual(request);
-		cieFiltreCommand.setOrganGestorId(organGestorActual != null ? organGestorActual.getId() : null);
-		var params = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		var pagadorsCie = pagadorCieService.findAmbFiltrePaginat(entitat.getId(), cieFiltreCommand.asDto(), params);
-		return DatatablesHelper.getDatatableResponse(request, pagadorsCie, "id");
+		PaginaDto<CieTableItemDto> pagadorsCie = pagadorCieService.findAmbFiltrePaginat(
+							entitat.getId(),
+							cieFiltreCommand.asDto(),
+							DatatablesHelper.getPaginacioDtoFromRequest(request));
+		
+		return DatatablesHelper.getDatatableResponse(
+				request, 
+				pagadorsCie, 
+				"id");
 	}
 	
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
-	public String newGet(HttpServletRequest request, Model model) {
-		return formGet(request, null, model);
+	public String newGet(
+			HttpServletRequest request,
+			Model model) {
+		String vista = formGet(request, null, model);
+		return vista;
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public String post(HttpServletRequest request, CieFiltreCommand command, Model model) {
-
-		var entitat = getEntitatActualComprovantPermisos(request);
-		RequestSessionHelper.actualitzarObjecteSessio(request, PAGADOR_CIE_FILTRE, command);
-		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
+	public String post(	
+			HttpServletRequest request,
+			CieFiltreCommand command,
+			Model model) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request, 
+				PAGADOR_CIE_FILTRE, 
+				command);
+		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
 		model.addAttribute("organsGestors", organsGestors);
 		return "cieList";
 	}
@@ -79,60 +111,82 @@ public class CieController extends BaseUserController{
 	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
 	public String save(HttpServletRequest request, @Valid CieCommand cieCommand, BindingResult bindingResult, Model model) {
 
-		var entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
+			List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
 			model.addAttribute("organsGestors", organsGestors);
 			return "cieForm";
 		}
-		var msg = cieCommand.getId() != null ? "cie.controller.modificat.ok" : "cie.controller.creat.ok";
-		var dto = cieCommand.asDto();
+		String msg = cieCommand.getId() != null ? "cie.controller.modificat.ok" : "cie.controller.creat.ok";
+		CieDataDto dto = cieCommand.asDto();
 		pagadorCieService.upsert(entitatActual.getId(), dto);
 		return getModalControllerReturnValueSuccess(request, "redirect:cie", msg);
 	}
 	
 	@RequestMapping(value = "/{pagadorCieId}", method = RequestMethod.GET)
-	public String formGet(HttpServletRequest request, @PathVariable Long pagadorCieId, Model model) {
-
-		var entitatActual = getEntitatActualComprovantPermisos(request);
-		CieCommand cieCommand;
+	public String formGet(
+			HttpServletRequest request,
+			@PathVariable Long pagadorCieId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		CieCommand cieCommand = null;
 		CieDto pagadorCie = null;
+		
 		if (pagadorCieId != null) {
 			pagadorCie = pagadorCieService.findById(pagadorCieId);
+			
 			model.addAttribute(pagadorCie);
 		}
-		cieCommand = pagadorCie != null ? CieCommand.asCommand(pagadorCie) : new CieCommand();
+		
+		if (pagadorCie != null)
+			cieCommand = CieCommand.asCommand(pagadorCie);
+		else
+			cieCommand = new CieCommand();
+		
 		model.addAttribute(cieCommand);
-		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
+		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
 		model.addAttribute("organsGestors", organsGestors);
 		return "cieForm";
 	}
 	
 	@RequestMapping(value = "/{pagadorCieId}/delete", method = RequestMethod.GET)
-	public String delete(HttpServletRequest request, @PathVariable Long pagadorCieId) {
-
-		var url = "redirect:../../cie";
+	public String delete(
+			HttpServletRequest request,
+			@PathVariable Long pagadorCieId) {		
 		try {
 			pagadorCieService.delete(pagadorCieId);
-			return getAjaxControllerReturnValueSuccess(request, url, "cie.controller.esborrat.ok");
 		} catch (Exception e) {
-			return getAjaxControllerReturnValueError(request, url, "cie.controller.esborrat.ora.ko");
+			return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../cie",
+						"cie.controller.esborrat.ora.ko");
 		}
+		
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../cie",
+				"cie.controller.esborrat.ok");
 	}
 	
-	private CieFiltreCommand getFiltreCommand(HttpServletRequest request) {
-
-		var cieFiltreCommand = (CieFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, PAGADOR_CIE_FILTRE);
-		if (cieFiltreCommand != null) {
-			return cieFiltreCommand;
+	private CieFiltreCommand getFiltreCommand(
+			HttpServletRequest request) {
+		CieFiltreCommand cieFiltreCommand = (CieFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				PAGADOR_CIE_FILTRE);
+		if (cieFiltreCommand == null) {
+			cieFiltreCommand = new CieFiltreCommand();
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					PAGADOR_CIE_FILTRE,
+					cieFiltreCommand);
 		}
-		cieFiltreCommand = new CieFiltreCommand();
-		RequestSessionHelper.actualitzarObjecteSessio(request, PAGADOR_CIE_FILTRE, cieFiltreCommand);
 		return cieFiltreCommand;
 	}
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
-		binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
+		binder.registerCustomEditor(
+				Date.class, 
+				new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
 	}
 }

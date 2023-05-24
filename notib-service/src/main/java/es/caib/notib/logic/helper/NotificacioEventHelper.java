@@ -1,19 +1,19 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.logic.intf.dto.NotificacioErrorTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
+import es.caib.notib.logic.intf.exception.EventException;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
+import lombok.Builder;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.util.*;
+import java.util.List;
 
 /**
  * Helper amb totes les operacions sobre els esdeveniments de les notificacions.
@@ -25,428 +25,214 @@ import java.util.*;
 public class NotificacioEventHelper {
 
     @Autowired
-    private NotificacioEventRepository notificacioEventRepository;
+    private NotificacioEventRepository eventRepository;
     @Autowired
-    private AuditEnviamentHelper auditEnviamentHelper;
+    private ConfigHelper configHelper;
 
-    /**
-     * Elimina tots els events associats a la notificació indicada. Conserva els rellevants:
-     *  - Enviament registre OK
-     *  - Enviament notifica OK
-     *  - Notifica confirmació finalitzat
-     *
-     * @param notificacio Notificació objectiu
-     */
-    public void clearOldUselessEvents(NotificacioEntity notificacio) {
+    private static Boolean notificaConsultaActiva = null;
 
-        for (var enviament : notificacio.getEnviaments()) {
-            if (enviament.isNotificaError() && enviament.isPerEmail()) {
-                continue;
-            }
-            auditEnviamentHelper.updateErrorNotifica(enviament, enviament.isNotificaError(), null);
-        }
-        notificacioEventRepository.deleteOldUselessEvents(notificacio);
+    public static void clearNotificaConsultaActiva() {
+        notificaConsultaActiva = null;
     }
-
-    public void clearOldNotificaUselessEvents(NotificacioEntity notificacio) {
-
-        for (var enviament : notificacio.getEnviaments()) {
-            if (!enviament.isPerEmail())
-                auditEnviamentHelper.updateErrorNotifica(enviament, enviament.isNotificaError(), null);
-        }
-        notificacioEventRepository.deleteOldNotificaUselessEvents(notificacio);
-    }
-
-    public void addRegistreCallBackEstatEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, String descripcio, boolean isError) {
-
-        if (isError) {
-            clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT);
-        } else {
-            deleteByNotificacioAndTipusAndError(notificacio, enviament, NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,false );
-        }
-        var eventBuilder = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT, enviament.getNotificacio()).error(isError).enviament(enviament);
-        if (isError) {
-            eventBuilder.errorDescripcio(descripcio);
-        } else {
-            eventBuilder.descripcio(descripcio);
-        }
-        if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
-            eventBuilder.callbackInicialitza();
-        }
-        var event = eventBuilder.build();
-        notificacio.updateEventAfegir(event);
-        enviament.updateNotificaError(isError, isError ? event : null);
-        notificacioEventRepository.save(event);
-    }
-
-    public void addRegistreConsultaInfoErrorEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, String descripcio) {
-
-        clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO);
-        var event = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO, notificacio).enviament(enviament).error(true).errorDescripcio(descripcio).build();
-        updateNotificacio(notificacio, event);
-        notificacioEventRepository.saveAndFlush(event);
-        enviament.updateNotificaError(true, event);
-    }
-
-    public NotificacioEventEntity addNotificaRegistreEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, String errorDescripcio, NotificacioErrorTipusEnumDto errorTipus) {
-
-        clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE);
-        //Crea un nou event
-        var event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE).notificacio(notificacio).error(true).errorTipus(errorTipus).errorDescripcio(errorDescripcio).build();
-        if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
-            event.callbackInicialitza();
-        }
-
-        //Actualitza l'event per cada enviament
-        if (enviament != null) {
-            event.setEnviament(enviament);
-            notificacioEventRepository.saveAndFlush(event);
-        } else {
-            for (var enviamentEntity : notificacio.getEnviaments()) {
-                event.setEnviament(enviamentEntity);
-                notificacioEventRepository.saveAndFlush(event);
-                enviamentEntity.updateNotificaError(true, event);
+    public Boolean isNotificaConsultaActiva() {
+        if (notificaConsultaActiva == null) {
+            try {
+                notificaConsultaActiva = !configHelper.getConfigAsBoolean("es.caib.notib.adviser.actiu") &&
+                        configHelper.getConfigAsBoolean("es.caib.notib.tasques.actives") &&
+                        configHelper.getConfigAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.estat.actiu");
+            } catch (Exception ex) {
+                log.error("No s'ha pogut calcular si les consultes a notifica estan actives", ex);
+                notificaConsultaActiva = true;
             }
         }
-        updateNotificacio(notificacio, event);
-        return event;
+        return notificaConsultaActiva;
     }
 
-    public void addCallbackEvent(NotificacioEntity notificacio, NotificacioEventEntity event, boolean isError) {
-
-        log.debug("[Events-CALLBACK_CLIENT] Intentam afegir nou event de callback a client");
-        var enviamentEventOld = event.getEnviament();
-        // Elimina tots els events de callback anteriors
-        deleteByNotificacioAndTipusAndError(notificacio, null, NotificacioEventTipusEnumDto.CALLBACK_CLIENT, isError);
-
-        log.trace("[Events-CALLBACK_CLIENT] Cream un nou event de callback a client");
-        // Crea una nova entrada a la taula d'events per deixar constància de la notificació a l'aplicació client
-        var eventBuilder = event.getEnviament() != null ?
-             NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.CALLBACK_CLIENT, notificacio).enviament(event.getEnviament()).descripcio("Callback " + event.getTipus())
-            : NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.CALLBACK_CLIENT,notificacio).descripcio("Callback " + event.getTipus());
-        if (isError) {
-            log.trace("[Events-CALLBACK_CLIENT] Eliminam els events d'error de callback a client innecessaris");
-            clearUselessErrors(notificacio, null, NotificacioEventTipusEnumDto.CALLBACK_CLIENT);
-            eventBuilder.error(true).errorDescripcio(event.getCallbackError());
-        }
-        // TODO: l'enviament de l'event s'esborra amb l'anotació preremove (degut a un problema d'inconsistencia). Tornar a assignar l'enviament només a aquest event (SOLUCIÓ TEMPORAL!!!)
-     	eventBuilder.enviament(enviamentEventOld);
-     		
-        log.trace("[Events-CALLBACK_CLIENT] Actualitzam la base de dades");
-        var callbackEvent = eventBuilder.build();
-        updateNotificacio(notificacio, callbackEvent);
-        notificacioEventRepository.saveAndFlush(callbackEvent);
-        log.trace("[Events-CALLBACK_CLIENT] Event afegit satisfactoriament.");
+    public List<NotificacioEventEntity> getEvent(NotificacioEnviamentEntity enviament, NotificacioEventTipusEnumDto tipus) {
+        return eventRepository.findByEnviamentIdAndTipus(enviament.getId(), tipus);
     }
 
-    public void addCallbackActivarEvent(NotificacioEnviamentEntity enviament) {
+    public NotificacioEventEntity addEvent(EventInfo eventInfo) {
 
-        var event = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.CALLBACK_ACTIVAR, enviament.getNotificacio()).enviament(enviament).callbackInicialitza().build();
-        notificacioEventRepository.saveAndFlush(event);
-    }
+        NotificacioEventEntity event = null;
 
-    public void addNotificaConsultaSirErrorEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
+        // Validacions
+        if (eventInfo.getEnviament() == null)
+            throw new EventException("No s'ha indicat l'enviament al que assignar l'event");
+        if (eventInfo.getTipus() == null)
+            throw new EventException("No s'ha indicat el tipus d'event a generar");
 
-        deleteByNotificacioAndTipusAndError(notificacio, enviament, NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR, true);
-        var event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR)
-                                    .notificacio(notificacio).enviament(enviament).error(true).errorTipus(NotificacioErrorTipusEnumDto.ERROR_REINTENTS_SIR)
-                                    .errorDescripcio("S'han esgotat els reintents de consulta de canvi d'estat a SIR").build();
+        // Només generem un event d'enviament (si hi ha reintents es modifica l'actual)
+        // i de consulta SIR per ara (fins que no implementin el callback)
+        boolean eventUnic = NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT.equals(eventInfo.getTipus()) ||
+                NotificacioEventTipusEnumDto.SIR_ENVIAMENT.equals(eventInfo.getTipus()) ||
+                NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT.equals(eventInfo.getTipus()) ||
+                NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT.equals(eventInfo.getTipus()) ||
+                NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(eventInfo.getTipus()) ||       // Per consulta Sir activa
+                (isNotificaConsultaActiva() && NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA.equals(eventInfo.getTipus()));    // Per consulta notifica activa
 
-        if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
-            event.callbackInicialitza();
-        }
-        updateNotificacio(notificacio, event);
-        notificacioEventRepository.saveAndFlush(event);
-    }
+        // Si es tracta d'un event de Callback, si ja n'existeix un, i aquest és amb error l'actualitzarem. Si no el crearem nou
+        boolean eventNoUnic = NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT.equals(eventInfo.getTipus()) ||  NotificacioEventTipusEnumDto.API_CARPETA.equals(eventInfo.getTipus());
+        boolean crearNouEvent = true;
 
-    public void addEnviamentRegistreOKEvent(NotificacioEntity notificacio, String registreNum, Date registreData, NotificacioRegistreEstatEnumDto registreEstat,
-                                            Set<NotificacioEnviamentEntity> enviaments, boolean totsAdministracio) {
-
-        //Crea un nou event
-        var eventBuilder = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, notificacio);
-        if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
-            eventBuilder.callbackInicialitza();
-        }
-        var event = eventBuilder.build();
-        for(var enviamentEntity: enviaments) {
-            auditEnviamentHelper.updateRegistreEnviament(notificacio, enviamentEntity, registreNum, registreData, registreEstat, totsAdministracio, event);
-        }
-        updateNotificacio(notificacio, event);
-        notificacioEventRepository.saveAndFlush(event);
-    }
-    /**
-     * Registre un event a la notificació per a cada enviament realitzat correctament indicant que
-     * la notificació s'ha enviat correctament a notifica.
-     *
-     * @param notificacio Notificació on afegir els events
-     * @param identificadorsResultatsEnviaments Diccionari amb els enviaments realitzats
-     */
-    public void addEnviamentNotificaOKEvent(NotificacioEntity notificacio, Map<NotificacioEnviamentEntity, String> identificadorsResultatsEnviaments) {
-
-        var eventBuilder = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, notificacio);
-        if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
-            eventBuilder.callbackInicialitza();
-        }
-        // TODO: Revisar generació d'events amb múltiples enviaments
-        var event = eventBuilder.build();
-        for (var enviament: identificadorsResultatsEnviaments.keySet()) {
-            auditEnviamentHelper.updateEnviamentEnviat(notificacio, event, identificadorsResultatsEnviaments.get(enviament), enviament);
-        }
-        updateNotificacio(notificacio, event);
-        notificacioEventRepository.saveAndFlush(event);
-    }
-
-    /**
-     *
-     * @param notificacio Notificació on es vol afegir l'event
-     * @param enviament Enviament relacionat amb l'event
-     * @param eventTipus NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT |
-     *                   NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO
-     * @param descripcio Text descriptiu de l'event
-     */
-    public void addNotificaCallbackEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, NotificacioEventTipusEnumDto eventTipus, String descripcio) {
-        addNotificaCallbackEvent(notificacio, enviament, eventTipus, descripcio,null,true);
-    }
-
-    /**
-     *
-     * @param notificacio Notificació on es vol afegir l'event
-     * @param enviament Enviament relacionat amb l'event
-     * @param eventTipus NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT |
-     *                   NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO
-     * @param descripcio Text descriptiu de l'event
-     * @param errorDescripcio Si l'event està asociat a un error definir aquest parametre descrivint-lo
-     * @param initialitzaCallback indicar si s'ha d'inicialitzar el callball a l'event
-     *
-     * @return L'event creat
-     */
-    public NotificacioEventEntity addNotificaCallbackEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, NotificacioEventTipusEnumDto eventTipus,
-                                         String descripcio, String errorDescripcio, boolean initialitzaCallback) {
-
-        if (errorDescripcio != null){
-            clearUselessErrors(notificacio, enviament, eventTipus);
-        }
-        var eventBuilder = NotificacioEventEntity.getBuilder(eventTipus, notificacio).enviament(enviament);
-        if (descripcio != null) {
-            eventBuilder.descripcio(descripcio);
-        }
-        if (errorDescripcio != null) {
-            eventBuilder.errorDescripcio(errorDescripcio);
-            eventBuilder.error(true);
-        }
-        if (initialitzaCallback && enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-            eventBuilder.callbackInicialitza();
-
-        var event = eventBuilder.build();
-        enviament.updateNotificaError(errorDescripcio != null, errorDescripcio != null ? event : null);
-        updateNotificacio(notificacio, event);
-        notificacioEventRepository.saveAndFlush(event);
-        return event;
-    }
-
-    public void addNotificaConsultaInfoEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, String errorDescripcio, boolean isError) {
-
-        if (isError){
-            clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO);
-        } else {
-            deleteByNotificacioAndTipusAndError(notificacio, enviament, NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,false);
-        }
-        var event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO)
-                                    .notificacio(notificacio).enviament(enviament).error(isError).errorDescripcio(errorDescripcio).build();
-
-        updateNotificacio(notificacio, event);
-        notificacioEventRepository.saveAndFlush(event);
-        enviament.updateNotificaError(isError, isError ? event : null);
-    }
-
-    public void addNotificaConsultaErrorEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
-
-        clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR);
-        var event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR)
-                                .notificacio(notificacio).enviament(enviament).error(true)
-                                .errorDescripcio("S'han esgotat els reintents de consulta de canvi d'estat a Notific@")
-                                .errorTipus(NotificacioErrorTipusEnumDto.ERROR_REINTENTS_CONSULTA).build();
-
-        if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
-            event.callbackInicialitza();
-        }
-        updateNotificacio(notificacio, event);
-        notificacioEventRepository.saveAndFlush(event);
-    }
-
-    public void addErrorEvent(NotificacioEntity notificacio, NotificacioEventTipusEnumDto eventTipus, String errorDescripcio,
-                              NotificacioErrorTipusEnumDto errorTipus, boolean notificaError) {
-
-        clearUselessErrors(notificacio, null, eventTipus);
-        //Actualitza l'event per cada enviament
-        for (var enviamentEntity : notificacio.getEnviaments()) {
-            if (enviamentEntity.isPerEmail()) {
-                continue;
-            }
-            //Crea un nou event
-            var event = NotificacioEventEntity.builder().tipus(eventTipus).notificacio(notificacio).error(true).errorTipus(errorTipus)
-                                        .errorDescripcio(errorDescripcio).enviament(enviamentEntity).build();
-
-            if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
-                event.callbackInicialitza();
-            }
-            notificacioEventRepository.saveAndFlush(event);
-            // TODO fer per la notificacio no a cada enviament
-            updateNotificacio(notificacio, event);
-            switch (eventTipus)
-            {
-                case NOTIFICA_REGISTRE:
-                    enviamentEntity.updateNotificaError(true, event);
-                    break;
-                case NOTIFICA_ENVIAMENT:
-                    auditEnviamentHelper.updateErrorNotifica(enviamentEntity, notificaError, event);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    // Enviament via Email
-
-    // Afegir event a un enviament
-    public void addNotificacioEmailEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, boolean isError, String errorDescripcio) {
-
-//        clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT);
-        var event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT).notificacio(notificacio)
-                                    .enviament(enviament).error(isError).errorDescripcio(errorDescripcio)
-                                    .errorTipus(isError ? NotificacioErrorTipusEnumDto.ERROR_EMAIL : null).build();
-
-        if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
-            event.callbackInicialitza();
-        }
-//        enviament.updateNotificaError(isError, isError ? event : null);
-        notificacioEventRepository.saveAndFlush(event);
-        if (!isError) {
-            auditEnviamentHelper.updateEnviamentEmailFinalitzat(enviament);
-        } else {
-            auditEnviamentHelper.updateErrorNotifica(enviament, true, event);
-        }
-        clearUselessEnviamentErrors(enviament, NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT);
-    }
-
-    // Afegir event d'enviament correcte a la notificació
-    public void addEnviamentEmailOKEvent(NotificacioEntity notificacio) {
-
-        var event = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT, notificacio).build();
-        if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
-            event.callbackInicialitza();
-        }
-        updateNotificacio(notificacio, event);
-        notificacioEventRepository.saveAndFlush(event);
-        clearUselessErrors(notificacio, null, NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT);
-    }
-
-    // Afegir event d'error a la notificació
-    public void addEnviamentEmailErrorEvent(NotificacioEntity notificacio) {
-
-        var msg = "S'ha produït algun error en l'enviament via email. Els errors es poden consultar en cada un dels enviaments.";
-        var event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT).notificacio(notificacio)
-                                    .error(true).errorTipus(NotificacioErrorTipusEnumDto.ERROR_EMAIL).errorDescripcio(msg).build();
-                                    // TODO ERROR MULTIIDIOMA
-                                    // .errorDescripcio(messageHelper.getMessage("error.notificacio.enviaments.email")).build();
-
-        if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
-            event.callbackInicialitza();
-        }
-        notificacioEventRepository.saveAndFlush(event);
-        updateNotificacio(notificacio, event);
-        clearUselessNotificacioErrors(notificacio, NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT);
-    }
-
-    private void updateNotificacio(NotificacioEntity notificacio, NotificacioEventEntity eventCreat) {
-        notificacio.updateEventAfegir(eventCreat);
-    }
-
-    private void deleteByNotificacioAndTipusAndError(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament,
-                                                     NotificacioEventTipusEnumDto tipus, boolean isError){
-
-        if (isError && notificacio.getEvents() != null) {
-            for (var e: new ArrayList<>(notificacio.getEvents())) {
-                if (e.getTipus().equals(tipus) && e.isError() == isError){
-                    preRemoveErrorEvent(e, notificacio, enviament);
+        // Si es tracta d'un event únic o de callback comprovam si ja existeix un event del mateixtipus.
+        // En aquest cas, si és un event únic s'actualitzarà, si és de callback, s'actualitzarà si l'existent és amb error
+        if (eventUnic || eventNoUnic) {
+            // Obtenim una llista per compatibilitat amb els events existents
+            List<NotificacioEventEntity> events = eventRepository.findByEnviamentAndTipusOrderByIdDesc(eventInfo.getEnviament(), eventInfo.getTipus());
+            if (events != null && !events.isEmpty()) {
+                event = events.get(0);
+                // Actualitza event
+                if (!eventNoUnic || eventNoUnic && event.isError()) {
+                    event.update(eventInfo.isError(), eventInfo.errorDescripcio, eventInfo.isFiReintents());
+                    crearNouEvent = false;
                 }
             }
         }
-        if (notificacio.getEvents() != null) {
-            for (var e : new ArrayList<>(notificacio.getEvents())) {
-                if (tipus.equals(e.getTipus()) && e.isError() == isError) {
-                    notificacio.getEvents().remove(e);
-                }
+
+        // Si no es tracta d'un event únic, o aquest encara no existeix, es crea un event nou
+        if (crearNouEvent) {
+            event = NotificacioEventEntity.builder()
+                    .notificacio(eventInfo.getEnviament().getNotificacio())
+                    .enviament(eventInfo.getEnviament())
+                    .tipus(eventInfo.getTipus())
+                    .error(eventInfo.isError())
+                    .intents(1)
+                    .fiReintents(eventInfo.isFiReintents())
+                    .errorDescripcio(eventInfo.getErrorDescripcio()).build();
+        }
+        if (!eventInfo.isError() && event.getFiReintents()) {
+            event.setFiReintents(false);
+        }
+        eventRepository.saveAndFlush(event);
+
+        // Actualitzar l'error de la notificació i enviament
+        eventInfo.getEnviament().getNotificacio().updateEventAfegir(event);
+        if (!eventNoUnic) {
+            eventInfo.getEnviament().updateNotificaError(eventInfo.isError(), eventInfo.isError() ? event : null);
+        }
+        return event;
+    }
+
+    // Events de Registre
+    // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void addRegistreEnviamentEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+        addEvent(EventInfo.builder()
+                .enviament(enviament)
+                .tipus(NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT)
+                .error(error)
+                .errorDescripcio(errorDescripcio)
+                .fiReintents(errorMaxReintents)
+                .build());
+    }
+
+    public void addSirEnviamentEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+        addEvent(EventInfo.builder()
+                .enviament(enviament)
+                .tipus(NotificacioEventTipusEnumDto.SIR_ENVIAMENT)
+                .error(error)
+                .errorDescripcio(errorDescripcio)
+                .fiReintents(errorMaxReintents)
+                .build());
+    }
+
+    public void addSirConsultaEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+        addEvent(EventInfo.builder()
+                .enviament(enviament)
+                .tipus(NotificacioEventTipusEnumDto.SIR_CONSULTA)
+                .error(error)
+                .errorDescripcio(errorDescripcio)
+                .fiReintents(errorMaxReintents)
+                .build());
+    }
+
+
+    // Events de Notifica
+    // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void addNotificaEnviamentEvent(NotificacioEntity notificacio, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+
+        for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+            if (InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+                continue;
             }
-        }
-        notificacioEventRepository.deleteByNotificacioAndTipusAndError(notificacio, tipus, isError);
-    }
-
-    private void preRemoveErrorEvent(NotificacioEventEntity event, NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
-
-        if (event.getEnviament() != null) {
-            event.getEnviament().setNotificacioErrorEvent(null);
-        }
-        if (enviament != null) {
-            enviament.setNotificacioErrorEvent(null);
-        }
-        if (event.getNotificacio() != null && notificacio.getEvents() != null) {
-            notificacio.getEvents().remove(event);
+            addEvent(EventInfo.builder()
+                    .enviament(enviament)
+                    .tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT)
+                    .error(error)
+                    .errorDescripcio(errorDescripcio)
+                    .fiReintents(errorMaxReintents)
+                    .build());
         }
     }
 
-    /**
-     * Si hi ha més d'un error associat a la notificació els elimina, conservant el més antic.
-     *
-     * @param notificacio Notificació dels events
-     * @param errorType Tipus d'events d'error
-     */
-    private void clearUselessErrors(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, NotificacioEventTipusEnumDto errorType) {
-
-        var events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(notificacio, errorType, true);
-        if (events == null || events.size() <= 1) {
-            return;
-        }
-        // conservam l'event més antic i eliminam els intermitjos,
-        // si tot va correctament em aquest punt la llista només tendra dos elements.
-        NotificacioEventEntity event;
-        for (var i = 1; i < events.size(); i++) {
-            event = events.get(i);
-            preRemoveErrorEvent(event, notificacio, enviament);
-            notificacioEventRepository.delete(event);
-        }
-        notificacioEventRepository.flush();
+    public void addNotificaConsultaEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+        addEvent(EventInfo.builder()
+                .enviament(enviament)
+                .tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA)
+                .error(error)
+                .errorDescripcio(errorDescripcio)
+                .fiReintents(errorMaxReintents)
+                .build());
     }
 
-    private void clearUselessNotificacioErrors(NotificacioEntity notificacio, NotificacioEventTipusEnumDto errorType) {
-
-        var events = notificacioEventRepository.findByNotificacioAndTipusAndErrorAndEnviamentIsNullOrderByDataDescIdDesc(notificacio, errorType, true);
-        if (events == null || events.size() <= 1) {
-            return;
-        }
-        // conservam l'event més antic i eliminam els intermitjos,
-        // si tot va correctament em aquest punt la llista només tendra dos elements.
-        for (int i = 1; i < events.size(); i++) {
-            NotificacioEventEntity event = events.get(i);
-            notificacioEventRepository.delete(event);
-        }
-        notificacioEventRepository.flush();
+    public void addAdviserCertificacioEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio) {
+        addEvent(EventInfo.builder()
+                .enviament(enviament)
+                .tipus(NotificacioEventTipusEnumDto.ADVISER_CERTIFICACIO)
+                .error(error)
+                .errorDescripcio(errorDescripcio)
+                .build());
     }
 
-    private void clearUselessEnviamentErrors(NotificacioEnviamentEntity enviament, NotificacioEventTipusEnumDto errorType) {
-
-        var events = notificacioEventRepository.findByEnviamentAndTipusAndErrorOrderByDataDescIdDesc(enviament, errorType, true);
-        if (events == null || events.size() <= 1) {
-            return;
-        }
-        // conservam l'event més antic i eliminam els intermitjos,
-        // si tot va correctament em aquest punt la llista només tendra dos elements.
-        for (int i = 1; i < events.size(); i++) {
-            NotificacioEventEntity event = events.get(i);
-            notificacioEventRepository.delete(event);
-        }
-        notificacioEventRepository.flush();
+    public void addAdviserDatatEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio) {
+        addEvent(EventInfo.builder()
+                .enviament(enviament)
+                .tipus(NotificacioEventTipusEnumDto.ADVISER_DATAT)
+                .error(error)
+                .errorDescripcio(errorDescripcio)
+                .build());
     }
 
+
+    // Events d'enviament via Email
+    // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void addEmailEnviamentEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio) {
+        NotificacioEventEntity event = addEvent(EventInfo.builder()
+                .enviament(enviament)
+                .tipus(NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT)
+                .error(error)
+                .errorDescripcio(errorDescripcio)
+                .build());
+    }
+
+
+    // Enviament de Callback
+    // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void addCallbackEnviamentEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+        NotificacioEventEntity event = addEvent(EventInfo.builder()
+                .enviament(enviament)
+                .tipus(NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT)
+                .error(error)
+                .errorDescripcio(errorDescripcio)
+                .fiReintents(errorMaxReintents)
+                .build());
+    }
+
+
+    @Data
+    @Builder
+    public static class EventInfo {
+//        NotificacioEntity notificacio;
+        NotificacioEnviamentEntity enviament;
+        NotificacioEventTipusEnumDto tipus;
+//        String descripcio;
+        boolean error;
+        String errorDescripcio;
+        boolean fiReintents;
+//        boolean activaCallback;
+    }
 }

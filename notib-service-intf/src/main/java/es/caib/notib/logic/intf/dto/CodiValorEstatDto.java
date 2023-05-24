@@ -1,7 +1,5 @@
 package es.caib.notib.logic.intf.dto;
 
-import java.io.Serializable;
-
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor @AllArgsConstructor
 @Getter @Setter
 public class CodiValorEstatDto implements Serializable {
 

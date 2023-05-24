@@ -50,14 +50,18 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 </c:forEach>
 $(document).ready(function() {
 	$('#events').on('rowinfo.dataTable', function(e, td, rowData) {
+		let errorText = rowData['errorDescripcio'];
+		if (rowData['fiReintents']) {
+			errorText += "\n\nEsgotats els reintents.";
+		}
 		$(td).empty();
-    	$(td).append('<textarea style="width:100%" rows="10">' + rowData['errorDescripcio'] + '</textarea>');
+    	$(td).append('<textarea style="width:100%" rows="10">' + errorText + '</textarea>');
 	});
 	$('#events').on('draw.dt', function(e, settings) {
 		var api = new $.fn.dataTable.Api(settings);
 		api.rows().every(function (rowIdx, tableLoop, rowLoop) {
 			var data = this.data();
-			if (!data.error || data.errorDescripcio == null) {
+			if (!data.errorDescripcio) {
 				$('td:last-child', this.node()).empty();
 			}
 		});
@@ -77,13 +81,31 @@ $(document).ready(function() {
 		$("#refrescarEstat").prop("disabled", true);
 		e.preventDefault();
 		$.ajax({
-			url: "/notib/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatNotifica",
+			url: '<c:url value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatNotifica"/>',
 			success: data => {
 				$("#refrescarEstat").prop("disabled", false);
 				let classe = data.ok ? "alert-success" : "alert-danger";
 				let div = '<div class="alert ' + classe +'"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +
 						'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
 				$("#contingut-missatges").append(div);
+				window.location.href = '<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}?pipellaActiva=estatNotifica"/>';
+			},
+			error: err => console.error(err)
+		});
+	});
+
+	$("#refrescarEstatSir").click(e => {
+		$("#refrescarEstatSir").prop("disabled", true);
+		e.preventDefault();
+		$.ajax({
+			url: '<c:url value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatSir"/>',
+			success: data => {
+				$("#refrescarEstatSir").prop("disabled", false);
+				let classe = data.ok ? "alert-success" : "alert-danger";
+				let div = '<div class="alert ' + classe +'"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +
+						'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
+				$("#contingut-missatges").append(div);
+				window.location.href = '<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}?pipellaActiva=estatNotifica"/>';
 			},
 			error: err => console.error(err)
 		});
@@ -92,7 +114,8 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
-	<div id="contingut-missatges"></div>
+<div id="contingut-missatges"></div>
+<%-- TODO EVENTS: mostrar missatges d'events --%>
 	<c:if test="${enviament.notificacio.notificaError}">
 		<div class="alert alert-danger well-sm">
 			<span class="fa fa-warning text-danger"></span>
@@ -113,6 +136,7 @@ $(document).ready(function() {
 			</div>
 		</div>
 	</c:if>
+
 	<ul class="nav nav-tabs" role="tablist">
 		<li role="presentation"<c:if test="${pipellaActiva == 'dades'}"> class="active"</c:if>>
 			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab">
@@ -208,7 +232,24 @@ $(document).ready(function() {
 					</tr>
 					<tr>
 						<td width="30%"><strong><spring:message code="enviament.info.dada.estat"/></strong></td>
-						<td colspan="4"><spring:message code="es.caib.notib.logic.intf.dto.NotificacioEstatEnumDto.${enviament.notificacio.estat}"/></td>
+						<td colspan="4">
+							<spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/>
+							<c:if test="${enviament.notificaError and enviament.notificaEstat != 'FINALITZADA' and enviament.notificaEstat == 'PROCESSADA'}">
+								<span class="fa fa-warning text-danger" title="<c:out value='${enviament.notificaErrorDescripcio}' escapeXml='true'/>"></span>
+							</c:if>
+							<c:if test="${enviament.fiReintents}">
+								<span class="fa fa-warning text-warning" title="<c:out value='${enviament.fiReintentsDesc}' escapeXml='true'/>"></span>
+							</c:if>
+							<c:if test="${enviament.callbackFiReintents}">
+								<span class="fa fa-warning text-info" title="<c:out value='${enviament.callbackFiReintentsDesc}' escapeXml='true'/>"></span>
+							</c:if>
+							<c:if test="${enviament.callbackFiReintents}">
+								<span class="fa fa-warning text-info" title="<c:out value='${enviament.callbackFiReintentsDesc}' escapeXml='true'/>"></span>
+							</c:if>
+							<c:if test="${not empty enviament.notificacioMovilErrorDesc}">
+								<span style="color:#8a6d3b;  cursor:pointer;" class="fa fa-mobile fa-lg" title="<c:out value='${enviament.notificacioMovilErrorDesc}' escapeXml='true'/>"></span>
+							</c:if>
+						</td>
 					</tr>
 				</tbody>
 				</table>
@@ -410,11 +451,20 @@ $(document).ready(function() {
 			</c:if>
 			<c:if test="${enviament.notificacio.estat != 'PENDENT'}">
 				<c:choose>
-					<c:when test="${(notificacio.enviamentTipus == 'COMUNICACIO' && enviament.titular.interessatTipus == 'ADMINISTRACIO') || enviament.perEmail}">
+					<c:when test="${(notificacio.enviamentTipus == 'COMUNICACIO' && enviament.titular.interessatTipus == 'ADMINISTRACIO')}">
+						<p class="text-right" style="margin-top: 1em">
+							<button id="refrescarEstatSir" class="btn btn-default">
+								<span class="fa fa-refresh"></span>
+								<spring:message code="enviament.info.accio.refrescar.estat"/>
+							</button>
+						</p>
+					</c:when>
+					<c:when test="${enviament.perEmail}">
 						<br/>
 					</c:when>
 					<c:otherwise>
 						<p class="text-right" style="margin-top: 1em">
+<%--							<a id="refrescarEstat" href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatNotifica"/>" class="btn btn-default">--%>
 							<button id="refrescarEstat" class="btn btn-default">
 								<span class="fa fa-refresh"></span>
 								<spring:message code="enviament.info.accio.refrescar.estat"/>
@@ -438,10 +488,30 @@ $(document).ready(function() {
 									<td width="30%"><strong><spring:message code="enviament.info.notifica.estat"/></strong></td>
 									<td><spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/></td>
 								</tr>
-								<tr>
-									<td><strong><spring:message code="enviament.info.notifica.estat.data"/></strong></td>
-									<td><fmt:formatDate value="${enviament.notificaEstatData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-								</tr>
+								<c:if test="${not empty enviament.sirRecepcioData}">
+									<tr>
+										<td><strong><spring:message code="enviament.info.sir.recepcio.data"/></strong></td>
+										<td><fmt:formatDate value="${enviament.sirRecepcioData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+									</tr>
+								</c:if>
+								<c:if test="${not empty enviament.sirRegDestiData}">
+									<tr>
+										<td><strong><spring:message code="enviament.info.sir.registre.desti.data"/></strong></td>
+										<td><fmt:formatDate value="${enviament.sirRegDestiData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+									</tr>
+								</c:if>
+								<c:if test="${not empty enviament.notificaEstatData}">
+									<tr>
+										<td><strong><spring:message code="enviament.info.notifica.estat.data"/></strong></td>
+										<td><fmt:formatDate value="${enviament.notificaEstatData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+									</tr>
+								</c:if>
+								<c:if test="${not empty enviament.notificaIdentificador}">
+									<tr>
+										<td><strong><spring:message code="notificacio.list.filtre.camp.identificador"/></strong></td>
+										<td>${enviament.notificaIdentificador}</td>
+									</tr>
+								</c:if>
 								<c:if test="${not empty enviament.notificaDatatErrorDescripcio}">
 									<tr>
 										<td><strong><spring:message code="enviament.info.notifica.estat.descripcio"/></strong></td>
@@ -632,15 +702,13 @@ $(document).ready(function() {
 			<thead>
 				<tr>
 					<th data-col-name="id" data-visible="false">#</th>
-					<th data-col-name="enviamentAssociat" data-visible="false"></th>
 					<th data-col-name="errorDescripcio" data-visible="false"></th>
-					<%--th data-col-name="createdBy.nom" data-orderable="false"><spring:message code="notificacio.event.list.columna.usuari"/></th--%>
+					<th data-col-name="fiReintents" data-visible="false"></th>
 					<th data-col-name="data" data-converter="datetime" data-orderable="false"><spring:message code="enviament.event.list.columna.data"/></th>
 					<th data-col-name="tipus" data-template="#cellTipus" data-orderable="false">
 						<spring:message code="enviament.event.list.columna.tipus"/>
 						<script id="cellTipus" type="text/x-jsrender">
 							{{:~eval('eventTipus["' + tipus + '"]')}}
-							{{if enviamentAssociat}}<span class="label label-default pull-right" title="<spring:message code="notificacio.event.list.info.associat"/>">E</span>{{/if}}
 						</script>
 					</th>
 					<th data-col-name="error" data-template="#cellResultat" data-orderable="false">
@@ -651,11 +719,19 @@ $(document).ready(function() {
 							{{else}}
 								<span class="fa fa-check text-success" title="<spring:message code="enviament.event.list.processat.ok"/>"></span>
 							{{/if}}
+							{{if fiReintents}}
+									<span class="fa fa-warning text-info" title="<spring:message code="enviament.event.list.fi.reintents"/>"></span>
+							{{/if}}
 						</script>
 					</th>
+					<th data-col-name="intents" data-orderable="false"><spring:message code="notificacio.event.list.columna.intents"/></th>
 				</tr>
 			</thead>
 			</table>
+			<c:if test="${enviament.callbackPendent}">
+				<br>
+				<div class="alert alert-info well-sm"><span class="fa fa-clock-o"></span> <span><spring:message code="callback.pendent.enviament"/> ${enviament.callbackData}</span></div>
+			</c:if>
 		</div>
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'historic'}"> active</c:if>" id="historic">
 			<table id="historic"

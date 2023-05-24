@@ -34,16 +34,20 @@ public abstract class NotificacioBaseRestClient {
 	protected String username;
 	protected String password;
 
-	protected boolean autenticacioBasic = false;
+	protected boolean autenticacioBasic = true;
 	protected int connecTimeout = 20000;
 	protected int readTimeout = 120000;
 
-	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(String identificador, String serviceUrl) {
+	protected Client jerseyClient;
 
+	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(String identificador, String serviceUrl) {
 		try {
 			String urlAmbMetode = baseUrl + serviceUrl + "/consultaJustificantNotificacio/" + identificador;
-			Client jerseyClient = generarClient(urlAmbMetode);
-			String json = jerseyClient.resource(urlAmbMetode).type("application/json").get(String.class);
+			jerseyClient = generarClient(urlAmbMetode);
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type("application/json").
+					get(String.class);
 			return getMapper().readValue(json, RespostaConsultaJustificantEnviament.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
@@ -55,7 +59,7 @@ public abstract class NotificacioBaseRestClient {
 			String urlAmbMetode = baseUrl + serviceUrl + "/permisConsulta";
 			ObjectMapper mapper = getMapper();
 			String body = mapper.writeValueAsString(permisConsulta);
-			Client jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient(urlAmbMetode);
 			logger.debug("Missatge REST enviat: " + body);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
@@ -73,19 +77,20 @@ public abstract class NotificacioBaseRestClient {
 	}
 
 	protected Client generarClient(String urlAmbMetode) throws Exception {
-		Client jerseyClient = generarClient();
+
+		if (jerseyClient != null) {
+			return jerseyClient;
+		}
+		jerseyClient = generarClient();
 		if (username != null) {
-			autenticarClient(
-					jerseyClient,
-					urlAmbMetode,
-					username,
-					password);
+			autenticarClient(jerseyClient, urlAmbMetode, username, password);
 		}
 		return jerseyClient;
 	}
 
 	protected Client generarClient() {
-		Client jerseyClient = Client.create();
+
+		jerseyClient = Client.create();
 		jerseyClient.setConnectTimeout(connecTimeout);
 		jerseyClient.setReadTimeout(readTimeout);
 		//jerseyClient.addFilter(new LoggingFilter(System.out));
@@ -113,16 +118,16 @@ public abstract class NotificacioBaseRestClient {
 					@Override
 					public ClientResponse handle(ClientRequest request) throws ClientHandlerException {
 						ClientHandler ch = getNext();
-				        ClientResponse resp = ch.handle(request);
+						ClientResponse resp = ch.handle(request);
 
 						if (resp.getStatus()/100 != 3) {
 //				        if (resp.getStatusInfo().getFamily() != Response.Status.Family.REDIRECTION) {
-				            return resp;
-				        } else {
-				            String redirectTarget = resp.getHeaders().getFirst("Location");
-				            request.setURI(UriBuilder.fromUri(redirectTarget).build());
-				            return ch.handle(request);
-				        }
+							return resp;
+						} else {
+							String redirectTarget = resp.getHeaders().getFirst("Location");
+							request.setURI(UriBuilder.fromUri(redirectTarget).build());
+							return ch.handle(request);
+						}
 					}
 				}
 		);
@@ -137,23 +142,23 @@ public abstract class NotificacioBaseRestClient {
 		if (!autenticacioBasic) {
 			logger.debug(
 					"Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
-					"urlAmbMetode=" + urlAmbMetode + ", " +
-					"username=" + username +
-					"password=********)");
+							"urlAmbMetode=" + urlAmbMetode + ", " +
+							"username=" + username +
+							"password=********)");
 			jerseyClient.resource(urlAmbMetode).get(String.class);
 			Form form = new Form();
 			form.putSingle("j_username", username);
 			form.putSingle("j_password", password);
 			jerseyClient.
-			resource(baseUrl + "/j_security_check").
-			type("application/x-www-form-urlencoded").
-			post(form);
+					resource(baseUrl + "/j_security_check").
+					type("application/x-www-form-urlencoded").
+					post(form);
 		} else {
 			logger.debug(
 					"Autenticant REST amb autenticació de tipus HTTP basic (" +
-					"urlAmbMetode=" + urlAmbMetode + ", " +
-					"username=" + username +
-					"password=********)");
+							"urlAmbMetode=" + urlAmbMetode + ", " +
+							"username=" + username +
+							"password=********)");
 			jerseyClient.addFilter(
 					new HTTPBasicAuthFilter(username, password));
 		}

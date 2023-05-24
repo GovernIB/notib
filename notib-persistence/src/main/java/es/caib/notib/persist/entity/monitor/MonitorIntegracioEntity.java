@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -35,6 +36,8 @@ import java.util.List;
 @Table(name="not_mon_int")
 @EntityListeners(AuditingEntityListener.class)
 public class MonitorIntegracioEntity extends AbstractPersistable<Long> {
+
+    private static int ERROR_DESC_MAX_LENGTH = 1024;
 
     @Column(name = "codi", length = 64, nullable = false, unique = true)
     private String codi;
@@ -78,5 +81,36 @@ public class MonitorIntegracioEntity extends AbstractPersistable<Long> {
 
     @OneToMany(mappedBy = "monitorIntegracio", fetch = FetchType.LAZY, orphanRemoval = true, cascade={CascadeType.ALL})
     private List<MonitorIntegracioParamEntity> parametres = new ArrayList<>();
+
+
+    public void setErrorDescripcio(String errorDescripcio) {
+        this.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH);;
+    }
+    public void setExcepcioMessage(String excepcioMessage) {
+        this.excepcioMessage = StringUtils.abbreviate(excepcioMessage, ERROR_DESC_MAX_LENGTH);;
+    }
+
+    public void setExcepcioStacktrace(String excepcioStacktrace) {
+        this.excepcioStacktrace = StringUtils.abbreviate(excepcioStacktrace, ERROR_DESC_MAX_LENGTH*2);
+    }
+
+    // Custom builder setters
+    public static class MonitorIntegracioEntityBuilder {
+        private String errorDescripcio;
+        public MonitorIntegracioEntity.MonitorIntegracioEntityBuilder errorDescripcio(String errorDescripcio){
+            this.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH);
+            return this;
+        }
+
+        public MonitorIntegracioEntity.MonitorIntegracioEntityBuilder excepcioMessage(String excepcioMessage){
+            this.excepcioMessage = StringUtils.abbreviate(excepcioMessage, ERROR_DESC_MAX_LENGTH);
+            return this;
+        }
+
+        public MonitorIntegracioEntity.MonitorIntegracioEntityBuilder excepcioStacktrace(String excepcioStacktrace){
+            this.excepcioStacktrace = StringUtils.abbreviate(excepcioStacktrace, ERROR_DESC_MAX_LENGTH*2);
+            return this;
+        }
+    }
 
 }

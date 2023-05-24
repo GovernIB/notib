@@ -3,10 +3,13 @@
  */
 package es.caib.notib.back.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
 import com.google.common.base.Strings;
+import es.caib.notib.back.command.PermisCommand;
+import es.caib.notib.back.helper.DatatablesHelper;
+import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.PermisDto;
+import es.caib.notib.logic.intf.service.EntitatService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,11 +19,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import es.caib.notib.logic.intf.dto.PermisDto;
-import es.caib.notib.logic.intf.service.EntitatService;
-import es.caib.notib.back.command.PermisCommand;
-import es.caib.notib.back.helper.DatatablesHelper;
-import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * Controlador per al manteniment dels permisos d'entitats.
@@ -46,8 +48,8 @@ public class EntitatPermisController extends BaseController {
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request, @PathVariable Long entitatId) {
 
-		var paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		var permisos = entitatService.permisFindByEntitatId(entitatId, paginacio);
+		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		List<PermisDto> permisos = entitatService.permisFindByEntitatId(entitatId, paginacio);
 		return DatatablesHelper.getDatatableResponse(request, permisos);
 	}
 
@@ -55,7 +57,7 @@ public class EntitatPermisController extends BaseController {
 	public String getNew(HttpServletRequest request, @PathVariable Long entitatId, Model model) {
 
 		model.addAttribute("entitat", entitatService.findById(entitatId));
-		var permisCommand = new PermisCommand();
+		PermisCommand permisCommand = new PermisCommand();
 		model.addAttribute(permisCommand);
 		model.addAttribute("principalSize", permisCommand.getPrincipalDefaultSize());
 		return "entitatPermisForm";
@@ -65,6 +67,7 @@ public class EntitatPermisController extends BaseController {
 	@RequestMapping(value="/{principal}/existeix", method = RequestMethod.GET)
 	public boolean existeixPrincipal(HttpServletRequest request, @PathVariable Long entitatId, @PathVariable String principal, Model model) {
 
+//		System.out.println(principal);
 		if (Strings.isNullOrEmpty(principal)) {
 			return false;
 		}
@@ -80,9 +83,10 @@ public class EntitatPermisController extends BaseController {
 	public String get(HttpServletRequest request, @PathVariable Long entitatId, @PathVariable Long permisId, Model model) {
 
 		model.addAttribute("entitat", entitatService.findById(entitatId));
-		var permisos = entitatService.permisFindByEntitatId(entitatId, null);
+		List<PermisDto> permisos = null;
+		permisos = entitatService.permisFindByEntitatId(entitatId, null);
 		PermisDto permis = null;
-		for (var p: permisos) {
+		for (PermisDto p: permisos) {
 			if (p.getId().equals(permisId)) {
 				permis = p;
 				break;

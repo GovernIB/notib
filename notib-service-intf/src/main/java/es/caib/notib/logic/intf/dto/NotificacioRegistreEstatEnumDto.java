@@ -43,5 +43,4 @@ public enum NotificacioRegistreEstatEnumDto implements Serializable {
 		this.budget = budget;
 		this.color = color;
     }
-
 }

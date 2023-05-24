@@ -30,6 +30,7 @@ public class ValidNotificacioMassiuValidator  implements ConstraintValidator<Val
 	public boolean isValid(NotificacioMassivaCommand notificacioMassivaCommand, ConstraintValidatorContext context) {
 
 		var valid = true;
+
 		var messageError = checkCSVFile(notificacioMassivaCommand);
 		if (messageError != null && !messageError.isEmpty()) {
 			valid = false;
@@ -57,10 +58,12 @@ public class ValidNotificacioMassiuValidator  implements ConstraintValidator<Val
 		if (notificacioMassivaCommand.getFitxerCSVGestdocId() != null && !notificacioMassivaCommand.getFitxerCSVGestdocId().isEmpty()) {
 			return null;
 		}
+
 		var fitxerCSV = notificacioMassivaCommand.getFicheroCsv();
 		if (fitxerCSV == null || fitxerCSV.getSize() == 0) {
 			return "NotEmpty";
 		}
+
 		var extensio = FilenameUtils.getExtension(fitxerCSV.getOriginalFilename());
 		if (!extensionsCsvDisponibles.contains(extensio)) {
 			log.info("Error validacio CSV enviament massiu. Extensió fitxer incorrecte: " + extensio);
@@ -88,6 +91,7 @@ public class ValidNotificacioMassiuValidator  implements ConstraintValidator<Val
 		if (notificacioMassivaCommand.getFitxerZIPGestdocId() != null && !notificacioMassivaCommand.getFitxerZIPGestdocId().isEmpty()) {
 			return null;
 		}
+
 		var fitxerZIP = notificacioMassivaCommand.getFicheroZip();
 		if (fitxerZIP == null || fitxerZIP.getSize() == 0) {
 			return null;
@@ -97,10 +101,6 @@ public class ValidNotificacioMassiuValidator  implements ConstraintValidator<Val
 			log.info("Error validacio ZIP enviament massiu. Extensió fitxer incorrecte: " + extensio);
 			return "notificacio.form.valid.document.format";
 		}
-//			if (!formatsZipDisponibles.contains(fitxerZIP.getContentType())) {
-//				log.info("Error validacio CSV enviament massiu. Format fitxer incorrecte: " + fitxerZIP.getContentType());
-//				return "notificacio.form.valid.document.format";
-//			}
 		var fileSize = fitxerZIP.getSize();
 		if (fileSize > zipFileMaxSize) {
 			return "notificacio.form.valid.document.size";

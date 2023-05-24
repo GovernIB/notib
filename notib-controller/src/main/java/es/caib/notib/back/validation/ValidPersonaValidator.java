@@ -27,13 +27,9 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 	public static final int MAX_SIZE_RAO_SOCIAL = 80;
 	private static final int MIN_SIZE_LLINATGES = 2;
 	private static final int MIN_SIZE_NOM_RAO = 2;
-	
+
 	@Autowired
 	private AplicacioService aplicacioService;
-
-	private Locale locale;
-	private PersonaCommand persona;
-	private ConstraintValidatorContext context;
 
 	@Override
 	public void initialize(final ValidPersona constraintAnnotation) {
@@ -42,148 +38,129 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(final PersonaCommand persona, final ConstraintValidatorContext context) {
-
 		boolean valid = true;
+
 		try {
-			this.persona = persona;
-			this.context = context;
-			locale = new Locale(SessioHelper.getIdioma(aplicacioService));
+			Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
 			// Validació del NIF/NIE/CIF
-			if (persona.getNif() != null && !persona.getNif().isEmpty() && !InteressatTipus.FISICA_SENSE_NIF.equals(persona.getInteressatTipus())) {
-				if (!NifHelper.isvalid(persona.getNif())) {
-					valid = false;
-					var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.persona.nif", null, locale);
-					context.buildConstraintViolationWithTemplate(msg).addNode("nif").addConstraintViolation();
-			    }
+			if (persona.getNif() != null && !persona.getNif().isEmpty() && !InteressatTipus.FISICA_SENSE_NIF.equals(persona.getInteressatTipus()) && !NifHelper.isvalid(persona.getNif())) {
+				valid = false;
+				String msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.persona.nif", null, locale);
+				context.buildConstraintViolationWithTemplate(msg).addNode("nif").addConstraintViolation();
 			}
+
 			// Validacions per tipus de persona
 			switch (persona.getInteressatTipus()) {
 				case FISICA:
-					return valid && validFisica();
+					valid = validarNom(persona, context);
+					String llinatge1Interessat = persona.getLlinatge1();
+					String llinatge2Interessat = persona.getLlinatge2();
+
+					if (Strings.isNullOrEmpty(llinatge1Interessat)) {
+						valid = false;
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.llinatge1", null, locale))
+								.addNode("llinatge1")
+								.addConstraintViolation();
+					}
+					if (!Strings.isNullOrEmpty(llinatge1Interessat)) {
+						int llinatge1InteressatSize = llinatge1Interessat.length();
+						int llinatge2InteressatSize = llinatge2Interessat != null ? llinatge2Interessat.length() : 0;
+						if ((llinatge1InteressatSize + llinatge2InteressatSize) < MIN_SIZE_LLINATGES) {
+							valid = false;
+							context.buildConstraintViolationWithTemplate(
+											MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.llinatges.size", new Object[] {MIN_SIZE_LLINATGES}, locale))
+									.addNode("llinatge1").addConstraintViolation();
+						}
+					}
+					if (Strings.isNullOrEmpty(persona.getNif())) {
+						valid = false;
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.nif", null, locale))
+								.addNode("nif")
+								.addConstraintViolation();
+					}
+					if (!Strings.isNullOrEmpty(persona.getNif()) && !NifHelper.isValidNifNie(persona.getNif())) {
+						valid = false;
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.tipoDocumentoIncorrecto", null, locale))
+								.addNode("nif")
+								.addConstraintViolation();
+					}
+					break;
 				case FISICA_SENSE_NIF:
-					return valid && validFisicaSenseNif();
+					valid = validarNom(persona, context);
+					if (persona.getLlinatge1() == null || persona.getLlinatge1().isEmpty()) {
+						valid = false;
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.llinatge1", null, locale))
+								.addNode("llinatge1")
+								.addConstraintViolation();
+					}
+					String llinatge1 = persona.getLlinatge1();
+					String llinatge2 = persona.getLlinatge2();
+					int llinatge1Size = llinatge1.length();
+					int llinatge2Size = llinatge2 != null ? llinatge2.length() : 0;
+					if ((llinatge1Size + llinatge2Size) < MIN_SIZE_LLINATGES) {
+						valid = false;
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.llinatges.size", new Object[] {MIN_SIZE_LLINATGES}, locale))
+								.addNode("llinatge1").addConstraintViolation();
+					}
+					break;
 				case JURIDICA:
-					return valid && validJuridica();
+					valid = validarNom(persona, context);
+					if (persona.getNif() == null || persona.getNif().isEmpty()) {
+						valid = false;
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.juridica.cif", null, locale))
+								.addNode("nif")
+								.addConstraintViolation();
+					}
+					if (persona.getNif() != null && !persona.getNif().isEmpty() && !NifHelper.isValidCif(persona.getNif())) {
+						valid = false;
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.juridica.tipoDocumentoIncorrecto", null, locale))
+								.addNode("nif")
+								.addConstraintViolation();
+					}
+					break;
 				case ADMINISTRACIO:
-					return valid && validAdministracio();
-				default:
-					return false;
+					if (Strings.isNullOrEmpty(persona.getRaoSocialInput())) {
+						valid = false;
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.administracio.nom", null, locale))
+								.addNode("nom")
+								.addConstraintViolation();
+					}
+					if (Strings.isNullOrEmpty(persona.getDir3Codi())) {
+						valid = false;
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.administracio.dir3", null, locale))
+								.addNode("dir3Codi")
+								.addConstraintViolation();
+					}
+					break;
 			}
 
 		} catch (final Exception ex) {
-//        	LOGGER.error("Una comunicació no pot estar dirigida a una administració i a una persona física/jurídica a la vegada.", ex);
 			log.error("S'ha produït un error inesperat al validar la notificació. "
 					+ "Si l'error es continua donant en properes intents, posis en contacte amb els administradors de l'aplicació.", ex);
-			return false;
-		}
-	}
-
-	private boolean validFisica() {
-
-		var valid = true;
-		valid = validarNom(persona, context);
-		String llinatge1Interessat = persona.getLlinatge1();
-		String llinatge2Interessat = persona.getLlinatge2();
-
-		if (Strings.isNullOrEmpty(llinatge1Interessat)) {
 			valid = false;
-			var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.llinatge1", null, locale);
-			context.buildConstraintViolationWithTemplate(msg).addNode("llinatge1").addConstraintViolation();
 		}
-		if (!Strings.isNullOrEmpty(llinatge1Interessat)) {
-			var llinatge1InteressatSize = llinatge1Interessat.length();
-			var llinatge2InteressatSize = llinatge2Interessat != null ? llinatge2Interessat.length() : 0;
-			if ((llinatge1InteressatSize + llinatge2InteressatSize) < MIN_SIZE_LLINATGES) {
-				valid = false;
-				var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.llinatges.size", new Object[] {MIN_SIZE_LLINATGES}, locale);
-				context.buildConstraintViolationWithTemplate(msg).addNode("llinatge1").addConstraintViolation();
-			}
-		}
-		if (Strings.isNullOrEmpty(persona.getNif())) {
-			valid = false;
-			var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.nif", null, locale);
-			context.buildConstraintViolationWithTemplate(msg).addNode("nif").addConstraintViolation();
-		}
-		if (!Strings.isNullOrEmpty(persona.getNif()) && !NifHelper.isValidNifNie(persona.getNif())) {
-			valid = false;
-			var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.tipoDocumentoIncorrecto", null, locale);
-			context.buildConstraintViolationWithTemplate(msg).addNode("nif").addConstraintViolation();
-		}
-		return valid;
-	}
 
-	private boolean validFisicaSenseNif() {
 
-		var valid = true;
-		valid = validarNom(persona, context);
-		if (persona.getLlinatge1() == null || persona.getLlinatge1().isEmpty()) {
-			valid = false;
-			var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.llinatge1", null, locale);
-			context.buildConstraintViolationWithTemplate(msg).addNode("llinatge1").addConstraintViolation();
-		}
-		var llinatge1 = persona.getLlinatge1();
-		var llinatge2 = persona.getLlinatge2();
-		var llinatge1Size = llinatge1.length();
-		var llinatge2Size = llinatge2 != null ? llinatge2.length() : 0;
-		if ((llinatge1Size + llinatge2Size) < MIN_SIZE_LLINATGES) {
-			valid = false;
-			var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.llinatges.size", new Object[] {MIN_SIZE_LLINATGES}, locale);
-			context.buildConstraintViolationWithTemplate(msg).addNode("llinatge1").addConstraintViolation();
-		}
-//				if (persona.getNif() != null && !persona.getNif().isEmpty() && !NifHelper.isValidNifNie(persona.getNif())) {
-//					valid = false;
-//					context.buildConstraintViolationWithTemplate(
-//									MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.tipoDocumentoIncorrecto", null, locale))
-//							.addNode("nif")
-//							.addConstraintViolation();
-//				}
-		return valid;
-	}
-
-	private boolean validJuridica() {
-
-		var valid = true;
-		valid = validarNom(persona, context);
-		if (persona.getNif() == null || persona.getNif().isEmpty()) {
-			valid = false;
-			context.buildConstraintViolationWithTemplate(
-							MessageHelper.getInstance().getMessage("notificacio.form.valid.juridica.cif", null, locale))
-					.addNode("nif")
-					.addConstraintViolation();
-		}
-		if (persona.getNif() != null && !persona.getNif().isEmpty() && !NifHelper.isValidCif(persona.getNif())) {
-			valid = false;
-			var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.juridica.tipoDocumentoIncorrecto", null, locale);
-			context.buildConstraintViolationWithTemplate(msg).addNode("nif").addConstraintViolation();
-		}
-		return valid;
-	}
-
-	private boolean validAdministracio() {
-
-		var valid = true;
-		if (Strings.isNullOrEmpty(persona.getRaoSocialInput())) {
-			valid = false;
-			var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.administracio.nom", null, locale);
-			context.buildConstraintViolationWithTemplate(msg).addNode("nom").addConstraintViolation();
-		}
-		if (Strings.isNullOrEmpty(persona.getDir3Codi())) {
-			valid = false;
-			var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.administracio.dir3", null, locale);
-			context.buildConstraintViolationWithTemplate(msg).addNode("dir3Codi").addConstraintViolation();
-		}
 		return valid;
 	}
 
 	private boolean validarNom(final PersonaCommand persona, final ConstraintValidatorContext context) {
-
-		var locale = new Locale(SessioHelper.getIdioma(aplicacioService));
-		var isJuridica = InteressatTipus.JURIDICA.equals(persona.getInteressatTipus());
-		var msgKey = "";
-		var ok = true;
+		Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
+		boolean isJuridica = InteressatTipus.JURIDICA.equals(persona.getInteressatTipus());
+		String msgKey = "";
+		boolean ok = true;
 		Object [] vars = null;
-		var raoSocialInteressat = persona.getRaoSocialInput();
-		var nomInteressat = persona.getNomInput();
+		String raoSocialInteressat = persona.getRaoSocialInput();
+		String nomInteressat = persona.getNomInput();
 		if (Strings.isNullOrEmpty(raoSocialInteressat) && isJuridica) {
 			ok = false;
 			msgKey = "notificacio.form.valid.juridica.rao";
@@ -219,5 +196,4 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 		}
 		return ok;
 	}
-
 }

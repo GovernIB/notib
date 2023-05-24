@@ -62,23 +62,22 @@ public class PermisosCacheable {
         hasPermisos.put(RolEnumDto.NOT_APL, hasPermisAplicacioEntitat);
         hasPermisos.put(RolEnumDto.NOT_ADMIN_ORGAN, hasPermisAdminOrgan);
 
-        if (!getGenerarLogsPermisosOrgan()) {
-            return hasPermisos;
+        if (getGenerarLogsPermisosOrgan()) {
+            log.info("### PERMISOS - Obtenir Permisos ###########################################");
+            log.info("### -----------------------------------------------------------------------");
+            log.info("### Usuari: " + auth.getName());
+            log.info("### Rols: ");
+            if (auth.getAuthorities() != null)
+                for (GrantedAuthority authority : auth.getAuthorities()) {
+                    log.info("### # " + authority.getAuthority());
+                }
+            log.info("### Permís Usuari: " + hasPermisUsuariEntitat);
+            log.info("### Permís Adm entitat: " + hasPermisAdminEntitat);
+            log.info("### Permís Adm òrgan: " + hasPermisAdminOrgan);
+            log.info("### Permís Aplicació: " + hasPermisAplicacioEntitat);
+            log.info("### -----------------------------------------------------------------------");
         }
 
-        log.info("### PERMISOS - Obtenir Permisos ###########################################");
-        log.info("### -----------------------------------------------------------------------");
-        log.info("### Usuari: " + auth.getName());
-        log.info("### Rols: ");
-        if (auth.getAuthorities() != null)
-            for (GrantedAuthority authority : auth.getAuthorities()) {
-                log.info("### # " + authority.getAuthority());
-            }
-        log.info("### Permís Usuari: " + hasPermisUsuariEntitat);
-        log.info("### Permís Adm entitat: " + hasPermisAdminEntitat);
-        log.info("### Permís Adm òrgan: " + hasPermisAdminOrgan);
-        log.info("### Permís Aplicació: " + hasPermisAplicacioEntitat);
-        log.info("### -----------------------------------------------------------------------");
         return hasPermisos;
     }
 
@@ -107,10 +106,8 @@ public class PermisosCacheable {
         permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
         var organGestorsAmbPermisos = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, permisos);
         for(var dto : resposta) {
-            dto.setUsuariActualAdministradorEntitat(false);
-            if (!organGestorsAmbPermisos.isEmpty()) {
-                dto.setUsuariActualAdministradorOrgan(organGestorRepository.isAnyOfEntitat(organGestorsAmbPermisos, dto.getId()));
-            }
+            dto.setUsuariActualAdministradorEntitat(true);
+            dto.setUsuariActualAdministradorOrgan(!organGestorsAmbPermisos.isEmpty() && organGestorRepository.isAnyOfEntitat(organGestorsAmbPermisos, dto.getId()));
         }
         return resposta;
     }
@@ -120,12 +117,12 @@ public class PermisosCacheable {
 
         var organsGestors = organGestorRepository.findAll();
         Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
-        permisosHelper.filterGrantedAny(organsGestors,
-                new PermisosHelper.ObjectIdentifierExtractor<OrganGestorEntity>() {
-                    public Long getObjectIdentifier(OrganGestorEntity organGestor) {
-                        return organGestor.getId();
-                    }
-                }, OrganGestorEntity.class, permisos, auth);
+        permisosHelper.filterGrantedAny(
+                organsGestors,
+                (PermisosHelper.ObjectIdentifierExtractor<OrganGestorEntity>) organGestor -> organGestor.getId(),
+                OrganGestorEntity.class,
+                permisos,
+                auth);
 
         if (getGenerarLogsPermisosOrgan()) {
             log.info("### PERMISOS - Obtenir Òrgans gestors #####################################");

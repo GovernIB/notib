@@ -3,32 +3,34 @@ package es.caib.notib.logic.threads;
 import es.caib.notib.logic.helper.CallbackHelper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.concurrent.Callable;
 
 @Slf4j
 public class CallbackProcessarPendentsThread implements Callable<Boolean> {
 
-    protected Long eventId;
+    protected Long enviamentId;
     protected CallbackHelper callbackHelper;
     @Getter
     public boolean error;
 
-    public CallbackProcessarPendentsThread(Long eventId, CallbackHelper callbackHelper) {
-        this.eventId = eventId;
+    public CallbackProcessarPendentsThread(Long enviamentId, CallbackHelper callbackHelper) {
+        this.enviamentId = enviamentId;
         this.callbackHelper= callbackHelper;
     }
 
     @Override
     public Boolean call() throws Exception {
 
-        log.info("[REG] >>> Realitzant registre de la notificació amb id " + eventId);
+        log.info("[REG] >>> Realitzant registre de la notificació amb id enviamentId");
         try {
-            return callbackHelper.notifica(eventId);
+            return callbackHelper.notifica(enviamentId);
         } catch (Exception e) {
             error = true;
-            log.error("Error registrant la notificació amb id " + eventId, e);
-            throw new RuntimeException(e);
+            log.error(String.format("[Callback] L'enviament [Id: %d] ha provocat la següent excepcio:", enviamentId), e);
+            callbackHelper.marcarEventNoProcessable(enviamentId, e.getMessage(), ExceptionUtils.getStackTrace(e));
+            return error;
         }
     }
 }

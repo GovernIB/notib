@@ -14,7 +14,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -22,13 +21,30 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PreRemove;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Classe del model de dades que representa els enviaments d'una
@@ -255,6 +271,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "per_email")
 	private boolean perEmail;
 
+	@Column(name = "callback_error")
+	protected boolean errorLastCallback;
+
 	@Transient
 	private String csvUuid;
 
@@ -287,6 +306,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
 		this.registreNumeroFormatat = registreNumeroFormatat;
+	}
+	public void updateLastCallbackError(boolean error) {
+		this.errorLastCallback = error;
 	}
 
 	public void updateRegistreEstat(
@@ -364,13 +386,13 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaEstatData = notificaEstatData;
 		this.notificaEstatFinal = notificaEstatFinal;
 		this.notificaEstatDescripcio = notificaEstatDescripcio;
-		if (!StringUtils.isBlank(notificaDatatOrigen))
+		if (!isBlank(notificaDatatOrigen))
 			this.notificaDatatOrigen = notificaDatatOrigen;
-		if (!StringUtils.isBlank(notificaDatatReceptorNif))
+		if (!isBlank(notificaDatatReceptorNif))
 			this.notificaDatatReceptorNif = notificaDatatReceptorNif;
-		if (!StringUtils.isBlank(notificaDatatReceptorNom))
+		if (!isBlank(notificaDatatReceptorNom))
 			this.notificaDatatReceptorNom = notificaDatatReceptorNom;
-		if (!StringUtils.isBlank(notificaDatatNumSeguiment))
+		if (!isBlank(notificaDatatNumSeguiment))
 			this.notificaDatatNumSeguiment = notificaDatatNumSeguiment;
 		this.notificaDatatErrorDescripcio = notificaDatatErrorDescripcio;
 		this.notificaEstatDataActualitzacio = new Date();
@@ -379,9 +401,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public void updateReceptorDatat(
 			String notificaDatatReceptorNif,
 			String notificaDatatReceptorNom) {
-		if (!StringUtils.isBlank(notificaDatatReceptorNif))
+		if (!isBlank(notificaDatatReceptorNif))
 			this.notificaDatatReceptorNif = notificaDatatReceptorNif;
-		if (!StringUtils.isBlank(notificaDatatReceptorNom))
+		if (!isBlank(notificaDatatReceptorNom))
 			this.notificaDatatReceptorNom = notificaDatatReceptorNom;
 	}
 	

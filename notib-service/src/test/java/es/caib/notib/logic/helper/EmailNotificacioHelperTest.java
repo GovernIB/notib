@@ -3,7 +3,17 @@ package es.caib.notib.logic.helper;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
-import es.caib.notib.persist.entity.*;
+import es.caib.notib.persist.entity.DocumentEntity;
+import es.caib.notib.persist.entity.EntitatEntity;
+import es.caib.notib.persist.entity.GrupEntity;
+import es.caib.notib.persist.entity.GrupProcSerEntity;
+import es.caib.notib.persist.entity.NotificacioEntity;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.entity.OrganGestorEntity;
+import es.caib.notib.persist.entity.PersonaEntity;
+import es.caib.notib.persist.entity.ProcSerEntity;
+import es.caib.notib.persist.entity.ProcedimentEntity;
+import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.repository.GrupProcSerRepository;
 import es.caib.notib.persist.repository.GrupRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
@@ -146,7 +156,6 @@ public class EmailNotificacioHelperTest {
 		ProcedimentEntity procediment = ProcedimentEntity.builder().nom("Nom del procediment").agrupar(false).createdBy(usuari).build();
 		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entidad).build();
 		GrupEntity grupNotificacio = GrupEntity.getBuilder(null, null, entidad, organGestor).build();
-
 		notificacioMock =  Mockito.mock(NotificacioEntity.class);
 		Mockito.when(notificacioMock.getId()).thenReturn(666L);
 		Mockito.when(notificacioMock.getProcediment()).thenReturn(procediment);

@@ -4,7 +4,6 @@
 package es.caib.notib.persist.dialect;
 
 import es.caib.notib.persist.audit.AbstractAuditableEntity;
-import org.hibernate.Hibernate;
 import org.hibernate.dialect.Oracle10gDialect;
 import org.hibernate.type.IntegerType;
 
@@ -20,7 +19,6 @@ public class OracleCaibDialect extends Oracle10gDialect {
 	private static final String HIBERNATE_SEQ = "hibernate_seq";
 
 	public OracleCaibDialect() {
-
 		super();
 		registerFunction("bitand", new OracleBitwiseAndSQLFunction("bitand", IntegerType.INSTANCE));
 	}

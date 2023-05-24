@@ -36,12 +36,10 @@ public class ConfigHelperTest {
     private final String configKey = ".propietat.de.test";
     private final String valorGlobal = "valor_global";
     private final String valorEntitat = "valor_entitat";
-    private EntitatDto entitatEntity;
     private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();
 
     @Before
     public void setUp() throws Exception {
-
         ConfigHelper.setEntitatCodi(entitatCodi);
         Mockito.when(configRepository.findById(Mockito.eq("PROPERTY_KEY"))).thenReturn(Optional.of(new ConfigEntity("PROPERTY_KEY", "PROPERTY_VALUE")));
         Mockito.when(configRepository.findById(Mockito.eq(ConfigDto.prefix + configKey))).thenReturn(Optional.of(new ConfigEntity(ConfigDto.prefix + configKey, "valor_global")));

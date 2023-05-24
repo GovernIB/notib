@@ -3,28 +3,17 @@
  */
 package es.caib.notib.back.controller;
 
-import es.caib.notib.back.helper.AjaxHelper;
-import es.caib.notib.back.helper.ModalHelper;
 import es.caib.notib.back.helper.RolHelper;
-import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.SchedulledService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 
 /**
  * Controlador amb utilitats per a l'aplicació NOTIB.
@@ -57,6 +46,7 @@ public class IndexController {
 		aplicacioService.propagateDbProperties();
 		aplicacioService.restartSchedulledTasks();
 	}
+
 //	public void listResources() throws IOException {
 //		for (File file: getResourceFolderFiles("")) {
 //			listFileDir(file, 0);

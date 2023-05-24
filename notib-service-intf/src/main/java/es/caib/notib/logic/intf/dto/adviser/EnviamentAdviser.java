@@ -1,6 +1,9 @@
 package es.caib.notib.logic.intf.dto.adviser;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -9,6 +12,9 @@ import java.math.BigInteger;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class EnviamentAdviser implements Serializable {
 
     private String organismoEmisor;
