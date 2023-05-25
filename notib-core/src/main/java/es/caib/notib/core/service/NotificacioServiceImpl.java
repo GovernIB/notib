@@ -549,10 +549,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 				String msg = "";
 				String tipus = "";
 				String m = "";
+				int env = 1;
 				for (NotificacioEventEntity event : lastErrorEvent) {
 					msg = messageHelper.getMessage("notificacio.event.fi.reintents");
 					tipus = messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto." + event.getTipus());
-					m += msg + " -> " + tipus + "\n";
+					m += "Env " + env + ": " + msg + " -> " + tipus + "\n";
+					env++;
 				}
 				dto.setFiReintentsDesc(m);
 				dto.setFiReintents(true);
