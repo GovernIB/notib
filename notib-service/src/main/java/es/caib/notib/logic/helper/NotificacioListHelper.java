@@ -192,7 +192,8 @@ public class NotificacioListHelper {
         NotificacioEventEntity e = !isFinal ? eventRepository.findLastErrorEventByNotificacioId(item.getId()) : null;
 //        String error = item.isNotificaError() ? " <span class=\"fa fa-warning text-danger\" title=\"" + htmlEscape(item.getNotificaErrorDescripcio()) + " \"></span>"
 //                        : e != null ? " <span class=\"fa fa-warning text-danger\" title=\"" + htmlEscape(e.getErrorDescripcio()) + " \"></span>" : "";
-        String error = e != null && !Strings.isNullOrEmpty(e.getErrorDescripcio()) ? " <span class=\"fa fa-warning text-danger\" title=\"" + htmlEscape(e.getErrorDescripcio()) + " \"></span>" : "";
+        String error = e != null && !Strings.isNullOrEmpty(e.getErrorDescripcio()) ? " <span class=\"fa fa-warning text-danger\" title=\""
+                + (enviaments.size() == 1 ? htmlEscape(e.getErrorDescripcio()) : messageHelper.getMessage("error.notificacio.enviaments")) + " \"></span>" : "";
         error += TipusUsuariEnumDto.APLICACIO.equals(item.getTipusUsuari()) && item.isErrorLastCallback() ?
                 " <span class=\"fa fa-exclamation-circle text-primary\" title=\"<spring:message code=\"notificacio.list.client.error/>\"></span>" : "";
 
@@ -202,10 +203,12 @@ public class NotificacioListHelper {
         if (lastErrorEvent != null && !lastErrorEvent.isEmpty()) {
             String msg = "";
             String tipus = "";
+            int env = 1;
             for (NotificacioEventEntity event : lastErrorEvent) {
                 msg = messageHelper.getMessage("notificacio.event.fi.reintents");
                 tipus = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + event.getTipus());
-                m += msg + " -> " + tipus + "\n";
+                m += "Env " + env + ": " + msg + " -> " + tipus + "\n";
+                env++;
             }
         }
         int callbackFiReintents = eventRepository.countEventCallbackAmbFiReintentsByNotificacioId(item.getId());
