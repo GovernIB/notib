@@ -9,7 +9,7 @@ INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PRO
 
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.carpeta.usuari', '','Usuari de connexió a la Carpeta', 'CARPETA', 2, 1, 'TEXT', 1);
 
-INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.carpeta.contrasenya', '','Contrasenya de l’usuari', 'CARPETA', 3, 1, 'TEXT', 1);
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.carpeta.contrasenya', '','Contrasenya de l’usuari', 'CARPETA', 3, 1, 'PASSWORD', 1);
 
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.carpeta.missatge.codi.notificacio', 'NOTIFICACIO','Codi de la plantilla de missatge de la carpeta a utilitzar per les notificacions', 'CARPETA', 4, 0, 'TEXT', 1);
 
