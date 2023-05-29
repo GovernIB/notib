@@ -3,8 +3,6 @@ package es.caib.notib.client.domini;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import es.caib.notib.client.util.TrimStringDeserializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,9 +25,9 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Enviament {
 
-    private Long id;
-    @JsonDeserialize(using = TrimStringDeserializer.class)
-    private String referencia;
+//    private Long id;
+//    @JsonDeserialize(using = TrimStringDeserializer.class)
+//    private String referencia;
     private Persona titular;
     private List<Persona> destinataris;
     private boolean entregaPostalActiva;
@@ -37,7 +35,7 @@ public class Enviament {
     private boolean entregaDehActiva;
     private EntregaDeh entregaDeh;
     private NotificaServeiTipusEnumDto serveiTipus;
-    private boolean perEmail;
+//    private boolean perEmail;
 
     public List<Persona> getDestinataris() {
         if (destinataris == null) {

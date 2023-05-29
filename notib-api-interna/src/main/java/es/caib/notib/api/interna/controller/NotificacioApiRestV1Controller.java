@@ -11,6 +11,7 @@ import es.caib.notib.client.domini.RespostaConsultaDadesRegistre;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviament;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacio;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,8 +37,9 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Hidden
 @RestController
-@RequestMapping("/api/services/notificacioV2")
+@RequestMapping("/notificacio/v1")
 @Tag(name = "Notificacio v1", description = "API de notificació v1")
 public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseController {
 

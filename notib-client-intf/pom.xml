@@ -10,7 +10,7 @@
     <properties>
         <jackson.version>2.6.3</jackson.version>
         <jakarta.xml>2.3.3</jakarta.xml>
-        <lombok.version>1.18.12</lombok.version>
+        <lombok.version>1.18.24</lombok.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

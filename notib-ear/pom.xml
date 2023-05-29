@@ -58,6 +58,12 @@
 			<version>${project.version}</version>
 			<type>war</type>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>notib-api-externa</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+		</dependency>
 		<!--
 			 La següent dependència ja està inclosa a dins el .war. Només s'inclou aquí per a que l'ear
 			 contengui les seves dependències. Després s'haurà d'excloure el fitxer notib-controller*.jar
@@ -246,6 +252,12 @@
 							<artifactId>notib-api-interna</artifactId>
 							<contextRoot>/notibapi/interna</contextRoot>
 							<bundleFileName>notib-api-interna.war</bundleFileName>
+						</webModule>
+						<webModule>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>notib-api-externa</artifactId>
+							<contextRoot>/notibapi/externa</contextRoot>
+							<bundleFileName>notib-api-externa.war</bundleFileName>
 						</webModule>
 					</modules>
 <!--					<defaultJavaBundleDir>lib/</defaultJavaBundleDir>-->

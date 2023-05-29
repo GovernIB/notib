@@ -184,7 +184,7 @@ public class NotificacioHelper {
 		}
 		List<NotificacioEnviamentEntity> enviamentsCreats = new ArrayList<NotificacioEnviamentEntity>();
 		for (Enviament enviament: enviaments) {
-			log.trace("Alta Notificació web - Alta enviament id={}", enviament.getId());
+			log.trace("Alta Notificació web - Alta enviament titular={}", enviament.getTitular() != null ? enviament.getTitular().getNif() : "");
 			if (enviament.getTitular() != null) {
 				ServeiTipusEnumDto serveiTipus = null;
 				if (enviament.getServeiTipus() != null) {

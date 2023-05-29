@@ -1,17 +1,23 @@
 /**
  * 
  */
-package es.caib.notib.api.interna.controller;
+package es.caib.notib.api.externa.controller;
 
+import es.caib.notib.api.externa.openapi.model.AppInfoApi;
 import es.caib.notib.client.domini.AppInfo;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -27,27 +33,23 @@ import java.util.jar.Manifest;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/api")
 @Tag(name = "Informació Notib", description = "API de informació de Notib")
-public class NotificacioApiRestController {
+public class ExpernaApiRestController {
 
 	@Autowired
 	private ServletContext servletContext;
 
-//	@RequestMapping(value = {"/apidoc", "/rest"}, method = RequestMethod.GET)
-//	public String documentacio(HttpServletRequest request) {
-//		return "apidoc";
-//	}
-	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = {"/rest/appinfo"}, method = RequestMethod.GET)
-	@Operation(summary = "Consulta la informació de Notib", description = "Retorna la data i la versió de Notib")
-	@ResponseBody
+	@Operation(summary = "Consulta la informació de la API", description = "Retorna la data i la versió de la API REST Externa Notib")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Informació de l'aplicació", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = AppInfoApi.class, description = "Informació de l'aplicació"))})})
+	@SecurityRequirements()
 	public AppInfo getAppInfo(HttpServletRequest request) throws IOException {
 
 		var appInfo = new AppInfo();
-		appInfo.setNom("Notib");
+		appInfo.setNom("Api REST externa de Notib");
 		var manifest = new Manifest(servletContext.getResourceAsStream("/" + JarFile.MANIFEST_NAME));
 		var manifestAtributs = manifest.getMainAttributes();
 		Map<String, Object>manifestAtributsMap = new HashMap<>();
@@ -56,16 +58,11 @@ public class NotificacioApiRestController {
 		}
 		if (!manifestAtributsMap.isEmpty()) {
 			var version = manifestAtributsMap.get("Implementation-Version");
-			var data = manifestAtributsMap.get("Release-Date");
+			var data = manifestAtributsMap.get("Build-Timestamp");
 			appInfo.setVersio(version != null ? version.toString() : null);
 			appInfo.setData(data != null ? data.toString() : null);
 		}
 		return appInfo;
 	}
 
-//	@RequestMapping(value = "/rest/notificaCanvi", method = RequestMethod.POST)
-//	@ResponseStatus(value = HttpStatus.OK)
-//	public void enviarContingutPost(@RequestBody NotificacioCanviClient notificacioCanvi) {
-//		log.info("Notificacio canvi " + notificacioCanvi.toString());
-//	}
 }

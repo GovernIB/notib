@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.rest.consulta.Arxiu;
 import es.caib.notib.logic.intf.rest.consulta.Resposta;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,9 +32,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
 
+@Hidden
 @RestController
 @Slf4j
-@RequestMapping("/api/consulta/v1")
+@RequestMapping("/consulta/v1")
 @Tag(name = "Consulta v1", description = "API de consulta de comunicacions i notificacions v1")
 public class ConsultaApiRestV1Controller {
 

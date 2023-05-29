@@ -8,7 +8,6 @@ import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.OrigenEnum;
-import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.helper.*;
@@ -333,7 +332,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 
 			// Creació o edició enviament existent
-			for (Enviament enviament: enviaments) {
+
+			for (int i = 0; i < enviaments.size(); i++) {
+				Enviament enviament = enviaments.get(i);
+				NotEnviamentDatabaseDto enviamentDto = notificacio.getEnviaments().get(i);
+
 				ServeiTipusEnumDto serveiTipus = null;
 				if (enviament.getServeiTipus() != null) {
 					switch (enviament.getServeiTipus()) {
@@ -347,15 +350,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 
 				PersonaEntity titular = null;
-				if (enviament.getTitular().getId() != null) {
-					titular = personaHelper.update(enviament.getTitular(),  enviament.getTitular().isIncapacitat());
+				if (enviamentDto.getTitular().getId() != null) {
+					titular = personaHelper.update(enviamentDto.getTitular(),  enviament.getTitular().isIncapacitat());
 				} else {
 					titular = personaHelper.create(enviament.getTitular(), enviament.getTitular().isIncapacitat());
 				}
 				List<PersonaEntity> nousDestinataris = new ArrayList<PersonaEntity>();
 //					### Crear o editar destinataris enviament existent
 				if (enviament.getDestinataris() != null) {
-					for(Persona destinatari: enviament.getDestinataris()) {
+					for(PersonaDto destinatari: enviamentDto.getDestinataris()) {
 							if ((destinatari.getNif() != null && !destinatari.getNif().isEmpty()) ||
 									(destinatari.getDir3Codi() != null && !destinatari.getDir3Codi().isEmpty())) {
 								if (destinatari.getId() != null) {
@@ -372,8 +375,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 
 //					### Actualitzar les dades d'un enviament existent o crear un de nou
-				if (enviament.getId() != null) {
-					NotificacioEnviamentEntity enviamentEntity = notificacioEnviamentRepository.findById(enviament.getId()).orElseThrow();
+				if (enviamentDto.getId() != null) {
+					NotificacioEnviamentEntity enviamentEntity = notificacioEnviamentRepository.findById(enviamentDto.getId()).orElseThrow();
 					enviamentEntity.update(
 							enviament,
 							entitat.isAmbEntregaDeh(),

@@ -46,7 +46,7 @@
 		<itext.pdf.version>5.5.13.3</itext.pdf.version>
 	  	<docker.image.prefix>280421</docker.image.prefix>
 <!--		<docker.image.name>notib</docker.image.name>-->
-	  <junit.jupiter.version>5.8.2</junit.jupiter.version>
+	  <junit.jupiter.version>5.9.3</junit.jupiter.version>
 	</properties>
 	<modules>
 		<module>notib-boot</module>
@@ -55,16 +55,18 @@
 		<module>notib-service-intf</module>
 		<module>notib-persistence</module>
 		<module>notib-api-interna</module>
+        <module>notib-api-externa</module>
 		<module>notib-plugin-intf</module>
 		<module>notib-plugin</module>
 		<module>notib-ejb</module>
 
 		<module>notib-client</module>
+        <module>notib-client-2</module>
 		<module>notib-client-intf</module>
 
 		<module>notib-ear</module>
 		<module>notib-controller</module>
-		<!--		<module>notib-lib-common</module>-->
+        <!--		<module>notib-lib-common</module>-->
 	</modules>
 	<build>
 		<plugins>

@@ -79,18 +79,18 @@
 			<module name="deployment.notib-api-libs"/>
 		</dependencies>
 	</sub-deployment>
-<!--	<sub-deployment name="notib-api-externa.war">-->
-<!--		<exclude-subsystems>-->
-<!--			<subsystem name="jsf"/>-->
-<!--		</exclude-subsystems>-->
-<!--		<exclusions>-->
-<!--			<module name="notib.ear"/>-->
-<!--			<module name="notib-back.war"/>-->
-<!--		</exclusions>-->
-<!--		<dependencies>-->
-<!--			<module name="deployment.notib-service-intf"/>-->
-<!--			<module name="deployment.notib-client-intf"/>-->
-<!--			<module name="deployment.notib-api-libs"/>-->
-<!--		</dependencies>-->
-<!--	</sub-deployment>-->
+	<sub-deployment name="notib-api-externa.war">
+		<exclude-subsystems>
+			<subsystem name="jsf"/>
+		</exclude-subsystems>
+		<exclusions>
+			<module name="notib.ear"/>
+			<module name="notib-back.war"/>
+		</exclusions>
+		<dependencies>
+			<module name="deployment.notib-service-intf"/>
+			<module name="deployment.notib-client-intf"/>
+			<module name="deployment.notib-api-libs"/>
+		</dependencies>
+	</sub-deployment>
 </jboss-deployment-structure>

@@ -3,14 +3,15 @@
  */
 package es.caib.notib.api.interna.controller;
 
-import es.caib.notib.client.domini.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import es.caib.notib.api.interna.openapi.interficies.NotificacioApiRestV2Intf;
+import es.caib.notib.client.domini.DadesConsulta;
+import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.client.domini.PermisConsulta;
+import es.caib.notib.client.domini.RespostaAltaV2;
+import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
+import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
+import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
+import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,15 +31,12 @@ import java.util.Date;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @RestController
-@RequestMapping("/api/services/notificacioV22")
-@Tag(name = "Notificacio v2", description = "API de notificació v2")
-public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseController {
+@RequestMapping("/notificacio/v2")
+public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseController implements NotificacioApiRestV2Intf {
 
 	@ResponseStatus(HttpStatus.CREATED)
-	@Operation(summary = "Registra i envia la notificació a Notific@.", description = "Retorna una llista amb els codis dels enviaments creats per poder consultar el seu estat posteriorment")
-	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Alta de notificació", content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RespostaAltaV2.class, description = "Informació de alta"))})})
 	@PostMapping(value = "/alta", produces = MediaType.APPLICATION_JSON_VALUE)
-	public RespostaAltaV2 alta(@Parameter(description = "Objecte amb les dades necessàries per a generar una notificació", required = true) @RequestBody NotificacioV2 notificacio) {
+	public RespostaAltaV2 alta(@RequestBody NotificacioV2 notificacio) {
 		try {
 			return notificacioServiceWs.altaV2(notificacio);
 		} catch (Exception e) {
@@ -46,9 +44,6 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 		}
 	}
 
-	@Operation(summary = "Consulta de la informació d'una notificació", description = "Retorna la informació sobre l'estat de l'enviament dins Notib o Notific@")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Consulta realitzada correctament", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RespostaConsultaEstatNotificacioV2.class, description = "Estat de la notificació")) }) })
-	@Parameter(name = "identificador", description = "Identificador de la notificació a consultar", required = true)
 	@GetMapping(value = {"/consultaEstatNotificacio/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(HttpServletRequest request) throws UnsupportedEncodingException {
 
@@ -64,12 +59,8 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 		}
 	}
 
-	@Operation(summary = "Consulta la informació de l'estat d'un enviament dins Notific@", description = "Retorna la informació sobre l'estat de l'enviament dins Notific@.")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Consulta realitzada correctament", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RespostaConsultaEstatEnviamentV2.class, description = "Estat de l'enviament")) }) })
-	@Parameter(name = "referencia", description = "Referència de la notificació a consultar", required = true)
 	@GetMapping(value = {"/consultaEstatEnviament/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviament(
-			HttpServletRequest request) throws UnsupportedEncodingException {
+	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviament(HttpServletRequest request) throws UnsupportedEncodingException {
 
 		var referencia = extractIdentificador(request);
 		try {
@@ -83,11 +74,8 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 		}
 	}
 
-	@Operation(summary = "Genera el justificant i consulta la informació del registre d'una notificació.", description = "Retorna la informació del registre i el justificant d'una notificació dins Notib.")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Consulta realitzada correctament", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RespostaConsultaDadesRegistreV2.class, description = "Estat del registre")) }) })
 	@PostMapping(value = {"/consultaDadesRegistre"}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public RespostaConsultaDadesRegistreV2 consultaDadesRegistre(@Parameter(description = "Objecte amb les dades necessàries per consultar les dades de registre d'una notificació o enviament",
-					required = false) @RequestBody DadesConsulta dadesConsulta) {
+	public RespostaConsultaDadesRegistreV2 consultaDadesRegistre(@RequestBody DadesConsulta dadesConsulta) {
 
 		try {
 			return notificacioServiceWs.consultaDadesRegistreV2(dadesConsulta);
@@ -96,20 +84,14 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 		}
 	}
 
-	@Operation(summary = "Consulta el justificant de l'enviament d'una notificació", description = "Retorna el document PDF amb el justificant de l'enviament de la notificació")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Consulta realitzada correctament", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RespostaConsultaJustificantEnviament.class, description = "Justificant de l'enviament")) }) })
-	@Parameter(name = "identificador", description = "Identificador de la notificació a consultar", required = true)
 	@GetMapping(value = {"/consultaJustificantNotificacio/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaJustificantEnviament consultaJustificantV2(HttpServletRequest request) {
 		return consultaJustificant(request);
 	}
 
 	@ResponseStatus(HttpStatus.CREATED)
-	@Operation(summary = "Donar permis de consulta a un usuari sobre un procediment", description = "Aquest mètode permet donar el permís de consulta a un usuari específic")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Permisos assignats", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = String.class, description = "Estat de l'assignació de permisos")) }) })
 	@PostMapping(value = "/permisConsulta", produces = MediaType.APPLICATION_JSON_VALUE)
-	public String donarPermisConsultaV2(@Parameter(description = "Objecte amb les dades necessàries per donar el permís", required = true)
-										@RequestBody PermisConsulta permisConsulta) {
+	public String donarPermisConsultaV2(@RequestBody PermisConsulta permisConsulta) {
 
 		return donarPermisConsulta(permisConsulta);
 	}

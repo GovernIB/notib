@@ -2,7 +2,6 @@
 package es.caib.notib.client.domini;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import es.caib.notib.client.util.TrimStringDeserializer;
@@ -14,7 +13,6 @@ import lombok.NoArgsConstructor;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 
 /**
@@ -32,9 +30,9 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Persona {
 
-    @XmlTransient
-    @JsonIgnore
-    private Long id;
+//    @XmlTransient
+//    @JsonIgnore
+//    private Long id;
     private boolean incapacitat;
     private InteressatTipus interessatTipus;
     @JsonDeserialize(using = TrimStringDeserializer.class)
