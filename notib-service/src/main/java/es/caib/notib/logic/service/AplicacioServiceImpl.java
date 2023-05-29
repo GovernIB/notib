@@ -120,13 +120,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public void crearUsuari(String codi) {
 
 		logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + codi + ")");
-		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(codi);
-		String idioma = configHelper.getConfig("es.caib.notib.default.user.language");
+		var dadesUsuari = cacheHelper.findUsuariAmbCodi(codi);
+		var idioma = configHelper.getConfig("es.caib.notib.default.user.language");
 		if (dadesUsuari == null) {
 			throw new NotFoundException(codi, DadesUsuari.class);
 		}
-		UsuariEntity u = UsuariEntity.getBuilder(dadesUsuari.getCodi(), dadesUsuari.getEmail(), idioma).nom(dadesUsuari.getNom())
-							.llinatges(dadesUsuari.getLlinatges()).nomSencer(dadesUsuari.getNomSencer()).build();
+		var u = UsuariEntity.builder().codi(dadesUsuari.getCodi()).email(dadesUsuari.getEmail()).idioma(idioma).nom(dadesUsuari.getNom())
+						.llinatges(dadesUsuari.getLlinatges()).nomSencer(dadesUsuari.getNomSencer()).build();
 		usuariRepository.save(u);
 	}
 
@@ -138,7 +138,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			logger.debug("Actualitzant configuració de usuari actual");
 			UsuariEntity usuari = usuariRepository.findById(dto.getCodi()).orElseThrow();
-			usuari.update(UsuariEntity.hiddenBuilder().rebreEmailsNotificacio(dto.getRebreEmailsNotificacio()).emailAlt(dto.getEmailAlt())
+			usuari.update(UsuariEntity.builder().rebreEmailsNotificacio(dto.getRebreEmailsNotificacio()).emailAlt(dto.getEmailAlt())
 					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats()).idioma(dto.getIdioma()).build());
 			return toUsuariDtoAmbRols(usuari);
 		} finally {

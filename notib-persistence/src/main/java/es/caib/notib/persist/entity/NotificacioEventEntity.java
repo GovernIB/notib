@@ -43,6 +43,7 @@ import java.util.Date;
 public class NotificacioEventEntity extends NotibAuditable<Long> {
 
 	private static final int ERROR_DESC_MAX_LENGTH = 2048;
+	private static final int DESC_MAX_LENGTH = 256;
 
 	@Column(name = "tipus", nullable = false)
 	private NotificacioEventTipusEnumDto tipus;
@@ -56,6 +57,9 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	@Column(name = "error", nullable = false)
 	@Builder.Default
 	private boolean error = false;
+
+//	@Column(name = "descripcio", length = DESC_MAX_LENGTH)
+//	private String descripcio;
 	
 	@Column(name = "error_desc", length = ERROR_DESC_MAX_LENGTH)
 	private String errorDescripcio;

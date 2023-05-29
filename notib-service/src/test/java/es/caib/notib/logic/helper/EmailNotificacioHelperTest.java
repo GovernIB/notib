@@ -152,7 +152,7 @@ public class EmailNotificacioHelperTest {
 		EntitatEntity entidad = new EntitatEntity();
 		Set<String> usuaris = new HashSet<>(Arrays.asList("user"));
 		DadesUsuari dadesUsuari = DadesUsuari.builder().email(EMAIL_DEST).build();
-		UsuariEntity usuari = UsuariEntity.hiddenBuilder().codi("user").rebreEmailsNotificacio(true).rebreEmailsNotificacioCreats(true).build();
+		UsuariEntity usuari = UsuariEntity.builder().codi("user").rebreEmailsNotificacio(true).rebreEmailsNotificacioCreats(true).build();
 		ProcedimentEntity procediment = ProcedimentEntity.builder().nom("Nom del procediment").agrupar(false).createdBy(usuari).build();
 		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entidad).build();
 		GrupEntity grupNotificacio = GrupEntity.getBuilder(null, null, entidad, organGestor).build();

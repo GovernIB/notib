@@ -683,26 +683,17 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 
 	@Override
 	@Transactional
-	public PaginaDto<ProcSerFormDto> findAmbFiltrePaginat(
-			Long entitatId,
-			boolean isUsuari,
-			boolean isUsuariEntitat,
-			boolean isAdministrador,
-			OrganGestorDto organGestorActual,
-			ProcSerFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+	public PaginaDto<ProcSerFormDto> findAmbFiltrePaginat(Long entitatId, boolean isUsuari, boolean isUsuariEntitat, boolean isAdministrador,
+														  OrganGestorDto organGestorActual, ProcSerFiltreDto filtre, PaginacioParamsDto paginacioParams) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarEntitat(
-					entitatId,
-					false,
-					false,
-					false);
-			
+			entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+
 			EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId);
 			List<EntitatEntity> entitatsActiva = entitatRepository.findByActiva(true);
 			List<Long> entitatsActivaId = new ArrayList<Long>();
-			
+
 			for (EntitatEntity entitatActiva : entitatsActiva) {
 				entitatsActivaId.add(entitatActiva.getId());
 			}
@@ -718,30 +709,23 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 
 			List<String> organsFills = new ArrayList<String>();
 			if (organGestorActual != null) { // Administrador d'òrgan
-				organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
-						entitatActual.getDir3Codi(), 
-						organGestorActual.getCodi());
+				organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorActual.getCodi());
 			}
 
 			if (filtre == null) {
 				if (isUsuariEntitat) {
-					procediments = procedimentFormRepository.findAmbEntitatActual(
-							entitatActual.getId(),
-							pageable);
+					procediments = procedimentFormRepository.findAmbEntitatActual(entitatActual.getId(), pageable);
 				} else if (isAdministrador) {
 					procediments = procedimentFormRepository.findAmbEntitatActiva(entitatsActivaId, pageable);
 				} else if (organGestorActual != null) { // Administrador d'òrgan
-					procediments = procedimentFormRepository.findAmbOrganGestorActualOrComu(
-							entitatActual.getId(),
-							organsFills,
-							pageable);
+					procediments = procedimentFormRepository.findAmbOrganGestorActualOrComu(entitatActual.getId(), organsFills, pageable);
 				}
 			} else {
 
 				if (isUsuariEntitat) {
 					procediments = procedimentFormRepository.findAmbEntitatAndFiltre(
 							entitatActual.getId(),
-							filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
+							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
 							filtre.getCodi() == null ? "" : filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom() == null ? "" : filtre.getNom(),
@@ -755,7 +739,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 
 				} else if (isAdministrador) {
 					procediments = procedimentFormRepository.findAmbFiltre(
-							filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
+							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
 							filtre.getCodi() == null ? "" : filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom() == null ? "" : filtre.getNom(),
@@ -770,7 +754,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 				} else if (organGestorActual != null) { // Administrador d'òrgan
 					procediments = procedimentFormRepository.findAmbOrganGestorOrComuAndFiltre(
 							entitatActual.getId(),
-							filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
+							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
 							filtre.getCodi() == null ? "" : filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom() == null ? "" : filtre.getNom(),
@@ -790,10 +774,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 //			}
 			assert procedimentsPage != null;
 			for (ProcSerFormDto procediment: procedimentsPage.getContingut()) {
-				List<PermisDto> permisos = permisosHelper.findPermisos(
-						procediment.getId(),
-						ProcedimentEntity.class);
-
+				List<PermisDto> permisos = permisosHelper.findPermisos(procediment.getId(), ProcedimentEntity.class);
 				if (procediment.isComu()) {
 					String organActual = null;
 					if (organGestorActual != null) {
