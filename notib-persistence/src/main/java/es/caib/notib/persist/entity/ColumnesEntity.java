@@ -35,7 +35,8 @@ import es.caib.notib.persist.audit.NotibAuditable;
 @EntityListeners(AuditingEntityListener.class)
 public class ColumnesEntity extends NotibAuditable<Long> {
 
-	@Column(name="data_enviament")
+//	@Column(name="data_enviament")
+	@Column(name="created_date")
 	private boolean dataEnviament;
 	@Column(name="data_programada")
 	private boolean dataProgramada;
@@ -86,7 +87,7 @@ public class ColumnesEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "entitat_id")
 	@ForeignKey(name = "not_columnes_entitat_fk")
 	private EntitatEntity entitat;
-	
+
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "usuari_codi")
 	@ForeignKey(name = "not_columnes_usuari_fk")

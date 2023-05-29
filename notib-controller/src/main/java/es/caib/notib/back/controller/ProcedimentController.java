@@ -30,8 +30,7 @@ import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -54,6 +53,7 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  *
  */
+@Slf4j
 @Controller
 @RequestMapping("/procediment")
 public class ProcedimentController extends BaseUserController {
@@ -140,45 +140,27 @@ public class ProcedimentController extends BaseUserController {
 	}
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request ) {
+	public DatatablesResponse datatable(HttpServletRequest request ) {
 		
-		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
-		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
-		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
-		
-		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
-		PaginaDto<ProcSerFormDto> procediments = new PaginaDto<ProcSerFormDto>();
-		
+		var isUsuari = RolHelper.isUsuariActualUsuari(request);
+		var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
+		var isAdministrador = RolHelper.isUsuariActualAdministrador(request);
+		var organGestorActual = getOrganGestorActual(request);
+		var procSerFiltreCommand = getFiltreCommand(request);
+		var procediments = new PaginaDto<ProcSerFormDto>();
 		try {
-			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-
-			procediments = procedimentService.findAmbFiltrePaginat(
-					entitat.getId(),
-					isUsuari,
-					isUsuariEntitat,
-					isAdministrador,
-					organGestorActual,
-					procSerFiltreCommand.asDto(),
-					DatatablesHelper.getPaginacioDtoFromRequest(request));
-		}catch(SecurityException e) {
-			MissatgesHelper.error(
-					request, 
-					getMessage(
-							request, 
-							"notificacio.controller.entitat.cap.assignada"));
+			var entitat = getEntitatActualComprovantPermisos(request);
+ 			procediments = procedimentService.findAmbFiltrePaginat(entitat.getId(), isUsuari, isUsuariEntitat, isAdministrador, organGestorActual, procSerFiltreCommand.asDto(), DatatablesHelper.getPaginacioDtoFromRequest(request));
+		} catch (SecurityException e) {
+			MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
+		} catch (Exception ex) {
+			log.error("Error en el llistat de procediments", ex);
 		}
-		return DatatablesHelper.getDatatableResponse(
-				request, 
-				procediments,
-				"id");
+		return DatatablesHelper.getDatatableResponse(request, procediments, "id");
 	}
 	
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
-	public String newGet(
-			HttpServletRequest request,
-			Model model) {
+	public String newGet(HttpServletRequest request, Model model) {
 		return formGet(request, null, model);
 	}
 	
@@ -226,7 +208,7 @@ public class ProcedimentController extends BaseUserController {
 						RolHelper.isUsuariActualAdministradorEntitat(request));
 				
 			} catch(NotFoundException | ValidationException ev) {
-				logger.debug("Error al actualitzar el procediment", ev);
+				log.debug("Error al actualitzar el procediment", ev);
 			}
 			return getModalControllerReturnValueSuccess(
 					request,
@@ -357,7 +339,7 @@ public class ProcedimentController extends BaseUserController {
 		try {
 			procedimentService.actualitzaProcediments(entitat);
 		} catch (Exception e) {
-			logger.error("Error inesperat al actualitzar els procediments", e);
+			log.error("Error inesperat al actualitzar els procediments", e);
 			model.addAttribute("errors", e.getMessage());
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
@@ -488,22 +470,15 @@ public class ProcedimentController extends BaseUserController {
 	}
 	
 	@RequestMapping(value = "/cache/refrescar", method = RequestMethod.GET)
-	private String refrescar(
-		HttpServletRequest request,
-		Model model) {
+	private String refrescar(HttpServletRequest request, Model model) {
+
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		procedimentService.refrescarCache(entitat);
-		
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../procediment",
-				"procediment.controller.esborrat.cache.ok");
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../procediment", "procediment.controller.esborrat.cache.ok");
 	}
 	
-	private boolean isAdministrador(
-			HttpServletRequest request) {
+	private boolean isAdministrador(HttpServletRequest request) {
 		return RolHelper.isUsuariActualAdministrador(request);
 	}
 	
-	private static final Logger logger = LoggerFactory.getLogger(ProcedimentController.class);
 }

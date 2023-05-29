@@ -7,19 +7,9 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%
-pageContext.setAttribute(
-		"isRolActualAdministrador",
-		es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(request));
-pageContext.setAttribute(
-		"notificacioComunicacioEnumOptions",
-		es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(
-				es.caib.notib.logic.intf.dto.NotificacioTipusEnviamentEnumDto.class,
-				"notificacio.tipus.enviament.enum."));
-pageContext.setAttribute(
-		"notificacioEstatEnumOptions",
-		es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(
-				NotificacioEstatEnumDto.class,
-				"notificacio.estat.enum."));
+pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(request));
+pageContext.setAttribute("notificacioComunicacioEnumOptions", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(es.caib.notib.logic.intf.dto.NotificacioTipusEnviamentEnumDto.class, "notificacio.tipus.enviament.enum."));
+pageContext.setAttribute("notificacioEstatEnumOptions", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class, "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto."));
 
 %>
 <c:set var="ampladaConcepte">

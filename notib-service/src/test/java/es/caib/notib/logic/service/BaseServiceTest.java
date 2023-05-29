@@ -197,14 +197,7 @@ public class BaseServiceTest {
         SecurityContextHolder.getContext().setAuthentication(authToken);
         UsuariEntity usuariEntity = usuariRepository.findById(usuariCodi).orElse(null);
 		if (usuariEntity == null) {
-			usuariRepository.save(
-					UsuariEntity.getBuilder(
-							usuariCodi,
-							usuariCodi + "@mail.com",
-							"CA")
-					.nom(usuariCodi)
-					.llinatges(usuariCodi)
-					.build());
+			usuariRepository.save(UsuariEntity.builder().codi(usuariCodi).email(usuariCodi + "@mail.com").idioma("CA").nom(usuariCodi).llinatges(usuariCodi).build());
 		}
 		logger.debug("... usuari " + usuariCodi + " autenticat correctament");
 	}

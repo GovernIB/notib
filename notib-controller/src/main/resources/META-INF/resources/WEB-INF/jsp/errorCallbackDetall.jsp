@@ -18,8 +18,8 @@ detallErrorCallback<%@ page language="java" contentType="text/html; charset=UTF-
 			<dd><fmt:formatDate value="${event.data}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
 			<dt><spring:message code="event.detall.camp.tipus"/></dt>
 			<dd>${event.tipus}</dd>
-			<dt><spring:message code="event.detall.camp.descripcio"/></dt>
-			<dd>${event.descripcio}</dd>
+<%--			<dt><spring:message code="event.detall.camp.descripcio"/></dt>--%>
+<%--			<dd>${event.descripcio}</dd>--%>
 		</dl>
 		<div class="panel-body" >
 			<pre style="height:300px">${event.errorDescripcio}</pre>

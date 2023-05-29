@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Component
 public class AuthenticationTest {
+
     @Autowired
     private UserDetailsService userDetailsService;
     @Autowired
@@ -21,23 +22,14 @@ public class AuthenticationTest {
 
     @Transactional
     public void autenticarUsuari(String usuariCodi) {
+
         log.debug("Autenticant usuari " + usuariCodi + "...");
-        UserDetails userDetails = userDetailsService.loadUserByUsername(usuariCodi);
-        org.springframework.security.core.Authentication authToken = new UsernamePasswordAuthenticationToken(
-                userDetails.getUsername(),
-                userDetails.getPassword(),
-                userDetails.getAuthorities());
+        var userDetails = userDetailsService.loadUserByUsername(usuariCodi);
+        org.springframework.security.core.Authentication authToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
-        UsuariEntity usuariEntity = usuariRepository.findById(usuariCodi).orElse(null);
+        var usuariEntity = usuariRepository.findById(usuariCodi).orElse(null);
         if (usuariEntity == null) {
-            usuariRepository.save(
-                    UsuariEntity.getBuilder(
-                            usuariCodi,
-                            usuariCodi + "@mail.com",
-                            "CA")
-                            .nom(usuariCodi)
-                            .llinatges(usuariCodi)
-                            .build());
+            usuariRepository.save(UsuariEntity.builder().codi(usuariCodi).email(usuariCodi + "@mail.com").idioma("CA").nom(usuariCodi).llinatges(usuariCodi).build());
         }
         log.debug("... usuari " + usuariCodi + " autenticat correctament");
     }

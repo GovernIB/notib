@@ -24,8 +24,10 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Getter @Setter
-@Builder(builderMethodName = "hiddenBuilder")
+@Getter
+@Setter
+//@Builder(builderMethodName = "hiddenBuilder")
+@Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
@@ -88,9 +90,9 @@ public class UsuariEntity implements Serializable {
 	}
 
 	
-	public static UsuariEntityBuilder getBuilder(String codi, String email,	String idioma) {
-		return hiddenBuilder().codi(codi).email(email).idioma(idioma);
-	}
+//	public static UsuariEntityBuilder getBuilder(String codi, String email,	String idioma) {
+//		return hiddenBuilder().codi(codi).email(email).idioma(idioma);
+//	}
 
 	@Override
 	public int hashCode() {
