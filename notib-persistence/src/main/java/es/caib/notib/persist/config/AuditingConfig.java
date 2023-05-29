@@ -3,14 +3,16 @@
  */
 package es.caib.notib.persist.config;
 
+import es.caib.notib.persist.entity.UsuariEntity;
+import es.caib.notib.persist.repository.UsuariRepository;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
@@ -26,20 +28,15 @@ public class AuditingConfig implements EnvironmentAware {
 
 	@Setter
 	private Environment environment;
+	@Autowired
+	private UsuariRepository usuariRepository;
 
 	@Bean
-	public AuditorAware<String> auditorProvider() {
-		return new AuditorAware<String>() {
-			@Override
-			public Optional<String> getCurrentAuditor() {
-				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-				if (authentication != null && authentication.isAuthenticated()) {
-					return Optional.of(authentication.getName());
-				}
-//				return Optional.ofNullable(environment.getProperty("es.caib.emiserv.default.auditor", "anonymous"));
-//						(defaultAuditor != null) ? defaultAuditor : "anonymous");
-				return Optional.empty();
-			}
+	public AuditorAware<UsuariEntity> auditorProvider() {
+		return () -> {
+			var authentication = SecurityContextHolder.getContext().getAuthentication();
+			return authentication != null && authentication.isAuthenticated() ?
+				 Optional.of(usuariRepository.findByCodi(authentication.getName())) : Optional.empty();
 		};
 	}
 
