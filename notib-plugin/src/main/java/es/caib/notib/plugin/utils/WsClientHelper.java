@@ -3,24 +3,14 @@
  */
 package es.caib.notib.plugin.utils;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ejb.CreateException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MalformedObjectNameException;
-import javax.naming.NamingException;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 import javax.xml.ws.handler.Handler;
-
-import org.jboss.mx.util.MBeanProxyCreationException;
-
-import es.caib.loginModule.client.AuthenticationFailureException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utilitat per a instanciar clients per al servei d'enviament
@@ -31,7 +21,7 @@ import es.caib.loginModule.client.AuthenticationFailureException;
 public class WsClientHelper<T> {
 
 	public T generarClientWs(URL wsdlResourceUrl, String endpoint, QName qname, String username, String password, String soapAction, Class<T> clazz, Handler<?>... handlers)
-			throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
+			throws MalformedURLException {
 
 		URL url = wsdlResourceUrl;
 		if (url == null) {
@@ -66,7 +56,7 @@ public class WsClientHelper<T> {
 	}
 
 	public T generarClientWs(String endpoint, QName qname, String userName, String password, String soapAction, Class<T> clazz, Handler<?>... handlers)
-			throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
+			throws MalformedURLException {
 
 		return this.generarClientWs(null, endpoint, qname, userName, password, soapAction, clazz, handlers);
 	}
