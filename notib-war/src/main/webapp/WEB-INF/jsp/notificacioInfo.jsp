@@ -649,7 +649,7 @@ $(document).ready(function() {
 													<c:set var="errorTitle">
 														<c:choose>
 														<c:when test="${not empty enviament.notificacioErrorDescripcio}">
-															${enviament.notificacioErrorDescripcio}
+															${fn:escapeXml(enviament.notificacioErrorDescripcio)}
 														</c:when>
 														<c:otherwise>
 															Descripció de l'error no registrada
