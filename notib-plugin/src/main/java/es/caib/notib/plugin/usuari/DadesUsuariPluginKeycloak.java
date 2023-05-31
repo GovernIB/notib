@@ -49,10 +49,6 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 			if (userInfo == null) {
 				return null;
 			}
-//			var llinatges = userInfo.getSurname1();
-//			if (!Strings.isNullOrEmpty(userInfo.getSurname2())) {
-//				llinatges += " " + userInfo.getSurname2();
-//			}
 			return DadesUsuari.builder().codi(userInfo.getUsername()).nom(userInfo.getName()).llinatges(userInfo.getSurname1())
 					.nif(userInfo.getAdministrationID()).email(userInfo.getEmail()).build();
 		} catch (Exception ex) {
@@ -65,8 +61,6 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 		
 		log.debug("Consulta dels usuaris del grup (grupCodi=" + grupCodi + ")");
 		try {
-			var roleres = this.getKeyCloakConnectionForRoles();
-			var userRep = roleres.get(grupCodi).getRoleUserMembers();
 			var usuariCodis = getUsernamesByRol(grupCodi);
 			if (usuariCodis == null || usuariCodis.length == 0) {
 				return new ArrayList<>();

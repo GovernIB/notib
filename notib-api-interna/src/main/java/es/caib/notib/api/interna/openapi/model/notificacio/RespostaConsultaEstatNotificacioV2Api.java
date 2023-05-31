@@ -37,7 +37,7 @@ public class RespostaConsultaEstatNotificacioV2Api extends RespostaBaseApi {
             description = "Codi DIR3 de l’òrgan gestor que realitza la notificació/comunicació")
     private String organGestorDir3;
     @Schema(name = "concepte", implementation = String.class, example = "Concepte de la notificació",
-            description = "Concepte de l’enviament")
+            description = "Concepte de la notificació")
     private String concepte;
     @Schema(name = "numExpedient", implementation = String.class, example = "123/2023",
             description = "Identificador de l'expedient al qual pertany la notificació")
@@ -50,7 +50,7 @@ public class RespostaConsultaEstatNotificacioV2Api extends RespostaBaseApi {
             description = "Data en que s'ha enviat la notificació a Notifica (o SIR)")
     private Date dataEnviada;
     @Schema(name = "dataFinalitzada", implementation = Date.class, example = "2023-05-29T07:32:03.526+0000",
-            description = "Data en que s'ha finalitzat la norificació")
+            description = "Data en que s'ha finalitzat la notificació")
     private Date dataFinalitzada;
     @Schema(name = "dataProcessada", implementation = Date.class, example = "2023-05-29T07:32:03.526+0000",
             description = "Data en que s'ha marcat la notificació com a processada")
