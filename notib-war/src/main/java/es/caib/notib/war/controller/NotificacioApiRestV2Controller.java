@@ -37,7 +37,7 @@ import java.util.Date;
 @Api(value = "/services/v2", description = "Notificacio API v2")
 public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseController {
 
-	@RequestMapping(value = "/", method = RequestMethod.POST, produces="application/json")
+	@RequestMapping(value = "/alta", method = RequestMethod.POST, produces="application/json")
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation(value = "Registra i envia la notificació a Notific@.", notes = "Retorna una llista amb els codis dels enviaments creats per poder consultar el seu estat posteriorment")
 	@ResponseBody
