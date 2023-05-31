@@ -1,5 +1,6 @@
 package es.caib.notib.logic.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
@@ -612,6 +613,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			}
 			Envio envio = new Envio();
 			Persona titular = new Persona();
+			boolean titularIncapacitat = false;
 			if (enviament.getTitular().isIncapacitat() && enviament.getDestinataris() != null) {
 				titular.setNif(enviament.getDestinataris().get(0).getNif());
 				titular.setApellidos(concatenarLlinatges(enviament.getDestinataris().get(0).getLlinatge1(), enviament.getDestinataris().get(0).getLlinatge2()));
@@ -623,7 +625,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					titular.setNombre(enviament.getDestinataris().get(0).getNom());
 				}
 				titular.setCodigoDestino(enviament.getDestinataris().get(0).getDir3Codi());
-				enviament.getDestinataris().remove(0);
+				titularIncapacitat = true;
 			} else {
 				titular.setNif(InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) ? null : enviament.getTitular().getNif());
 				titular.setApellidos(concatenarLlinatges(enviament.getTitular().getLlinatge1(), enviament.getTitular().getLlinatge2()));
@@ -639,21 +641,24 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 			envio.setTitular(titular);
 			Destinatarios destinatarios = new Destinatarios();
+			int counter = 0;
 			for(PersonaEntity destinatari : enviament.getDestinataris()) {
-				if (destinatari.getNif() != null) {
-					Persona destinatario = new Persona();
-					destinatario.setNif(destinatari.getNif());
-					destinatario.setApellidos(concatenarLlinatges(destinatari.getLlinatge1(), destinatari.getLlinatge2()));
-					destinatario.setTelefono(destinatari.getTelefon());
-					destinatario.setEmail(destinatari.getEmail());
-					if (destinatari.getInteressatTipus().equals(InteressatTipus.JURIDICA)) {
-						destinatario.setRazonSocial(destinatari.getRaoSocial());
-					} else {
-						destinatario.setNombre(destinatari.getNom());
-					}
-					destinatario.setCodigoDestino(destinatari.getDir3Codi());
-					destinatarios.getDestinatario().add(destinatario);
+				if (Strings.isNullOrEmpty(destinatari.getNif()) || titularIncapacitat && counter == 0) {
+					continue;
 				}
+				counter++;
+				Persona destinatario = new Persona();
+				destinatario.setNif(destinatari.getNif());
+				destinatario.setApellidos(concatenarLlinatges(destinatari.getLlinatge1(), destinatari.getLlinatge2()));
+				destinatario.setTelefono(destinatari.getTelefon());
+				destinatario.setEmail(destinatari.getEmail());
+				if (destinatari.getInteressatTipus().equals(InteressatTipus.JURIDICA)) {
+					destinatario.setRazonSocial(destinatari.getRaoSocial());
+				} else {
+					destinatario.setNombre(destinatari.getNom());
+				}
+				destinatario.setCodigoDestino(destinatari.getDir3Codi());
+				destinatarios.getDestinatario().add(destinatario);
 			}
 			if (!destinatarios.getDestinatario().isEmpty()) {
 				envio.setDestinatarios(destinatarios);

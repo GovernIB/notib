@@ -1825,6 +1825,21 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		if (notificacio.getEnviamentTipus() == null) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.tipus.enviament.no.null"));
 		}
+
+		// Dates
+		Date now = new Date();
+		Date dataProg = notificacio.getEnviamentDataProgramada();
+		Date dataCaducitat = notificacio.getCaducitat();
+		if (dataProg != null && dataProg.before(now)) {
+			return setRespostaError(messageHelper.getMessage("error.validacio.data.enviament.programada.anterior"));
+		}
+		if (dataCaducitat != null && dataCaducitat.before(now)) {
+			return setRespostaError(messageHelper.getMessage("error.validacio.data.caducitat.anterior"));
+		}
+		if (dataProg != null && dataCaducitat != null && dataCaducitat.before(dataProg)) {
+			return setRespostaError(messageHelper.getMessage("error.validacio.data.caducitat.anterior.data.programada"));
+		}
+
 		// Document
 		if (notificacio.getDocument() == null) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.document.no.null"));
