@@ -1855,7 +1855,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if (dataProg != null && dataProg.before(now) && !DateUtils.isSameDay(dataProg, now)) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.data.enviament.programada.anterior"));
 		}
-		if (dataCaducitat != null && dataCaducitat.before(now) && !DateUtils.isSameDay(dataProg, now)) {
+		if (dataCaducitat != null && dataCaducitat.before(now) && !DateUtils.isSameDay(dataCaducitat, now)) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.data.caducitat.anterior"));
 		}
 		if (dataProg != null && dataCaducitat != null && dataCaducitat.before(dataProg)) {
