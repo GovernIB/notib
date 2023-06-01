@@ -92,6 +92,7 @@ import es.caib.plugins.arxiu.api.DocumentContingut;
 import lombok.Builder;
 import lombok.Data;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1851,10 +1852,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		Date now = new Date();
 		Date dataProg = notificacio.getEnviamentDataProgramada();
 		Date dataCaducitat = notificacio.getCaducitat();
-		if (dataProg != null && dataProg.before(now)) {
+		if (dataProg != null && dataProg.before(now) && !DateUtils.isSameDay(dataProg, now)) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.data.enviament.programada.anterior"));
 		}
-		if (dataCaducitat != null && dataCaducitat.before(now)) {
+		if (dataCaducitat != null && dataCaducitat.before(now) && !DateUtils.isSameDay(dataProg, now)) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.data.caducitat.anterior"));
 		}
 		if (dataProg != null && dataCaducitat != null && dataCaducitat.before(dataProg)) {
