@@ -1,5 +1,8 @@
 package es.caib.notib.logic.intf.dto.adviser;
 
+import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
+import es.caib.notib.logic.intf.ws.adviser.common.Opciones;
+import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

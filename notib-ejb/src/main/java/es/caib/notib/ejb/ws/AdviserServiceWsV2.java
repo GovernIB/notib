@@ -4,10 +4,9 @@
 package es.caib.notib.ejb.ws;
 
 import es.caib.notib.ejb.AbstractService;
-import es.caib.notib.logic.wsdl.adviser.Acuse;
-import es.caib.notib.logic.wsdl.adviser.AdviserWsV2PortType;
-import es.caib.notib.logic.wsdl.adviser.Opciones;
-import es.caib.notib.logic.wsdl.adviser.Receptor;
+import es.caib.notib.logic.intf.ws.adviser.common.Opciones;
+import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
+import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
 import org.jboss.ws.api.annotation.WebContext;
 
 import javax.annotation.security.PermitAll;
@@ -29,60 +28,58 @@ import java.math.BigInteger;
 @Stateless
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 @WebService(
-		name = "adviserWs",
-		serviceName = "AdviserWsV2Service",
-		portName = "AdviserWsV2PortType",
-		targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/")
+		name = es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2.SERVICE_NAME,
+		serviceName = es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2.SERVICE_NAME + "Service",
+		portName = es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2.SERVICE_NAME + "Port",
+		targetNamespace = es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2.NAMESPACE_URI)
+//		targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notificawsv2/1.0/")
 @WebContext(
 		contextRoot = "/notib/ws",
-		urlPattern = "/adviser",
-		transportGuarantee = "NONE",
-		secureWSDLAccess = false)
-//@RolesAllowed({"NOT_NOTIFICA"})
-public class NotificaAdviserWsV2 extends AbstractService<AdviserWsV2PortType> implements AdviserWsV2PortType {
+		urlPattern = "/adviser")
+public class AdviserServiceWsV2 extends AbstractService<es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2> implements es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2 {
 
 	@Override
 	@PermitAll
 	@WebMethod
 	public void sincronizarEnvio(
 			@WebParam(name = "organismoEmisor", targetNamespace = "")
-			String organismoEmisor, 
+			String organismoEmisor,
 			@WebParam(name = "identificador", targetNamespace = "")
-			Holder<String> identificador, 
+            Holder<String> identificador,
 			@WebParam(name = "tipoEntrega", targetNamespace = "")
-			BigInteger tipoEntrega,
+            BigInteger tipoEntrega,
 			@WebParam(name = "modoNotificacion", targetNamespace = "")
-			BigInteger modoNotificacion, 
+			BigInteger modoNotificacion,
 			@WebParam(name = "estado", targetNamespace = "")
-			String estado, 
+			String estado,
 			@WebParam(name = "fechaEstado", targetNamespace = "")
-			XMLGregorianCalendar fechaEstado, 
+            XMLGregorianCalendar fechaEstado,
 			@WebParam(name = "receptor", targetNamespace = "")
-			Receptor receptor,
+            Receptor receptor,
 			@WebParam(name = "acusePDF", targetNamespace = "")
-			Acuse acusePDF, 
+            Acuse acusePDF,
 			@WebParam(name = "acuseXML", targetNamespace = "")
 			Acuse acuseXML,
 			@WebParam(name = "opcionesSincronizarEnvio", targetNamespace = "")
-			Opciones opcionesSincronizarEnvio, 
+			Opciones opcionesSincronizarEnvio,
 			@WebParam(mode = WebParam.Mode.OUT, name = "codigoRespuesta", targetNamespace = "")
 			Holder<String> codigoRespuesta,
 			@WebParam(mode = WebParam.Mode.OUT, name = "descripcionRespuesta", targetNamespace = "")
-			Holder<String> descripcionRespuesta, 
+			Holder<String> descripcionRespuesta,
 			@WebParam(mode = WebParam.Mode.OUT, name = "opcionesResultadoSincronizarEnvio", targetNamespace = "")
 			Holder<Opciones> opcionesResultadoSincronizarEnvio) {
 		getDelegateService().sincronizarEnvio(
-				organismoEmisor, 
-				identificador, 
-				tipoEntrega, 
-				modoNotificacion, 
-				estado, 
+				organismoEmisor,
+				identificador,
+				tipoEntrega,
+				modoNotificacion,
+				estado,
 				fechaEstado,
-				receptor, 
+				receptor,
 				acusePDF,
-				acuseXML, 
-				opcionesSincronizarEnvio, 
-				codigoRespuesta, 
+				acuseXML,
+				opcionesSincronizarEnvio,
+				codigoRespuesta,
 				descripcionRespuesta,
 				opcionesResultadoSincronizarEnvio);
 	}

@@ -1,4 +1,4 @@
-package es.caib.notib.logic.intf.ws.callback;
+package es.caib.notib.logic.intf.dto.callback;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;

@@ -3,7 +3,7 @@ package es.caib.notib.logic.helper;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.Statuses;
 import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
-import es.caib.notib.logic.intf.ws.callback.NotificacioCanviClient;
+import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;

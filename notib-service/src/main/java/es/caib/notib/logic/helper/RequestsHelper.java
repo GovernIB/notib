@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.LoggingFilter;
-import es.caib.notib.logic.intf.ws.callback.NotificacioCanviClient;
+import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import org.springframework.stereotype.Component;
 
 @Component

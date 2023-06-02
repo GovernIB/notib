@@ -32,6 +32,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 			"/swagger-ui/**",
 			"/api/rest",
 			"/api-docs",
+			"/ws/**",
 			"/webjars/**"
 	};
 

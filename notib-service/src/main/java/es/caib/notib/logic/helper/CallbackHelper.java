@@ -9,7 +9,7 @@ import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.AuditService;
-import es.caib.notib.logic.intf.ws.callback.NotificacioCanviClient;
+import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;

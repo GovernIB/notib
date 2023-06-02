@@ -45,7 +45,13 @@ public class AdviserController  extends BaseController {
                         .build();
             }
 
-            return adviserService.sincronitzarEnviament(adviser.asDto());
+            var resposta = adviserService.sincronizarEnvio(adviser.asSincronizarEnvio());
+            return AdviserResponseDto.builder()
+                    .identificador(resposta.getIdentificador())
+                    .codigoRespuesta(resposta.getCodigoRespuesta())
+                    .descripcionRespuesta(resposta.getDescripcionRespuesta())
+                    .build();
+//            return adviserService.sincronitzarEnviament(adviser.asDto());
         } catch (Exception ex) {
             log.error("Error al sincronitzar l'enviament", ex);
             return AdviserResponseDto.builder()

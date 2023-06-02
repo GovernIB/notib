@@ -13,9 +13,9 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.api.representation.Form;
 import es.caib.notib.logic.intf.dto.AdviserResponseDto;
-import es.caib.notib.logic.intf.dto.adviser.Acuse;
+import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
 import es.caib.notib.logic.intf.dto.adviser.EnviamentAdviser;
-import es.caib.notib.logic.intf.dto.adviser.Receptor;
+import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
 
