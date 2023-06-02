@@ -677,7 +677,7 @@ function loadOrgansGestors(urlCercaUnitats){
                         clase += ' unselectable';
                     }
                     list_html += '<tr class="' + clase + '" data-codi="' + item.codi + '" data-denominacio="' + item.nom + '" data-cif="' + item.cif + '">' +
-                        '<td width="85%">' + item.codi + ' - ' + item.nom + '</td>' +
+                        '<td width="85%">' + item.codi + ' - ' + (item.nom ? item.nom : item.nomEs) + '</td>' +
                         '<td>' + (socSir) + '</td>' +
                         '<td>';
                     if (enviamentTipus === 'NOTIFICACIO' || enviamentTipus === 'COMUNICACIO' || comSir) {
