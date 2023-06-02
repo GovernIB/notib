@@ -30,6 +30,7 @@ import es.caib.notib.core.api.dto.organisme.UnitatOrganitzativaDto;
 import es.caib.notib.core.api.exception.NoPermisosException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
@@ -1922,10 +1923,10 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	@Override
 	@Transactional
-	public void sincronitzarOrganNomMultidioma() {
+	public void sincronitzarOrganNomMultidioma(List<Long> ids) {
 
 		try {
-			List<EntitatEntity> entitats = entitatRepository.findAll();
+			List<EntitatEntity> entitats = ids != null ? entitatRepository.findByIds(ids) : entitatRepository.findAll();
 			List<NodeDir3> nodesDir3;
 			OrganGestorEntity organ;
 			for (EntitatEntity entitat : entitats) {

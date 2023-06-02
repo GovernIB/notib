@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -319,6 +320,22 @@ public class OrganGestorController extends BaseUserController{
 		} catch (Exception ex) {
 			logger.error("Error actualitzant les oficines SIR ", ex);
 			return getAjaxControllerReturnValueError(request, redirect,"organgestor.list.boto.actualitzar.oficines.error");
+		}
+	}
+
+	@RequestMapping(value = "/sync/noms/{lloc}")
+	public String syncNoms(HttpServletRequest request, @PathVariable String lloc, Model model) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		String redirect = "ARBRE".equalsIgnoreCase(lloc) ? "redirect:../../../organgestorArbre" : "redirect:../../../organgestor";
+		try {
+			List<Long> ids = new ArrayList<>();
+			ids.add(entitat.getId());
+			organGestorService.sincronitzarOrganNomMultidioma(ids);
+			return getAjaxControllerReturnValueSuccess(request, redirect,"organgestor.list.boto.actualitzar.noms.ok");
+		} catch (Exception ex) {
+			logger.error("Error actualitzant les oficines SIR ", ex);
+			return getAjaxControllerReturnValueError(request, redirect,"organgestor.list.boto.actualitzar.noms.error");
 		}
 	}
 

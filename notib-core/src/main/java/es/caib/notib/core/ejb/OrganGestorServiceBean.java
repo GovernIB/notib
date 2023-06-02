@@ -269,8 +269,8 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
-	public void sincronitzarOrganNomMultidioma() {
-		delegate.sincronitzarOrganNomMultidioma();
+	public void sincronitzarOrganNomMultidioma(List<Long> ids) {
+		delegate.sincronitzarOrganNomMultidioma(ids);
 	}
 
 	@Override

@@ -58,7 +58,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                         configService.crearPropietatsConfigPerEntitats();
                         break;
                     case SINCRONITZAR_ORGANS_NOMS_MULTIDIOMA:
-                        organService.sincronitzarOrganNomMultidioma();
+                        organService.sincronitzarOrganNomMultidioma(null);
                     default:
                         log.error("Procés inicial no definit");
                         break;

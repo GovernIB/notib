@@ -70,10 +70,8 @@
 
 		$("#estat").on("change", () => $('#btnFiltrar').click());
 
-		$("#organ-boto-update-oficines").on("click", () => {
-			bloquejar();
-			// console.log("bloquejant");
-		});
+		$("#organ-boto-update-oficines").on("click", () => bloquejar());
+		$("#organ-boto-update-noms").on("click", () => bloquejar());
 	});
 	// Bloquejar la pantalla
 	function bloquejar() {
@@ -243,15 +241,15 @@
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right">
+			<a id="organ-boto-update-noms" class="btn btn-default" href="organgestor/sync/noms/LLISTA" onClick="bloquejar()">
+					<span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.noms"/>
+			</a>
 			<c:if test="${setOficina}">
 			<a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines/LLISTA"  onClick="bloquejar()">
 					<span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
 			</a>
 			</c:if>
-			<a id="organ-boto-update"
-					class="btn btn-default" href="organgestor/sync/dir3"
-					data-toggle="modal"
-					data-maximized="false">
+			<a id="organ-boto-update" class="btn btn-default" href="organgestor/sync/dir3" data-toggle="modal" data-maximized="false">
 					<span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.tots"/>
 			</a>
 <%--			<a id="organgestor-boto-nou" class="btn btn-default" href="organgestor/new" data-toggle="modal" data-adjust-height="false" data-height="400px"><span class="fa fa-plus"></span>&nbsp;<spring:message code="organgestor.list.boto.nou"/></a>--%>

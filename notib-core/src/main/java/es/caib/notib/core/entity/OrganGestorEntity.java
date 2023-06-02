@@ -115,13 +115,12 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 //		this.codiPare = codiPare;
 //	}
 
-	public void update(
-			String nom,
-			String estat,
-			String codiPare) {
+	public void update(String nom, String nomEs, String estat, String codiPare) {
+
 		this.nom = nom;
 		this.estat = getEstat(estat);
 		this.codiPare = codiPare;
+		this.nomEs = nomEs;
 	}
 
 	public void updateLlibre(
