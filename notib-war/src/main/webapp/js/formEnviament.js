@@ -676,7 +676,7 @@ function loadOrgansGestors(urlCercaUnitats){
                     if (enviamentTipus === 'COMUNICACIO_SIR' && !comSir) {
                         clase += ' unselectable';
                     }
-                    list_html += '<tr class="' + clase + '" data-codi="' + item.codi + '" data-denominacio="' + item.nom + '" data-cif="' + item.cif + '">' +
+                    list_html += '<tr class="' + clase + '" data-codi="' + item.codi + '" data-denominacio="' + (item.nom ? item.nom : item.nomEs) + '" data-cif="' + item.cif + '">' +
                         '<td width="85%">' + item.codi + ' - ' + (item.nom ? item.nom : item.nomEs) + '</td>' +
                         '<td>' + (socSir) + '</td>' +
                         '<td>';
