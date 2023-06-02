@@ -76,7 +76,7 @@ public class ServeiFormEntity {
 	protected String organGestorNom;
 	
 	@Column(name = "organGestorEstat")
-	@Enumerated(EnumType.ORDINAL)
+	@Enumerated(EnumType.STRING)
 	protected OrganGestorEstatEnum organGestorEstat;
 	
 	@Column(name = "tipusassumpte")

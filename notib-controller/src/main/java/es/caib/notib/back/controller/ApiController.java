@@ -16,11 +16,6 @@ public class ApiController extends BaseUserController {
     @Autowired
     private AplicacioService aplicacioService;
 
-//	@RequestMapping(value = "/rest")
-//	public String altaForm(
-//			HttpServletRequest request) {
-//		return "redirect:apidoc";
-//	}
 
     @RequestMapping(value = "/scheduling/restart", method = RequestMethod.GET)
     @ResponseBody

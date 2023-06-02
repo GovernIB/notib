@@ -25,7 +25,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Entity
 @Table(name = "not_oficina")
-@EntityListeners(AuditingEntityListener.class)
+//@EntityListeners(AuditingEntityListener.class)
 public class OficinaEntity implements Serializable {
 
     @Id
