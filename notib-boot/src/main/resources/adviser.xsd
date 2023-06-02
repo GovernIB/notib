@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:sin="http://administracionelectronica.gob.es/notifica/ws/adviserwsv2/1.0/sincronizarEnvio"
             xmlns:com="http://administracionelectronica.gob.es/notifica/ws/adviserwsv2/1.0/common"
+            xmlns:tns="http://administracionelectronica.gob.es/notifica/ws/adviserwsv2/1.0/sincronizarEnvio"
             targetNamespace="http://administracionelectronica.gob.es/notifica/ws/adviserwsv2/1.0/sincronizarEnvio"
             elementFormDefault="qualified">
 <import namespace="http://administracionelectronica.gob.es/notifica/ws/adviserwsv2/1.0/common" schemaLocation="opciones.xsd"/>

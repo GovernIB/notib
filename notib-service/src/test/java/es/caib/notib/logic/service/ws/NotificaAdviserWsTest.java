@@ -1,7 +1,25 @@
 package es.caib.notib.logic.service.ws;
 
-import static org.junit.Assert.assertNotNull;
+import es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2;
+import es.caib.notib.logic.intf.ws.adviser.common.Opciones;
+import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
+import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
+import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.SincronizarEnvio;
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Holder;
+import javax.xml.ws.Service;
+import javax.xml.ws.handler.Handler;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
@@ -14,26 +32,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Holder;
-import javax.xml.ws.Service;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
+import static org.junit.Assert.assertNotNull;
 
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
-import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
-
-import es.caib.notib.logic.wsdl.adviser.Acuse;
-import es.caib.notib.logic.wsdl.adviser.AdviserWsV2PortType;
-import es.caib.notib.logic.wsdl.adviser.Opciones;
-import es.caib.notib.logic.wsdl.adviser.Receptor;
 /** Prova del WS Adviser des de Notific@ que rep notificacions sobre
  * canvis d'estat de notificacions o de certificat.
  *
@@ -162,48 +162,65 @@ public class NotificaAdviserWsTest {
 	
 //	@Test
 	public void a_datadoOrganismoTest() throws Exception {
-		AdviserWsV2PortType ws = this.getWS();
-		Holder<String> codigoRespuesta = new Holder<String>();
-		Holder<String> descripcionRespuesta = new Holder<String>();
+		AdviserServiceWsV2 ws = this.getWS();
+
 		// Data
 		GregorianCalendar c = new GregorianCalendar();
 		c.setTime(new Date());
 		XMLGregorianCalendar date = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
-		
+
 		// Receptor enviament
 		Receptor receptor = new Receptor();
 		receptor.setNifReceptor("12345678Z");
 		receptor.setNombreReceptor("destinatariNom0 destLlinatge1_0 destLlinatge2_0");
-		
+
 		Acuse acusePDF = new Acuse();
-		
+
 		acusePDF.setContenido(CERIFICACIO_B64.getBytes());
 		acusePDF.setCsvResguardo("dasd-dsadad-asdasd-asda-sda-das");
 		acusePDF.setHash(CERIFICACIO_SHA1);
+
+		SincronizarEnvio sincronizarEnvio = new SincronizarEnvio();
+		sincronizarEnvio.setOrganismoEmisor(EMISOR_DIR3);
+		sincronizarEnvio.setIdentificador("39128285cf121cb00453");
+		sincronizarEnvio.setTipoEntrega(unmarshal("2"));
+		sincronizarEnvio.setModoNotificacion(unmarshal("5"));
+		sincronizarEnvio.setEstado("notificada");
+		sincronizarEnvio.setFechaEstado(date);
+		sincronizarEnvio.setReceptor(receptor);
+		sincronizarEnvio.setAcusePDF(acusePDF);
+		sincronizarEnvio.setAcuseXML(null);
+		sincronizarEnvio.setOpcionesSincronizarEnvio(null);
+
+		Holder<String> codigoRespuesta = new Holder<String>();
+		Holder<String> descripcionRespuesta = new Holder<String>();
+
 
 		Holder<Opciones> opcionesResultadoSincronizarEnvio = new Holder<Opciones>();
 		
 		Holder<String> identificador = new Holder<String>();
 		identificador.value = "39128285cf121cb00453";
-		
-		ws.sincronizarEnvio(
-				EMISOR_DIR3, 
-				identificador, 
-				unmarshal("2"), 
-				unmarshal("5"), 
-				"notificada", 
-				date, 
-				receptor, 
-				acusePDF, 
-				null, 
-				null, 
-				codigoRespuesta, 
-				descripcionRespuesta, 
+
+//		ResultadoSincronizarEnvio resultadoSincronizarEnvio =
+		ws.sincronizarEnvio(//sincronizarEnvio);
+				EMISOR_DIR3,
+				identificador,
+				unmarshal("2"),
+				unmarshal("5"),
+				"notificada",
+				date,
+				receptor,
+				acusePDF,
+				null,
+				null,
+				codigoRespuesta,
+				descripcionRespuesta,
 				opcionesResultadoSincronizarEnvio);
 		
-		assertNotNull(
-				descripcionRespuesta.value,
-				codigoRespuesta);
+//		assertNotNull(resultadoSincronizarEnvio.getCodigoRespuesta());
+		assertNotNull(codigoRespuesta);
+//		assertNotNull(resultadoSincronizarEnvio.getDescripcionRespuesta());
+		assertNotNull(descripcionRespuesta);
 	}
 	
 //	@Test
@@ -224,13 +241,13 @@ public class NotificaAdviserWsTest {
 //				new Holder<String>());
 //	}
 	
-	private AdviserWsV2PortType getWS() throws Exception {
+	private AdviserServiceWsV2 getWS() throws Exception {
 		URL url = new URL(ENDPOINT_ADDRESS + "?wsdl");
 		QName qname = new QName(
 				"https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/",
 				"AdviserWsV2Service");
 		Service service = Service.create(url, qname);
-		AdviserWsV2PortType backofficeWs = service.getPort(AdviserWsV2PortType.class);
+		AdviserServiceWsV2 backofficeWs = service.getPort(AdviserServiceWsV2.class);
 		BindingProvider bp = (BindingProvider)backofficeWs;
 		@SuppressWarnings("rawtypes")
 		List<Handler> handlerChain = new ArrayList<Handler>();

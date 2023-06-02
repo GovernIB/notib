@@ -5,7 +5,7 @@ package es.caib.notib.logic.service.ws;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.caib.notib.logic.intf.ws.callback.NotificacioCanviClient;
+import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 
 import java.util.Date;
 

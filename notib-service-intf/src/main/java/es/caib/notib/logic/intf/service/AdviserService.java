@@ -1,10 +1,11 @@
 package es.caib.notib.logic.intf.service;
 
 
-import es.caib.notib.logic.intf.dto.AdviserResponseDto;
-import es.caib.notib.logic.intf.dto.adviser.EnviamentAdviser;
+import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.ResultadoSincronizarEnvio;
+import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.SincronizarEnvio;
 
 public interface AdviserService {
 
-    AdviserResponseDto sincronitzarEnviament(EnviamentAdviser env);
+    public ResultadoSincronizarEnvio sincronizarEnvio(SincronizarEnvio sincronizarEnvio);
+
 }

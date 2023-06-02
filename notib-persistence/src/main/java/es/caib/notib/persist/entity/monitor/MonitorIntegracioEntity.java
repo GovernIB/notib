@@ -10,12 +10,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.AbstractPersistable;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
@@ -34,7 +32,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name="not_mon_int")
-@EntityListeners(AuditingEntityListener.class)
+//@EntityListeners(AuditingEntityListener.class)
 public class MonitorIntegracioEntity extends AbstractPersistable<Long> {
 
     private static int ERROR_DESC_MAX_LENGTH = 1024;
