@@ -1818,10 +1818,10 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	@Override
 	@Transactional
-	public void sincronitzarOrganNomMultidioma() {
+	public void sincronitzarOrganNomMultidioma(List<Long> ids) {
 
 		try {
-			List<EntitatEntity> entitats = entitatRepository.findAll();
+			List<EntitatEntity> entitats = ids != null ? entitatRepository.findByIds(ids) : entitatRepository.findAll();
 			List<NodeDir3> nodesDir3;
 			OrganGestorEntity organ;
 			for (EntitatEntity entitat : entitats) {

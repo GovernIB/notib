@@ -114,6 +114,7 @@
                 });
 
                 $("#organ-boto-update-oficines").on("click", () => bloquejar());
+                $("#organ-boto-update-noms").on("click", () => bloquejar());
             });
             // Bloquejar la pantalla
             function bloquejar() {
@@ -208,6 +209,9 @@
             </div>
             <div class="col-md-7">
                 <div style="padding-bottom: 10px; text-align: right">
+                    <a id="organ-boto-update-noms" class="btn btn-default" href="organgestor/sync/noms/arbre">
+                        <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.noms"/>
+                    </a>
                     <c:if test="${setOficina}">
                         <a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines/ARBRE"
                                 data-refresh-pagina="true" data-maximized="false">

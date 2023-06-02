@@ -371,8 +371,9 @@ public class OrganGestorHelper {
 		// checks if unitat already exists in database
 		unitat = organGestorRepository.findByCodi(unitatWS.getCodi());
 		// if not it creates a new one
+		String nom = !Strings.isNullOrEmpty(unitatWS.getDenominacionCooficial()) ? unitatWS.getDenominacionCooficial() : unitatWS.getDenominacio();
 		if (unitat != null) {
-			unitat.update(unitatWS.getDenominacio(), unitatWS.getEstat(), unitatWS.getSuperior());
+			unitat.update(nom, unitatWS.getDenominacio(), unitatWS.getEstat(), unitatWS.getSuperior());
 			updateLlibreAndOficina(unitat, entitat.getDir3Codi());
 			log.debug(prefix + "guardant nova unitat amb codi " + unitat.getCodi() + " - " + unitat.getNom());
 			organGestorRepository.save(unitat);
@@ -380,7 +381,7 @@ public class OrganGestorHelper {
 		}
 		// Venen les unitats ordenades, primer el pare i després els fills?
 
-		String nom = !Strings.isNullOrEmpty(unitatWS.getDenominacionCooficial()) ? unitatWS.getDenominacionCooficial() : unitatWS.getDenominacio();
+
 		unitat = OrganGestorEntity.builder().codi(unitatWS.getCodi()).entitat(entitat).nom(nom).nomEs(unitatWS.getDenominacio())
 				.codiPare(unitatWS.getSuperior()).estat(unitatWS.getEstat()).build();
 		updateLlibreAndOficina(unitat, entitat.getDir3Codi());

@@ -230,8 +230,8 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@PermitAll
-	public void sincronitzarOrganNomMultidioma() {
-		getDelegateService().sincronitzarOrganNomMultidioma();
+	public void sincronitzarOrganNomMultidioma(List<Long> ids) {
+		getDelegateService().sincronitzarOrganNomMultidioma(ids);
 	}
 
 	@Override

@@ -242,5 +242,5 @@ public interface OrganGestorService {
 	// For testing:
 	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper);
 
-	void sincronitzarOrganNomMultidioma();
+	void sincronitzarOrganNomMultidioma(List<Long> ids);
 }
