@@ -606,9 +606,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         try {
             InputStream input;
             if (registreNotificaHelper.isSendDocumentsActive()) {
-                input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/core/plantillas/modelo_datos_carga_masiva_metadades.csv");
+                input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/logic/plantillas/modelo_datos_carga_masiva_metadades.csv");
             } else {
-                input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/core/plantillas/modelo_datos_carga_masiva.csv");
+                input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/logic/plantillas/modelo_datos_carga_masiva.csv");
             }
             assert input != null;
             return IOUtils.toByteArray(input);
