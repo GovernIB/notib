@@ -17,10 +17,12 @@ import es.caib.notib.logic.helper.ExcepcioLogHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
+import es.caib.notib.logic.intf.dto.ProcessosInicialsEnum;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.persist.entity.UsuariEntity;
+import es.caib.notib.persist.repository.ProcessosInicialsRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.persist.repository.acl.AclSidRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
@@ -33,8 +35,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Implementació dels mètodes per a gestionar la versió de l'aplicació.
@@ -49,6 +53,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private AclSidRepository aclSidRepository;
+	@Autowired
+	private ProcessosInicialsRepository processosInicialsRepository;
 	@Autowired
 	private CacheHelper cacheHelper;
 	@Autowired
@@ -403,6 +409,25 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public void propagateDbProperties() {
 		configHelper.reloadDbProperties();
+	}
+
+
+	// PROCESSOS INICIALS
+    @Override
+	@Transactional(readOnly = true)
+    public List<ProcessosInicialsEnum> getProcessosInicialsPendents() {
+		List<ProcessosInicialsEnum> processosInicials = new ArrayList<>();
+
+		var processos = processosInicialsRepository.findProcesosInicialsEntityByInitTrue();
+		if (processos != null)
+			processosInicials = processos.stream().map(p -> p.getCodi()).collect(Collectors.toList());
+        return processosInicials;
+    }
+
+	@Override
+	@Transactional
+	public void updateProcesInicialExecutat(ProcessosInicialsEnum proces) {
+		processosInicialsRepository.updateInit(proces, false);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(AplicacioServiceImpl.class);

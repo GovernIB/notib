@@ -10,6 +10,8 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
@@ -26,6 +28,7 @@ public class ProcesosInicialsEntity implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "codi", nullable = false)
     private ProcessosInicialsEnum codi;
 

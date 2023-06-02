@@ -4,6 +4,7 @@
 package es.caib.notib.logic.intf.service;
 
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
+import es.caib.notib.logic.intf.dto.ProcessosInicialsEnum;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -175,4 +176,11 @@ public interface AplicacioService {
 	void restartSchedulledTasks();
 
 	public void propagateDbProperties();
+
+	// PROCESSOS INICIALS
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	List<ProcessosInicialsEnum> getProcessosInicialsPendents();
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	void updateProcesInicialExecutat(ProcessosInicialsEnum proces);
 }

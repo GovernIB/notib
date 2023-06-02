@@ -6,7 +6,8 @@ import es.caib.notib.back.helper.MonitorHelper;
 import es.caib.notib.logic.intf.monitor.MonitorTascaEstat;
 import es.caib.notib.logic.intf.monitor.MonitorTascaInfo;
 import es.caib.notib.logic.intf.service.MonitorTasquesService;
-import org.json.JSONArray;
+import lombok.Builder;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +22,6 @@ import java.lang.management.ThreadInfo;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -121,51 +121,42 @@ public class MonitorSystemController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/tasques", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, JSONArray> getTasquesJson(HttpServletRequest request) {
+	public List<TasquesSegonPlaInfo> getTasquesJson(HttpServletRequest request) {
 
-		Map<String, JSONArray> tasques = new HashMap<>();
-		JSONArray tasca = new JSONArray();
-		JSONArray estat = new JSONArray();
-		JSONArray iniciExecucio = new JSONArray();
-		JSONArray tempsExecucio = new JSONArray();
-		JSONArray properaExecucio = new JSONArray();
-		JSONArray observacions = new JSONArray();
-		JSONArray identificadors = new JSONArray();
+		List<TasquesSegonPlaInfo> tasquesSegonPlaInfos = new ArrayList<>();
 
 		List<MonitorTascaInfo> monitorTasques = monitortasquesService.findAll();
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		for(MonitorTascaInfo monitorTasca : monitorTasques) {
 
-			identificadors.put(monitorTasca.getCodi());
-			tasca.put(getMessage(request, "monitor.tasques.tasca") + ": " + getMessage(request, "monitor.tasques.tasca.codi." + monitorTasca.getCodi()));
-			estat.put(getMessage(request, "monitor.tasques.estat") + ": " + getMessage(request, "monitor.tasques.estat." + monitorTasca.getEstat()));
+		if (monitorTasques != null) {
+			for (MonitorTascaInfo monitorTasca : monitorTasques) {
 
-			String strDataInici = "-";
-			if (monitorTasca.getDataInici() != null) {
-				strDataInici = sdf.format(monitorTasca.getDataInici());
+				String iniciExecucio = monitorTasca.getDataInici() != null ? sdf.format(monitorTasca.getDataInici()) : "-";
+				String properaExecucio = !MonitorTascaEstat.EN_EXECUCIO.equals(monitorTasca.getEstat()) && monitorTasca.getProperaExecucio() != null ?
+						sdf.format(monitorTasca.getProperaExecucio()) : "-";
+
+				tasquesSegonPlaInfos.add(TasquesSegonPlaInfo.builder()
+						.codi(monitorTasca.getCodi())
+						.estat(getMessage(request, "monitor.tasques.estat." + monitorTasca.getEstat()))
+						.iniciExecucio(getMessage(request, "monitor.tasques.darrer.inici") + ": " + iniciExecucio)
+						.tempsExecucio(getMessage(request, "monitor.tasques.temps.execucio") + ": " + monitorTasca.getTempsExecucio())
+						.properaExecucio(getMessage(request, "monitor.tasques.propera.execucio") + ": " + properaExecucio)
+						.observacions(getMessage(request, "monitor.tasques.observacions") + ": " + monitorTasca.getObservacions())
+						.build());
 			}
-			iniciExecucio.put(getMessage(request, "monitor.tasques.darrer.inici") + ": " + strDataInici);
-
-			@SuppressWarnings("unused")
-			String difDataSegons = "-";
-			if (monitorTasca.getDataInici() != null) {
-				long difDatas = System.currentTimeMillis() - monitorTasca.getDataInici().getTime();
-				difDataSegons = ((int) (difDatas / 1000) % 60) + "s";
-			}
-			tempsExecucio.put(getMessage(request, "monitor.tasques.temps.execucio") + ": " + monitorTasca.getTempsExecucio());
-
-			String strProperaExecucio = !MonitorTascaEstat.EN_EXECUCIO.equals(monitorTasca.getEstat()) && monitorTasca.getProperaExecucio() != null
-										? sdf.format(monitorTasca.getProperaExecucio()) : "-";
-			properaExecucio.put(getMessage(request, "monitor.tasques.propera.execucio") + ": " + strProperaExecucio);
-			observacions.put(getMessage(request, "monitor.tasques.observacions") + ": " + monitorTasca.getObservacions());
 		}
-		tasques.put("tasca", tasca);
-		tasques.put("estat", estat);
-		tasques.put("iniciExecucio", iniciExecucio);
-		tasques.put("tempsExecucio", tempsExecucio);
-		tasques.put("properaExecucio", properaExecucio);
-		tasques.put("observacions", observacions);
-		tasques.put("identificadors", identificadors);
-		return tasques;
+
+		return tasquesSegonPlaInfos;
+	}
+
+	@Builder
+	@Getter
+	public static class TasquesSegonPlaInfo {
+		private String codi;
+		private String estat;
+		private String iniciExecucio;
+		private String tempsExecucio;
+		private String properaExecucio;
+		private String observacions;
 	}
 }

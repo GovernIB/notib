@@ -4,6 +4,7 @@
 package es.caib.notib.ejb;
 
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
+import es.caib.notib.logic.intf.dto.ProcessosInicialsEnum;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 
 import javax.annotation.security.PermitAll;
@@ -184,5 +185,18 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
     public void propagateDbProperties() {
         getDelegateService().propagateDbProperties();
     }
+
+	// PROCESSOS INICIALS
+    @Override
+	@RolesAllowed({"NOT_SUPER"})
+    public List<ProcessosInicialsEnum> getProcessosInicialsPendents() {
+        return getDelegateService().getProcessosInicialsPendents();
+    }
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public void updateProcesInicialExecutat(ProcessosInicialsEnum proces) {
+		getDelegateService().updateProcesInicialExecutat(proces);
+	}
 
 }

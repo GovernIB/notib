@@ -1,9 +1,9 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.ConfigService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
-import es.caib.notib.persist.repository.ProcessosInicialsRepository;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     @Autowired
     private ConfigService configService;
     @Autowired
-    private ProcessosInicialsRepository processosInicialsRepository;
+    private AplicacioService aplicacioService;
     @Autowired
     private OrganGestorService organService;
 
@@ -39,36 +38,35 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     private Authentication auth;
 
     @Synchronized
-    @Transactional
     @Override public void onApplicationEvent(ContextRefreshedEvent event) {
-// TODO: Executar processos inicials
-//        log.info("Executant processos inicials. Counter: " + counter++);
-//        addCustomAuthentication();
-//        try {
-//
-//            List<ProcesosInicialsEntity> processos = processosInicialsRepository.findProcesosInicialsEntityByInitTrue();
-//            for (ProcesosInicialsEntity proces : processos) {
-//                log.info("Executant procés inicial: {}",  proces.getCodi());
-//                switch (proces.getCodi()) {
-//                    case ACTUALITZAR_REFERENCIES:
-//                        notificacioService.actualitzarReferencies();
-//                        break;
-//                    case PROPIETATS_CONFIG_ENTITATS:
-//                        configService.crearPropietatsConfigPerEntitats();
-//                        break;
-//                    case SINCRONITZAR_ORGANS_NOMS_MULTIDIOMA:
-//                        organService.sincronitzarOrganNomMultidioma();
-//                    default:
-//                        log.error("Procés inicial no definit");
-//                        break;
-//                }
-//                processosInicialsRepository.updateInit(proces.getId(), false);
-//            }
-//            configService.actualitzarPropietatsJBossBdd();
-//        } catch (Exception ex) {
-//            log.error("Errror executant els processos inicials", ex);
-//        }
-//        restoreAuthentication();
+        log.info("Executant processos inicials. Counter: " + counter++);
+        addCustomAuthentication();
+        try {
+
+            var processos = aplicacioService.getProcessosInicialsPendents();
+            for (var proces : processos) {
+                log.info("Executant procés inicial: {}",  proces);
+                switch (proces) {
+                    case ACTUALITZAR_REFERENCIES:
+                        notificacioService.actualitzarReferencies();
+                        break;
+                    case PROPIETATS_CONFIG_ENTITATS:
+                        configService.crearPropietatsConfigPerEntitats();
+                        break;
+                    case SINCRONITZAR_ORGANS_NOMS_MULTIDIOMA:
+                        organService.sincronitzarOrganNomMultidioma();
+                        break;
+                    default:
+                        log.error("Procés inicial no definit");
+                        break;
+                }
+                aplicacioService.updateProcesInicialExecutat(proces);
+            }
+            configService.actualitzarPropietatsJBossBdd();
+        } catch (Exception ex) {
+            log.error("Errror executant els processos inicials", ex);
+        }
+        restoreAuthentication();
     }
 
     private void addCustomAuthentication() {

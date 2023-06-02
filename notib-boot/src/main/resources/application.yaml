@@ -68,11 +68,11 @@ logging:
   level:
     root: INFO
     org.springframework: DEBUG
-#    org.springframework.web: DEBUG
-#    org.springframework.ws.client.MessageTracing.sent: DEBUG
-#    org.springframework.ws.server.MessageTracing.sent: DEBUG
-#    org.springframework.ws.client.MessageTracing.received: TRACE
-#    org.springframework.ws.server.MessageTracing.received: TRACE
+    #    org.springframework.web: DEBUG
+    #    org.springframework.ws.client.MessageTracing.sent: DEBUG
+    #    org.springframework.ws.server.MessageTracing.sent: DEBUG
+    #    org.springframework.ws.client.MessageTracing.received: TRACE
+    #    org.springframework.ws.server.MessageTracing.received: TRACE
     #    org.springframework.jdbc.core: TRACE
     #    org.hibernate.SQL: DEBUG
     #    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

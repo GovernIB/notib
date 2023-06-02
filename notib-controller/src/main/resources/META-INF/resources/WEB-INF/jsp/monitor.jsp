@@ -63,6 +63,7 @@
 				carregaMonitor();
 			});
 			carregaMonitor();
+			carregaTasques();
 		});
 		
 		function carregaMonitor() {				
@@ -170,7 +171,7 @@
 				dataType: 'json',
 				async: false,
 				success: function(data){
-					$("#tbody_monitor").empty().html(getTasquesTBody(data.tasca, data.estat, data.iniciExecucio, data.tempsExecucio, data.properaExecucio, data.identificadors));
+					$("#tbody_monitor").empty().html(getTasquesTBody(data));
 				}
 			})
 					.fail(function( jqxhr, textStatus, error ) {
@@ -189,19 +190,20 @@
 		}
 
 
-		function getTasquesTBody(tasca, estat, iniciExecucio, tempsExecucio, properaExecucio, identificadors) {
+		function getTasquesTBody(tasques) {
 
-			if (!tasca) {
+			if (!tasques) {
 				return '';
 			}
 			let content = '';
-			for (let i = 0; i < tasca.length; i++) {
+			for (let i = 0; i < tasques.length; i++) {
+				let tasca = tasques[i];
 				content +=  '<tr class="monitor_fila">' +
-						'<td id="tasca-' + identificadors[i] + '">' + tasca[i].replace("<spring:message code='monitor.tasques.tasca'/>: ", "") + '</td>' +
-						'<td class="text-center" id="estat-' + identificadors[i] + '">' + estat[i].replace("<spring:message code='monitor.tasques.estat'/>: ", "") + '</td>' +
-						'<td class="text-center" id="inici-execucio-' + identificadors[i] + '">' + iniciExecucio[i].replace("<spring:message code='monitor.tasques.darrer.inici'/>: ", "") + '</td>' +
-						'<td class="text-right" id ="temps-execucio-' + identificadors[i] + '">' + tempsExecucio[i].replace("<spring:message code='monitor.tasques.temps.execucio'/>: ", "") + '</td>' +
-						'<td class="text-center" id="propera-execucio-' + identificadors[i] + '">' + properaExecucio[i].replace("<spring:message code='monitor.tasques.propera.execucio'/>: ", "") + '</td>' +
+						'<td id="tasca-' + tasca.codi + '">' + tasca.codi + '</td>' +
+						'<td class="text-center" id="estat-' + tasca.codi + '">' + tasca.estat + '</td>' +
+						'<td class="text-center" id="inici-execucio-' + tasca.codi + '">' + tasca.iniciExecucio + '</td>' +
+						'<td class="text-right" id ="temps-execucio-' + tasca.codi + '">' + tasca.tempsExecucio + '</td>' +
+						'<td class="text-center" id="propera-execucio-' + tasca.codi + '">' + tasca.properaExecucio + '</td>' +
 						'</tr>';
 			}
 			return content;
