@@ -4,6 +4,7 @@
 package es.caib.notib.core.ejb;
 
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
+import es.caib.notib.core.api.dto.ProcessosInicialsEnum;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,6 +176,19 @@ public class AplicacioServiceBean implements AplicacioService {
 	@Override
 	public String getMissatgeErrorAccesAdmin() {
 		return delegate.getMissatgeErrorAccesAdmin();
+	}
+
+	// PROCESSOS INICIALS
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public List<ProcessosInicialsEnum> getProcessosInicialsPendents() {
+		return delegate.getProcessosInicialsPendents();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public void updateProcesInicialExecutat(ProcessosInicialsEnum proces) {
+		delegate.updateProcesInicialExecutat(proces);
 	}
 
 }

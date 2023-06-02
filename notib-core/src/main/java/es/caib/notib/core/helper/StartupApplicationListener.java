@@ -1,10 +1,10 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.core.api.dto.ProcessosInicialsEnum;
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.ConfigService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.core.entity.ProcesosInicialsEntity;
-import es.caib.notib.core.repository.ProcessosInicialsRepository;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     @Autowired
     private ConfigService configService;
     @Autowired
-    private ProcessosInicialsRepository processosInicialsRepository;
+    private AplicacioService aplicacioService;
     @Autowired
     private OrganGestorService organService;
 
@@ -40,17 +39,16 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     private Authentication auth;
 
     @Synchronized
-    @Transactional
     @Override public void onApplicationEvent(ContextRefreshedEvent event) {
 
         log.info("Executant processos inicials. Counter: " + counter++);
         addCustomAuthentication();
         try {
 
-            List<ProcesosInicialsEntity> processos = processosInicialsRepository.findProcesosInicialsEntityByInitTrue();
-            for (ProcesosInicialsEntity proces : processos) {
-                log.info("Executant procés inicial: {}",  proces.getCodi());
-                switch (proces.getCodi()) {
+            List<ProcessosInicialsEnum> processos = aplicacioService.getProcessosInicialsPendents();
+            for (ProcessosInicialsEnum proces : processos) {
+                log.info("Executant procés inicial: {}",  proces);
+                switch (proces) {
                     case ACTUALITZAR_REFERENCIES:
                         notificacioService.actualitzarReferencies();
                         break;
@@ -59,11 +57,12 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                         break;
                     case SINCRONITZAR_ORGANS_NOMS_MULTIDIOMA:
                         organService.sincronitzarOrganNomMultidioma(null);
+                        break;
                     default:
                         log.error("Procés inicial no definit");
                         break;
                 }
-                processosInicialsRepository.updateInit(proces.getId(), false);
+                aplicacioService.updateProcesInicialExecutat(proces);
             }
             configService.actualitzarPropietatsJBossBdd();
         } catch (Exception ex) {

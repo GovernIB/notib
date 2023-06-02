@@ -4,6 +4,7 @@
 package es.caib.notib.core.api.service;
 
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
+import es.caib.notib.core.api.dto.ProcessosInicialsEnum;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -171,4 +172,11 @@ public interface AplicacioService {
 	void setAppVersion(String appVersion);
 
 	String getMissatgeErrorAccesAdmin();
+
+	// PROCESSOS INICIALS
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	List<ProcessosInicialsEnum> getProcessosInicialsPendents();
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	void updateProcesInicialExecutat(ProcessosInicialsEnum proces);
 }
