@@ -8,11 +8,13 @@ import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
+import es.caib.notib.core.api.dto.ProcessosInicialsEnum;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.cacheable.ProcSerCacheable;
+import es.caib.notib.core.entity.ProcesosInicialsEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConfigHelper;
@@ -20,6 +22,7 @@ import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.ExcepcioLogHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.repository.ProcessosInicialsRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.core.repository.acl.AclSidRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
@@ -32,6 +35,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -48,6 +52,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private AclSidRepository aclSidRepository;
+	@Autowired
+	private ProcessosInicialsRepository processosInicialsRepository;
 	@Autowired
 	private CacheHelper cacheHelper;
 	@Autowired
@@ -393,6 +399,27 @@ public class AplicacioServiceImpl implements AplicacioService {
 		return messageHelper.getMessage("error.acces.administrador.excepcio");
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(AplicacioServiceImpl.class);
+	// PROCESSOS INICIALS
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProcessosInicialsEnum> getProcessosInicialsPendents() {
+		List<ProcessosInicialsEnum> processosInicials = new ArrayList<>();
+
+		List<ProcesosInicialsEntity> processos = processosInicialsRepository.findProcesosInicialsEntityByInitTrue();
+		if (processos != null) {
+			for (ProcesosInicialsEntity proces : processos) {
+				processosInicials.add(proces.getCodi());
+			}
+		}
+		return processosInicials;
+	}
+
+	@Override
+	@Transactional
+	public void updateProcesInicialExecutat(ProcessosInicialsEnum proces) {
+		processosInicialsRepository.updateInit(proces, false);
+	}
+
+    private static final Logger logger = LoggerFactory.getLogger(AplicacioServiceImpl.class);
 
 }
