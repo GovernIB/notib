@@ -42,6 +42,7 @@ public class ExcepcioLogController extends BaseUserController {
 
 	@RequestMapping(value = "/{index}", method = RequestMethod.GET)
 	public String detall(HttpServletRequest request, @PathVariable Long index, Model model) {
+
 		model.addAttribute("excepcio", aplicacioService.excepcioFindOne(index));
 		return "excepcioDetall";
 	}

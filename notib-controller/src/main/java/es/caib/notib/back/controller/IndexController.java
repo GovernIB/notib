@@ -31,14 +31,8 @@ public class IndexController {
 	public String root(HttpServletRequest request) {
 
 		var rolActual = RolHelper.getRolActual(request, aplicacioService);
-		if (RolHelper.ROLE_SUPER.equals(rolActual)) {
-			return "redirect:/integracio";
-		}
-		if (RolHelper.ROLE_APLICACIO.equals(rolActual)) {
-			return "redirect:/api/rest";
-		}
-
-		return "redirect:/notificacio";
+		return RolHelper.ROLE_SUPER.equals(rolActual) ? "redirect:/integracio" :
+				RolHelper.ROLE_APLICACIO.equals(rolActual) ? "redirect:/api/rest" : "redirect:/notificacio";
 	}
 
 	@PostConstruct

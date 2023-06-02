@@ -23,14 +23,10 @@ public class BaseUserController extends BaseController {
 	public EntitatDto getEntitatActualComprovantPermisos(HttpServletRequest request) {
 
 		var entitat = EntitatHelper.getEntitatActual(request);
-//		boolean administradorEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 		var administradorOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		if (entitat == null) {
 			throw new SecurityException("No te cap entitat assignada");
 		}
-//		if (administradorEntitat && !entitat.isUsuariActualAdministradorEntitat()) {
-//			throw new SecurityException("No te permisos per accedir a aquesta entitat com a administrador de entitat");
-//		}
 		if (administradorOrgan && !entitat.isUsuariActualAdministradorOrgan()) {
 			throw new SecurityException("No te permisos per accedir a aquesta entitat com a administrador de òrgan");
 		}

@@ -75,14 +75,12 @@ public class IntegracioController extends BaseUserController {
 	@RequestMapping(value = "/{codi}", method = RequestMethod.GET)
 	public String getAmbCodi(HttpServletRequest request, @PathVariable @NonNull String codi, Model model) {
 
-		List<IntegracioDto> integracions = monitorIntegracioService.integracioFindAll();
-		
+		var integracions = monitorIntegracioService.integracioFindAll();
 		// Consulta el número d'errors per codi d'integracio
 		try {
-			Map<String, Integer> errors = monitorIntegracioService.countErrors();
-
-			for (IntegracioDto integracio : integracions) {
-				for (IntegracioEnumDto integracioEnum : IntegracioEnumDto.values()) {
+			var errors = monitorIntegracioService.countErrors();
+			for (var integracio : integracions) {
+				for (var integracioEnum : IntegracioEnumDto.values()) {
 					if (integracio.getCodi().equals(integracioEnum.name())) {
 						integracio.setNom(EnumHelper.getOneOptionForEnum(IntegracioEnumDto.class, "integracio.list.pipella." + integracio.getCodi()).getText());
 					}
@@ -92,11 +90,11 @@ public class IntegracioController extends BaseUserController {
 				}
 			}
 		} catch (Exception ex) {
-			String msg = "Error contant el nombre d'integracions amb error";
+			var msg = "Error contant el nombre d'integracions amb error";
 			log.error(msg, ex);
 			MissatgesHelper.warning(request, msg);
 		}
-		IntegracioFiltreCommand command = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
+		var command = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
 		model.addAttribute("integracioFiltreCommand", command);
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE, codi);
 		model.addAttribute("codiActual", codi);
@@ -104,12 +102,6 @@ public class IntegracioController extends BaseUserController {
 		RequestSessionHelper.actualitzarObjecteSessio(request, INTEGRACIO_FILTRE, command);
 		model.addAttribute("codiActual", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE));
 		log.info(String.format("[INTEGRACIONS] - Carregant dades de %s", codi));
-//		try {
-//			PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-//			model.addAttribute("data", (new ObjectMapper()).writeValueAsString(monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, command.asDto())));
-//		} catch (JsonProcessingException e) {
-//			e.printStackTrace();
-//		}
 		return "integracioList";
 	}
 
@@ -117,25 +109,24 @@ public class IntegracioController extends BaseUserController {
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request) {
 
-		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		String codi = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
-		IntegracioFiltreCommand filtre = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
-		PaginaDto<IntegracioAccioDto> accions = monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, filtre !=null ? filtre.asDto() : null);
+		var paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		var codi = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
+		var filtre = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
+		var accions = monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, filtre != null ? filtre.asDto() : null);
 		return DatatablesHelper.getDatatableResponse(request, accions);
 	}
 
 	@RequestMapping(value = "/{codi}/detall/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public IntegracioDetall detall(HttpServletRequest request, @PathVariable String codi, @PathVariable Long id, Model model) {
-
 		return monitorIntegracioService.detallIntegracio(id);
 	}
 
 	@RequestMapping(value = "/netejar", method = RequestMethod.GET)
 	public String netejar(HttpServletRequest request, Model model) {
 
-		String redirect = "redirect:../integracio";
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var redirect = "redirect:../integracio";
+		var entitat = getEntitatActualComprovantPermisos(request);
 		try {
 			monitorIntegracioService.netejarMonitor();
 			return getAjaxControllerReturnValueSuccess(request, redirect, "integracio.netejar.ok");

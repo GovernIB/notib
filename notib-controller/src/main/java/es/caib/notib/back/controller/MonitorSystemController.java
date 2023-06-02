@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,7 +73,7 @@ public class MonitorSystemController extends BaseController {
 		sistema.add(getMessage(request, "monitor.os-version") + ": " + MonitorHelper.getVersion());
 		sistema.add(getMessage(request, "monitor.carga_cpu") + ": " + MonitorHelper.getCPULoad());
 		
-		for (File root : File.listRoots()) {
+		for (var root : File.listRoots()) {
 			sistema.add(getMessage(request, "monitor.space.total") + " " + root.getAbsolutePath()+": " + MonitorHelper.humanReadableByteCount(root.getTotalSpace()));
 			sistema.add(getMessage(request, "monitor.space.free") + " " + root.getAbsolutePath()+": " + MonitorHelper.humanReadableByteCount(root.getFreeSpace()));
 		}
@@ -85,30 +84,30 @@ public class MonitorSystemController extends BaseController {
 		}
 		sistema.add(getMessage(request, "monitor.deadlocked")+": " + numDeadlocked);
 		sistema.add(getMessage(request, "monitor.daemon_thread")+": " + bean.getDaemonThreadCount());
-		
 		bean.resetPeakThreadCount();
-		
 		if (bean.isThreadCpuTimeSupported()) {
 			long[] ids = bean.getAllThreadIds();
-			ThreadInfo[] info = bean.getThreadInfo(ids);
+			var info = bean.getThreadInfo(ids);
 			Set hs = new HashSet();
-			for (int a = 0; a < ids.length; ++a) {
+			for (var a = 0; a < ids.length; ++a) {
 				hs.add(bean.getThreadCpuTime(ids[a]));
 			}
 			long tiempoCPUTotal =  ((Long)Collections.max(hs)).longValue();
-			for (int a = 0; a < ids.length; ++a) {
-				String nombre = (info[a].getLockName() == null ? info[a].getThreadName() : info[a].getLockName());
-				if (!"main".equals(nombre)) {
-					hilo.add(nombre);
-					long tiempoCPU = (long) ((float)100*((float) bean.getThreadCpuTime(ids[a]) / (float) tiempoCPUTotal));
-					cputime.add(((tiempoCPU>100)?100:tiempoCPU) + " %");
-					estado.add(getMessage(request, "monitor."+info[a].getThreadState()));
-					espera.add(((info[a].getWaitedTime() == -1)? 0:info[a].getWaitedTime()) + " ns");
-					blockedtime.add(((info[a].getBlockedTime() == -1)? 0:info[a].getBlockedTime()) + " ns");
+			String nombre;
+			long tiempoCPU;
+			for (var a = 0; a < ids.length; ++a) {
+				nombre = (info[a].getLockName() == null ? info[a].getThreadName() : info[a].getLockName());
+				if ("main".equals(nombre)) {
+					continue;
 				}
+				hilo.add(nombre);
+				tiempoCPU = (long) ((float)100*((float) bean.getThreadCpuTime(ids[a]) / (float) tiempoCPUTotal));
+				cputime.add(((tiempoCPU>100)?100:tiempoCPU) + " %");
+				estado.add(getMessage(request, "monitor."+info[a].getThreadState()));
+				espera.add(((info[a].getWaitedTime() == -1)? 0:info[a].getWaitedTime()) + " ns");
+				blockedtime.add(((info[a].getBlockedTime() == -1)? 0:info[a].getBlockedTime()) + " ns");
 			}
 		}
-		
 		mjson.put("sistema", sistema);
 		mjson.put("hilo", hilo);
 		mjson.put("cputime", cputime);
@@ -124,34 +123,33 @@ public class MonitorSystemController extends BaseController {
 	public List<TasquesSegonPlaInfo> getTasquesJson(HttpServletRequest request) {
 
 		List<TasquesSegonPlaInfo> tasquesSegonPlaInfos = new ArrayList<>();
-
-		List<MonitorTascaInfo> monitorTasques = monitortasquesService.findAll();
+		var monitorTasques = monitortasquesService.findAll();
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-
-		if (monitorTasques != null) {
-			for (MonitorTascaInfo monitorTasca : monitorTasques) {
-
-				String iniciExecucio = monitorTasca.getDataInici() != null ? sdf.format(monitorTasca.getDataInici()) : "-";
-				String properaExecucio = !MonitorTascaEstat.EN_EXECUCIO.equals(monitorTasca.getEstat()) && monitorTasca.getProperaExecucio() != null ?
-						sdf.format(monitorTasca.getProperaExecucio()) : "-";
-
-				tasquesSegonPlaInfos.add(TasquesSegonPlaInfo.builder()
-						.codi(monitorTasca.getCodi())
-						.estat(getMessage(request, "monitor.tasques.estat." + monitorTasca.getEstat()))
-						.iniciExecucio(getMessage(request, "monitor.tasques.darrer.inici") + ": " + iniciExecucio)
-						.tempsExecucio(getMessage(request, "monitor.tasques.temps.execucio") + ": " + monitorTasca.getTempsExecucio())
-						.properaExecucio(getMessage(request, "monitor.tasques.propera.execucio") + ": " + properaExecucio)
-						.observacions(getMessage(request, "monitor.tasques.observacions") + ": " + monitorTasca.getObservacions())
-						.build());
-			}
+		if (monitorTasques == null) {
+			return tasquesSegonPlaInfos;
 		}
+		for (MonitorTascaInfo monitorTasca : monitorTasques) {
 
+			var iniciExecucio = monitorTasca.getDataInici() != null ? sdf.format(monitorTasca.getDataInici()) : "-";
+			var properaExecucio = !MonitorTascaEstat.EN_EXECUCIO.equals(monitorTasca.getEstat()) && monitorTasca.getProperaExecucio() != null ?
+					sdf.format(monitorTasca.getProperaExecucio()) : "-";
+
+			tasquesSegonPlaInfos.add(TasquesSegonPlaInfo.builder()
+					.codi(monitorTasca.getCodi())
+					.estat(getMessage(request, "monitor.tasques.estat." + monitorTasca.getEstat()))
+					.iniciExecucio(getMessage(request, "monitor.tasques.darrer.inici") + ": " + iniciExecucio)
+					.tempsExecucio(getMessage(request, "monitor.tasques.temps.execucio") + ": " + monitorTasca.getTempsExecucio())
+					.properaExecucio(getMessage(request, "monitor.tasques.propera.execucio") + ": " + properaExecucio)
+					.observacions(getMessage(request, "monitor.tasques.observacions") + ": " + monitorTasca.getObservacions())
+					.build());
+		}
 		return tasquesSegonPlaInfos;
 	}
 
 	@Builder
 	@Getter
 	public static class TasquesSegonPlaInfo {
+
 		private String codi;
 		private String estat;
 		private String iniciExecucio;

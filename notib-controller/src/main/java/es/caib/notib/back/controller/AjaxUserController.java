@@ -4,8 +4,6 @@
 package es.caib.notib.back.controller;
 
 import es.caib.notib.back.helper.EnumHelper.HtmlOption;
-import es.caib.notib.logic.intf.dto.AplicacioDto;
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.UsuariAplicacioService;
@@ -57,19 +55,20 @@ public class AjaxUserController extends BaseUserController {
 	@ResponseBody
 	public List<UsuariDto> getPluginDadesUsuari(HttpServletRequest request, @PathVariable String text, Model model) {
 
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		Set<UsuariDto> setUsuaris = new HashSet<UsuariDto>();
+		var entitatActual = getEntitatActualComprovantPermisos(request);
+		Set<UsuariDto> setUsuaris = new HashSet<>();
 		try {
-			String encoded = new String(text.getBytes("ISO-8859-1"), "UTF-8");
-			List<UsuariDto> usuarisWeb = aplicacioService.findUsuariAmbText(encoded);
+			var encoded = new String(text.getBytes("ISO-8859-1"), "UTF-8");
+			var usuarisWeb = aplicacioService.findUsuariAmbText(encoded);
 			setUsuaris.addAll(usuarisWeb);
-			AplicacioDto aplicacio = usuariAplicacioService.findByEntitatAndText(entitatActual.getId(), encoded);
-			if (aplicacio != null) {
-				UsuariDto usuariAplciacio = new UsuariDto();
-				usuariAplciacio.setCodi(aplicacio.getUsuariCodi());
-				usuariAplciacio.setNom(aplicacio.getUsuariCodi());
-				setUsuaris.add(usuariAplciacio);
+			var aplicacio = usuariAplicacioService.findByEntitatAndText(entitatActual.getId(), encoded);
+			if (aplicacio == null) {
+				return new ArrayList<>(setUsuaris);
 			}
+			var usuariAplciacio = new UsuariDto();
+			usuariAplciacio.setCodi(aplicacio.getUsuariCodi());
+			usuariAplciacio.setNom(aplicacio.getUsuariCodi());
+			setUsuaris.add(usuariAplciacio);
 			return new ArrayList<>(setUsuaris);
 		} catch (Exception ex) {
 			log.error("Error al consultar la informació dels usuaris amb el filtre \"" + text + "\"", ex);
@@ -81,20 +80,21 @@ public class AjaxUserController extends BaseUserController {
 	@ResponseBody
 	public List<HtmlOption> enumValorsAmbText(HttpServletRequest request, @PathVariable String enumClass) throws ClassNotFoundException {
 
-		Class<?> enumeracio = Class.forName("es.caib.notib.logic.intf.dto." + enumClass);
-		StringBuilder textKeyPrefix = new StringBuilder();
-		String[] textKeys = StringUtils.splitByCharacterTypeCamelCase(enumClass);
-		for (String textKey: textKeys) {
+		var enumeracio = Class.forName("es.caib.notib.logic.intf.dto." + enumClass);
+		var textKeyPrefix = new StringBuilder();
+		var textKeys = StringUtils.splitByCharacterTypeCamelCase(enumClass);
+		for (var textKey: textKeys) {
 			if (!"dto".equalsIgnoreCase(textKey)) {
 				textKeyPrefix.append(textKey.toLowerCase());
 				textKeyPrefix.append(".");
 			}
 		}
-		List<HtmlOption> resposta = new ArrayList<HtmlOption>();
-		if (enumeracio.isEnum()) {
-			for (Object e: enumeracio.getEnumConstants()) {
+		if (!enumeracio.isEnum()) {
+			return new ArrayList<>();
+		}
+		List<HtmlOption> resposta = new ArrayList<>();
+		for (var e: enumeracio.getEnumConstants()) {
 				resposta.add(new HtmlOption(((Enum<?>)e).name(), getMessage(request, textKeyPrefix.toString() + ((Enum<?>)e).name(), null)));
-			}
 		}
 		return resposta;
 	}

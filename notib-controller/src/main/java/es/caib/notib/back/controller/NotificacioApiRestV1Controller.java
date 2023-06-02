@@ -39,7 +39,7 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	public RespostaAlta alta(@RequestBody NotificacioV2 notificacio, HttpServletRequest request, HttpServletResponse response) {
 
 		try {
-			RespostaAlta r =  notificacioServiceWs.alta(notificacio);
+			var r =  notificacioServiceWs.alta(notificacio);
 			logoutSession(request, response);
 			return r;
 		} catch (Exception e) {
@@ -53,12 +53,12 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
 
 		try {
-			String identificador = extractIdentificador(request);
+			var identificador = extractIdentificador(request);
 			if (identificador.isEmpty()) {
-				String err = "No s'ha informat cap identificador de la notificació";
+				var err = "No s'ha informat cap identificador de la notificació";
 				return RespostaConsultaEstatNotificacio.builder().error(true).errorDescripcio(err).errorData(new Date()).build();
 			}
-			RespostaConsultaEstatNotificacio r = notificacioServiceWs.consultaEstatNotificacio(identificador);
+			var r = notificacioServiceWs.consultaEstatNotificacio(identificador);
 			logoutSession(request, response);
 			return r;
 		} catch (Exception e) {
@@ -71,14 +71,14 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	@ResponseBody
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
 
-		String referencia = extractIdentificador(request);
+		var referencia = extractIdentificador(request);
 		try {
 			if (referencia.isEmpty()) {
-				String err = "No s'ha informat cap referència de l'enviament";
+				var err = "No s'ha informat cap referència de l'enviament";
 				logoutSession(request, response);
 				return RespostaConsultaEstatEnviament.builder().error(true).errorDescripcio(err).errorData(new Date()).build();
 			}
-			RespostaConsultaEstatEnviament r = notificacioServiceWs.consultaEstatEnviament(referencia);
+			var r = notificacioServiceWs.consultaEstatEnviament(referencia);
 			logoutSession(request, response);
 			return r;
 		} catch (Exception e) {
@@ -92,7 +92,7 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	public RespostaConsultaDadesRegistre consultaDadesRegistre(@RequestBody DadesConsulta dadesConsulta, HttpServletRequest request, HttpServletResponse response) {
 
 		try {
-			RespostaConsultaDadesRegistre r = notificacioServiceWs.consultaDadesRegistre(dadesConsulta);
+			var r = notificacioServiceWs.consultaDadesRegistre(dadesConsulta);
 			logoutSession(request, response);
 			return r;
 		} catch (Exception e) {
@@ -111,7 +111,8 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	@ResponseStatus(HttpStatus.CREATED)
 	@ResponseBody
 	public String donarPermisConsultaV1(@RequestBody PermisConsulta permisConsulta, HttpServletRequest request, HttpServletResponse response) {
-		String r = donarPermisConsulta(permisConsulta);
+
+		var r = donarPermisConsulta(permisConsulta);
 		logoutSession(request, response);
 		return r;
 	}

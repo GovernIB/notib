@@ -32,33 +32,20 @@ public class AdviserController  extends BaseController {
             var factory = Validation.buildDefaultValidatorFactory();
             var validator = factory.getValidator();
             var violations = validator.validate(adviser);
-
             if (!violations.isEmpty()) {
-                StringBuilder errorDescripcio = new StringBuilder(getMessage(request, "adviser.sincronitzar.enviament.error") + ": ");
+                var errorDescripcio = new StringBuilder(getMessage(request, "adviser.sincronitzar.enviament.error") + ": ");
                 for (ConstraintViolation<EnviamentAdviser> violation: violations) {
                     errorDescripcio.append("[" + violation.getPropertyPath() + ": " + violation.getMessage() + "] ");
                 }
-                return AdviserResponseDto.builder()
-                        .identificador(adviser.getHIdentificador())
-                        .codigoRespuesta("998")
-                        .descripcionRespuesta(errorDescripcio.toString())
-                        .build();
+                return AdviserResponseDto.builder().identificador(adviser.getHIdentificador()).codigoRespuesta("998").descripcionRespuesta(errorDescripcio.toString()).build();
             }
-
             var resposta = adviserService.sincronizarEnvio(adviser.asSincronizarEnvio());
-            return AdviserResponseDto.builder()
-                    .identificador(resposta.getIdentificador())
-                    .codigoRespuesta(resposta.getCodigoRespuesta())
-                    .descripcionRespuesta(resposta.getDescripcionRespuesta())
-                    .build();
+            return AdviserResponseDto.builder().identificador(resposta.getIdentificador()).codigoRespuesta(resposta.getCodigoRespuesta()).descripcionRespuesta(resposta.getDescripcionRespuesta()).build();
 //            return adviserService.sincronitzarEnviament(adviser.asDto());
         } catch (Exception ex) {
             log.error("Error al sincronitzar l'enviament", ex);
-            return AdviserResponseDto.builder()
-                    .identificador(adviser.getHIdentificador())
-                    .codigoRespuesta("999")
-                    .descripcionRespuesta(getMessage(request, "adviser.sincronitzar.enviament.error") + ": " + ex.getMessage())
-                    .build();
+            var desc = getMessage(request, "adviser.sincronitzar.enviament.error") + ": " + ex.getMessage();
+            return AdviserResponseDto.builder().identificador(adviser.getHIdentificador()).codigoRespuesta("999").descripcionRespuesta(desc).build();
         }
     }
 }

@@ -44,7 +44,6 @@ public class AvisController extends BaseUserController {
 	@ResponseBody
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	public DatatablesResponse datatable(HttpServletRequest request) {
-
 		return DatatablesHelper.getDatatableResponse(request, avisService.findPaginat(DatatablesHelper.getPaginacioDtoFromRequest(request)));
 	}
 
@@ -55,7 +54,6 @@ public class AvisController extends BaseUserController {
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
-
 	    binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
 	}
 	

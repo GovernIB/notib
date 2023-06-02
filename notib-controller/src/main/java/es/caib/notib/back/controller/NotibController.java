@@ -56,7 +56,7 @@ public class NotibController implements ErrorController {
 		if (RolHelper.isUsuariActualUsuari(request)) {
 			return "redirect:notificacio";
 		}
-		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+		var entitat = EntitatHelper.getEntitatActual(request);
 		if (entitat == null)
 			throw new SecurityException("No te cap entitat assignada");
 		if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
@@ -91,6 +91,7 @@ public class NotibController implements ErrorController {
 
 	@RequestMapping(value = "/error")
 	public String error(HttpServletRequest request, Model model) {
+
 		model.addAttribute("errorObject", new ErrorObject(request));
 		return "util/error";
 	}

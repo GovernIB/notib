@@ -3,6 +3,7 @@
  */
 package es.caib.notib.back.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.logic.intf.service.AplicacioService;
@@ -27,54 +28,42 @@ public abstract class NotificacioApiRestBaseController extends BaseController {
 	protected NotificacioServiceWs notificacioServiceWs;
 
 	protected String getErrorDescripcio(Exception e) {
+
 		String errorDescripcio;
 		if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
-			errorDescripcio = "L'usuari " + getCodiUsuariActual() + " no té els permisos necessaris: " + e.getMessage();
-		} else {
-			errorDescripcio = UtilitatsNotib.getMessageExceptionOrCauseInstanceOf(e, EJBAccessException.class);
-			if (errorDescripcio == null || errorDescripcio.isEmpty()) {
-				errorDescripcio = e.getMessage();
-			}
+			return "L'usuari " + getCodiUsuariActual() + " no té els permisos necessaris: " + e.getMessage();
 		}
-		return errorDescripcio;
+		errorDescripcio = UtilitatsNotib.getMessageExceptionOrCauseInstanceOf(e, EJBAccessException.class);
+		return Strings.isNullOrEmpty(errorDescripcio) ? e.getMessage() : errorDescripcio;
 	}
 
 	protected String extractIdentificador(HttpServletRequest request) {
-		String url = request.getRequestURL().toString();
-		String[] urlArr = url.split("/consultaEstatNotificacio|/consultaEstatEnviament|/consultaJustificantNotificacio");
-		String referencia = urlArr.length > 1 ? urlArr[1].substring(1) : "";
-		return referencia;
+
+		var url = request.getRequestURL().toString();
+		var urlArr = url.split("/consultaEstatNotificacio|/consultaEstatEnviament|/consultaJustificantNotificacio");
+		return urlArr.length > 1 ? urlArr[1].substring(1) : "";
 	}
 
 	public RespostaConsultaJustificantEnviament consultaJustificant(HttpServletRequest request) {
-		String referencia = extractIdentificador(request);
+
+		var referencia = extractIdentificador(request);
 		try {
-			if (referencia.isEmpty()) {
-				return RespostaConsultaJustificantEnviament.builder()
-						.error(true)
-						.errorDescripcio("No s'ha informat cap referència de l'enviament")
-						.errorData(new Date())
-						.build();
+			if (!referencia.isEmpty()) {
+				return notificacioServiceWs.consultaJustificantEnviament(referencia);
 			}
-			return notificacioServiceWs.consultaJustificantEnviament(referencia);
+			var errorDesc = "No s'ha informat cap referència de l'enviament";
+			return RespostaConsultaJustificantEnviament.builder().error(true).errorDescripcio(errorDesc).errorData(new Date()).build();
 		} catch (Exception e) {
-			return RespostaConsultaJustificantEnviament.builder()
-					.error(true)
-					.errorDescripcio(getErrorDescripcio(e))
-					.errorData(new Date())
-					.build();
+			return RespostaConsultaJustificantEnviament.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
 		}
 	}
 
 	public String donarPermisConsulta(PermisConsulta permisConsulta) {
-		String resposta = null;
+
 		try {
-			if (notificacioServiceWs.donarPermisConsulta(permisConsulta)) {
-				resposta = "OK";
-			}
+			return notificacioServiceWs.donarPermisConsulta(permisConsulta) ? "OK" : null;
 		} catch (Exception e) {
-			resposta = getErrorDescripcio(e);
+			return getErrorDescripcio(e);
 		}
-		return resposta;
 	}
 }

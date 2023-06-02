@@ -35,29 +35,20 @@ public class CacheController extends BaseController {
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request ) {
-		return DatatablesHelper.getDatatableResponse(
-				request,
-				cacheService.getAllCaches());
+		return DatatablesHelper.getDatatableResponse(request, cacheService.getAllCaches());
 	}
 	
 	@RequestMapping(value = "/{cacheValue}/buidar", method = RequestMethod.GET)
-	public String buidar(
-			HttpServletRequest request,
-			@PathVariable String cacheValue) {
+	public String buidar(HttpServletRequest request, @PathVariable String cacheValue) {
+
 		cacheService.removeCache(cacheValue);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../entitat",
-				"cache.controller.esborrada.ok");
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "cache.controller.esborrada.ok");
 	}
 
 	@RequestMapping(value = "/all/buidar", method = RequestMethod.GET)
-	public String buidarTot(
-			HttpServletRequest request) {
+	public String buidarTot(HttpServletRequest request) {
+
 		cacheService.removeAllCaches();
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../entitat",
-				"cache.controller.esborrada.ok");
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "cache.controller.esborrada.ok");
 	}
 }

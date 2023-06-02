@@ -44,13 +44,13 @@ public class ConfigController extends BaseUserController{
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
 
-        List<ConfigGroupDto> configGroups = configService.findAll();
+        var configGroups = configService.findAll();
         List<EntitatDto> entitats = new ArrayList<>();
         if (RolHelper.isUsuariActualAdministrador(request)) {
             entitats = entitatService.findAll();
         }
         model.addAttribute("config_groups", configGroups);
-        for (ConfigGroupDto cGroup: configGroups) {
+        for (var cGroup: configGroups) {
             fillFormsModel(cGroup, model, entitats);
         }
         return "config";
@@ -75,10 +75,10 @@ public class ConfigController extends BaseUserController{
         if (bindingResult.hasErrors()) {
             return SimpleResponse.builder().status(0).message(getMessage(request, "config.controller.edit.error")).build();
         }
-        String msg = "config.controller.edit.ok";
-        int status = 1;
+        var msg = "config.controller.edit.ok";
+        var status = 1;
         try {
-            ConfigDto c = configService.updateProperty(configCommand.asDto());
+            var c = configService.updateProperty(configCommand.asDto());
             msg = c == null ? "config.controller.edit.error" : msg;
             status = c == null ? 0 : status;
         } catch (Exception e) {
@@ -94,7 +94,7 @@ public class ConfigController extends BaseUserController{
     public SyncResponse sync(HttpServletRequest request, Model model) {
 
         try {
-            List<String> editedProperties = configService.syncFromJBossProperties();
+            var editedProperties = configService.syncFromJBossProperties();
             return SyncResponse.builder().status(true).editedProperties(editedProperties).build();
         } catch (Exception e) {
             return SyncResponse.builder().status(false).build();
@@ -105,12 +105,12 @@ public class ConfigController extends BaseUserController{
 
         String key = null;
         List<ConfigDto> confs = new ArrayList<>();
-        for (ConfigDto config: cGroup.getConfigs()) {
+        for (var config: cGroup.getConfigs()) {
             if (!Strings.isNullOrEmpty(config.getEntitatCodi())) {
                 continue;
             }
             model.addAttribute("config_" + config.getKey().replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
-            for (EntitatDto entitat : entitats) {
+            for (var entitat : entitats) {
                 key = config.addEntitatKey(entitat);
 //                model.addAttribute("entitat_config_" + key.replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
             }
@@ -120,7 +120,7 @@ public class ConfigController extends BaseUserController{
         if (cGroup.getInnerConfigs() == null || cGroup.getInnerConfigs().isEmpty()){
             return;
         }
-        for (ConfigGroupDto child : cGroup.getInnerConfigs()){
+        for (var child : cGroup.getInnerConfigs()){
             fillFormsModel(child, model, entitats);
         }
     }

@@ -13,12 +13,10 @@ import es.caib.notib.back.helper.EntitatHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
-import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,11 +60,12 @@ public class EnviamentController extends TableAccionsMassivesController {
 	}
 
 	protected List<Long> getIdsElementsFiltrats(HttpServletRequest request) throws ParseException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		NotificacioEnviamentFiltreCommand filtreCommand = getFiltreCommand(request);
+
+		var entitatActual = getEntitatActualComprovantPermisos(request);
+		var filtreCommand = getFiltreCommand(request);
 		String organGestorCodi = null;
 		if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request) && entitatActual != null) {
-			OrganGestorDto organGestorActual = getOrganGestorActual(request);
+			var organGestorActual = getOrganGestorActual(request);
 			organGestorCodi = organGestorActual.getCodi();
 		}
 		return enviamentService.findIdsAmbFiltre(entitatActual.getId(), RolEnumDto.valueOf(RolHelper.getRolActual(request)), getCodiUsuariActual(), organGestorCodi, NotificacioEnviamentFiltreCommand.asDto(filtreCommand));
@@ -77,14 +76,13 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
 		model.addAttribute("mantenirPaginacio", mantenirPaginacio != null ? mantenirPaginacio : false);
-		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		var entitatActual = EntitatHelper.getEntitatActual(request);
 		ColumnesDto columnes = null;
-
-		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
+		var filtreEnviaments = getFiltreCommand(request);
 		model.addAttribute(filtreEnviaments);
 		model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
 		if(entitatActual != null) {
-			String codiUsuari = getCodiUsuariActual();
+			var codiUsuari = getCodiUsuariActual();
 			columnes = enviamentService.getColumnesUsuari(entitatActual.getId(), codiUsuari);
 			if (columnes == null) {
 				enviamentService.columnesCreate(codiUsuari, entitatActual.getId(), columnes);
@@ -99,31 +97,15 @@ public class EnviamentController extends TableAccionsMassivesController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public String post(
-			HttpServletRequest request,
-			@Valid NotificacioEnviamentFiltreCommand filtreCommand,
-			BindingResult bindingResult,
-			Model model,
-			@RequestParam(value = "accio", required = false) String accio) {
+	public String post(HttpServletRequest request, @Valid NotificacioEnviamentFiltreCommand filtreCommand, BindingResult bindingResult, Model model,
+					   @RequestParam(value = "accio", required = false) String accio) {
 
-		RequestSessionHelper.actualitzarObjecteSessio(
-				request,
-				ENVIAMENTS_FILTRE,
-				filtreCommand);
-
-		Long enviamentId = (Long)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				ENVIAMENT_ID);
+		RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENTS_FILTRE, filtreCommand);
+		var enviamentId = (Long)RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_ID);
 		if (enviamentId == null || !enviamentId.equals(filtreCommand.getId())) {
-			RequestSessionHelper.esborrarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_SELECCIO);
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					ENVIAMENT_ID,
-					filtreCommand.getId());
+			RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
+			RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENT_ID, filtreCommand.getId());
 		}
-
 		return "redirect:enviament";
 	}
 
@@ -131,27 +113,22 @@ public class EnviamentController extends TableAccionsMassivesController {
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request, Model model) throws ParseException {
 
-		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
-		PaginaDto<NotEnviamentTableItemDto> enviaments = new PaginaDto<>();
-		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		var filtreEnviaments = getFiltreCommand(request);
+		var enviaments = new PaginaDto<NotEnviamentTableItemDto>();
+		var isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		String organGestorCodi = null;
 		try {
 			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
 				filtreEnviaments.setEstat(null);
 			}
-			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			var entitatActual = getEntitatActualComprovantPermisos(request);
 			if (isAdminOrgan) {
-				OrganGestorDto organGestorActual = getOrganGestorActual(request);
+				var organGestorActual = getOrganGestorActual(request);
 				organGestorCodi = organGestorActual.getCodi();
 			}
 
-			enviaments = enviamentService.enviamentFindByEntityAndFiltre(
-					entitatActual.getId(),
-					RolEnumDto.valueOf(RolHelper.getRolActual(request)),
-					organGestorCodi,
-					getCodiUsuariActual(),
-					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
-					DatatablesHelper.getPaginacioDtoFromRequest(request));
+			enviaments = enviamentService.enviamentFindByEntityAndFiltre(entitatActual.getId(), RolEnumDto.valueOf(RolHelper.getRolActual(request)), organGestorCodi,
+					getCodiUsuariActual(), NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments), DatatablesHelper.getPaginacioDtoFromRequest(request));
 
 		} catch(SecurityException e) {
 			MissatgesHelper.error(request, getMessage(request, "enviament.controller.entitat.cap.assignada"));
@@ -162,8 +139,8 @@ public class EnviamentController extends TableAccionsMassivesController {
 	@RequestMapping(value = "/visualitzar", method = RequestMethod.GET)
 	public String visualitzar(HttpServletRequest request, Model model) {
 
-		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-		ColumnesDto columnes = enviamentService.getColumnesUsuari(entitat.getId(), getCodiUsuariActual());
+		var entitat = EntitatHelper.getEntitatActual(request);
+		var columnes = enviamentService.getColumnesUsuari(entitat.getId(), getCodiUsuariActual());
 		model.addAttribute(columnes != null ? ColumnesCommand.asCommand(columnes) : new ColumnesCommand());
 		return "enviamentColumns";
 	}
@@ -171,7 +148,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 	@RequestMapping(value = "/visualitzar/save", method = RequestMethod.POST)
 	public String save(HttpServletRequest request, @Valid ColumnesCommand columnesCommand, BindingResult bindingResult, Model model) throws IOException {
 
-		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+		var entitat = EntitatHelper.getEntitatActual(request);
 		if (bindingResult.hasErrors()) {
 			return "procedimentAdminForm";
 		}
@@ -182,7 +159,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 	private NotificacioEnviamentFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
-		NotificacioEnviamentFiltreCommand filtreCommand = (NotificacioEnviamentFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENTS_FILTRE);
+		var filtreCommand = (NotificacioEnviamentFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENTS_FILTRE);
 		if (filtreCommand != null) {
 			setDefaultFiltreData(filtreCommand);
 			return filtreCommand;
@@ -198,17 +175,18 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 	private  void setDefaultFiltreData(NotificacioEnviamentFiltreCommand command) {
 
-		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-		Date avui = new Date();
+		var df = new SimpleDateFormat("dd/MM/yyyy");
+		var avui = new Date();
 		if (command.getDataEnviamentFi() == null) {
 			command.setDataEnviamentFi(df.format(avui));
 		}
-		if (command.getDataEnviamentInici() == null) {
-			Calendar c = Calendar.getInstance();
-			c.setTime(avui);
-			c.add(Calendar.MONTH, -3);
-			Date inici = c.getTime();
-			command.setDataEnviamentInici(df.format(inici));
+		if (command.getDataEnviamentInici() != null) {
+			return;
 		}
+		var c = Calendar.getInstance();
+		c.setTime(avui);
+		c.add(Calendar.MONTH, -3);
+		var inici = c.getTime();
+		command.setDataEnviamentInici(df.format(inici));
 	}
 }

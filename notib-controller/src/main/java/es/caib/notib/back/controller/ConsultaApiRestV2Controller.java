@@ -1,5 +1,6 @@
 package es.caib.notib.back.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.back.helper.CaseInsensitiveEnumEditor;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
@@ -209,21 +210,12 @@ public class ConsultaApiRestV2Controller extends BaseController {
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
-		String basePath = location.toString();
-		ApiConsulta consulta = ApiConsulta.builder()
-				.dniTitular(dniTitular)
-				.tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO)
-				.estatFinal(true)
-				.basePath(basePath)
-				.pagina(pagina)
-				.mida(mida)
-				.dataInicial(dataInicial)
-				.dataFinal(dataFinal)
-				.idioma(lang != null ? lang : Idioma.CA)
-				.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true)
-				.build();
-		RespostaConsultaV2 r = enviamentService.findEnviamentsV2(consulta);
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var basePath = location.toString();
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(true).basePath(basePath)
+				.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
+				.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
+		var r = enviamentService.findEnviamentsV2(consulta);
 		logoutSession(request, response);
 		return r;
 	}
@@ -234,31 +226,29 @@ public class ConsultaApiRestV2Controller extends BaseController {
 
 		Arxiu document = null;
 		ArxiuDto arxiu = null;
-		HttpStatus status = HttpStatus.OK;
+		var status = HttpStatus.OK;
 		try {
 			arxiu = notificacioService.getDocumentArxiu(notificacioId);
 		} catch (Exception e) {
 			log.debug("No s'ha trobat el document per a la notificació amb identificador " + notificacioId);
 		}
 		if (arxiu != null && arxiu.getContingut() != null) {
-			if (arxiu.getContentType() == null) {
-				if (arxiu.getNom() != null) {
-					if (arxiu.getNom().endsWith(".pdf")) {
-						arxiu.setContentType("application/pdf");
-					} else if (arxiu.getNom().endsWith(".pdf")) {
-						arxiu.setContentType("application/zip");
-					}
+			if (arxiu.getContentType() == null && !Strings.isNullOrEmpty(arxiu.getNom())) {
+				if (arxiu.getNom().endsWith(".pdf")) {
+					arxiu.setContentType("application/pdf");
+				} else if (arxiu.getNom().endsWith(".zip")) {
+					arxiu.setContentType("application/zip");
 				}
 			}
-			String contingutDocumentBasse64 = Base64.encodeBase64String(arxiu.getContingut());
+			var contingutDocumentBasse64 = Base64.encodeBase64String(arxiu.getContingut());
 			document = Arxiu.builder().nom(arxiu.getNom()).mediaType(arxiu.getContentType()).contingut(contingutDocumentBasse64).build();
-			ResponseEntity<Arxiu> r = new ResponseEntity<>(document, status);
+			var r = new ResponseEntity<>(document, status);
 			logoutSession(request, response);
 			return r;
 		}
 		document = Arxiu.builder().error(true).missatgeError("No s'ha trobat el document.").build();
 		status = HttpStatus.BAD_REQUEST;
-		ResponseEntity<Arxiu> r = new ResponseEntity<>(document, status);
+		var r = new ResponseEntity<>(document, status);
 		logoutSession(request, response);
 		return r;
 	}
@@ -269,22 +259,22 @@ public class ConsultaApiRestV2Controller extends BaseController {
 
 		Arxiu certificacio = null;
 		ArxiuDto arxiu = null;
-		HttpStatus status = HttpStatus.OK;
+		var status = HttpStatus.OK;
 		try {
 			arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
 		} catch (Exception e) {
 			log.debug("No s'ha trobat la certificació per a l'enviament amb identificador " + enviamentId);
 		}
 		if (arxiu != null && arxiu.getContingut() != null) {
-			String contingutCertificacioBasse64 = Base64.encodeBase64String(arxiu.getContingut());
+			var contingutCertificacioBasse64 = Base64.encodeBase64String(arxiu.getContingut());
 			certificacio = Arxiu.builder().nom(arxiu.getNom()).mediaType(arxiu.getContentType()).contingut(contingutCertificacioBasse64).build();
-			ResponseEntity<Arxiu> r = new ResponseEntity<Arxiu>(certificacio, status);
+			var r = new ResponseEntity<>(certificacio, status);
 			logoutSession(request, response);
 			return r;
 		}
 		certificacio = Arxiu.builder().error(true).missatgeError("No s'ha trobat la certificació.").build();
 		status = HttpStatus.BAD_REQUEST;
-		ResponseEntity<Arxiu> r = new ResponseEntity<Arxiu>(certificacio, status);
+		var r = new ResponseEntity<>(certificacio, status);
 		logoutSession(request, response);
 		return r;
 	}
@@ -295,22 +285,22 @@ public class ConsultaApiRestV2Controller extends BaseController {
 
 		Arxiu justificant = null;
 		byte[] contingutJustificant = null;
-		HttpStatus status = HttpStatus.OK;
+		var status = HttpStatus.OK;
 		try {
 			contingutJustificant = enviamentService.getDocumentJustificant(enviamentId);
 		} catch (Exception e) {
 			log.debug("No s'ha trobat el justificant per a l'enviament amb identificador " + enviamentId);
 		}
 		if (contingutJustificant != null) {
-			String contingutJustificantBasse64 = Base64.encodeBase64String(contingutJustificant);
+			var contingutJustificantBasse64 = Base64.encodeBase64String(contingutJustificant);
 			justificant = Arxiu.builder().nom("Justificant").mediaType(com.google.common.net.MediaType.PDF.toString()).contingut(contingutJustificantBasse64).build();
-			ResponseEntity<Arxiu> r = new ResponseEntity<>(justificant, status);
+			var r = new ResponseEntity<>(justificant, status);
 			logoutSession(request, response);
 			return r;
 		}
 		justificant = Arxiu.builder().error(true).missatgeError("No s'ha trobat el justificant.").build();
 		status = HttpStatus.BAD_REQUEST;
-		ResponseEntity<Arxiu> r = new ResponseEntity<>(justificant, status);
+		var r = new ResponseEntity<>(justificant, status);
 		logoutSession(request, response);
 		return r;
 	}
