@@ -7,8 +7,11 @@ import es.caib.notib.persist.entity.UsuariEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -18,8 +21,13 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
-	
+
 	public UsuariEntity findByCodi(String codi);
+
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
+	@Query("from UsuariEntity u where u.codi = :codi")
+	public Optional<UsuariEntity> getByCodiReadOnlyNewTransaction(@Param("codi") String codi);
+
 
 	@Query(   "select "
 			+ "    u "

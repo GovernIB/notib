@@ -26,7 +26,6 @@ import java.io.Serializable;
 @Entity
 @Getter
 @Setter
-//@Builder(builderMethodName = "hiddenBuilder")
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
