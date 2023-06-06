@@ -127,7 +127,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 		serviceName = "NotificacioServiceV2",
 		portName = "NotificacioServiceV2Port",
 		targetNamespace = "http://www.caib.es/notib/ws/notificacio",
-		endpointInterface = "es.caib.notib.logic.intf.service.ws.NotificacioServiceV2")
+		endpointInterface = "es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2")
 public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, NotificacioServiceWs {
 
 	private final static Pattern UUID_REGEX_PATTERN = Pattern.compile("^[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$");

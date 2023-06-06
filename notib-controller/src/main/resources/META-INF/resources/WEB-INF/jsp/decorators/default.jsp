@@ -254,7 +254,7 @@
 								<a id="mu_manual" href="https://github.com/GovernIB/notib/raw/${manifestAtributes['Implementation-SCM-Branch']}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
 							</li>
 							<li>
-								<a id="mu_logout" href="<c:url value="/usuari/logout"/>">
+								<a id="mu_logout" href="<c:url value="/logout"/>">
 									<i class="fa fa-power-off"></i> <spring:message code="decorator.menu.accions.desconectar"/>
 								</a>
 							</li>

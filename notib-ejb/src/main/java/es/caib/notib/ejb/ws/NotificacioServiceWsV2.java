@@ -16,7 +16,7 @@ import es.caib.notib.client.domini.RespostaConsultaEstatNotificacio;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.ejb.AbstractService;
-import es.caib.notib.ejb.helper.UsuariHelper;
+import es.caib.notib.ejb.helper.UsuariAuthHelper;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import org.jboss.ws.api.annotation.WebContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,7 @@ public class NotificacioServiceWsV2 extends AbstractService<es.caib.notib.logic.
 	private SessionContext sessionContext;
 
 	@Autowired
-	private UsuariHelper usuariHelper;
+	private UsuariAuthHelper usuariHelper;
 
 
 

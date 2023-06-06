@@ -6,6 +6,10 @@
 <html>
 <head>
 	<title>NOTIB - Error ${errorObject.statusCode}</title>
+	<link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>
+	<script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
 	<rip:modalHead/>
 </head>
 <body>
@@ -13,7 +17,12 @@
 	<c:choose>
 		<c:when test="${errorObject.throwableClassName == 'java.lang.SecurityException'}">
 			<div class="alert alert-danger" style="margin-top: 20px;" role="alert">
-				<strong><spring:message code="error.acces.notib"/></strong> ${errorObject.exceptionMessage}</div>
+				<strong><spring:message code="error.acces.notib"/></strong> ${errorObject.exceptionMessage}
+			</div>
+			<div class="col-md-2" style="padding-top: 20px;">
+				<a href="<c:url value="/index"><c:param name="canviRol" value="tothom"/></c:url>" class="btn btn-primary"><spring:message code="comu.boto.inici"/></a>
+				<a href="<c:url value="/usuari/logout"/>" class="btn btn-default" style="margin-left: 10px;"><spring:message code="decorator.menu.accions.desconectar"/></a>
+			</div>
 		</c:when>
 		<c:otherwise>
 			<div class="row">

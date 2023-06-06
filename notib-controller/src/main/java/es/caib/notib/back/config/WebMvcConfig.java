@@ -139,11 +139,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		return registrationBean;
 	}
 
-	private static final String[] PERMISOS_INTERCEPTOR_EXCLUSIONS = { "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/error", "/api/consulta/**", "/api/consulta/**", "/api/services/**" };
-	private static final String[] APLICACIO_INTERCEPTOR_EXCLUSIONS = { "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/api/services/**", "/notificacio/refrescarEstatNotifica/estat" };
-	private static final String[] INTERCEPTOR_EXCLUSIONS = { "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/api/services/**", "/error", "/notificacio/refrescarEstatNotifica/estat", "/**/monitor/tasques"};
-	private static final String[] USUARI_EXCLUSIONS = { "/entitat/organigrama/**", "/entitat/getEntitatLogoCap", "/entitat/getEntitatLogoPeu" };
+	private static final String[] PERMISOS_INTERCEPTOR_EXCLUSIONS = 	{ "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/error", "/api/consulta/**", "/api/consulta/**", "/api/services/**" };
+	private static final String[] APLICACIO_INTERCEPTOR_EXCLUSIONS = 	{ "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/api/services/**", "/notificacio/refrescarEstatNotifica/estat", "/usuari/configuracio", "/usuari/configuracio/**" };
+	private static final String[] INTERCEPTOR_EXCLUSIONS = 				{ "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/api/services/**", "/notificacio/refrescarEstatNotifica/estat", "/usuari/configuracio", "/usuari/configuracio/**", "/error", "/**/monitor/tasques"};
 
+	private static final String[] USUARI_EXCLUSIONS = { "/entitat/organigrama/**", "/entitat/getEntitatLogoCap", "/entitat/getEntitatLogoPeu" };
 	private static final String[] PAGADORS_PATHS = { "/cie**", "/cie/**", "/operadorPostal**", "/operadorPostal/**" };
 	private static final String[] ADMIN_PATHS = { "/organgestor**", "/organgestor/**", "/procediment**", "/procediment/**", "/servei**", "/servei/**", "/grup**", "/grup/**", "/massiu/registre/notificacionsError", "/massiu/registre/notificacionsError/**" };
 	private static final String[] SUPER_PATHS = { "/avis**", "/avis/**", "/cache**", "/cache/**", "/config**", "/config/**", "/metrics", "/metrics/list", "/monitor", "/monitor/all", "/excepcio", "/excepcio/**", "/integracio", "/integracio/**", "/notificacio/refrescarEstatNotifica", "/notificacio/refrescarEstatNotifica/**", "/massiu/notificacions**", "/massiu/notificacions/**" };

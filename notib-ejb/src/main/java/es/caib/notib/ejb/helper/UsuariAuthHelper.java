@@ -24,7 +24,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class UsuariHelper {
+public class UsuariAuthHelper {
 
 	public Authentication generarUsuariAutenticatEjb(SessionContext sessionContext, boolean establirComAUsuariActual) {
 
