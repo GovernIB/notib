@@ -20,10 +20,11 @@ import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -55,33 +56,34 @@ public class ReintentMassiuController extends BaseUserController {
 	@Autowired
 	private ProcedimentService procedimentService;
 	
-	private final static String MASSIU_CALLBACK_FILTRE = "massiu_callback_filtre";
-	private final static String MASSIU_REGISTRE_FILTRE = "massiu_registre_filtre";
+	private static final String MASSIU_CALLBACK_FILTRE = "massiu_callback_filtre";
+	private static final String MASSIU_REGISTRE_FILTRE = "massiu_registre_filtre";
+	private static final String PROCEDIMENTS = "procediments";
 
 	
-	@RequestMapping(value = "/notificacions", method = RequestMethod.GET)
+	@GetMapping(value = "/notificacions")
 	public String getNotificacions(HttpServletRequest request, Model model) {
 
 		var mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
 		model.addAttribute("mantenirPaginacio", mantenirPaginacio);
 		model.addAttribute(getFiltre(request));
-		model.addAttribute("procediments", procedimentService.findAll());
+		model.addAttribute(PROCEDIMENTS, procedimentService.findAll());
 		model.addAttribute("notificacioEstats", EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class, "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto."));
 		model.addAttribute("notificacioEnviamentEstats", EnumHelper.getOptionsForEnum(EnviamentEstat.class, "es.caib.notib.client.domini.EnviamentEstat."));
 		return "contingutMassiuList";
 	}
 	
-	@RequestMapping(value = "/notificacions", method = RequestMethod.POST)
+	@PostMapping(value = "/notificacions")
 	public String post(HttpServletRequest request, NotificacioErrorCallbackFiltreCommand notificacioErrorCallbackFiltreCommand, Model model) {
 
 		request.getSession().setAttribute(MASSIU_CALLBACK_FILTRE, NotificacioErrorCallbackFiltreCommand.asDto(notificacioErrorCallbackFiltreCommand));
-		model.addAttribute("procediments", procedimentService.findAll());
+		model.addAttribute(PROCEDIMENTS, procedimentService.findAll());
 		model.addAttribute("notificacioEstats", EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class, "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto."));
 		model.addAttribute("notificacioEnviamentEstats", EnumHelper.getOptionsForEnum(EnviamentEstat.class, "es.caib.notib.client.domini.EnviamentEstat."));
 		return "contingutMassiuList";
 	}
 	
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@GetMapping(value = "/datatable")
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request) {
 
@@ -97,26 +99,26 @@ public class ReintentMassiuController extends BaseUserController {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/notificacions/reintentar", method = RequestMethod.GET)
+	@GetMapping(value = "/notificacions/reintentar")
 	public String reintentar(HttpServletRequest request, Model model) {
 
 		var seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
 		if (seleccio == null || seleccio.isEmpty()) {
 			return getModalControllerReturnValueError(request, "redirect:/massiu/notificacions", "accio.massiva.seleccio.buida");
 		}
-		for (Long notificacioId : seleccio) {
+		for (var notificacioId : seleccio) {
 			callbackService.reintentarCallback(notificacioId);
 		}
 		RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
 		return getModalControllerReturnValueSuccess(request, "redirect:../../massiu/notificacions", "accio.massiva.creat.ok");
 	}
 	
-	@RequestMapping(value = "/select", method = RequestMethod.GET)
+	@GetMapping(value = "/select")
 	@ResponseBody
 	public int select(HttpServletRequest request, @RequestParam(value="ids[]", required = false) Long[] ids) {
 
 		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
+		var seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
 		if (seleccio == null) {
 			seleccio = new HashSet<>();
 			RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO, seleccio);
@@ -128,12 +130,12 @@ public class ReintentMassiuController extends BaseUserController {
 		return seleccio.size();
 	}
 
-	@RequestMapping(value = "/deselect", method = RequestMethod.GET)
+	@GetMapping(value = "/deselect")
 	@ResponseBody
 	public int deselect(HttpServletRequest request, @RequestParam(value="ids[]", required = false) Long[] ids) {
 
 		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
+		var seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
 		if (seleccio == null) {
 			seleccio = new HashSet<>();
 			RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO, seleccio);
@@ -148,7 +150,7 @@ public class ReintentMassiuController extends BaseUserController {
 		return seleccio.size();
 	}
 	
-	@RequestMapping(value = "/detallErrorCallback/{notificacioId}", method = RequestMethod.GET)
+	@GetMapping(value = "/detallErrorCallback/{notificacioId}")
 	public String info(HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
 		
 		var lastEvent = notificacioService.findUltimEventCallbackByNotificacio(notificacioId);
@@ -156,26 +158,25 @@ public class ReintentMassiuController extends BaseUserController {
 		return "errorCallbackDetall";
 	}
 	
-	
 	// REENVIAMENT A REGISTRE
 	
-	@RequestMapping(value = "/registre/notificacionsError", method = RequestMethod.GET)
+	@GetMapping(value = "/registre/notificacionsError")
 	public String getNotificacionsRegistreError(HttpServletRequest request, Model model) {
 
 		model.addAttribute(new NotificacioRegistreErrorFiltreCommand());
-		model.addAttribute("procediments", procedimentService.findAll());
+		model.addAttribute(PROCEDIMENTS, procedimentService.findAll());
 		return "registreMassiuList";
 	}
 	
-	@RequestMapping(value = "/registre/notificacionsError", method = RequestMethod.POST)
-	public String NotificacionsRegistreError(HttpServletRequest request, NotificacioRegistreErrorFiltreCommand notificacioRegistreErrorFiltreCommand, Model model) {
+	@PostMapping(value = "/registre/notificacionsError")
+	public String notificacionsRegistreError(HttpServletRequest request, NotificacioRegistreErrorFiltreCommand notificacioRegistreErrorFiltreCommand, Model model) {
 
 		request.getSession().setAttribute(MASSIU_REGISTRE_FILTRE, NotificacioRegistreErrorFiltreCommand.asDto(notificacioRegistreErrorFiltreCommand));
-		model.addAttribute("procediments", procedimentService.findAll());
+		model.addAttribute(PROCEDIMENTS, procedimentService.findAll());
 		return "registreMassiuList";
 	}
 	
-	@RequestMapping(value = "/registre/datatable", method = RequestMethod.GET)
+	@GetMapping(value = "/registre/datatable")
 	@ResponseBody
 	public DatatablesResponse registreDatatable(HttpServletRequest request) {
 
@@ -186,7 +187,7 @@ public class ReintentMassiuController extends BaseUserController {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/registre/notificacionsError/reintentar", method = RequestMethod.GET)
+	@GetMapping(value = "/registre/notificacionsError/reintentar")
 	public String registreReintentar(HttpServletRequest request, Model model) {
 
 		var seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_REGISTRE_SELECCIO);
@@ -194,7 +195,7 @@ public class ReintentMassiuController extends BaseUserController {
 		if (seleccio == null || seleccio.isEmpty()) {
 			return getModalControllerReturnValueError(request, redirect, "accio.massiva.seleccio.buida");
 		}
-		List<String> notificacionsError = new ArrayList<String>();
+		List<String> notificacionsError = new ArrayList<>();
 		for (var notificacioId : seleccio) {
 			try {
 				notificacioService.reactivarRegistre(notificacioId);
@@ -206,19 +207,18 @@ public class ReintentMassiuController extends BaseUserController {
 		
 		if (!notificacionsError.isEmpty()) {
 			if (notificacionsError.size() == seleccio.size()) {
-				getModalControllerReturnValueError(request, redirect, "accio.massiva.creat.ko");
-			} else {
-				var desc = new StringBuilder();
-				for (var err: notificacionsError) {
-					desc.append(err).append(" \n");
-				}
-				return getModalControllerReturnValueErrorWithDescription(request, redirect, "accio.massiva.creat.part", desc.toString());
+				return getModalControllerReturnValueError(request, redirect, "accio.massiva.creat.ko");
 			}
+			var desc = new StringBuilder();
+			for (var err: notificacionsError) {
+				desc.append(err).append(" \n");
+			}
+			return getModalControllerReturnValueErrorWithDescription(request, redirect, "accio.massiva.creat.part", desc.toString());
 		}
 		return getModalControllerReturnValueSuccess(request, redirect, "accio.massiva.creat.ok");
 	}
 	
-	@RequestMapping(value = "/registre/detallError/{notificacioId}", method = RequestMethod.GET)
+	@GetMapping(value = "/registre/detallError/{notificacioId}")
 	public String inforErrorReg(HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
 		
 		var lastEvent = notificacioService.findUltimEventRegistreByNotificacio(notificacioId);
@@ -226,7 +226,7 @@ public class ReintentMassiuController extends BaseUserController {
 		return "errorCallbackDetall";
 	}
 	
-	@RequestMapping(value = "/registre/select", method = RequestMethod.GET)
+	@GetMapping(value = "/registre/select")
 	@ResponseBody
 	public int registreSelect(HttpServletRequest request, @RequestParam(value="ids[]", required = false) Long[] ids) {
 
@@ -237,9 +237,7 @@ public class ReintentMassiuController extends BaseUserController {
 			RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_REGISTRE_SELECCIO, seleccio);
 		}
 		if (ids != null) {
-			for (Long id: ids) {
-				seleccio.add(id);
-			}
+			Collections.addAll(seleccio, ids);
 			return seleccio.size();
 		}
 		var entitatActual = getEntitatActualComprovantPermisos(request);
@@ -256,7 +254,7 @@ public class ReintentMassiuController extends BaseUserController {
 		return seleccio.size();
 	}
 
-	@RequestMapping(value = "/registre/deselect", method = RequestMethod.GET)
+	@GetMapping(value = "/registre/deselect")
 	@ResponseBody
 	public int registreDeselect(HttpServletRequest request, @RequestParam(value="ids[]", required = false) Long[] ids) {
 
