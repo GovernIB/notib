@@ -4,6 +4,7 @@
 package es.caib.notib.ejb;
 
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -15,6 +16,7 @@ import javax.ejb.Stateless;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 public class SchedulledService extends AbstractService<es.caib.notib.logic.intf.service.SchedulledService> implements es.caib.notib.logic.intf.service.SchedulledService {
 

@@ -37,7 +37,7 @@ import java.util.Set;
 public class MonitorSystemController extends BaseController {
 
 	@Autowired
-	private MonitorTasquesService monitortasquesService;
+	private MonitorTasquesService monitorTasquesService;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
@@ -123,7 +123,7 @@ public class MonitorSystemController extends BaseController {
 	public List<TasquesSegonPlaInfo> getTasquesJson(HttpServletRequest request) {
 
 		List<TasquesSegonPlaInfo> tasquesSegonPlaInfos = new ArrayList<>();
-		var monitorTasques = monitortasquesService.findAll();
+		var monitorTasques = monitorTasquesService.findAll();
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		if (monitorTasques == null) {
 			return tasquesSegonPlaInfos;

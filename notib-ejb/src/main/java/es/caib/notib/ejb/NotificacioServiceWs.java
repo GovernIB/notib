@@ -18,6 +18,7 @@ import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.ejb.helper.UsuariAuthHelper;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -29,6 +30,7 @@ import javax.xml.bind.annotation.XmlElement;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2> implements es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2 {
 

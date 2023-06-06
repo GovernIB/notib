@@ -6,6 +6,7 @@ package es.caib.notib.ejb;
 import es.caib.notib.logic.intf.ws.adviser.common.Opciones;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
 import javax.ejb.Stateless;
@@ -19,6 +20,7 @@ import java.math.BigInteger;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 public class AdviserServiceWs extends AbstractService<es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2> implements es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2 {
 

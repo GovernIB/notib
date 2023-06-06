@@ -20,6 +20,7 @@ import es.caib.notib.ejb.helper.UsuariAuthHelper;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import org.jboss.ws.api.annotation.WebContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.Resource;
 import javax.ejb.SessionContext;
@@ -35,6 +36,7 @@ import javax.xml.bind.annotation.XmlElement;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 @WebService(

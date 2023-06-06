@@ -6,6 +6,7 @@ package es.caib.notib.ejb;
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
 import es.caib.notib.logic.intf.dto.ProcessosInicialsEnum;
 import es.caib.notib.logic.intf.dto.UsuariDto;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -18,6 +19,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.service.AplicacioService> implements es.caib.notib.logic.intf.service.AplicacioService {
 

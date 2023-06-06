@@ -15,6 +15,7 @@ import es.caib.notib.logic.intf.dto.TipusDocumentDto;
 import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -30,6 +31,7 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 public class EntitatService extends AbstractService<es.caib.notib.logic.intf.service.EntitatService> implements es.caib.notib.logic.intf.service.EntitatService {
 

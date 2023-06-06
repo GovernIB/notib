@@ -6,6 +6,7 @@ package es.caib.notib.ejb;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
 import es.caib.notib.logic.intf.exception.JustificantException;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -17,6 +18,7 @@ import javax.ejb.Stateless;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 public class JustificantService extends AbstractService<es.caib.notib.logic.intf.service.JustificantService> implements es.caib.notib.logic.intf.service.JustificantService {
 

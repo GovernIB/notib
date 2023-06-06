@@ -31,7 +31,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     @Autowired
     private AplicacioService aplicacioService;
     @Autowired
-    private OrganGestorService organService;
+    private OrganGestorService organGestorService;
 
     public static int counter = 0;
 
@@ -54,7 +54,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                         configService.crearPropietatsConfigPerEntitats();
                         break;
                     case SINCRONITZAR_ORGANS_NOMS_MULTIDIOMA:
-                        organService.sincronitzarOrganNomMultidioma(null);
+                        organGestorService.sincronitzarOrganNomMultidioma(null);
                         break;
                     default:
                         log.error("Procés inicial no definit");

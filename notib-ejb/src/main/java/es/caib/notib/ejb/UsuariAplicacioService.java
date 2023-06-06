@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -18,6 +19,7 @@ import javax.ejb.Stateless;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 public class UsuariAplicacioService extends AbstractService<es.caib.notib.logic.intf.service.UsuariAplicacioService> implements es.caib.notib.logic.intf.service.UsuariAplicacioService {
 

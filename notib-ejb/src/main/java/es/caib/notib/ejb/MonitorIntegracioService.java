@@ -9,6 +9,7 @@ import es.caib.notib.logic.intf.dto.IntegracioDto;
 import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -21,6 +22,7 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 public class MonitorIntegracioService extends AbstractService<es.caib.notib.logic.intf.service.MonitorIntegracioService> implements es.caib.notib.logic.intf.service.MonitorIntegracioService {
 

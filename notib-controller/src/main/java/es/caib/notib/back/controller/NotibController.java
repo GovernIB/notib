@@ -7,7 +7,6 @@ import es.caib.notib.back.helper.AjaxHelper;
 import es.caib.notib.back.helper.EntitatHelper;
 import es.caib.notib.back.helper.ModalHelper;
 import es.caib.notib.back.helper.RolHelper;
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -168,6 +167,9 @@ public class NotibController implements ErrorController {
 		}
 		public String getThrowableClassName() {
 			return throwable != null ? throwable.getClass().getName() : "";
+		}
+		public String getThrowableCauseClassName() {
+			return throwable != null && throwable.getCause() != null ? throwable.getCause().getClass().getName() : "";
 		}
 		public String getExceptionMessage() {
 			return exceptionMessage;

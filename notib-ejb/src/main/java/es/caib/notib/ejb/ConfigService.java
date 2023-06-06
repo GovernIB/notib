@@ -5,6 +5,7 @@ package es.caib.notib.ejb;
 
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.dto.config.ConfigGroupDto;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -17,6 +18,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 public class ConfigService extends AbstractService<es.caib.notib.logic.intf.service.ConfigService> implements es.caib.notib.logic.intf.service.ConfigService {
 

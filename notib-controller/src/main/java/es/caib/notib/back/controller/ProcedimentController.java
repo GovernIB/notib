@@ -75,8 +75,6 @@ public class ProcedimentController extends BaseUserController {
 	private PagadorCieService pagadorCieService;
 	@Autowired
 	private AplicacioService aplicacioService;
-	@Autowired
-	private PagadorCieService cieService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
@@ -194,7 +192,7 @@ public class ProcedimentController extends BaseUserController {
 			model.addAttribute("errors", bindingResult.getAllErrors());
 			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
+			List<IdentificadorTextDto> cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("cieList", cieList);
 			return "procedimentAdminForm";
 		}
@@ -232,7 +230,7 @@ public class ProcedimentController extends BaseUserController {
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		boolean isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		List<IdentificadorTextDto> postal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
-		List<IdentificadorTextDto> cie = cieService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
+		List<IdentificadorTextDto> cie = pagadorCieService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
 		return Operadors.builder().operadorsPostal(postal).operadorsCie(cie).build();
 	}
 
@@ -290,7 +288,7 @@ public class ProcedimentController extends BaseUserController {
 		model.addAttribute(procSerCommand);
 		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("operadorPostalList", operadorPostalList);
-		List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
+		List<IdentificadorTextDto> cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("cieList", cieList);
 		return "procedimentAdminForm";
 	}

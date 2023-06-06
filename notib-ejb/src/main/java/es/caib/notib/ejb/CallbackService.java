@@ -1,5 +1,7 @@
 package es.caib.notib.ejb;
 
+import org.springframework.context.annotation.Primary;
+
 import javax.annotation.security.PermitAll;
 import javax.ejb.Stateless;
 
@@ -10,6 +12,7 @@ import javax.ejb.Stateless;
  * @author Limit Tecnologies <limit@limit.es>
  *
  */
+@Primary
 @Stateless
 public class CallbackService extends AbstractService<es.caib.notib.logic.intf.service.CallbackService> implements es.caib.notib.logic.intf.service.CallbackService {
 	

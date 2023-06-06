@@ -61,7 +61,7 @@ public class EntitatController extends BaseController {
 	@Autowired
 	private OperadorPostalService operadorPostalService;
 	@Autowired
-	private PagadorCieService cieService;
+	private PagadorCieService pagadorCieService;
 	@Autowired
 	private AplicacioService aplicacioService;
 	@Autowired
@@ -113,7 +113,7 @@ public class EntitatController extends BaseController {
 		var operadorPostalList = entitat != null ? operadorPostalService.findPagadorsByEntitat(entitat) : operadorPostalService.findAllIdentificadorText();
 		model.addAttribute("operadorPostalList", operadorPostalList);
 		model.addAttribute("entitatNova", entitat != null && entitat.getId() != null);
-		var cieList = entitat != null ? cieService.findPagadorsByEntitat(entitat) : cieService.findAllIdentificadorText();
+		var cieList = entitat != null ? pagadorCieService.findPagadorsByEntitat(entitat) : pagadorCieService.findAllIdentificadorText();
 		model.addAttribute("cieList", cieList);
 		return "entitatForm";
 	}
@@ -166,7 +166,7 @@ public class EntitatController extends BaseController {
 		if (bindingResult.hasErrors()) {
 			var operadorPostalList = operadorPostalService.findAllIdentificadorText();
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			var cieList = cieService.findAllIdentificadorText();
+			var cieList = pagadorCieService.findAllIdentificadorText();
 			model.addAttribute("cieList", cieList);
 			model.addAttribute("errors", bindingResult.getAllErrors());
 			model.addAttribute("oficinaSelected", command.getOficina());

@@ -13,6 +13,7 @@ import es.caib.notib.logic.intf.dto.cie.CieFiltreDto;
 import es.caib.notib.logic.intf.dto.cie.CieTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -25,6 +26,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 public class PagadorCieService extends AbstractService<es.caib.notib.logic.intf.service.PagadorCieService> implements es.caib.notib.logic.intf.service.PagadorCieService {
 

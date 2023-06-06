@@ -22,6 +22,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -39,7 +40,7 @@ public class EntitatServiceIT extends BaseServiceTestV2 {
 
 	@Autowired
 	PermisosHelper permisosHelper;
-	@Autowired
+	@PersistenceContext
 	private EntityManager entityManager;
 	@Autowired
 	protected EntitatService entitatService;

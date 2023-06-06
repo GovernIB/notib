@@ -20,6 +20,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorFiltreDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.organisme.PrediccioSincronitzacio;
 import es.caib.notib.logic.intf.exception.NotFoundException;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -33,6 +34,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf.service.OrganGestorService> implements es.caib.notib.logic.intf.service.OrganGestorService {
 

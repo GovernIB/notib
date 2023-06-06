@@ -72,6 +72,7 @@
 		<exclusions>
 			<module name="notib.ear"/>
 			<module name="notib-back.war"/>
+			<module name="notib-api-externa.ear"/>
 		</exclusions>
 		<dependencies>
 			<module name="deployment.notib-service-intf"/>
@@ -86,6 +87,7 @@
 		<exclusions>
 			<module name="notib.ear"/>
 			<module name="notib-back.war"/>
+			<module name="notib-api-interna.ear"/>
 		</exclusions>
 		<dependencies>
 			<module name="deployment.notib-service-intf"/>

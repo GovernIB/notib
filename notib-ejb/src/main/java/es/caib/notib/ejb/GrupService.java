@@ -11,6 +11,7 @@ import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -22,6 +23,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 public class GrupService extends AbstractService<es.caib.notib.logic.intf.service.GrupService> implements es.caib.notib.logic.intf.service.GrupService {
 

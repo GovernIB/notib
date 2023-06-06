@@ -7,16 +7,12 @@ import es.caib.notib.back.helper.MessageHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
-import es.caib.notib.logic.intf.dto.Arbre;
 import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
-import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.exception.NotFoundException;
-import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
@@ -24,8 +20,6 @@ import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -56,15 +50,11 @@ public class OrganGestorArbreController extends BaseUserController {
     @Autowired
     private EntitatService entitatService;
     @Autowired
-    private OrganGestorController controller;
-    @Autowired
-    private OrganGestorService organService;
+    private OrganGestorService organGestorService;
     @Autowired
     private OperadorPostalService operadorPostalService;
     @Autowired
-    private PagadorCieService cieService;
-    @Autowired
-    private AplicacioService aplicacioService;
+    private PagadorCieService pagadorCieService;
     @Autowired
     private PermisosService permisosService;
 
@@ -73,8 +63,8 @@ public class OrganGestorArbreController extends BaseUserController {
 
         try {
             var ti = System.currentTimeMillis();
-            var entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
-            var filtres = controller.getFiltreCommand(request);
+            var entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
+            var filtres = OrganGestorController.getFiltreCommand(request);
             model.addAttribute("organGestorFiltreCommand", filtres);
             model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, "es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum."));
             var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
@@ -84,7 +74,7 @@ public class OrganGestorArbreController extends BaseUserController {
 //            System.out.println(">>>>>>>>>>>>>>>> ARBRE >>> T1: " + (tf - ti) + "ms");
 //            ti = tf;
 
-            var arbre = organService.generarArbreOrgans(entitat, filtres.asDto(), isAdminOrgan, organ);
+            var arbre = organGestorService.generarArbreOrgans(entitat, filtres.asDto(), isAdminOrgan, organ);
             model.addAttribute("arbreOrgans", arbre);
             model.addAttribute("filtresEmpty", filtres.isEmpty());
             model.addAttribute("isFiltre", "true".equals(filtres.getIsFiltre()));
@@ -123,7 +113,7 @@ public class OrganGestorArbreController extends BaseUserController {
     @RequestMapping(method = RequestMethod.POST, value="/guardar")
     public String guardarOrgan(HttpServletRequest request, @Valid OrganGestorCommand command, BindingResult bindingResult, Model model) {
 
-        var entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
+        var entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
         var organ = OrganGestorCommand.asDto(command);
         var msg = "";
         if (bindingResult.hasErrors()) {
@@ -131,9 +121,9 @@ public class OrganGestorArbreController extends BaseUserController {
             msg = "organgestor.arbre.error.guardar";
             return getAjaxControllerReturnValueError(request,"redirect:./", msg);
         }
-        organ.setLlibreNom(command.getLlibre() != null ? organService.getLlibreOrganisme(entitat.getId(), organ.getCodi()).getNomLlarg() : null);
+        organ.setLlibreNom(command.getLlibre() != null ? organGestorService.getLlibreOrganisme(entitat.getId(), organ.getCodi()).getNomLlarg() : null);
         if (command.getOficina() != null) {
-            var oficines = organService.getOficinesSIR(entitat.getId(), organ.getCodi(),true);
+            var oficines = organGestorService.getOficinesSIR(entitat.getId(), organ.getCodi(),true);
             String oficinaNom = null;
             for (var oficina : oficines) {
                 if (oficina.getCodi().equals(organ.getCodi())) {
@@ -145,7 +135,7 @@ public class OrganGestorArbreController extends BaseUserController {
 
         if (command.getId() != null) {
             msg = "organgestor.controller.update.nom.ok";
-            organService.update(organ);
+            organGestorService.update(organ);
         }
         return getAjaxControllerReturnValueSuccess(request, "redirect:./", msg);
     }
@@ -155,13 +145,13 @@ public class OrganGestorArbreController extends BaseUserController {
 
         try {
             model.addAttribute("desactivarAvisos", true);
-            var entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
+            var entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
             var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
             var operadorPostalList = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, codi, isAdminOrgan);
             model.addAttribute("operadorPostalList", operadorPostalList);
-            var cieList = cieService.findNoCaducatsByEntitatAndOrgan(entitat, codi, isAdminOrgan);
+            var cieList = pagadorCieService.findNoCaducatsByEntitatAndOrgan(entitat, codi, isAdminOrgan);
             model.addAttribute("cieList", cieList);
-            var o = organService.findByCodi(entitat.getId(), codi);
+            var o = organGestorService.findByCodi(entitat.getId(), codi);
             var usr = SecurityContextHolder.getContext().getAuthentication().getName();
             if (o == null || (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, codi, PermisEnum.ADMIN))) {
                 throw new NotFoundException(codi, OrganGestorDto.class);
@@ -192,7 +182,7 @@ public class OrganGestorArbreController extends BaseUserController {
 //        System.out.println(">>>>>>>>>>>>>>>> ARBRE >>> T2.1: " + (tf - ti) + "ms");
 //        ti = tf;
 
-        model.addAttribute("organsEntitat", organService.getOrgansAsList());
+        model.addAttribute("organsEntitat", organGestorService.getOrgansAsList());
         model.addAttribute("id", organ != null && organ.getId() != null ? organ.getId() : 0);
         model.addAttribute("organGestorCommand", command);
         model.addAttribute("entitat", entitat);
@@ -205,7 +195,7 @@ public class OrganGestorArbreController extends BaseUserController {
 //        ti = tf;
 
         if (!entitat.isOficinaEntitat()) {
-            var oficinesEntitat = organService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(),true);    // <-- TODO: El problema està aquí
+            var oficinesEntitat = organGestorService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(),true);    // <-- TODO: El problema està aquí
             model.addAttribute("oficinesEntitat", oficinesEntitat);
         }
         if (organ == null) {
@@ -217,14 +207,14 @@ public class OrganGestorArbreController extends BaseUserController {
 //        ti = tf;
 
         List<LlibreDto> llibres = new ArrayList<>();
-        llibres.add(organService.getLlibreOrganisme(entitat.getId(), organ.getCodi()));
+        llibres.add(organGestorService.getLlibreOrganisme(entitat.getId(), organ.getCodi()));
         model.addAttribute("llibres", llibres);
 
 //        tf = System.currentTimeMillis();
 //        System.out.println(">>>>>>>>>>>>>>>> ARBRE >>> T2.4: " + (tf - ti) + "ms");
 //        ti = tf;
 
-        var oficines = organService.getOficinesSIR(entitat.getId(), organ.getCodi(),false);
+        var oficines = organGestorService.getOficinesSIR(entitat.getId(), organ.getCodi(),false);
         model.addAttribute("oficines", oficines);
 
 //        tf = System.currentTimeMillis();

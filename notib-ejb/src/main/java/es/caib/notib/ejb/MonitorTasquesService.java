@@ -2,12 +2,14 @@ package es.caib.notib.ejb;
 
 import es.caib.notib.logic.intf.monitor.MonitorTascaEstat;
 import es.caib.notib.logic.intf.monitor.MonitorTascaInfo;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
 import javax.ejb.Stateless;
 import java.util.Date;
 import java.util.List;
 
+@Primary
 @Stateless
 public class MonitorTasquesService extends AbstractService<es.caib.notib.logic.intf.service.MonitorTasquesService> implements es.caib.notib.logic.intf.service.MonitorTasquesService {
 

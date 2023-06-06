@@ -59,9 +59,7 @@ public class OrganGestorController extends BaseUserController{
 	@Autowired
 	private OperadorPostalService operadorPostalService;
 	@Autowired
-	private PagadorCieService cieService;
-	@Autowired
-	private OrganGestorService organService;
+	private PagadorCieService pagadorCieService;
 
 
 	@RequestMapping(method = RequestMethod.GET)
@@ -70,7 +68,7 @@ public class OrganGestorController extends BaseUserController{
 		var entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
 		var filtres = getFiltreCommand(request);
 		model.addAttribute("organGestorFiltreCommand", filtres);
-		model.addAttribute("organsEntitat", organService.getOrgansAsList(entitat));
+		model.addAttribute("organsEntitat", organGestorService.getOrgansAsList(entitat));
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
 		var estats = EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, "es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.");
 		model.addAttribute("organGestorEstats", estats);
@@ -120,7 +118,7 @@ public class OrganGestorController extends BaseUserController{
 			model.addAttribute("setOficina", !entitat.isOficinaEntitat());
 			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			var cieList = cieService.findNoCaducatsByEntitat(entitat);
+			var cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("cieList", cieList);
 			if (organGestorCommand.getId() != null) {
 				model.addAttribute("isModificacio", true);
@@ -148,7 +146,7 @@ public class OrganGestorController extends BaseUserController{
 			model.addAttribute("isModificacio", true);
 			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			var cieList = cieService.findNoCaducatsByEntitat(entitat);
+			var cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("cieList", cieList);
 			return "organGestorForm";
 		} catch (Exception e) {
@@ -283,7 +281,7 @@ public class OrganGestorController extends BaseUserController{
 		return organGestorService.getOficinesSIR(entitat.getId(), organGestorDir3Codi, false);
 	}
 
-	public OrganGestorFiltreCommand getFiltreCommand(HttpServletRequest request) {
+	public static OrganGestorFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
 		var organGestorFiltreCommand = (OrganGestorFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, ORGANS_FILTRE);
 		if (organGestorFiltreCommand != null) {

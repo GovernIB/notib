@@ -101,7 +101,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @Autowired
     private NotificacioBackHelper notificacioListHelper;
     @Autowired
-    private PermisosService permisService;
+    private PermisosService permisosService;
     @Autowired
     private CallbackService callbackService;
 
@@ -837,8 +837,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         model.addAttribute("eventTipus", EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class, text));
         var permisGestio = false;
         if (notificacio != null && notificacio.getProcediment() != null && !notificacio.getProcedimentCodiNotib().isEmpty()) {
-//            permisGestio = permisService.hasNotificacioPermis(notificacioId, entitatActual.getId(), notificacio.getUsuariCodi(), PermisEnum.GESTIO);
-            permisGestio = permisService.hasNotificacioPermis(notificacioId, entitatActual.getId(), getCodiUsuariActual(), PermisEnum.GESTIO);
+            permisGestio = permisosService.hasNotificacioPermis(notificacioId, entitatActual.getId(), getCodiUsuariActual(), PermisEnum.GESTIO);
             permisGestio = permisGestio || procedimentService.hasPermisProcediment(notificacio.getProcediment().getId(), PermisEnum.GESTIO);
         }
         model.addAttribute("permisGestio", permisGestio);

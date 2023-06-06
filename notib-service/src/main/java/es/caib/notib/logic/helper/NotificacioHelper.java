@@ -51,6 +51,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +102,8 @@ public class NotificacioHelper {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private MessageHelper messageHelper;
-	@Autowired
+
+	@PersistenceContext
 	private EntityManager entityManager;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

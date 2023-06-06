@@ -8,6 +8,7 @@ import es.caib.notib.logic.intf.ws.adviser.common.Opciones;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
 import org.jboss.ws.api.annotation.WebContext;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
 import javax.ejb.Stateless;
@@ -25,6 +26,7 @@ import java.math.BigInteger;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 @WebService(

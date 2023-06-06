@@ -4,6 +4,7 @@ import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatSobreDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -15,6 +16,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 public class PagadorCieFormatSobreService extends AbstractService<es.caib.notib.logic.intf.service.PagadorCieFormatSobreService> implements es.caib.notib.logic.intf.service.PagadorCieFormatSobreService {
 

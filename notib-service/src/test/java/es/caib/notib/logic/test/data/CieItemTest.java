@@ -13,7 +13,7 @@ import java.util.Date;
 @Component
 public class CieItemTest extends DatabaseItemTest<CieDataDto>{
     @Autowired
-    protected PagadorCieService cieService;
+    protected PagadorCieService pagadorCieService;
     @Autowired
     protected AuthenticationTest authenticationTest;
     @Autowired
@@ -24,13 +24,13 @@ public class CieItemTest extends DatabaseItemTest<CieDataDto>{
 
     @Override
     public CieDataDto create(Object element, Long entitatId) throws Exception{
-        return cieService.upsert(entitatId, (CieDataDto) element);
+        return pagadorCieService.upsert(entitatId, (CieDataDto) element);
     }
 
     @Override
     public void delete(Long entitatId, CieDataDto object) {
         authenticationTest.autenticarUsuari("admin");
-        cieService.delete(object.getId());
+        pagadorCieService.delete(object.getId());
     }
 
 //    @Override

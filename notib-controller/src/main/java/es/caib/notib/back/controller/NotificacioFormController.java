@@ -734,7 +734,6 @@ public class NotificacioFormController extends BaseUserController {
         if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
             organFiltreProcs = getOrganGestorActual(request).getCodi();
         }
-        var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
         List<CodiValorOrganGestorComuDto> procedimentsDisponibles = procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organFiltreProcs, rol, tipusEnviament);
         List<CodiValorOrganGestorComuDto> serveisDisponibles = serveiService.getServeisOrganNotificables(entitatActual.getId(), organFiltreProcs, rol, tipusEnviament);
 

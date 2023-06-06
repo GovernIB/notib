@@ -15,6 +15,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaTableItemDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -28,6 +29,7 @@ import java.nio.file.NoSuchFileException;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 public class NotificacioMassivaService extends AbstractService<es.caib.notib.logic.intf.service.NotificacioMassivaService> implements es.caib.notib.logic.intf.service.NotificacioMassivaService {
 

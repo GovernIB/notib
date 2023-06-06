@@ -23,6 +23,7 @@ import es.caib.notib.logic.intf.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerSimpleDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -35,6 +36,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Primary
 @Stateless
 public class ProcedimentService extends AbstractService<es.caib.notib.logic.intf.service.ProcedimentService> implements es.caib.notib.logic.intf.service.ProcedimentService {
 

@@ -13,7 +13,6 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.service.EntitatService;
-import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PagadorCieService;
@@ -50,8 +49,6 @@ public class ProcedimentPermisController extends BaseUserController{
 	OperadorPostalService operadorPostalService;
 	@Autowired
 	PagadorCieService pagadorCieService;
-	@Autowired
-	GrupService grupsService;
 	@Autowired
 	OrganGestorService organGestorService;
 

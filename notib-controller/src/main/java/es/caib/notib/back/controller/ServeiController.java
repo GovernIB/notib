@@ -24,7 +24,6 @@ import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PagadorCieService;
-import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.ServeiService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,8 +61,6 @@ public class ServeiController extends BaseUserController{
 	@Autowired
 	private ServeiService serveiService;
 	@Autowired
-	private ProcedimentService procedimentService;
-	@Autowired
 	private OrganGestorService organGestorService;
 	@Autowired
 	private EntitatService entitatService;
@@ -73,8 +70,6 @@ public class ServeiController extends BaseUserController{
 	private PagadorCieService pagadorCieService;
 	@Autowired
 	private AplicacioService aplicacioService;
-	@Autowired
-	private PagadorCieService cieService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
@@ -205,7 +200,7 @@ public class ServeiController extends BaseUserController{
 			model.addAttribute("errors", bindingResult.getAllErrors());
 			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
+			List<IdentificadorTextDto> cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("cieList", cieList);
 			return "serveiAdminForm";
 		}
@@ -261,7 +256,7 @@ public class ServeiController extends BaseUserController{
 		model.addAttribute(procSerCommand);
 		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("operadorPostalList", operadorPostalList);
-		List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
+		List<IdentificadorTextDto> cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("cieList", cieList);
 		return "serveiAdminForm";
 	}
