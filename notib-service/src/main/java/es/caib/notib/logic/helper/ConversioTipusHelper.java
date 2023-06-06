@@ -34,6 +34,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioInfoDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaDataDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaTableItemDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
@@ -198,6 +199,22 @@ public class ConversioTipusHelper {
 								entity.getCreatedBy().ifPresent((usuari) -> {
 									dto.setCreatedByNom(usuari.getNom());
 									dto.setCreatedByCodi(usuari.getCodi());
+								});
+							}
+						}
+				).
+				register();
+
+		mapperFactory.classMap(NotificacioMassivaEntity.class, NotificacioMassivaDataDto.class).
+				byDefault().
+				customize(new CustomMapper<>() {
+							@Override
+							public void mapAtoB(NotificacioMassivaEntity entity, NotificacioMassivaDataDto dto, MappingContext context) {
+								entity.getCreatedBy().ifPresent((usuari) -> {
+									var usr = new UsuariDto();
+									usr.setNom(usuari.getNomSencer());
+									usr.setCodi(usuari.getCodi());
+									dto.setCreatedBy(usr);
 								});
 							}
 						}

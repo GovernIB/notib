@@ -33,7 +33,7 @@ import java.util.Date;
 @RequestMapping("/api/services/notificacioV22")
 public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseController {
 
-	@RequestMapping(value = "/", method = RequestMethod.POST, produces="application/json")
+	@RequestMapping(value = "/alta", method = RequestMethod.POST, produces="application/json")
 	@ResponseStatus(HttpStatus.CREATED)
 	@ResponseBody
 	public RespostaAltaV2 alta(@RequestBody NotificacioV2 notificacio, HttpServletRequest request, HttpServletResponse response) {

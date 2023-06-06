@@ -10,7 +10,6 @@ import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
@@ -25,13 +24,14 @@ import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.intf.service.ServeiService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -49,14 +49,10 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  *
  */
+@Slf4j
 @Controller
 @RequestMapping("/servei")
 public class ServeiController extends BaseUserController{
-	
-	private final static String SERVEIS_FILTRE = "serveis_filtre";
-	private final static String SERVEIS_FILTRE_MODAL = "serveis_filtre_modal";
-
-	private String currentFiltre = SERVEIS_FILTRE;
 
 	@Autowired
 	private ServeiService serveiService;
@@ -71,12 +67,17 @@ public class ServeiController extends BaseUserController{
 	@Autowired
 	private AplicacioService aplicacioService;
 
-	@RequestMapping(method = RequestMethod.GET)
+	private static final String SERVEIS_FILTRE = "serveis_filtre";
+	private static final String SERVEIS_FILTRE_MODAL = "serveis_filtre_modal";
+	private String currentFiltre = SERVEIS_FILTRE;
+
+	@GetMapping
 	public String get(HttpServletRequest request, Model model) {
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
-		this.currentFiltre = SERVEIS_FILTRE;
-		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
+
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var organGestorActual = getOrganGestorActual(request);
+		currentFiltre = SERVEIS_FILTRE;
+		var procSerFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
 		model.addAttribute("procedimentEstats", EnumHelper.getOptionsForEnum(ProcedimentEstat.class, "es.caib.notib.logic.intf.dto.procediment.ProcedimentEstat."));
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
@@ -85,24 +86,23 @@ public class ServeiController extends BaseUserController{
 		return "serveiListPage";
 	}
 
-	@RequestMapping(value = "/filtre/codi/{serveiCodi}", method = RequestMethod.GET)
+	@GetMapping(value = "/filtre/codi/{serveiCodi}")
 	public String getFiltratByOrganGestor(HttpServletRequest request,  @PathVariable String serveiCodi, Model model) {
 
-		this.currentFiltre = SERVEIS_FILTRE;
-		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
+		currentFiltre = SERVEIS_FILTRE;
+		var procSerFiltreCommand = getFiltreCommand(request);
 		procSerFiltreCommand.setCodi(serveiCodi);
 		RequestSessionHelper.actualitzarObjecteSessio(request, this.currentFiltre, procSerFiltreCommand);
 		return "redirect:/servei";
 	}
 
-	@RequestMapping(value = "/organ/{organCodi}", method = RequestMethod.GET)
-	public String getByOrganGestor(HttpServletRequest request,
-								   @PathVariable String organCodi,
-								   Model model) {
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
-		this.currentFiltre = SERVEIS_FILTRE_MODAL;
-		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
+	@GetMapping(value = "/organ/{organCodi}")
+	public String getByOrganGestor(HttpServletRequest request, @PathVariable String organCodi, Model model) {
+
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var organGestorActual = getOrganGestorActual(request);
+		currentFiltre = SERVEIS_FILTRE_MODAL;
+		var procSerFiltreCommand = getFiltreCommand(request);
 		procSerFiltreCommand.setOrganGestor(organCodi);
 		model.addAttribute("isModal", true);
 		model.addAttribute("organCodi", organCodi);
@@ -114,204 +114,126 @@ public class ServeiController extends BaseUserController{
 
 	private List<CodiValorEstatDto> findOrgansGestorsAccessibles (EntitatDto entitatActual, OrganGestorDto organGestorActual) {
 
-		List<CodiValorEstatDto> organsGestors = new ArrayList<CodiValorEstatDto>();
 		if (organGestorActual == null) {
-			organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
-		} else {
-			List<OrganGestorDto> organsDto = organGestorService.findDescencentsByCodi(entitatActual.getId(),
-					organGestorActual.getCodi());
-			for (OrganGestorDto organ: organsDto) {
-				organsGestors.add(CodiValorEstatDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
-			}
+			return organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
+		}
+		var organsDto = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
+		List<CodiValorEstatDto> organsGestors = new ArrayList<>();
+		for (var organ: organsDto) {
+			organsGestors.add(CodiValorEstatDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
 		}
 		return organsGestors;
 	}
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+
+	@GetMapping(value = "/datatable")
 	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request ) {
+	public DatatablesResponse datatable(HttpServletRequest request ) {
 		
-		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
-		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
-		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
-		
-		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
-		PaginaDto<ProcSerFormDto> serveis = new PaginaDto<>();
-		
+		var isUsuari = RolHelper.isUsuariActualUsuari(request);
+		var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
+		var isAdministrador = RolHelper.isUsuariActualAdministrador(request);
+		var organGestorActual = getOrganGestorActual(request);
+		var procSerFiltreCommand = getFiltreCommand(request);
+		var serveis = new PaginaDto<ProcSerFormDto>();
 		try {
 			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-
-			serveis = serveiService.findAmbFiltrePaginat(
-					entitat.getId(),
-					isUsuari,
-					isUsuariEntitat,
-					isAdministrador,
-					organGestorActual,
-					procSerFiltreCommand.asDto(),
-					DatatablesHelper.getPaginacioDtoFromRequest(request));
-		}catch(SecurityException e) {
-			MissatgesHelper.error(
-					request, 
-					getMessage(
-							request, 
-							"notificacio.controller.entitat.cap.assignada"));
+			serveis = serveiService.findAmbFiltrePaginat(entitat.getId(), isUsuari, isUsuariEntitat, isAdministrador, organGestorActual,
+					procSerFiltreCommand.asDto(), DatatablesHelper.getPaginacioDtoFromRequest(request));
+		} catch (SecurityException e) {
+			MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
 		}
-		return DatatablesHelper.getDatatableResponse(
-				request, 
-				serveis,
-				"id");
+		return DatatablesHelper.getDatatableResponse(request, serveis, "id");
 	}
 	
-	@RequestMapping(value = "/new", method = RequestMethod.GET)
-	public String newGet(
-			HttpServletRequest request,
-			Model model) {
+	@GetMapping(value = "/new")
+	public String newGet(HttpServletRequest request, Model model) {
 		return formGet(request, null, model);
 	}
 	
-	@RequestMapping(method = RequestMethod.POST)
-	public String post(	
-			HttpServletRequest request,
-			ProcSerFiltreCommand command,
-			Model model) {
+	@PostMapping
+	public String post(HttpServletRequest request, ProcSerFiltreCommand command, Model model) {
 		
-		RequestSessionHelper.actualitzarObjecteSessio(
-				request,
-				this.currentFiltre,
-				command);
-		
+		RequestSessionHelper.actualitzarObjecteSessio(request, this.currentFiltre, command);
 		return "serveiListPage";
 	}
 	
-	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
-	public String save(
-			HttpServletRequest request,
-			@Valid ProcSerCommand procSerCommand,
-			BindingResult bindingResult,
-			Model model) {
+	@PostMapping(value = "/newOrModify")
+	public String save(HttpServletRequest request, @Valid ProcSerCommand procSerCommand, BindingResult bindingResult, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			emplenarModelServei(
-					request,
-					procSerCommand.getId(),
-					model);
+			emplenarModelServei(request, procSerCommand.getId(), model);
 			model.addAttribute("errors", bindingResult.getAllErrors());
-			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
+			var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			List<IdentificadorTextDto> cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
+			var cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("cieList", cieList);
 			return "serveiAdminForm";
 		}
 		
 		if (procSerCommand.getId() != null) {
 			try {
-				serveiService.update(
-						procSerCommand.getEntitatId(),
-						ProcSerCommand.asDto(procSerCommand),
-						isAdministrador(request),
-						RolHelper.isUsuariActualAdministradorEntitat(request));
-				
+				serveiService.update(procSerCommand.getEntitatId(), ProcSerCommand.asDto(procSerCommand), isAdministrador(request), RolHelper.isUsuariActualAdministradorEntitat(request));
 			} catch(NotFoundException | ValidationException ev) {
-				logger.debug("Error al actualitzar el procediment", ev);
+				log.debug("Error al actualitzar el procediment", ev);
 			}
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../servei",
-					"servei.controller.modificat.ok");
-		} else {
-			serveiService.create(
-					procSerCommand.getEntitatId(),
-					ProcSerCommand.asDto(procSerCommand));
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../servei",
-					"servei.controller.creat.ok");
+			return getModalControllerReturnValueSuccess(request, "redirect:../servei", "servei.controller.modificat.ok");
 		}
+		serveiService.create(procSerCommand.getEntitatId(), ProcSerCommand.asDto(procSerCommand));
+		return getModalControllerReturnValueSuccess(request, "redirect:../servei", "servei.controller.creat.ok");
 	}
 	
-	@RequestMapping(value = "/{serveiId}", method = RequestMethod.GET)
-	public String formGet(
-			HttpServletRequest request, 
-			@PathVariable Long serveiId,
-			Model model) {
+	@GetMapping(value = "/{serveiId}")
+	public String formGet(HttpServletRequest request, @PathVariable Long serveiId, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		ProcSerCommand procSerCommand;
-		ProcSerDto servei = emplenarModelServei(
-				request,
-				serveiId,
-				model);
-		if (servei != null) {
-			procSerCommand = ProcSerCommand.asCommand(servei);
-//			procSerCommand.setEntitatId(servei.getEntitat().getId());
-//			if (servei.getPagadorcie() != null)
-//				procSerCommand.setPagadorCieId(servei.getPagadorcie().getId());
-//			if (servei.getPagadorpostal() != null)
-//				procSerCommand.setPagadorPostalId(servei.getPagadorpostal().getId());
-		} else {
-			procSerCommand = new ProcSerCommand();
-		}
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var servei = emplenarModelServei(request, serveiId, model);
+		var procSerCommand = servei != null ?ProcSerCommand.asCommand(servei) : new ProcSerCommand();
 		model.addAttribute(procSerCommand);
-		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
+		var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("operadorPostalList", operadorPostalList);
-		List<IdentificadorTextDto> cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
+		var cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("cieList", cieList);
 		return "serveiAdminForm";
 	}
 	
-	@RequestMapping(value = "/{serveiId}/delete", method = RequestMethod.GET)
-	public String delete(
-			HttpServletRequest request,
-			@PathVariable Long serveiId) {
-		
+	@GetMapping(value = "/{serveiId}/delete")
+	public String delete(HttpServletRequest request, @PathVariable Long serveiId) {
+
+		var redirect = "redirect:../../servei";
 		try {
-			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-			
+			var entitat = getEntitatActualComprovantPermisos(request);
 			if (serveiService.serveiEnUs(serveiId)) {
-				return getAjaxControllerReturnValueError(
-						request,
-						"redirect:../../servei",
-						"servei.controller.esborrat.enUs");
-			} else {
-				serveiService.delete(
-						entitat.getId(),
-						serveiId,
-						RolHelper.isUsuariActualAdministradorEntitat(request));
-				
-				return getAjaxControllerReturnValueSuccess(
-						request,
-						"redirect:../../servei",
-						"servei.controller.esborrat.ok");
+				return getAjaxControllerReturnValueError(request, redirect, "servei.controller.esborrat.enUs");
 			}
+			serveiService.delete(entitat.getId(), serveiId, RolHelper.isUsuariActualAdministradorEntitat(request));
+			return getAjaxControllerReturnValueSuccess(request, redirect, "servei.controller.esborrat.ok");
 		} catch (Exception e) {
-			return getAjaxControllerReturnValueError(
-					request,
-					"redirect:../../servei",
-					"servei.controller.esborrat.ko",
-					e);
+			return getAjaxControllerReturnValueError(request, redirect, "servei.controller.esborrat.ko", e);
 		}
 	}
 
-	@RequestMapping(value = "/{serveiId}/enable", method = RequestMethod.GET)
+	@GetMapping(value = "/{serveiId}/enable")
 	public String enable(HttpServletRequest request, @PathVariable Long serveiId) {
+
 		serveiService.updateActiu(serveiId, true);
 		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "servei.controller.activada.ok");
 	}
-	@RequestMapping(value = "/{serveiId}/disable", method = RequestMethod.GET)
+
+	@GetMapping(value = "/{serveiId}/disable")
 	public String disable(HttpServletRequest request, @PathVariable Long serveiId) {
+
 		serveiService.updateActiu(serveiId, false);
 		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "servei.controller.desactivada.ok");
 	}
 
-	@RequestMapping(value = "/{codiSia}/update", method = RequestMethod.GET)
+	@GetMapping(value = "/{codiSia}/update")
 	public String actualitzarProcediment(HttpServletRequest request, @PathVariable String codiSia) {
 
-		String urlResponse = "redirect:../../servei";
+		var urlResponse = "redirect:../../servei";
 		try {
-			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-			boolean trobat = serveiService.actualitzarServei(codiSia, entitat);
+			var entitat = getEntitatActualComprovantPermisos(request);
+			var trobat = serveiService.actualitzarServei(codiSia, entitat);
 			return trobat ?  getAjaxControllerReturnValueSuccess(request, urlResponse, "servei.controller.update.ok")
 					:  getAjaxControllerReturnValueError(request, urlResponse, "servei.controller.update.no.trobat");
 		} catch (Exception ex) {
@@ -319,82 +241,63 @@ public class ServeiController extends BaseUserController{
 		}
 	}
 	
-	@RequestMapping(value = "/update/auto", method = RequestMethod.GET)
-	public String actualitzacioAutomaticaGet(
-			HttpServletRequest request,
-			Model model) {
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+	@GetMapping(value = "/update/auto")
+	public String actualitzacioAutomaticaGet(HttpServletRequest request, Model model) {
+
+		var entitat = getEntitatActualComprovantPermisos(request);
 		model.addAttribute("isUpdatingProcediments", serveiService.isUpdatingServeis(entitat));
 		return "serveisActualitzacioForm";
 	}
 	
-	@RequestMapping(value = "/update/auto", method = RequestMethod.POST)
-	public String actualitzacioAutomaticaPost(
-			HttpServletRequest request,
-			Model model) {
+	@PostMapping(value = "/update/auto")
+	public String actualitzacioAutomaticaPost(HttpServletRequest request, Model model) {
 				
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
 		try {
 			serveiService.actualitzaServeis(entitat);
 		} catch (Exception e) {
-			logger.error("Error inesperat al actualitzar els serveis", e);
+			log.error("Error inesperat al actualitzar els serveis", e);
 			model.addAttribute("errors", e.getMessage());
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
+			var sw = new StringWriter();
+			var pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
 			MissatgesHelper.error(request, "Error: \n" + sw.toString());
 			return "serveisActualitzacioForm";
 		}
-		
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"/serveisActualitzacioForm",
-				"procediment.controller.update.auto.ok");
+		return getAjaxControllerReturnValueSuccess(request, "/serveisActualitzacioForm", "procediment.controller.update.auto.ok");
 	}
 	
-	@RequestMapping(value = "/update/auto/progres", method = RequestMethod.GET)
+	@GetMapping(value = "/update/auto/progres")
 	@ResponseBody
 	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+
+		var entitat = getEntitatActualComprovantPermisos(request);
 		return serveiService.getProgresActualitzacio(entitat.getDir3Codi());
 	}
-			
-	
-	private ProcSerFiltreCommand getFiltreCommand(
-			HttpServletRequest request) {
-		ProcSerFiltreCommand procSerFiltreCommand = (
-				ProcSerFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
-						request,
-						this.currentFiltre);
+
+	private ProcSerFiltreCommand getFiltreCommand(HttpServletRequest request) {
+
+		var procSerFiltreCommand = (ProcSerFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, currentFiltre);
 		if (procSerFiltreCommand == null) {
 			procSerFiltreCommand = new ProcSerFiltreCommand();
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					this.currentFiltre,
-					procSerFiltreCommand);
+			RequestSessionHelper.actualitzarObjecteSessio(request, currentFiltre, procSerFiltreCommand);
 		}
 		return procSerFiltreCommand;
 	}
 	
-	private ProcSerDto emplenarModelServei(
-			HttpServletRequest request,
-			Long serveiId,
-			Model model) {
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+	private ProcSerDto emplenarModelServei(HttpServletRequest request, Long serveiId, Model model) {
+
+		var entitat = getEntitatActualComprovantPermisos(request);
 		ProcSerDto servei = null;
-		
 		if (serveiId != null) {
-			servei = serveiService.findById(
-					entitat.getId(),
-					isAdministrador(request),
-					serveiId);
+			servei = serveiService.findById(entitat.getId(), isAdministrador(request), serveiId);
 			if (servei != null && servei.getOrganGestor() != null) {
 				servei.setOrganGestorNom(servei.getOrganGestor() + " - " + servei.getOrganGestorNom());
 			}
 			model.addAttribute(servei);
 		}
 		
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		var organGestorActual = getOrganGestorActual(request);
 		if (organGestorActual != null) {
 			model.addAttribute("pagadorsPostal", operadorPostalService.findByEntitatAndOrganGestor(entitat, organGestorActual));
 			model.addAttribute("pagadorsCie", pagadorCieService.findByEntitatAndOrganGestor(entitat, organGestorActual));
@@ -402,32 +305,25 @@ public class ServeiController extends BaseUserController{
 			model.addAttribute("pagadorsPostal", operadorPostalService.findByEntitat(entitat.getId()));
 			model.addAttribute("pagadorsCie", pagadorCieService.findByEntitat(entitat.getId()));
 		}
-		
 		if (servei != null) {
 			model.addAttribute("entitatId", servei.getEntitat().getId());
 		}
-		if (RolHelper.isUsuariActualAdministrador(request))
+		if (RolHelper.isUsuariActualAdministrador(request)) {
 			model.addAttribute("entitats", entitatService.findAll());
-		else
+		} else {
 			model.addAttribute("entitat", entitat);
-		
+		}
 		return servei;
 	}
 	
-	@RequestMapping(value = "/organisme/{organGestorCodi}", method = RequestMethod.GET)
-	private String emplenarOrganismeServei(
-			HttpServletRequest request,
-			@PathVariable String organGestorCodi,
-			Model model) {
+	@GetMapping(value = "/organisme/{organGestorCodi}")
+	public String emplenarOrganismeServei(HttpServletRequest request, @PathVariable String organGestorCodi, Model model) {
+
 		model.addAttribute("organisme", organGestorCodi);
 		return "redirect:/servei/new";
 	}
-	
 
-	private boolean isAdministrador(
-			HttpServletRequest request) {
+	private boolean isAdministrador(HttpServletRequest request) {
 		return RolHelper.isUsuariActualAdministrador(request);
 	}
-	
-	private static final Logger logger = LoggerFactory.getLogger(ServeiController.class);
 }

@@ -14,9 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +43,8 @@ public class ServeiGrupController extends BaseUserController{
 	@Autowired
 	GrupService grupService;
 
-	@RequestMapping(value = "/{serveiId}/grup", method = RequestMethod.GET)
+
+	@GetMapping(value = "/{serveiId}/grup")
 	public String permis(HttpServletRequest request, @PathVariable Long serveiId, Model model) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
@@ -50,12 +52,12 @@ public class ServeiGrupController extends BaseUserController{
 		return "serveiAdminGrup";
 	}
 	
-	@RequestMapping(value = "/{serveiId}/grup/new", method = RequestMethod.GET)
+	@GetMapping(value = "/{serveiId}/grup/new")
 	public String getNew(HttpServletRequest request, @PathVariable Long serveiId, Model model) {
 		return get(request, serveiId, null, model);
 	}
 	
-	@RequestMapping(value = "/{serveiId}/grup/{grupId}", method = RequestMethod.GET)
+	@GetMapping(value = "/{serveiId}/grup/{grupId}")
 	public String get(HttpServletRequest request, @PathVariable Long serveiId, @PathVariable Long grupId, Model model) {
 		
 		var serveiGrup = emplenarModelGrups(request, serveiId, grupId, model);
@@ -64,7 +66,7 @@ public class ServeiGrupController extends BaseUserController{
 		return "serveiAdminGrupForm";
 	}
 	
-	@RequestMapping(value = "/{serveiId}/grup/{grupId}/delete", method = RequestMethod.GET)
+	@GetMapping(value = "/{serveiId}/grup/{grupId}/delete")
 	@ResponseBody
 	public String delete(HttpServletRequest request, @PathVariable Long serveiId, @PathVariable Long grupId, Model model) {
 
@@ -90,7 +92,7 @@ public class ServeiGrupController extends BaseUserController{
 		return serveiGrups;
 	}
 	
-	@RequestMapping(value = "/{serveiId}/grup", method = RequestMethod.POST)
+	@PostMapping(value = "/{serveiId}/grup")
 	public String save(HttpServletRequest request, @PathVariable Long serveiId, @Valid ProcedimentGrupCommand command, BindingResult bindingResult, Model model) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
@@ -107,7 +109,7 @@ public class ServeiGrupController extends BaseUserController{
 		return getModalControllerReturnValueSuccess(request, url, msg);
 	}
 
-	@RequestMapping(value = "/{serveiId}/grup/datatable", method = RequestMethod.GET)
+	@GetMapping(value = "/{serveiId}/grup/datatable")
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request, @PathVariable Long serveiId, Model model) {
 

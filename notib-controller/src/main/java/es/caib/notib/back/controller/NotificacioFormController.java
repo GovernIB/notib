@@ -69,11 +69,12 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -98,13 +99,6 @@ import java.util.List;
 @Controller
 @RequestMapping("/notificacio")
 public class NotificacioFormController extends BaseUserController {
-
-    private final static String METADADES_ORIGEN = "metadades_origen";
-    private final static String METADADES_VALIDESA = "metadades_validesa";
-    private final static String METADADES_TIPO_DOCUMENTAL = "metadades_tipo_documental";
-    private final static String METADADES_MODO_FIRMA = "metadades_modo_firma";
-    private final static String EDIT_REFERER = "edit_referer";
-    private final static String ENVIAMENT_TIPUS = "enviament_tipus";
     
     @Autowired
     private AplicacioService aplicacioService;
@@ -128,17 +122,24 @@ public class NotificacioFormController extends BaseUserController {
     private GestioDocumentalService gestioDocumentalService;
     @Autowired
     private PermisosService permisosService;
-
     DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-
     private TipusEnviamentEnumDto tipusEnviament;
+    private static final String NOTIFICACIO_FORM = "notificacioForm";
+    private static final String METADADES_ORIGEN = "metadades_origen";
+    private static final String METADADES_VALIDESA = "metadades_validesa";
+    private static final String METADADES_TIPO_DOCUMENTAL = "metadades_tipo_documental";
+    private static final String METADADES_MODO_FIRMA = "metadades_modo_firma";
+    private static final String EDIT_REFERER = "edit_referer";
+    private static final String ENVIAMENT_TIPUS = "enviament_tipus";
+
+
 
     @RequestMapping(value = "/new/notificacio")
     public String altaNotificacio(HttpServletRequest request, Model model) {
 
         initForm(request, model, TipusEnviamentEnumDto.NOTIFICACIO);
         RequestSessionHelper.esborrarObjecteSessio(request, ENVIAMENT_TIPUS);
-        return "notificacioForm";
+        return NOTIFICACIO_FORM;
     }
 
     @RequestMapping(value = "/new/comunicacio")
@@ -146,7 +147,7 @@ public class NotificacioFormController extends BaseUserController {
 
         initForm(request, model, TipusEnviamentEnumDto.COMUNICACIO);
         RequestSessionHelper.esborrarObjecteSessio(request, ENVIAMENT_TIPUS);
-        return "notificacioForm";
+        return NOTIFICACIO_FORM;
     }
 
     @RequestMapping(value = "/new/comunicacioSIR")
@@ -154,7 +155,7 @@ public class NotificacioFormController extends BaseUserController {
 
         initForm(request, model, TipusEnviamentEnumDto.COMUNICACIO_SIR);
         RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENT_TIPUS, TipusEnviamentEnumDto.COMUNICACIO_SIR);
-        return "notificacioForm";
+        return NOTIFICACIO_FORM;
     }
 
     private void initForm(HttpServletRequest request, Model model, TipusEnviamentEnumDto tipusEnviament) {
@@ -164,8 +165,8 @@ public class NotificacioFormController extends BaseUserController {
         var entitatActual = EntitatHelper.getEntitatActual(request);
         var notificacioCommand = new NotificacioCommand();
         List<EnviamentCommand> enviaments = new ArrayList<>();
-        EnviamentCommand enviament = new EnviamentCommand();
-        EntregapostalCommand entregaPostal = new EntregapostalCommand();
+        var enviament = new EnviamentCommand();
+        var entregaPostal = new EntregapostalCommand();
         entregaPostal.setPaisCodi("ES");
         enviament.setEntregaPostal(entregaPostal);
         enviaments.add(enviament);
@@ -190,7 +191,7 @@ public class NotificacioFormController extends BaseUserController {
 
     }
 
-    @RequestMapping(value = "/organ/{organId}/procediments", method = RequestMethod.GET)
+    @GetMapping(value = "/organ/{organId}/procediments")
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(HttpServletRequest request, @PathVariable String organId) {
 
@@ -199,7 +200,7 @@ public class NotificacioFormController extends BaseUserController {
         return procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId, rol, tipusEnviament);
     }
 
-    @RequestMapping(value = "/organ/{organId}/serveis", method = RequestMethod.GET)
+    @GetMapping(value = "/organ/{organId}/serveis")
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getServeisOrgan(HttpServletRequest request, @PathVariable String organId) {
 
@@ -209,7 +210,7 @@ public class NotificacioFormController extends BaseUserController {
         return serveiService.getServeisOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId, rol, enviamentTipus);
     }
 
-    @RequestMapping(value = "/cercaUnitats", method = RequestMethod.GET)
+    @GetMapping(value = "/cercaUnitats")
     @ResponseBody
     public List<OrganGestorDto> getAdministracions(
             HttpServletRequest request,
@@ -223,8 +224,6 @@ public class NotificacioFormController extends BaseUserController {
 
         var codiNull = Strings.isNullOrEmpty(codi);
         var denominacioNull = Strings.isNullOrEmpty(denominacio);
-        var comunitatNull = comunitatAutonoma == null;
-//        if (comunitatNull && comunitatNull && (!codiNull || !denominacioNull) ||  !comunitatNull && codiNull && denominacioNull || codiNull && denominacioNull && comunitatNull) {
         if (codiNull && denominacioNull) {
             return new ArrayList<>();
         }
@@ -237,26 +236,26 @@ public class NotificacioFormController extends BaseUserController {
         }
     }
 
-    @RequestMapping(value = "/administracions/codi/{codi}", method = RequestMethod.GET)
+    @GetMapping(value = "/administracions/codi/{codi}")
     @ResponseBody
     public List<OrganGestorDto> getAdministracionsPerCodi(HttpServletRequest request, @PathVariable String codi, Model model) {
         return notificacioService.unitatsPerCodi(codi);
 
     }
 
-    @RequestMapping(value = "/administracions/denominacio/{denominacio}", method = RequestMethod.GET)
+    @GetMapping(value = "/administracions/denominacio/{denominacio}")
     @ResponseBody
     public List<OrganGestorDto> getAdministracionsPerDenominacio(HttpServletRequest request, @PathVariable String denominacio, Model model) {
         return notificacioService.unitatsPerDenominacio(denominacio);
     }
 
-    @RequestMapping(value = "/new/destinatari", method = RequestMethod.GET)
+    @GetMapping(value = "/new/destinatari")
     public PersonaCommand altaDestinatari(HttpServletRequest request, Model model) {
         return new PersonaCommand();
     }
 
     @ResponseBody
-    @RequestMapping(value = "/organ/oficina/{organCodi}")
+    @GetMapping(value = "/organ/oficina/{organCodi}")
     public OficinaDto getOficina(HttpServletRequest request, Model model, @PathVariable String organCodi) {
 
         var entitat = getEntitatActualComprovantPermisos(request);
@@ -269,7 +268,7 @@ public class NotificacioFormController extends BaseUserController {
         }
     }
 
-    @RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
+    @PostMapping(value = "/newOrModify")
     public String save(HttpServletRequest request, @Valid NotificacioCommand notificacioCommand, BindingResult bindingResult, Model model) throws IOException {
 
         log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. ");
@@ -314,7 +313,6 @@ public class NotificacioFormController extends BaseUserController {
             log.error(ExceptionUtils.getStackTrace(ex));
             MissatgesHelper.error(request, ex.getMessage());
             relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
-//            ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
             model.addAttribute("notificacioCommandV2", notificacioCommand);
             return "notificacioForm";
         }
@@ -390,7 +388,7 @@ public class NotificacioFormController extends BaseUserController {
         }
     }
 
-    @RequestMapping(value = "/valida/firma", method = RequestMethod.POST)
+    @PostMapping(value = "/valida/firma")
     @ResponseBody
     public FirmaValidDto validaFirmaDocument(HttpServletRequest request, @RequestParam(value = "fitxer") MultipartFile fitxer) throws IOException {
 
@@ -398,8 +396,6 @@ public class NotificacioFormController extends BaseUserController {
         var content = fitxer.getBytes();
         var contentType = fitxer.getContentType();
         var contingutBase64 = Base64.encodeBase64String(content);
-//        String arxiuGestdocId = gestioDocumentalService.guardarArxiuTemporal(contingutBase64);
-
         var firma = FirmaValidDto.builder().nom(nom).mida(fitxer.getSize()).mediaType(fitxer.getContentType()).build();
         if (!FileHelper.isPdf(contingutBase64)) {
             return firma;
@@ -425,29 +421,29 @@ public class NotificacioFormController extends BaseUserController {
         bindingResult.addError(new FieldError(bindingResult.getObjectName(), "arxiu[" + position + "]", "", true, codes, null, "La firma del document no és vàlida"));
     }
 
-    @RequestMapping(value = "/{notificacioId}/edit", method = RequestMethod.GET)
+    @GetMapping(value = "/{notificacioId}/edit")
     public String editar(HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
 
         var referer = request.getHeader("Referer");
         RequestSessionHelper.actualitzarObjecteSessio(request, EDIT_REFERER, referer);
         var notificacioDto = notificacioService.findAmbId(notificacioId, false);
         var notificacioCommand = NotificacioCommand.asCommand(notificacioDto);
+        var nomDocument = "nomDocument_";
         for(var i = 0; i < 5; i++) {
-//                if (notificacio.getDocument()[i] != null) {
             if (notificacioCommand.getDocuments()[i].getArxiuNom() != null) {
-                model.addAttribute("nomDocument_" + i, notificacioCommand.getDocuments()[i].getArxiuNom());
+                model.addAttribute(nomDocument + i, notificacioCommand.getDocuments()[i].getArxiuNom());
                 notificacioCommand.setTipusDocumentDefault(i, TipusDocumentEnumDto.ARXIU.name());
             }
             if (notificacioCommand.getDocuments()[i].getUuid() != null) {
-                model.addAttribute("nomDocument_" + i, notificacioCommand.getDocuments()[i].getUuid());
+                model.addAttribute(nomDocument + i, notificacioCommand.getDocuments()[i].getUuid());
                 notificacioCommand.setTipusDocumentDefault(i, TipusDocumentEnumDto.UUID.name());
             }
             if (notificacioCommand.getDocuments()[i].getCsv() != null) {
-                model.addAttribute("nomDocument_" + i, notificacioCommand.getDocuments()[i].getCsv());
+                model.addAttribute(nomDocument + i, notificacioCommand.getDocuments()[i].getCsv());
                 notificacioCommand.setTipusDocumentDefault(i, TipusDocumentEnumDto.CSV.name());
             }
             if (notificacioCommand.getDocuments()[i].getUrl() != null) {
-                model.addAttribute("nomDocument_" + i, notificacioCommand.getDocuments()[i].getUrl());
+                model.addAttribute(nomDocument + i, notificacioCommand.getDocuments()[i].getUrl());
                 notificacioCommand.setTipusDocumentDefault(i, TipusDocumentEnumDto.URL.name());
             }
         }
@@ -455,26 +451,26 @@ public class NotificacioFormController extends BaseUserController {
         return "notificacioForm";
     }
 
-    @RequestMapping(value = "/nivellsAdministracions", method = RequestMethod.GET)
+    @GetMapping(value = "/nivellsAdministracions")
     @ResponseBody
-    private List<CodiValorDto> getNivellsAdministracions(HttpServletRequest request, Model model) {
+    public List<CodiValorDto> getNivellsAdministracions(HttpServletRequest request, Model model) {
         return notificacioService.llistarNivellsAdministracions();
     }
 
 
-    @RequestMapping(value = "/comunitatsAutonomes", method = RequestMethod.GET)
+    @GetMapping(value = "/comunitatsAutonomes")
     @ResponseBody
-    private List<CodiValorDto> getComunitatsAutonomess(HttpServletRequest request, Model model) {
+    public List<CodiValorDto> getComunitatsAutonomess(HttpServletRequest request, Model model) {
         return notificacioService.llistarComunitatsAutonomes();
     }
 
-    @RequestMapping(value = "/provincies/{codiCA}", method = RequestMethod.GET)
+    @GetMapping(value = "/provincies/{codiCA}")
     @ResponseBody
-    private List<ProvinciesDto> getProvinciesPerCA(HttpServletRequest request, Model model, @PathVariable String codiCA) {
+    public List<ProvinciesDto> getProvinciesPerCA(HttpServletRequest request, Model model, @PathVariable String codiCA) {
         return notificacioService.llistarProvincies(codiCA);
     }
 
-    @RequestMapping(value = "/procediment/{procedimentId}/dades", method = RequestMethod.GET)
+    @GetMapping(value = "/procediment/{procedimentId}/dades")
     @ResponseBody
     public DadesProcediment getDadesProcSer(HttpServletRequest request, @PathVariable Long procedimentId) {
 
@@ -497,56 +493,48 @@ public class NotificacioFormController extends BaseUserController {
         dadesProcediment.setComu(procedimentActual.isComu());
         dadesProcediment.setEntregaCieActiva(procedimentActual.isEntregaCieActivaAlgunNivell());
         dadesProcediment.setEntregaCieVigent(procedimentActual.isEntregaCieVigent());
-        if (procedimentActual.isComu()) {
-            // Obtenim òrgans seleccionables
-            PermisEnum permis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
-                                TipusEnviamentEnumDto.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO :
-                                PermisEnum.NOTIFICACIO;
-            dadesProcediment.setOrgansDisponibles(permisosService.getOrgansCodisAmbPermisPerProcedimentComu(entitatActual.getId(), getCodiUsuariActual(), permis, procedimentActual));
-//        	List<ProcSerOrganDto> procedimentsOrgansAmbPermis = new ArrayList<ProcSerOrganDto>();
-//        	if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus)) {
-//                procedimentsOrgansAmbPermis = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNICACIO_SIR);
-//            } else {
-//        		procedimentsOrgansAmbPermis = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-//            }
-//            dadesProcediment.setOrgansDisponibles(procedimentService.findProcedimentsOrganCodiWithPermisByProcediment(procedimentActual, entitatActual.getDir3Codi(), procedimentsOrgansAmbPermis));
+        if (!procedimentActual.isComu()) {
+            return dadesProcediment;
         }
+            // Obtenim òrgans seleccionables
+        var permis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
+                                TipusEnviamentEnumDto.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
+        dadesProcediment.setOrgansDisponibles(permisosService.getOrgansCodisAmbPermisPerProcedimentComu(entitatActual.getId(), getCodiUsuariActual(), permis, procedimentActual));
         return dadesProcediment;
     }
 
-    @RequestMapping(value = "/paisos", method = RequestMethod.GET)
+    @GetMapping(value = "/paisos")
     @ResponseBody
-    private List<PaisosDto> getPaisos(HttpServletRequest request, Model model) {
+    public List<PaisosDto> getPaisos(HttpServletRequest request, Model model) {
         return notificacioService.llistarPaisos();
     }
 
-    @RequestMapping(value = "/provincies", method = RequestMethod.GET)
+    @GetMapping(value = "/provincies")
     @ResponseBody
-    private List<ProvinciesDto> getProvincies(HttpServletRequest request, Model model) {
+    public List<ProvinciesDto> getProvincies(HttpServletRequest request, Model model) {
         return notificacioService.llistarProvincies();
     }
 
-    @RequestMapping(value = "/localitats/{provinciaId}", method = RequestMethod.GET)
+    @GetMapping(value = "/localitats/{provinciaId}")
     @ResponseBody
-    private List<LocalitatsDto> getLocalitats(HttpServletRequest request, Model model, @PathVariable String provinciaId) {
+    public List<LocalitatsDto> getLocalitats(HttpServletRequest request, Model model, @PathVariable String provinciaId) {
         return notificacioService.llistarLocalitats(provinciaId);
     }
 
-    @RequestMapping(value = "/consultaDocumentIMetadadesCsv/consulta", method = RequestMethod.POST, headers="Content-Type=application/json")
+    @PostMapping(value = "/consultaDocumentIMetadadesCsv/consulta", headers="Content-Type=application/json")
     @ResponseBody
     public RespostaConsultaArxiuDto consultaDocumentIMetadadesCsv(HttpServletRequest request, @RequestBody String csv) {
 
         DocumentDto doc = null;
-        Boolean validacioIdCsv = notificacioService.validarIdCsv(csv);
+        var validacioIdCsv = notificacioService.validarIdCsv(csv);
 //        Boolean formatCsvValid = notificacioService.validarFormatCsv(csv); //TODO AQUEST VALIDACIO NOSE SI FUNCIONA
         if (validacioIdCsv) {
             doc = notificacioService.consultaDocumentIMetadades(csv, false);
         }
-//    	return prepararResposta(validacioIdCsv && formatCsvValid, doc, request);
         return prepararResposta(validacioIdCsv, doc, request);
     }
 
-    @RequestMapping(value = "/consultaDocumentIMetadadesUuid/consulta", method = RequestMethod.POST, headers="Content-Type=application/json" )
+    @PostMapping(value = "/consultaDocumentIMetadadesUuid/consulta", headers="Content-Type=application/json" )
     @ResponseBody
     public RespostaConsultaArxiuDto consultaDocumentIMetadadesUuid(HttpServletRequest request, @RequestBody String uuid) {
 
@@ -554,9 +542,9 @@ public class NotificacioFormController extends BaseUserController {
         return prepararResposta(true, doc, request);
     }
 
-    private RespostaConsultaArxiuDto prepararResposta(Boolean validacio, DocumentDto doc, HttpServletRequest request) {
+    private RespostaConsultaArxiuDto prepararResposta(boolean validacio, DocumentDto doc, HttpServletRequest request) {
 
-        var teMetadades = Boolean.FALSE;
+        var teMetadades = false;
         if (!validacio && doc == null) {
             return RespostaConsultaArxiuDto.builder().validacioIdCsv(false).documentExistent(false)
                     .metadadesExistents(teMetadades).origen(null).validesa(null).tipoDocumental(null).modoFirma(null).build();
@@ -578,15 +566,15 @@ public class NotificacioFormController extends BaseUserController {
                 .tipoDocumental(doc.getTipoDocumental()).modoFirma(doc.getModoFirma()).build();
     }
 
-    @RequestMapping(value = "/caducitatDiesNaturals/{dia}/{mes}/{any}", method = RequestMethod.GET)
+    @GetMapping(value = "/caducitatDiesNaturals/{dia}/{mes}/{any}")
     @ResponseBody
-    private long getDiesCaducitat(@PathVariable String dia, @PathVariable String mes, @PathVariable String any) throws ParseException {
+    public long getDiesCaducitat(@PathVariable String dia, @PathVariable String mes, @PathVariable String any) throws ParseException {
         return CaducitatHelper.getDiesEntreDates(df.parse(dia + "/" + mes + "/" + any));
     }
 
-    @RequestMapping(value = "/caducitatData/{dies}", method = RequestMethod.GET)
+    @GetMapping(value = "/caducitatData/{dies}")
     @ResponseBody
-    private String getDataCaducitat(@PathVariable int dies) {
+    public String getDataCaducitat(@PathVariable int dies) {
         return df.format(CaducitatHelper.sumarDiesNaturals(dies));
     }
 
@@ -623,43 +611,6 @@ public class NotificacioFormController extends BaseUserController {
         model.addAttribute("isPermesComunicacionsSirPropiaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.comunicacions.sir.internes", "false"));
     }
 
-
-//    private List<OrganGestorDto> recuperarOrgansPerProcedimentAmbPermis(EntitatDto entitatActual, List<CodiValorOrganGestorComuDto> procedimentsDisponibles, PermisEnum permis) {
-//
-//        // 1-recuperam els òrgans dels procediments disponibles (amb permís)
-//        List<String> codisOrgansGestorsProcediments = new ArrayList<>();
-//        for (CodiValorOrganGestorComuDto pro : procedimentsDisponibles)
-//            codisOrgansGestorsProcediments.add(pro.getOrganGestor());
-//
-//        // 2-Descartam els organs vigents i els transformam a Dto
-//        List<OrganGestorDto> organsGestorsProcediments = new ArrayList<>();
-//        if (!codisOrgansGestorsProcediments.isEmpty())
-//            organsGestorsProcediments = organGestorService.findByCodisAndEstat(codisOrgansGestorsProcediments, OrganGestorEstatEnum.V);
-//
-//        // 3-Obtenim els òrgans amb permís de notificació
-//        List<OrganGestorDto> organsGestorsAmbPermis = organGestorService.findOrgansGestorsWithPermis(
-//                entitatActual.getId(),
-//                SecurityContextHolder.getContext().getAuthentication().getName(),
-//                permis); //PermisEnum.NOTIFICACIO || PermisEnum.COMUNICACIO_SIR);
-//
-//        // 4-juntam tots els òrgans i ordenam per nom
-//        Set<OrganGestorDto> setOrgansGestors = new HashSet<OrganGestorDto>(organsGestorsProcediments);
-//        setOrgansGestors.addAll(organsGestorsAmbPermis);
-//
-//        List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>(setOrgansGestors);
-//        if (!PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes", false)) {
-//            organsGestors.remove(organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi()));
-//        }
-//
-//        Collections.sort(organsGestors, new Comparator<OrganGestorDto>() {
-//            @Override
-//            public int compare(OrganGestorDto p1, OrganGestorDto p2) {
-//                return p1.getNom().compareTo(p2.getNom());
-//            }
-//        });
-//        return organsGestors;
-//    }
-
     private void ompliModelFormulari(HttpServletRequest request, ProcSerDto procedimentActual, EntitatDto entitatActual, NotificacioCommand notificacioCommand,
                                     BindingResult bindingResult, List<String> tipusDocumentEnumDto, Model model) {
 
@@ -670,8 +621,9 @@ public class NotificacioFormController extends BaseUserController {
                 tipusDocumentEnumDto.add(tipusDocument.getTipusDocEnum().name());
             }
             if (tipusDocumentDefault != null) {
-                for (var i = 0; i < 5; i++)
+                for (var i = 0; i < 5; i++) {
                     notificacioCommand.setTipusDocumentDefault(i, tipusDocumentDefault.name());
+                }
             }
         }
         model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
@@ -745,15 +697,12 @@ public class NotificacioFormController extends BaseUserController {
         if (RolEnumDto.NOT_ADMIN.equals(rol)) {
             organsGestors = organGestorService.findByEntitat(entitatActual.getId());
         } else if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
-            OrganGestorDto organGestorActual = getOrganGestorActual(request);
+            var organGestorActual = getOrganGestorActual(request);
             organsGestors = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
 
         } else { // Rol usuari o altres
             var permis = tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR) ? PermisEnum.COMUNICACIO_SIR :
-                                tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO) ? PermisEnum.COMUNICACIO :
-                                PermisEnum.NOTIFICACIO;
-//            organsGestors = recuperarOrgansPerProcedimentAmbPermis(entitatActual, procSerDisponibles, tipus);
-//            codisValor = organGestorService.getOrgansAmbPermis(entitatActual.getId(), permis);
+                                tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
             codisValor = permisosService.getOrgansAmbPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), permis);
         }
 
@@ -830,17 +779,15 @@ public class NotificacioFormController extends BaseUserController {
         private String organCodi;
         private List<String> organsDisponibles;
         private boolean agrupable = false;
-        private List<GrupDto> grups = new ArrayList<GrupDto>();
-        private List<CieFormatSobreDto> formatsSobre = new ArrayList<CieFormatSobreDto>();
-        private List<CieFormatFullaDto> formatsFulla = new ArrayList<CieFormatFullaDto>();
+        private List<GrupDto> grups = new ArrayList<>();
+        private List<CieFormatSobreDto> formatsSobre = new ArrayList<>();
+        private List<CieFormatFullaDto> formatsFulla = new ArrayList<>();
         private boolean comu;
         private boolean entregaCieVigent;
         private boolean entregaCieActiva;
 
-        private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-
         public void setCaducitat(Date data) {
-            this.caducitat = format.format(data);
+            this.caducitat = df.format(data);
         }
     }
 }

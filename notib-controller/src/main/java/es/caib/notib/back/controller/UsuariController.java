@@ -7,12 +7,13 @@ import es.caib.notib.back.command.UsuariCommand;
 import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.back.helper.SessioHelper;
 import es.caib.notib.client.domini.Idioma;
-import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -34,25 +35,28 @@ public class UsuariController extends BaseController {
 	@Autowired
 	private AplicacioService aplicacioService;
 
+	private static final String REDIRECT = "redirect:/";
+
 	@RequestMapping(value = "/refresh", method = RequestMethod.HEAD)
 	public void refresh(HttpServletRequest request, HttpServletResponse response) {
+		// EMPTY METHOD
 	}
 
 	@RequestMapping(value = "/configuracio", method = RequestMethod.GET)
 	public String getConfiguracio(HttpServletRequest request, Model model) {
 
-		UsuariDto usuari = aplicacioService.getUsuariActual();
+		var usuari = aplicacioService.getUsuariActual();
 		model.addAttribute(UsuariCommand.asCommand(usuari));
 		model.addAttribute("idiomaEnumOptions", EnumHelper.getOptionsForEnum(Idioma.class,"usuari.form.camp.idioma.enum."));
 		return "usuariForm";
 	}
 
-	@RequestMapping(value = "/configuracio", method = RequestMethod.POST)
+	@PostMapping(value = "/configuracio")
 	public String save(HttpServletRequest request, @Valid UsuariCommand command, BindingResult bindingResult, Model model) {
 
 		if (bindingResult.hasErrors()) {
-			UsuariDto usuari = aplicacioService.getUsuariActual();
-			UsuariCommand uc = UsuariCommand.asCommand(usuari);
+			var usuari = aplicacioService.getUsuariActual();
+			var uc = UsuariCommand.asCommand(usuari);
 			uc.setEmailAlt(command.getEmailAlt());
 			command.setNom(uc.getNom());
 			command.setEmail(uc.getEmail());
@@ -63,12 +67,12 @@ public class UsuariController extends BaseController {
 			model.addAttribute("idiomaEnumOptions", EnumHelper.getOptionsForEnum(Idioma.class,"usuari.form.camp.idioma.enum."));
 			return "usuariForm";
 		}
-		UsuariDto usuari = aplicacioService.updateUsuariActual(UsuariCommand.asDto(command));
+		var usuari = aplicacioService.updateUsuariActual(UsuariCommand.asDto(command));
 		SessioHelper.setUsuariActual(request, usuari);
-		return getModalControllerReturnValueSuccess(request,"redirect:/","usuari.controller.modificat.ok");
+		return getModalControllerReturnValueSuccess(request, REDIRECT,"usuari.controller.modificat.ok");
 	}
 
-	@RequestMapping(value = "/configuracio/idioma", method = RequestMethod.GET)
+	@GetMapping(value = "/configuracio/idioma")
 	@ResponseBody
 	public String getIdioma() {
 		return new Locale(SessioHelper.getIdioma(aplicacioService), Locale.getDefault().getCountry()).toLanguageTag();
