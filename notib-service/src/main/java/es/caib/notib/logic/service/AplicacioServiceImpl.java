@@ -33,6 +33,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -414,7 +415,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	// PROCESSOS INICIALS
     @Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
     public List<ProcessosInicialsEnum> getProcessosInicialsPendents() {
 		List<ProcessosInicialsEnum> processosInicials = new ArrayList<>();
 
@@ -425,7 +426,7 @@ public class AplicacioServiceImpl implements AplicacioService {
     }
 
 	@Override
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void updateProcesInicialExecutat(ProcessosInicialsEnum proces) {
 		processosInicialsRepository.updateInit(proces, false);
 	}
