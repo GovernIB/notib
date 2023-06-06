@@ -282,7 +282,7 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public EntitatDto findById(Long entitatId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta de l'entitat (id=" + entitatId + ")");
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);

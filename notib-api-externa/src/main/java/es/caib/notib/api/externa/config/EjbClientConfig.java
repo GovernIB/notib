@@ -18,24 +18,6 @@ public class EjbClientConfig {
 
 	private static final String EJB_JNDI_PREFIX = "java:app/notib-ejb/";
 	private static final String EJB_JNDI_SUFFIX = "";
-
-//	@Bean
-//	public LocalStatelessSessionProxyFactoryBean aplicacioService() {
-//		return getLocalEjbFactoyBean(AplicacioService.class);
-//	}
-//	@Bean
-//	public LocalStatelessSessionProxyFactoryBean enviamentService() {
-//		return getLocalEjbFactoyBean(EnviamentService.class);
-//	}
-//	@Bean
-//	public LocalStatelessSessionProxyFactoryBean notificacioService() {
-//		return getLocalEjbFactoyBean(NotificacioService.class);
-//	}
-//	@Bean
-//	public LocalStatelessSessionProxyFactoryBean notificacioServiceWs() {
-//		return getLocalEjbFactoyBean(NotificacioServiceWs.class);
-//	}
-
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {
 
 		var jndiName = EJB_JNDI_PREFIX + serviceClass.getSimpleName() + EJB_JNDI_SUFFIX;

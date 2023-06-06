@@ -35,7 +35,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -57,11 +59,6 @@ import java.util.List;
 @Controller
 @RequestMapping("/procediment")
 public class ProcedimentController extends BaseUserController {
-	
-	private final static String PROCEDIMENTS_FILTRE = "procediments_filtre";
-	private final static String PROCEDIMENTS_FILTRE_MODAL = "procediments_filtre_modal";
-
-	private String currentFiltre = PROCEDIMENTS_FILTRE;
 
 	@Autowired
 	private ProcedimentService procedimentService;
@@ -76,8 +73,13 @@ public class ProcedimentController extends BaseUserController {
 	@Autowired
 	private AplicacioService aplicacioService;
 
+	private static final String PROCEDIMENTS_FILTRE = "procediments_filtre";
+	private static final String PROCEDIMENTS_FILTRE_MODAL = "procediments_filtre_modal";
+	private static final String REDIRECT = "redirect:../../procediment";
+	private String currentFiltre = PROCEDIMENTS_FILTRE;
 
-	@RequestMapping(method = RequestMethod.GET)
+
+	@GetMapping
 	public String get(HttpServletRequest request, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
@@ -96,7 +98,7 @@ public class ProcedimentController extends BaseUserController {
 		return "procedimentListPage";
 	}
 
-	@RequestMapping(value = "/filtre/codi/{procCodi}", method = RequestMethod.GET)
+	@GetMapping(value = "/filtre/codi/{procCodi}")
 	public String getFiltratByOrganGestor(HttpServletRequest request,  @PathVariable String procCodi, Model model) {
 
 		currentFiltre = PROCEDIMENTS_FILTRE;
@@ -106,7 +108,7 @@ public class ProcedimentController extends BaseUserController {
 		return "redirect:/procediment";
 	}
 
-	@RequestMapping(value = "/organ/{organCodi}", method = RequestMethod.GET)
+	@GetMapping(value = "/organ/{organCodi}")
 	public String getByOrganGestor(HttpServletRequest request, @PathVariable String organCodi, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
@@ -134,7 +136,8 @@ public class ProcedimentController extends BaseUserController {
 		}
 		return organsGestors;
 	}
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+
+	@GetMapping(value = "/datatable")
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request ) {
 		
@@ -155,19 +158,19 @@ public class ProcedimentController extends BaseUserController {
 		return DatatablesHelper.getDatatableResponse(request, procediments, "id");
 	}
 	
-	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	@GetMapping(value = "/new")
 	public String newGet(HttpServletRequest request, Model model) {
 		return formGet(request, null, model);
 	}
 	
-	@RequestMapping(method = RequestMethod.POST)
+	@PostMapping
 	public String post(HttpServletRequest request, ProcSerFiltreCommand command, Model model) {
 		
 		RequestSessionHelper.actualitzarObjecteSessio(request, this.currentFiltre, command);
 		return "procedimentListPage";
 	}
 	
-	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
+	@PostMapping(value = "/newOrModify")
 	public String save(HttpServletRequest request, @Valid ProcSerCommand procSerCommand, BindingResult bindingResult, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
@@ -195,7 +198,7 @@ public class ProcedimentController extends BaseUserController {
 	}
 
 	@ResponseBody
-	@RequestMapping(value = "/operadors/{organ}", method = RequestMethod.GET)
+	@GetMapping(value = "/operadors/{organ}")
 	public Operadors getOperadors(HttpServletRequest request, @PathVariable String organ) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
@@ -205,23 +208,22 @@ public class ProcedimentController extends BaseUserController {
 		return Operadors.builder().operadorsPostal(postal).operadorsCie(cie).build();
 	}
 
-	@RequestMapping(value = "/{procedimentId}/delete", method = RequestMethod.GET)
+	@GetMapping(value = "/{procedimentId}/delete")
 	public String delete(HttpServletRequest request, @PathVariable Long procedimentId) {
 
-		var redirect = "redirect:../../procediment";
 		try {
 			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 			if (procedimentService.procedimentEnUs(procedimentId)) {
-				return getAjaxControllerReturnValueError(request, redirect, "procediment.controller.esborrat.enUs");
+				return getAjaxControllerReturnValueError(request, REDIRECT, "procediment.controller.esborrat.enUs");
 			}
 			procedimentService.delete(entitat.getId(), procedimentId, RolHelper.isUsuariActualAdministradorEntitat(request));
-			return getAjaxControllerReturnValueSuccess(request, redirect, "procediment.controller.esborrat.ok");
+			return getAjaxControllerReturnValueSuccess(request, REDIRECT, "procediment.controller.esborrat.ok");
 		} catch (Exception e) {
-			return getAjaxControllerReturnValueError(request, redirect, "procediment.controller.esborrat.ko", e);
+			return getAjaxControllerReturnValueError(request, REDIRECT, "procediment.controller.esborrat.ko", e);
 		}
 	}
 
-	@RequestMapping(value = "/{procedimentId}", method = RequestMethod.GET)
+	@GetMapping(value = "/{procedimentId}")
 	public String formGet(HttpServletRequest request, @PathVariable Long procedimentId, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
@@ -241,24 +243,24 @@ public class ProcedimentController extends BaseUserController {
 		return "procedimentAdminForm";
 	}
 
-	@RequestMapping(value = "/{procedimentId}/enable", method = RequestMethod.GET)
+	@GetMapping(value = "/{procedimentId}/enable")
 	public String enable(HttpServletRequest request, @PathVariable Long procedimentId) {
 
 		procedimentService.updateActiu(procedimentId, true);
 		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "procediment.controller.activada.ok");
 	}
 
-	@RequestMapping(value = "/{procedimentId}/disable", method = RequestMethod.GET)
+	@GetMapping(value = "/{procedimentId}/disable")
 	public String disable(HttpServletRequest request, @PathVariable Long procedimentId) {
 
 		procedimentService.updateActiu(procedimentId, false);
 		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "procediment.controller.desactivada.ok");
 	}
 
-	@RequestMapping(value = "/{codiSia}/update", method = RequestMethod.GET)
+	@GetMapping(value = "/{codiSia}/update")
 	public String actualitzarProcediment(HttpServletRequest request, @PathVariable String codiSia) {
 
-		var urlResponse = "redirect:../../procediment";
+		var urlResponse = REDIRECT;
 		try {
 			var entitat = getEntitatActualComprovantPermisos(request);
 			var trobat = procedimentService.actualitzarProcediment(codiSia, entitat);
@@ -270,7 +272,7 @@ public class ProcedimentController extends BaseUserController {
 	}
 
 
-	@RequestMapping(value = "/update/auto", method = RequestMethod.GET)
+	@GetMapping(value = "/update/auto")
 	public String actualitzacioAutomaticaGet(HttpServletRequest request, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
@@ -278,7 +280,7 @@ public class ProcedimentController extends BaseUserController {
 		return "procedimentsActualitzacioForm";
 	}
 	
-	@RequestMapping(value = "/update/auto", method = RequestMethod.POST)
+	@PostMapping(value = "/update/auto")
 	public String actualitzacioAutomaticaPost(HttpServletRequest request, Model model) {
 				
 		var entitat = getEntitatActualComprovantPermisos(request);
@@ -300,7 +302,7 @@ public class ProcedimentController extends BaseUserController {
 				"procediment.controller.update.auto.ok");
 	}
 	
-	@RequestMapping(value = "/update/auto/progres", method = RequestMethod.GET)
+	@GetMapping(value = "/update/auto/progres")
 	@ResponseBody
 	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
@@ -308,34 +310,23 @@ public class ProcedimentController extends BaseUserController {
 	}
 			
 	
-	private ProcSerFiltreCommand getFiltreCommand(
-			HttpServletRequest request) {
-		ProcSerFiltreCommand procSerFiltreCommand = (
-				ProcSerFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
-						request,
-						this.currentFiltre);
-		if (procSerFiltreCommand == null) {
-			procSerFiltreCommand = new ProcSerFiltreCommand();
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					this.currentFiltre,
-					procSerFiltreCommand);
+	private ProcSerFiltreCommand getFiltreCommand(HttpServletRequest request) {
+
+		var procSerFiltreCommand = (ProcSerFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, this.currentFiltre);
+		if (procSerFiltreCommand != null) {
+			return procSerFiltreCommand;
 		}
+		procSerFiltreCommand = new ProcSerFiltreCommand();
+		RequestSessionHelper.actualitzarObjecteSessio(request, this.currentFiltre, procSerFiltreCommand);
 		return procSerFiltreCommand;
 	}
 	
-	private ProcSerDto emplenarModelProcediment(
-			HttpServletRequest request,
-			Long procedimentId,
-			Model model) {
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+	private ProcSerDto emplenarModelProcediment(HttpServletRequest request, Long procedimentId, Model model) {
+
+		var entitat = getEntitatActualComprovantPermisos(request);
 		ProcSerDto procediment = null;
-		
 		if (procedimentId != null) {
-			procediment = procedimentService.findById(
-					entitat.getId(),
-					isAdministrador(request),
-					procedimentId);
+			procediment = procedimentService.findById(entitat.getId(), isAdministrador(request), procedimentId);
 			if (procediment != null && procediment.getOrganGestor() != null) {
 				procediment.setOrganGestorNom(procediment.getOrganGestor() + " - " + procediment.getOrganGestorNom());
 			}
@@ -354,73 +345,53 @@ public class ProcedimentController extends BaseUserController {
 		if (procediment != null) {
 			model.addAttribute("entitatId", procediment.getEntitat().getId());
 		}
-		if (RolHelper.isUsuariActualAdministrador(request))
+		if (RolHelper.isUsuariActualAdministrador(request)) {
 			model.addAttribute("entitats", entitatService.findAll());
-		else
+		} else {
 			model.addAttribute("entitat", entitat);
-		
+		}
 		return procediment;
 	}
 	
-	@RequestMapping(value = "/organisme/{organGestorCodi}", method = RequestMethod.GET)
-	private String emplenarOrganismeProcediment(
-			HttpServletRequest request,
-			@PathVariable String organGestorCodi,
-			Model model) {
+	@GetMapping(value = "/organisme/{organGestorCodi}")
+	public String emplenarOrganismeProcediment(HttpServletRequest request, @PathVariable String organGestorCodi, Model model) {
+
 		model.addAttribute("organisme", organGestorCodi);
 		return "redirect:/procediment/new";
 	}
 	
-	@RequestMapping(value = "/tipusAssumpte/{entitatId}", method = RequestMethod.GET)
+	@GetMapping(value = "/tipusAssumpte/{entitatId}")
 	@ResponseBody
-	private List<TipusAssumpteDto> getTipusAssumpte(
-		HttpServletRequest request,
-		Model model,
-		@PathVariable Long entitatId) {
-		EntitatDto entitat = entitatService.findById(entitatId);
-		
+	public List<TipusAssumpteDto> getTipusAssumpte(HttpServletRequest request, Model model, @PathVariable Long entitatId) {
+
+		var entitat = entitatService.findById(entitatId);
 		model.addAttribute("tipusAssumpte", procedimentService.findTipusAssumpte(entitat));
-		
 		return procedimentService.findTipusAssumpte(entitat);
 	}
 	
-	@RequestMapping(value = "/codiAssumpte/{entitatId}/{codiTipusAssumpte}", method = RequestMethod.GET)
+	@GetMapping(value = "/codiAssumpte/{entitatId}/{codiTipusAssumpte}")
 	@ResponseBody
-	private List<CodiAssumpteDto> getCodiAssumpte(
-		HttpServletRequest request,
-		Model model,
-		@PathVariable Long entitatId,
-		@PathVariable String codiTipusAssumpte) {
-		EntitatDto entitat = entitatService.findById(entitatId);
-		
-		return procedimentService.findCodisAssumpte(
-				entitat,
-				codiTipusAssumpte);
-	}
-	
-	@RequestMapping(value = "/organismes/{entitatId}", method = RequestMethod.GET)
-	@ResponseBody
-	private List<OrganismeDto> getOrganismes(
-		HttpServletRequest request,
-		Model model,
-		@PathVariable Long entitatId) {
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
-		List<OrganismeDto> organismes;
-		if (organGestorActual != null) {
-			organismes = organGestorService.findOrganismes(entitat, organGestorActual);
-		} else {
-			organismes = organGestorService.findOrganismes(entitat);
-		}
-		return organismes;
-	}
-	
-	@RequestMapping(value = "/cache/refrescar", method = RequestMethod.GET)
-	private String refrescar(HttpServletRequest request, Model model) {
+	public List<CodiAssumpteDto> getCodiAssumpte(HttpServletRequest request, Model model, @PathVariable Long entitatId, @PathVariable String codiTipusAssumpte) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var entitat = entitatService.findById(entitatId);
+		return procedimentService.findCodisAssumpte(entitat, codiTipusAssumpte);
+	}
+	
+	@GetMapping(value = "/organismes/{entitatId}")
+	@ResponseBody
+	public List<OrganismeDto> getOrganismes(HttpServletRequest request, Model model, @PathVariable Long entitatId) {
+
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var organGestorActual = getOrganGestorActual(request);
+		return organGestorActual != null ? organGestorService.findOrganismes(entitat, organGestorActual) : organGestorService.findOrganismes(entitat);
+	}
+	
+	@GetMapping(value = "/cache/refrescar")
+	public String refrescar(HttpServletRequest request, Model model) {
+
+		var entitat = getEntitatActualComprovantPermisos(request);
 		procedimentService.refrescarCache(entitat);
-		return getAjaxControllerReturnValueSuccess(request, "redirect:../../procediment", "procediment.controller.esborrat.cache.ok");
+		return getAjaxControllerReturnValueSuccess(request, REDIRECT, "procediment.controller.esborrat.cache.ok");
 	}
 	
 	private boolean isAdministrador(HttpServletRequest request) {

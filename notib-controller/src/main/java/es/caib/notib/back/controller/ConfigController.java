@@ -15,9 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +41,8 @@ public class ConfigController extends BaseUserController{
     @Autowired
     private EntitatService entitatService;
 
-    @RequestMapping(method = RequestMethod.GET)
+
+    @GetMapping
     public String get(HttpServletRequest request, Model model) {
 
         var configGroups = configService.findAll();
@@ -57,7 +58,7 @@ public class ConfigController extends BaseUserController{
     }
 
     @ResponseBody
-    @RequestMapping(value = "/entitat/{key}", method = RequestMethod.GET)
+    @GetMapping(value = "/entitat/{key}")
     public List<ConfigDto> getEntitatConfigByKey(HttpServletRequest request, @PathVariable String key, Model model) {
 
         try {
@@ -69,28 +70,28 @@ public class ConfigController extends BaseUserController{
     }
 
     @ResponseBody
-    @RequestMapping(value="/update", method = RequestMethod.POST)
+    @GetMapping(value="/update")
     public SimpleResponse updateConfig(HttpServletRequest request, Model model, @Valid ConfigCommand configCommand, BindingResult bindingResult) {
 
+        var errorMsg = "config.controller.edit.error";
         if (bindingResult.hasErrors()) {
-            return SimpleResponse.builder().status(0).message(getMessage(request, "config.controller.edit.error")).build();
+            return SimpleResponse.builder().status(0).message(getMessage(request, errorMsg)).build();
         }
         var msg = "config.controller.edit.ok";
         var status = 1;
         try {
             var c = configService.updateProperty(configCommand.asDto());
-            msg = c == null ? "config.controller.edit.error" : msg;
+            msg = c == null ? errorMsg : msg;
             status = c == null ? 0 : status;
-        } catch (Exception e) {
-            e.printStackTrace();
-            msg = "config.controller.edit.error";
+        } catch (Exception ex) {
             status = 0;
+            log.error(errorMsg, ex);
         }
         return SimpleResponse.builder().status(status).message(getMessage(request, msg)).build();
     }
 
     @ResponseBody
-    @RequestMapping(value="/sync", method = RequestMethod.GET)
+    @GetMapping(value="/sync")
     public SyncResponse sync(HttpServletRequest request, Model model) {
 
         try {
@@ -103,7 +104,6 @@ public class ConfigController extends BaseUserController{
 
     private void fillFormsModel(ConfigGroupDto cGroup, Model model, List<EntitatDto> entitats){
 
-        String key = null;
         List<ConfigDto> confs = new ArrayList<>();
         for (var config: cGroup.getConfigs()) {
             if (!Strings.isNullOrEmpty(config.getEntitatCodi())) {
@@ -111,8 +111,7 @@ public class ConfigController extends BaseUserController{
             }
             model.addAttribute("config_" + config.getKey().replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
             for (var entitat : entitats) {
-                key = config.addEntitatKey(entitat);
-//                model.addAttribute("entitat_config_" + key.replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
+                config.addEntitatKey(entitat);
             }
             confs.add(config);
         }

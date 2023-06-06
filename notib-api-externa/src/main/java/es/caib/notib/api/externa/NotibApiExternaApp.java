@@ -40,8 +40,7 @@ import org.springframework.context.annotation.PropertySource;
 //		MultipleOpenApiSupportConfiguration.class,
 		SpringDataWebAutoConfiguration.class
 })
-@ComponentScan(
-		excludeFilters = @ComponentScan.Filter(
+@ComponentScan(excludeFilters = @ComponentScan.Filter(
 				type = FilterType.REGEX,
 				pattern = {
 						"es\\.caib\\.notib\\.logic\\..*",

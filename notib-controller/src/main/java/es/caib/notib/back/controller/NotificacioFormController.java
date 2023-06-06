@@ -131,10 +131,11 @@ public class NotificacioFormController extends BaseUserController {
     private static final String METADADES_MODO_FIRMA = "metadades_modo_firma";
     private static final String EDIT_REFERER = "edit_referer";
     private static final String ENVIAMENT_TIPUS = "enviament_tipus";
+    private static final String NOM_DOCUMENT = "nomDocument_";
+    private static final String FALSE = "false";
 
 
-
-    @RequestMapping(value = "/new/notificacio")
+    @GetMapping(value = "/new/notificacio")
     public String altaNotificacio(HttpServletRequest request, Model model) {
 
         initForm(request, model, TipusEnviamentEnumDto.NOTIFICACIO);
@@ -142,7 +143,7 @@ public class NotificacioFormController extends BaseUserController {
         return NOTIFICACIO_FORM;
     }
 
-    @RequestMapping(value = "/new/comunicacio")
+    @GetMapping(value = "/new/comunicacio")
     public String altaComunicacio(HttpServletRequest request, Model model) {
 
         initForm(request, model, TipusEnviamentEnumDto.COMUNICACIO);
@@ -150,7 +151,7 @@ public class NotificacioFormController extends BaseUserController {
         return NOTIFICACIO_FORM;
     }
 
-    @RequestMapping(value = "/new/comunicacioSIR")
+    @GetMapping(value = "/new/comunicacioSIR")
     public String altaComunicacioSIR(HttpServletRequest request, Model model) {
 
         initForm(request, model, TipusEnviamentEnumDto.COMUNICACIO_SIR);
@@ -275,7 +276,7 @@ public class NotificacioFormController extends BaseUserController {
         List<String> tipusDocumentEnumDto = new ArrayList<>();
         var entitatActual = EntitatHelper.getEntitatActual(request);
         ProcSerDto procedimentActual = null;
-        var property = aplicacioService.propertyGetByEntitat("es.caib.notib.comunicacions.sir.internes", "false");
+        var property = aplicacioService.propertyGetByEntitat("es.caib.notib.comunicacions.sir.internes", FALSE);
         model.addAttribute("isPermesComunicacionsSirPropiaEntitat", property);
         if (notificacioCommand.getProcedimentId() != null) {
             procedimentActual = procedimentService.findById(entitatActual.getId(), isAdministrador(request), notificacioCommand.getProcedimentId());
@@ -286,7 +287,7 @@ public class NotificacioFormController extends BaseUserController {
                     "notificacio.form.errors.validacio.notificacio" : "notificacio.form.errors.validacio.comunicacio";
             MissatgesHelper.error(request, getMessage(request, msg));
             relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
-            return "notificacioForm";
+            return NOTIFICACIO_FORM;
         }
 
         if (RolHelper.isUsuariActualAdministrador(request)) {
@@ -300,7 +301,7 @@ public class NotificacioFormController extends BaseUserController {
             updateDocuments(notificacioCommand, bindingResult);
             if (bindingResult.hasErrors()) {
                 relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
-                return "notificacioForm";
+                return NOTIFICACIO_FORM;
             }
             if (notificacioCommand.getId() != null) {
                 notificacioService.update(entitatActual.getId(), notificacioCommand.asDatabaseDto(), RolHelper.isUsuariActualAdministradorEntitat(request));
@@ -308,13 +309,12 @@ public class NotificacioFormController extends BaseUserController {
                 notificacioService.create(entitatActual.getId(), notificacioCommand.asDatabaseDto());
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
             log.error("[NOT-CONTROLLER] POST notificació desde interfície web. Excepció al processar les dades del formulari", ex);
             log.error(ExceptionUtils.getStackTrace(ex));
             MissatgesHelper.error(request, ex.getMessage());
             relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
             model.addAttribute("notificacioCommandV2", notificacioCommand);
-            return "notificacioForm";
+            return NOTIFICACIO_FORM;
         }
         log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Formulari processat satisfactoriament. ");
         return "redirect:../notificacio";
@@ -428,27 +428,26 @@ public class NotificacioFormController extends BaseUserController {
         RequestSessionHelper.actualitzarObjecteSessio(request, EDIT_REFERER, referer);
         var notificacioDto = notificacioService.findAmbId(notificacioId, false);
         var notificacioCommand = NotificacioCommand.asCommand(notificacioDto);
-        var nomDocument = "nomDocument_";
         for(var i = 0; i < 5; i++) {
             if (notificacioCommand.getDocuments()[i].getArxiuNom() != null) {
-                model.addAttribute(nomDocument + i, notificacioCommand.getDocuments()[i].getArxiuNom());
+                model.addAttribute(NOM_DOCUMENT + i, notificacioCommand.getDocuments()[i].getArxiuNom());
                 notificacioCommand.setTipusDocumentDefault(i, TipusDocumentEnumDto.ARXIU.name());
             }
             if (notificacioCommand.getDocuments()[i].getUuid() != null) {
-                model.addAttribute(nomDocument + i, notificacioCommand.getDocuments()[i].getUuid());
+                model.addAttribute(NOM_DOCUMENT + i, notificacioCommand.getDocuments()[i].getUuid());
                 notificacioCommand.setTipusDocumentDefault(i, TipusDocumentEnumDto.UUID.name());
             }
             if (notificacioCommand.getDocuments()[i].getCsv() != null) {
-                model.addAttribute(nomDocument + i, notificacioCommand.getDocuments()[i].getCsv());
+                model.addAttribute(NOM_DOCUMENT + i, notificacioCommand.getDocuments()[i].getCsv());
                 notificacioCommand.setTipusDocumentDefault(i, TipusDocumentEnumDto.CSV.name());
             }
             if (notificacioCommand.getDocuments()[i].getUrl() != null) {
-                model.addAttribute(nomDocument + i, notificacioCommand.getDocuments()[i].getUrl());
+                model.addAttribute(NOM_DOCUMENT + i, notificacioCommand.getDocuments()[i].getUrl());
                 notificacioCommand.setTipusDocumentDefault(i, TipusDocumentEnumDto.URL.name());
             }
         }
         emplenarModelNotificacio(request, model, notificacioCommand);
-        return "notificacioForm";
+        return NOTIFICACIO_FORM;
     }
 
     @GetMapping(value = "/nivellsAdministracions")
@@ -608,7 +607,7 @@ public class NotificacioFormController extends BaseUserController {
         var referer = (String) RequestSessionHelper.obtenirObjecteSessio(request, EDIT_REFERER);
         model.addAttribute("referer", referer);
         model.addAttribute("validaFirmaWebEnabled", isValidaFirmaWebEnabled());
-        model.addAttribute("isPermesComunicacionsSirPropiaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.comunicacions.sir.internes", "false"));
+        model.addAttribute("isPermesComunicacionsSirPropiaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.comunicacions.sir.internes", FALSE));
     }
 
     private void ompliModelFormulari(HttpServletRequest request, ProcSerDto procedimentActual, EntitatDto entitatActual, NotificacioCommand notificacioCommand,
@@ -661,11 +660,11 @@ public class NotificacioFormController extends BaseUserController {
                 documentCommand.setMida(notificacioCommand.getArxiu()[i].getSize());
                 arxiuGestdocId = gestioDocumentalService.guardarArxiuTemporal(documentCommand.getContingutBase64());
                 documentCommand.setArxiuGestdocId(arxiuGestdocId);
-                model.addAttribute("nomDocument_" + i, notificacioCommand.getArxiu()[i].getOriginalFilename());
+                model.addAttribute(NOM_DOCUMENT + i, notificacioCommand.getArxiu()[i].getOriginalFilename());
             } else if (documentCommand.getArxiuNom() != null && !documentCommand.getArxiuNom().isEmpty()) {
-                model.addAttribute("nomDocument_" + i, documentCommand.getArxiuNom());
+                model.addAttribute(NOM_DOCUMENT + i, documentCommand.getArxiuNom());
             } else if (notificacioCommand.getArxiu()[i] != null) {
-                model.addAttribute("nomDocument_" + i, notificacioCommand.getArxiu()[i].getOriginalFilename());
+                model.addAttribute(NOM_DOCUMENT + i, notificacioCommand.getArxiu()[i].getOriginalFilename());
             }
         }
         model.addAttribute("document", notificacioCommand.getDocuments());
@@ -723,7 +722,7 @@ public class NotificacioFormController extends BaseUserController {
         model.addAttribute("procediments", procedimentsDisponibles);
         model.addAttribute("serveis", serveisDisponibles);
         model.addAttribute("isTitularAmbIncapacitat", aplicacioService.propertyGetByEntitat("es.caib.notib.titular.incapacitat", "true"));
-        model.addAttribute("isMultiplesDestinataris", aplicacioService.propertyGetByEntitat("es.caib.notib.destinatari.multiple", "false"));
+        model.addAttribute("isMultiplesDestinataris", aplicacioService.propertyGetByEntitat("es.caib.notib.destinatari.multiple", FALSE));
         model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
         model.addAttribute("comunicacioTipus", EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class,"es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto."));
         model.addAttribute("enviamentTipus",EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class, "notificacio.tipus.enviament.enum."));

@@ -36,10 +36,6 @@ public class EjbClientConfig {
 	public LocalStatelessSessionProxyFactoryBean aplicacioService() {
 		return getLocalEjbFactoyBean(AplicacioService.class);
 	}
-//	@Bean
-//	public LocalStatelessSessionProxyFactoryBean auditService() {
-//		return getLocalEjbFactoyBean(AuditService.class);
-//	}
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean avisService() {
 		return getLocalEjbFactoyBean(AvisService.class);

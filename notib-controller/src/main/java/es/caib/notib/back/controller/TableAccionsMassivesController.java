@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
-import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -33,13 +32,20 @@ import java.util.Set;
 @Slf4j
 public abstract class TableAccionsMassivesController extends BaseUserController {
 
-    protected String sessionAttributeSeleccio;
-    protected Long notMassivaId;
-
     @Autowired
     private NotificacioService notificacioService;
     @Autowired
     private EnviamentService enviamentService;
+
+    protected String sessionAttributeSeleccio;
+    protected Long notMassivaId;
+    private static final String REFERER = "Referer";
+    private static final String ERROR = "error";
+    private static final String REINTENT_TEXT = "enviament.controller.reintent.";
+    private static final String NOTIFICACIO = "notificacio";
+    private static final String NOTIFICACIONS = "notificacions";
+    private static final String REDIRECT = "redirect:";
+
 
     @SuppressWarnings("unchecked")
     @GetMapping(value = {"/seleccionar/all", "{notificacioId}/notificacio/seleccionar/all"})
@@ -51,7 +57,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             try {
                 notMassivaId = Long.valueOf(id);
             } catch (Exception ex) {
-                log.error("Error seleccionant elements", ex);
+                log.error("Error seleccionant tots elements", ex);
             }
         }
         var seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(request, sessionAttributeSeleccio);
@@ -61,8 +67,8 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
         try {
             seleccio.addAll(getIdsElementsFiltrats(request));
-        } catch (NotFoundException | ParseException e) {
-            e.printStackTrace();
+        } catch (NotFoundException | ParseException ex) {
+            log.error("Error seleccionant tots els elements", ex);
         }
         return seleccio.size();
     }
@@ -83,8 +89,8 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
         try {
             seleccio.addAll(getIdsElementsFiltrats(request));
-        } catch (NotFoundException | ParseException e) {
-            e.printStackTrace();
+        } catch (NotFoundException | ParseException ex) {
+            log.error("Error seleccionant elements", ex);
         }
         return seleccio.size();
     }
@@ -121,20 +127,20 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         try {
             var fitxer = enviamentService.exportacio(entitatActual.getId(), seleccio, format);
             writeFileToResponse(fitxer.getNom(), fitxer.getContingut(), response);
-        } catch (NotFoundException | ParseException e) {
-            e.printStackTrace();
+        } catch (NotFoundException | ParseException ex) {
+            log.error("Error exportant els elements seleccionats", ex);
         }
         return null;
     }
 
     @GetMapping(value = {"/reintentar/notificacio", "{notificacioId}/notificacio/reintentar/notificacio"})
     @ResponseBody
-    public String reintentarNotificacio(HttpServletRequest request, HttpServletResponse response) throws IOException, RegistreNotificaException {
+    public String reintentarNotificacio(HttpServletRequest request, HttpServletResponse response) throws RegistreNotificaException {
 
         var seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.notificacio.seleccio.buida"));
-            return "error";
+            return ERROR;
         }
         MissatgesHelper.info( request, getMessage(request, "enviament.controller.reintent.notificacio.pendents.executant"));
         Set<Long> notificacioIds = new HashSet<>();
@@ -145,8 +151,9 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
         var notificacionsNoRegistrades = 0;
         var notificacionsError = 0;
+        NotificacioDtoV2 notificacio;
         for(var notificacioId: notificacioIds) {
-            NotificacioDtoV2 notificacio = notificacioService.findAmbId(notificacioId, isAdministrador(request));
+            notificacio = notificacioService.findAmbId(notificacioId, isAdministrador(request));
             if(notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)) {
                 try {
                     notificacioService.registrarNotificar(notificacioId);
@@ -167,19 +174,18 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             }
             notificacionsNoRegistrades++;
         }
-
         String msg;
         if(notificacionsNoRegistrades == notificacioIds.size()) {
-            msg = getMessage(request, "enviament.controller.reintent." + (notificacionsNoRegistrades == 1 ? "notificacio" : "notificacions" )+ ".pendents.KO");
+            msg = getMessage(request, REINTENT_TEXT + (notificacionsNoRegistrades == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".pendents.KO");
             MissatgesHelper.error(request, msg);
         } else if(notificacionsError == notificacioIds.size()) {
-            msg = getMessage(request, "enviament.controller.reintent." + (notificacionsError == 1 ? "notificacio" : "notificacions" )+ ".pendents.error");
+            msg = getMessage(request, REINTENT_TEXT + (notificacionsError == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".pendents.error");
             MissatgesHelper.error(request, msg);
         } else if (notificacionsError > 0) {
             msg = getMessage(request, "enviament.controller.reintent.notificacions.pendents.error.alguna");
             MissatgesHelper.warning(request, notificacionsError + " " + msg);
         } else {
-            msg = getMessage(request, "enviament.controller.reintent." + (notificacioIds.size() == 1 ? "notificacio" : "notificacions") + ".pendents.OK");
+            msg = getMessage(request, REINTENT_TEXT + (notificacioIds.size() == 1 ? NOTIFICACIO : NOTIFICACIONS) + ".pendents.OK");
             MissatgesHelper.info(request, msg);
         }
         return "ok";
@@ -192,7 +198,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.notificacio.seleccio.buida"));
-            return "error";
+            return ERROR;
         }
         NotificacioEnviamentDtoV2 e;
         Set<Long> notificacioIds = new HashSet<>();
@@ -218,16 +224,16 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
         String msg;
         if (notificacionsNoFinalitzadesAmbError == notificacioIds.size()) {
-            msg = getMessage(request, "enviament.controller.reintent." + (notificacionsNoFinalitzadesAmbError == 1 ? "notificacio" : "notificacions" )+ ".errors.KO");
+            msg = getMessage(request, REINTENT_TEXT + (notificacionsNoFinalitzadesAmbError == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".errors.KO");
             MissatgesHelper.error(request, msg);
         } else if (notificacionsError == notificacioIds.size()) {
-            msg = getMessage(request, "enviament.controller.reintent." + (notificacionsError == 1 ? "notificacio" : "notificacions" )+ ".errors.error");
+            msg = getMessage(request, REINTENT_TEXT + (notificacionsError == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".errors.error");
             MissatgesHelper.error(request, msg);
         } else if (notificacionsError > 0) {
             msg = getMessage(request, "enviament.controller.reintent.notificacions.errors.error.alguna");
             MissatgesHelper.warning(request, notificacionsError + " " + msg);
         } else {
-            msg = getMessage(request, "enviament.controller.reintent." + (notificacioIds.size() == 1 ? "notificacio" : "notificacions") + ".errors.OK");
+            msg = getMessage(request, REINTENT_TEXT + (notificacioIds.size() == 1 ? NOTIFICACIO : NOTIFICACIONS) + ".errors.OK");
             MissatgesHelper.info(request, msg);
         }
         return "ok";
@@ -239,7 +245,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.seleccio.buida"));
-            return "redirect:" + request.getHeader("Referer");
+            return REDIRECT + request.getHeader(REFERER);
         }
         log.info("Reactivam consulta dels enviaments: " + StringUtils.join(seleccio, ", "));
         try {
@@ -248,7 +254,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         } catch (Exception e) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.consultes.KO"));
         }
-        return "redirect:" + request.getHeader("Referer");
+        return REDIRECT + request.getHeader(REFERER);
     }
 
     @GetMapping(value = "/reactivar/sir")
@@ -258,7 +264,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.seleccio.buida"));
-            return "redirect:" + request.getHeader("Referer");
+            return REDIRECT + request.getHeader(REFERER);
         }
         log.info("Reactivam SIR dels enviaments: " + StringUtils.join(seleccio, ", "));
         try {
@@ -277,7 +283,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.actualitzarestat.buida"));
-            return "error";
+            return ERROR;
         }
         MissatgesHelper.info( request, getMessage(request, "enviament.controller.actualitzarestat.executant"));
         log.info("Acualitzam estat dels enviaments: " + StringUtils.join(seleccio, ", "));
@@ -305,10 +311,10 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var seleccio = getIdsSeleccionats(request);
         if ((seleccio == null || seleccio.isEmpty()) && (path.length == 0 || Strings.isNullOrEmpty(path[2]))) {
             MissatgesHelper.error(request, getMessage(request,"enviament.controller.enviar.callback.buida"));
-            return "redirect:" + request.getHeader("Referer");
+            return REDIRECT + request.getHeader(REFERER);
         }
-        var notificacioId = seleccio.isEmpty() ? Long.parseLong(path[2]) : null;
-        seleccio = notificacioId != null ? new HashSet<>(Arrays.asList(notificacioId)) : seleccio;
+        var notificacioId =  seleccio != null && seleccio.isEmpty() ? Long.parseLong(path[2]) : null;
+        seleccio = notificacioId != null ? new HashSet<>(List.of(notificacioId)) : seleccio;
         log.info("Reactivam callback dels enviaments: " + StringUtils.join(seleccio, ", "));
         var hasErrors = false;
         try {
@@ -324,7 +330,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         if (!hasErrors) {
             MissatgesHelper.info(request, getMessage(request,"enviament.controller.enviar.callback.OK"));
         }
-        return "redirect:" + request.getHeader("Referer");
+        return REDIRECT + request.getHeader(REFERER);
     }
 
     @GetMapping(value = "/reactivar/callback")
@@ -333,7 +339,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(request, getMessage(request,"enviament.controller.reactivar.callback.buida"));
-            return "redirect:" + request.getHeader("Referer");
+            return REDIRECT + request.getHeader(REFERER);
         }
         log.info("Reactivam callback dels enviaments: " + StringUtils.join(seleccio, ", "));
         var hasErrors = false;
@@ -348,7 +354,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         if (!hasErrors) {
             MissatgesHelper.info(request, getMessage(request,"enviament.controller.reactivar.callback.OK"));
         }
-        return "redirect:" + request.getHeader("Referer");
+        return REDIRECT + request.getHeader(REFERER);
     }
 
     private boolean isAdministrador(HttpServletRequest request) {
@@ -364,14 +370,15 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             errorMessage = e.getCause().getMessage();
         }
         if (e.getStackTrace() != null && e.getStackTrace().length > 2) {
-            errorMessage += "<br/>";
-            errorMessage += e.getStackTrace()[0] + "<br/>";
-            errorMessage += e.getStackTrace()[1] + "<br/>";
-            errorMessage += e.getStackTrace()[2] + "<br/>...";
+            var br = "<br/>";
+            errorMessage += br;
+            errorMessage += e.getStackTrace()[0] + br;
+            errorMessage += e.getStackTrace()[1] + br;
+            errorMessage += e.getStackTrace()[2] + br + "...";
         }
-        MissatgesHelper.error(request, getMessage(request,"enviament.controller.reintent.notificacio.pendents.error",
-                        new String[]{notificacioId.toString(), notificacio.getCreatedDateAmbFormat(), notificacio.getConcepte(), errorMessage})
-        );
+        var key = "enviament.controller.reintent.notificacio.pendents.error";
+        var msg = getMessage(request, key, new String[]{notificacioId.toString(), notificacio.getCreatedDateAmbFormat(), notificacio.getConcepte(), errorMessage});
+        MissatgesHelper.error(request, msg);
     }
 
     protected boolean requestIsRemesesEnviamentMassiu(HttpServletRequest request) {

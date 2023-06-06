@@ -217,11 +217,11 @@ public class NotificacioListHelper {
 
         String data = "\n";
         if ((NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat())) && item.getEstatDate() != null) {
-            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
             String d = df.format(item.getEstatDate());
             data += "<span class=\"horaProcessat\">" + d + "</span>\n";
         } else if (NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) && item.getEstatProcessatDate() != null) {
-            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
             String d = df.format(item.getEstatProcessatDate());
             data += "<span class=\"horaProcessat\">" + d + "</span>\n";
         }
