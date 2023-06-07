@@ -13,15 +13,15 @@ import es.caib.notib.client.domini.RespostaConsultaEstatNotificacio;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 /**
@@ -33,7 +33,8 @@ import java.util.Date;
 @RequestMapping("/api/services/notificacioV2")
 public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseController {
 
-	@RequestMapping(value = "/alta", method = RequestMethod.POST, produces="application/json")
+
+	@PostMapping(value = "/alta", produces="application/json")
 	@ResponseStatus(HttpStatus.CREATED)
 	@ResponseBody
 	public RespostaAlta alta(@RequestBody NotificacioV2 notificacio, HttpServletRequest request, HttpServletResponse response) {
@@ -48,9 +49,9 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 		}
 	}
 
-	@RequestMapping(value = {"/consultaEstatNotificacio/**"}, method = RequestMethod.GET, produces="application/json")
+	@GetMapping(value = {"/consultaEstatNotificacio/**"}, produces="application/json")
 	@ResponseBody
-	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
+	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
 			var identificador = extractIdentificador(request);
@@ -67,9 +68,9 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 		}
 	}
 
-	@RequestMapping(value = {"/consultaEstatEnviament/**"}, method = RequestMethod.GET, produces="application/json")
+	@GetMapping(value = {"/consultaEstatEnviament/**"}, produces="application/json")
 	@ResponseBody
-	public RespostaConsultaEstatEnviament consultaEstatEnviament(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
+	public RespostaConsultaEstatEnviament consultaEstatEnviament(HttpServletRequest request, HttpServletResponse response) {
 
 		var referencia = extractIdentificador(request);
 		try {
@@ -87,7 +88,7 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 		}
 	}
 
-	@RequestMapping(value = {"/consultaDadesRegistre"}, method = RequestMethod.POST, produces="application/json")
+	@PostMapping(value = {"/consultaDadesRegistre"}, produces="application/json")
 	@ResponseBody
 	public RespostaConsultaDadesRegistre consultaDadesRegistre(@RequestBody DadesConsulta dadesConsulta, HttpServletRequest request, HttpServletResponse response) {
 
@@ -101,13 +102,13 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 		}
 	}
 
-	@RequestMapping(value = {"/consultaJustificantNotificacio/**"}, method = RequestMethod.GET, produces="application/json")
+	@GetMapping(value = {"/consultaJustificantNotificacio/**"}, produces="application/json")
 	@ResponseBody
 	public RespostaConsultaJustificantEnviament consultaJustificantV1(HttpServletRequest request) {
 		return consultaJustificant(request);
 	}
 
-	@RequestMapping(value = "/permisConsulta", method = RequestMethod.POST, produces="application/json")
+	@PostMapping(value = "/permisConsulta", produces="application/json")
 	@ResponseStatus(HttpStatus.CREATED)
 	@ResponseBody
 	public String donarPermisConsultaV1(@RequestBody PermisConsulta permisConsulta, HttpServletRequest request, HttpServletResponse response) {

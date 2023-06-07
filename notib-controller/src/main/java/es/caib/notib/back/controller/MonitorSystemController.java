@@ -11,6 +11,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,13 +39,14 @@ public class MonitorSystemController extends BaseController {
 
 	@Autowired
 	private MonitorTasquesService monitorTasquesService;
+
 	
-	@RequestMapping(method = RequestMethod.GET)
+	@GetMapping
 	public String get(HttpServletRequest request, Model model) {
 		return "monitor";
 	}
 
-	@RequestMapping(value = "/all", method = RequestMethod.GET)
+	@GetMapping(value = "/all")
 	@ResponseBody
 	public String monitor(HttpServletRequest request, String familia) throws JsonProcessingException {
 
@@ -101,7 +103,7 @@ public class MonitorSystemController extends BaseController {
 					continue;
 				}
 				hilo.add(nombre);
-				tiempoCPU = (long) ((float)100*((float) bean.getThreadCpuTime(ids[a]) / (float) tiempoCPUTotal));
+				tiempoCPU = (long) (100*((float) bean.getThreadCpuTime(ids[a]) / (float) tiempoCPUTotal));
 				cputime.add(((tiempoCPU>100)?100:tiempoCPU) + " %");
 				estado.add(getMessage(request, "monitor."+info[a].getThreadState()));
 				espera.add(((info[a].getWaitedTime() == -1)? 0:info[a].getWaitedTime()) + " ns");
@@ -118,17 +120,17 @@ public class MonitorSystemController extends BaseController {
 	}
 
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value="/tasques", method = RequestMethod.GET)
+	@GetMapping(value="/tasques")
 	@ResponseBody
 	public List<TasquesSegonPlaInfo> getTasquesJson(HttpServletRequest request) {
 
 		List<TasquesSegonPlaInfo> tasquesSegonPlaInfos = new ArrayList<>();
 		var monitorTasques = monitorTasquesService.findAll();
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		var sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		if (monitorTasques == null) {
 			return tasquesSegonPlaInfos;
 		}
-		for (MonitorTascaInfo monitorTasca : monitorTasques) {
+		for (var monitorTasca : monitorTasques) {
 
 			var iniciExecucio = monitorTasca.getDataInici() != null ? sdf.format(monitorTasca.getDataInici()) : "-";
 			var properaExecucio = !MonitorTascaEstat.EN_EXECUCIO.equals(monitorTasca.getEstat()) && monitorTasca.getProperaExecucio() != null ?

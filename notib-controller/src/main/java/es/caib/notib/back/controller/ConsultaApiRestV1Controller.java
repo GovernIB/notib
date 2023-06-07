@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -35,8 +36,10 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 	private EnviamentService enviamentService;
 	@Autowired
 	private NotificacioService notificacioService;
-	
-	@RequestMapping(value="/comunicacions/{dniTitular}", method = RequestMethod.GET, produces = "application/json")
+	private static final String PATH = "/api/consulta/v1";
+
+
+	@GetMapping(value="/comunicacions/{dniTitular}", produces = "application/json")
 	@ResponseBody
 	public Resposta comunicacionsByTitular(
 			HttpServletRequest request, HttpServletResponse response,
@@ -46,7 +49,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 		
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(null)
 					.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
@@ -56,7 +59,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 
 	}
 	
-	@RequestMapping(value="/notificacions/{dniTitular}", method = RequestMethod.GET, produces = "application/json")
+	@GetMapping(value="/notificacions/{dniTitular}", produces = "application/json")
 	@ResponseBody
 	public Resposta notificacionsByTitular(
 			HttpServletRequest request,HttpServletResponse response,
@@ -66,7 +69,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(null)
 					.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
@@ -75,7 +78,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 		return r;
 	}
 
-	@RequestMapping(value="/comunicacions/{dniTitular}/pendents", method = RequestMethod.GET, produces = "application/json")
+	@GetMapping(value="/comunicacions/{dniTitular}/pendents", produces = "application/json")
 	@ResponseBody
 	public Resposta comunicacionsPendentsByTitular(
 			HttpServletRequest request, HttpServletResponse response,
@@ -85,7 +88,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(false)
 					.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
@@ -94,7 +97,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 		return r;
 	}
 
-	@RequestMapping(value="/notificacions/{dniTitular}/pendents", method = RequestMethod.GET, produces = "application/json")
+	@GetMapping(value="/notificacions/{dniTitular}/pendents", produces = "application/json")
 	@ResponseBody
 	public Resposta notificacionsPendentsByTitular(
 			HttpServletRequest request, HttpServletResponse response,
@@ -104,7 +107,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(false)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
@@ -113,7 +116,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 		return r;
 	}
 
-	@RequestMapping(value="/comunicacions/{dniTitular}/llegides", method = RequestMethod.GET, produces = "application/json")
+	@GetMapping(value="/comunicacions/{dniTitular}/llegides", produces = "application/json")
 	@ResponseBody
 	public Resposta comunicacionsLlegidesByTitular(
 			HttpServletRequest request, HttpServletResponse response,
@@ -123,7 +126,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(true)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
@@ -132,7 +135,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 		return r;
 	}
 
-	@RequestMapping(value="/notificacions/{dniTitular}/llegides", method = RequestMethod.GET, produces = "application/json")
+	@GetMapping(value="/notificacions/{dniTitular}/llegides", produces = "application/json")
 	@ResponseBody
 	public Resposta notificacionsLlegidesByTitular(
 			HttpServletRequest request, HttpServletResponse response,
@@ -142,7 +145,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(true)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
@@ -151,7 +154,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 		return r;
 	}
 
-	@RequestMapping(value="/document/{notificacioId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value="/document/{notificacioId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Arxiu> getDocument(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId) {
 
@@ -164,14 +167,13 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 			log.debug("No s'ha trobat el document per a la notificació amb identificador " + notificacioId);
 		}
 		if (arxiu != null && arxiu.getContingut() != null) {
-			if (arxiu.getContentType() == null) {
-				if (arxiu.getNom() != null) {
+			if (arxiu.getContentType() == null && arxiu.getNom() != null) {
 					if (arxiu.getNom().endsWith(".pdf")) {
 						arxiu.setContentType("application/pdf");
-					} else if (arxiu.getNom().endsWith(".pdf")) {
+					} else if (arxiu.getNom().endsWith(".zip")) {
 						arxiu.setContentType("application/zip");
 					}
-				}
+
 			}
 			var contingutDocumentBasse64 = Base64.encodeBase64String(arxiu.getContingut());
 			document = Arxiu.builder().nom(arxiu.getNom()).mediaType(arxiu.getContentType()).contingut(contingutDocumentBasse64).build();
@@ -186,7 +188,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 		return r;
 	}
 
-	@RequestMapping(value="/certificacio/{enviamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value="/certificacio/{enviamentId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Arxiu> getCertificacio(HttpServletRequest request, HttpServletResponse response, @PathVariable Long enviamentId) {
 
@@ -212,7 +214,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 		return r;
 	}
 
-	@RequestMapping(value="/justificant/{enviamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value="/justificant/{enviamentId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Arxiu> getJustificant(HttpServletRequest request, HttpServletResponse response, @PathVariable Long enviamentId) {
 

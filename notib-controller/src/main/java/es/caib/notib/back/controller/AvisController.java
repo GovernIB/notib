@@ -12,8 +12,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,18 +38,19 @@ public class AvisController extends BaseUserController {
 	@Autowired
 	private AvisService avisService;
 
-	@RequestMapping(method = RequestMethod.GET)
+
+	@GetMapping
 	public String get() {
 		return "avisList";
 	}
 
 	@ResponseBody
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@GetMapping(value = "/datatable")
 	public DatatablesResponse datatable(HttpServletRequest request) {
 		return DatatablesHelper.getDatatableResponse(request, avisService.findPaginat(DatatablesHelper.getPaginacioDtoFromRequest(request)));
 	}
 
-	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	@GetMapping(value = "/new")
 	public String getNew(Model model) {
 		return get(null, model);
 	}
@@ -57,7 +60,7 @@ public class AvisController extends BaseUserController {
 	    binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
 	}
 	
-	@RequestMapping(value = "/{avisId}", method = RequestMethod.GET)
+	@GetMapping(value = "/{avisId}")
 	public String get(@PathVariable Long avisId, Model model) {
 
 		AvisDto avis = null;
@@ -74,7 +77,7 @@ public class AvisController extends BaseUserController {
 		return "avisForm";
 	}
 
-	@RequestMapping(method = RequestMethod.POST)
+	@PostMapping
 	public String save(HttpServletRequest request, @Valid AvisCommand command, BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
@@ -90,21 +93,21 @@ public class AvisController extends BaseUserController {
 		return getModalControllerReturnValueSuccess(request, url, msg);
 	}
 
-	@RequestMapping(value = "/{avisId}/enable", method = RequestMethod.GET)
+	@GetMapping(value = "/{avisId}/enable")
 	public String enable(HttpServletRequest request, @PathVariable Long avisId) {
 
 		avisService.updateActiva(avisId, true);
 		return getAjaxControllerReturnValueSuccess(request, "redirect:../../avis", "avis.controller.activat.ok");
 	}
 
-	@RequestMapping(value = "/{avisId}/disable", method = RequestMethod.GET)
+	@GetMapping(value = "/{avisId}/disable")
 	public String disable(HttpServletRequest request, @PathVariable Long avisId) {
 
 		avisService.updateActiva(avisId, false);
 		return getAjaxControllerReturnValueSuccess(request, "redirect:../../avis", "avis.controller.desactivat.ok");
 	}
 
-	@RequestMapping(value = "/{avisId}/delete", method = RequestMethod.GET)
+	@GetMapping(value = "/{avisId}/delete")
 	public String delete(HttpServletRequest request, @PathVariable Long avisId) {
 
 		avisService.delete(avisId);

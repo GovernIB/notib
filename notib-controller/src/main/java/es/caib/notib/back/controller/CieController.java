@@ -16,10 +16,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,24 +38,28 @@ import java.util.Date;
 @RequestMapping("/cie")
 public class CieController extends BaseUserController{
 	
-	private final static String PAGADOR_CIE_FILTRE = "pagadorcie_filtre";
+
 	@Autowired
 	private PagadorCieService pagadorCieService;
 	@Autowired
 	private OrganGestorService organGestorService;
+
+	private static final  String PAGADOR_CIE_FILTRE = "pagadorcie_filtre";
+	private static final String ORGANS_GESTORS = "organsGestors";
+
 	
-	@RequestMapping(method = RequestMethod.GET)
+	@GetMapping
 	public String get(HttpServletRequest request, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
 		var cieFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("cieFiltreCommand", cieFiltreCommand);
 		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
-		model.addAttribute("organsGestors", organsGestors);
+		model.addAttribute(ORGANS_GESTORS, organsGestors);
 		return "cieList";
 	}
 	
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@GetMapping(value = "/datatable")
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request ) {
 
@@ -67,30 +72,28 @@ public class CieController extends BaseUserController{
 		return DatatablesHelper.getDatatableResponse(request, pagadorsCie, "id");
 	}
 	
-	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	@GetMapping(value = "/new")
 	public String newGet(HttpServletRequest request, Model model) {
-
-		var vista = formGet(request, null, model);
-		return vista;
+		return formGet(request, null, model);
 	}
 	
-	@RequestMapping(method = RequestMethod.POST)
+	@PostMapping
 	public String post(HttpServletRequest request, CieFiltreCommand command, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
 		RequestSessionHelper.actualitzarObjecteSessio(request, PAGADOR_CIE_FILTRE, command);
 		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
-		model.addAttribute("organsGestors", organsGestors);
+		model.addAttribute(ORGANS_GESTORS, organsGestors);
 		return "cieList";
 	}
 	
-	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
+	@PostMapping(value = "/newOrModify")
 	public String save(HttpServletRequest request, @Valid CieCommand cieCommand, BindingResult bindingResult, Model model) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
-			model.addAttribute("organsGestors", organsGestors);
+			model.addAttribute(ORGANS_GESTORS, organsGestors);
 			return "cieForm";
 		}
 		var msg = cieCommand.getId() != null ? "cie.controller.modificat.ok" : "cie.controller.creat.ok";
@@ -99,7 +102,7 @@ public class CieController extends BaseUserController{
 		return getModalControllerReturnValueSuccess(request, "redirect:cie", msg);
 	}
 	
-	@RequestMapping(value = "/{pagadorCieId}", method = RequestMethod.GET)
+	@GetMapping(value = "/{pagadorCieId}")
 	public String formGet(HttpServletRequest request, @PathVariable Long pagadorCieId, Model model) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
@@ -112,11 +115,11 @@ public class CieController extends BaseUserController{
 		cieCommand = pagadorCie != null ? CieCommand.asCommand(pagadorCie) : new CieCommand();
 		model.addAttribute(cieCommand);
 		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
-		model.addAttribute("organsGestors", organsGestors);
+		model.addAttribute(ORGANS_GESTORS, organsGestors);
 		return "cieForm";
 	}
 	
-	@RequestMapping(value = "/{pagadorCieId}/delete", method = RequestMethod.GET)
+	@GetMapping(value = "/{pagadorCieId}/delete")
 	public String delete(HttpServletRequest request, @PathVariable Long pagadorCieId) {
 
 		var redirect = "redirect:../../cie";

@@ -53,6 +53,10 @@ public class ServeiPermisController extends BaseUserController{
 	OrganGestorService organGestorService;
 
 	private static final String SERVEI = "servei";
+	private static final String ORGANS = "organs";
+	private static final String SERVEI_ADMIN_PERMIS_FORM = "serveiAdminPermisForm";
+	private static final String PERMIS = "/permis";
+
 
 	@GetMapping(value = "/{serveiId}/permis")
 	public String get(HttpServletRequest request, @PathVariable Long serveiId, Model model) {
@@ -116,14 +120,14 @@ public class ServeiPermisController extends BaseUserController{
 			}
 		}
 		if (servei.isComu()) {
-			model.addAttribute("organs", getOrganismes(request));
+			model.addAttribute(ORGANS, getOrganismes(request));
 		}
 		var command = permis != null ? ProcSerPermisCommand.asCommand(permis, ProcSerPermisCommand.EntitatPermis.SERVEI) : new ProcSerPermisCommand();
 		if (!servei.isComu()) {
 			command.setOrgan(servei.getOrganGestor());
 		}
 		model.addAttribute(command);
-		return "serveiAdminPermisForm";
+		return SERVEI_ADMIN_PERMIS_FORM;
 	}
 	
 	@PostMapping(value = "/{serveiId}/permis")
@@ -133,22 +137,22 @@ public class ServeiPermisController extends BaseUserController{
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(SERVEI, serveiService.findById(entitatActual.getId(), isAdministrador(request), serveiId));
 			if (command.getOrgan() != null) {
-				model.addAttribute("organs", getOrganismes(request));
+				model.addAttribute(ORGANS, getOrganismes(request));
 			}
 			model.addAttribute("principalSize", command.getPrincipalDefaultSize());
-			return "serveiAdminPermisForm";
+			return SERVEI_ADMIN_PERMIS_FORM;
 		}
 		
 		if (TipusEnumDto.ROL.equals(command.getTipus()) && command.getPrincipal().equalsIgnoreCase("tothom") && RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
 			model.addAttribute(SERVEI, serveiService.findById(entitatActual.getId(), isAdministrador(request), serveiId));
 			if (command.getOrgan() != null) {
-				model.addAttribute("organs", getOrganismes(request));
+				model.addAttribute(ORGANS, getOrganismes(request));
 			}
-			return getModalControllerReturnValueError(request, "serveiAdminPermisForm", "servei.controller.permis.modificat.ko");
+			return getModalControllerReturnValueError(request, SERVEI_ADMIN_PERMIS_FORM, "servei.controller.permis.modificat.ko");
 		}
 		var organGestorActualId = getOrganGestorActualId(request);
 		procedimentService.permisUpdate(entitatActual.getId(), organGestorActualId, serveiId, ProcSerPermisCommand.asDto(command));
-		return getModalControllerReturnValueSuccess(request, "redirect:../../servei/" + serveiId + "/permis", "servei.controller.permis.modificat.ok");
+		return getModalControllerReturnValueSuccess(request, "redirect:../../servei/" + serveiId + PERMIS, "servei.controller.permis.modificat.ok");
 	}
 	
 	@GetMapping(value = "/{serveiId}/permis/{permisId}/delete")
@@ -157,7 +161,7 @@ public class ServeiPermisController extends BaseUserController{
 		var entitatActual = getEntitatActualComprovantPermisos(request);
 		var organGestorActualId = getOrganGestorActualId(request);
 		procedimentService.permisDelete(entitatActual.getId(), organGestorActualId, serveiId, null, permisId, TipusPermis.PROCEDIMENT);
-		return getAjaxControllerReturnValueSuccess(request, "redirect:../../../../servei/" + serveiId + "/permis", "servei.controller.permis.esborrat.ok");
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../../../servei/" + serveiId + PERMIS, "servei.controller.permis.esborrat.ok");
 	}
 	
 	@GetMapping(value = "/{serveiId}/organ/{organ}/permis/{permisId}/delete")
@@ -166,7 +170,7 @@ public class ServeiPermisController extends BaseUserController{
 		var entitatActual = getEntitatActualComprovantPermisos(request);
 		var organGestorActualId = getOrganGestorActualId(request);
 		procedimentService.permisDelete(entitatActual.getId(), organGestorActualId, serveiId, organ, permisId, TipusPermis.PROCEDIMENT_ORGAN);
-		return getAjaxControllerReturnValueSuccess(request, "redirect:../../../../servei/" + serveiId + "/permis", "servei.controller.permis.esborrat.ok");
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../../../servei/" + serveiId + PERMIS, "servei.controller.permis.esborrat.ok");
 	}
 	
 	private List<OrganismeDto> getOrganismes(HttpServletRequest request) {

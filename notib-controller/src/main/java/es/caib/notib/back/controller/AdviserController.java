@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,7 +26,7 @@ public class AdviserController  extends BaseController {
     private AdviserService adviserService;
 
     @ResponseBody
-    @RequestMapping(value = "/sincronitzar", method = RequestMethod.POST, headers="Content-Type=application/json")
+    @PostMapping(value = "/sincronitzar", headers="Content-Type=application/json")
     public AdviserResponseDto actualitzarReferencies(HttpServletRequest request, @RequestBody EnviamentAdviser adviser, Model model) {
 
         try {
@@ -41,7 +42,6 @@ public class AdviserController  extends BaseController {
             }
             var resposta = adviserService.sincronizarEnvio(adviser.asSincronizarEnvio());
             return AdviserResponseDto.builder().identificador(resposta.getIdentificador()).codigoRespuesta(resposta.getCodigoRespuesta()).descripcionRespuesta(resposta.getDescripcionRespuesta()).build();
-//            return adviserService.sincronitzarEnviament(adviser.asDto());
         } catch (Exception ex) {
             log.error("Error al sincronitzar l'enviament", ex);
             var desc = getMessage(request, "adviser.sincronitzar.enviament.error") + ": " + ex.getMessage();

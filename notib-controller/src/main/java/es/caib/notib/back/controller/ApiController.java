@@ -3,8 +3,8 @@ package es.caib.notib.back.controller;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +17,7 @@ public class ApiController extends BaseUserController {
     private AplicacioService aplicacioService;
 
 
-    @RequestMapping(value = "/scheduling/restart", method = RequestMethod.GET)
+    @GetMapping(value = "/scheduling/restart")
     @ResponseBody
     public String schedulingRestart(HttpServletRequest request) {
 

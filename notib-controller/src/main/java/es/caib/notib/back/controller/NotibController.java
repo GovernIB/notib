@@ -18,9 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -43,7 +42,9 @@ public class NotibController implements ErrorController {
 	@Autowired
 	private AplicacioService aplicacioService;
 
-	@RequestMapping(value = "/index", method = RequestMethod.GET)
+	private static final String REDIRECT_NOTIFICACIO = "redirect:notificacio";
+
+	@GetMapping(value = "/index")
 	public String get(HttpServletRequest request, Model model) {
 		
 		if (RolHelper.isUsuariActualAdministrador(request)) {
@@ -53,66 +54,68 @@ public class NotibController implements ErrorController {
 			return "redirect:api/rest";
 		}
 		if (RolHelper.isUsuariActualUsuari(request)) {
-			return "redirect:notificacio";
+			return REDIRECT_NOTIFICACIO;
 		}
 		var entitat = EntitatHelper.getEntitatActual(request);
 		if (entitat == null)
 			throw new SecurityException("No te cap entitat assignada");
 		if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
-			return "redirect:notificacio";
+			return REDIRECT_NOTIFICACIO;
 		}
 		if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
-			return "redirect:notificacio";
+			return REDIRECT_NOTIFICACIO;
 		}
 		return "index";
 	}
 
-	@RequestMapping(value = ModalHelper.ACCIO_MODAL_TANCAR, method = RequestMethod.GET)
+	@GetMapping(value = ModalHelper.ACCIO_MODAL_TANCAR)
 	@ResponseStatus(value = HttpStatus.OK)
 	public void modalTancar() {
+		// modalTancar
 	}
 
-	@RequestMapping(value = AjaxHelper.ACCIO_AJAX_OK, method = RequestMethod.GET)
+	@GetMapping(value = AjaxHelper.ACCIO_AJAX_OK)
 	@ResponseStatus(value = HttpStatus.OK)
 	public void ajaxOk() {
+		// ajaxOk
 	}
 
-	@RequestMapping(value = "/missatges", method = RequestMethod.GET)
+	@GetMapping(value = "/missatges")
 	public String get() {
 		return "util/missatges";
 	}
 
-	@RequestMapping(value = "/desenv/usuariActual", method = RequestMethod.GET)
+	@GetMapping(value = "/desenv/usuariActual")
 	@ResponseBody
 	public UsuariDto desenvUsuariActual() {
 		return aplicacioService.getUsuariActual();
 	}
 
-	@RequestMapping(value = "/error")
+	@GetMapping(value = "/error")
 	public String error(HttpServletRequest request, Model model) {
 
 		model.addAttribute("errorObject", new ErrorObject(request));
 		return "util/error";
 	}
 
-	@RequestMapping(value = "/api")
+	@GetMapping(value = "/api")
 	public String api(HttpServletRequest request, Model model) {
 		return "redirect:/api/rest";
 	}
 
-	@RequestMapping(value = "/log/download", method = RequestMethod.GET)
+	@GetMapping(value = "/log/download")
 	@ResponseBody
 	public ResponseEntity<Resource> logDownload(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		return getLogFile(request, response, null);
 	}
 
-	@RequestMapping(value = "/log/download/{dia}", method = RequestMethod.GET)
+	@GetMapping(value = "/log/download/{dia}")
 	@ResponseBody
 	public ResponseEntity<Resource> logDownload(HttpServletRequest request, @PathVariable String dia, HttpServletResponse response) throws Exception {
 		return getLogFile(request, response, dia);
 	}
 
-	private ResponseEntity getLogFile(HttpServletRequest request, HttpServletResponse response, String dia) throws IOException {
+	private ResponseEntity<Resource> getLogFile(HttpServletRequest request, HttpServletResponse response, String dia) throws IOException {
 
 		var thisPath = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
 		if (thisPath.startsWith("file:")) {
@@ -132,7 +135,7 @@ public class NotibController implements ErrorController {
 		if (logExist && request.isUserInRole("ROLE_ADMIN")) {
 			fileName = "server." + (dia != null ? dia : fileName) + ".log";
 			response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-			return new ResponseEntity(new FileSystemResource(logFile), HttpStatus.OK);
+			return new ResponseEntity<>(new FileSystemResource(logFile), HttpStatus.OK);
 		}
 		fileName = "no." + (dia != null ? dia : fileName) + ".log";
 		response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");

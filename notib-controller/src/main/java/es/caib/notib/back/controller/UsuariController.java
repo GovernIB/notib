@@ -42,7 +42,7 @@ public class UsuariController extends BaseController {
 		// EMPTY METHOD
 	}
 
-	@RequestMapping(value = "/configuracio", method = RequestMethod.GET)
+	@GetMapping(value = "/configuracio")
 	public String getConfiguracio(HttpServletRequest request, Model model) {
 
 		var usuari = aplicacioService.getUsuariActual();

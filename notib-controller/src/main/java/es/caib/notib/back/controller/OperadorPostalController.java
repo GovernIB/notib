@@ -14,8 +14,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -34,26 +36,28 @@ import java.util.Date;
 @Controller
 @RequestMapping("/operadorPostal")
 public class OperadorPostalController extends BaseUserController{
-	
-	private final static String PAGADOR_POSTAL_FILTRE = "pagadorpostal_filtre";
 
 	@Autowired
 	private OperadorPostalService operadorPostalService;
 	@Autowired
 	private OrganGestorService organGestorService;
 
-	@RequestMapping(method = RequestMethod.GET)
+	private static final String PAGADOR_POSTAL_FILTRE = "pagadorpostal_filtre";
+	private static final String ORGANS_GESTORS = "organsGestors";
+
+
+	@GetMapping
 	public String get(HttpServletRequest request, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
 		var operadorPostalFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("operadorPostalFiltreCommand", operadorPostalFiltreCommand);
 		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
-		model.addAttribute("organsGestors", organsGestors);
+		model.addAttribute(ORGANS_GESTORS, organsGestors);
 		return "operadorPostalList";
 	}
 	
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@GetMapping(value = "/datatable")
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request ) {
 
@@ -66,28 +70,28 @@ public class OperadorPostalController extends BaseUserController{
 		return DatatablesHelper.getDatatableResponse(request, pagadorsPostals, "id");
 	}
 	
-	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	@GetMapping(value = "/new")
 	public String newGet(HttpServletRequest request, Model model) {
 		return formGet(request, null, model);
 	}
 	
-	@RequestMapping(method = RequestMethod.POST)
+	@PostMapping
 	public String post(HttpServletRequest request, OperadorPostalFiltreCommand command, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
 		RequestSessionHelper.actualitzarObjecteSessio(request, PAGADOR_POSTAL_FILTRE, command);
 		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
-		model.addAttribute("organsGestors", organsGestors);
+		model.addAttribute(ORGANS_GESTORS, organsGestors);
 		return "operadorPostalList";
 	}
 	
-	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
+	@PostMapping(value = "/newOrModify")
 	public String save(HttpServletRequest request, @Valid OperadorPostalCommand operadorPostalCommand, BindingResult bindingResult, Model model) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
-			model.addAttribute("organsGestors", organsGestors);
+			model.addAttribute(ORGANS_GESTORS, organsGestors);
 			return "operadorPostalForm";
 		}
 		var msg = operadorPostalCommand.getId() != null ? "operadorpostal.controller.modificat.ok" : "operadorpostal.controller.creat.ok";
@@ -96,7 +100,7 @@ public class OperadorPostalController extends BaseUserController{
 		return getModalControllerReturnValueSuccess(request, "redirect:pagadorsPostals", msg);
 	}
 	
-	@RequestMapping(value = "/{operadorPostalId}", method = RequestMethod.GET)
+	@GetMapping(value = "/{operadorPostalId}")
 	public String formGet(HttpServletRequest request, @PathVariable Long operadorPostalId, Model model) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
@@ -109,14 +113,13 @@ public class OperadorPostalController extends BaseUserController{
 		operadorPostalCommand = operadorPostal != null ? OperadorPostalCommand.asCommand(operadorPostal) : new OperadorPostalCommand();
 		model.addAttribute(operadorPostalCommand);
 		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
-		model.addAttribute("organsGestors", organsGestors);
+		model.addAttribute(ORGANS_GESTORS, organsGestors);
 		return "operadorPostalForm";
 	}
 	
-	@RequestMapping(value = "/{operadorPostalId}/delete", method = RequestMethod.GET)
+	@GetMapping(value = "/{operadorPostalId}/delete")
 	public String delete(HttpServletRequest request, @PathVariable Long operadorPostalId) {
 
-		//EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		var redirect = "redirect:../../operadorPostal";
 		try {
 			operadorPostalService.delete(operadorPostalId);
