@@ -404,14 +404,6 @@ public class NotificacioValidatorHelper {
 		return valid;
 	}
 
-
-
-	public static boolean isPdf(String docBase64) {
-
-		String formatsPdf = "JVBERi0"; //PDF
-		return docBase64.startsWith(formatsPdf);
-	}
-
 	private Long getMaxSizeFile() {
 		return configHelper.getAsLong("es.caib.notib.notificacio.document.size");
 	}

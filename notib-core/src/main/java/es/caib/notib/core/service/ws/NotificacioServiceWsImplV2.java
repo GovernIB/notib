@@ -1457,7 +1457,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if(documentV2.getContingutBase64() != null) {
 			logger.debug(">> [ALTA] document contingut Base64");
 			byte[] contingut = Base64.decodeBase64(documentV2.getContingutBase64());
-			boolean isPdf = NotificacioValidatorHelper.isPdf(Base64.encodeBase64String(contingut));
+			boolean isPdf = MimeUtils.isPDF(Base64.encodeBase64String(contingut));
 			String mediaType = MimeUtils.getMimeTypeFromContingut(documentV2.getArxiuNom(), documentV2.getContingutBase64());
 			if (isPdf && isValidaFirmaRestEnabled()) {
 				SignatureInfoDto signatureInfo = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, documentV2.getArxiuNom(), mediaType);
@@ -2635,14 +2635,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 	}
 
-	private boolean isPDF(String docBase64) {
-		return docBase64.startsWith("JVBERi0");
-	}
 
 	private Boolean isMultipleDestinataris() {
+
 		String property = "es.caib.notib.destinatari.multiple";
-		logger.debug("Consulta del valor de la property (" +
-				"property=" + property + ")");
+		logger.debug("Consulta del valor de la property (property=" + property + ")");
 		return configHelper.getAsBoolean(property);
 	}
 

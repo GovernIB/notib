@@ -15,7 +15,17 @@ import java.util.zip.ZipFile;
 public class MimeUtils {
 
     private static final String ZIP_SIGNED = "application/pkcs7-signature";
+    private static final String PDF = "application/pdf";
+    private static final String ZIP = "application/zip";
     private static final String[] formatsValidsNotCom = {"JVBERi0","UEsDB"}; //PDF / ZIP
+
+    public static boolean isPDF(String docBase64) {
+        return docBase64.startsWith(formatsValidsNotCom[0]);
+    }
+
+    public static boolean isZIP(String docBase64) {
+        return docBase64.startsWith(formatsValidsNotCom[1]);
+    }
 
     public static String getMimeTypeFromContingut(String arxiuNom, byte[] contingut) {
         return getMimeTypeFromContingut(arxiuNom, Base64.encodeBase64String(contingut));
@@ -26,7 +36,12 @@ public class MimeUtils {
         try {
             int lastIndex = arxiuNom.lastIndexOf(".");
             if (lastIndex == 0 || lastIndex == -1) {
-                throw new RuntimeException("Nom de l'arxiu invàlid: " + arxiuNom);
+                if (isPDF(base64)) {
+                    return PDF;
+                }
+                if (isZIP(base64)) {
+                    return ZIP;
+                }
             }
             String nom = arxiuNom.substring(0, lastIndex);
             String ext = arxiuNom.substring(lastIndex, arxiuNom.length());
