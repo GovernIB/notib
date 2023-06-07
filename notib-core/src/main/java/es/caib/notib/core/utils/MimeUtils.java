@@ -34,24 +34,25 @@ public class MimeUtils {
     public static String getMimeTypeFromContingut(String arxiuNom, String base64) {
 
         try {
-            int lastIndex = arxiuNom.lastIndexOf(".");
-            if (lastIndex == 0 || lastIndex == -1) {
-                if (isPDF(base64)) {
-                    return PDF;
-                }
-                if (isZIP(base64)) {
-                    return ZIP;
-                }
-            }
-            String nom = arxiuNom.substring(0, lastIndex);
-            String ext = arxiuNom.substring(lastIndex, arxiuNom.length());
-            return getMimeTypeFromBase64(base64, nom, ext);
+            return getMimeTypeFromBase64(base64, arxiuNom);
         } catch (IOException ex) {
             String err = "Error obtenint el tipus MIME del document " + arxiuNom;
             log.error(err, ex);
             throw new RuntimeException(err);
         }
     }
+
+    public static String getMimeTypeFromBase64(String base64, String nom) throws IOException {
+
+        byte[] contingut = Base64.decodeBase64(base64);
+        File tmp = File.createTempFile(nom, "");
+        Files.write(contingut, tmp);
+        Tika tika = new Tika();
+        String mimeType = tika.detect(tmp);
+        tmp.delete();
+        return mimeType;
+    }
+
 
     public static String getMimeTypeFromBase64(String base64, String nom, String extensio) throws IOException {
 
