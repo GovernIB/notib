@@ -64,7 +64,8 @@ public class RegistreHelper {
 		boolean error = false;
 		String errorPrefix = "Error al consultar l'estat d'un Registre (" + "notificacioId=" + notificacio.getId() + ", " + "registreNumeroFormatat=" + enviament.getRegistreNumeroFormatat() + ")";
 		String errorDescripcio = null;
-
+		boolean canviEstat = false;
+		boolean errorUltimaConsulta = enviament.getSirConsultaIntent() > 0;
 		try {
 			// Validacions
 			if (enviament.getRegistreNumeroFormatat() == null) {
@@ -89,6 +90,7 @@ public class RegistreHelper {
 
 			// Consulta retorna correctement
 			} else {
+				canviEstat = !enviament.getRegistreEstat().equals(resposta.getEstat());
 				enviamentUpdateDatat(
 						resposta.getEstat(),
 						resposta.getRegistreData(),
@@ -119,7 +121,9 @@ public class RegistreHelper {
 		}
 
 		notificacioEventHelper.addSirConsultaEvent(enviament, error, errorDescripcio, errorMaxReintents);
-		callbackHelper.updateCallback(enviament, error, errorDescripcio);
+		if (canviEstat || error && !errorUltimaConsulta || !error && errorUltimaConsulta) {
+			callbackHelper.updateCallback(enviament, error, errorDescripcio);
+		}
 		logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 
 		enviamentTableHelper.actualitzarRegistre(enviament);
