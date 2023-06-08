@@ -58,33 +58,33 @@ public class AuditServiceImpl implements AuditService {
 	public void audita(Object objecteAuditar, TipusOperacio tipusOperacio, TipusEntitat tipusEntitat, TipusObjecte tipusObjecte, String joinPoint) {
 
 		switch (tipusEntitat) {
-		case APLICACIO:
-			auditaAplicacio(objecteAuditar, tipusOperacio, joinPoint);
-			break;
-		case ENTITAT:
-			auditaEntitat(objecteAuditar, tipusOperacio, joinPoint);
-			break;
-		case GRUP:
-			auditaGrup(objecteAuditar, tipusOperacio, joinPoint);
-			break;
-		case PROCEDIMENT:
-			auditaProcediment(objecteAuditar, tipusOperacio, tipusObjecte, joinPoint);
-			break;
-		case SERVEI:
-			auditaServei(objecteAuditar, tipusOperacio, tipusObjecte, joinPoint);
-			break;
-		case PROCEDIMENT_GRUP:
-			auditaProcedimentGrup(objecteAuditar, tipusOperacio, joinPoint);
-			break;
-		case NOTIFICACIO:
-			auditaNotificacio(objecteAuditar, tipusOperacio, joinPoint);
-			break;
-		case ENVIAMENT:
-			auditaEnviament(objecteAuditar, tipusOperacio, joinPoint);
-			break;
-		default:
-			log.error("Error auditoria: No s'ha informat el tipus d'entitat a auditar per: " + (objecteAuditar != null ? objecteAuditar.toString() : "null"));
-			break;
+			case APLICACIO:
+				auditaAplicacio(objecteAuditar, tipusOperacio, joinPoint);
+				break;
+			case ENTITAT:
+				auditaEntitat(objecteAuditar, tipusOperacio, joinPoint);
+				break;
+			case GRUP:
+				auditaGrup(objecteAuditar, tipusOperacio, joinPoint);
+				break;
+			case PROCEDIMENT:
+				auditaProcediment(objecteAuditar, tipusOperacio, tipusObjecte, joinPoint);
+				break;
+			case SERVEI:
+				auditaServei(objecteAuditar, tipusOperacio, tipusObjecte, joinPoint);
+				break;
+			case PROCEDIMENT_GRUP:
+				auditaProcedimentGrup(objecteAuditar, tipusOperacio, joinPoint);
+				break;
+			case NOTIFICACIO:
+				auditaNotificacio(objecteAuditar, tipusOperacio, joinPoint);
+				break;
+			case ENVIAMENT:
+				auditaEnviament(objecteAuditar, tipusOperacio, joinPoint);
+				break;
+			default:
+				log.error("Error auditoria: No s'ha informat el tipus d'entitat a auditar per: " + (objecteAuditar != null ? objecteAuditar.toString() : "null"));
+				break;
 		}
 	}
 
@@ -169,12 +169,17 @@ public class AuditServiceImpl implements AuditService {
 			log.error("Error auditoria: L'objecte a auditar no és del tipus correcte: ServeiEntity || ServeiDto");
 			isAuditar = false;
 		}
-		if (isAuditar) {
-			audit = tipusObjecte == null || TipusObjecte.ENTITAT.equals(tipusObjecte) ?
-					ProcedimentAudit.getBuilder((ProcSerEntity)objecteAuditar, tipusOperacio, joinPoint).build()
-					: ProcedimentAudit.getBuilder((ProcSerDto)objecteAuditar, tipusOperacio, joinPoint).build();
-			procedimentAuditRepository.saveAndFlush(audit);
+		if (!isAuditar) {
+			return;
 		}
+		if (tipusObjecte == null || TipusObjecte.ENTITAT.equals(tipusObjecte)) {
+			assert objecteAuditar instanceof ProcSerEntity;
+			audit = ProcedimentAudit.getBuilder((ProcSerEntity)objecteAuditar, tipusOperacio, joinPoint).build();
+		} else {
+			assert objecteAuditar instanceof ProcSerDto;
+			audit = ProcedimentAudit.getBuilder((ProcSerDto)objecteAuditar, tipusOperacio, joinPoint).build();
+		}
+		procedimentAuditRepository.saveAndFlush(audit);
 	}
 
 	private void auditaProcedimentGrup(Object objecteAuditar, TipusOperacio tipusOperacio, String joinPoint) {
@@ -205,13 +210,14 @@ public class AuditServiceImpl implements AuditService {
 			log.error("Error auditoria: L'objecte a auditar no és del tipus correcte: NotificacioEntity");
 			isAuditar = false;
 		}
-		if (isAuditar) {
-			var lastErrorEvent = notificacioHelper.getNotificaErrorEvent((NotificacioEntity)objecteAuditar);
-			audit = new NotificacioAudit((NotificacioEntity)objecteAuditar, lastErrorEvent, tipusOperacio, joinPoint);
-			var lastAudit = notificacioAuditRepository.findLastAudit(audit.getNotificacioId());
-			if (lastAudit == null || !audit.getTipusOperacio().equals(lastAudit.getTipusOperacio()) || !audit.equals(lastAudit)) {
-				notificacioAuditRepository.saveAndFlush(audit);
-			}
+		if (!isAuditar) {
+			return;
+		}
+		var lastErrorEvent = notificacioHelper.getNotificaErrorEvent((NotificacioEntity)objecteAuditar);
+		audit = new NotificacioAudit((NotificacioEntity)objecteAuditar, lastErrorEvent, tipusOperacio, joinPoint);
+		var lastAudit = notificacioAuditRepository.findLastAudit(audit.getNotificacioId());
+		if (lastAudit == null || !audit.getTipusOperacio().equals(lastAudit.getTipusOperacio()) || !audit.equals(lastAudit)) {
+			notificacioAuditRepository.saveAndFlush(audit);
 		}
 	}
 
@@ -226,12 +232,13 @@ public class AuditServiceImpl implements AuditService {
 			log.error("Error auditoria: L'objecte a auditar no és del tipus correcte: NotificacioEnviamentEntity");
 			isAuditar = false;
 		}
-		if (isAuditar) {
-			audit = NotificacioEnviamentAudit.getBuilder((NotificacioEnviamentEntity)objecteAuditar, tipusOperacio, joinPoint).build();
-			var lastAudit = notificacioEnviamentAuditRepository.findLastAudit(audit.getEnviamentId());
-			if (lastAudit == null || !audit.getTipusOperacio().equals(lastAudit.getTipusOperacio()) || !audit.equals(lastAudit)) {
-				notificacioEnviamentAuditRepository.saveAndFlush(audit);
-			}
+		if (!isAuditar) {
+			return;
+		}
+		audit = NotificacioEnviamentAudit.getBuilder((NotificacioEnviamentEntity)objecteAuditar, tipusOperacio, joinPoint).build();
+		var lastAudit = notificacioEnviamentAuditRepository.findLastAudit(audit.getEnviamentId());
+		if (lastAudit == null || !audit.getTipusOperacio().equals(lastAudit.getTipusOperacio()) || !audit.equals(lastAudit)) {
+			notificacioEnviamentAuditRepository.saveAndFlush(audit);
 		}
 	}
 }

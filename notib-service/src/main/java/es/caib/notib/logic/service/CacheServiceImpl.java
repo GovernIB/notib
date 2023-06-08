@@ -3,7 +3,6 @@
  */
 package es.caib.notib.logic.service;
 
-import com.codahale.metrics.Timer;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
@@ -11,15 +10,11 @@ import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.intf.dto.CacheDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.service.CacheService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +24,7 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Service
 public class CacheServiceImpl implements CacheService {
 
@@ -41,7 +37,7 @@ public class CacheServiceImpl implements CacheService {
 	@Autowired
 	private PaginacioHelper paginacioHelper;
 
-	public static Map<String, Integer> ordreCaches;
+	private static final Map<String, Integer> ordreCaches;
 
 	static {
 		ordreCaches = new HashMap<>();
@@ -80,31 +76,30 @@ public class CacheServiceImpl implements CacheService {
 
 	@Override
 	public PaginaDto<CacheDto> getAllCaches() {
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Recuperant el llistat de les caches disponibles");
+			log.debug("Recuperant el llistat de les caches disponibles");
 			List<CacheDto> caches = new ArrayList<>();
-			Collection<String> cachesValues = cacheHelper.getAllCaches();
-			for (String cacheValue : cachesValues) {
-//				if (!cacheValue.equals("aclCache")) {
-					CacheDto cache = new CacheDto();
-					cache.setCodi(cacheValue);
-					cache.setDescripcio(messageHelper.getMessage("es.caib.notib.ehcache." + cacheValue));
-					cache.setLocalHeapSize(cacheHelper.getCacheSize(cacheValue));
-					caches.add(cache);
-//				}
+			var cachesValues = cacheHelper.getAllCaches();
+			CacheDto cache;
+			for (var cacheValue : cachesValues) {
+				cache = new CacheDto();
+				cache.setCodi(cacheValue);
+				cache.setDescripcio(messageHelper.getMessage("es.caib.notib.ehcache." + cacheValue));
+				cache.setLocalHeapSize(cacheHelper.getCacheSize(cacheValue));
+				caches.add(cache);
 			}
-			Collections.sort(caches, new Comparator<CacheDto>() {
-				@Override
-				public int compare(CacheDto c1, CacheDto c2) {
-					Integer c1Pos = ordreCaches.get(c1.getCodi());
-					if (c1Pos == null)
-						c1Pos = 1000;
-					Integer c2Pos = ordreCaches.get(c2.getCodi());
-					if (c2Pos == null)
-						c2Pos = 1001;
-					return c1Pos.compareTo(c2Pos);
+			caches.sort((c1, c2) -> {
+				var c1Pos = ordreCaches.get(c1.getCodi());
+				if (c1Pos == null) {
+					c1Pos = 1000;
 				}
+				var c2Pos = ordreCaches.get(c2.getCodi());
+				if (c2Pos == null) {
+					c2Pos = 1001;
+				}
+				return c1Pos.compareTo(c2Pos);
 			});
 			return paginacioHelper.toPaginaDto(caches, CacheDto.class);
 		} finally {
@@ -114,9 +109,10 @@ public class CacheServiceImpl implements CacheService {
 
 	@Override
 	public void removeCache(String value) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
+
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Esborrant la cache (value=" + value + ")");
+			log.debug("Esborrant la cache (value=" + value + ")");
 			cacheHelper.clearCache(value);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -125,15 +121,14 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public void removeAllCaches() {
-		Timer.Context timer = metricsHelper.iniciMetrica();
+
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Esborrant totes les caches");
+			log.debug("Esborrant totes les caches");
 			cacheHelper.clearAllCaches();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
     }
-
-    private static final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
 
 }

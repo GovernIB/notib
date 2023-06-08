@@ -1,6 +1,5 @@
 package es.caib.notib.logic.service;
 
-import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.helper.AuditHelper;
@@ -62,19 +61,18 @@ public class AdviserServiceImpl implements AdviserService {
     @Autowired
     private AuditHelper auditHelper;
 
-    private final Object lock = new Object();
+    private static final String ERROR_CALLBACK_NOTIFICA = "Error al processar petició datadoOrganismo dins el callback de Notifica (identificadorDestinatario=";
+
 
     @Override
     @Transactional
     public ResultadoSincronizarEnvio sincronizarEnvio(SincronizarEnvio sincronizarEnvio) {
 
-        Timer.Context timer = metricsHelper.iniciMetrica();
-        ResultadoSincronizarEnvio resultadoSincronizarEnvio = new ResultadoSincronizarEnvio();
+        var timer = metricsHelper.iniciMetrica();
         try {
-            String identificador = sincronizarEnvio.getIdentificador();
-
-            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm");
-            Date dataEstat = toDate(sincronizarEnvio.getFechaEstado());
+            var identificador = sincronizarEnvio.getIdentificador();
+            var sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+            var dataEstat = toDate(sincronizarEnvio.getFechaEstado());
 
             log.info("[ADV] Inici sincronització enviament Adviser [");
             log.info("        Id: " + (identificador != null ? identificador : ""));
@@ -86,13 +84,10 @@ public class AdviserServiceImpl implements AdviserService {
                 log.info("        FechaEstado: " + sdf.format(dataEstat));
             }
             log.info("        Receptor: " + (sincronizarEnvio.getReceptor() != null ? sincronizarEnvio.getReceptor().getNifReceptor() : "") + "]");
-
             log.debug("--------------------------------------------------------------");
             log.debug("Processar petició dins l'Adviser...");
 
-            IntegracioInfo info = new IntegracioInfo(
-                    IntegracioHelper.INTCODI_NOTIFICA,
-                    "Recepció de canvi de notificació via Adviser",
+            IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA, "Recepció de canvi de notificació via Adviser",
                     IntegracioAccioTipusEnumDto.RECEPCIO,
                     new AccioParam("Organisme emisor", sincronizarEnvio.getOrganismoEmisor()),
                     new AccioParam("Identificador", (identificador != null ? identificador : "")),
@@ -107,45 +102,24 @@ public class AdviserServiceImpl implements AdviserService {
                     new AccioParam("Acús en PDF (Hash)", sincronizarEnvio.getAcusePDF() != null ? sincronizarEnvio.getAcusePDF().getHash() : ""),
                     new AccioParam("Acús en XML (Hash)", sincronizarEnvio.getAcuseXML() != null ? sincronizarEnvio.getAcuseXML().getHash() : ""));
 
-            resultadoSincronizarEnvio = updateEnviament(
-                    sincronizarEnvio.getOrganismoEmisor(),
-                    sincronizarEnvio.getIdentificador(),
-                    sincronizarEnvio.getTipoEntrega(),
-                    sincronizarEnvio.getModoNotificacion(),
-                    sincronizarEnvio.getEstado(),
-                    dataEstat,
-                    sincronizarEnvio.getReceptor(),
-                    sincronizarEnvio.getAcusePDF(),
-                    info);
+            return updateEnviament(sincronizarEnvio.getIdentificador(), sincronizarEnvio.getTipoEntrega(), sincronizarEnvio.getModoNotificacion(),
+                                        sincronizarEnvio.getEstado(), dataEstat, sincronizarEnvio.getReceptor(), sincronizarEnvio.getAcusePDF(), info);
         } finally {
             metricsHelper.fiMetrica(timer);
         }
-
-        return resultadoSincronizarEnvio;
     }
 
-    private ResultadoSincronizarEnvio updateEnviament(
-            String organismoEmisor,
-            String identificador,
-            BigInteger tipoEntrega,
-            BigInteger modoNotificacion,
-            String estado,
-            Date dataEstat,
-            Receptor receptor,
-            Acuse acusePDF,
-            IntegracioInfo info) {
-        ResultadoSincronizarEnvio resultadoSincronizarEnvio = new ResultadoSincronizarEnvio();
+    private ResultadoSincronizarEnvio updateEnviament(String identificador, BigInteger tipoEntrega, BigInteger modoNotificacion, String estado,
+                                                      Date dataEstat, Receptor receptor, Acuse acusePDF, IntegracioInfo info) {
+
+        var resultadoSincronizarEnvio = new ResultadoSincronizarEnvio();
         resultadoSincronizarEnvio.setIdentificador(identificador);
-
         NotificacioEnviamentEntity enviament = null;
-
         String eventErrorDescripcio = null;
         try {
             enviament = notificacioEnviamentRepository.findByNotificaIdentificador(identificador);
             if (enviament == null) {
-                log.error(
-                        "Error al processar petició datadoOrganismo dins el callback de Notifica (identificadorDestinatario=" + identificador + "): " +
-                                "No s'ha trobat cap enviament amb l'identificador especificat (" + identificador + ").");
+                log.error(ERROR_CALLBACK_NOTIFICA + identificador + "): No s'ha trobat cap enviament amb l'identificador especificat (" + identificador + ").");
                 resultadoSincronizarEnvio.setCodigoRespuesta("002");
                 resultadoSincronizarEnvio.setDescripcionRespuesta("Identificador no encontrado");
                 integracioHelper.addAccioError(info, "No s'ha trobat cap enviament amb l'identificador especificat");
@@ -160,10 +134,8 @@ public class AdviserServiceImpl implements AdviserService {
             }
 
             if (enviament.isNotificaEstatFinal()) {
-
-                String msg = "L'enviament amb identificador " + enviament.getNotificaIdentificador() + " ha rebut un callback de l'adviser de tipus " + tipoEntrega + " quan ja es troba en estat final." ;
+                var msg = "L'enviament amb identificador " + enviament.getNotificaIdentificador() + " ha rebut un callback de l'adviser de tipus " + tipoEntrega + " quan ja es troba en estat final." ;
                 log.debug(msg);
-
                 // DATAT
                 if (tipoEntrega.equals(BigInteger.valueOf(1L))) { //if datado (1L)
                     log.warn("Error al processar petició datadoOrganismo dins el callback de Notifica (L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
@@ -179,15 +151,8 @@ public class AdviserServiceImpl implements AdviserService {
                     // CERTIFICACIO
                 } else if (tipoEntrega.equals(BigInteger.valueOf(3L))) { //if certificació (3L)
                     log.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
-                    certificacionOrganismo(
-                            acusePDF,
-                            organismoEmisor,
-                            modoNotificacion,
-                            identificador,
-                            enviament,
-                            resultadoSincronizarEnvio);
+                    certificacionOrganismo(acusePDF, modoNotificacion, identificador, enviament, resultadoSincronizarEnvio);
                     log.debug("Certificació guardada correctament.");
-
                     // DATAT + CERTIFICACIO
                 } else {
                     eventErrorDescripcio = msg;
@@ -199,62 +164,30 @@ public class AdviserServiceImpl implements AdviserService {
                     receptorNombre = receptor.getNombreReceptor();
                     receptorNif = receptor.getNifReceptor();
                 }
-                EnviamentEstat notificaEstat = getNotificaEstat(estado);
-
+                var notificaEstat = getNotificaEstat(estado);
                 //Update enviament
-                notificaHelper.enviamentUpdateDatat(
-                        notificaEstat,
-                        dataEstat,
-                        estado,
-                        getModoNotificacion(modoNotificacion),
-                        receptorNif,
-                        receptorNombre,
-                        null,
-                        null,
-                        enviament);
+                notificaHelper.enviamentUpdateDatat(notificaEstat, dataEstat, estado, getModoNotificacion(modoNotificacion), receptorNif, receptorNombre, null, null, enviament);
                 log.debug("Registrant event callbackdatat de l'Adviser...");
-
                 resultadoSincronizarEnvio.setCodigoRespuesta("000");
                 resultadoSincronizarEnvio.setDescripcionRespuesta("OK");
-
-
                 // CERTIFICACIO o DATAT + CERTIFICACIO
                 if (tipoEntrega.equals(BigInteger.valueOf(2L)) || tipoEntrega.equals(BigInteger.valueOf(3L))) {
                     log.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
-                    certificacionOrganismo(
-                            acusePDF,
-                            organismoEmisor,
-                            modoNotificacion,
-                            identificador,
-                            enviament,
-                            resultadoSincronizarEnvio);
+                    certificacionOrganismo(acusePDF, modoNotificacion, identificador, enviament, resultadoSincronizarEnvio);
                     log.debug("Certificació guardada correctament.");
                 }
                 integracioHelper.addAccioOk(info);
-
-//					if ("expirada".equals(estado) && acusePDF == null && enviament.getNotificaCertificacioData() == null) {
-//						log.debug("Consultant la certificació de l'enviament expirat...");
-//						notificaHelper.enviamentRefrescarEstat(enviament.getId());
-//					}
             }
-
-//		} catch (DatatypeConfigurationException ex) {
-//			codigoRespuesta.value = "004";
-//			descripcionRespuesta.value = "Fecha incorrecta";
-//			integracioHelper.addAccioError(info, "La data de l'estat no té un format vàlid");
         } catch (Exception ex) {
             resultadoSincronizarEnvio.setCodigoRespuesta("666");
             resultadoSincronizarEnvio.setDescripcionRespuesta("Error procesando peticion");
-
             eventErrorDescripcio = ExceptionUtils.getStackTrace(ex);
-            log.error("Error al processar petició datadoOrganismo dins el callback de Notifica (identificadorDestinatario=" + identificador + ")", ex);
+            log.error(ERROR_CALLBACK_NOTIFICA + identificador + ")", ex);
             integracioHelper.addAccioError(info, "Error processant la petició", ex);
         }
-
         log.debug("Peticició processada correctament.");
-
-        NotificacioEstatEnumDto estat = enviament.getNotificacio().getEstat();
-        boolean isError = !NotificacioEstatEnumDto.FINALITZADA.equals(estat) && !NotificacioEstatEnumDto.PROCESSADA.equals(estat) && !Strings.isNullOrEmpty(eventErrorDescripcio);
+        var estat = enviament.getNotificacio().getEstat();
+        var isError = !NotificacioEstatEnumDto.FINALITZADA.equals(estat) && !NotificacioEstatEnumDto.PROCESSADA.equals(estat) && !Strings.isNullOrEmpty(eventErrorDescripcio);
         if (tipoEntrega.equals(BigInteger.valueOf(1L)) || tipoEntrega.equals(BigInteger.valueOf(2L))) {
             notificacioEventHelper.addAdviserDatatEvent(enviament, isError, eventErrorDescripcio);
         }
@@ -264,35 +197,22 @@ public class AdviserServiceImpl implements AdviserService {
         return resultadoSincronizarEnvio;
     }
 
-    private void certificacionOrganismo(
-            Acuse acusePDF,
-            String organismoEmisor,
-            BigInteger modoNotificacion,
-            String identificador,
-            NotificacioEnviamentEntity enviament,
-            ResultadoSincronizarEnvio resultadoSincronizarEnvio) throws Exception {
+    private void certificacionOrganismo(Acuse acusePDF, BigInteger modoNotificacion, String identificador, NotificacioEnviamentEntity enviament, ResultadoSincronizarEnvio resultadoSincronizarEnvio) throws Exception {
+
         if (enviament == null) {
             throw new Exception("Enviament should not be null");
         }
-        String gestioDocumentalId = null;
-        boolean ambAcuse = acusePDF != null && acusePDF.getContenido() != null && acusePDF.getContenido().length > 0;
-        boolean isError = false;
-        String errorDesc = "";
+        var ambAcuse = acusePDF != null && acusePDF.getContenido() != null && acusePDF.getContenido().length > 0;
+        var isError = false;
+        var errorDesc = "";
         try {
             if (ambAcuse) {
-                String certificacioAntiga = enviament.getNotificaCertificacioArxiuId();
-
+                var certificacioAntiga = enviament.getNotificaCertificacioArxiuId();
                 log.debug("Nou estat enviament: " + enviament.getNotificaEstatDescripcio());
-                if (enviament.getNotificacio() != null)
+                if (enviament.getNotificacio() != null) {
                     log.debug("Nou estat notificació: " + enviament.getNotificacio().getEstat().name());
-                try {
-                    log.info("Guardant certificació acusament de rebut...");
-                    gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
-                            PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-                            acusePDF.getContenido());
-                } catch (Exception ex) {
-                    log.error("No s'ha pogut guardar la certificació a la gestió documental", ex);
                 }
+                var gestioDocumentalId = guardarCertificacioAcuseRecibo(acusePDF.getContenido());
                 log.debug("Actualitzant enviament amb la certificació. ID gestió documental: " + gestioDocumentalId);
                 enviament.updateNotificaCertificacio(
                         new Date(),
@@ -308,20 +228,17 @@ public class AdviserServiceImpl implements AdviserService {
                         null); // núm. seguiment
                 log.debug("Registrant event callbackcertificacio de l'Adviser...");
                 notificacioEventHelper.addAdviserCertificacioEvent(enviament, false, null);
-
                 //si hi havia una certificació antiga
                 if (certificacioAntiga != null) {
                     log.debug("Esborrant certificació antiga...");
                     pluginHelper.gestioDocumentalDelete(certificacioAntiga, PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
                 }
-
                 resultadoSincronizarEnvio.setCodigoRespuesta("000");
                 resultadoSincronizarEnvio.setDescripcionRespuesta("OK");
                 log.debug("Event callbackcertificacio registrat correctament: " + NotificacioEventTipusEnumDto.ADVISER_CERTIFICACIO.name());
             } else {
                 isError = true;
-                errorDesc = "Error al processar petició datadoOrganismo dins el callback de Notifica (identificadorDestinatario=" + identificador + "): " +
-                        "No s'ha trobat el camp amb l'acús PDF a dins la petició rebuda.";
+                errorDesc = ERROR_CALLBACK_NOTIFICA + identificador + "): No s'ha trobat el camp amb l'acús PDF a dins la petició rebuda.";
                 log.error(errorDesc);
                 notificacioEventHelper.addAdviserCertificacioEvent(enviament, true, errorDesc);
                 resultadoSincronizarEnvio.setCodigoRespuesta("001");
@@ -329,155 +246,111 @@ public class AdviserServiceImpl implements AdviserService {
             }
         } catch (Exception ex) {
             isError = true;
-            errorDesc = "Error al processar petició datadoOrganismo dins el callback de Notifica (identificadorDestinatario=" + identificador + ")";
+            errorDesc = ERROR_CALLBACK_NOTIFICA + identificador + ")";
             log.error(errorDesc, ex);
             notificacioEventHelper.addAdviserCertificacioEvent(enviament, true, ExceptionUtils.getStackTrace(ex));
             resultadoSincronizarEnvio.setCodigoRespuesta("666");
             resultadoSincronizarEnvio.setDescripcionRespuesta("Error procesando peticion");
         }
-
         callbackHelper.updateCallback(enviament, isError, errorDesc);
         log.debug("Sortint de la certificació...");
     }
 
-    private EnviamentEstat getNotificaEstat(String estado) {
-        EnviamentEstat notificaEstat = null;
-        if ("pendiente_envio".equals(estado)) {
-            notificaEstat = EnviamentEstat.PENDENT_ENVIAMENT;
-        } else if ("enviado_ci".equals(estado)) {
-            notificaEstat = EnviamentEstat.ENVIADA_CI;
-        } else if ("notificada".equals(estado)) {
-            notificaEstat = EnviamentEstat.NOTIFICADA;
-        } else if ("extraviada".equals(estado)) {
-            notificaEstat = EnviamentEstat.EXTRAVIADA;
-        } else if ("rehusada".equals(estado)) {
-            notificaEstat = EnviamentEstat.REBUTJADA;
-        } else if ("desconocido".equals(estado)) {
-            notificaEstat = EnviamentEstat.DESCONEGUT;
-        } else if ("fallecido".equals(estado)) {
-            notificaEstat = EnviamentEstat.MORT;
-        } else if ("ausente".equals(estado)) {
-            notificaEstat = EnviamentEstat.ABSENT;
-        } else if ("direccion_incorrecta".equals(estado)) {
-            notificaEstat = EnviamentEstat.ADRESA_INCORRECTA;
-        } else if ("sin_informacion".equals(estado)) {
-            notificaEstat = EnviamentEstat.SENSE_INFORMACIO;
-        } else if ("error".equals(estado)) {
-            notificaEstat = EnviamentEstat.ERROR_ENTREGA;
-        } else if ("pendiente_sede".equals(estado)) {
-            notificaEstat = EnviamentEstat.PENDENT_SEU;
-        } else if ("enviado_deh".equals(estado)) {
-            notificaEstat = EnviamentEstat.ENVIADA_DEH;
-        } else if ("leida".equals(estado)) {
-            notificaEstat = EnviamentEstat.LLEGIDA;
-        } else if ("envio_programado".equals(estado)) {
-            notificaEstat = EnviamentEstat.ENVIAMENT_PROGRAMAT;
-        } else if ("pendiente_cie".equals(estado)) {
-            notificaEstat = EnviamentEstat.PENDENT_CIE;
-        } else if ("pendiente_deh".equals(estado)) {
-            notificaEstat = EnviamentEstat.PENDENT_DEH;
-        } else if ("entregado_op".equals(estado)) {
-            notificaEstat = EnviamentEstat.ENTREGADA_OP;
-        } else if ("expirada".equals(estado)) {
-            notificaEstat = EnviamentEstat.EXPIRADA;
-        } else if ("anulada".equals(estado)) {
-            notificaEstat = EnviamentEstat.ANULADA;
+    private String guardarCertificacioAcuseRecibo(byte[] acuse) {
+
+        try {
+            log.info("Guardant certificació acusament de rebut...");
+            return pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,acuse);
+        } catch (Exception ex) {
+            log.error("No s'ha pogut guardar la certificació a la gestió documental", ex);
         }
-        return notificaEstat;
+        return null;
+    }
+
+    private EnviamentEstat getNotificaEstat(String estado) {
+
+        if ("pendiente_envio".equals(estado)) {
+            return EnviamentEstat.PENDENT_ENVIAMENT;
+        }
+        if ("enviado_ci".equals(estado)) {
+           return EnviamentEstat.ENVIADA_CI;
+        }
+        if ("notificada".equals(estado)) {
+         return EnviamentEstat.NOTIFICADA;
+        }
+        if ("extraviada".equals(estado)) {
+            return EnviamentEstat.EXTRAVIADA;
+        }
+        if ("rehusada".equals(estado)) {
+            return EnviamentEstat.REBUTJADA;
+        }
+        if ("desconocido".equals(estado)) {
+            return EnviamentEstat.DESCONEGUT;
+        }
+        if ("fallecido".equals(estado)) {
+            return EnviamentEstat.MORT;
+        }
+        if ("ausente".equals(estado)) {
+            return EnviamentEstat.ABSENT;
+        }
+        if ("direccion_incorrecta".equals(estado)) {
+            return EnviamentEstat.ADRESA_INCORRECTA;
+        }
+        if ("sin_informacion".equals(estado)) {
+            return EnviamentEstat.SENSE_INFORMACIO;
+        }
+        if ("error".equals(estado)) {
+            return EnviamentEstat.ERROR_ENTREGA;
+        }
+        if ("pendiente_sede".equals(estado)) {
+            return EnviamentEstat.PENDENT_SEU;
+        }
+        if ("enviado_deh".equals(estado)) {
+            return EnviamentEstat.ENVIADA_DEH;
+        }
+        if ("leida".equals(estado)) {
+            return EnviamentEstat.LLEGIDA;
+        }
+        if ("envio_programado".equals(estado)) {
+            return EnviamentEstat.ENVIAMENT_PROGRAMAT;
+        }
+        if ("pendiente_cie".equals(estado)) {
+            return EnviamentEstat.PENDENT_CIE;
+        }
+        if ("pendiente_deh".equals(estado)) {
+            return EnviamentEstat.PENDENT_DEH;
+        }
+        if ("entregado_op".equals(estado)) {
+            return EnviamentEstat.ENTREGADA_OP;
+        }
+        if ("expirada".equals(estado)) {
+            return EnviamentEstat.EXPIRADA;
+        }
+        if ("anulada".equals(estado)) {
+            return EnviamentEstat.ANULADA;
+        }
+        return null;
     }
 
     private String getModoNotificacion(BigInteger modo) {
-        String modoNotificacion = null;
+
         switch (modo.intValue()) {
             case 1:
-                modoNotificacion = "sede";
-                break;
+                return "sede";
             case 2:
-                modoNotificacion = "funcionario_habilitado";
-                break;
+                return "funcionario_habilitado";
             case 3:
-                modoNotificacion = "postal";
-                break;
+                return "postal";
             case 4:
-                modoNotificacion = "electronico";
-                break;
+                return "electronico";
             case 5:
-                modoNotificacion = "carpeta";
-                break;
+                return "carpeta";
+            default:
+                return null;
         }
-        return modoNotificacion;
     }
 
     private Date toDate(XMLGregorianCalendar calendar) {
-        if (calendar == null) {
-            return null;
-        }
-        return calendar.toGregorianCalendar().getTime();
+        return calendar != null ? calendar.toGregorianCalendar().getTime() : null;
     }
-
-
-//    @Autowired
-//    private AdviserWsV2PortType adviser;
-//
-//    @Override
-//    public AdviserResponseDto sincronitzarEnviament(EnviamentAdviser env) {
-//
-//        Receptor receptor = new Receptor();
-//        receptor.setNifReceptor(env.getReceptor().getNifReceptor());
-//        receptor.setNombreReceptor(env.getReceptor().getNombreReceptor());
-//        receptor.setVinculoReceptor(env.getReceptor().getVinculoReceptor());
-//        receptor.setNifRepresentante(env.getReceptor().getNifRepresentante());
-//        receptor.setNombreRepresentante(env.getReceptor().getNombreRepresentante());
-//        receptor.setCsvRepresetante(env.getReceptor().getCsvRepresetante());
-//
-//        Acuse acusePdf = new Acuse();
-//        acusePdf.setContenido(env.getAcusePDF().getContenido());
-//        acusePdf.setHash(env.getAcusePDF().getHash());
-//        acusePdf.setCsvResguardo(env.getAcusePDF().getCsvResguardo());
-//
-//        Acuse acuseXml = new Acuse();
-//        acuseXml.setContenido(env.getAcusePDF().getContenido());
-//        acuseXml.setHash(env.getAcusePDF().getHash());
-//        acuseXml.setCsvResguardo(env.getAcusePDF().getCsvResguardo());
-//
-//        Holder<String> identificador = new Holder<>(env.getHIdentificador());
-//        Holder<String> codigoRespuesta = new Holder<>(env.getCodigoRespuesta());
-//        Holder<String> descripcionRespuesta = new Holder<>(env.getDescripcionRespuesta());
-//        Holder<Opciones> opciones = new Holder<>(getOpciones(env.getOpcionesResultadoSincronizarEnvio()));
-//
-//        adviser.sincronizarEnvio(
-//                env.getOrganismoEmisor(),
-//                identificador,
-//                env.getTipoEntrega(),
-//                env.getModoNotificacion(),
-//                env.getEstado(),
-//                env.getFechaEstado(),
-//                receptor,
-//                acusePdf,
-//                acuseXml,
-//                getOpciones(env.getOpcionesSincronizarEnvio()),
-//                codigoRespuesta,
-//                descripcionRespuesta,
-//                opciones);
-//
-//        return AdviserResponseDto.builder()
-//                .identificador(env.getHIdentificador())
-//                .codigoRespuesta(codigoRespuesta.value)
-//                .descripcionRespuesta(descripcionRespuesta.value)
-//                .opcionesResultadoSincronizarEnvio(env.getOpcionesResultadoSincronizarEnvio())
-//                .build();
-//    }
-//
-//    private Opciones getOpciones(es.caib.notib.logic.intf.dto.adviser.Opciones opciones) {
-//
-//        Opciones os = new Opciones();
-//        Opcion o;
-//        for ( es.caib.notib.logic.intf.dto.adviser.Opcion op : opciones.getOpcion()) {
-//            o = new Opcion();
-//            o.setTipo(op.getTipo());
-//            o.setValue(o.getValue());
-//            os.getOpcion().add(o);
-//        }
-//        return os;
-//    }
 }
