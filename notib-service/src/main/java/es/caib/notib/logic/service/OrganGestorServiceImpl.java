@@ -141,15 +141,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Resource
 	private IntegracioHelper integracioHelper;
 
-	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 	private static Long permisosEntitatsModificatsInstant;
+	protected static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
+	private static final String AUTO_TEMPS_TEXT = "procediment.actualitzacio.auto.temps";
 
 	private List<OrganGestorDto> sotredOrgans = new ArrayList<>();
 	private List<String> codisAmbPermis = new ArrayList<>();
 	private boolean isAdminOrgan;
 	private OrganGestorDto organActual;
-	protected static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
-	private static final String AUTO_TEMPS_TEXT = "procediment.actualitzacio.auto.temps";
 
 	@Getter
 	private List<OrganGestorDto> organsList;
