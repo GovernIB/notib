@@ -34,8 +34,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -60,12 +63,6 @@ import java.util.List;
 @RequestMapping("/notificacio/massiva")
 public class NotificacioMassivaController extends TableAccionsMassivesController {
 
-    private final static String TABLE_FILTRE = "not_massiva_filtre";
-    private final static String TABLE_NOTIFICACIONS_FILTRE = "not_massiva_nots_filtre";
-    private static final String SESSION_ATTRIBUTE_SELECCIO = "NotificacioController.session.seleccio";
-
-    @Autowired
-    private AplicacioService aplicacioService;
     @Autowired
     private NotificacioMassivaService notificacioMassivaService;
     @Autowired
@@ -77,11 +74,19 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @Autowired
     private GestioDocumentalService gestioDocumentalService;
 
+    private static final  String TABLE_FILTRE = "not_massiva_filtre";
+    private static final String TABLE_NOTIFICACIONS_FILTRE = "not_massiva_nots_filtre";
+    private static final String SESSION_ATTRIBUTE_SELECCIO = "NotificacioController.session.seleccio";
+    private static final String SET_COOKIE = "Set-cookie";
+    private static final String REDIRECT = "redirect:..";
+    private static final String FILE_DOWNLOAD = "fileDownload=true; path=/";
+
+
     public NotificacioMassivaController() {
         super.sessionAttributeSeleccio = SESSION_ATTRIBUTE_SELECCIO;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public String mainPage(HttpServletRequest request, Model model) {
 
         var filtre = getFiltreCommand(request);
@@ -91,14 +96,14 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         return "notificacioMassivaList";
     }
 
-    @RequestMapping(method = RequestMethod.POST)
-    public String post(HttpServletRequest request, NotificacioMassivaFiltreCommand command, Model model) throws ParseException {
+    @PostMapping
+    public String post(HttpServletRequest request, NotificacioMassivaFiltreCommand command, Model model) {
 
         RequestSessionHelper.actualitzarObjecteSessio(request, TABLE_FILTRE, command);
         return "notificacioMassivaList";
     }
 
-    @RequestMapping(value = "/datatable", method = RequestMethod.GET)
+    @GetMapping(value = "/datatable")
     @ResponseBody
     public DatatablesHelper.DatatablesResponse datatable(HttpServletRequest request) {
 
@@ -115,7 +120,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         return DatatablesHelper.getDatatableResponse(request, notificacions);
     }
 
-    @RequestMapping(value = "/{id}/resum", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}/resum")
     public String summary(HttpServletRequest request, Model model, @PathVariable Long id) {
 
         var entitatActual = sessionScopedContext.getEntitatActual();
@@ -124,53 +129,53 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         return "notificacioMassivaInfo";
     }
 
-    @RequestMapping(value = "/{id}/csv/download", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}/csv/download")
     @ResponseBody
     public void csvDownload(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var file = notificacioMassivaService.getCSVFile(entitatActual.getId(), id);
-        response.setHeader("Set-cookie", "fileDownload=true; path=/");
+        response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
         writeFileToResponse(file.getNom(), file.getContingut(), response);
     }
 
-    @RequestMapping(value = "/{id}/zip/download", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}/zip/download")
     public void zipDownload(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var file = notificacioMassivaService.getZipFile(entitatActual.getId(), id);
-        response.setHeader("Set-cookie", "fileDownload=true; path=/");
+        response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
         writeFileToResponse(file.getNom(), file.getContingut(), response);
     }
 
-    @RequestMapping(value = "/{id}/resum/download", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}/resum/download")
     public void summaryDownload(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var file = notificacioMassivaService.getResumFile(entitatActual.getId(), id);
-        response.setHeader("Set-cookie", "fileDownload=true; path=/");
+        response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
         writeFileToResponse(file.getNom(), file.getContingut(), response);
     }
 
-    @RequestMapping(value = "/{id}/errors/validacio/download", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}/errors/validacio/download")
     public void errorsValidacioDownload(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var file = notificacioMassivaService.getErrorsValidacioFile(entitatActual.getId(), id);
-        response.setHeader("Set-cookie", "fileDownload=true; path=/");
+        response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
         writeFileToResponse(file.getNom(), file.getContingut(), response);
     }
 
-    @RequestMapping(value = "/{id}/errors/execucio/download", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}/errors/execucio/download")
     public void errorsExecucioDownload(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var file = notificacioMassivaService.getErrorsExecucioFile(entitatActual.getId(), id);
-        response.setHeader("Set-cookie", "fileDownload=true; path=/");
+        response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
         writeFileToResponse(file.getNom(), file.getContingut(), response);
     }
 
-    @RequestMapping(value = "/{id}/posposar", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}/posposar")
     public String posposar(HttpServletRequest request, @PathVariable Long id) {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
@@ -178,12 +183,12 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
             notificacioMassivaService.posposar(entitatActual.getId(), id);
         } catch (Exception e) {
             log.error("Hi ha hagut un error posposant la notificació massiva", e);
-            return getModalControllerReturnValueError(request, "redirect:..", "notificacio.massiva.controller.posposar.ko", new Object[]{e.getMessage()});
+            return getModalControllerReturnValueError(request, REDIRECT, "notificacio.massiva.controller.posposar.ko", new Object[]{e.getMessage()});
         }
-        return getModalControllerReturnValueSuccess(request,"redirect:..","notificacio.massiva.controller.posposar.ok");
+        return getModalControllerReturnValueSuccess(request,REDIRECT,"notificacio.massiva.controller.posposar.ok");
     }
 
-    @RequestMapping(value = "/{id}/reactivar", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}/reactivar")
     public String reactivar(HttpServletRequest request, @PathVariable Long id) {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
@@ -191,16 +196,16 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
             notificacioMassivaService.reactivar(entitatActual.getId(), id);
         } catch (Exception e) {
             log.error("Hi ha hagut un error reactivant la notificació massiva", e);
-            return getModalControllerReturnValueError(request,"redirect:..", "notificacio.massiva.controller.reactivar.ko", new Object[]{e.getMessage()});
+            return getModalControllerReturnValueError(request,REDIRECT, "notificacio.massiva.controller.reactivar.ko", new Object[]{e.getMessage()});
         }
-        return getModalControllerReturnValueSuccess(request, "redirect:..", "notificacio.massiva.controller.reactivar.ok");
+        return getModalControllerReturnValueSuccess(request, REDIRECT, "notificacio.massiva.controller.reactivar.ok");
     }
 
-    @RequestMapping(value = "/{id}/cancelar", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}/cancelar")
     public String cancelar(HttpServletRequest request, @PathVariable Long id) {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
-        var redirect = "redirect:..";
+        var redirect = REDIRECT;
         var msg = "notificacio.massiva.controller.cancelar.ok";
         try {
             notificacioMassivaService.cancelar(entitatActual.getId(), id);
@@ -212,7 +217,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         return getModalControllerReturnValueSuccess(request, redirect, msg);
     }
 
-    @RequestMapping(value = "/{id}/remeses", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}/remeses")
     public String consultarRemeses(HttpServletRequest request, Model model, @PathVariable Long id) {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
@@ -228,14 +233,14 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         return "notificacioMassivaNotificacionsList";
     }
 
-    @RequestMapping(value = "/{id}/remeses", method = RequestMethod.POST)
+    @PostMapping(value = "/{id}/remeses")
     public String consultarRemesesUpdateFiltre(HttpServletRequest request, NotificacioFiltreCommand command, Model model) {
 
         RequestSessionHelper.actualitzarObjecteSessio(request, TABLE_NOTIFICACIONS_FILTRE, command);
         return "notificacioMassivaNotificacionsList";
     }
 
-    @RequestMapping(value = "/{id}/remeses/datatable", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}/remeses/datatable")
     @ResponseBody
     public DatatablesHelper.DatatablesResponse consultarRemesesDatatable(HttpServletRequest request, @PathVariable Long id) {
 
@@ -250,7 +255,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         return DatatablesHelper.getDatatableResponse(request, notificacions, "id", SESSION_ATTRIBUTE_SELECCIO);
     }
 
-    @RequestMapping(value = "/new")
+    @GetMapping(value = "/new")
     public String get(HttpServletRequest request, Model model) {
 
         var entitat = getEntitatActualComprovantPermisos(request);
@@ -263,12 +268,12 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
 
     private String getNotificacioMassivaForm(EntitatDto entitat, HttpServletRequest request, Model model) {
 
-        var organGestorActual = getOrganGestorActual(request);
+        getOrganGestorActual(request);
         model.addAttribute("pagadorsPostal", operadorPostalService.findByEntitat(entitat.getId()));
         return "notificacioMassivaForm";
     }
 
-    @RequestMapping(value = "/new", method = RequestMethod.POST)
+    @PostMapping(value = "/new")
     public String post(HttpServletRequest request, @Valid NotificacioMassivaCommand notificacioMassivaCommand, BindingResult bindingResult, Model model) throws IOException {
 
         log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. ");
@@ -329,11 +334,11 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         return "redirect:/notificacio/massiva";
     }
 
-    @RequestMapping(value = "/getModelDadesCarregaMassiuCSV", method = RequestMethod.GET)
+    @GetMapping(value = "/getModelDadesCarregaMassiuCSV")
     @ResponseBody
     public void getModelDadesCarregaMassiuCSV(HttpServletResponse response) throws IOException {
 
-        response.setHeader("Set-cookie", "fileDownload=true; path=/");
+        response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
         try {
             writeFileToResponse("modelo_datos_carga_masiva.csv", notificacioMassivaService.getModelDadesCarregaMassiuCSV(), response);
         } catch (Exception ex) {
@@ -366,7 +371,6 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
             organGestorCodi = organGestorActual.getCodi();
 
         }
-//        NotificacioFiltreDto filtre = notificacioListHelper.getFiltreCommand(request, TABLE_FILTRE).asDto();
         var filtre = notificacioListHelper.getFiltreCommand(request, TABLE_NOTIFICACIONS_FILTRE).asDto();
         filtre.setNotMassivaId(this.notMassivaId);
         assert entitatActual != null;

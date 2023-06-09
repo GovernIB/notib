@@ -25,7 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -46,8 +48,6 @@ import java.util.List;
 @RequestMapping("/organgestor")
 public class OrganGestorController extends BaseUserController{
 	
-	private final static String ORGANS_FILTRE = "organs_filtre";
-	
 	@Autowired
 	private OrganGestorService organGestorService;
 	@Autowired
@@ -61,8 +61,13 @@ public class OrganGestorController extends BaseUserController{
 	@Autowired
 	private PagadorCieService pagadorCieService;
 
+	private static final String ORGANS_FILTRE = "organs_filtre";
+	private static final String REDIRECT = "redirect:../../organgestor";
+	private static final String SET_LLIBRE = "setLlibre";
+	private static final String SET_OFICINA = "setOficina";
 
-	@RequestMapping(method = RequestMethod.GET)
+
+	@GetMapping
 	public String get(HttpServletRequest request, Model model) {
 
 		var entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
@@ -72,15 +77,15 @@ public class OrganGestorController extends BaseUserController{
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
 		var estats = EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, "es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.");
 		model.addAttribute("organGestorEstats", estats);
-		model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
-		model.addAttribute("setOficina", !entitat.isOficinaEntitat());
+		model.addAttribute(SET_LLIBRE, !entitat.isLlibreEntitat());
+		model.addAttribute(SET_OFICINA, !entitat.isOficinaEntitat());
 		if (!entitat.isOficinaEntitat()) {
 			model.addAttribute("oficinesEntitat", organGestorService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(), true));
 		}
 		return "organGestorList";
 	}
 
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@GetMapping(value = "/datatable")
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request ) {
 
@@ -101,21 +106,21 @@ public class OrganGestorController extends BaseUserController{
 		return DatatablesHelper.getDatatableResponse(request, organs, "codi");
 	}
 
-	@RequestMapping(method = RequestMethod.POST)
+	@PostMapping
 	public String post(HttpServletRequest request, OrganGestorFiltreCommand command, Model model) {
 		
 		RequestSessionHelper.actualitzarObjecteSessio(request, ORGANS_FILTRE, command);
 		return "organGestorList";
 	}
 
-	@RequestMapping(value = "/new", method = RequestMethod.POST)
+	@PostMapping(value = "/new")
 	public String save(HttpServletRequest request, @Valid OrganGestorCommand organGestorCommand, BindingResult bindingResult, Model model) {
 
 		if (bindingResult.hasErrors()) {
 			var entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
 			model.addAttribute("entitat", entitat);
-			model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
-			model.addAttribute("setOficina", !entitat.isOficinaEntitat());
+			model.addAttribute(SET_LLIBRE, !entitat.isLlibreEntitat());
+			model.addAttribute(SET_OFICINA, !entitat.isOficinaEntitat());
 			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
 			var cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
@@ -131,7 +136,7 @@ public class OrganGestorController extends BaseUserController{
 		return getModalControllerReturnValueSuccess(request,"redirect:organgestor","organgestor.controller.update.nom.ok");
 	}
 	
-	@RequestMapping(value = "/{organGestorId}", method = RequestMethod.GET)
+	@GetMapping(value = "/{organGestorId}")
 	public String update(HttpServletRequest request, Model model, @PathVariable Long organGestorId) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
@@ -141,8 +146,8 @@ public class OrganGestorController extends BaseUserController{
 			entitat = entitatService.findById(entitat.getId());
 			model.addAttribute(organGestorCommand);
 			model.addAttribute("entitat", entitat);
-			model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
-			model.addAttribute("setOficina", !entitat.isOficinaEntitat());
+			model.addAttribute(SET_LLIBRE, !entitat.isLlibreEntitat());
+			model.addAttribute(SET_OFICINA, !entitat.isOficinaEntitat());
 			model.addAttribute("isModificacio", true);
 			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
@@ -151,18 +156,17 @@ public class OrganGestorController extends BaseUserController{
 			return "organGestorForm";
 		} catch (Exception e) {
 			log.error(String.format("Excepció intentant actualitzar l'òrgan gestor (Id=%d):", organGestorId), e);
-			return getAjaxControllerReturnValueError(request, "redirect:../../organgestor", "organgestor.controller.update.nom.error");
+			return getAjaxControllerReturnValueError(request, REDIRECT, "organgestor.controller.update.nom.error");
 		}
 	}
 
-	@RequestMapping(value = "/update/auto/progres", method = RequestMethod.GET)
+	@GetMapping(value = "/update/auto/progres")
 	@ResponseBody
 	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
 		var progresActualitzacio = organGestorService.getProgresActualitzacio(entitat.getDir3Codi());
 		if (progresActualitzacio == null) {
-//			log.error("No s'ha trobat el progres actualització d'organs gestors per a l'entitat {}", entitat.getDir3Codi());
 			return new ProgresActualitzacioDto();
 		}
 
@@ -173,7 +177,6 @@ public class OrganGestorController extends BaseUserController{
 				progresAcumulat.setProgres(45 + (progresProc.getProgres() * 18 / 100));
 				progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
 				progresAcumulat.getInfo().addAll(progresProc.getInfo());
-//				log.info("Progres actualització organs gestors fase 2: {}",  progresAcumulat.getProgres());
 				return progresAcumulat;
 			}
 		}
@@ -184,19 +187,17 @@ public class OrganGestorController extends BaseUserController{
 				progresAcumulat.setProgres(63 + (progresSer.getProgres() * 18 / 100));
 				progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
 				progresAcumulat.getInfo().addAll(progresSer.getInfo());
-//				log.info("Progres actualització organs gestors fase 3: {}", progresAcumulat.getProgres());
 				return progresAcumulat;
 			}
 		}
-//		log.info("Progres actualització organs gestors fase {}: {}",progresActualitzacio.getFase(), progresActualitzacio.getProgres());
 		return progresActualitzacio;
 	}
 
-	@RequestMapping(value = "/sync/dir3", method = RequestMethod.GET)
+	@GetMapping(value = "/sync/dir3")
 	public String syncDir3(HttpServletRequest request, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
-		var redirect = "redirect:../../organgestor";
+		var redirect = REDIRECT;
 		if (entitat.getDir3Codi() == null || entitat.getDir3Codi().isEmpty()) {
 			return getAjaxControllerReturnValueError(request, redirect, "L'entitat actual no té cap codi DIR3 associat");
 		}
@@ -218,11 +219,10 @@ public class OrganGestorController extends BaseUserController{
 					? getModalControllerReturnValueSuccess(request, redirect, text, new Object[] {entitat.getDir3Codi()})
 					: getModalControllerReturnValueErrorMessageText(request, redirect, ex.getMessage());
 		}
-
 		return "synchronizationPrediction";
 	}
 
-	@RequestMapping(value = "/saveSynchronize", method = RequestMethod.POST)
+	@PostMapping(value = "/saveSynchronize")
 	public String synchronizePost(HttpServletRequest request) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
@@ -231,11 +231,11 @@ public class OrganGestorController extends BaseUserController{
 			return getModalControllerReturnValueSuccess(request, "redirect:unitatOrganitzativa", "organgestor.controller.synchronize.ok");
 		} catch (Exception e) {
 			log.error("Error al syncronitzar", e);
-			return getModalControllerReturnValueErrorMessageText(request, "redirect:../../organgestor", e.getMessage());
+			return getModalControllerReturnValueErrorMessageText(request, REDIRECT, e.getMessage());
 		}
 	}
 
-	@RequestMapping(value = "/sync/oficines/{lloc}")
+	@GetMapping(value = "/sync/oficines/{lloc}")
 	public String syncOficinesSIR(HttpServletRequest request, @PathVariable String lloc, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
@@ -249,7 +249,7 @@ public class OrganGestorController extends BaseUserController{
 		}
 	}
 
-	@RequestMapping(value = "/sync/noms/{lloc}")
+	@GetMapping(value = "/sync/noms/{lloc}")
 	public String syncNoms(HttpServletRequest request, @PathVariable String lloc, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
@@ -266,16 +266,16 @@ public class OrganGestorController extends BaseUserController{
 	}
 
 	@ResponseBody
-	@RequestMapping(value = "/llibre/{organGestorDir3Codi}", method = RequestMethod.GET)
-	private LlibreDto getLlibreOrgan(HttpServletRequest request, Model model, @PathVariable String organGestorDir3Codi) {
+	@GetMapping(value = "/llibre/{organGestorDir3Codi}")
+	public LlibreDto getLlibreOrgan(HttpServletRequest request, Model model, @PathVariable String organGestorDir3Codi) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
 		return organGestorService.getLlibreOrganisme(entitat.getId(), organGestorDir3Codi);
 	}
 
 	@ResponseBody
-	@RequestMapping(value = "/oficines/{organGestorDir3Codi}", method = RequestMethod.GET)
-	private List<OficinaDto> getOficinesOrgan(HttpServletRequest request, Model model, @PathVariable String organGestorDir3Codi) {
+	@GetMapping(value = "/oficines/{organGestorDir3Codi}")
+	public List<OficinaDto> getOficinesOrgan(HttpServletRequest request, Model model, @PathVariable String organGestorDir3Codi) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
 		return organGestorService.getOficinesSIR(entitat.getId(), organGestorDir3Codi, false);

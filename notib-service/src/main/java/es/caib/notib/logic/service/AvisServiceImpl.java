@@ -33,6 +33,7 @@ public class AvisServiceImpl implements AvisService {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
+
 	
 	@Transactional
 	@Override
@@ -80,8 +81,7 @@ public class AvisServiceImpl implements AvisService {
 
 		log.debug("Consulta de l'avis (id=" + id + ")");
 		var avisEntity = avisRepository.findById(id).orElse(null);
-		AvisDto dto = conversioTipusHelper.convertir(avisEntity, AvisDto.class);
-		return dto;
+		return conversioTipusHelper.convertir(avisEntity, AvisDto.class);
 	}
 
 	@Transactional(readOnly = true)
@@ -97,6 +97,7 @@ public class AvisServiceImpl implements AvisService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<AvisDto> findActive() {
+
 		log.debug("Consulta els avisos actius");
 		return conversioTipusHelper.convertirList(avisRepository.findActive(DateUtils.truncate(new Date(), Calendar.DATE)), AvisDto.class);
 	}

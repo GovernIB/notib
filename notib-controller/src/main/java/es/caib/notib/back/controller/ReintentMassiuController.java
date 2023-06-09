@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.CallbackService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -42,6 +43,7 @@ import java.util.Set;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Controller
 @RequestMapping("/massiu")
 public class ReintentMassiuController extends BaseUserController {
@@ -248,8 +250,8 @@ public class ReintentMassiuController extends BaseUserController {
 					seleccio.add(id);
 				}
 			}
-		} catch (NotFoundException e) {
-			e.printStackTrace();
+		} catch (NotFoundException ex) {
+			log.error("No s'han pogut trobar notificacions amb error de registre", ex);
 		}
 		return seleccio.size();
 	}

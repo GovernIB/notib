@@ -7,11 +7,13 @@ import es.caib.notib.back.helper.EnumHelper.HtmlOption;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.UsuariAplicacioService;
+import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,8 +40,9 @@ public class AjaxUserController extends BaseUserController {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private UsuariAplicacioService usuariAplicacioService;
-	
-	@RequestMapping(value = "/usuariDades/{codi}", method = RequestMethod.GET)
+
+
+	@GetMapping(value = "/usuariDades/{codi}")
 	@ResponseBody
 	public UsuariDto getByCodiPluginDadesUsuari(HttpServletRequest request, @PathVariable String codi, Model model) {
 
@@ -51,14 +54,14 @@ public class AjaxUserController extends BaseUserController {
 		}
 	}
 
-	@RequestMapping(value = "/usuarisDades/{text}", method = RequestMethod.GET)
+	@GetMapping(value = "/usuarisDades/{text}")
 	@ResponseBody
 	public List<UsuariDto> getPluginDadesUsuari(HttpServletRequest request, @PathVariable String text, Model model) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
 		Set<UsuariDto> setUsuaris = new HashSet<>();
 		try {
-			var encoded = new String(text.getBytes("ISO-8859-1"), "UTF-8");
+			var encoded = new String(text.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
 			var usuarisWeb = aplicacioService.findUsuariAmbText(encoded);
 			setUsuaris.addAll(usuarisWeb);
 			var aplicacio = usuariAplicacioService.findByEntitatAndText(entitatActual.getId(), encoded);
@@ -76,7 +79,7 @@ public class AjaxUserController extends BaseUserController {
 		}
 	}
 	
-	@RequestMapping(value = "/enum/{enumClass}", method = RequestMethod.GET)
+	@GetMapping(value = "/enum/{enumClass}")
 	@ResponseBody
 	public List<HtmlOption> enumValorsAmbText(HttpServletRequest request, @PathVariable String enumClass) throws ClassNotFoundException {
 

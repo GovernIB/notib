@@ -48,6 +48,7 @@ public class ConfigServiceImpl implements ConfigService {
     @Autowired
     private ConfigHelper configHelper;
 
+
     @Override
     @Transactional
     public ConfigDto updateProperty(ConfigDto property) {
@@ -94,10 +95,11 @@ public class ConfigServiceImpl implements ConfigService {
             value = properties.getProperty(key);
             log.info(key + " : " + value);
             configEntity = configRepository.findById(key).orElse(null);
-            if (configEntity != null) {
-                configEntity.update(value);
-                editedProperties.add(configEntity.getKey());
+            if (configEntity == null) {
+                continue;
             }
+            configEntity.update(value);
+            editedProperties.add(configEntity.getKey());
         }
         configHelper.reloadDbProperties();
         pluginHelper.resetAllPlugins();
@@ -127,9 +129,10 @@ public class ConfigServiceImpl implements ConfigService {
         var configs = configRepository.findByEntitatCodiIsNullAndConfigurableIsTrue();
         var entitats = entitatRepository.findAll();
         ConfigEntity nova;
+        String key;
         for (var config : configs) {
             for (var entitat : entitats) {
-                String key = configHelper.crearEntitatKey(entitat.getCodi(), config.getKey());
+                key = configHelper.crearEntitatKey(entitat.getCodi(), config.getKey());
                 if (configRepository.findByKey(key) != null ) {
                     continue;
                 }
@@ -146,8 +149,9 @@ public class ConfigServiceImpl implements ConfigService {
     public void actualitzarPropietatsJBossBdd() {
 
         var configs = configRepository.findJBossConfigurables();
+        String property;
         for(var config : configs) {
-            String property = configHelper.getConfigGlobal(config.getKey());
+            property = configHelper.getConfigGlobal(config.getKey());
             config.setValue(property);
             configRepository.save(config);
         }
@@ -163,16 +167,18 @@ public class ConfigServiceImpl implements ConfigService {
         for (var config: cGroup.getConfigs()) {
             if ("PASSWORD".equals(config.getTypeCode())){
                 config.setValue("*****");
-            } else if (config.isJbossProperty()) {
+                continue;
+            }
+            if (config.isJbossProperty()) {
                 // Les propietats de Jboss es llegeixen del fitxer de properties i si no estan definides prenen el valor especificat a la base de dades.
                 config.setValue(configHelper.getConfig(config.getKey(), config.getValue()));
             }
         }
-
-        if (cGroup.getInnerConfigs() != null && !cGroup.getInnerConfigs().isEmpty()) {
-            for (var child : cGroup.getInnerConfigs()) {
-                processPropertyValues(child);
-            }
+        if (cGroup.getInnerConfigs() == null || cGroup.getInnerConfigs().isEmpty()) {
+            return;
+        }
+        for (var child : cGroup.getInnerConfigs()) {
+            processPropertyValues(child);
         }
     }
 }

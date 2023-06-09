@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,7 +28,7 @@ public class ActualitzarController extends BaseController {
     private NotificacioService notificacioService;
 
     @ResponseBody
-    @RequestMapping(value = "/referencies", method = RequestMethod.GET)
+    @GetMapping(value = "/referencies")
     public void actualitzarReferencies(HttpServletRequest request, Model model) {
         notificacioService.actualitzarReferencies();
     }

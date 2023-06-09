@@ -4,6 +4,7 @@
 package es.caib.notib.plugin.firmaservidor;
 
 import es.caib.notib.plugin.SistemaExternException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.logging.Logger;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class FirmaServidorPluginMock implements FirmaServidorPlugin {
 
 	public FirmaServidorPluginMock(Properties properties) {
@@ -25,7 +27,7 @@ public class FirmaServidorPluginMock implements FirmaServidorPlugin {
 	@Override
 	public byte[] firmar(String nom, String motiu, byte[] contingut, TipusFirma tipusFirma, String idioma) throws SistemaExternException {
 
-		if (motiu != null && "e".equals(motiu)) {
+		if ("e".equals(motiu)) {
 			// Cas per provocar una excepció
 			var errMsg = "Excepció provocada per paràmetre a SignaturaPluginMock";
 			Logger.getLogger(FirmaServidorPluginMock.class.getName()).log(Level.SEVERE, errMsg);
@@ -35,10 +37,10 @@ public class FirmaServidorPluginMock implements FirmaServidorPlugin {
 		byte[] firmaContingut = null;
 		try {
 			firmaContingut = IOUtils.toByteArray(this.getClass().getResourceAsStream("/es/caib/ripea/plugin/firmaservidor/firma_document_mock.xml"));
-		} catch (IOException e) {
-			var errMsg = "Error llegint el fitxer mock de firma XAdES: " + e.getMessage();
-			Logger.getLogger(FirmaServidorPluginMock.class.getName()).log(Level.SEVERE, errMsg, e);
-			e.printStackTrace();
+		} catch (IOException ex) {
+			var errMsg = "Error llegint el fitxer mock de firma XAdES: " ;
+			Logger.getLogger(FirmaServidorPluginMock.class.getName()).log(Level.SEVERE, errMsg, ex);
+			log.error(errMsg, ex);
 		}
 		return firmaContingut;
 	}

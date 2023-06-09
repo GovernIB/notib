@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import com.google.common.net.MediaType;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MimeType;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -51,7 +53,9 @@ public class JustificantServiceImpl implements JustificantService {
     @Autowired
     private PluginHelper pluginHelper;
 
-    public static Map<String, ProgresDescarregaDto> progresDescarrega = new HashMap<String, ProgresDescarregaDto>();
+    private static final String PROCES_INICIAT_EXISTENT = "Ja existeix un altre procés iniciat";
+    private static final String PROCES_INICIAT_EXISTENT_TEXT = "es.caib.notib.justificant.proces.iniciant";
+    protected static Map<String, ProgresDescarregaDto> progresDescarrega = new HashMap<>();
 
     @Transactional
     @Override
@@ -66,8 +70,8 @@ public class JustificantServiceImpl implements JustificantService {
                 throw new ValidationException("No es pot generar el justificant d'una notificació amb enviaments pendents.");
             }
             if (isABackgroundProcessNotEnded(sequence)) {
-                log.error("Ja existeix un altre procés iniciat");
-                getProgress(sequence).addInfo(ProgresDescarregaDto.TipusInfo.ERROR, messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant"));
+                log.error(PROCES_INICIAT_EXISTENT);
+                getProgress(sequence).addInfo(ProgresDescarregaDto.TipusInfo.ERROR, messageHelper.getMessage(PROCES_INICIAT_EXISTENT_TEXT));
                 return null;
             }
             return generarJustificantEnviament(notificacio, sequence);
@@ -89,8 +93,8 @@ public class JustificantServiceImpl implements JustificantService {
             }
             entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false);
             if (isABackgroundProcessRunning(sequence)) {
-                log.error("Ja existeix un altre procés iniciat");
-                getProgress(sequence).addInfo(ProgresDescarregaDto.TipusInfo.ERROR, messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant"));
+                log.error(PROCES_INICIAT_EXISTENT);
+                getProgress(sequence).addInfo(ProgresDescarregaDto.TipusInfo.ERROR, messageHelper.getMessage(PROCES_INICIAT_EXISTENT_TEXT));
                 return null;
             }
             return generarJustificantEnviament(notificacio, sequence);
@@ -111,8 +115,8 @@ public class JustificantServiceImpl implements JustificantService {
             }
             entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false);
             if (isABackgroundProcessRunning(sequence)) {
-                log.error("Ja existeix un altre procés iniciat");
-                getProgress(sequence).addInfo(ProgresDescarregaDto.TipusInfo.ERROR, messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant"));
+                log.error(PROCES_INICIAT_EXISTENT);
+                getProgress(sequence).addInfo(ProgresDescarregaDto.TipusInfo.ERROR, messageHelper.getMessage(PROCES_INICIAT_EXISTENT_TEXT));
                 return null;
             }
             return generarJustificantComunicacioSIR(enviament, sequence);
@@ -170,7 +174,7 @@ public class JustificantServiceImpl implements JustificantService {
         var contingut = justificantEnviamentHelper.generarJustificant(conversioTipusHelper.convertir(notificacio, NotificacioDtoV2.class), progres);
         var justificantOriginal = new FitxerDto();
         justificantOriginal.setNom("justificant_notificació_" + notificacio.getId() + ".pdf");
-        justificantOriginal.setContentType("application/pdf");
+        justificantOriginal.setContentType(MediaType.PDF.toString());
         justificantOriginal.setContingut(contingut);
 
         //## FIRMA EN SERVIDOR
@@ -191,7 +195,7 @@ public class JustificantServiceImpl implements JustificantService {
         }
         progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.finalitzat.firma"));
         var justificantFirmat = new FitxerDto();
-        justificantFirmat.setContentType("application/pdf");
+        justificantFirmat.setContentType(MediaType.PDF.toString());
         justificantFirmat.setContingut(contingutFirmat);
         justificantFirmat.setNom("justificant_notificació_" + notificacio.getId() + "_firmat.pdf");
         justificantFirmat.setTamany(contingutFirmat.length);

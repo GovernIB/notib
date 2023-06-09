@@ -8,9 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.logic.intf.service.AplicacioService;
@@ -29,18 +29,18 @@ public class ExcepcioLogController extends BaseUserController {
 	@Autowired
 	private AplicacioService aplicacioService;
 
-	@RequestMapping(method = RequestMethod.GET)
+	@GetMapping
 	public String get(HttpServletRequest request, Model model) {
 		return "excepcioList";
 	}
 
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@GetMapping(value = "/datatable")
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request) {
 		return DatatablesHelper.getDatatableResponse(request, aplicacioService.excepcioFindAll());
 	}
 
-	@RequestMapping(value = "/{index}", method = RequestMethod.GET)
+	@GetMapping(value = "/{index}")
 	public String detall(HttpServletRequest request, @PathVariable Long index, Model model) {
 
 		model.addAttribute("excepcio", aplicacioService.excepcioFindOne(index));

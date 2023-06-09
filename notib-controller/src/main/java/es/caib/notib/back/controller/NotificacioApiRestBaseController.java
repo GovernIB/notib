@@ -27,6 +27,7 @@ public abstract class NotificacioApiRestBaseController extends BaseController {
 	@Autowired
 	protected NotificacioServiceWs notificacioServiceWs;
 
+
 	protected String getErrorDescripcio(Exception e) {
 
 		String errorDescripcio;

@@ -21,7 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -40,12 +42,12 @@ import java.util.Map;
 @RequestMapping("/integracio")
 public class IntegracioController extends BaseUserController {
 
+	@Autowired
+	private MonitorIntegracioService monitorIntegracioService;
+
 	private static final String SESSION_ATTRIBUTE_FILTRE = "IntegracioController.session.filtre";
 	private static final String INTEGRACIO_FILTRE = "integracio_filtre";
 
-	@Autowired
-	private MonitorIntegracioService monitorIntegracioService;
-	
 	enum IntegracioEnumDto {
 		USUARIS,
 		REGISTRE,
@@ -60,19 +62,19 @@ public class IntegracioController extends BaseUserController {
 		VALIDASIG
 	}
 
-	@RequestMapping(method = RequestMethod.GET)
+	@GetMapping
 	public String get(HttpServletRequest request, Model model) {
 		return getAmbCodi(request, "USUARIS", model);
 	}
 
-	@RequestMapping(value="/{codi}", method = RequestMethod.POST)
+	@PostMapping(value="/{codi}")
 	public String post(HttpServletRequest request, @PathVariable @NonNull String codi, IntegracioFiltreCommand command, Model model) {
 
 		RequestSessionHelper.actualitzarObjecteSessio(request, INTEGRACIO_FILTRE, command);
 		return getAmbCodi(request, codi, model);
 	}
 
-	@RequestMapping(value = "/{codi}", method = RequestMethod.GET)
+	@GetMapping(value = "/{codi}")
 	public String getAmbCodi(HttpServletRequest request, @PathVariable @NonNull String codi, Model model) {
 
 		var integracions = monitorIntegracioService.integracioFindAll();
@@ -105,7 +107,7 @@ public class IntegracioController extends BaseUserController {
 		return "integracioList";
 	}
 
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@GetMapping(value = "/datatable")
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request) {
 
@@ -116,17 +118,17 @@ public class IntegracioController extends BaseUserController {
 		return DatatablesHelper.getDatatableResponse(request, accions);
 	}
 
-	@RequestMapping(value = "/{codi}/detall/{id}", method = RequestMethod.GET)
+	@GetMapping(value = "/{codi}/detall/{id}")
 	@ResponseBody
 	public IntegracioDetall detall(HttpServletRequest request, @PathVariable String codi, @PathVariable Long id, Model model) {
 		return monitorIntegracioService.detallIntegracio(id);
 	}
 
-	@RequestMapping(value = "/netejar", method = RequestMethod.GET)
+	@GetMapping(value = "/netejar")
 	public String netejar(HttpServletRequest request, Model model) {
 
 		var redirect = "redirect:../integracio";
-		var entitat = getEntitatActualComprovantPermisos(request);
+		getEntitatActualComprovantPermisos(request);
 		try {
 			monitorIntegracioService.netejarMonitor();
 			return getAjaxControllerReturnValueSuccess(request, redirect, "integracio.netejar.ok");

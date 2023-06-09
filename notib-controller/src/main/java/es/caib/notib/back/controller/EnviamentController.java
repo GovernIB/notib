@@ -22,16 +22,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -61,20 +62,23 @@ public class EnviamentController extends TableAccionsMassivesController {
 	protected List<Long> getIdsElementsFiltrats(HttpServletRequest request) throws ParseException {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
+		if (entitatActual == null) {
+			return  new ArrayList<>();
+		}
 		var filtreCommand = getFiltreCommand(request);
 		String organGestorCodi = null;
-		if (RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual()) && entitatActual != null) {
+		if (RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual())) {
 			var organGestorActual = getOrganGestorActual(request);
 			organGestorCodi = organGestorActual.getCodi();
 		}
 		return enviamentService.findIdsAmbFiltre(entitatActual.getId(), RolEnumDto.valueOf(sessionScopedContext.getRolActual()), getCodiUsuariActual(), organGestorCodi, NotificacioEnviamentFiltreCommand.asDto(filtreCommand));
 	}
 
-	@RequestMapping(method = RequestMethod.GET)
+	@GetMapping
 	public String get(HttpServletRequest request, Model model) {
 
 		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
-		model.addAttribute("mantenirPaginacio", mantenirPaginacio != null ? mantenirPaginacio : false);
+		model.addAttribute("mantenirPaginacio", mantenirPaginacio != null && mantenirPaginacio);
 		var entitatActual = sessionScopedContext.getEntitatActual();
 		ColumnesDto columnes = null;
 		var filtreEnviaments = getFiltreCommand(request);
@@ -95,7 +99,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 		return "enviamentList";
 	}
 
-	@RequestMapping(method = RequestMethod.POST)
+	@PostMapping
 	public String post(HttpServletRequest request, @Valid NotificacioEnviamentFiltreCommand filtreCommand, BindingResult bindingResult, Model model,
 					   @RequestParam(value = "accio", required = false) String accio) {
 
@@ -108,7 +112,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 		return "redirect:enviament";
 	}
 
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@GetMapping(value = "/datatable")
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request, Model model) throws ParseException {
 
@@ -135,7 +139,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 		return DatatablesHelper.getDatatableResponse(request, enviaments,"id", SESSION_ATTRIBUTE_SELECCIO);
 	}
 
-	@RequestMapping(value = "/visualitzar", method = RequestMethod.GET)
+	@GetMapping(value = "/visualitzar")
 	public String visualitzar(HttpServletRequest request, Model model) {
 
 		var entitat = sessionScopedContext.getEntitatActual();
@@ -144,8 +148,8 @@ public class EnviamentController extends TableAccionsMassivesController {
 		return "enviamentColumns";
 	}
 
-	@RequestMapping(value = "/visualitzar/save", method = RequestMethod.POST)
-	public String save(HttpServletRequest request, @Valid ColumnesCommand columnesCommand, BindingResult bindingResult, Model model) throws IOException {
+	@PostMapping(value = "/visualitzar/save")
+	public String save(HttpServletRequest request, @Valid ColumnesCommand columnesCommand, BindingResult bindingResult, Model model) {
 
 		var entitat = sessionScopedContext.getEntitatActual();
 		if (bindingResult.hasErrors()) {
@@ -167,9 +171,6 @@ public class EnviamentController extends TableAccionsMassivesController {
 		setDefaultFiltreData(filtreCommand);
 		RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENTS_FILTRE, filtreCommand);
 		return filtreCommand;
-
-		/*Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);
-		filtreCommand.setMeusExpedients(cookie != null && "true".equals(cookie.getValue()));*/
 	}
 
 	private  void setDefaultFiltreData(NotificacioEnviamentFiltreCommand command) {

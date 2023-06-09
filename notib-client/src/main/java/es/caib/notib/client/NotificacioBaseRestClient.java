@@ -15,19 +15,17 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
 import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.ws.rs.core.UriBuilder;
 import java.util.ArrayList;
-
-;
 
 /**
  * Client REST per al servei de notificacions de NOTIB.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public abstract class NotificacioBaseRestClient {
 
 	protected String baseUrl;
@@ -41,13 +39,11 @@ public abstract class NotificacioBaseRestClient {
 	protected Client jerseyClient;
 
 	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(String identificador, String serviceUrl) {
+
 		try {
 			String urlAmbMetode = baseUrl + serviceUrl + "/consultaJustificantNotificacio/" + identificador;
 			jerseyClient = generarClient(urlAmbMetode);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					get(String.class);
+			String json = jerseyClient.resource(urlAmbMetode).type("application/json").get(String.class);
 			return getMapper().readValue(json, RespostaConsultaJustificantEnviament.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
@@ -55,17 +51,15 @@ public abstract class NotificacioBaseRestClient {
 	}
 
 	public boolean donarPermisConsulta(PermisConsulta permisConsulta, String serviceUrl) {
+
 		try {
 			String urlAmbMetode = baseUrl + serviceUrl + "/permisConsulta";
 			ObjectMapper mapper = getMapper();
 			String body = mapper.writeValueAsString(permisConsulta);
 			jerseyClient = generarClient(urlAmbMetode);
-			logger.debug("Missatge REST enviat: " + body);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					post(String.class, body);
-			logger.debug("Missatge REST rebut: " + json);
+			log.debug("Missatge REST enviat: " + body);
+			String json = jerseyClient.resource(urlAmbMetode).type("application/json").post(String.class, body);
+			log.debug("Missatge REST rebut: " + json);
 			return mapper.readValue(json, boolean.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
@@ -93,7 +87,6 @@ public abstract class NotificacioBaseRestClient {
 		jerseyClient = Client.create();
 		jerseyClient.setConnectTimeout(connecTimeout);
 		jerseyClient.setReadTimeout(readTimeout);
-		//jerseyClient.addFilter(new LoggingFilter(System.out));
 		jerseyClient.addFilter(
 				new ClientFilter() {
 					private ArrayList<Object> cookies;
@@ -103,12 +96,13 @@ public abstract class NotificacioBaseRestClient {
 							request.getHeaders().put("Cookie", cookies);
 						}
 						ClientResponse response = getNext().handle(request);
-						if (response.getCookies() != null) {
-							if (cookies == null) {
-								cookies = new ArrayList<Object>();
-							}
-							cookies.addAll(response.getCookies());
+						if (response.getCookies() == null) {
+							return response;
 						}
+						if (cookies == null) {
+							cookies = new ArrayList<>();
+						}
+						cookies.addAll(response.getCookies());
 						return response;
 					}
 				}
@@ -119,55 +113,38 @@ public abstract class NotificacioBaseRestClient {
 					public ClientResponse handle(ClientRequest request) throws ClientHandlerException {
 						ClientHandler ch = getNext();
 						ClientResponse resp = ch.handle(request);
-
 						if (resp.getStatus()/100 != 3) {
-//				        if (resp.getStatusInfo().getFamily() != Response.Status.Family.REDIRECTION) {
 							return resp;
-						} else {
-							String redirectTarget = resp.getHeaders().getFirst("Location");
-							request.setURI(UriBuilder.fromUri(redirectTarget).build());
-							return ch.handle(request);
 						}
+						String redirectTarget = resp.getHeaders().getFirst("Location");
+						request.setURI(UriBuilder.fromUri(redirectTarget).build());
+						return ch.handle(request);
 					}
 				}
 		);
 		return jerseyClient;
 	}
 
-	protected void autenticarClient(
-			Client jerseyClient,
-			String urlAmbMetode,
-			String username,
-			String password) throws Exception {
-		if (!autenticacioBasic) {
-			logger.debug(
-					"Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
-							"urlAmbMetode=" + urlAmbMetode + ", " +
-							"username=" + username +
-							"password=********)");
-			jerseyClient.resource(urlAmbMetode).get(String.class);
-			Form form = new Form();
-			form.putSingle("j_username", username);
-			form.putSingle("j_password", password);
-			jerseyClient.
-					resource(baseUrl + "/j_security_check").
-					type("application/x-www-form-urlencoded").
-					post(form);
-		} else {
-			logger.debug(
-					"Autenticant REST amb autenticació de tipus HTTP basic (" +
-							"urlAmbMetode=" + urlAmbMetode + ", " +
-							"username=" + username +
-							"password=********)");
-			jerseyClient.addFilter(
-					new HTTPBasicAuthFilter(username, password));
+	protected void autenticarClient(Client jerseyClient, String urlAmbMetode, String username, String password) throws Exception {
+
+		String msg;
+		if (autenticacioBasic) {
+			msg = "Autenticant REST amb autenticació de tipus HTTP basic (urlAmbMetode=" + urlAmbMetode + ", username=" + username + ")";
+			log.debug(msg);
+			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
+			return;
 		}
+		msg = "Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (urlAmbMetode=" + urlAmbMetode + ", username=" + username + ")";
+		log.debug(msg);
+		jerseyClient.resource(urlAmbMetode).get(String.class);
+		Form form = new Form();
+		form.putSingle("j_username", username);
+		form.putSingle("j_password", password);
+		jerseyClient.resource(baseUrl + "/j_security_check").type("application/x-www-form-urlencoded").post(form);
 	}
 
 	protected ObjectMapper getMapper() {
 		return new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
-
-	protected static final Logger logger = LoggerFactory.getLogger(NotificacioBaseRestClient.class);
 
 }

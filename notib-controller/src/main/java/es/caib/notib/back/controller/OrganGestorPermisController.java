@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,7 +43,7 @@ public class OrganGestorPermisController extends BaseUserController{
 	EntitatService entitatService;
 
 
-	@RequestMapping(value = "/{organGestorId}/permis", method = RequestMethod.GET)
+	@GetMapping(value = "/{organGestorId}/permis")
 	public String get(HttpServletRequest request, @PathVariable Long organGestorId, Model model) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
@@ -50,7 +52,7 @@ public class OrganGestorPermisController extends BaseUserController{
 		return "organGestorPermis";
 	}
 
-	@RequestMapping(value = "/{organGestorId}/permis/datatable", method = RequestMethod.GET)
+	@GetMapping(value = "/{organGestorId}/permis/datatable")
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request, @PathVariable Long organGestorId, Model model) {
 
@@ -78,7 +80,7 @@ public class OrganGestorPermisController extends BaseUserController{
 		return DatatablesHelper.getDatatableResponse(request, new ArrayList<>(), "id");
 	}
 
-	@RequestMapping(value = "/{codiSia}/permisos", method = RequestMethod.GET)
+	@GetMapping(value = "/{codiSia}/permisos")
 	@ResponseBody
 	public DatatablesResponse getPermisos(HttpServletRequest request, @PathVariable String codiSia, Model model) {
 
@@ -95,7 +97,7 @@ public class OrganGestorPermisController extends BaseUserController{
 		return DatatablesHelper.getDatatableResponse(request, permisos, "id");
 	}
 
-	@RequestMapping(value = "/{organGestorId}/permis/new", method = RequestMethod.GET)
+	@GetMapping(value = "/{organGestorId}/permis/new")
 	public String getNew(HttpServletRequest request, @PathVariable Long organGestorId, Model model) throws ValidationException {
 
 		var permisCommand = new PermisCommand();
@@ -103,7 +105,7 @@ public class OrganGestorPermisController extends BaseUserController{
 		return get(request, organGestorId, null, model);
 	}
 	
-	@RequestMapping(value = "/{organGestorId}/permis/{permisId}", method = RequestMethod.GET)
+	@GetMapping(value = "/{organGestorId}/permis/{permisId}")
 	public String get(HttpServletRequest request, @PathVariable Long organGestorId, @PathVariable Long permisId, Model model) throws ValidationException {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
@@ -126,7 +128,7 @@ public class OrganGestorPermisController extends BaseUserController{
 		return "organGestorPermisForm";
 	}
 	
-	@RequestMapping(value = "/{organGestorId}/permis", method = RequestMethod.POST)
+	@PostMapping(value = "/{organGestorId}/permis")
 	public String save(HttpServletRequest request, @PathVariable Long organGestorId, @Valid PermisCommand command, BindingResult bindingResult, Model model) throws NotFoundException, ValidationException {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
@@ -151,7 +153,7 @@ public class OrganGestorPermisController extends BaseUserController{
 		return getModalControllerReturnValueSuccess(request, "redirect:../../organgestor/" + organGestorId + "/permis", text);
 	}
 	
-	@RequestMapping(value = "/{organGestorId}/permis/{permisId}/delete", method = RequestMethod.GET)
+	@GetMapping(value = "/{organGestorId}/permis/{permisId}/delete")
 	public String delete(HttpServletRequest request, @PathVariable Long organGestorId, @PathVariable Long permisId, Model model) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);

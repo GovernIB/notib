@@ -7,9 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.logic.intf.dto.GrupDto;
@@ -31,14 +32,14 @@ import es.caib.notib.back.helper.RequestSessionHelper;
 @RequestMapping("/grup")
 public class GrupController extends BaseUserController{
 	
-	private final static String GRUP_FILTRE = "grup_filtre";
-	
 	@Autowired
 	EntitatService entitatService;
 	@Autowired
 	GrupService grupService;
+
+	private static final String GRUP_FILTRE = "grup_filtre";
 	
-	@RequestMapping(method = RequestMethod.GET)
+	@GetMapping
 	public String get(HttpServletRequest request, Model model) {
 
 		model.addAttribute(new GrupFiltreCommand());
@@ -47,7 +48,7 @@ public class GrupController extends BaseUserController{
 		return "grupAdminList";
 	}
 	
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@GetMapping(value = "/datatable")
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request) {
 
@@ -59,19 +60,19 @@ public class GrupController extends BaseUserController{
 		return DatatablesHelper.getDatatableResponse(request, grup, "id");
 	}
 	
-	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	@GetMapping(value = "/new")
 	public String newGet(HttpServletRequest request, Model model) {
 		return formGet(request, null, model);
 	}
 	
-	@RequestMapping(method = RequestMethod.POST)
+	@PostMapping
 	public String post(HttpServletRequest request, GrupFiltreCommand command, Model model) {
 		
 		RequestSessionHelper.actualitzarObjecteSessio(request, GRUP_FILTRE, command);
 		return "grupAdminList";
 	}
 
-	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
+	@PostMapping(value = "/newOrModify")
 	public String save(HttpServletRequest request, @Valid GrupCommand grupCommand, BindingResult bindingResult, Model model) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
@@ -91,7 +92,7 @@ public class GrupController extends BaseUserController{
 		return getModalControllerReturnValueSuccess(request, url, msg);
 	}
 	
-	@RequestMapping(value = "/{grupId}", method = RequestMethod.GET)
+	@GetMapping(value = "/{grupId}")
 	public String formGet(HttpServletRequest request, @PathVariable Long grupId, Model model) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
@@ -105,15 +106,15 @@ public class GrupController extends BaseUserController{
 		return "grupAdminForm";
 	}
 	
-	@RequestMapping(value = "/{grupId}/delete", method = RequestMethod.GET)
+	@GetMapping(value = "/{grupId}/delete")
 	public String delete(HttpServletRequest request, @PathVariable Long grupId) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
 		var existeix = grupService.existProcedimentGrupByGrupId(entitatActual.getId(), grupId);
 		var url = "redirect:../../grup";
-		var msg = existeix ? "grup.controller.esborrat.ko.enus" : "grup.controller.esborrat.ok";
+		var msg = Boolean.TRUE.equals(existeix) ? "grup.controller.esborrat.ko.enus" : "grup.controller.esborrat.ok";
 		// Comprova que el grup no s'utilitzi
-		if (existeix) {
+		if (Boolean.TRUE.equals(existeix)) {
 			return getAjaxControllerReturnValueError(request, url, msg);
 		}
 		grupService.delete(grupId);

@@ -48,9 +48,11 @@ public abstract class BaseController implements MessageSourceAware {
 			return;
 		}
 
+		Cookie ck;
 		for (var c : request.getCookies()) {
 			// Es sobre escriu el valor de cada cookie a NULL
-			var ck = new Cookie(c.getName(), null);
+			ck = new Cookie(c.getName(), null);
+			ck.setHttpOnly(true);
 			ck.setPath(request.getContextPath());
 			response.addCookie(ck);
 		}
@@ -71,6 +73,7 @@ public abstract class BaseController implements MessageSourceAware {
 	}
 
 	protected String getAjaxControllerReturnValueSuccess(HttpServletRequest request, String url, String messageKey, Object[] messageArgs) {
+
 		if (messageKey != null) {
 			MissatgesHelper.success(request, getMessage(request, messageKey, messageArgs));
 		}

@@ -30,7 +30,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -69,12 +72,16 @@ public class EntitatController extends BaseController {
 	@Autowired
 	private SessionScopedContext sessionScopedContext;
 
-	@RequestMapping(method = RequestMethod.GET)
+	private static final String CONFIG_ENTITAT = "configEntitat";
+	private static final String REDIRECT = "redirect:../../entitat";
+
+
+	@GetMapping
 	public String get( HttpServletRequest request, Model model) {
 		return "entitatList";
 	}
 
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@GetMapping(value = "/datatable")
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request ) {
 
@@ -88,12 +95,12 @@ public class EntitatController extends BaseController {
 		return null;
 	}
 
-	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	@GetMapping(value = "/new")
 	public String getNew(HttpServletRequest request, Model model) {
 		return !RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual()) ? "entitatList" : get(request, null, model);
 	}
 
-	@RequestMapping(value = "/{entitatId}", method = RequestMethod.GET)
+	@GetMapping(value = "/{entitatId}")
 	public String get(HttpServletRequest request, @PathVariable Long entitatId, Model model) {
 
 		EntitatDto entitat = null;
@@ -120,7 +127,7 @@ public class EntitatController extends BaseController {
 		return "entitatForm";
 	}
 
-	@RequestMapping(value = "/{entitatId}/configurar", method = RequestMethod.GET)
+	@GetMapping(value = "/{entitatId}/configurar")
 	public String configEntitat(HttpServletRequest request, @PathVariable Long entitatId, Model model) {
 
 		var configGroups = configService.findAll();
@@ -128,19 +135,19 @@ public class EntitatController extends BaseController {
 		var entitat = entitatService.findById(entitatId);
 		model.addAttribute("entitatNom", entitat.getNom());
 		if (entitat == null || Strings.isNullOrEmpty(entitat.getCodi())) {
-			return "configEntitat";
+			return CONFIG_ENTITAT;
 		}
 		for (var cGroup: configGroups) {
 			fillFormsModel(cGroup, model, entitat.getCodi());
 		}
-		return "configEntitat";
+		return CONFIG_ENTITAT;
 	}
 
-	@RequestMapping(value = "/{entitatId}/reset/actualitzacio/organs", method = RequestMethod.GET)
+	@GetMapping(value = "/{entitatId}/reset/actualitzacio/organs")
 	public String resetActualitzacioOrgans(HttpServletRequest request, @PathVariable Long entitatId, Model model) {
 
 		entitatService.resetActualitzacioOrgans(entitatId);
-		return "configEntitat";
+		return CONFIG_ENTITAT;
 	}
 
 	private void fillFormsModel(ConfigGroupDto cGroup, Model model, String entiatCodi){
@@ -162,7 +169,7 @@ public class EntitatController extends BaseController {
 		}
 	}
 
-	@RequestMapping(method = RequestMethod.POST)
+	@PostMapping
 	public String save(HttpServletRequest request, @Valid EntitatCommand command, BindingResult bindingResult, Model model) throws NotFoundException, IOException {
 
 		if (bindingResult.hasErrors()) {
@@ -198,51 +205,51 @@ public class EntitatController extends BaseController {
 		List<CodiValorDescDto> valors = new ArrayList<>();
 		TipusDocumentEnumDto tipus;
 		CodiValorDescDto valor;
-		for (var foo = 0; foo < tipusDocName.length; foo++) {
-			tipus = TipusDocumentEnumDto.toEnum(tipusDocName[foo]);
+		for (String s : tipusDocName) {
+			tipus = TipusDocumentEnumDto.toEnum(s);
 			if (tipus == null) {
 				continue;
 			}
 			valor = new CodiValorDescDto();
 			valor.setCodi(tipus.getText());
 			valor.setValor(tipus.name());
-			valor.setDesc(MessageHelper.getInstance().getMessage("tipus.document.enum." + tipus.name(),null, getLocale(request)));
+			valor.setDesc(MessageHelper.getInstance().getMessage("tipus.document.enum." + tipus.name(), null, getLocale(request)));
 			valors.add(valor);
 		}
 		return valors;
 	}
 
-	@RequestMapping(value = "/{entitatId}/enable", method = RequestMethod.GET)
+	@GetMapping(value = "/{entitatId}/enable")
 	public String enable(HttpServletRequest request, @PathVariable Long entitatId) {
 
 		entitatService.updateActiva(entitatId, true);
-		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "entitat.controller.activada.ok");
+		return getAjaxControllerReturnValueSuccess(request, REDIRECT, "entitat.controller.activada.ok");
 	}
 
-	@RequestMapping(value = "/{entitatId}/disable", method = RequestMethod.GET)
+	@GetMapping(value = "/{entitatId}/disable")
 	public String disable(HttpServletRequest request, @PathVariable Long entitatId) {
 
 		entitatService.updateActiva(entitatId, false);
-		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "entitat.controller.desactivada.ok");
+		return getAjaxControllerReturnValueSuccess(request,REDIRECT, "entitat.controller.desactivada.ok");
 	}
 
-	@RequestMapping(value = "/{entitatId}/delete", method = RequestMethod.GET)
+	@GetMapping(value = "/{entitatId}/delete")
 	public String delete(HttpServletRequest request, @PathVariable Long entitatId) {
 
 		var msg = "entitat.controller.esborrada.ok";
 		try {
 			if (entitatService.delete(entitatId) != null) {
-				return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", msg);
+				return getAjaxControllerReturnValueSuccess(request, REDIRECT, msg);
 			}
 			msg = "entitat.controller.esborrada.ko.notificacions.existents";
-			return getAjaxControllerReturnValueError(request, "redirect:../../entitat", msg);
+			return getAjaxControllerReturnValueError(request, REDIRECT, msg);
 		} catch(Exception ex) {
 			msg = "entitat.controller.esborrada.ko";
-			return getAjaxControllerReturnValueError(request, "redirect:../../entitat", msg);
+			return getAjaxControllerReturnValueError(request, REDIRECT, msg);
 		}
 	}
 	
-	@RequestMapping(value = "/getEntitatLogoCap", method = RequestMethod.GET)
+	@GetMapping(value = "/getEntitatLogoCap")
 	public String getEntitatLogoCap(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		var entitatActual = sessionScopedContext.getEntitatActual();
@@ -261,7 +268,7 @@ public class EntitatController extends BaseController {
 		return null;
 	}
 	
-	@RequestMapping(value = "/getEntitatLogoPeu", method = RequestMethod.GET)
+	@GetMapping(value = "/getEntitatLogoPeu")
 	public String getEntitatLogoPeu(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		var entitatActual = sessionScopedContext.getEntitatActual();
@@ -280,9 +287,9 @@ public class EntitatController extends BaseController {
 		return null;
 	}
 	
-	@RequestMapping(value = "/{entitatId}/tipusDocument", method = RequestMethod.GET)
+	@GetMapping(value = "/{entitatId}/tipusDocument")
 	@ResponseBody
-	public CodiValorDescDto[] getTipusDocument(@PathVariable Long entitatId, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public CodiValorDescDto[] getTipusDocument(@PathVariable Long entitatId, HttpServletRequest request, HttpServletResponse response) {
 
 		CodiValorDescDto[] tipusDoc = null;
 		var tipusDocuments = entitatService.findTipusDocumentByEntitat(entitatId);
@@ -298,29 +305,29 @@ public class EntitatController extends BaseController {
 		return tipusDoc;
 	}
 	
-	@RequestMapping(value = "/oficines/{dir3codi}", method = RequestMethod.GET)
+	@GetMapping(value = "/oficines/{dir3codi}")
 	@ResponseBody
-	private List<OficinaDto> getOficines(HttpServletRequest request, Model model, @PathVariable String dir3codi) {
+	public List<OficinaDto> getOficines(HttpServletRequest request, Model model, @PathVariable String dir3codi) {
 		return entitatService.findOficinesEntitat(dir3codi);
 	}
 	
-	@RequestMapping(value = "/llibre/{dir3codi}", method = RequestMethod.GET)
+	@GetMapping(value = "/llibre/{dir3codi}")
 	@ResponseBody
-	private LlibreDto getLlibreEntitat(HttpServletRequest request, Model model, @PathVariable String dir3codi) {
+	public LlibreDto getLlibreEntitat(HttpServletRequest request, Model model, @PathVariable String dir3codi) {
 		return entitatService.getLlibreEntitat(dir3codi);
 	}
 
-	@RequestMapping(value = "/localerequest", method = RequestMethod.GET)
+	@GetMapping(value = "/localerequest")
 	@ResponseBody
-	private Locale getLocale(HttpServletRequest request) {
+	public Locale getLocale(HttpServletRequest request) {
 
 		var localeResolver = RequestContextUtils.getLocaleResolver(request);
 		return localeResolver != null ? localeResolver.resolveLocale(request) : request.getLocale();
 	}
 
-	@RequestMapping(value = "/organigrama/{entitatCodi}", method = RequestMethod.GET)
+	@GetMapping(value = "/organigrama/{entitatCodi}")
 	@ResponseBody
-	public Map<String, OrganismeDto> getOrganigrama(@PathVariable String entitatCodi, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, OrganismeDto> getOrganigrama(@PathVariable String entitatCodi, HttpServletRequest request, HttpServletResponse response) {
 		return entitatService.findOrganigramaByEntitat(entitatCodi);
 	}
 }
