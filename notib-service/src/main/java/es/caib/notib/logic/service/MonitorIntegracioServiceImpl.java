@@ -3,10 +3,8 @@
  */
 package es.caib.notib.logic.service;
 
-import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
-import es.caib.notib.logic.helper.EntityComprovarHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
@@ -18,14 +16,9 @@ import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.service.MonitorIntegracioService;
-import es.caib.notib.persist.entity.monitor.MonitorIntegracioEntity;
-import es.caib.notib.persist.entity.monitor.MonitorIntegracioParamEntity;
 import es.caib.notib.persist.repository.monitor.MonitorIntegracioParamRepository;
 import es.caib.notib.persist.repository.monitor.MonitorIntegracioRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +32,7 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Service
 public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 
@@ -49,8 +43,6 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	@Resource
 	private PaginacioHelper paginacioHelper;
 	@Resource
-	private EntityComprovarHelper entityComprovarHelper;
-	@Resource
 	private MetricsHelper metricsHelper;
 	@Resource
 	private MonitorIntegracioRepository monitorRepository;
@@ -60,9 +52,9 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	@Override
 	public List<IntegracioDto> integracioFindAll() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consultant les integracions");
+			log.debug("Consultant les integracions");
 			return integracioHelper.findAll();
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -73,27 +65,14 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	@Transactional(readOnly = true)
 	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consultant les darreres accions per a la integració ( codi=" + codi + ")");
-//			List<IntegracioAccioDto> accions = integracioHelper.findAccions(codi, filtre);
-
-			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacio);
-			Page<MonitorIntegracioEntity> accions = monitorRepository.getByFiltre(
-					codi,
-					Strings.isNullOrEmpty(filtre.getEntitatCodi()),
-					filtre.getEntitatCodi(),
-					Strings.isNullOrEmpty(filtre.getAplicacio()),
-					filtre.getAplicacio(),
-					pageable);
+			log.debug("Consultant les darreres accions per a la integració ( codi=" + codi + ")");
+			var pageable = paginacioHelper.toSpringDataPageable(paginacio);
+			var entitatCodiNull = Strings.isNullOrEmpty(filtre.getEntitatCodi());
+			var appNull = Strings.isNullOrEmpty(filtre.getAplicacio());
+			var accions = monitorRepository.getByFiltre(codi, entitatCodiNull, filtre.getEntitatCodi(), appNull, filtre.getAplicacio(), pageable);
 			return paginacioHelper.toPaginaDto(accions, IntegracioAccioDto.class);
-
-//			int index = 0;
-//			for (IntegracioAccioDto accio : accions) {
-//				accio.setIndex(Long.valueOf(index));
-//				index++;
-//			}
-//			return accions;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -102,7 +81,8 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	@Transactional(readOnly = true)
 	@Override
 	public Map<String, Integer> countErrors() {
-		Timer.Context timer = metricsHelper.iniciMetrica();
+
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			return integracioHelper.countErrorsGroupByCodi();
 		} finally {
@@ -114,7 +94,7 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	@Override
 	public void netejarMonitor() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			monitorRepository.deleteAll();
 		} finally {
@@ -126,12 +106,12 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	public IntegracioDetall detallIntegracio(Long id) {
 
 		try {
-			MonitorIntegracioEntity i = monitorRepository.findById(id).orElseThrow();
-			List<MonitorIntegracioParamEntity> a = paramRepository.findByMonitorIntegracio(i);
+			var i = monitorRepository.findById(id).orElseThrow();
+			var a = paramRepository.findByMonitorIntegracio(i);
 			if (a == null) {
 				return IntegracioDetall.builder().descripcio("Error obtinguent el detall de la integració " + id).build();
 			}
-			List<AccioParam> accions = conversioTipusHelper.convertirList(a, AccioParam.class);
+			var accions = conversioTipusHelper.convertirList(a, AccioParam.class);
 			return IntegracioDetall.builder().data(i.getData()).descripcio(i.getDescripcio()).tipus(i.getTipus()).estat(i.getEstat())
 					.errorDescripcio(i.getErrorDescripcio()).excepcioMessage(i.getExcepcioMessage())
 					.excepcioStacktrace(i.getExcepcioStacktrace()).parametres(accions).build();
@@ -139,6 +119,5 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 			return IntegracioDetall.builder().descripcio("Error obtinguent el detall de la integració " + id).build();
 		}
 	}
-	private static final Logger logger = LoggerFactory.getLogger(MonitorIntegracioServiceImpl.class);
 
 }

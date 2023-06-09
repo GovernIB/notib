@@ -28,7 +28,7 @@ public class MonitorTasquesServiceImpl implements MonitorTasquesService {
 	@Override
 	public MonitorTascaInfo addTasca(String codiTasca) {
 
-		MonitorTascaInfo monitorTascaInfo = new MonitorTascaInfo();
+		var monitorTascaInfo = new MonitorTascaInfo();
 		monitorTascaInfo.setCodi(codiTasca);
 		monitorTascaInfo.setEstat(MonitorTascaEstat.EN_ESPERA);
 		MonitorTasquesServiceImpl.tasques.put(codiTasca, monitorTascaInfo);
@@ -42,7 +42,7 @@ public class MonitorTasquesServiceImpl implements MonitorTasquesService {
 
 	private void updateEstat(String codi, MonitorTascaEstat estat) {
 
-		MonitorTascaInfo monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
+		var monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
 		monitorTascaInfo.setEstat(estat);
 		MonitorTasquesServiceImpl.tasques.put(codi, monitorTascaInfo);
 

@@ -155,8 +155,8 @@ public class GrupServiceImpl implements GrupService{
 					continue;
 				}
 				rols = cacheHelper.findRolsUsuariAmbCodi(usuariGrup.getCodi());
-				if (rols.contains(grupProcediment.getGrup().getCodi())) {
-					grups.add(conversioTipusHelper.convertir(grupReposity.findById(grupProcediment.getGrup().getId()).get(), GrupDto.class));
+				if (grupProcediment.getGrup() != null && rols.contains(grupProcediment.getGrup().getCodi())) {
+					grups.add(conversioTipusHelper.convertir(grupReposity.findById(grupProcediment.getGrup().getId()).orElseThrow(), GrupDto.class));
 				}
 			}
 			return grups;
@@ -175,7 +175,7 @@ public class GrupServiceImpl implements GrupService{
 			var procSer = procSerRepository.findById(procSerId).orElseThrow();
 			var grupsProcediment = grupProcSerRepository.findByProcSer(procSer);
 			for (var grupProcediment : grupsProcediment) {
-				grups.add(conversioTipusHelper.convertir(grupReposity.findById(grupProcediment.getGrup().getId()).get(), GrupDto.class));
+				grups.add(conversioTipusHelper.convertir(grupReposity.findById(grupProcediment.getGrup().getId()).orElseThrow(), GrupDto.class));
 			}
 			return grups;
 		} finally {
@@ -221,7 +221,7 @@ public class GrupServiceImpl implements GrupService{
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var grup = entityComprovarHelper.comprovarGrup(grupId);
-			if (!grup.getEntitat().getId().equals(entitatId)) {
+			if (entitatId == null || !entitatId.equals(grup.getEntitat().getId())) {
 				throw new ValidationException("El grup que s'intenta eliminar no pertany a la entitat actual");
 			}
 			var procedimentGrups = grupProcSerRepository.findByGrup(grup);
@@ -300,7 +300,7 @@ public class GrupServiceImpl implements GrupService{
 	@Override
 	public List<GrupDto> findAll() {
 		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<>();
 	}
 
 	@Override
