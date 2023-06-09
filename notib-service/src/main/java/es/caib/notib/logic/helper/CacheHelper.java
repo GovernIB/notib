@@ -12,8 +12,6 @@ import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
-import org.ehcache.core.Ehcache;
-import org.ehcache.sizeof.SizeOf;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
@@ -21,12 +19,16 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.cache.Cache;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Utilitat per a accedir a les caches. Els mètodes cacheables es
@@ -225,13 +227,13 @@ public class CacheHelper {
 		}
 	}
 
-	public long getCacheSize(String cacheName)
-	{
-		var cache = cacheManager.getCache(cacheName);
-		var nativeCache = cache.getNativeCache();
-		if (nativeCache instanceof Ehcache) {
-			var sizeOf = SizeOf.newInstance();
-			return sizeOf.deepSizeOf(cache);
+	public long getCacheSize(String cacheName) {
+		try {
+			var cache = (Cache)cacheManager.getCache(cacheName).getNativeCache();
+			var cacheSize = StreamSupport.stream(Spliterators.spliteratorUnknownSize(cache.iterator(), Spliterator.ORDERED), false).count();
+			return cacheSize;
+		} catch (Exception ex) {
+			log.error("Error obtenint mida de la cache " + cacheName, ex);
 		}
 		return 0L;
 	}

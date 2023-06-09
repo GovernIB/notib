@@ -23,7 +23,7 @@ import java.io.IOException;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class BaseController implements MessageSourceAware {
+public abstract class BaseController implements MessageSourceAware {
 
 	MessageSource messageSource;
 

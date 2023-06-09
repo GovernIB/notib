@@ -3,19 +3,20 @@
  */
 package es.caib.notib.logic.intf.dto;
 
-import java.io.Serializable;
-
 import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Include;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+
+import java.io.Serializable;
 
 /**
  * Informació d'un usuari.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter @Setter @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@Getter @Setter @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true) @ToString
 public class UsuariDto implements Serializable {
 
 	@Include

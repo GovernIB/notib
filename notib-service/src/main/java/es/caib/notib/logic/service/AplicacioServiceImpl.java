@@ -29,6 +29,7 @@ import es.caib.notib.plugin.usuari.DadesUsuari;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -327,6 +328,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	@Override
+	@Cacheable(value = "propietat", key = "#property")
 	public String propertyGet(String property) {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();

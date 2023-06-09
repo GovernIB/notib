@@ -5,9 +5,9 @@ import com.google.common.base.Strings;
 import es.caib.notib.back.command.EnviamentCommand;
 import es.caib.notib.back.command.NotificacioCommand;
 import es.caib.notib.back.command.PersonaCommand;
+import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.EmailValidHelper;
 import es.caib.notib.back.helper.MessageHelper;
-import es.caib.notib.back.helper.SessioHelper;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
@@ -41,6 +41,8 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 	private OrganGestorService organService;
 	@Autowired
 	private EntitatService entitatService;
+	@Autowired
+	private SessionScopedContext sessionScopedContext;
 
 	@Override
 	public void initialize(final ValidNotificacio constraintAnnotation) {
@@ -52,7 +54,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 		boolean valid = true;
 		boolean comunicacioAmbAdministracio = false;
 		boolean comunicacioSenseAdministracio = false;
-		Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
+		Locale locale = new Locale(sessionScopedContext.getIdiomaUsuari());
 		context.disableDefaultConstraintViolation();
 		String maxSizeError = "";
 		try {

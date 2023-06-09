@@ -146,6 +146,12 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@PermitAll
+	public List<OrganGestorDto> findAccessiblesByUsuariAndEntitatActual(Long entitatId) {
+		return getDelegateService().findAccessiblesByUsuariAndEntitatActual(entitatId);
+	}
+
+	@Override
+	@PermitAll
 	public List<PermisDto> permisFind(Long entitatId, Long id, PaginacioParamsDto paginacioParams) throws NotFoundException {
 		return getDelegateService().permisFind(entitatId, id, paginacioParams);
 	}
@@ -236,7 +242,13 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 		getDelegateService().sincronitzarOrganNomMultidioma(ids);
 	}
 
-	@Override
+    @Override
+	@PermitAll
+    public Long getLastPermisosModificatsInstant() {
+        return getDelegateService().getLastPermisosModificatsInstant();
+    }
+
+    @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public OrganGestorDto update(OrganGestorDto dto) {
 		return getDelegateService().update(dto);

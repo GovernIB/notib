@@ -1,14 +1,14 @@
 package es.caib.notib.back.controller;
 
-import es.caib.notib.logic.intf.dto.procediment.ProcSerGrupDto;
-import es.caib.notib.logic.intf.service.EntitatService;
-import es.caib.notib.logic.intf.service.GrupService;
-import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.back.command.ProcedimentGrupCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RolHelper;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerGrupDto;
+import es.caib.notib.logic.intf.service.EntitatService;
+import es.caib.notib.logic.intf.service.GrupService;
+import es.caib.notib.logic.intf.service.ProcedimentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,7 +43,7 @@ public class ProcedimentGrupController extends BaseUserController{
 	public String permis(HttpServletRequest request, @PathVariable Long procedimentId, Model model) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
-		model.addAttribute("procediment", procedimentService.findById(entitatActual.getId(), isAdministrador(request), procedimentId));
+		model.addAttribute("procediment", procedimentService.findById(entitatActual.getId(), isAdministrador(), procedimentId));
 		return "procedimentAdminGrup";
 	}
 	
@@ -79,7 +79,7 @@ public class ProcedimentGrupController extends BaseUserController{
 		var grups = organGestorActual == null ? grupService.findByEntitat(entitatActual.getId())
 								: grupService.findByEntitatAndOrganGestor(entitatActual, organGestorActual);
 		model.addAttribute("grups", grups);
-		model.addAttribute("procediment", procedimentService.findById(entitatActual.getId(), isAdministrador(request), procedimentId));
+		model.addAttribute("procediment", procedimentService.findById(entitatActual.getId(), isAdministrador(), procedimentId));
 		if (grupId == null) {
 			return procedimentGrups;
 		}
@@ -114,7 +114,7 @@ public class ProcedimentGrupController extends BaseUserController{
 		return DatatablesHelper.getDatatableResponse(request, grupService.findByProcSer(entitatActual.getId(), procedimentId, params), "id");
 	}
 	
-	private boolean isAdministrador(HttpServletRequest request) {
-		return RolHelper.isUsuariActualAdministrador(request);
+	private boolean isAdministrador() {
+		return RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
 	}
 }

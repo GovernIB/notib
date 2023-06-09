@@ -183,4 +183,5 @@ public interface AplicacioService {
 
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	void updateProcesInicialExecutat(ProcessosInicialsEnum proces);
+
 }

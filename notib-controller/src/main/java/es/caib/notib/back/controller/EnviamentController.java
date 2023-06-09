@@ -9,7 +9,6 @@ import es.caib.notib.back.command.NotificacioEnviamentFiltreCommand;
 import es.caib.notib.back.command.NotificacioFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.notib.back.helper.EntitatHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
@@ -64,11 +63,11 @@ public class EnviamentController extends TableAccionsMassivesController {
 		var entitatActual = getEntitatActualComprovantPermisos(request);
 		var filtreCommand = getFiltreCommand(request);
 		String organGestorCodi = null;
-		if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request) && entitatActual != null) {
+		if (RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual()) && entitatActual != null) {
 			var organGestorActual = getOrganGestorActual(request);
 			organGestorCodi = organGestorActual.getCodi();
 		}
-		return enviamentService.findIdsAmbFiltre(entitatActual.getId(), RolEnumDto.valueOf(RolHelper.getRolActual(request)), getCodiUsuariActual(), organGestorCodi, NotificacioEnviamentFiltreCommand.asDto(filtreCommand));
+		return enviamentService.findIdsAmbFiltre(entitatActual.getId(), RolEnumDto.valueOf(sessionScopedContext.getRolActual()), getCodiUsuariActual(), organGestorCodi, NotificacioEnviamentFiltreCommand.asDto(filtreCommand));
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
@@ -76,7 +75,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
 		model.addAttribute("mantenirPaginacio", mantenirPaginacio != null ? mantenirPaginacio : false);
-		var entitatActual = EntitatHelper.getEntitatActual(request);
+		var entitatActual = sessionScopedContext.getEntitatActual();
 		ColumnesDto columnes = null;
 		var filtreEnviaments = getFiltreCommand(request);
 		model.addAttribute(filtreEnviaments);
@@ -115,7 +114,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 		var filtreEnviaments = getFiltreCommand(request);
 		var enviaments = new PaginaDto<NotEnviamentTableItemDto>();
-		var isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		var isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
 		String organGestorCodi = null;
 		try {
 			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
@@ -127,7 +126,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 				organGestorCodi = organGestorActual.getCodi();
 			}
 
-			enviaments = enviamentService.enviamentFindByEntityAndFiltre(entitatActual.getId(), RolEnumDto.valueOf(RolHelper.getRolActual(request)), organGestorCodi,
+			enviaments = enviamentService.enviamentFindByEntityAndFiltre(entitatActual.getId(), RolEnumDto.valueOf(sessionScopedContext.getRolActual()), organGestorCodi,
 					getCodiUsuariActual(), NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments), DatatablesHelper.getPaginacioDtoFromRequest(request));
 
 		} catch(SecurityException e) {
@@ -139,7 +138,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 	@RequestMapping(value = "/visualitzar", method = RequestMethod.GET)
 	public String visualitzar(HttpServletRequest request, Model model) {
 
-		var entitat = EntitatHelper.getEntitatActual(request);
+		var entitat = sessionScopedContext.getEntitatActual();
 		var columnes = enviamentService.getColumnesUsuari(entitat.getId(), getCodiUsuariActual());
 		model.addAttribute(columnes != null ? ColumnesCommand.asCommand(columnes) : new ColumnesCommand());
 		return "enviamentColumns";
@@ -148,7 +147,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 	@RequestMapping(value = "/visualitzar/save", method = RequestMethod.POST)
 	public String save(HttpServletRequest request, @Valid ColumnesCommand columnesCommand, BindingResult bindingResult, Model model) throws IOException {
 
-		var entitat = EntitatHelper.getEntitatActual(request);
+		var entitat = sessionScopedContext.getEntitatActual();
 		if (bindingResult.hasErrors()) {
 			return "procedimentAdminForm";
 		}

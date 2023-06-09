@@ -29,6 +29,8 @@ import java.util.Map;
  */
 public interface EntitatService {
 
+	Long getLastPermisosModificatsInstant();
+
 	/**
 	 * Crea una nova entitat.
 	 * 

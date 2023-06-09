@@ -2,12 +2,11 @@ package es.caib.notib.back.validation;
 
 
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.back.command.PersonaCommand;
+import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.MessageHelper;
 import es.caib.notib.back.helper.NifHelper;
-import es.caib.notib.back.helper.SessioHelper;
+import es.caib.notib.client.domini.InteressatTipus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,7 +28,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 	private static final int MIN_SIZE_NOM_RAO = 2;
 
 	@Autowired
-	private AplicacioService aplicacioService;
+	private SessionScopedContext sessionScopedContext;
 
 	@Override
 	public void initialize(final ValidPersona constraintAnnotation) {
@@ -41,7 +40,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 		boolean valid = true;
 
 		try {
-			Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
+			Locale locale = new Locale(sessionScopedContext.getIdiomaUsuari());
 			// Validació del NIF/NIE/CIF
 			if (persona.getNif() != null && !persona.getNif().isEmpty() && !InteressatTipus.FISICA_SENSE_NIF.equals(persona.getInteressatTipus()) && !NifHelper.isvalid(persona.getNif())) {
 				valid = false;
@@ -52,7 +51,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 			// Validacions per tipus de persona
 			switch (persona.getInteressatTipus()) {
 				case FISICA:
-					valid = validarNom(persona, context);
+					valid = validarNom(persona, context, locale);
 					String llinatge1Interessat = persona.getLlinatge1();
 					String llinatge2Interessat = persona.getLlinatge2();
 
@@ -89,7 +88,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 					}
 					break;
 				case FISICA_SENSE_NIF:
-					valid = validarNom(persona, context);
+					valid = validarNom(persona, context, locale);
 					if (persona.getLlinatge1() == null || persona.getLlinatge1().isEmpty()) {
 						valid = false;
 						context.buildConstraintViolationWithTemplate(
@@ -109,7 +108,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 					}
 					break;
 				case JURIDICA:
-					valid = validarNom(persona, context);
+					valid = validarNom(persona, context, locale);
 					if (persona.getNif() == null || persona.getNif().isEmpty()) {
 						valid = false;
 						context.buildConstraintViolationWithTemplate(
@@ -153,8 +152,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 		return valid;
 	}
 
-	private boolean validarNom(final PersonaCommand persona, final ConstraintValidatorContext context) {
-		Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
+	private boolean validarNom(final PersonaCommand persona, final ConstraintValidatorContext context, final Locale locale) {
 		boolean isJuridica = InteressatTipus.JURIDICA.equals(persona.getInteressatTipus());
 		String msgKey = "";
 		boolean ok = true;

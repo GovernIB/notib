@@ -8,15 +8,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 
 <%
-	pageContext.setAttribute(
-			"isRolActualAdministradorEntitat",
-			es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
-	pageContext.setAttribute(
-			"isRolActualAdministradorOrgan",
-			es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
-	pageContext.setAttribute(
-			"isRolActualAdministrador",
-			es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(request));
+	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
+	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()));
+	pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(ssc.getRolActual()));
+	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(ssc.getRolActual()));
 %>
 
 <html>

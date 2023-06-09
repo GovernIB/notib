@@ -3,9 +3,9 @@
  */
 package es.caib.notib.back.interceptor;
 
-import es.caib.notib.logic.intf.dto.UsuariDto;
-import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.RolHelper;
+import es.caib.notib.logic.intf.service.AplicacioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,12 +25,13 @@ public class AccesUsuariInterceptor implements AsyncHandlerInterceptor {
 
 	@Autowired @Lazy
 	private AplicacioService aplicacioService;
-
+	@Autowired
+	private SessionScopedContext sessionScopedContext;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-		if (!RolHelper.isUsuariActualUsuari(request)) {
+		if (!RolHelper.isUsuariActualUsuari(sessionScopedContext.getRolActual())) {
 			return true;
 		}
 		var name = "";

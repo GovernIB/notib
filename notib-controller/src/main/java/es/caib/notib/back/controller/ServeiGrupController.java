@@ -1,15 +1,15 @@
 package es.caib.notib.back.controller;
 
-import es.caib.notib.logic.intf.dto.procediment.ProcSerGrupDto;
-import es.caib.notib.logic.intf.service.EntitatService;
-import es.caib.notib.logic.intf.service.GrupService;
-import es.caib.notib.logic.intf.service.ProcedimentService;
-import es.caib.notib.logic.intf.service.ServeiService;
 import es.caib.notib.back.command.ProcedimentGrupCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RolHelper;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerGrupDto;
+import es.caib.notib.logic.intf.service.EntitatService;
+import es.caib.notib.logic.intf.service.GrupService;
+import es.caib.notib.logic.intf.service.ProcedimentService;
+import es.caib.notib.logic.intf.service.ServeiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,7 +48,7 @@ public class ServeiGrupController extends BaseUserController{
 	public String permis(HttpServletRequest request, @PathVariable Long serveiId, Model model) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
-		model.addAttribute("servei", serveiService.findById(entitatActual.getId(), isAdministrador(request), serveiId));
+		model.addAttribute("servei", serveiService.findById(entitatActual.getId(), isAdministrador(), serveiId));
 		return "serveiAdminGrup";
 	}
 	
@@ -83,7 +83,7 @@ public class ServeiGrupController extends BaseUserController{
 		var grups = organGestorActual == null ? grupService.findByEntitat(entitatActual.getId())
 								: grupService.findByEntitatAndOrganGestor(entitatActual, organGestorActual);
 		model.addAttribute("grups", grups);
-		model.addAttribute("servei", serveiService.findById(entitatActual.getId(), isAdministrador(request), serveiId));
+		model.addAttribute("servei", serveiService.findById(entitatActual.getId(), isAdministrador(), serveiId));
 		if (grupId == null) {
 			return null;
 		}
@@ -118,7 +118,7 @@ public class ServeiGrupController extends BaseUserController{
 		return DatatablesHelper.getDatatableResponse(request, grupService.findByProcSer(entitatActual.getId(), serveiId, params), "id");
 	}
 	
-	private boolean isAdministrador(HttpServletRequest request) {
-		return RolHelper.isUsuariActualAdministrador(request);
+	private boolean isAdministrador() {
+		return RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
 	}
 }

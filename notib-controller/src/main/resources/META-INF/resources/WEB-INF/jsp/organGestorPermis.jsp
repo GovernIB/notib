@@ -5,9 +5,8 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <%
-pageContext.setAttribute(
-		"isRolActualAdministradorOrgan",
-		es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
+	pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(ssc.getRolActual()));
 %>
 <html>
 <head>

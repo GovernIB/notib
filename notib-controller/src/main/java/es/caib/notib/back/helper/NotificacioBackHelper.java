@@ -3,6 +3,7 @@
  */
 package es.caib.notib.back.helper;
 
+import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
@@ -36,6 +37,8 @@ public class NotificacioBackHelper {
 	private EntitatService entitatService;
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private SessionScopedContext sessionScopedContext;
 	@Autowired
 	MessageSource messageSource;
 
@@ -74,9 +77,9 @@ public class NotificacioBackHelper {
 		List<CodiValorEstatDto> organsDisponibles = new ArrayList<>();
 		var entitatId = entitatActual.getId();
 		var usuari = SecurityContextHolder.getContext().getAuthentication().getName();
-		var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+		var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
 		var organ = organGestorActual != null ? organGestorActual.getCodi() : null;
-		if (RolHelper.isUsuariActualAdministrador(request)) {
+		if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
 			model.addAttribute("entitat", entitatService.findAll());
 		}
 //		// Eliminam l'òrgan gestor entitat  --> Per ara el mantenim, ja que hi ha notificacions realitzades a l'entitat

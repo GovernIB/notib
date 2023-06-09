@@ -1,3 +1,4 @@
+<%@ page import="es.caib.notib.back.config.scopedata.SessionScopedContext" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
@@ -6,24 +7,26 @@
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 
 <%
-	pageContext.setAttribute("sessionEntitats", es.caib.notib.back.helper.EntitatHelper.findEntitatsAccessibles(request));
-	pageContext.setAttribute("entitatActual", es.caib.notib.back.helper.EntitatHelper.getEntitatActual(request));
-	pageContext.setAttribute("requestParameterCanviEntitat", es.caib.notib.back.helper.EntitatHelper.getRequestParameterCanviEntitat());
-	pageContext.setAttribute("rolActual", es.caib.notib.back.helper.RolHelper.getRolActual(request));
-	pageContext.setAttribute("rolsUsuariActual", es.caib.notib.back.helper.RolHelper.getRolsUsuariActual(request));
-	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(request));
-	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(request), PageContext.REQUEST_SCOPE);pageContext.setAttribute("isRolActualUsuari", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuari(request));
-	pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
-	pageContext.setAttribute("requestParameterCanviRol", es.caib.notib.back.helper.RolHelper.getRequestParameterCanviRol());
-	pageContext.setAttribute("permisNotificacioMenu", request.getAttribute("permisNotificacioMenu"));
-	pageContext.setAttribute("permisComunicacioMenu", request.getAttribute("permisComunicacioMenu"));
-	pageContext.setAttribute("permisComunicacioSirMenu", request.getAttribute("permisComunicacioSirMenu"));
-	pageContext.setAttribute("sessionOrgans", es.caib.notib.back.helper.OrganGestorHelper.getOrgansGestorsUsuariActual(request));
-	pageContext.setAttribute("organActual", es.caib.notib.back.helper.OrganGestorHelper.getOrganGestorUsuariActual(request));
-	pageContext.setAttribute("requestParameterCanviOrgan", es.caib.notib.back.helper.OrganGestorHelper.getRequestParameterCanviOrgan());
-	pageContext.setAttribute("avisos", es.caib.notib.back.helper.AvisHelper.getAvisos(request));
-	pageContext.setAttribute("organsProcNoSincronitzats", es.caib.notib.back.helper.OrganGestorHelper.getOrgansProcNoSincronitzats(request));
-	pageContext.setAttribute("organsServNoSincronitzats", es.caib.notib.back.helper.OrganGestorHelper.getOrgansServNoSincronitzats(request));
+	es.caib.notib.back.config.scopedata.SessionScopedContext sessionScopedContext = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
+	pageContext.setAttribute("sessionEntitats", sessionScopedContext.getEntitatsAccessibles());
+	pageContext.setAttribute("entitatActual", sessionScopedContext.getEntitatActual());
+	pageContext.setAttribute("requestParameterCanviEntitat", es.caib.notib.back.helper.RolHelper.REQUEST_PARAMETER_CANVI_ENTITAT);
+	pageContext.setAttribute("rolActual", sessionScopedContext.getRolActual());
+	pageContext.setAttribute("rolsUsuariActual", sessionScopedContext.getRolsDisponibles());
+	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual()));
+	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()), PageContext.REQUEST_SCOPE);
+	pageContext.setAttribute("isRolActualUsuari", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuari(sessionScopedContext.getRolActual()));
+	pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual()));
+	pageContext.setAttribute("requestParameterCanviRol", es.caib.notib.back.helper.RolHelper.REQUEST_PARAMETER_CANVI_ROL);
+	pageContext.setAttribute("permisNotificacioMenu", sessionScopedContext.getMenuNotificacions());
+	pageContext.setAttribute("permisComunicacioMenu", sessionScopedContext.getMenuComunicacions());
+	pageContext.setAttribute("permisComunicacioSirMenu", sessionScopedContext.getMenuSir());
+	pageContext.setAttribute("sessionOrgans", sessionScopedContext.getOrgansAccessibles());
+	pageContext.setAttribute("organActual", sessionScopedContext.getOrganActual());
+	pageContext.setAttribute("requestParameterCanviOrgan", es.caib.notib.back.helper.RolHelper.REQUEST_PARAMETER_CANVI_ORGAN);
+	pageContext.setAttribute("avisos", sessionScopedContext.getAvisos());
+	pageContext.setAttribute("organsProcNoSincronitzats", sessionScopedContext.getOrgansProcNoSincronitzats());
+	pageContext.setAttribute("organsServNoSincronitzats", sessionScopedContext.getOrgansServNoSincronitzats());
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>
@@ -51,6 +54,9 @@
 	<script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/css/bootstrap-colorpicker.min.css"/>" rel="stylesheet">
 	<script src="<c:url value="/js/bootstrap-colorpicker.min.js"/>"></script>
+	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<script type="text/javascript">
 		var userLanguage;
 		var setIdioma = function() {
@@ -88,12 +94,12 @@
 		}
 		</c:when>
 		<c:otherwise>
-		<c:if test="${sessionScope['SessionHelper.capsaleraColorFons']!=null  && not empty sessionScope['SessionHelper.capsaleraColorFons']}">
+		<c:if test="${sessionScopedContext.capBackColor!=null  && not empty sessionScopedContext.capBackColor}">
 		.navbar-app {
-			background-color: ${sessionScope['SessionHelper.capsaleraColorFons']} !important;
+			background-color: ${sessionScopedContext.capBackColor} !important;
 		}
 		.navbar-app .list-inline li.dropdown>a {
-			background-color: ${sessionScope['SessionHelper.capsaleraColorFons']} !important;
+			background-color: ${sessionScopedContext.capBackColor} !important;
 		}
 		</c:if>
 		</c:otherwise>
@@ -112,15 +118,15 @@
 		}
 		</c:when>
 		<c:otherwise>
-		<c:if test="${sessionScope['SessionHelper.capsaleraColorLletra']!=null  && not empty sessionScope['SessionHelper.capsaleraColorLletra']}">
+		<c:if test="${sessionScopedContext.capColor!=null  && not empty sessionScopedContext.capColor}">
 		.navbar-app .list-inline li.dropdown>a {
-			color: ${sessionScope['SessionHelper.capsaleraColorLletra']};
+			color: ${sessionScopedContext.capColor};
 		}
 		.caret-white {
-			border-top-color: ${sessionScope['SessionHelper.capsaleraColorLletra']} !important;
+			border-top-color: ${sessionScopedContext.capColor} !important;
 		}
 		.list-inline.pull-right {
-			color: ${sessionScope['SessionHelper.capsaleraColorLletra']} !important;
+			color: ${sessionScopedContext.capColor} !important;
 		}
 		</c:if>
 		</c:otherwise>
@@ -148,7 +154,7 @@
 			<div class="navbar-brand">
 				<div id="govern-logo" class="pull-left">
 					<c:choose>
-						<c:when test="${sessionScope['SessionHelper.capsaleraCapLogo']!=null  && not empty sessionScope['SessionHelper.capsaleraCapLogo'] || sessionScope['EntitatHelper.entitatActual'].logoCapBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoCapBytes)!=0}">
+						<c:when test="${sessionScopedContext.capLogo!=null  && not empty sessionScopedContext.capLogo || sessionScope['EntitatHelper.entitatActual'].logoCapBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoCapBytes)!=0}">
 							<img src="<c:url value="/entitat/getEntitatLogoCap"/>"  height="65" alt="Govern de les Illes Balears" />
 						</c:when>
 						<c:otherwise>
@@ -450,7 +456,7 @@
 	<div class="pull-right govern-footer">
 		<p>
 			<c:choose>
-				<c:when test="${sessionScope['SessionHelper.capsaleraPeuLogo']!=null  && not empty sessionScope['SessionHelper.capsaleraPeuLogo'] || sessionScope['EntitatHelper.entitatActual'].logoPeuBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoPeuBytes)!=0}">
+				<c:when test="${sessionScopedContext.peuLogo!=null  && not empty sessionScopedContext.peuLogo || sessionScope['EntitatHelper.entitatActual'].logoPeuBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoPeuBytes)!=0}">
 					<img src="<c:url value="/entitat/getEntitatLogoPeu"/>"  height="65" alt="Govern de les Illes Balears" />
 				</c:when>
 				<c:otherwise>

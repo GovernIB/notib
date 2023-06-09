@@ -3,14 +3,17 @@
  */
 package es.caib.notib.back.controller;
 
+import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.AjaxHelper;
-import es.caib.notib.back.helper.EntitatHelper;
+import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.ModalHelper;
 import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -24,44 +27,70 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import javax.annotation.PostConstruct;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 /**
  * Controlador amb utilitats per a l'aplicació NOTIB.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Controller
 public class NotibController implements ErrorController {
 
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Autowired
+	private ServletContext servletContext;
+	@Autowired
+	BuildProperties buildProperties;
+	@Autowired
+	SessionScopedContext sessionScopedContext;
+
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String root(HttpServletRequest request) {
+
+		var rolActual = sessionScopedContext.getRolActual();
+		return RolHelper.ROLE_SUPER.equals(rolActual) ? "redirect:/integracio" :
+				RolHelper.ROLE_APLICACIO.equals(rolActual) ? "redirect:/api/rest" : "redirect:/notificacio";
+	}
 
 	@RequestMapping(value = "/index", method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
 		
-		if (RolHelper.isUsuariActualAdministrador(request)) {
+		if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
 			return "redirect:integracio";
 		}
-		if (RolHelper.isUsuariActualAplicacio(request)) {
+		if (RolHelper.isUsuariActualAplicacio(sessionScopedContext.getRolActual())) {
 			return "redirect:api/rest";
 		}
-		if (RolHelper.isUsuariActualUsuari(request)) {
+		if (RolHelper.isUsuariActualUsuari(sessionScopedContext.getRolActual())) {
 			return "redirect:notificacio";
 		}
-		var entitat = EntitatHelper.getEntitatActual(request);
+		var entitat = sessionScopedContext.getEntitatActual();
 		if (entitat == null)
 			throw new SecurityException("No te cap entitat assignada");
-		if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
+		if (RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual())) {
 			return "redirect:notificacio";
 		}
-		if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
+		if (RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual())) {
 			return "redirect:notificacio";
 		}
 		return "index";
@@ -195,5 +224,55 @@ public class NotibController implements ErrorController {
 			var rootCause = ExceptionUtils.getRootCause(throwable);
 			return rootCause != null ? rootCause.getMessage() : throwable.getMessage();
 		}
+	}
+
+
+	@PostConstruct
+	public void propagateDbProperties() {
+		aplicacioService.propagateDbProperties();
+//		aplicacioService.restartSchedulledTasks();
+		MissatgesHelper.manifestAtributsMap = getManifestAttributes();
+	}
+
+
+	private Map<String, Object> getManifestAttributes() {
+		Map<String, Object> manifestAtributsMap = null;
+
+		try {
+			var is = servletContext.getResourceAsStream("/" + JarFile.MANIFEST_NAME);
+			if (is != null) {
+				manifestAtributsMap = new HashMap<>();
+				var manifest = new Manifest(is);
+				var manifestAtributs = manifest.getMainAttributes();
+				for (var key : new HashMap(manifestAtributs).keySet()) {
+					manifestAtributsMap.put(key.toString(), manifestAtributs.get(key));
+				}
+				aplicacioService.setAppVersion((String) manifestAtributsMap.get("Implementation-Version"));
+				manifestAtributsMap.put("Build-Timestamp", formatBuildTimestamp(manifestAtributsMap.get("Build-Timestamp").toString()));
+			} else if (buildProperties != null){
+				manifestAtributsMap = new HashMap<>();
+				manifestAtributsMap.put("Build-Timestamp", formatBuildTimestamp(buildProperties.get("Build-Timestamp")));
+				manifestAtributsMap.put("Implementation-Vendor", buildProperties.get("Implementation-Vendor"));
+				manifestAtributsMap.put("Implementation-Version", buildProperties.get("Implementation-Version"));
+				manifestAtributsMap.put("Implementation-SCM-Branch", buildProperties.get("Implementation-SCM-Branch"));
+				manifestAtributsMap.put("Implementation-SCM-Revision", buildProperties.get("Implementation-SCM-Revision"));
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY.MM.dd HH:mm").withZone(ZoneId.systemDefault());
+				manifestAtributsMap.put("Version", buildProperties.getVersion());
+				manifestAtributsMap.put("Time", formatter.format(buildProperties.getTime()));
+				aplicacioService.setAppVersion((String) buildProperties.get("Implementation-Version"));
+			}
+		} catch (Exception ex) {
+			log.error("Error obtenint els atributs del manifest per a mostrar el numero de versió", ex);
+		}
+		return manifestAtributsMap;
+	}
+
+	private String formatBuildTimestamp(String timestamp) throws ParseException {
+		var ISO_DATE_FORMAT_ZERO_OFFSET = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+		var simpleDateFormat = new SimpleDateFormat(ISO_DATE_FORMAT_ZERO_OFFSET);
+		simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+		var dateFormat = new SimpleDateFormat("YYYY.MM.dd HH:mm", new Locale("ca", "ES"));
+		var date = simpleDateFormat.parse(timestamp);
+		return dateFormat.format(date) + "h";
 	}
 }

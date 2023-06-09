@@ -3,13 +3,13 @@
  */
 package es.caib.notib.back.controller;
 
-import javax.servlet.http.HttpServletRequest;
-
+import es.caib.notib.back.config.scopedata.SessionScopedContext;
+import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
-import es.caib.notib.back.helper.EntitatHelper;
-import es.caib.notib.back.helper.OrganGestorHelper;
-import es.caib.notib.back.helper.RolHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -18,12 +18,15 @@ import es.caib.notib.back.helper.RolHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class BaseUserController extends BaseController {
+public abstract class BaseUserController extends BaseController {
+
+	@Autowired
+	protected SessionScopedContext sessionScopedContext;
 
 	public EntitatDto getEntitatActualComprovantPermisos(HttpServletRequest request) {
 
-		var entitat = EntitatHelper.getEntitatActual(request);
-		var administradorOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		var entitat = sessionScopedContext.getEntitatActual();
+		var administradorOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
 		if (entitat == null) {
 			throw new SecurityException("No te cap entitat assignada");
 		}
@@ -38,8 +41,8 @@ public class BaseUserController extends BaseController {
 	
 	public OrganGestorDto getOrganGestorActual(HttpServletRequest request) {
 
-		var administradorOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
-		return administradorOrgan ? OrganGestorHelper.getOrganGestorUsuariActual(request) : null;
+		var administradorOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
+		return administradorOrgan ? sessionScopedContext.getOrganActual() : null;
 	}
 	
 	public Long getOrganGestorActualId(HttpServletRequest request) {

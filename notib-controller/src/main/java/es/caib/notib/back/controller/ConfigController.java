@@ -46,7 +46,7 @@ public class ConfigController extends BaseUserController{
 
         var configGroups = configService.findAll();
         List<EntitatDto> entitats = new ArrayList<>();
-        if (RolHelper.isUsuariActualAdministrador(request)) {
+        if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
             entitats = entitatService.findAll();
         }
         model.addAttribute("config_groups", configGroups);

@@ -4,9 +4,9 @@
 package es.caib.notib.back.validation;
 
 import es.caib.notib.back.command.AplicacioCommand;
+import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.MessageHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
-import es.caib.notib.back.helper.SessioHelper;
 import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.UsuariAplicacioService;
@@ -34,6 +34,8 @@ public class CodiAplicacioNoRepetitValidator implements ConstraintValidator<Codi
 	private UsuariAplicacioService usuariAplicacioService;
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Autowired
+	private SessionScopedContext sessionScopedContext;
 	
 	
 	@Override
@@ -48,7 +50,7 @@ public class CodiAplicacioNoRepetitValidator implements ConstraintValidator<Codi
 	public boolean isValid(final AplicacioCommand command, final ConstraintValidatorContext context) {
 
 		try {
-			final var locale = new Locale(SessioHelper.getIdioma(aplicacioService));
+			final var locale = new Locale(sessionScopedContext.getIdiomaUsuari());
 			final var id = command.getId();
 			final var usuariCodi = command.getUsuariCodi();
 			final var entitatId = command.getEntitatId();

@@ -101,6 +101,21 @@ public class EntitatServiceImpl implements EntitatService {
 	@Autowired
 	private NotificacioRepository notificacioRepository;
 
+
+
+	private static Long permisosEntitatsModificatsInstant;
+
+	private static void updateEntitatsSessio() {
+		permisosEntitatsModificatsInstant = System.currentTimeMillis();
+	}
+
+	@Override
+	public Long getLastPermisosModificatsInstant() {
+		return EntitatServiceImpl.permisosEntitatsModificatsInstant;
+	}
+
+
+
 	@Transactional
 	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Override
@@ -129,6 +144,7 @@ public class EntitatServiceImpl implements EntitatService {
 				}
 			}
 
+			updateEntitatsSessio();
 			configHelper.crearConfigsEntitat(entitat.getCodi());
 			return conversioTipusHelper.convertir(entitatSaved, EntitatDto.class);
 		} finally {
@@ -191,6 +207,7 @@ public class EntitatServiceImpl implements EntitatService {
 			if (!entitat.isEntregaCieActiva() && entregaCie != null) {
 				entregaCieRepository.delete(entregaCie);
 			}
+			updateEntitatsSessio();
 			permisosCacheable.evictAllFindEntitatsAccessiblesUsuari();
 			return conversioTipusHelper.convertir(entity, EntitatDto.class);
 		} finally {
@@ -239,6 +256,7 @@ public class EntitatServiceImpl implements EntitatService {
 			entitatRepository.delete(entitat);
 			permisosHelper.deleteAcl(entitat.getId(), EntitatEntity.class);
 			configHelper.deleteConfigEntitat(entitat.getCodi());
+			updateEntitatsSessio();
 			return conversioTipusHelper.convertir(entitat, EntitatDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -411,6 +429,7 @@ public class EntitatServiceImpl implements EntitatService {
 			
 			entityComprovarHelper.comprovarEntitat(entitatId,true,true,false,false);
 			permisosHelper.updatePermis(entitatId, EntitatEntity.class, permis);
+			updateEntitatsSessio();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -426,6 +445,7 @@ public class EntitatServiceImpl implements EntitatService {
 			logger.debug("Eliminació com a superusuari del permis de l'entitat (entitatId=" + entitatId + ", permisId=" + permisId + ")");
 			entityComprovarHelper.comprovarEntitat(entitatId,true,true,false,false);
 			permisosHelper.deletePermis(entitatId, EntitatEntity.class, permisId);
+			updateEntitatsSessio();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

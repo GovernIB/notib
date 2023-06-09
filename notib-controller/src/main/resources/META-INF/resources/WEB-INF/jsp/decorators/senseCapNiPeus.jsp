@@ -40,7 +40,7 @@
 	</script>
 	<decorator:head />
 </head>
-<body>
+<body style="padding-top: 1em;">
 	<div class="container-nocappeus">
 		<div id="contingut-missatges"><not:missatges/></div>
 		<decorator:body />

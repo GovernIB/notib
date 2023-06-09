@@ -5,7 +5,6 @@ import es.caib.notib.back.command.NotificacioMassivaCommand;
 import es.caib.notib.back.command.NotificacioMassivaFiltreCommand;
 import es.caib.notib.back.helper.CaducitatHelper;
 import es.caib.notib.back.helper.DatatablesHelper;
-import es.caib.notib.back.helper.EntitatHelper;
 import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.back.helper.ExceptionHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
@@ -13,17 +12,11 @@ import es.caib.notib.back.helper.NotificacioBackHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaDataDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaEstatDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaFiltreDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaTableItemDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
-import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.InvalidCSVFileNotificacioMassivaException;
 import es.caib.notib.logic.intf.exception.MaxLinesExceededException;
 import es.caib.notib.logic.intf.exception.NotificacioMassivaException;
@@ -40,7 +33,6 @@ import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -114,7 +106,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         var filtre = getFiltreCommand(request).asDto();
         var notificacions = new PaginaDto<NotificacioMassivaTableItemDto>();
         try {
-            var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+            var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
             var paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
             notificacions = notificacioMassivaService.findAmbFiltrePaginat(entitatActual != null ? entitatActual.getId() : null, filtre, rol, paginacio);
         } catch (SecurityException e) {
@@ -126,7 +118,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @RequestMapping(value = "/{id}/resum", method = RequestMethod.GET)
     public String summary(HttpServletRequest request, Model model, @PathVariable Long id) {
 
-        var entitatActual = EntitatHelper.getEntitatActual(request);
+        var entitatActual = sessionScopedContext.getEntitatActual();
         var info = notificacioMassivaService.getNotificacioMassivaInfo(entitatActual.getId(), id);
         model.addAttribute("info", info);
         return "notificacioMassivaInfo";
@@ -369,7 +361,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         String organGestorCodi = null;
-        if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request) && entitatActual != null) {
+        if (RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual()) && entitatActual != null) {
             var organGestorActual = getOrganGestorActual(request);
             organGestorCodi = organGestorActual.getCodi();
 
@@ -378,7 +370,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         var filtre = notificacioListHelper.getFiltreCommand(request, TABLE_NOTIFICACIONS_FILTRE).asDto();
         filtre.setNotMassivaId(this.notMassivaId);
         assert entitatActual != null;
-        var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
         return notificacioService.findIdsAmbFiltre(entitatActual.getId(), rol, organGestorCodi, getCodiUsuariActual(), filtre);
     }
 }

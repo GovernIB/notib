@@ -9,7 +9,6 @@ import es.caib.notib.back.command.NotificacioFiltreCommand;
 import es.caib.notib.back.command.OrganGestorFiltreCommand;
 import es.caib.notib.back.command.PersonaCommand;
 import es.caib.notib.back.helper.CaducitatHelper;
-import es.caib.notib.back.helper.EntitatHelper;
 import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.back.helper.FileHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
@@ -122,6 +121,8 @@ public class NotificacioFormController extends BaseUserController {
     private GestioDocumentalService gestioDocumentalService;
     @Autowired
     private PermisosService permisosService;
+
+
     DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
     private TipusEnviamentEnumDto tipusEnviament;
     private static final String NOTIFICACIO_FORM = "notificacioForm";
@@ -162,7 +163,7 @@ public class NotificacioFormController extends BaseUserController {
 
         var referer = request.getHeader("Referer");
         RequestSessionHelper.actualitzarObjecteSessio(request, EDIT_REFERER, referer);
-        var entitatActual = EntitatHelper.getEntitatActual(request);
+        var entitatActual = sessionScopedContext.getEntitatActual();
         var notificacioCommand = new NotificacioCommand();
         List<EnviamentCommand> enviaments = new ArrayList<>();
         var enviament = new EnviamentCommand();
@@ -195,8 +196,8 @@ public class NotificacioFormController extends BaseUserController {
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(HttpServletRequest request, @PathVariable String organId) {
 
-        var entitatActual = EntitatHelper.getEntitatActual(request);
-        var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        var entitatActual = sessionScopedContext.getEntitatActual();
+        var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
         return procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId, rol, tipusEnviament);
     }
 
@@ -205,8 +206,8 @@ public class NotificacioFormController extends BaseUserController {
     public List<CodiValorOrganGestorComuDto> getServeisOrgan(HttpServletRequest request, @PathVariable String organId) {
 
         var enviamentTipus = (TipusEnviamentEnumDto) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
-        var entitatActual = EntitatHelper.getEntitatActual(request);
-        var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        var entitatActual = sessionScopedContext.getEntitatActual();
+        var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
         return serveiService.getServeisOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId, rol, enviamentTipus);
     }
 
@@ -273,7 +274,7 @@ public class NotificacioFormController extends BaseUserController {
 
         log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. ");
         List<String> tipusDocumentEnumDto = new ArrayList<>();
-        var entitatActual = EntitatHelper.getEntitatActual(request);
+        var entitatActual = sessionScopedContext.getEntitatActual();
         ProcSerDto procedimentActual = null;
         var property = aplicacioService.propertyGetByEntitat("es.caib.notib.comunicacions.sir.internes", "false");
         model.addAttribute("isPermesComunicacionsSirPropiaEntitat", property);
@@ -289,7 +290,7 @@ public class NotificacioFormController extends BaseUserController {
             return "notificacioForm";
         }
 
-        if (RolHelper.isUsuariActualAdministrador(request)) {
+        if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
             model.addAttribute("entitat", entitatService.findAll());
         }
         model.addAttribute(new NotificacioFiltreCommand());
@@ -303,7 +304,7 @@ public class NotificacioFormController extends BaseUserController {
                 return "notificacioForm";
             }
             if (notificacioCommand.getId() != null) {
-                notificacioService.update(entitatActual.getId(), notificacioCommand.asDatabaseDto(), RolHelper.isUsuariActualAdministradorEntitat(request));
+                notificacioService.update(entitatActual.getId(), notificacioCommand.asDatabaseDto(), RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()));
             } else {
                 notificacioService.create(entitatActual.getId(), notificacioCommand.asDatabaseDto());
             }
@@ -474,7 +475,7 @@ public class NotificacioFormController extends BaseUserController {
     @ResponseBody
     public DadesProcediment getDadesProcSer(HttpServletRequest request, @PathVariable Long procedimentId) {
 
-        var entitatActual = EntitatHelper.getEntitatActual(request);
+        var entitatActual = sessionScopedContext.getEntitatActual();
         var procedimentActual = procedimentService.findById(entitatActual.getId(),false, procedimentId);
         var enviamentTipus = (TipusEnviamentEnumDto) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
         var dadesProcediment = new DadesProcediment();
@@ -580,7 +581,7 @@ public class NotificacioFormController extends BaseUserController {
 
     private void emplenarModelNotificacio(HttpServletRequest request, Model model, NotificacioCommand notificacioCommand) {
 
-        var entitatActual = EntitatHelper.getEntitatActual(request);
+        var entitatActual = sessionScopedContext.getEntitatActual();
         List<String> tipusDocumentEnumDto = new ArrayList<>();
         var tipusDocuments = entitatService.findTipusDocumentByEntitat(entitatActual.getId());
         if (tipusDocuments != null) {
@@ -681,7 +682,7 @@ public class NotificacioFormController extends BaseUserController {
 
     private void fillNotificacioModel(HttpServletRequest request, EntitatDto entitatActual, Model model, TipusEnviamentEnumDto tipusEnviament) {
 
-        var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
         String organFiltreProcs = null;
         if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
             organFiltreProcs = getOrganGestorActual(request).getCodi();
@@ -756,7 +757,7 @@ public class NotificacioFormController extends BaseUserController {
     }
 
     private boolean isAdministrador(HttpServletRequest request) {
-        return RolHelper.isUsuariActualAdministrador(request);
+        return RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
     }
 
     private boolean isValidaFirmaWebEnabled() {

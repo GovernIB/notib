@@ -4,15 +4,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%
-	pageContext.setAttribute(
-			"isRolActualAdministrador",
-			es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(request));
-	pageContext.setAttribute(
-			"isRolActualAdministradorEntitat",
-			es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
-	pageContext.setAttribute(
-			"isRolActualUsuari",
-			es.caib.notib.back.helper.RolHelper.isUsuariActualUsuari(request));
+	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
+	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(ssc.getRolActual()));
+	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()));
+	pageContext.setAttribute("isRolActualUsuari", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuari(ssc.getRolActual()));
 %>
 <html>
 <head>

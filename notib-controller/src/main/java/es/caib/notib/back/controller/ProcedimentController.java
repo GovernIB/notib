@@ -12,7 +12,6 @@ import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.CodiAssumpteDto;
 import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.TipusAssumpteDto;
@@ -138,9 +137,9 @@ public class ProcedimentController extends BaseUserController {
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request ) {
 		
-		var isUsuari = RolHelper.isUsuariActualUsuari(request);
-		var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
-		var isAdministrador = RolHelper.isUsuariActualAdministrador(request);
+		var isUsuari = RolHelper.isUsuariActualUsuari(sessionScopedContext.getRolActual());
+		var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
+		var isAdministrador = RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
 		var organGestorActual = getOrganGestorActual(request);
 		var procSerFiltreCommand = getFiltreCommand(request);
 		var procediments = new PaginaDto<ProcSerFormDto>();
@@ -186,7 +185,7 @@ public class ProcedimentController extends BaseUserController {
 			return getModalControllerReturnValueSuccess(request, redirect, "procediment.controller.creat.ok");
 		}
 		try {
-			var rol = RolHelper.isUsuariActualAdministradorEntitat(request);
+			var rol = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
 			procedimentService.update(procSerCommand.getEntitatId(), ProcSerCommand.asDto(procSerCommand), isAdministrador(request), rol);
 		} catch(NotFoundException | ValidationException ev) {
 			log.debug("Error al actualitzar el procediment", ev);
@@ -199,7 +198,7 @@ public class ProcedimentController extends BaseUserController {
 	public Operadors getOperadors(HttpServletRequest request, @PathVariable String organ) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
-		var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
 		var postal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
 		var cie = pagadorCieService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
 		return Operadors.builder().operadorsPostal(postal).operadorsCie(cie).build();
@@ -214,7 +213,7 @@ public class ProcedimentController extends BaseUserController {
 			if (procedimentService.procedimentEnUs(procedimentId)) {
 				return getAjaxControllerReturnValueError(request, redirect, "procediment.controller.esborrat.enUs");
 			}
-			procedimentService.delete(entitat.getId(), procedimentId, RolHelper.isUsuariActualAdministradorEntitat(request));
+			procedimentService.delete(entitat.getId(), procedimentId, RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()));
 			return getAjaxControllerReturnValueSuccess(request, redirect, "procediment.controller.esborrat.ok");
 		} catch (Exception e) {
 			return getAjaxControllerReturnValueError(request, redirect, "procediment.controller.esborrat.ko", e);
@@ -354,7 +353,7 @@ public class ProcedimentController extends BaseUserController {
 		if (procediment != null) {
 			model.addAttribute("entitatId", procediment.getEntitat().getId());
 		}
-		if (RolHelper.isUsuariActualAdministrador(request))
+		if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual()))
 			model.addAttribute("entitats", entitatService.findAll());
 		else
 			model.addAttribute("entitat", entitat);
@@ -424,7 +423,7 @@ public class ProcedimentController extends BaseUserController {
 	}
 	
 	private boolean isAdministrador(HttpServletRequest request) {
-		return RolHelper.isUsuariActualAdministrador(request);
+		return RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
 	}
 	
 }

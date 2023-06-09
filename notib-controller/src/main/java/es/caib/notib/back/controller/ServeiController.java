@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -129,9 +128,9 @@ public class ServeiController extends BaseUserController{
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request ) {
 		
-		var isUsuari = RolHelper.isUsuariActualUsuari(request);
-		var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
-		var isAdministrador = RolHelper.isUsuariActualAdministrador(request);
+		var isUsuari = RolHelper.isUsuariActualUsuari(sessionScopedContext.getRolActual());
+		var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
+		var isAdministrador = RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
 		var organGestorActual = getOrganGestorActual(request);
 		var procSerFiltreCommand = getFiltreCommand(request);
 		var serveis = new PaginaDto<ProcSerFormDto>();
@@ -173,7 +172,7 @@ public class ServeiController extends BaseUserController{
 		
 		if (procSerCommand.getId() != null) {
 			try {
-				serveiService.update(procSerCommand.getEntitatId(), ProcSerCommand.asDto(procSerCommand), isAdministrador(request), RolHelper.isUsuariActualAdministradorEntitat(request));
+				serveiService.update(procSerCommand.getEntitatId(), ProcSerCommand.asDto(procSerCommand), isAdministrador(request), RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()));
 			} catch(NotFoundException | ValidationException ev) {
 				log.debug("Error al actualitzar el procediment", ev);
 			}
@@ -206,7 +205,7 @@ public class ServeiController extends BaseUserController{
 			if (serveiService.serveiEnUs(serveiId)) {
 				return getAjaxControllerReturnValueError(request, redirect, "servei.controller.esborrat.enUs");
 			}
-			serveiService.delete(entitat.getId(), serveiId, RolHelper.isUsuariActualAdministradorEntitat(request));
+			serveiService.delete(entitat.getId(), serveiId, RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()));
 			return getAjaxControllerReturnValueSuccess(request, redirect, "servei.controller.esborrat.ok");
 		} catch (Exception e) {
 			return getAjaxControllerReturnValueError(request, redirect, "servei.controller.esborrat.ko", e);
@@ -308,7 +307,7 @@ public class ServeiController extends BaseUserController{
 		if (servei != null) {
 			model.addAttribute("entitatId", servei.getEntitat().getId());
 		}
-		if (RolHelper.isUsuariActualAdministrador(request)) {
+		if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
 			model.addAttribute("entitats", entitatService.findAll());
 		} else {
 			model.addAttribute("entitat", entitat);
@@ -324,6 +323,6 @@ public class ServeiController extends BaseUserController{
 	}
 
 	private boolean isAdministrador(HttpServletRequest request) {
-		return RolHelper.isUsuariActualAdministrador(request);
+		return RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
 	}
 }

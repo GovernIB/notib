@@ -4,8 +4,8 @@
 package es.caib.notib.back.controller;
 
 import es.caib.notib.back.command.UsuariCommand;
+import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.EnumHelper;
-import es.caib.notib.back.helper.SessioHelper;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,8 @@ public class UsuariController extends BaseController {
 
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Autowired
+	private SessionScopedContext sessionScopedContext;
 
 	private static final String REDIRECT = "redirect:/";
 
@@ -68,14 +70,14 @@ public class UsuariController extends BaseController {
 			return "usuariForm";
 		}
 		var usuari = aplicacioService.updateUsuariActual(UsuariCommand.asDto(command));
-		SessioHelper.setUsuariActual(request, usuari);
+		sessionScopedContext.setUsuariActual(usuari);
 		return getModalControllerReturnValueSuccess(request, REDIRECT,"usuari.controller.modificat.ok");
 	}
 
 	@GetMapping(value = "/configuracio/idioma")
 	@ResponseBody
 	public String getIdioma() {
-		return new Locale(SessioHelper.getIdioma(aplicacioService), Locale.getDefault().getCountry()).toLanguageTag();
+		return new Locale(sessionScopedContext.getIdiomaUsuari(), Locale.getDefault().getCountry()).toLanguageTag();
 	}
 
 }

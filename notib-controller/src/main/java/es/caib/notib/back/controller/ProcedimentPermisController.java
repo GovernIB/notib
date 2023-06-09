@@ -59,7 +59,7 @@ public class ProcedimentPermisController extends BaseUserController{
 	@GetMapping(value = "/{procedimentId}/permis")
 	public String get(HttpServletRequest request, @PathVariable Long procedimentId, Model model) {
 
-		var isAdministrador = RolHelper.isUsuariActualAdministrador(request);
+		var isAdministrador = RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
 		var entitatActual = getEntitatActualComprovantPermisos(request);
 		var procediment = procedimentService.findById(entitatActual.getId(), isAdministrador, procedimentId);
 		model.addAttribute(PROCEDIMENT, procediment);
@@ -136,7 +136,7 @@ public class ProcedimentPermisController extends BaseUserController{
 			model.addAttribute("principalSize", command.getPrincipalDefaultSize());
 			return PERMIS_FORM;
 		}
-		if (TipusEnumDto.ROL.equals(command.getTipus()) && command.getPrincipal().equalsIgnoreCase("tothom") && RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
+		if (TipusEnumDto.ROL.equals(command.getTipus()) && command.getPrincipal().equalsIgnoreCase("tothom") && RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual())) {
 			model.addAttribute(PROCEDIMENT, procedimentService.findById(entitatActual.getId(), isAdministrador(request), procedimentId));
 			if (command.getOrgan() != null) {
 				model.addAttribute(ORGANS, getOrganismes(request));
@@ -188,6 +188,6 @@ public class ProcedimentPermisController extends BaseUserController{
 	}
 
 	private boolean isAdministrador(HttpServletRequest request) {
-		return RolHelper.isUsuariActualAdministrador(request);
+		return RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
 	}
 }

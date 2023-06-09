@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
-import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -352,7 +351,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
     }
 
     private boolean isAdministrador(HttpServletRequest request) {
-        return RolHelper.isUsuariActualAdministrador(request);
+        return RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
     }
 
     private void mostraErrorReintentarNotificacio(HttpServletRequest request, Long notificacioId, NotificacioDtoV2 notificacio, Exception e) {

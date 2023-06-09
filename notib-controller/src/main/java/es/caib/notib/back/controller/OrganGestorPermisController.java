@@ -109,7 +109,7 @@ public class OrganGestorPermisController extends BaseUserController{
 		var entitatActual = getEntitatActualComprovantPermisos(request);
 		model.addAttribute("organGestor", organGestorService.findById(entitatActual.getId(), organGestorId));
 		PermisDto permis = null;
-		var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
 		if (permisId != null) {
 			var permisos = organGestorService.permisFind(entitatActual.getId(), organGestorId, null);
 			for (var p: permisos) {
@@ -138,14 +138,14 @@ public class OrganGestorPermisController extends BaseUserController{
 
 		var msg = command.getId() == null ? "creat" : "modificat";
 		if (TipusEnumDto.ROL.equals(command.getTipus()) && command.getPrincipal().equalsIgnoreCase("tothom") &&
-				RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
+				RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual())) {
 
 			model.addAttribute("organGestor", organGestorService.findById(entitatActual.getId(), organGestorId));
 			return getModalControllerReturnValueError(request,"organGestorPermisForm",
 					"organgestor.controller.permis." + msg + ".ko");
 		}
 
-		var isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		var isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
 		organGestorService.permisUpdate(entitatActual.getId(), organGestorId, isAdminOrgan, PermisCommand.asDto(command));
 		var text = "organgestor.controller.permis." + msg + ".ok";
 		return getModalControllerReturnValueSuccess(request, "redirect:../../organgestor/" + organGestorId + "/permis", text);

@@ -8,16 +8,8 @@ import es.caib.notib.back.interceptor.AccesAdminInterceptor;
 import es.caib.notib.back.interceptor.AccesPagadorsInterceptor;
 import es.caib.notib.back.interceptor.AccesSuperInterceptor;
 import es.caib.notib.back.interceptor.AccesUsuariInterceptor;
-import es.caib.notib.back.interceptor.AjaxInterceptor;
-import es.caib.notib.back.interceptor.AplicacioInterceptor;
-import es.caib.notib.back.interceptor.AvisosInterceptor;
-import es.caib.notib.back.interceptor.LlistaEntitatsInterceptor;
-import es.caib.notib.back.interceptor.LlistaRolsInterceptor;
-import es.caib.notib.back.interceptor.ModalInterceptor;
-import es.caib.notib.back.interceptor.NodecoInterceptor;
-import es.caib.notib.back.interceptor.PermisosEntitatInterceptor;
-import es.caib.notib.back.interceptor.PermisosInterceptor;
-import es.caib.notib.back.interceptor.SessioInterceptor;
+import es.caib.notib.back.interceptor.NotibInterceptor;
+import es.caib.notib.back.interceptor.SessionInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -62,23 +54,9 @@ import java.util.Locale;
 public class WebMvcConfig implements WebMvcConfigurer {
 
 	@Autowired
-	private AplicacioInterceptor aplicacioInterceptor;
+	private NotibInterceptor notibInterceptor;
 	@Autowired
-	private PermisosEntitatInterceptor permisosEntitatInterceptor;
-	@Autowired
-	private SessioInterceptor sessioInterceptor;
-	@Autowired
-	private LlistaRolsInterceptor llistaRolsInterceptor;
-	@Autowired
-	private LlistaEntitatsInterceptor llistaEntitatsInterceptor;
-	@Autowired
-	private ModalInterceptor modalInterceptor;
-	@Autowired
-	private NodecoInterceptor nodecoInterceptor;
-	@Autowired
-	private AjaxInterceptor ajaxInterceptor;
-	@Autowired
-	private PermisosInterceptor permisosInterceptor;
+	private SessionInterceptor sessionInterceptor;
 	@Autowired
 	private AccesPagadorsInterceptor accesPagadorsInterceptor;
 	@Autowired
@@ -87,8 +65,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	private AccesSuperInterceptor accesSuperInterceptor;
 	@Autowired
 	private AccesUsuariInterceptor accesUsuariInterceptor;
-	@Autowired
-	private AvisosInterceptor avisosInterceptor;
 
 	@Bean
 	public LocaleResolver localeResolver() {
@@ -108,20 +84,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		return bean;
 	}
 
-//	@Override
-//	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//		registry.addResourceHandler("/webjars/**")
-//				.addResourceLocations("/webjars/", "/META-INF/resources/webjars/" , "classpath:/META-INF/resources/webjars/")
-//				.resourceChain(false)
-//				.addResolver(new WebJarsResourceResolver());
-//		registry.setOrder(1);
-//	}
-
-//	@Override
-//	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-//		configurer.enable("notibServlet");
-//	}
-
 	@Bean
 	public LocaleChangeInterceptor localeChangeInterceptor() {
 
@@ -139,33 +101,46 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		return registrationBean;
 	}
 
-	private static final String[] PERMISOS_INTERCEPTOR_EXCLUSIONS = 	{ "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/error", "/api/consulta/**", "/api/consulta/**", "/api/services/**" };
-	private static final String[] APLICACIO_INTERCEPTOR_EXCLUSIONS = 	{ "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/api/services/**", "/notificacio/refrescarEstatNotifica/estat", "/usuari/configuracio", "/usuari/configuracio/**" };
-	private static final String[] INTERCEPTOR_EXCLUSIONS = 				{ "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/api/services/**", "/notificacio/refrescarEstatNotifica/estat", "/usuari/configuracio", "/usuari/configuracio/**", "/error", "/**/monitor/tasques"};
-
-	private static final String[] USUARI_EXCLUSIONS = { "/entitat/organigrama/**", "/entitat/getEntitatLogoCap", "/entitat/getEntitatLogoPeu" };
+	private static final String[] INTERCEPTOR_EXCLUSIONS = 	{
+			"/js/**",
+			"/css/**",
+			"/fonts/**",
+			"/img/**",
+			"/images/**",
+			"/extensions/**",
+			"/webjars/**",
+			"/**/datatable/**",
+			"/**/selection/**",
+			"/api/rest/**",
+			"/api/apidoc**",
+			"/api-docs/**",
+			"/**/api-docs/",
+			"/api/consulta/**",
+			"/api/services/**",
+			"/notificacio/refrescarEstatNotifica/estat",
+			"/notificacio/procedimentsOrgan",
+			"/notificacio/serveisOrgan",
+//			"/usuari/configuracio",
+			"/usuari/configuracio/**",
+			"/error",
+			"/**/monitor/tasques"};
+	private static final String[] ALL_EXCLUSIONS = {"/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/api/services/**", "/usuari/configuracio/**"};
+	// Urls accés
 	private static final String[] PAGADORS_PATHS = { "/cie**", "/cie/**", "/operadorPostal**", "/operadorPostal/**" };
 	private static final String[] ADMIN_PATHS = { "/organgestor**", "/organgestor/**", "/procediment**", "/procediment/**", "/servei**", "/servei/**", "/grup**", "/grup/**", "/massiu/registre/notificacionsError", "/massiu/registre/notificacionsError/**" };
 	private static final String[] SUPER_PATHS = { "/avis**", "/avis/**", "/cache**", "/cache/**", "/config**", "/config/**", "/metrics", "/metrics/list", "/monitor", "/monitor/all", "/excepcio", "/excepcio/**", "/integracio", "/integracio/**", "/notificacio/refrescarEstatNotifica", "/notificacio/refrescarEstatNotifica/**", "/massiu/notificacions**", "/massiu/notificacions/**" };
 	private static final String[] USUARI_PATHS = { "/entitat**", "/entitat/**" };
+	private static final String[] USUARI_EXCLUSIONS = { "/entitat/organigrama/**", "/entitat/getEntitatLogoCap", "/entitat/getEntitatLogoPeu" };
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(localeChangeInterceptor());
-		registry.addInterceptor(aplicacioInterceptor).excludePathPatterns(APLICACIO_INTERCEPTOR_EXCLUSIONS);
-		registry.addInterceptor(permisosEntitatInterceptor).excludePathPatterns(PERMISOS_INTERCEPTOR_EXCLUSIONS);
-		registry.addInterceptor(sessioInterceptor).excludePathPatterns(INTERCEPTOR_EXCLUSIONS);
-		registry.addInterceptor(llistaRolsInterceptor).excludePathPatterns(INTERCEPTOR_EXCLUSIONS);
-		registry.addInterceptor(llistaEntitatsInterceptor).excludePathPatterns(INTERCEPTOR_EXCLUSIONS);
-		registry.addInterceptor(modalInterceptor).excludePathPatterns(APLICACIO_INTERCEPTOR_EXCLUSIONS);
-		registry.addInterceptor(nodecoInterceptor).excludePathPatterns(APLICACIO_INTERCEPTOR_EXCLUSIONS);
-		registry.addInterceptor(ajaxInterceptor).excludePathPatterns(APLICACIO_INTERCEPTOR_EXCLUSIONS);
-		registry.addInterceptor(permisosInterceptor).excludePathPatterns(INTERCEPTOR_EXCLUSIONS);
-		registry.addInterceptor(accesPagadorsInterceptor).addPathPatterns(PAGADORS_PATHS);
-		registry.addInterceptor(accesAdminInterceptor).addPathPatterns(ADMIN_PATHS);
-		registry.addInterceptor(accesSuperInterceptor).addPathPatterns(SUPER_PATHS);
-		registry.addInterceptor(accesUsuariInterceptor).addPathPatterns(USUARI_PATHS).excludePathPatterns(USUARI_EXCLUSIONS);
-		registry.addInterceptor(avisosInterceptor).excludePathPatterns(INTERCEPTOR_EXCLUSIONS);
+		registry.addInterceptor(notibInterceptor).excludePathPatterns(INTERCEPTOR_EXCLUSIONS).order(0);
+//		registry.addInterceptor(sessionInterceptor).excludePathPatterns(ALL_EXCLUSIONS).order(1);
+		registry.addInterceptor(accesSuperInterceptor).addPathPatterns(SUPER_PATHS).order(2);
+		registry.addInterceptor(accesAdminInterceptor).addPathPatterns(ADMIN_PATHS).order(3);
+		registry.addInterceptor(accesUsuariInterceptor).addPathPatterns(USUARI_PATHS).excludePathPatterns(USUARI_EXCLUSIONS).order(4);
+		registry.addInterceptor(accesPagadorsInterceptor).addPathPatterns(PAGADORS_PATHS).order(5);
 	}
 
 	@Override

@@ -3,6 +3,7 @@
  */
 package es.caib.notib.back.interceptor;
 
+import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.back.helper.RolHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +25,14 @@ public class AccesAdminInterceptor implements AsyncHandlerInterceptor {
 
 	@Autowired @Lazy
 	private AplicacioService aplicacioService;
+	@Autowired
+	private SessionScopedContext sessionScopedContext;
 
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-		if (RolHelper.isUsuariActualAdministradorEntitat(request) || RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
+		if (RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()) || RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual())) {
 			return true;
 		}
 		throw new SecurityException(aplicacioService.getMissatgeErrorAccesAdmin(), null);

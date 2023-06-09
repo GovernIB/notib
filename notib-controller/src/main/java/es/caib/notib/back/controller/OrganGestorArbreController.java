@@ -67,7 +67,7 @@ public class OrganGestorArbreController extends BaseUserController {
             var filtres = OrganGestorController.getFiltreCommand(request);
             model.addAttribute("organGestorFiltreCommand", filtres);
             model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, "es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum."));
-            var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+            var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
             var organ = getOrganGestorActual(request);
 
 //            Long tf = System.currentTimeMillis();
@@ -146,7 +146,7 @@ public class OrganGestorArbreController extends BaseUserController {
         try {
             model.addAttribute("desactivarAvisos", true);
             var entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
-            var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+            var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
             var operadorPostalList = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, codi, isAdminOrgan);
             model.addAttribute("operadorPostalList", operadorPostalList);
             var cieList = pagadorCieService.findNoCaducatsByEntitatAndOrgan(entitat, codi, isAdminOrgan);

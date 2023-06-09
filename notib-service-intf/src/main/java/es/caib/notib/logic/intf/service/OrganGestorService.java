@@ -29,6 +29,8 @@ import java.util.List;
  */
 public interface OrganGestorService {
 
+	Long getLastPermisosModificatsInstant();
+
 //	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 //	public OrganGestorDto create(OrganGestorDto dto);
 //
@@ -152,10 +154,13 @@ public interface OrganGestorService {
 			Long entitatId,
 			Long id,
 			Long permisId) throws NotFoundException;
-	
+
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public List<OrganGestorDto> findAccessiblesByUsuariActual();
-	
+
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	public List<OrganGestorDto> findAccessiblesByUsuariAndEntitatActual(Long entitatId);
+
 	/**
 	 * Recupera els organimes d'una entitat.
 	 * 
@@ -243,4 +248,5 @@ public interface OrganGestorService {
 	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper);
 
 	void sincronitzarOrganNomMultidioma(List<Long> ids);
+
 }

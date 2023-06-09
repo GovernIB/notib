@@ -85,6 +85,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de gestió de òrgans gestors.
@@ -151,13 +152,25 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private List<OrganGestorDto> sotredOrgans = new ArrayList<>();
 
 
+	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
+	private static Long permisosEntitatsModificatsInstant;
+
+
 	private List<String> codisAmbPermis = new ArrayList<>();
 	private boolean isAdminOrgan;
 	private OrganGestorDto organActual;
-	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 
 	@Getter
 	private List<OrganGestorDto> organsList;
+
+	private static void updateOrgansSessio() {
+		permisosEntitatsModificatsInstant = System.currentTimeMillis();
+	}
+
+	@Override
+	public Long getLastPermisosModificatsInstant() {
+		return OrganGestorServiceImpl.permisosEntitatsModificatsInstant;
+	}
 
 	@Override
 	@Transactional
@@ -574,6 +587,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.oficines.fi"));
 
 			cacheHelper.clearAllCaches();
+			updateOrgansSessio();
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.fi"));
 		} catch (Exception ex) {
 			e = ex;
@@ -1197,7 +1211,18 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		return permisosCacheable.findOrgansGestorsAccessiblesUsuari(auth);
 	}
 
-	@Transactional
+    @Override
+	@Transactional(readOnly = true)
+    public List<OrganGestorDto> findAccessiblesByUsuariAndEntitatActual(Long entitatId) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		var organsAccessibles = permisosCacheable.findOrgansGestorsAccessiblesUsuari(auth);
+
+		return organsAccessibles != null ?
+				organsAccessibles.stream().filter(o -> entitatId.equals(o.getEntitatId())).collect(Collectors.toList()) :
+				new ArrayList<>();
+    }
+
+    @Transactional
 	@Override
 	public List<PermisDto> permisFind(Long entitatId, Long id) {
 
@@ -1293,6 +1318,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			cacheHelper.evictFindProcedimentServeisWithPermis();
 			cacheHelper.evictFindOrgansGestorWithPermis();
 			permisosCacheable.evictAllPermisosEntitatsUsuariActual();
+			updateOrgansSessio();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1330,6 +1356,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			cacheHelper.evictFindProcedimentServeisWithPermis();
 			cacheHelper.evictFindOrgansGestorWithPermis();
 			permisosCacheable.evictAllPermisosEntitatsUsuariActual();
+			updateOrgansSessio();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

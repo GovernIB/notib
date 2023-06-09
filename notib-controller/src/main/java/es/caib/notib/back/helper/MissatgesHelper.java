@@ -3,10 +3,10 @@
  */
 package es.caib.notib.back.helper;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * Helper per a mostrar missatges d'alerta o informació.
@@ -20,18 +20,18 @@ public class MissatgesHelper {
 	public static final String SESSION_ATTRIBUTE_SUCCESS = "MissatgesHelper.Success";
 	public static final String SESSION_ATTRIBUTE_INFO = "MissatgesHelper.Info";
 
+	public static Map<String, Object> manifestAtributsMap;
+
+
 	public static void error(HttpServletRequest request, String text) {
 		newAlert(request, SESSION_ATTRIBUTE_ERROR, text);
 	}
-
 	public static void warning(HttpServletRequest request, String text) {
 		newAlert(request, SESSION_ATTRIBUTE_WARNING, text);
 	}
-
 	public static void success(HttpServletRequest request, String text) {
 		newAlert(request, SESSION_ATTRIBUTE_SUCCESS, text);
 	}
-
 	public static void info(HttpServletRequest request, String text) {
 		newAlert(request, SESSION_ATTRIBUTE_INFO, text);
 	}

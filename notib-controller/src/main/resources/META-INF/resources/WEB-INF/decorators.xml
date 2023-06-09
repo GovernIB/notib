@@ -15,6 +15,7 @@
 	<decorator name="senseCapNiPeus" page="senseCapNiPeus.jsp">
 		<pattern>/api/apidoc</pattern>
 		<pattern>/api/rest</pattern>
+		<pattern>/modal/*</pattern>
 		<pattern>/error</pattern>
 	</decorator>
 	<decorator name="default" page="default.jsp">

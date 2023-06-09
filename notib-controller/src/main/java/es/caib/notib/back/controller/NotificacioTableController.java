@@ -5,14 +5,12 @@ import es.caib.notib.back.command.MarcarProcessatCommand;
 import es.caib.notib.back.command.NotificacioFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.notib.back.helper.EntitatHelper;
 import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.back.helper.MessageHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.NotificacioBackHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
-import es.caib.notib.back.helper.SessioHelper;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
@@ -113,13 +111,13 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         String organGestorCodi = null;
-        if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request) && entitatActual != null) {
+        if (RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual()) && entitatActual != null) {
             var organGestorActual = getOrganGestorActual(request);
             organGestorCodi = organGestorActual.getCodi();
         }
         var filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE).asDto();
         assert entitatActual != null;
-        return notificacioService.findIdsAmbFiltre(entitatActual.getId(), RolEnumDto.valueOf(RolHelper.getRolActual(request)),
+        return notificacioService.findIdsAmbFiltre(entitatActual.getId(), RolEnumDto.valueOf(sessionScopedContext.getRolActual()),
                                                     organGestorCodi, getCodiUsuariActual(), filtre);
     }
 
@@ -169,10 +167,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE).asDto();
         var notificacions = new PaginaDto<NotificacioTableItemDto>();
-        var isUsuari = RolHelper.isUsuariActualUsuari(request);
-        var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
-        var isAdministrador = RolHelper.isUsuariActualAdministrador(request);
-        var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+        var isUsuari = RolHelper.isUsuariActualUsuari(sessionScopedContext.getRolActual());
+        var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
+        var isAdministrador = RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
+        var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
         String organGestorCodi = null;
         try {
             if (isUsuariEntitat && filtre != null) {
@@ -183,7 +181,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 organGestorCodi = organGestorActual.getCodi();
             }
             notificacions = notificacioService.findAmbFiltrePaginat(entitatActual != null ? entitatActual.getId() : null,
-                                                RolEnumDto.valueOf(RolHelper.getRolActual(request)), organGestorCodi, getCodiUsuariActual(), filtre,
+                                                RolEnumDto.valueOf(sessionScopedContext.getRolActual()), organGestorCodi, getCodiUsuariActual(), filtre,
                                                 DatatablesHelper.getPaginacioDtoFromRequest(request));
         } catch (SecurityException e) {
             MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
@@ -203,14 +201,14 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getProcediments(HttpServletRequest request, Model model) {
 
-        var entitatId = EntitatHelper.getEntitatActual(request).getId();
+        var entitatId = sessionScopedContext.getEntitatActualId();
         String organCodi = null;
         var permis = PermisEnum.CONSULTA;
         var organGestor = getOrganGestorActual(request);
         if (organGestor != null) {
             organCodi = organGestor.getCodi();
         }
-        var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
         return procedimentService.getProcedimentsOrgan(entitatId, organCodi, null, rol, permis);
     }
 
@@ -218,14 +216,14 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getServeis(HttpServletRequest request, Model model) {
 
-        var entitatId = EntitatHelper.getEntitatActual(request).getId();
+        var entitatId = sessionScopedContext.getEntitatActualId();
         String organCodi = null;
         var permis = PermisEnum.CONSULTA;
         var organGestor = getOrganGestorActual(request);
         if (organGestor != null) {
             organCodi = organGestor.getCodi();
         }
-        var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
         return serveiService.getServeisOrgan(entitatId, organCodi,null, rol, permis);
     }
 
@@ -241,14 +239,14 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getProcedimentByOrganGestor(HttpServletRequest request, @PathVariable Long organGestor, Model model) {
 
-        var entitatId = EntitatHelper.getEntitatActual(request).getId();
+        var entitatId = sessionScopedContext.getEntitatActualId();
         String organCodi = null;
         var permis = PermisEnum.CONSULTA;
         var organActual = getOrganGestorActual(request);
         if (organActual != null) {
             organCodi = organActual.getCodi();
         }
-        var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
         return procedimentService.getProcedimentsOrgan(entitatId, organCodi, organGestor, rol, permis);
     }
 
@@ -256,21 +254,21 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getServeiByOrganGestor(HttpServletRequest request, @PathVariable Long organGestor, Model model) {
 
-        Long entitatId = EntitatHelper.getEntitatActual(request).getId();
+        Long entitatId = sessionScopedContext.getEntitatActualId();
         String organCodi = null;
         PermisEnum permis = PermisEnum.CONSULTA;
         OrganGestorDto organActual = getOrganGestorActual(request);
         if (organActual != null) {
             organCodi = organActual.getCodi();
         }
-        RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        RolEnumDto rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
         return serveiService.getServeisOrgan(entitatId, organCodi, organGestor, rol, permis);
     }
 
     @RequestMapping(value = "/{notificacioId}/info", method = RequestMethod.GET)
     public String info(HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
 
-        var entitatActual = EntitatHelper.getEntitatActual(request);
+        var entitatActual = sessionScopedContext.getEntitatActual();
         emplenarModelNotificacioInfo(entitatActual, notificacioId, request,"dades", model);
         return "notificacioInfo";
     }
@@ -278,7 +276,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @RequestMapping(value = "/{notificacioId}/delete", method = RequestMethod.GET)
     public String eliminar(HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
 
-        var entitatActual = EntitatHelper.getEntitatActual(request);
+        var entitatActual = sessionScopedContext.getEntitatActual();
         var referer = request.getHeader("Referer");
         try {
             notificacioService.delete(entitatActual.getId(), notificacioId);
@@ -504,7 +502,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public void certificacionsDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId) throws IOException {
 
         try {
-            var locale = new Locale(SessioHelper.getIdioma(aplicacioService));
+            var locale = new Locale(sessionScopedContext.getIdiomaUsuari());
             boolean contingut = false;
             var baos = new ByteArrayOutputStream();
             var zos = new ZipOutputStream(baos);
@@ -795,7 +793,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @RequestMapping(value = {"/eliminar", "{notificacioId}/notificacio/eliminar/"} , method = RequestMethod.GET)
     public String eliminarMassiu(HttpServletRequest request, Model model) {
 
-        var entitatActual = EntitatHelper.getEntitatActual(request);
+        var entitatActual = sessionScopedContext.getEntitatActual();
         var referer = request.getHeader("Referer");
         var seleccio = getIdsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
@@ -856,7 +854,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     }
 
     private boolean isAdministrador(HttpServletRequest request) {
-        return RolHelper.isUsuariActualAdministradorEntitat(request);
+        return RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
     }
 
     @InitBinder

@@ -3,6 +3,15 @@
  */
 package es.caib.notib.persist.entity;
 
+import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
+import es.caib.notib.persist.audit.NotibAuditable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -10,15 +19,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import es.caib.notib.persist.audit.NotibAuditable;
 
 
 /**
@@ -35,8 +35,7 @@ import es.caib.notib.persist.audit.NotibAuditable;
 @EntityListeners(AuditingEntityListener.class)
 public class ColumnesEntity extends NotibAuditable<Long> {
 
-//	@Column(name="data_enviament")
-	@Column(name="created_date")
+	@Column(name="data_enviament")
 	private boolean dataEnviament;
 	@Column(name="data_programada")
 	private boolean dataProgramada;

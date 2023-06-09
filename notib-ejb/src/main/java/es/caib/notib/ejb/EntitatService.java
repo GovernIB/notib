@@ -35,7 +35,13 @@ import java.util.Map;
 @Stateless
 public class EntitatService extends AbstractService<es.caib.notib.logic.intf.service.EntitatService> implements es.caib.notib.logic.intf.service.EntitatService {
 
-	@Override
+    @Override
+	@PermitAll
+    public Long getLastPermisosModificatsInstant() {
+        return getDelegateService().getLastPermisosModificatsInstant();
+    }
+
+    @Override
 	@RolesAllowed("NOT_SUPER")
 	public EntitatDto create(EntitatDataDto entitat) {
 		return getDelegateService().create(entitat);

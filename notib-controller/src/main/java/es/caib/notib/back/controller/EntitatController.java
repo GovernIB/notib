@@ -6,9 +6,9 @@ package es.caib.notib.back.controller;
 import com.google.common.base.Strings;
 import es.caib.notib.back.command.ConfigCommand;
 import es.caib.notib.back.command.EntitatCommand;
+import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.notib.back.helper.EntitatHelper;
 import es.caib.notib.back.helper.MessageHelper;
 import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.CodiValorDescDto;
@@ -66,6 +66,8 @@ public class EntitatController extends BaseController {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private ConfigService configService;
+	@Autowired
+	private SessionScopedContext sessionScopedContext;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get( HttpServletRequest request, Model model) {
@@ -76,11 +78,11 @@ public class EntitatController extends BaseController {
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request ) {
 
-		if (RolHelper.isUsuariActualAdministrador(request)) {
+		if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
 			return DatatablesHelper.getDatatableResponse(request, entitatService.findAllPaginat(DatatablesHelper.getPaginacioDtoFromRequest(request)));
 		}
-		if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
-			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+		if (RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual())) {
+			EntitatDto entitat = sessionScopedContext.getEntitatActual();
 			return DatatablesHelper.getDatatableResponse(request, Arrays.asList(entitat));
 		}
 		return null;
@@ -88,7 +90,7 @@ public class EntitatController extends BaseController {
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
 	public String getNew(HttpServletRequest request, Model model) {
-		return !RolHelper.isUsuariActualAdministrador(request) ? "entitatList" : get(request, null, model);
+		return !RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual()) ? "entitatList" : get(request, null, model);
 	}
 
 	@RequestMapping(value = "/{entitatId}", method = RequestMethod.GET)
@@ -177,11 +179,11 @@ public class EntitatController extends BaseController {
 		var msg = command.getId() != null ? "entitat.controller.modificada.ok" : "entitat.controller.creada.ok";
 		if (command.getId() != null) {
 			var entitatDto = entitatService.update(command.asDto());
-			var entitatActual = EntitatHelper.getEntitatActual(request);
-			if (entitatDto != null && entitatActual != null && entitatDto.equals(entitatActual)) {
-				EntitatHelper.actualitzarEntitatActualEnSessio(request, aplicacioService, entitatService);
+			var entitatActualId = sessionScopedContext.getEntitatActualId();
+			if (entitatDto != null && entitatActualId != null && entitatDto.getId().equals(entitatActualId)) {
+				sessionScopedContext.setEntitatActual(entitatDto);
 			}
-			var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
+			var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
 			return getModalControllerReturnValueSuccess(request,redirect + (isAdminEntitat ? "/" + command.getId() : ""), msg);
 		}
 		entitatService.create(command.asDto());
@@ -243,7 +245,7 @@ public class EntitatController extends BaseController {
 	@RequestMapping(value = "/getEntitatLogoCap", method = RequestMethod.GET)
 	public String getEntitatLogoCap(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		var entitatActual = EntitatHelper.getEntitatActual(request);
+		var entitatActual = sessionScopedContext.getEntitatActual();
 		if (entitatActual == null) {
 			return null;
 		}
@@ -262,7 +264,7 @@ public class EntitatController extends BaseController {
 	@RequestMapping(value = "/getEntitatLogoPeu", method = RequestMethod.GET)
 	public String getEntitatLogoPeu(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		var entitatActual = EntitatHelper.getEntitatActual(request);
+		var entitatActual = sessionScopedContext.getEntitatActual();
 		if (entitatActual == null) {
 			return null;
 		}

@@ -5,22 +5,11 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%
-	pageContext.setAttribute(
-			"isRolActualAdministrador",
-			es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(request),
-			PageContext.REQUEST_SCOPE);
-	pageContext.setAttribute(
-			"isRolActualUsuari",
-			es.caib.notib.back.helper.RolHelper.isUsuariActualUsuari(request),
-			PageContext.REQUEST_SCOPE);
-	pageContext.setAttribute(
-			"isRolActualAdministradorEntitat",
-			es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(request),
-			PageContext.REQUEST_SCOPE);
-	pageContext.setAttribute(
-			"isRolActualAdministradorOrgan",
-			es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request),
-			PageContext.REQUEST_SCOPE);
+	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
+	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(ssc.getRolActual()), PageContext.REQUEST_SCOPE);
+	pageContext.setAttribute("isRolActualUsuari", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuari(ssc.getRolActual()), PageContext.REQUEST_SCOPE);
+	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()), PageContext.REQUEST_SCOPE);
+	pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(ssc.getRolActual()), PageContext.REQUEST_SCOPE);
 %>
 
 <c:set var="mostraEntitat" value="${isRolActualAdministrador && mostrarColumnaEntitat}" scope="request"/>
