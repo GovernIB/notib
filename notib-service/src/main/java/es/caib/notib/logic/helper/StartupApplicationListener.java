@@ -33,13 +33,12 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     @Autowired
     private OrganGestorService organGestorService;
 
-    public static int counter = 0;
-
     private Authentication auth;
 
     @Synchronized
     @Override public void onApplicationEvent(ContextRefreshedEvent event) {
-        log.info("Executant processos inicials. Counter: " + counter++);
+
+        log.info("Executant processos inicials.");
         addCustomAuthentication();
         try {
 
@@ -64,7 +63,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
             }
             configService.actualitzarPropietatsJBossBdd();
         } catch (Exception ex) {
-            log.error("Errror executant els processos inicials", ex);
+            log.error("Error executant els processos inicials", ex);
         }
         restoreAuthentication();
     }
@@ -72,11 +71,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     private void addCustomAuthentication() {
 
         auth = SecurityContextHolder.getContext().getAuthentication();
-        Principal principal = new Principal() {
-            public String getName() {
-                return "INIT";
-            }
-        };
+        Principal principal = () -> "INIT";
         List<GrantedAuthority> rols = new ArrayList<>();
         rols.add(new SimpleGrantedAuthority("NOT_SUPER"));
         rols.add(new SimpleGrantedAuthority("NOT_ADMIN"));

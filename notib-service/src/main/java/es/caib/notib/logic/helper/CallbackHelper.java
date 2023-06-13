@@ -17,8 +17,6 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.CallbackRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
-import es.caib.notib.persist.repository.NotificacioEventRepository;
-import es.caib.notib.persist.repository.auditoria.NotificacioAuditRepository;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -30,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Classe per englobar la tasca de notificar l'estat o la certificació a l'aplicació
@@ -54,13 +51,7 @@ public class CallbackHelper {
 	@Autowired
 	private NotificacioEnviamentRepository enviamentRepository;
 	@Autowired
-	private NotificacioEventRepository notificacioEventRepository;
-	@Autowired
-	private NotificacioAuditRepository notificacioAuditRepository;
-	@Autowired
 	private CallbackRepository callbackRepository;
-//	@Autowired
-//	private NotificaHelper notificaHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired
@@ -86,8 +77,8 @@ public class CallbackHelper {
 				return;
 			}
 			log.debug("[CALLBACK_CLIENT] Afegint callback per l'enviament " + env.getId());
-			CallbackEntity c = callbackRepository.findByEnviamentId(env.getId());
-			var usuari = env.getCreatedBy().get();
+			var c = callbackRepository.findByEnviamentId(env.getId());
+			var usuari = env.getCreatedBy().orElseThrow();
 			if (c == null) {
 				c = CallbackEntity.builder().usuariCodi(usuari.getCodi()).notificacioId(not.getId()).enviamentId(env.getId()).build();
 			}
@@ -104,7 +95,7 @@ public class CallbackHelper {
 	@Transactional
 	public void reactivarCallback(NotificacioEnviamentEntity env) {
 
-		CallbackEntity c = updateCallback(env, false, null);
+		var c = updateCallback(env, false, null);
 		if (c == null) {
 			return;
 		}
@@ -117,9 +108,9 @@ public class CallbackHelper {
 		if (isInterficieWeb(env.getNotificacio())) {
 			return null;
 		}
-		CallbackEntity callback = callbackRepository.findByEnviamentId(env.getId());
+		var callback = callbackRepository.findByEnviamentId(env.getId());
 		if (callback == null) {
-			var usuari = env.getCreatedBy().get();
+			var usuari = env.getCreatedBy().orElseThrow();
 			callback = CallbackEntity.builder().usuariCodi(usuari.getCodi()).notificacioId(env.getNotificacio().getId()).enviamentId(env.getId()).build();
 		}
 		callback.setData(new Date());
@@ -130,10 +121,10 @@ public class CallbackHelper {
 	@Transactional
 	public void updateCallbacks(NotificacioEntity not, boolean isError, String errorDesc) {
 
-		Set<NotificacioEnviamentEntity> enviaments = not.getEnviaments();
+		var enviaments = not.getEnviaments();
 		CallbackEntity callback;
 		List<CallbackEntity> callbacks = new ArrayList<>();
-		for(NotificacioEnviamentEntity env : enviaments) {
+		for(var env : enviaments) {
 			callback = updateCallback(env, isError, errorDesc);
 			if (callback == null) {
 				continue;
@@ -146,20 +137,20 @@ public class CallbackHelper {
 	@Transactional (rollbackFor = RuntimeException.class, propagation = Propagation.REQUIRES_NEW)
 	public boolean notifica(@NonNull Long enviamentId) throws Exception {
 
-		NotificacioEnviamentEntity env = enviamentRepository.findById(enviamentId).orElse(null);
+		var env = enviamentRepository.findById(enviamentId).orElse(null);
 		if (env == null) {
 			return false;
 		}
-		NotificacioEntity notificacioProcessada = notifica(env);
+		var notificacioProcessada = notifica(env);
 		return notificacioProcessada == null || notificacioProcessada.isErrorLastCallback();
 	}
 
 	@Transactional (rollbackFor = RuntimeException.class)
 	public NotificacioEntity notifica(@NonNull NotificacioEnviamentEntity env) throws Exception{
 
-		CallbackEntity callback = callbackRepository.findByEnviamentId(env.getId());
-		NotificacioEntity notificacio = env.getNotificacio();
-		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_CLIENT, String.format("Enviament d'avís de canvi d'estat"), IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var callback = callbackRepository.findByEnviamentId(env.getId());
+		var notificacio = env.getNotificacio();
+		var info = new IntegracioInfo(IntegracioHelper.INTCODI_CLIENT, "Enviament d'avís de canvi d'estat", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de l'enviament", String.valueOf(env.getId())),
 				new AccioParam("Identificador de la notificació", String.valueOf(notificacio.getId())));
 
@@ -168,7 +159,7 @@ public class CallbackHelper {
 			return notificacio;
 		}
 		log.trace("[Callback] Consultant aplicació de l'event. ");
-		AplicacioEntity aplicacio = getAplicacio(callback, env);
+		var aplicacio = getAplicacio(callback, env);
 		info.addParam("Codi aplicació", aplicacio.getUsuariCodi());
 		info.addParam("Callback id", callback.getId() + "");
 		info.addParam("Callback URL", aplicacio.getCallbackUrl());
@@ -176,13 +167,13 @@ public class CallbackHelper {
 		info.setCodiEntitat(notificacio.getEntitat() != null ? notificacio.getEntitat().getCodi() : null);
 		int intents = callback.getIntents() + 1;
 		log.info(String.format("[Callback] Intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]", intents, callback.getId(), notificacio.getId()));
-		boolean isError = false;
+		var isError = false;
 		String errorDescripcio = null;
-		boolean errorMaxReintents = false;
+		var errorMaxReintents = false;
 		try {
-			long start = System.nanoTime();
+			var start = System.nanoTime();
 			notificaCanvi(env, aplicacio.getCallbackUrl());
-			long elapsedTime = System.nanoTime() - start;
+			var elapsedTime = System.nanoTime() - start;
 			log.info("notificaCanvi "  + elapsedTime);
 
 			//Marcar com a processada si la notificació s'ha fet des de una aplicació
@@ -206,55 +197,48 @@ public class CallbackHelper {
 			elapsedTime = System.nanoTime() - start;
 			log.info("marcar com a notificat: "  + elapsedTime);
 		} catch (Exception ex) {
-			long start = System.nanoTime();
+			var start = System.nanoTime();
 			isError = true;
 			log.info(String.format("[Callback] Excepció notificant el callback [Id: %d]: %s", callback.getId(), ex.getMessage()));
 			ex.printStackTrace();
 			// Marca un error a l'event
-			Integer maxIntents = this.getEventsIntentsMaxProperty();
+			var maxIntents = this.getEventsIntentsMaxProperty();
 			errorMaxReintents = intents >= maxIntents;
-			CallbackEstatEnumDto estatNou = maxIntents == null || intents < maxIntents ? CallbackEstatEnumDto.PENDENT : CallbackEstatEnumDto.ERROR;
+			var estatNou = maxIntents == null || intents < maxIntents ? CallbackEstatEnumDto.PENDENT : CallbackEstatEnumDto.ERROR;
 			log.info(String.format("[Callback] Actualitzam la base de dades amb l'error de l'event [Id: %d]", callback.getId()));
 			errorDescripcio = "Error notificant canvis al client: " + ex.getMessage() + "\n" + ExceptionUtils.getStackTrace(ex);
 			callback.update(estatNou, intents, "Error notificant canvis al client: " + ex.getMessage(), getIntentsPeriodeProperty());
 			notificacio.updateLastCallbackError(true);
 			integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat", ex);
-			long elapsedTime = System.nanoTime() - start;
+			var elapsedTime = System.nanoTime() - start;
 			log.info("excepcio: "  + elapsedTime);
 		}
-		long start = System.nanoTime();
+		var start = System.nanoTime();
 		notificacioEventHelper.addCallbackEnviamentEvent(env, isError, errorDescripcio, errorMaxReintents);
 		log.info(String.format("[Callback] Fi intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]", intents, callback.getId(), notificacio.getId()));
 		long elapsedTime = System.nanoTime() - start;
 		log.info("addCallbackEvent: "  + elapsedTime);
-
 		auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "CallbackHelper.notifica");
 		return notificacio;
 	}
 
 	public String notificaCanvi(@NonNull NotificacioEnviamentEntity enviament, @NonNull String urlBase) throws Exception {
 
-//		NotificacioCanviClient notificacioCanvi = NotificacioServiceWsImplV2.isValidUUID(enviament.getNotificaReferencia()) ?
-//				new NotificacioCanviClient(enviament.getNotificacio().getReferencia(), enviament.getNotificaReferencia()) :
-//				new NotificacioCanviClient(notificaHelper.xifrarId(enviament.getNotificacio().getId()), notificaHelper.xifrarId(enviament.getId()));
-		NotificacioCanviClient notificacioCanvi = new NotificacioCanviClient(enviament.getNotificacio().getReferencia(), enviament.getNotificaReferencia());
-
+		var notificacioCanvi = new NotificacioCanviClient(enviament.getNotificacio().getReferencia(), enviament.getNotificaReferencia());
 		// Completa la URL al mètode
-		String urlCallback = urlBase + (urlBase.endsWith("/") ? "" : "/") +  NOTIFICACIO_CANVI;
-		ClientResponse response = requestsHelper.callbackAplicacioNotificaCanvi(urlCallback, notificacioCanvi);
-
+		var urlCallback = urlBase + (urlBase.endsWith("/") ? "" : "/") +  NOTIFICACIO_CANVI;
+		var response = requestsHelper.callbackAplicacioNotificaCanvi(urlCallback, notificacioCanvi);
 		// Comprova que la resposta sigui 200 OK
 		if ( ClientResponse.Status.OK.getStatusCode() != response.getStatusInfo().getStatusCode()) {
 			throw new Exception("La resposta del client és: " + response.getStatusInfo().getStatusCode() + " - " + response.getStatusInfo().getReasonPhrase());
 		}
-
 		return response.getEntity(String.class);
 	}
 
 	private AplicacioEntity getAplicacio(CallbackEntity callback, @NonNull NotificacioEnviamentEntity enviament) throws Exception {
 
 		// Resol si hi ha una aplicació pel codi d'usuari que ha creat l'enviament
-		var usuari = enviament.getCreatedBy().get();
+		var usuari = enviament.getCreatedBy().orElseThrow();
 		var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuari.getCodi(), enviament.getNotificacio().getEntitat().getId());
 		String errorMessage = null;
 		if (aplicacio == null) {
@@ -273,11 +257,10 @@ public class CallbackHelper {
 			var msg = "Error notificant el callback al client: " + errorMessage;
 			info.setAplicacio(aplicacio != null ? aplicacio.getUsuariCodi() : "Sense aplicació");
 
-			int intents = callback.getIntents() + 1;
-			Integer maxIntents = this.getEventsIntentsMaxProperty();
-			CallbackEstatEnumDto estatNou = maxIntents == null || intents < maxIntents ? CallbackEstatEnumDto.PENDENT : CallbackEstatEnumDto.ERROR;
-			boolean errorMaxReintents = intents >= maxIntents;
-
+			var intents = callback.getIntents() + 1;
+			var maxIntents = this.getEventsIntentsMaxProperty();
+			var estatNou = maxIntents == null || intents < maxIntents ? CallbackEstatEnumDto.PENDENT : CallbackEstatEnumDto.ERROR;
+			var errorMaxReintents = intents >= maxIntents;
 			callback.update(estatNou, intents, msg, getIntentsPeriodeProperty());
 			integracioHelper.addAccioError(info, msg);
 			notificacioEventHelper.addCallbackEnviamentEvent(enviament, true, msg, errorMaxReintents);
@@ -286,35 +269,32 @@ public class CallbackHelper {
 		return aplicacio;
 	}
 
-	// TODO CALLBACK:
 	@Transactional
-	public void marcarEventNoProcessable(@NonNull Long enviamentId,
-										 String errorDescripcio,
-										 String longErrorMessage){
-		NotificacioEnviamentEntity enviament = enviamentRepository.findById(enviamentId).orElse(null);
+	public void marcarEventNoProcessable(@NonNull Long enviamentId, String errorDescripcio, String longErrorMessage){
+
+		var enviament = enviamentRepository.findById(enviamentId).orElse(null);
 		if (enviament == null) {
 			log.info(String.format("[Callback] Enviament [Id: %d] no trobat a la base de dades. Error: %s", enviamentId, errorDescripcio));
 			return;
 		}
 		errorDescripcio = errorDescripcio == null ? "" : errorDescripcio;
 		longErrorMessage = longErrorMessage == null ? "" : longErrorMessage;
-
-		CallbackEntity callback = callbackRepository.findByEnviamentId(enviamentId);
+		var callback = callbackRepository.findByEnviamentId(enviamentId);
 		callback.update(CallbackEstatEnumDto.ERROR, getEventsIntentsMaxProperty(), "Error fatal: " + errorDescripcio + "\n" + longErrorMessage, getIntentsPeriodeProperty());
 		log.info(String.format("[Callback] Enviament [Id: %d] eliminat de la coa de callback per error fatal. Error: %s", enviamentId, errorDescripcio));
 	}
 
 	public boolean isAllEnviamentsEstatFinal(NotificacioEntity notificacio) {
-		boolean estatsEnviamentsFinals = true;
-		if (notificacio != null) {
-			for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-				if (!enviament.isNotificaEstatFinal()) {
-					estatsEnviamentsFinals = false;
-					break;
-				}
+
+		if (notificacio == null) {
+			return true;
+		}
+		for (var enviament: notificacio.getEnviaments()) {
+			if (!enviament.isNotificaEstatFinal()) {
+				return false;
 			}
 		}
-		return estatsEnviamentsFinals;
+		return true;
 	}
 
 	/** Propietat que assenayala el màxim de reintents. Si la propietat és null llavors no hi ha un màxim. */

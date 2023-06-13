@@ -199,7 +199,7 @@ public class ConfigHelper {
 
     public String crearEntitatKey(String entitatCodi, String key) {
 
-        if (entitatCodi == null || entitatCodi == "" || key == null || key == "") {
+        if (Strings.isNullOrEmpty(entitatCodi) || Strings.isNullOrEmpty(key)) {
             var msg = "Codi entitat " + entitatCodi + " i/o key " + key + " no contenen valor";
             log.error(msg);
             throw new RuntimeException(msg);

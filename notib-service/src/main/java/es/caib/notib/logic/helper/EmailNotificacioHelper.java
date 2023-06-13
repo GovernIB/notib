@@ -20,8 +20,8 @@ import java.util.*;
 @Component
 public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 
-	@Resource
-	private MessageHelper messageHelper;
+//	@Resource
+//	private MessageHelper messageHelper;
 	@Resource ProcSerHelper procSerHelper;
 
 	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws Exception {
@@ -44,9 +44,9 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 			}
 			return null;
 		} catch (Exception ex) {
-			var errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
-			log.error(errorDescripció);
-			return errorDescripció;
+			var errorDescripcio = "No s'ha pogut avisar per correu electrònic: " + ex;
+			log.error(errorDescripcio);
+			return errorDescripcio;
 		}
 	}
 

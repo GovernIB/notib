@@ -1,7 +1,6 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.logic.intf.dto.AccioParam;
@@ -25,28 +24,20 @@ import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorCIE;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorPostal;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.Persona;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
-import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
-import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.Certificacion;
-import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.CodigoDIR;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.Datado;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.InfoEnvioV2;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
-import es.caib.notib.persist.entity.PersonaEntity;
-import es.caib.notib.persist.entity.ProcSerEntity;
-import es.caib.notib.persist.entity.cie.EntregaCieEntity;
-import es.caib.notib.persist.entity.cie.EntregaPostalEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -58,11 +49,8 @@ import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
-import javax.xml.soap.SOAPHeader;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
@@ -84,6 +72,7 @@ import java.util.TreeSet;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class NotificaV2Helper extends AbstractNotificaHelper {
 
@@ -102,45 +91,44 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Autowired
 	private EnviamentTableHelper enviamentTableHelper;
 
+
 	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
 
-		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
 
-		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
-		logger.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
+		var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
+		log.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		info.setCodiEntitat(notificacio.getEntitat() != null ? notificacio.getEntitat().getCodi() : null);
 		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
 
 		// Validacions
 		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
-			logger.error(" [NOT] la notificació no té l'estat REGISTRADA o ENVIADA AMB ERRORS.");
+			log.error(" [NOT] la notificació no té l'estat REGISTRADA o ENVIADA AMB ERRORS.");
 			integracioHelper.addAccioError(info, "La notificació no està registrada, o enviada amb errors");
 			throw new ValidationException(notificacioId, NotificacioEntity.class, "La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA.name() + " o " + NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.name());
 		}
-
-		boolean error = false;
+		var error = false;
 		String errorDescripcio = null;
 		try {
-			logger.info(" >>> Enviant notificació...");
-
-			long startTime = System.nanoTime();
+			log.info(" >>> Enviant notificació...");
+			var startTime = System.nanoTime();
 			double elapsedTime;
-			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);
+			var resultadoAlta = enviaNotificacio(notificacio);
 			elapsedTime = (System.nanoTime() - startTime) / 10e6;
-			logger.info(" [TIMER-NOT] Notificació enviar (enviaNotificacio SOAP-QUERY)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
+			log.info(" [TIMER-NOT] Notificació enviar (enviaNotificacio SOAP-QUERY)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
 			notificacio.updateNotificaEnviamentData();
 
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				startTime = System.nanoTime();
-				logger.info(" >>> ... OK");
+				log.info(" >>> ... OK");
 				if (!ambEnviamentPerEmail) {
 					notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 				}
 				List<Long> enviamentsActualitzats = new ArrayList<>();
-				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
-					for (NotificacioEnviamentEntity enviament: notificacio.getEnviamentsPerNotifica()) {
-						String nif = enviament.getTitular().getNif();
+				for (var resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
+					for (var enviament: notificacio.getEnviamentsPerNotifica()) {
+						var nif = enviament.getTitular().getNif();
 						if (nif != null && nif.equalsIgnoreCase(resultadoEnvio.getNifTitular()) && !enviamentsActualitzats.contains(enviament.getId())) {
 							enviamentsActualitzats.add(enviament.getId());
 							enviament.updateNotificaEnviada(resultadoEnvio.getIdentificador());
@@ -156,29 +144,27 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					}
 				}
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
-				logger.info(" [TIMER-NOT] Notificació enviar (Preparar events)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
+				log.info(" [TIMER-NOT] Notificació enviar (Preparar events)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
 				integracioHelper.addAccioOk(info);
 			} else {
 				error = true;
 				errorDescripcio = "Intent " + notificacio.getNotificaEnviamentIntent() + " \n\nError retornat per Notifica: [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
-				logger.info(" >>> ... ERROR: " + errorDescripcio);
+				log.info(" >>> ... ERROR: " + errorDescripcio);
 				integracioHelper.addAccioError(info, errorDescripcio);
 			}
 		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
+			log.error(ex.getMessage(), ex);
 			error = true;
 			errorDescripcio = "Intent " + notificacio.getNotificaEnviamentIntent() + "\n\n" + (ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex));
 			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 		}
-		boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
+		var fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
 		if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat()) /*|| NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())*/)) {
 			notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
 		}
-
 		notificacioEventHelper.addNotificaEnviamentEvent(notificacio, error, errorDescripcio, fiReintents);
 		callbackHelper.updateCallbacks(notificacio, error, errorDescripcio);
-		logger.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
-
+		log.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		notificacioTableHelper.actualitzarRegistre(notificacio);
 		auditHelper.auditaNotificacio(notificacio, TipusOperacio.UPDATE, "NotificaV2Helper.notificacioEnviar");
 		return notificacio;
@@ -189,8 +175,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
 
-		logger.info(String.format(" [NOT] Refrescant estat de notific@ de l'enviament (Id=%d)", enviamentId));
-		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+		log.info(String.format(" [NOT] Refrescant estat de notific@ de l'enviament (Id=%d)", enviamentId));
+		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 		try {
 			return enviamentRefrescarEstat(enviament, false);
 		} catch (Exception e) {
@@ -203,79 +189,71 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception {
-		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+
+		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 		return enviamentRefrescarEstat(enviament, raiseExceptions);
 	}
 
 	private NotificacioEnviamentEntity enviamentRefrescarEstat(@NonNull NotificacioEnviamentEntity enviament, boolean raiseExceptions) throws Exception {
 
-		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA,"Consultar estat d'un enviament", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA,"Consultar estat d'un enviament", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de l'enviament", String.valueOf(enviament.getId())));
 
-		logger.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
+		log.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		info.setCodiEntitat(enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null ?  enviament.getNotificacio().getEntitat().getCodi() : null);
 		long startTime;
 		double elapsedTime;
-
-		boolean error = false;
+		var error = false;
 		String errorDescripcio = null;
-		boolean errorMaxReintents = false;
+		var errorMaxReintents = false;
 		Exception excepcio = null;
 		try {
-			Date dataUltimDatat = enviament.getNotificaDataCreacio();
-
+			var dataUltimDatat = enviament.getNotificaDataCreacio();
 			enviament.updateNotificaDataRefrescEstat();
 			enviament.updateNotificaNovaConsulta(pluginHelper.getConsultaReintentsPeriodeProperty());
-
 			// Validacions
 			if (enviament.getNotificaIdentificador() == null) {
-				logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
+				log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				errorDescripcio = "L'enviament no té identificador de Notifica";
 				integracioHelper.addAccioError(info, errorDescripcio);
 				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 			}
-
 			startTime = System.nanoTime();
-			ResultadoInfoEnvioV2 resultadoInfoEnvio = getNotificaResultadoInfoEnvio(enviament, info);
+			var resultadoInfoEnvio = getNotificaResultadoInfoEnvio(enviament, info);
 			elapsedTime = (System.nanoTime() - startTime) / 10e6;
-			logger.info(" [TIMER-EST] Refrescar estat enviament (infoEnvioV2)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
-
-			Datado darrerDatat = getDarrerDatat(resultadoInfoEnvio, enviament, info);
+			log.info(" [TIMER-EST] Refrescar estat enviament (infoEnvioV2)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
+			var darrerDatat = getDarrerDatat(resultadoInfoEnvio, enviament, info);
 			if (resultadoInfoEnvio.getCertificacion() != null) {
-				logger.info(" [EST] Actualitzant certificació de l'enviament [Id: " + enviament.getId() + "] ...");
+				log.info(" [EST] Actualitzant certificació de l'enviament [Id: " + enviament.getId() + "] ...");
 				actualitzaCertificacio(resultadoInfoEnvio, enviament, darrerDatat);
 			} else {
-				logger.info(" [EST] Notifica no té cap certificació de l'enviament [Id: " + enviament.getId() + "] ...");
+				log.info(" [EST] Notifica no té cap certificació de l'enviament [Id: " + enviament.getId() + "] ...");
 			}
-
-			logger.info(" [EST] Actualitzant informació enviament amb Datat...");
-			Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
-			EnviamentEstat estat = getEstatNotifica(darrerDatat.getResultado());
+			log.info(" [EST] Actualitzant informació enviament amb Datat...");
+			var dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
+			var estat = getEstatNotifica(darrerDatat.getResultado());
 			if (!dataDatat.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
 				actualitzaDatatEnviament(resultadoInfoEnvio, enviament, darrerDatat);
 			}
-			logger.info(" [EST] Enviament actualitzat");
-
+			log.info(" [EST] Enviament actualitzat");
 			enviament.refreshNotificaConsulta();
 			integracioHelper.addAccioOk(info);
-			logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
+			log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 
 		} catch (Exception ex) {
 			error = true;
 			errorMaxReintents = enviament.getNotificaIntentNum() >= pluginHelper.getConsultaReintentsMaxProperty();
 			errorDescripcio = getErrorDescripcio(enviament.getNotificaIntentNum(), ex);
-			logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
+			log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 			integracioHelper.addAccioError(info, "Error consultat l'estat de l'enviament", ex);
 			excepcio = ex;
-			logger.error("Error al consultar l'estat d'un enviament fet amb NotificaV2 (notificacioId=" + enviament.getNotificacio().getId() + ", "
-							+ "notificaIdentificador=" + enviament.getNotificaIdentificador() + ")",
-					ex);
+			var msg = "Error al consultar l'estat d'un enviament fet amb NotificaV2 (notificacioId=";
+			log.error(msg + enviament.getNotificacio().getId() + ", notificaIdentificador=" + enviament.getNotificaIdentificador() + ")", ex);
 
 		}
 		notificacioEventHelper.addNotificaConsultaEvent(enviament, error, errorDescripcio, errorMaxReintents);
 		enviamentTableHelper.actualitzarRegistre(enviament);
 		auditHelper.auditaEnviament(enviament, TipusOperacio.UPDATE, "NotificaV2Helper.enviamentRefrescarEstat");
-
 		if (error && raiseExceptions){
 			throw excepcio;
 		}
@@ -283,25 +261,17 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	}
 
 	private String getErrorDescripcio(int intent, Exception ex) {
-		String errorDescripcio;
-		// Generam el missatge d'error
-		errorDescripcio = "Intent " + intent + "\n\n";
-		if (ex instanceof ValidationException) {
-			errorDescripcio += ex.getMessage();
-		} else {
-			errorDescripcio += ExceptionUtils.getStackTrace(ex);
-		}
-		return errorDescripcio;
+		return "Intent " + intent + "\n\n" + (ex instanceof ValidationException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex));
 	}
 
 	private ResultadoInfoEnvioV2 getNotificaResultadoInfoEnvio(NotificacioEnviamentEntity enviament, IntegracioInfo info) throws Exception {
 
-		InfoEnvioV2 infoEnvio = new InfoEnvioV2();
+		var infoEnvio = new InfoEnvioV2();
 		infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
-		String apiKey = enviament.getNotificacio().getEntitat().getApiKey();
-		ResultadoInfoEnvioV2 resultadoInfoEnvio = getNotificaWs(apiKey).infoEnvioV2(infoEnvio);
+		var apiKey = enviament.getNotificacio().getEntitat().getApiKey();
+		var resultadoInfoEnvio = getNotificaWs(apiKey).infoEnvioV2(infoEnvio);
 		if (resultadoInfoEnvio.getDatados() == null) {
-			String errorDescripcio = "La resposta rebuda de Notifica no conté informació de datat";
+			var errorDescripcio = "La resposta rebuda de Notifica no conté informació de datat";
 			integracioHelper.addAccioError(info, errorDescripcio);
 			throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 		}
@@ -312,79 +282,63 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 		info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 		if (resultadoInfoEnvio.getDatados() == null) {
-			String errorDescripcio = "La resposta rebuda de Notifica no conté informació de datat";
+			var errorDescripcio = "La resposta rebuda de Notifica no conté informació de datat";
 			integracioHelper.addAccioError(info, errorDescripcio);
 			throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 		}
-
 		Datado datatDarrer = null;
-		for (Datado datado: resultadoInfoEnvio.getDatados().getDatado()) {
-			Date datatData = toDate(datado.getFecha());
+		for (var datado: resultadoInfoEnvio.getDatados().getDatado()) {
+			var datatData = toDate(datado.getFecha());
 			if (datatDarrer == null) {
 				datatDarrer = datado;
-			} else if (datado.getFecha() != null) {
-				Date datatDarrerData = toDate(datatDarrer.getFecha());
+				continue;
+			}
+			if (datado.getFecha() != null) {
+				var datatDarrerData = toDate(datatDarrer.getFecha());
 				if (datatData.after(datatDarrerData)) {
 					datatDarrer = datado;
 				}
 			}
 		}
 		if (datatDarrer == null) {
-			String errorDescripcio = "No s'ha pogut trobar el darrer datat dins la resposta rebuda de Notifica";
+			var errorDescripcio = "No s'ha pogut trobar el darrer datat dins la resposta rebuda de Notifica";
 			integracioHelper.addAccioError(info, errorDescripcio);
 			throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 		}
 		return datatDarrer;
 	}
 
-	private void actualitzaCertificacio(ResultadoInfoEnvioV2 resultadoInfoEnvio,
-										NotificacioEnviamentEntity enviament,
-										Datado darrerDatat) throws DatatypeConfigurationException {
-		Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();
-		Certificacion certificacio = resultadoInfoEnvio.getCertificacion();
-		Date dataCertificacio = toDate(certificacio.getFechaCertificacion());
-		configHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
+	private void actualitzaCertificacio(ResultadoInfoEnvioV2 resultadoInfoEnvio, NotificacioEnviamentEntity enviament, Datado darrerDatat) throws DatatypeConfigurationException {
+
+		var dataUltimaCertificacio = enviament.getNotificaCertificacioData();
+		var certificacio = resultadoInfoEnvio.getCertificacion();
+		var dataCertificacio = toDate(certificacio.getFechaCertificacion());
+		ConfigHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
 		if (dataCertificacio.equals(dataUltimaCertificacio) && enviament.getNotificaCertificacioArxiuId() != null) {
-			logger.info(" [EST] El certificat de l'enviament ja estava actualitzat");
+			log.info(" [EST] El certificat de l'enviament ja estava actualitzat");
 			return;
 		}
-		byte[] decodificat = certificacio.getContenidoCertificacion();
+		var decodificat = certificacio.getContenidoCertificacion();
 		if (enviament.getNotificaCertificacioArxiuId() != null) {
-			pluginHelper.gestioDocumentalDelete(
-					enviament.getNotificaCertificacioArxiuId(),
-					PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
+			pluginHelper.gestioDocumentalDelete(enviament.getNotificaCertificacioArxiuId(), PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
 		}
-		String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
-				PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-				decodificat);
+		var gestioDocumentalId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, decodificat);
+		log.info(" [EST] Actualitzant certificació enviament...");
+		enviament.updateNotificaCertificacio(dataCertificacio, gestioDocumentalId, certificacio.getHash(), certificacio.getOrigen(), certificacio.getMetadatos(),
+				certificacio.getCsv(), certificacio.getMime(), Integer.parseInt(certificacio.getSize()), null, null, null);
 
-		logger.info(" [EST] Actualitzant certificació enviament...");
-		enviament.updateNotificaCertificacio(
-				dataCertificacio,
-				gestioDocumentalId,
-				certificacio.getHash(),
-				certificacio.getOrigen(),
-				certificacio.getMetadatos(),
-				certificacio.getCsv(),
-				certificacio.getMime(),
-				Integer.parseInt(certificacio.getSize()),
-				null,
-				null,
-				null);
-
-		logger.info(" [EST] Fi actualització certificació. Creant nou event per certificació...");
+		log.info(" [EST] Fi actualització certificació. Creant nou event per certificació...");
 		//Crea un nou event
 		notificacioEventHelper.addAdviserCertificacioEvent(enviament, false, null);
 		callbackHelper.updateCallback(enviament, false, null);
 	}
 
-	private void actualitzaDatatEnviament(ResultadoInfoEnvioV2 resultadoInfoEnvio,
-										  NotificacioEnviamentEntity enviament,
-										  Datado darrerDatat) throws Exception {
-		Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
-		EnviamentEstat estat = getEstatNotifica(darrerDatat.getResultado());
-		CodigoDIR organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
-		CodigoDIR organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
+	private void actualitzaDatatEnviament(ResultadoInfoEnvioV2 resultadoInfoEnvio, NotificacioEnviamentEntity enviament, Datado darrerDatat) throws Exception {
+
+		var dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
+		var estat = getEstatNotifica(darrerDatat.getResultado());
+		var organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
+		var organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
 		enviament.updateNotificaInformacio(
 				dataDatat,
 				toDate(resultadoInfoEnvio.getFechaPuestaDisposicion()),
@@ -395,54 +349,43 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
 				(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
 				(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
-		if (estat != null)
-			logger.info(" [EST] Nou estat: " + estat.name());
-
+		if (estat != null) {
+			log.info(" [EST] Nou estat: " + estat.name());
+		}
 		//Crea un nou event
-		logger.info(" [EST] Creant nou event per Datat...");
+		log.info(" [EST] Creant nou event per Datat...");
 		notificacioEventHelper.addAdviserDatatEvent(enviament, false, null);
 		callbackHelper.updateCallback(enviament, false, null);
-		logger.info(" [EST] L'event s'ha guardat correctament...");
-
-		logger.info(" [EST] Actualitzant Datat enviament...");
-		enviamentUpdateDatat(
-				estat,
-				toDate(darrerDatat.getFecha()),
-				null,
-				darrerDatat.getOrigen(),
-				darrerDatat.getNifReceptor(),
-				darrerDatat.getNombreReceptor(),
-				null,
-				null,
-				enviament);
-		logger.info(" [EST] Fi actualització Datat");
+		log.info(" [EST] L'event s'ha guardat correctament...");
+		log.info(" [EST] Actualitzant Datat enviament...");
+		enviamentUpdateDatat(estat, toDate(darrerDatat.getFecha()), null, darrerDatat.getOrigen(), darrerDatat.getNifReceptor(),
+				darrerDatat.getNombreReceptor(), null, null, enviament);
+		log.info(" [EST] Fi actualització Datat");
 	}
 
 	private ResultadoAltaRemesaEnvios enviaNotificacio(NotificacioEntity notificacio) throws Exception {
 
-		ResultadoAltaRemesaEnvios resultat = null;
 		try {
-			String apiKey = notificacio.getEntitat().getApiKey();
-			AltaRemesaEnvios altaRemesaEnvios = generarAltaRemesaEnvios(notificacio);
-			resultat = getNotificaWs(apiKey).altaRemesaEnvios(altaRemesaEnvios);
+			var apiKey = notificacio.getEntitat().getApiKey();
+			var altaRemesaEnvios = generarAltaRemesaEnvios(notificacio);
+			return getNotificaWs(apiKey).altaRemesaEnvios(altaRemesaEnvios);
 		} catch (SOAPFaultException sfe) {
-			String codiResposta = sfe.getFault().getFaultCode();
-			String descripcioResposta = sfe.getFault().getFaultString();
-			resultat = new ResultadoAltaRemesaEnvios();
+			var codiResposta = sfe.getFault().getFaultCode();
+			var descripcioResposta = sfe.getFault().getFaultString();
+			var resultat = new ResultadoAltaRemesaEnvios();
 			resultat.setCodigoRespuesta(codiResposta);
 			resultat.setDescripcionRespuesta(descripcioResposta);
-			logger.error("Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacio.getId() + ")", descripcioResposta);
+			log.error("Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacio.getId() + ")", descripcioResposta);
+			return resultat;
 		}
-		return resultat;
 	}
 
 	private AltaRemesaEnvios generarAltaRemesaEnvios(NotificacioEntity notificacio) throws GeneralSecurityException, DatatypeConfigurationException, DecoderException {
 
-		AltaRemesaEnvios envios = new AltaRemesaEnvios();
+		var envios = new AltaRemesaEnvios();
 		Integer retardPostal = null;
 		ConfigHelper.setEntitatCodi(notificacio.getEntitat().getDir3Codi());
 		try {
-//			envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
 			if (!isCodiDir3Entitat() && notificacio.getOrganGestor() != null) {
 				envios.setCodigoOrganismoEmisor(notificacio.getOrganGestor().getCodi());
 			} else if(!isCodiDir3Entitat() && notificacio.getProcediment() != null && notificacio.getProcediment().getOrganGestor() != null) {
@@ -450,7 +393,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			} else {
 				envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
 			}
-
 			switch (notificacio.getEnviamentTipus()) {
 				case COMUNICACIO:
 					envios.setTipoEnvio(new BigInteger("1"));
@@ -460,11 +402,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					break;
 			}
 			if (notificacio.getEnviamentDataProgramada() != null) {
-				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-				Date today = new Date();
-				Date todayWithZeroTime = formatter.parse(formatter.format(today));
-				Date DataProgramadaWithZeroTime = formatter.parse(formatter.format(notificacio.getEnviamentDataProgramada()));
-
+				var formatter = new SimpleDateFormat("dd/MM/yyyy");
+				var today = new Date();
+				var todayWithZeroTime = formatter.parse(formatter.format(today));
+				var DataProgramadaWithZeroTime = formatter.parse(formatter.format(notificacio.getEnviamentDataProgramada()));
 				if (DataProgramadaWithZeroTime.after(todayWithZeroTime)) {
 					envios.setFechaEnvioProgramado(toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
 				}
@@ -474,17 +415,17 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				envios.setDescripcion(notificacio.getDescripcio().replace('·', '.'));
 			}
 			envios.setProcedimiento(notificacio.getProcedimentCodiNotib());
-			Documento documento = new Documento();
+			var documento = new Documento();
 			if(notificacio.getDocument() != null && notificacio.getDocument().getArxiuGestdocId() != null) {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				var baos = new ByteArrayOutputStream();
 				pluginHelper.gestioDocumentalGet(notificacio.getDocument().getArxiuGestdocId(), PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, baos);
 				documento.setContenido(baos.toByteArray());
-				Opciones opcionesDocumento = new Opciones();
-				Opcion opcionNormalizado = new Opcion();
+				var opcionesDocumento = new Opciones();
+				var opcionNormalizado = new Opcion();
 				opcionNormalizado.setTipo("normalizado");
 				opcionNormalizado.setValue(notificacio.getDocument().getNormalitzat()  ? "si" : "no");
 				opcionesDocumento.getOpcion().add(opcionNormalizado);
-				Opcion opcionGenerarCsv = new Opcion();
+				var opcionGenerarCsv = new Opcion();
 				opcionGenerarCsv.setTipo("generarCsv");
 				opcionGenerarCsv.setValue("no");
 				opcionesDocumento.getOpcion().add(opcionGenerarCsv);
@@ -496,7 +437,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				}
 				envios.setDocumento(documento);
 			} else if (notificacio.getDocument() != null && notificacio.getDocument().getCsv() != null) {
-				byte[] contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
+				var contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
 				documento.setContenido(contingut);
 				if(contingut != null) {
 					String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
@@ -516,36 +457,36 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				documento.setOpcionesDocumento(opcionesDocumento);
 				envios.setDocumento(documento);
 			} else if (notificacio.getDocument() != null && notificacio.getDocument().getUrl() != null) {
-				String url = notificacio.getDocument().getUrl();
+				var url = notificacio.getDocument().getUrl();
 				documento.setEnlaceDocumento(url);
-				String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(url).toCharArray()));
+				var hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(url).toCharArray()));
 				//Hash a enviar
 				documento.setHash(hash256);
-				Opciones opcionesDocumento = new Opciones();
-				Opcion opcionNormalizado = new Opcion();
+				var opcionesDocumento = new Opciones();
+				var opcionNormalizado = new Opcion();
 				opcionNormalizado.setTipo("normalizado");
 				opcionNormalizado.setValue(notificacio.getDocument().getNormalitzat()  ? "si" : "no");
 				opcionesDocumento.getOpcion().add(opcionNormalizado);
-				Opcion opcionGenerarCsv = new Opcion();
+				var opcionGenerarCsv = new Opcion();
 				opcionGenerarCsv.setTipo("generarCsv");
 				opcionGenerarCsv.setValue("no");
 				opcionesDocumento.getOpcion().add(opcionGenerarCsv);
 				documento.setOpcionesDocumento(opcionesDocumento);
 				envios.setDocumento(documento);
 			} else if (notificacio.getDocument() != null && notificacio.getDocument().getUuid() != null) {
-				byte[] contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
+				var contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
 				documento.setContenido(contingut);
 				if(contingut != null) {
-					String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
+					var hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
 					//Hash a enviar
 					documento.setHash(hash256);
 				}
-				Opciones opcionesDocumento = new Opciones();
-				Opcion opcionNormalizado = new Opcion();
+				var opcionesDocumento = new Opciones();
+				var opcionNormalizado = new Opcion();
 				opcionNormalizado.setTipo("normalizado");
 				opcionNormalizado.setValue(notificacio.getDocument().getNormalitzat()  ? "si" : "no");
 				opcionesDocumento.getOpcion().add(opcionNormalizado);
-				Opcion opcionGenerarCsv = new Opcion();
+				var opcionGenerarCsv = new Opcion();
 				opcionGenerarCsv.setTipo("generarCsv");
 				opcionGenerarCsv.setValue("no");
 				opcionesDocumento.getOpcion().add(opcionGenerarCsv);
@@ -554,66 +495,62 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			} else if(notificacio.getDocument() != null) {
 				documento.setHash(notificacio.getDocument().getHash());
 				if(notificacio.getDocument().getContingutBase64() != null) {
-					byte[] contingut = notificacio.getDocument().getContingutBase64().getBytes();
+					var contingut = notificacio.getDocument().getContingutBase64().getBytes();
 					documento.setContenido(contingut);
-					String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
+					var hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
 					//Hash a enviar
 					documento.setHash(hash256);
 				}
-				Opciones opcionesDocumento = new Opciones();
-				Opcion opcionNormalizado = new Opcion();
+				var opcionesDocumento = new Opciones();
+				var opcionNormalizado = new Opcion();
 				opcionNormalizado.setTipo("normalizado");
 				opcionNormalizado.setValue(notificacio.getDocument().getNormalitzat()  ? "si" : "no");
 				opcionesDocumento.getOpcion().add(opcionNormalizado);
-				Opcion opcionGenerarCsv = new Opcion();
+				var opcionGenerarCsv = new Opcion();
 				opcionGenerarCsv.setTipo("generarCsv");
 				opcionGenerarCsv.setValue("no");
 				opcionesDocumento.getOpcion().add(opcionGenerarCsv);
 				documento.setOpcionesDocumento(opcionesDocumento);
 				envios.setDocumento(documento);
 			}
-
 			envios.setEnvios(generarEnvios(notificacio));
-			Opciones opcionesRemesa = new Opciones();
-
+			var opcionesRemesa = new Opciones();
 			if(notificacio.getRetard() != null) {
 				retardPostal = notificacio.getRetard();
 			} else if (notificacio.getProcediment() != null) {
-				ProcSerEntity procSer = procSerRepository.findById(notificacio.getProcediment().getId()).orElse(null);
+				var procSer = procSerRepository.findById(notificacio.getProcediment().getId()).orElse(null);
 				retardPostal = procSer != null ? procSer.getRetard() : null;
 			}
-
 			if (retardPostal != null) {
-				Opcion opcionRetardo = new Opcion();
+				var opcionRetardo = new Opcion();
 				opcionRetardo.setTipo("retardo");
 				opcionRetardo.setValue(retardPostal.toString()); // número de días
 				opcionesRemesa.getOpcion().add(opcionRetardo);
 			}
-
 			if (notificacio.getCaducitat() != null) {
-				Opcion opcionCaducidad = new Opcion();
+				var opcionCaducidad = new Opcion();
 				opcionCaducidad.setTipo("caducidad");
-				SimpleDateFormat sdfCaducitat = new SimpleDateFormat("yyyy-MM-dd");
+				var sdfCaducitat = new SimpleDateFormat("yyyy-MM-dd");
 				opcionCaducidad.setValue(sdfCaducitat.format(notificacio.getCaducitat())); // formato YYYY-MM-DD
 				opcionesRemesa.getOpcion().add(opcionCaducidad);
 			}
 			envios.setOpcionesRemesa(opcionesRemesa);
 		} catch (Exception ex) {
-			logger.error("Error generant la petició (notificacioId=" + notificacio.getId() + ")", ex);
+			log.error("Error generant la petició (notificacioId=" + notificacio.getId() + ")", ex);
 		}
 		return envios;
 	}
 
 	private Envios generarEnvios(NotificacioEntity notificacio) throws DatatypeConfigurationException {
 
-		Envios envios = new Envios();
-		for (NotificacioEnviamentEntity enviament: notificacio.getEnviamentsPerNotifica()) {
+		var envios = new Envios();
+		for (var enviament: notificacio.getEnviamentsPerNotifica()) {
 			if (enviament == null) {
 				continue;
 			}
-			Envio envio = new Envio();
-			Persona titular = new Persona();
-			boolean titularIncapacitat = false;
+			var envio = new Envio();
+			var titular = new Persona();
+			var titularIncapacitat = false;
 			if (enviament.getTitular().isIncapacitat() && enviament.getDestinataris() != null) {
 				titular.setNif(enviament.getDestinataris().get(0).getNif());
 				titular.setApellidos(concatenarLlinatges(enviament.getDestinataris().get(0).getLlinatge1(), enviament.getDestinataris().get(0).getLlinatge2()));
@@ -638,16 +575,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				}
 				titular.setCodigoDestino(enviament.getTitular().getDir3Codi());
 			}
-
 			envio.setTitular(titular);
-			Destinatarios destinatarios = new Destinatarios();
-			int counter = 0;
-			for(PersonaEntity destinatari : enviament.getDestinataris()) {
+			var destinatarios = new Destinatarios();
+			var counter = 0;
+			for (var destinatari : enviament.getDestinataris()) {
 				if (Strings.isNullOrEmpty(destinatari.getNif()) || titularIncapacitat && counter == 0) {
 					continue;
 				}
 				counter++;
-				Persona destinatario = new Persona();
+				var destinatario = new Persona();
 				destinatario.setNif(destinatari.getNif());
 				destinatario.setApellidos(concatenarLlinatges(destinatari.getLlinatge1(), destinatari.getLlinatge2()));
 				destinatario.setTelefono(destinatari.getTelefon());
@@ -664,12 +600,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				envio.setDestinatarios(destinatarios);
 			}
 			if (enviament.getEntregaPostal() != null) {
-				EntregaPostal entregaPostal = new EntregaPostal();
-				ProcSerEntity procedimentNotificacio = notificacio.getProcediment();
+				var entregaPostal = new EntregaPostal();
+				var procedimentNotificacio = notificacio.getProcediment();
 				if (procedimentNotificacio != null && procedimentNotificacio.getEntregaCie() != null) {
-					EntregaCieEntity entregaCieEntity = procedimentNotificacio.getEntregaCie();
+					var entregaCieEntity = procedimentNotificacio.getEntregaCie();
 					if (entregaCieEntity.getOperadorPostal() != null) {
-						OrganismoPagadorPostal pagadorPostal = new OrganismoPagadorPostal();
+						var pagadorPostal = new OrganismoPagadorPostal();
 						pagadorPostal.setCodigoDIR3Postal(entregaCieEntity.getOperadorPostal().getOrganGestor().getCodi());
 						pagadorPostal.setCodClienteFacturacionPostal(entregaCieEntity.getOperadorPostal().getFacturacioClientCodi());
 						pagadorPostal.setNumContratoPostal(entregaCieEntity.getOperadorPostal().getContracteNum());
@@ -677,13 +613,13 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						entregaPostal.setOrganismoPagadorPostal(pagadorPostal);
 					}
 					if (entregaCieEntity.getCie() != null) {
-						OrganismoPagadorCIE pagadorCie = new OrganismoPagadorCIE();
+						var pagadorCie = new OrganismoPagadorCIE();
 						pagadorCie.setCodigoDIR3CIE(entregaCieEntity.getCie().getOrganGestor().getCodi());
 						pagadorCie.setFechaVigenciaCIE(toXmlGregorianCalendar(entregaCieEntity.getCie().getContracteDataVig()));
 						entregaPostal.setOrganismoPagadorCIE(pagadorCie);
 					}
 				}
-				EntregaPostalEntity entregaPostalEntity = enviament.getEntregaPostal();
+				var entregaPostalEntity = enviament.getEntregaPostal();
 				if (entregaPostalEntity.getDomiciliConcretTipus() != null) {
 					switch (entregaPostalEntity.getDomiciliConcretTipus())  {
 						case NACIONAL:
@@ -727,21 +663,21 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				if (entregaPostal.getPais() == null) {
 					entregaPostal.setPais("ES");
 				}
-				Opciones opcionesCie = new Opciones();
+				var opcionesCie = new Opciones();
 				if (entregaPostalEntity.getDomiciliCie() != null) {
-					Opcion opcionCie = new Opcion();
+					var opcionCie = new Opcion();
 					opcionCie.setTipo("cie");
 					opcionCie.setValue(entregaPostalEntity.getDomiciliCie().toString()); // identificador CIE
 					opcionesCie.getOpcion().add(opcionCie);
 				}
 				if (entregaPostalEntity.getFormatSobre() != null) {
-					Opcion opcionFormatoSobre = new Opcion();
+					var opcionFormatoSobre = new Opcion();
 					opcionFormatoSobre.setTipo("formatoSobre");
 					opcionFormatoSobre.setValue(entregaPostalEntity.getFormatSobre()); // americano, C5...
 					opcionesCie.getOpcion().add(opcionFormatoSobre);
 				}
 				if (entregaPostalEntity.getFormatFulla() != null) {
-					Opcion opcionFormatoHoja = new Opcion();
+					var opcionFormatoHoja = new Opcion();
 					opcionFormatoHoja.setTipo("formatoHoja");
 					opcionFormatoHoja.setValue(entregaPostalEntity.getFormatFulla()); // A4, A5...
 					opcionesCie.getOpcion().add(opcionFormatoHoja);
@@ -750,7 +686,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				envio.setEntregaPostal(entregaPostal);
 			}
 			if (enviament.getDehNif() != null && enviament.getDehProcedimentCodi() != null && enviament.getDehObligat() != null) {
-				EntregaDEH entregaDeh = new EntregaDEH();
+				var entregaDeh = new EntregaDEH();
 				entregaDeh.setObligado(enviament.getDehObligat());
 				entregaDeh.setCodigoProcedimiento(enviament.getDehProcedimentCodi());
 				envio.setEntregaDEH(entregaDeh);
@@ -778,36 +714,24 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		@Override
 		public boolean handleMessage(SOAPMessageContext context) {
 
-			Boolean outboundProperty = (Boolean)context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-			if (!outboundProperty.booleanValue()) {
+			var outboundProperty = (Boolean)context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+			if (!outboundProperty) {
 				return true;
 			}
 			try {
-				SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
-				SOAPFactory factory = SOAPFactory.newInstance();
+				var envelope = context.getMessage().getSOAPPart().getEnvelope();
+				var factory = SOAPFactory.newInstance();
 				/*SOAPElement apiKeyElement = factory.createElement("apiKey");*/
-				SOAPElement apiKeyElement = factory.createElement(new QName("https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/","apiKey"));
+				var apiKeyElement = factory.createElement(new QName("https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/","apiKey"));
 				apiKeyElement.addTextNode(apiKey);
-				SOAPHeader header = envelope.getHeader();
+				var header = envelope.getHeader();
 				if (header == null) {
 					header = envelope.addHeader();
 				}
 				header.addChildElement(apiKeyElement);
 				context.getMessage().saveChanges();
-
-				// Debug
-//					StringBuilder sb = new StringBuilder();
-//					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//					try {
-//						context.getMessage().writeTo(baos);
-//						sb.append(baos.toString());
-//					} catch (Exception ex) {
-//						sb.append("Error al processar el missatge XML: " + ex.getMessage());
-//					}
-//					logger.info(sb.toString());
-
 			} catch (SOAPException ex) {
-				logger.error("No s'ha pogut afegir l'API key a la petició SOAP per Notifica", ex);
+				log.error("No s'ha pogut afegir l'API key a la petició SOAP per Notifica", ex);
 			}
 			return true;
 		}
@@ -819,11 +743,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 		@Override
 		public void close(MessageContext context) {
+			// close
 		}
 
 		@Override
 		public Set<QName> getHeaders() {
-			return new TreeSet<QName>();
+			return new TreeSet<>();
 		}
 	}
 
@@ -831,6 +756,5 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return configHelper.getConfigAsBoolean("es.caib.notib.plugin.codi.dir3.entitat");
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(NotificaV2Helper.class);
 
 }

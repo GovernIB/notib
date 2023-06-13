@@ -15,8 +15,6 @@ public class CaducitatHelper {
 
 		var diaActual = Calendar.getInstance();
 		diaActual.setTime(dataCaducitat);
-//		diaActual.add(Calendar.DATE, 1); La data de caducitat comtempla tot el dia final, fins a última hora.
-		
 		try {
 			var diesASumar = 1;
 			Calendar diaSeguent;
@@ -27,7 +25,9 @@ public class CaducitatHelper {
 				if ((diaSeguent.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY)) {
 					diesASumar++;
 					diaActual.add(Calendar.DAY_OF_YEAR, 1);
-				} else if (diaSeguent.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY){
+					continue;
+				}
+				if (diaSeguent.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY){
 					diesASumar += 3;
 					diaActual.add(Calendar.DAY_OF_YEAR, 3);
 				}

@@ -42,14 +42,15 @@ public class WsClientHelper<T> {
 							throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
 
 		var url = wsdlResourceUrl;
+		var wsdl = "?wsdl";
 		if (url == null) {
-			url = !endpoint.endsWith("?wsdl") ? new URL(endpoint + "?wsdl") : new URL(endpoint);
+			url = !endpoint.endsWith(wsdl) ? new URL(endpoint + wsdl) : new URL(endpoint);
 		}
 		var service = Service.create(url, qname);
 		T servicePort = service.getPort(clazz);
 		var bindingProvider = (BindingProvider)servicePort;
 		// Configura l'adreça del servei
-		var endpointAddress = !endpoint.endsWith("?wsdl") ? endpoint : endpoint.substring(0, endpoint.length() - "?wsdl".length());
+		var endpointAddress = !endpoint.endsWith(wsdl) ? endpoint : endpoint.substring(0, endpoint.length() - wsdl.length());
 		bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointAddress);
 		// Configura l'autenticació si és necessària
 		if (username != null && !username.isEmpty()) {
@@ -64,12 +65,11 @@ public class WsClientHelper<T> {
 			System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
 			System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
 			System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
-			// handlerChain.add(new SOAPLoggingHandler(clazz));
 		}
 		// Configura handlers addicionals
-		for (var i = 0; i < handlers.length; i++) {
-			if (handlers[i] != null) {
-				handlerChain.add(handlers[i]);
+		for (var handler : handlers) {
+			if (handler != null) {
+				handlerChain.add(handler);
 			}
 		}
 		bindingProvider.getBinding().setHandlerChain(handlerChain);
@@ -114,42 +114,42 @@ public class WsClientHelper<T> {
 	}
 
 	public static class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
+
 		private final Logger LOGGER;
 		public SOAPLoggingHandler(Class<?> loggerClass) {
 			super();
 			LOGGER = LoggerFactory.getLogger(loggerClass);
 		}
+
 		public Set<QName> getHeaders() {
 			return null;
 		}
+
 		public boolean handleMessage(SOAPMessageContext smc) {
 			logXml(smc);
 			return true;
 		}
+
 		public boolean handleFault(SOAPMessageContext smc) {
 			logXml(smc);
 			return true;
 		}
+
 		public void close(MessageContext messageContext) {
 		}
+
 		private void logXml(SOAPMessageContext messageContext) {
 
 			var sb = new StringBuilder();
 			var outboundProperty = (Boolean)messageContext.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-			sb.append(outboundProperty.booleanValue() ? "Missarge sortint: " : "Missarge entrant: ");
-			/*@SuppressWarnings("unchecked")
-			Map<String, List<String>> requestHeaders = (Map<String, List<String>>)context.get(MessageContext.HTTP_REQUEST_HEADERS);
-			if (requestHeaders == null) {
-                requestHeaders = new HashMap<String, List<String>>();
-                context.put(MessageContext.HTTP_REQUEST_HEADERS, requestHeaders);
-            }*/
+			sb.append(Boolean.TRUE.equals(outboundProperty) ? "Missarge sortint: " : "Missarge entrant: ");
 			var message = messageContext.getMessage();
 			var baos = new ByteArrayOutputStream();
 			try {
 				message.writeTo(baos);
-				sb.append(baos.toString());
+				sb.append(baos);
 			} catch (Exception ex) {
-				sb.append("Error al imprimir el missatge XML: " + ex.getMessage());
+				sb.append("Error al imprimir el missatge XML: ").append(ex.getMessage());
 			}
 			LOGGER.debug(sb.toString());
 		}

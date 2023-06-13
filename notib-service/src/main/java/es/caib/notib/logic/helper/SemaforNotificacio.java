@@ -12,7 +12,6 @@ public class SemaforNotificacio {
 	public static Map<Long, Integer> semafors = new HashMap<>();
 
 	public static Object getCreacioSemafor() {
-
 		return creacioSemafor;
 	}
 
@@ -26,7 +25,7 @@ public class SemaforNotificacio {
 	@Synchronized
 	public static void alliberar(Long notificacioId) {
 
-		Integer n = semafors.get(notificacioId);
+		var n = semafors.get(notificacioId);
 		if (n-1 == 0) {
 			semafors.remove(notificacioId);
 			return;
@@ -36,16 +35,7 @@ public class SemaforNotificacio {
 
 	@Synchronized
 	public static boolean isSemaforInUse(Long notificacioId) {
-
 		return semafors.get(notificacioId) != null && semafors.get(notificacioId) > 0;
 	}
-
-	//	private boolean isSemaforInUse() {
-//		boolean inUse = true;
-//		synchronized(SemaforNotificacio.creacioSemafor()) {
-//			inUse = false;
-//		}
-//		return inUse;
-//	}
 
 }

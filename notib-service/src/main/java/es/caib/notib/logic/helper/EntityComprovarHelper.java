@@ -8,7 +8,6 @@ import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
-import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.PermissionDeniedException;
 import es.caib.notib.logic.intf.exception.ValidationException;
@@ -39,15 +38,16 @@ import es.caib.notib.persist.repository.ProcSerOrganRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Helper per a la comprovació de l'existencia d'entitats de base de dades.
@@ -89,86 +89,51 @@ public class EntityComprovarHelper {
 	@Autowired
 	private ProcSerOrganRepository procedimentOrganRepository;
 
-	public EntitatEntity comprovarEntitat(
-			Long entitatId,
-			boolean comprovarPermisUsuari,
-			boolean comprovarPermisAdminEntitat,
-			boolean comprovarPermisAplicacio) throws NotFoundException {
+	public EntitatEntity comprovarEntitat(Long entitatId, boolean comprovarPermisUsuari, boolean comprovarPermisAdminEntitat, boolean comprovarPermisAplicacio) throws NotFoundException {
 		return comprovarEntitat(entitatId, comprovarPermisUsuari, comprovarPermisAdminEntitat, comprovarPermisAplicacio, false);
 	}
-	public EntitatEntity comprovarEntitat(
-			Long entitatId,
-			boolean comprovarPermisSuper,
-			boolean comprovarPermisAdminEntitat,
-			boolean comprovarPermisUsuari,
-			boolean comprovarPermisAplicacio) throws NotFoundException {
+	public EntitatEntity comprovarEntitat(Long entitatId, boolean comprovarPermisSuper, boolean comprovarPermisAdminEntitat, boolean comprovarPermisUsuari, boolean comprovarPermisAplicacio) throws NotFoundException {
+
 		if (entitatId == null) {
-			throw new NotFoundException(
-					entitatId,
-					EntitatEntity.class);
+			throw new NotFoundException(entitatId, EntitatEntity.class);
 		}
-		EntitatEntity entitat = entitatRepository.findById(entitatId).orElse(null);
+		var entitat = entitatRepository.findById(entitatId).orElse(null);
 		if (entitat == null) {
-			throw new NotFoundException(
-					entitatId,
-					EntitatEntity.class);
+			throw new NotFoundException(entitatId, EntitatEntity.class);
 		}
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		
-		boolean tePermis = !(comprovarPermisUsuari || comprovarPermisAdminEntitat || comprovarPermisAplicacio);
+		var tePermis = !(comprovarPermisUsuari || comprovarPermisAdminEntitat || comprovarPermisAplicacio);
 		
 		if (comprovarPermisSuper) {
-			for (GrantedAuthority ga: auth.getAuthorities()) {
+			for (var ga: auth.getAuthorities()) {
 				if (ga.toString().equals("NOT_SUPER")) {
 					tePermis = true;
 					break;
 				}
 			}
 		}
-		if (comprovarPermisUsuari) {
-			if (permisosHelper.isGrantedAll(
-					entitatId,
-					EntitatEntity.class,
-					new Permission[] {ExtendedPermission.USUARI},
-					auth))
+		if (comprovarPermisUsuari && (permisosHelper.isGrantedAll(entitatId, EntitatEntity.class, new Permission[] {ExtendedPermission.USUARI}, auth))) {
 				tePermis = true;
 		}	
-		if (comprovarPermisAdminEntitat) {
-			if (permisosHelper.isGrantedAll(
-					entitatId,
-					EntitatEntity.class,
-					new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT},
-					auth))
-				tePermis = true;
+		if (comprovarPermisAdminEntitat && (permisosHelper.isGrantedAll(entitatId, EntitatEntity.class, new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT}, auth))) {
+			tePermis = true;
 		}
-		if (comprovarPermisAplicacio) {
-			if (permisosHelper.isGrantedAny(
-					entitatId,
-					EntitatEntity.class,
-					new Permission[] {ExtendedPermission.APLICACIO},
-					auth))
-				tePermis = true;
+		if (comprovarPermisAplicacio && (permisosHelper.isGrantedAny(entitatId, EntitatEntity.class, new Permission[] {ExtendedPermission.APLICACIO}, auth))) {
+			tePermis = true;
 		}
-		if (tePermis) {
-			return entitat;
-		} else {
-			throw new PermissionDeniedException(
-					entitatId,
-					EntitatEntity.class,
-					auth.getName(),
-					comprovarPermisUsuari ? "USUARI" : comprovarPermisAplicacio ? "APLICACIO" : "ADMINISTRADORENTITAT");
+		if (!tePermis) {
+			var tipus = comprovarPermisUsuari ? "USUARI" : comprovarPermisAplicacio ? "APLICACIO" : "ADMINISTRADORENTITAT";
+			throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(), tipus);
 		}
+		return entitat;
 	}
 	
-	public void comprovarPermisos(
-			Long entitatId,
-			boolean comprovarSuper,
-			boolean comprovarAdmin,
-			boolean comprovarUser) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		boolean tePermis = !(comprovarSuper || comprovarAdmin || comprovarUser);
+	public void comprovarPermisos(Long entitatId, boolean comprovarSuper, boolean comprovarAdmin, boolean comprovarUser) {
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		var tePermis = !(comprovarSuper || comprovarAdmin || comprovarUser);
 		if (comprovarSuper) {
-			for (GrantedAuthority ga: auth.getAuthorities()) {
+			for (var ga: auth.getAuthorities()) {
 				if (ga.toString().equals("NOT_SUPER")) {
 					tePermis = true;
 					break;
@@ -176,7 +141,7 @@ public class EntityComprovarHelper {
 			}
 		}
 		if (comprovarAdmin) {
-			for (GrantedAuthority ga: auth.getAuthorities()) {
+			for (var ga: auth.getAuthorities()) {
 				if (ga.toString().equals("NOT_ADMIN")) {
 					tePermis = true;
 					break;
@@ -184,7 +149,7 @@ public class EntityComprovarHelper {
 			}
 		}
 		if (comprovarUser) {
-			for (GrantedAuthority ga: auth.getAuthorities()) {
+			for (var ga: auth.getAuthorities()) {
 				if (ga.toString().equals("tothom")) {
 					tePermis = true;
 					break;
@@ -193,308 +158,177 @@ public class EntityComprovarHelper {
 		}
 		
 		// Comprovarem que es compleixi algun dels permisos demanats
-		if (tePermis) {
-			return;
-		} else {
-			throw new PermissionDeniedException(
-					entitatId,
-					EntitatEntity.class,
-					auth.getName(),
-					comprovarUser ? "USUARI" : comprovarAdmin ? "ADMINISTRATION" : "SUPERUSUARI");
+		if (!tePermis) {
+			var tipus = comprovarUser ? "USUARI" : comprovarAdmin ? "ADMINISTRATION" : "SUPERUSUARI";
+			throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(), tipus);
 		}
-		
 	}
 
-	public EntitatEntity comprovarEntitat(
-			Long id) {
-		EntitatEntity entitat = entitatRepository.findById(id).orElse(null);
+	public EntitatEntity comprovarEntitat(Long id) {
+
+		var entitat = entitatRepository.findById(id).orElse(null);
 		if (entitat == null) {
-			throw new NotFoundException(
-					id,
-					EntitatEntity.class);
+			throw new NotFoundException(id, EntitatEntity.class);
 		}
 		return entitat;
 	}
 
-	public EntitatEntity comprovarEntitatAplicacio(
-			String dir3Codi) {
-		EntitatEntity entitat = entitatRepository.findByDir3Codi(dir3Codi);
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (!permisosHelper.isGrantedAll(
-				entitat.getId(),
-				EntitatEntity.class,
-				new Permission[] {ExtendedPermission.APLICACIO},
-				auth)) {
-			throw new PermissionDeniedException(
-					entitat.getId(),
-					EntitatEntity.class,
-					auth.getName(),
-					"APLICACIO");
-			
+	public EntitatEntity comprovarEntitatAplicacio(String dir3Codi) {
+
+		var entitat = entitatRepository.findByDir3Codi(dir3Codi);
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!permisosHelper.isGrantedAll(entitat.getId(), EntitatEntity.class, new Permission[] {ExtendedPermission.APLICACIO}, auth)) {
+			throw new PermissionDeniedException(entitat.getId(), EntitatEntity.class, auth.getName(), "APLICACIO");
 		}
 		return entitat;
 	}
 
-	public NotificacioEntity comprovarNotificacioAplicacio(
-			String referencia) {
-		NotificacioEnviamentEntity notificacioEnviament = notificacioEnviamentRepository.findByNotificaReferencia(
-				referencia);
+	public NotificacioEntity comprovarNotificacioAplicacio(String referencia) {
+
+		var notificacioEnviament = notificacioEnviamentRepository.findByNotificaReferencia(referencia);
 		if (notificacioEnviament == null) {
-			throw new NotFoundException(
-					"ref:" + referencia,
-					NotificacioEnviamentEntity.class);
+			throw new NotFoundException("ref:" + referencia, NotificacioEnviamentEntity.class);
 		}
-		EntitatEntity entitat = notificacioEnviament.getNotificacio().getEntitat();
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (!permisosHelper.isGrantedAll(
-				entitat.getId(),
-				EntitatEntity.class,
-				new Permission[] {ExtendedPermission.APLICACIO},
-				auth)) {
-			throw new PermissionDeniedException(
-					entitat.getId(),
-					EntitatEntity.class,
-					auth.getName(),
-					"APLICACIO");
-			
+		var entitat = notificacioEnviament.getNotificacio().getEntitat();
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!permisosHelper.isGrantedAll(entitat.getId(), EntitatEntity.class, new Permission[] {ExtendedPermission.APLICACIO}, auth)) {
+			throw new PermissionDeniedException(entitat.getId(), EntitatEntity.class, auth.getName(), "APLICACIO");
 		}
 		return notificacioEnviament.getNotificacio();
 	}
 	
-	public PagadorPostalEntity comprovarPagadorPostal(
-			Long pagadorPostalId) {
-		PagadorPostalEntity pagadorPostal = pagadorPostalRepository.findById(pagadorPostalId).orElse(null);
+	public PagadorPostalEntity comprovarPagadorPostal(Long pagadorPostalId) {
+
+		var pagadorPostal = pagadorPostalRepository.findById(pagadorPostalId).orElse(null);
 		if (pagadorPostal == null) {
-			throw new NotFoundException(
-					pagadorPostalId,
-					PagadorPostalEntity.class);
+			throw new NotFoundException(pagadorPostalId, PagadorPostalEntity.class);
 		}
-		
 		return pagadorPostal;
 	}
 	
-	public PagadorCieEntity comprovarPagadorCie(
-			Long pagadorCieId) {
-		PagadorCieEntity pagadorCie = pagadorCieRepository.findById(pagadorCieId).orElse(null);
+	public PagadorCieEntity comprovarPagadorCie(Long pagadorCieId) {
+
+		var pagadorCie = pagadorCieRepository.findById(pagadorCieId).orElse(null);
 		if (pagadorCie == null) {
-			throw new NotFoundException(
-					pagadorCieId,
-					PagadorPostalEntity.class);
+			throw new NotFoundException(pagadorCieId, PagadorPostalEntity.class);
 		}
-		
 		return pagadorCie;
 	}
 	
-	public PagadorCieFormatFullaEntity comprovarPagadorCieFormatFulla(
-			Long formatFullaId) {
-		PagadorCieFormatFullaEntity pagadorCieFormatFulla = pagadorCieFormatFullaRepository.findById(formatFullaId).orElse(null);
+	public PagadorCieFormatFullaEntity comprovarPagadorCieFormatFulla(Long formatFullaId) {
+
+		var pagadorCieFormatFulla = pagadorCieFormatFullaRepository.findById(formatFullaId).orElse(null);
 		if (pagadorCieFormatFulla == null) {
-			throw new NotFoundException(
-					formatFullaId,
-					PagadorPostalEntity.class);
+			throw new NotFoundException(formatFullaId, PagadorPostalEntity.class);
 		}
-		
 		return pagadorCieFormatFulla;
 	}
 	
-	public PagadorCieFormatSobreEntity comprovarPagadorCieFormatSobre(
-			Long formatSobreId) {
-		PagadorCieFormatSobreEntity pagadorCieFormatSobre = pagadorCieFormatSobreRepository.findById(formatSobreId).orElse(null);
+	public PagadorCieFormatSobreEntity comprovarPagadorCieFormatSobre(Long formatSobreId) {
+
+		var pagadorCieFormatSobre = pagadorCieFormatSobreRepository.findById(formatSobreId).orElse(null);
 		if (pagadorCieFormatSobre == null) {
-			throw new NotFoundException(
-					formatSobreId,
-					PagadorPostalEntity.class);
+			throw new NotFoundException(formatSobreId, PagadorPostalEntity.class);
 		}
-		
 		return pagadorCieFormatSobre;
 	}
 	
-	public GrupProcSerEntity comprovarGrupProcediment(
-			Long grupProcedimentId) {
-		GrupProcSerEntity grupProcediment = grupProcedimentRepository.findById(grupProcedimentId).orElse(null);
+	public GrupProcSerEntity comprovarGrupProcediment(Long grupProcedimentId) {
+
+		var grupProcediment = grupProcedimentRepository.findById(grupProcedimentId).orElse(null);
 		if (grupProcediment == null) {
-			throw new NotFoundException(
-					grupProcediment,
-					GrupProcSerEntity.class);
+			throw new NotFoundException(grupProcediment, GrupProcSerEntity.class);
 		}
-		
 		return grupProcediment;
 	}
 	
-	
-	public ProcSerEntity comprovarProcediment(
-			EntitatEntity entitat,
-			Long id) {
+	public ProcSerEntity comprovarProcediment(EntitatEntity entitat, Long id) {
 		return comprovarProcediment(entitat.getId(), id);
 	}
 	
-	public ProcSerEntity comprovarProcediment(
-			Long entitatId,
-			Long id) {
+	public ProcSerEntity comprovarProcediment(Long entitatId, Long id) {
 
-		ProcSerEntity procediment = procSerRepository.findById(id).orElse(null);
+		var procediment = procSerRepository.findById(id).orElse(null);
 		if (procediment == null) {
-			throw new NotFoundException(
-					id,
-					ProcedimentEntity.class);
+			throw new NotFoundException(id, ProcedimentEntity.class);
 		}
-		
 		if (entitatId != null && !entitatId.equals(procediment.getEntitat().getId())) {
-			throw new ValidationException(
-					id,
-					ProcedimentEntity.class,
-					"L'entitat especificada (id=" + entitatId + ") no coincideix amb l'entitat del procediment");
+			throw new ValidationException(id, ProcedimentEntity.class, "L'entitat especificada (id=" + entitatId + ") no coincideix amb l'entitat del procediment");
 		}
-		
 		return procediment;
 	}
 	
-	public void comprovarPermisAdminEntitatOAdminOrgan(
-			Long entitatId,
-			Long organGestorId) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		
+	public void comprovarPermisAdminEntitatOAdminOrgan(Long entitatId, Long organGestorId) {
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
 		if (organGestorId != null) {
-			boolean hasPermisAdmin = permisosHelper.isGrantedAll(
-					organGestorId, 
-					OrganGestorEntity.class,
-					new Permission[] {ExtendedPermission.ADMINISTRADOR}, 
-					auth);
+			var hasPermisAdmin = permisosHelper.isGrantedAll(organGestorId, OrganGestorEntity.class, new Permission[] {ExtendedPermission.ADMINISTRADOR}, auth);
 			if (!hasPermisAdmin) {
-				throw new PermissionDeniedException(
-						organGestorId,
-						OrganGestorEntity.class,
-						auth.getName(),
-						"ADMINISTRADOR");
+				throw new PermissionDeniedException(organGestorId, OrganGestorEntity.class, auth.getName(), "ADMINISTRADOR");
 			}
-		} else {
-			boolean hasPermisAdmin = permisosHelper.isGrantedAll(
-					entitatId,
-					EntitatEntity.class,
-					new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT},
-					auth);
-			if (!hasPermisAdmin) {
-				throw new PermissionDeniedException(
-						entitatId,
-						EntitatEntity.class,
-						auth.getName(),
-						"ADMINISTRADORENTITAT");
-			}
+			return;
 		}
-		
+		var hasPermisAdmin = permisosHelper.isGrantedAll(entitatId, EntitatEntity.class, new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT}, auth);
+		if (!hasPermisAdmin) {
+			throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(), "ADMINISTRADORENTITAT");
+		}
 	}
 	
 	public void comprovarPermisosOrganGestor(String organCodiDir3) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		OrganGestorEntity organGestorEntity = organGestorRepository.findByCodi(organCodiDir3);
-		Boolean hasPermisAdminOrgan = permisosHelper.isGrantedAny(
-				organGestorEntity.getId(), 
-				OrganGestorEntity.class, 
-				new Permission[] {ExtendedPermission.ADMINISTRADOR}, 
-				auth);
-		if (!hasPermisAdminOrgan)
-			throw new PermissionDeniedException(
-					organGestorEntity.getId(),
-					OrganGestorEntity.class,
-					auth.getName(),
-					"ADMINISTRADOR");
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		var organGestorEntity = organGestorRepository.findByCodi(organCodiDir3);
+		var hasPermisAdminOrgan = permisosHelper.isGrantedAny(organGestorEntity.getId(), OrganGestorEntity.class, new Permission[]{ExtendedPermission.ADMINISTRADOR}, auth);
+		if (Boolean.FALSE.equals(hasPermisAdminOrgan)) {
+			throw new PermissionDeniedException(organGestorEntity.getId(), OrganGestorEntity.class, auth.getName(), "ADMINISTRADOR");
+		}
 	}
 	
-	public OrganGestorEntity comprovarOrganGestor(
-			EntitatEntity entitat,
-			Long id) {
+	public OrganGestorEntity comprovarOrganGestor(EntitatEntity entitat, Long id) {
 		
-		OrganGestorEntity organGestor = organGestorRepository.findById(id).orElse(null);
+		var organGestor = organGestorRepository.findById(id).orElse(null);
 		if (organGestor == null) {
-			throw new NotFoundException(
-					id,
-					OrganGestorEntity.class);
+			throw new NotFoundException(id, OrganGestorEntity.class);
 		}
-		
 		if (entitat != null && !entitat.equals(organGestor.getEntitat())) {
-			throw new ValidationException(
-					id,
-					OrganGestorEntity.class,
-					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de l'organ gestor");
+			throw new ValidationException(id, OrganGestorEntity.class, "L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de l'organ gestor");
 		}
-		
 		return organGestor;
 	}
-	public OrganGestorEntity comprovarOrganGestor(
-			EntitatEntity entitat,
-			String codi) {
+	public OrganGestorEntity comprovarOrganGestor(EntitatEntity entitat, String codi) {
 		
-		OrganGestorEntity organGestor = organGestorRepository.findByCodi(codi);
+		var organGestor = organGestorRepository.findByCodi(codi);
 		if (organGestor == null) {
-			throw new NotFoundException(
-					codi,
-					OrganGestorEntity.class);
+			throw new NotFoundException(codi, OrganGestorEntity.class);
 		}
-		
 		if (entitat != null && !entitat.equals(organGestor.getEntitat())) {
-			throw new ValidationException(
-					codi,
-					OrganGestorEntity.class,
-					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de l'organ gestor");
+			throw new ValidationException(codi, OrganGestorEntity.class, "L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de l'organ gestor");
 		}
-		
 		return organGestor;
 	}
 
-	public NotificacioEntity comprovarNotificacio(
-			EntitatEntity entitat,
-			Long id) {
+	public NotificacioEntity comprovarNotificacio(EntitatEntity entitat, Long id) {
 		
-		NotificacioEntity notificacio = notificacioRepository.findById(id).orElse(null);
+		var notificacio = notificacioRepository.findById(id).orElse(null);
 		if (notificacio == null) {
-			throw new NotFoundException(
-					id,
-					NotificacioEntity.class);
+			throw new NotFoundException(id, NotificacioEntity.class);
 		}
-		
 		if (entitat != null && !entitat.equals(notificacio.getEntitat())) {
-			throw new ValidationException(
-					id,
-					NotificacioEntity.class,
-					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de la notificació");
+			throw new ValidationException(id, NotificacioEntity.class, "L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de la notificació");
 		}
-		
 		return notificacio;
 	}
 	
-	public ProcSerEntity comprovarProcediment(
-			Long entitatId,
-			Long procedimentId,
-			boolean comprovarPermisConsulta,
-			boolean comprovarPermisProcessar,
-			boolean comprovarPermisNotificacio,
-			boolean comprovarPermisGestio,
-			boolean comprovarPermisComunicacioSir) {
-		
-		EntitatEntity entitatEntity = comprovarEntitat(entitatId);
-		
-		return comprovarProcediment(
-				entitatEntity,
-				procedimentId,
-				comprovarPermisConsulta,
-				comprovarPermisProcessar,
-				comprovarPermisNotificacio,
-				comprovarPermisGestio,
-				comprovarPermisComunicacioSir);
+	public ProcSerEntity comprovarProcediment(Long entitatId, Long procedimentId, boolean comprovarPermisConsulta, boolean comprovarPermisProcessar, boolean comprovarPermisNotificacio, boolean comprovarPermisGestio, boolean comprovarPermisComunicacioSir) {
+
+		var entitatEntity = comprovarEntitat(entitatId);
+		return comprovarProcediment(entitatEntity, procedimentId, comprovarPermisConsulta, comprovarPermisProcessar, comprovarPermisNotificacio, comprovarPermisGestio, comprovarPermisComunicacioSir);
 	}
 	
-	public ProcSerEntity comprovarProcediment(
-			EntitatEntity entitat,
-			Long procedimentId,
-			boolean comprovarPermisConsulta,
-			boolean comprovarPermisProcessar,
-			boolean comprovarPermisNotificacio,
-			boolean comprovarPermisGestio,
-			boolean comprovarPermisComunicacioSir) {
+	public ProcSerEntity comprovarProcediment(EntitatEntity entitat, Long procedimentId, boolean comprovarPermisConsulta, boolean comprovarPermisProcessar, boolean comprovarPermisNotificacio, boolean comprovarPermisGestio, boolean comprovarPermisComunicacioSir) {
 
-		ProcSerEntity procediment = comprovarProcediment(entitat, procedimentId);
-		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		var procediment = comprovarProcediment(entitat, procedimentId);
+		var auth = SecurityContextHolder.getContext().getAuthentication();
 		if (comprovarPermisConsulta) {
 			checkPermisProcediment(procediment, auth, PermisEnum.CONSULTA);
 		}
@@ -510,33 +344,21 @@ public class EntityComprovarHelper {
 		if (comprovarPermisComunicacioSir) {
 			checkPermisProcediment(procediment, auth, PermisEnum.COMUNICACIO_SIR);
 		}
-
 		return procediment;
 	}
+
 	private void checkPermisProcediment(ProcSerEntity procediment, Authentication auth, PermisEnum permis) {
-		boolean granted = hasPermisProcediment(procediment, permis);
+
+		var granted = hasPermisProcediment(procediment, permis);
 		if (!granted) {
-			throw new PermissionDeniedException(
-					procediment.getId(),
-					ProcedimentEntity.class,
-					auth.getName(),
-					getPermissionName(permis));
+			throw new PermissionDeniedException(procediment.getId(), ProcedimentEntity.class, auth.getName(), getPermissionName(permis));
 		}
 	}
 	
-	public ProcSerEntity comprovarProcedimentOrgan(
-			EntitatEntity entitat,
-			Long procedimentId,
-			ProcSerOrganEntity procedimentOrgan,
-			boolean comprovarPermisConsulta,
-			boolean comprovarPermisProcessar,
-			boolean comprovarPermisNotificacio,
-			boolean comprovarPermisGestio,
-			boolean comprovarPermisComunicacioSir) {
+	public ProcSerEntity comprovarProcedimentOrgan(EntitatEntity entitat, Long procedimentId, ProcSerOrganEntity procedimentOrgan, boolean comprovarPermisConsulta, boolean comprovarPermisProcessar, boolean comprovarPermisNotificacio, boolean comprovarPermisGestio, boolean comprovarPermisComunicacioSir) {
 
-		ProcSerEntity procediment = comprovarProcediment(entitat, procedimentId);
-		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		var procediment = comprovarProcediment(entitat, procedimentId);
+		var auth = SecurityContextHolder.getContext().getAuthentication();
 		if (comprovarPermisConsulta) {
 			checkPermisProcedimentOrgan(procedimentOrgan, procediment, auth, PermisEnum.CONSULTA);
 		}
@@ -554,21 +376,15 @@ public class EntityComprovarHelper {
 		}
 		return procediment;
 	}
-	private void checkPermisProcedimentOrgan(
-			ProcSerOrganEntity procedimentOrgan,
-			ProcSerEntity procediment,
-			Authentication auth,
-			PermisEnum permis) {
+	private void checkPermisProcedimentOrgan(ProcSerOrganEntity procedimentOrgan, ProcSerEntity procediment, Authentication auth, PermisEnum permis) {
+
 		// TODO: Comprovar que es correcte --> Al modificar notificació ha donat un error
 		boolean granted = hasPermisProcediment(procediment, permis);
-		if (!granted && procediment.isComu())
+		if (!granted && procediment.isComu()) {
 			granted = hasPermisProcedimentOrgan(procedimentOrgan, permis);
+		}
 		if (!granted) {
-			throw new PermissionDeniedException(
-					procediment.getId(),
-					ProcedimentEntity.class,
-					auth.getName(),
-					getPermissionName(permis));
+			throw new PermissionDeniedException(procediment.getId(), ProcedimentEntity.class, auth.getName(), getPermissionName(permis));
 		}
 	}
 
@@ -580,28 +396,19 @@ public class EntityComprovarHelper {
 	 * @return boleà indicant si té permís.
 	 */
 	public boolean hasPermisOrganGestor(OrganGestorEntity organGestorEntity, PermisEnum permis) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		EntitatEntity entitat = organGestorEntity.getEntitat();
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		var entitat = organGestorEntity.getEntitat();
 		Permission[] permisos = getPermissionsFromName(permis);
 
-		List<OrganGestorEntity> organsGestors = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(
-				entitat.getDir3Codi(),
-				organGestorEntity.getCodi());
-		permisosHelper.filterGrantedAny(
-				organsGestors,
-				new ObjectIdentifierExtractor<OrganGestorEntity>() {
-					public Long getObjectIdentifier(OrganGestorEntity organGestor) {
-						return organGestor.getId();
-					}
-				},
-				OrganGestorEntity.class,
-				permisos,
-				auth);
+		var organsGestors = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(entitat.getDir3Codi(), organGestorEntity.getCodi());
+		permisosHelper.filterGrantedAny(organsGestors, (ObjectIdentifierExtractor<OrganGestorEntity>) AbstractPersistable::getId, OrganGestorEntity.class, permisos, auth);
 		return !organsGestors.isEmpty();
 	}
 
 	public boolean hasPermisProcediment(Long procedimentId, PermisEnum permis) {
-		ProcSerEntity procediment = procSerRepository.findById(procedimentId).get();
+
+		var procediment = procSerRepository.findById(procedimentId).orElseThrow();
 		return hasPermisProcediment(procediment, permis);
 	}
 
@@ -614,73 +421,52 @@ public class EntityComprovarHelper {
 	 * @return
 	 */
 	public boolean hasPermisProcediment(ProcSerEntity procediment, PermisEnum permis) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
 		List<ProcSerEntity> procediments = new ArrayList<>();
 		procediments.add(procediment);
-		
 		// 1. Comprovam si el procediment té assignat el permís d'administration
 		Permission[] permisos = getPermissionsFromName(permis);
-		permisosHelper.filterGrantedAny(
-				procediments,
-				(ObjectIdentifierExtractor<ProcSerEntity>) procediment1 -> procediment1.getId(),
-				ProcedimentEntity.class,
-				permisos,
-				auth);
-		if (!procediments.isEmpty())
+		permisosHelper.filterGrantedAny(procediments, (ObjectIdentifierExtractor<ProcSerEntity>) AbstractPersistable::getId, ProcedimentEntity.class, permisos, auth);
+		if (!procediments.isEmpty()) {
 			return true;
-		
+		}
 		// 2. Comprovam si l'òrgan del procediment o algun organ pare té el permis
 		return hasPermisOrganGestor(procediment.getOrganGestor(), permis);
 	}
 	
-	public boolean hasPermisProcedimentOrgan(
-			Long procedimentOrganId,
-			PermisEnum permis) {
-		ProcSerOrganEntity procedimentOrgan = procedimentOrganRepository.findById(procedimentOrganId).get();
+	public boolean hasPermisProcedimentOrgan(Long procedimentOrganId, PermisEnum permis) {
+
+		var procedimentOrgan = procedimentOrganRepository.findById(procedimentOrganId).orElseThrow();
 		return hasPermisProcedimentOrgan(procedimentOrgan, permis);
 	}
-	public boolean hasPermisProcedimentOrgan(
-			ProcSerOrganEntity procedimentOrgan,
-			PermisEnum permis) {
-		if (procedimentOrgan != null) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			List<ProcSerOrganEntity> procedimentOrgans = new ArrayList<ProcSerOrganEntity>();
-			procedimentOrgans.add(procedimentOrgan);
-			
-			Permission[] permisos = getPermissionsFromName(permis);
-			permisosHelper.filterGrantedAny(
-					procedimentOrgans,
-					new ObjectIdentifierExtractor<ProcSerOrganEntity>() {
-						public Long getObjectIdentifier(ProcSerOrganEntity procedimentOrgan) {
-							return procedimentOrgan.getId();
-						}
-					},
-					ProcSerOrganEntity.class,
-					permisos,
-					auth);
-			if (!procedimentOrgans.isEmpty())
-				return true;
+	public boolean hasPermisProcedimentOrgan(ProcSerOrganEntity procedimentOrgan, PermisEnum permis) {
+
+		if (procedimentOrgan == null) {
+			return false;
 		}
-		return false;
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			List<ProcSerOrganEntity> procedimentOrgans = new ArrayList<>();
+			procedimentOrgans.add(procedimentOrgan);
+			Permission[] permisos = getPermissionsFromName(permis);
+			permisosHelper.filterGrantedAny(procedimentOrgans, (ObjectIdentifierExtractor<ProcSerOrganEntity>) AbstractPersistable::getId, ProcSerOrganEntity.class, permisos, auth);
+		return !procedimentOrgans.isEmpty();
 	}
 	
 	public Permission[] getPermissionsFromName(PermisEnum permis) {
-		Permission perm = getPermissionFromName(permis);
-		if (perm == null)
-			return null;
-		else
-			return new Permission[] {perm};
+
+		var perm = getPermissionFromName(permis);
+		return perm != null ? new Permission[] {perm} : null;
 	}
 
 	public Permission[] getPermissionsFromName(String permis) {
-		Permission perm = getPermissionFromName(permis);
-		if (perm == null)
-			return null;
-		else
-			return new Permission[] {perm};
+
+		var perm = getPermissionFromName(permis);
+		return perm == null ? new Permission[] {perm} : null;
 	}
 	
 	public Permission getPermissionFromName(PermisEnum permis) {
+
 		switch (permis) {
 			case CONSULTA: return ExtendedPermission.READ;
 			case PROCESSAR: return ExtendedPermission.PROCESSAR;
@@ -695,6 +481,7 @@ public class EntityComprovarHelper {
 	}
 
 	public Permission getPermissionFromName(String permis) {
+
 		switch (permis) {
 			case "CONSULTA": return ExtendedPermission.READ;
 			case "PROCESSAR": return ExtendedPermission.PROCESSAR;
@@ -709,74 +496,50 @@ public class EntityComprovarHelper {
 	}
 	
 	public String getPermissionName(PermisEnum permis) {
+
 		switch (permis) {
-		case CONSULTA: return "READ";
-		case PROCESSAR: return "PROCESSAR";
-		case NOTIFICACIO: return "NOTIFICACIO";
-		case COMUNICACIO: return "COMUNICACIO";
-		case GESTIO: return "ADMINISTRATION";
-		case COMUNICACIO_SIR: return "COMUNIACIO_SIR";
-		case ADMIN: return "ADMINISTRADOR";
-		default: return null;
+			case CONSULTA: return "READ";
+			case PROCESSAR: return "PROCESSAR";
+			case NOTIFICACIO: return "NOTIFICACIO";
+			case COMUNICACIO: return "COMUNICACIO";
+			case GESTIO: return "ADMINISTRATION";
+			case COMUNICACIO_SIR: return "COMUNIACIO_SIR";
+			case ADMIN: return "ADMINISTRADOR";
+			default: return null;
 		}
 	}
 	
-	public GrupEntity comprovarGrup(
-			Long grupId) {
-		GrupEntity grup = grupRepository.findById(grupId).orElse(null);
+	public GrupEntity comprovarGrup(Long grupId) {
+
+		var grup = grupRepository.findById(grupId).orElse(null);
 		if (grup == null) {
-			throw new NotFoundException(
-					grupId,
-					GrupEntity.class);
+			throw new NotFoundException(grupId, GrupEntity.class);
 		}
-		
 		return grup;
 	}
 	
-	public List<GrupEntity> comprovarGrups(
-			List<GrupDto> grups) {
+	public List<GrupEntity> comprovarGrups(List<GrupDto> grups) {
 		
-		List<GrupEntity> grupsEntity = new ArrayList<GrupEntity>();
-		
+		List<GrupEntity> grupsEntity = new ArrayList<>();
+
+		Optional<GrupEntity> opt;
 		for (GrupDto grupdto : grups) {
-			GrupEntity grup = grupRepository.findById(grupdto.getId()).get();
-			
-			grupsEntity.add(grup);
-			
-			if (grup == null) {
-				throw new NotFoundException(
-						grupdto.getId(),
-						GrupEntity.class);
+			opt = grupRepository.findById(grupdto.getId());
+
+			if (opt.isEmpty()) {
+				throw new NotFoundException(grupdto.getId(), GrupEntity.class);
 			}
+			grupsEntity.add(opt.get());
 		}
 		return grupsEntity;
 	}
 
-	public List<EntitatDto> findPermisEntitat(
-			Permission[] permisos) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<EntitatEntity> entitatsEntity = entitatRepository.findAll();
-		List<EntitatDto> resposta;
-		
-		permisosHelper.filterGrantedAny(
-				entitatsEntity,
-				new ObjectIdentifierExtractor<EntitatEntity>() {
-					public Long getObjectIdentifier(EntitatEntity entitatEntity) {
-						return entitatEntity.getId();
-					}
-				},
-				EntitatEntity.class,
-				permisos,
-				auth);
-		resposta = conversioTipusHelper.convertirList(
-				entitatsEntity,
-				EntitatDto.class);
-		
-		return resposta;
-	}
-	public List<ProcSerDto> findGrupProcedimentsUsuariActual() {
-		
-		return null;
+	public List<EntitatDto> findPermisEntitat(Permission[] permisos) {
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		var entitatsEntity = entitatRepository.findAll();
+		permisosHelper.filterGrantedAny(entitatsEntity, (ObjectIdentifierExtractor<EntitatEntity>) AbstractPersistable::getId, EntitatEntity.class, permisos, auth);
+		return conversioTipusHelper.convertirList(entitatsEntity, EntitatDto.class);
 	}
 
 }

@@ -10,25 +10,23 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
-import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
-import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.Date;
-import java.util.Set;
 
 /**
  * Helper per a interactuar amb el servei web de Notific@.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class RegistreHelper {
 	
@@ -50,91 +48,69 @@ public class RegistreHelper {
 	private NotificacioTableHelper notificacioTableHelper;
 	@Autowired
 	private EnviamentTableHelper enviamentTableHelper;
-	@Autowired
-	private EnviamentHelper enviamentHelper;
+
 
 	public NotificacioEnviamentEntity enviamentRefrescarEstatRegistre(Long enviamentId) {
 
-		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacio().getId()).orElseThrow();
-
-		LogTimeHelper log = new LogTimeHelper(logger);
-		log.info(" [SIR] Inici actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-
-		boolean error = false;
-		String errorPrefix = "Error al consultar l'estat d'un Registre (" + "notificacioId=" + notificacio.getId() + ", " + "registreNumeroFormatat=" + enviament.getRegistreNumeroFormatat() + ")";
+		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+		var notificacio = notificacioRepository.findById(enviament.getNotificacio().getId()).orElseThrow();
+		var log = new LogTimeHelper(logger);
+		var estatText =  ", Estat: ";
+		var fiActEstatRegistreText = " [SIR] Fi actualitzar estat registre enviament [Id: ";
+		log.info(" [SIR] Inici actualitzar estat registre enviament [Id: " + enviament.getId() + estatText + enviament.getNotificaEstat() + "]");
+		var error = false;
+		var errorPrefix = "Error al consultar l'estat d'un Registre (" + "notificacioId=" + notificacio.getId() + ", " + "registreNumeroFormatat=" + enviament.getRegistreNumeroFormatat() + ")";
 		String errorDescripcio = null;
-		boolean canviEstat = false;
-		boolean errorUltimaConsulta = enviament.getSirConsultaIntent() > 0;
+		var canviEstat = false;
+		var errorUltimaConsulta = enviament.getSirConsultaIntent() > 0;
 		try {
 			// Validacions
 			if (enviament.getRegistreNumeroFormatat() == null) {
-				log.infoWithoutTime(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]. L'enviament no té número de registre SIR");
+				log.infoWithoutTime(fiActEstatRegistreText + enviament.getId() + estatText + enviament.getNotificaEstat() + "]. L'enviament no té número de registre SIR");
 				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, "L'enviament no té número de registre SIR");
 			}
-
 			log.debugWithoutTime("Comunicació SIR --> número registre formatat: " + enviament.getRegistreNumeroFormatat());
-
 			// Consulta al registre
-			RespostaConsultaRegistre resposta = pluginHelper.obtenerAsientoRegistral(
-					notificacio.getEntitat().getDir3Codi(),
-					enviament.getRegistreNumeroFormatat(),
-					2L,  //registre sortida
-					false);
-
+			var resposta = pluginHelper.obtenerAsientoRegistral(notificacio.getEntitat().getDir3Codi(), enviament.getRegistreNumeroFormatat(), 2L,  /*registre sortida*/ false);
 			log.info(" [TIMER-SIR] Obtener asiento registral  [Id: " + enviamentId + "]");
-
 			// Consulta retorna error
 			if (resposta.getErrorCodi() != null && !resposta.getErrorCodi().isEmpty()) {
 				throw new RegistreNotificaException(resposta.getErrorDescripcio());
-
-			// Consulta retorna correctement
-			} else {
-				canviEstat = !enviament.getRegistreEstat().equals(resposta.getEstat());
-				enviamentUpdateDatat(
-						resposta.getEstat(),
-						resposta.getRegistreData(),
-						resposta.getSirRecepecioData(),
-						resposta.getSirRegistreDestiData(),
-						resposta.getRegistreNumeroFormatat(),
-						enviament);
-				log.info(" [TIMER-SIR] Actualitzar estat comunicació SIR [Id: " + enviamentId + "]: ");
-
-				if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
-					emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
-					log.info(" [TIMER-SIR] Preparar enviament mail notificació [Id: " + enviamentId + "]");
-				}
-				enviament.refreshSirConsulta();
 			}
-			log.infoWithoutTime(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-
+			// Consulta retorna correctement
+			canviEstat = !enviament.getRegistreEstat().equals(resposta.getEstat());
+			enviamentUpdateDatat(resposta.getEstat(), resposta.getRegistreData(), resposta.getSirRecepecioData(), resposta.getSirRegistreDestiData(), resposta.getRegistreNumeroFormatat(), enviament);
+			log.info(" [TIMER-SIR] Actualitzar estat comunicació SIR [Id: " + enviamentId + "]: ");
+			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
+				emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
+				log.info(" [TIMER-SIR] Preparar enviament mail notificació [Id: " + enviamentId + "]");
+			}
+			enviament.refreshSirConsulta();
+			log.infoWithoutTime(fiActEstatRegistreText + enviament.getId() + estatText + enviament.getNotificaEstat() + "]");
 		} catch (Exception ex) {
 			error = true;
 			errorDescripcio = getErrorDescripcio(enviament.getSirConsultaIntent(), ex);
 			logger.error(errorPrefix, ex);
 		}
-
-		boolean errorMaxReintents = false;
+		var errorMaxReintents = false;
 		if (error) {
 			enviament.updateSirNovaConsulta(pluginHelper.getConsultaSirReintentsPeriodeProperty());
 			errorMaxReintents = enviament.getSirConsultaIntent() >= pluginHelper.getConsultaSirReintentsMaxProperty();
 		}
-
 		notificacioEventHelper.addSirConsultaEvent(enviament, error, errorDescripcio, errorMaxReintents);
 		if (canviEstat || error && !errorUltimaConsulta || !error && errorUltimaConsulta) {
 			callbackHelper.updateCallback(enviament, error, errorDescripcio);
 		}
-		logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-
+		log.info(fiActEstatRegistreText + enviament.getId() + estatText + enviament.getNotificaEstat() + "]");
 		enviamentTableHelper.actualitzarRegistre(enviament);
 		auditHelper.auditaEnviament(enviament, TipusOperacio.UPDATE, "RegistreHelper.enviamentRefrescarEstatRegistre");
 		return enviament;
 	}
 
 	private static String getErrorDescripcio(int intent, Exception ex) {
-		String errorDescripcio;
+
 		// Generam el missatge d'error
-		errorDescripcio = "Intent " + intent + "\n\n";
+		var errorDescripcio = "Intent " + intent + "\n\n";
 		if (ex instanceof ValidationException || ex instanceof RegistreNotificaException) {
 			errorDescripcio += ex.getMessage();
 		} else {
@@ -144,24 +120,13 @@ public class RegistreHelper {
 	}
 
 
-	public void enviamentUpdateDatat(
-			NotificacioRegistreEstatEnumDto registreEstat,
-			Date registreEstatData,
-			Date sirRecepcioData,
-			Date sirRegistreDestiData,
-			String registreNumeroFormatat,
-			NotificacioEnviamentEntity enviament) {
-		logger.debug("Estat actual: " + registreEstat.name());
-		enviament.updateRegistreEstat(
-				registreEstat,
-				registreEstatData,
-				sirRecepcioData,
-				sirRegistreDestiData,
-				registreNumeroFormatat);
-		
-		boolean estatsEnviamentsFinals = true;
-		Set<NotificacioEnviamentEntity> enviaments = enviament.getNotificacio().getEnviaments();
-		for (NotificacioEnviamentEntity env: enviaments) {
+	public void enviamentUpdateDatat(NotificacioRegistreEstatEnumDto registreEstat, Date registreEstatData, Date sirRecepcioData, Date sirRegistreDestiData, String registreNumeroFormatat, NotificacioEnviamentEntity enviament) {
+
+		log.debug("Estat actual: " + registreEstat.name());
+		enviament.updateRegistreEstat(registreEstat, registreEstatData, sirRecepcioData, sirRegistreDestiData, registreNumeroFormatat);
+		var estatsEnviamentsFinals = true;
+		var enviaments = enviament.getNotificacio().getEnviaments();
+		for (var env: enviaments) {
 			if (env.getId().equals(enviament.getId())) {
 				env = enviament;
 			}
@@ -170,21 +135,20 @@ public class RegistreHelper {
 				break;
 			}
 		}
-		logger.debug("Estat final: " + estatsEnviamentsFinals);
+		log.debug("Estat final: " + estatsEnviamentsFinals);
 		if (estatsEnviamentsFinals) {
-			NotificacioEstatEnumDto nouEstat = NotificacioEstatEnumDto.FINALITZADA;
+			var nouEstat = NotificacioEstatEnumDto.FINALITZADA;
 			//Marcar com a processada si la notificació s'ha fet des de una aplicació
 			if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {
 				nouEstat = NotificacioEstatEnumDto.PROCESSADA;
 			}
-
 			enviament.getNotificacio().updateEstat(nouEstat);
 			enviament.getNotificacio().updateMotiu(registreEstat.name());
 			enviament.getNotificacio().updateEstatDate(new Date());
 			notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(enviament.getNotificacio().getId()).estat(nouEstat).estatDate(new Date()).build());
 			auditHelper.auditaNotificacio(enviament.getNotificacio(), TipusOperacio.UPDATE, "RegistreHelper.enviamentUpdateDatat");
 		}
-		logger.debug("L'estat de la comunicació SIR s'ha actualitzat correctament.");
+		log.debug("L'estat de la comunicació SIR s'ha actualitzat correctament.");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(RegistreHelper.class);

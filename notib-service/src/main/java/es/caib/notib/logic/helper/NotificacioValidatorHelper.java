@@ -31,6 +31,7 @@ import java.util.Map;
 @Slf4j
 @Component
 public class NotificacioValidatorHelper {
+
 	@Resource
 	private CacheHelper cacheHelper;
 	@Autowired
@@ -45,10 +46,9 @@ public class NotificacioValidatorHelper {
 	public List<String> validarNotificacioMassiu(@NonNull NotificacioDatabaseDto notificacio, @NonNull EntitatEntity entitat, Map<String, Long> documentsProcessatsMassiu) {
 
 		log.info("[NOT-VALIDACIO] Validació notificació de nova notificacio massiva");
-		List<String> errors = notificacio.getErrors();
-		boolean comunicacioSenseAdministracio = false;
-		String emisorDir3Codi = notificacio.getEmisorDir3Codi(); //entitat.getDir3Codi() entidad actual
-		Map<String, OrganismeDto> organigramaByEntitat = organGestorCachable.findOrganigramaByEntitat(emisorDir3Codi);
+		var errors = notificacio.getErrors();
+		var emisorDir3Codi = notificacio.getEmisorDir3Codi(); //entitat.getDir3Codi() entidad actual
+		var organigramaByEntitat = organGestorCachable.findOrganigramaByEntitat(emisorDir3Codi);
 
 		// Emisor
 		if (emisorDir3Codi == null || emisorDir3Codi.isEmpty()) {
@@ -59,10 +59,9 @@ public class NotificacioValidatorHelper {
 
 		// Entitat
 		if (entitat == null) {
-			errors.add(
-					messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.a")
-							+ emisorDir3Codi +
-							messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.b"));
+			var a = messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.a");
+			var b = messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.b");
+			errors.add(a + emisorDir3Codi + b);
 		} else if (!entitat.isActiva()) {
 			errors.add(messageHelper.getMessage("error.validacio.entitat.desactivada.per.enviament.notificacions"));
 		}
@@ -74,25 +73,25 @@ public class NotificacioValidatorHelper {
 			if (notificacio.getConcepte().length() > 240) {
 				errors.add(messageHelper.getMessage("error.validacio.concepte.longitud.max"));
 			}
-			List<Character> caractersNoValids = validFormat(notificacio.getConcepte());
+			var caractersNoValids = validFormat(notificacio.getConcepte());
 			if (!caractersNoValids.isEmpty()) {
-				errors.add(messageHelper.getMessage("error.validacio.concepte.format.invalid.a") +
-						StringUtils.join(caractersNoValids, ',')
-						+ messageHelper.getMessage("error.validacio.concepte.format.invalid.b"));
+				var a = messageHelper.getMessage("error.validacio.concepte.format.invalid.a");
+				var b = messageHelper.getMessage("error.validacio.concepte.format.invalid.b");
+				errors.add(a + StringUtils.join(caractersNoValids, ',') + b);
 			}
 		}
 
 		// Descripció
-		String desc = notificacio.getDescripcio();
+		var desc = notificacio.getDescripcio();
 		if (!Strings.isNullOrEmpty(desc)) {
 			if (desc.length() > 1000) {
 				errors.add(messageHelper.getMessage("error.validacio.descripcio.notificacio.longitud.max"));
 			}
 			List<Character> caractersNoValids = validFormat(notificacio.getConcepte());
 			if (!caractersNoValids.isEmpty()) {
-				errors.add(messageHelper.getMessage("error.validacio.descripcio.invalid.a") +
-						StringUtils.join(caractersNoValids, ',')
-						+ messageHelper.getMessage("error.validacio.descripcio.invalid.b"));
+				var a = messageHelper.getMessage("error.validacio.descripcio.invalid.a");
+				var b = messageHelper.getMessage("error.validacio.descripcio.invalid.b");
+				errors.add(a + StringUtils.join(caractersNoValids, ',') + b);
 			}
 		}
 
@@ -112,15 +111,9 @@ public class NotificacioValidatorHelper {
 		if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {
 			errors.add(messageHelper.getMessage("error.validacio.enviaments.no.null"));
 		} else {
-			for (NotEnviamentDatabaseDto enviament : notificacio.getEnviaments()) {
+			for (var enviament : notificacio.getEnviaments()) {
 				//Si és comunicació a administració i altres mitjans (persona física/jurídica) --> Excepció
-				if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO) {
-					if ((enviament.getTitular().getInteressatTipus() == InteressatTipus.FISICA) ||
-							(enviament.getTitular().getInteressatTipus() == InteressatTipus.JURIDICA)) {
-						comunicacioSenseAdministracio = true;
-					}
-				}
-				boolean senseNif = true;
+				var senseNif = true;
 
 				// Servei tipus
 				// Per defecte es posa a normal
@@ -155,7 +148,7 @@ public class NotificacioValidatorHelper {
 					if (!InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())
 							&& enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
 
-						String nif = enviament.getTitular().getNif();
+						var nif = enviament.getTitular().getNif();
 						if (NifHelper.isvalid(nif)) {
 							senseNif = false;
 							switch (enviament.getTitular().getInteressatTipus()) {
@@ -171,13 +164,15 @@ public class NotificacioValidatorHelper {
 									break;
 								case ADMINISTRACIO:
 									break;
+								default:
+									break;
 							}
 						} else {
 							errors.add(messageHelper.getMessage("error.validacio.nif.titular.invalid"));
 						}
 					}
 					// - Email
-					String email = enviament.getTitular().getEmail();
+					var email = enviament.getTitular().getEmail();
 					if (email != null && email.length() > 160) {
 						errors.add(messageHelper.getMessage("error.validacio.email.titular.longitud.max"));
 					}
@@ -293,83 +288,63 @@ public class NotificacioValidatorHelper {
 			errors.add(messageHelper.getMessage("error.validacio.procediment.codi.longitud.max"));
 		}
 
-		if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO ) {
-			if (notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) {
-				errors.add(messageHelper.getMessage("error.validacio.procediment.codi.no.null"));
-			}
+		if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO &&
+			(notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null)) {
+
+			errors.add(messageHelper.getMessage("error.validacio.procediment.codi.no.null"));
 		}
-//		else if ((notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) && notificacio.getOrganGestorCodi() == null){
-//			errors.add(messageHelper.getMessage("error.validacio.organ.gestor.no.null.comunicacio.administracio.sense.procediment"));
-//		}
-//		if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO && comunicacioSenseAdministracio) {
-//			if (notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) {
-//				errors.add(messageHelper.getMessage("error.validacio.procediment.codi.no.null"));
-//			}
-//		}
 		if (!organigramaByEntitat.containsKey(notificacio.getOrganGestorCodi())) {
 			errors.add(messageHelper.getMessage("error.validacio.organ.gestor.no.organ.entitat"));
 		}
-		//TODO: está fallando en REST y aquí esta validación. Es correcto???
-		// Respuesta: Por ahora no pongas esta validación. Lo consultaré con la DGTIC. Pero el problema no es la validación. Son los datos utilizados.
-		// Otra cosa es que la validación NO se tiene que hacer si notificacio.getOrganGestor() == null en el caso de REST.
-		// Entiendo que para CSV siempre tienen que enviarla.
-		// En el CSV me indican órgano y procedimiento. Si el procedimiento no es común y es de otro órgano => error
-//		if (notificacio.getProcediment() != null && !notificacio.getProcediment().isComu()) {
-//		 if (notificacio.getOrganGestorCodi() != notificacio.getProcediment().getOrganGestor()) {
-//				errors.add("[1024] El camp 'organ gestor' no es correspon a l'òrgan gestor de l'procediment.");
-//			}
-//		}
 
 		// Documents
-		DocumentDto document = notificacio.getDocument();
+		var document = notificacio.getDocument();
 		if (document == null) {
 			errors.add(messageHelper.getMessage("error.validacio.document.no.null"));
-		} else {
-			if (document.getArxiuNom() != null && document.getArxiuNom().length() > 200) {
-				errors.add(messageHelper.getMessage("error.validacio.arxiu.nom.longitud.max"));
-			}
+			return errors;
+		}
+		if (document.getArxiuNom() != null && document.getArxiuNom().length() > 200) {
+			errors.add(messageHelper.getMessage("error.validacio.arxiu.nom.longitud.max"));
+		}
 
-			if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
-					(documentsProcessatsMassiu.containsKey(document.getArxiuNom()) &&
-							documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
-				if ((document.getContingutBase64() == null || document.getContingutBase64().isEmpty()) &&
-						(document.getCsv() == null || document.getCsv().isEmpty()) &&
-						(document.getUrl() == null || document.getUrl().isEmpty()) &&
-						(document.getUuid() == null || document.getUuid().isEmpty())) {
-					errors.add(messageHelper.getMessage("error.validacio.document.necessari"));
+		if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
+			(documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && documentsProcessatsMassiu.get(document.getArxiuNom()) == null) &&
+			((document.getContingutBase64() == null || document.getContingutBase64().isEmpty()) &&
+			(document.getCsv() == null || document.getCsv().isEmpty()) &&
+			(document.getUrl() == null || document.getUrl().isEmpty()) &&
+			(document.getUuid() == null || document.getUuid().isEmpty()))) {
+
+				errors.add(messageHelper.getMessage("error.validacio.document.necessari"));
+		}
+
+		if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
+				(documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
+
+			if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
+				if (!MimeUtils.isFormatValid(document.getMediaType(), document.getContingutBase64())) {
+					errors.add(messageHelper.getMessage("error.validacio.document.format.invalid"));
+				}
+				if (document.getMida() > getMaxSizeFile()) {
+					var a = messageHelper.getMessage("error.validacio.document.longitud.max.a");
+					var b = messageHelper.getMessage("error.validacio.document.longitud.max.b");
+					errors.add(a + getMaxSizeFile() / (1024*1024) + b);
 				}
 			}
 
-			if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
-					(documentsProcessatsMassiu.containsKey(document.getArxiuNom()) &&
-							documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
-
-				if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
-					if (!MimeUtils.isFormatValid(document.getMediaType(), document.getContingutBase64())) {
-						errors.add(messageHelper.getMessage("error.validacio.document.format.invalid"));
-					}
-					if (document.getMida() > getMaxSizeFile()) {
-						errors.add(messageHelper.getMessage("error.validacio.document.longitud.max.a")
-								+ getMaxSizeFile() / (1024*1024) +
-								messageHelper.getMessage("error.validacio.document.longitud.max.b"));
-					}
+			// Metadades
+			if ((document.getContingutBase64() != null && !document.getContingutBase64().isEmpty())
+					&& registreNotificaHelper.isSendDocumentsActive()) {
+				if (document.getOrigen() == null) {
+					errors.add(messageHelper.getMessage("error.validacio.metadades.document.origen.no.informat"));
 				}
-
-				// Metadades
-				if ((document.getContingutBase64() != null && !document.getContingutBase64().isEmpty())
-						&& registreNotificaHelper.isSendDocumentsActive()) {
-					if (document.getOrigen() == null) {
-						errors.add(messageHelper.getMessage("error.validacio.metadades.document.origen.no.informat"));
-					}
-					if (document.getValidesa() == null) {
-						errors.add(messageHelper.getMessage("error.validacio.metadades.document.validesa.no.informat"));
-					}
-					if (document.getTipoDocumental() == null) {
-						errors.add(messageHelper.getMessage("error.validacio.metadades.document.tipus.documental.no.informat"));
-					}
-					if (document.getArxiuNom().toUpperCase().endsWith("PDF") && document.getModoFirma() == null) {
-						errors.add(messageHelper.getMessage("error.validacio.metadades.document.mode.firma.no.informat"));
-					}
+				if (document.getValidesa() == null) {
+					errors.add(messageHelper.getMessage("error.validacio.metadades.document.validesa.no.informat"));
+				}
+				if (document.getTipoDocumental() == null) {
+					errors.add(messageHelper.getMessage("error.validacio.metadades.document.tipus.documental.no.informat"));
+				}
+				if (document.getArxiuNom().toUpperCase().endsWith("PDF") && document.getModoFirma() == null) {
+					errors.add(messageHelper.getMessage("error.validacio.metadades.document.mode.firma.no.informat"));
 				}
 			}
 		}
@@ -378,15 +353,15 @@ public class NotificacioValidatorHelper {
 
 
 	private ArrayList<Character> validFormat(String value) {
-		String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
-		ArrayList<Character> charsNoValids = new ArrayList<Character>();
-		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
 
-		boolean esCaracterValid = true;
-		for (int i = 0; i < chars.length; i++) {
-			esCaracterValid = !(CONTROL_CARACTERS.indexOf(chars[i]) < 0);
+		var CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
+		ArrayList<Character> charsNoValids = new ArrayList<>();
+		var chars = value.replace("\n", "").replace("\r", "").toCharArray();
+		var esCaracterValid = true;
+		for (char aChar : chars) {
+			esCaracterValid = !(CONTROL_CARACTERS.indexOf(aChar) < 0);
 			if (!esCaracterValid) {
-				charsNoValids.add(chars[i]);
+				charsNoValids.add(aChar);
 			}
 		}
 		return charsNoValids;
@@ -394,14 +369,14 @@ public class NotificacioValidatorHelper {
 
 
 	private boolean isEmailValid(String email) {
-		boolean valid = true;
+
 		try {
 			InternetAddress emailAddr = new InternetAddress(email);
 			emailAddr.validate();
+			return true;
 		} catch (Exception e) {
-			valid = false; //no vàlid
+			return false; //no vàlid
 		}
-		return valid;
 	}
 
 	private Long getMaxSizeFile() {

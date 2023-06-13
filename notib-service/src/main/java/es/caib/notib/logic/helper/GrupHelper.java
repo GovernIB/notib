@@ -17,18 +17,6 @@ public class GrupHelper {
 		dto.setId(grup.getId());
 		dto.setCodi(grup.getCodi());
 		dto.setNom(grup.getNom());
-
-		/*dto.setCreatedBy(
-				conversioTipusHelper.convertir(
-				pagadorPostal.getCreatedBy(),
-				UsuariDto.class));
-		dto.setCreatedDate(pagadorPostal.getCreatedDate().toDate());
-		dto.setLastModifiedBy(
-				conversioTipusHelper.convertir(
-						pagadorPostal.getLastModifiedBy(),
-						UsuariDto.class));
-		dto.setLastModifiedDate(pagadorPostal.getLastModifiedDate().toDate());*/
-
 		return dto;
 	}
 	

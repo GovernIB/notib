@@ -9,30 +9,31 @@ import java.util.Date;
 public class FiltreHelper {
 
     public static Date toIniciDia(Date data) {
-        if (data != null) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(data);
-            cal.set(Calendar.HOUR, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            data = cal.getTime();
+
+        if (data == null) {
+            return data;
         }
-        return data;
+        var cal = Calendar.getInstance();
+        cal.setTime(data);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
     }
 
     public static Date toFiDia(Date data) {
 
-        if (data != null) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(data);
-            cal.set(Calendar.HOUR, 23);
-            cal.set(Calendar.MINUTE, 59);
-            cal.set(Calendar.SECOND, 59);
-            cal.set(Calendar.MILLISECOND, 999);
-            data = cal.getTime();
+        if (data == null) {
+            return data;
         }
-        return data;
+        var cal = Calendar.getInstance();
+        cal.setTime(data);
+        cal.set(Calendar.HOUR, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
+        return cal.getTime();
     }
 
     @Getter
@@ -47,10 +48,7 @@ public class FiltreHelper {
         }
 
         public boolean isNull() {
-            if (isNull == null) {
-                return field == null;
-            }
-            return isNull;
+            return isNull != null ? isNull : field == null;
         }
     }
 
@@ -59,6 +57,8 @@ public class FiltreHelper {
         public StringField(String field) {
             super(field == null ? "" : field);
         }
+
+        @Override
         public boolean isNull() {
             return field.isEmpty();
         }

@@ -53,17 +53,14 @@ public class DocumentHelper {
     private byte[] downloadUsingStream(String urlStr, String file) throws IOException {
 
         var url = new URL(urlStr);
-        var bis = new BufferedInputStream(url.openStream());
-        var fis = new FileOutputStream(file);
-        var buffer = new byte[1024];
-        var count = 0;
-        while((count = bis.read(buffer,0,1024)) != -1)
-        {
-            fis.write(buffer, 0, count);
+        try (var bis = new BufferedInputStream(url.openStream()); var fis = new FileOutputStream(file)) {
+            var buffer = new byte[1024];
+            var count = 0;
+            while ((count = bis.read(buffer, 0, 1024)) != -1) {
+                fis.write(buffer, 0, count);
+            }
+            return buffer;
         }
-        fis.close();
-        bis.close();
-        return buffer;
     }
 
 }

@@ -38,9 +38,6 @@ import java.util.stream.Collectors;
 @Component
 public class IntegracioHelper {
 
-//	@Resource
-//	private UsuariHelper usuariHelper;
-
 	@Autowired
 	private UsuariRepository usuariRepository;
 	@Autowired
@@ -49,8 +46,6 @@ public class IntegracioHelper {
 	private MonitorIntegracioRepository monitorRepository;
 	@Autowired
 	private MonitorIntegracioParamRepository monitorParamRepository;
-//	@Autowired
-//	private ConversioTipusHelper conversio;
 
 	public static final String INTCODI_USUARIS = "USUARIS";
 	public static final String INTCODI_REGISTRE = "REGISTRE";
@@ -61,12 +56,12 @@ public class IntegracioHelper {
 	public static final String INTCODI_UNITATS = "UNITATS";
 	public static final String INTCODI_GESCONADM = "GESCONADM";
 	public static final String INTCODI_PROCEDIMENT = "PROCEDIMENTS";
-//	public static final String INTCODI_CONVERT = "CONVERT";
 	public static final String INTCODI_FIRMASERV = "FIRMASERV";
 	public static final String INTCODI_VALIDASIG = "VALIDASIG";
 	public static final String CARPETA = "CARPETA";
 
 	public List<IntegracioDto> findAll() {
+
 		List<IntegracioDto> integracions = new ArrayList<>();
 		integracions.add(novaIntegracio(INTCODI_USUARIS));
 		integracions.add(novaIntegracio(INTCODI_REGISTRE));
@@ -83,7 +78,8 @@ public class IntegracioHelper {
 	}
 
 	public Map<String, Integer> countErrorsGroupByCodi() {
-		Map<String ,Integer> errorsGroupByCodi = new HashMap<String, Integer>();
+
+		Map<String ,Integer> errorsGroupByCodi = new HashMap<>();
 		errorsGroupByCodi.put(INTCODI_USUARIS,countErrors(INTCODI_USUARIS));
 		errorsGroupByCodi.put(INTCODI_REGISTRE,countErrors(INTCODI_REGISTRE));
 		errorsGroupByCodi.put(INTCODI_NOTIFICA,countErrors(INTCODI_NOTIFICA));
@@ -105,19 +101,10 @@ public class IntegracioHelper {
 //	@Transactional
 	public void addAccioOk(IntegracioInfo info, boolean obtenirUsuari) {
 
-		MonitorIntegracioEntity accio = MonitorIntegracioEntity.builder()
-				.codi(info.getCodi())
-				.data(new Date())
-				.descripcio(info.getDescripcio())
-				.tipus(info.getTipus())
-				.codiEntitat(info.getCodiEntitat())
-				.tempsResposta(info.getTempsResposta())
-				.estat(IntegracioAccioEstatEnumDto.OK)
-				.aplicacio(info.getAplicacio()).build();
-
+		var accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio()).tipus(info.getTipus())
+				.codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.OK).aplicacio(info.getAplicacio()).build();
 		assignarAccioAParams(info, accio);
 		addAccio(accio, obtenirUsuari);
-//		accio.setIntegracio(novaIntegracio(info.getCodi()));
 	}
 
 	public void addAccioError(IntegracioInfo info, String errorDescripcio) {
@@ -138,17 +125,10 @@ public class IntegracioHelper {
 //	@Transactional
 	public void addAccioError(IntegracioInfo info, String errorDescripcio, Throwable throwable, boolean obtenirUsuari) {
 
-		MonitorIntegracioEntity accio = MonitorIntegracioEntity.builder()
-				.codi(info.getCodi())
-				.data(new Date())
-				.descripcio(info.getDescripcio())
-				.tipus(info.getTipus())
-				.codiEntitat(info.getCodiEntitat())
-				.tempsResposta(info.getTempsResposta())
-				.estat(IntegracioAccioEstatEnumDto.ERROR)
-				.errorDescripcio(errorDescripcio)
+		var accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio()).tipus(info.getTipus())
+				.codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.ERROR).errorDescripcio(errorDescripcio)
 				.aplicacio(info.getAplicacio()).build();
-//		accio.setIntegracio(novaIntegracio(info.getCodi()));
+
 		assignarAccioAParams(info, accio);
 		if (throwable != null) {
 			accio.setExcepcioMessage(ExceptionUtils.getMessage(throwable));
@@ -163,7 +143,7 @@ public class IntegracioHelper {
 	private void addAccio(MonitorIntegracioEntity accio, boolean obtenirUsuari) {
 
 		afegirParametreUsuari(accio, obtenirUsuari);
-		String st = accio.getExcepcioStacktrace();
+		var st = accio.getExcepcioStacktrace();
 		accio.setExcepcioStacktrace(st != null && st.getBytes().length > 2000 ? st.substring(0, 1997) + "..." : st);
 		try {
 			monitorRepository.save(accio);
@@ -180,42 +160,35 @@ public class IntegracioHelper {
 
 	private void assignarAccioAParams(IntegracioInfo info, MonitorIntegracioEntity accio) {
 
-//		List<MonitorIntegracioParamEntity> params = conversio.convertirList(info.getParams(), MonitorIntegracioParamEntity.class);
 		var params = info.getParams().stream()
 				.map(p -> MonitorIntegracioParamEntity.builder()
 						.monitorIntegracio(accio)
 						.codi(p.getCodi())
 						.valor(p.getValor()).build())
 				.collect(Collectors.toList());
-//		for (var param : params) {
-//			param.setMonitorIntegracio(accio);
-//		}
 		accio.setParametres(params);
 	}
 
 	private void afegirParametreUsuari(MonitorIntegracioEntity accio, boolean obtenirUsuari) {
 
 		if (accio.getParametres() == null) {
-			accio.setParametres(new ArrayList<MonitorIntegracioParamEntity>());
+			accio.setParametres(new ArrayList<>());
 		}
-		accio.getParametres().add(MonitorIntegracioParamEntity.builder()
-				.monitorIntegracio(accio)
-				.codi("Usuari")
-				.valor(getUsuariNomCodi(obtenirUsuari)).build());
+		accio.getParametres().add(MonitorIntegracioParamEntity.builder().monitorIntegracio(accio).codi("Usuari").valor(getUsuariNomCodi(obtenirUsuari)).build());
 	}
 
 	private String getUsuariNomCodi(boolean obtenirUsuari) {
 
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		var auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth == null || Strings.isNullOrEmpty(auth.getName())) {
 			return "";
 		}
-		String usuariNomCodi = auth.getName();
+		var usuariNomCodi = auth.getName();
 		if (!obtenirUsuari) {
 			return usuariNomCodi;
 		}
 		try {
-			UsuariEntity usuari = usuariRepository.findById(auth.getName()).orElse(null);
+			var usuari = usuariRepository.findById(auth.getName()).orElse(null);
 			if (usuari == null) {
 				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari no trobat a la bdd");
 				return usuariNomCodi;
@@ -229,7 +202,7 @@ public class IntegracioHelper {
 
 	private IntegracioDto novaIntegracio(String codi) {
 
-		IntegracioDto integracio = new IntegracioDto();
+		var integracio = new IntegracioDto();
 		integracio.setCodi(codi);
 		if (INTCODI_USUARIS.equals(codi)) {
 			integracio.setNom("Usuaris");
@@ -259,14 +232,14 @@ public class IntegracioHelper {
 
 	public void addAplicacioAccioParam(IntegracioInfo info, Long entitatId) {
 
-		String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+		var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
 		info.setAplicacio(usuariCodi);
 		if (entitatId == null) {
-			String msg = "No existeix una aplicació amb el codi '" + usuariCodi;
+			var msg = "No existeix una aplicació amb el codi '" + usuariCodi;
 			info.getParams().add(new AccioParam("Codi aplicació", msg));
 			return;
 		}
-		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuariCodi, entitatId);
+		var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuariCodi, entitatId);
 		info.getParams().add(new AccioParam("Codi aplicació", aplicacio != null ? aplicacio.getUsuariCodi() : ""));
 	}
 
@@ -279,8 +252,6 @@ public class IntegracioHelper {
 				ids = monitorRepository.getNotificacionsAntigues(llindar);
 				eliminarAntics(ids);
 			}
-//			monitorRepository.flush();
-//			monitorRepository.eliminarAntics(llindar);
 		} catch (Exception ex) {
 			log.error("Error esborrant les entrades del monitor d'integracions antigues.", ex);
 		}
@@ -288,6 +259,7 @@ public class IntegracioHelper {
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void eliminarAntics(List<Long> ids) {
+
 		monitorParamRepository.eliminarAntics(ids);
 		monitorRepository.eliminarAntics(ids);
 		monitorRepository.flush();

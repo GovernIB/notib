@@ -31,8 +31,7 @@ import java.util.List;
 @Component
 public class UsuariHelper {
  
-	@Resource
-	private EntitatRepository entitatRepository;
+
 	@Resource
 	private UsuariRepository usuariRepository;
 
@@ -40,7 +39,6 @@ public class UsuariHelper {
 	private CacheHelper cacheHelper;
 	@Resource
 	private ConfigHelper configHelper;
-
 
 
 	public Authentication generarUsuariAutenticatEjb(SessionContext sessionContext, boolean establirComAUsuariActual) {

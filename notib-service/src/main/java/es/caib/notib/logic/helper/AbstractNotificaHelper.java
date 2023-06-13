@@ -149,14 +149,6 @@ public abstract class AbstractNotificaHelper {
 				double elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				log.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
 			}
-
-//			//Marcar com a processada si la notificació s'ha fet des de una aplicació
-//			if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {
-//				log.info("Marcant notificació com processada per ser usuari aplicació...");
-//				enviament.getNotificacio().updateEstat(NotificacioEstatEnumDto.PROCESSADA);
-//				enviament.getNotificacio().updateMotiu(notificaEstat.name());
-//				enviament.getNotificacio().updateEstatDate(new Date());
-//			}
 		}
 		// Actualitzar màscara d'estats
 		notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(notificacio.getId()).estat(notificacio.getEstat()).build());
@@ -368,7 +360,6 @@ public abstract class AbstractNotificaHelper {
 		cipher.init(Cipher.ENCRYPT_MODE, rc4Key);
 		byte[] xifrat = cipher.doFinal(bytes);
 		return new String(Base64.encodeBase64(xifrat));
-//		return new String(Hex.encodeHex(xifrat));
 	}
 	protected Long desxifrarId(String idXifrat) throws GeneralSecurityException {
 		Cipher cipher = Cipher.getInstance("RC4");
@@ -376,13 +367,11 @@ public abstract class AbstractNotificaHelper {
 		cipher.init(Cipher.DECRYPT_MODE, rc4Key);
 
 		if (idXifrat.length() < 11) {
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_CLIENT,
-					"La longitud mínima del identificador xifrat ha de ser 11 caràcters.");
+			throw new SistemaExternException(IntegracioHelper.INTCODI_CLIENT, "La longitud mínima del identificador xifrat ha de ser 11 caràcters.");
 		}
 
 		byte[] desxifrat = cipher.doFinal(Base64.decodeBase64(idXifrat.getBytes()));
-		return new Long(bytesToLong(desxifrat));
+		return bytesToLong(desxifrat);
 	}
 
 	protected byte[] longToBytes(long l) {
@@ -467,12 +456,15 @@ public abstract class AbstractNotificaHelper {
 		public boolean handleFault(SOAPMessageContext context) {
 			return false;
 		}
+
 		@Override
 		public void close(MessageContext context) {
+			//close
 		}
+
 		@Override
 		public Set<QName> getHeaders() {
-			return new TreeSet<QName>();
+			return new TreeSet<>();
 		}
 	}
 }

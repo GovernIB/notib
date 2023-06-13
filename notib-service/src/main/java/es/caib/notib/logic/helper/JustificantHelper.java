@@ -22,25 +22,28 @@ import java.util.Date;
 @Slf4j
 @Component
 public abstract class JustificantHelper<T> {
-    protected final Font frutiger8 = FontFactory.getFont("Frutiger", 8, new BaseColor(127, 127, 127, 1)); // #7F7F7F
-    protected final Font frutiger9 = FontFactory.getFont("Frutiger", 8, new BaseColor(127, 127, 127, 1)); // #7F7F7F
-    protected final Font frutigerTitolBold = FontFactory.getFont("Frutiger", 11, Font.BOLD);
-    protected final Font calibri10 = FontFactory.getFont("Calibri", 10);
-    protected final Font calibri8 = FontFactory.getFont("Calibri", 8);
-    protected final Font calibri10Bold = FontFactory.getFont("Calibri", 10, Font.BOLD);
-    protected final Font calibriWhiteBold = FontFactory.getFont("Calibri", 10, Font.BOLD, new BaseColor(255, 255, 255)); // #FFFFFF
+
+    private static final String FRUTIGER = "Frutiger";
+    private static final String CALIBRI = "Calibri";
+    protected final Font frutiger8 = FontFactory.getFont(FRUTIGER, 8, new BaseColor(127, 127, 127, 1)); // #7F7F7F
+    protected final Font frutiger9 = FontFactory.getFont(FRUTIGER, 8, new BaseColor(127, 127, 127, 1)); // #7F7F7F
+    protected final Font frutigerTitolBold = FontFactory.getFont(FRUTIGER, 11, Font.BOLD);
+    protected final Font calibri10 = FontFactory.getFont(CALIBRI, 10);
+    protected final Font calibri8 = FontFactory.getFont(CALIBRI, 8);
+    protected final Font calibri10Bold = FontFactory.getFont(CALIBRI, 10, Font.BOLD);
+    protected final Font calibriWhiteBold = FontFactory.getFont(CALIBRI, 10, Font.BOLD, new BaseColor(255, 255, 255)); // #FFFFFF
+
 
     @Autowired
     protected MessageHelper messageHelper;
     @Autowired
     protected ConfigHelper configHelper;
 
-    public abstract byte[] generarJustificant(
-            T notificacio,
-            ProgresDescarregaDto progres) throws JustificantException;
+    public abstract byte[] generarJustificant(T notificacio, ProgresDescarregaDto progres) throws JustificantException;
 
     @Builder
     protected static class JustificantTextKeys {
+
         String keyTitol;
         String keyTitolIntroduccio;
         String keyTitolDescripcio;
@@ -49,19 +52,19 @@ public abstract class JustificantHelper<T> {
 
     protected void setParametersBold(Paragraph paragraph, String content) {
 
-        var cacacter = new Chunk();
+        Chunk caracter;
         for (var i = 0; i < content.length(); i++) {
             if (content.charAt(i) == '[') {
                 while (content.charAt(i + 1) != ']') {
-                    cacacter = new Chunk(String.valueOf(content.charAt(i + 1)), calibri10Bold);
-                    paragraph.add(cacacter);
+                    caracter = new Chunk(String.valueOf(content.charAt(i + 1)), calibri10Bold);
+                    paragraph.add(caracter);
                     i++;
                 }
                 continue;
             }
             if (content.charAt(i) != '[' && content.charAt(i) != ']') {
-                cacacter = new Chunk(String.valueOf(content.charAt(i)), calibri10);
-                paragraph.add(cacacter);
+                caracter = new Chunk(String.valueOf(content.charAt(i)), calibri10);
+                paragraph.add(caracter);
             }
         }
     }
@@ -82,7 +85,6 @@ public abstract class JustificantHelper<T> {
         var footerEvent = new FooterPageEvent(progres);
         var justificant = new Document(PageSize.A4, 36, 36, 35 + headerEvent.getTableHeight(), 36);
         var writer = PdfWriter.getInstance(justificant, out);
-//		writer.setViewerPreferences(PdfWriter.ALLOW_PRINTING);
         writer.setPageEvent(headerEvent);
         writer.setPageEvent(footerEvent);
         justificant.open();
@@ -91,9 +93,12 @@ public abstract class JustificantHelper<T> {
         justificant.addCreator("iText library");
         return justificant;
     }
+
+
     protected class FooterPageEvent extends PdfPageEventHelper {
         private PdfPTable footer;
 
+        @Override
         public void onEndPage(PdfWriter writer, Document justificant) {
             footer.writeSelectedRows(0, -1, 36, 80, writer.getDirectContent());
         }
@@ -184,6 +189,7 @@ public abstract class JustificantHelper<T> {
     }
 
     protected class HeaderPageEvent extends PdfPageEventHelper {
+
         private PdfPTable header;
         private float tableHeight;
 
@@ -191,6 +197,7 @@ public abstract class JustificantHelper<T> {
             return tableHeight;
         }
 
+        @Override
         public void onEndPage(PdfWriter writer, Document justificant) {
 
             var yPos = 750 + ((justificant.topMargin() + tableHeight) / 2);
@@ -209,7 +216,7 @@ public abstract class JustificantHelper<T> {
                 header.setLockedWidth(true);
 
 //				## [LOGO ENTITAT]
-                Image logoCapsalera = null;
+                Image logoCapsalera;
                 if (getCapsaleraLogo() != null) {
                     logoCapsalera = Image.getInstance(getCapsaleraLogo());
                 } else {
@@ -225,7 +232,7 @@ public abstract class JustificantHelper<T> {
                 }
 
 //				## [LOGO ENTITAT]
-                Image logoPeu = null;
+                Image logoPeu;
                 if (getPeuLogo() != null) {
                     logoPeu = Image.getInstance(getPeuLogo());
                 } else {
