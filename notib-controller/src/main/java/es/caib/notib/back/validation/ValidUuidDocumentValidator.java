@@ -36,9 +36,9 @@ public class ValidUuidDocumentValidator implements ConstraintValidator<ValidUuid
 		boolean valid = true;
 		try {
 			
-			var FieldType = BeanUtils.getProperty(value, fieldName);
+			var fieldType = BeanUtils.getProperty(value, fieldName);
 			var dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
-			if (FieldType == TipusDocumentEnumDto.UUID.name() && (dependFieldValue == null || dependFieldValue.isEmpty())) {
+			if (TipusDocumentEnumDto.UUID.name().equals(fieldType) && (dependFieldValue == null || dependFieldValue.isEmpty())) {
 				var msg = MessageHelper.getInstance().getMessage("NotEmpty");
 				context.buildConstraintViolationWithTemplate(msg).addNode("documentArxiuUuid").addConstraintViolation();
 				valid = false;

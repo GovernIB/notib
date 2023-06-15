@@ -7,7 +7,6 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @Builder
@@ -36,7 +35,7 @@ public class ConfigDto {
     public String addEntitatKey(EntitatDto entitat) {
 
         String [] split = key.split(prefix);
-        if (entitat == null || entitat.getCodi() == null || entitat.getCodi() == "" || split == null || split.length == 0 || split.length != 2) {
+        if (entitat == null || entitat.getCodi() == null || entitat.getCodi().equals("") || split == null || split.length == 0 || split.length != 2) {
             return null;
         }
         EntitatConfig config = new EntitatConfig();
@@ -48,7 +47,7 @@ public class ConfigDto {
 
     public String crearEntitatKey() {
 
-        if (entitatCodi == null || entitatCodi == "" || key == null || key == "") {
+        if (entitatCodi == null || entitatCodi.equals("") || key == null || key.equals("")) {
             return null;
         }
         String [] split = key.split(prefix);

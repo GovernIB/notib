@@ -39,7 +39,7 @@ public class ValidUrlDocumentValidator implements ConstraintValidator<ValidUrlDo
 		try {
 			var fieldType = BeanUtils.getProperty(value, fieldName);
 			var dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
-			if (fieldType == TipusDocumentEnumDto.URL.name() && (dependFieldValue == null || dependFieldValue.isEmpty())) {
+			if (TipusDocumentEnumDto.URL.name().equals(fieldType) && (dependFieldValue == null || dependFieldValue.isEmpty())) {
 				var msg = MessageHelper.getInstance().getMessage("NotEmpty");
 				context.buildConstraintViolationWithTemplate(msg).addNode("documentArxiuUrl").addConstraintViolation();
 				valid = false;
@@ -48,7 +48,6 @@ public class ValidUrlDocumentValidator implements ConstraintValidator<ValidUrlDo
         	log.error("Ha d'informar el email quan hi ha entrega DEH", ex);
         	valid = false;
         }
-		
 		if (!valid) {
 			context.disableDefaultConstraintViolation();
 		}

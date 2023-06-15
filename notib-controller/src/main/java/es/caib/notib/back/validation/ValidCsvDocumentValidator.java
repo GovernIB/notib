@@ -37,9 +37,9 @@ public class ValidCsvDocumentValidator implements ConstraintValidator<ValidCsvDo
 
 		var valid = true;
 		try {
-			var FieldType = BeanUtils.getProperty(value, fieldName);
+			var fieldType = BeanUtils.getProperty(value, fieldName);
 			var dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
-			if (FieldType == TipusDocumentEnumDto.CSV.name() && (dependFieldValue == null || dependFieldValue.isEmpty())) {
+			if (TipusDocumentEnumDto.CSV.name().equals(fieldType) && (dependFieldValue == null || dependFieldValue.isEmpty())) {
 				var msg = MessageHelper.getInstance().getMessage("NotEmpty");
 				context.buildConstraintViolationWithTemplate(msg).addNode("documentArxiuCsv").addConstraintViolation();
 				valid = false;

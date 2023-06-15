@@ -35,9 +35,9 @@ public class ValidArxiuDocumentValidator implements ConstraintValidator<ValidArx
 
 		try {
 			var valid = true;
-			var FieldType = BeanUtils.getProperty(value, fieldName);
+			var fieldType = BeanUtils.getProperty(value, fieldName);
 			var dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
-			if (FieldType == TipusDocumentEnumDto.ARXIU.name() && (dependFieldValue == null || dependFieldValue.isEmpty())){
+			if (TipusDocumentEnumDto.ARXIU.name().equals(fieldType) && (dependFieldValue == null || dependFieldValue.isEmpty())){
 				var msg = MessageHelper.getInstance().getMessage("NotEmpty");
 				context.buildConstraintViolationWithTemplate(msg).addNode("arxiu").addConstraintViolation();
 				valid = false;

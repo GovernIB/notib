@@ -58,7 +58,7 @@ public class NotibApiExternaApp extends SpringBootServletInitializer {
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(NotibApiExternaApp.class, args);
+		SpringApplication.run(NotibApiExternaApp.class);
 	}
 
 }

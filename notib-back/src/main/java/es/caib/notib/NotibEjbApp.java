@@ -47,7 +47,7 @@ public class NotibEjbApp extends NotibApp {
 //	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(NotibEjbApp.class, args);
+		SpringApplication.run(NotibEjbApp.class);
 	}
 
 }

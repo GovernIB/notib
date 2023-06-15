@@ -18,6 +18,10 @@ import java.util.List;
  */
 public class EnumHelper {
 
+	private EnumHelper() {
+		throw new IllegalStateException("EnumHelper no es pot instanciar");
+	}
+
 	public static List<HtmlOption> getOptionsForEnum(Class<?> enumeracio) {
 		return getOptionsForEnum(enumeracio, null);
 	}
@@ -34,8 +38,8 @@ public class EnumHelper {
 		for (var e: enumeracio.getEnumConstants()) {
 			incloure = true;
 			if (ignores != null) {
-				for (Enum<?> ignore: ignores) {
-					if (((Enum<?>)e).equals(ignore)) {
+				for (var ignore: ignores) {
+					if (e.equals(ignore)) {
 						incloure = false;
 						break;
 					}

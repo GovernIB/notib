@@ -1,5 +1,7 @@
 package es.caib.notib.back.helper;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
@@ -9,13 +11,16 @@ import java.lang.management.ThreadMXBean;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @SuppressWarnings("restriction")
 public class MonitorHelper {
 
 	private static Boolean actiu = null;
-	private static long prevUpTime, prevProcessCpuTime;
+	private static long prevUpTime;
+	private static long	prevProcessCpuTime;
 	private static RuntimeMXBean rmBean;
 	private static com.sun.management.OperatingSystemMXBean sunOSMBean;
+	private static final String noDisponible = "No disponible";
 
 	public static com.sun.management.OperatingSystemMXBean getSunOSMBean() {
 		return sunOSMBean;
@@ -26,7 +31,7 @@ public class MonitorHelper {
 		try {
 			return sunOSMBean.getArch();
 		} catch (Exception e) {
-			return "No disponible";
+			return noDisponible;
 		}
 	}
 	
@@ -35,7 +40,7 @@ public class MonitorHelper {
 		try {
 			return sunOSMBean.getName();
 		} catch (Exception e) {
-			return "No disponible";
+			return noDisponible;
 		}
 	}
 	
@@ -44,7 +49,7 @@ public class MonitorHelper {
 		try {
 			return sunOSMBean.getVersion();
 		} catch (Exception e) {
-			return "No disponible";
+			return noDisponible;
 		}
 	}
 
@@ -74,7 +79,7 @@ public class MonitorHelper {
 				result.processCpuTime = sunOSMBean.getProcessCpuTime();
 			}
 		} catch (Exception e) {
-			System.err.println(MonitorHelper.class.getSimpleName() + " exception: " + e.getMessage());
+			log.error(MonitorHelper.class.getSimpleName() + " exception ", e.getMessage());
 		}
 	}
 
@@ -111,7 +116,7 @@ public class MonitorHelper {
 			}
 			return result.cpuUsage + "%";
 		} catch (Exception e) {
-			return "No disponible";
+			return noDisponible;
 		}
 	}
 
@@ -182,7 +187,8 @@ public class MonitorHelper {
 			return 0L;
 		}
 		var time = 0L;
-		long tc, tu;
+		long tc;
+		long tu;
 		for (var i : getThreadsIds()) {
 			tc = bean.getThreadCpuTime(i);
 			tu = bean.getThreadUserTime(i);

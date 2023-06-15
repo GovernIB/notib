@@ -37,24 +37,24 @@ public class MissatgeCarpetaParams {
 
     public void setQueryParams(MultivaluedMap<String, String> params) {
 
-        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-        String caducitat = caducitatNotificacio != null ? df.format(caducitatNotificacio) : "";
-        String compareixenca = dataDisponibleCompareixenca != null ? df.format(dataDisponibleCompareixenca) : "";
-
-        params.add("notificationParameters", nomCompletDestinatari != null ? nomCompletDestinatari : "");
-        params.add("notificationParameters", codiDir3Entitat != null ? codiDir3Entitat : "");
-        params.add("notificationParameters", nomEntitat != null ? nomEntitat : "") ;
-        params.add("notificationParameters", nomOrganEmisor != null ? nomOrganEmisor : "");
-        params.add("notificationParameters", codiOrganEmisor != null ? codiOrganEmisor : "");
-        params.add("notificationParameters", concepteNotificacio != null ? concepteNotificacio : "");
-        params.add("notificationParameters", descNotificacio != null ? descNotificacio : "");
-        params.add("notificationParameters", uuIdNotificacio != null ? uuIdNotificacio : "");
-        params.add("notificationParameters", tipus != null ? tipus.name() : "");
-        params.add("notificationParameters", vincleInteressat != null ? vincleInteressat.name() : "");
-        params.add("notificationParameters", codiSiaProcediment != null ? codiSiaProcediment : "");
-        params.add("notificationParameters", nomProcediment != null ? nomProcediment : "");
-        params.add("notificationParameters", caducitat);
-        params.add("notificationParameters", compareixenca);
-        params.add("notificationParameters", numExpedient != null ? numExpedient : "");
+        var df = new SimpleDateFormat("dd-MM-yyyy");
+        var caducitat = caducitatNotificacio != null ? df.format(caducitatNotificacio) : "";
+        var compareixenca = dataDisponibleCompareixenca != null ? df.format(dataDisponibleCompareixenca) : "";
+        var notificacioParametres = "notificationParameters";
+        params.add(notificacioParametres, nomCompletDestinatari != null ? nomCompletDestinatari : "");
+        params.add(notificacioParametres, codiDir3Entitat != null ? codiDir3Entitat : "");
+        params.add(notificacioParametres, nomEntitat != null ? nomEntitat : "") ;
+        params.add(notificacioParametres, nomOrganEmisor != null ? nomOrganEmisor : "");
+        params.add(notificacioParametres, codiOrganEmisor != null ? codiOrganEmisor : "");
+        params.add(notificacioParametres, concepteNotificacio != null ? concepteNotificacio : "");
+        params.add(notificacioParametres, descNotificacio != null ? descNotificacio : "");
+        params.add(notificacioParametres, uuIdNotificacio != null ? uuIdNotificacio : "");
+        params.add(notificacioParametres, tipus != null ? tipus.name() : "");
+        params.add(notificacioParametres, vincleInteressat != null ? vincleInteressat.name() : "");
+        params.add(notificacioParametres, codiSiaProcediment != null ? codiSiaProcediment : "");
+        params.add(notificacioParametres, nomProcediment != null ? nomProcediment : "");
+        params.add(notificacioParametres, caducitat);
+        params.add(notificacioParametres, compareixenca);
+        params.add(notificacioParametres, numExpedient != null ? numExpedient : "");
     }
 }

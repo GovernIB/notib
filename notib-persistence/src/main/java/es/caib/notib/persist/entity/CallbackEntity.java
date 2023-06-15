@@ -61,8 +61,8 @@ public class CallbackEntity extends AbstractPersistable<Long> implements Seriali
 
         this.intents = intents;
         this.estat = estat;
-        Calendar cal = GregorianCalendar.getInstance();
-        cal.add(Calendar.SECOND, (int) ((reintentsPeriode/7200)*Math.pow(3, intents)));
+        var cal = Calendar.getInstance();
+        cal.add(Calendar.SECOND, (int) (((double)reintentsPeriode/7200)*Math.pow(3, intents)));
         this.data = cal.getTime();
         this.error = StringUtils.isNotBlank(error);
         this.errorDesc = StringUtils.abbreviate(error, ERROR_DESC_MAX_LENGTH - 5);

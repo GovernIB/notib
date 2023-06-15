@@ -71,7 +71,7 @@ public class NotificaHelper {
 	private AbstractNotificaHelper getNotificaHelper() {
 
 		var versio = getNotificaVersioProperty();
-		return "0".equals(versio) ? notificaV0Helper : "2".equals(versio) ? notificaV2Helper : notificaV2Helper;
+		return "0".equals(versio) ? notificaV0Helper : notificaV2Helper;
 	}
 
 	private String getNotificaVersioProperty() {

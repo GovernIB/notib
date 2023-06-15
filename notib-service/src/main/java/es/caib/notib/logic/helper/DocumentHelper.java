@@ -45,7 +45,7 @@ public class DocumentHelper {
             byte[] contingut = downloadUsingStream(document.getUrl(), "document");
             return new ArxiuDto(nom, "PDF", contingut, contingut.length);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error convertint el document ", e);
             return null;
         }
     }

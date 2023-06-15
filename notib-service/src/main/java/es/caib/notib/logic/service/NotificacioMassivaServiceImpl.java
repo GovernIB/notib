@@ -228,7 +228,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     public NotificacioMassivaDataDto create(Long entitatId, @NonNull String usuariCodi, @NonNull NotificacioMassivaDto notificacioMassiva) throws RegistreNotificaException {
 
         var timer = metricsHelper.iniciMetrica();
-        try {
+        try (var writerListErrors = new StringWriter();var writerListInforme = new StringWriter()){
             log.info("[NOT-MASSIVA] Alta de nova notificacio massiva (usuari: {}). Fitxer csv: {}", usuariCodi, notificacioMassiva.getFicheroCsvNom());
             var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
             var csvHeader = CSVReader.readHeader(notificacioMassiva.getFicheroCsvBytes());
@@ -236,8 +236,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             checkCSVContent(linies, csvHeader);
             var fileNames = ZipFileUtils.readZipFileNames(notificacioMassiva.getFicheroZipBytes());
             Map<String, Long> documentsProcessatsMassiu = new HashMap<>(); // key: csv/uuid/arxiuFisicoNom - value: documentEntity.getId()
-            var writerListErrors = new StringWriter();
-            var writerListInforme = new StringWriter();
             csvHeader.add("Errores");
             var listWriterErrors = initCsvWritter(writerListErrors);
             var listWriterInforme = initCsvWritter(writerListInforme);
@@ -272,9 +270,10 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     } else if (procediment != null) {
                         notificacio.setProcediment(conversioTipusHelper.convertir(procediment, ProcSerDto.class));
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    errors.add(messageHelper.getMessage("error.obtenint.procediment.amb.codi") + notificacio.getProcediment().getCodi());
+                } catch (Exception ex) {
+                    var msg = messageHelper.getMessage("error.obtenint.procediment.amb.codi") + notificacio.getProcediment().getCodi();
+                    log.error(msg, ex);
+                    errors.add(msg);
                 }
                 if (errors.isEmpty()) {
                     try {
@@ -320,7 +319,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             return conversioTipusHelper.convertir(notificacioMassivaEntity, NotificacioMassivaDataDto.class);
         } catch (Throwable t) {
             log.error("[NOT-MASSIVA] Error no controlat en l'enviament massiu", t);
-            throw t;
+            throw new RegistreNotificaException(t.getMessage());
         } finally {
             metricsHelper.fiMetrica(timer);
         }

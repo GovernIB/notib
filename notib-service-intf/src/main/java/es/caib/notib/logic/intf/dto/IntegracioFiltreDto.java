@@ -15,11 +15,11 @@ public class IntegracioFiltreDto implements Serializable {
 
     public boolean filtresOK(IntegracioAccioDto accio, String integracioCodi) {
 
-        return ((entitatCodi == null || entitatCodi == "")
-                || ((entitatCodi != null || entitatCodi != "") && accio.getCodiEntitat() != null && accio.getCodiEntitat() != ""
+        return ((entitatCodi == null || entitatCodi.equals(""))
+                || ((entitatCodi != null || !entitatCodi.equals("")) && accio.getCodiEntitat() != null && !"".equals(accio.getCodiEntitat())
                    && accio.getCodiEntitat().toLowerCase().contains(entitatCodi.toLowerCase())))
-                && ((!"CALLBACK".equals(integracioCodi) || aplicacio != null || aplicacio != "")
-                    || ((aplicacio != null || aplicacio != "") && accio.getAplicacio() != null && accio.getAplicacio() != ""
+                && ((!"CALLBACK".equals(integracioCodi) || aplicacio != null || !"".equals(aplicacio))
+                    || ((aplicacio != null || !aplicacio.equals("")) && accio.getAplicacio() != null && !accio.getAplicacio().equals("")
                         && accio.getAplicacio().toLowerCase().contains( aplicacio.toLowerCase())));
     }
 }

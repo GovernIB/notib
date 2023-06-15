@@ -216,7 +216,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			fetch = FetchType.LAZY,
 			cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH},
 			orphanRemoval = true)
-	protected Set<NotificacioEnviamentEntity> enviaments = new LinkedHashSet<NotificacioEnviamentEntity>();
+	protected Set<NotificacioEnviamentEntity> enviaments = new LinkedHashSet<>();
 	
 	@OneToMany(
 			mappedBy = "notificacio",
@@ -287,8 +287,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	public void updateNotificaNouEnviament(int reintentsPeriodeNotifica) {
 		this.notificaEnviamentIntent++;
-		Calendar cal = GregorianCalendar.getInstance();
-		cal.add(Calendar.SECOND, (int) ((reintentsPeriodeNotifica/1000)*Math.pow(2, notificaEnviamentIntent)));
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.SECOND, (int) (((double)reintentsPeriodeNotifica/1000)*Math.pow(2, notificaEnviamentIntent)));
 		this.notificaEnviamentData = cal.getTime();
 	}
 	
@@ -298,33 +298,36 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	public void updateRegistreNouEnviament(int reintentsPeriodeRegistre) {
 		this.registreEnviamentIntent++;
-		decreaseRegistreEnviamentPrioritat((int) ((reintentsPeriodeRegistre/1000)*Math.pow(2, registreEnviamentIntent)));
+		decreaseRegistreEnviamentPrioritat((int) (((double)reintentsPeriodeRegistre/1000)*Math.pow(2, registreEnviamentIntent)));
 	}
 
 	public void decreaseRegistreEnviamentPrioritat(int seconds) {
-		Calendar cal = GregorianCalendar.getInstance();
-		if (notificaEnviamentData != null)
+
+		Calendar cal = Calendar.getInstance();
+		if (notificaEnviamentData != null) {
 			cal.setTime(this.notificaEnviamentData);
+		}
 		cal.add(Calendar.SECOND, seconds);
 		this.notificaEnviamentData = cal.getTime();
 	}
 
 	public void increaseRegistreEnviamentPrioritat(int seconds) {
-		Calendar cal = GregorianCalendar.getInstance();
+
+		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.SECOND, -seconds);
 		this.notificaEnviamentData = cal.getTime();
 	}
 
 	public void restablirPrioritat() {
-		this.getCreatedDate().ifPresentOrElse(
-				value -> this.notificaEnviamentData = Date.from(value.atZone(ZoneId.systemDefault()).toInstant()),
-				() -> this.notificaEnviamentData = null
-		);
+
+		this.getCreatedDate().ifPresentOrElse(value -> this.notificaEnviamentData = Date.from(value.atZone(ZoneId.systemDefault()).toInstant()),
+				() -> this.notificaEnviamentData = null);
 	}
 
 	public void refreshRegistre() {
+
 		this.registreEnviamentIntent = 1;
-		Calendar cal = GregorianCalendar.getInstance();
+		var cal = Calendar.getInstance();
 		this.registreData = cal.getTime();
 	}
 
@@ -386,7 +389,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	}
 
 	public boolean hasEnviamentsPerEmail() {
-		return getEnviamentsPerEmail().size() > 0;
+		return !getEnviamentsPerEmail().isEmpty();
 	}
 
 	public boolean hasEnviamentsEnviats() {
@@ -659,9 +662,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				return false;
 		} else if (!entitat.equals(other.entitat))
 			return false;
-		if (enviamentTipus != other.enviamentTipus)
-			return false;
-		return true;
+		return enviamentTipus == other.enviamentTipus;
 	}
 
 

@@ -371,12 +371,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public String getAppVersion() {
-		return CacheHelper.appVersion;
+		return CacheHelper.getAppVersion();
 	}
 
 	@Override
 	public void setAppVersion(String appVersion) {
-		CacheHelper.appVersion = appVersion;
+		CacheHelper.setAppVersion(appVersion);
 	}
 
 	private UsuariDto toUsuariDtoAmbRols(UsuariEntity usuari) {

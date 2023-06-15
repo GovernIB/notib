@@ -227,7 +227,7 @@ public class ConfigHelper {
 
     public Map<String, Object> getEnvironmentPropertiesMap() {
 
-        Map<String, Object> propertiesMap = new HashMap();
+        Map<String, Object> propertiesMap = new HashMap<>();
         environment.getPropertySources().stream().forEach(ps -> {
             if (ps instanceof MapPropertySource) {
                 propertiesMap.putAll(((MapPropertySource) ps).getSource());

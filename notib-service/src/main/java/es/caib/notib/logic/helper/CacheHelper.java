@@ -11,6 +11,8 @@ import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.usuari.DadesUsuari;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
@@ -50,7 +52,8 @@ public class CacheHelper {
 	@Resource
 	private CacheManager cacheManager;
 
-	public static String appVersion;
+	@Getter @Setter
+	private static String appVersion;
 
 
 	@Autowired

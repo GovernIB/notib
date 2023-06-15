@@ -426,17 +426,19 @@ public class SchedulledServiceImpl implements SchedulledService {
 		if (Strings.isNullOrEmpty(dir)) {
 			return;
 		}
-		Path path = Paths.get(dir);
-		DirectoryStream<Path> files = Files.newDirectoryStream(path);
-		for (Path file : files) {
-			if (Files.isDirectory(file)) {
-				esborrarTemporals(file.toString());
-			}
-			File f = file.toFile();
-			long periode = System.currentTimeMillis() - (1 * 24 * 60 * 60 * 1000L);
-			if (f.lastModified() < periode) {
-				log.info("Esborrant fitxer " + file);
-				Files.delete(file);
+		var path = Paths.get(dir);
+		File f;
+		try (var files = Files.newDirectoryStream(path)) {
+			for (var file : files) {
+				if (Files.isDirectory(file)) {
+					esborrarTemporals(file.toString());
+				}
+				f = file.toFile();
+				long periode = System.currentTimeMillis() - (24 * 60 * 60 * 1000L);
+				if (f.lastModified() < periode) {
+					log.info("Esborrant fitxer " + file);
+					Files.delete(file);
+				}
 			}
 		}
 	}
@@ -467,18 +469,13 @@ public class SchedulledServiceImpl implements SchedulledService {
 	
 	private void addAdminAuthentication() {
 
-		Principal principal = new Principal() {
-			public String getName() {
-				return "SCHEDULLER";
-			}
-		};
+		Principal principal = () -> "SCHEDULLER";
 		List<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority("NOT_SUPER"));
 		authorities.add(new SimpleGrantedAuthority("NOT_ADMIN"));
 		Authentication auth = new UsernamePasswordAuthenticationToken(principal , "N/A", authorities);
 		SecurityContextHolder.getContext().setAuthentication(auth);
 	}
-
 
 	private boolean isNotificaEnviamentsActiu() {
 		return configHelper.getConfigAsBoolean("es.caib.notib.tasca.notifica.enviaments.actiu");

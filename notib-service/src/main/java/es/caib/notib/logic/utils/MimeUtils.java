@@ -3,6 +3,7 @@ package es.caib.notib.logic.utils;
 import com.google.common.io.Files;
 import es.caib.notib.client.domini.DocumentV2;
 import es.caib.notib.logic.intf.dto.mime.MimesSIR;
+import es.caib.notib.logic.intf.util.FitxerUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.tika.Tika;
@@ -13,6 +14,10 @@ import java.util.zip.ZipFile;
 
 @Slf4j
 public class MimeUtils {
+
+    private MimeUtils() {
+        throw new IllegalStateException("MimeUtils no pot ser instanciat");
+    }
 
     private static final String ZIP_SIGNED = "application/pkcs7-signature";
     private static final String[] formatsValidsNotCom = {"JVBERi0","UEsDB"}; //PDF / ZIP
@@ -47,7 +52,7 @@ public class MimeUtils {
         Files.write(contingut, tmp);
         Tika tika = new Tika();
         String mimeType = tika.detect(tmp);
-        tmp.delete();
+        FitxerUtils.esborrar(tmp);
         return mimeType;
     }
 
@@ -58,12 +63,12 @@ public class MimeUtils {
         Files.write(contingut, tmp);
         Tika tika = new Tika();
         String mimeType = tika.detect(tmp);
-        tmp.delete();
+        FitxerUtils.esborrar(tmp);
         return mimeType;
     }
 
     public static boolean isMimeValidSIR(String mime) throws Exception {
-        return MimesSIR.formats.contains(mime);
+        return MimesSIR.getFormats().contains(mime);
     }
 
     public static boolean isFormatValid(DocumentV2 doc) {
@@ -88,7 +93,7 @@ public class MimeUtils {
             Files.write(contingut, tmp);
             ZipFile zip = new ZipFile(tmp);
             zip.close();
-            tmp.delete();
+            FitxerUtils.esborrar(tmp);
             return true;
         } catch (IOException ex) {
             log.error("Error comprovant si es un fitxer zipSigned", ex);

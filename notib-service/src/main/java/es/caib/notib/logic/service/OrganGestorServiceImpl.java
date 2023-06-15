@@ -505,9 +505,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			} catch (Exception ex) {
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.actualitzacio.error.rolsac"));
 			}
-			var progresProc = ProcedimentServiceImpl.progresActualitzacio.get(entitat.getDir3Codi());
+			var progresProc = ProcedimentServiceImpl.getProgresActualitzacio().get(entitat.getDir3Codi());
 			if (progresProc != null && progresProc.getInfo() != null && !progresProc.getInfo().isEmpty()) {
-				progres.getInfo().addAll(ProcedimentServiceImpl.progresActualitzacio.get(entitat.getDir3Codi()).getInfo());
+				progres.getInfo().addAll(ProcedimentServiceImpl.getProgresActualitzacio().get(entitat.getDir3Codi()).getInfo());
 			}
 			progres.setProgres(63);
 			tf = System.currentTimeMillis();
@@ -523,9 +523,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			} catch (Exception ex) {
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("serveis.actualitzacio.error.rolsac"));
 			}
-			ProgresActualitzacioDto progresSer = ServeiServiceImpl.progresActualitzacioServeis.get(entitat.getDir3Codi());
+			ProgresActualitzacioDto progresSer = ServeiServiceImpl.getProgresActualitzacioServeis().get(entitat.getDir3Codi());
 			if (progresSer != null && progresSer.getInfo() != null && !progresSer.getInfo().isEmpty()) {
-				progres.getInfo().addAll(ServeiServiceImpl.progresActualitzacioServeis.get(entitat.getDir3Codi()).getInfo());
+				progres.getInfo().addAll(ServeiServiceImpl.getProgresActualitzacioServeis().get(entitat.getDir3Codi()).getInfo());
 			}
 			progres.setFase(4);
 			progres.setProgres(81);
@@ -1250,7 +1250,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private boolean checkPermisOrgan(ArbreNode<OrganGestorDto>  node) {
 
 		if (node.getFills().isEmpty()) {
-			return codisAmbPermis.contains(node.dades.getCodi());
+			return codisAmbPermis.contains(node.getDades().getCodi());
 		}
 		var ok = false;
 		var fills = node.getFills();

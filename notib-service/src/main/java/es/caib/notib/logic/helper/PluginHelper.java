@@ -222,11 +222,9 @@ public class PluginHelper {
 
 		blockedObtenirJustificant = new HashSet<>();
 		final ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
-		Runnable clearBlockedRunnable = new Runnable() {
-			public void run() {
-				blockedObtenirJustificant = null;
-				exec.shutdown();
-			}
+		Runnable clearBlockedRunnable = () -> {
+			blockedObtenirJustificant = null;
+			exec.shutdown();
 		};
 		exec.scheduleAtFixedRate(clearBlockedRunnable, getSegonsEntreReintentRegistreProperty(), getSegonsEntreReintentRegistreProperty(), TimeUnit.SECONDS);
 	}
@@ -1325,7 +1323,7 @@ public class PluginHelper {
 					}
 				}
 				
-				if (enviarContingut) {
+				if (enviarContingut && doc != null) {
 					annex.setFicheroAnexado(doc.getContingut());
 					annex.setNombreFicheroAnexado(doc.getArxiuNom());
 				} else {
@@ -1344,7 +1342,7 @@ public class PluginHelper {
 					annex.setModoFirma(getModeFirma(docDetall, doc.getArxiuNom()));
 				}
 				
-				if (enviarTipoMIMEFicheroAnexado) {
+				if (Boolean.TRUE.equals(enviarTipoMIMEFicheroAnexado)) {
 					path = new File(doc.getArxiuNom()).toPath();
 				}
 			} else if (document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
@@ -1411,27 +1409,18 @@ public class PluginHelper {
 	public byte[] getUrlDocumentContent(String urlPath) throws SistemaExternException {
 
 		var baos = new ByteArrayOutputStream();
-		InputStream is = null;
 		try {
-			var url = new URL(urlPath);
-			is = url.openStream();
-			var byteChunk = new byte[4096]; // Or whatever size you want to read in at a time.
-			int n;
-			while ((n = is.read(byteChunk)) > 0) {
-				baos.write(byteChunk, 0, n);
+			try (var is = new URL(urlPath).openStream()) {
+				var byteChunk = new byte[4096]; // Or whatever size you want to read in at a time.
+				int n;
+				while ((n = is.read(byteChunk)) > 0) {
+					baos.write(byteChunk, 0, n);
+				}
+				return baos.toByteArray();
 			}
-			return baos.toByteArray();
 		} catch (Exception e) {
 			log.error("Error al obtenir document de la URL: " + urlPath, e);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, "Error al obtenir document de la URL: " + urlPath);
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 	}
 
@@ -1541,11 +1530,13 @@ public class PluginHelper {
 			log.info("Afegint codi Sia");
 			try {
 				registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
-			} catch (NumberFormatException nfe) {}
+			} catch (NumberFormatException nfe) {
+				log.error("Error afegint el codi SIA");
+			}
 		}
 		log.info("Afegint dades varies del registre");
 		registre.setCodigoUsuario(notificacio.getUsuariCodi());
-		registre.setAplicacionTelematica("NOTIB v." + CacheHelper.appVersion);
+		registre.setAplicacionTelematica("NOTIB v." + CacheHelper.getAppVersion());
 		registre.setAplicacion("RWE");
 		registre.setVersion("3.1");
 		registre.setObservaciones("Notib: " + notificacio.getUsuariCodi());

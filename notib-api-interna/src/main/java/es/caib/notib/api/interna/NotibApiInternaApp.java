@@ -59,7 +59,7 @@ public class NotibApiInternaApp extends SpringBootServletInitializer {
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(NotibApiInternaApp.class, args);
+		SpringApplication.run(NotibApiInternaApp.class);
 	}
 
 }

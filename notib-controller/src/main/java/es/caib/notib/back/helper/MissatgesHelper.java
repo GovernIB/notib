@@ -3,6 +3,9 @@
  */
 package es.caib.notib.back.helper;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +23,8 @@ public class MissatgesHelper {
 	public static final String SESSION_ATTRIBUTE_SUCCESS = "MissatgesHelper.Success";
 	public static final String SESSION_ATTRIBUTE_INFO = "MissatgesHelper.Info";
 
-	public static Map<String, Object> manifestAtributsMap;
+	@Getter @Setter
+	private static Map<String, Object> manifestAtributsMap;
 
 
 	public static void error(HttpServletRequest request, String text) {

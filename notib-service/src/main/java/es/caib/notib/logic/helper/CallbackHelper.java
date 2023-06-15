@@ -199,8 +199,7 @@ public class CallbackHelper {
 		} catch (Exception ex) {
 			var start = System.nanoTime();
 			isError = true;
-			log.info(String.format("[Callback] Excepció notificant el callback [Id: %d]: %s", callback.getId(), ex.getMessage()));
-			ex.printStackTrace();
+			log.info(String.format("[Callback] Excepció notificant el callback [Id: %d]: %s", callback.getId(), ex));
 			// Marca un error a l'event
 			var maxIntents = this.getEventsIntentsMaxProperty();
 			errorMaxReintents = intents >= maxIntents;

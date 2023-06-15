@@ -46,21 +46,22 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 
 	@Override
 	public Document documentDetalls(String identificador, String versio, boolean ambContingut) throws ArxiuException {
+
 		if (identificador.contains("csv:")) {
 			identificador = identificador.replace("csv:", "");
 			return documentDetallsCsv(identificador, ambContingut);
-		} else {
-			identificador = identificador.replace("uuid:", "");
-			return documentDetallsUuid(identificador, ambContingut);
 		}
+		identificador = identificador.replace("uuid:", "");
+		return documentDetallsUuid(identificador, ambContingut);
 	}
 
 	private Document documentDetallsCsv(String identificador, boolean ambContingut) {
+
 		try {
 			Document response = new Document();
-			if (ambContingut)
+			if (ambContingut) {
 				response.setContingut(documentImprimibleCsv(identificador));
-
+			}
 			try {
 				Map<String,Object> result = documentMetadadesCsv(identificador);
 				response.setMetadades(toDocumentMetadades(result));
@@ -421,15 +422,13 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 	}
 
 	private int getPropertyTimeoutConnect() {
-		String timeout = getPluginProperties().getProperty(
-				ARXIUCAIB_BASE_PROPERTY + "timeout.connect",
-				JERSEY_TIMEOUT_CONNECT);
+
+		var timeout = getPluginProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "timeout.connect", JERSEY_TIMEOUT_CONNECT);
 		return Integer.parseInt(timeout);
 	}
 	private int getPropertyTimeoutRead() {
-		String timeout = getPluginProperties().getProperty(
-				ARXIUCAIB_BASE_PROPERTY + "timeout.read",
-				JERSEY_TIMEOUT_READ);
+
+		var timeout = getPluginProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "timeout.read", JERSEY_TIMEOUT_READ);
 		return Integer.parseInt(timeout);
 	}
 

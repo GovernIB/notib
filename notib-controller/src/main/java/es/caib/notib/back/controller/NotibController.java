@@ -232,37 +232,39 @@ public class NotibController implements ErrorController {
 
 	@PostConstruct
 	public void propagateDbProperties() {
+
 		aplicacioService.propagateDbProperties();
-//		aplicacioService.restartSchedulledTasks();
-		MissatgesHelper.manifestAtributsMap = getManifestAttributes();
+		MissatgesHelper.setManifestAtributsMap(getManifestAttributes());
 	}
 
 
 	private Map<String, Object> getManifestAttributes() {
-		Map<String, Object> manifestAtributsMap = null;
 
+		Map<String, Object> manifestAtributsMap = null;
 		try {
 			var is = servletContext.getResourceAsStream("/" + JarFile.MANIFEST_NAME);
+			var implVersion = "Implementation-Version";
+			var buildTimeStamp = "Build-Timestamp";
 			if (is != null) {
 				manifestAtributsMap = new HashMap<>();
 				var manifest = new Manifest(is);
 				var manifestAtributs = manifest.getMainAttributes();
-				for (var key : new HashMap(manifestAtributs).keySet()) {
+				for (var key : new HashMap<>(manifestAtributs).keySet()) {
 					manifestAtributsMap.put(key.toString(), manifestAtributs.get(key));
 				}
-				aplicacioService.setAppVersion((String) manifestAtributsMap.get("Implementation-Version"));
-				manifestAtributsMap.put("Build-Timestamp", formatBuildTimestamp(manifestAtributsMap.get("Build-Timestamp").toString()));
+				aplicacioService.setAppVersion((String) manifestAtributsMap.get(implVersion));
+				manifestAtributsMap.put(buildTimeStamp, formatBuildTimestamp(manifestAtributsMap.get(buildTimeStamp).toString()));
 			} else if (buildProperties != null){
 				manifestAtributsMap = new HashMap<>();
-				manifestAtributsMap.put("Build-Timestamp", formatBuildTimestamp(buildProperties.get("Build-Timestamp")));
+				manifestAtributsMap.put(buildTimeStamp, formatBuildTimestamp(buildProperties.get(buildTimeStamp)));
 				manifestAtributsMap.put("Implementation-Vendor", buildProperties.get("Implementation-Vendor"));
-				manifestAtributsMap.put("Implementation-Version", buildProperties.get("Implementation-Version"));
+				manifestAtributsMap.put(implVersion, buildProperties.get(implVersion));
 				manifestAtributsMap.put("Implementation-SCM-Branch", buildProperties.get("Implementation-SCM-Branch"));
 				manifestAtributsMap.put("Implementation-SCM-Revision", buildProperties.get("Implementation-SCM-Revision"));
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY.MM.dd HH:mm").withZone(ZoneId.systemDefault());
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm").withZone(ZoneId.systemDefault());
 				manifestAtributsMap.put("Version", buildProperties.getVersion());
 				manifestAtributsMap.put("Time", formatter.format(buildProperties.getTime()));
-				aplicacioService.setAppVersion((String) buildProperties.get("Implementation-Version"));
+				aplicacioService.setAppVersion(buildProperties.get(implVersion));
 			}
 		} catch (Exception ex) {
 			log.error("Error obtenint els atributs del manifest per a mostrar el numero de versió", ex);
@@ -271,10 +273,11 @@ public class NotibController implements ErrorController {
 	}
 
 	private String formatBuildTimestamp(String timestamp) throws ParseException {
+
 		var ISO_DATE_FORMAT_ZERO_OFFSET = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 		var simpleDateFormat = new SimpleDateFormat(ISO_DATE_FORMAT_ZERO_OFFSET);
 		simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-		var dateFormat = new SimpleDateFormat("YYYY.MM.dd HH:mm", new Locale("ca", "ES"));
+		var dateFormat = new SimpleDateFormat("yyyyy.MM.dd HH:mm", new Locale("ca", "ES"));
 		var date = simpleDateFormat.parse(timestamp);
 		return dateFormat.format(date) + "h";
 	}

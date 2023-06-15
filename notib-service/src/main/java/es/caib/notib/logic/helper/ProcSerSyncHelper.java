@@ -78,14 +78,14 @@ public class ProcSerSyncHelper {
 		ConfigHelper.setEntitatCodi(entitatDto.getCodi());
 		log.debug("[PROCEDIMENTS] Inici actualitzar procediments");
 		// Comprova si hi ha una altre instància del procés en execució
-		var progres = ProcedimentServiceImpl.progresActualitzacio.get(entitatDto.getDir3Codi());
+		var progres = ProcedimentServiceImpl.getProgresActualitzacio().get(entitatDto.getDir3Codi());
 		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
 			log.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
 			return;	// Ja existeix un altre procés que està executant l'actualització.
 		}
 		// inicialitza el seguiment del prgrés d'actualització
 		progres = new ProgresActualitzacioProcSer();
-		ProcedimentServiceImpl.progresActualitzacio.put(entitatDto.getDir3Codi(), progres);
+		ProcedimentServiceImpl.getProgresActualitzacio().put(entitatDto.getDir3Codi(), progres);
 		Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
 		try {
 			var ti = System.currentTimeMillis();
@@ -120,16 +120,16 @@ public class ProcSerSyncHelper {
 			}
 			progres.setProgres(100);
 			progres.setFinished(true);
-			ProcedimentServiceImpl.procedimentsAmbOrganNoSincronitzat.put(entitat.getId(), avisosProcedimentsOrgans.size());
+			ProcedimentServiceImpl.getProcedimentsAmbOrganNoSincronitzat().put(entitat.getId(), avisosProcedimentsOrgans.size());
 			actualitzaAvisosSyncProcediments(avisosProcedimentsOrgans, entitatDto.getId());
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			var sw = new StringWriter();
 			log.error("Error actualitzant procediments", ex);
-			ProcedimentServiceImpl.progresActualitzacio.get(entitatDto.getDir3Codi()).setError(true);
-			ProcedimentServiceImpl.progresActualitzacio.get(entitatDto.getDir3Codi()).setErrorMsg(sw.toString());
-			ProcedimentServiceImpl.progresActualitzacio.get(entitatDto.getDir3Codi()).setProgres(100);
-			ProcedimentServiceImpl.progresActualitzacio.get(entitatDto.getDir3Codi()).setFinished(true);
+			ProcedimentServiceImpl.getProgresActualitzacio().get(entitatDto.getDir3Codi()).setError(true);
+			ProcedimentServiceImpl.getProgresActualitzacio().get(entitatDto.getDir3Codi()).setErrorMsg(sw.toString());
+			ProcedimentServiceImpl.getProgresActualitzacio().get(entitatDto.getDir3Codi()).setProgres(100);
+			ProcedimentServiceImpl.getProgresActualitzacio().get(entitatDto.getDir3Codi()).setFinished(true);
 			for (var inf: progres.getInfo()) {
 				if (inf.getText() != null)
 					info.getParams().add(new AccioParam(MSG_PROCES, inf.getText()));
@@ -291,7 +291,7 @@ public class ProcSerSyncHelper {
 
 	private void actualitzaAvisosSyncProcediments(Map<String, String[]> avisosProcedimentsOrgans, Long entitatId) {
 
-		var avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitatId, ProcedimentServiceImpl.PROCEDIMENT_ORGAN_NO_SYNC);
+		var avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitatId, ProcedimentServiceImpl.getPROCEDIMENT_ORGAN_NO_SYNC());
 		if (avisosSinc != null && !avisosSinc.isEmpty()) {
 			avisRepository.deleteAll(avisosSinc);
 		}
@@ -313,7 +313,7 @@ public class ProcSerSyncHelper {
 		var calendar = Calendar.getInstance();
 		calendar.setTime(ara);
 		calendar.add(Calendar.YEAR, 1);
-		var avis = AvisEntity.getBuilder(ProcedimentServiceImpl.PROCEDIMENT_ORGAN_NO_SYNC, missatgeAvis.toString(), ara, calendar.getTime(), AvisNivellEnumDto.ERROR, true, entitatId).build();
+		var avis = AvisEntity.getBuilder(ProcedimentServiceImpl.getPROCEDIMENT_ORGAN_NO_SYNC(), missatgeAvis.toString(), ara, calendar.getTime(), AvisNivellEnumDto.ERROR, true, entitatId).build();
 		avisRepository.save(avis);
 	}
 
@@ -329,7 +329,7 @@ public class ProcSerSyncHelper {
 
 	private List<ProcSerDto> getProcedimentsGdaByEntitat(String codiDir3) {
 
-		var progres = ProcedimentServiceImpl.progresActualitzacio.get(codiDir3);
+		var progres = ProcedimentServiceImpl.getProgresActualitzacio().get(codiDir3);
 		log.debug(">>>> >> Obtenir tots els procediments de Rolsac...");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm"));
 		var t1 = System.currentTimeMillis();
@@ -343,7 +343,7 @@ public class ProcSerSyncHelper {
 
 	private List<ProcSerDto> getProcedimentsGdaByEntitat(String codiDir3, int numPagina) {
 
-		var progres = ProcedimentServiceImpl.progresActualitzacio.get(codiDir3);
+		var progres = ProcedimentServiceImpl.getProgresActualitzacio().get(codiDir3);
 		log.debug(">>>> >> Obtenir tots els procediments de Rolsac...");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm"));
 		var t1 = System.currentTimeMillis();
@@ -386,14 +386,14 @@ public class ProcSerSyncHelper {
 		ConfigHelper.setEntitatCodi(entitatDto.getCodi());
 		log.debug("[SERVEIS] Inici actualitzar serveis");
 		// Comprova si hi ha una altre instància del procés en execució
-		var progres = ServeiServiceImpl.progresActualitzacioServeis.get(entitatDto.getDir3Codi());
+		var progres = ServeiServiceImpl.getProgresActualitzacioServeis().get(entitatDto.getDir3Codi());
 		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
 			log.debug("[SERVEIS] Ja existeix un altre procés que està executant l'actualització");
 			return;	// Ja existeix un altre procés que està executant l'actualització.
 		}
 		// inicialitza el seguiment del prgrés d'actualització
 		progres = new ProgresActualitzacioProcSer();
-		ServeiServiceImpl.progresActualitzacioServeis.put(entitatDto.getDir3Codi(), progres);
+		ServeiServiceImpl.getProgresActualitzacioServeis().put(entitatDto.getDir3Codi(), progres);
 		Map<String, String[]> avisosServeisOrgans = new HashMap<>();
 		try {
 			var ti = System.currentTimeMillis();
@@ -429,17 +429,17 @@ public class ProcSerSyncHelper {
 			}
 			progres.setProgres(100);
 			progres.setFinished(true);
-			ServeiServiceImpl.serveisAmbOrganNoSincronitzat.put(entitat.getId(), avisosServeisOrgans.size());
+			ServeiServiceImpl.getServeisAmbOrganNoSincronitzat().put(entitat.getId(), avisosServeisOrgans.size());
 			actualitzaAvisosSyncServeis(avisosServeisOrgans, entitatDto.getId());
 			integracioHelper.addAccioOk(info);
 		} catch (Exception e) {
 			var sw = new StringWriter();
 			var pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
-			ServeiServiceImpl.progresActualitzacioServeis.get(entitatDto.getDir3Codi()).setError(true);
-			ServeiServiceImpl.progresActualitzacioServeis.get(entitatDto.getDir3Codi()).setErrorMsg(sw.toString());
-			ServeiServiceImpl.progresActualitzacioServeis.get(entitatDto.getDir3Codi()).setProgres(100);
-			ServeiServiceImpl.progresActualitzacioServeis.get(entitatDto.getDir3Codi()).setFinished(true);
+			ServeiServiceImpl.getProgresActualitzacioServeis().get(entitatDto.getDir3Codi()).setError(true);
+			ServeiServiceImpl.getProgresActualitzacioServeis().get(entitatDto.getDir3Codi()).setErrorMsg(sw.toString());
+			ServeiServiceImpl.getProgresActualitzacioServeis().get(entitatDto.getDir3Codi()).setProgres(100);
+			ServeiServiceImpl.getProgresActualitzacioServeis().get(entitatDto.getDir3Codi()).setFinished(true);
 			for (ActualitzacioInfo inf: progres.getInfo()) {
 				if (inf.getText() != null) {
 					info.getParams().add(new AccioParam(MSG_PROCES, inf.getText()));
@@ -614,7 +614,7 @@ public class ProcSerSyncHelper {
 
 	private List<ProcSerDto> getServeisGdaByEntitat(String codiDir3) {
 
-		var progres = ServeiServiceImpl.progresActualitzacioServeis.get(codiDir3);
+		var progres = ServeiServiceImpl.getProgresActualitzacioServeis().get(codiDir3);
 		log.debug(">>>> >> Obtenir tots els serveis de Rolsac...");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.consulta.gesconadm"));
 		var t1 = System.currentTimeMillis();
@@ -628,7 +628,7 @@ public class ProcSerSyncHelper {
 
 	private List<ProcSerDto> getServeisGdaByEntitat(String codiDir3, int numPagina) {
 
-		var progres = ServeiServiceImpl.progresActualitzacioServeis.get(codiDir3);
+		var progres = ServeiServiceImpl.getProgresActualitzacioServeis().get(codiDir3);
 		log.debug(">>>> >> Obtenir tots els serveis de Rolsac...");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.consulta.gesconadm"));
 		var t1 = System.currentTimeMillis();

@@ -83,10 +83,7 @@ public class AplicacioController extends BaseController {
 
 	private void prepararFiltres(HttpServletRequest request, PaginacioParamsDto params) {
 
-		AplicacioFiltreCommand command = getFiltreCommand(request);
-		if (command == null) {
-			return;
-		}
+		var command = getFiltreCommand(request);
 		params.setFiltres(new ArrayList<>());
 		params.afegirFiltre("codiUsuari", command.getCodiUsuari());
 		params.afegirFiltre("callbackUrl", command.getCallbackUrl());

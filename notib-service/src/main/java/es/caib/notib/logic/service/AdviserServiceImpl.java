@@ -186,6 +186,10 @@ public class AdviserServiceImpl implements AdviserService {
             integracioHelper.addAccioError(info, "Error processant la petició", ex);
         }
         log.debug("Peticició processada correctament.");
+        if (enviament == null || enviament.getNotificacio() == null) {
+            log.error("Error greu enviament o notificació son nulls ");
+            return resultadoSincronizarEnvio;
+        }
         var estat = enviament.getNotificacio().getEstat();
         var isError = !NotificacioEstatEnumDto.FINALITZADA.equals(estat) && !NotificacioEstatEnumDto.PROCESSADA.equals(estat) && !Strings.isNullOrEmpty(eventErrorDescripcio);
         if (tipoEntrega.equals(BigInteger.valueOf(1L)) || tipoEntrega.equals(BigInteger.valueOf(2L))) {

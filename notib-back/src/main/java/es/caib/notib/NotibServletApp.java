@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Profile;
 public class NotibServletApp extends NotibApp {
 
 	public static void main(String[] args) {
-		SpringApplication.run(NotibServletApp.class, args);
+		SpringApplication.run(NotibServletApp.class);
 	}
 
 }

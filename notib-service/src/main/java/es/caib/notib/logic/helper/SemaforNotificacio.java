@@ -5,11 +5,16 @@ import lombok.Synchronized;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class SemaforNotificacio {
 
-	public static Object creacioSemafor = new Object();
+	private SemaforNotificacio() {
+		throw new IllegalStateException("SemaforNotificacio no es pot instanciar");
+	}
 
-	public static Map<Long, Integer> semafors = new HashMap<>();
+	private static Object creacioSemafor = new Object();
+
+	private static Map<Long, Integer> semafors = new HashMap<>();
 
 	public static Object getCreacioSemafor() {
 		return creacioSemafor;

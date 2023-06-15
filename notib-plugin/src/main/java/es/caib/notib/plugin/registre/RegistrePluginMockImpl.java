@@ -3,8 +3,7 @@ package es.caib.notib.plugin.registre;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.DatosInteresadoWsDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +24,7 @@ import java.util.Scanner;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-
+@Slf4j
 public class RegistrePluginMockImpl implements RegistrePlugin{
 
 	private final Properties properties;
@@ -35,13 +34,10 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	}
 
 	@Override
-	public RespostaConsultaRegistre salidaAsientoRegistral(
-			String codiDir3Entitat, 
-			AsientoRegistralBeanDto arb,
-			Long tipusOperacio,
-			boolean generarJustificant) {
+	public RespostaConsultaRegistre salidaAsientoRegistral(String codiDir3Entitat, AsientoRegistralBeanDto arb, Long tipusOperacio, boolean generarJustificant) {
+
 		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
-		logger.info(arb.toString());
+		log.info(arb.toString());
 //		System.out.println(">>> DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 //		ObjectMapper mapper = new ObjectMapper();
 //		try {
@@ -119,8 +115,6 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		
 		resposta.setJustificant(getJustificant());
 		resposta.setErrorCodi("OK");
-//		resposta.setJustificant(null);
-//		resposta.setErrorCodi("ERROR");
 		return resposta;
 		
 	}
@@ -136,7 +130,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	@Override
 	public List<TipusAssumpte> llistarTipusAssumpte(String entitat) throws RegistrePluginException {
 		
-		List<TipusAssumpte> tipusAssumptes = new ArrayList<TipusAssumpte>();
+		List<TipusAssumpte> tipusAssumptes = new ArrayList<>();
 		
 //		TipusAssumpte tipusAssumpte1 = new TipusAssumpte();
 //		tipusAssumpte1.setCodi("");
@@ -151,7 +145,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 			String entitat,
 			String tipusAssumpte) throws RegistrePluginException {
 		
-		List<CodiAssumpte> codiAssumptes = new ArrayList<CodiAssumpte>();
+		List<CodiAssumpte> codiAssumptes = new ArrayList<>();
 		
 //		CodiAssumpte codiAssumpte1 = new CodiAssumpte();
 //		codiAssumpte1.setCodi("");
@@ -178,7 +172,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 			String entitat,
 			Long autoritzacio) throws RegistrePluginException {
 		
-		List<Oficina> oficines = new ArrayList<Oficina>();
+		List<Oficina> oficines = new ArrayList<>();
 		
 		Oficina oficina1 = new Oficina();
 		oficina1.setCodi("O00001496");
@@ -254,7 +248,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 			String oficina,
 			Long autoritzacio) throws RegistrePluginException {
 		
-		List<Llibre> llibres = new ArrayList<Llibre>();
+		List<Llibre> llibres = new ArrayList<>();
 	
 		Llibre llibre1 = new Llibre();
 		llibre1.setCodi("L95");
@@ -281,17 +275,13 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	}
 	
 	@Override
-	public List<LlibreOficina> llistarLlibresOficines(
-			String entitatCodi, 
-			String usuariCodi,
-			Long tipusRegistre){
+	public List<LlibreOficina> llistarLlibresOficines(String entitatCodi, String usuariCodi, Long tipusRegistre){
 		return null;
 	}
 	
 	@Override
-	public Llibre llistarLlibreOrganisme(
-			String entitatCodi, 
-			String organismeCodi) throws RegistrePluginException {
+	public Llibre llistarLlibreOrganisme(String entitatCodi, String organismeCodi) {
+
 		Random rand = new Random();
 		Integer num = rand.nextInt(100);
 		Llibre llibre = new Llibre();
@@ -305,7 +295,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	public List<Organisme> llistarOrganismes(
 			String entitat) throws RegistrePluginException {
 		
-		List<Organisme> organismes = new ArrayList<Organisme>(); 
+		List<Organisme> organismes = new ArrayList<>();
 		
 		Organisme organisme = new Organisme();
 		organisme.setCodi("A04003003");
@@ -320,20 +310,18 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		
 		Integer anualitat =  null;
 		Integer numero = null;
-		
+
 //		ClassLoader classLoader = getClass().getClassLoader();
 //		File file = new File(classLoader.getResource("es/caib/notib/plugin/caib/registre/registre.txt").getFile());
 		File file = new File(getSequenciaPath());
-		
+
 		try (Scanner scanner = new Scanner(file)) {
 
 			anualitat = Integer.parseInt(scanner.nextLine());
 			numero = Integer.parseInt(scanner.nextLine());
 
-			scanner.close();
-			
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Scanner error ", e);
 		}
 		
 		if (update) {
@@ -348,13 +336,10 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 			}
 			
 			try (PrintStream fs = new PrintStream(file)) {
-				
-				fs.println(anualitat.toString());
-				fs.print(numero.toString());
-				fs.close();
-				
+				fs.println(anualitat);
+				fs.print(numero);
 			} catch (IOException e) {
-				e.printStackTrace();
+				log.error("PrintStream error ", e);
 			}
 		}
 		
@@ -364,20 +349,13 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	private byte[] getJustificant() {
 		
 		byte[] fileContent = null;
-		
-//		ClassLoader classLoader = getClass().getClassLoader();
-//		File file = new File(classLoader.getResource("es/caib/notib/plugin/caib/registre/justificant.pdf").getFile());
-		String justificantPath = getJustificantPath();
-		File file = new File(justificantPath);
-		
+		var justificantPath = getJustificantPath();
+		var file = new File(justificantPath);
 		try {
-		
 			fileContent = Files.readAllBytes(file.toPath());
-		
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Error llegint el justificant ", e);
 		}
-		
 		return fileContent;
 	}
 	
@@ -388,9 +366,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	public String getJustificantPath() {
 		return properties.getProperty("es.caib.notib.plugin.regweb.mock.justificant");
 	}
-	
-	private static final Logger logger = LoggerFactory.getLogger(RegistrePluginMockImpl.class);
-	
+
 	@Override
 	public String toString() {
 	    return getClass().getName() + "@" + Integer.toHexString(hashCode());
