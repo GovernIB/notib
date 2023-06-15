@@ -12,9 +12,11 @@ import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.api.representation.Form;
 import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +30,7 @@ import java.util.ArrayList;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public abstract class NotificacioBaseRestClient {
 
 	protected String baseUrl;
@@ -37,6 +40,7 @@ public abstract class NotificacioBaseRestClient {
 	protected boolean autenticacioBasic = true;
 	protected int connecTimeout = 20000;
 	protected int readTimeout = 120000;
+	protected boolean debug = false;
 
 	protected Client jerseyClient;
 
@@ -93,7 +97,8 @@ public abstract class NotificacioBaseRestClient {
 		jerseyClient = Client.create();
 		jerseyClient.setConnectTimeout(connecTimeout);
 		jerseyClient.setReadTimeout(readTimeout);
-		//jerseyClient.addFilter(new LoggingFilter(System.out));
+		if (this.debug)
+			jerseyClient.addFilter(new LoggingFilter(System.out));
 		jerseyClient.addFilter(
 				new ClientFilter() {
 					private ArrayList<Object> cookies;

@@ -4,16 +4,26 @@
 package es.caib.notib.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import es.caib.notib.client.domini.*;
+import es.caib.notib.client.domini.AppInfo;
+import es.caib.notib.client.domini.DadesConsulta;
+import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.client.domini.PermisConsulta;
+import es.caib.notib.client.domini.RespostaAltaV2;
+import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
+import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
+import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
+import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-;import java.text.SimpleDateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+
+;
 
 /**
  * Client REST v2 per al servei de notificacions de NOTIB.
@@ -78,19 +88,19 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	 * @param baseUrl URL de NOTIB al que es vol connectar. Ex. https://notib_server:8080/notib
 	 * @param username Nom de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
 	 * @param password Contrassenya de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
-	 * @param autenticacioBasic Indica si utilitzar autenticació tipus basic. Si té el valor false, utilitzarà autenticació tipus Form (per defecte en entorn CAIB)
+	 * @param debug Indica si generar traces de debug.
 	 * @version 2.0
 	 */
 	public NotificacioRestClientV2(
 			String baseUrl,
 			String username,
 			String password,
-			boolean autenticacioBasic) {
+			boolean debug) {
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
 		this.password = password;
-		this.autenticacioBasic = autenticacioBasic;
+		this.debug = debug;
 	}
 
 	/**
@@ -99,7 +109,6 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	 * @param baseUrl URL de NOTIB al que es vol connectar. Ex. https://notib_server:8080/notib
 	 * @param username Nom de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
 	 * @param password Contrassenya de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
-	 * @param autenticacioBasic Indica si utilitzar autenticació tipus basic. Si té el valor false, utilitzarà autenticació tipus Form (per defecte en entorn CAIB)
 	 * @param connecTimeout Timeout de connexio en milisegons
 	 * @param readTimeout Timeout de lectura en milisegons
 	 * @version 2.0
@@ -108,16 +117,16 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 			String baseUrl,
 			String username,
 			String password,
-			boolean autenticacioBasic,
 			int connecTimeout,
-			int readTimeout) {
+			int readTimeout,
+			boolean debug) {
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
 		this.password = password;
-		this.autenticacioBasic = autenticacioBasic;
 		this.connecTimeout = connecTimeout;
 		this.readTimeout = readTimeout;
+		this.debug = debug;
 	}
 
 	public AppInfo getAppInfo() {

@@ -2,6 +2,7 @@ package es.caib.notib.selenium;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
+import java.sql.Driver;
 import java.util.concurrent.TimeUnit;
 
 public class Test {
@@ -12,15 +13,15 @@ public class Test {
         for (int i = 0; i<1;i++) {
 
             t = new Thread(() -> {
-                var driver = new ChromeDriver();
+                WebDriver driver = new ChromeDriver();
                 driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
                 try {
-                    var ls = new LoginSelenium(driver);
+                    LoginSelenium ls = new LoginSelenium(driver);
                     ls.login();
                     while (true) {
-                        var ns = new RemesesSelenium(driver);
+                        RemesesSelenium ns = new RemesesSelenium(driver);
                         ns.test();
-                        var es = new EnviamentsSelenium(driver);
+                        EnviamentsSelenium es = new EnviamentsSelenium(driver);
                         es.test();
                     }
                 } catch (Exception ex) {

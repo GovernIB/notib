@@ -30,13 +30,13 @@ import static org.junit.Assert.*;
 public class ClientRestValidacionsTest extends ClientBaseTest {
 
 	
-	private static final String URL = "http://localhost:8280/notib";
-	private static final String USERNAME = "admin";
-	private static final String PASSWORD = "admin";
+//	private static final String URL = "http://localhost:8280/notib";
+//	private static final String USERNAME = "admin";
+//	private static final String PASSWORD = "admin";
 
-//	private static final String URL = "https://dev.caib.es/notib";
-//	private static final String USERNAME = "$ripea_notib";
-//	private static final String PASSWORD = "ripea_notib";
+	private static final String URL = "https://dev.caib.es/notibapi";
+	private static final String USERNAME = "$ripea_notib";
+	private static final String PASSWORD = "ripea_notib";
 
 	/*
 	@Rule
@@ -50,8 +50,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		client = NotificacioRestClientFactory.getRestClient(
 				URL,
 				USERNAME,
-				PASSWORD,
-				false);
+				PASSWORD);
 	}
 
 	@Test

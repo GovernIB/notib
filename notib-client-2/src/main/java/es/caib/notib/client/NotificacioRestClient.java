@@ -45,9 +45,9 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 		this.password = password;
 	}
 
+
 	/**
 	 * Constructor per a crear un client per a connectar-se amb la API REST v1 de NOTIB.
-	 * <p>El client creat amb aquest constructor utilitzarà autenticació tipus form (per defecte en entorn CAIB)</p>
 	 *
 	 * @param baseUrl URL de NOTIB al que es vol connectar. Ex. https://notib_server:8080/notib
 	 * @param username Nom de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
@@ -62,47 +62,6 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 		this.baseUrl = baseUrl;
 		this.username = username;
 		this.password = password;
-		this.connecTimeout = connecTimeout;
-		this.readTimeout = readTimeout;
-	}
-
-	/**
-	 * Constructor per a crear un client per a connectar-se amb la API REST v1 de NOTIB.
-	 * <p>El client creat amb aquest constructor utilitzarà un timeout de connexió de 20s i un timeout de lectura de 120s</p>
-	 *
-	 * @param baseUrl URL de NOTIB al que es vol connectar. Ex. https://notib_server:8080/notib
-	 * @param username Nom de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
-	 * @param password Contrassenya de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
-	 * @param autenticacioBasic Indica si utilitzar autenticació tipus basic. Si té el valor false, utilitzarà autenticació tipus Form (per defecte en entorn CAIB)
-	 * @version 1.0
-	 */
-	public NotificacioRestClient(String baseUrl, String username, String password, boolean autenticacioBasic) {
-
-		super();
-		this.baseUrl = baseUrl;
-		this.username = username;
-		this.password = password;
-		this.autenticacioBasic = autenticacioBasic;
-	}
-
-	/**
-	 * Constructor per a crear un client per a connectar-se amb la API REST v1 de NOTIB.
-	 *
-	 * @param baseUrl URL de NOTIB al que es vol connectar. Ex. https://notib_server:8080/notib
-	 * @param username Nom de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
-	 * @param password Contrassenya de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
-	 * @param autenticacioBasic Indica si utilitzar autenticació tipus basic. Si té el valor false, utilitzarà autenticació tipus Form (per defecte en entorn CAIB)
-	 * @param connecTimeout Timeout de connexio en milisegons
-	 * @param readTimeout Timeout de lectura en milisegons
-	 * @version 1.0
-	 */
-	public NotificacioRestClient(String baseUrl, String username, String password, boolean autenticacioBasic, int connecTimeout, int readTimeout) {
-
-		super();
-		this.baseUrl = baseUrl;
-		this.username = username;
-		this.password = password;
-		this.autenticacioBasic = autenticacioBasic;
 		this.connecTimeout = connecTimeout;
 		this.readTimeout = readTimeout;
 	}
@@ -127,16 +86,6 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 			var r = wt.request(MediaType.APPLICATION_JSON).post(Entity.json(body)).readEntity(RespostaAlta.class);
 			log.debug("Missatge REST rebut: " + r);
 			return r;
-//		} catch (UniformInterfaceException ue) {
-//			RespostaAlta respostaAlta = new RespostaAlta();
-//			ClientResponse response = ue.getResponse();
-//
-//			if (response != null && response.getStatus() == 401) {
-//				respostaAlta.setError(true);
-//				respostaAlta.setErrorDescripcio("[CLIENT] Hi ha hagut un problema d'autenticació: "  + ue.getMessage());
-//				return respostaAlta;
-//			}
-//			throw new RuntimeException(ue);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}

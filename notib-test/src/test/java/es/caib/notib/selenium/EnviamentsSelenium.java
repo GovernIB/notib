@@ -17,7 +17,7 @@ public class EnviamentsSelenium extends  NotibSelenium {
 
     public void filtrar() {
 
-        var nom = driver.findElement(By.name("titularNomLlinatge"));
+        WebElement nom = driver.findElement(By.name("titularNomLlinatge"));
         nom.sendKeys("test");
         driver.findElement(By.id("btnFiltrar")).click();
     }
@@ -25,11 +25,11 @@ public class EnviamentsSelenium extends  NotibSelenium {
     public void modificarColumnes() {
 
         esperar();
-        var path = "/notib/enviament/visualitzar";
-        var aTags = driver.findElements(By.tagName("a"));
+        String path = "/notib/enviament/visualitzar";
+        List<WebElement> aTags = driver.findElements(By.tagName("a"));
         WebElement boto = null;
         String href;
-        for (var a : aTags) {
+        for (WebElement a : aTags) {
             href = a.getAttribute("href");
             if (!Strings.isNullOrEmpty(href) && href.contains(path)) {
                 boto = a;
@@ -42,7 +42,7 @@ public class EnviamentsSelenium extends  NotibSelenium {
         boto.click();
         esperar();
         get(urlBase + "/modal/enviament/visualitzar");
-        var check = driver.findElement(By.id("titularEmail"));
+        WebElement check = driver.findElement(By.id("titularEmail"));
         check.click();
         driver.findElement(By.tagName("button")).click();
         get(urlBase + "/enviament");

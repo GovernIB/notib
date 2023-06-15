@@ -13,11 +13,11 @@ public class LoginSelenium  extends NotibSelenium{
     void login() {
 
         this.driver.get(urlBase);
-        var user = driver.findElement(By.id("j_username"));
+        WebElement user = driver.findElement(By.id("j_username"));
         user.sendKeys("admin");
-        var pass = driver.findElement(By.id("j_password"));
+        WebElement pass = driver.findElement(By.id("j_password"));
         pass.sendKeys("admin");
-        var button = driver.findElement(By.name("formUCboton"));
+        WebElement button = driver.findElement(By.name("formUCboton"));
         button.click();
     }
 }

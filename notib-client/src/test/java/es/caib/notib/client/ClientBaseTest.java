@@ -106,7 +106,8 @@ public class ClientBaseTest {
 			destinatari.setNif("18225486x");
 			destinatari.setTelefon("666020202");
 			destinatari.setEmail("sandreu@limit.es");
-			destinatari.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+//			destinatari.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+			destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
 			if (destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
 				destinatari.setDir3Codi(ORGAN_SIR_CODI);
 			}

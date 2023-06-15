@@ -13,12 +13,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.logging.LoggingFeature;
 
+import javax.annotation.PostConstruct;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 ;
 
@@ -34,7 +39,7 @@ public abstract class NotificacioBaseRestClient {
 	protected String username;
 	protected String password;
 
-	protected boolean autenticacioBasic = true;
+	protected boolean debug = false;
 	protected Integer connecTimeout = 20000;
 	protected Integer readTimeout = 120000;
 
@@ -71,19 +76,12 @@ public abstract class NotificacioBaseRestClient {
 		}
 	}
 
-	public boolean isAutenticacioBasic() {
-		return autenticacioBasic;
-	}
-
 	protected Client generarClient(String urlAmbMetode) throws Exception {
 
 		if (jerseyClient != null) {
 			return jerseyClient;
 		}
 		jerseyClient = generarClient();
-//		if (username != null) {
-//			autenticarClient(jerseyClient, urlAmbMetode, username, password);
-//		}
 		return jerseyClient;
 	}
 
@@ -93,11 +91,12 @@ public abstract class NotificacioBaseRestClient {
 		config.register(JacksonFeature.class);
 		if (username != null && !username.isBlank()) {
 			log.debug("Autenticant REST amb autenticació de tipus HTTP basic (usuari= {})", username);
-//			var feature = HttpAuthenticationFeature.basic(username, password);
-//			config.register(feature);
 			config.register(HttpAuthenticationFeature.basic(username, password));
 		}
 		config.register(ResponseClientFilter.class);
+		if (debug) {
+			config.property(LoggingFeature.LOGGING_FEATURE_VERBOSITY_CLIENT, LoggingFeature.Verbosity.PAYLOAD_ANY);
+		}
 		var clientBuilder = ClientBuilder.newBuilder().withConfig(config);
 		if (connecTimeout != null) {
 			clientBuilder.connectTimeout(connecTimeout, TimeUnit.MILLISECONDS);
@@ -115,70 +114,8 @@ public abstract class NotificacioBaseRestClient {
 		mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 
-//
-//
-//		jerseyClient = Client.create();
-//		jerseyClient.setConnectTimeout(connecTimeout);
-//		jerseyClient.setReadTimeout(readTimeout);
-//		//jerseyClient.addFilter(new LoggingFilter(System.out));
-//		jerseyClient.addFilter(
-//				new ClientFilter() {
-//					private ArrayList<Object> cookies;
-//					@Override
-//					public ClientResponse handle(ClientRequest request) throws ClientHandlerException {
-//						if (cookies != null) {
-//							request.getHeaders().put("Cookie", cookies);
-//						}
-//						ClientResponse response = getNext().handle(request);
-//						if (response.getCookies() != null) {
-//							if (cookies == null) {
-//								cookies = new ArrayList<Object>();
-//							}
-//							cookies.addAll(response.getCookies());
-//						}
-//						return response;
-//					}
-//				}
-//		);
-//		jerseyClient.addFilter(
-//				new ClientFilter() {
-//					@Override
-//					public ClientResponse handle(ClientRequest request) throws ClientHandlerException {
-//						ClientHandler ch = getNext();
-//				        ClientResponse resp = ch.handle(request);
-//
-//						if (resp.getStatus()/100 != 3) {
-////				        if (resp.getStatusInfo().getFamily() != Response.Status.Family.REDIRECTION) {
-//				            return resp;
-//				        } else {
-//				            String redirectTarget = resp.getHeaders().getFirst("Location");
-//				            request.setURI(UriBuilder.fromUri(redirectTarget).build());
-//				            return ch.handle(request);
-//				        }
-//					}
-//				}
-//		);
 		return jerseyClient;
 	}
-
-//	protected void autenticarClient(Client jerseyClient, String urlAmbMetode, String username, String password) throws Exception {
-//
-//		if (!autenticacioBasic) {
-//			log.debug("Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (urlAmbMetode=" + urlAmbMetode + ", username=" + username);
-//			var form = new Form();
-//			form.param("j_username", username);
-//			form.param("j_password", password);
-//			var wt = jerseyClient.target(baseUrl + "/j_security_check");
-//			var r = wt.request(MediaType.MULTIPART_FORM_DATA).post(Entity.form(form));
-////			jerseyClient.
-////			resource(baseUrl + "/j_security_check").
-////			type("application/x-www-form-urlencoded").
-////			post(form);
-//		} else {
-//			log.debug("Autenticant REST amb autenticació de tipus HTTP basic (urlAmbMetode=" + urlAmbMetode + ", username=" + username);
-////			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
-//		}
-//	}
 
 	protected ObjectMapper getMapper() {
 		return new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
