@@ -59,6 +59,8 @@ public class EjbContextConfig {
 	private String showSql;
 	@Value("${spring.jpa.properties.hibernate.format_sql}")
 	private String formatSql;
+	@Value("es.caib.notib.servidor.jboss:true")
+	private String jboss;
 
 	private static boolean initialized;
 	private static ApplicationContext applicationContext;
@@ -130,7 +132,7 @@ public class EjbContextConfig {
 	}
 
 	private boolean isJBoss() {
-		return true;
+		return Boolean.parseBoolean(jboss);
 	}
 
 }

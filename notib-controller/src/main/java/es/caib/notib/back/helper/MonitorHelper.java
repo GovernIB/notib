@@ -20,7 +20,11 @@ public class MonitorHelper {
 	private static long	prevProcessCpuTime;
 	private static RuntimeMXBean rmBean;
 	private static com.sun.management.OperatingSystemMXBean sunOSMBean;
-	private static final String noDisponible = "No disponible";
+	private static final String NO_DISPONIBLE = "No disponible";
+
+	private MonitorHelper() {
+		throw new IllegalStateException("Utility class");
+	}
 
 	public static com.sun.management.OperatingSystemMXBean getSunOSMBean() {
 		return sunOSMBean;
@@ -31,7 +35,7 @@ public class MonitorHelper {
 		try {
 			return sunOSMBean.getArch();
 		} catch (Exception e) {
-			return noDisponible;
+			return NO_DISPONIBLE;
 		}
 	}
 	
@@ -40,7 +44,7 @@ public class MonitorHelper {
 		try {
 			return sunOSMBean.getName();
 		} catch (Exception e) {
-			return noDisponible;
+			return NO_DISPONIBLE;
 		}
 	}
 	
@@ -49,7 +53,7 @@ public class MonitorHelper {
 		try {
 			return sunOSMBean.getVersion();
 		} catch (Exception e) {
-			return noDisponible;
+			return NO_DISPONIBLE;
 		}
 	}
 
@@ -89,20 +93,14 @@ public class MonitorHelper {
 		return ManagementFactory.getThreadMXBean().getAllThreadIds();
 	}
 
-	public MonitorHelper(String sactiu) {
-		super();
-		actiu = !"true".equalsIgnoreCase(sactiu);
-	}
-
 	public static String humanReadableByteCount(long bytes) {
 
-		var si = true;
-		var unit = si ? 1000 : 1024;
+		var unit = 1000;
 		if (bytes < unit) {
 			return bytes + " B";
 		}
 		var exp = (int) (Math.log(bytes) / Math.log(unit));
-		var pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+		var pre = "kMGTPE".charAt(exp - 1);
 		return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
 	}
 
@@ -116,7 +114,7 @@ public class MonitorHelper {
 			}
 			return result.cpuUsage + "%";
 		} catch (Exception e) {
-			return noDisponible;
+			return NO_DISPONIBLE;
 		}
 	}
 

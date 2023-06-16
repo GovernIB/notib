@@ -23,6 +23,6 @@ public class RespostaProcediments {
     @JsonProperty("mensaje")
     private String mensaje;
     @JsonProperty("resultado")
-    private List<Procediment> resultado = new ArrayList<Procediment>();
+    private List<Procediment> resultado = new ArrayList<>();
     
 }

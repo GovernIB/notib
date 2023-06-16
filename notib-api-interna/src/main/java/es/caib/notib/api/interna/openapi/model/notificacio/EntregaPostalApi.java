@@ -20,56 +20,56 @@ public class EntregaPostalApi {
     @Schema(name = "tipus", implementation = NotificaDomiciliConcretTipus.class, example = "NACIONAL", required = true,
             description = "Enumerat que indica el tipus de entrega postal.")
     protected NotificaDomiciliConcretTipus tipus;
-    @Schema(name = "viaTipus", implementation = EntregaPostalVia.class, example = "CARRER", required = false,
+    @Schema(name = "viaTipus", implementation = EntregaPostalVia.class, example = "CARRER",
             description = "Enumerat que indica el tipus de via per a entregues postals\n" +
                     " * Obligatori quan tipoDomicili = NACIONAL")
     protected EntregaPostalVia viaTipus;
     @Size(max = 50)
-    @Schema(name = "viaNom", implementation = String.class, example = "Aragó", required = false,
+    @Schema(name = "viaNom", implementation = String.class, example = "Aragó",
             description = "Nom de la via per entregues postals\n" +
                     " * Obligatori quan tipoDomicili = NACIONAL o ESTRANGER")
     protected String viaNom;
     @Size(max = 5)
-    @Schema(name = "numeroCasa", implementation = String.class, example = "26", required = false,
+    @Schema(name = "numeroCasa", implementation = String.class, example = "26",
             description = "Número de la casa per entregues postals\n" +
                     " * Obligatori quan tipoDomicili = NACIONAL excepte si s’indica el punt quilomètric")
     protected String numeroCasa;
     @Size(max = 3)
-    @Schema(name = "numeroQualificador", implementation = String.class, example = "bis", required = false,
+    @Schema(name = "numeroQualificador", implementation = String.class, example = "bis",
             description = "Informació addicional sobre la numeració de l’adreça")
     protected String numeroQualificador;
     @Size(max = 30)
-    @Schema(name = "puntKm", implementation = String.class, example = "12.5", required = false,
+    @Schema(name = "puntKm", implementation = String.class, example = "12.5",
             description = "Punt quilomètric per entregues postals\n" +
                     " * Obligatori quan tipoDomicili = NACIONAL excepte si s’indica numeroCasa")
     protected String puntKm;
     @Size(max = 10)
-    @Schema(name = "apartatCorreus", implementation = String.class, example = "123", required = false,
+    @Schema(name = "apartatCorreus", implementation = String.class, example = "123",
             description = "Apartat de correus per entregues postals\n" +
                     " * Obligatori quan tipoDomicili = APARTAT_CORREUS")
     protected String apartatCorreus;
     @Size(max = 3)
-    @Schema(name = "portal", implementation = String.class, example = "2", required = false,
+    @Schema(name = "portal", implementation = String.class, example = "2",
             description = "Portal de la casa per entregues postals")
     protected String portal;
     @Size(max = 3)
-    @Schema(name = "escala", implementation = String.class, example = "B", required = false,
+    @Schema(name = "escala", implementation = String.class, example = "B",
             description = "Escala de la casa per entregues postals")
     protected String escala;
     @Size(max = 3)
-    @Schema(name = "planta", implementation = String.class, example = "4", required = false,
+    @Schema(name = "planta", implementation = String.class, example = "4",
             description = "Planta de la casa per entregues postals")
     protected String planta;
     @Size(max = 3)
-    @Schema(name = "porta", implementation = String.class, example = "2", required = false,
+    @Schema(name = "porta", implementation = String.class, example = "2",
             description = "Porta de la casa per entregues postals")
     protected String porta;
     @Size(max = 3)
-    @Schema(name = "bloc", implementation = String.class, example = "C", required = false,
+    @Schema(name = "bloc", implementation = String.class, example = "C",
             description = "Bloc de la casa per entregues postals")
     protected String bloc;
     @Size(max = 40)
-    @Schema(name = "complement", implementation = String.class, example = "Edificio Walden", required = false,
+    @Schema(name = "complement", implementation = String.class, example = "Edificio Walden",
             description = "Informació extra sobre la casa per entregues postals")
     protected String complement;
     @Size(max = 10)
@@ -78,45 +78,42 @@ public class EntregaPostalApi {
                     " * Per enviaments internacionals a països sense codi posatal es pot posar 00000.")
     protected String codiPostal;
     @Size(max = 255)
-    @Schema(name = "poblacio", implementation = String.class, example = "Palma", required = false,
+    @Schema(name = "poblacio", implementation = String.class, example = "Palma",
             description = "Població on s’entrega l’enviament\n" +
                     " * Obligatori quan tipoDomicili = NACIONAL, ESTRANGER o APARTAT_POSTAL")
     protected String poblacio;
     @Size(max = 6)
-    @Schema(name = "municipiCodi", implementation = String.class, example = "070407", required = false,
+    @Schema(name = "municipiCodi", implementation = String.class, example = "070407",
             description = "Codi INE de 6 caràcters del municipi on s’entrega l’enviament (inclou codi de control)\n" +
                     " * Obligatori quan tipoDomicili = NACIONAL o APARTAT_POSTAL")
     protected String municipiCodi;
     @Size(max = 2)
-    @Schema(name = "provincia", implementation = String.class, example = "07", required = false,
+    @Schema(name = "provincia", implementation = String.class, example = "07",
             description = "Codi INE de 2 dígits de la província on s’entrega l’enviament\n" +
                     " * Obligatori quan tipoDomicili = NACIONAL o APARTAT_POSTAL")
     protected String provincia;
     @Size(max = 2)
-    @Schema(name = "paisCodi", implementation = String.class, example = "DE", required = false,
+    @Schema(name = "paisCodi", implementation = String.class, example = "DE",
             description = "Codi ISO 3166 de 2 caràcters del país on s’entrega l’enviament\n" +
                     "* Obligatori quan tipoDomicili = ESTRANGER")
     protected String paisCodi;
     @Size(max = 50)
-    @Schema(name = "linea1", implementation = String.class, example = "Carrer Aragó 26bis, 4t - 3", required = false,
+    @Schema(name = "linea1", implementation = String.class, example = "Carrer Aragó 26bis, 4t - 3",
             description = "Línia 1 de l’adreça d’entrega de l’enviament sense normalitzar\n" +
                     " * Obligatori quan tipoDomicili = SENSE_NORMALITZAR")
     protected String linea1;
     @Size(max = 50)
-    @Schema(name = "linea2", implementation = String.class, example = "Palma 07003 - Illes Balears", required = false,
+    @Schema(name = "linea2", implementation = String.class, example = "Palma 07003 - Illes Balears",
             description = "Línia 2 de l’adreça d’entrega de l’enviament sense normalitzar\n" +
                     " * Obligatori quan tipoDomicili = SENSE_NORMALITZAR")
     protected String linea2;
-    @Schema(name = "cie", implementation = String.class, example = "Servera", required = false,
-            description = "Línia 2 de l’adreça d’entrega de l’enviament sense normalitzar")
+    @Schema(name = "cie", implementation = String.class, example = "Servera", description = "Línia 2 de l’adreça d’entrega de l’enviament sense normalitzar")
     protected Integer cie;
     @Size(max = 10)
-    @Schema(name = "formatSobre", implementation = String.class, example = "C5", required = false,
-            description = "Cadena indicant el format del sobre ")
+    @Schema(name = "formatSobre", implementation = String.class, example = "C5", description = "Cadena indicant el format del sobre ")
     protected String formatSobre;
     @Size(max = 10)
-    @Schema(name = "formatFulla", implementation = String.class, example = "A4", required = false,
-            description = "Cadena indicant el format de la fulla")
+    @Schema(name = "formatFulla", implementation = String.class, example = "A4", description = "Cadena indicant el format de la fulla")
     protected String formatFulla;
 
 }

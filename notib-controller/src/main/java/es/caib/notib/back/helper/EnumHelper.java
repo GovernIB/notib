@@ -25,9 +25,11 @@ public class EnumHelper {
 	public static List<HtmlOption> getOptionsForEnum(Class<?> enumeracio) {
 		return getOptionsForEnum(enumeracio, null);
 	}
+
 	public static List<HtmlOption> getOptionsForEnum(Class<?> enumeracio, String textKeyPrefix) {
 		return getOptionsForEnum(enumeracio, textKeyPrefix, null);
 	}
+
 	public static List<HtmlOption> getOptionsForEnum(Class<?> enumeracio, String textKeyPrefix, Enum<?>[] ignores) {
 
 		if (!enumeracio.isEnum()) {
@@ -58,8 +60,8 @@ public class EnumHelper {
 		if (!enumeracio.isEnum()) {
 			return resposta;
 		}
-		for (Object e: ordre) {
-			resposta.add(new HtmlOption(((Enum<?>)e).name(), (textKeyPrefix != null) ? textKeyPrefix + ((Enum<?>)e).name() : ((Enum<?>)e).name()));
+		for (var e: ordre) {
+			resposta.add(new HtmlOption(e.name(), (textKeyPrefix != null) ? textKeyPrefix + e.name() : e.name()));
 		}
 		return resposta;
 	}
@@ -70,9 +72,9 @@ public class EnumHelper {
 			return null;
 		}
 		HtmlOption resposta = null;
-		for (Object e : enumeracio.getEnumConstants()) {
+		for (var e : enumeracio.getEnumConstants()) {
 			if (textKeyPrefix.contains(((Enum<?>) e).name())) {
-				resposta = new HtmlOption(((Enum<?>) e).name(), (textKeyPrefix != null) ? textKeyPrefix : ((Enum<?>) e).name());
+				resposta = new HtmlOption(((Enum<?>) e).name(), textKeyPrefix);
 			}
 		}
 		return resposta;

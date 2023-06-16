@@ -65,7 +65,7 @@ public class CarpetaCaibImpl implements CarpetaPlugin {
             return;
         }
         String username = properties.getProperty("es.caib.notib.plugin.carpeta.usuari");
-        String password = properties.getProperty("es.caib.notib.plugin.carpeta.contrasenya");;
+        String password = properties.getProperty("es.caib.notib.plugin.carpeta.contrasenya");
         client = Client.create();
         client.addFilter(new HTTPBasicAuthFilter(username, password));
     }

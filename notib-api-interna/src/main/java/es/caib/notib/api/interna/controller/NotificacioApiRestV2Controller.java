@@ -45,7 +45,7 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 	}
 
 	@GetMapping(value = {"/consultaEstatNotificacio/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(HttpServletRequest request) throws UnsupportedEncodingException {
+	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(HttpServletRequest request) {
 
 		var identificador = extractIdentificador(request);
 		try {

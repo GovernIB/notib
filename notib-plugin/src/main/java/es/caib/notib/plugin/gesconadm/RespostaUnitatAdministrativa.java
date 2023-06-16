@@ -16,6 +16,6 @@ public class RespostaUnitatAdministrativa {
     @JsonProperty("status")
     private String status;
     @JsonProperty("resultado")
-    private List<UnitatAdministrativa> resultado = new ArrayList<UnitatAdministrativa>();
+    private List<UnitatAdministrativa> resultado = new ArrayList<>();
 	    
 }

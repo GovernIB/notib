@@ -30,9 +30,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Persona {
 
-//    @XmlTransient
-//    @JsonIgnore
-//    private Long id;
     private boolean incapacitat;
     private InteressatTipus interessatTipus;
     @JsonDeserialize(using = TrimStringDeserializer.class)

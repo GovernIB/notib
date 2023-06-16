@@ -68,9 +68,10 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 			} else {
 				ps = con.prepareStatement(sqlQuery);
 			}
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				rols.add(rs.getString(1));
+			try (var rs = ps.executeQuery()) {
+				while (rs.next()) {
+					rols.add(rs.getString(1));
+				}
 			}
 		} catch (Exception ex) {
 			throw new SistemaExternException(ex);
@@ -111,14 +112,15 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 				} else {
 					ps = con.prepareStatement(sqlQuery);
 				}
-				var rs = ps.executeQuery();
-				while (rs.next()) {
-					DadesUsuari dadesUsuari = new DadesUsuari();
-					dadesUsuari.setCodi(rs.getString(1));
-					dadesUsuari.setNom(rs.getString(2));
-					dadesUsuari.setNif(rs.getString(3));
-					dadesUsuari.setEmail(rs.getString(4));
-					llistaUsuaris.add(dadesUsuari);
+				try (var rs = ps.executeQuery()) {
+					while (rs.next()) {
+						DadesUsuari dadesUsuari = new DadesUsuari();
+						dadesUsuari.setCodi(rs.getString(1));
+						dadesUsuari.setNom(rs.getString(2));
+						dadesUsuari.setNif(rs.getString(3));
+						dadesUsuari.setEmail(rs.getString(4));
+						llistaUsuaris.add(dadesUsuari);
+					}
 				}
 			}
 		} catch (Exception ex) {

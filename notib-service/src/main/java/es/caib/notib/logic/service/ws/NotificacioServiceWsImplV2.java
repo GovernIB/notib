@@ -556,7 +556,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			ObjectMapper mapper  = new ObjectMapper();
 			try {
 				json = mapper.writeValueAsString(permisConsulta);
-			} catch (Exception e) { }
+			} catch (Exception e) {
+				log.error("Error convertint el permis a JSON", e);
+			}
 
 			IntegracioInfo info = new IntegracioInfo(
 					IntegracioHelper.INTCODI_CLIENT,
@@ -575,13 +577,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				ConfigHelper.setEntitatCodi(entitat.getCodi());
 				info.setCodiEntitat(entitat.getCodi());
 				integracioHelper.addAplicacioAccioParam(info, entitat.getId());
-				ProcSerEntity procediment = procSerRepository.findByEntitatAndCodiProcediment(entitat, permisConsulta.getProcedimentCodi());
-
-				List<PermisDto> permisos = permisosHelper.findPermisos(procediment.getId(), ProcedimentEntity.class);
+				var procediment = procSerRepository.findByEntitatAndCodiProcediment(entitat, permisConsulta.getProcedimentCodi());
+				var permisos = permisosHelper.findPermisos(procediment.getId(), ProcedimentEntity.class);
 				if (permisos == null || permisos.isEmpty()) {
 					PermisDto permisNou = new PermisDto();
-					permisos = new ArrayList<PermisDto>();
-
+					permisos = new ArrayList<>();
 					permisNou.setPrincipal(permisConsulta.getUsuariCodi());
 					permisNou.setTipus(TipusEnumDto.USUARI);
 					//Consulta
@@ -590,10 +590,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 					permisNou.setNotificacio(false);
 					//gestió
 					permisNou.setAdministration(false);
-
 					permisos.add(permisNou);
 				}
-				for (PermisDto permisDto : permisos) {
+				for (var permisDto : permisos) {
 					if (permisDto.getPrincipal().equals(permisConsulta.getUsuariCodi())) {
 						permisDto.setRead(permisConsulta.isPermisConsulta());
 						permisosHelper.updatePermis(procediment.getId(), ProcedimentEntity.class, permisDto);
@@ -948,27 +947,26 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	@Override
 	@Transactional(readOnly = true)
 	public RespostaConsultaDadesRegistreV2 consultaDadesRegistreV2(DadesConsulta dadesConsulta) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			String json = "S'ha produït un error al intentar llegir la informació de les dades de la consulta";
 			ObjectMapper mapper  = new ObjectMapper();
 			try {
 				json = mapper.writeValueAsString(dadesConsulta);
-			} catch (Exception e) { }
+			} catch (Exception e) {
+				log.error("Error convertint les dades de consulta a JSON", e);
+			}
 
-			IntegracioInfo info = new IntegracioInfo(
-					IntegracioHelper.INTCODI_CLIENT,
-					"Consulta de les dades de registre",
-					IntegracioAccioTipusEnumDto.RECEPCIO,
+			IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_CLIENT, "Consulta de les dades de registre", IntegracioAccioTipusEnumDto.RECEPCIO,
 					new AccioParam("Dades de la consulta", json));
 
-			RespostaConsultaDadesRegistreV2 resposta = new RespostaConsultaDadesRegistreV2();
+			var resposta = new RespostaConsultaDadesRegistreV2();
 			String numeroRegistreFormatat = null;
 			String codiDir3Entitat = null;
 
 			if (dadesConsulta.getIdentificador() != null) {
 				log.debug("Consultant les dades de registre de la notificació amb identificador: " + dadesConsulta.getIdentificador());
-				int numeroRegistre = 0;
 				NotificacioEntity notificacio;
 
 				if (isValidUUID(dadesConsulta.getIdentificador())) {
@@ -1213,14 +1211,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		}
 		NotificacioEventEntity errorEvent = notificacioHelper.getNotificaErrorEvent(notificacioGuardada);
 		if (errorEvent != null) {
-//			log.debug(">> [ALTA] Event d'error de Notifica!: " + errorEvent.getErrorDescripcio());
 			info.setCodiEntitat(errorEvent.getNotificacio().getEntitat().getCodi());
 			resposta.setError(true);
 			resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
 			resposta.setErrorData(new Date());
 		}
 		resposta.setReferencies(referencies);
-		resposta.setDataCreacio(notificacioGuardada.getCreatedDate().isPresent() ? Date.from(notificacioGuardada.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()) : null);
+		resposta.setDataCreacio(notificacioGuardada.getCreatedDate().isPresent() ? Date.from(notificacioGuardada.getCreatedDate().orElseThrow().atZone(ZoneId.systemDefault()).toInstant()) : null);
 		log.debug(">> [ALTA] afegides referències");
 		integracioHelper.addAccioOk(info);
 		return resposta;
@@ -1281,7 +1278,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	}
 
 	private List<PersonaEntity> getDestinataris(Enviament enviament) {
-		List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
+		List<PersonaEntity> destinataris = new ArrayList<>();
 		if (enviament.getDestinataris() != null) {
 			for(Persona persona: enviament.getDestinataris()) {
 				PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilderV2(
@@ -1302,7 +1299,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	}
 
 	private PersonaEntity saveTitular(Enviament enviament) {
-		PersonaEntity titular = personaRepository.save(PersonaEntity.getBuilderV2(
+		return personaRepository.save(PersonaEntity.getBuilderV2(
 				enviament.getTitular().getInteressatTipus(),
 				enviament.getTitular().getEmail(),
 				enviament.getTitular().getLlinatge1(),
@@ -1313,60 +1310,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				enviament.getTitular().getRaoSocial(),
 				enviament.getTitular().getDir3Codi()
 		).incapacitat(enviament.getTitular().isIncapacitat()).build());
-		return titular;
 	}
 
-//	private NotificaDomiciliNumeracioTipusEnumDto getDomiciliNumeracioTipus(Enviament enviament) {
-//		NotificaDomiciliNumeracioTipusEnumDto numeracioTipus;
-//		if (enviament.getEntregaPostal().getNumeroCasa() != null) {
-//			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.NUMERO;
-//		} else if (enviament.getEntregaPostal().getApartatCorreus() != null) {
-//			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.APARTAT_CORREUS;
-//		} else if (enviament.getEntregaPostal().getPuntKm() != null) {
-//			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.PUNT_KILOMETRIC;
-//		} else {
-//			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.SENSE_NUMERO;
-//		}
-//		return numeracioTipus;
-//	}
-
-//	private NotificaDomiciliConcretTipus getDomiciliTipusConcret(
-//			Enviament enviament) {
-//		NotificaDomiciliConcretTipus tipusConcret = null;
-//		if (enviament.getEntregaPostal().getTipus() != null) {
-//			switch (enviament.getEntregaPostal().getTipus()) {
-//				case APARTAT_CORREUS:
-//					tipusConcret = NotificaDomiciliConcretTipus.APARTAT_CORREUS;
-//					break;
-//				case ESTRANGER:
-//					tipusConcret = NotificaDomiciliConcretTipus.ESTRANGER;
-//					break;
-//				case NACIONAL:
-//					tipusConcret = NotificaDomiciliConcretTipus.NACIONAL;
-//					break;
-//				case SENSE_NORMALITZAR:
-//					tipusConcret = NotificaDomiciliConcretTipus.SENSE_NORMALITZAR;
-//					break;
-//			}
-//		} else {
-//			throw new ValidationException(
-//					"ENTREGA_POSTAL",
-//					"L'entrega postal te el camp tipus buit");
-//		}
-//		return tipusConcret;
-//	}
-
 	private ServeiTipusEnumDto getServeiTipus(Enviament enviament) {
-		ServeiTipusEnumDto serveiTipus = null;
-		if (enviament.getServeiTipus() != null) {
-			switch (enviament.getServeiTipus()) {
-				case NORMAL:
-					serveiTipus = ServeiTipusEnumDto.NORMAL;
-					break;
-				case URGENT:
-					serveiTipus = ServeiTipusEnumDto.URGENT;
-					break;
-			}
+
+		if (enviament.getServeiTipus() == null) {
+			return null;
+		}
+		ServeiTipusEnumDto serveiTipus = ServeiTipusEnumDto.NORMAL;
+		if (NotificaServeiTipusEnumDto.URGENT.equals(enviament.getServeiTipus())) {
+			serveiTipus = ServeiTipusEnumDto.URGENT;
 		}
 		return serveiTipus;
 	}
@@ -1952,6 +1905,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 						break;
 					case ADMINISTRACIO:
 						break;
+					default:
+						break;
 				}
 			}
 			// - Email
@@ -2395,20 +2350,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 	private RespostaAltaV2 validaDocumentComunicacioAdmin(DocumentV2 document, int numDocument) {
 
+		var txt = "error.validacio.num.document";
 		if (document.getArxiuNom() == null || document.getArxiuNom().isEmpty()) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.nom.arxiu.document.no.null")
-					+ " " + messageHelper.getMessage("error.validacio.num.document") + numDocument);
+					+ " " + messageHelper.getMessage(txt) + numDocument);
 		}
-		if (document.getArxiuNom() != null && document.getArxiuNom().length() > 200) {
-			return setRespostaError(messageHelper.getMessage("error.validacio.arxiu.nom.longitud.max")
-					+ " " + messageHelper.getMessage("error.validacio.num.document") + numDocument );
+		if (document.getArxiuNom().length() > 200) {
+			return setRespostaError(messageHelper.getMessage("error.validacio.arxiu.nom.longitud.max") + " " + messageHelper.getMessage(txt) + numDocument );
 		}
 		if ((document.getContingutBase64() == null || document.getContingutBase64().isEmpty()) &&
 				(document.getCsv() == null || document.getCsv().isEmpty()) &&
 				(document.getUrl() == null || document.getUrl().isEmpty()) &&
 				(document.getUuid() == null || document.getUuid().isEmpty())) {
-			return setRespostaError(messageHelper.getMessage("error.validacio.document.necessari")
-					+ messageHelper.getMessage("error.validacio.num.document") + numDocument);
+
+			return setRespostaError(messageHelper.getMessage("error.validacio.document.necessari") + messageHelper.getMessage(txt) + numDocument);
 		}
 
 		// Format
@@ -2575,7 +2530,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 	private ArrayList<Character> validFormat(String value) {
 		String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
-		ArrayList<Character> charsNoValids = new ArrayList<Character>();
+		ArrayList<Character> charsNoValids = new ArrayList<>();
 		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
 
 		boolean esCaracterValid;
@@ -2609,10 +2564,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		} catch (Exception e) {
 			return false;
 		}
-	}
-
-	private boolean isPDF(String docBase64) {
-		return docBase64.startsWith("JVBERi0");
 	}
 
 	private Boolean isMultipleDestinataris() {

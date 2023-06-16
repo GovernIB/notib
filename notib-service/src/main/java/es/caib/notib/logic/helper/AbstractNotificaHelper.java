@@ -391,13 +391,12 @@ public abstract class AbstractNotificaHelper {
 		return result;
 	}
 
-	protected String concatenarLlinatges(
-			String llinatge1,
-			String llinatge2) {
-		if (llinatge1 == null && llinatge2 == null) {
+	protected String concatenarLlinatges(String llinatge1, String llinatge2) {
+
+		if (llinatge1 == null) {
 			return null;
 		}
-		StringBuilder llinatges = new StringBuilder();
+		var llinatges = new StringBuilder();
 		llinatges.append(llinatge1.trim());
 		if (llinatge2 != null && !llinatge2.trim().isEmpty()) {
 			llinatges.append(" ");

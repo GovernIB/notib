@@ -300,8 +300,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 		queryParam("lang", lang != null ? lang.name() : "").
 		queryParam("pagina", pagina != null ? pagina.toString() : "").
 		queryParam("mida", mida != null ? mida.toString() : "");
-		var response = wt.request(MediaType.APPLICATION_JSON).get(String.class);
-		return response;
+		return wt.request(MediaType.APPLICATION_JSON).get(String.class);
 	}
 
 }

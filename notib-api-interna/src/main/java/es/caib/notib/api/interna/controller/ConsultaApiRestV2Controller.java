@@ -40,6 +40,8 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 	@Autowired
 	private NotificacioService notificacioService;
 
+	private static final String PATH = "/api/consulta/v2";
+
 	@GetMapping(value="/comunicacions/{dniTitular}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaV2 comunicacionsByTitular(
 			HttpServletRequest request,
@@ -55,7 +57,7 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(null).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
-								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
+								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
 
@@ -74,7 +76,7 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(null).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
-								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
+								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
 
@@ -89,11 +91,11 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v2").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(false).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
-								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
+								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
 
@@ -108,11 +110,11 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v2").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(false).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
-								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
+								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
 
@@ -127,11 +129,11 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v2").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(true).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
-								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
+								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
 
@@ -146,18 +148,16 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v2").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(true).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
-								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
+								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
 
 	@GetMapping(value="/document/{notificacioId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Arxiu> getDocument(
-			HttpServletRequest request,
-			@PathVariable Long notificacioId) {
+	public ResponseEntity<Arxiu> getDocument(HttpServletRequest request, @PathVariable Long notificacioId) {
 
 		Arxiu document;
 		ArxiuDto arxiu = null;
@@ -182,9 +182,7 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 	}
 
 	@GetMapping(value="/certificacio/{enviamentId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Arxiu> getCertificacio(
-			HttpServletRequest request,
-			@PathVariable Long enviamentId) {
+	public ResponseEntity<Arxiu> getCertificacio(HttpServletRequest request, @PathVariable Long enviamentId) {
 
 		Arxiu certificacio;
 		ArxiuDto arxiu = null;
@@ -197,7 +195,7 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 		if (arxiu != null && arxiu.getContingut() != null) {
 			var contingutCertificacioBasse64 = Base64.getEncoder().encodeToString(arxiu.getContingut());
 			certificacio = Arxiu.builder().nom(arxiu.getNom()).mediaType(arxiu.getContentType()).contingut(contingutCertificacioBasse64).build();
-			return new ResponseEntity<Arxiu>(certificacio, status);
+			return new ResponseEntity<>(certificacio, status);
 		}
 		certificacio = Arxiu.builder().error(true).missatgeError("No s'ha trobat la certificació.").build();
 		status = HttpStatus.BAD_REQUEST;
@@ -205,9 +203,7 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 	}
 
 	@GetMapping(value="/justificant/{enviamentId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Arxiu> getJustificant(
-			HttpServletRequest request,
-			@PathVariable Long enviamentId) {
+	public ResponseEntity<Arxiu> getJustificant(HttpServletRequest request, @PathVariable Long enviamentId) {
 
 		Arxiu justificant = null;
 		byte[] contingutJustificant = null;

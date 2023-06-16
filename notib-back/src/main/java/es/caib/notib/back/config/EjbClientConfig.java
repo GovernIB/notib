@@ -120,14 +120,6 @@ public class EjbClientConfig {
 	public LocalStatelessSessionProxyFactoryBean procedimentService() {
 		return getLocalEjbFactoyBean(ProcedimentService.class);
 	}
-//	@Bean
-//	public LocalStatelessSessionProxyFactoryBean registreService() {
-//		return getLocalEjbFactoyBean(RegistreService.class);
-//	}
-//	@Bean
-//	public LocalStatelessSessionProxyFactoryBean schedulledService() {
-//		return getLocalEjbFactoyBean(SchedulledService.class);
-//	}
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean serveiService() {
 		return getLocalEjbFactoyBean(ServeiService.class);

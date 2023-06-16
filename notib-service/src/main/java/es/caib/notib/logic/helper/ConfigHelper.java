@@ -53,7 +53,6 @@ public class ConfigHelper {
         ConfigHelper.entitatCodi.set(entitatCodi);
     }
 
-    @Transactional(readOnly = true)
     public String getEntitatActualCodi() {
         return entitatCodi.get();
     }

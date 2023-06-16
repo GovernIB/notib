@@ -1,5 +1,6 @@
 package es.caib.notib.persist.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -53,27 +54,26 @@ public class ServeiEntity extends ProcSerEntity {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		ServeiEntity other = (ServeiEntity) obj;
+		}
+		var other = (ServeiEntity) obj;
 		if (codi == null) {
-			if (other.codi != null)
-				return false;
-		} else if (!codi.equals(other.codi))
-			return false;
-		return true;
+			return other.codi == null;
+		}
+		return codi.equals(other.codi);
 	}
 
 	@Override
 	public String toString() {
-		return "ServeiEntity{" +
-				"codi='" + codi + '\'' +
-				", nom='" + nom + '\'' +
-				'}';
+		return "ServeiEntity{codi='" + codi + '\'' + ", nom='" + nom + '\'' + '}';
 	}
 
 	private static final long serialVersionUID = -5588155683744582417L;

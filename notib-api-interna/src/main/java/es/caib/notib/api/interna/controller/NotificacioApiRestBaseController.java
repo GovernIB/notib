@@ -44,8 +44,7 @@ public abstract class NotificacioApiRestBaseController {
 
 		var url = request.getRequestURL().toString();
 		var urlArr = url.split("/consultaEstatNotificacio|/consultaEstatEnviament|/consultaJustificantNotificacio");
-		var referencia = urlArr.length > 1 ? urlArr[1].substring(1) : "";
-		return referencia;
+		return urlArr.length > 1 ? urlArr[1].substring(1) : "";
 	}
 
 	public RespostaConsultaJustificantEnviament consultaJustificant(HttpServletRequest request) {

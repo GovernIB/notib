@@ -28,6 +28,9 @@ import java.util.Scanner;
 public class RegistrePluginMockImpl implements RegistrePlugin{
 
 	private final Properties properties;
+	private final Random rand = new Random();
+	private static final String ENTITAT_DIR3_CODI = "A04003003";
+
 
 	public RegistrePluginMockImpl(Properties properties) {
 		this.properties = properties;
@@ -72,11 +75,8 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	}
 	
 	@Override
-	public RespostaConsultaRegistre obtenerAsientoRegistral(
-			String codiDir3Entitat, 
-			String numeroRegistreFormatat,
-			Long tipusOperacio,
-			boolean ambAnnexos) {
+	public RespostaConsultaRegistre obtenerAsientoRegistral(String codiDir3Entitat, String numeroRegistreFormatat, Long tipusOperacio, boolean ambAnnexos) {
+
 		boolean respostaAmbError = false;
 		RespostaConsultaRegistre respostaConsultaRegistre = new RespostaConsultaRegistre();
 		Date data = new Date();
@@ -92,7 +92,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 				 respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.REBUTJAT))
 			 respostaConsultaRegistre.setSirRegistreDestiData(data);
 
-		respostaConsultaRegistre.setEntitatCodi("A04003003");
+		respostaConsultaRegistre.setEntitatCodi(ENTITAT_DIR3_CODI);
 		respostaConsultaRegistre.setEntitatDenominacio("CAIB");
 		if (respostaAmbError) {
 			respostaConsultaRegistre.setErrorCodi("500");
@@ -141,26 +141,21 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	}
 	
 	@Override
-	public List<CodiAssumpte> llistarCodisAssumpte(
-			String entitat,
-			String tipusAssumpte) throws RegistrePluginException {
-		
+	public List<CodiAssumpte> llistarCodisAssumpte(String entitat, String tipusAssumpte) {
+
 		List<CodiAssumpte> codiAssumptes = new ArrayList<>();
-		
 //		CodiAssumpte codiAssumpte1 = new CodiAssumpte();
 //		codiAssumpte1.setCodi("");
 //		codiAssumpte1.setNom("");
 //		codiAssumpte1.setTipusAssumpte(tipusAssumpte);
 //		codiAssumptes.add(codiAssumpte1);
-		
+
 		return codiAssumptes;
 	}
 	
 	@Override
-	public Oficina llistarOficinaVirtual(
-			String entitatCodi, 
-			String nomOficinaVirtualEntitat,
-			Long autoritzacioValor) throws RegistrePluginException {
+	public Oficina llistarOficinaVirtual(String entitatCodi, String nomOficinaVirtualEntitat, Long autoritzacioValor) {
+
 		Oficina oficina = new Oficina();
 		oficina.setCodi("O00009390");
 		oficina.setNom(("DGTIC"));
@@ -168,9 +163,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	}
 	
 	@Override
-	public List<Oficina> llistarOficines(
-			String entitat,
-			Long autoritzacio) throws RegistrePluginException {
+	public List<Oficina> llistarOficines(String entitat, Long autoritzacio) {
 		
 		List<Oficina> oficines = new ArrayList<>();
 		
@@ -252,21 +245,21 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	
 		Llibre llibre1 = new Llibre();
 		llibre1.setCodi("L95");
-		llibre1.setOrganisme("A04003003");
+		llibre1.setOrganisme(ENTITAT_DIR3_CODI);
 		llibre1.setNomCurt("L95");
 		llibre1.setNomLlarg("FOGAIBA");
 		llibres.add(llibre1);
 		
 		Llibre llibre2 = new Llibre();
 		llibre2.setCodi("L2");
-		llibre2.setOrganisme("A04003003");
+		llibre2.setOrganisme(ENTITAT_DIR3_CODI);
 		llibre2.setNomCurt("L2");
 		llibre2.setNomLlarg("OF. CONVENI CONSELL MENORCA");
 		llibres.add(llibre2);
 		
 		Llibre llibre3 = new Llibre();
 		llibre3.setCodi("L3");
-		llibre3.setOrganisme("A04003003");
+		llibre3.setOrganisme(ENTITAT_DIR3_CODI);
 		llibre3.setNomCurt("L3");
 		llibre3.setNomLlarg("OF. CONVENI CONSELL EIVISSA");
 		llibres.add(llibre3);
@@ -276,13 +269,13 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	
 	@Override
 	public List<LlibreOficina> llistarLlibresOficines(String entitatCodi, String usuariCodi, Long tipusRegistre){
-		return null;
+		return new ArrayList<>();
 	}
 	
 	@Override
 	public Llibre llistarLlibreOrganisme(String entitatCodi, String organismeCodi) {
 
-		Random rand = new Random();
+
 		Integer num = rand.nextInt(100);
 		Llibre llibre = new Llibre();
 		llibre.setCodi("L" + num);
@@ -298,7 +291,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		List<Organisme> organismes = new ArrayList<>();
 		
 		Organisme organisme = new Organisme();
-		organisme.setCodi("A04003003");
+		organisme.setCodi(ENTITAT_DIR3_CODI);
 		organisme.setNom("FOGAIBA");
 		organismes.add(organisme);
 			
