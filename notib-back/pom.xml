@@ -187,16 +187,4 @@
 		</plugins>
 		<finalName>notibback</finalName>
 	</build>
-<!--	<repositories>-->
-<!--		<repository>-->
-<!--			<id>github-governib-maven-repos</id>-->
-<!--			<name>GitHub GovernIB Maven Repository</name>-->
-<!--			<url>https://GovernIB.github.io/maven/maven/</url>-->
-<!--		</repository>-->
-<!--		<repository>-->
-<!--			<name>Local Maven repository</name>-->
-<!--			<id>es.caib.notib.local</id>-->
-<!--			<url>file://${basedir}/../local-repo</url>-->
-<!--		</repository>-->
-<!--	</repositories>-->
 </project>

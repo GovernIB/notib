@@ -1,5 +1,6 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.logic.intf.util.NifHelper;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 

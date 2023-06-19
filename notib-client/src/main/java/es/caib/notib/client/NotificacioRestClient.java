@@ -14,16 +14,15 @@ import es.caib.notib.client.domini.RespostaConsultaDadesRegistre;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviament;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacio;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
-;
 
 /**
  * Client REST v1 per al servei de notificacions de NOTIB.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Deprecated
 public class NotificacioRestClient extends NotificacioBaseRestClient {
 
@@ -39,10 +38,8 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 	 * @param password Contrassenya de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
 	 * @version 1.0
 	 */
-	public NotificacioRestClient(
-			String baseUrl,
-			String username,
-			String password) {
+	public NotificacioRestClient(String baseUrl, String username, String password) {
+
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
@@ -60,12 +57,8 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 	 * @param readTimeout Timeout de lectura en milisegons
 	 * @version 1.0
 	 */
-	public NotificacioRestClient(
-			String baseUrl,
-			String username,
-			String password,
-			int connecTimeout,
-			int readTimeout) {
+	public NotificacioRestClient(String baseUrl, String username, String password, int connecTimeout, int readTimeout) {
+
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
@@ -84,11 +77,8 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 	 * @param autenticacioBasic Indica si utilitzar autenticació tipus basic. Si té el valor false, utilitzarà autenticació tipus Form (per defecte en entorn CAIB)
 	 * @version 1.0
 	 */
-	public NotificacioRestClient(
-			String baseUrl,
-			String username,
-			String password,
-			boolean autenticacioBasic) {
+	public NotificacioRestClient(String baseUrl, String username, String password, boolean autenticacioBasic) {
+
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
@@ -107,13 +97,8 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 	 * @param readTimeout Timeout de lectura en milisegons
 	 * @version 1.0
 	 */
-	public NotificacioRestClient(
-			String baseUrl,
-			String username,
-			String password,
-			boolean autenticacioBasic,
-			int connecTimeout,
-			int readTimeout) {
+	public NotificacioRestClient(String baseUrl, String username, String password, boolean autenticacioBasic, int connecTimeout, int readTimeout) {
+		
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
@@ -136,17 +121,13 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 			ObjectMapper mapper  = getMapper();
 			String body = mapper.writeValueAsString(notificacio);
 			jerseyClient = generarClient(urlAmbMetode);
-			logger.debug("Missatge REST enviat: " + body);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					post(String.class, body);
-			logger.debug("Missatge REST rebut: " + json);
+			log.debug("Missatge REST enviat: " + body);
+			String json = jerseyClient.resource(urlAmbMetode).type("application/json").post(String.class, body);
+			log.debug("Missatge REST rebut: " + json);
 			return mapper.readValue(json, RespostaAlta.class);
 		} catch (UniformInterfaceException ue) {
 			RespostaAlta respostaAlta = new RespostaAlta();
 			ClientResponse response = ue.getResponse();
-
 			if (response != null && response.getStatus() == 401) {
 				respostaAlta.setError(true);
 				respostaAlta.setErrorDescripcio("[CLIENT] Hi ha hagut un problema d'autenticació: "  + ue.getMessage());
@@ -168,10 +149,7 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
 			jerseyClient = generarClient(urlAmbMetode);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					get(String.class);
+			String json = jerseyClient.resource(urlAmbMetode).type("application/json").get(String.class);
 			return getMapper().readValue(json, RespostaConsultaEstatNotificacio.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
@@ -188,10 +166,7 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
 			jerseyClient = generarClient(urlAmbMetode);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					get(String.class);
+			String json = jerseyClient.resource(urlAmbMetode).type("application/json").get(String.class);
 			return getMapper().readValue(json, RespostaConsultaEstatEnviament.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
@@ -210,11 +185,8 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 			ObjectMapper mapper  = getMapper();
 			String body = mapper.writeValueAsString(dadesConsulta);
 			jerseyClient = generarClient(urlAmbMetode);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					post(String.class, body);
-			logger.debug("Missatge REST rebut: " + json);
+			String json = jerseyClient.resource(urlAmbMetode).type("application/json").post(String.class, body);
+			log.debug("Missatge REST rebut: " + json);
 			return mapper.readValue(json, RespostaConsultaDadesRegistre.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
@@ -240,7 +212,5 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
 		return donarPermisConsulta(permisConsulta, NOTIFICACIOV1_SERVICE_PATH);
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(NotificacioRestClient.class);
 
 }

@@ -17,19 +17,17 @@ import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-;
 
 /**
  * Client REST v2 per al servei de notificacions de NOTIB.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	private static final String NOTIFICACIOV2_SERVICE_PATH = "/interna/notificacio/v2";
@@ -158,12 +156,9 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 			ObjectMapper mapper  = getMapper();
 			String body = mapper.writeValueAsString(notificacio);
 			jerseyClient = generarClient(urlAmbMetode);
-			logger.debug("Missatge REST enviat: " + body);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					post(String.class, body);
-			logger.debug("Missatge REST rebut: " + json);
+			log.debug("Missatge REST enviat: " + body);
+			String json = jerseyClient.resource(urlAmbMetode).type("application/json").post(String.class, body);
+			log.debug("Missatge REST rebut: " + json);
 			return mapper.readValue(json, RespostaAltaV2.class);
 		} catch (UniformInterfaceException ue) {
 			RespostaAltaV2 respostaAlta = new RespostaAltaV2();
@@ -236,7 +231,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 					resource(urlAmbMetode).
 					type("application/json").
 					post(String.class, body);
-			logger.debug("Missatge REST rebut: " + json);
+			log.debug("Missatge REST rebut: " + json);
 			return mapper.readValue(json, RespostaConsultaDadesRegistreV2.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
@@ -327,8 +322,9 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	}
 
 	private String getConsultaJsonString(Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida, String urlAmbMetode) throws Exception {
+
 		jerseyClient = generarClient(urlAmbMetode);
-		String json = jerseyClient.
+		return jerseyClient.
 				resource(urlAmbMetode).
 				queryParam("dataInicial", dataInicial != null ? sdf.format(dataInicial) : "").
 				queryParam("dataFinal", dataInicial != null ? sdf.format(dataFinal) : "").
@@ -338,9 +334,5 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 				queryParam("mida", mida != null ? mida.toString() : "").
 				type("application/json").
 				get(String.class);
-		return json;
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(NotificacioRestClientV2.class);
-
 }

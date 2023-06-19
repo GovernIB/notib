@@ -3,6 +3,7 @@
  */
 package es.caib.notib.api.interna.config;
 
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.KeycloakPrincipal;
 import org.springframework.beans.factory.annotation.Value;
@@ -101,6 +102,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public PreAuthenticatedGrantedAuthoritiesUserDetailsService preAuthenticatedGrantedAuthoritiesUserDetailsService() {
 
 		return new PreAuthenticatedGrantedAuthoritiesUserDetailsService() {
+			@Override
 			protected UserDetails createUserDetails(Authentication token, Collection<? extends GrantedAuthority> authorities) {
 
 				if (token.getDetails() instanceof KeycloakWebAuthenticationDetails) {
@@ -169,14 +171,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Bean
 	public LogoutHandler getLogoutHandler() {
-		return new LogoutHandler() {
-			@Override
-			public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-				try {
-					request.logout();
-				} catch (ServletException ex) {
-					log.error("Error al sortir de l'aplicació", ex);
-				}
+		return (request, response, authentication) -> {
+			try {
+				request.logout();
+			} catch (ServletException ex) {
+				log.error("Error al sortir de l'aplicació", ex);
 			}
 		};
 	}
@@ -208,23 +207,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		}
 
 		public String getGivenName() {
-			return keycloakPrincipal instanceof KeycloakPrincipal ?
-					((KeycloakPrincipal<?>)keycloakPrincipal).getKeycloakSecurityContext().getToken().getGivenName() : null;
+			return keycloakPrincipal instanceof KeycloakPrincipal ? keycloakPrincipal.getKeycloakSecurityContext().getToken().getGivenName() : null;
 		}
 
 		public String getFamilyName() {
-			return keycloakPrincipal instanceof KeycloakPrincipal ?
-					((KeycloakPrincipal<?>)keycloakPrincipal).getKeycloakSecurityContext().getToken().getFamilyName() : null;
+			return keycloakPrincipal instanceof KeycloakPrincipal ? keycloakPrincipal.getKeycloakSecurityContext().getToken().getFamilyName() : null;
 		}
 
 		public String getFullName() {
-			return keycloakPrincipal instanceof KeycloakPrincipal ?
-					((KeycloakPrincipal<?>)keycloakPrincipal).getKeycloakSecurityContext().getToken().getName() : null;
+			return keycloakPrincipal instanceof KeycloakPrincipal ? keycloakPrincipal.getKeycloakSecurityContext().getToken().getName() : null;
 		}
 
 		public String getEmail() {
-			return keycloakPrincipal instanceof KeycloakPrincipal ?
-					((KeycloakPrincipal<?>)keycloakPrincipal).getKeycloakSecurityContext().getToken().getEmail() : null;
+			return keycloakPrincipal instanceof KeycloakPrincipal ? keycloakPrincipal.getKeycloakSecurityContext().getToken().getEmail() : null;
 		}
 	}
 

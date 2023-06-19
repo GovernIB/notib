@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,13 +41,16 @@ public class OrganGestorPermisController extends BaseUserController{
 	@Autowired
 	EntitatService entitatService;
 
+	private static final String ORGAN_GESTOR = "organGestor";
+	private static final String ORGAN_GESTOR_PERMIS_FORM = "organGestorPermisForm";
+
 
 	@GetMapping(value = "/{organGestorId}/permis")
 	public String get(HttpServletRequest request, @PathVariable Long organGestorId, Model model) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
 		var organGestor = organGestorService.findById(entitatActual.getId(), organGestorId);
-		model.addAttribute("organGestor", organGestor);
+		model.addAttribute(ORGAN_GESTOR, organGestor);
 		return "organGestorPermis";
 	}
 
@@ -109,7 +111,7 @@ public class OrganGestorPermisController extends BaseUserController{
 	public String get(HttpServletRequest request, @PathVariable Long organGestorId, @PathVariable Long permisId, Model model) throws ValidationException {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
-		model.addAttribute("organGestor", organGestorService.findById(entitatActual.getId(), organGestorId));
+		model.addAttribute(ORGAN_GESTOR, organGestorService.findById(entitatActual.getId(), organGestorId));
 		PermisDto permis = null;
 		var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
 		if (permisId != null) {
@@ -125,7 +127,7 @@ public class OrganGestorPermisController extends BaseUserController{
 			throw new ValidationException("Un administrador d'òrgan no pot gestionar el permís d'admministrador d'òrgans gestors");
 		}
 		model.addAttribute(permis != null ? PermisCommand.asCommand(permis, PermisCommand.EntitatPermis.ORGAN) : new PermisCommand());
-		return "organGestorPermisForm";
+		return ORGAN_GESTOR_PERMIS_FORM;
 	}
 	
 	@PostMapping(value = "/{organGestorId}/permis")
@@ -133,18 +135,17 @@ public class OrganGestorPermisController extends BaseUserController{
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			model.addAttribute("organGestor", organGestorService.findById(entitatActual.getId(), organGestorId));
+			model.addAttribute(ORGAN_GESTOR, organGestorService.findById(entitatActual.getId(), organGestorId));
 			model.addAttribute("principalSize", command.getPrincipalDefaultSize());
-			return "organGestorPermisForm";
+			return ORGAN_GESTOR_PERMIS_FORM;
 		}
 
 		var msg = command.getId() == null ? "creat" : "modificat";
 		if (TipusEnumDto.ROL.equals(command.getTipus()) && command.getPrincipal().equalsIgnoreCase("tothom") &&
 				RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual())) {
 
-			model.addAttribute("organGestor", organGestorService.findById(entitatActual.getId(), organGestorId));
-			return getModalControllerReturnValueError(request,"organGestorPermisForm",
-					"organgestor.controller.permis." + msg + ".ko");
+			model.addAttribute(ORGAN_GESTOR, organGestorService.findById(entitatActual.getId(), organGestorId));
+			return getModalControllerReturnValueError(request,ORGAN_GESTOR_PERMIS_FORM, "organgestor.controller.permis." + msg + ".ko");
 		}
 
 		var isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());

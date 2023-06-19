@@ -36,9 +36,11 @@ public class DatatablesHelper {
 
 	private static final String ATRIBUT_ID = "DT_Id";
 	private static final String ATRIBUT_ROW_ID = "DT_RowId";
-	//private static final String ATRIBUT_ROW_DATA = "DT_RowData";
 	private static final String ATRIBUT_ROW_SELECTED = "DT_RowSelected";
 
+	private DatatablesHelper() {
+		throw new IllegalStateException("DatatablesHelper no es pot instanciar");
+	}
 
 	public static PaginacioParamsDto getPaginacioDtoFromRequest(HttpServletRequest request) {
 		return getPaginacioDtoFromRequest(request, null, null);
@@ -129,7 +131,8 @@ public class DatatablesHelper {
 			Object[] dadesRegistre;
 			Map<String, Object> mapRegistre;
 			String propietatNom;
-			Object valor, valorId;
+			Object valor;
+			Object valorId;
 			int size;
 			for (var registre: pagina.getContingut()) {
 				descriptors = getBeanPropertyDescriptors(registre);
@@ -158,7 +161,7 @@ public class DatatablesHelper {
 						log.error("No s'ha pogut llegir la propietat de l'objecte (propietatNom=" + atributId + ")", ex);
 					}
 				} else {
-					valorId = new Long(index);
+					valorId = index;
 				}
 				mapRegistre.put(ATRIBUT_ROW_ID, "row_" + valorId);
 				mapRegistre.put(ATRIBUT_ID, valorId);
@@ -199,33 +202,6 @@ public class DatatablesHelper {
 		dto.setContingut(llista);
 		return getDatatableResponse(request, bindingResult, dto, atributId, null);
 	}
-
-	/*public static <T> DatatablesResponse getDatatableResponse(
-			HttpServletRequest request,
-			T element) {
-		return getDatatableResponse(request, null, element, null);
-	}
-	public static <T> DatatablesResponse getDatatableResponse(
-			HttpServletRequest request,
-			T element,
-			String atributId) {
-		return getDatatableResponse(request, null, element, atributId);
-	}
-	public static <T> DatatablesResponse getDatatableResponse(
-			HttpServletRequest request,
-			BindingResult bindingResult,
-			T element) {
-		return getDatatableResponse(request, bindingResult, element, null);
-	}
-	public static <T> DatatablesResponse getDatatableResponse(
-			HttpServletRequest request,
-			BindingResult bindingResult,
-			T element,
-			String atributId) {
-		List<T> list = new ArrayList<T>();
-		list.add(element);
-		return getDatatableResponse(request, bindingResult, list, atributId);
-	}*/
 
 	public static <T> DatatablesResponse getEmptyDatatableResponse(HttpServletRequest request) {
 		return getDatatableResponse(request, null, (List<T>)null, null);
@@ -317,33 +293,13 @@ public class DatatablesHelper {
 		return descriptors;
 	}
 
-	/*private static Map<String, Object> getRowData(
-			Object bean,
-			String atributId) {
-		Map<String, Object> rowData = new HashMap<String, Object>();
-		try {
-			rowData.put(
-					"id",
-					PropertyUtils.getProperty(bean, atributId));
-		} catch (Exception ex) {
-			log.error(
-					"No s'ha pogut llegir la propietat de l'objecte (" +
-							"propietatNom=" + atributId + ")",
-					ex);
-		}
-		return rowData;
-	}*/
-
 	private static Object getPropietatValor(Object registre, String propietatNom, List<PropertyDescriptor> descriptors) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
 		try {
 			int index = Integer.parseInt(propietatNom);
 			return PropertyUtils.getProperty(registre, descriptors.get(index).getName());
 		} catch (NumberFormatException ex) {
-			if (propietatNom != null && !propietatNom.isEmpty() && !"<null>".equals(propietatNom)) {
-				return PropertyUtils.getProperty(registre, propietatNom);
-			}
-			return null;
+			return propietatNom != null && !propietatNom.isEmpty() && !"<null>".equals(propietatNom) ? PropertyUtils.getProperty(registre, propietatNom) : null;
 		}
 	}
 	

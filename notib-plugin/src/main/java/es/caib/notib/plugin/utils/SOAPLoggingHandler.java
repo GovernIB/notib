@@ -38,6 +38,7 @@ public class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
 	}
 
 	public void close(MessageContext messageContext) {
+		// close
 	}
 
 	private void log(SOAPMessageContext messageContext) {

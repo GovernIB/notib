@@ -23,8 +23,6 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EntregaDeh {
 
-//    @JsonDeserialize(using = TrimStringDeserializer.class)
-//    private String emisorNif;
     private boolean obligat;
     @JsonDeserialize(using = TrimStringDeserializer.class)
     private String procedimentCodi;

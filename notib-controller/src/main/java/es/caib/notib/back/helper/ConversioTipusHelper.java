@@ -43,7 +43,6 @@ public class ConversioTipusHelper {
 	private static MapperFactory mapperFactory;
 
 	public ConversioTipusHelper() {
-//		mapperFactory = new DefaultMapperFactory.Builder().build();
 		mapperFactory = new DefaultMapperFactory.Builder().compilerStrategy(new CustomJavassistCompilerStrategy()).build();
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DateTime, Date>() {
@@ -85,7 +84,7 @@ public class ConversioTipusHelper {
 			.customize(new CustomMapper<EnviamentCommand, NotEnviamentDatabaseDto>() {
 				@Override
 				public void mapAtoB(EnviamentCommand command, NotEnviamentDatabaseDto dto, MappingContext context) {
-
+					// empty
 				}
 				@Override
 				public void mapBtoA(NotEnviamentDatabaseDto dto, EnviamentCommand command, MappingContext context) {
@@ -102,7 +101,7 @@ public class ConversioTipusHelper {
 				.customize(new CustomMapper<EnviamentCommand, NotificacioEnviamentDtoV2>() {
 					@Override
 					public void mapAtoB(EnviamentCommand command, NotificacioEnviamentDtoV2 dto, MappingContext context) {
-
+						// empty
 					}
 					@Override
 					public void mapBtoA(NotificacioEnviamentDtoV2 dto, EnviamentCommand command, MappingContext context) {
@@ -117,7 +116,6 @@ public class ConversioTipusHelper {
 				.customize(new CustomMapper<NotificacioDtoV2, NotificacioCommand>() {
 					@Override
 					public void mapAtoB(NotificacioDtoV2 notificacioDto, NotificacioCommand notificacioCommand, MappingContext context) {
-						int i = 0;
 						// Documents
 						var documents = new DocumentCommand[5];
 						documents[0] = DocumentCommand.asCommand(notificacioDto.getDocument());
@@ -152,7 +150,7 @@ public class ConversioTipusHelper {
 						if (document5 != null) {
 							documents.add(document5);
 						}
-						notificacioDto.setDocument(documents.size() > 0 ? documents.get(0) : null);
+						notificacioDto.setDocument(!documents.isEmpty() ? documents.get(0) : null);
 						notificacioDto.setDocument2(documents.size() > 1 ? documents.get(1) : null);
 						notificacioDto.setDocument3(documents.size() > 2 ? documents.get(2) : null);
 						notificacioDto.setDocument4(documents.size() > 3 ? documents.get(3) : null);
@@ -172,7 +170,6 @@ public class ConversioTipusHelper {
 				.customize(new CustomMapper<NotificacioDatabaseDto, NotificacioCommand>() {
 					@Override
 					public void mapAtoB(NotificacioDatabaseDto notificacioDto, NotificacioCommand notificacioCommand, MappingContext context) {
-						int i = 0;
 						// Documents
 						var documents = new DocumentCommand[5];
 						documents[0] = DocumentCommand.asCommand(notificacioDto.getDocument());
@@ -218,7 +215,7 @@ public class ConversioTipusHelper {
 						var document5 = DocumentCommand.asDto(notificacioCommand.getDocuments()[4]);
 						if (document5 != null)
 							documents.add(document5);
-						notificacioDto.setDocument(documents.size() > 0 ? documents.get(0) : null);
+						notificacioDto.setDocument(!documents.isEmpty() ? documents.get(0) : null);
 						notificacioDto.setDocument2(documents.size() > 1 ? documents.get(1) : null);
 						notificacioDto.setDocument3(documents.size() > 2 ? documents.get(2) : null);
 						notificacioDto.setDocument4(documents.size() > 3 ? documents.get(3) : null);

@@ -21,6 +21,9 @@ public class ModalHelper {
 	private static final String SESSION_ATTRIBUTE_REQUESTPATHSMAP = "ModalHelper.RequestPathsMap";
 	public static final String ACCIO_MODAL_TANCAR = PREFIX_MODAL + "/tancar";
 
+	private ModalHelper() {
+		throw new IllegalStateException("ModalHelper no es pot instanciar");
+	}
 
 	public static boolean isModal(HttpServletRequest request) {
 		return request.getAttribute(REQUEST_ATTRIBUTE_MODAL) != null;
@@ -67,7 +70,7 @@ public class ModalHelper {
 	}
 
 	private static void marcarModal(HttpServletRequest request) {
-		request.setAttribute(REQUEST_ATTRIBUTE_MODAL, new Boolean(true));
+		request.setAttribute(REQUEST_ATTRIBUTE_MODAL, true);
 	}
 
 }

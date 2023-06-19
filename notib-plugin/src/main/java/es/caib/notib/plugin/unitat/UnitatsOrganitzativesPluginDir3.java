@@ -95,9 +95,8 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	@Override
 	public Map<String, NodeDir3> organigramaPerEntitat(String pareCodi, Date fechaActualizacion, Date fechaSincronizacion) throws SistemaExternException {
 
-		Map<String, NodeDir3> organigrama = new HashMap<>();
+
 		try {
-			List<UnitatOrganitzativa> arbol = new ArrayList<>();
 
 			var url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerArbolUnidades?codigo=" + pareCodi +
 					(fechaActualizacion != null ? FECHA_ACT_PARAM + fechaActualizacion : "") +
@@ -106,34 +105,41 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			var response = getResponse(url);
 			var mapper = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			if (response != null && response.length > 0) {
-				arbol = mapper.readValue(response, new TypeReference<>() {});
+			if (response == null || response.length == 0) {
+				return new HashMap<>();
 			}
-			for(UnitatOrganitzativa unidadTF: arbol){
-				if (!"V".equals(unidadTF.getCodigoEstadoEntidad()) && !"T".equals(unidadTF.getCodigoEstadoEntidad())) {
-					continue;
-				}
-				// Unitats Vigents o Transitòries
-				var node = toNodeDir3(unidadTF);
-				var pare = organigrama.get(node.getSuperior());
-				if (!node.getCodi().equalsIgnoreCase(pareCodi) && pare == null) {
-					continue;
-				}
-				organigrama.put(node.getCodi(), node);
-				if (pare == null) {
-					continue;
-				}
-				List<NodeDir3> fills = pare.getFills();
-				if (fills == null) {
-					fills = new ArrayList<>();
-					pare.setFills(fills);
-				}
-				fills.add(node);
-			}
-			return organigrama;
+			List<UnitatOrganitzativa> arbol = mapper.readValue(response, new TypeReference<>() {});
+			return emplenearOrganigrama(pareCodi, arbol);
 		} catch (Exception ex) {
 			throw new SistemaExternException("No s'han pogut consultar les unitats organitzatives via WS (pareCodi=" + pareCodi + ")", ex);
 		}
+	}
+
+	private Map<String, NodeDir3> emplenearOrganigrama(String pareCodi, List<UnitatOrganitzativa> arbol) {
+
+		Map<String, NodeDir3> organigrama = new HashMap<>();
+		for(UnitatOrganitzativa unidadTF: arbol){
+			if (!"V".equals(unidadTF.getCodigoEstadoEntidad()) && !"T".equals(unidadTF.getCodigoEstadoEntidad())) {
+				continue;
+			}
+			// Unitats Vigents o Transitòries
+			var node = toNodeDir3(unidadTF);
+			var pare = organigrama.get(node.getSuperior());
+			if (!node.getCodi().equalsIgnoreCase(pareCodi) && pare == null) {
+				continue;
+			}
+			organigrama.put(node.getCodi(), node);
+			if (pare == null) {
+				continue;
+			}
+			List<NodeDir3> fills = pare.getFills();
+			if (fills == null) {
+				fills = new ArrayList<>();
+				pare.setFills(fills);
+			}
+			fills.add(node);
+		}
+		return organigrama;
 	}
 
 	@Override

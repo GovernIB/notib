@@ -75,7 +75,7 @@ public class AjaxHelper {
 		return requestPathsMap;
 	}
 	private static void marcarAjax(HttpServletRequest request) {
-		request.setAttribute(REQUEST_ATTRIBUTE_AJAX, new Boolean(true));
+		request.setAttribute(REQUEST_ATTRIBUTE_AJAX, true);
 	}
 
 	@Getter

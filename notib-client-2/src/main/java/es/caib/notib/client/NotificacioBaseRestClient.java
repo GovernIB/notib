@@ -19,8 +19,6 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import java.util.concurrent.TimeUnit;
 
-;
-
 /**
  * Client REST per al servei de notificacions de NOTIB.
  * 
@@ -36,15 +34,13 @@ public abstract class NotificacioBaseRestClient {
 	protected boolean autenticacioBasic = true;
 	protected Integer connecTimeout = 20000;
 	protected Integer readTimeout = 120000;
-
 	protected Client jerseyClient;
-	private ObjectMapper mapper;
 
 	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(String identificador, String serviceUrl) {
 
 		try {
 			var urlAmbMetode = baseUrl + serviceUrl + "/consultaJustificantNotificacio/" + identificador;
-			jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient();
 			var wt = jerseyClient.target(urlAmbMetode);
 			var json = wt.request(MediaType.APPLICATION_JSON).get(String.class);
 			return getMapper().readValue(json, RespostaConsultaJustificantEnviament.class);
@@ -59,7 +55,7 @@ public abstract class NotificacioBaseRestClient {
 			var urlAmbMetode = baseUrl + serviceUrl + "/permisConsulta";
 			var mapper = getMapper();
 			var body = mapper.writeValueAsString(permisConsulta);
-			jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient();
 			log.debug("Missatge REST enviat: " + body);
 			var wt = jerseyClient.target(urlAmbMetode);
 			var r = wt.request(MediaType.APPLICATION_JSON).post(Entity.json(body)).readEntity(Boolean.class);
@@ -70,23 +66,17 @@ public abstract class NotificacioBaseRestClient {
 		}
 	}
 
-	protected Client generarClient(String urlAmbMetode) throws Exception {
-
-		if (jerseyClient != null) {
-			return jerseyClient;
-		}
-		jerseyClient = generarClient();
-		return jerseyClient;
+	protected Client generarClient() {
+		return jerseyClient != null ? jerseyClient : crearClient();
 	}
 
-	protected Client generarClient() {
+	protected Client crearClient() {
 
 		var config = new ClientConfig();
 		config.register(JacksonFeature.class);
 		if (username != null && !username.isBlank()) {
 			log.debug("Autenticant REST amb autenticació de tipus HTTP basic (usuari= {})", username);
-			if (username != null)
-				config.register(HttpAuthenticationFeature.basic(username, password));
+			config.register(HttpAuthenticationFeature.basic(username, password));
 		}
 		config.register(ResponseClientFilter.class);
 		var clientBuilder = ClientBuilder.newBuilder().withConfig(config);
@@ -97,7 +87,7 @@ public abstract class NotificacioBaseRestClient {
 			clientBuilder.readTimeout(readTimeout, TimeUnit.MILLISECONDS);
 		}
 		jerseyClient = clientBuilder.build();
-		mapper = new ObjectMapper();
+		var mapper = new ObjectMapper();
 		// Permet rebre un sol objecte en el lloc a on hi hauria d'haver una llista.
 		mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 		// Mecanisme de deserialització dels enums

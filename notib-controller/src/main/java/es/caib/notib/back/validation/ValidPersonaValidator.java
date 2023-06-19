@@ -5,8 +5,8 @@ import com.google.common.base.Strings;
 import es.caib.notib.back.command.PersonaCommand;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.MessageHelper;
-import es.caib.notib.back.helper.NifHelper;
 import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.logic.intf.util.NifHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 

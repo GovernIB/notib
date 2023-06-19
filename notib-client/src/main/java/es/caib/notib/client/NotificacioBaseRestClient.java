@@ -5,6 +5,7 @@ package es.caib.notib.client;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -70,7 +71,7 @@ public abstract class NotificacioBaseRestClient {
 		return autenticacioBasic;
 	}
 
-	protected Client generarClient(String urlAmbMetode) throws Exception {
+	protected Client generarClient(String urlAmbMetode) {
 
 		if (jerseyClient != null) {
 			return jerseyClient;
@@ -125,7 +126,7 @@ public abstract class NotificacioBaseRestClient {
 		return jerseyClient;
 	}
 
-	protected void autenticarClient(Client jerseyClient, String urlAmbMetode, String username, String password) throws Exception {
+	protected void autenticarClient(Client jerseyClient, String urlAmbMetode, String username, String password) {
 
 		String msg;
 		if (autenticacioBasic) {

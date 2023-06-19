@@ -23,13 +23,11 @@ public enum ValidesaEnum implements Serializable {
 
     private static final Map<String, ValidesaEnum> lookup;
     static {
-        lookup = new HashMap<String, ValidesaEnum>();
+        lookup = new HashMap<>();
         for (ValidesaEnum s: EnumSet.allOf(ValidesaEnum.class))
             lookup.put(s.getValor(), s);
     }
     public static ValidesaEnum valorAsEnum(String valor) {
-        if (valor == null)
-            return null;
-        return lookup.get(valor);
+        return valor != null ? lookup.get(valor) : null;
     }
 }

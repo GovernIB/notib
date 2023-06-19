@@ -13,6 +13,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class ContingutEstaticHelper {
 
+	private ContingutEstaticHelper() {
+		throw new IllegalStateException("ContingutEstaticHelper no es pot instanciar");
+	}
+
 	public static boolean isContingutEstatic(HttpServletRequest request) {
 
 		var uri = request.getRequestURI();

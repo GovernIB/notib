@@ -1,7 +1,6 @@
 package es.caib.notib.api.interna.controller;
 
 import es.caib.notib.api.interna.openapi.interficies.ConsultaApiRestV2Intf;
-import es.caib.notib.api.interna.util.CaseInsensitiveEnumEditor;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
@@ -10,6 +9,7 @@ import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.rest.consulta.Arxiu;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
+import es.caib.notib.logic.intf.util.CaseInsensitiveEnumEditor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;

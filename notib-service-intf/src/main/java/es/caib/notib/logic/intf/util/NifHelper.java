@@ -1,4 +1,4 @@
-package es.caib.notib.logic.helper;
+package es.caib.notib.logic.intf.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;

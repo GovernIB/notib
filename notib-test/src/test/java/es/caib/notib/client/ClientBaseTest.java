@@ -3,9 +3,21 @@
  */
 package es.caib.notib.client;
 
-import es.caib.notib.ws.notificacio.*;
+import es.caib.notib.client.domini.DocumentV2;
+import es.caib.notib.client.domini.EntregaDeh;
+import es.caib.notib.client.domini.EntregaPostal;
+import es.caib.notib.client.domini.EntregaPostalViaTipusEnum;
+import es.caib.notib.client.domini.Enviament;
+import es.caib.notib.client.domini.EnviamentTipusEnum;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.NotificaServeiTipusEnumDto;
+import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.Persona;
+import es.caib.notib.client.domini.TipusDocumentalEnum;
+import es.caib.notib.client.domini.ValidesaEnum;
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -14,6 +26,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -66,7 +79,7 @@ public class ClientBaseTest {
 		notificacio.setDescripcio("descripcio_" + notificacioId);
 		notificacio.setEnviamentDataProgramada(null);
 		notificacio.setRetard(5);
-		notificacio.setCaducitat(toXmlGregorianCalendar(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000)));
+		notificacio.setCaducitat(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000));
 		DocumentV2 document = new DocumentV2();
 		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 		
@@ -231,7 +244,7 @@ public class ClientBaseTest {
 			notificacio.setDescripcio("descripcio_" + notificacioId);
 			notificacio.setEnviamentDataProgramada(null);
 			notificacio.setRetard(5);
-			notificacio.setCaducitat(toXmlGregorianCalendar(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000)));
+			notificacio.setCaducitat(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000));
 
 			List<DocumentV2> documents = new ArrayList<>();
 			if (comunicacioAdministracio)
@@ -376,7 +389,7 @@ public class ClientBaseTest {
 		notificacio.setDescripcio("descripcio_" + notificacioId);
 		notificacio.setEnviamentDataProgramada(null);
 		notificacio.setRetard(5);
-		notificacio.setCaducitat(toXmlGregorianCalendar(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000)));
+		notificacio.setCaducitat(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000));
 
 		List<DocumentV2> documents = new ArrayList<>();
 		if (comunicacioAdministracio)
@@ -544,7 +557,7 @@ public class ClientBaseTest {
 		notificacio.setDescripcio("descripcio_" + notificacioId);
 		notificacio.setEnviamentDataProgramada(null);
 		notificacio.setRetard(5);
-		notificacio.setCaducitat(toXmlGregorianCalendar(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000)));
+		notificacio.setCaducitat(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000));
 		DocumentV2 document = new DocumentV2();
 		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 
