@@ -207,16 +207,16 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 
 		private String getDestinataris(List<PersonaEntity> destinataris) {
 
-			String destinatariIds = "";
+			StringBuilder destinatariIds = new StringBuilder();
 			if (destinataris != null) {
 				for (PersonaEntity destinatari: destinataris) {
-					destinatariIds += destinatari.getId() + " - ";
+					destinatariIds.append(destinatari.getId()).append(" - ");
 				}
 			}
-			if (destinatariIds.isEmpty()) {
+			if (destinatariIds.length() == 0) {
 				return null;
 			}
-			return destinatariIds.length() > 100 ? ellipsis(destinatariIds, 100) : destinatariIds.substring(0, destinatariIds.length() - 1);
+			return destinatariIds.length() > 100 ? ellipsis(destinatariIds.toString(), 100) : destinatariIds.substring(0, destinatariIds.length() - 1);
 
 		}
 		private String ellipsis(final String text, int length) {

@@ -32,6 +32,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 
 	@Override
 	public void initialize(final ValidPersona constraintAnnotation) {
+		// init
 	}
 
 	@SuppressWarnings("deprecation")

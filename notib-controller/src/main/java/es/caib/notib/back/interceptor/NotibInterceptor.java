@@ -140,11 +140,12 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
     // Comprova si s'està canviant el rol.
     // En cas afirmatiu s'assignarà el nou rol, i es recalcularan les entitats disponibles per rol, i actual
     private void processarCanviRol(HttpServletRequest request) {
+
         // Comprovam si s'està canviant el rol
         var nouRol = request.getParameter(RolHelper.REQUEST_PARAMETER_CANVI_ROL);
-        if (Strings.isNullOrEmpty(nouRol))
+        if (Strings.isNullOrEmpty(nouRol)) {
             return;
-
+        }
         // Si es canvia el rol, i es tracta d'un rol vàlid
         // (rol disponible per usuari o administrador d'òrgan i rol tothom amb permís d'administració sobre algun òrgan)
         log.debug("Processant canvi rol (rol=" + nouRol + ")");
@@ -155,20 +156,20 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
             aplicacioService.updateRolUsuariActual(nouRol);
 
             // Al canviar el rol poden canviar les entitats accessibles, i l'entitat actual
-            processarCanviEntitatPerRol(request);
+            processarCanviEntitatPerRol();
         }
     }
 
     // Al realitzar un canvi de rol poden canviar les entitats accessibles, i l'entitat actual
-    private void processarCanviEntitatPerRol(HttpServletRequest request) {
+    private void processarCanviEntitatPerRol() {
         // Reassignam les entitats accessibles, depenent del rol actual
-        var entitatsAccessibles = getEntitatsAccessibles(request);
+        var entitatsAccessibles = getEntitatsAccessibles();
         sessionScopedContext.setEntitatsAccessibles(entitatsAccessibles);
 
         // Obtenim l'entitat actual
         var entitatActual = sessionScopedContext.getEntitatActual();
         if (entitatActual == null) {
-            entitatActual = getEntitatActual(request);
+            entitatActual = getEntitatActual();
             sessionScopedContext.setEntitatActual(entitatActual);
         }
         // Si l'entitat actual no és una de les entitas disponibles, llavors s'assigna la primera entitat accessible com a entitat actual
@@ -182,42 +183,49 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
 
     // Es carreguen les entitats disponibles i actual, així com els rols disponibles i actuals (si bo s'ha fet un canvi de rol)
     private void processarEntitatsIRols(HttpServletRequest request) {
+
         // Comprovam si les entitats o els seus permisos s'han modificat des de l'últim com que s'han obtingut el llistat d'entitats disponibles,
         // i per tant si s'han d'actualitzar les entitats disponibles i l'entitat actual
         var entitatsToBeUpdated = hasToBeUpdated(entitatService.getLastPermisosModificatsInstant(), sessionScopedContext.getInstantEntitatsCarregades());
         // Si encara no s'han obtingut les entitats accessibles en aquesta sessió, o s'han d'actualitzar, obtenim les entitats accessibles
-        if (sessionScopedContext.getEntitatsAccessibles() == null || entitatsToBeUpdated)
-            sessionScopedContext.setEntitatsAccessibles(getEntitatsAccessibles(request));
+        if (sessionScopedContext.getEntitatsAccessibles() == null || entitatsToBeUpdated) {
+            sessionScopedContext.setEntitatsAccessibles(getEntitatsAccessibles());
+        }
         // Si encara no s'ha obtingut l'entitat actual en aquesta sessió, o s'han d'actualitzar les entitats, obtenim l'entitat actual
-        if (sessionScopedContext.getEntitatActual() == null || entitatsToBeUpdated)
-            sessionScopedContext.setEntitatActual(getEntitatActual(request));
+        if (sessionScopedContext.getEntitatActual() == null || entitatsToBeUpdated) {
+            sessionScopedContext.setEntitatActual(getEntitatActual());
+        }
         // Si encara no s'han obtingut els rols disponibles en aquesta sessió, els obtenim
-        if (sessionScopedContext.getRolsDisponibles() == null)
+        if (sessionScopedContext.getRolsDisponibles() == null) {
             sessionScopedContext.setRolsDisponibles(getRolsDisponibles(request));
+        }
         // Si encara no s'ha obtingut el rol actual en aquesta sessió, l'obtenim
-        if (sessionScopedContext.getRolActual() == null)
+        if (sessionScopedContext.getRolActual() == null) {
             sessionScopedContext.setRolActual(getRolActual(request));
+        }
     }
 
     // Comprova is s'està canviant l'entitat. En cas afirmatiu:
     // En cas afirmatiu s'assigna la nova entitat
     private void processarCanviEntitat(HttpServletRequest request) {
+
         // Comprovam si s'està canviant l'entitat
         var novaEntitat = request.getParameter(RolHelper.REQUEST_PARAMETER_CANVI_ENTITAT);
-        if (Strings.isNullOrEmpty(novaEntitat))
+        if (Strings.isNullOrEmpty(novaEntitat)) {
             return;
-
+        }
         // Si es canvia l'entitat, i es tracta d'una entitat accessible per l'usuari, s'assigna com a entitat actual
         log.debug("Processant canvi entitat (id=" + novaEntitat + ")");
         try {
-            Long novaEntitatId = new Long(novaEntitat);
-            List<EntitatDto> entitats = sessionScopedContext.getEntitatsAccessibles();
-            for (EntitatDto entitat: entitats) {
-                if (novaEntitatId.equals(entitat.getId())) {
-                    sessionScopedContext.setEntitatActual(entitat);
-                    // Desam l'entitat actual com a darrera entitat utilitzada per l'usuari
-                    aplicacioService.updateEntitatUsuariActual(novaEntitatId);
+            Long novaEntitatId = Long.parseLong(novaEntitat);
+            var entitats = sessionScopedContext.getEntitatsAccessibles();
+            for (var entitat: entitats) {
+                if (!novaEntitatId.equals(entitat.getId())) {
+                    continue;
                 }
+                sessionScopedContext.setEntitatActual(entitat);
+                // Desam l'entitat actual com a darrera entitat utilitzada per l'usuari
+                aplicacioService.updateEntitatUsuariActual(novaEntitatId);
             }
         } catch (NumberFormatException ignoredEx) {
             log.error("Error al canviar a la entitat amb id: " + novaEntitat, ignoredEx);
@@ -226,6 +234,7 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
 
     // Obtenim els permisos per a mostrar o ocultar els menus d'alta de notificacions, comunicacions i comunicacions SIR
     private void obtenirPermisosMenu() {
+
         // Només cal obtenir els permisis si el rol actual és usuari
         if (sessionScopedContext.getEntitatActual() == null || sessionScopedContext.getUsuariActual() == null || !RolHelper.isUsuariActualUsuari(sessionScopedContext.getRolActual())) {
             return;
@@ -237,18 +246,18 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
 
     // Obtenim els òrgans gestors accessibles com a administrador per l'usuari, i comprovam si es fa un canvi d'òrgan
     private void processarOrgansGestors(HttpServletRequest request) {
+
         // Carregam la informació dels òrgans que tenen procediments o servies pendents de sincronitzar
         if (RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()) || RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual())) {
             var entitatActualId = sessionScopedContext.getEntitatActualId();
             sessionScopedContext.setProcedimentsAmbOrganNoSinc(procedimentService.getProcedimentsAmbOrganNoSincronitzat(entitatActualId));
             sessionScopedContext.setServeisAmbOrganNoSinc(serveiService.getServeisAmbOrganNoSincronitzat(entitatActualId));
         }
-
         // Carregam el òrgans gestors únicament si el rol actual és el d'administrador d'òrgan
         var rolActual = sessionScopedContext.getRolActual();
-        if (rolActual == null || !RolEnumDto.NOT_ADMIN_ORGAN.name().equals(rolActual))
+        if (!RolEnumDto.NOT_ADMIN_ORGAN.name().equals(rolActual)) {
             return;
-
+        }
         // Comprovam si els òrgans han estat sincronizats o els seus permisos s'han modificat des de l'últim com que s'han obtingut el llistat d'òrgans disponibles,
         // i per tant si s'han d'actualitzar els òrgans disponibles i l'òrgan actual
         var organsToBeUpdated = hasToBeUpdated(organGestorService.getLastPermisosModificatsInstant(), sessionScopedContext.getInstantOrgansCarregades());
@@ -257,29 +266,29 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
             sessionScopedContext.setOrgansAccessibles(organGestorService.findAccessiblesByUsuariAndEntitatActual(sessionScopedContext.getEntitatActualId()));
             sessionScopedContext.setInstantOrgansCarregades(System.currentTimeMillis());
         }
-
         // Si tenim òrgans disponibles, assignamer l'òrgan actual, i comprovarem si hi ha canvi d'òrgan
         var organsAccessibles = sessionScopedContext.getOrgansAccessibles();
-        if (organsAccessibles != null && !organsAccessibles.isEmpty()) {
-            // Si encara no s'ha assignat cap òrgan, assignam el primer dels disponibles
-            if (sessionScopedContext.getOrganActual() == null || !organsAccessibles.contains(sessionScopedContext.getOrganActual())) {
-                sessionScopedContext.setOrganActual(sessionScopedContext.getOrgansAccessibles().get(0));
-            }
-
-            // Comprovam si es produeix un canvi d'òrgan gestor
-            var nouOrgan = request.getParameter(RolHelper.REQUEST_PARAMETER_CANVI_ORGAN);
-            if (Strings.isNullOrEmpty(nouOrgan)) {
-                try {
-                    Long organId = Long.parseLong(nouOrgan);
-                    for (var organGestor: organsAccessibles) {
-                        if (organGestor.getId().equals(organId)) {
-                            sessionScopedContext.setOrganActual(organGestor);
-                        }
-                    }
-                } catch (NumberFormatException ignoredEx) {
-                    log.error("Error al canviar a l'òrgan amb id: " + nouOrgan, ignoredEx);
+        if (organsAccessibles == null || organsAccessibles.isEmpty()) {
+            return;
+        }
+        // Si encara no s'ha assignat cap òrgan, assignam el primer dels disponibles
+        if (sessionScopedContext.getOrganActual() == null || !organsAccessibles.contains(sessionScopedContext.getOrganActual())) {
+            sessionScopedContext.setOrganActual(sessionScopedContext.getOrgansAccessibles().get(0));
+        }
+        // Comprovam si es produeix un canvi d'òrgan gestor
+        var nouOrgan = request.getParameter(RolHelper.REQUEST_PARAMETER_CANVI_ORGAN);
+        if (!Strings.isNullOrEmpty(nouOrgan)) {
+            return;
+        }
+        try {
+            Long organId = Long.parseLong(nouOrgan);
+            for (var organGestor: organsAccessibles) {
+                if (organGestor.getId().equals(organId)) {
+                    sessionScopedContext.setOrganActual(organGestor);
                 }
             }
+        } catch (NumberFormatException ignoredEx) {
+            log.error("Error al canviar a l'òrgan amb id: " + nouOrgan, ignoredEx);
         }
     }
 
@@ -316,7 +325,7 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
     }
 
     // Obtenim les entitats accessibles per l'usuari actual, donat el rol actual
-    private List<EntitatDto> getEntitatsAccessibles(HttpServletRequest request) {
+    private List<EntitatDto> getEntitatsAccessibles() {
         var rolActual = sessionScopedContext.getRolActual();
         if (rolActual == null) {
             rolActual = "";
@@ -327,7 +336,7 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
     }
 
     // Obtenim l'entitat actual
-    private EntitatDto getEntitatActual(HttpServletRequest request) {
+    private EntitatDto getEntitatActual() {
         // L'entitat actual ha de seu una de les entitats accessibles de l'usuari
         var entitatsAccessibles = sessionScopedContext.getEntitatsAccessibles();
         if (entitatsAccessibles == null || entitatsAccessibles.isEmpty())

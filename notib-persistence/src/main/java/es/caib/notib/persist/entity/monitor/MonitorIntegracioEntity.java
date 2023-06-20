@@ -82,10 +82,10 @@ public class MonitorIntegracioEntity extends AbstractPersistable<Long> {
 
 
     public void setErrorDescripcio(String errorDescripcio) {
-        this.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH);;
+        this.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH);
     }
     public void setExcepcioMessage(String excepcioMessage) {
-        this.excepcioMessage = StringUtils.abbreviate(excepcioMessage, ERROR_DESC_MAX_LENGTH);;
+        this.excepcioMessage = StringUtils.abbreviate(excepcioMessage, ERROR_DESC_MAX_LENGTH);
     }
 
     public void setExcepcioStacktrace(String excepcioStacktrace) {
@@ -94,7 +94,6 @@ public class MonitorIntegracioEntity extends AbstractPersistable<Long> {
 
     // Custom builder setters
     public static class MonitorIntegracioEntityBuilder {
-        private String errorDescripcio;
         public MonitorIntegracioEntity.MonitorIntegracioEntityBuilder errorDescripcio(String errorDescripcio){
             this.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH);
             return this;

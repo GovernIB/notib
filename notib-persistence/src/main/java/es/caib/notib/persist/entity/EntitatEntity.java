@@ -91,12 +91,6 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	@Column(name = "data_actualitzacio")
 	@Temporal(TemporalType.TIMESTAMP)
 	Date dataActualitzacio;
-//	@OneToMany(
-//			mappedBy = "entitat",
-//			fetch = FetchType.LAZY,
-//			cascade = CascadeType.ALL,
-//			orphanRemoval = true)
-//	protected List<OrganGetorEntity> organsGestors  = new ArrayList<OrganGetorEntity>();
 
 	@Version
 	private long version = 0;
@@ -143,8 +137,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		this.oficinaEntitat = oficinaEntitat;
 	}
 
-	public void updateActiva(
-			boolean activa) {
+	public void updateActiva(boolean activa) {
 		this.activa = activa;
 	}
 	
@@ -156,7 +149,6 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String dir3CodiReg,
 			String apiKey,
 			boolean ambEntregaDeh,
-//			boolean ambEntregaCie,
 			byte[] logoCapBytes,
 			byte[] logoPeuBytes,
 			String colorFons,

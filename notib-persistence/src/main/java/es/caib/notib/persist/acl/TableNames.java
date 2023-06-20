@@ -10,6 +10,10 @@ package es.caib.notib.persist.acl;
  */
 public class TableNames {
 
+	private TableNames() {
+		throw new IllegalStateException("TableNames no es pot instanciar");
+	}
+
 	public static final String TABLE_PREFIX = "not_";
 
 	public static final String TABLE_OBJECT_IDENTITY = TABLE_PREFIX + "acl_object_identity";

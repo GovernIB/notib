@@ -437,28 +437,14 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaError = notificaError;
 		this.notificacioErrorEvent = notificaErrorEvent;
 	}
-	
-//	public void updateNotificaFiOperacio() {
-//		this.notificaIntentData = new Date();
-//	}
-//	public void updateNotificaFiOperacio(boolean isError, Integer reintentPeriode) {
-//		if (isError) {
-//			this.intentNum++;
-//			Calendar cal = GregorianCalendar.getInstance();
-//			cal.add(Calendar.MILLISECOND, reintentPeriode*(2^intentNum));
-//			this.notificaIntentData = cal.getTime();
-//		} else {
-//			this.intentNum = 0;
-//			this.notificaIntentData = new Date();
-//		}
-//	}
+
 	public void updateNotificaDataRefrescEstat() {
 		this.notificaEstatDataActualitzacio = new Date();
 	}
 	
 	public void updateNotificaNovaConsulta(Integer reintentPeriode) {
 		this.notificaIntentNum++;
-		Calendar cal = GregorianCalendar.getInstance();
+		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MILLISECOND, reintentPeriode*(2^notificaIntentNum));
 		this.notificaIntentData = cal.getTime();
 	}
@@ -470,7 +456,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	
 	public void updateSirNovaConsulta(Integer reintentPeriode) {
 		this.sirConsultaIntent++;
-		Calendar cal = GregorianCalendar.getInstance();
+		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MILLISECOND, reintentPeriode*(2^sirConsultaIntent));
 		this.sirConsultaData = cal.getTime();
 	}
@@ -482,24 +468,20 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	
 	public void updateDEHCertNovaConsulta(Integer reintentPeriode) {
 		this.dehCertIntentNum++;
-		Calendar cal = GregorianCalendar.getInstance();
+		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MILLISECOND, reintentPeriode*(2^dehCertIntentNum));
 		this.dehCertIntentData = cal.getTime();
 	}
 	
 	public void updateCIECertNovaConsulta(Integer reintentPeriode) {
 		this.cieCertIntentNum++;
-		Calendar cal = GregorianCalendar.getInstance();
+		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MILLISECOND, reintentPeriode*(2^cieCertIntentNum));
 		this.cieCertIntentData = cal.getTime();
 	}
 	
-	public void update(
-			Enviament enviament,
-			boolean isAmbEntregaDeh,
-			ServeiTipusEnumDto tipusServei,
-			NotificacioEntity notificacioGuardada,
-			PersonaEntity titular) {
+	public void update(Enviament enviament, boolean isAmbEntregaDeh, ServeiTipusEnumDto tipusServei, NotificacioEntity notificacioGuardada, PersonaEntity titular) {
+
 		this.serveiTipus = tipusServei;
 		this.notificaEstat = EnviamentEstat.NOTIB_PENDENT;
 		this.notificaIntentNum = 0;

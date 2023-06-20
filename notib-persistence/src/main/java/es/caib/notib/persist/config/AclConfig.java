@@ -128,7 +128,7 @@ public class AclConfig {
 //	public EhCacheBasedAclCache aclCache() {
 //		return new EhCacheBasedAclCache(
 //				aclEhCacheFactoryBean().getObject(),
-//				permissionGrantingStrategy(),
+//				permissionGrantingStrategy(),AvisEntity
 //				aclAuthorizationStrategy());
 //	}
 
@@ -152,13 +152,10 @@ public class AclConfig {
 
 	@Bean
 	public AclAuthorizationStrategy aclAuthorizationStrategy() {
-		return new AclAuthorizationStrategy() {
-			@Override
-			public void securityCheck(Acl acl, int changeType) {
-				if ((SecurityContextHolder.getContext() == null) || (SecurityContextHolder.getContext().getAuthentication() == null)
-						|| !SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-					throw new AccessDeniedException("Authenticated principal required to operate with ACLs");
-				}
+		return (acl, changeType) -> {
+			if ((SecurityContextHolder.getContext() == null) || (SecurityContextHolder.getContext().getAuthentication() == null)
+					|| !SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+				throw new AccessDeniedException("Authenticated principal required to operate with ACLs");
 			}
 		};
 	}

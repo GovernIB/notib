@@ -62,11 +62,12 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entitat.validation.dir3.repetit"))
 						.addNode("dir3Codi").addConstraintViolation();
 			}
+			var notEmpty = "NotEmpty";
 			// validar si és oficina per entitat
 			if (entitatCommand.isOficinaEntitat() && (entitatCommand.getOficina() == null || entitatCommand.getOficina().isEmpty())) {
 				valid = false;
 				context.disableDefaultConstraintViolation();
-				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty")).addNode("oficina").addConstraintViolation();
+				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage(notEmpty)).addNode("oficina").addConstraintViolation();
 			}
 			if (!entitatCommand.isEntregaCieActiva()) {
 				return valid;
@@ -74,14 +75,14 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 			if (entitatCommand.getOperadorPostalId() == null) {
 				valid = false;
 				context.disableDefaultConstraintViolation();
-				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage(notEmpty))
 						.addNode("operadorPostalId").addConstraintViolation();
 			}
 
 			if (entitatCommand.getCieId() == null) {
 				valid = false;
 				context.disableDefaultConstraintViolation();
-				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty")).addNode("cieId").addConstraintViolation();
+				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage(notEmpty)).addNode("cieId").addConstraintViolation();
 			}
 			return valid;
         } catch (Exception ex) {

@@ -20,6 +20,7 @@ public class ValidUsuariValidator implements ConstraintValidator<ValidUsuari, Us
 
     @Override
     public void initialize(final ValidUsuari constraintAnnotation) {
+        // init
     }
 
     @SuppressWarnings("deprecation")

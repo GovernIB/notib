@@ -46,6 +46,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 
 	@Override
 	public void initialize(final ValidNotificacio constraintAnnotation) {
+		//init
 	}
 
 	@SuppressWarnings("deprecation")
@@ -60,50 +61,41 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 		try {
 
 			// Validació del Concepte
-			if (notificacio.getConcepte() != null && !notificacio.getConcepte().isEmpty()) {
-				if (!validFormat(notificacio.getConcepte()).isEmpty()) {
-					valid = false;
-					context.buildConstraintViolationWithTemplate(
-									MessageHelper.getInstance().getMessage("notificacio.form.valid.concepte", new Object[] {listToString(validFormat(notificacio.getConcepte()))}, locale))
-							.addNode("concepte")
-							.addConstraintViolation();
-				}
+			if (notificacio.getConcepte() != null && !notificacio.getConcepte().isEmpty() && (!validFormat(notificacio.getConcepte()).isEmpty())) {
+				valid = false;
+				var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.concepte", new Object[] {listToString(validFormat(notificacio.getConcepte()))}, locale);
+				context.buildConstraintViolationWithTemplate(msg).addNode("concepte").addConstraintViolation();
+
 			}
 
 			// Validació de la Descripció
-			if (notificacio.getDescripcio() != null && !notificacio.getDescripcio().isEmpty()) {
-				if (!validFormat(notificacio.getDescripcio()).isEmpty()) {
-					valid = false;
-					context.buildConstraintViolationWithTemplate(
-									MessageHelper.getInstance().getMessage("notificacio.form.valid.descripcio", new Object[] {listToString(validFormat(notificacio.getDescripcio()))}, locale))
-							.addNode("descripcio")
-							.addConstraintViolation();
-				}
+			if (notificacio.getDescripcio() != null && !notificacio.getDescripcio().isEmpty() && (!validFormat(notificacio.getDescripcio()).isEmpty())) {
+				valid = false;
+				var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.descripcio", new Object[] {listToString(validFormat(notificacio.getDescripcio()))}, locale);
+				context.buildConstraintViolationWithTemplate(msg).addNode("descripcio").addConstraintViolation();
 			}
 
 			//Validar si és comunicació
 			// TODO: Aquesta validació no té molt de sentit ara que hem dividit els formularis
-			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.COMUNICACIO || notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.COMUNICACIO_SIR) {
-				if (notificacio.getEnviaments() != null) {
-					for (EnviamentCommand enviament : notificacio.getEnviaments()) {
-						if (enviament.getTitular().getInteressatTipus() == InteressatTipus.ADMINISTRACIO) {
-							comunicacioAmbAdministracio = true;
-						}
-						if ((enviament.getTitular().getInteressatTipus() == InteressatTipus.FISICA) || (enviament.getTitular().getInteressatTipus() == InteressatTipus.JURIDICA)) {
-							comunicacioSenseAdministracio = true;
-						}
+			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.COMUNICACIO || notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.COMUNICACIO_SIR && (notificacio.getEnviaments() != null)) {
+				for (var enviament : notificacio.getEnviaments()) {
+					if (enviament.getTitular().getInteressatTipus() == InteressatTipus.ADMINISTRACIO) {
+						comunicacioAmbAdministracio = true;
+					}
+					if ((enviament.getTitular().getInteressatTipus() == InteressatTipus.FISICA) || (enviament.getTitular().getInteressatTipus() == InteressatTipus.JURIDICA)) {
+						comunicacioSenseAdministracio = true;
 					}
 				}
 			}
 
 			if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(notificacio.getEnviamentTipus())) {
-				String organ = notificacio.getOrganGestor();
-				OrganGestorDto o = organService.findByCodi(null, organ);
+				var organ = notificacio.getOrganGestor();
+				var o = organService.findByCodi(null, organ);
 				if (o != null) {
-					EntitatDto entitat = entitatService.findById(o.getEntitatId());
+					var entitat = entitatService.findById(o.getEntitatId());
 					valid = entitat.isOficinaEntitat() || o.getOficina() != null && !Strings.isNullOrEmpty(o.getOficina().getCodi());
 					if (!valid) {
-						String msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.sense.oficina", null, locale);
+						var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.sense.oficina", null, locale);
 						context.buildConstraintViolationWithTemplate(msg).addNode("organGestor").addConstraintViolation();
 					}
 				}
@@ -111,28 +103,22 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			if (comunicacioAmbAdministracio && comunicacioSenseAdministracio) {
 				valid = false;
 				context.disableDefaultConstraintViolation();
-				context.buildConstraintViolationWithTemplate(
-						MessageHelper.getInstance().getMessage("notificacio.form.comunicacio", null, locale)).addConstraintViolation();
+				var msg = MessageHelper.getInstance().getMessage("notificacio.form.comunicacio", null, locale);
+				context.buildConstraintViolationWithTemplate(msg).addConstraintViolation();
 			}
 
 			// Procediment
 			boolean useProcediment = "PROCEDIMENT".equals(notificacio.getTipusProcSer());
 			Long procSer = useProcediment ? notificacio.getProcedimentId() : notificacio.getServeiId();
 
-			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.NOTIFICACIO) {
-				if (procSer == null) {
-					valid = false;
-					if (useProcediment) {
-						context.buildConstraintViolationWithTemplate(
-										MessageHelper.getInstance().getMessage("notificacio.form.valid.procediment", null, locale))
-								.addNode("procedimentId")
-								.addConstraintViolation();
-					} else {
-						context.buildConstraintViolationWithTemplate(
-										MessageHelper.getInstance().getMessage("notificacio.form.valid.servei", null, locale))
-								.addNode("serveiId")
-								.addConstraintViolation();
-					}
+			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.NOTIFICACIO && (procSer == null)) {
+				valid = false;
+				if (useProcediment) {
+					var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.procediment", null, locale);
+					context.buildConstraintViolationWithTemplate(msg).addNode("procedimentId").addConstraintViolation();
+				} else {
+					var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.servei", null, locale);
+					context.buildConstraintViolationWithTemplate(msg).addNode("serveiId").addConstraintViolation();
 				}
 			}
 			if (procSer != null) {
@@ -140,53 +126,43 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				if (!procedimentActiu) {
 					valid = false;
 					if (useProcediment) {
-						context.buildConstraintViolationWithTemplate(
-										MessageHelper.getInstance().getMessage("notificacio.form.valid.procediment.inactiu", null, locale))
-								.addNode("procedimentId")
-								.addConstraintViolation();
+						var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.procediment.inactiu", null, locale);
+						context.buildConstraintViolationWithTemplate(msg).addNode("procedimentId").addConstraintViolation();
 					} else {
-						context.buildConstraintViolationWithTemplate(
-										MessageHelper.getInstance().getMessage("notificacio.form.valid.servei.inactiu", null, locale))
-								.addNode("serveiId")
-								.addConstraintViolation();
+						var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.servei.inactiu", null, locale);
+						context.buildConstraintViolationWithTemplate(msg).addNode("serveiId").addConstraintViolation();
 					}
 				}
 
-				boolean procedimentAmbGrups = procedimentService.procedimentAmbGrups(procSer);
+				var procedimentAmbGrups = procedimentService.procedimentAmbGrups(procSer);
 				if (procedimentAmbGrups && notificacio.getGrupId() == null) {
 					valid = false;
-					context.buildConstraintViolationWithTemplate(
-									MessageHelper.getInstance().getMessage("notificacio.form.valid.grup", null, locale))
-							.addNode("grupId")
-							.addConstraintViolation();
+					var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.grup", null, locale);
+					context.buildConstraintViolationWithTemplate(msg).addNode("grupId").addConstraintViolation();
 				}
 			}
 
 			// Validació caducitat
 			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.NOTIFICACIO) {
 				if (notificacio.getCaducitat() == null) {
-					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotNull", null, locale))
-							.addNode("caducitat")
-							.addConstraintViolation();
-				}
-				else if (!notificacio.getCaducitat().after(new Date())) {
+					var msg = MessageHelper.getInstance().getMessage("NotNull", null, locale);
+					context.buildConstraintViolationWithTemplate(msg).addNode("caducitat").addConstraintViolation();
+				} else if (!notificacio.getCaducitat().after(new Date())) {
 					valid = false;
-					context.buildConstraintViolationWithTemplate(
-									MessageHelper.getInstance().getMessage("notificacio.form.valid.caducitat", null, locale))
-							.addNode("caducitat")
-							.addConstraintViolation();
+					var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.caducitat", null, locale);
+					context.buildConstraintViolationWithTemplate(msg).addNode("caducitat").addConstraintViolation();
 				}
 			}
 
 			// Validació de documents
-			Long fileMaxSize = 10485760L; //10MB
-			Long fileTotalMaxSize = 15728640L; // 15MB
-			List<String> formatsDisponibles = Arrays.asList(new String[] {"application/pdf", "application/zip", "application/x-zip-compressed"});
-			List<String> extensionsDisponibles = Arrays.asList(new String[] {"jpg", "jpeg", "odt", "odp", "ods", "odg", "docx", "xlsx", "pptx", "pdf", "png", "rtf", "svg", "tiff", "txt", "xml", "xsig"});
-			if (aplicacioService.propertyGet("es.caib.notib.notificacio.document.size") != null)
-				fileMaxSize = Long.valueOf(aplicacioService.propertyGet("es.caib.notib.notificacio.document.size"));
-			Long fileTotalSize = 0L;
-
+			var fileMaxSize = 10485760L; //10MB
+			var fileTotalMaxSize = 15728640L; // 15MB
+			List<String> formatsDisponibles = Arrays.asList("application/pdf", "application/zip", "application/x-zip-compressed");
+			List<String> extensionsDisponibles = Arrays.asList("jpg", "jpeg", "odt", "odp", "ods", "odg", "docx", "xlsx", "pptx", "pdf", "png", "rtf", "svg", "tiff", "txt", "xml", "xsig");
+			if (aplicacioService.propertyGet("es.caib.notib.notificacio.document.size") != null) {
+				fileMaxSize = Long.parseLong(aplicacioService.propertyGet("es.caib.notib.notificacio.document.size"));
+			}
+			var fileTotalSize = 0L;
 			for (int i = 0; i < 5; i++) {
 				if(notificacio.getTipusDocument()[i] == null) {
 					continue;
@@ -196,12 +172,12 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 						if (i == 0 && ((notificacio.getContingutArxiu(i) == null || notificacio.getContingutArxiu(i).length == 0 || notificacio.getDocuments()[i].getArxiuGestdocId() == null)
 								&& (notificacio.getDocuments()[i].getArxiuGestdocId() == null || notificacio.getDocuments()[i].getArxiuGestdocId().isEmpty()))) {
 							valid = false;
-							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, locale))
-									.addNode("arxiu[" + i + "]")
-									.addConstraintViolation();
+							var msg = MessageHelper.getInstance().getMessage("NotEmpty", null, locale);
+							context.buildConstraintViolationWithTemplate(msg).addNode("arxiu[" + i + "]").addConstraintViolation();
 						}
 						if ((notificacio.getContingutArxiu(i) != null && notificacio.getContingutArxiu(i).length != 0) ||
 								(notificacio.getDocuments()[i].getArxiuGestdocId() != null && !notificacio.getDocuments()[i].getArxiuGestdocId().trim().isEmpty())) {
+
 							String extensio;
 							String contentType;
 							Long fileSize;
@@ -222,9 +198,8 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 									log.info("NOTIFICACIO-VAL: > Extensió no vàlida!");
 									formatValid = false;
 									valid = false;
-									context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.format", null, locale))
-											.addNode("arxiu[" + i + "]")
-											.addConstraintViolation();
+									var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.document.format", null, locale);
+									context.buildConstraintViolationWithTemplate(msg).addNode("arxiu[" + i + "]").addConstraintViolation();
 								}
 							} else {
 								log.info("NOTIFICACIO-VAL: > ContentType: '{}'", contentType);
@@ -232,9 +207,8 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 									log.info("NOTIFICACIO-VAL: > ContentType no vàlid!!");
 									formatValid = false;
 									valid = false;
-									context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.format", null, locale))
-											.addNode("arxiu[" + i + "]")
-											.addConstraintViolation();
+									var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.document.format", null, locale);
+									context.buildConstraintViolationWithTemplate(msg).addNode("arxiu[" + i + "]").addConstraintViolation();
 								}
 							}
 							if (formatValid) {
@@ -243,34 +217,30 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 							fileTotalSize += fileSize;
 							if (fileSize > fileMaxSize) {
 								valid = false;
-								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.size", null, locale))
-										.addNode("arxiu[" + i + "]")
-										.addConstraintViolation();
+								var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.document.size", null, locale);
+								context.buildConstraintViolationWithTemplate(msg).addNode("arxiu[" + i + "]").addConstraintViolation();
 							}
 						}
 						break;
 					case URL:
 						if (i == 0 && (notificacio.getDocumentArxiuUrl()[i] == null || notificacio.getDocumentArxiuUrl()[i].trim().isEmpty())) {
 							valid = false;
-							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, locale))
-									.addNode("documentArxiuUrl[" + i + "]")
-									.addConstraintViolation();
+							var msg = MessageHelper.getInstance().getMessage("NotEmpty", null, locale);
+							context.buildConstraintViolationWithTemplate(msg).addNode("documentArxiuUrl[" + i + "]").addConstraintViolation();
 						}
 						break;
 					case CSV:
 						if (i == 0 && (notificacio.getDocumentArxiuCsv()[i] == null || notificacio.getDocumentArxiuCsv()[i].trim().isEmpty())) {
 							valid = false;
-							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, locale))
-									.addNode("documentArxiuCsv[" + i + "]")
-									.addConstraintViolation();
+							var msg = MessageHelper.getInstance().getMessage("NotEmpty", null, locale);
+							context.buildConstraintViolationWithTemplate(msg).addNode("documentArxiuCsv[" + i + "]").addConstraintViolation();
 						}
 						break;
 					case UUID:
 						if (i == 0 && (notificacio.getDocumentArxiuUuid()[i] == null || notificacio.getDocumentArxiuUuid()[i].trim().isEmpty())) {
 							valid = false;
-							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, locale))
-									.addNode("documentArxiuUuid[" + i + "]")
-									.addConstraintViolation();
+							var msg = MessageHelper.getInstance().getMessage("NotEmpty", null, locale);
+							context.buildConstraintViolationWithTemplate(msg).addNode("documentArxiuUuid[" + i + "]").addConstraintViolation();
 						}
 						break;
 				}
@@ -286,27 +256,23 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			if (notificacio.getEnviaments() != null) {
 				int envCount = 0;
 				List<String> nifs = new ArrayList<>();
-				for (EnviamentCommand enviament: notificacio.getEnviaments()) {
+				for (var enviament: notificacio.getEnviaments()) {
 
 					// Incapacitat -> Destinataris no null
-					if (enviament.getTitular() != null && enviament.getTitular().isIncapacitat()) {
-						if (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty()) {
-							valid = false;
-							context.buildConstraintViolationWithTemplate(
-											MessageHelper.getInstance().getMessage("notificacio.form.valid.titular.incapacitat", new Object[] {envCount + 1}, locale))
-									.addConstraintViolation();
-							context.buildConstraintViolationWithTemplate(
-											MessageHelper.getInstance().getMessage("notificacio.form.valid.titular.incapacitat", new Object[] {envCount + 1}, locale))
-									.addNode("enviaments["+envCount+"].titular.incapacitat")
-									.addConstraintViolation();
-						}
+					if (enviament.getTitular() != null && enviament.getTitular().isIncapacitat() && (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty())) {
+						valid = false;
+						var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.titular.incapacitat", new Object[] {envCount + 1}, locale);
+						context.buildConstraintViolationWithTemplate(msg).addConstraintViolation();
+						msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.titular.incapacitat", new Object[] {envCount + 1}, locale);
+						context.buildConstraintViolationWithTemplate(msg).addNode("enviaments["+envCount+"].titular.incapacitat").addConstraintViolation();
+
 					}
 					if (!notificacio.isComunicacioSIR()) {
 						boolean senseNif = true;
-						if (!InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && senseNif) {
-							if (enviament.getTitular() != null && enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
+						if (!InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && senseNif
+								&& (enviament.getTitular() != null && enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty())) {
 								senseNif = false;
-							}
+
 						}
 						if (senseNif && enviament.getDestinataris() != null) {
 							for (PersonaCommand destinatari: enviament.getDestinataris()) {
@@ -315,7 +281,6 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 								}
 							}
 						}
-
 						if (!InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && senseNif) {
 							valid = false;
 							context.buildConstraintViolationWithTemplate(
@@ -325,15 +290,14 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 						}
 
 						// SI ES UNA PERSONA SENSE NIF I NO TÉ CAP DESTINATARI NI ENVIAMENT PER ENTREGA POSTAL ACTIVA -> EMAIL OBLIGATORI
-						if (InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
-							if(senseNif && (enviament.getEntregaPostal() == null || !enviament.getEntregaPostal().isActiva()) && Strings.isNullOrEmpty(enviament.getTitular().getEmail())) {
+						if (InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) &&
+								(senseNif && (enviament.getEntregaPostal() == null || !enviament.getEntregaPostal().isActiva())
+										&& Strings.isNullOrEmpty(enviament.getTitular().getEmail()))) {
+
 								// Email obligatori si no té destinataris amb nif o enviament postal
 								valid = false;
-								context.buildConstraintViolationWithTemplate(
-												MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.sense.nif.email", null, locale))
-										.addNode("enviaments[" + envCount + "].titular.email")
-										.addConstraintViolation();
-							}
+								var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.sense.nif.email", null, locale);
+								context.buildConstraintViolationWithTemplate(msg).addNode("enviaments[" + envCount + "].titular.email").addConstraintViolation();
 						}
 
 						if (!Strings.isNullOrEmpty(enviament.getTitular().getNif()) && !InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
@@ -351,40 +315,38 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					if (enviament.getEntregaDeh() != null && enviament.getEntregaDeh().isActiva()) {
 						if (InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
 							valid = false;
-							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entregadeh.form.valid.persona.sense.nif", null, locale))
-									.addNode("enviaments["+envCount+"].entregaDeh.activa").addConstraintViolation();
+							var msg = MessageHelper.getInstance().getMessage("entregadeh.form.valid.persona.sense.nif", null, locale);
+							context.buildConstraintViolationWithTemplate(msg).addNode("enviaments["+envCount+"].entregaDeh.activa").addConstraintViolation();
 						}
 						if (enviament.getTitular() == null || enviament.getTitular().getNif() == null || enviament.getTitular().getNif().isEmpty()) {
 							valid = false;
-							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entregadeh.form.valid.sensenif", null, locale))
-									.addNode("enviaments["+envCount+"].titular.nif").addConstraintViolation();
+							var msg = MessageHelper.getInstance().getMessage("entregadeh.form.valid.sensenif", null, locale);
+							context.buildConstraintViolationWithTemplate(msg).addNode("enviaments["+envCount+"].titular.nif").addConstraintViolation();
 						}
 					}
 
 					if (enviament.getTitular() != null && enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty() && !EmailValidHelper.isEmailValid(enviament.getTitular().getEmail())) {
 						valid = false;
-						context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
-								.addNode("enviaments["+envCount+"].titular.email").addConstraintViolation();
+						var msg = MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale);
+						context.buildConstraintViolationWithTemplate(msg).addNode("enviaments["+envCount+"].titular.email").addConstraintViolation();
 					}
 					if (enviament.getDestinataris() != null) {
 						int destCount = 0;
-						for (PersonaCommand destinatari: enviament.getDestinataris()) {
+						for (var destinatari: enviament.getDestinataris()) {
 							if (!Strings.isNullOrEmpty(destinatari.getEmail()) && !EmailValidHelper.isEmailValid(destinatari.getEmail())) {
 								valid = false;
-								context.buildConstraintViolationWithTemplate(
-												MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
-										.addNode("enviaments["+envCount+"].destinataris[" + destCount +"].email")
-										.addConstraintViolation();
+								var msg = MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale);
+								var node = "enviaments["+envCount+"].destinataris[" + destCount +"].email";
+								context.buildConstraintViolationWithTemplate(msg).addNode(node).addConstraintViolation();
 							}
 							String nif = destinatari.getNif();
 							if (!Strings.isNullOrEmpty(nif)) {
 								nif = nif.toLowerCase();
 								if (nifs.contains(nif)) {
 									valid = false;
-									context.buildConstraintViolationWithTemplate(
-													MessageHelper.getInstance().getMessage("notificacio.form.valid.nif.repetit", null, locale))
-											.addNode("enviaments["+envCount+"].destinataris[" + destCount +"].nif")
-											.addConstraintViolation();
+									var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.nif.repetit", null, locale);
+									var node = "enviaments["+envCount+"].destinataris[" + destCount +"].nif";
+									context.buildConstraintViolationWithTemplate(msg).addNode(node).addConstraintViolation();
 								} else {
 									nifs.add(nif);
 								}
@@ -396,23 +358,22 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				}
 			}
 		} catch (final Exception ex) {
-			log.error("S'ha produït un error inesperat al validar la notificació. "
-					+ "Si l'error es continua donant en properes intents, posis en contacte amb els administradors de l'aplicació.", ex);
+			log.error("S'ha produït un error inesperat al validar la notificació. Si l'error es continua donant en properes intents, posis en contacte amb els administradors de l'aplicació.", ex);
 			valid = false;
 		}
 		return valid;
 	}
 
 	public static ArrayList<Character> validFormat(String value) {
-		String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
-		ArrayList<Character> charsNoValids = new ArrayList<Character>();
-		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
 
+		String controlCaracters = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
+		ArrayList<Character> charsNoValids = new ArrayList<>();
+		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
 		boolean esCaracterValid = true;
-		for (int i = 0; i < chars.length; i++) {
-			esCaracterValid = !(CONTROL_CARACTERS.indexOf(chars[i]) < 0);
-			if (!esCaracterValid && !charsNoValids.contains(chars[i])) {
-				charsNoValids.add(chars[i]);
+		for (char aChar : chars) {
+			esCaracterValid = controlCaracters.indexOf(aChar) >= 0;
+			if (!esCaracterValid && !charsNoValids.contains(aChar)) {
+				charsNoValids.add(aChar);
 			}
 		}
 		return charsNoValids;

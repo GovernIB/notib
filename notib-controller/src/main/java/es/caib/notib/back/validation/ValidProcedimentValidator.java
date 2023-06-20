@@ -95,17 +95,17 @@ public class ValidProcedimentValidator implements ConstraintValidator<ValidProce
 		if (procediment == null) {
 			return true;
 		}
-		return id != null ? id.longValue() == procediment.getId().longValue() : false;
+		return id != null && id.longValue() == procediment.getId().longValue();
 	}
 
 	private boolean checkNom(final ProcSerCommand command) {
 
-		final Long id = command.getId();
-		ProcSerDto procediment = procedimentService.findByNom(command.getEntitatId(), command.getNom());
+		final var id = command.getId();
+		var procediment = procedimentService.findByNom(command.getEntitatId(), command.getNom());
 		if (procediment == null) {
 			return true;
 		}
-		return id != null ? ( id.longValue() == procediment.getId().longValue() ) : false;
+		return id != null && (id.longValue() == procediment.getId().longValue());
 	}
 
 }

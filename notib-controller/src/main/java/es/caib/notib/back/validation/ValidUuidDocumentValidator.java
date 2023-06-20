@@ -35,7 +35,6 @@ public class ValidUuidDocumentValidator implements ConstraintValidator<ValidUuid
 
 		boolean valid = true;
 		try {
-			
 			var fieldType = BeanUtils.getProperty(value, fieldName);
 			var dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
 			if (TipusDocumentEnumDto.UUID.name().equals(fieldType) && (dependFieldValue == null || dependFieldValue.isEmpty())) {
@@ -43,12 +42,10 @@ public class ValidUuidDocumentValidator implements ConstraintValidator<ValidUuid
 				context.buildConstraintViolationWithTemplate(msg).addNode("documentArxiuUuid").addConstraintViolation();
 				valid = false;
 			}
-
 		} catch (final Exception ex) {
         	log.error("Ha d'informar el email quan hi ha entrega DEH", ex);
         	valid = false;
         }
-		
 		if (!valid) {
 			context.disableDefaultConstraintViolation();
 		}

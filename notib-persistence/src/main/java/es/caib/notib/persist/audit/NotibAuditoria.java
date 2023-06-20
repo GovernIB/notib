@@ -7,7 +7,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.MappedSuperclass;
 
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
-import es.caib.notib.persist.audit.NotibAuditable;
 import lombok.Getter;
 
 /**

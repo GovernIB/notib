@@ -143,13 +143,13 @@ public class EntitatService extends AbstractService<es.caib.notib.logic.intf.ser
 
 	@Override
 	@PermitAll
-	public byte[] getCapLogo() throws NoSuchFileException, IOException {
+	public byte[] getCapLogo() throws IOException {
 		return getDelegateService().getCapLogo();
 	}
 
 	@Override
 	@PermitAll
-	public byte[] getPeuLogo() throws NoSuchFileException, IOException {
+	public byte[] getPeuLogo() throws IOException {
 		return getDelegateService().getPeuLogo();
 	}
 
