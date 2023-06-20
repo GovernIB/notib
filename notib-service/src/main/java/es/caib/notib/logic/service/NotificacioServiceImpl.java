@@ -41,6 +41,7 @@ import es.caib.notib.persist.entity.NotificacioTableEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.entity.ProcedimentEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
+import es.caib.notib.persist.objectes.FiltreNotificacio;
 import es.caib.notib.persist.repository.CallbackRepository;
 import es.caib.notib.persist.repository.ColumnesRepository;
 import es.caib.notib.persist.repository.DocumentRepository;
@@ -612,160 +613,211 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
 			var esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
 			var esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
-			if (filtre == null || filtre.isEmpty()) {
+			var f = notificacioListHelper.getFiltre(filtre);
+			var organs = isAdminOrgan ? organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi) : null;
+			var entitatsActives = isSuperAdmin ? entitatRepository.findByActiva(true) : null;
+			var entitatFiltre = isUsuariEntitat || isUsuari ? entitatId : f.getEntitatId().getField();
+			var not = FiltreNotificacio.builder().entitatIdNull(entitatFiltre == null).entitatId(entitatActual.getId())
+					.enviamentTipusNull(f.getEnviamentTipus().isNull())
+					.enviamentTipus(f.getEnviamentTipus().getField())
+					.concepteNull(f.getConcepte().isNull())
+					.concepte(f.getConcepte().getField())
+					.estatNull(f.getEstat().isNull())
+					.estatMask(f.getEstat().isNull() ? 0 : f.getEstat().getField().getMask())
+					.dataIniciNull(f.getDataInici().isNull())
+					.dataInici(f.getDataInici().getField())
+					.dataFiNull(f.getDataFi().isNull())
+					.dataFi(f.getDataFi().getField())
+					.titularNull(f.getTitular().isNull())
+					.titular(f.getTitular().isNull() ? "" : f.getTitular().getField())
+					.organCodiNull(f.getOrganGestor().isNull())
+					.organCodi(f.getOrganGestor().isNull() ? "" : f.getOrganGestor().getField().getCodi())
+					.procedimentNull(f.getProcediment().isNull())
+					.procedimentCodi(f.getProcediment().isNull() ? "" : f.getProcediment().getField().getCodi())
+					.tipusUsuariNull(f.getTipusUsuari().isNull())
+					.tipusUsuari(f.getTipusUsuari().getField())
+					.numExpedientNull(f.getNumExpedient().isNull())
+					.numExpedient(f.getNumExpedient().getField())
+					.creadaPerNull(f.getCreadaPer().isNull())
+					.creadaPer(f.getCreadaPer().getField())
+					.identificadorNull(f.getIdentificador().isNull())
+					.identificador(f.getIdentificador().getField())
+					.nomesAmbErrors(f.getNomesAmbErrors().getField())
+					.nomesSenseErrors(f.getNomesSenseErrors().getField())
+					.referenciaNull(f.getReferencia().isNull())
+					.referencia(f.getReferencia().getField())
+					.isUsuari(isUsuari)
+					.procedimentsCodisNotibNull(esProcedimentsCodisNotibNull)
+					.procedimentsCodisNotib(esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles)
+					.grupsProcedimentCodisNotib(aplicacioService.findRolsUsuariActual())
+					.organsGestorsCodisNotibNull(esOrgansGestorsCodisNotibNull)
+					.organsGestorsCodisNotib(esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles)
+					.procedimentOrgansIdsNotibNull(esProcedimentOrgansAmbPermisNull)
+					.procedimentOrgansIdsNotib(esProcedimentOrgansAmbPermisNull ?  null : codisProcedimentsOrgans)
+					.usuariCodi(usuariCodi)
+					.isSuperAdmin(isSuperAdmin)
+					.entitatsActives(entitatsActives)
+					.isAdminOrgan(isAdminOrgan)
+					.organs(organs)
+					.notMassivaIdNull(filtre.getNotMassivaId() == null)
+					.notMassivaId(filtre.getNotMassivaId()).build();
+			notificacions = notificacioTableViewRepository.findAmbFiltre(not, pageable);
+//			if (filtre == null || filtre.isEmpty()) {
+//
+//				//Consulta les notificacions sobre les quals té permis l'usuari actual
+//				if (isUsuari) {
+//					long start = System.nanoTime();
 
-				//Consulta les notificacions sobre les quals té permis l'usuari actual
-				if (isUsuari) {
-					long start = System.nanoTime();
-					notificacions = notificacioTableViewRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
-							esProcedimentsCodisNotibNull,
-							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
-							aplicacioService.findRolsUsuariActual(),
-							esOrgansGestorsCodisNotibNull,
-							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
-							esProcedimentOrgansAmbPermisNull,
-							esProcedimentOrgansAmbPermisNull ?  null : codisProcedimentsOrgans,
-							entitatActual,
-							usuariCodi,
-							pageable);
-					var elapsedTime = System.nanoTime() - start;
-					log.info(">>>>>>>>>>>>> Notificacions sense filtre: "  + elapsedTime);
-				//Consulta les notificacions de l'entitat acutal
-				} else if (isUsuariEntitat) {
-					notificacions = notificacioTableViewRepository.findByEntitatActual(entitatActual, pageable);
-				//Consulta totes les notificacions de les entitats actives
-				} else if (isSuperAdmin) {
-					var entitatsActiva = entitatRepository.findByActiva(true);
-					notificacions = notificacioTableViewRepository.findByEntitatActiva(entitatsActiva, pageable);
-				} else if (isAdminOrgan) {
-					var organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
-					notificacions = notificacioTableViewRepository.findByProcedimentCodiNotibAndEntitat(esProcedimentsCodisNotibNull,
-							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles, entitatActual, organs, pageable);
-				}
-			} else {
-				var filtreNetejat = notificacioListHelper.getFiltre(filtre);
-				if (isUsuari) {
-					notificacions = notificacioTableViewRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
-							entitatActual,
-							filtreNetejat.getEntitatId().isNull(),
-							filtreNetejat.getEntitatId().getField(),
-							esProcedimentsCodisNotibNull,
-							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
-							aplicacioService.findRolsUsuariActual(),
-							esOrgansGestorsCodisNotibNull,
-							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
-							esProcedimentOrgansAmbPermisNull,
-							esProcedimentOrgansAmbPermisNull ?  null : codisProcedimentsOrgans,
-							filtreNetejat.getEnviamentTipus().isNull(),
-							filtreNetejat.getEnviamentTipus().getField(),
-							filtreNetejat.getConcepte().isNull(),
-							filtreNetejat.getConcepte().isNull() ? "" : filtreNetejat.getConcepte().getField(),
-							filtreNetejat.getEstat().isNull(),
-							filtreNetejat.getEstat().isNull() ? 0 : filtreNetejat.getEstat().getField().getMask(),
-//							!filtreNetejat.getEstat().isNull() ?
-//									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
-							filtreNetejat.getDataInici().isNull(),
-							filtreNetejat.getDataInici().getField(),
-							filtreNetejat.getDataFi().isNull(),
-							filtreNetejat.getDataFi().getField(),
-							filtreNetejat.getTitular().isNull(),
-							filtreNetejat.getTitular().isNull() ? "" : filtreNetejat.getTitular().getField(),
-							filtreNetejat.getOrganGestor().isNull(),
-							filtreNetejat.getOrganGestor().isNull() ? "" : filtreNetejat.getOrganGestor().getField().getCodi(),
-							filtreNetejat.getProcediment().isNull(),
-							filtreNetejat.getProcediment().isNull() ? "" : filtreNetejat.getProcediment().getField().getCodi(),
-							filtreNetejat.getTipusUsuari().isNull(),
-							filtreNetejat.getTipusUsuari().getField(),
-							filtreNetejat.getNumExpedient().isNull(),
-							filtreNetejat.getNumExpedient().getField(),
-							filtreNetejat.getCreadaPer().isNull(),
-							filtreNetejat.getCreadaPer().getField(),
-							filtreNetejat.getIdentificador().isNull(),
-							filtreNetejat.getIdentificador().getField(),
-							usuariCodi,
-							filtreNetejat.getNomesAmbErrors().getField(),
-							filtreNetejat.getNomesSenseErrors().getField(),
-							filtreNetejat.getReferencia().isNull(),
-							filtreNetejat.getReferencia().getField(),
-							pageable);
-				} else if (isUsuariEntitat || isSuperAdmin) {
-					var entitatFiltre = isUsuariEntitat ? entitatId :filtreNetejat.getEntitatId().getField();
-					notificacions = notificacioTableViewRepository.findAmbFiltre(
-							entitatFiltre == null,
-							entitatFiltre,
-							filtreNetejat.getEnviamentTipus().isNull(),
-							filtreNetejat.getEnviamentTipus().getField(),
-							filtreNetejat.getConcepte().isNull(),
-							filtreNetejat.getConcepte().getField(),
-							filtreNetejat.getEstat().isNull(),
-							filtreNetejat.getEstat().isNull() ? 0 : filtreNetejat.getEstat().getField().getMask(),
-//							!filtreNetejat.getEstat().isNull() ?
-//									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
-							filtreNetejat.getDataInici().isNull(),
-							filtreNetejat.getDataInici().getField(),
-							filtreNetejat.getDataFi().isNull(),
-							filtreNetejat.getDataFi().getField(),
-							filtreNetejat.getTitular().isNull(),
-							filtreNetejat.getTitular().isNull() ? "" : filtreNetejat.getTitular().getField(),
-							filtreNetejat.getOrganGestor().isNull(),
-							filtreNetejat.getOrganGestor().isNull() ? "" : filtreNetejat.getOrganGestor().getField().getCodi(),
-							filtreNetejat.getProcediment().isNull(),
-							filtreNetejat.getProcediment().isNull() ? "" : filtreNetejat.getProcediment().getField().getCodi(),
-							filtreNetejat.getTipusUsuari().isNull(),
-							filtreNetejat.getTipusUsuari().getField(),
-							filtreNetejat.getNumExpedient().isNull(),
-							filtreNetejat.getNumExpedient().getField(),
-							filtreNetejat.getCreadaPer().isNull(),
-							filtreNetejat.getCreadaPer().getField(),
-							filtreNetejat.getIdentificador().isNull(),
-							filtreNetejat.getIdentificador().getField(),
-							filtreNetejat.getNomesAmbErrors().getField(),
-							filtreNetejat.getNomesSenseErrors().getField(),
-							filtreNetejat.getReferencia().isNull(),
-							filtreNetejat.getReferencia().getField(),
-							pageable);
-
-				} else if (isAdminOrgan) {
-					var organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
-					notificacions = notificacioTableViewRepository.findAmbFiltreAndProcedimentCodiNotib(
-							entitatActual,
-							filtreNetejat.getEntitatId().isNull(),
-							filtreNetejat.getEntitatId().getField(),
-							esProcedimentsCodisNotibNull,
-							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
-							filtreNetejat.getEnviamentTipus().isNull(),
-							filtreNetejat.getEnviamentTipus().getField(),
-							filtreNetejat.getConcepte().isNull(),
-							filtreNetejat.getConcepte().getField(),
-							filtreNetejat.getEstat().isNull(),
-							filtreNetejat.getEstat().isNull() ? 0 : filtreNetejat.getEstat().getField().getMask(),
-//							!filtreNetejat.getEstat().isNull() ?
-//									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
-							filtreNetejat.getDataInici().isNull(),
-							filtreNetejat.getDataInici().getField(),
-							filtreNetejat.getDataFi().isNull(),
-							filtreNetejat.getDataFi().getField(),
-							filtreNetejat.getTitular().isNull(),
-							filtreNetejat.getTitular().isNull() ? "" : filtreNetejat.getTitular().getField(),
-							filtreNetejat.getOrganGestor().isNull(),
-							filtreNetejat.getOrganGestor().isNull() ? "" : filtreNetejat.getOrganGestor().getField().getCodi(),
-							filtreNetejat.getProcediment().isNull(),
-							filtreNetejat.getProcediment().isNull() ? "" : filtreNetejat.getProcediment().getField().getCodi(),
-							filtreNetejat.getTipusUsuari().isNull(),
-							filtreNetejat.getTipusUsuari().getField(),
-							filtreNetejat.getNumExpedient().isNull(),
-							filtreNetejat.getNumExpedient().getField(),
-							filtreNetejat.getCreadaPer().isNull(),
-							filtreNetejat.getCreadaPer().getField(),
-							filtreNetejat.getIdentificador().isNull(),
-							filtreNetejat.getIdentificador().getField(),
-							organs,
-							filtreNetejat.getNomesSenseErrors().getField(),
-							filtreNetejat.getReferencia().isNull(),
-							filtreNetejat.getReferencia().getField(),
-							pageable);
-				}
-			}
+//
+//					notificacions = notificacioTableViewRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
+//							esProcedimentsCodisNotibNull,
+//							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
+//							aplicacioService.findRolsUsuariActual(),
+//							esOrgansGestorsCodisNotibNull,
+//							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+//							esProcedimentOrgansAmbPermisNull,
+//							esProcedimentOrgansAmbPermisNull ?  null : codisProcedimentsOrgans,
+//							entitatActual,
+//							usuariCodi,
+//							pageable);
+//					var elapsedTime = System.nanoTime() - start;
+//					log.info(">>>>>>>>>>>>> Notificacions sense filtre: "  + elapsedTime);
+//				//Consulta les notificacions de l'entitat acutal
+//				} else if (isUsuariEntitat) {
+//					notificacions = notificacioTableViewRepository.findByEntitatActual(entitatActual, pageable);
+//				//Consulta totes les notificacions de les entitats actives
+//				} else if (isSuperAdmin) {
+//					var entitatsActiva = entitatRepository.findByActiva(true);
+//					notificacions = notificacioTableViewRepository.findByEntitatActiva(entitatsActiva, pageable);
+//				} else if (isAdminOrgan) {
+//					var organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
+//					notificacions = notificacioTableViewRepository.findByProcedimentCodiNotibAndEntitat(esProcedimentsCodisNotibNull,
+//							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles, entitatActual, organs, pageable);
+//				}
+//			} else {
+//				var filtreNetejat = notificacioListHelper.getFiltre(filtre);
+//				if (isUsuari) {
+//					notificacions = notificacioTableViewRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
+//							entitatActual,
+//							filtreNetejat.getEntitatId().isNull(),
+//							filtreNetejat.getEntitatId().getField(),
+//							esProcedimentsCodisNotibNull,
+//							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
+//							aplicacioService.findRolsUsuariActual(),
+//							esOrgansGestorsCodisNotibNull,
+//							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+//							esProcedimentOrgansAmbPermisNull,
+//							esProcedimentOrgansAmbPermisNull ?  null : codisProcedimentsOrgans,
+//							filtreNetejat.getEnviamentTipus().isNull(),
+//							filtreNetejat.getEnviamentTipus().getField(),
+//							filtreNetejat.getConcepte().isNull(),
+//							filtreNetejat.getConcepte().isNull() ? "" : filtreNetejat.getConcepte().getField(),
+//							filtreNetejat.getEstat().isNull(),
+//							filtreNetejat.getEstat().isNull() ? 0 : filtreNetejat.getEstat().getField().getMask(),
+////							!filtreNetejat.getEstat().isNull() ?
+////									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
+//							filtreNetejat.getDataInici().isNull(),
+//							filtreNetejat.getDataInici().getField(),
+//							filtreNetejat.getDataFi().isNull(),
+//							filtreNetejat.getDataFi().getField(),
+//							filtreNetejat.getTitular().isNull(),
+//							filtreNetejat.getTitular().isNull() ? "" : filtreNetejat.getTitular().getField(),
+//							filtreNetejat.getOrganGestor().isNull(),
+//							filtreNetejat.getOrganGestor().isNull() ? "" : filtreNetejat.getOrganGestor().getField().getCodi(),
+//							filtreNetejat.getProcediment().isNull(),
+//							filtreNetejat.getProcediment().isNull() ? "" : filtreNetejat.getProcediment().getField().getCodi(),
+//							filtreNetejat.getTipusUsuari().isNull(),
+//							filtreNetejat.getTipusUsuari().getField(),
+//							filtreNetejat.getNumExpedient().isNull(),
+//							filtreNetejat.getNumExpedient().getField(),
+//							filtreNetejat.getCreadaPer().isNull(),
+//							filtreNetejat.getCreadaPer().getField(),
+//							filtreNetejat.getIdentificador().isNull(),
+//							filtreNetejat.getIdentificador().getField(),
+//							usuariCodi,
+//							filtreNetejat.getNomesAmbErrors().getField(),
+//							filtreNetejat.getNomesSenseErrors().getField(),
+//							filtreNetejat.getReferencia().isNull(),
+//							filtreNetejat.getReferencia().getField(),
+//							pageable);
+//				} else if (isUsuariEntitat || isSuperAdmin) {
+//					var entitatFiltre = isUsuariEntitat ? entitatId :filtreNetejat.getEntitatId().getField();
+//					notificacions = notificacioTableViewRepository.findAmbFiltre(
+//							entitatFiltre == null,
+//							entitatFiltre,
+//							filtreNetejat.getEnviamentTipus().isNull(),
+//							filtreNetejat.getEnviamentTipus().getField(),
+//							filtreNetejat.getConcepte().isNull(),
+//							filtreNetejat.getConcepte().getField(),
+//							filtreNetejat.getEstat().isNull(),
+//							filtreNetejat.getEstat().isNull() ? 0 : filtreNetejat.getEstat().getField().getMask(),
+////							!filtreNetejat.getEstat().isNull() ?
+////									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
+//							filtreNetejat.getDataInici().isNull(),
+//							filtreNetejat.getDataInici().getField(),
+//							filtreNetejat.getDataFi().isNull(),
+//							filtreNetejat.getDataFi().getField(),
+//							filtreNetejat.getTitular().isNull(),
+//							filtreNetejat.getTitular().isNull() ? "" : filtreNetejat.getTitular().getField(),
+//							filtreNetejat.getOrganGestor().isNull(),
+//							filtreNetejat.getOrganGestor().isNull() ? "" : filtreNetejat.getOrganGestor().getField().getCodi(),
+//							filtreNetejat.getProcediment().isNull(),
+//							filtreNetejat.getProcediment().isNull() ? "" : filtreNetejat.getProcediment().getField().getCodi(),
+//							filtreNetejat.getTipusUsuari().isNull(),
+//							filtreNetejat.getTipusUsuari().getField(),
+//							filtreNetejat.getNumExpedient().isNull(),
+//							filtreNetejat.getNumExpedient().getField(),
+//							filtreNetejat.getCreadaPer().isNull(),
+//							filtreNetejat.getCreadaPer().getField(),
+//							filtreNetejat.getIdentificador().isNull(),
+//							filtreNetejat.getIdentificador().getField(),
+//							filtreNetejat.getNomesAmbErrors().getField(),
+//							filtreNetejat.getNomesSenseErrors().getField(),
+//							filtreNetejat.getReferencia().isNull(),
+//							filtreNetejat.getReferencia().getField(),
+//							pageable);
+//
+//				} else if (isAdminOrgan) {
+//					var organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
+//					notificacions = notificacioTableViewRepository.findAmbFiltreAndProcedimentCodiNotib(
+//							entitatActual,
+//							filtreNetejat.getEntitatId().isNull(),
+//							filtreNetejat.getEntitatId().getField(),
+//							esProcedimentsCodisNotibNull,
+//							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
+//							filtreNetejat.getEnviamentTipus().isNull(),
+//							filtreNetejat.getEnviamentTipus().getField(),
+//							filtreNetejat.getConcepte().isNull(),
+//							filtreNetejat.getConcepte().getField(),
+//							filtreNetejat.getEstat().isNull(),
+//							filtreNetejat.getEstat().isNull() ? 0 : filtreNetejat.getEstat().getField().getMask(),
+////							!filtreNetejat.getEstat().isNull() ?
+////									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
+//							filtreNetejat.getDataInici().isNull(),
+//							filtreNetejat.getDataInici().getField(),
+//							filtreNetejat.getDataFi().isNull(),
+//							filtreNetejat.getDataFi().getField(),
+//							filtreNetejat.getTitular().isNull(),
+//							filtreNetejat.getTitular().isNull() ? "" : filtreNetejat.getTitular().getField(),
+//							filtreNetejat.getOrganGestor().isNull(),
+//							filtreNetejat.getOrganGestor().isNull() ? "" : filtreNetejat.getOrganGestor().getField().getCodi(),
+//							filtreNetejat.getProcediment().isNull(),
+//							filtreNetejat.getProcediment().isNull() ? "" : filtreNetejat.getProcediment().getField().getCodi(),
+//							filtreNetejat.getTipusUsuari().isNull(),
+//							filtreNetejat.getTipusUsuari().getField(),
+//							filtreNetejat.getNumExpedient().isNull(),
+//							filtreNetejat.getNumExpedient().getField(),
+//							filtreNetejat.getCreadaPer().isNull(),
+//							filtreNetejat.getCreadaPer().getField(),
+//							filtreNetejat.getIdentificador().isNull(),
+//							filtreNetejat.getIdentificador().getField(),
+//							organs,
+//							filtreNetejat.getNomesSenseErrors().getField(),
+//							filtreNetejat.getReferencia().isNull(),
+//							filtreNetejat.getReferencia().getField(),
+//							pageable);
+//				}
+//			}
  			return notificacioListHelper.complementaNotificacions(entitatActual, usuariCodi, notificacions);
 		} finally {
 			metricsHelper.fiMetrica(timer);
