@@ -1,15 +1,13 @@
 package es.caib.notib.back.validation;
 
 
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
+import es.caib.notib.back.helper.MessageHelper;
+import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 
-import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
-import es.caib.notib.back.helper.MessageHelper;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * Constraint de validació que controla que camp email és obligatori si està habilitada l'entrega a la Direcció Electrònica Hablitada (DEH)
@@ -38,10 +36,7 @@ public class ValidDocumentValidator implements ConstraintValidator<ValidDocument
 			var FieldType = BeanUtils.getProperty(value, fieldName);
 			var dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
 			var msg = MessageHelper.getInstance().getMessage("NotEmpty");
-			if (FieldType == TipusDocumentEnumDto.URL.name() && (dependFieldValue == null || dependFieldValue.isEmpty())) {
-				context.buildConstraintViolationWithTemplate(msg).addNode("documentArxiuUrl").addConstraintViolation();
-				valid = false;
-			} else if (FieldType == TipusDocumentEnumDto.UUID.name() && (dependFieldValue == null || dependFieldValue.isEmpty())) {
+			if (FieldType == TipusDocumentEnumDto.UUID.name() && (dependFieldValue == null || dependFieldValue.isEmpty())) {
 				context.buildConstraintViolationWithTemplate(msg).addNode("documentArxiuUuid").addConstraintViolation();
 				valid = false;
 			} else if (FieldType == TipusDocumentEnumDto.ARXIU.name() && (dependFieldValue == null || dependFieldValue.isEmpty())){

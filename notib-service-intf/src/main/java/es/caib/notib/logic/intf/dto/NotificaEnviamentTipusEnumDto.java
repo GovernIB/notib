@@ -13,7 +13,8 @@ import java.io.Serializable;
 public enum NotificaEnviamentTipusEnumDto implements Serializable {
 
 	NOTIFICACIO("NOTIFICACION"),
-	COMUNICACIO("COMUNICACION");
+	COMUNICACIO("COMUNICACION"),
+	SIR("SIR");
 
 	private final String text;
 
@@ -24,15 +25,15 @@ public enum NotificaEnviamentTipusEnumDto implements Serializable {
 		return text;
 	}
 
-	public static NotificaEnviamentTipusEnumDto toEnum(String text) {
-		if (text == null)
-			return null;
-		for (NotificaEnviamentTipusEnumDto valor : NotificaEnviamentTipusEnumDto.values()) {
-			if (text.equals(valor.getText())) {
-				return valor;
-			}
-		}
-		throw new IllegalArgumentException("No s'ha trobat cap correspondència a dins l'enumeració " + NotificaEnviamentTipusEnumDto.class.getName() + " per al text " + text);
-	}
+//	public static NotificaEnviamentTipusEnumDto toEnum(String text) {
+//		if (text == null)
+//			return null;
+//		for (NotificaEnviamentTipusEnumDto valor : NotificaEnviamentTipusEnumDto.values()) {
+//			if (text.equals(valor.getText())) {
+//				return valor;
+//			}
+//		}
+//		throw new IllegalArgumentException("No s'ha trobat cap correspondència a dins l'enumeració " + NotificaEnviamentTipusEnumDto.class.getName() + " per al text " + text);
+//	}
 
 }

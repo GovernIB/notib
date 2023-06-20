@@ -40,9 +40,6 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 	@Column(name = "hash", length = 256)
 	protected String hash;
 	
-	@Column(name = "url", length = 256)
-	protected String url;
-	
 	@Column(name = "normalitzat")
 	protected Boolean normalitzat;
 	
@@ -77,7 +74,6 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 	public void update (
 			String arxiuGestdocId,
 			String arxiuNom,
-			String url,
 			Boolean normalitzat,
 			String uuid,
 			String csv,
@@ -89,7 +85,6 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			Boolean modoFirma) {
 		this.arxiuGestdocId = arxiuGestdocId;
 		this.arxiuNom = arxiuNom;
-		this.url = url;
 		this.normalitzat = normalitzat;
 		this.uuid = uuid;
 		this.csv = csv;
@@ -102,11 +97,9 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 	}
 	
 	public static Builder getBuilder(
-			String arxiuId,
 			String arxiuGestdocId,
 			String arxiuNom,
 			String hash,
-			String url,
 			String metadades,
 			Boolean normalitzat,
 			Boolean generarCsv,
@@ -118,11 +111,9 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			Boolean modoFirma
 			) {
 		return new Builder(
-				arxiuId,
 				arxiuGestdocId,
 				arxiuNom,
 				hash,
-				url,
 				metadades,
 				normalitzat,
 				generarCsv,
@@ -138,11 +129,9 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 	public static class Builder{
 		DocumentEntity built;
 		Builder(
-				String arxiuId,
 				String arxiuGestdocId,
 				String arxiuNom,
 				String hash,
-				String url,
 				String metadades,
 				Boolean normalitzat,
 				Boolean generarCsv,
@@ -158,7 +147,6 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			built.arxiuNom = arxiuNom;
 			built.hash = hash;
 			built.normalitzat = normalitzat;
-			built.url = url;
 			built.mediaType = media;
 			built.mida = mida;
 			built.origen = origen;
@@ -174,10 +162,8 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 	
 	
 	public static BuilderV2 getBuilderV2(
-			String arxiuId,
 			String arxiuGestdocId,
 			String arxiuNom,
-			String url,
 			Boolean normalitzat,
 			String uuid,
 			String csv,
@@ -189,10 +175,8 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			Boolean modoFirma
 			) {
 		return new BuilderV2(
-				arxiuId,
 				arxiuGestdocId,
 				arxiuNom,
-				url,
 				normalitzat,
 				uuid,
 				csv,
@@ -207,10 +191,8 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 	public static class BuilderV2{
 		DocumentEntity built;
 		BuilderV2(
-				String arxiuId,
 				String arxiuGestdocId,
 				String arxiuNom,
-				String url,
 				Boolean normalitzat,
 				String uuid,
 				String csv,
@@ -233,7 +215,6 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 //		    }
 //			built.metadades = metadadesStr;
 			built.normalitzat = normalitzat;
-			built.url = url;
 			built.uuid = uuid;
 			built.mediaType = media;
 			built.mida = mida;

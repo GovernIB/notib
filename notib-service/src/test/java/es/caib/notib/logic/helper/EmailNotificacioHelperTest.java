@@ -233,7 +233,7 @@ public class EmailNotificacioHelperTest {
 		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entidad).nom("Direcció General de Modernització o Administració Digital").build();
 		ProcedimentEntity procediment = ProcedimentEntity.builder().nom("Nom del procediment").build();
 		PersonaEntity persona = PersonaEntity.builder().nom("Nom").llinatge1("Llinatge1").llinatge2("Llinatge2").email(EMAIL_DEST).build();
-		DocumentEntity document = DocumentEntity.getBuilderV2(null, null, "buit.pdf", null, false, null, null, null, null, null, null, null, null).build();
+		DocumentEntity document = DocumentEntity.getBuilderV2(null, "buit.pdf", false, null, null, null, null, null, null, null, null).build();
 		ArxiuDto arxiu = ArxiuDto.builder().nom("buit.pdf").contingut(Files.readAllBytes(Paths.get(FILE_PATH))).build();
 
 		notificacioMock =  Mockito.mock(NotificacioEntity.class);

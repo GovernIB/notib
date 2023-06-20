@@ -524,7 +524,6 @@ public class NotificacioHelper {
 				documentEntity.update(
 						documentGesdocId != null ? documentGesdocId : document.getArxiuGestdocId(),
 						document.getArxiuNom(),
-						document.getUrl(),
 						document.isNormalitzat(),
 						document.getUuid(),
 						document.getCsv(),
@@ -536,10 +535,8 @@ public class NotificacioHelper {
 						document.getModoFirma());
 			} else {
 				documentEntity = documentRepository.save(DocumentEntity.getBuilderV2(
-						document.getArxiuGestdocId(),
 						documentGesdocId != null ? documentGesdocId : document.getArxiuGestdocId(),
 						document.getArxiuNom(),
-						document.getUrl(),
 						document.isNormalitzat(),
 						document.getUuid(),
 						document.getCsv(),

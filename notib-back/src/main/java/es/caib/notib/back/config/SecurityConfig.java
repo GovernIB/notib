@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.representations.AccessToken.Access;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -35,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -253,6 +255,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				return null;
 			}
 		}
+	}
+
+	@Bean
+	public BuildProperties buildProperties() {
+		return new BuildProperties(new Properties());
 	}
 
 }

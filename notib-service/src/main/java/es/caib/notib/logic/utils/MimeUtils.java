@@ -2,7 +2,7 @@ package es.caib.notib.logic.utils;
 
 import com.google.common.io.Files;
 import es.caib.notib.client.domini.DocumentV2;
-import es.caib.notib.logic.intf.dto.mime.MimesSIR;
+import es.caib.notib.logic.intf.dto.mime.Mimes;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.tika.Tika;
@@ -26,7 +26,19 @@ public class MimeUtils {
     }
 
     public static String getMimeTypeFromContingut(String arxiuNom, byte[] contingut) {
-        return getMimeTypeFromContingut(arxiuNom, Base64.encodeBase64String(contingut));
+//        return getMimeTypeFromContingut(arxiuNom, Base64.encodeBase64String(contingut));
+        try {
+            File tmp = File.createTempFile(arxiuNom, "");
+            Files.write(contingut, tmp);
+            Tika tika = new Tika();
+            String mimeType = tika.detect(tmp);
+            tmp.delete();
+            return mimeType;
+        } catch (IOException ex) {
+            String err = "Error obtenint el tipus MIME del document " + arxiuNom;
+            log.error(err, ex);
+            throw new RuntimeException(err);
+        }
     }
 
     public static String getMimeTypeFromContingut(String arxiuNom, String base64) {
@@ -62,8 +74,11 @@ public class MimeUtils {
         return mimeType;
     }
 
-    public static boolean isMimeValidSIR(String mime) throws Exception {
-        return MimesSIR.formats.contains(mime);
+    public static boolean isMimeValidSIR(String mime) {
+        return Mimes.formatsSIR.contains(mime);
+    }
+    public static boolean isMimeValidNoSIR(String mime) {
+        return Mimes.formatsNoSIR.contains(mime);
     }
 
     public static boolean isFormatValid(DocumentV2 doc) {

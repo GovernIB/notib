@@ -657,8 +657,10 @@
             <script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
                 {{if enviamentTipus == 'NOTIFICACIO'}}
                     <div class="not-icon-o" title="<spring:message code="es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto.NOTIFICACIO"/>">N</div>
-                {{else}}
+                {{else enviamentTipus == 'COMUNICACIO'}}
                     <div class="com-icon-o" title="<spring:message code="es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto.COMUNICACIO"/>">C</div>
+                {{else}}
+                    <div class="com-icon-o" title="<spring:message code="es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto.SIR"/>">S</div>
                 {{/if}}
             </script>
         </th>

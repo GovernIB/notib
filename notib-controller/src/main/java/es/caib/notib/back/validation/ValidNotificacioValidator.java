@@ -249,14 +249,6 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 							}
 						}
 						break;
-					case URL:
-						if (i == 0 && (notificacio.getDocumentArxiuUrl()[i] == null || notificacio.getDocumentArxiuUrl()[i].trim().isEmpty())) {
-							valid = false;
-							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, locale))
-									.addNode("documentArxiuUrl[" + i + "]")
-									.addConstraintViolation();
-						}
-						break;
 					case CSV:
 						if (i == 0 && (notificacio.getDocumentArxiuCsv()[i] == null || notificacio.getDocumentArxiuCsv()[i].trim().isEmpty())) {
 							valid = false;

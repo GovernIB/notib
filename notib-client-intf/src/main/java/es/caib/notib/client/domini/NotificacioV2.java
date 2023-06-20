@@ -14,6 +14,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class NotificacioV2 {
+public class NotificacioV2 implements Serializable {
 
     /**
      * Codi Dir3 de l’organisme emisor
@@ -50,7 +51,7 @@ public class NotificacioV2 {
 
     /**
      * Enumerat que indica si l’enviament és una comunicació o una notificació.
-     * Possibles valors: [NOTIFICACIO, COMUNICACIO]
+     * Possibles valors: [NOTIFICACIO, COMUNICACIO, SIR]
      * Valor per defecte: COMUNICACIO
      * Camp obligatori
      */
@@ -177,4 +178,32 @@ public class NotificacioV2 {
         }
         return this.enviaments;
     }
+
+    public EnviamentTipus getEnviamentTipus() {
+        if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
+            if (enviaments != null) {
+                boolean sir = true;
+                for (Enviament enviament : enviaments) {
+                    if (!InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
+                        sir = false;
+                        break;
+                    }
+                }
+                if (sir) {
+                    return EnviamentTipus.SIR;
+                }
+            }
+        }
+        return enviamentTipus;
+    }
+
+    // Mètodes per a validacions
+    public List<String> getNifsEnviaments() {
+        List<String> nifs = new ArrayList<>();
+        for(Enviament enviament: getEnviaments()) {
+            nifs.addAll(enviament.getNifsEnviament());
+        }
+        return nifs;
+    }
+
 }

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MimesSIR {
+public class Mimes {
 
-    public static final List<String> formats = new ArrayList<>(Arrays.asList(
+    public static final List<String> formatsSIR = new ArrayList<>(Arrays.asList(
             "image/jpeg", "application/vnd.oasis.opendocument.text",
             "application/vnd.oasis.opendocument.presentation",
             "application/vnd.oasis.opendocument.spreadsheet",
@@ -22,6 +22,11 @@ public class MimesSIR {
             "text/plain",
             "application/xml",
             "xsig" // TODO FALTA DETERMINAR EL MIME TYPE PER UN XSIG
+    ));
+
+    public static final List<String> formatsNoSIR = new ArrayList<>(Arrays.asList(
+            "application/pdf",
+            "application/zip"
     ));
 
 }

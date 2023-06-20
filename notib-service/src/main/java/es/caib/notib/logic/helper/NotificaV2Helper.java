@@ -515,23 +515,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				opcionesDocumento.getOpcion().add(opcionGenerarCsv);
 				documento.setOpcionesDocumento(opcionesDocumento);
 				envios.setDocumento(documento);
-			} else if (notificacio.getDocument() != null && notificacio.getDocument().getUrl() != null) {
-				String url = notificacio.getDocument().getUrl();
-				documento.setEnlaceDocumento(url);
-				String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(url).toCharArray()));
-				//Hash a enviar
-				documento.setHash(hash256);
-				Opciones opcionesDocumento = new Opciones();
-				Opcion opcionNormalizado = new Opcion();
-				opcionNormalizado.setTipo("normalizado");
-				opcionNormalizado.setValue(notificacio.getDocument().getNormalitzat()  ? "si" : "no");
-				opcionesDocumento.getOpcion().add(opcionNormalizado);
-				Opcion opcionGenerarCsv = new Opcion();
-				opcionGenerarCsv.setTipo("generarCsv");
-				opcionGenerarCsv.setValue("no");
-				opcionesDocumento.getOpcion().add(opcionGenerarCsv);
-				documento.setOpcionesDocumento(opcionesDocumento);
-				envios.setDocumento(documento);
 			} else if (notificacio.getDocument() != null && notificacio.getDocument().getUuid() != null) {
 				byte[] contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
 				documento.setContenido(contingut);

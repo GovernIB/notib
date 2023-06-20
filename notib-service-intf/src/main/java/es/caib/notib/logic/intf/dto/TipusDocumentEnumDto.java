@@ -13,8 +13,7 @@ import java.io.Serializable;
 public enum TipusDocumentEnumDto implements Serializable {
 	CSV("0"),
 	UUID("1"),
-	ARXIU("2"),
-	URL("3");
+	ARXIU("2");
 	
 	private final String text;
 

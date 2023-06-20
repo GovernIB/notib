@@ -1,12 +1,20 @@
 package es.caib.notib.logic.intf.dto;
 
-import java.io.Serializable;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+import java.io.Serializable;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 public class GrupDto extends AuditoriaDto implements Serializable {
 
 	private Long id;

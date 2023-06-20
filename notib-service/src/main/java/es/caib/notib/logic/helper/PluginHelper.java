@@ -81,7 +81,6 @@ import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
@@ -1308,7 +1307,7 @@ public class PluginHelper {
 		annex.setData(new Date());
 		annex.setIdiomaCodi("ca");
 
-		if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
+		if((document.getUuid() != null || document.getCsv() != null) && document.getContingutBase64() == null) {
 			boolean loadFromArxiu = isReadDocsMetadataFromArxiu() && document.getUuid() != null || document.getCsv() == null;
 			DocumentContingut doc;
 			if(loadFromArxiu) {
@@ -1334,13 +1333,7 @@ public class PluginHelper {
 				}
 			}
 
-		} else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
-			annex.setNom(document.getUrl());
-			annex.setArxiuNom(document.getArxiuNom());
-			annex.setArxiuContingut(getUrlDocumentContent(document.getUrl()));
-			annex.setModeFirma(RegistreModeFirmaDtoEnum.SENSE_FIRMA);
-
-		} else if(document.getContingutBase64() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
+		} else if(document.getContingutBase64() != null && (document.getUuid() == null && document.getCsv() == null)) {
 			annex.setArxiuContingut(document.getContingutBase64().getBytes());
 			annex.setArxiuNom(document.getArxiuNom());
 			annex.setModeFirma(RegistreModeFirmaDtoEnum.SENSE_FIRMA);
@@ -1373,7 +1366,7 @@ public class PluginHelper {
 			String tipoDocumental = document.getTipoDocumental() != null ? document.getTipoDocumental().getValor() : TipusDocumentalEnum.NOTIFICACIO.getValor();
 			Integer modoFirma = document.getModoFirma() != null ? (document.getModoFirma() ? 1 : 0) : 0;
 
-			if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
+			if((document.getUuid() != null || document.getCsv() != null) && document.getContingutBase64() == null) {
 				annex = new AnexoWsDto();
 				String id = "";
 				DocumentContingut doc = null;
@@ -1428,19 +1421,7 @@ public class PluginHelper {
 				if (enviarTipoMIMEFicheroAnexado) {
 					path = new File(doc.getArxiuNom()).toPath();
 				}
-			}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
-				annex = new AnexoWsDto();
-				annex.setFicheroAnexado(getUrlDocumentContent(document.getUrl()));
-				annex.setNombreFicheroAnexado(FilenameUtils.getName(document.getUrl()));
-				
-				//Metadades
-				annex.setTipoDocumental(tipoDocumental);
-				annex.setOrigenCiudadanoAdmin(origen);
-				annex.setValidezDocumento(validezDocumento);
-				annex.setModoFirma(modoFirma);
-				annex.setFechaCaptura(toXmlGregorianCalendar(new Date()));
-				path = new File(FilenameUtils.getName(document.getUrl())).toPath();
-			}else if(document.getArxiuGestdocId() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
+			}else if(document.getArxiuGestdocId() != null && (document.getUuid() == null && document.getCsv() == null)) {
 				annex = new AnexoWsDto();
 				
 				ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -1463,14 +1444,7 @@ public class PluginHelper {
 			}
 			
 			if (enviarTipoMIMEFicheroAnexado) {
-//				try {
-					/*  TODO: Revisar perque amb els tests unitaris Files.exists(path) es false en Tomcat
-					 *	(Això causa que fallin els tests en Tomcat) */
-//					annex.setTipoMIMEFicheroAnexado(Files.probeContentType(path));
-					annex.setTipoMIMEFicheroAnexado(document.getMediaType());
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
+				annex.setTipoMIMEFicheroAnexado(document.getMediaType());
 			}
 			annex.setTitulo("Annex " + idx);
 			annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
@@ -1483,7 +1457,7 @@ public class PluginHelper {
 		}
 	}
 
-	public String estatElaboracioToValidesa(DocumentEstatElaboracio estatElaboracio) {
+	public static String estatElaboracioToValidesa(DocumentEstatElaboracio estatElaboracio) {
 		if (estatElaboracio == null)
 			return ValidesaEnum.ORIGINAL.getValor();	// Valor per defecte
 		switch (estatElaboracio) {
@@ -1498,10 +1472,11 @@ public class PluginHelper {
 				return ValidesaEnum.ORIGINAL.getValor();
 		}
 	}
-	public Integer getModeFirma(Document document, String nom) {
+	public static Integer getModeFirma(Document document, String nom) {
 		Integer modeFirma = 0;
-		if (nom != null && nom.toLowerCase().endsWith("pdf") &&
-				(document.getFirmes() != null && !document.getFirmes().isEmpty()))
+		boolean isPdf = (document.getContingut() != null && "application/pdf".equals(document.getContingut().getTipusMime()))
+				|| (nom != null && nom.toLowerCase().endsWith("pdf"));
+		if (isPdf && document.getFirmes() != null && !document.getFirmes().isEmpty())
 			modeFirma = 1;
 		return modeFirma;
 	}
