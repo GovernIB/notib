@@ -297,7 +297,6 @@ public class NotificacioValidatorHelper {
 			(documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && documentsProcessatsMassiu.get(document.getArxiuNom()) == null) &&
 			((document.getContingutBase64() == null || document.getContingutBase64().isEmpty()) &&
 			(document.getCsv() == null || document.getCsv().isEmpty()) &&
-			(document.getUrl() == null || document.getUrl().isEmpty()) &&
 			(document.getUuid() == null || document.getUuid().isEmpty()))) {
 
 			errors.add(messageHelper.getMessage("error.validacio.1073", new Object[]{""}));

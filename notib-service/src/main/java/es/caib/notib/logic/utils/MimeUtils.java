@@ -32,12 +32,8 @@ public class MimeUtils {
 
     public static String getMimeTypeFromContingut(String arxiuNom, byte[] contingut) {
         try {
-            File tmp = File.createTempFile(arxiuNom, "");
-            Files.write(contingut, tmp);
-            Tika tika = new Tika();
-            String mimeType = tika.detect(tmp);
-            FitxerUtils.esborrar(tmp);
-            return mimeType;
+            var suffix = "";
+            return getMimeType(arxiuNom, contingut, suffix);
         } catch (IOException ex) {
             String err = "Error obtenint el tipus MIME del document " + arxiuNom;
             log.error(err, ex);
@@ -58,25 +54,27 @@ public class MimeUtils {
 
     public static String getMimeTypeFromBase64(String base64, String nom) throws IOException {
 
+        var suffix = "";
         byte[] contingut = Base64.decodeBase64(base64);
-        File tmp = File.createTempFile(nom, "");
-        Files.write(contingut, tmp);
-        Tika tika = new Tika();
-        String mimeType = tika.detect(tmp);
-        FitxerUtils.esborrar(tmp);
-        return mimeType;
+        return getMimeType(nom, contingut, suffix);
     }
 
     public static String getMimeTypeFromBase64(String base64, String nom, String extensio) throws IOException {
 
+        var suffix = "." + extensio;
         byte[] contingut = Base64.decodeBase64(base64);
-        File tmp = File.createTempFile(nom, "." + extensio);
+        return getMimeType(nom, contingut, suffix);
+    }
+
+    private static String getMimeType(String arxiuNom, byte[] contingut, String suffix) throws IOException {
+        File tmp = File.createTempFile(arxiuNom, suffix);
         Files.write(contingut, tmp);
         Tika tika = new Tika();
         String mimeType = tika.detect(tmp);
         FitxerUtils.esborrar(tmp);
         return mimeType;
     }
+
 
     public static boolean isMimeValidSIR(String mime) {
         return Mimes.getFormatsSIR().contains(mime);

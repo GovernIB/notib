@@ -90,8 +90,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Path;
@@ -1250,7 +1248,7 @@ public class PluginHelper {
 			}
 			return annex;
 		}
-		if(document.getContingutBase64() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
+		if(document.getContingutBase64() != null && (document.getUuid() == null && document.getCsv() == null)) {
 			annex.setArxiuContingut(document.getContingutBase64().getBytes());
 			annex.setArxiuNom(document.getArxiuNom());
 			annex.setModeFirma(RegistreModeFirmaDtoEnum.SENSE_FIRMA);

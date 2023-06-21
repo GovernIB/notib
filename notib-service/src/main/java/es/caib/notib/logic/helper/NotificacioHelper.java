@@ -3,7 +3,6 @@ package es.caib.notib.logic.helper;
 import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.OrigenEnum;
-import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.intf.dto.DocumentDto;
@@ -473,7 +472,6 @@ public class NotificacioHelper {
 					document.getValidesa(), document.getTipoDocumental(), document.getModoFirma());
 		} else {
 			documentEntity = documentRepository.save(DocumentEntity.getBuilderV2(
-					document.getArxiuGestdocId(),
 					documentGesdocId != null ? documentGesdocId : document.getArxiuGestdocId(),
 					document.getArxiuNom(),
 					document.isNormalitzat(),
