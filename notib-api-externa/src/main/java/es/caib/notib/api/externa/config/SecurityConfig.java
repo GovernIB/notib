@@ -30,11 +30,12 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * Configuració de seguretat.
@@ -68,21 +69,49 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.authenticationProvider(preauthAuthProvider()).
-		jee().j2eePreAuthenticatedProcessingFilter(preAuthenticatedProcessingFilter());
-		http.logout().
-		addLogoutHandler(getLogoutHandler()).
-		logoutRequestMatcher(new AntPathRequestMatcher("/logout")).
-		invalidateHttpSession(true).
-		logoutSuccessUrl("/").
-		permitAll(false);
-		http.authorizeRequests().
-		antMatchers(AUTH_WHITELIST).permitAll().
-		anyRequest().authenticated();
-		http.cors();
-		http.csrf().disable();
-		http.headers().frameOptions().disable();
+		J2eePreAuthenticatedProcessingFilter j2eePreAuthenticatedProcessingFilter = preAuthenticatedProcessingFilter();
+		http
+				.cors(withDefaults())
+				.csrf((csrf) -> csrf.disable())
+				.authenticationProvider(preauthAuthProvider())
+				.jee((jee) -> jee.j2eePreAuthenticatedProcessingFilter(j2eePreAuthenticatedProcessingFilter))
+				.logout((lo) -> lo.addLogoutHandler(getLogoutHandler())
+						.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+						.invalidateHttpSession(true).logoutSuccessUrl("/")
+						.permitAll(false))
+				.authorizeRequests((authz) -> authz.antMatchers(AUTH_WHITELIST)
+						.permitAll()
+						.anyRequest().authenticated())
+				.headers((hd) -> hd.frameOptions().disable());
+
 	}
+
+//	public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+//
+//		J2eePreAuthenticatedProcessingFilter j2eePreAuthenticatedProcessingFilter = preAuthenticatedProcessingFilter();
+//		http
+//				.cors(withDefaults())
+//				.csrf((csrf) -> csrf.disable())
+//				.authenticationProvider(preauthAuthProvider())
+//				.jee((jee) -> jee.j2eePreAuthenticatedProcessingFilter(j2eePreAuthenticatedProcessingFilter))
+//				.logout((lo) -> lo.addLogoutHandler(getLogoutHandler())
+//						.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+//						.invalidateHttpSession(true).logoutSuccessUrl("/")
+//						.permitAll(false))
+//				.authorizeRequests((authz) -> authz.antMatchers(AUTH_WHITELIST)
+//						.permitAll()
+//						.anyRequest().authenticated())
+//				.headers((hd) -> hd.frameOptions().disable());
+//
+//		return http.build();
+//	}
+
+//	@Bean
+//	public AuthenticationManager getAuthenticationManager(HttpSecurity http) throws Exception {
+//		AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+//		authenticationManagerBuilder.authenticationProvider(preauthAuthProvider());
+//		return authenticationManagerBuilder.build();
+//	}
 
 	@Bean
 	public PreAuthenticatedAuthenticationProvider preauthAuthProvider() {

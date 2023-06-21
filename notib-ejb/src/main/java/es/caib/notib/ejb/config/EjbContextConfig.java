@@ -3,13 +3,8 @@
  */
 package es.caib.notib.ejb.config;
 
-import java.util.Properties;
-
-import javax.naming.NamingException;
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-
 import es.caib.notib.ejb.ConfigService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
@@ -29,7 +24,10 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
-import lombok.extern.slf4j.Slf4j;
+import javax.naming.NamingException;
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * Creació del context Spring per a la capa dels EJBs.
@@ -59,7 +57,7 @@ public class EjbContextConfig {
 	private String showSql;
 	@Value("${spring.jpa.properties.hibernate.format_sql}")
 	private String formatSql;
-	@Value("es.caib.notib.servidor.jboss:true")
+	@Value("${es.caib.notib.servidor.jboss:true}")
 	private String jboss;
 
 	private static boolean initialized;

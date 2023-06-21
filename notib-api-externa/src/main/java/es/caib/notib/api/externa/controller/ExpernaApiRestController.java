@@ -65,4 +65,8 @@ public class ExpernaApiRestController {
 		return appInfo;
 	}
 
+	@GetMapping(value = {"/rest/securedAppinfo"})
+	public AppInfo getAppInfoSecured(HttpServletRequest request) throws IOException {
+		return getAppInfo(request);
+	}
 }
