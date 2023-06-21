@@ -9,6 +9,6 @@ import lombok.Setter;
 @Builder
 public class Resposta {
 
-    public String msg;
-    public boolean error;
+    private String msg;
+    private boolean error;
 }

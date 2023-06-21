@@ -12,6 +12,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class RequestSessionHelper {
 
+	private RequestSessionHelper() {
+		throw new IllegalStateException("RequestSessionHelper no es instanciable");
+	}
+
 	public static Object obtenirObjecteSessio(HttpServletRequest request, String clau) {
 		return request.getSession().getAttribute(clau);
 	}

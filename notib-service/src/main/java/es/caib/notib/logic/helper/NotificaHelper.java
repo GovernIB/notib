@@ -28,6 +28,7 @@ public class NotificaHelper {
 	@Autowired
 	private ConfigHelper configHelper;
 
+
 	public NotificacioEntity notificacioEnviar(Long notificacioId) {
 		return getNotificaHelper().notificacioEnviar(notificacioId, false);
 	}
@@ -69,8 +70,8 @@ public class NotificaHelper {
 
 	private AbstractNotificaHelper getNotificaHelper() {
 
-		String versio = getNotificaVersioProperty();
-		return "0".equals(versio) ? notificaV0Helper : "2".equals(versio) ? notificaV2Helper : notificaV2Helper;
+		var versio = getNotificaVersioProperty();
+		return "0".equals(versio) ? notificaV0Helper : notificaV2Helper;
 	}
 
 	private String getNotificaVersioProperty() {

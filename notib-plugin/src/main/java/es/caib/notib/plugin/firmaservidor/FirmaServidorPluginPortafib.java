@@ -1,6 +1,9 @@
 package es.caib.notib.plugin.firmaservidor;
 
+import es.caib.notib.client.domini.Fitxer;
+import es.caib.notib.logic.intf.util.FitxerUtils;
 import es.caib.notib.plugin.SistemaExternException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.fundaciobit.plugins.signature.api.*;
 import org.fundaciobit.plugins.signatureserver.api.ISignatureServerPlugin;
@@ -16,6 +19,7 @@ import java.util.UUID;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 
 	private static final String PROPERTIES_BASE = "es.caib.notib.plugin.firmaservidor.portafib.";
@@ -70,10 +74,10 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 		} finally {
 			// Esborra els arxius temporals
 			if (sourceFile != null && sourceFile.exists()) {
-				sourceFile.delete();
+				FitxerUtils.esborrar(sourceFile);
 			}
 			if (destFile != null && destFile.exists()) {
-				destFile.delete();
+				FitxerUtils.esborrar(destFile);
 			}
 		}
 	}
@@ -103,15 +107,6 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 		var signAlgorithm = FileInfoSignature.SIGN_ALGORITHM_SHA1;
 		var signaturesTableLocation = FileInfoSignature.SIGNATURESTABLELOCATION_WITHOUT;
 		PdfVisibleSignature pdfInfoSignature = null;
-		/*
-		 * IRubricGenerator rubricGenerator = null; if
-		 * (FileInfoSignature.SIGN_TYPE_PADES.equals(signType) && rubricGenerator !=
-		 * null) { signaturesTableLocation =
-		 * FileInfoSignature.SIGNATURESTABLELOCATION_LASTPAGE; PdfRubricRectangle
-		 * pdfRubricRectangle = new PdfRubricRectangle(106, 650, 555, 710);
-		 * pdfInfoSignature = new PdfVisibleSignature(pdfRubricRectangle,
-		 * rubricGenerator); }
-		 */
 		final ITimeStampGenerator timeStampGenerator = null;
 		// Valors per defecte
 		final SignaturesTableHeader signaturesTableHeader = null;
@@ -138,12 +133,13 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 		var status = fis.getStatusSignature();
 		if (status.getStatus() == StatusSignaturesSet.STATUS_FINAL_OK) {
 			// Document firmat correctament
-			status.getSignedData().renameTo(new File(destPath));
+			if(!status.getSignedData().renameTo(new File(destPath))) {
+				log.error("Error renombrant el fitxer firmat " + status.getSignedData());
+			}
 			return;
 		}
 		// Error en el document a firmar
-		String exceptionMessage = "Error al firmar en servidor el document (status=" + status.getStatus() + "): " +
-				status.getErrorMsg();
+		String exceptionMessage = "Error al firmar en servidor el document (status=" + status.getStatus() + "): " + status.getErrorMsg();
 		if (signaturesSetStatus.getErrorException() != null) {
 			throw new SistemaExternException(exceptionMessage, signaturesSetStatus.getErrorException());
 		}

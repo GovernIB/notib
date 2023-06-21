@@ -36,11 +36,11 @@ public class LogTimeHelper {
     }
 
     public void log(LogLevel logLevel, String message, boolean includeTime) {
+
         if (includeTime) {
             calculateTimes();
         }
-        String logMsg = message + (includeTime ? " (Temps de procés: " + elapsedTime +" ms)" : "");
-
+        var logMsg = message + (includeTime ? " (Temps de procés: " + elapsedTime +" ms)" : "");
         switch (logLevel.getLabel()) {
             case "INFO" :
                 logger.info(logMsg);
@@ -51,10 +51,13 @@ public class LogTimeHelper {
             case "ERROR" :
                 logger.error(logMsg);
                 break;
+            default:
+                logger.info("Log level inexistent " + logLevel.getLabel());
         }
     }
 
     private void calculateTimes() {
+
         long currentTime = System.nanoTime();
         elapsedTime = (currentTime - startTime) / 10e6;
         startTime = currentTime;

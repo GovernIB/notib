@@ -120,8 +120,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 			"/notificacio/refrescarEstatNotifica/estat",
 			"/notificacio/procedimentsOrgan",
 			"/notificacio/serveisOrgan",
-//			"/usuari/configuracio",
-			"/usuari/configuracio/**",
 			"/error",
 			"/**/monitor/tasques"};
 	private static final String[] ALL_EXCLUSIONS = {"/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/api/services/**", "/usuari/configuracio/**"};

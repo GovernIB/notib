@@ -15,8 +15,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletContext;
@@ -42,7 +42,7 @@ public class ExpernaApiRestController {
 	private ServletContext servletContext;
 
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = {"/rest/appinfo"}, method = RequestMethod.GET)
+	@GetMapping(value = {"/rest/appinfo"})
 	@Operation(summary = "Consulta la informació de la API", description = "Retorna la data i la versió de la API REST Externa Notib")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Informació de l'aplicació", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = AppInfoApi.class, description = "Informació de l'aplicació"))})})
 	@SecurityRequirements()
@@ -52,8 +52,8 @@ public class ExpernaApiRestController {
 		appInfo.setNom("Api REST externa de Notib");
 		var manifest = new Manifest(servletContext.getResourceAsStream("/" + JarFile.MANIFEST_NAME));
 		var manifestAtributs = manifest.getMainAttributes();
-		Map<String, Object>manifestAtributsMap = new HashMap<>();
-		for (var key: new HashMap(manifestAtributs).keySet()) {
+		Map<String, Object> manifestAtributsMap = new HashMap<>();
+		for (var key: new HashMap<>(manifestAtributs).keySet()) {
 			manifestAtributsMap.put(key.toString(), manifestAtributs.get(key));
 		}
 		if (!manifestAtributsMap.isEmpty()) {

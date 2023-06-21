@@ -3,12 +3,10 @@ package es.caib.notib.logic.helper;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
-import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
-import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
+import es.caib.notib.logic.intf.util.NifHelper;
 import es.caib.notib.logic.utils.MimeUtils;
 import es.caib.notib.persist.entity.EntitatEntity;
 import lombok.NonNull;
@@ -31,6 +29,7 @@ import java.util.Map;
 @Slf4j
 @Component
 public class NotificacioValidatorHelper {
+
 	@Resource
 	private CacheHelper cacheHelper;
 	@Autowired
@@ -45,10 +44,9 @@ public class NotificacioValidatorHelper {
 	public List<String> validarNotificacioMassiu(@NonNull NotificacioDatabaseDto notificacio, @NonNull EntitatEntity entitat, Map<String, Long> documentsProcessatsMassiu) {
 
 		log.info("[NOT-VALIDACIO] Validació notificació de nova notificacio massiva");
-		List<String> errors = notificacio.getErrors();
-		boolean comunicacioSenseAdministracio = false;
-		String emisorDir3Codi = notificacio.getEmisorDir3Codi(); //entitat.getDir3Codi() entidad actual
-		Map<String, OrganismeDto> organigramaByEntitat = organGestorCachable.findOrganigramaByEntitat(emisorDir3Codi);
+		var errors = notificacio.getErrors();
+		var emisorDir3Codi = notificacio.getEmisorDir3Codi(); //entitat.getDir3Codi() entidad actual
+		var organigramaByEntitat = organGestorCachable.findOrganigramaByEntitat(emisorDir3Codi);
 
 		// Emisor
 		if (emisorDir3Codi == null || emisorDir3Codi.isEmpty()) {
@@ -71,14 +69,14 @@ public class NotificacioValidatorHelper {
 			if (notificacio.getConcepte().length() > 240) {
 				errors.add(messageHelper.getMessage("error.validacio.1031"));
 			}
-			List<Character> caractersNoValids = validFormat(notificacio.getConcepte());
+			var caractersNoValids = validFormat(notificacio.getConcepte());
 			if (!caractersNoValids.isEmpty()) {
 				errors.add(messageHelper.getMessage("error.validacio.1032", new Object[]{StringUtils.join(caractersNoValids, ',')}));
 			}
 		}
 
 		// Descripció
-		String desc = notificacio.getDescripcio();
+		var desc = notificacio.getDescripcio();
 		if (!Strings.isNullOrEmpty(desc)) {
 			if (desc.length() > 1000) {
 				errors.add(messageHelper.getMessage("error.validacio.1040"));
@@ -105,15 +103,9 @@ public class NotificacioValidatorHelper {
 		if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {
 			errors.add(messageHelper.getMessage("error.validacio.1100"));
 		} else {
-			for (NotEnviamentDatabaseDto enviament : notificacio.getEnviaments()) {
+			for (var enviament : notificacio.getEnviaments()) {
 				//Si és comunicació a administració i altres mitjans (persona física/jurídica) --> Excepció
-				if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO) {
-					if ((enviament.getTitular().getInteressatTipus() == InteressatTipus.FISICA) ||
-							(enviament.getTitular().getInteressatTipus() == InteressatTipus.JURIDICA)) {
-						comunicacioSenseAdministracio = true;
-					}
-				}
-				boolean senseNif = true;
+				var senseNif = true;
 
 				// Servei tipus
 				// Per defecte es posa a normal
@@ -148,7 +140,7 @@ public class NotificacioValidatorHelper {
 					if (!InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())
 							&& enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
 
-						String nif = enviament.getTitular().getNif();
+						var nif = enviament.getTitular().getNif();
 						if (NifHelper.isvalid(nif)) {
 							senseNif = false;
 							switch (enviament.getTitular().getInteressatTipus()) {
@@ -164,13 +156,15 @@ public class NotificacioValidatorHelper {
 									break;
 								case ADMINISTRACIO:
 									break;
+								default:
+									break;
 							}
 						} else {
 							errors.add(messageHelper.getMessage("error.validacio.1138", new Object[]{"", "fisica", ""}));
 						}
 					}
 					// - Email
-					String email = enviament.getTitular().getEmail();
+					var email = enviament.getTitular().getEmail();
 					if (email != null && email.length() > 160) {
 						errors.add(messageHelper.getMessage("error.validacio.1139", new Object[]{""}));
 					}
@@ -280,80 +274,61 @@ public class NotificacioValidatorHelper {
 			errors.add(messageHelper.getMessage("error.validacio.1021"));
 		}
 
-		if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO ) {
-			if (notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) {
-				errors.add(messageHelper.getMessage("error.validacio.1020"));
-			}
+		if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO &&
+				(notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null)) {
+
+			errors.add(messageHelper.getMessage("error.validacio.1020"));
 		}
-//		else if ((notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) && notificacio.getOrganGestorCodi() == null){
-//			errors.add(messageHelper.getMessage("error.validacio.organ.gestor.no.null.comunicacio.administracio.sense.procediment"));
-//		}
-//		if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO && comunicacioSenseAdministracio) {
-//			if (notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) {
-//				errors.add(messageHelper.getMessage("error.validacio.procediment.codi.no.null"));
-//			}
-//		}
 		if (!organigramaByEntitat.containsKey(notificacio.getOrganGestorCodi())) {
 			errors.add(messageHelper.getMessage("error.validacio.1027"));
 		}
-		//TODO: está fallando en REST y aquí esta validación. Es correcto???
-		// Respuesta: Por ahora no pongas esta validación. Lo consultaré con la DGTIC. Pero el problema no es la validación. Son los datos utilizados.
-		// Otra cosa es que la validación NO se tiene que hacer si notificacio.getOrganGestor() == null en el caso de REST.
-		// Entiendo que para CSV siempre tienen que enviarla.
-		// En el CSV me indican órgano y procedimiento. Si el procedimiento no es común y es de otro órgano => error
-//		if (notificacio.getProcediment() != null && !notificacio.getProcediment().isComu()) {
-//		 if (notificacio.getOrganGestorCodi() != notificacio.getProcediment().getOrganGestor()) {
-//				errors.add("[1024] El camp 'organ gestor' no es correspon a l'òrgan gestor de l'procediment.");
-//			}
-//		}
 
 		// Documents
-		DocumentDto document = notificacio.getDocument();
+		var document = notificacio.getDocument();
 		if (document == null) {
 			errors.add(messageHelper.getMessage("error.validacio.1070"));
-		} else {
-			if (document.getArxiuNom() != null && document.getArxiuNom().length() > 200) {
-				errors.add(messageHelper.getMessage("error.validacio.1072", new Object[]{""}));
-			}
+			return errors;
+		}
+		if (document.getArxiuNom() != null && document.getArxiuNom().length() > 200) {
+			errors.add(messageHelper.getMessage("error.validacio.1072", new Object[]{""}));
+		}
 
-			if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
-					(documentsProcessatsMassiu.containsKey(document.getArxiuNom()) &&
-							documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
-				if ((document.getContingutBase64() == null || document.getContingutBase64().isEmpty()) &&
-						(document.getCsv() == null || document.getCsv().isEmpty()) &&
-						(document.getUuid() == null || document.getUuid().isEmpty())) {
-					errors.add(messageHelper.getMessage("error.validacio.1073", new Object[]{""}));
+		if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
+			(documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && documentsProcessatsMassiu.get(document.getArxiuNom()) == null) &&
+			((document.getContingutBase64() == null || document.getContingutBase64().isEmpty()) &&
+			(document.getCsv() == null || document.getCsv().isEmpty()) &&
+			(document.getUrl() == null || document.getUrl().isEmpty()) &&
+			(document.getUuid() == null || document.getUuid().isEmpty()))) {
+
+			errors.add(messageHelper.getMessage("error.validacio.1073", new Object[]{""}));
+		}
+
+		if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
+				(documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
+
+			if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
+				if (!MimeUtils.isFormatValid(document.getMediaType(), document.getContingutBase64())) {
+					errors.add(messageHelper.getMessage("error.validacio.1075", new Object[]{""}));
+				}
+				if (document.getMida() > getMaxSizeFile()) {
+					errors.add(messageHelper.getMessage("error.validacio.1085", new Object[]{getMaxSizeFile() / (1024*1024)}));
 				}
 			}
 
-			if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
-					(documentsProcessatsMassiu.containsKey(document.getArxiuNom()) &&
-							documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
-
-				if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
-					if (!MimeUtils.isFormatValid(document.getMediaType(), document.getContingutBase64())) {
-						errors.add(messageHelper.getMessage("error.validacio.1075", new Object[]{""}));
-					}
-					if (document.getMida() > getMaxSizeFile()) {
-						errors.add(messageHelper.getMessage("error.validacio.1085", new Object[]{getMaxSizeFile() / (1024*1024)}));
-					}
+			// Metadades
+			if ((document.getContingutBase64() != null && !document.getContingutBase64().isEmpty())
+					&& registreNotificaHelper.isSendDocumentsActive()) {
+				if (document.getOrigen() == null) {
+					errors.add(messageHelper.getMessage("error.validacio.1080", new Object[]{""}));
 				}
-
-				// Metadades
-				if ((document.getContingutBase64() != null && !document.getContingutBase64().isEmpty())
-						&& registreNotificaHelper.isSendDocumentsActive()) {
-					if (document.getOrigen() == null) {
-						errors.add(messageHelper.getMessage("error.validacio.1080", new Object[]{""}));
-					}
-					if (document.getValidesa() == null) {
-						errors.add(messageHelper.getMessage("error.validacio.1081", new Object[]{""}));
-					}
-					if (document.getTipoDocumental() == null) {
-						errors.add(messageHelper.getMessage("error.validacio.1082", new Object[]{""}));
-					}
-					if (document.getArxiuNom().toUpperCase().endsWith("PDF") && document.getModoFirma() == null) {
-						errors.add(messageHelper.getMessage("error.validacio.1083", new Object[]{""}));
-					}
+				if (document.getValidesa() == null) {
+					errors.add(messageHelper.getMessage("error.validacio.1081", new Object[]{""}));
+				}
+				if (document.getTipoDocumental() == null) {
+					errors.add(messageHelper.getMessage("error.validacio.1082", new Object[]{""}));
+				}
+				if (document.getArxiuNom().toUpperCase().endsWith("PDF") && document.getModoFirma() == null) {
+					errors.add(messageHelper.getMessage("error.validacio.1083", new Object[]{""}));
 				}
 			}
 		}
@@ -361,16 +336,16 @@ public class NotificacioValidatorHelper {
 	}
 
 
-	private List<Character> validFormat(String value) {
-		String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
-		ArrayList<Character> charsNoValids = new ArrayList<Character>();
-		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
+	private ArrayList<Character> validFormat(String value) {
 
-		boolean esCaracterValid = true;
-		for (int i = 0; i < chars.length; i++) {
-			esCaracterValid = !(CONTROL_CARACTERS.indexOf(chars[i]) < 0);
+		var CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
+		ArrayList<Character> charsNoValids = new ArrayList<>();
+		var chars = value.replace("\n", "").replace("\r", "").toCharArray();
+		var esCaracterValid = true;
+		for (char aChar : chars) {
+			esCaracterValid = !(CONTROL_CARACTERS.indexOf(aChar) < 0);
 			if (!esCaracterValid) {
-				charsNoValids.add(chars[i]);
+				charsNoValids.add(aChar);
 			}
 		}
 		return charsNoValids;
@@ -378,14 +353,14 @@ public class NotificacioValidatorHelper {
 
 
 	private boolean isEmailValid(String email) {
-		boolean valid = true;
+
 		try {
 			InternetAddress emailAddr = new InternetAddress(email);
 			emailAddr.validate();
+			return true;
 		} catch (Exception e) {
-			valid = false; //no vàlid
+			return false; //no vàlid
 		}
-		return valid;
 	}
 
 	private Long getMaxSizeFile() {

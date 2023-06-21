@@ -45,9 +45,10 @@ public class ProcSerUpdateHelper {
 	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.CREATE)
 	public ProcedimentEntity nouProcediment(ProcSerDataDto procedimentGda, EntitatEntity entitat, OrganGestorEntity organGestor) {
 
+		var retard = configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard");
+		var caducitat = configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat");
 		var procediment = ProcedimentEntity.getBuilder(procedimentGda.getCodi(), procedimentGda.getNom() != null ? procedimentGda.getNom().trim() : null,
-				configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard"), configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat"),
-				entitat, false, procedimentGda.isComu() ? organGestorRepository.findByCodi(entitat.getDir3Codi()) : organGestor,
+				retard, caducitat, entitat, false, procedimentGda.isComu() ? organGestorRepository.findByCodi(entitat.getDir3Codi()) : organGestor,
 				null, null, null, null, procedimentGda.isComu(), false).build();
 		
 		procediment.updateDataActualitzacio(new Date());
@@ -57,8 +58,8 @@ public class ProcSerUpdateHelper {
 	@Audita(entityType = TipusEntitat.SERVEI, operationType = TipusOperacio.UPDATE)
 	public ServeiEntity updateServei(ProcSerDataDto serveiGda, ServeiEntity servei, OrganGestorEntity organGestor) {
 
-		servei.update(serveiGda.getNom() != null ? serveiGda.getNom().trim() : null,
-						serveiGda.isComu() ? organGestorRepository.findByCodi(serveiGda.getEntitat().getDir3Codi()) : organGestor, serveiGda.isComu());
+		var organ = serveiGda.isComu() ? organGestorRepository.findByCodi(serveiGda.getEntitat().getDir3Codi()) : organGestor;
+		servei.update(serveiGda.getNom() != null ? serveiGda.getNom().trim() : null, organ, serveiGda.isComu());
 		servei.updateDataActualitzacio(new Date());
 		return serveiRepository.save(servei);
 	}
@@ -66,9 +67,10 @@ public class ProcSerUpdateHelper {
 	@Audita(entityType = TipusEntitat.SERVEI, operationType = TipusOperacio.CREATE)
 	public ServeiEntity nouServei(ProcSerDataDto serveiGda, EntitatEntity entitat, OrganGestorEntity organGestor) {
 
+		var retard = configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard");
+		var caducitat = configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat");
 		var servei = ServeiEntity.getBuilder(serveiGda.getCodi(), serveiGda.getNom() != null ? serveiGda.getNom().trim() : null,
-				configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard"), configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat"),
-				entitat, false, serveiGda.isComu() ? organGestorRepository.findByCodi(entitat.getDir3Codi()) : organGestor,
+				retard, caducitat, entitat, false, serveiGda.isComu() ? organGestorRepository.findByCodi(entitat.getDir3Codi()) : organGestor,
 				null, null, null, null, serveiGda.isComu(), false).build();
 
 		servei.updateDataActualitzacio(new Date());

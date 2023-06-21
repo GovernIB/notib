@@ -53,7 +53,6 @@ public class ConfigHelper {
         ConfigHelper.entitatCodi.set(entitatCodi);
     }
 
-    @Transactional(readOnly = true)
     public String getEntitatActualCodi() {
         return entitatCodi.get();
     }
@@ -199,7 +198,7 @@ public class ConfigHelper {
 
     public String crearEntitatKey(String entitatCodi, String key) {
 
-        if (entitatCodi == null || entitatCodi == "" || key == null || key == "") {
+        if (Strings.isNullOrEmpty(entitatCodi) || Strings.isNullOrEmpty(key)) {
             var msg = "Codi entitat " + entitatCodi + " i/o key " + key + " no contenen valor";
             log.error(msg);
             throw new RuntimeException(msg);
@@ -227,7 +226,7 @@ public class ConfigHelper {
 
     public Map<String, Object> getEnvironmentPropertiesMap() {
 
-        Map<String, Object> propertiesMap = new HashMap();
+        Map<String, Object> propertiesMap = new HashMap<>();
         environment.getPropertySources().stream().forEach(ps -> {
             if (ps instanceof MapPropertySource) {
                 propertiesMap.putAll(((MapPropertySource) ps).getSource());

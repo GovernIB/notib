@@ -6,7 +6,11 @@ import java.util.List;
 
 public class Mimes {
 
-    public static final List<String> formatsSIR = new ArrayList<>(Arrays.asList(
+    private Mimes() {
+        throw new IllegalStateException("Mimes no pot ser instanciat");
+    }
+
+    private static final List<String> formatsSIR = new ArrayList<>(Arrays.asList(
             "image/jpeg", "application/vnd.oasis.opendocument.text",
             "application/vnd.oasis.opendocument.presentation",
             "application/vnd.oasis.opendocument.spreadsheet",
@@ -24,9 +28,17 @@ public class Mimes {
             "xsig" // TODO FALTA DETERMINAR EL MIME TYPE PER UN XSIG
     ));
 
-    public static final List<String> formatsNoSIR = new ArrayList<>(Arrays.asList(
+    private static final List<String> formatsNoSIR = new ArrayList<>(Arrays.asList(
             "application/pdf",
             "application/zip"
     ));
+
+    public static List<String> getFormatsSIR() {
+        return formatsSIR;
+    }
+
+    public static List<String> getFormatsNoSIR() {
+        return formatsNoSIR;
+    }
 
 }

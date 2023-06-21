@@ -76,7 +76,7 @@ public class PaginacioHelper {
 
 	public <T, S> PaginaDto<T> toPaginaDto(List<T> list, Page<S> page) {
 
-		PaginaDto<T> dto = new PaginaDto<>();
+		var dto = new PaginaDto<T>();
 		dto.setNumero(page.getNumber());
 		dto.setTamany(page.getSize());
 		dto.setTotal(page.getTotalPages());

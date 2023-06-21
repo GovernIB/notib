@@ -20,7 +20,7 @@ public class ExcepcioLogHelper {
 
 	public static final int DEFAULT_MAX_EXCEPCIONS = 20;
 
-	private LinkedList<ExcepcioLogDto> excepcions = new LinkedList<ExcepcioLogDto>();
+	private LinkedList<ExcepcioLogDto> excepcions = new LinkedList<>();
 
 	public List<ExcepcioLogDto> findAll() {
 

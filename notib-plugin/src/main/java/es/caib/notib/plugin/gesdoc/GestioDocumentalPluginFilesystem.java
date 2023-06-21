@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.gesdoc;
 
+import es.caib.notib.logic.intf.util.FitxerUtils;
 import es.caib.notib.plugin.SistemaExternException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,9 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 	private final Properties properties;
 
+	private static final String AMB_ID = " amb id: ";
+	private static final String ARXIU_NO_TROBAT = "No s'ha trobat l'arxiu (id=";
+
 	public GestioDocumentalPluginFilesystem(Properties properties) {
 		this.properties = properties;
 	}
@@ -39,10 +43,10 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			var basedir = getBaseDir(agrupacio);
 			var subfolderId = getValidSubfolder(agrupacio);
 			var id = subfolderId + generateUniqueName(basedir);
-			log.debug("Creant fitxer al directori: %s amb id: %s ".format(basedir, id));
-			var outContent = new FileOutputStream(basedir + "/" + id);
-			IOUtils.copy(contingut, outContent);
-			outContent.close();
+			log.debug("Creant fitxer al directori: " + basedir + AMB_ID + id);
+			try (var outContent = new FileOutputStream(basedir + "/" + id)) {
+				IOUtils.copy(contingut, outContent);
+			}
 			return id;
 		} catch (Exception ex) {
 			throw new SistemaExternException("No s'ha pogut crear l'arxiu", ex);
@@ -54,13 +58,13 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 		try {
 			var fContent = getFile(agrupacio, id);
-			log.debug("Actalitzant fitxer, directori: %s amb id: %s ".format(getBaseDir(agrupacio), id));
+			log.debug("Actalitzant fitxer, directori: " + getBaseDir(agrupacio) + AMB_ID + id);
 			if (fContent == null) {
-				throw new SistemaExternException("No s'ha trobat l'arxiu (id=" + id + ")");
+				throw new SistemaExternException(ARXIU_NO_TROBAT + id + ")");
 			}
-			var outContent = new FileOutputStream(fContent, false);
-			IOUtils.copy(contingut, outContent);
-			outContent.close();
+			try (var outContent = new FileOutputStream(fContent, false)) {
+				IOUtils.copy(contingut, outContent);
+			}
 		} catch (Exception ex) {
 			throw new SistemaExternException("No s'ha pogut actualitzar l'arxiu (id=" + id + ")", ex);
 		}
@@ -71,11 +75,11 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 		try {
 			var fContent = getFile(agrupacio, id);
-			log.debug("Eliminant fitxer, directori: %s amb id: %s ".format(getBaseDir(agrupacio), id));
+			log.debug("Eliminant fitxer, directori: " + getBaseDir(agrupacio) + AMB_ID + id);
 			if (fContent == null) {
-				throw new SistemaExternException("No s'ha trobat l'arxiu (id=" + id + ")");
+				throw new SistemaExternException(ARXIU_NO_TROBAT + id + ")");
 			}
-			fContent.delete();
+			FitxerUtils.esborrar(fContent);
 		} catch (Exception ex) {
 			throw new SistemaExternException("No s'ha pogut esborrar l'arxiu (id=" + id + ")", ex);
 		}
@@ -86,17 +90,18 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 		try {
 			var fContent = getFile(agrupacio, id);
+			var isAgrupacio = true;
 			if (fContent == null && "notificacions".equals(agrupacio)) {
 				fContent = getFile("", id);
-				log.debug("Consultant fitxer, directori: %s amb id: %s ".format(getBaseDir(""), id));
-			} else {
-				log.debug("Consultant fitxer, directori: %s amb id: %s ".format(getBaseDir(agrupacio), id));
+				isAgrupacio = false;
 			}
+			log.debug("Consultant fitxer, directori: " + (isAgrupacio ? getBaseDir(agrupacio) : "") + AMB_ID + id);
 			if (fContent == null) {
-				throw new SistemaExternException("No s'ha trobat l'arxiu (id=" + id + ")");
+				throw new SistemaExternException(ARXIU_NO_TROBAT + id + ")");
 			}
-			FileInputStream contingutIn = new FileInputStream(fContent);
-			IOUtils.copy(contingutIn, contingutOut);
+			try (var contingutIn = new FileInputStream(fContent)) {
+				IOUtils.copy(contingutIn, contingutOut);
+			}
 		} catch (Exception ex) {
 			throw new SistemaExternException("No s'ha pogut llegir l'arxiu (id=" + id + ")", ex);
 		}
@@ -115,20 +120,15 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	private String getValidSubfolder(String agrupacio){
 
 		var basedir = getBaseDir(agrupacio);
+		assert basedir != null;
 		var file = new File(basedir);
-		File[] directories = file.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File current, String name) {
-				var f = new File(current, name);
-				if (!f.isDirectory()) {
-					return false;
-				}
-				var files = f.list();
-				if (files != null && files.length >= MAX_FILES_IN_FOLDER) {
-					return false;
-				}
-				return true;
+		File[] directories = file.listFiles((current, name) -> {
+			var f = new File(current, name);
+			if (!f.isDirectory()) {
+				return false;
 			}
+			var files = f.list();
+			return files == null || files.length < MAX_FILES_IN_FOLDER;
 		});
 		if (directories != null && directories.length > 0){
 			return directories[0].getName() + "/";

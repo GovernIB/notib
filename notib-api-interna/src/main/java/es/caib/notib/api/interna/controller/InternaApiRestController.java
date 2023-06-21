@@ -53,7 +53,7 @@ public class InternaApiRestController {
 		var manifest = new Manifest(servletContext.getResourceAsStream("/" + JarFile.MANIFEST_NAME));
 		var manifestAtributs = manifest.getMainAttributes();
 		Map<String, Object>manifestAtributsMap = new HashMap<>();
-		for (var key: new HashMap(manifestAtributs).keySet()) {
+		for (var key: new HashMap<>(manifestAtributs).keySet()) {
 			manifestAtributsMap.put(key.toString(), manifestAtributs.get(key));
 		}
 		if (!manifestAtributsMap.isEmpty()) {

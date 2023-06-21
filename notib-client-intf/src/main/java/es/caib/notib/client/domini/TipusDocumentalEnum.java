@@ -68,15 +68,15 @@ public enum TipusDocumentalEnum implements Serializable {
     }
 
     private static final Map<String, TipusDocumentalEnum> lookup;
+
     static {
-        lookup = new HashMap<String, TipusDocumentalEnum>();
+        lookup = new HashMap<>();
         for (TipusDocumentalEnum s: EnumSet.allOf(TipusDocumentalEnum.class))
             lookup.put(s.getValor(), s);
     }
+
     public static TipusDocumentalEnum valorAsEnum(String valor) {
-        if (valor == null)
-            return null;
-        return lookup.get(valor);
+        return valor != null ? lookup.get(valor) : null;
     }
 
     private static final long serialVersionUID = 1488827482782270649L;

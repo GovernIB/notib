@@ -25,8 +25,6 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EntregaDeh implements Serializable {
 
-//    @JsonDeserialize(using = TrimStringDeserializer.class)
-//    private String emisorNif;
     private boolean obligat;
     @JsonDeserialize(using = TrimStringDeserializer.class)
     private String procedimentCodi;

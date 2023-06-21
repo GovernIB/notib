@@ -49,7 +49,6 @@ public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
 		FirmaSimpleFile fileToSign = new FirmaSimpleFile(nom, "application/pdf", contingut);
 		FirmaSimpleSignatureResult result;
 		try {
-//			getAvailableProfiles(api);
 			String perfil = getPropertyPerfil();
 			result = internalSignDocument(api, perfil, fileToSign, motiu, tipusDocumental);
 			return result.getSignedFile().getData();
@@ -58,7 +57,7 @@ public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
 		}
 	}  
 
-	protected FirmaSimpleSignatureResult internalSignDocument(ApiFirmaEnServidorSimple api, final String perfil, FirmaSimpleFile fileToSign, String motiu, String tipusDocumental) throws Exception, FileNotFoundException, IOException {
+	protected FirmaSimpleSignatureResult internalSignDocument(ApiFirmaEnServidorSimple api, final String perfil, FirmaSimpleFile fileToSign, String motiu, String tipusDocumental) throws Exception {
 
 		var signID = "999";
 		var name = fileToSign.getNom();
@@ -80,19 +79,19 @@ public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
 		var transactionStatus = fullResults.getStatus();
 		var status = transactionStatus.getStatus();
 		switch (status) {
-			case FirmaSimpleStatus.STATUS_INITIALIZING: // = 0;
+			case FirmaSimpleStatus.STATUS_INITIALIZING: // 0
 				throw new SistemaExternException("API de firma simple ha tornat status erroni: Initializing ...Unknown Error (???)");
 
-			case FirmaSimpleStatus.STATUS_IN_PROGRESS: // = 1;
+			case FirmaSimpleStatus.STATUS_IN_PROGRESS: // 1
 				throw new SistemaExternException("API de firma simple ha tornat status erroni: In PROGRESS ...Unknown Error (???)");
 
-			case FirmaSimpleStatus.STATUS_FINAL_ERROR: // = -1;
+			case FirmaSimpleStatus.STATUS_FINAL_ERROR: // -1
 				throw new SistemaExternException("Error durant la realització de les firmes: " + transactionStatus.getErrorMessage() +"\r\n" +transactionStatus.getErrorStackTrace());
 
-			case FirmaSimpleStatus.STATUS_CANCELLED: // = -2;
+			case FirmaSimpleStatus.STATUS_CANCELLED: // -2
 				throw new SistemaExternException("S'ha cancel·lat el procés de firmat.");
 
-			case FirmaSimpleStatus.STATUS_FINAL_OK: // = 2;
+			case FirmaSimpleStatus.STATUS_FINAL_OK: // 2
 				log.debug(" ===== RESULTAT  =========");
 				log.debug(" ---- Signature [ " + fullResults.getSignID() + " ]");
 				log.debug(FirmaSimpleSignedFileInfo.toString(fullResults.getSignedFileInfo()));
@@ -109,7 +108,7 @@ public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
 		for (var languageUI : languagesUI) {
 			log.info(" ==== LanguageUI : " + languageUI + " ===========");
 			listProfiles = api.getAvailableProfiles(languageUI);
-			if (listProfiles.size() == 0) {
+			if (listProfiles.isEmpty()) {
 				log.info("NO HI HA PERFILS PER AQUEST USUARI APLICACIÓ");
 				continue;
 			}

@@ -1,9 +1,9 @@
-package es.caib.notib.back.helper;
-
+package es.caib.notib.logic.intf.util;
 
 import java.beans.PropertyEditorSupport;
 
 public class CaseInsensitiveEnumEditor extends PropertyEditorSupport {
+
     private final Class<? extends Enum> enumType;
     private final String[] enumNames;
 

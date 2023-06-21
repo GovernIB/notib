@@ -22,6 +22,6 @@ public class RespostaServeis {
     @JsonProperty("mensaje")
     private String mensaje;
     @JsonProperty("resultado")
-    private List<Servei> resultado = new ArrayList<Servei>();
+    private List<Servei> resultado = new ArrayList<>();
     
 }

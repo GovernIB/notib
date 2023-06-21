@@ -78,7 +78,7 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 	private List<String> consultaRolsUsuari(String filtre, String valor) throws NamingException {
 		
 		List<String> rolsUsuari = new ArrayList<>();
-		Hashtable<String, String> entornLdap = new Hashtable<String, String>();
+		Hashtable<String, String> entornLdap = new Hashtable<>();
 		entornLdap.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 		entornLdap.put(Context.PROVIDER_URL, getLdapServerUrl());
 		entornLdap.put(Context.SECURITY_PRINCIPAL, getLdapPrincipal());
@@ -117,7 +117,8 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 			searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 			var answer = ctx.search(getLdapSearchBase(), filtre.replace("XXX", valor), searchCtls);
 			SearchResult result;
-			String grup, memberOf;
+			String grup;
+			String memberOf;
 			boolean excloure;
 			while (answer.hasMoreElements()) {
 				result = answer.next();
@@ -125,8 +126,8 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 				memberOf = obtenirAtributComString(result.getAttributes(), atributs[5]);
 				excloure = false;
 				if (getLdapExcloureGrup() != null) {
-					excloure = grup.equals(getLdapExcloureGrup());
-					if (excloure && getLdapExcloureMembre() != null) {
+					excloure = getLdapExcloureGrup().equals(grup);
+					if (excloure && getLdapExcloureMembre() != null && memberOf != null) {
 						excloure = memberOf.contains(getLdapExcloureMembre());
 					}
 				}
@@ -164,7 +165,8 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 		List<String> listRols = new ArrayList<>();
 		var rols = atribut.getAll();
 		String rol;
-		int iniciIndexRol, fiIndexRol;
+		int iniciIndexRol;
+		int fiIndexRol;
 		while (rols.hasMoreElements()) {
 			rol = rols.next().toString();
 			iniciIndexRol = rol.indexOf("CN=") + 3;

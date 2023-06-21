@@ -195,7 +195,6 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 	public String toString() {
 
 		String domicili = "";
-		String domiciliPoblacio ="";
 		switch (domiciliConcretTipus) {
 			case ESTRANGER:
 				domicili = domiciliPaisCodiIso + "-";
@@ -221,17 +220,19 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 				domicili = domiciliLinea1 + " " + domiciliLinea2;
 				break;
 			default:
-				return null;
+				return "";
 		}
 		return domicili;
 	}
+
 	private String getDomiciliPoblacioString() {
 
-		if (domiciliPoblacio != null) {
-			return domiciliPoblacio;
+		if (domiciliPoblacio == null) {
+			return "";
 		}
 		return domiciliPoblacio.length() > 30 ? " (" + domiciliPoblacio.substring(0, 30) + ") - " : " (" + domiciliPoblacio + ") - ";
 	}
+
 	private String getAdressa() {
 
 		var adressa = "";

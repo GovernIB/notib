@@ -29,8 +29,8 @@ public class OrganGestorFiltreDto extends AuditoriaDto implements Serializable {
 	private static final long serialVersionUID = -2393511650074099319L;
 
 	public boolean isEmpty() {
-		return (codi == null || codi == "") /*&& (codiPare == null || codiPare == "")*/ && (nom == null || nom == "")
-				&& (oficina == null || oficina == "") && estat == null && !entregaCie;
+		return (codi == null || codi.equals("")) /*&& (codiPare == null || codiPare == "")*/ && (nom == null || nom.equals(""))
+				&& (oficina == null || oficina.equals("")) && estat == null && !entregaCie;
 	}
 
 	public boolean filtresOk(OrganGestorDto organ) {

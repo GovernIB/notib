@@ -5,6 +5,7 @@ package es.caib.notib.back.helper;
 
 import java.util.Locale;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.NoSuchMessageException;
@@ -57,11 +58,11 @@ public class MessageHelper implements MessageSourceAware {
 		return getMessage(key, null, null);
 	}
 
-	public void setMessageSource(MessageSource messageSource) {
+	public void setMessageSource(@NotNull MessageSource messageSource) {
 		INSTANCE.messageSource = messageSource;
 	}
 
-	public static MessageHelper INSTANCE = new MessageHelper();
+	private static MessageHelper INSTANCE = new MessageHelper();
 	
 	public static MessageHelper getInstance() {
 		return INSTANCE;

@@ -11,19 +11,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Component
 public class EnviamentTableHelper {
+
     @Autowired
     private EnviamentTableRepository enviamentTableRepository;
 
-
     @Transactional(propagation = Propagation.MANDATORY)
-    public void crearRegistre(NotificacioEnviamentEntity enviament){
-        NotificacioEntity notificacio = enviament.getNotificacio();
-        PersonaEntity titular = enviament.getTitular();
-        DocumentEntity document = notificacio.getDocument();
+    public void crearRegistre(NotificacioEnviamentEntity enviament) {
+
+        var notificacio = enviament.getNotificacio();
+        var titular = enviament.getTitular();
+        var document = notificacio.getDocument();
 
         EnviamentTableEntity tableViewItem = EnviamentTableEntity.builder()
                 .enviament(enviament)
@@ -31,14 +30,12 @@ public class EnviamentTableHelper {
                 .entitat(notificacio.getEntitat())
                 .destinataris(getEnviamentDestinataris(enviament))
                 .tipusEnviament(notificacio.getEnviamentTipus())
-
                 .titularNif(titular != null ? titular.getNif() : null)
                 .titularNom(titular != null ? titular.getNom() : null)
                 .titularEmail(titular != null ? titular.getEmail() : null)
                 .titularLlinatge1(titular != null ? titular.getLlinatge1() : null)
                 .titularLlinatge2(titular != null ? titular.getLlinatge2() : null)
                 .titularRaoSocial(titular != null ? titular.getRaoSocial() : null)
-
                 .enviamentDataProgramada(notificacio.getEnviamentDataProgramada())
                 .procedimentCodiNotib(notificacio.getProcedimentCodiNotib())
                 .grupCodi(notificacio.getGrupCodi())
@@ -52,22 +49,18 @@ public class EnviamentTableHelper {
                 .estat(notificacio.getEstat())
                 .csv_uuid(document != null ? document.getCsv() + document.getUuid() : null)
                 .hasErrors(false)
-
                 .procedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu())
                 .procedimentOrganId(notificacio.getProcedimentOrgan() != null ? notificacio.getProcedimentOrgan().getId() : null)
                 .procedimentRequirePermission(notificacio.getProcediment() != null && notificacio.getProcediment().isRequireDirectPermission())
                 .procedimentTipus(notificacio.getProcediment() != null ? notificacio.getProcediment().getTipus() : null)
-
                 .registreNumero(notificacio.getRegistreNumero())
                 .registreData(notificacio.getRegistreData())
                 .registreEnviamentIntent(0)
-
                 .notificaDataCaducitat(enviament.getNotificaDataCaducitat())
                 .notificaIdentificador(enviament.getNotificaIdentificador())
                 .notificaCertificacioNumSeguiment(enviament.getNotificaCertificacioNumSeguiment())
                 .notificaEstat(enviament.getNotificaEstat())
                 .notificaReferencia(enviament.getNotificaReferencia())
-
                 .errorLastCallback(false)
                 .build();
 
@@ -75,7 +68,8 @@ public class EnviamentTableHelper {
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
-    public void actualitzarRegistre(NotificacioEnviamentEntity enviament){
+    public void actualitzarRegistre(NotificacioEnviamentEntity enviament) {
+
         EnviamentTableEntity tableViewItem = enviamentTableRepository.findById(enviament.getId()).orElse(null);
         if (tableViewItem == null) {
             this.crearRegistre(enviament);
@@ -139,13 +133,15 @@ public class EnviamentTableHelper {
     ////
 
     private String getEnviamentDestinataris(NotificacioEnviamentEntity enviament) {
-        List<PersonaEntity> destinataris = enviament.getDestinataris();
-        StringBuilder destinatarisNomLlinatges = new StringBuilder();
-        for(PersonaEntity destinatari: destinataris) {
+
+        var destinataris = enviament.getDestinataris();
+        var destinatarisNomLlinatges = new StringBuilder();
+        for(var destinatari: destinataris) {
             destinatarisNomLlinatges.append(destinatari.asDto().getNomFormatted()).append("<br>");
         }
-        if (destinatarisNomLlinatges.length() > 0)
+        if (destinatarisNomLlinatges.length() > 0) {
             destinatarisNomLlinatges.delete(destinatarisNomLlinatges.length() - 4, destinatarisNomLlinatges.length());
+        }
         return destinatarisNomLlinatges.toString();
     }
 }

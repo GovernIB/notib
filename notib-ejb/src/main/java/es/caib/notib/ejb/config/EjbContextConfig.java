@@ -59,50 +59,44 @@ public class EjbContextConfig {
 	private String showSql;
 	@Value("${spring.jpa.properties.hibernate.format_sql}")
 	private String formatSql;
+	@Value("es.caib.notib.servidor.jboss:true")
+	private String jboss;
 
 	private static boolean initialized;
 	private static ApplicationContext applicationContext;
 
 	public static ApplicationContext getApplicationContext() {
-		if (!initialized) {
-			initialized = true;
-			log.info("Starting EJB spring application..");
-			applicationContext = new AnnotationConfigApplicationContext(EjbContextConfig.class);
-			log.info("...EJB spring application started.");
+
+		if (initialized) {
+			return applicationContext;
 		}
+		initialized = true;
+		log.info("Starting EJB spring application..");
+		applicationContext = new AnnotationConfigApplicationContext(EjbContextConfig.class);
+		log.info("...EJB spring application started.");
 		return applicationContext;
 	}
 
 	@Bean
 	public AbstractEntityManagerFactoryBean entityManagerFactory() throws NamingException {
+
 		log.debug("Creating EntityManagerFactory " + dataSource().getClass() + "...");
-		LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
+		var entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
 		if (isJBoss()) {
 			entityManagerFactoryBean.setJtaDataSource(dataSource());
 		} else {
 			entityManagerFactoryBean.setDataSource(dataSource());
 		}
-//		entityManagerFactoryBean.setDataSource(dataSource());
 		entityManagerFactoryBean.setPackagesToScan("es.caib.notib.persist");
 		entityManagerFactoryBean.setJpaDialect(new HibernateJpaDialect());
 		entityManagerFactoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 		Properties jpaProperties = new Properties();
-		jpaProperties.setProperty(
-				"hibernate.dialect",
-				hibernateDialect);
-		jpaProperties.setProperty(
-				"hibernate.hbm2ddl.auto",
-				hibernateDdlAuto);
-		jpaProperties.setProperty(
-				"hibernate.show_sql",
-				showSql);
-		jpaProperties.setProperty(
-				"hibernate.format_sql",
-				formatSql);
+		jpaProperties.setProperty("hibernate.dialect", hibernateDialect);
+		jpaProperties.setProperty("hibernate.hbm2ddl.auto", hibernateDdlAuto);
+		jpaProperties.setProperty("hibernate.show_sql", showSql);
+		jpaProperties.setProperty("hibernate.format_sql", formatSql);
 		if (isJBoss()) {
-			jpaProperties.setProperty(
-					"hibernate.transaction.manager_lookup_class",
-					"org.hibernate.transaction.JBossTransactionManagerLookup");
+			jpaProperties.setProperty("hibernate.transaction.manager_lookup_class", "org.hibernate.transaction.JBossTransactionManagerLookup");
 		}
 		entityManagerFactoryBean.setJpaProperties(jpaProperties);
 		log.debug("...EntityManagerFactory successfully created.");
@@ -111,21 +105,22 @@ public class EjbContextConfig {
 
 	@Bean
 	public DataSource dataSource() {
+
 		log.debug("Retrieving DataSource...");
-		JndiDataSourceLookup lookup = new JndiDataSourceLookup();
-		DataSource dataSource = lookup.getDataSource(dataSourceJndiName);
+		var lookup = new JndiDataSourceLookup();
+		var dataSource = lookup.getDataSource(dataSourceJndiName);
 		log.debug("...DataSource successfully retrieved.");
 		return dataSource;
 	}
 
 	@Bean
 	public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
+
 		log.debug("Creating TransactionManager...");
 		PlatformTransactionManager transactionManager;
 		if (isJBoss()) {
 			JtaTransactionManager jtaTransactionManager = new JtaTransactionManager();
 			jtaTransactionManager.setTransactionManagerName("java:/TransactionManager");
-			//jtaTransactionManager.setUserTransactionName("java:jboss/UserTransaction");
 			transactionManager = jtaTransactionManager;
 		} else {
 			JpaTransactionManager jpaTransactionManager = new JpaTransactionManager();
@@ -137,7 +132,7 @@ public class EjbContextConfig {
 	}
 
 	private boolean isJBoss() {
-		return true;
+		return Boolean.parseBoolean(jboss);
 	}
 
 }

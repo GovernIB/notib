@@ -21,16 +21,15 @@ public class EmailNotificacioMassivaHelper extends EmailHelper<NotificacioMassiv
 
 	public String sendMail(@NonNull NotificacioMassivaEntity item, @NonNull String email, @NonNull byte[] fileResumContent, @NonNull byte[] fileErrorsContent) throws Exception {
 
-		String resposta = null;
 		try {
 			email = email.replaceAll("\\s+","");
 			sendEmailNotificacio(email, item, Arrays.asList(new Attachment("resum.csv", fileResumContent), new Attachment("errors.csv", fileErrorsContent)));
 		} catch (Exception ex) {
-			var errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
-			log.error(errorDescripció);
-			resposta = errorDescripció;
+			var errorDescripcio = "No s'ha pogut avisar per correu electrònic: " + ex;
+			log.error(errorDescripcio);
+			return errorDescripcio;
 		}
-		return resposta;
+		return null;
 	}
 	@Override
 	protected String getMailHtmlBody(NotificacioMassivaEntity item) {
@@ -139,8 +138,7 @@ public class EmailNotificacioMassivaHelper extends EmailHelper<NotificacioMassiv
 				"\t\t\t\t" + messageHelper.getMessage("notificacio.massiva.email.body.fitxer1") + "\n" +
 				"\t\t\t\t" + messageHelper.getMessage("notificacio.massiva.email.body.fitxer2") + "\n" +
 				// TODO: posar url als detalls de la notificacio massiva
-				"\t"+ "<a href=\""+appBaseUrl+"/notificacio/\">"+ messageHelper.getMessage("notificacio.email.notificacio.detall") + "</a> \n"+
-						"";
+				"\t"+ "<a href=\""+appBaseUrl+"/notificacio/\">"+ messageHelper.getMessage("notificacio.email.notificacio.detall") + "</a> \n";
 	}
 
 	@Override

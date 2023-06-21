@@ -1,5 +1,7 @@
 package es.caib.notib.back.helper;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
@@ -9,13 +11,20 @@ import java.lang.management.ThreadMXBean;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @SuppressWarnings("restriction")
 public class MonitorHelper {
 
 	private static Boolean actiu = null;
-	private static long prevUpTime, prevProcessCpuTime;
+	private static long prevUpTime;
+	private static long	prevProcessCpuTime;
 	private static RuntimeMXBean rmBean;
 	private static com.sun.management.OperatingSystemMXBean sunOSMBean;
+	private static final String NO_DISPONIBLE = "No disponible";
+
+	private MonitorHelper() {
+		throw new IllegalStateException("Utility class");
+	}
 
 	public static com.sun.management.OperatingSystemMXBean getSunOSMBean() {
 		return sunOSMBean;
@@ -26,7 +35,7 @@ public class MonitorHelper {
 		try {
 			return sunOSMBean.getArch();
 		} catch (Exception e) {
-			return "No disponible";
+			return NO_DISPONIBLE;
 		}
 	}
 	
@@ -35,7 +44,7 @@ public class MonitorHelper {
 		try {
 			return sunOSMBean.getName();
 		} catch (Exception e) {
-			return "No disponible";
+			return NO_DISPONIBLE;
 		}
 	}
 	
@@ -44,7 +53,7 @@ public class MonitorHelper {
 		try {
 			return sunOSMBean.getVersion();
 		} catch (Exception e) {
-			return "No disponible";
+			return NO_DISPONIBLE;
 		}
 	}
 
@@ -74,7 +83,7 @@ public class MonitorHelper {
 				result.processCpuTime = sunOSMBean.getProcessCpuTime();
 			}
 		} catch (Exception e) {
-			System.err.println(MonitorHelper.class.getSimpleName() + " exception: " + e.getMessage());
+			log.error(MonitorHelper.class.getSimpleName() + " exception ", e.getMessage());
 		}
 	}
 
@@ -84,20 +93,14 @@ public class MonitorHelper {
 		return ManagementFactory.getThreadMXBean().getAllThreadIds();
 	}
 
-	public MonitorHelper(String sactiu) {
-		super();
-		actiu = !"true".equalsIgnoreCase(sactiu);
-	}
-
 	public static String humanReadableByteCount(long bytes) {
 
-		var si = true;
-		var unit = si ? 1000 : 1024;
+		var unit = 1000;
 		if (bytes < unit) {
 			return bytes + " B";
 		}
 		var exp = (int) (Math.log(bytes) / Math.log(unit));
-		var pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+		var pre = "kMGTPE".charAt(exp - 1);
 		return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
 	}
 
@@ -111,7 +114,7 @@ public class MonitorHelper {
 			}
 			return result.cpuUsage + "%";
 		} catch (Exception e) {
-			return "No disponible";
+			return NO_DISPONIBLE;
 		}
 	}
 
@@ -182,7 +185,8 @@ public class MonitorHelper {
 			return 0L;
 		}
 		var time = 0L;
-		long tc, tu;
+		long tc;
+		long tu;
 		for (var i : getThreadsIds()) {
 			tc = bean.getThreadCpuTime(i);
 			tu = bean.getThreadUserTime(i);

@@ -24,9 +24,10 @@ public class AuditHelper {
 
 
     public void auditaNotificacio(NotificacioEntity notificacio, AuditService.TipusOperacio tipusOperacio, String metode) {
-        NotificacioEventEntity lastErrorEvent = NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()) ? null : notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
-        NotificacioAudit audit = new NotificacioAudit(notificacio, lastErrorEvent, tipusOperacio, metode);
-        NotificacioAudit lastAudit = notificacioAuditRepository.findLastAudit(notificacio.getId());
+
+        var lastErrorEvent = NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()) ? null : notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
+        var audit = new NotificacioAudit(notificacio, lastErrorEvent, tipusOperacio, metode);
+        var lastAudit = notificacioAuditRepository.findLastAudit(notificacio.getId());
         if (lastAudit == null || !tipusOperacio.equals(lastAudit.getTipusOperacio()) || !audit.equals(lastAudit)) {
             notificacioAuditRepository.saveAndFlush(audit);
         } else {
@@ -35,8 +36,9 @@ public class AuditHelper {
     }
 
     public void auditaEnviament(NotificacioEnviamentEntity enviament, AuditService.TipusOperacio tipusOperacio, String metode) {
-        NotificacioEnviamentAudit audit = NotificacioEnviamentAudit.getBuilder(enviament, tipusOperacio, metode).build();
-        NotificacioEnviamentAudit lastAudit = notificacioEnviamentAuditRepository.findLastAudit(enviament.getId());
+
+        var audit = NotificacioEnviamentAudit.getBuilder(enviament, tipusOperacio, metode).build();
+        var lastAudit = notificacioEnviamentAuditRepository.findLastAudit(enviament.getId());
         if (lastAudit == null || !tipusOperacio.equals(lastAudit.getTipusOperacio()) || !audit.equals(lastAudit)) {
             notificacioEnviamentAuditRepository.saveAndFlush(audit);
         } else {

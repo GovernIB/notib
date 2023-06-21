@@ -33,16 +33,16 @@ public class ValidDocumentValidator implements ConstraintValidator<ValidDocument
 
 		var valid = true;
 		try {
-			var FieldType = BeanUtils.getProperty(value, fieldName);
+			var fieldType = BeanUtils.getProperty(value, fieldName);
 			var dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
 			var msg = MessageHelper.getInstance().getMessage("NotEmpty");
-			if (FieldType == TipusDocumentEnumDto.UUID.name() && (dependFieldValue == null || dependFieldValue.isEmpty())) {
+			if (TipusDocumentEnumDto.UUID.name().equals(FieldType)  && (dependFieldValue == null || dependFieldValue.isEmpty())) {
 				context.buildConstraintViolationWithTemplate(msg).addNode("documentArxiuUuid").addConstraintViolation();
 				valid = false;
-			} else if (FieldType == TipusDocumentEnumDto.ARXIU.name() && (dependFieldValue == null || dependFieldValue.isEmpty())){
+			} else if (TipusDocumentEnumDto.ARXIU.name().equals(fieldType) && (dependFieldValue == null || dependFieldValue.isEmpty())){
 				context.buildConstraintViolationWithTemplate(msg).addNode("arxiu").addConstraintViolation();
 				valid = false;
-			} else if (FieldType == TipusDocumentEnumDto.CSV.name() && (dependFieldValue == null || dependFieldValue.isEmpty())){
+			} else if (TipusDocumentEnumDto.CSV.name().equals(fieldType) && (dependFieldValue == null || dependFieldValue.isEmpty())){
 				context.buildConstraintViolationWithTemplate(msg).addNode("documentArxiuCsv").addConstraintViolation();
 				valid = false;
 			} 

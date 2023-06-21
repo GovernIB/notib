@@ -11,13 +11,13 @@ import java.util.List;
 @Setter
 public class ArbreNode<T> implements Serializable {
 
-    public ArbreNode<T> pare;
-    public T dades;
-    public List<ArbreNode<T>> fills;
-    public long count = 0;
-    public boolean mostrarCount = false;
-    public boolean filtresOk;
-    public boolean retornatFiltre;
+    private ArbreNode<T> pare;
+    private T dades;
+    private List<ArbreNode<T>> fills;
+    private long count = 0;
+    private boolean mostrarCount = false;
+    private boolean filtresOk;
+    private boolean retornatFiltre;
 
     public ArbreNode(ArbreNode<T> pare) {
         super();
@@ -42,7 +42,7 @@ public class ArbreNode<T> implements Serializable {
      * @return Els fills del node actual.
      */
     public List<ArbreNode<T>> getFills() {
-        return this.fills != null ? fills : new ArrayList<ArbreNode<T>>();
+        return this.fills != null ? fills : new ArrayList<>();
     }
     /**
      * Estableix els fills del node actual.
@@ -157,14 +157,15 @@ public class ArbreNode<T> implements Serializable {
 
     public ArbreNode<T> clone(ArbreNode<T> pare) {
 
-        ArbreNode<T> clon = new ArbreNode<T>(pare, getDades());
-        for (ArbreNode<T> fill: getFills()) {
+        var clon = new ArbreNode<>(pare, getDades());
+        for (var fill: getFills()) {
             clon.addFill(fill.clone(clon));
         }
         return clon;
     }
 
     public String toString() {
+
         StringBuilder sb = new StringBuilder();
         sb.append("{").append(getDades().toString()).append(",[");
         int i = 0;

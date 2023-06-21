@@ -12,10 +12,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.boot.autoconfigure.websocket.servlet.WebSocketServletAutoConfiguration;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Profile;
 
 /**
  * Aplicació Spring Boot de NOTIB per a ser executada des de JBoss.
@@ -41,13 +39,8 @@ import org.springframework.context.annotation.Profile;
 						"es\\.caib\\.notib\\.api\\..*"}))
 public class NotibEjbApp extends NotibApp {
 
-//	@Override
-//	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-//		return application.sources(NotibEjbApp.class);
-//	}
-
 	public static void main(String[] args) {
-		SpringApplication.run(NotibEjbApp.class, args);
+		SpringApplication.run(NotibEjbApp.class);
 	}
 
 }

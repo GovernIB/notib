@@ -68,9 +68,10 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 			} else {
 				ps = con.prepareStatement(sqlQuery);
 			}
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				rols.add(rs.getString(1));
+			try (var rs = ps.executeQuery()) {
+				while (rs.next()) {
+					rols.add(rs.getString(1));
+				}
 			}
 		} catch (Exception ex) {
 			throw new SistemaExternException(ex);
@@ -91,48 +92,46 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 
 	private DadesUsuari consultaDadesUsuariUnic(String sqlQuery, String paramName, String paramValue) throws SistemaExternException {
 
-		List<DadesUsuari> llista = consultaDadesUsuari(sqlQuery, paramName, paramValue);
-		return llista.size() > 0 ? llista.get(0) : null;
+		var llista = consultaDadesUsuari(sqlQuery, paramName, paramValue);
+		return !llista.isEmpty() ? llista.get(0) : null;
 	}
 
 	private List<DadesUsuari> consultaDadesUsuari(String sqlQuery, String paramName, String paramValue) throws SistemaExternException {
 
 		List<DadesUsuari> llistaUsuaris = new ArrayList<>();
-		Connection con = null;
 		PreparedStatement ps = null;
 		try {
 			var initContext = new InitialContext();
 			var ds = (DataSource)initContext.lookup(getDatasourceJndiName());
-			con = ds.getConnection();
-			if (sqlQuery.contains("?")) {
-				ps = con.prepareStatement(sqlQuery);
-				ps.setString(1, paramValue);
-			} else if (sqlQuery.contains(":" + paramName)) {
-				ps = con.prepareStatement(sqlQuery.replace(":" + paramName, "'" + paramValue + "'"));
-			} else {
-				ps = con.prepareStatement(sqlQuery);
-			}
-			var rs = ps.executeQuery();
-			while (rs.next()) {
-				DadesUsuari dadesUsuari = new DadesUsuari();
-				dadesUsuari.setCodi(rs.getString(1));
-				dadesUsuari.setNom(rs.getString(2));
-				dadesUsuari.setNif(rs.getString(3));
-				dadesUsuari.setEmail(rs.getString(4));
-				llistaUsuaris.add(dadesUsuari);
+			try (var con = ds.getConnection()) {
+				if (sqlQuery.contains("?")) {
+					ps = con.prepareStatement(sqlQuery);
+					ps.setString(1, paramValue);
+				} else if (sqlQuery.contains(":" + paramName)) {
+					ps = con.prepareStatement(sqlQuery.replace(":" + paramName, "'" + paramValue + "'"));
+				} else {
+					ps = con.prepareStatement(sqlQuery);
+				}
+				try (var rs = ps.executeQuery()) {
+					while (rs.next()) {
+						DadesUsuari dadesUsuari = new DadesUsuari();
+						dadesUsuari.setCodi(rs.getString(1));
+						dadesUsuari.setNom(rs.getString(2));
+						dadesUsuari.setNif(rs.getString(3));
+						dadesUsuari.setEmail(rs.getString(4));
+						llistaUsuaris.add(dadesUsuari);
+					}
+				}
 			}
 		} catch (Exception ex) {
 			throw new SistemaExternException(ex);
 		} finally {
 			try {
-				if (ps != null) ps.close();
+				if (ps != null) {
+					ps.close();
+				}
 			} catch (Exception ex) {
 				log.error("Error al tancar el PreparedStatement", ex);
-			}
-			try {
-				if (con != null) con.close();
-			} catch (Exception ex) {
-				log.error("Error al tancar la connexió", ex);
 			}
 		}
 		return llistaUsuaris;

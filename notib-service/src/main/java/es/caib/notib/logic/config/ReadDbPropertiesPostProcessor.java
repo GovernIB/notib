@@ -1,6 +1,5 @@
 package es.caib.notib.logic.config;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.boot.logging.DeferredLog;
@@ -10,10 +9,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,24 +31,23 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
             log.info("... Datasource carregat correctament.");
 
             log.info("Carregant les propietats...");
-            var connection = dataSource.getConnection();
-            var preparedStatement = connection.prepareStatement("SELECT key, value FROM not_config WHERE jboss_property = 0");
-            var resultSet = preparedStatement.executeQuery();
-            String clau, valor;
-            while(resultSet.next()) {
-                clau = resultSet.getString("key");
-                valor = resultSet.getString("value");
-                propertySource.put(clau, valor);
-                log.info("   ... carregada la propietat: " + clau + "=" + valor);
+            try (var connection = dataSource.getConnection();
+                 var preparedStatement = connection.prepareStatement("SELECT key, value FROM not_config WHERE jboss_property = 0");
+                var resultSet = preparedStatement.executeQuery()) {
+                String clau;
+                String valor;
+                while (resultSet.next()) {
+                    clau = resultSet.getString("key");
+                    valor = resultSet.getString("value");
+                    propertySource.put(clau, valor);
+                    log.info("   ... carregada la propietat: " + clau + "=" + valor);
+                }
             }
-            resultSet.close();
-            preparedStatement.close();
-            connection.close();
             log.info("... Finalitzada la càrega de propietats");
             log.info("Afegint les propietats carregades de base de dades al entorn...");
             environment.getPropertySources().addFirst(new MapPropertySource(DBAPP_PROPERTIES, propertySource));
             log.info("...Propietats afegides");
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             log.error("No s'han pogut carregar les propietats de la BBDD", ex);
         }
 

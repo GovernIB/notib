@@ -62,7 +62,7 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        request.setAttribute(REQUEST_ATTRIBUTE_MANIFEST_ATRIBUTES, MissatgesHelper.manifestAtributsMap);
+        request.setAttribute(REQUEST_ATTRIBUTE_MANIFEST_ATRIBUTES, MissatgesHelper.getManifestAtributsMap());
         request.setAttribute(REQUEST_ATTRIBUTE_LOCALE, RequestContextUtils.getLocale(request).getLanguage());
 
         // Tipus accés: Es comprova si s0estpa fent una petició noDeco, modal o ajax.

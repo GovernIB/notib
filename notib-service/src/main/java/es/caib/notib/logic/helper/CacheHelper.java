@@ -11,6 +11,8 @@ import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.usuari.DadesUsuari;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
@@ -50,7 +52,8 @@ public class CacheHelper {
 	@Resource
 	private CacheManager cacheManager;
 
-	public static String appVersion;
+	@Getter @Setter
+	private static String appVersion;
 
 
 	@Autowired
@@ -82,37 +85,27 @@ public class CacheHelper {
 	public List<OficinaDto> getOficinesSIRUnitat(Map<String, OrganismeDto> arbreUnitats, String codiDir3Organ) {
 
 		List<OficinaEntity> oficines = new ArrayList<>();
-		String organ = codiDir3Organ;
+		var organ = codiDir3Organ;
 		while (organ != null && !organ.isEmpty()) {
 			oficines.addAll(oficinaRepository.findByOrganGestorCodiAndSirIsTrue(organ));
 			organ = arbreUnitats.get(organ) != null ? arbreUnitats.get(organ).getPare() : null;
 		}
-		return oficines.stream()
-				.map(o -> OficinaDto.builder()
-						.codi(o.getCodi())
-						.nom(o.getNom())
-						.organCodi(o.getOrganGestor() != null ? o.getOrganGestor().getCodi() : null)
-						.sir(o.isSir()).build())
-				.collect(Collectors.toList());
+		return oficines.stream().map(o -> OficinaDto.builder().codi(o.getCodi()).nom(o.getNom()).sir(o.isSir())
+						.organCodi(o.getOrganGestor() != null ? o.getOrganGestor().getCodi() : null).build()).collect(Collectors.toList());
 	}
 
 	@Cacheable(value = "oficinesSIREntitat", key="#codiDir3Entitat")
 	public List<OficinaDto> getOficinesSIREntitat(String codiDir3Entitat) {
 
-		List<OficinaEntity> oficines = oficinaRepository.findByEntitat_Dir3CodiAndSirIsTrue(codiDir3Entitat);
-		return oficines.stream()
-				.map(o -> OficinaDto.builder()
-						.codi(o.getCodi())
-						.nom(o.getNom())
-						.organCodi(o.getOrganGestor() != null ? o.getOrganGestor().getCodi() : null)
-						.sir(o.isSir()).build())
-				.collect(Collectors.toList());
+		var oficines = oficinaRepository.findByEntitat_Dir3CodiAndSirIsTrue(codiDir3Entitat);
+		return oficines.stream().map(o -> OficinaDto.builder().codi(o.getCodi()).nom(o.getNom()).sir(o.isSir())
+						.organCodi(o.getOrganGestor() != null ? o.getOrganGestor().getCodi() : null).build()).collect(Collectors.toList());
 	}
 
 	@Cacheable(value = "unitatPerCodi", key="#codi")
 	public OrganGestorDto unitatPerCodi(String codi) {
 
-		List<OrganGestorDto> organs = pluginHelper.unitatsPerCodi(codi);
+		var organs = pluginHelper.unitatsPerCodi(codi);
 		return organs != null && !organs.isEmpty() ? organs.get(0) : null;
 	}
 
@@ -120,36 +113,34 @@ public class CacheHelper {
 	public Map<String, OrganismeDto> findOrganigramaNodeByEntitat(final String entitatDir3Codi) {
 
 		Map<String, OrganismeDto> organigrama = new HashMap<>();
-		List<OrganGestorEntity> organs = organGestorRepository.findByEntitatDir3Codi(entitatDir3Codi);
+		var organs = organGestorRepository.findByEntitatDir3Codi(entitatDir3Codi);
 		if (organs == null || organs.isEmpty()) {
 			return organigrama;
 		}
-
-		OrganGestorEntity arrel = organGestorRepository.findByCodi(entitatDir3Codi);
-		HashMap<String, List<OrganGestorEntity>> organsMap = organsToMap(organs);
+		var arrel = organGestorRepository.findByCodi(entitatDir3Codi);
+		var organsMap = organsToMap(organs);
 		organToOrganigrama(arrel, organsMap, organigrama);
 		return organigrama;
 	}
 
 	private HashMap<String, List<OrganGestorEntity>> organsToMap(final List<OrganGestorEntity> organs) {
-		HashMap<String, List<OrganGestorEntity>> organsMap = new HashMap<>();
-		for (OrganGestorEntity organ: organs) {
-//			if (OrganGestorEstatEnum.V.equals(organ.getEstat()) || OrganGestorEstatEnum.T.equals(organ.getEstat())) {    // Unitats Vigents o Transitòries
 
+		HashMap<String, List<OrganGestorEntity>> organsMap = new HashMap<>();
+		for (var organ: organs) {
 			if (organsMap.containsKey(organ.getCodiPare())) {
 				List<OrganGestorEntity> fills = organsMap.get(organ.getCodiPare());
 				fills.add(organ);
-			} else {
-				List<OrganGestorEntity> fills = new ArrayList<>();
-				fills.add(organ);
-				organsMap.put(organ.getCodiPare(), fills);
+				continue;
 			}
-//			}
+			List<OrganGestorEntity> fills = new ArrayList<>();
+			fills.add(organ);
+			organsMap.put(organ.getCodiPare(), fills);
 		}
 		return organsMap;
 	}
 
 	private void organToOrganigrama(final OrganGestorEntity organ, final HashMap<String, List<OrganGestorEntity>> organsMap, Map<String, OrganismeDto> organigrama) {
+
 		List<OrganGestorEntity> fills = organsMap.get(organ.getCodi());
 		List<String> codisFills = null;
 		if (fills != null && !fills.isEmpty()) {
@@ -158,25 +149,20 @@ public class CacheHelper {
 				codisFills.add(fill.getCodi());
 			}
 		}
-		organigrama.put(
-				organ.getCodi(),
-				OrganismeDto.builder()
-						.codi(organ.getCodi())
-						.nom(organ.getNom())
-						.pare(organ.getCodiPare())
-						.fills(codisFills)
-						.build());
-
-		if (fills != null)
-			for (OrganGestorEntity fill : fills)
-				organToOrganigrama(fill, organsMap, organigrama);
+		var organisme = OrganismeDto.builder().codi(organ.getCodi()).nom(organ.getNom()).pare(organ.getCodiPare()).fills(codisFills).build();
+		organigrama.put(organ.getCodi(), organisme);
+		if (fills == null) {
+			return;
+		}
+		for (OrganGestorEntity fill : fills) {
+			organToOrganigrama(fill, organsMap, organigrama);
+		}
 	}
 
 	@Cacheable(value = "llistarNivellsAdministracions")
 	public List<CodiValor> llistarNivellsAdministracions() {
 		return pluginHelper.llistarNivellsAdministracions();
 	}
-
 
 	@Cacheable(value = "llistarComunitatsAutonomes")
 	public List<CodiValor> llistarComunitatsAutonomes() {
@@ -193,49 +179,68 @@ public class CacheHelper {
 		return pluginHelper.llistarLocalitats(codiProvincia);
 	}
 
-
-
 	public Collection<String> getAllCaches() {
 		return cacheManager.getCacheNames();
 	}
 
 	@CacheEvict(value = {"procserAmbPermis", "procedimentsAmbPermis", "serveisAmbPermis", "procsersPermisNotificacioMenu", "procsersPermisComunicacioMenu", "procsersPermisComunicacioSirMenu"}, allEntries = true)
-	public void evictFindProcedimentServeisWithPermis() {}
+	public void evictFindProcedimentServeisWithPermis() {
+		//evictFindProcedimentServeisWithPermis
+	}
 
 	@CacheEvict(value = {"organsPermisPerProcedimentComu", "procserOrgansCodisAmbPermis"}, allEntries = true)
-	public void evictFindProcedimentsOrganWithPermis() {}
+	public void evictFindProcedimentsOrganWithPermis() {
+		//evictFindProcedimentsOrganWithPermis
+	}
 
 	@CacheEvict(value = {"organsAmbPermis"}, allEntries = true)
-	public void evictFindOrgansGestorWithPermis() {}
+	public void evictFindOrgansGestorWithPermis() {
+		//evictFindOrgansGestorWithPermis
+	}
 
 	@CacheEvict(value = "unitatPerCodi", allEntries = true)
-	public void evictUnitatPerCodi() {}
+	public void evictUnitatPerCodi() {
+		// evictUnitatPerCodi
+	}
 
 	@CacheEvict(value = "findUsuarisAmbPermis", key="#procedimentId.concat('-').concat(#codiOrgan)")
-	public void evictFindUsuarisAmbPermis(String procedimentId, String codiOrgan) {}
+	public void evictFindUsuarisAmbPermis(String procedimentId, String codiOrgan) {
+		//evictFindUsuarisAmbPermis
+	}
 
 	@CacheEvict(value = {"oficinesSIREntitat", "oficinesSIRUnitat"}, allEntries = true)
-	public void evictCercaOficines() {};
+	public void evictCercaOficines() {
+		//evictCercaOficines
+	}
 
 	public void clearCache(String cacheName) {
-		cacheManager.getCache(cacheName).clear();
+
+		var cache = cacheManager.getCache(cacheName);
+		if (cache != null) {
+			cache.clear();
+		}
 	}
 
 	public void clearAllCaches() {
-		for(String cacheName : cacheManager.getCacheNames()) {
+
+		for(var cacheName : cacheManager.getCacheNames()) {
 			clearCache(cacheName);
 		}
 	}
 
 	public long getCacheSize(String cacheName) {
+
 		try {
-			var cache = (Cache)cacheManager.getCache(cacheName).getNativeCache();
-			var cacheSize = StreamSupport.stream(Spliterators.spliteratorUnknownSize(cache.iterator(), Spliterator.ORDERED), false).count();
-			return cacheSize;
+			var cache = cacheManager.getCache(cacheName);
+			if (cache == null) {
+				return 0L;
+			}
+			var c = (Cache)cache.getNativeCache();
+			return StreamSupport.stream(Spliterators.spliteratorUnknownSize(c.iterator(), Spliterator.ORDERED), false).count();
 		} catch (Exception ex) {
 			log.error("Error obtenint mida de la cache " + cacheName, ex);
+			return 0L;
 		}
-		return 0L;
 	}
 
 	public long getTotalEhCacheSize() {

@@ -31,6 +31,8 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	private static final String NOTIFICACIOV2_SERVICE_PATH = "/interna/notificacio/v2";
 	private static final String CONSULTAV2_SERVICE_PATH = "/interna/consulta/v2";
+	private static final String COMUNICACIONS = "/comunicacions/";
+	private static final String NOTIFICACIONS = "/notificacions/";
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	/**
@@ -117,7 +119,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 		String urlAmbMetode = baseUrl + "/interna/api/rest/appinfo";
 		try {
-			jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient();
 			var wt = jerseyClient.target(urlAmbMetode);
 			var json = wt.request(MediaType.APPLICATION_JSON).get(String.class);
 			return getMapper().readValue(json, AppInfo.class);
@@ -139,7 +141,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/alta";
 			ObjectMapper mapper  = getMapper();
 			String body = mapper.writeValueAsString(notificacio);
-			jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient();
 			log.debug("Missatge REST enviat: " + body);
 			var wt = jerseyClient.target(urlAmbMetode);
 			var r = wt.request(MediaType.APPLICATION_JSON).post(Entity.json(body)).readEntity(RespostaAltaV2.class);
@@ -159,7 +161,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(String identificador) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
-			jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient();
 			var wt = jerseyClient.target(urlAmbMetode);
 			var json = wt.request(MediaType.APPLICATION_JSON).get(String.class);
 			return getMapper().readValue(json, RespostaConsultaEstatNotificacioV2.class);
@@ -177,7 +179,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviament(String referencia) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
-			jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient();
 			var wt = jerseyClient.target(urlAmbMetode);
 			var json = wt.request(MediaType.APPLICATION_JSON).get(String.class);
 			return getMapper().readValue(json, RespostaConsultaEstatEnviamentV2.class);
@@ -197,7 +199,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaDadesRegistre";
 			ObjectMapper mapper  = getMapper();
 			String body = mapper.writeValueAsString(dadesConsulta);
-			jerseyClient = generarClient(urlAmbMetode);
+			jerseyClient = generarClient();
 			var wt = jerseyClient.target(urlAmbMetode);
 			var r = wt.request(MediaType.APPLICATION_JSON).post(Entity.json(body)).readEntity(RespostaConsultaDadesRegistreV2.class);
 			log.debug("Missatge REST rebut: " + r);
@@ -232,7 +234,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	public RespostaConsultaV2 comunicacionsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
-			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/comunicacions/" + dniTitular;
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + COMUNICACIONS + dniTitular;
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
 			return getMapper().readValue(json, RespostaConsultaV2.class);
 		} catch (Exception ex) {
@@ -242,7 +244,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	public RespostaConsultaV2 notificacionsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
-			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/notificacions/" + dniTitular;
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + NOTIFICACIONS + dniTitular;
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
 			return getMapper().readValue(json, RespostaConsultaV2.class);
 		} catch (Exception ex) {
@@ -252,7 +254,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	public RespostaConsultaV2 comunicacionsPendentsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
-			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/comunicacions/" + dniTitular + "/pendents";
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + COMUNICACIONS + dniTitular + "/pendents";
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
 			return getMapper().readValue(json, RespostaConsultaV2.class);
 		} catch (Exception ex) {
@@ -262,7 +264,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	public RespostaConsultaV2 notificacionsPendentsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
-			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/notificacions/" + dniTitular + "/pendents";
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + NOTIFICACIONS + dniTitular + "/pendents";
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
 			return getMapper().readValue(json, RespostaConsultaV2.class);
 		} catch (Exception ex) {
@@ -272,7 +274,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	public RespostaConsultaV2 comunicacionsLlegidesByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
-			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/comunicacions/" + dniTitular + "/llegides";
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + COMUNICACIONS + dniTitular + "/llegides";
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
 			return getMapper().readValue(json, RespostaConsultaV2.class);
 		} catch (Exception ex) {
@@ -281,8 +283,9 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	}
 
 	public RespostaConsultaV2 notificacionsLlegidesByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
+
 		try {
-			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/notificacions/" + dniTitular + "/llegides";
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + NOTIFICACIONS + dniTitular + "/llegides";
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
 			return getMapper().readValue(json, RespostaConsultaV2.class);
 		} catch (Exception ex) {
@@ -290,9 +293,9 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 		}
 	}
 
-	private String getConsultaJsonString(Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida, String urlAmbMetode) throws Exception {
+	private String getConsultaJsonString(Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida, String urlAmbMetode)  {
 
-		jerseyClient = generarClient(urlAmbMetode);
+		jerseyClient = generarClient();
 		var wt = jerseyClient.target(urlAmbMetode);
 		wt.queryParam("dataInicial", dataInicial != null ? sdf.format(dataInicial) : "").
 		queryParam("dataFinal", dataInicial != null ? sdf.format(dataFinal) : "").
@@ -300,8 +303,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 		queryParam("lang", lang != null ? lang.name() : "").
 		queryParam("pagina", pagina != null ? pagina.toString() : "").
 		queryParam("mida", mida != null ? mida.toString() : "");
-		var response = wt.request(MediaType.APPLICATION_JSON).get(String.class);
-		return response;
+		return wt.request(MediaType.APPLICATION_JSON).get(String.class);
 	}
 
 }

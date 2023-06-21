@@ -39,24 +39,24 @@ public class NotificacioV2Api {
                     " * Si ha d’anar a CIE només s’agafaran els 50 primers caràcters")
     private String concepte;
     @Size(max = 1000)
-    @Schema(name = "descripcio", implementation = String.class, example = "Descripció de la notificació", required = false,
+    @Schema(name = "descripcio", implementation = String.class, example = "Descripció de la notificació",
             description = "Descripció detallada de l’enviament")
     private String descripcio;
-    @Schema(name = "enviamentDataProgramada", implementation = Date.class, example = "2023-05-25", required = false,
+    @Schema(name = "enviamentDataProgramada", implementation = Date.class, example = "2023-05-25",
             description = "Data en la que l’enviament es posarà a disposició per a la compareixença.\n" +
                     " * En cas de no informar-se es posarà en disposició per a la compareixença de forma inmediata.\n\n" +
                     "El format de la data serà del tipus yyyy-MM-dd")
     private Date enviamentDataProgramada;
-    @Schema(name = "retard", implementation = Integer.class, example = "5", required = false,
+    @Schema(name = "retard", implementation = Integer.class, example = "5",
             description = "Dies que l’enviament estarà a disposició de compareixença en carpeta abans d’entregar-lo per altres mitjans")
     private Integer retard;
-    @Schema(name = "caducitat", implementation = Date.class, example = "2023-05-25", required = false,
+    @Schema(name = "caducitat", implementation = Date.class, example = "2023-05-25",
             description = "Data d’expiració de l’enviament.\n" +
                     " * Aquest camp és excloent amb el de caducitatDiesNaturals. Només s'ha d'indicar un dels dos. En cas d'informar els dos, s'ignorarà el camp caducitatDiesNaturals.\n" +
                     " * Aquest camp és obligatori per notificacions i opcional per a comunicacions.\n\n" +
                     "El format de la data serà del tipus yyyy-MM-dd")
     private Date caducitat;
-    @Schema(name = "caducitatDiesNaturals", implementation = Integer.class, example = "10", required = false,
+    @Schema(name = "caducitatDiesNaturals", implementation = Integer.class, example = "10",
             description = "Dies naturals abans que expiri l'enviament\n" +
                     " * Aquest camp és excloent amb el de caducitat. Només s'ha d'indicar un dels dos. En cas d'informar els dos, aquest s'ignorarà.")
     private Integer caducitatDiesNaturals;
@@ -66,41 +66,41 @@ public class NotificacioV2Api {
                     "Aquest usuari s'utilitzarà per a realitzar l'assentament registral de sortida")
     private String usuariCodi;
     @Size(max = 64)
-    @Schema(name = "procedimentCodi", implementation = String.class, example = "666666", required = false,
+    @Schema(name = "procedimentCodi", implementation = String.class, example = "666666",
             description = "Identificador del procediment SIA al que pertany la notificació.\n" +
                     "Obligatori en el cas de notificacions")
     private String procedimentCodi;
     @Size(max = 64)
-    @Schema(name = "grupCodi", implementation = String.class, example = "NOT_DG_DESTECNOLOGIC", required = false,
+    @Schema(name = "grupCodi", implementation = String.class, example = "NOT_DG_DESTECNOLOGIC",
             description = "Codi del grup al que s’assigna la notificació.\n " +
                     "* Aquest camp només té sentit quan es vol donar d’alta una notificació que s’ha configurat amb grups a Notifica (veure manual d’usuari)")
     private String grupCodi;
     @Size(max = 80)
-    @Schema(name = "numExpedient", implementation = String.class, example = "123/2023", required = false,
+    @Schema(name = "numExpedient", implementation = String.class, example = "123/2023",
             description = "Identificador de l'expedient al qual pertany la notificació")
     private String numExpedient;
     @Schema(name = "enviaments", required = true,
             description = "Llista d'enviaments continguts en la Notificació/Comunicació")
     private List<EnviamentApi> enviaments;
-    @Schema(name = "idioma", implementation = Idioma.class, defaultValue = "CA", example = "ES", required = false,
+    @Schema(name = "idioma", implementation = Idioma.class, defaultValue = "CA", example = "ES",
             description = "Enumerat que indica l’idioma de la notificació")
     private Idioma idioma;
     @Schema(name = "document", implementation = DocumentApi.class, required = true,
             description = "Document que s’envia en la notificació.")
     private DocumentApi document;
-    @Schema(name = "document2", implementation = DocumentApi.class, required = false,
+    @Schema(name = "document2", implementation = DocumentApi.class,
             description = "Document que s’envia en la comunicació.\n" +
                     " * Únicament es pot adjuntar més d’un document en cas de comunicacions a la administració (SIR)")
     private DocumentApi document2;
-    @Schema(name = "document3", implementation = DocumentApi.class, required = false,
+    @Schema(name = "document3", implementation = DocumentApi.class,
             description = "Document que s’envia en la comunicació.\n" +
                     " * Únicament es pot adjuntar més d’un document en cas de comunicacions a la administració (SIR)")
     private DocumentApi document3;
-    @Schema(name = "document4", implementation = DocumentApi.class, required = false,
+    @Schema(name = "document4", implementation = DocumentApi.class,
             description = "Document que s’envia en la comunicació.\n" +
                     " * Únicament es pot adjuntar més d’un document en cas de comunicacions a la administració (SIR)")
     private DocumentApi document4;
-    @Schema(name = "document5", implementation = DocumentApi.class, required = false,
+    @Schema(name = "document5", implementation = DocumentApi.class,
             description = "Document que s’envia en la comunicació.\n" +
                     " * Únicament es pot adjuntar més d’un document en cas de comunicacions a la administració (SIR)")
     private DocumentApi document5;

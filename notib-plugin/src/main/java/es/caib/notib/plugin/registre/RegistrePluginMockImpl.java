@@ -3,8 +3,7 @@ package es.caib.notib.plugin.registre;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.DatosInteresadoWsDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,23 +24,23 @@ import java.util.Scanner;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-
+@Slf4j
 public class RegistrePluginMockImpl implements RegistrePlugin{
 
 	private final Properties properties;
+	private final Random rand = new Random();
+	private static final String ENTITAT_DIR3_CODI = "A04003003";
+
 
 	public RegistrePluginMockImpl(Properties properties) {
 		this.properties = properties;
 	}
 
 	@Override
-	public RespostaConsultaRegistre salidaAsientoRegistral(
-			String codiDir3Entitat, 
-			AsientoRegistralBeanDto arb,
-			Long tipusOperacio,
-			boolean generarJustificant) {
+	public RespostaConsultaRegistre salidaAsientoRegistral(String codiDir3Entitat, AsientoRegistralBeanDto arb, Long tipusOperacio, boolean generarJustificant) {
+
 		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
-		logger.info(arb.toString());
+		log.info(arb.toString());
 //		System.out.println(">>> DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 //		ObjectMapper mapper = new ObjectMapper();
 //		try {
@@ -76,11 +75,8 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	}
 	
 	@Override
-	public RespostaConsultaRegistre obtenerAsientoRegistral(
-			String codiDir3Entitat, 
-			String numeroRegistreFormatat,
-			Long tipusOperacio,
-			boolean ambAnnexos) {
+	public RespostaConsultaRegistre obtenerAsientoRegistral(String codiDir3Entitat, String numeroRegistreFormatat, Long tipusOperacio, boolean ambAnnexos) {
+
 		boolean respostaAmbError = false;
 		RespostaConsultaRegistre respostaConsultaRegistre = new RespostaConsultaRegistre();
 		Date data = new Date();
@@ -96,7 +92,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 				 respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.REBUTJAT))
 			 respostaConsultaRegistre.setSirRegistreDestiData(data);
 
-		respostaConsultaRegistre.setEntitatCodi("A04003003");
+		respostaConsultaRegistre.setEntitatCodi(ENTITAT_DIR3_CODI);
 		respostaConsultaRegistre.setEntitatDenominacio("CAIB");
 		if (respostaAmbError) {
 			respostaConsultaRegistre.setErrorCodi("500");
@@ -119,8 +115,6 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		
 		resposta.setJustificant(getJustificant());
 		resposta.setErrorCodi("OK");
-//		resposta.setJustificant(null);
-//		resposta.setErrorCodi("ERROR");
 		return resposta;
 		
 	}
@@ -136,7 +130,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	@Override
 	public List<TipusAssumpte> llistarTipusAssumpte(String entitat) throws RegistrePluginException {
 		
-		List<TipusAssumpte> tipusAssumptes = new ArrayList<TipusAssumpte>();
+		List<TipusAssumpte> tipusAssumptes = new ArrayList<>();
 		
 //		TipusAssumpte tipusAssumpte1 = new TipusAssumpte();
 //		tipusAssumpte1.setCodi("");
@@ -147,26 +141,21 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	}
 	
 	@Override
-	public List<CodiAssumpte> llistarCodisAssumpte(
-			String entitat,
-			String tipusAssumpte) throws RegistrePluginException {
-		
-		List<CodiAssumpte> codiAssumptes = new ArrayList<CodiAssumpte>();
-		
+	public List<CodiAssumpte> llistarCodisAssumpte(String entitat, String tipusAssumpte) {
+
+		List<CodiAssumpte> codiAssumptes = new ArrayList<>();
 //		CodiAssumpte codiAssumpte1 = new CodiAssumpte();
 //		codiAssumpte1.setCodi("");
 //		codiAssumpte1.setNom("");
 //		codiAssumpte1.setTipusAssumpte(tipusAssumpte);
 //		codiAssumptes.add(codiAssumpte1);
-		
+
 		return codiAssumptes;
 	}
 	
 	@Override
-	public Oficina llistarOficinaVirtual(
-			String entitatCodi, 
-			String nomOficinaVirtualEntitat,
-			Long autoritzacioValor) throws RegistrePluginException {
+	public Oficina llistarOficinaVirtual(String entitatCodi, String nomOficinaVirtualEntitat, Long autoritzacioValor) {
+
 		Oficina oficina = new Oficina();
 		oficina.setCodi("O00009390");
 		oficina.setNom(("DGTIC"));
@@ -174,11 +163,9 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	}
 	
 	@Override
-	public List<Oficina> llistarOficines(
-			String entitat,
-			Long autoritzacio) throws RegistrePluginException {
+	public List<Oficina> llistarOficines(String entitat, Long autoritzacio) {
 		
-		List<Oficina> oficines = new ArrayList<Oficina>();
+		List<Oficina> oficines = new ArrayList<>();
 		
 		Oficina oficina1 = new Oficina();
 		oficina1.setCodi("O00001496");
@@ -254,25 +241,25 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 			String oficina,
 			Long autoritzacio) throws RegistrePluginException {
 		
-		List<Llibre> llibres = new ArrayList<Llibre>();
+		List<Llibre> llibres = new ArrayList<>();
 	
 		Llibre llibre1 = new Llibre();
 		llibre1.setCodi("L95");
-		llibre1.setOrganisme("A04003003");
+		llibre1.setOrganisme(ENTITAT_DIR3_CODI);
 		llibre1.setNomCurt("L95");
 		llibre1.setNomLlarg("FOGAIBA");
 		llibres.add(llibre1);
 		
 		Llibre llibre2 = new Llibre();
 		llibre2.setCodi("L2");
-		llibre2.setOrganisme("A04003003");
+		llibre2.setOrganisme(ENTITAT_DIR3_CODI);
 		llibre2.setNomCurt("L2");
 		llibre2.setNomLlarg("OF. CONVENI CONSELL MENORCA");
 		llibres.add(llibre2);
 		
 		Llibre llibre3 = new Llibre();
 		llibre3.setCodi("L3");
-		llibre3.setOrganisme("A04003003");
+		llibre3.setOrganisme(ENTITAT_DIR3_CODI);
 		llibre3.setNomCurt("L3");
 		llibre3.setNomLlarg("OF. CONVENI CONSELL EIVISSA");
 		llibres.add(llibre3);
@@ -281,18 +268,14 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	}
 	
 	@Override
-	public List<LlibreOficina> llistarLlibresOficines(
-			String entitatCodi, 
-			String usuariCodi,
-			Long tipusRegistre){
-		return null;
+	public List<LlibreOficina> llistarLlibresOficines(String entitatCodi, String usuariCodi, Long tipusRegistre){
+		return new ArrayList<>();
 	}
 	
 	@Override
-	public Llibre llistarLlibreOrganisme(
-			String entitatCodi, 
-			String organismeCodi) throws RegistrePluginException {
-		Random rand = new Random();
+	public Llibre llistarLlibreOrganisme(String entitatCodi, String organismeCodi) {
+
+
 		Integer num = rand.nextInt(100);
 		Llibre llibre = new Llibre();
 		llibre.setCodi("L" + num);
@@ -305,10 +288,10 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	public List<Organisme> llistarOrganismes(
 			String entitat) throws RegistrePluginException {
 		
-		List<Organisme> organismes = new ArrayList<Organisme>(); 
+		List<Organisme> organismes = new ArrayList<>();
 		
 		Organisme organisme = new Organisme();
-		organisme.setCodi("A04003003");
+		organisme.setCodi(ENTITAT_DIR3_CODI);
 		organisme.setNom("FOGAIBA");
 		organismes.add(organisme);
 			
@@ -320,20 +303,18 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		
 		Integer anualitat =  null;
 		Integer numero = null;
-		
+
 //		ClassLoader classLoader = getClass().getClassLoader();
 //		File file = new File(classLoader.getResource("es/caib/notib/plugin/caib/registre/registre.txt").getFile());
 		File file = new File(getSequenciaPath());
-		
+
 		try (Scanner scanner = new Scanner(file)) {
 
 			anualitat = Integer.parseInt(scanner.nextLine());
 			numero = Integer.parseInt(scanner.nextLine());
 
-			scanner.close();
-			
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Scanner error ", e);
 		}
 		
 		if (update) {
@@ -348,13 +329,10 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 			}
 			
 			try (PrintStream fs = new PrintStream(file)) {
-				
-				fs.println(anualitat.toString());
-				fs.print(numero.toString());
-				fs.close();
-				
+				fs.println(anualitat);
+				fs.print(numero);
 			} catch (IOException e) {
-				e.printStackTrace();
+				log.error("PrintStream error ", e);
 			}
 		}
 		
@@ -364,20 +342,13 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	private byte[] getJustificant() {
 		
 		byte[] fileContent = null;
-		
-//		ClassLoader classLoader = getClass().getClassLoader();
-//		File file = new File(classLoader.getResource("es/caib/notib/plugin/caib/registre/justificant.pdf").getFile());
-		String justificantPath = getJustificantPath();
-		File file = new File(justificantPath);
-		
+		var justificantPath = getJustificantPath();
+		var file = new File(justificantPath);
 		try {
-		
 			fileContent = Files.readAllBytes(file.toPath());
-		
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Error llegint el justificant ", e);
 		}
-		
 		return fileContent;
 	}
 	
@@ -388,9 +359,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	public String getJustificantPath() {
 		return properties.getProperty("es.caib.notib.plugin.regweb.mock.justificant");
 	}
-	
-	private static final Logger logger = LoggerFactory.getLogger(RegistrePluginMockImpl.class);
-	
+
 	@Override
 	public String toString() {
 	    return getClass().getName() + "@" + Integer.toHexString(hashCode());

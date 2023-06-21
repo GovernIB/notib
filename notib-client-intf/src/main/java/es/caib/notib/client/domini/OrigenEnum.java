@@ -27,7 +27,7 @@ public enum OrigenEnum  implements Serializable {
 
     private static final Map<Integer, OrigenEnum> lookup;
     static {
-        lookup = new HashMap<Integer, OrigenEnum>();
+        lookup = new HashMap<>();
         for (OrigenEnum s: EnumSet.allOf(OrigenEnum.class))
             lookup.put(s.getValor(), s);
     }

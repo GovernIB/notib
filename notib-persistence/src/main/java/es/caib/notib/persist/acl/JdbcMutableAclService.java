@@ -14,6 +14,7 @@
  */
 package es.caib.notib.persist.acl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.security.acls.domain.AccessControlEntryImpl;
@@ -47,6 +48,7 @@ import java.util.List;
  * @author Ben Alex
  * @author Johannes Zlattinger
  */
+@Slf4j
 public class JdbcMutableAclService extends JdbcAclService implements NotibMutableAclService {
 	
 	private static final String CLASS_IDENTITY_ORACLE = "SELECT " + TableNames.SEQUENCE_CLASS + ".CURRVAL FROM DUAL";
@@ -94,9 +96,11 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
     public JdbcMutableAclService(DataSource dataSource, LookupStrategy lookupStrategy, AclCache aclCache) {
 
         super(dataSource, lookupStrategy);
-        try {
-            dialect = dataSource.getConnection().getMetaData().getDatabaseProductName().toLowerCase();
-        } catch (Exception ex) {}
+        try (var conn = dataSource.getConnection()){
+            dialect = conn.getMetaData().getDatabaseProductName().toLowerCase();
+        } catch (Exception ex) {
+            log.error("JdbcMutableAclService", ex);
+        }
         Assert.notNull(aclCache, "AclCache required");
         this.aclCache = aclCache;
     }
@@ -188,7 +192,7 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
         }
         jdbcTemplate.update(insertClass, type);
         Assert.isTrue(TransactionSynchronizationManager.isSynchronizationActive(), "Transaction must be running");
-        return new Long(jdbcTemplate.queryForObject(getClassIdentityQuery(), Long.class));
+        return jdbcTemplate.queryForObject(getClassIdentityQuery(), Long.class);
     }
 
     /**
@@ -224,7 +228,7 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
         }
         jdbcTemplate.update(insertSid, Boolean.valueOf(sidIsPrincipal), sidName);
         Assert.isTrue(TransactionSynchronizationManager.isSynchronizationActive(), "Transaction must be running");
-        return new Long(jdbcTemplate.queryForObject(getSidIdentityQuery(), Long.class));
+        return jdbcTemplate.queryForObject(getSidIdentityQuery(), Long.class);
     }
 
     public void deleteAcl(ObjectIdentity objectIdentity, boolean deleteChildren) throws ChildrenExistException {
@@ -296,7 +300,7 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
      */
     protected Long retrieveObjectIdentityPrimaryKey(ObjectIdentity oid) {
         try {
-            return new Long(jdbcTemplate.queryForObject(selectObjectIdentityPrimaryKey, Long.class, oid.getType(), oid.getIdentifier()));
+            return jdbcTemplate.queryForObject(selectObjectIdentityPrimaryKey, Long.class, oid.getType(), oid.getIdentifier());
         } catch (DataAccessException notFound) {
             return null;
         }

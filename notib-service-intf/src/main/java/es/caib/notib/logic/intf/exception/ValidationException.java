@@ -15,24 +15,21 @@ public class ValidationException extends RuntimeException {
 	private Class<?> objectClass;
 	private String error;
 	
-	public ValidationException(
-			Object objectId,
-			Class<?> objectClass,
-			String error) {
+	public ValidationException(Object objectId, Class<?> objectClass, String error) {
+
 		super(error);
 		this.objectId = objectId;
 		this.objectClass = objectClass;
 		this.error = error;
 	}
-	public ValidationException(
-			Object objectId,
-			String error) {
+	public ValidationException(Object objectId, String error) {
+
 		super(error);
 		this.objectId = objectId;
 		this.error = error;
 	}
-	public ValidationException(
-			String error) {
+	public ValidationException(String error) {
+
 		super(error);
 		this.error = error;
 	}
@@ -48,24 +45,12 @@ public class ValidationException extends RuntimeException {
 	}
 
 	public String getErrorInfo() {
-		if (objectClass != null && objectId != null) {
-			StringBuilder sb = new StringBuilder();
-			sb.append(error);
-			sb.append(" (");
-			if (objectClass != null)
-				sb.append(objectClass.getClass().getName());
-			else
-				sb.append("null");
-			sb.append("#");
-			if (objectId != null)
-				sb.append(objectId.toString());
-			else
-				sb.append("null");
-			sb.append(")");
-			return sb.toString();
-		} else {
+
+		if (objectClass == null || objectId == null) {
 			return error;
 		}
+		return error + " (" + objectClass.getName() + "#" + objectId + ")";
+
 	}
 
 }

@@ -13,6 +13,10 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class CaducitatHelper {
 
+	private CaducitatHelper() {
+		throw new IllegalStateException("CaducitatHelper no es pot instanciar");
+	}
+
 	public static Date sumarDiesLaborals(Date dataCaducitat, int diesCaducitat) {
 
 		var diaActual = Calendar.getInstance();
@@ -60,7 +64,7 @@ public class CaducitatHelper {
 	public static int getDiesEntreDates(Date inici, Date fi) {
 
 		var diff = fi.getTime() - inici.getTime();
-		return new Long(TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) +1).intValue();
+		return (int) (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) +1);
 	}
 
 }

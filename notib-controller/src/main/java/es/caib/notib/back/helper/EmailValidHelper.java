@@ -22,6 +22,10 @@ import java.util.regex.Pattern;
 @Slf4j
 public class EmailValidHelper {
 
+    private EmailValidHelper() {
+        throw new IllegalStateException("EmailValidHelper no es pot instanciar");
+    }
+
     public static final Pattern EMAIL_REGEX = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$", Pattern.CASE_INSENSITIVE);
     public static boolean isEmailValid(String email) {
 
@@ -116,57 +120,52 @@ public class EmailValidHelper {
 
         // Just because we can send mail to the domain, doesn't mean that the
         // address is valid, but if we can't, it's a sure sign that it isn't
-        if ( mxList.size() == 0 ) return false;
+        if (mxList.isEmpty()) return false;
 
         // Now, do the SMTP validation, try each mail exchanger until we get
         // a positive acceptance. It *MAY* be possible for one MX to allow
         // a message [store and forwarder for example] and another [like
         // the actual mail server] to reject it. This is why we REALLY ought
         // to take the preference into account.
-        for ( int mx = 0 ; mx < mxList.size() ; mx++ ) {
+        for (Object o : mxList) {
             boolean valid = false;
-            try {
-                int res;
+            try (var skt = new Socket((String) o, 25)) {
                 //
-                Socket skt = new Socket( (String) mxList.get( mx ), 25 );
-                BufferedReader rdr = new BufferedReader
-                        ( new InputStreamReader( skt.getInputStream() ) );
-                BufferedWriter wtr = new BufferedWriter
-                        ( new OutputStreamWriter( skt.getOutputStream() ) );
+                BufferedReader rdr = new BufferedReader(new InputStreamReader(skt.getInputStream()));
+                BufferedWriter wtr = new BufferedWriter(new OutputStreamWriter(skt.getOutputStream()));
+                var res = hear(rdr);
+                if (res != 220) throw new Exception("Invalid header");
+                say(wtr, "EHLO rgagnon.com");
 
-                res = hear( rdr );
-                if ( res != 220 ) throw new Exception( "Invalid header" );
-                say( wtr, "EHLO rgagnon.com" );
-
-                res = hear( rdr );
-                if ( res != 250 ) throw new Exception( "Not ESMTP" );
+                res = hear(rdr);
+                if (res != 250) throw new Exception("Not ESMTP");
 
                 // validate the sender address
-                say( wtr, "MAIL FROM: <tim@orbaker.com>" );
-                res = hear( rdr );
-                if ( res != 250 ) throw new Exception( "Sender rejected" );
+                say(wtr, "MAIL FROM: <tim@orbaker.com>");
+                res = hear(rdr);
+                if (res != 250) throw new Exception("Sender rejected");
 
-                say( wtr, "RCPT TO: <" + address + ">" );
-                res = hear( rdr );
+                say(wtr, "RCPT TO: <" + address + ">");
+                res = hear(rdr);
 
                 // be polite
-                say( wtr, "RSET" ); hear( rdr );
-                say( wtr, "QUIT" ); hear( rdr );
+                say(wtr, "RSET");
+                hear(rdr);
+                say(wtr, "QUIT");
+                hear(rdr);
 
-                if ( res != 250 )
-                    throw new Exception( "Address is not valid!" );
+                if (res != 250)
+                    throw new Exception("Address is not valid!");
 
                 valid = true;
                 rdr.close();
                 wtr.close();
-                skt.close();
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 // Do nothing but try next host
-               log.error("Error validant el mail", ex);
+                log.error("Error validant el mail", ex);
             }
-            finally {
-                if ( valid ) return true;
+            if (valid) {
+                return true;
             }
         }
         return false;

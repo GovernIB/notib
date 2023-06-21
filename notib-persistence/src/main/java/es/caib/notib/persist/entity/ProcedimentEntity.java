@@ -55,6 +55,7 @@ public class ProcedimentEntity extends ProcSerEntity {
 	
 	@Override
 	public boolean equals(Object obj) {
+
 		if (this == obj)
 			return true;
 		if (!super.equals(obj))
@@ -72,10 +73,7 @@ public class ProcedimentEntity extends ProcSerEntity {
 
 	@Override
 	public String toString() {
-		return "ProcedimentEntity{" +
-				"codi='" + codi + '\'' +
-				", nom='" + nom + '\'' +
-				'}';
+		return "ProcedimentEntity{codi='" + codi + '\'' + ", nom='" + nom + '\'' + '}';
 	}
 
 	private static final long serialVersionUID = 458331024861203562L;

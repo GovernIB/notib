@@ -31,9 +31,6 @@ import java.io.Serializable;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Persona implements Serializable {
 
-//    @XmlTransient
-//    @JsonIgnore
-//    private Long id;
     private boolean incapacitat;
     private InteressatTipus interessatTipus;
     @JsonDeserialize(using = TrimStringDeserializer.class)

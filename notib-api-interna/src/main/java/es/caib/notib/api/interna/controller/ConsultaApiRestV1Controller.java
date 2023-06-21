@@ -43,6 +43,7 @@ public class ConsultaApiRestV1Controller {
 	private EnviamentService enviamentService;
 	@Autowired
 	private NotificacioService notificacioService;
+	private static final String PATH = "/api/consulta/v1";
 	
 	@GetMapping(value="/comunicacions/{dniTitular}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "Consulta totes les comunicacions d'un titular donat el seu dni", description = "Retorna informació de totes les comunicacions d'un titular, i el seu estat")
@@ -60,7 +61,7 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 		
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(null)
 						.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
@@ -83,7 +84,7 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(null)
 								.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
@@ -106,7 +107,7 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(false)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
@@ -129,7 +130,7 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(false)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
@@ -152,7 +153,7 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(true)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
@@ -175,7 +176,7 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(true)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
@@ -229,7 +230,7 @@ public class ConsultaApiRestV1Controller {
 		}
 		certificacio = Arxiu.builder().error(true).missatgeError("No s'ha trobat la certificació.").build();
 		status = HttpStatus.BAD_REQUEST;
-		return new ResponseEntity<Arxiu>(certificacio, status);
+		return new ResponseEntity<>(certificacio, status);
 	}
 
 	@GetMapping(value="/justificant/{enviamentId}", produces = MediaType.APPLICATION_JSON_VALUE)

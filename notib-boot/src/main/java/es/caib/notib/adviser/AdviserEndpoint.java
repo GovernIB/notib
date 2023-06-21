@@ -23,16 +23,10 @@ public class AdviserEndpoint {
     @ResponsePayload
     public JAXBElement<ResultadoSincronizarEnvio> sincronizarEnvio(@RequestPayload JAXBElement<SincronizarEnvio> sincronizarEnvio) {
         var resp = adviserService.sincronizarEnvio(sincronizarEnvio.getValue());
-        return new JAXBElement<ResultadoSincronizarEnvio>(
+        return new JAXBElement<>(
                 new QName(AdviserServiceWsV2.NAMESPACE_URI, "resultadoSincronizarEnvio"),
                 ResultadoSincronizarEnvio.class,
                 resp);
     }
-
-//    @PayloadRoot(namespace = AdviserService.NAMESPACE_URI, localPart = "sincronizarEnvio")
-//    @ResponsePayload
-//    public ResultadoSincronizarEnvio sincronizarEnvio(@RequestPayload SincronizarEnvio sincronizarEnvio) {
-//        return adviserService.sincronizarEnvio(sincronizarEnvio);
-//    }
 
 }

@@ -29,8 +29,8 @@ import java.util.Properties;
 public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistrePlugin{
 	
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
-	
 	private static final String OFICINA_VIRTUAL_DEFAULT = "Oficina Virtual";
+	private static final String ERROR_TO_RESPOSTA_CONSULTA = "Error no controlat toRespostaConsultaRegistre ";
 
 	public RegistrePluginRegweb3Impl(Properties properties) {
 		super(properties);
@@ -53,7 +53,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			rc.setErrorDescripcio(e.getMessage());
 			return rc;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(ERROR_TO_RESPOSTA_CONSULTA, e);
 			rc.setErrorCodi("2");
 			rc.setErrorDescripcio(e.getMessage());
 			return rc;
@@ -65,8 +65,6 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 		var rc = new RespostaConsultaRegistre();
 		try {
-//			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-//			log.info(ow.writeValueAsString(arb.getInteresados()));
 			var asientoRegistralWs = getAsientoRegistralApi().obtenerAsientoRegistral(codiDir3Entitat, numeroRegistre, tipusOperacio, ambAnnexos);
 			return toRespostaConsultaRegistre(asientoRegistralWs);
 		} catch (WsI18NException e) {
@@ -78,7 +76,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			rc.setErrorDescripcio(e.getMessage());
 			return rc;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(ERROR_TO_RESPOSTA_CONSULTA, e);
 			rc.setErrorCodi("2");
 			rc.setErrorDescripcio(e.getMessage());
 			return rc;
@@ -91,9 +89,6 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		var rj = new RespostaJustificantRecepcio();
 		try {
 			return toRespostaJustificantRecepcio(getAsientoRegistralApi().obtenerJustificante(codiDir3Entitat, numeroRegistreFormatat, tipusRegistre));
-//			return toRespostaJustificantRecepcio(getRegistroSalidaApi().obtenerJustificante(
-//					codiDir3Entitat, 
-//					numeroRegistreFormatat));
 		} catch (WsI18NException e) {
 			rj.setErrorCodi("0");
 			rj.setErrorDescripcio("No s'ha pogut obtenir el justificant");
@@ -105,7 +100,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		} catch (Exception e) {
 			rj.setErrorCodi("2");
 			rj.setErrorDescripcio("Error obtenint el justificant");
-			e.printStackTrace();
+			log.error("Error no controlat toRespostaJustificantRecepcio ", e);
 			return rj;
 		}
 	}
@@ -166,9 +161,6 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		ar.setEntidadRegistralOrigenDenominacion(dto.getEntidadRegistralOrigenDenominacion());
 		ar.setEstado(dto.getEstado());
 		ar.setExpone(dto.getExpone());
-//		ar.setFechaRecepcion(dto.getFechaRecepcion());
-//		ar.setFechaRegistro(dto.getFechaRegistro());
-//		ar.setFechaRegistroDestino(dto.getFechaRegistroDestino());
 		ar.setId(dto.getId());
 		ar.setIdentificadorIntercambio(dto.getIdentificadorIntercambio());
 		ar.setIdioma(dto.getIdioma());
@@ -184,8 +176,6 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		ar.setReferenciaExterna(dto.getReferenciaExterna());
 		ar.setResumen(dto.getResumen());
 		ar.setSolicita(dto.getSolicita());
-		//ar.setTipoAsunto(dto.getTipoAsunto());
-		//ar.setTipoAsuntoDenominacion(dto.getTipoAsuntoDenominacion());
 		ar.setTipoDocumentacionFisicaCodigo(dto.getTipoDocumentacionFisicaCodigo());
 		ar.setTipoEnvioDocumentacion(dto.getTipoEnvioDocumentacion());
 		ar.setTipoRegistro(dto.getTipoRegistro());
@@ -227,7 +217,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		return ar;
 	}
 	
-	public RespostaAnotacioRegistre toRespostaAnotacioRegistre(IdentificadorWs iw) throws DatatypeConfigurationException {
+	public RespostaAnotacioRegistre toRespostaAnotacioRegistre(IdentificadorWs iw) {
 
 		var resposta = new RespostaAnotacioRegistre();
 		resposta.setData(new Timestamp(System.currentTimeMillis()));
@@ -287,6 +277,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 				break;
 			case 13:
 				resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_SIR);
+				break;
+			default:
+				log.error("AsientoRegistralWs no té un estat conegut estat -> " +  ar.getEstado());
 				break;
 		}
 		resposta.setEntitatCodi(ar.getEntidadCodigo());
@@ -349,7 +342,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			String nom = interesadoWsDto.getInteresado().getNombre();
 			String raoSocial = interesadoWsDto.getInteresado().getRazonSocial();
 			DatosInteresadoWs interessatDades = new DatosInteresadoWs();
-			interessatDades.setTipoInteresado(interesadoWsDto.getInteresado().getTipoInteresado().longValue());
+			interessatDades.setTipoInteresado(interesadoWsDto.getInteresado().getTipoInteresado());
 			interessatDades.setTipoDocumentoIdentificacion(interesadoWsDto.getInteresado().getTipoDocumentoIdentificacion());
 			interessatDades.setDocumento(interesadoWsDto.getInteresado().getDocumento());
 			interessatDades.setNombre(nom);
@@ -363,7 +356,6 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			interessatDades.setDireccionElectronica(interesadoWsDto.getInteresado().getDireccionElectronica());
 			interessatDades.setTelefono(interesadoWsDto.getInteresado().getTelefono());
 			interessatDades.setCanal(interesadoWsDto.getInteresado().getCanal());
-//			interessatDades.setDireCodigo(interesadoWsDto.getInteresado().getCodigoDire());
 			interessatDades.setLocalidad(interesadoWsDto.getInteresado().getLocalidad());
 			interessatDades.setPais(interesadoWsDto.getInteresado().getPais());
 			interessatDades.setProvincia(interesadoWsDto.getInteresado().getProvincia());
@@ -374,7 +366,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			String nom = interesadoWsDto.getRepresentante().getNombre();
 			String raoSocial = interesadoWsDto.getRepresentante().getRazonSocial();
 			DatosInteresadoWs representantDades = new DatosInteresadoWs();
-			representantDades.setTipoInteresado(interesadoWsDto.getRepresentante().getTipoInteresado().longValue());
+			representantDades.setTipoInteresado(interesadoWsDto.getRepresentante().getTipoInteresado());
 			representantDades.setTipoDocumentoIdentificacion(interesadoWsDto.getInteresado().getTipoDocumentoIdentificacion());
 			representantDades.setDocumento(interesadoWsDto.getRepresentante().getDocumento());
 			representantDades.setRazonSocial(raoSocial != null ? raoSocial : nom);
@@ -388,27 +380,12 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			representantDades.setDireccionElectronica(interesadoWsDto.getRepresentante().getDireccionElectronica());
 			representantDades.setTelefono(interesadoWsDto.getRepresentante().getTelefono());
 			representantDades.setCanal(interesadoWsDto.getRepresentante().getCanal());
-//			representantDades.setCodigoDire(interesadoWsDto.getRepresentante().getCodigoDire());
 			representantDades.setLocalidad(interesadoWsDto.getRepresentante().getLocalidad());
 			representantDades.setPais(interesadoWsDto.getRepresentante().getPais());
 			representantDades.setProvincia(interesadoWsDto.getRepresentante().getProvincia());
 			interessat.setRepresentante(representantDades);
 		}
 		return interessat;
-	}
-	
-	public static DocumentBuilder getDocumentBuilder() throws Exception {
-
-		try {
-			var dbf = DocumentBuilderFactory.newInstance();
-			dbf.setIgnoringComments(true);
-			dbf.setCoalescing(true);
-			dbf.setIgnoringElementContentWhitespace(true);
-			dbf.setValidating(false);
-			return dbf.newDocumentBuilder();
-    	} catch (Exception exc) {
-    		throw new Exception(exc.getMessage());
-    	}
 	}
 
 	@Override
@@ -437,7 +414,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		String nomOficinaVirtual = nomOficinaVirtualEntitat != null ? nomOficinaVirtualEntitat : OFICINA_VIRTUAL_DEFAULT;
 		try {
 			var oficines = toOficines(getInfoApi().listarOficinas(entitatCodi, autoritzacioValor));
-			if (oficines == null || oficines.isEmpty()) {
+			if (oficines.isEmpty()) {
 				return new Oficina();
 			}
 			Oficina oficinaVirtual = new Oficina();

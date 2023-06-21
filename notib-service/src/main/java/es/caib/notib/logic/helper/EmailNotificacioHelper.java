@@ -20,8 +20,6 @@ import java.util.*;
 @Component
 public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 
-	@Resource
-	private MessageHelper messageHelper;
 	@Resource ProcSerHelper procSerHelper;
 
 	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws Exception {
@@ -44,17 +42,15 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 			}
 			return null;
 		} catch (Exception ex) {
-			var errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
-			log.error(errorDescripció);
-			return errorDescripció;
+			var errorDescripcio = "No s'ha pogut avisar per correu electrònic: " + ex;
+			log.error(errorDescripcio);
+			return errorDescripcio;
 		}
 	}
 
 	private List<UsuariDto> obtenirCodiDestinatarisPerProcediment(NotificacioEntity notificacio) {
 
 		List<UsuariDto> destinataris = new ArrayList<>();
-//		ProcSerEntity proc = notificacio.getProcediment();
-
 		var usuaris = procSerHelper.findUsuaris(notificacio);
 		DadesUsuari dadesUsuari;
 		for (var usuari: usuaris) {
@@ -64,7 +60,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 			}
 			var user = usuariRepository.findById(usuari).orElse(null);
 			if (user == null || (user.isRebreEmailsNotificacio() && (!user.isRebreEmailsNotificacioCreats()
-				|| user.isRebreEmailsNotificacioCreats() && usuari.equals(notificacio.getCreatedBy().get().getCodi())))) {
+				|| user.isRebreEmailsNotificacioCreats() && usuari.equals(notificacio.getCreatedBy().orElseThrow().getCodi())))) {
 
 				var u = new UsuariDto();
 				u.setCodi(usuari);
@@ -206,21 +202,21 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 	protected String getMailPlainTextBody(NotificacioEntity notificacio) {
 
 		var appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
-		return
-				messageHelper.getMessage("notificacio.email.notificacio")+
-						"\t\t\t\t"+ Objects.toString(notificacio.getId(), "")+"\n"+
+		var t = "\t\t\t\t";
+		return messageHelper.getMessage("notificacio.email.notificacio")+
+						t+ Objects.toString(notificacio.getId(), "")+"\n"+
 						"\t"+messageHelper.getMessage("notificacio.email.notificacio.concepte") +
-						"\t\t\t\t"+ Objects.toString(notificacio.getConcepte(), "") +"\n"+
+						t+ Objects.toString(notificacio.getConcepte(), "") +"\n"+
 						"\t"+messageHelper.getMessage("notificacio.email.procediment")+
-						"\t\t\t\t"+ Objects.toString(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : "----", "")+"\n"+
+						t+ Objects.toString(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : "----", "")+"\n"+
 						"\t"+messageHelper.getMessage("notificacio.email.entitat")+
-						"\t\t\t\t"+ Objects.toString(notificacio.getEmisorDir3Codi(), "")+"\n"+
+						t+ Objects.toString(notificacio.getEmisorDir3Codi(), "")+"\n"+
 						"\t"+messageHelper.getMessage("notificacio.email.estat.nou") +
-						"\t\t\t\t"+ Objects.toString(notificacio.getEstat().name(), "") +"\n"+
+						t+ Objects.toString(notificacio.getEstat().name(), "") +"\n"+
 						"\t"+messageHelper.getMessage("notificacio.email.estat.motiu") +
-						"\t\t\t\t"+ Objects.toString(notificacio.getMotiu(), "") +"\n"+
+						t+ Objects.toString(notificacio.getMotiu(), "") +"\n"+
 						"\t"+messageHelper.getMessage("notificacio.email.notificacio.info") +
-						"\t\t\t\t"+ "<a href=\""+appBaseUrl+"/notificacio/"+notificacio.getId()+"/info\">"+ messageHelper.getMessage("notificacio.email.notificacio.detall") + "</a> \n"+
+						t+ "<a href=\""+appBaseUrl+"/notificacio/"+notificacio.getId()+"/info\">"+ messageHelper.getMessage("notificacio.email.notificacio.detall") + "</a> \n"+
 						"";
 	}
 	@Override

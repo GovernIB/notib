@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 /**
@@ -59,7 +58,7 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Consulta realitzada correctament", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RespostaConsultaEstatNotificacio.class, description = "Estat de la notificació")) }) })
 	@Parameter(name = "identificador", description = "Identificador de la notificació a consultar", required = true)
 	@GetMapping(value = {"/consultaEstatNotificacio/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(HttpServletRequest request) throws UnsupportedEncodingException {
+	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(HttpServletRequest request) {
 
 		var identificador = extractIdentificador(request);
 		try {
@@ -77,7 +76,7 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Consulta realitzada correctament", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RespostaConsultaEstatEnviament.class, description = "Estat de l'enviament")) }) })
 	@Parameter(name = "referencia", description = "Referència de la notificació a consultar", required = true)
 	@GetMapping(value = {"/consultaEstatEnviament/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public RespostaConsultaEstatEnviament consultaEstatEnviament(HttpServletRequest request) throws UnsupportedEncodingException {
+	public RespostaConsultaEstatEnviament consultaEstatEnviament(HttpServletRequest request) {
 
 		var referencia = extractIdentificador(request);
 		try {

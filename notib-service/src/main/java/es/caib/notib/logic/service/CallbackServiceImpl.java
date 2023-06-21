@@ -78,7 +78,7 @@ public class CallbackServiceImpl implements CallbackService {
 					}
 				} catch (Exception ex) {
 					errors++;
-					log.error(String.format("[Callback] L'enviament [Id: %d] ha provocat la següent excepcio:", id), ex);
+					log.error("[Callback] L'enviament [Id: " + id + "] ha provocat la següent excepcio:", ex);
 					callbackHelper.marcarEventNoProcessable(id, ex.getMessage(), ExceptionUtils.getStackTrace(ex));
 				}
 			}
@@ -90,12 +90,11 @@ public class CallbackServiceImpl implements CallbackService {
 					errors = Boolean.TRUE.equals(err) ? errors + 1 : errors;
 				} catch (Exception ex) {
 					errors++;
-					log.error(String.format("[Callback] L'enviament [Id: %d] ha provocat la següent excepcio:", key), ex);
+					log.error("[Callback] L'enviament [Id: " + key + "] ha provocat la següent excepcio:", ex);
 					callbackHelper.marcarEventNoProcessable(key, ex.getMessage(), ExceptionUtils.getStackTrace(ex));
 				}
 			}
 			log.info("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + pendents.size() + ", " + errors + " errors");
-
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
