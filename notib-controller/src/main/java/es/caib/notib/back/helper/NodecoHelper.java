@@ -20,6 +20,9 @@ public class NodecoHelper {
 	private static final String REQUEST_ATTRIBUTE_NODECO = "NodecoHelper.Nodeco";
 	private static final String SESSION_ATTRIBUTE_REQUESTPATHSMAP = "NodecoHelper.RequestPathsMap";
 
+	private NodecoHelper() {
+		throw new IllegalStateException("NodecoHelper no es pot instanciar");
+	}
 
 	public static boolean isNodeco(HttpServletRequest request) {
 		return request.getAttribute(REQUEST_ATTRIBUTE_NODECO) != null;
@@ -66,7 +69,7 @@ public class NodecoHelper {
 	}
 
 	private static void marcarNodeco(HttpServletRequest request) {
-		request.setAttribute(REQUEST_ATTRIBUTE_NODECO, new Boolean(true));
+		request.setAttribute(REQUEST_ATTRIBUTE_NODECO, true);
 	}
 
 }

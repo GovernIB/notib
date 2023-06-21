@@ -82,10 +82,6 @@ public class NotificacioBackHelper {
 		if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
 			model.addAttribute("entitat", entitatService.findAll());
 		}
-//		// Eliminam l'òrgan gestor entitat  --> Per ara el mantenim, ja que hi ha notificacions realitzades a l'entitat
-//		OrganGestorDto organEntitat = organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi());
-//		organsGestorsDisponibles.remove(organEntitat);
-
 		try {
 			organsDisponibles = organGestorService.getOrgansGestorsDisponiblesConsulta(entitatId, usuari, rol, organ);
 		} catch (Exception e) {

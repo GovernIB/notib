@@ -3,7 +3,9 @@ package es.caib.notib.persist.repository;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.persist.objectes.FiltreNotificacio;
 import es.caib.notib.persist.entity.EntitatEntity;
+import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import es.caib.notib.persist.entity.NotificacioTableEntity;
 import org.springframework.data.domain.Page;
@@ -458,5 +460,45 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("organs") List<String> organs,
 			@Param("isNullNotMassivaId") boolean isNullNotMassivaId,
 			@Param("notMassivaId") Long notMassivaId);
+
+	@Query("select ntf from NotificacioTableEntity ntf " +
+			"where " +
+			"    (:#{#filtre.entitatIdNull} = true or ntf.entitat.id = :#{#filtre.entitatId}) " +
+			" and  (:#{#filtre.isUsuari} = false or (" + // usuari
+			"		(:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}) and ntf.procedimentIsComu = false) " +	// Té permís sobre el procediment
+			"	or	(:#{#filtre.organsGestorsCodisNotibNull} = false and ntf.organCodi is not null " +
+			"												and (ntf.procedimentCodiNotib is null or (ntf.procedimentIsComu = true and ntf.procedimentRequirePermission = false)) " + // comunicacions o procediments comuns
+			"												and ntf.organCodi in (:#{#filtre.organsGestorsCodisNotib})) " +						// Té permís sobre l'òrgan
+			"   or 	((ntf.procedimentCodiNotib is null or ntf.procedimentIsComu = true) and ntf.usuariCodi = :#{#filtre.usuariCodi}) " +										// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
+			"   or 	(:#{#filtre.procedimentOrgansIdsNotibNull} = false and ntf.procedimentCodiNotib is not null and " +
+			"			CONCAT(ntf.procedimentCodiNotib, '-', ntf.organCodi) in (:#{#filtre.procedimentOrgansIdsNotib})" +
+			"		) " +	// Procediment comú amb permís de procediment-òrgan
+			"	)" +
+			"	and (ntf.grupCodi = null or (ntf.grupCodi in (:#{#filtre.grupsProcedimentCodisNotib})))" +
+			") " +
+			"and (:#{#filtre.isSuperAdmin} = false or ntf.entitat in (:#{#filtre.entitatsActives})) " +
+			"and (:#{#filtre.isAdminOrgan} = false or " +
+			"   (" +
+			"	(:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}))" +
+//			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " +
+			"   or (ntf.organCodi is not null and ntf.organCodi in (:#{#filtre.organs}))" +
+			"	)) " +
+			"and (:#{#filtre.notMassivaIdNull} = true or ntf.notificacioMassiva.id = :#{#filtre.notMassivaId}) " +
+			"and (:#{#filtre.enviamentTipusNull} = true or ntf.enviamentTipus = :#{#filtre.enviamentTipus}) " +
+			"and (:#{#filtre.concepteNull} = true or lower(ntf.concepte) like concat('%', lower(:#{#filtre.concepte}), '%')) " +
+			"and (:#{#filtre.estatNull} = true or bitand(ntf.estatMask, :#{#filtre.estatMask}) <> 0) " +
+			"and (:#{#filtre.dataIniciNull} = true or ntf.createdDate >= :#{#filtre.dataInici}) " +
+			"and (:#{#filtre.dataFiNull} = true or ntf.createdDate <= :#{#filtre.dataFi}) "+
+			"and (:#{#filtre.organCodiNull} = true or ntf.organCodi = :#{#filtre.organCodi}) " +
+			"and (:#{#filtre.procedimentNull} = true or ntf.procedimentCodi = :#{#filtre.procedimentCodi}) " +
+			"and (:#{#filtre.titularNull} = true or lower(ntf.titular) like concat('%', lower(:#{#filtre.titular}), '%'))" +
+			"and (:#{#filtre.tipusUsuariNull} = true or ntf.tipusUsuari = :#{#filtre.tipusUsuari}) " +
+			"and (:#{#filtre.numExpedientNull} = true or lower(ntf.numExpedient) like concat('%', lower(:#{#filtre.numExpedient}), '%')) " +
+			"and (:#{#filtre.creadaPerNull} = true or ntf.createdBy.codi = :#{#filtre.creadaPer}) " +
+			"and (:#{#filtre.identificadorNull} = true or ntf.notificaIds like concat('%', :#{#filtre.identificador}, '%')) " +
+			"and (:#{#filtre.nomesSenseErrors} = false or ntf.notificaErrorData is null) " +
+			"and (:#{#filtre.adminOrgan} = true or :#{#filtre.nomesAmbErrors} = false or ntf.notificaErrorData is not null) " +
+			"and (:#{#filtre.referenciaNull} = true or lower(ntf.referencia) like '%' || lower(:#{#filtre.referencia}) || '%')")
+	Page<NotificacioTableEntity> findAmbFiltre(FiltreNotificacio filtre, Pageable paginacio);
 
 }

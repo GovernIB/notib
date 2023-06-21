@@ -76,7 +76,7 @@ public class AvisEntity extends NotibAuditable<Long> {
 			built.dataFinal = dataFinal;
 			built.actiu = true;
 			built.avisNivell = avisNivell;
-			built.avisAdministrador = avisAdministrador != null ? avisAdministrador : false;
+			built.avisAdministrador = avisAdministrador != null && avisAdministrador;
 			built.entitatId = entitatId;
 		}
 		public AvisEntity build() {

@@ -45,7 +45,6 @@ import java.util.Map;
 public class JdbcAclService implements AclService {
     //~ Static fields/initializers =====================================================================================
 
-    //protected static final Log log = LogFactory.getLog(JdbcAclService.class);
     private static final String DEFAULT_SELECT_ACL_WITH_PARENT_SQL = "select obj.object_id_identity as obj_id, class.class as class "
         + "from " + TableNames.TABLE_OBJECT_IDENTITY + " obj, " + TableNames.TABLE_OBJECT_IDENTITY + " parent, " + TableNames.TABLE_CLASS + " class "
         + "where obj.parent_object = parent.id and obj.object_id_class = class.id "
@@ -75,17 +74,11 @@ public class JdbcAclService implements AclService {
                 new RowMapper<ObjectIdentity>() {
                     public ObjectIdentity mapRow(ResultSet rs, int rowNum) throws SQLException {
                         String javaType = rs.getString("class");
-                        Long identifier = new Long(rs.getLong("obj_id"));
-
+                        Long identifier = rs.getLong("obj_id");
                         return new ObjectIdentityImpl(javaType, identifier);
                     }
                 });
-
-        if (objects.size() == 0) {
-            return null;
-        }
-
-        return objects;
+        return !objects.isEmpty() ? objects : null;
     }
 
     public Acl readAclById(ObjectIdentity object, List<Sid> sids) throws NotFoundException {

@@ -11,8 +11,6 @@ import es.caib.notib.back.command.OrganGestorCommand;
 import es.caib.notib.back.helper.MessageHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -60,7 +58,9 @@ public class OrganNoRepetitValidator implements ConstraintValidator<OrganNoRepet
 			OrganGestorDto organGestor = null;
 			try {
 				organGestor = organGestorService.findByCodi(command.getEntitatId(), codi);
-			} catch (NotFoundException e) {	}
+			} catch (NotFoundException ex) {
+				log.error("Organ no trobat amb el codi " + codi + " per la entitat " + command.getEntitatId(), ex);
+			}
 			
 			if (organGestor != null && id == null) {
 				valid = false;
@@ -69,12 +69,11 @@ public class OrganNoRepetitValidator implements ConstraintValidator<OrganNoRepet
 			}
 			
 			// Si el llibre es desa a l'òrgan, llavors comprovar que s'ha informat
-			if (!entitatService.findById(command.getEntitatId()).isLlibreEntitat() && id == null) {
-				if (command.getLlibre() == null || command.getLlibre().isEmpty()) {
+			if (!entitatService.findById(command.getEntitatId()).isLlibreEntitat() && id == null && (command.getLlibre() == null || command.getLlibre().isEmpty())) {
 					valid = false;
 					context.disableDefaultConstraintViolation();
 					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("organgestor.validation.llibre.buit")).addConstraintViolation();
-				}
+
 			}
 
 			if (command.isEntregaCieActiva()) {

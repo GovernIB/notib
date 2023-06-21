@@ -65,15 +65,6 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
     private String deleteEntryByObjectIdentityForeignKey = "delete from " + TableNames.TABLE_ENTRY + " where acl_object_identity=?";
     private String deleteEntryByObjectIdentityAndSid = "delete from " + TableNames.TABLE_ENTRY + " where acl_object_identity=? and sid=?";
     private String deleteObjectIdentityByPrimaryKey = "delete from " + TableNames.TABLE_OBJECT_IDENTITY + " where id=?";
-    // Original
-    //private String classIdentityQuery = "call identity()";
-    //private String sidIdentityQuery = "call identity()";
-    // Oracle
-    //private String classIdentityQuery = "SELECT " + TableNames.SEQUENCE_CLASS + ".CURRVAL FROM DUAL";
-    //private String sidIdentityQuery = "SELECT " + TableNames.SEQUENCE_SID + ".CURRVAL FROM DUAL";
-    // PostgreSQL
-    //private String classIdentityQuery = "select currval(pg_get_serial_sequence('acl_class', 'id'))";
-    //private String sidIdentityQuery = "select currval(pg_get_serial_sequence('acl_sid', 'id'))";
     private String insertClass = "insert into " + TableNames.TABLE_CLASS + " (class) values (?)";
     private String insertEntry = "insert into " + TableNames.TABLE_ENTRY + " "
         + "(acl_object_identity, ace_order, sid, mask, granting, audit_success, audit_failure)"
@@ -367,28 +358,6 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
             throw new NotFoundException("Unable to locate ACL to update");
         }
     }
-
-    /**
-     * Sets the query that will be used to retrieve the identity of a newly created row in the <tt>acl_class</tt>
-     * table.
-     *
-     * @param classIdentityQuery the query, which should return the identifier. Defaults to <tt>call identity()</tt>
-     */
-//    public void setClassIdentityQuery(String classIdentityQuery) {
-//        Assert.hasText(classIdentityQuery, "New classIdentityQuery query is required");
-//        this.classIdentityQuery = classIdentityQuery;
-//    }
-
-//    /**
-//     * Sets the query that will be used to retrieve the identity of a newly created row in the <tt>acl_sid</tt>
-//     * table.
-//     *
-//     * @param sidIdentityQuery the query, which should return the identifier. Defaults to <tt>call identity()</tt>
-//     */
-//    public void setSidIdentityQuery(String sidIdentityQuery) {
-//        Assert.hasText(sidIdentityQuery, "New sidIdentityQuery query is required");
-//        this.sidIdentityQuery = sidIdentityQuery;
-//    }
 
     public void setDeleteEntryByObjectIdentityForeignKeySql(String deleteEntryByObjectIdentityForeignKey) {
         this.deleteEntryByObjectIdentityForeignKey = deleteEntryByObjectIdentityForeignKey;

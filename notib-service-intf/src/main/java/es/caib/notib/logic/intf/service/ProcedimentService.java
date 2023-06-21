@@ -41,9 +41,7 @@ public interface ProcedimentService {
 	 * @return El procediment creat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	ProcSerDto create(
-			Long entitatId,
-			ProcSerDataDto procediment);
+	ProcSerDto create(Long entitatId, ProcSerDataDto procediment);
 
 	/**
 	 * Actualitza la informació del procediment 
@@ -55,11 +53,7 @@ public interface ProcedimentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public ProcSerDto update(
-			Long entitatId,
-			ProcSerDataDto procediment,
-			boolean isAdmin,
-			boolean isAdminEntitat) throws NotFoundException;
+	public ProcSerDto update(Long entitatId, ProcSerDataDto procediment, boolean isAdmin, boolean isAdminEntitat) throws NotFoundException;
 
 	/**
 	 * Marca el procediment amb l'id especificat com a actiu/inactiu.
@@ -73,9 +67,7 @@ public interface ProcedimentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	public ProcSerDto updateActiu(
-			Long id,
-			boolean actiu) throws NotFoundException;
+	public ProcSerDto updateActiu(Long id, boolean actiu) throws NotFoundException;
 
 	/**
 	 * Esborra el procediment amb el mateix id que l'especificat.
@@ -87,10 +79,7 @@ public interface ProcedimentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public ProcSerDto delete(
-			Long entitatId,
-			Long id,
-			boolean isAdminEntitat) throws NotFoundException;
+	public ProcSerDto delete(Long entitatId, Long id, boolean isAdminEntitat) throws NotFoundException;
 
 	/**
 	 * Consulta un procediment donat el seu id.
@@ -104,10 +93,7 @@ public interface ProcedimentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public ProcSerDto findById(
-			Long entitatId,
-			boolean isAdministrador,
-			Long id) throws NotFoundException;
+	public ProcSerDto findById(Long entitatId, boolean isAdministrador, Long id) throws NotFoundException;
 	
 	/**
 	 * Consulta un procediment donat el seu codi i entitat.
@@ -120,9 +106,7 @@ public interface ProcedimentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	public ProcSerDto findByCodi(
-			Long entitatId,
-			String codiProcediment) throws NotFoundException;
+	public ProcSerDto findByCodi(Long entitatId, String codiProcediment) throws NotFoundException;
 
 	/**
 	 * Consulta els procediments d'una entitat.
@@ -143,14 +127,10 @@ public interface ProcedimentService {
 	 * @return Els procediments associats a l'òrgan gestor, o a algund els seus descendents.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ProcSerSimpleDto> findByOrganGestorIDescendents(
-			Long entitatId, 
-			OrganGestorDto organGestor);
+	public List<ProcSerSimpleDto> findByOrganGestorIDescendents(Long entitatId, OrganGestorDto organGestor);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ProcSerDto> findByOrganGestorIDescendentsAndComu(
-			Long entitatId,
-			OrganGestorDto organGestor);
+	public List<ProcSerDto> findByOrganGestorIDescendentsAndComu(Long entitatId, OrganGestorDto organGestor);
 	
 	
 	/**
@@ -169,14 +149,8 @@ public interface ProcedimentService {
 	 * @return La pàgina amb les notificacions.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public PaginaDto<ProcSerFormDto> findAmbFiltrePaginat(
-			Long entitatId,
-			boolean isUsuari,
-			boolean isUsuariEntitat,
-			boolean isAdministrador,
-			OrganGestorDto organGestorActual,
-			ProcSerFiltreDto filtre,
-			PaginacioParamsDto paginacioParams);
+	public PaginaDto<ProcSerFormDto> findAmbFiltrePaginat(Long entitatId, boolean isUsuari, boolean isUsuariEntitat, boolean isAdministrador,
+														  OrganGestorDto organGestorActual, ProcSerFiltreDto filtre, PaginacioParamsDto paginacioParams);
 	
 	/**
 	 * Llistat amb tots els procediments.
@@ -219,12 +193,6 @@ public interface ProcedimentService {
 	 * @param entitatId
 	 * @return Procediments with the given permission for the given user
 	 */
-//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-//	List<ProcSerSimpleDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
-//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-//	List<ProcSerSimpleDto> findProcedimentServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
-//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-//	List<ProcSerSimpleDto> findProcedimentServeisWithPermisMenu(Long entitatId, String usuariCodi, PermisEnum permis);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<ProcSerDto> findProcedimentsSenseGrups(Long entitatId);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
@@ -387,9 +355,7 @@ public interface ProcedimentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public ProcSerGrupDto grupDelete(
-			Long entitatId,
-			Long GrupId) throws NotFoundException;
+	public ProcSerGrupDto grupDelete(Long entitatId, Long grupId) throws NotFoundException;
 
 	/**
 	 * Comprova si l'usuari actual té permisos de notificació sobre algun procediment
@@ -397,9 +363,7 @@ public interface ProcedimentService {
 	 * @return true / false
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public boolean hasPermisProcediment(
-			Long procedimentId,
-			PermisEnum permis);
+	public boolean hasPermisProcediment(Long procedimentId, PermisEnum permis);
 	
 	/**
 	 * buida els procediments en cache per entitat
@@ -410,25 +374,15 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public void refrescarCache(
 			EntitatDto entitat);
-
 	
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	public List<ProcSerDto> findProcedimentsByOrganGestor(String organGestorCodi);
 
 	@PreAuthorize("hasRole('tothom')")
-	public List<ProcSerDto> findProcedimentsByOrganGestorWithPermis(
-			Long entitatId,
-			String organGestorCodi,
-			List<String> grups,
-			PermisEnum permis);
+	public List<ProcSerDto> findProcedimentsByOrganGestorWithPermis(Long entitatId, String organGestorCodi, List<String> grups, PermisEnum permis);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(
-			Long entitatId,
-			String organCodi,
-			Long organFiltre,
-			RolEnumDto rol,
-			PermisEnum permis);
+	List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(Long entitatId, String organCodi, Long organFiltre, RolEnumDto rol, PermisEnum permis);
 
 	/**
 	 * Obté un llistat de tots els procediments notificables d'un organ gestor concret
@@ -442,11 +396,7 @@ public interface ProcedimentService {
 	 *
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(
-			Long entitatId,
-			String organCodi,
-			RolEnumDto rol,
-			TipusEnviamentEnumDto enviamentTipus);
+	List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol, TipusEnviamentEnumDto enviamentTipus);
 
 	/**
 	 * Consulta si l'usuari té permís de notificació a tots els procediments comuns per a algún òrgan gestor.

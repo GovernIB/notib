@@ -25,31 +25,33 @@ public class ValidConcepteValidator implements ConstraintValidator<ValidConcepte
 	@Override
 	public boolean isValid(final Object value, final ConstraintValidatorContext context) {
 
-		boolean valid = true;
+		boolean valid;
 		try {
 			var fieldValue = BeanUtils.getProperty(value,  fieldName);
-			if (fieldValue == null || fieldValue.isEmpty())
-				valid = true;
+			if (fieldValue == null || fieldValue.isEmpty()) {
+				return true;
+			}
 			valid = validacioConcepte(fieldValue,context);
 		} catch (final Exception ex) {
 			log.error("Error en la validació del concepte", ex);
 			valid = false;
 		}
-		if (!valid)
+		if (!valid) {
 			context.disableDefaultConstraintViolation();
-
+		}
 		return valid;
 	}
+
 	// Validació del concepte
 	private static final String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;";
 
 	@SuppressWarnings("deprecation")
 	private static boolean validacioConcepte(String concepte, final ConstraintValidatorContext context) {
 
-		var concepte_chars = concepte.toCharArray();
+		var concepteChars = concepte.toCharArray();
 		var esCaracterValid = true;
-		for (var i = 0; esCaracterValid && i < concepte_chars.length; i++) {
-			esCaracterValid = !(CONTROL_CARACTERS.indexOf(concepte_chars[i]) < 0);
+		for (var i = 0; esCaracterValid && i < concepteChars.length; i++) {
+			esCaracterValid = CONTROL_CARACTERS.indexOf(concepteChars[i]) >= 0;
 			if (!esCaracterValid) {
 				var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.concepte");
 				context.buildConstraintViolationWithTemplate(msg).addNode("concepte").addConstraintViolation();

@@ -14,8 +14,6 @@ import es.caib.notib.logic.intf.exception.RegistreNotificaException;
  */
 public interface SchedulledService {
 
-//	void restartSchedulledTasks();
-
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
 	 * a Notific@.

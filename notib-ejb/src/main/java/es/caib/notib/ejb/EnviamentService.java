@@ -48,20 +48,8 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(
-			Long entitatId,
-			RolEnumDto rol,
-			String organGestorCodi,
-			String usuariCodi,
-			NotificacioEnviamentFiltreDto filtre,
-			PaginacioParamsDto paginacio) throws ParseException {
-		return getDelegateService().enviamentFindByEntityAndFiltre(
-				entitatId,
-				rol,
-				organGestorCodi,
-				usuariCodi,
-				filtre,
-				paginacio);
+	public PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioEnviamentFiltreDto filtre, PaginacioParamsDto paginacio) throws ParseException {
+		return getDelegateService().enviamentFindByEntityAndFiltre(entitatId, rol, organGestorCodi, usuariCodi, filtre, paginacio);
 	}
 
 
@@ -97,12 +85,8 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public void columnesUpdate(
-			Long entitatId,
-			ColumnesDto columnes) {
-		getDelegateService().columnesUpdate(
-				entitatId,
-				columnes);
+	public void columnesUpdate(Long entitatId, ColumnesDto columnes) {
+		getDelegateService().columnesUpdate(entitatId, columnes);
 	}
 
 	@Override
@@ -113,15 +97,8 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public FitxerDto exportacio(
-			Long entitatId,
-			Collection<Long> enviamentIds,
-			String format)
-			throws IOException, NotFoundException, ParseException {
-		return getDelegateService().exportacio(
-				entitatId,
-				enviamentIds,
-				format);
+	public FitxerDto exportacio(Long entitatId, Collection<Long> enviamentIds, String format) throws IOException, NotFoundException, ParseException {
+		return getDelegateService().exportacio(entitatId, enviamentIds, format);
 	}
 
 	@Override

@@ -124,10 +124,7 @@ public interface EnviamentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	FitxerDto exportacio(
-			Long entitatId,
-			Collection<Long> enviamentIds,
-			String format) throws IOException, NotFoundException, ParseException;
+	FitxerDto exportacio(Long entitatId, Collection<Long> enviamentIds, String format) throws IOException, NotFoundException, ParseException;
 	
 	/**
 	 * Crea les columnes s'han de mostrar
@@ -147,9 +144,7 @@ public interface EnviamentService {
 	 * @return columnes que s'han de visualitzar.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public void columnesUpdate(
-			Long entitatId,
-			ColumnesDto columnes);
+	public void columnesUpdate(Long entitatId, ColumnesDto columnes);
 	
 	/**
 	 * Obté les columnes visibles per un usuari i entitat

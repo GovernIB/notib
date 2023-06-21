@@ -27,7 +27,6 @@ public class PropertiesHelper extends Properties {
 	private boolean llegirSystem = true;
 
 
-
 	public static PropertiesHelper getProperties() {
 		return getProperties(null);
 	}
@@ -72,36 +71,36 @@ public class PropertiesHelper extends Properties {
 	}
 
 	public boolean getAsBoolean(String key) {
-		return new Boolean(getProperty(key)).booleanValue();
+		return Boolean.parseBoolean(getProperty(key));
 	}
 	public boolean getAsBoolean(String key, boolean defaultValue) {
-		return new Boolean(getProperty(key, Boolean.toString(defaultValue))).booleanValue();
+		return Boolean.parseBoolean(getProperty(key, Boolean.toString(defaultValue)));
 	}
 	public int getAsInt(String key) {
-		return new Integer(getProperty(key)).intValue();
+		return Integer.parseInt(getProperty(key));
 	}
 	public int getAsInt(String key, int defaultValue) {
-		return new Integer(getProperty(key, Integer.toString(defaultValue))).intValue();
+		return Integer.parseInt(getProperty(key, Integer.toString(defaultValue)));
 	}
 	public long getAsLong(String key) {
-		return new Long(getProperty(key)).longValue();
+		return Long.parseLong(getProperty(key));
 	}
 	public long getAsLong(String key, long defaultValue) {
-		return new Long(getProperty(key, Long.toString(defaultValue))).longValue();
+		return Long.parseLong(getProperty(key, Long.toString(defaultValue)));
 	}
 	public float getAsFloat(String key) {
-		return new Float(getProperty(key)).floatValue();
+		return Float.parseFloat(getProperty(key));
 	}
 	public float getAsFloat(String key, float defaultValue) {
-		return new Float(getProperty(key, Float.toString(defaultValue))).floatValue();
+		return Float.parseFloat(getProperty(key, Float.toString(defaultValue)));
 	}
 	public double getAsDouble(String key, double defaultValue) {
-		return new Double(getProperty(key, Double.toString(defaultValue))).doubleValue();
+		return Double.parseDouble(getProperty(key, Double.toString(defaultValue)));
 	}
 
 	public Map<String, String> findByPrefix(String prefix) {
 
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
 		if (llegirSystem) {
 			for (Object key: System.getProperties().keySet()) {
 				if (key instanceof String) {

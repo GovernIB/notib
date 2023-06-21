@@ -20,6 +20,7 @@ public class DocumentIdentitatValidator implements ConstraintValidator<DocumentI
 	
 	@Override
 	public void initialize(final DocumentIdentitat constraintAnnotation) {
+		// init
 	}
 
 	@Override
@@ -42,8 +43,9 @@ public class DocumentIdentitatValidator implements ConstraintValidator<DocumentI
 		}
 		String nums = dni.substring(0, 8);
 		String lletra = dni.substring(8);
-		return lletra.equals(lletraNif(new Integer(nums).intValue()));
+		return lletra.equals(lletraNif(Integer.parseInt(nums)));
 	}
+
 	// Validació del NIE
 	private static final Pattern niePattern = Pattern.compile("[XYZ][0-9]{7}[A-Z]");
 	private static boolean validacioNie(String nie) {
@@ -52,7 +54,7 @@ public class DocumentIdentitatValidator implements ConstraintValidator<DocumentI
 		}
 		String nums = (char)(nie.charAt(0) - 40) + nie.substring(1, 8);
 		String lletra = nie.substring(8);
-		return lletra.equals(lletraNif(new Integer(nums).intValue()));
+		return lletra.equals(lletraNif(Integer.parseInt(nums)));
 	}
 	// Validació del NIF
 	// Només s'admeten nombres com a caràcter de control
@@ -93,12 +95,10 @@ public class DocumentIdentitatValidator implements ConstraintValidator<DocumentI
 			final int digitoD = (digitoE > 0) ? (10 - digitoE) : 0;
 			final char letraIni = nif.charAt(0);
 			final char caracterFin = nif.charAt(8);
-			final boolean esControlValido =
-					// El caràcter de control es vàlid com a lletra?
+			return// El caràcter de control es vàlid com a lletra?
 					(CONTROL_SOLO_NUMEROS.indexOf(letraIni) < 0 && CONTROL_NUMERO_A_LETRA.charAt(digitoD) == caracterFin) ||
 							// El caràcter de control es vàlid com a dígit?
 							(CONTROL_SOLO_LETRAS.indexOf(letraIni) < 0 && digitoD == Character.digit(caracterFin, 10));
-			return esControlValido;
 		} else {
 			return false;
 		}
