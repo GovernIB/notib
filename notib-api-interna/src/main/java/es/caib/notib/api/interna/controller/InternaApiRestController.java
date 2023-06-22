@@ -5,6 +5,7 @@ package es.caib.notib.api.interna.controller;
 
 import es.caib.notib.api.interna.openapi.model.AppInfoApi;
 import es.caib.notib.client.domini.AppInfo;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -65,6 +66,7 @@ public class InternaApiRestController {
 		return appInfo;
 	}
 
+	@Hidden
 	@GetMapping(value = {"/rest/securedAppinfo"})
 	public AppInfo getAppInfoSecured(HttpServletRequest request) throws IOException {
 		return getAppInfo(request);

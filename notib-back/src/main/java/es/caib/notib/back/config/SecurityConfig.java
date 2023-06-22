@@ -12,9 +12,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,22 +24,27 @@ import org.springframework.security.core.authority.mapping.SimpleAttributes2Gran
 import org.springframework.security.core.authority.mapping.SimpleMappableAttributesRetriever;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedGrantedAuthoritiesUserDetailsService;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails;
 import org.springframework.security.web.authentication.preauth.j2ee.J2eeBasedPreAuthenticatedWebAuthenticationDetailsSource;
 import org.springframework.security.web.authentication.preauth.j2ee.J2eePreAuthenticatedProcessingFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * Configuració de seguretat.
@@ -48,7 +55,7 @@ import java.util.Set;
 @Slf4j
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
 	@Value("${es.caib.notib.security.mappableRoles:NOT_SUPER,NOT_ADMIN,NOT_CARPETA,NOT_APL,tothom}")
 	private String mappableRoles;
@@ -65,22 +72,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/webjars/**"
 	};
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http.authenticationProvider(preauthAuthProvider()).
-		jee().j2eePreAuthenticatedProcessingFilter(preAuthenticatedProcessingFilter());
-		http.logout().
-		addLogoutHandler(getLogoutHandler()).
-		logoutRequestMatcher(new AntPathRequestMatcher("/logout")).
-		invalidateHttpSession(true).
-		logoutSuccessUrl("/").
-		permitAll(false);
-		http.authorizeRequests().
-		antMatchers(AUTH_WHITELIST).permitAll().
-		anyRequest().authenticated();
-		http.cors();
-		http.csrf().disable();
-		http.headers().frameOptions().disable();
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		return http
+				.cors(withDefaults())
+				.csrf((csrf) -> csrf.disable())
+				.addFilterBefore(preAuthenticatedProcessingFilter(), BasicAuthenticationFilter.class)
+				.authenticationProvider(preauthAuthProvider())
+				.logout((lo) -> lo.addLogoutHandler(getLogoutHandler())
+						.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+						.invalidateHttpSession(true).logoutSuccessUrl("/")
+						.permitAll(false))
+				.authorizeRequests((authz) -> authz.antMatchers(AUTH_WHITELIST)
+						.permitAll()
+						.anyRequest().authenticated())
+				.headers((hd) -> hd.frameOptions().disable())
+				.build();
+	}
+
+	@Bean
+	protected AuthenticationManager authenticationManager() throws Exception {
+		final List<AuthenticationProvider> providers = new ArrayList<>(1);
+		providers.add(preauthAuthProvider());
+		return new ProviderManager(providers);
 	}
 
 	@Bean
