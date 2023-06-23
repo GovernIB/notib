@@ -30,15 +30,14 @@ import static org.junit.Assert.*;
 public class ClientRestv2Test extends ClientBaseTest {
 
 	
-//	private static final String URL = "http://localhost:8080/notib";
-	private static final String URL = "http://localhost:8280/notibapi";
-	private static final String USERNAME = "admin";
-	private static final String PASSWORD = "admin";
+//	private static final String URL = "http://localhost:8280/notibapi";
+//	private static final String USERNAME = "admin";
+//	private static final String PASSWORD = "admin";
 
 
-//	private static final String URL = "https://dev.caib.es/notib";
-//	private static final String USERNAME = "$ripea_notib";
-//	private static final String PASSWORD = "ripea_notib";
+	private static final String URL = "https://dev.caib.es/notibapi";
+	private static final String USERNAME = "$ripea_notib";
+	private static final String PASSWORD = "ripea_notib";
 
 	// Indicar si el servidor esta configurat en mode síncron
 	private static final boolean SYNC_MODE = false;
@@ -56,8 +55,8 @@ public class ClientRestv2Test extends ClientBaseTest {
 	public void setUp() throws Exception {
 
 //		String keystorePath = ClientRestv2Test.class.getResource("/es/caib/notib/client/truststore.jks").toURI().getPath();
-//		System.setProperty("javax.net.ssl.trustStore", keystorePath);
-//		System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
+		System.setProperty("javax.net.ssl.trustStore", "/home/siona/Feina/Conf/Certificats/truststore.jks");
+		System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
 
 		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, true); //tomcat = true jboss = false/true
 	}

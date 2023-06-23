@@ -264,8 +264,8 @@ public class OrganGestorServiceBean implements OrganGestorService {
 //	}
 
 	@Override
-	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper) {
-		delegate.setServicesForSynctest(procSerSyncHelper, pluginHelper);
+	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper, Object integracioHelper) {
+		delegate.setServicesForSynctest(procSerSyncHelper, pluginHelper, integracioHelper);
 	}
 
 	@Override

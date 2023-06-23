@@ -30,10 +30,9 @@ import static org.junit.Assert.assertNotNull;
 public class ClientRestTestConsulta {
 
 	
-	private static final String URL = "http://localhost:8280/notib";
+	private static final String URL = "http://localhost:8280/notibapi";
 	private static final String USERNAME = "admin";
 	private static final String PASSWORD = "admin";
-	private static final boolean BASIC_AUTH = false;
 	private static final String CLAU_XIFRAT = "P0rt4FI8";
 	
 //	private static final String URL = "http://dev.caib.es/notib";
@@ -47,8 +46,7 @@ public class ClientRestTestConsulta {
 		client = NotificacioRestClientFactory.getRestClient(
 				URL,
 				USERNAME,
-				PASSWORD,
-				BASIC_AUTH);
+				PASSWORD);
 	}
 	
 	@Test

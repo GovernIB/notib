@@ -29,7 +29,7 @@ public class ClientRestTest extends ClientBaseTest {
 //	private static final String PASSWORD = "admin";
 
 
-	private static final String URL = "https://dev.caib.es/notib";
+	private static final String URL = "https://dev.caib.es/notibapi";
 	private static final String USERNAME = "$ripea_notib";
 	private static final String PASSWORD = "ripea_notib";
 
@@ -53,8 +53,7 @@ public class ClientRestTest extends ClientBaseTest {
 		client = NotificacioRestClientFactory.getRestClient(
 				URL,
 				USERNAME,
-				PASSWORD,
-				false);
+				PASSWORD);
 	}
 
 	@Test

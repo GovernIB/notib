@@ -3,6 +3,7 @@ package es.caib.notib.core.helper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.service.OrganGestorService;
@@ -51,6 +52,8 @@ public class OrganGestorSyncHelperIT {
     private PluginHelper pluginHelper;
     @Mock
     private ProcSerSyncHelper procSerSyncHelper;
+    @Mock
+    private IntegracioHelper integracioHelper;
 
     private static final String UNITATS_JSON = "[" +
             "{\"codigo\": \"A002\", \"denominacion\": \"B002\", \"descripcionEstado\":\"V\", \"superior\": \"A000\", \"hijos\": [], \"historicosUO\": []}," +
@@ -100,13 +103,14 @@ public class OrganGestorSyncHelperIT {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        organGestorService.setServicesForSynctest(procSerSyncHelper, pluginHelper);
+        organGestorService.setServicesForSynctest(procSerSyncHelper, pluginHelper, integracioHelper);
         cacheHelper.setPluginHelper(pluginHelper);
         ObjectMapper mapper = new ObjectMapper();
 
         Mockito.when(pluginHelper.unitatsOrganitzativesFindByPare(Mockito.anyString(), Mockito.anyString(), Mockito.nullable(Date.class), Mockito.nullable(Date.class))).thenReturn(mapper.readValue(UNITATS_JSON, new TypeReference<List<NodeDir3>>(){}));
         Mockito.doNothing().when(procSerSyncHelper).actualitzaProcediments(Mockito.any(EntitatDto.class));
         Mockito.doNothing().when(procSerSyncHelper).actualitzaServeis(Mockito.any(EntitatDto.class));
+        Mockito.doNothing().when(integracioHelper).addAccioOk(Mockito.any(IntegracioInfo.class));
         Mockito.when(pluginHelper.dadesUsuariConsultarAmbCodi(Mockito.anyString())).thenReturn(null);
 
     }
@@ -137,7 +141,8 @@ public class OrganGestorSyncHelperIT {
 
         // ÒRGANS
         // Vigents
-        Assert.assertEquals(18, organsVigents.size());
+        Assert.assertEquals(19, organsVigents.size());
+        Assert.assertTrue(conteOrgan(organsVigents, "EA0004518"));
         Assert.assertTrue(conteOrgan(organsVigents, "A000"));
         Assert.assertTrue(conteOrgan(organsVigents, "A001"));
         Assert.assertTrue(conteOrgan(organsVigents, "A002"));
@@ -201,6 +206,8 @@ public class OrganGestorSyncHelperIT {
                 }
             }
             switch (organ.getCodi()) {
+                case "EA0004518":
+                    break;
                 case "A000":
                     Assert.assertEquals(0, permisos.size());
                     break;

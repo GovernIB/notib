@@ -15,7 +15,7 @@ public class DriverManager {
         if (driver_name == null) {
             driver_name = "geckodriver";
             String os = System.getProperty("os.name");
-            if (os != null && os.isBlank() && os.toLowerCase().startsWith("windows")) {
+            if (os != null && os.trim().length() > 0 && os.toLowerCase().startsWith("windows")) {
                 driver_name += ".exe";
             }
         }

@@ -53,8 +53,7 @@ public class ClientRestTest extends ClientBaseTest {
 		client = NotificacioRestClientFactory.getRestClient(
 				URL,
 				USERNAME,
-				PASSWORD,
-				false);
+				PASSWORD);
 	}
 
 	@Test

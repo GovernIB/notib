@@ -230,7 +230,7 @@ public interface OrganGestorService {
 
 
 	// For testing:
-	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper);
+	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper, Object integracioHelper);
 
 	void sincronitzarOrganNomMultidioma(List<Long> idEntitat);
 }

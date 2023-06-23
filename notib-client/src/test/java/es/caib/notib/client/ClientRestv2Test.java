@@ -28,14 +28,14 @@ public class ClientRestv2Test extends ClientBaseTest {
 
 	
 //	private static final String URL = "http://localhost:8080/notib";
-	private static final String URL = "http://localhost:8280/notibapi";
-	private static final String USERNAME = "admin";
-	private static final String PASSWORD = "admin";
+//	private static final String URL = "http://localhost:8280/notibapi";
+//	private static final String USERNAME = "admin";
+//	private static final String PASSWORD = "admin";
 
 
-//	private static final String URL = "https://dev.caib.es/notib";
-//	private static final String USERNAME = "$ripea_notib";
-//	private static final String PASSWORD = "ripea_notib";
+	private static final String URL = "https://dev.caib.es/notibapi";
+	private static final String USERNAME = "$ripea_notib";
+	private static final String PASSWORD = "ripea_notib";
 
 	// Indicar si el servidor esta configurat en mode síncron
 	private static final boolean SYNC_MODE = false;
@@ -781,7 +781,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	public void consultaEstatNotificacioTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 //		String referencia = "43573ddf-4f26-40d9-ae80-5bc9dcafbb96";
-		String referencia = "4a125809-08a9-4073-8eaf-edfe1aef45c3";
+		String referencia = "02c8c4fb-d83d-4686-a21b-ddb30d43c5bf";
 
 		// When
 		RespostaConsultaEstatNotificacioV2 respostaConsultaEstatNotificacio = client.consultaEstatNotificacio(referencia);
@@ -797,10 +797,10 @@ public class ClientRestv2Test extends ClientBaseTest {
 	}
 
 	@Test
-	public void consultaEstatEnviamentTest() throws DatatypeConfigurationException, IOException, DecoderException {
+	public void consultaEstatEnviamentTest() throws DatatypeConfigurationException, IOException, DecoderException, InterruptedException {
 		// Given
 //		String referencia = "a4256bed-292b-4ad1-bb84-05f8f14a7f1c";
-		String referencia = "8f7271df-e62a-4754-945c-9e52259f646e";
+		String referencia = "f791cfe9-8e79-4af0-9935-0b72d1a6b6cb";
 
 		// When
 		RespostaConsultaEstatEnviamentV2 respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);

@@ -31,28 +31,28 @@ public class RemesesSelenium extends NotibSelenium {
 
     private void filtrar() {
 
-        var tipus = new Select(driver.findElement(By.id("enviamentTipus")));
+        Select tipus = new Select(driver.findElement(By.id("enviamentTipus")));
         tipus.selectByIndex(2);
-        var concepte = driver.findElement(By.id("concepte"));
+        WebElement concepte = driver.findElement(By.id("concepte"));
         concepte.sendKeys("test");
-        var estat = new Select(driver.findElement(By.id("estat")));
+        Select estat = new Select(driver.findElement(By.id("estat")));
         estat.selectByIndex(9);
-        var organ = new Select(driver.findElement(By.id("organGestor")));
+        Select organ = new Select(driver.findElement(By.id("organGestor")));
         organ.selectByValue("18445"); // organ amb codi A04035942
-        var button = driver.findElement(By.name("accio"));
+        WebElement button = driver.findElement(By.name("accio"));
         button.click();
     }
 
     private String detallTaula() {
 
         esperar();
-        var files = driver.findElements(By.tagName("tr"));
+        List<WebElement> files = driver.findElements(By.tagName("tr"));
         int size = files.size()- 1;
-        var r = new Random();
-        var inici = 1;
-        var fi = size;
-        var resultat = r.nextInt(fi-inici) + inici;
-        var fila = files.get(resultat);
+        Random r = new Random();
+        Integer inici = 1;
+        Integer fi = size;
+        Integer resultat = r.nextInt(fi-inici) + inici;
+        WebElement fila = files.get(resultat);
         fila.click();
         return fila.getAttribute("id").split("_")[1];
     }
@@ -60,8 +60,8 @@ public class RemesesSelenium extends NotibSelenium {
     private void tancar(String id) {
 
         get(urlBase + "/modal/notificacio/" + id + "/info");
-        var cancelar = driver.findElements(By.tagName("a"));
-        var a = cancelar.get(cancelar.size()-1);
+        List<WebElement> cancelar = driver.findElements(By.tagName("a"));
+        WebElement a = cancelar.get(cancelar.size()-1);
         esperar();
         a.click();
     }
