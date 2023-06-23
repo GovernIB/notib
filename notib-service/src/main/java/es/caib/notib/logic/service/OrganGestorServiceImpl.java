@@ -1467,10 +1467,10 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	// Sync Testing:
 	@Override
-	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper) {
-
+	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper, Object integracioHelper) {
 		this.procSerSyncHelper = (ProcSerSyncHelper)procSerSyncHelper;
 		this.pluginHelper = (PluginHelper)pluginHelper;
+		this.integracioHelper = (IntegracioHelper) integracioHelper;
 	}
 
 	@Override

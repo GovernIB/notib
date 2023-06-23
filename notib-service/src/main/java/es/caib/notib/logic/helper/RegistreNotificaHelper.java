@@ -134,6 +134,28 @@ public class RegistreNotificaHelper {
 		log.info(" [REG-NOT] Fi procés Registrar-Notificar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
 	}
 
+	private void crearAssentamentRegistral(NotificacioEntity not, NotificacioEnviamentEntity env, boolean isSirActivat, boolean isComunicacio) {
+
+		//Crea assentament registral + Notific@
+		log.info(" >>> Nou assentament registral...");
+		RespostaConsultaRegistre arbResposta;
+		try {
+
+			var inclouDocuments = isInclouDocuments(isComunicacio, isSirActivat, isAnyEnviamentsAAdministracio(not));
+			var generarJustificant = isGenerarJustificant(isComunicacio, isSirActivat, isAnyEnviamentsAAdministracio(not));
+			Set<NotificacioEnviamentEntity> enviamentSet = new HashSet<>();
+			enviamentSet.add(env);
+			var arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(not, enviamentSet, inclouDocuments);
+			var op = isSirActivat ? (isComunicacio ? 2L : 1L) : null; //### [SIR-DESACTIVAT = registre normal, SIR-ACTIVAT = notificació/comunicació]
+
+
+		} catch (Exception ex) {
+			arbResposta = new RespostaConsultaRegistre();
+			arbResposta.setErrorCodi("ERROR");
+			arbResposta.setErrorDescripcio(ex.getMessage());
+		}
+	}
+
 	private void crearAssentamentRegistralPerNotificacio(NotificacioEntity notificacioEntity, String dir3Codi, boolean isComunicacio, boolean isSirActivat,
 														IntegracioInfo info, long t0, NotificacioEnviamentEntity enviament){
 

@@ -232,8 +232,8 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@PermitAll
-	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper) {
-		getDelegateService().setServicesForSynctest(procSerSyncHelper, pluginHelper);
+	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper, Object integracioHelper) {
+		getDelegateService().setServicesForSynctest(procSerSyncHelper, pluginHelper, integracioHelper);
 	}
 
 	@Override

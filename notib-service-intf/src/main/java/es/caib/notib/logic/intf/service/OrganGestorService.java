@@ -240,12 +240,9 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	boolean hasPermisOrgan(Long entitatId, String organCodi, PermisEnum permis);
 
-//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-//	List<CodiValorDto> getOrgansAmbPermis(Long entitatId, PermisEnum permis);
-
-
 	// For testing:
-	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper);
+	void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper, Object integracioHelper);
+
 
 	void sincronitzarOrganNomMultidioma(List<Long> ids);
 

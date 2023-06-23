@@ -133,6 +133,7 @@ public class OrganGestorHelper {
 			}
 		}
 		progres.setProgres(22);
+		obsoleteUnitats.addAll(organGestorRepository.findByEntitatNoVigent(entitat));
 		// Definint tipus de transició
 		log.debug(prefix + "Sincronitzant unitats obsoletes");
 		nombreUnitatsProcessades = 0;
