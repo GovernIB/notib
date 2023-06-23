@@ -21,6 +21,8 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+	<script src="<c:url value="/js/printThis.js"/>"></script>
+	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<not:modalHead />
 	<script>
 		var itervalProgres;
@@ -159,6 +161,8 @@
 			});
 		}
 
+		let crearPdf = () => $('#divPredict').printThis();
+
 	</script>
 	<style type="text/css">
 		.info-TITOL {
@@ -291,7 +295,7 @@
 </head>
 <body>
 
-	<div class="panel-group prediccio">
+	<div id="divPredict" class="panel-group prediccio">
 	
 		<!-- If this is first sincronization it shows all currently vigent unitats that will be created in db  -->
 <%--		<c:if test="${isFirstSincronization}">--%>
@@ -609,6 +613,7 @@
 	</c:set>
 	<form:form id="formSync" action="${formAction}" method="post" cssClass="form-horizontal" role="form">
 		<div id="modal-botons">
+			<a id="pdfBtn" class="btn btn-default" onclick="crearPdf()"><spring:message code="comu.boto.descarregar.pdf" /></a>
 			<button id="autobtn" type="submit" class="btn btn-success" data-noloading="true"
 				<c:if test="${isAllEmpty and !isFirstSincronization}"><c:out value="disabled='disabled'"/></c:if>>
 				<span class="fa fa-save"></span>
