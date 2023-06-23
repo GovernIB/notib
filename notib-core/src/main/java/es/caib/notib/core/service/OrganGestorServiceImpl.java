@@ -30,7 +30,6 @@ import es.caib.notib.core.api.dto.organisme.UnitatOrganitzativaDto;
 import es.caib.notib.core.api.exception.NoPermisosException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.SistemaExternException;
-import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
@@ -1916,9 +1915,10 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	// Sync Testing:
 	@Override
-	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper) {
+	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper, Object integracioHelper) {
 		this.procSerSyncHelper = (ProcSerSyncHelper)procSerSyncHelper;
 		this.pluginHelper = (PluginHelper)pluginHelper;
+		this.integracioHelper = (IntegracioHelper) integracioHelper;
 	}
 
 	@Override
