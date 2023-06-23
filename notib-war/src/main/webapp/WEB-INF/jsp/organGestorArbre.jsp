@@ -114,7 +114,6 @@
                 });
 
                 $("#organ-boto-update-oficines").on("click", () => bloquejar());
-                $("#organ-boto-update-noms").on("click", () => bloquejar());
             });
             // Bloquejar la pantalla
             function bloquejar() {
@@ -209,17 +208,15 @@
             </div>
             <div class="col-md-7">
                 <div style="padding-bottom: 10px; text-align: right">
-                    <a id="organ-boto-update-noms" class="btn btn-default" href="organgestor/sync/noms/arbre">
-                        <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.noms"/>
-                    </a>
                     <c:if test="${setOficina}">
                         <a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines/ARBRE"
-                                data-refresh-pagina="true" data-maximized="false">
-                                <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
+                            title='<spring:message code="organgestor.list.boto.actualitzar.oficines.tooltip"/>'
+                            data-refresh-pagina="true" data-maximized="false">
+                            <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
                         </a>
                     </c:if>
-                    <a id="organ-boto-update"
-                       class="btn btn-default" href="organgestor/sync/dir3"
+                    <a id="organ-boto-update" title='<spring:message code="organgestor.list.boto.actualitzar.tots.tooltip"/>'
+                       class="btn btn-success" href="organgestor/sync/dir3"
                        data-toggle="modal"
                        data-refresh-pagina="true"
                        data-maximized="false">
