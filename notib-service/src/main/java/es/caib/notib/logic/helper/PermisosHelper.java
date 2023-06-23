@@ -720,9 +720,6 @@ public class PermisosHelper {
 			progres.setProgres(63 + (nombreUnitatsProcessades++ * 18)/nombreUnitatsTotal);
 			var organOrigen = getOrgan(organsDividits, unitat.getCodi());
 			if (organOrigen != null) {
-				for (var organDesti : organOrigen.getNous()) {
-					duplicaPermisos(classname, organOrigen, organDesti);
-				}
 				continue;
 			}
 			organOrigen = getOrgan(organsFusionats, unitat.getCodi());
