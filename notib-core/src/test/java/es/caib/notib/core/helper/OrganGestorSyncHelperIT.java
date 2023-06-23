@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.service.OrganGestorService;
@@ -112,6 +113,7 @@ public class OrganGestorSyncHelperIT {
         Mockito.doNothing().when(procSerSyncHelper).actualitzaServeis(Mockito.any(EntitatDto.class));
         Mockito.doNothing().when(integracioHelper).addAccioOk(Mockito.any(IntegracioInfo.class));
         Mockito.when(pluginHelper.dadesUsuariConsultarAmbCodi(Mockito.anyString())).thenReturn(null);
+        Mockito.when(pluginHelper.llistarLlibreOrganisme(Mockito.anyString(), Mockito.anyString())).thenReturn(new LlibreDto());
 
     }
 
@@ -226,10 +228,8 @@ public class OrganGestorSyncHelperIT {
                     break;
                 case "A101":
                 case "A102":
-                    Assert.assertEquals(1, permisos.size());
-                    Assert.assertNotNull(permisRole);
-                    Assert.assertTrue(permisRole.isRead());
-                    Assert.assertTrue(permisRole.isProcessar());
+                    Assert.assertEquals(0, permisos.size());
+                    Assert.assertNull(permisRole);
                     break;
                 case "A103":
                     Assert.assertEquals(2, permisos.size());
@@ -254,14 +254,9 @@ public class OrganGestorSyncHelperIT {
                     break;
                 case "A109":
                 case "A110":
-                    Assert.assertEquals(2, permisos.size());
-                    Assert.assertNotNull(permisAdmin);
-                    Assert.assertNotNull(permisRole);
-                    Assert.assertTrue(permisAdmin.isRead());
-                    Assert.assertTrue(permisAdmin.isAdministration());
-                    Assert.assertTrue(permisAdmin.isAdministrador());
-                    Assert.assertTrue(permisRole.isAdministrador());
-                    Assert.assertTrue(permisRole.isProcessar());
+                    Assert.assertEquals(0, permisos.size());
+                    Assert.assertNull(permisAdmin);
+                    Assert.assertNull(permisRole);
                     break;
                 case "A114":
                     Assert.assertEquals(2, permisos.size());
@@ -269,27 +264,20 @@ public class OrganGestorSyncHelperIT {
                     Assert.assertNotNull(permisRole);
                     Assert.assertTrue(permisAdmin.isRead());
                     Assert.assertTrue(permisAdmin.isAdministration());
-                    Assert.assertTrue(permisAdmin.isProcessar());
                     Assert.assertTrue(permisAdmin.isNotificacio());
-                    Assert.assertTrue(permisRole.isAdministrador());
                     Assert.assertTrue(permisRole.isProcessar());
                     Assert.assertTrue(permisRole.isComuns());
                     Assert.assertTrue(permisRole.isComunicacioSir());
                     break;
                 case "A115":
                 case "A116":
-                    Assert.assertEquals(2, permisos.size());
-                    Assert.assertNotNull(permisAdmin);
-                    Assert.assertNotNull(permisRole);
-                    Assert.assertTrue(permisAdmin.isAdministration());
-                    Assert.assertTrue(permisAdmin.isProcessar());
-                    Assert.assertTrue(permisRole.isAdministrador());
+                    Assert.assertEquals(0, permisos.size());
+                    Assert.assertNull(permisAdmin);
+                    Assert.assertNull(permisRole);
                     break;
                 case "A118":
-                    Assert.assertEquals(1, permisos.size());
-                    Assert.assertNotNull(permisAdmin);
-                    Assert.assertTrue(permisAdmin.isAdministrador());
-                    Assert.assertTrue(permisAdmin.isProcessar());
+                    Assert.assertEquals(0, permisos.size());
+                    Assert.assertNull(permisAdmin);
                     break;
                 case "A119":
                     Assert.assertEquals(1, permisos.size());

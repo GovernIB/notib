@@ -880,16 +880,14 @@ public class PermisosHelper {
 		int nombreUnitatsProcessades = 0;
 
 		// Actualitzam permisos en l'ordre en que ens arriben del Dir3
+		OrganGestorEntity organOrigen;
 		for(NodeDir3 unitat: unitatsWs) {
 
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.permisos.unitat", new Object[] {unitat.getCodi()}));
 			progres.setProgres(63 + (nombreUnitatsProcessades++ * 18)/nombreUnitatsTotal);
 
-			OrganGestorEntity organOrigen = getOrgan(organsDividits, unitat.getCodi());
+			organOrigen = getOrgan(organsDividits, unitat.getCodi());
 			if (organOrigen != null) {
-				for (OrganGestorEntity organDesti : organOrigen.getNous()) {
-					duplicaPermisos(classname, organOrigen, organDesti);
-				}
 				continue;
 			}
 
@@ -907,7 +905,6 @@ public class PermisosHelper {
 			if (organOrigen != null) {
 				OrganGestorEntity organDesti = organOrigen.getNous().get(0);
 				duplicaPermisos(classname, organOrigen, organDesti);
-				continue;
 			}
 		}
 	}
@@ -960,6 +957,9 @@ public class PermisosHelper {
 			if (ownerSid == null)
 				ownerSid = objectIdentityAntic.getOwnerSid();
 			permisosOrigen.addAll(aclEntryRepository.findByAclObjectIdentity(objectIdentityAntic));
+		}
+		if (ownerSid == null) {
+			return;
 		}
 		duplicaEntradesPermisos(classname, organDesti, ownerSid, permisosOrigen, permisosDesti);
 		aclEntryRepository.save(permisosDesti);
