@@ -306,7 +306,6 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		}
 
 //						assertEquals(notificacio.getDocument().getHash(), notificacioEntity.getDocument().getHash()); // no sé que fa
-		assertEquals(notificacioDto.getDocument().getUrl(), notificacioEntity.getDocument().getUrl());
 		assertEquals(notificacioDto.getDocument().isNormalitzat(), notificacioEntity.getDocument().getNormalitzat());
 //			assertEquals(notificacio.getDocument().isGenerarCsv(), notificacioEntity.getDocument().isGenerarCsv());
 		assertEquals(notificacioDto.getDocument().getUuid(), notificacioEntity.getDocument().getUuid());

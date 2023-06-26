@@ -1,26 +1,16 @@
 package es.caib.notib.logic.service.ws;
 
-import com.google.common.base.Strings;
+import com.codahale.metrics.Timer;
 import es.caib.notib.client.domini.DocumentV2;
-import es.caib.notib.client.domini.EntregaDeh;
-import es.caib.notib.client.domini.EntregaPostal;
-import es.caib.notib.client.domini.EntregaPostalVia;
-import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentReferencia;
-import es.caib.notib.client.domini.EnviamentTipus;
-import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
-import es.caib.notib.client.domini.NotificaServeiTipusEnumDto;
 import es.caib.notib.client.domini.NotificacioEstatEnum;
 import es.caib.notib.client.domini.NotificacioV2;
-import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.RespostaAlta;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
-import es.caib.notib.logic.helper.ConversioTipusHelper;
-import es.caib.notib.logic.helper.EnviamentHelper;
 import es.caib.notib.logic.helper.EnviamentTableHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.MessageHelper;
@@ -31,34 +21,41 @@ import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.RegistreNotificaHelper;
+import es.caib.notib.logic.intf.dto.EntitatTipusEnumDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
+import es.caib.notib.logic.intf.dto.SignatureInfoDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
-import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.service.GrupService;
+import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.persist.entity.AplicacioEntity;
+import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
+import es.caib.notib.persist.entity.ProcSerEntity;
 import es.caib.notib.persist.entity.ProcSerOrganEntity;
 import es.caib.notib.persist.entity.ProcedimentEntity;
+import es.caib.notib.persist.entity.ServeiEntity;
+import es.caib.notib.persist.entity.cie.EntregaCieEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
-import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.PersonaRepository;
 import es.caib.notib.persist.repository.ProcSerOrganRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
+import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
@@ -68,55 +65,62 @@ import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import es.caib.plugins.arxiu.api.DocumentTipus;
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
+import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.*;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 //@RunWith(JUnitParamsRunner.class)
+@ExtendWith({MockitoExtension.class})
 public class NotificacioServiceWsV2Test {
 
 	@Rule
 	public MockitoRule rule = MockitoJUnit.rule();
 
 	protected static final String ENTITAT_DIR3CODI = "A04003003";
-	protected static final String ORGAN_CODI = "A04003003";
+	protected static final String ORGAN_CODI = "A04035965";
+	protected static final String ORGAN_POSTAL_CODI = "A04035966";
 	protected static final String LLIBRE = "L16";
 	protected static final String OFICINA = "O00009390";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292";
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "874510";
+	protected static final String IDENTIFICADOR_PROCEDIMENT_POSTAL = "8745100";
 	protected static final String IDIOMA = "ca";
 	protected static final String USUARI_CODI = "e18225486x";
+	protected static final String APP_CODI = "mockApp";
 //	protected static final NotificaDomiciliConcretTipus TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipus.NACIONAL;
 	protected static final NotificaDomiciliConcretTipus TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipus.SENSE_NORMALITZAR;
 
-	
+	// Autowired del servei
 	@Mock
 	private EntitatRepository entitatRepository;
 	@Mock
 	private NotificacioRepository notificacioRepository;
 	@Mock
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
-//	@Mock
-//	private ProcedimentRepository procedimentRepository;
 	@Mock
 	private ProcSerRepository procSerRepository;
 	@Mock
@@ -126,23 +130,17 @@ public class NotificacioServiceWsV2Test {
 	@Mock
 	private DocumentRepository documentRepository;
 	@Mock
-	private AplicacioRepository aplicacioRepository;
-	@Mock
 	private OrganGestorRepository organGestorRepository;
 	@Mock
-	private ConversioTipusHelper conversioTipusHelper;
-	@Mock 
+	private UsuariRepository usuariRepository;
+	@Mock
 	private PermisosHelper permisosHelper;
-	@Mock 
-	private NotificacioEventRepository notificacioEventRepository;
 	@Mock
 	private NotificaHelper notificaHelper;
 	@Mock
-	private AuditHelper auditHelper;
+	private EnviamentTableHelper enviamentTableHelper;
 	@Mock
 	private PluginHelper pluginHelper;
-	@Mock
-	private GrupService grupService;
 	@Mock
 	private RegistreNotificaHelper registreNotificaHelper;
 	@Mock
@@ -154,291 +152,275 @@ public class NotificacioServiceWsV2Test {
 	@Mock
 	private NotificacioTableHelper notificacioTableHelper;
 	@Mock
-	private OrganGestorCachable organGestorCachable;
-	@Mock
 	private NotificacioHelper notificacioHelper;
+	@Mock
+	private JustificantService justificantService;
+	@Mock
+	private ConfigHelper configHelper;
+	@Mock
+	private AuditHelper auditHelper;
+	@Mock
+	private MessageHelper messageHelper;
+
+	// Autowired de NotificacioValidator
+	@Mock
+	private AplicacioRepository aplicacioRepository;
+	@Mock
+	private GrupService grupService;
+	@Mock
+	private OrganGestorCachable organGestorCachable;
+
+	// Mocks entitats
 	@Mock
 	private LlibreDto llibreOrganMock;
 	@Mock
 	private Map<String, NodeDir3> arbreUnitatsMock;
 	@Mock
 	private List<OficinaDto> oficinesSIRMock;
-//	@Mock
-//	private EntitatEntity entitatMock;
+	//	@Mock
+	//	private EntitatEntity entitatMock;
 	@Mock
 	private Authentication auth;
 	@Mock
 	private NotificacioEnviamentEntity enviamentSavedMock;
 	@Mock
 	private NotificacioEventEntity notificacioEventEntityMock;
-	@Mock
-	private ConfigHelper configHelper;
-	@Mock
-	private MessageHelper messageHelper;
-	@Mock
-	private EnviamentTableHelper enviamentTableHelper;
-	@Mock
-	private EnviamentHelper enviamentHelper;
 
-	private AplicacioEntity aplicacio;
-	
-	private NotificacioEventEntity notificacioEventEntity = null;
-	
+//	@Spy
+//	private NotificacioValidator notificacioValidator; // = new NotificacioValidator(aplicacioRepository, grupService, messageHelper, cacheHelper, organGestorCachable, configHelper);
+
+
+	private EntitatEntity entitatMock;
+	private OrganGestorEntity organGestorMock;
+	private OrganGestorEntity organGestorPostalMock;
+	private ProcedimentEntity procedimentMock;
+	private ProcedimentEntity procedimentPostalMock;
+	private ProcedimentEntity procedimentComuMock;
+	private ServeiEntity serveiMock;
+	private ProcSerOrganEntity procedimentOrganMock;
+	private AplicacioEntity aplicacioMock;
+	private DadesUsuari dadesUsuariMock;
+
+	private DocumentV2 document;
+
+	private Document documentArxiuMock;
+	private DocumentEntity documentEntityMock;
+
 	@InjectMocks
 	NotificacioServiceWsV2 notificacioService = new NotificacioServiceWsImplV2();
-	
-	@Before
-	public void setUp() {
-		Mockito.when(configHelper.getConfigAsInteger(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
-		Mockito.when(configHelper.getConfigAsInteger(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
-		Mockito.when(configHelper.getConfigAsLong(Mockito.eq("es.caib.notib.notificacio.document.size"))).thenReturn(10485760L);
-//		Mockito.when(configHelper.getAsLong(Mockito.eq("es.caib.notib.notificacio.document.total.size"))).thenReturn(15728640L);
-		Mockito.when(configHelper.getConfigAsBoolean(Mockito.eq("es.caib.notib.document.metadades.por.defecto"))).thenReturn(true);
-		Mockito.when(auth.getName()).thenReturn("mockedName");
-		Mockito.when(messageHelper.getMessage("error.validacio.nom.titular.longitud.max")).thenReturn("error.validacio.nom.titular.longitud.max");
-		Mockito.when(messageHelper.getMessage("error.validacio.llinatge1.titular.longitud.max")).thenReturn("error.validacio.llinatge1.titular.longitud.max");
-		Mockito.when(messageHelper.getMessage("error.validacio.llinatge2.titular.longitud.max")).thenReturn("error.validacio.llinatge2.titular.longitud.max");
-		Mockito.when(messageHelper.getMessage("error.validacio.nom.destinatari.longitud.max")).thenReturn("error.validacio.nom.destinatari.longitud.max");
-		Mockito.when(messageHelper.getMessage("error.validacio.llinatge1.destinatari.longitud.max")).thenReturn("error.validacio.llinatge1.destinatari.longitud.max");
-		Mockito.when(messageHelper.getMessage("error.validacio.llinatge2.destinatari.longitud.max")).thenReturn("error.validacio.llinatge2.destinatari.longitud.max");
-//		Mockito.when(messageHelper.getMessage(Mockito.anyString())).thenReturn("Missatge traduit");
+
+ 	@BeforeEach
+	public void setUp() throws IOException {
+
+		((NotificacioServiceWsImplV2)notificacioService).setNotificacioValidator(new NotificacioValidator(aplicacioRepository, grupService, messageHelper, cacheHelper, organGestorCachable, configHelper));
+		entitatMock = EntitatEntity.hiddenBuilder().codi("GOIB").nom("Govern de les Illes Balears").tipus(EntitatTipusEnumDto.GOVERN).dir3Codi(ENTITAT_DIR3CODI).activa(true).apiKey("xxxxxx").ambEntregaDeh(false).llibreEntitat(false).oficinaEntitat(false).build();
+		aplicacioMock = AplicacioEntity.builder().entitat(entitatMock).activa(true).usuariCodi(APP_CODI).callbackUrl("http://callback.url").build();
+		organGestorMock = OrganGestorEntity.builder().codi(ORGAN_CODI).nom("Direcció General de Política Lingüística").entitat(entitatMock).build();
+		organGestorPostalMock = OrganGestorEntity.builder().codi(ORGAN_POSTAL_CODI).nom("Direcció General de Política Lingüística").entregaCie(new EntregaCieEntity()).entitat(entitatMock).build();
+		procedimentMock = ProcedimentEntity.builder().codi(IDENTIFICADOR_PROCEDIMENT).nom("Convocatòria d'ajuts destinats a la premsa de caràcter local").entitat(entitatMock).retard(0).caducitat(10).agrupar(false).organGestor(organGestorMock).comu(false).requireDirectPermission(false).build();
+		procedimentPostalMock = ProcedimentEntity.builder().codi(IDENTIFICADOR_PROCEDIMENT_POSTAL).nom("Convocatòria d'ajuts destinats a la premsa de caràcter local").entitat(entitatMock).retard(0).caducitat(10).agrupar(false).organGestor(organGestorPostalMock).comu(false).requireDirectPermission(false).build();
+		procedimentComuMock = ProcedimentEntity.builder().codi(IDENTIFICADOR_PROCEDIMENT).nom("Convocatòria d'ajuts destinats a la premsa de caràcter local").entitat(entitatMock).retard(0).caducitat(10).agrupar(false).comu(true).requireDirectPermission(false).build();
+		((ProcSerEntity)procedimentMock).setTipus(ProcSerTipusEnum.PROCEDIMENT);
+		((ProcSerEntity)procedimentComuMock).setTipus(ProcSerTipusEnum.PROCEDIMENT);
+		serveiMock = ServeiEntity.builder()
+				.codi(IDENTIFICADOR_PROCEDIMENT)
+				.nom("SERVEI - Convocatòria d'ajuts destinats a la premsa de caràcter local")
+				.entitat(entitatMock)
+				.retard(0)
+				.caducitat(10)
+				.agrupar(false)
+				.organGestor(organGestorMock)
+				.comu(false)
+				.requireDirectPermission(false)
+				.build();
+		((ProcSerEntity)serveiMock).setTipus(ProcSerTipusEnum.SERVEI);
+		procedimentOrganMock = ProcSerOrganEntity.getBuilder(procedimentMock, organGestorMock).build();
+		document = DocumentV2.builder().arxiuNom("document.pdf").uuid("00000000-0000-0000-0000-000000000000").normalitzat(false).build();;
+		documentArxiuMock = initDocument(document.getUuid());
+		documentEntityMock = DocumentEntity.getBuilderV2(
+				document.getUuid(),
+				document.getArxiuNom(),
+				document.isNormalitzat(),
+				document.getUuid(),
+				document.getCsv(),
+				documentArxiuMock.getContingut().getTipusMime(),
+				documentArxiuMock.getContingut().getTamany(),
+				document.getOrigen(),
+				document.getValidesa(),
+				document.getTipoDocumental(),
+				document.getModoFirma()).build();
+		dadesUsuariMock = DadesUsuari.builder().codi("e18225486x").nom("Usuari").llinatges("Llinatge1 Llinatge2").nif("12345678Z").email("usuari@limit.es").build();
+
+		lenient().when(auth.getName()).thenReturn(APP_CODI);
+		lenient().doNothing().when(metricsHelper).fiMetrica(nullable(Timer.Context.class));
+		lenient().when(metricsHelper.iniciMetrica()).thenReturn(null);
+		lenient().doNothing().when(integracioHelper).addAplicacioAccioParam(nullable(IntegracioInfo.class), nullable(Long.class));
+		lenient().doNothing().when(integracioHelper).addAccioError(nullable(IntegracioInfo.class), nullable(String.class));
+		lenient().when(entitatRepository.findByDir3Codi(anyString())).thenReturn(entitatMock);
+		lenient().when(aplicacioRepository.findByEntitatIdAndUsuariCodi(nullable(Long.class), anyString())).thenReturn(aplicacioMock);
+		lenient().when(procSerRepository.findByCodiAndEntitat(eq(IDENTIFICADOR_PROCEDIMENT), any(EntitatEntity.class))).thenReturn(procedimentMock);
+		lenient().when(procSerRepository.findByCodiAndEntitat(eq(IDENTIFICADOR_PROCEDIMENT_POSTAL), any(EntitatEntity.class))).thenReturn(procedimentPostalMock);
+//		lenient().when(procSerRepository.findByCodiAndEntitat(anyString(), any(EntitatEntity.class))).thenReturn(procedimentMock);
+		lenient().when(procSerRepository.findByCodiAndEntitat(eq("COMU"), any(EntitatEntity.class))).thenReturn(procedimentComuMock);
+		lenient().when(organGestorRepository.findByCodi(eq(ORGAN_CODI))).thenReturn(organGestorMock);
+		lenient().when(organGestorRepository.findByCodi(eq(ORGAN_POSTAL_CODI))).thenReturn(organGestorPostalMock);
+		lenient().when(procedimentOrganRepository.findByProcSerIdAndOrganGestorId(anyLong(), anyLong())).thenReturn(procedimentOrganMock);
+		lenient().when(documentRepository.saveAndFlush(any(DocumentEntity.class))).thenReturn(documentEntityMock);
+		lenient().when(pluginHelper.arxiuGetImprimible(anyString(), anyBoolean())).thenReturn(documentArxiuMock.getContingut());
+		lenient().when(pluginHelper.arxiuDocumentConsultar(anyString(), nullable(String.class), anyBoolean(), anyBoolean())).thenReturn(documentArxiuMock);
+		lenient().when(notificacioRepository.saveAndFlush(any(NotificacioEntity.class))).thenAnswer(n -> n.getArgument(0));
+		lenient().when(notificacioEnviamentRepository.saveAndFlush(any(NotificacioEnviamentEntity.class))).thenReturn(NotificacioEnviamentEntity.builder().notificaReferencia(UUID.randomUUID().toString()).build());
+		lenient().when(personaRepository.save(any(PersonaEntity.class))).thenAnswer(p -> p.getArgument(0));
+		lenient().when(messageHelper.getMessage(anyString())).thenAnswer(code -> "[" + code.getArgument(0).toString().substring(16) + "] Error");
+		lenient().when(messageHelper.getMessage(anyString(), any(Locale.class))).thenAnswer(code -> "[" + code.getArgument(0).toString().substring(16) + "] Error");
+		lenient().when(messageHelper.getMessage(anyString(), nullable(Object[].class), any(Locale.class))).thenAnswer(code -> "[" + code.getArgument(0).toString().substring(16) + "] Error");
+		lenient().when(cacheHelper.findUsuariAmbCodi(Mockito.anyString())).thenReturn(dadesUsuariMock);
+		lenient().when(cacheHelper.unitatPerCodi(eq(ORGAN_CODI))).thenReturn(OrganGestorDto.builder().codi(ORGAN_CODI).build());
+		lenient().when(configHelper.getConfigAsLong(eq("es.caib.notib.notificacio.document.size"))).thenReturn(10485760L);
+		lenient().when(configHelper.getConfigAsLong(eq("es.caib.notib.notificacio.document.total.size"))).thenReturn(15728640L);
+		lenient().when(configHelper.getConfigAsBoolean(eq("es.caib.notib.comunicacions.sir.internes"))).thenReturn(false);
+		lenient().when(configHelper.getConfigAsBoolean(eq("es.caib.notib.destinatari.multiple"))).thenReturn(false);
+		lenient().when(configHelper.getConfigAsBoolean(eq("es.caib.notib.document.metadades.por.defecto"))).thenReturn(true);
+
 		SecurityContextHolder.getContext().setAuthentication(auth);
 	}
-	
-	//Test consultaDocumentIMetadades para Uuid docu existent y metadades existents
-	@Test
-	public void whenAltaUuid_thenReturnRespostaAltaOK() throws IOException {
+
+	// Test de validacions de alta de notificació
+	@ParameterizedTest(name = "[{index}] Validació error {1}")
+	@ArgumentsSource(NotificacioProvider.class)
+	public void whenAltaUuid_thenReturnErrorOrRespostaAltaOK(NotificacioV2 notificacio, int errorEsperat) throws IOException {
 		
 		// Given
-		String notificacioId = Long.toString(System.currentTimeMillis());
-		EntitatEntity entitatMock = EntitatEntity.getBuilder("codi", 
-				"nom", 
-				null, 
-				"dir3Codi",
-				"dir3CodiReg", 
-				"apiKey", 
-				false, 
-//				false,
-				null, 
-				null, 
-				"colorFons", 
-				"colorLletra", 
-				null, 
-				"oficina", 
-				"nomOficinaVirtual", 
-				false, 
-				"llibre", 
-				"llibreNom", 
-				false)
-				.build();
-		
-		Date caducitat = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
-		ProcedimentEntity procediment = ProcedimentEntity.getBuilder(
-				"",
-				"",
-				configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard"),
-				configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat"),
-				entitatMock,
-				false,
-				null, // organGestor
-				null,
-				null,
-				null,
-				null,
-				false,
-				false).build();
-		
-		List<GrupDto> grups = new ArrayList<GrupDto>();
-		GrupDto grupDto = new GrupDto();
-		grupDto.setId(1L);
-		grups.add(grupDto);
-		
-		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entitatMock).build();
-		
-//		Map<String, OrganismeDto> organigramaEntitat = null;
-		
-		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
-		
-//		DocumentV2 document = new DocumentV2();
-//		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
-//		try {
-//			String arxiuB64 = Base64.encodeBase64String(IOUtils.toByteArray(getClass().getResourceAsStream(
-//					"/es/caib/notib/core/notificacio_adjunt.pdf")));		
-//			document.setContingutBase64(arxiuB64);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		document.setNormalitzat(false);
-//		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
-
-		DocumentV2 document2 = new DocumentV2();
-		document2.setUuid(UUID.randomUUID().toString());
-		document2.setNormalitzat(false);
-		document2.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
-		
-//		DocumentV2 document3 = new DocumentV2();
-//		document3.setCsv("54a27c163550ef2d5f3a8cd985a4ab949b6dfb5e66174a11c2bc979e0070090a");
-//		document3.setNormalitzat(false);
-//		document3.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
-		
-//		Document documentArxiuCsv = initDocument(document3.getCsv());
-		Document documentArxiuUuid = initDocument(document2.getUuid());
-		
-		NotificacioV2 notificacio = generarNotificacioV2(notificacioId, 1, false, null, document2, null, null, null);
-		
-		aplicacio = AplicacioEntity.builder().usuariCodi("").callbackUrl("").activa(true).entitat(entitatMock).build();
-		PersonaEntity personaEntity = PersonaEntity.builder().email("sandreu@limit.es").llinatge1("Andreu").llinatge2("Nadal").nif("00000000T").nom("Siòn").telefon("666010101").build();
-		OrganGestorDto organ = new OrganGestorDto();
-		organ.setSir(true);
-		
-		NotificacioEntity notificacioGuardada = NotificacioEntity.getBuilderV2(entitatMock, 
-				notificacioId, organGestor, null, null, notificacioId, notificacioId, caducitat, 
-				null, caducitat, notificacioId, notificacioId, procediment, notificacioId, notificacioId, 
-				null, procedimentOrgan, null, UUID.randomUUID().toString()).build();
-		
-		List<NotificacioEnviamentEntity> listaNotificacioGuardada = new ArrayList<NotificacioEnviamentEntity>();
-
-		DadesUsuari dadesUsuari = DadesUsuari.builder().codi("codi").nom("Usuari").llinatges("Llinatge1 Llinatge2").nif("12345678Z").email("usuari@limit.es").build();
-		
-		// When	
-		Mockito.when(entitatRepository.findByDir3Codi(Mockito.anyString())).thenReturn(entitatMock);
-		Mockito.when(aplicacioRepository.findByEntitatIdAndUsuariCodi(Mockito.nullable(Long.class), Mockito.anyString())).thenReturn(aplicacio);
-//		Mockito.when(procedimentRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class))).thenReturn(procediment);
-		Mockito.when(procSerRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class))).thenReturn(procediment);
-//		Mockito.when(grupService.findByProcedimentAndUsuariGrups(Mockito.anyLong())).thenReturn(grups);
-//		Mockito.when(grupService.findByCodi(Mockito.anyString(), Mockito.anyLong())).thenReturn(null);//GrupDto grupNotificacio
-		Mockito.when(organGestorRepository.findByCodi(notificacio.getOrganGestor())).thenReturn(organGestor);
-//		Mockito.when(organGestorCachable.findOrganigramaByEntitat(Mockito.anyString())).thenReturn(organigramaEntitat);
-		Mockito.when(pluginHelper.llistarLlibreOrganisme(Mockito.anyString(), Mockito.anyString())).thenReturn(llibreOrganMock);
-//		Mockito.when(cacheHelper.findOrganigramaNodeByEntitat(Mockito.anyString())).thenReturn(arbreUnitatsMock);
-//		Mockito.when(cacheHelper.getOficinesSIRUnitat(Mockito.anyMapOf(String.class, NodeDir3.class), Mockito.anyString())).thenReturn(oficinesSIRMock);
-//		Mockito.when(organGestorRepository.save(Mockito.any(OrganGestorEntity.class))).thenReturn(null);
-//		Mockito.when(procedimentOrganRepository.findByProcedimentIdAndOrganGestorId(procediment.getId(), organGestor.getId())).thenReturn(procedimentOrgan);
-		Mockito.when(pluginHelper.getModeFirma(Mockito.any(Document.class), Mockito.anyString())).thenReturn(1); //TRUE
-		Mockito.when(pluginHelper.arxiuGetImprimible(Mockito.anyString(), Mockito.eq(true))).thenReturn(documentArxiuUuid.getContingut());
-//		Mockito.when(pluginHelper.arxiuGetImprimible(Mockito.anyString(), Mockito.eq(false))).thenReturn(documentArxiuCsv.getContingut());
-		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(true)))
-			.thenReturn(documentArxiuUuid);
-//		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(false)))
-//		.thenReturn(documentArxiuCsv);
-		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class))).thenReturn(Long.toString(new Random().nextLong()));
-//		Mockito.when(auditEnviamentHelper.desaEnviamentAmbReferencia(Mockito.any(EntitatEntity.class),
-//				Mockito.nullable(NotificacioEntity.class), Mockito.any(Enviament.class),
-//				Mockito.any(ServeiTipusEnumDto.class), Mockito.any(PersonaEntity.class),
-//				Mockito.<PersonaEntity>anyList())).thenReturn(enviamentSavedMock);
-		Mockito.when(notificacioEnviamentRepository.saveAndFlush(Mockito.<NotificacioEnviamentEntity>any())).thenReturn(enviamentSavedMock);
-		Mockito.when(personaRepository.save(Mockito.any(PersonaEntity.class))).thenReturn(personaEntity);
-		Mockito.doNothing().when(notificacioTableHelper).crearRegistre(Mockito.any(NotificacioEntity.class));
-		Mockito.doNothing().when(auditHelper).auditaNotificacio(Mockito.any(NotificacioEntity.class), Mockito.<AuditService.TipusOperacio>any(), Mockito.anyString());
-		Mockito.when(notificacioRepository.saveAndFlush(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioGuardada);
-		Mockito.when(pluginHelper.getNotibTipusComunicacioDefecte()).thenReturn(NotificacioComunicacioTipusEnumDto.ASINCRON);
-		Mockito.when(notificacioEnviamentRepository.findByNotificacio(Mockito.any(NotificacioEntity.class))).thenReturn(listaNotificacioGuardada);
-		Mockito.when(notificacioHelper.getNotificaErrorEvent(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioEventEntity);
-		Mockito.doNothing().when(integracioHelper).addAccioOk(Mockito.any(IntegracioInfo.class));
-//		Mockito.when(organGestorCachable.findOrganigramaByEntitat(Mockito.anyString())).thenReturn(new HashMap<String, OrganismeDto>());
-		Mockito.when(cacheHelper.unitatPerCodi(Mockito.anyString())).thenReturn(organ);
-		Mockito.when(cacheHelper.findUsuariAmbCodi(Mockito.anyString())).thenReturn(dadesUsuari);
-
-		// Then
-		RespostaAlta respostaAlta = notificacioService.alta(notificacio);
-		
-		if (respostaAlta.isError()) {
-			System.out.println(">>> Reposta amb error: " + respostaAlta.getErrorDescripcio());
-			
-		} else {
-			System.out.println(">>> Reposta Ok");
-		}
-		assertNotNull(respostaAlta);
-		assertFalse(respostaAlta.isError());
-		assertNull(respostaAlta.getErrorDescripcio());
-		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
-		assertEquals(1, referencies.size());
-		assertEquals(NotificacioEstatEnum.PENDENT, /*ASINCRON*/ respostaAlta.getEstat());
-	}
-
-
-	@ParameterizedTest
-	@CsvSource({
-			"Paunnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn, Test, Test, Jordi, Test, Test, error.validacio.nom.titular.longitud.max",
-			"Pau, Testnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn, Test, Jordi, Test, Test, error.validacio.llinatge1.titular.longitud.max",
-			"Pau, Test, Testnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn, Jordi, Test, Test, error.validacio.llinatge2.titular.longitud.max",
-			"Pau, Test, Test, Jordinnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn, Test, Test, error.validacio.nom.destinatari.longitud.max",
-			"Pau, Test, Test, Jordi, Testnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn, Test, error.validacio.llinatge1.destinatari.longitud.max",
-			"Pau, Test, Test, Jordi, Test, Testnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn, error.validacio.llinatge2.destinatari.longitud.max",
-	})
-	public void whenAlta_thenValidate(String titularNom, String titularLlinatge1, String titularLlinatge2,
-									  String destNom, String destLlinatge1, String destLlinatge2, String missatgeEsperat) throws IOException {
-		// Given
-		String notificacioId = Long.toString(System.currentTimeMillis());
-		EntitatEntity entitatMock = EntitatEntity.getBuilder("codi", "nom", null, "dir3Codi", "dir3CodiReg", "apiKey", false, null, null, "colorFons", "colorLletra", null, "oficina", "nomOficinaVirtual", false, "llibre", "llibreNom", false).build();
-		Date caducitat = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
-		ProcedimentEntity procediment = ProcedimentEntity.getBuilder("", "", configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard"), configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat"), entitatMock, false, null, /* organGestor*/ null, null, null, null, false, false).build();
-
-		List<GrupDto> grups = new ArrayList<GrupDto>();
-		GrupDto grupDto = new GrupDto();
-		grupDto.setId(1L);
-		grups.add(grupDto);
-
-		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entitatMock).build();
-		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
-		DocumentV2 document2 = new DocumentV2();
-		document2.setUuid(UUID.randomUUID().toString());
-		document2.setNormalitzat(false);
-		document2.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
-		Document documentArxiuUuid = initDocument(document2.getUuid());
-		Persona titular = crearPersona("00000000T", titularNom, titularLlinatge1, titularLlinatge2, "666010101", "pau@limit.es");
-		Persona destinatari = crearPersona("18225486x", destNom, destLlinatge1, destLlinatge2, "666020202", "jordi@limit.es");
-		NotificacioV2 notificacio = generarNotificacioV2(notificacioId, 1, false, null, document2, null, titular, destinatari);
-		aplicacio = AplicacioEntity.builder().usuariCodi("").callbackUrl("").activa(true).entitat(entitatMock).build();
-		PersonaEntity personaEntity = PersonaEntity.builder().email("sandreu@limit.es").llinatge1("Andreu").llinatge2("Nadal").nif("00000000T").nom("Siòn").telefon("666010101").build();
-		OrganGestorDto organ = new OrganGestorDto();
-		organ.setSir(true);
-		DadesUsuari dadesUsuari = DadesUsuari.builder().codi("codi").nom("Usuari").llinatges("Llinatge1 Llinatge2").nif("12345678Z").email("usuari@limit.es").build();
-		NotificacioEntity notificacioGuardada = NotificacioEntity.getBuilderV2(entitatMock, notificacioId, organGestor, null, null, notificacioId, notificacioId, caducitat, null, caducitat, notificacioId, notificacioId, procediment, notificacioId, notificacioId, null, procedimentOrgan, null, UUID.randomUUID().toString()).build();
-
-		List<NotificacioEnviamentEntity> listaNotificacioGuardada = new ArrayList<NotificacioEnviamentEntity>();
 
 		// When
-		Mockito.when(entitatRepository.findByDir3Codi(Mockito.anyString())).thenReturn(entitatMock);
-		Mockito.when(aplicacioRepository.findByEntitatIdAndUsuariCodi(Mockito.nullable(Long.class), Mockito.anyString())).thenReturn(aplicacio);
-//		Mockito.when(procSerRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class))).thenReturn(procediment);
-//		Mockito.when(organGestorRepository.findByCodi(notificacio.getOrganGestor())).thenReturn(organGestor);
-		Mockito.when(pluginHelper.llistarLlibreOrganisme(Mockito.anyString(), Mockito.anyString())).thenReturn(llibreOrganMock);
-		Mockito.when(pluginHelper.getModeFirma(Mockito.any(Document.class), Mockito.anyString())).thenReturn(1); //TRUE
-		Mockito.when(pluginHelper.arxiuGetImprimible(Mockito.anyString(), Mockito.eq(true))).thenReturn(documentArxiuUuid.getContingut());
-		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(true))).thenReturn(documentArxiuUuid);
-		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class))).thenReturn(Long.toString(new Random().nextLong()));
-//		Mockito.when(auditEnviamentHelper.desaEnviamentAmbReferencia(Mockito.any(EntitatEntity.class), Mockito.nullable(NotificacioEntity.class), Mockito.any(Enviament.class), Mockito.any(ServeiTipusEnumDto.class), Mockito.any(PersonaEntity.class), Mockito.anyListOf(PersonaEntity.class))).thenReturn(enviamentSavedMock);
-//		Mockito.when(personaRepository.save(Mockito.any(PersonaEntity.class))).thenReturn(personaEntity);
-//		Mockito.when(auditNotificacioHelper.desaNotificacio(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioGuardada);
-//		Mockito.when(notificacioRepository.saveAndFlush(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioGuardada);
-//		Mockito.when(pluginHelper.getNotibTipusComunicacioDefecte()).thenReturn(NotificacioComunicacioTipusEnumDto.ASINCRON);
-//		Mockito.when(notificacioEnviamentRepository.findByNotificacio(Mockito.any(NotificacioEntity.class))).thenReturn(listaNotificacioGuardada);
-		Mockito.when(notificacioHelper.getNotificaErrorEvent(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioEventEntity);
-//		Mockito.doNothing().when(integracioHelper).addAccioOk(Mockito.any(IntegracioInfo.class));
-		Mockito.when(cacheHelper.unitatPerCodi(Mockito.anyString())).thenReturn(organ);
-		Mockito.when(cacheHelper.findUsuariAmbCodi(Mockito.anyString())).thenReturn(dadesUsuari);
+		switch (errorEsperat) {
+			case EMISOR_DIR3_NULL:
+				when(entitatRepository.findByDir3Codi(Mockito.isNull())).thenReturn(null);
+				break;
+			case EMISOR_DIR3_NO_EXIST:
+				when(entitatRepository.findByDir3Codi(eq("NO_EXIST"))).thenReturn(null);
+				break;
+			case ENTITAT_INACTIVA:
+				when(entitatRepository.findByDir3Codi(anyString())).thenReturn(EntitatEntity.hiddenBuilder().codi("GOIB").nom("Govern de les Illes Balears").activa(false).ambEntregaDeh(false).llibreEntitat(false).oficinaEntitat(false).build());
+				break;
+			case APLICACIO_NO_EXIST:
+				when(aplicacioRepository.findByEntitatIdAndUsuariCodi(nullable(Long.class), anyString())).thenReturn(null);
+				break;
+			case PROCSER_NO_EXIST:
+				when(procSerRepository.findByCodiAndEntitat(eq("NO_EXIST"), any(EntitatEntity.class))).thenReturn(null);
+				break;
+			case PROCSER_INACTIU:
+				procedimentMock.setActiu(false);
+				break;
+			case SERVEI_EN_NOTIFICACIO:
+				when(procSerRepository.findByCodiAndEntitat(eq("SERVEI"), any(EntitatEntity.class))).thenReturn(serveiMock);
+				break;
+			case ORGAN_ALTRE_ENTITAT:
+				when(organGestorRepository.findByCodi(eq("NO_EXIST"))).thenReturn(null);
+				break;
+			case ORGAN_DIFF_AL_DEL_PROCEDIMENT:
+				lenient().when(organGestorRepository.findByCodi(eq("ORGAN_DIFERENT"))).thenReturn(OrganGestorEntity.builder().codi("XXXXXXXX").nom("Qualsevol altre organ").entitat(entitatMock).build());
+				break;
+			case USUARI_INEXISTENT:
+				when(cacheHelper.findUsuariAmbCodi(eq("NO_EXIST"))).thenReturn(null);
+				break;
+			case DOCUMENT_FORMAT_SIR_INVALID:
+				organGestorMock.setOficina("Oficina");
+				break;
+			case DOCUMENT_ERROR_OBTENINT:
+				lenient().when(pluginHelper.arxiuGetImprimible(eq("00000000-0000-0000-0000-00000000000E"), eq(true))).thenThrow(new RuntimeException("Error obtenint fitxer"));
+				break;
+			case DOCUMENT_ERROR_OBTENINT_METADADES:
+				lenient().when(configHelper.getConfigAsBoolean(eq("es.caib.notib.document.metadades.por.defecto"))).thenReturn(false);
+				lenient().when(pluginHelper.arxiuDocumentConsultar(eq("00000000-0000-0000-0000-0000000000ME"), nullable(String.class), eq(true), eq(true))).thenThrow(new RuntimeException("Error obtenint metadades"));
+				lenient().when(pluginHelper.arxiuDocumentConsultar(eq("00000000-0000-0000-0000-0000000000MN"), nullable(String.class), eq(true), eq(true))).thenReturn(null);
+				break;
+			case DOCUMENT_ERROR_VALIDANT_FIRMA:
+				lenient().when(configHelper.getConfigAsBoolean(eq("es.caib.notib.plugins.validatesignature.enable.rest"))).thenReturn(true);
+				lenient().when(pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(any(byte[].class), eq("document_error_firma.pdf"), anyString())).thenReturn(SignatureInfoDto.builder().error(true).errorMsg("Error validant firma").build());
+				break;
+			case DOCUMENT_METADADES_ORIGEN_NULL:
+			case DOCUMENT_METADADES_VALIDESA_NULL:
+			case DOCUMENT_METADADES_TIPUS_DOCUMENTAL_NULL:
+			case DOCUMENT_METADADES_MODE_FIRMA_NULL:
+				lenient().when(configHelper.getConfigAsBoolean(eq("es.caib.notib.document.metadades.por.defecto"))).thenReturn(false);
+				break;
+			case DOCUMENT_MASSA_GRAN:
+				DocumentContingut contingut = new DocumentContingut();
+				contingut.setTamany(15728640L);
+				contingut.setTipusMime("application/pdf");
+				lenient().when(pluginHelper.arxiuGetImprimible(eq("00000000-0000-0000-0000-00000000000G"), eq(true))).thenReturn(contingut);
+				break;
+			case DOCUMENTS_SIR_MASSA_GRANS:
+				organGestorMock.setOficina("Oficina");
+				DocumentContingut contingutMig = new DocumentContingut();
+				contingutMig.setTamany(8388608L);
+				contingutMig.setTipusMime("application/pdf");
+				lenient().when(pluginHelper.arxiuGetImprimible(eq("00000000-0000-0000-0000-00000000000M"), eq(true))).thenReturn(contingutMig);
+				break;
+			case GRUP_INEXISTENT:
+				procedimentMock.setAgrupar(true);
+				break;
+			case GRUP_EN_PROCEDIMENT_NO_AGRUPADA:
+				lenient().when(grupService.findByCodi(eq("GRUP"), nullable(Long.class))).thenReturn(GrupDto.builder().codi("GRUP").build());
+				procedimentMock.setAgrupar(true);
+				break;
+			case GRUP_NO_ASSIGNAT:
+				lenient().when(grupService.findByCodi(eq("GRUP"), nullable(Long.class))).thenReturn(GrupDto.builder().codi("GRUP").build());
+				lenient().when(grupService.findByProcedimentAndUsuariGrups(nullable(Long.class))).thenReturn(List.of(GrupDto.builder().codi("ALTRE_GRUP").build()));
+				procedimentMock.setAgrupar(true);
+				break;
+			case PERSONA_DIR3CODI_PROPIA_ENTITAT:
+				Map<String, OrganismeDto> organigrama = new HashMap();
+				organigrama.put(ORGAN_CODI, OrganismeDto.builder().codi(ORGAN_CODI).build());
+				lenient().when(organGestorCachable.findOrganigramaByEntitat(eq(ENTITAT_DIR3CODI))).thenReturn(organigrama);
+				break;
+			case DEH_NULL:
+			case DEH_NIF_NULL:
+				EntitatEntity entitatDehMock = EntitatEntity.hiddenBuilder().codi("GOIB").nom("Govern de les Illes Balears").tipus(EntitatTipusEnumDto.GOVERN).dir3Codi(ENTITAT_DIR3CODI).activa(true).apiKey("xxxxxx").ambEntregaDeh(true).llibreEntitat(false).oficinaEntitat(false).build();
+				lenient().when(entitatRepository.findByDir3Codi(anyString())).thenReturn(entitatDehMock);
+				break;
+			case POSTAL_ENTREGA_INACTIVA:
+				organGestorPostalMock.setEntregaCie(null);
+				break;
+
+		}
 
 		// Then
 		RespostaAlta respostaAlta = notificacioService.alta(notificacio);
-		String msg = respostaAlta.isError() ? ">>> Reposta amb error: " + respostaAlta.getErrorDescripcio() : ">>> Reposta Ok";
-		System.out.println(msg);
 		assertNotNull(respostaAlta);
-		assertTrue(respostaAlta.isError());
-		assertNotNull(respostaAlta.getErrorDescripcio());
-		assertEquals(respostaAlta.getErrorDescripcio(), missatgeEsperat);
-//		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
-//		assertEquals(1, referencies.size());
-		assertEquals(NotificacioEstatEnum.PENDENT, /*ASINCRON*/ respostaAlta.getEstat());
+
+		if (errorEsperat == 0) {
+			assertFalse("Resposta amb error (" + respostaAlta.getErrorDescripcio() + ") quan s'esperava OK", respostaAlta.isError());
+			assertNull(
+					"Resposta OK amb descripció d'error (" + respostaAlta.getErrorDescripcio() + ")",
+					respostaAlta.getErrorDescripcio());
+			List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+			assertEquals(
+					"No s'han rebut el mateix nombre de referències (" + referencies.size() + ") que d'enviaments (" + notificacio.getEnviaments().size() + ")",
+					notificacio.getEnviaments().size(), referencies.size());
+			assertEquals("La notificació no es troba en estat PENDENT", NotificacioEstatEnum.PENDENT, respostaAlta.getEstat());
+			return;
+		}
+
+		assertTrue("Resposta OK quan s'esperava amb error", respostaAlta.isError());
+		assertNotNull("Error sense descripció", respostaAlta.getErrorDescripcio());
+		assertTrue(
+				"L'error retornat no conté el codi d'error [" + errorEsperat + "]",
+				respostaAlta.getErrorDescripcio().contains("[" + errorEsperat + "]"));
+
+		System.out.println(respostaAlta.getErrorDescripcio());
+
 	}
 
-	private Document initDocument(String identificador) {
+
+	private Document initDocument(String identificador) throws IOException {
 		Document documentArxiu = new Document();
 		
 		DocumentContingut contingut = new DocumentContingut();
 		contingut.setArxiuNom("arxiu.pdf");
 		contingut.setTipusMime("application/pdf");
-		contingut.setContingut("/es/caib/notib/logic/arxiu.pdf".getBytes());
+		contingut.setContingut(IOUtils.toByteArray(getClass().getResourceAsStream("/es/caib/notib/logic/arxiu.pdf")));
 		contingut.setTamany(contingut.getContingut().length);
 		documentArxiu.setContingut(contingut);
 		
@@ -463,83 +445,4 @@ public class NotificacioServiceWsV2Test {
 		Mockito.reset(pluginHelper);
 	}
 	
-	private NotificacioV2 generarNotificacioV2(String notificacioId, int numDestinataris, boolean ambEnviamentPostal, DocumentV2 document, DocumentV2 document2,
-											   DocumentV2 document3, Persona titular, Persona destinatari) {
-
-		NotificacioV2 notificacio = new NotificacioV2();
-		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
-		notificacio.setEnviamentTipus(EnviamentTipus.NOTIFICACIO);
-		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
-		notificacio.setUsuariCodi(USUARI_CODI);
-		notificacio.setOrganGestor(ORGAN_CODI);
-		notificacio.setConcepte("concepte_" + notificacioId);
-		notificacio.setDescripcio("descripcio_" + notificacioId);
-		notificacio.setEnviamentDataProgramada(null);
-		notificacio.setRetard(5);
-		notificacio.setCaducitat(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000));
-		notificacio.setDocument(document2);
-		
-		for (int i = 0; i < numDestinataris; i++) {
-
-			Enviament enviament = new Enviament();
-			if (titular == null) {
-				titular = crearPersona("00000000T","Pau","Test","Test", "666010101","pau@limit.es");
-			}
-			enviament.setTitular(titular);
-			if (destinatari == null) {
-				destinatari = crearPersona("18225486x","Jordi","Test1","Test1", "666020202","jordi@limit.es");
-			}
-			enviament.setDestinataris(new ArrayList<Persona>());
-			enviament.getDestinataris().add(destinatari);
-			if (ambEnviamentPostal) {
-				EntregaPostal entregaPostal = new EntregaPostal();
-				if (NotificaDomiciliConcretTipus.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {
-					entregaPostal.setTipus(TIPUS_ENTREGA_POSTAL);
-					entregaPostal.setLinea1("linea1_" + i);
-					entregaPostal.setLinea2("linea2_" + i);
-				} else {
-					entregaPostal.setTipus(NotificaDomiciliConcretTipus.NACIONAL);
-					entregaPostal.setViaTipus(EntregaPostalVia.CALLE);
-					entregaPostal.setViaNom("Bas");
-					entregaPostal.setNumeroCasa("25");
-					entregaPostal.setNumeroQualificador("bis");
-					//entregaPostal.setApartatCorreus("0228");
-					entregaPostal.setPortal("pt" + i);
-					entregaPostal.setEscala("es" + i);
-					entregaPostal.setPlanta("pl" + i);
-					entregaPostal.setPorta("pr" + i);
-					entregaPostal.setBloc("bl" + i);
-					entregaPostal.setComplement("complement" + i);
-					entregaPostal.setCodiPostal("07500");
-					entregaPostal.setPoblacio("poblacio" + i);
-					entregaPostal.setMunicipiCodi("070337");
-					entregaPostal.setProvincia("07");
-					entregaPostal.setPaisCodi("ES");
-				}
-				entregaPostal.setCie(new Integer(0));
-				enviament.setEntregaPostal(entregaPostal);
-				enviament.setEntregaPostalActiva(true);
-			}
-			EntregaDeh entregaDeh = new EntregaDeh();
-			entregaDeh.setObligat(true);
-			entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
-			enviament.setEntregaDeh(entregaDeh);
-			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
-		//	notificacio.setEnviaments(new ArrayList<Enviament>());
-			notificacio.getEnviaments().add(enviament);
-		}
-		return notificacio;
-	}
-
-	private Persona crearPersona(String nif, String nom, String llinatge1, String llinatge2, String telefon, String email) {
-
-		Persona persona = Persona.builder().nif(Strings.isNullOrEmpty(nif) ? "00000000T" : nif).nom(nom).llinatge1(llinatge1).llinatge2(llinatge2)
-						.telefon(Strings.isNullOrEmpty(telefon) ? "666010101" : telefon).email(Strings.isNullOrEmpty(email)  ? "test@limit.es" : email)
-						.interessatTipus(InteressatTipus.FISICA).build();
-		if (persona.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
-			persona.setDir3Codi(ENTITAT_DIR3CODI);
-		}
-		return persona;
-	}
-
 }

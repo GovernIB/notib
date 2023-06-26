@@ -8,7 +8,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -23,7 +25,7 @@ import java.util.List;
 @AllArgsConstructor
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Enviament {
+public class Enviament implements Serializable {
 
     private Persona titular;
     private List<Persona> destinataris;
@@ -35,5 +37,20 @@ public class Enviament {
 
     public List<Persona> getDestinataris() {
         return destinataris != null ? destinataris : new ArrayList<Persona>();
+    }
+
+    public Collection<String> getNifsEnviament() {
+        List<String> nifs = new ArrayList<>();
+        if (titular != null && !InteressatTipus.FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) && titular.getNif() != null && titular.getNif().trim().length() > 0) {
+            nifs.add(titular.getNif());
+        }
+        if (destinataris != null) {
+            for (Persona destinatari: destinataris) {
+                if (destinatari != null && (destinatari.getNif() != null && destinatari.getNif().trim().length() > 0)) {
+                    nifs.add(destinatari.getNif());
+                }
+            }
+        }
+        return nifs;
     }
 }

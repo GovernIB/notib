@@ -248,10 +248,9 @@ public class NotificacioHelperTest {
 	
 	private DocumentEntity initDocumentEntity(DocumentDto document, String documentGesdocId) {
 		DocumentEntity documentEntity = DocumentEntity.getBuilderV2(
-				document.getId(),
+//				document.getId(),
 				documentGesdocId,
 				document.getArxiuNom(),
-				document.getUrl(),
 				document.isNormalitzat(),
 				document.getUuid(),
 				document.getCsv(),

@@ -28,9 +28,9 @@ import static org.junit.Assert.*;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ClientRestv2Test extends ClientBaseTest {
 
-	private static final String URL = "http://localhost:8280/notibapi";
-	private static final String USERNAME = "admin";
-	private static final String PASSWORD = "admin";
+	private static final String URL = "http://localhost:8080/notibapi";
+	private static final String USERNAME = "u999000";
+	private static final String PASSWORD = "u999000";
 
 
 	// Indicar si el servidor esta configurat en mode síncron

@@ -75,7 +75,6 @@ import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
@@ -91,8 +90,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Path;
@@ -1225,7 +1222,8 @@ public class PluginHelper {
 		annex.setOrigen(RegistreOrigenDtoEnum.ADMINISTRACIO);
 		annex.setData(new Date());
 		annex.setIdiomaCodi("ca");
-		if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
+
+		if((document.getUuid() != null || document.getCsv() != null) && document.getContingutBase64() == null) {
 			var loadFromArxiu = isReadDocsMetadataFromArxiu() && document.getUuid() != null || document.getCsv() == null;
 			DocumentContingut doc;
 			if(loadFromArxiu) {
@@ -1250,14 +1248,7 @@ public class PluginHelper {
 			}
 			return annex;
 		}
-		if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
-			annex.setNom(document.getUrl());
-			annex.setArxiuNom(document.getArxiuNom());
-			annex.setArxiuContingut(getUrlDocumentContent(document.getUrl()));
-			annex.setModeFirma(RegistreModeFirmaDtoEnum.SENSE_FIRMA);
-			return annex;
-		}
-		if(document.getContingutBase64() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
+		if(document.getContingutBase64() != null && (document.getUuid() == null && document.getCsv() == null)) {
 			annex.setArxiuContingut(document.getContingutBase64().getBytes());
 			annex.setArxiuNom(document.getArxiuNom());
 			annex.setModeFirma(RegistreModeFirmaDtoEnum.SENSE_FIRMA);
@@ -1287,7 +1278,7 @@ public class PluginHelper {
 			var tipoDocumental = document.getTipoDocumental() != null ? document.getTipoDocumental().getValor() : TipusDocumentalEnum.NOTIFICACIO.getValor();
 			Integer modoFirma = document.getModoFirma() != null ? (document.getModoFirma() ? 1 : 0) : 0;
 
-			if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
+			if((document.getUuid() != null || document.getCsv() != null) && document.getContingutBase64() == null) {
 				annex = new AnexoWsDto();
 				var id = "";
 				DocumentContingut doc = null;
@@ -1345,19 +1336,7 @@ public class PluginHelper {
 				if (Boolean.TRUE.equals(enviarTipoMIMEFicheroAnexado)) {
 					path = new File(doc.getArxiuNom()).toPath();
 				}
-			} else if (document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
-				annex = new AnexoWsDto();
-				annex.setFicheroAnexado(getUrlDocumentContent(document.getUrl()));
-				annex.setNombreFicheroAnexado(FilenameUtils.getName(document.getUrl()));
-				
-				//Metadades
-				annex.setTipoDocumental(tipoDocumental);
-				annex.setOrigenCiudadanoAdmin(origen);
-				annex.setValidezDocumento(validezDocumento);
-				annex.setModoFirma(modoFirma);
-				annex.setFechaCaptura(toXmlGregorianCalendar(new Date()));
-				path = new File(FilenameUtils.getName(document.getUrl())).toPath();
-			} else if (document.getArxiuGestdocId() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
+			} else if(document.getArxiuGestdocId() != null && (document.getUuid() == null && document.getCsv() == null)) {
 				annex = new AnexoWsDto();
 				var output = new ByteArrayOutputStream();
 				gestioDocumentalGet(document.getArxiuGestdocId(), GESDOC_AGRUPACIO_NOTIFICACIONS, output);
@@ -1385,7 +1364,7 @@ public class PluginHelper {
 		}
 	}
 
-	public String estatElaboracioToValidesa(DocumentEstatElaboracio estatElaboracio) {
+	public static String estatElaboracioToValidesa(DocumentEstatElaboracio estatElaboracio) {
 
 		if (estatElaboracio == null) {
 			return ValidesaEnum.ORIGINAL.getValor(); // Valor per defecte
@@ -1402,7 +1381,7 @@ public class PluginHelper {
 				return ValidesaEnum.ORIGINAL.getValor();
 		}
 	}
-	public Integer getModeFirma(Document document, String nom) {
+	public static Integer getModeFirma(Document document, String nom) {
 		return nom != null && nom.toLowerCase().endsWith("pdf") && (document.getFirmes() != null && !document.getFirmes().isEmpty()) ? 1 : 0;
 	}
 

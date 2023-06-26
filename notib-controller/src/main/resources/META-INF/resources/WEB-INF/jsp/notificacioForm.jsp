@@ -739,8 +739,6 @@
 				$('#input-origen-csv_' + id).removeClass('hidden');
 				$('#input-origen-uuid_' + id).addClass('hidden');
 				$('#documentArxiuUuid\\[' + id + '\\]').val('');
-				$('#input-origen-url_' + id).addClass('hidden');
-				$('#documentArxiuUrl\\[' + id + '\\]').val('');
 				$('#input-origen-arxiu_' + id).addClass('hidden');
 				$('#arxiu\\[' + id + '\\]').val('');
 				$('#metadades_' + id).removeClass('hidden');
@@ -748,17 +746,6 @@
 				$('#input-origen-csv_' + id).addClass('hidden');
 				$('#documentArxiuCsv\\[' + id + '\\]').val('');
 				$('#input-origen-uuid_' + id).removeClass('hidden');
-				$('#input-origen-url_' + id).addClass('hidden');
-				$('#documentArxiuUrl\\[' + id + '\\]').val('');
-				$('#input-origen-arxiu_' + id).addClass('hidden');
-				$('#arxiu\\[' + id + '\\]').val('');
-				$('#metadades_' + id).removeClass('hidden');
-			} else if ($(this).val() == 'URL') {
-				$('#input-origen-csv_' + id).addClass('hidden');
-				$('#documentArxiuCsv\\[' + id + '\\]').val('');
-				$('#input-origen-uuid_' + id).addClass('hidden');
-				$('#documentArxiuUuid\\[' + id + '\\]').val('');
-				$('#input-origen-url_' + id).removeClass('hidden');
 				$('#input-origen-arxiu_' + id).addClass('hidden');
 				$('#arxiu\\[' + id + '\\]').val('');
 				$('#metadades_' + id).removeClass('hidden');
@@ -767,8 +754,6 @@
 				$('#documentArxiuCsv\\[' + id + '\\]').val('');
 				$('#input-origen-uuid_' + id).addClass('hidden');
 				$('#documentArxiuUuid\\[' + id + '\\]').val('');
-				$('#input-origen-url_' + id).addClass('hidden');
-				$('#documentArxiuUrl\\[' + id + '\\]').val('');
 				$('#input-origen-arxiu_' + id).removeClass('hidden');
 				$('#metadades_' + id).removeClass('hidden');
 			} else if ($(this).val() == ''){
@@ -776,8 +761,6 @@
 				$('#documentArxiuCsv\\[' + id + '\\]').val('');
 				$('#input-origen-uuid_' + id).removeClass('hidden');
 				$('#documentArxiuUuid\\[' + id + '\\]').val('');
-				$('#input-origen-url_' + id).addClass('hidden');
-				$('#documentArxiuUrl\\[' + id + '\\]').val('');
 				$('#input-origen-arxiu_' + id).addClass('hidden');
 				$('#arxiu\\[' + id + '\\]').val('');
 				$('#metadades_' + id).addClass('hidden');
@@ -813,8 +796,6 @@
 					$('#documentArxiuCsv\\[' + i + '\\]').val(nom_documents[i]);
 				} else if (tipusDocumentDefault === 'UUID') {
 					$('#documentArxiuUuid\\[' + i + '\\]').val(nom_documents[i]);
-				} else if (tipusDocumentDefault === 'URL') {
-					$('#documentArxiuUrl\\[' + i + '\\]').val(nom_documents[i]);
 				}
 				// $("#tipusDocument_" + i).val(tipusDocumentDefault[i]).trigger("change");
 			}
@@ -2054,11 +2035,6 @@
 						<not:inputText name="documentArxiuUuid[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 					</div>
 					
-					<!-- URL -->
-					<div id="input-origen-url_0" class="col-md-6 hidden">
-						<not:inputText name="documentArxiuUrl[0]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
-					</div>
-					
 					<!-- FITXER -->
 					<div id="input-origen-arxiu_0" class="col-md-6 hidden">
 						<c:choose>
@@ -2122,11 +2098,6 @@
 							<not:inputText name="documentArxiuUuid[1]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 						</div>
 	
-						<!-- URL -->
-						<div id="input-origen-url_1" class="col-md-6 hidden">
-							<not:inputText name="documentArxiuUrl[1]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
-						</div>
-	
 						<!-- FITXER -->
 						<div id="input-origen-arxiu_1" class="col-md-6 hidden">
 							<c:choose>
@@ -2184,11 +2155,6 @@
 						<!-- UUID -->
 						<div id="input-origen-uuid_2" class="col-md-6 hidden">
 							<not:inputText name="documentArxiuUuid[2]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
-						</div>
-	
-						<!-- URL -->
-						<div id="input-origen-url_2" class="col-md-6 hidden">
-							<not:inputText name="documentArxiuUrl[2]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 						</div>
 	
 						<!-- FITXER -->
@@ -2252,11 +2218,6 @@
 							<not:inputText name="documentArxiuUuid[3]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 						</div>
 	
-						<!-- URL -->
-						<div id="input-origen-url_3" class="col-md-6 hidden">
-							<not:inputText name="documentArxiuUrl[3]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
-						</div>
-	
 						<!-- FITXER -->
 						<div id="input-origen-arxiu_3" class="col-md-6 hidden">
 							<c:choose>
@@ -2314,11 +2275,6 @@
 						<!-- UUID -->
 						<div id="input-origen-uuid_4" class="col-md-6 hidden">
 							<not:inputText name="documentArxiuUuid[4]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
-						</div>
-	
-						<!-- URL -->
-						<div id="input-origen-url_4" class="col-md-6 hidden">
-							<not:inputText name="documentArxiuUrl[4]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 						</div>
 	
 						<!-- FITXER -->

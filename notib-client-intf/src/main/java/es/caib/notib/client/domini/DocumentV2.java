@@ -36,16 +36,30 @@ public class DocumentV2 {
     private boolean normalitzat;
     private OrigenEnum origen;
     private TipusDocumentalEnum tipoDocumental;
-    @JsonDeserialize(using = TrimStringDeserializer.class)
-    private String url;
     private ValidesaEnum validesa;
 
     public boolean isEmpty() {
-        return ((arxiuNom == null || arxiuNom.isEmpty()) &&
-                (contingutBase64 == null || contingutBase64.isEmpty()) &&
-                (url == null || url.isEmpty()) &&
-                (uuid == null || uuid.isEmpty()) &&
-                (csv == null || csv.isEmpty()));
+        return ((arxiuNom == null || arxiuNom.trim().isEmpty()) &&
+                (contingutBase64 == null || contingutBase64.trim().isEmpty()) &&
+                (uuid == null || uuid.trim().isEmpty()) &&
+                (csv == null || csv.trim().isEmpty()));
     }
+    public boolean hasOnlyOneSource() {
+        int countSources = getCountSources();
+        return countSources == 1;
+    }
+    public boolean hasMultipleSources() {
+        int countSources = getCountSources();
+        return countSources > 1;
+    }
+
+    private int getCountSources() {
+        int countSources = 0;
+        if(contingutBase64 != null && !contingutBase64.trim().isEmpty()) countSources++;
+        if(uuid != null && !uuid.trim().isEmpty()) countSources++;
+        if(csv != null && !csv.trim().isEmpty()) countSources++;
+        return countSources;
+    }
+
 
 }

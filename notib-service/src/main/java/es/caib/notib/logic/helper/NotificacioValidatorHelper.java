@@ -50,32 +50,28 @@ public class NotificacioValidatorHelper {
 
 		// Emisor
 		if (emisorDir3Codi == null || emisorDir3Codi.isEmpty()) {
-			errors.add(messageHelper.getMessage("error.validacio.emisordir3codi.no.null"));
+			errors.add(messageHelper.getMessage("error.validacio.1000"));
 		} else if (emisorDir3Codi.length() > 9) {
-			errors.add(messageHelper.getMessage("error.validacio.emisordir3codi.longitud.max"));
+			errors.add(messageHelper.getMessage("error.validacio.1001"));
 		}
 
 		// Entitat
 		if (entitat == null) {
-			var a = messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.a");
-			var b = messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.b");
-			errors.add(a + emisorDir3Codi + b);
+			errors.add(messageHelper.getMessage("error.validacio.1010", new Object[] {emisorDir3Codi}));
 		} else if (!entitat.isActiva()) {
-			errors.add(messageHelper.getMessage("error.validacio.entitat.desactivada.per.enviament.notificacions"));
+			errors.add(messageHelper.getMessage("error.validacio.1011"));
 		}
 
 		// Concepte
 		if (notificacio.getConcepte() == null || notificacio.getConcepte().isEmpty()) {
-			errors.add(messageHelper.getMessage("error.validacio.concepte.no.null"));
+			errors.add(messageHelper.getMessage("error.validacio.1030"));
 		} else {
 			if (notificacio.getConcepte().length() > 240) {
-				errors.add(messageHelper.getMessage("error.validacio.concepte.longitud.max"));
+				errors.add(messageHelper.getMessage("error.validacio.1031"));
 			}
 			var caractersNoValids = validFormat(notificacio.getConcepte());
 			if (!caractersNoValids.isEmpty()) {
-				var a = messageHelper.getMessage("error.validacio.concepte.format.invalid.a");
-				var b = messageHelper.getMessage("error.validacio.concepte.format.invalid.b");
-				errors.add(a + StringUtils.join(caractersNoValids, ',') + b);
+				errors.add(messageHelper.getMessage("error.validacio.1032", new Object[]{StringUtils.join(caractersNoValids, ',')}));
 			}
 		}
 
@@ -83,31 +79,29 @@ public class NotificacioValidatorHelper {
 		var desc = notificacio.getDescripcio();
 		if (!Strings.isNullOrEmpty(desc)) {
 			if (desc.length() > 1000) {
-				errors.add(messageHelper.getMessage("error.validacio.descripcio.notificacio.longitud.max"));
+				errors.add(messageHelper.getMessage("error.validacio.1040"));
 			}
 			List<Character> caractersNoValids = validFormat(notificacio.getConcepte());
 			if (!caractersNoValids.isEmpty()) {
-				var a = messageHelper.getMessage("error.validacio.descripcio.invalid.a");
-				var b = messageHelper.getMessage("error.validacio.descripcio.invalid.b");
-				errors.add(a + StringUtils.join(caractersNoValids, ',') + b);
+				errors.add(messageHelper.getMessage("error.validacio.1041", new Object[]{StringUtils.join(caractersNoValids, ',')}));
 			}
 		}
 
 		// Tipus d'enviament
 		if (notificacio.getEnviamentTipus() == null) {
-			errors.add(messageHelper.getMessage("error.validacio.tipus.enviament.no.null"));
+			errors.add(messageHelper.getMessage("error.validacio.1050"));
 		}
 
 		// Usuari
 		if (notificacio.getUsuariCodi() == null || notificacio.getUsuariCodi().isEmpty()) {
-			errors.add(messageHelper.getMessage("error.validacio.usuari.codi.no.null"));
+			errors.add(messageHelper.getMessage("error.validacio.1060"));
 		} else if (notificacio.getUsuariCodi().length() > 64) {
-			errors.add(messageHelper.getMessage("error.validacio.usuari.codi.longitud.max"));
+			errors.add(messageHelper.getMessage("error.validacio.1061"));
 		}
 
 		// Enviaments
 		if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {
-			errors.add(messageHelper.getMessage("error.validacio.enviaments.no.null"));
+			errors.add(messageHelper.getMessage("error.validacio.1100"));
 		} else {
 			for (var enviament : notificacio.getEnviaments()) {
 				//Si és comunicació a administració i altres mitjans (persona física/jurídica) --> Excepció
@@ -116,32 +110,32 @@ public class NotificacioValidatorHelper {
 				// Servei tipus
 				// Per defecte es posa a normal
 				if (enviament.getServeiTipus() == null) {
-					errors.add(messageHelper.getMessage("error.validacio.servei.tipus.no.null"));
+					errors.add(messageHelper.getMessage("error.validacio.1101", new Object[]{""}));
 				}
 
 				// Titular
 				if (enviament.getTitular() == null) {
-					errors.add(messageHelper.getMessage("error.validacio.titular.enviament.no.null"));
+					errors.add(messageHelper.getMessage("error.validacio.1110", new Object[]{""}));
 				} else {
 					// - Nom
 					if (enviament.getTitular().getNom() != null && enviament.getTitular().getNom().length() > 255) {
-						errors.add(messageHelper.getMessage("error.validacio.nom.titular.longitud.max"));
+						errors.add(messageHelper.getMessage("error.validacio.1132", new Object[]{"", enviament.getTitular().getInteressatTipus(), 255}));
 					}
 					// - Llinatge 1
 					if (enviament.getTitular().getLlinatge1() != null && enviament.getTitular().getLlinatge1().length() > 30) {
-						errors.add(messageHelper.getMessage("error.validacio.llinatge1.titular.longitud.max"));
+						errors.add(messageHelper.getMessage("error.validacio.1134", new Object[]{"", enviament.getTitular().getInteressatTipus(), 30}));
 					}
 					// - Llinatge 2
 					if (enviament.getTitular().getLlinatge2() != null && enviament.getTitular().getLlinatge2().length() > 30) {
-						errors.add(messageHelper.getMessage("error.validacio.llinatge2.titular.longitud.max"));
+						errors.add(messageHelper.getMessage("error.validacio.1135", new Object[]{"", enviament.getTitular().getInteressatTipus(), 30}));
 					}
 					// - Nif
 					if (enviament.getTitular().getNif() != null && enviament.getTitular().getNif().length() > 9) {
-						errors.add(messageHelper.getMessage("error.validacio.nif.titular.longitud.max"));
+						errors.add(messageHelper.getMessage("error.validacio.1137", new Object[]{"", enviament.getTitular().getInteressatTipus(), 9}));
 					}
 					// - Tipus
 					if (enviament.getTitular().getInteressatTipus() == null) {
-						errors.add(messageHelper.getMessage("error.validacio.interessat.tipus.titular.enviament.no.null"));
+						errors.add(messageHelper.getMessage("error.validacio.1130", new Object[]{""}));
 					}
 					if (!InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())
 							&& enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
@@ -152,12 +146,12 @@ public class NotificacioValidatorHelper {
 							switch (enviament.getTitular().getInteressatTipus()) {
 								case FISICA:
 									if (!NifHelper.isValidNifNie(nif)) {
-										errors.add(messageHelper.getMessage("error.validacio.nif.titular.tipus.document.no.valid.persona.fisica"));
+										errors.add(messageHelper.getMessage("error.validacio.1138", new Object[]{"", "fisica", "Només s'admet NIF/NIE"}));
 									}
 									break;
 								case JURIDICA:
 									if (!NifHelper.isValidCif(nif)) {
-										errors.add(messageHelper.getMessage("error.validacio.nif.titular.tipus.document.invalid.persona.juridica"));
+										errors.add(messageHelper.getMessage("error.validacio.1138", new Object[]{"", "juridica", "Només s'admet CIF"}));
 									}
 									break;
 								case ADMINISTRACIO:
@@ -166,78 +160,72 @@ public class NotificacioValidatorHelper {
 									break;
 							}
 						} else {
-							errors.add(messageHelper.getMessage("error.validacio.nif.titular.invalid"));
+							errors.add(messageHelper.getMessage("error.validacio.1138", new Object[]{"", "fisica", ""}));
 						}
 					}
 					// - Email
 					var email = enviament.getTitular().getEmail();
 					if (email != null && email.length() > 160) {
-						errors.add(messageHelper.getMessage("error.validacio.email.titular.longitud.max"));
+						errors.add(messageHelper.getMessage("error.validacio.1139", new Object[]{""}));
 					}
 					if (email != null && (!EmailHelper.isEmailValid(email) || !isEmailValid(email))) {
-						errors.add(messageHelper.getMessage("error.validacio.email.titular.format.invalid"));
+						errors.add(messageHelper.getMessage("error.validacio.1140", new Object[]{"", 160}));
 					}
 					// - Telèfon
 					if (enviament.getTitular().getTelefon() != null && enviament.getTitular().getTelefon().length() > 16) {
-						errors.add(messageHelper.getMessage("error.validacio.telefon.longitud.max"));
+						errors.add(messageHelper.getMessage("error.validacio.1141", new Object[]{"", 16}));
 					}
 					// - Raó social
 					if (enviament.getTitular().getRaoSocial() != null && enviament.getTitular().getRaoSocial().length() > 80) {
-						errors.add(messageHelper.getMessage("error.validacio.rao.social.longitud.max"));
+						errors.add(messageHelper.getMessage("error.validacio.1143", new Object[]{"", 80}));
 					}
 					// - Codi Dir3
 					if (enviament.getTitular().getDir3Codi() != null && enviament.getTitular().getDir3Codi().length() > 9) {
-						errors.add(messageHelper.getMessage("error.validacio.dir3codi.titular.longitud.max"));
+						errors.add(messageHelper.getMessage("error.validacio.1145", new Object[]{"", 9}));
 					}
 					// - Incapacitat
 					if (enviament.getTitular().isIncapacitat() && (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty())) {
-						errors.add(messageHelper.getMessage("error.validacio.indicar.destinatari.titular.incapacitat"));
+						errors.add(messageHelper.getMessage("error.validacio.1111", new Object[]{""}));
 					}
 					//   - Persona física
 					if (enviament.getTitular().getInteressatTipus() != null) {
 						if (enviament.getTitular().getInteressatTipus().equals(InteressatTipus.FISICA)) {
 							if (enviament.getTitular().getNom() == null || enviament.getTitular().getNom().isEmpty()) {
-								errors.add(messageHelper.getMessage("error.validacio.nom.persona.fisica.no.null"));
+								errors.add(messageHelper.getMessage("error.validacio.1131", new Object[]{"", "fisica"}));
 							}
 							if (enviament.getTitular().getLlinatge1() == null || enviament.getTitular().getLlinatge1().isEmpty()) {
-								errors.add(messageHelper.getMessage("error.validacio.llinatge1.persona.fisica.titular.enviament.no.null"));
+								errors.add(messageHelper.getMessage("error.validacio.1133", new Object[]{"", "fisica"}));
 							}
 							if (enviament.getTitular().getNif() == null || enviament.getTitular().getNif().isEmpty()) {
-								errors.add(messageHelper.getMessage("error.validacio.nif.persona.fisica.titular.enviament.no.null"));
+								errors.add(messageHelper.getMessage("error.validacio.1136", new Object[]{"", "fisica"}));
 							}
 							//   - Persona jurídica
 						} else if (enviament.getTitular().getInteressatTipus().equals(InteressatTipus.JURIDICA)) {
 							if ((enviament.getTitular().getRaoSocial() == null || enviament.getTitular().getRaoSocial().isEmpty()) &&
 									(enviament.getTitular().getNom() == null || enviament.getTitular().getNom().isEmpty())) {
-								errors.add(messageHelper.getMessage("error.validacio.rao.social.persona.juridica.titular.enviament.no.null"));
+								errors.add(messageHelper.getMessage("error.validacio.1142", new Object[]{"", "juridica"}));
 							}
 							if (enviament.getTitular().getNif() == null || enviament.getTitular().getNif().isEmpty()) {
-								errors.add(messageHelper.getMessage("error.validacio.nif.persona.juridica.titular.enviament.no.null"));
+								errors.add(messageHelper.getMessage("error.validacio.1136", new Object[]{"", "juridica"}));
 							}
 							//   - Administració
 						} else if (enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 							if (enviament.getTitular().getNom() == null || enviament.getTitular().getNom().isEmpty()) {
-								errors.add(messageHelper.getMessage("error.validacio.nom.administracio.titular.enviament.no.null"));
+								errors.add(messageHelper.getMessage("error.validacio.1131", new Object[]{"", "administracio"}));
 							}
 							if (enviament.getTitular().getDir3Codi() == null) {
-								errors.add(messageHelper.getMessage("error.validacio.dir3codi.administracio.titular.enviament.no.null"));
+								errors.add(messageHelper.getMessage("error.validacio.1144", new Object[]{"", "administracio"}));
 							}
 							OrganGestorDto organDir3 = cacheHelper.unitatPerCodi(enviament.getTitular().getDir3Codi());
 							if (organDir3 == null) {
-								errors.add(messageHelper.getMessage("error.validacio.dir3codi.invalid.a")
-										+ enviament.getTitular().getDir3Codi()
-										+ messageHelper.getMessage("error.validacio.dir3codi.invalid.b"));
+								errors.add(messageHelper.getMessage("error.validacio.1146", new Object[]{"", enviament.getTitular().getDir3Codi()}));
 							} else {
 								if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO) {
 									if (organDir3.getSir() == null || !organDir3.getSir()) {
-										errors.add(messageHelper.getMessage("error.validacio.dir3codi.no.oficina.sir.a")
-												+ enviament.getTitular().getDir3Codi()
-												+ messageHelper.getMessage("error.validacio.dir3codi.no.oficina.sir.b"));
+										errors.add(messageHelper.getMessage("error.validacio.1147", new Object[]{"", enviament.getTitular().getDir3Codi()}));
 									}
 									if (organigramaByEntitat.containsKey(enviament.getTitular().getDir3Codi())) {
-										errors.add(messageHelper.getMessage("error.validacio.dir3.codi.referencia.administracio.propia.entitat.a")
-												+ enviament.getTitular().getDir3Codi() +
-												messageHelper.getMessage("error.validacio.dir3.codi.referencia.administracio.propia.entitat.b"));
+										errors.add(messageHelper.getMessage("error.validacio.1148", new Object[]{"", enviament.getTitular().getDir3Codi()}));
 									}
 								}
 								if (enviament.getTitular().getNif() == null || enviament.getTitular().getNif().isEmpty()) {
@@ -252,7 +240,7 @@ public class NotificacioValidatorHelper {
 
 				if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO
 						&& !InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && senseNif) {
-					errors.add(messageHelper.getMessage("error.validacio.nif.informat.interessats"));
+					errors.add(messageHelper.getMessage("error.validacio.1102", new Object[]{""}));
 				}
 
 				// Entrega postal
@@ -283,36 +271,35 @@ public class NotificacioValidatorHelper {
 
 		// Procediment
 		if (notificacio.getProcediment() != null && notificacio.getProcediment().getCodi() != null && notificacio.getProcediment().getCodi().length() > 9) {
-			errors.add(messageHelper.getMessage("error.validacio.procediment.codi.longitud.max"));
+			errors.add(messageHelper.getMessage("error.validacio.1021"));
 		}
 
 		if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO &&
-			(notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null)) {
+				(notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null)) {
 
-			errors.add(messageHelper.getMessage("error.validacio.procediment.codi.no.null"));
+			errors.add(messageHelper.getMessage("error.validacio.1020"));
 		}
 		if (!organigramaByEntitat.containsKey(notificacio.getOrganGestorCodi())) {
-			errors.add(messageHelper.getMessage("error.validacio.organ.gestor.no.organ.entitat"));
+			errors.add(messageHelper.getMessage("error.validacio.1027"));
 		}
 
 		// Documents
 		var document = notificacio.getDocument();
 		if (document == null) {
-			errors.add(messageHelper.getMessage("error.validacio.document.no.null"));
+			errors.add(messageHelper.getMessage("error.validacio.1070"));
 			return errors;
 		}
 		if (document.getArxiuNom() != null && document.getArxiuNom().length() > 200) {
-			errors.add(messageHelper.getMessage("error.validacio.arxiu.nom.longitud.max"));
+			errors.add(messageHelper.getMessage("error.validacio.1072", new Object[]{""}));
 		}
 
 		if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
 			(documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && documentsProcessatsMassiu.get(document.getArxiuNom()) == null) &&
 			((document.getContingutBase64() == null || document.getContingutBase64().isEmpty()) &&
 			(document.getCsv() == null || document.getCsv().isEmpty()) &&
-			(document.getUrl() == null || document.getUrl().isEmpty()) &&
 			(document.getUuid() == null || document.getUuid().isEmpty()))) {
 
-				errors.add(messageHelper.getMessage("error.validacio.document.necessari"));
+			errors.add(messageHelper.getMessage("error.validacio.1073", new Object[]{""}));
 		}
 
 		if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
@@ -320,12 +307,10 @@ public class NotificacioValidatorHelper {
 
 			if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
 				if (!MimeUtils.isFormatValid(document.getMediaType(), document.getContingutBase64())) {
-					errors.add(messageHelper.getMessage("error.validacio.document.format.invalid"));
+					errors.add(messageHelper.getMessage("error.validacio.1075", new Object[]{""}));
 				}
 				if (document.getMida() > getMaxSizeFile()) {
-					var a = messageHelper.getMessage("error.validacio.document.longitud.max.a");
-					var b = messageHelper.getMessage("error.validacio.document.longitud.max.b");
-					errors.add(a + getMaxSizeFile() / (1024*1024) + b);
+					errors.add(messageHelper.getMessage("error.validacio.1085", new Object[]{getMaxSizeFile() / (1024*1024)}));
 				}
 			}
 
@@ -333,16 +318,16 @@ public class NotificacioValidatorHelper {
 			if ((document.getContingutBase64() != null && !document.getContingutBase64().isEmpty())
 					&& registreNotificaHelper.isSendDocumentsActive()) {
 				if (document.getOrigen() == null) {
-					errors.add(messageHelper.getMessage("error.validacio.metadades.document.origen.no.informat"));
+					errors.add(messageHelper.getMessage("error.validacio.1080", new Object[]{""}));
 				}
 				if (document.getValidesa() == null) {
-					errors.add(messageHelper.getMessage("error.validacio.metadades.document.validesa.no.informat"));
+					errors.add(messageHelper.getMessage("error.validacio.1081", new Object[]{""}));
 				}
 				if (document.getTipoDocumental() == null) {
-					errors.add(messageHelper.getMessage("error.validacio.metadades.document.tipus.documental.no.informat"));
+					errors.add(messageHelper.getMessage("error.validacio.1082", new Object[]{""}));
 				}
 				if (document.getArxiuNom().toUpperCase().endsWith("PDF") && document.getModoFirma() == null) {
-					errors.add(messageHelper.getMessage("error.validacio.metadades.document.mode.firma.no.informat"));
+					errors.add(messageHelper.getMessage("error.validacio.1083", new Object[]{""}));
 				}
 			}
 		}

@@ -80,9 +80,15 @@ public class MessageHelper implements MessageSourceAware {
 	public String getMessage(String key) {
 		return getMessage(key, null, null);
 	}
+	public String getMessage(String key, Locale locale) {
+		return getMessage(key, null, locale);
+	}
 
 	public void setMessageSource(MessageSource messageSource) {
 		this.messageSource = messageSource;
 	}
 
+	public void setUsuariRepository(UsuariRepository usuariRepository) {
+		this.usuariRepository = usuariRepository;
+	}
 }

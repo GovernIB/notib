@@ -10,5 +10,6 @@ import java.io.Serializable;
  */
 public enum EnviamentTipus implements Serializable {
     NOTIFICACIO,
-    COMUNICACIO
+    COMUNICACIO,
+    SIR
 }

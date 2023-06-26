@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * Informació de l'entrega postal.
  *
@@ -21,7 +23,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EntregaPostal {
+public class EntregaPostal implements Serializable {
 
     @JsonDeserialize(using = TrimStringDeserializer.class)
     protected String apartatCorreus;

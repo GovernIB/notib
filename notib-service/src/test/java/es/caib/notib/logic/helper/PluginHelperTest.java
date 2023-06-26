@@ -586,10 +586,8 @@ public class PluginHelperTest {
 		document.setGenerarCsv(true);
 		
 		DocumentEntity documentEntity = DocumentEntity.getBuilderV2(
-				document.getId(),
 				documentGesdocId,
 				document.getArxiuNom(),
-				document.getUrl(),
 				document.isNormalitzat(),
 				document.getUuid(),
 				document.getCsv(),

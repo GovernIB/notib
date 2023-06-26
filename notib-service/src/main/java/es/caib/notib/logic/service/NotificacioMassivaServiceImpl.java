@@ -264,9 +264,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     procediment = !Strings.isNullOrEmpty(notificacio.getProcediment().getCodi()) ?
                             procSerRepository.findByCodiAndEntitat(notificacio.getProcediment().getCodi(), entitat) : null;
                     if (procediment == null && !NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacio.getEnviamentTipus())) {
-                        errors.add(messageHelper.getMessage("error.validacio.procser.amb.codi.no.trobat"));
+                        errors.add(messageHelper.getMessage("error.validacio.1022"));
                     } else if (procediment != null && ProcSerTipusEnum.SERVEI.equals(procediment.getTipus()) && NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
-                        errors.add(messageHelper.getMessage("error.validacio.alta.notificacio.amb.servei.nomes.comunicacions"));
+                        errors.add(messageHelper.getMessage("error.validacio.1024"));
                     } else if (procediment != null) {
                         notificacio.setProcediment(conversioTipusHelper.convertir(procediment, ProcSerDto.class));
                     }
@@ -279,9 +279,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     try {
                         crearNotificacio(entitat, notificacio, notificacioMassivaEntity, documentsProcessatsMassiu);
                     } catch (DocumentNotFoundException | NoDocumentException ex) {
-                        errors.add(messageHelper.getMessage("error.obtenint.document.arxiu"));
+                        errors.add(messageHelper.getMessage("error.validacio.1077", new Object[]{""}));
                     } catch (NoMetadadesException ex) {
-                        errors.add(messageHelper.getMessage("error.metadades.document"));
+                        errors.add(messageHelper.getMessage("error.validacio.1078"));
                     }
                 }
 

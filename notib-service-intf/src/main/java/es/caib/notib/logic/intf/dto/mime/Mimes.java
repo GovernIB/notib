@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MimesSIR {
+public class Mimes {
 
-    private MimesSIR() {
-        throw new IllegalStateException("MimesSIR no pot ser instanciat");
+    private Mimes() {
+        throw new IllegalStateException("Mimes no pot ser instanciat");
     }
 
-    private static final List<String> formats = new ArrayList<>(Arrays.asList(
+    private static final List<String> formatsSIR = new ArrayList<>(Arrays.asList(
             "image/jpeg", "application/vnd.oasis.opendocument.text",
             "application/vnd.oasis.opendocument.presentation",
             "application/vnd.oasis.opendocument.spreadsheet",
@@ -28,8 +28,17 @@ public class MimesSIR {
             "xsig" // TODO FALTA DETERMINAR EL MIME TYPE PER UN XSIG
     ));
 
-    public static List<String> getFormats() {
-        return formats;
+    private static final List<String> formatsNoSIR = new ArrayList<>(Arrays.asList(
+            "application/pdf",
+            "application/zip"
+    ));
+
+    public static List<String> getFormatsSIR() {
+        return formatsSIR;
+    }
+
+    public static List<String> getFormatsNoSIR() {
+        return formatsNoSIR;
     }
 
 }

@@ -27,9 +27,6 @@ public class DocumentCommand {
 	private Long mida;
 	private String contingutBase64;
 	private String hash;
-	private String url;
-	//	private List<String> metadadesKeys = new ArrayList<String>();
-	//	private List<String> metadadesValues = new ArrayList<String>();
 	private boolean normalitzat;
 	private boolean generarCsv;
 	private String uuid;
@@ -49,8 +46,7 @@ public class DocumentCommand {
 				(command.getArxiuGestdocId() == null || command.getArxiuGestdocId().isEmpty()) &&
 				(command.getContingutBase64() == null || command.getContingutBase64().isEmpty()) &&
 				(command.getUuid() == null || command.getUuid().isEmpty()) &&
-				(command.getCsv() == null || command.getCsv().isEmpty()) &&
-				(command.getUrl() == null || command.getUrl().isEmpty()))
+				(command.getCsv() == null || command.getCsv().isEmpty()))
 				? null : ConversioTipusHelper.convertir(command, DocumentDto.class);
 	}
 

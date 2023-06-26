@@ -5,6 +5,7 @@ package es.caib.notib.api.externa.controller;
 
 import es.caib.notib.api.externa.openapi.model.AppInfoApi;
 import es.caib.notib.client.domini.AppInfo;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -65,4 +66,9 @@ public class ExpernaApiRestController {
 		return appInfo;
 	}
 
+	@Hidden
+	@GetMapping(value = {"/rest/securedAppinfo"})
+	public AppInfo getAppInfoSecured(HttpServletRequest request) throws IOException {
+		return getAppInfo(request);
+	}
 }

@@ -6,27 +6,24 @@ import es.caib.notib.client.domini.ValidesaEnum;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
-
 @Getter @Setter
-public class DocumentDto implements Serializable {
+public class DocumentValidDto {
 
-	private String id;
-	private String arxiuGestdocId;
 	private String arxiuNom;
 	private String mediaType;
-	private Long mida;
-	private String contingutBase64;
-	private String hash;
-	private boolean normalitzat;
-	private boolean generarCsv;
+	private String arxiuGestdocId;
 	private String uuid;
 	private String csv;
+	private Long mida;
+
+	private boolean normalitzat;
 	private OrigenEnum origen;
 	private ValidesaEnum validesa;
 	private TipusDocumentalEnum tipoDocumental;
 	private Boolean modoFirma;
 
-	private static final long serialVersionUID = 299966599434094856L;
-
+	private boolean errorFitxer = false;
+	private boolean errorMetadades = false;
+	private boolean errorFirma = false;
+	private String errorFirmaMsg;
 }

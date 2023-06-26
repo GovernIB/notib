@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * Informació sobre l'entrega a la DEH.
  *
@@ -21,7 +23,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EntregaDeh {
+public class EntregaDeh implements Serializable {
 
     private boolean obligat;
     @JsonDeserialize(using = TrimStringDeserializer.class)

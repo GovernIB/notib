@@ -3,7 +3,6 @@ package es.caib.notib.logic.helper;
 import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.OrigenEnum;
-import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.intf.dto.DocumentDto;
@@ -468,15 +467,13 @@ public class NotificacioHelper {
 		log.trace("Enregistram el document llegit a la base de dades");
 		if (document.getId() != null && !document.getId().isEmpty()) {
 			documentEntity = documentRepository.findById(Long.valueOf(document.getId())).orElseThrow();
-			documentEntity.update(documentGesdocId != null ? documentGesdocId : document.getArxiuGestdocId(), document.getArxiuNom(), document.getUrl(),
+			documentEntity.update(documentGesdocId != null ? documentGesdocId : document.getArxiuGestdocId(), document.getArxiuNom(),
 					document.isNormalitzat(), document.getUuid(), document.getCsv(), document.getMediaType(), document.getMida(), document.getOrigen(),
 					document.getValidesa(), document.getTipoDocumental(), document.getModoFirma());
 		} else {
 			documentEntity = documentRepository.save(DocumentEntity.getBuilderV2(
-					document.getArxiuGestdocId(),
 					documentGesdocId != null ? documentGesdocId : document.getArxiuGestdocId(),
 					document.getArxiuNom(),
-					document.getUrl(),
 					document.isNormalitzat(),
 					document.getUuid(),
 					document.getCsv(),

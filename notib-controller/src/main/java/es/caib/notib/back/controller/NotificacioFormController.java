@@ -378,13 +378,6 @@ public class NotificacioFormController extends BaseUserController {
                     }
                     notificacioCommand.getDocuments()[i] = null;
                     break;
-                case URL:
-                    if (notificacioCommand.getDocumentArxiuUrl()[i] != null && !notificacioCommand.getDocumentArxiuUrl()[i].isEmpty()) {
-                        notificacioCommand.getDocuments()[i].setUrl(notificacioCommand.getDocumentArxiuUrl()[i]);
-                        break;
-                    }
-                    notificacioCommand.getDocuments()[i] = null;
-                    break;
             }
         }
     }
@@ -441,10 +434,6 @@ public class NotificacioFormController extends BaseUserController {
             if (notificacioCommand.getDocuments()[i].getCsv() != null) {
                 model.addAttribute(NOM_DOCUMENT + i, notificacioCommand.getDocuments()[i].getCsv());
                 notificacioCommand.setTipusDocumentDefault(i, TipusDocumentEnumDto.CSV.name());
-            }
-            if (notificacioCommand.getDocuments()[i].getUrl() != null) {
-                model.addAttribute(NOM_DOCUMENT + i, notificacioCommand.getDocuments()[i].getUrl());
-                notificacioCommand.setTipusDocumentDefault(i, TipusDocumentEnumDto.URL.name());
             }
         }
         emplenarModelNotificacio(request, model, notificacioCommand);
