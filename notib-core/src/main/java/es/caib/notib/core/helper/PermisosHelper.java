@@ -952,10 +952,12 @@ public class PermisosHelper {
 		AclSidEntity ownerSid = null;
 		for (OrganGestorEntity organOrigen: organsOrigen) {
 			AclObjectIdentityEntity objectIdentityAntic = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organOrigen.getId());
-			if (objectIdentityAntic == null)
+			if (objectIdentityAntic == null) {
 				continue;
-			if (ownerSid == null)
+			}
+			if (ownerSid == null) {
 				ownerSid = objectIdentityAntic.getOwnerSid();
+			}
 			permisosOrigen.addAll(aclEntryRepository.findByAclObjectIdentity(objectIdentityAntic));
 		}
 		if (ownerSid == null) {
@@ -983,6 +985,10 @@ public class PermisosHelper {
 					.mask(permisAntic.getMask())
 					.granting(permisAntic.getGranting())
 					.build();
+//
+			if (permisAntic.equals(aclEntry)) {
+				continue;
+			}
 			permisosDesti.add(aclEntry);
 		}
 	}

@@ -10,6 +10,7 @@ import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.OrganGestorRepository;
+import es.caib.notib.core.repository.acl.AclEntryRepository;
 import es.caib.notib.core.test.AuthenticationTest;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import org.junit.After;
@@ -38,6 +39,8 @@ public class OrganGestorSyncHelperIT {
     @Autowired
     @InjectMocks
     private OrganGestorService organGestorService;
+    @Autowired
+    private OrganGestorHelper organGestorHelper;
 
     @Autowired
     private OrganGestorRepository organGestorRepository;
@@ -72,6 +75,9 @@ public class OrganGestorSyncHelperIT {
             "{\"codigo\": \"A014\", \"denominacion\": \"A014\", \"descripcionEstado\":\"V\", \"superior\": \"A119\", \"hijos\": [], \"historicosUO\": []}," +
             "{\"codigo\": \"A015\", \"denominacion\": \"A015\", \"descripcionEstado\":\"E\", \"superior\": \"A000\", \"hijos\": [{\"codigo\": \"A016\", \"denominacion\": \"A016\", \"descripcionEstado\":\"V\", \"superior\": \"A015\", \"hijos\": [], \"historicosUO\": []}], \"historicosUO\": [\"A120\"]}," +
             "{\"codigo\": \"A016\", \"denominacion\": \"A016\", \"descripcionEstado\":\"V\", \"superior\": \"A121\", \"hijos\": [], \"historicosUO\": []}," +
+            "{\"codigo\": \"A017\", \"denominacion\": \"A017\", \"descripcionEstado\":\"E\", \"superior\": \"A000\", \"hijos\": [], \"historicosUO\": [\"A017\", \"A122\"]}," +
+            "{\"codigo\": \"A018\", \"denominacion\": \"A018\", \"descripcionEstado\":\"V\", \"superior\": \"A000\", \"hijos\": [], \"historicosUO\": [\"A018\"]}," +
+            "{\"codigo\": \"A019\", \"denominacion\": \"A019\", \"descripcionEstado\":\"E\", \"superior\": \"A000\", \"hijos\": [], \"historicosUO\": [\"A018\"]}," +
             "{\"codigo\": \"A101\", \"denominacion\": \"A101\", \"descripcionEstado\":\"V\", \"superior\": \"A000\", \"hijos\": [], \"historicosUO\": []}," +
             "{\"codigo\": \"A102\", \"denominacion\": \"A102\", \"descripcionEstado\":\"V\", \"superior\": \"A000\", \"hijos\": [], \"historicosUO\": []}," +
             "{\"codigo\": \"A103\", \"denominacion\": \"A103\", \"descripcionEstado\":\"V\", \"superior\": \"A000\", \"hijos\": [], \"historicosUO\": []}," +
@@ -92,7 +98,8 @@ public class OrganGestorSyncHelperIT {
             "{\"codigo\": \"A118\", \"denominacion\": \"A118\", \"descripcionEstado\":\"V\", \"superior\": \"A000\", \"hijos\": [], \"historicosUO\": []}," +
             "{\"codigo\": \"A119\", \"denominacion\": \"A119\", \"descripcionEstado\":\"V\", \"superior\": \"A000\", \"hijos\": [{\"codigo\": \"A014\", \"denominacion\": \"A014\", \"descripcionEstado\":\"V\", \"superior\": \"A119\", \"hijos\": [], \"historicosUO\": []}], \"historicosUO\": []}," +
             "{\"codigo\": \"A120\", \"denominacion\": \"A120\", \"descripcionEstado\":\"E\", \"superior\": \"A000\", \"hijos\": [{\"codigo\": \"A016\", \"denominacion\": \"A016\", \"descripcionEstado\":\"V\", \"superior\": \"A120\", \"hijos\": [], \"historicosUO\": []}], \"historicosUO\": [\"A121\"]}," +
-            "{\"codigo\": \"A121\", \"denominacion\": \"A121\", \"descripcionEstado\":\"V\", \"superior\": \"A000\", \"hijos\": [{\"codigo\": \"A014\", \"denominacion\": \"A016\", \"descripcionEstado\":\"V\", \"superior\": \"A121\", \"hijos\": [], \"historicosUO\": []}], \"historicosUO\": []}" +
+            "{\"codigo\": \"A121\", \"denominacion\": \"A121\", \"descripcionEstado\":\"V\", \"superior\": \"A000\", \"hijos\": [{\"codigo\": \"A014\", \"denominacion\": \"A016\", \"descripcionEstado\":\"V\", \"superior\": \"A121\", \"hijos\": [], \"historicosUO\": []}], \"historicosUO\": []}," +
+            "{\"codigo\": \"A122\", \"denominacion\": \"A122\", \"descripcionEstado\":\"V\", \"superior\": \"A000\", \"hijos\": [], \"historicosUO\": []}" +
             "]";
 
 
@@ -105,6 +112,7 @@ public class OrganGestorSyncHelperIT {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         organGestorService.setServicesForSynctest(procSerSyncHelper, pluginHelper, integracioHelper);
+        organGestorHelper.setServicesForSynctest(pluginHelper);
         cacheHelper.setPluginHelper(pluginHelper);
         ObjectMapper mapper = new ObjectMapper();
 
@@ -112,6 +120,7 @@ public class OrganGestorSyncHelperIT {
         Mockito.doNothing().when(procSerSyncHelper).actualitzaProcediments(Mockito.any(EntitatDto.class));
         Mockito.doNothing().when(procSerSyncHelper).actualitzaServeis(Mockito.any(EntitatDto.class));
         Mockito.doNothing().when(integracioHelper).addAccioOk(Mockito.any(IntegracioInfo.class));
+        Mockito.doNothing().when(integracioHelper).addAccioOk(Mockito.any(IntegracioInfo.class), Mockito.anyBoolean());
         Mockito.when(pluginHelper.dadesUsuariConsultarAmbCodi(Mockito.anyString())).thenReturn(null);
         Mockito.when(pluginHelper.llistarLlibreOrganisme(Mockito.anyString(), Mockito.anyString())).thenReturn(new LlibreDto());
 
@@ -143,7 +152,7 @@ public class OrganGestorSyncHelperIT {
 
         // ÒRGANS
         // Vigents
-        Assert.assertEquals(19, organsVigents.size());
+        Assert.assertEquals(22, organsVigents.size());
         Assert.assertTrue(conteOrgan(organsVigents, "EA0004518"));
         Assert.assertTrue(conteOrgan(organsVigents, "A000"));
         Assert.assertTrue(conteOrgan(organsVigents, "A001"));
@@ -163,20 +172,24 @@ public class OrganGestorSyncHelperIT {
         Assert.assertTrue(conteOrgan(organsVigents, "A014"));
         Assert.assertTrue(conteOrgan(organsVigents, "A121"));
         Assert.assertTrue(conteOrgan(organsVigents, "A016"));
+        Assert.assertTrue(conteOrgan(organsVigents, "A017"));
+        Assert.assertTrue(conteOrgan(organsVigents, "A018"));
+        Assert.assertTrue(conteOrgan(organsVigents, "A122"));
 
         // Obsolets
-        Assert.assertEquals(20, obsoleteUnitats.size());
+        Assert.assertEquals(22, obsoleteUnitats.size());
 
         // Dividits
-        Assert.assertEquals(5, organsDividits.size());
+        Assert.assertEquals(6, organsDividits.size());
         Assert.assertTrue(conteOrgan(organsDividits, "A003"));
         Assert.assertTrue(conteOrgan(organsDividits, "A008"));
         Assert.assertTrue(conteOrgan(organsDividits, "A011"));
         Assert.assertTrue(conteOrgan(organsDividits, "A113"));
         Assert.assertTrue(conteOrgan(organsDividits, "A012"));
+        Assert.assertTrue(conteOrgan(organsDividits, "A017"));
 
         // Fusionats
-        Assert.assertEquals(8, organsFusionats.size());
+        Assert.assertEquals(9, organsFusionats.size());
         Assert.assertTrue(conteOrgan(organsFusionats, "A004"));
         Assert.assertTrue(conteOrgan(organsFusionats, "A005"));
         Assert.assertTrue(conteOrgan(organsFusionats, "A107"));
@@ -185,6 +198,7 @@ public class OrganGestorSyncHelperIT {
         Assert.assertTrue(conteOrgan(organsFusionats, "A010"));
         Assert.assertTrue(conteOrgan(organsFusionats, "A111"));
         Assert.assertTrue(conteOrgan(organsFusionats, "A112"));
+        Assert.assertTrue(conteOrgan(organsFusionats, "A019"));
 
         // Substituits
         Assert.assertEquals(5, organsSubstituits.size());
@@ -299,6 +313,30 @@ public class OrganGestorSyncHelperIT {
                 case "A016":
                     Assert.assertEquals(1, permisos.size());
                     Assert.assertNotNull(permisAdmin);
+                    Assert.assertTrue(permisAdmin.isAdministration());
+                    break;
+                case "A017":
+                    Assert.assertEquals(2, permisos.size());
+                    Assert.assertNotNull(permisAdmin);
+                    Assert.assertTrue(permisAdmin.isAdministrador());
+                    Assert.assertNotNull(permisRole);
+                    Assert.assertTrue(permisRole.isProcessar());
+                    break;
+                case "A122":
+                    Assert.assertEquals(0, permisos.size());
+                    Assert.assertNull(permisAdmin);
+                    Assert.assertNull(permisRole);
+                    break;
+                case "A018":
+                    Assert.assertEquals(1, permisos.size());
+                    Assert.assertNotNull(permisRole);
+                    Assert.assertTrue(permisRole.isAdministration());
+                    Assert.assertTrue(permisRole.isComuns());
+                    break;
+                case "A019":
+                    Assert.assertEquals(1, permisos.size());
+                    Assert.assertEquals(1, permisos.size());
+                    Assert.assertNotNull(permisRole);
                     Assert.assertTrue(permisAdmin.isAdministration());
                     break;
                 default:
