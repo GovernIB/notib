@@ -97,7 +97,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				//Crea un nou event
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
 					for (NotificacioEnviamentEntity enviament: notificacio.getEnviamentsPerNotifica()) {
-						if (enviament.getTitular() != null && enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
+						String nif = enviament.getTitular().isIncapacitat() ? enviament.getDestinataris().get(0).getNif() : enviament.getTitular().getNif();
+						if (enviament.getTitular() != null && nif.equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
 							enviament.updateNotificaEnviada(resultadoEnvio.getIdentificador());
 							enviamentTableHelper.actualitzarRegistre(enviament);
 							enviamentHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaV0Helper.notificacioEnviar");
@@ -405,7 +406,13 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		ResultadoEnvios resultadoEnvios = new ResultadoEnvios();
 		for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 			ResultadoEnvio resultatEnviament = new ResultadoEnvio();
-			resultatEnviament.setNifTitular(enviament.getTitular().getNif());
+//			resultatEnviament.setNifTitular(enviament.getTitular().getNif());
+
+			if (enviament.getTitular().isIncapacitat() && enviament.getDestinataris() != null) {
+				resultatEnviament.setNifTitular(enviament.getDestinataris().get(0).getNif());
+			} else {
+				resultatEnviament.setNifTitular(enviament.getTitular().getNif());
+			}
 			resultatEnviament.setIdentificador(getRandomAlphaNumericString(20));
 			resultadoEnvios.getItem().add(resultatEnviament);
 		}
