@@ -756,15 +756,18 @@ public class PermisosHelper {
 	}
 
 	private void duplicaPermisos(AclClassEntity classname, List<OrganGestorEntity> organsOrigen, OrganGestorEntity organDesti) {
+
 		Set<AclEntryEntity> permisosDesti = new HashSet<>();
 		Set<AclEntryEntity> permisosOrigen = new HashSet<>();
 		AclSidEntity ownerSid = null;
 		for (OrganGestorEntity organOrigen: organsOrigen) {
 			AclObjectIdentityEntity objectIdentityAntic = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organOrigen.getId());
-			if (objectIdentityAntic == null)
+			if (objectIdentityAntic == null) {
 				continue;
-			if (ownerSid == null)
+			}
+			if (ownerSid == null) {
 				ownerSid = objectIdentityAntic.getOwnerSid();
+			}
 			permisosOrigen.addAll(aclEntryRepository.findByAclObjectIdentity(objectIdentityAntic));
 		}
 		duplicaEntradesPermisos(classname, organDesti, ownerSid, permisosOrigen, permisosDesti);
@@ -789,6 +792,9 @@ public class PermisosHelper {
 					.mask(permisAntic.getMask())
 					.granting(permisAntic.getGranting())
 					.build();
+			if (permisAntic.equals(aclEntry)) {
+				continue;
+			}
 			permisosDesti.add(aclEntry);
 		}
 	}

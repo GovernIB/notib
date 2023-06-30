@@ -60,6 +60,7 @@ import es.caib.notib.persist.repository.ProcSerRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -421,6 +422,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	@Override
 	@Transactional(timeout = 3600)
+	@SuppressWarnings("unchecked")
 	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto) throws Exception {
 
 		var entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false);
@@ -644,8 +646,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 			// Distinció entre substitució i fusió
 			Set<UnitatOrganitzativaDto> keysMergeOrSubst = mergeOrSubstMap.keySet();
-			var mergeMap = new ArrayListValuedHashMap();
-			var substMap = new ArrayListValuedHashMap();
+			MultiValuedMap mergeMap = new ArrayListValuedHashMap();
+			MultiValuedMap substMap = new ArrayListValuedHashMap();
 			List<UnitatOrganitzativaDto> values;
 			for (UnitatOrganitzativaDto mergeOrSubstKey : keysMergeOrSubst) {
 				values = (List<UnitatOrganitzativaDto>) mergeOrSubstMap.get(mergeOrSubstKey);
@@ -654,13 +656,20 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					continue;
 				}
 				for (var value : values) {
+					if (isAlreadyAddedToMap(mergeMap, mergeOrSubstKey, value)) {
+						//normally this shoudn't duplicate, it is added to deal with the result of call to WS DIR3 PRE in day 2023-06-21 with fechaActualizacion=[2023-06-15] which was probably incorrect
+						log.info("Detected duplication of organs in prediction of fusion. Unitat" + value.getCodi() + "already added to fusion into " + mergeOrSubstKey.getCodi() + ". Probably caused by error in DIR3");
+						continue;
+					}
 					mergeMap.put(mergeOrSubstKey, value);
 				}
 			}
 			// Obtenir llistat d'unitats que ara estan vigents en BBDD, i després de la sincronització continuen vigents, però amb les propietats canviades
+			// ====================  CANVIS EN ATRIBUTS ===================
 			unitatsVigents = getVigentsFromWebService(entitat, unitatsWS, organsVigents);
 
 			// Obtenir el llistat d'unitats que son totalment noves (no existeixen en BBDD): Creació
+			// ====================  NOUS ===================
 			List<UnitatOrganitzativaDto> unitatsNew = getNewFromWS(entitat, unitatsWS, organsVigents);
 			return PrediccioSincronitzacio.builder().unitatsVigents(unitatsVigents).unitatsNew(unitatsNew).unitatsExtingides(unitatsExtingides).splitMap(splitMap)
 					.substMap(substMap).mergeMap(mergeMap).build();
@@ -670,6 +679,22 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		} catch (Exception ex) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, "No ha estat possible obtenir la predicció de canvis de unitats organitzatives", ex);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private boolean isAlreadyAddedToMap(MultiValuedMap mergeMap, UnitatOrganitzativaDto key, UnitatOrganitzativaDto value) {
+
+		List<UnitatOrganitzativaDto> values = (List<UnitatOrganitzativaDto>) mergeMap.get(key);
+		if (values == null) {
+			return false;
+		}
+		boolean contains = false;
+		for (UnitatOrganitzativaDto unitat : values) {
+			if (unitat.getCodi().equals(value.getCodi())) {
+				contains = true;
+			}
+		}
+		return contains;
 	}
 
 	private PrediccioSincronitzacio predictFirstSynchronization(EntitatEntity entitat) throws SistemaExternException {
@@ -868,29 +893,41 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private void getLastHistoricosRecursive(NodeDir3 unitat, List<NodeDir3> unitatsFromWebService, List<NodeDir3> lastHistorics) {
 
 		log.info("Coloca historics recursiu(" + "unitatCodi=" + unitat.getCodi() + ")");
+
 		if (unitat.getHistoricosUO() == null || unitat.getHistoricosUO().isEmpty()) {
 			lastHistorics.add(unitat);
 			return;
 		}
-		for (var historicCodi : unitat.getHistoricosUO()) {
+		for (String historicCodi : unitat.getHistoricosUO()) {
 			NodeDir3 unitatFromCodi = getUnitatFromCodi(historicCodi, unitatsFromWebService);
-			if (unitatFromCodi != null) {
+			if (unitatFromCodi == null) {
+				// Looks for historico in database
+				OrganGestorEntity entity = organGestorRepository.findByCodi(historicCodi);
+				if (entity != null) {
+					NodeDir3 uo = conversioTipusHelper.convertir(entity, NodeDir3.class);
+					lastHistorics.add(uo);
+				} else {
+					String errorMissatge = "Error en la sincronització amb DIR3. La unitat orgánica (" + unitat.getCodi()
+							+ ") té l'estat (" + unitat.getEstat() + ") i l'històrica (" + historicCodi
+							+ ") però no s'ha retornat la unitat orgánica (" + historicCodi
+							+ ") en el resultat de la consulta del WS ni en la BBDD.";
+					throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
+				}
+			} else if (historicCodi.equals(unitat.getCodi())) {
+				// EXAMPLE:
+				//A04032359
+				//-A04032359
+				//-A04068486
+				// if it is transitioning to itself don't add it as last historic
+				//this probably shoudn't happen, it is added to deal with the result of call to WS made in PRE in day 2023-06-21 with fechaActualizacion=[2023-06-15] which was probably incorrect
+				log.info("Detected organ division with transitioning to itself : " + historicCodi + ". Probably caused by error in DIR3");
+			} else {
 				if (!unitatFromCodi.equals(unitat)) {
 					getLastHistoricosRecursive(unitatFromCodi, unitatsFromWebService, lastHistorics);
 				} else {
 					lastHistorics.add(unitat);
 				}
 			}
-			// Looks for historico in database
-			var entity = organGestorRepository.findByCodi(historicCodi);
-			if (entity == null) {
-				var errorMissatge = "Error en la sincronització amb DIR3. La unitat orgánica (" + unitat.getCodi()
-						+ ") té l'estat (" + unitat.getEstat() + ") i l'històrica (" + historicCodi
-						+ ") però no s'ha retornat la unitat orgánica (" + historicCodi + ") en el resultat de la consulta del WS ni en la BBDD.";
-				throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
-			}
-			var uo = conversioTipusHelper.convertir(entity, NodeDir3.class);
-			lastHistorics.add(uo);
 		}
 	}
 

@@ -145,6 +145,9 @@ public class OrganGestorHelper {
 			} else if (obsoleteUnitat.getNous().size() > 1) {
 				obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.DIVISIO);
 				organsDividits.add(obsoleteUnitat);
+				if (obsoleteUnitat.getNous().contains(obsoleteUnitat)) {
+					obsoleteUnitat.setEstat(OrganGestorEstatEnum.V);
+				}
 			} else if (obsoleteUnitat.getNous().size() == 1) {
 				if (obsoleteUnitat.getNous().get(0).getAntics().size() > 1) {
 					obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.FUSIO);
@@ -154,8 +157,11 @@ public class OrganGestorHelper {
 					organsSubstituits.add(obsoleteUnitat);
 				}
 			}
-			log.debug(prefix + "Unitat extingida " + obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom());
-			obsoleteUnitat.setEstat(OrganGestorEstatEnum.E);
+			List<OrganGestorEntity> nous = obsoleteUnitat.getNous();
+			if (nous != null && !nous.contains(obsoleteUnitat)) {
+				log.debug(prefix + "Unitat extingida " + obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom());
+				obsoleteUnitat.setEstat(OrganGestorEstatEnum.E);
+			}
 			progres.setProgres(22 + (nombreUnitatsProcessades++ * 5 / nombreUnitatsTotal));
 		}
 		var avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitat.getId(), ORGAN_NO_SYNC);
@@ -219,9 +225,25 @@ public class OrganGestorHelper {
 		OrganGestorEntity nova;
 		for (var historicoCodi : unidadWS.getHistoricosUO()) {
 			nova = organGestorRepository.findByEntitatAndCodi(entitat, historicoCodi);
+			if (unitat.getNous() != null && isAlreadyAddedToList(unitat.getNous(), nova)) {
+				//normally this shoudn't duplicate, it is added to deal with the result of call to WS DIR3 PRE in day 2023-06-21 with fechaActualizacion=[2023-06-15] which was probably incorrect
+				log.info("Detected duplication of transtition in DB. Unitat" + unitat.getCodi() + "already transitioned into " + nova.getCodi() + ". Probably caused by error in DIR3");
+				continue;
+			}
 			unitat.addNou(nova);
 			nova.addAntic(unitat);
 		}
+	}
+
+	private boolean isAlreadyAddedToList(List<OrganGestorEntity> organs, OrganGestorEntity organ) {
+
+		boolean contains = false;
+		for (OrganGestorEntity organGestorEntity : organs) {
+			if (organGestorEntity.getId().equals(organ.getId())) {
+				contains = true;
+			}
+		}
+		return contains;
 	}
 
 	@Transactional
@@ -286,5 +308,9 @@ public class OrganGestorHelper {
 		organ.setOficina(oficina.getCodi());
 		organ.setOficinaNom(oficina.getNom());
 		organGestorRepository.save(organ);
+	}
+
+	public void setServicesForSynctest(PluginHelper pluginHelper) {
+		this.pluginHelper = pluginHelper;
 	}
 }
