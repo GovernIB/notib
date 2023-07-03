@@ -11,6 +11,7 @@ import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.DocumentHelper;
 import es.caib.notib.logic.helper.EnviamentTableHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.MessageHelper;
@@ -161,6 +162,8 @@ public class NotificacioServiceWsV2Test {
 	private AuditHelper auditHelper;
 	@Mock
 	private MessageHelper messageHelper;
+	@Mock
+	private  DocumentHelper documentHelper;
 
 	// Autowired de NotificacioValidator
 	@Mock
@@ -291,8 +294,6 @@ public class NotificacioServiceWsV2Test {
 	public void whenAltaUuid_thenReturnErrorOrRespostaAltaOK(NotificacioV2 notificacio, int errorEsperat) throws IOException {
 		
 		// Given
-
-		// When
 		switch (errorEsperat) {
 			case EMISOR_DIR3_NULL:
 				when(entitatRepository.findByDir3Codi(Mockito.isNull())).thenReturn(null);
@@ -386,8 +387,10 @@ public class NotificacioServiceWsV2Test {
 
 		}
 
-		// Then
+		// When
 		RespostaAlta respostaAlta = notificacioService.alta(notificacio);
+
+		// Then
 		assertNotNull(respostaAlta);
 
 		if (errorEsperat == 0) {

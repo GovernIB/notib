@@ -44,7 +44,6 @@ import es.caib.notib.logic.intf.dto.organisme.UnitatOrganitzativaDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.persist.entity.AplicacioEntity;
-import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.EnviamentTableEntity;
 import es.caib.notib.persist.entity.GrupEntity;
@@ -84,6 +83,10 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -180,6 +183,9 @@ public class ConversioTipusHelper {
 									dto.setCreatedByNom(usuari.getNom());
 									dto.setCreatedByCodi(usuari.getCodi());
 								});
+								var data = entity.getCreatedDate().orElseThrow();
+								Date date = Date.from(data.atZone(ZoneId.systemDefault()).toInstant());
+								dto.setCreatedDate(date);
 							}
 				}).register();
 

@@ -34,6 +34,7 @@ public class Enviament implements Serializable {
     private boolean entregaDehActiva;
     private EntregaDeh entregaDeh;
     private NotificaServeiTipusEnumDto serveiTipus;
+    private boolean perEmail;
 
     public List<Persona> getDestinataris() {
         return destinataris != null ? destinataris : new ArrayList<Persona>();
