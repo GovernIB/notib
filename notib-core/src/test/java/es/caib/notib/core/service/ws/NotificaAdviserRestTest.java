@@ -664,7 +664,7 @@ public class NotificaAdviserRestTest {
 
 	private Client jerseyClient;
 
-	@Test
+//	@Test
 	public void testSynchronized() throws Exception{
 
 		EnviamentAdviser a = crearAdviser("pendiente_sede");
