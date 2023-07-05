@@ -75,6 +75,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 												new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
 
 		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
+		configHelper.setEntitatCodi(notificacio.getEntitat().getCodi());
 		log.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 			log.error(" [NOT] la notificació no té l'estat REGISTRADA.");

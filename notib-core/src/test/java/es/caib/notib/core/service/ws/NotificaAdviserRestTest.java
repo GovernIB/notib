@@ -17,6 +17,7 @@ import es.caib.notib.core.api.dto.adviser.Acuse;
 import es.caib.notib.core.api.dto.adviser.EnviamentAdviser;
 import es.caib.notib.core.api.dto.adviser.Receptor;
 import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import javax.ws.rs.core.UriBuilder;
@@ -662,6 +663,56 @@ public class NotificaAdviserRestTest {
 			"KkL6rZmP385WDpQ17lui");
 
 	private Client jerseyClient;
+
+	@Test
+	public void testSynchronized() throws Exception{
+
+		EnviamentAdviser a = crearAdviser("pendiente_sede");
+		EnviamentAdviser b = crearAdviser("notificada");
+
+		ObjectMapper mapper  = getMapper();
+		mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+		String body = mapper.writeValueAsString(a);
+
+		String jsonA = jerseyClient.resource(ENDPOINT_ADDRESS).type("application/json").post(String.class, body);
+		System.out.println("Missatge REST rebut: " + jsonA);
+		AdviserResponseDto respostaA = mapper.readValue(jsonA, AdviserResponseDto.class);
+
+		String jsonB = jerseyClient.resource(ENDPOINT_ADDRESS).type("application/json").post(String.class, body);
+		System.out.println("Missatge REST rebut: " + jsonB);
+		AdviserResponseDto respostaB = mapper.readValue(jsonB, AdviserResponseDto.class);
+
+		assertNotNull(respostaA.getCodigoRespuesta());
+		assertNotNull(respostaA.getDescripcionRespuesta());
+
+		assertNotNull(respostaB.getCodigoRespuesta());
+		assertNotNull(respostaB.getDescripcionRespuesta());
+	}
+
+	private EnviamentAdviser crearAdviser(String estat) throws Exception {
+
+		jerseyClient = generarClient(USER, PASS);
+
+		// Data
+		GregorianCalendar c = new GregorianCalendar();
+		c.setTime(new Date());
+		XMLGregorianCalendar date = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+
+		// Receptor enviament
+		Receptor receptor = new Receptor();
+		receptor.setNifReceptor("12345678Z");
+		receptor.setNombreReceptor("destinatariNom0 destLlinatge1_0 destLlinatge2_0");
+
+		// Acuse PDF
+		Acuse acusePDF = new Acuse();
+		acusePDF.setContenido(CERIFICACIO_B64.getBytes());
+		acusePDF.setCsvResguardo("dasd-dsadad-asdasd-asda-sda-das");
+		acusePDF.setHash(CERIFICACIO_SHA1);
+
+		return EnviamentAdviser.builder().organismoEmisor(EMISOR_DIR3).hIdentificador("39128285cf121cb00453")
+				.tipoEntrega(unmarshal("2")).modoNotificacion(unmarshal("5")).estado(estat)
+				.fechaEstado(date).receptor(receptor).acusePDF(acusePDF).build();
+	}
 	
 //	@Test
 	public void a_datadoOrganismoTest() throws Exception {
