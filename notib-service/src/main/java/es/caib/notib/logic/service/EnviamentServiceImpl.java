@@ -58,6 +58,8 @@ import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.PermisosService;
+import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
+import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.persist.entity.ColumnesEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.EnviamentTableEntity;
@@ -83,6 +85,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.supercsv.io.CsvListWriter;
@@ -165,9 +169,12 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Autowired
 	private NotificaHelper notificaHelper;
 
+
 	private static final String CONSULTA_ENV_LOG = "Consulta els enviaments de les notificacións que te una entitat";
 	private static final String FORMAT_DATA = "dd/MM/yyyy";
 	private static final String FORMAT_DATA_HORA = "dd/MM/yyyy HH:mm:ss";
+
+	private StateMachine<EnviamentSmEstat, EnviamentSmEvent> enviamentStateMachine;
 
 	@Override
 	@Transactional(readOnly = true)

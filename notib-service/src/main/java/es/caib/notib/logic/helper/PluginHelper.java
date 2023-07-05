@@ -2266,7 +2266,7 @@ public class PluginHelper {
 		this.gestorDocumentalAdministratiuPlugin = gestorDocumentalAdministratiuPlugin;
 	}
 
-	private boolean isReadDocsMetadataFromArxiu() {
+	public boolean isReadDocsMetadataFromArxiu() {
 		return configHelper.getConfigAsBoolean("es.caib.notib.documents.metadades.from.arxiu");
 	}
 

@@ -1,19 +1,22 @@
 package es.caib.notib.logic.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-
-@Configuration
+//@Configuration
 public class TaskSchedullerConfig {
 
-    @Bean
-    public TaskScheduler taskScheduler(){
-
-        var threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(10);
-        threadPoolTaskScheduler.setThreadNamePrefix("notib-scheduled-task-pool");
-        return threadPoolTaskScheduler;
-    }
+//    @Bean(name = "taskScheduler")
+//    public TaskScheduler taskScheduler(){
+//
+//        var threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+//        threadPoolTaskScheduler.setPoolSize(10);
+//        threadPoolTaskScheduler.setThreadNamePrefix("notib-scheduled-task-pool");
+//        return threadPoolTaskScheduler;
+//    }
+//
+//    @Bean(name = "smTaskScheduller")
+//    public TaskScheduler smTaskScheduler() {
+//        final ThreadPoolTaskScheduler smScheduler = new ThreadPoolTaskScheduler();
+//        smScheduler.setPoolSize(10);
+//        smScheduler.setThreadNamePrefix("notib-sm-task-pool");
+//        return smScheduler;
+//    }
 }

@@ -27,7 +27,6 @@ import org.springframework.security.acls.domain.PermissionFactory;
 import org.springframework.security.acls.domain.SpringCacheBasedAclCache;
 import org.springframework.security.acls.jdbc.BasicLookupStrategy;
 import org.springframework.security.acls.jdbc.LookupStrategy;
-import org.springframework.security.acls.model.Acl;
 import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.PermissionGrantingStrategy;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -115,7 +114,7 @@ public class AclConfig {
 	private static final String UPDATE_OBJECT_IDENTITY = "update " + TABLE_OBJECT_IDENTITY + " set " +
 			"parent_object = ?, owner_sid = ?, entries_inheriting = ?" + " where id = ?";
 
-	@Value("${spring.jpa.properties.hibernate.dialect:#{null}}")
+	@Value("${spring.jpa.properties.hibernate.dialect:es.caib.notib.persist.dialect.OracleCaibDialect}")
 	private String hibernateDialect;
 
 	@Autowired
@@ -193,6 +192,14 @@ public class AclConfig {
 
 	@Bean
 	public NotibMutableAclService aclService() {
+		String databaseType = "oracle";
+		if (hibernateDialect != null) {
+			if (hibernateDialect.toLowerCase().contains("postgresql")) {
+				databaseType = "postgresql";
+			} else if (hibernateDialect.toLowerCase().contains("hsql")) {
+				databaseType = "hsql";
+			}
+		}
 		// S'han hagut de modificar els mètodes retrieveObjectIdentityPrimaryKey i findChildren per a
 		// solucionar errors en les consultes quan el tipus de base de dades és PostgreSQL. Si forçam
 		// que l'identificador del ObjectIdentity sigui un String dona error al executar la consulta
@@ -205,6 +212,7 @@ public class AclConfig {
 				return super.findChildren(new ObjectIdentityImpl(parentIdentity.getType(), parentIdentity.getIdentifier().toString()));
 			}
 		};
+		((JdbcMutableAclService)jdbcMutableAclService).setDialect(databaseType);
 //		jdbcMutableAclService.setFindChildrenQuery(SELECT_ACL_WITH_PARENT_SQL);
 		// Les consultes per a obtenir els ids son diferents per a cada base de dades.
 //		if (hibernateDialect == null || hibernateDialect.toLowerCase().contains("hsql")) {

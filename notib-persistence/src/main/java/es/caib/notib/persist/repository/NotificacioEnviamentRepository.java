@@ -19,6 +19,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -347,4 +348,11 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("esVisibleCarpetaNull") boolean esVisibleCarpetaNull,
 			@Param("visibleCarpeta") Boolean visibleCarpeta,
 			Pageable pageable);
+
+	@Query("from NotificacioEnviamentEntity where notificaReferencia = :enviamentUuid")
+	Optional<NotificacioEnviamentEntity> findByUuid(@Param("enviamentUuid") String enviamentUuid);
+
+	@Query("select count(e.id) = 0 from NotificacioEnviamentEntity e where e.notificacio.id = :notificacioId and e.registreData is null")
+	boolean areEnviamentsNotificacioRegistrats(@Param("notificacioId") Long notificacioId);
+
 }

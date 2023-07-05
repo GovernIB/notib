@@ -61,6 +61,10 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(EnviamentService.class);
 	}
 	@Bean
+	public LocalStatelessSessionProxyFactoryBean enviamentSmService() {
+		return getLocalEjbFactoyBean(EnviamentSmService.class);
+	}
+	@Bean
 	public LocalStatelessSessionProxyFactoryBean gestioDocumentalService() {
 		return getLocalEjbFactoyBean(GestioDocumentalService.class);
 	}

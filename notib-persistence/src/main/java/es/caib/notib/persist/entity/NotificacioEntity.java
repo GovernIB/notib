@@ -670,16 +670,17 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	}
 
 	public boolean isComunicacioSir() { // Per al mapping al DTO
-		if (!NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(this.getEnviamentTipus())) {
-			return false;
-		}
-
-		for(NotificacioEnviamentEntity enviament : this.getEnviaments()) {
-			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
-				return false;
-			}
-		}
-		return true;
+//		if (!NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(this.getEnviamentTipus())) {
+//			return false;
+//		}
+//
+//		for(NotificacioEnviamentEntity enviament : this.getEnviaments()) {
+//			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
+//				return false;
+//			}
+//		}
+//		return true;
+		return NotificaEnviamentTipusEnumDto.SIR.equals(this.getEnviamentTipus());
 	}
 
 	@PreRemove

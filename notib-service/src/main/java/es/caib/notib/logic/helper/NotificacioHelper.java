@@ -19,6 +19,7 @@ import es.caib.notib.logic.intf.exception.NoMetadadesException;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.GrupEntity;
@@ -101,6 +102,9 @@ public class NotificacioHelper {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private MessageHelper messageHelper;
+
+	@Autowired
+	private EnviamentSmService enviamentSmService;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -203,11 +207,16 @@ public class NotificacioHelper {
 			// Rellenar dades enviament titular
 			var env = NotificacioEnviamentEntity.getBuilderV2(enviament, entitat.isAmbEntregaDeh(), serveiTipus, notificacioEntity, titular, destinataris, UUID.randomUUID().toString()).build();
 			nouEnviament = notificacioEnviamentRepository.saveAndFlush(env);
+			enviamentSmService.altaEnviament(nouEnviament.getNotificaReferencia());
 			enviamentsCreats.add(nouEnviament);
 			enviamentTableHelper.crearRegistre(nouEnviament);
 			auditHelper.auditaEnviament(nouEnviament, TipusOperacio.CREATE, "NotificacioHelper.altaEnviamentsWeb");
 		}
 		notificacioEntity.getEnviaments().addAll(enviamentsCreats);
+
+		// TODO SM
+		// notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.registreEnviament(e.getNotificaReferencia()));
+
 		// Comprovar on s'ha d'enviar ara
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 			synchronized(SemaforNotificacio.agafar(notificacioEntity.getId())) {

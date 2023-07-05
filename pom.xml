@@ -11,42 +11,32 @@
 		<version>2.7.12</version>
 		<relativePath />
 	</parent>
-  <properties>
-	  <keycloak.version>21.1.1</keycloak.version>
-	  <orika.starter.version>2.4.6</orika.starter.version>
-	  <sitemesh.version>2.4.2</sitemesh.version>
-	  <openapi.version>1.6.15</openapi.version>
-	  <java.compiler.version>11</java.compiler.version>
-	  <maven.compiler.target>${java.compiler.version}</maven.compiler.target>
-	  <maven.compiler.source>${java.compiler.version}</maven.compiler.source>
-<!--		<revision>1.1.22</revision>-->
-<!--		<version.date>2022.09.01 15:00h</version.date>-->
-<!--		<github.global.server>github</github.global.server>-->
+	<properties>
+		<keycloak.version>21.1.1</keycloak.version>
+		<orika.starter.version>2.4.6</orika.starter.version>
+		<sitemesh.version>2.4.2</sitemesh.version>
+		<openapi.version>1.6.15</openapi.version>
+		<java.compiler.version>11</java.compiler.version>
+		<maven.compiler.target>${java.compiler.version}</maven.compiler.target>
+		<maven.compiler.source>${java.compiler.version}</maven.compiler.source>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-boot.version>2.7.12</spring-boot.version>
-<!--		<spring-security.version>3.2.9.RELEASE</spring-security.version>-->
-<!--		<spring-data-jpa.version>2.7.2</spring-data-jpa.version>-->
-<!--		<hibernate.version>3.6.5.Final</hibernate.version>-->
-<!--		<hibernate.validator.version>4.1.0.Final</hibernate.validator.version>-->
-<!--		<ehcache.version>2.10.1</ehcache.version>-->
-<!--		<orika.version>1.4.6</orika.version>-->
 		<jackson.version>2.14.1</jackson.version>
 		<regweb.version>3.2.5</regweb.version>
 		<dir3caib.version>1.0.15</dir3caib.version>
-<!--		<rolsac.version>1.8.0</rolsac.version>-->
+		<!--		<rolsac.version>1.8.0</rolsac.version>-->
 		<slf4j.version>1.7.36</slf4j.version>
 		<cxf.version>3.4.8</cxf.version>
-<!--		<maven.compiler.source>1.7</maven.compiler.source>-->
-<!--		<maven.compiler.target>1.7</maven.compiler.target>-->
-<!--		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
 		<arxiu.api.version>2.0.26</arxiu.api.version>
-<!--		<lombok.version>1.18.12</lombok.version>-->
-<!--	  	<liquibase.version>4.4.3</liquibase.version>-->
-<!--		<apache.poi.version>4.1.2</apache.poi.version>-->
+		<mapstruct.version>1.5.5.Final</mapstruct.version>
+		<!--		<lombok.version>1.18.12</lombok.version>-->
+		<!--	  	<liquibase.version>4.4.3</liquibase.version>-->
+		<!--		<apache.poi.version>4.1.2</apache.poi.version>-->
 		<xdocreport.version>2.0.4</xdocreport.version>
 		<itext.pdf.version>5.5.13.3</itext.pdf.version>
-	  	<docker.image.prefix>280421</docker.image.prefix>
-<!--		<docker.image.name>notib</docker.image.name>-->
-	  <junit.jupiter.version>5.9.3</junit.jupiter.version>
+		<docker.image.prefix>280421</docker.image.prefix>
+		<!--		<docker.image.name>notib</docker.image.name>-->
+		<junit.jupiter.version>5.9.3</junit.jupiter.version>
 	</properties>
 	<modules>
 		<module>notib-boot</module>

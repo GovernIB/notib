@@ -208,9 +208,9 @@ public interface EnviamentService {
 	void activarCallback(Long enviamentId);
 
 	/**
-	 * Envia un event de callback de l'enviament indicat
+	 * Envia un event de callback de als enviament indicat
 	 *
-	 * @param enviamentId
+	 * @param notificacions
 	 *            id de l'enviament.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")

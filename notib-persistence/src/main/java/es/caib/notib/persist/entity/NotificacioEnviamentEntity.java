@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -56,8 +55,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Entity
 @Setter
+@Entity
 @Table(name="not_notificacio_env")
 @EntityListeners(AuditingEntityListener.class)
 public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
@@ -276,6 +275,11 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
 	@Transient
 	private String csvUuid;
+
+//	// State Machine
+//	@Column(name = "sm_estat")
+//	@Enumerated(EnumType.STRING)
+//	private EnviamentSmEstat smEstat;
 
 	public void setRegistreEstat(NotificacioRegistreEstatEnumDto registreEstat) {
 		this.registreEstat = registreEstat;

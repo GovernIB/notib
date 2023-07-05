@@ -79,7 +79,9 @@ public class NotificacioValidator implements Validator {
                          Errors errors,
                          Locale locale) {
 
-        Locale l = new Locale("rest");
+        if (locale == null) {
+            locale = new Locale("rest");
+        }
         EnviamentTipus enviamentTipus = notificacio.getEnviamentTipus();
         boolean entregaPostalActiva = entitat != null && entitat.getEntregaCie() != null 
                 || organGestor != null && organGestor.getEntregaCie() != null 

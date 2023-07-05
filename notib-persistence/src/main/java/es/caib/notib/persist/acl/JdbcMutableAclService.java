@@ -82,6 +82,11 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
 
 
     private String dialect = "oracle";
+
+    public void setDialect(String dialect) {
+        this.dialect = dialect;
+    }
+
     //~ Constructors ===================================================================================================
 
     public JdbcMutableAclService(DataSource dataSource, LookupStrategy lookupStrategy, AclCache aclCache) {
@@ -90,7 +95,8 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
         try (var conn = dataSource.getConnection()){
             dialect = conn.getMetaData().getDatabaseProductName().toLowerCase();
         } catch (Exception ex) {
-            log.error("JdbcMutableAclService", ex);
+            log.error("JdbcMutableAclService: No ha estat possible obtenir les metadades de la connexió");
+
         }
         Assert.notNull(aclCache, "AclCache required");
         this.aclCache = aclCache;

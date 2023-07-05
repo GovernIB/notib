@@ -31,6 +31,7 @@ import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.persist.entity.CallbackEntity;
@@ -177,6 +178,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private CallbackRepository callbackRepository;
 
+	@Autowired
+	private EnviamentSmService enviamentSmService;
+
 	private static final String DELETE = "NotificacioServiceImpl.delete";
 	private static final String UPDATE = "NotificacioServiceImpl.update";
 	private static final String ERROR_DIR3 = "Error recuperant les provincies de DIR3CAIB: ";
@@ -234,6 +238,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				notificacioEnviamentRepository.flush();
 				auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.DELETE, DELETE);
 				personaRepository.delete(titular);
+				enviamentSmService.remove(enviament.getNotificaReferencia());
 			}
 			notificacioTableHelper.eliminarRegistre(notificacio);
 			notificacioRepository.delete(notificacio);
@@ -367,6 +372,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 				var env = NotificacioEnviamentEntity.getBuilderV2(enviament, entitat.isAmbEntregaDeh(), serveiTipus, notificacioEntity, titular, nousDestinataris, UUID.randomUUID().toString()).build();
 				var nouEnviament = notificacioEnviamentRepository.saveAndFlush(env);
+				enviamentSmService.altaEnviament(nouEnviament.getNotificaReferencia());
 				nousEnviaments.add(nouEnviament);
 				enviamentsIds.add(nouEnviament.getId());
 				enviamentTableHelper.crearRegistre(nouEnviament);
@@ -386,6 +392,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					notificacioEnviamentRepository.delete(env);
 					notificacioEnviamentRepository.flush();
 					auditHelper.auditaEnviament(env, AuditService.TipusOperacio.DELETE, DELETE);
+					enviamentSmService.remove(env.getNotificaReferencia());
 				}
 
 //				### Destinataris esborrats
@@ -400,6 +407,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 					}
 				}
 			}
+
+			// TODO SM
+//			notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.registreEnviament(e.getNotificaReferencia()));
 
 //			### Realitzar el procés de registre i notific@
 			if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {

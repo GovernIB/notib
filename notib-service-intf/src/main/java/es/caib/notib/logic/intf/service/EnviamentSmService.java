@@ -1,0 +1,70 @@
+/**
+ * 
+ */
+package es.caib.notib.logic.intf.service;
+
+import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
+import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.statemachine.StateMachine;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Declaració dels mètodes per a la consulta de notificacions i dels
+ * destinataris i events associats.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
+public interface EnviamentSmService {
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreEnviament(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreSuccess(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreFailed(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaEnviament(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaSuccess(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaFailed(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailEnviament(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailSuccess(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailFailed(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> enviamentConsulta(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaSuccess(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaFailed(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirConsulta(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirSuccess(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirFailed(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
+	void remove(String enviamentUuid);
+}

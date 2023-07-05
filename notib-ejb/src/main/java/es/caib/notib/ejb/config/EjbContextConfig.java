@@ -7,6 +7,7 @@ import es.caib.notib.ejb.ConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -36,11 +37,10 @@ import java.util.Properties;
  */
 @Slf4j
 @Configuration
-@EnableAutoConfiguration(exclude = {
-		FreeMarkerAutoConfiguration.class
-})
-@EnableJpaRepositories({ "es.caib.notib.persist" })
+@EnableAutoConfiguration(exclude = { FreeMarkerAutoConfiguration.class })
+@EnableJpaRepositories({ "es.caib.notib.persist", "org.springframework.statemachine.data.jpa" })
 @ComponentScan({ "es.caib.notib.logic", "es.caib.notib.persist" })
+@EntityScan({"es.caib.notib.persist", "org.springframework.statemachine.data.jpa"})
 @PropertySource(ignoreResourceNotFound = true, value = {
 		"classpath:application.properties",
 		"file://${" + ConfigService.APP_PROPERTIES + "}",
@@ -49,13 +49,13 @@ public class EjbContextConfig {
 
 	@Value("${spring.datasource.jndi-name:java:jboss/datasources/notibDS}")
 	private String dataSourceJndiName;
-	@Value("${spring.jpa.properties.hibernate.dialect}")
+	@Value("${spring.jpa.properties.hibernate.dialect:es.caib.notib.persist.dialect.OracleCaibDialect}")
 	private String hibernateDialect;
-	@Value("${spring.jpa.hibernate.ddl-auto}")
+	@Value("${spring.jpa.hibernate.ddl-auto:mome}")
 	private String hibernateDdlAuto;
-	@Value("${spring.jpa.show-sql}")
+	@Value("${spring.jpa.show-sql:false}")
 	private String showSql;
-	@Value("${spring.jpa.properties.hibernate.format_sql}")
+	@Value("${spring.jpa.properties.hibernate.format_sql:false}")
 	private String formatSql;
 	@Value("${es.caib.notib.servidor.jboss:true}")
 	private String jboss;
@@ -85,7 +85,7 @@ public class EjbContextConfig {
 		} else {
 			entityManagerFactoryBean.setDataSource(dataSource());
 		}
-		entityManagerFactoryBean.setPackagesToScan("es.caib.notib.persist");
+		entityManagerFactoryBean.setPackagesToScan("es.caib.notib.persist", "org.springframework.statemachine.data.jpa");
 		entityManagerFactoryBean.setJpaDialect(new HibernateJpaDialect());
 		entityManagerFactoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 		Properties jpaProperties = new Properties();
