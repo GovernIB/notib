@@ -319,18 +319,15 @@ public class OrganGestorHelper {
 		log.debug(prefix + "Sincronitzant unitats obsoletes");
 		nombreUnitatsProcessades = 0;
 		nombreUnitatsTotal = obsoleteUnitats.size();
-		Date ara = new Date();
 		for (OrganGestorEntity obsoleteUnitat : obsoleteUnitats) {
 
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.definir.transicio", new Object[] {obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom()}));
+			obsoleteUnitat.setEstat(OrganGestorEstatEnum.E);
 			if (obsoleteUnitat.getNous() == null || obsoleteUnitat.getNous().isEmpty()) {
 				obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.EXTINCIO);
 			} else if (obsoleteUnitat.getNous().size() > 1) {
 				obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.DIVISIO);
 				organsDividits.add(obsoleteUnitat);
-				if (obsoleteUnitat.getNous().contains(obsoleteUnitat)) {
-					obsoleteUnitat.setEstat(OrganGestorEstatEnum.V);
-				}
 			} else {
 				if (obsoleteUnitat.getNous().size() == 1) {
 					if (obsoleteUnitat.getNous().get(0).getAntics().size() > 1) {
@@ -343,9 +340,9 @@ public class OrganGestorHelper {
 				}
 			}
 			List<OrganGestorEntity> nous = obsoleteUnitat.getNous();
-			if (nous != null && !nous.contains(obsoleteUnitat)) {
-				log.debug(prefix + "Unitat extingida " + obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom());
-				obsoleteUnitat.setEstat(OrganGestorEstatEnum.E);
+			if (nous != null && nous.contains(obsoleteUnitat)) {
+				log.debug(prefix + "Unitat dividia o fusionada " + obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom());
+				obsoleteUnitat.setEstat(OrganGestorEstatEnum.V);
 			}
 			progres.setProgres(22 + (nombreUnitatsProcessades++ * 5 / nombreUnitatsTotal));
 		}
@@ -356,7 +353,7 @@ public class OrganGestorHelper {
 		}
 		progres.setProgres(27);
 
-		ara = new Date();
+		Date ara = new Date();
 		log.debug(prefix + "Data de sincronització " + ara);
 		// Si és la primera sincronització
 		if (entitat.getDataSincronitzacio() == null) {

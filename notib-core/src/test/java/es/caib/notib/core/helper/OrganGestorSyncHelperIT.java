@@ -188,6 +188,9 @@ public class OrganGestorSyncHelperIT {
         Assert.assertTrue(conteOrgan(organsDividits, "A012"));
         Assert.assertTrue(conteOrgan(organsDividits, "A017"));
 
+        OrganGestorEntity o = getOrgan(organsDividits,"A017");
+        Assert.assertTrue(o != null && OrganGestorEstatEnum.V.equals(o.getEstat()));
+
         // Fusionats
         Assert.assertEquals(9, organsFusionats.size());
         Assert.assertTrue(conteOrgan(organsFusionats, "A004"));
@@ -352,5 +355,13 @@ public class OrganGestorSyncHelperIT {
                 return true;
         }
         return false;
+    }
+
+    private OrganGestorEntity getOrgan(List<OrganGestorEntity> llista, String codi) {
+        for (OrganGestorEntity organ: llista) {
+            if (organ.getCodi().equals(codi))
+                return organ;
+        }
+        return null;
     }
 }
