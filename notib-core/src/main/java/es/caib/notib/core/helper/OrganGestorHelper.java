@@ -373,9 +373,10 @@ public class OrganGestorHelper {
 		// if not it creates a new one
 		String nom = !Strings.isNullOrEmpty(unitatWS.getDenominacionCooficial()) ? unitatWS.getDenominacionCooficial() : unitatWS.getDenominacio();
 		if (unitat != null) {
+			log.debug(prefix + "actualitzant unitat amb codi " + unitat.getCodi() + " - " + unitat.getNom() + " - " + unitat.getEstat() + " - " + unitat.getEntitat().getCodi());
 			unitat.update(nom, unitatWS.getDenominacio(), unitatWS.getEstat(), unitatWS.getSuperior());
 			updateLlibreAndOficina(unitat, entitat.getDir3Codi());
-			log.debug(prefix + "guardant nova unitat amb codi " + unitat.getCodi() + " - " + unitat.getNom());
+			log.debug(prefix + "actualitzada unitat " + unitat.getNom() + " - " + unitat.getEstat());
 			organGestorRepository.save(unitat);
 			return unitat;
 		}
