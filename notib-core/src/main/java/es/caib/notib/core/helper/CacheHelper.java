@@ -114,6 +114,9 @@ public class CacheHelper {
 		}
 
 		OrganGestorEntity arrel = organGestorRepository.findByCodi(entitatDir3Codi);
+		if (arrel == null) {
+			return organigrama;
+		}
 		HashMap<String, List<OrganGestorEntity>> organsMap = organsToMap(organs);
 		organToOrganigrama(arrel, organsMap, organigrama);
 		return organigrama;
