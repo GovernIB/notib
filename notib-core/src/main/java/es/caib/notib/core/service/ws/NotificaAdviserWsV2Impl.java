@@ -138,19 +138,10 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 									receptor.getNombreRepresentante() + " (" + receptor.getNifRepresentante() + ")" : "") : ""),
 					new AccioParam("Acús en PDF (Hash)", acusePDF != null ? acusePDF.getHash() : ""),
 					new AccioParam("Acús en XML (Hash)", acuseXML != null ? acuseXML.getHash() : ""));
-			
-			updateEnviament(
-					organismoEmisor,
-					identificador,
-					tipoEntrega,
-					modoNotificacion,
-					estado,
-					dataEstat,
-					receptor,
-					acusePDF,
-					codigoRespuesta,
-					descripcionRespuesta,
-					info);
+
+			synchronized (identificador) {
+				updateEnviament(organismoEmisor, identificador, tipoEntrega, modoNotificacion, estado, dataEstat, receptor, acusePDF, codigoRespuesta, descripcionRespuesta, info);
+			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

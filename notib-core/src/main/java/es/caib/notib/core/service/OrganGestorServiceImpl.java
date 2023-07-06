@@ -523,6 +523,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	@Override
 	@Transactional(timeout = 3600)
+	@SuppressWarnings("unchecked")
 	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto) throws Exception {
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false);
@@ -783,22 +784,30 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			Set<UnitatOrganitzativaDto> keysMergeOrSubst = mergeOrSubstMap.keySet();
 			MultiMap mergeMap = new MultiHashMap();
 			MultiMap substMap = new MultiHashMap();
+			List<UnitatOrganitzativaDto> values;
 			for (UnitatOrganitzativaDto mergeOrSubstKey : keysMergeOrSubst) {
-				List<UnitatOrganitzativaDto> values = (List<UnitatOrganitzativaDto>) mergeOrSubstMap
-						.get(mergeOrSubstKey);
-				if (values.size() > 1) {
-					for (UnitatOrganitzativaDto value : values) {
-						mergeMap.put(mergeOrSubstKey, value);
-					}
-				} else {
+				values = (List<UnitatOrganitzativaDto>) mergeOrSubstMap.get(mergeOrSubstKey);
+				if (values.size() <= 1) {
+				// ==================== SUBSTITUCIONS ===================
 					substMap.put(mergeOrSubstKey, values.get(0));
+					continue;
+				}
+				for (UnitatOrganitzativaDto value : values) {
+					if (isAlreadyAddedToMap(mergeMap, mergeOrSubstKey, value)) {
+						//normally this shoudn't duplicate, it is added to deal with the result of call to WS DIR3 PRE in day 2023-06-21 with fechaActualizacion=[2023-06-15] which was probably incorrect
+						log.info("Detected duplication of organs in prediction of fusion. Unitat" + value.getCodi() + "already added to fusion into " + mergeOrSubstKey.getCodi() + ". Probably caused by error in DIR3");
+						continue;
+					}
+					mergeMap.put(mergeOrSubstKey, value);
 				}
 			}
 
 			// Obtenir llistat d'unitats que ara estan vigents en BBDD, i després de la sincronització continuen vigents, però amb les propietats canviades
+			// ====================  CANVIS EN ATRIBUTS ===================
 			unitatsVigents = getVigentsFromWebService(entitat, unitatsWS, organsVigents);
 
 			// Obtenir el llistat d'unitats que son totalment noves (no existeixen en BBDD): Creació
+			// ====================  NOUS ===================
 			List<UnitatOrganitzativaDto> unitatsNew = getNewFromWS(entitat, unitatsWS, organsVigents);
 
 			return PrediccioSincronitzacio.builder()
@@ -815,6 +824,22 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		} catch (Exception ex) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, "No ha estat possible obtenir la predicció de canvis de unitats organitzatives", ex);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private boolean isAlreadyAddedToMap(MultiMap mergeMap, UnitatOrganitzativaDto key, UnitatOrganitzativaDto value) {
+
+		List<UnitatOrganitzativaDto> values = (List<UnitatOrganitzativaDto>) mergeMap.get(key);
+		if (values == null) {
+			return false;
+		}
+		boolean contains = false;
+		for (UnitatOrganitzativaDto unitat : values) {
+			if (unitat.getCodi().equals(value.getCodi())) {
+				contains = true;
+			}
+		}
+		return contains;
 	}
 
 	private PrediccioSincronitzacio predictFirstSynchronization(EntitatEntity entitat) throws SistemaExternException {
@@ -1046,12 +1071,17 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 								+ ") en el resultat de la consulta del WS ni en la BBDD.";
 						throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
 					}
+				} else if (historicCodi.equals(unitat.getCodi())) {
+					// EXAMPLE:
+					//A04032359
+					//-A04032359
+					//-A04068486
+					// if it is transitioning to itself don't add it as last historic
+					//this probably shoudn't happen, it is added to deal with the result of call to WS made in PRE in day 2023-06-21 with fechaActualizacion=[2023-06-15] which was probably incorrect
+					log.info("Detected organ division with transitioning to itself : " + historicCodi + ". Probably caused by error in DIR3");
 				} else {
 					if (!unitatFromCodi.equals(unitat)) {
-						getLastHistoricosRecursive(
-								unitatFromCodi,
-								unitatsFromWebService,
-								lastHistorics);
+						getLastHistoricosRecursive(unitatFromCodi, unitatsFromWebService, lastHistorics);
 					} else {
 						lastHistorics.add(unitat);
 					}
