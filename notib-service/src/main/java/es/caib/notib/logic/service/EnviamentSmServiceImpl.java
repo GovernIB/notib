@@ -24,9 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	private final NotificacioEnviamentRepository notificacioEnviamentRepository;
-//	private final NotificaHelper notificaHelper;
 	private final StateMachineService<EnviamentSmEstat, EnviamentSmEvent> stateMachineService;
-//	private final ConfigHelper configHelper;
 
 
 	@Override
@@ -37,8 +35,6 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		var variables = sm.getExtendedState().getVariables();
 		variables.put(SmConstants.ENVIAMENT_TIPUS, enviament.getNotificacio().getEnviamentTipus().name());
 		variables.put(SmConstants.ENVIAMENT_SENSE_NIF, enviament.isPerEmail());
-
-//		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_ENVIAR);
 		return sm;
 	}
 
@@ -71,6 +67,14 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	}
 
 	@Override
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreRetry(String enviamentUuid) {
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_RETRY);
+		return sm;
+	}
+
+	@Override
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaEnviament(String enviamentUuid) {
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
@@ -94,37 +98,45 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		sm.getExtendedState().getVariables().put(
 				SmConstants.ENVIAMENT_REINTENTS,
 				(int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0) + 1);
+		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_ERROR);
+		return sm;
+	}
+
+	@Override
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaRetry(String enviamentUuid) {
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_RETRY);
 		return sm;
 	}
 
-	@Override
-	@Transactional
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailEnviament(String enviamentUuid) {
-		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
-		sendEvent(enviamentUuid, sm, EnviamentSmEvent.EM_ENVIAR);
-		return sm;
-	}
-
-	@Override
-	@Transactional
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailSuccess(String enviamentUuid) {
-		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
-		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
-		sendEvent(enviamentUuid, sm, EnviamentSmEvent.EM_SUCCESS);
-		return sm;
-	}
-
-	@Override
-	@Transactional
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailFailed(String enviamentUuid) {
-		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
-		sm.getExtendedState().getVariables().put(
-				SmConstants.ENVIAMENT_REINTENTS,
-				(int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0) + 1);
-		sendEvent(enviamentUuid, sm, EnviamentSmEvent.EM_RETRY);
-		return sm;
-	}
+//	@Override
+//	@Transactional
+//	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailEnviament(String enviamentUuid) {
+//		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+//		sendEvent(enviamentUuid, sm, EnviamentSmEvent.EM_ENVIAR);
+//		return sm;
+//	}
+//
+//	@Override
+//	@Transactional
+//	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailSuccess(String enviamentUuid) {
+//		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+//		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+//		sendEvent(enviamentUuid, sm, EnviamentSmEvent.EM_SUCCESS);
+//		return sm;
+//	}
+//
+//	@Override
+//	@Transactional
+//	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailFailed(String enviamentUuid) {
+//		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+//		sm.getExtendedState().getVariables().put(
+//				SmConstants.ENVIAMENT_REINTENTS,
+//				(int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0) + 1);
+//		sendEvent(enviamentUuid, sm, EnviamentSmEvent.EM_RETRY);
+//		return sm;
+//	}
 
 	@Override
 	@Transactional
@@ -152,6 +164,14 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		sm.getExtendedState().getVariables().put(
 				SmConstants.ENVIAMENT_REINTENTS,
 				(int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0) + 1);
+		sendEvent(enviamentUuid, sm, EnviamentSmEvent.CN_ERROR);
+		return sm;
+	}
+
+	@Override
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaRetry(String enviamentUuid) {
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.CN_RETRY);
 		return sm;
 	}
@@ -183,6 +203,14 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		sm.getExtendedState().getVariables().put(
 				SmConstants.ENVIAMENT_REINTENTS,
 				(int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0) + 1);
+		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_ERROR);
+		return sm;
+	}
+
+	@Override
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirRetry(String enviamentUuid) {
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_RETRY);
 		return sm;
 	}
@@ -193,25 +221,6 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		stateMachineService.releaseStateMachine(enviamentUuid, true);
 	}
 
-//	private int getMaxRegistreReintents() {
-//		return configHelper.getConfigAsInteger("es.caib.notib.tasca.registre.enviaments.reintents.maxim", 3);
-//	}
-//
-//	private int getMaxNotificaReintents() {
-//		return configHelper.getConfigAsInteger("es.caib.notib.tasca.notifica.enviaments.reintents.maxim", 3);
-//	}
-//
-//	private int getMaxEmailReintents() {
-//		return configHelper.getConfigAsInteger("es.caib.notib.tasca.notifica.enviaments.reintents.maxim", 3);
-//	}
-//
-//	private int getMaxConsultaReintents() {
-//		return configHelper.getConfigAsInteger("es.caib.notib.tasca.enviament.actualitzacio.estat.reintents.maxim", 3);
-//	}
-//
-//	private int getMaxConsultaSirReintents() {
-//		return configHelper.getConfigAsInteger("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.reintents.maxim", 3);
-//	}
 
 	private void sendEvent(String enviamentUuid, StateMachine<EnviamentSmEstat, EnviamentSmEvent> sm, EnviamentSmEvent event) {
 		var msg = MessageBuilder.withPayload(event)

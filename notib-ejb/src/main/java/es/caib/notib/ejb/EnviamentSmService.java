@@ -3,34 +3,13 @@
  */
 package es.caib.notib.ejb;
 
-import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
-import es.caib.notib.logic.intf.dto.ApiConsulta;
-import es.caib.notib.logic.intf.dto.FitxerDto;
-import es.caib.notib.logic.intf.dto.NotificacioEnviamentDto;
-import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.logic.intf.dto.NotificacioEnviamentFiltreDto;
-import es.caib.notib.logic.intf.dto.NotificacioEventDto;
-import es.caib.notib.logic.intf.dto.PaginaDto;
-import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
-import es.caib.notib.logic.intf.dto.RolEnumDto;
-import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
-import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
-import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
-import es.caib.notib.logic.intf.exception.NotFoundException;
-import es.caib.notib.logic.intf.rest.consulta.Resposta;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import org.springframework.context.annotation.Primary;
 import org.springframework.statemachine.StateMachine;
 
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Implementació de EnviamentService com a EJB que empra una clase
@@ -69,6 +48,12 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreRetry(String enviamentUuid) {
+		return getDelegateService().registreRetry(enviamentUuid);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaEnviament(String enviamentUuid) {
 		return getDelegateService().notificaEnviament(enviamentUuid);
 	}
@@ -87,21 +72,27 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailEnviament(String enviamentUuid) {
-		return getDelegateService().emailEnviament(enviamentUuid);
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaRetry(String enviamentUuid) {
+		return getDelegateService().notificaRetry(enviamentUuid);
 	}
 
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailSuccess(String enviamentUuid) {
-		return getDelegateService().emailSuccess(enviamentUuid);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailFailed(String enviamentUuid) {
-		return getDelegateService().emailFailed(enviamentUuid);
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+//	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailEnviament(String enviamentUuid) {
+//		return getDelegateService().emailEnviament(enviamentUuid);
+//	}
+//
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+//	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailSuccess(String enviamentUuid) {
+//		return getDelegateService().emailSuccess(enviamentUuid);
+//	}
+//
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+//	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailFailed(String enviamentUuid) {
+//		return getDelegateService().emailFailed(enviamentUuid);
+//	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
@@ -123,6 +114,12 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaRetry(String enviamentUuid) {
+		return getDelegateService().consultaRetry(enviamentUuid);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirConsulta(String enviamentUuid) {
 		return getDelegateService().sirConsulta(enviamentUuid);
 	}
@@ -137,6 +134,12 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirFailed(String enviamentUuid) {
 		return getDelegateService().sirFailed(enviamentUuid);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirRetry(String enviamentUuid) {
+		return getDelegateService().sirRetry(enviamentUuid);
 	}
 
 	@Override

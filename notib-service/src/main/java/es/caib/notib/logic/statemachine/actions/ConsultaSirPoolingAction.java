@@ -23,7 +23,7 @@ public class ConsultaSirPoolingAction implements Action<EnviamentSmEstat, Enviam
 
     private final NotificacioEnviamentRepository notificacioEnviamentRepository;
     private final ConfigHelper configHelper;
-    private final ConsultaSirMapper enviamentSirMapper;
+    private final ConsultaSirMapper consultaSirMapper;
     private final JmsTemplate jmsTemplate;
 
     @Override
@@ -35,7 +35,7 @@ public class ConsultaSirPoolingAction implements Action<EnviamentSmEstat, Enviam
         jmsTemplate.convertAndSend(
                 SmConstants.CUA_CONSULTA_SIR,
                 ConsultaSirRequest.builder()
-                        .consultaSirDto(enviamentSirMapper.toDto(enviament))
+                        .consultaSirDto(consultaSirMapper.toDto(enviament))
                         .numIntent(reintents + 1)
                         .build(),
                 m -> {

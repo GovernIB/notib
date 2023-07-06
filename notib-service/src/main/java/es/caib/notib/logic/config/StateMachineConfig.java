@@ -72,15 +72,50 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
     public void configure(StateMachineTransitionConfigurer<EnviamentSmEstat, EnviamentSmEvent> transitions) throws Exception {
         transitions
                 // Registre
-                .withExternal().source(NOU)             .target(REGISTRE_PENDENT)       .event(RG_ENVIAR)       .guard(uuidGuard())             .action(enviamentRegistreAction)        .and()
-                .withExternal().source(REGISTRE_PENDENT).target(REGISTRAT)              .event(RG_SUCCESS)      .guard(uuidGuard())                                                     .and()
-                .withExternal().source(REGISTRE_PENDENT).target(REGISTRE_RETRY)         .event(RG_ERROR)        .guard(uuidGuard())                                                     .and()
-                .withChoice()  .source(REGISTRE_RETRY)  .first(REGISTRE_PENDENT,                                 reintentsRegistreGuard,         enviamentRegistreAction)
-                                                        .last(REGISTRE_ERROR)                                                                                                           .and()
-                .withExternal().source(REGISTRE_ERROR)  .target(REGISTRE_PENDENT)       .event(RG_RETRY)        .guard(uuidGuard())             .action(enviamentRegistreAction)        .and()
-                .withChoice()  .source(REGISTRAT)       .first(SIR_PENDENT,                                      isSir(),                        consultaSirIniciPoolingAction)
-//                                                        .then(EMAIL_PENDENT,                                     senseNif(),                     emailAction) --> Els emails s'envien en la notificació
-                                                        .last(NOTIFICA_PENDENT,                                                                  notificaAction)                                                                                                 .and()
+                .withExternal().source(NOU).target(REGISTRE_PENDENT).event(RG_ENVIAR).guard(uuidGuard()).action(enviamentRegistreAction).and()
+                .withExternal().source(REGISTRE_PENDENT).target(REGISTRAT).event(RG_SUCCESS).guard(uuidGuard()).and()
+                .withExternal().source(REGISTRE_PENDENT).target(REGISTRE_RETRY).event(RG_ERROR).guard(uuidGuard()).and()
+                .withChoice().source(REGISTRE_RETRY)
+                    .first(REGISTRE_PENDENT, reintentsRegistreGuard, enviamentRegistreAction)
+                    .last(REGISTRE_ERROR).and()
+                .withExternal().source(REGISTRE_ERROR).target(REGISTRE_PENDENT).event(RG_RETRY).guard(uuidGuard()).action(enviamentRegistreAction).and()
+                .withChoice().source(REGISTRAT)
+                    .first(SIR_PENDENT, isSir(), consultaSirIniciPoolingAction)
+                    // .then(EMAIL_PENDENT, senseNif(), emailAction) --> Els emails s'envien en la notificació
+                    .last(NOTIFICA_PENDENT, notificaAction).and()
+                // Enviament notifica
+                .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_PENDENT).event(NT_ENVIAR).guard(uuidGuard()).action(enviamentNotificaAction).and()
+                .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_SENT).event(NT_SUCCESS).guard(uuidGuard()).action(consultaNotificaIniciPoolingAction).and()
+                .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_RETRY).event(NT_ERROR).guard(uuidGuard()).and()
+                .withChoice().source(NOTIFICA_RETRY)
+                    .first(NOTIFICA_PENDENT, reintentsNotificaGuard, enviamentNotificaAction)
+                    .last(NOTIFICA_ERROR).and()
+                .withExternal().source(NOTIFICA_ERROR).target(NOTIFICA_PENDENT).event(NT_RETRY).guard(uuidGuard()).action(enviamentNotificaAction).and()
+                // Consulta estat
+                .withExternal().source(NOTIFICA_SENT).target(NOTIFICA_SENT).event(CN_CONSULTAR).guard(uuidGuard()).action(consultaNotificaAction).and()
+                .withExternal().source(NOTIFICA_SENT).target(CONSULTA_ESTAT).event(CN_SUCCESS).guard(uuidGuard()).and()
+                .withChoice().source(CONSULTA_ESTAT)
+                    .first(FI, isEstatFinal())
+                    .last(NOTIFICA_SENT, consultaNotificaPoolingAction).and()
+                .withExternal().source(NOTIFICA_SENT).target(CONSULTA_RETRY).event(CN_ERROR).guard(uuidGuard()).and()
+                .withChoice().source(CONSULTA_RETRY)
+                    .first(NOTIFICA_SENT, isAdviser())
+                    .then(NOTIFICA_SENT, reintentsConsultaNotificaGuard, consultaNotificaAction)
+                    .last(CONSULTA_ERROR).and()
+                .withExternal().source(CONSULTA_ERROR).target(NOTIFICA_SENT).event(CN_RETRY).guard(uuidGuard()).action(consultaNotificaAction).and()
+                // Consulta SIR
+                .withExternal().source(SIR_PENDENT).target(SIR_PENDENT).event(SR_CONSULTAR).guard(uuidGuard()).action(consultaSirAction).and()
+                .withExternal().source(SIR_PENDENT).target(SIR_ESTAT).event(SR_SUCCESS).guard(uuidGuard()).and()
+                .withChoice().source(SIR_ESTAT)
+                    .first(FI, isEstatFinal())
+                    .last(SIR_PENDENT, consultaSirPoolingAction).and()
+                .withExternal().source(SIR_PENDENT).target(SIR_RETRY).event(SR_ERROR).guard(uuidGuard()).and()
+                .withChoice().source(SIR_RETRY)
+                    .first(SIR_PENDENT, isSirCallback())
+                    .then(SIR_PENDENT, reintentsConsultaSirGuard, consultaSirPoolingAction)
+                    .last(SIR_ERROR).and()
+                .withExternal().source(SIR_ERROR).target(SIR_PENDENT).event(SR_RETRY).guard(uuidGuard()).action(consultaSirAction);
+
 //                // Enviament email
 //                .withExternal().source(EMAIL_PENDENT)   .target(EMAIL_PENDENT)          .event(EM_ENVIAR)       .guard(uuidGuard())             .action(enviamentEmailAction)         .and()
 //                .withExternal().source(EMAIL_PENDENT)   .target(FI)                     .event(EM_SUCCESS)      .guard(uuidGuard())                                                   .and()
@@ -88,33 +123,6 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
 //                .withChoice()  .source(EMAIL_RETRY)     .first(EMAIL_PENDENT,                                    reintentsEmailGuard)
 //                                                        .last(EMAIL_ERROR)                                                                                                            .and()
 //                .withExternal().source(EMAIL_ERROR)     .target(EMAIL_PENDENT)          .event(EM_RETRY)        .guard(uuidGuard())             .action(enviamentEmailAction)         .and()
-                // Enviament notifica
-                .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_PENDENT)       .event(NT_ENVIAR)       .guard(uuidGuard())             .action(enviamentNotificaAction)        .and()
-                .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_SENT)          .event(NT_SUCCESS)      .guard(uuidGuard())             .action(consultaNotificaIniciPoolingAction).and()
-                .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_RETRY)         .event(NT_ERROR)        .guard(uuidGuard())                                                     .and()
-                .withChoice()  .source(NOTIFICA_RETRY)  .first(NOTIFICA_PENDENT,                                 reintentsNotificaGuard,         enviamentNotificaAction)
-                                                        .last(NOTIFICA_ERROR)                                                                                                           .and()
-                .withExternal().source(NOTIFICA_ERROR)  .target(NOTIFICA_PENDENT)       .event(NT_RETRY)        .guard(uuidGuard())             .action(enviamentNotificaAction)        .and()
-                // Consulta estat
-                .withExternal().source(NOTIFICA_SENT)   .target(NOTIFICA_SENT)          .event(CN_CONSULTAR)    .guard(uuidGuard())             .action(consultaNotificaAction)         .and()
-                .withExternal().source(NOTIFICA_SENT)   .target(CONSULTA_ESTAT)         .event(CN_SUCCESS)      .guard(uuidGuard())                                                     .and()
-                .withChoice()  .source(CONSULTA_ESTAT)  .first(FI,                                               isEstatFinal())
-                                                        .last(NOTIFICA_SENT,                                                                     consultaNotificaPoolingAction)         .and() // TODO: Només si es fa pooling
-                .withExternal().source(NOTIFICA_SENT)   .target(CONSULTA_RETRY)         .event(CN_ERROR)        .guard(uuidGuard())                                                     .and()
-                .withChoice()  .source(CONSULTA_RETRY)  .first(NOTIFICA_SENT,                                    isAdviser())
-                                                        .then(NOTIFICA_SENT,                                     reintentsConsultaNotificaGuard, consultaNotificaAction)
-                                                        .last(CONSULTA_ERROR)                                                                                                           .and()
-                .withExternal().source(CONSULTA_ERROR)  .target(NOTIFICA_SENT)          .event(CN_RETRY)        .guard(uuidGuard())             .action(consultaNotificaAction)         .and()
-                // Consulta SIR
-                .withExternal().source(SIR_PENDENT)     .target(SIR_PENDENT)            .event(SR_CONSULTAR)    .guard(uuidGuard())             .action(consultaSirAction)              .and()
-                .withExternal().source(SIR_PENDENT)     .target(SIR_ESTAT)              .event(SR_SUCCESS)      .guard(uuidGuard())                                                     .and()
-                .withChoice()  .source(SIR_ESTAT)       .first(FI,                                               isEstatFinal())
-                                                        .last(SIR_PENDENT,                                                                       consultaSirPoolingAction)                     .and() // TODO: Només si es fa pooling
-                .withExternal().source(SIR_PENDENT)     .target(SIR_RETRY)              .event(SR_ERROR)        .guard(uuidGuard())                                                     .and()
-                .withChoice()  .source(SIR_RETRY)       .first(SIR_PENDENT,                                      isSirCallback())
-                                                        .then(SIR_PENDENT,                                       reintentsConsultaSirGuard,      consultaSirAction)                            // TODO: Pooling
-                                                        .last(SIR_ERROR)                                                                                                                .and()
-                .withExternal().source(SIR_ERROR)       .target(SIR_PENDENT)            .event(SR_RETRY)        .guard(uuidGuard())             .action(consultaSirAction);
     }
 
     @Override
@@ -146,9 +154,9 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
     public Guard<EnviamentSmEstat, EnviamentSmEvent> isSir() {
         return ctx -> "SIR".equals(ctx.getExtendedState().getVariables().get(SmConstants.ENVIAMENT_TIPUS));
     }
-    public Guard<EnviamentSmEstat, EnviamentSmEvent> senseNif() {
-        return ctx -> (boolean) ctx.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_SENSE_NIF, false);
-    }
+//    public Guard<EnviamentSmEstat, EnviamentSmEvent> senseNif() {
+//        return ctx -> (boolean) ctx.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_SENSE_NIF, false);
+//    }
     public Guard<EnviamentSmEstat, EnviamentSmEvent> isEstatFinal() {
         return ctx -> (boolean) ctx.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_ESTAT_FINAL, false);
     }

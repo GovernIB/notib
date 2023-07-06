@@ -15,7 +15,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface DocumentMapper {
 
     @Mapping(source = "nom", target = "nombreFicheroAnexado")

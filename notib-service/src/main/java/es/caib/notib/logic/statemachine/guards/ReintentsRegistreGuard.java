@@ -1,4 +1,4 @@
-package es.caib.notib.logic.statemachine.actions.guards;
+package es.caib.notib.logic.statemachine.guards;
 
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
@@ -13,15 +13,15 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ReintentsNotificaGuard implements Guard<EnviamentSmEstat, EnviamentSmEvent> {
+public class ReintentsRegistreGuard implements Guard<EnviamentSmEstat, EnviamentSmEvent> {
 
     private final ConfigHelper configHelper;
 
     @Override
     public boolean evaluate(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
-        var numReintentsActuals = Integer.class.cast(stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0));
-        var maxReintents = configHelper.getConfigAsInteger("es.caib.notib.tasca.notifica.enviaments.reintents.maxim", 3);
-        log.debug("[SM] Reintent per error de enviament a notifica. Intent actual=" + numReintentsActuals + ", Max intents=" + maxReintents);
-        return numReintentsActuals.intValue() >= maxReintents;
+        var numReintentsActuals = (Integer) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
+        var maxReintents = configHelper.getConfigAsInteger("es.caib.notib.tasca.registre.enviaments.reintents.maxim", 3);
+        log.debug("[SM] Reintent per error de enviament a registre. Intent actual=" + numReintentsActuals + ", Max intents=" + maxReintents);
+        return numReintentsActuals < maxReintents;
     }
 }

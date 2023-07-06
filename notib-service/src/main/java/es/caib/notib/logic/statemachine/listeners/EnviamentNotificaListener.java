@@ -65,16 +65,17 @@ public class EnviamentNotificaListener {
 
             for (var env : notificacio.getEnviaments()) {
                 var enviamentSuccess = env.getNotificaEstatData() != null;
-                var event = env.isPerEmail() ?
-                        enviamentSuccess ? EnviamentSmEvent.EM_SUCCESS : EnviamentSmEvent.EM_ERROR :
-                        enviamentSuccess ? EnviamentSmEvent.NT_SUCCESS : EnviamentSmEvent.NT_ERROR;
+//                var event = env.isPerEmail() ?
+//                        enviamentSuccess ? EnviamentSmEvent.EM_SUCCESS : EnviamentSmEvent.EM_ERROR :
+//                        enviamentSuccess ? EnviamentSmEvent.NT_SUCCESS : EnviamentSmEvent.NT_ERROR;
+                var event = enviamentSuccess ? EnviamentSmEvent.NT_SUCCESS : EnviamentSmEvent.NT_ERROR;
                 switch (event) {
-                    case EM_SUCCESS:
-                        enviamentSmService.emailSuccess(env.getNotificaReferencia());
-                        break;
-                    case EM_ERROR:
-                        enviamentSmService.emailFailed(env.getNotificaReferencia());
-                        break;
+//                    case EM_SUCCESS:
+//                        enviamentSmService.emailSuccess(env.getNotificaReferencia());
+//                        break;
+//                    case EM_ERROR:
+//                        enviamentSmService.emailFailed(env.getNotificaReferencia());
+//                        break;
                     case NT_SUCCESS:
                         enviamentSmService.notificaSuccess(env.getNotificaReferencia());
                         break;
@@ -94,12 +95,4 @@ public class EnviamentNotificaListener {
 
     }
 
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    private static class NotExecucio {
-        Integer numIntent;
-        Boolean success;
-    }
 }
