@@ -73,6 +73,12 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
+	public void deleteHistoricSincronitzacio() {
+		delegate.deleteHistoricSincronitzacio();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
 	public Object[] syncDir3OrgansGestors(EntitatDto entitat) throws Exception {
 		return delegate.syncDir3OrgansGestors(entitat);
 	}
