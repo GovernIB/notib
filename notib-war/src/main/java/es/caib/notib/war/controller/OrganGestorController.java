@@ -279,6 +279,7 @@ public class OrganGestorController extends BaseUserController{
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		try {
 			organGestorService.syncDir3OrgansGestors(entitatActual);
+			organGestorService.deleteHistoricSincronitzacio();
 		} catch (Exception e) {
 			logger.error("Error al syncronitzar", e);
 			return getModalControllerReturnValueErrorMessageText(request, "redirect:../../organgestor", e.getMessage());
