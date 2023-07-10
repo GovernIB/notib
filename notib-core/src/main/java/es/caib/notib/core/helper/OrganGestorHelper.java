@@ -386,9 +386,10 @@ public class OrganGestorHelper {
 
 		unitat = OrganGestorEntity.builder().codi(unitatWS.getCodi()).entitat(entitat).nom(nom).nomEs(unitatWS.getDenominacio())
 				.codiPare(unitatWS.getSuperior()).estat(unitatWS.getEstat()).build();
+
+		organGestorRepository.save(unitat);
 		updateLlibreAndOficina(unitat, entitat.getDir3Codi());
 		log.debug(prefix + "guardant nova unitat amb codi " + unitat.getCodi() + " - " + unitat.getNom());
-		organGestorRepository.save(unitat);
 		return unitat;
 
 	}

@@ -20,6 +20,7 @@ import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.core.security.NotibMutableAclService;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.usuari.DadesUsuari;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
@@ -50,6 +51,7 @@ import java.util.*;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class PermisosHelper {
 
@@ -968,6 +970,11 @@ public class PermisosHelper {
 	}
 
 	private void duplicaEntradesPermisos(AclClassEntity classname, OrganGestorEntity organNou, AclSidEntity ownerSid, Set<AclEntryEntity> permisosOrigen, Set<AclEntryEntity> permisosDesti) {
+		if (classname == null || organNou == null || organNou.getId() == null || ownerSid == null || permisosOrigen == null) {
+			log.error("[DUP] Error al duplicar permisos algun dels valor obligatoris és nul. CLASSNAME=" + classname + ",ORGAN_NOU=" + organNou + ",OWNERSID=" + ownerSid);
+			return;
+		}
+
 		AclObjectIdentityEntity objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organNou.getId());
 		if (objectIdentityNou == null) {
 			objectIdentityNou = AclObjectIdentityEntity.builder()
@@ -975,9 +982,20 @@ public class PermisosHelper {
 					.objectId(organNou.getId())
 					.ownerSid(ownerSid)
 					.build();
-			aclObjectIdentityRepository.save(objectIdentityNou);
+			objectIdentityNou = aclObjectIdentityRepository.save(objectIdentityNou);
+		}
+		if (objectIdentityNou == null) {
+			log.error("[DUP] Nou objectIdentity null.");
+			return;
 		}
 		for (AclEntryEntity permisAntic : permisosOrigen) {
+			if (permisAntic == null) {
+				continue;
+			}
+			if (permisAntic.getSid() == null || permisAntic.getMask() == null || permisAntic.getGranting() == null) {
+				log.error("[DUP] Algun dels valors obligatoris del permis antic son nulls. Permis antic: SID=" + permisAntic.getSid() + ",MASK=" + permisAntic.getMask() + ";GRANTING=" + permisAntic.getGranting());
+				continue;
+			}
 			AclEntryEntity aclEntry = AclEntryEntity.builder()
 					.aclObjectIdentity(objectIdentityNou)
 					.sid(permisAntic.getSid())
