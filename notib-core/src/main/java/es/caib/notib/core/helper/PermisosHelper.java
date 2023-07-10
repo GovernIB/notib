@@ -982,7 +982,8 @@ public class PermisosHelper {
 					.objectId(organNou.getId())
 					.ownerSid(ownerSid)
 					.build();
-			objectIdentityNou = aclObjectIdentityRepository.save(objectIdentityNou);
+			aclObjectIdentityRepository.saveAndFlush(objectIdentityNou);
+			objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organNou.getId());
 		}
 		if (objectIdentityNou == null) {
 			log.error("[DUP] Nou objectIdentity null.");
