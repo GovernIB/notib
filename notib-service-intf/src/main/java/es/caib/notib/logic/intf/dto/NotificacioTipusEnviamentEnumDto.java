@@ -1,5 +1,7 @@
 package es.caib.notib.logic.intf.dto;
 
+import es.caib.notib.client.domini.EnviamentTipus;
+
 import java.io.Serializable;
 
 public enum NotificacioTipusEnviamentEnumDto implements Serializable {
@@ -30,14 +32,14 @@ public enum NotificacioTipusEnviamentEnumDto implements Serializable {
 		}
 	}
 	
-	public static int getNumVal(NotificaEnviamentTipusEnumDto tipus) {
+	public static int getNumVal(EnviamentTipus tipus) {
 		if(tipus.toString().toUpperCase().equals("NOTIFICACIO")) {
 			return 0;
-		}else if(tipus.toString().toUpperCase().equals("COMUNICACIO")) {
-			return 1;
-		}else {
-			return 0;
 		}
+		if(tipus.toString().toUpperCase().equals("COMUNICACIO")) {
+			return 1;
+		}
+		return 0;
 	}
 	
 	

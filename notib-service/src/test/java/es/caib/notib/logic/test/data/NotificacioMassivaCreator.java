@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 @Component
-public class NotificacioMassivaCreator extends DatabaseItemTest<NotificacioMassivaDataDto>{
+public class NotificacioMassivaCreator extends DatabaseItemTest<NotificacioMassivaDataDto> {
+
     @Autowired
     protected NotificacioMassivaService notificacioMassivaService;
     @Autowired
@@ -21,10 +22,7 @@ public class NotificacioMassivaCreator extends DatabaseItemTest<NotificacioMassi
 
     @Override
     public NotificacioMassivaDataDto create(Object element, Long entitatId) throws Exception{
-        return notificacioMassivaService.create(
-                entitatId,
-                ConfigTest.ADMIN_USER_CODE,
-                (NotificacioMassivaDto) element);
+        return notificacioMassivaService.create(entitatId, ConfigTest.ADMIN_USER_CODE, (NotificacioMassivaDto) element);
     }
 
     @Override

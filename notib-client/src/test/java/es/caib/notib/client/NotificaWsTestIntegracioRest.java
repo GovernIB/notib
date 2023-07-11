@@ -2110,7 +2110,7 @@ public class NotificaWsTestIntegracioRest {
 				entregaDeh.setProcedimentCodi("846823");
 				enviaments.setEntregaDeh(entregaDeh);
 			}
-			enviaments.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+			enviaments.setServeiTipus(ServeiTipus.URGENT);
 			notificacioV2.getEnviaments().add(enviaments);
 		}
 

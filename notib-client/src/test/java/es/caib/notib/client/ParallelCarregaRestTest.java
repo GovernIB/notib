@@ -7,7 +7,7 @@ import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentReferenciaV2;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.client.domini.NotificaServeiTipusEnumDto;
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.RespostaAltaV2;
@@ -439,7 +439,7 @@ public class ParallelCarregaRestTest {
                 entregaDeh.setObligat(false);
                 entregaDeh.setProcedimentCodi(infoNot.getProcedimentCodi());
                 enviament.setEntregaDeh(entregaDeh);
-                enviament.setServeiTipus(NotificaServeiTipusEnumDto.NORMAL);
+                enviament.setServeiTipus(ServeiTipus.NORMAL);
                 notificacio.getEnviaments().add(enviament);
             }
             return notificacio;

@@ -7,7 +7,9 @@ import com.google.common.base.Strings;
 import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.helper.*;
@@ -15,10 +17,8 @@ import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
 import es.caib.notib.logic.intf.dto.cie.CieDataDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDataDto;
-import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -186,7 +186,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional(rollbackFor=Exception.class)
 	@Override
-	public NotificacioDatabaseDto create(Long entitatId, NotificacioDatabaseDto notificacio) throws RegistreNotificaException {
+	public NotificacioV2 create(Long entitatId, NotificacioV2 notificacio) throws RegistreNotificaException {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
@@ -196,7 +196,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var notificacioEntity = notificacioHelper.saveNotificacio(notData);
 			notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
 			auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceImpl.create");
-			return conversioTipusHelper.convertir(notificacioEntity, NotificacioDatabaseDto.class);
+			return conversioTipusHelper.convertir(notificacioEntity, NotificacioV2.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -247,7 +247,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Transactional
 	@Override
-	public NotificacioDatabaseDto update(Long entitatId, NotificacioDatabaseDto notificacio, boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
+	public NotificacioV2 update(Long entitatId, NotificacioV2 notificacio, boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
@@ -303,10 +303,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<Long> destinatarisIds = new ArrayList<>();
 			List<NotificacioEnviamentEntity> nousEnviaments = new ArrayList<>();
 			for(var enviament: notificacio.getEnviaments()) {
-				if (enviament.getEntregaPostal() != null && Strings.isNullOrEmpty(enviament.getEntregaPostal().getCodiPostal())) {
-						enviament.getEntregaPostal().setCodiPostal(enviament.getEntregaPostal().getCodiPostalNorm());
-
-				}
+				// TODO VEURE PERQUE S'UTILITZAVA EL codiPostalNorm
+//				if (enviament.getEntregaPostal() != null && Strings.isNullOrEmpty(enviament.getEntregaPostal().getCodiPostal())) {
+//						enviament.getEntregaPostal().setCodiPostal(enviament.getEntregaPostal().getCodiPostalNorm());
+//
+//				}
 				if (enviament.getTitular() != null) {
 					enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
 				}
@@ -317,8 +318,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 			// Creació o edició enviament existent
 			Enviament enviament;
-			NotEnviamentDatabaseDto enviamentDto;
-			ServeiTipusEnumDto serveiTipus;
+			Enviament enviamentDto;
+			ServeiTipus serveiTipus;
 			PersonaEntity titular;
 			List<PersonaEntity> nousDestinataris;
 			for (var i = 0; i < enviaments.size(); i++) {
@@ -328,10 +329,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (enviament.getServeiTipus() != null) {
 					switch (enviament.getServeiTipus()) {
 					case NORMAL:
-						serveiTipus = ServeiTipusEnumDto.NORMAL;
+						serveiTipus = ServeiTipus.NORMAL;
 						break;
 					case URGENT:
-						serveiTipus = ServeiTipusEnumDto.URGENT;
+						serveiTipus = ServeiTipus.URGENT;
 						break;
 					}
 				}
@@ -413,7 +414,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 			notificacioTableHelper.actualitzarRegistre(notificacioEntity);
 			auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.UPDATE, UPDATE);
-			return conversioTipusHelper.convertir(notificacioRepository.getOne(notificacio.getId()), NotificacioDatabaseDto.class);
+			return conversioTipusHelper.convertir(notificacioRepository.getOne(notificacio.getId()), NotificacioV2.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

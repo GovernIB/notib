@@ -31,6 +31,12 @@ import java.io.Serializable;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Persona implements Serializable {
 
+    // TODO ATRIBUTS AFEGITS A POSTERIORI. FER UNA HERENCIA PER DEIXAR-HO CORRECTE
+
+    private Long id;
+
+    // TODO ****************************************************************************
+
     private boolean incapacitat;
     private InteressatTipus interessatTipus;
     @JsonDeserialize(using = TrimStringDeserializer.class)

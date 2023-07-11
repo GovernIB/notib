@@ -1,6 +1,7 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.aspect.Audita;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.CacheHelper;
@@ -28,7 +29,6 @@ import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.TipusAssumpteDto;
 import es.caib.notib.logic.intf.dto.TipusEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDataDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
@@ -845,13 +845,13 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol, TipusEnviamentEnumDto enviamentTipus) {
+	public List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol, EnviamentTipus enviamentTipus) {
 
 		var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		List<ProcedimentEntity> procediments;
 		if (!RolEnumDto.NOT_ADMIN.equals(rol)) {
-			var permis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
-					TipusEnviamentEnumDto.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
+			var permis = EnviamentTipus.SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
+					EnviamentTipus.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
 			return recuperarProcedimentAmbPermis(entitat, permis, organCodi);
 		}
 		procediments = recuperarProcedimentSensePermis(entitat, organCodi);
@@ -862,11 +862,11 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public boolean hasProcedimentsComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus) {
+	public boolean hasProcedimentsComunsAndNotificacioPermission(Long entitatId, EnviamentTipus enviamentTipus) {
 
 		var auth = SecurityContextHolder.getContext().getAuthentication();
-		var permis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
-							TipusEnviamentEnumDto.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
+		var permis = EnviamentTipus.SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
+				EnviamentTipus.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
 
 		var organGestorsAmbPermis = permisosService.getOrgansAmbPermis(entitatId, auth.getName(), PermisEnum.COMUNS);
 		organGestorsAmbPermis.addAll(permisosService.getOrgansAmbPermis(entitatId, auth.getName(), permis));

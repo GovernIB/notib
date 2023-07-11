@@ -1,8 +1,8 @@
 package es.caib.notib.api.interna.controller;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.rest.consulta.Arxiu;
 import es.caib.notib.logic.intf.rest.consulta.Resposta;
 import es.caib.notib.logic.intf.service.EnviamentService;
@@ -63,7 +63,7 @@ public class ConsultaApiRestV1Controller {
 		
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(null)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(null)
 						.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		return enviamentService.findEnviaments(consulta);
 	}
@@ -86,7 +86,7 @@ public class ConsultaApiRestV1Controller {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(null)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(null)
 								.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		return enviamentService.findEnviaments(consulta);
 	}
@@ -109,7 +109,7 @@ public class ConsultaApiRestV1Controller {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(false)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(false)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		return enviamentService.findEnviaments(consulta);
 	}
@@ -132,7 +132,7 @@ public class ConsultaApiRestV1Controller {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(false)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(false)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		return enviamentService.findEnviaments(consulta);
 	}
@@ -155,7 +155,7 @@ public class ConsultaApiRestV1Controller {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(true)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(true)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		return enviamentService.findEnviaments(consulta);
 	}
@@ -178,7 +178,7 @@ public class ConsultaApiRestV1Controller {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(true)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(true)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		return enviamentService.findEnviaments(consulta);
 	}

@@ -3,7 +3,10 @@
  */
 package es.caib.notib.logic.service;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.PermisosHelper;
@@ -15,23 +18,19 @@ import es.caib.notib.logic.intf.dto.EntitatDataDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto.OrdreDireccioDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.PersonaDto;
-import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatFullaDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatSobreDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
-import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.GrupService;
@@ -43,8 +42,6 @@ import es.caib.notib.logic.intf.service.PagadorCieFormatSobreService;
 import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.UsuariAplicacioService;
-import es.caib.notib.persist.entity.EntitatEntity;
-import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
@@ -79,6 +76,7 @@ import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
@@ -89,13 +87,9 @@ import org.junit.BeforeClass;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -122,6 +116,7 @@ import static org.junit.Assert.fail;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class BaseServiceTest {
 
 	@Autowired
@@ -188,29 +183,25 @@ public class BaseServiceTest {
 	
 	@Transactional
 	protected void autenticarUsuari(String usuariCodi) {
-		logger.debug("Autenticant usuari " + usuariCodi + "...");
-		UserDetails userDetails = userDetailsService.loadUserByUsername(usuariCodi);
-		Authentication authToken = new UsernamePasswordAuthenticationToken(
-				userDetails.getUsername(),
-				userDetails.getPassword(),
-				userDetails.getAuthorities());
+
+		log.debug("Autenticant usuari " + usuariCodi + "...");
+		var userDetails = userDetailsService.loadUserByUsername(usuariCodi);
+		var authToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
-        UsuariEntity usuariEntity = usuariRepository.findById(usuariCodi).orElse(null);
+        var usuariEntity = usuariRepository.findById(usuariCodi).orElse(null);
 		if (usuariEntity == null) {
 			usuariRepository.save(UsuariEntity.builder().codi(usuariCodi).email(usuariCodi + "@mail.com").idioma("CA").nom(usuariCodi).llinatges(usuariCodi).build());
 		}
-		logger.debug("... usuari " + usuariCodi + " autenticat correctament");
+		log.debug("... usuari " + usuariCodi + " autenticat correctament");
 	}
 
-	protected void testCreantElements(
-			TestAmbElementsCreats test,
-			String descripcioTest,
-			Object... elements) {
-		String descripcio = (descripcioTest != null && !descripcioTest.isEmpty()) ? descripcioTest : "";
-		logger.info("-------------------------------------------------------------------");
-		logger.info("-- Executant test \"" + descripcio + "\" amb els elements creats...");
-		logger.info("-------------------------------------------------------------------");
-		List<Object> elementsCreats = new ArrayList<Object>();
+	protected void testCreantElements(TestAmbElementsCreats test, String descripcioTest, Object... elements) {
+
+		var descripcio = (descripcioTest != null && !descripcioTest.isEmpty()) ? descripcioTest : "";
+		log.info("-------------------------------------------------------------------");
+		log.info("-- Executant test \"" + descripcio + "\" amb els elements creats...");
+		log.info("-------------------------------------------------------------------");
+		List<Object> elementsCreats = new ArrayList<>();
 		Long entitatId = null;
 		Long organGestorId = null;
 		Long pagadorCieId = null;
@@ -230,120 +221,96 @@ public class BaseServiceTest {
 			
 			for (Object element: elements) {
 				Long id = null;
-				logger.debug("Creant objecte de tipus " + element.getClass().getSimpleName() + "...");
+				log.debug("Creant objecte de tipus " + element.getClass().getSimpleName() + "...");
 				if (element instanceof EntitatDto) {
 					autenticarUsuari("super");
-					EntitatDto entitatCreada = entitatService.create((EntitatDataDto) element);
+					var entitatCreada = entitatService.create((EntitatDataDto) element);
 					entitatId = entitatCreada.getId();
 					elementsCreats.add(entitatCreada);
 					if (((EntitatDto)element).getPermisos() != null) {
 						for (PermisDto permis: ((EntitatDto)element).getPermisos()) {
-							entitatService.permisUpdate(
-									entitatCreada.getId(),
-									permis);
+							entitatService.permisUpdate(entitatCreada.getId(), permis);
 						}
 					}
 					id = entitatCreada.getId();
 				} else if(element instanceof AplicacioDto) {
 					autenticarUsuari("super");
-					AplicacioDto entitatCreada = usuariAplicacioService.create((AplicacioDto)element);
+					var entitatCreada = usuariAplicacioService.create((AplicacioDto)element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
 				} else if(element instanceof OrganGestorDto) {
 					autenticarUsuari("admin");
 					((OrganGestorDto)element).setEntitatId(entitatId);
-					OrganGestorDto entitatCreada = organGestorCreate((OrganGestorDto)element);
+					var entitatCreada = organGestorCreate((OrganGestorDto)element);
 					organGestorId = entitatCreada.getId();
 					elementsCreats.add(entitatCreada);
 					if (((OrganGestorDto)element).getPermisos() != null) {
 						for (PermisDto permis: ((OrganGestorDto)element).getPermisos()) {
-							organGestorService.permisUpdate(
-									entitatId, 
-									entitatCreada.getId(),
-									false,
-									permis);
+							organGestorService.permisUpdate(entitatId, entitatCreada.getId(), false, permis);
 						}
 					}
 					id = entitatCreada.getId();
 				} else if(element instanceof ProcSerDto) {
 					autenticarUsuari("admin");
-					ProcSerDto entitatCreada = procedimentService.create(
-							entitatId,
-							(ProcSerDto)element);
+					var entitatCreada = procedimentService.create(entitatId, (ProcSerDto)element);
 					elementsCreats.add(entitatCreada);
 					if (((ProcSerDto)element).getPermisos() != null) {
 						for (PermisDto permis: ((ProcSerDto)element).getPermisos()) {
-							procedimentService.permisUpdate(
-									entitatId,
-									organGestorId,
-									entitatCreada.getId(),
-									permis);
+							procedimentService.permisUpdate(entitatId, organGestorId, entitatCreada.getId(), permis);
 						}
 					}
 					id = entitatCreada.getId();
 				} else if(element instanceof GrupDto) {
 					autenticarUsuari("admin");
-					GrupDto entitatCreada = grupService.create(
-							entitatId,
-							(GrupDto)element);
+					var entitatCreada = grupService.create(entitatId, (GrupDto)element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
 				} else if(element instanceof OperadorPostalDto) {
 					autenticarUsuari("admin");
-					OperadorPostalDto entitatCreada = operadorPostalService.upsert(
-							entitatId,
-							(OperadorPostalDto)element);
+					var entitatCreada = operadorPostalService.upsert(entitatId, (OperadorPostalDto)element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
 				} else if(element instanceof CieDto) {
 					autenticarUsuari("admin");
-					CieDto entitatCreada = pagadorCieService.upsert(
-							entitatId,
-							(CieDto)element);
+					var entitatCreada = pagadorCieService.upsert(entitatId, (CieDto)element);
 					pagadorCieId = entitatCreada.getId();
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
 				} else if(element instanceof CieFormatFullaDto) {
 					autenticarUsuari("admin");
-					CieFormatFullaDto entitatCreada = pagadorCieFormatFullaService.create(
-							pagadorCieId,
-							(CieFormatFullaDto)element);
+					var entitatCreada = pagadorCieFormatFullaService.create(pagadorCieId, (CieFormatFullaDto)element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
 				}else if(element instanceof CieFormatSobreDto) {
 					autenticarUsuari("admin");
-					CieFormatSobreDto entitatCreada = pagadorCieFormatSobreService.create(
-							pagadorCieId,
-							(CieFormatSobreDto)element);
+					var entitatCreada = pagadorCieFormatSobreService.create(pagadorCieId, (CieFormatSobreDto)element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
-				} else if(element instanceof NotificacioDatabaseDto) {
+				} else if(element instanceof NotificacioV2) {
 					autenticarUsuari("admin");
-					NotificacioDatabaseDto entitatCreada = notificacioService.create(
-							entitatId,
-							(NotificacioDatabaseDto)element);
+					var entitatCreada = notificacioService.create(entitatId, (NotificacioV2) element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
 				} else {
 					fail("No s'ha trobat cap entitat per associar l'objecte de tipus " + element.getClass().getSimpleName());
 				}
-				logger.debug("...objecte de tipus " + element.getClass().getSimpleName() + "creat (id=" + id + ").");
+				log.debug("...objecte de tipus " + element.getClass().getSimpleName() + "creat (id=" + id + ").");
 			}
-			logger.debug("Executant accions del test...");
+			log.debug("Executant accions del test...");
 			test.executar(elementsCreats);
-			logger.debug("...accions del test executades.");
+			log.debug("...accions del test executades.");
 		} catch (Exception ex) {
-			logger.error("L'execució del test ha produït una excepció", ex);
+			log.error("L'execució del test ha produït una excepció", ex);
 			fail("L'execució del test ha produït una excepció");
 		} finally {
 			Collections.reverse(elementsCreats);
 			for (Object element: elementsCreats) {
-				logger.debug("Esborrant objecte de tipus " + element.getClass().getSimpleName() + "...");
+				log.debug("Esborrant objecte de tipus " + element.getClass().getSimpleName() + "...");
 				if (element instanceof EntitatDto) {
 					autenticarUsuari("admin");
-					Long entitadId = ((EntitatDto)element).getId();
-					List<OrganGestorDto> organsGestors = organGestorService.findByEntitat(entitadId);
-					for(OrganGestorDto organGestorDto: organsGestors) {
+					var entitadId = ((EntitatDto)element).getId();
+					var organsGestors = organGestorService.findByEntitat(entitadId);
+					for(var organGestorDto: organsGestors) {
 						organGestorDelete(entitatId, organGestorDto.getId());
 					}
 					autenticarUsuari("super");
@@ -358,15 +325,12 @@ public class BaseServiceTest {
 				} else if(element instanceof ProcSerDto) {
 					
 					autenticarUsuari("admin");
-					Long procedimentId = ((ProcSerDto)element).getId();
-					List<NotificacioEntity> notificacionsByProcediment = notificacioRepository.findByProcedimentId(procedimentId);
-					for(NotificacioEntity notificacioEntity: notificacionsByProcediment) {
+					var procedimentId = ((ProcSerDto)element).getId();
+					var notificacionsByProcediment = notificacioRepository.findByProcedimentId(procedimentId);
+					for(var notificacioEntity: notificacionsByProcediment) {
 						notificacioService.delete(entitatId, notificacioEntity.getId());
 					}
-					procedimentService.delete(
-							entitatId,
-							((ProcSerDto)element).getId(),
-							true);
+					procedimentService.delete(entitatId, ((ProcSerDto)element).getId(), true);
 				} else if(element instanceof GrupDto) {
 					autenticarUsuari("admin");
 					grupService.delete(((GrupDto)element).getId());
@@ -386,35 +350,34 @@ public class BaseServiceTest {
 					autenticarUsuari("admin");
 					notificacioService.delete(entitatId, ((NotificacioDtoV2)element).getId());
 				}
-				logger.debug("...objecte de tipus " + element.getClass().getSimpleName() + " esborrat correctament.");
+				log.debug("...objecte de tipus " + element.getClass().getSimpleName() + " esborrat correctament.");
 			}
 			removeAllConfigs();
-			logger.info("-------------------------------------------------------------------");
-			logger.info("-- ...test \"" + descripcio + "\" executat.");
-			logger.info("-------------------------------------------------------------------");
+			log.info("-------------------------------------------------------------------");
+			log.info("-- ...test \"" + descripcio + "\" executat.");
+			log.info("-------------------------------------------------------------------");
 		}
 	}
 
-	protected void testCreantElements(
-			final TestAmbElementsCreats test,
-			Object... elements) {
+	protected void testCreantElements(final TestAmbElementsCreats test, Object... elements) {
 		testCreantElements(test, null, elements);
 	}
 
 	protected abstract class TestAmbElementsCreats {
-		public abstract void executar(
-				List<Object> elementsCreats) throws Exception;
+		public abstract void executar(List<Object> elementsCreats) throws Exception;
 	}
 
 	protected void addConfig(String key, String value) {
 		ConfigEntity configEntity = new ConfigEntity(key, value);
 		configRepository.save(configEntity);
 	}
+
 	protected void setDefaultConfigs() throws IOException {
-		Properties props = new Properties(System.getProperties());
+
+		var props = new Properties(System.getProperties());
 		props.load(getClass().getClassLoader().getResourceAsStream("es/caib/notib/logic/test.properties"));
 //		Properties props = PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties").findAll();
-		for (Map.Entry<Object, Object> entry : props.entrySet() ) {
+		for (var entry : props.entrySet() ) {
 			addConfig(entry.getKey().toString(), entry.getValue().toString());
 		}
 	}
@@ -427,8 +390,9 @@ public class BaseServiceTest {
 	
 	//	DadesUsuariPlugin 
 	protected void configureMockDadesUsuariPlugin() throws SistemaExternException {
+
 		dadesUsuariPluginMock = Mockito.mock(DadesUsuariPlugin.class);
-		List<String> rols = new ArrayList<String>();
+		List<String> rols = new ArrayList<>();
 		rols.add("tothom");
 		DadesUsuari usuari = new DadesUsuari();
 		usuari.setCodi("user");
@@ -436,7 +400,7 @@ public class BaseServiceTest {
 		usuari.setLlinatges("Surname");
 		usuari.setNif("00000000T");
 		usuari.setEmail("user@user.es");
-		List<DadesUsuari> usuaris = new ArrayList<DadesUsuari>();
+		List<DadesUsuari> usuaris = new ArrayList<>();
 		usuaris.add(usuari);
 		Mockito.when(dadesUsuariPluginMock.consultarRolsAmbCodi(Mockito.anyString())).thenReturn(rols);
 		Mockito.when(dadesUsuariPluginMock.consultarAmbCodi(Mockito.anyString())).thenReturn(usuari);
@@ -446,15 +410,16 @@ public class BaseServiceTest {
 	
 	//	GestioDocumentalPlugin
 	protected void configureMockGestioDocumentalPlugin() throws SistemaExternException, IOException {
+
 		gestioDocumentalPluginMock = Mockito.mock(GestioDocumentalPlugin.class);
 		Mockito.when(gestioDocumentalPluginMock.create(Mockito.anyString(), Mockito.any(InputStream.class))).thenReturn(Integer.toString(ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE)));
 		Mockito.doNothing().when(gestioDocumentalPluginMock).update(Mockito.anyString(), Mockito.anyString(), Mockito.any(InputStream.class));
 		Mockito.doNothing().when(gestioDocumentalPluginMock).delete(Mockito.anyString(), Mockito.anyString());
 		Mockito.doAnswer(new Answer<Void>() {
 			public Void answer(InvocationOnMock invocation) throws IOException {
-				Object[] args = invocation.getArguments();
-				FitxerDto fitxer = getFitxerPdfDeTest();
-				byte[] contingut = fitxer.getContingut();
+				var args = invocation.getArguments();
+				var fitxer = getFitxerPdfDeTest();
+				var contingut = fitxer.getContingut();
 				IOUtils.copy(new ByteArrayInputStream(contingut), (OutputStream)args[2]);
 				return null;
 			}
@@ -464,8 +429,9 @@ public class BaseServiceTest {
 	
 	//	RegistrePlugin
 	protected void configureMockRegistrePlugin() throws RegistrePluginException, IOException {
+
 		registrePluginMock = Mockito.mock(RegistrePlugin.class);
-		FitxerDto fitxer = getFitxerPdfDeTest();
+		var fitxer = getFitxerPdfDeTest();
 		
 		// registrarSalida
 //		Mockito.doAnswer(new Answer<RespostaAnotacioRegistre>() {
@@ -483,44 +449,39 @@ public class BaseServiceTest {
 //		}).when(registrePluginMock).registrarSalida(Mockito.any(RegistreSortida.class), Mockito.anyString());
 
 		// salidaAsientoRegistral
-		Mockito.doAnswer(new Answer<RespostaConsultaRegistre>() {
-			public RespostaConsultaRegistre answer(InvocationOnMock invocation) {
-				RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
-				Date data = new Date();
-				Calendar calendar = new GregorianCalendar();
-				calendar.setTime(data);
-				String num = Integer.toString(ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE));
-				resposta.setRegistreData(data);
-				resposta.setRegistreNumero(num);
-				resposta.setRegistreNumeroFormatat(num + "/" + calendar.get(Calendar.YEAR));
-				resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);
-				return resposta;
-			}
-		}).when(registrePluginMock).salidaAsientoRegistral(
-				Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.anyLong(), Mockito.anyBoolean()
-		);
+		Mockito.doAnswer((Answer<RespostaConsultaRegistre>) invocation -> {
+
+			var resposta = new RespostaConsultaRegistre();
+			var data = new Date();
+			var calendar = new GregorianCalendar();
+			calendar.setTime(data);
+			var num = Integer.toString(ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE));
+			resposta.setRegistreData(data);
+			resposta.setRegistreNumero(num);
+			resposta.setRegistreNumeroFormatat(num + "/" + calendar.get(Calendar.YEAR));
+			resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);
+			return resposta;
+		}).when(registrePluginMock).salidaAsientoRegistral(Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.anyLong(), Mockito.anyBoolean());
 		
 		// obtenerAsientoRegistral
-		Mockito.doAnswer(new Answer<RespostaConsultaRegistre>() {
-			public RespostaConsultaRegistre answer(InvocationOnMock invocation) {
-				RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
-				Date data = new Date();
-				Calendar calendar = new GregorianCalendar();
-				calendar.setTime(data);
-				String num = Integer.toString(ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE));
-				resposta.setRegistreData(data);
-				resposta.setRegistreNumero(num);
-				resposta.setRegistreNumeroFormatat(num + "/" + calendar.get(Calendar.YEAR));
-				resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
-				resposta.setSirRegistreDestiData(data);
-				resposta.setEntitatCodi("A04003003");
-				resposta.setEntitatDenominacio("CAIB");
-				return resposta;
-			}
+		Mockito.doAnswer((Answer<RespostaConsultaRegistre>) invocation -> {
+			var resposta = new RespostaConsultaRegistre();
+			var data = new Date();
+			var calendar = new GregorianCalendar();
+			calendar.setTime(data);
+			var num = Integer.toString(ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE));
+			resposta.setRegistreData(data);
+			resposta.setRegistreNumero(num);
+			resposta.setRegistreNumeroFormatat(num + "/" + calendar.get(Calendar.YEAR));
+			resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
+			resposta.setSirRegistreDestiData(data);
+			resposta.setEntitatCodi("A04003003");
+			resposta.setEntitatDenominacio("CAIB");
+			return resposta;
 		}).when(registrePluginMock).obtenerAsientoRegistral(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong(), Mockito.anyBoolean());
 
 		// obtenerJustificante
-		RespostaJustificantRecepcio respostaJustificantRecepcio = new RespostaJustificantRecepcio();
+		var respostaJustificantRecepcio = new RespostaJustificantRecepcio();
 		respostaJustificantRecepcio.setJustificant(fitxer.getContingut());
 		respostaJustificantRecepcio.setErrorCodi("OK");
 		Mockito.when(registrePluginMock.obtenerJustificante(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong())).thenReturn(respostaJustificantRecepcio);
@@ -529,7 +490,7 @@ public class BaseServiceTest {
 		Mockito.when(registrePluginMock.obtenerOficioExterno(Mockito.anyString(), Mockito.anyString())).thenReturn(respostaJustificantRecepcio);
 		
 		// llistarTipusAssumpte
-		List<TipusAssumpte> tipusAssumptes = new ArrayList<TipusAssumpte>();
+		List<TipusAssumpte> tipusAssumptes = new ArrayList<>();
 		TipusAssumpte tipusAssumpte1 = new TipusAssumpte();
 		tipusAssumpte1.setCodi("TA01");
 		tipusAssumpte1.setNom("Tipus Assumpte 01");
@@ -537,8 +498,8 @@ public class BaseServiceTest {
 		Mockito.when(registrePluginMock.llistarTipusAssumpte(Mockito.anyString())).thenReturn(tipusAssumptes);
 		
 		// llistarCodisAssumpte
-		List<CodiAssumpte> codiAssumptes = new ArrayList<CodiAssumpte>();
-		CodiAssumpte codiAssumpte1 = new CodiAssumpte();
+		List<CodiAssumpte> codiAssumptes = new ArrayList<>();
+		var codiAssumpte1 = new CodiAssumpte();
 		codiAssumpte1.setCodi("CA01");
 		codiAssumpte1.setNom("Codi Assumpte 01");
 		codiAssumpte1.setTipusAssumpte("TA01");
@@ -546,13 +507,13 @@ public class BaseServiceTest {
 		Mockito.when(registrePluginMock.llistarCodisAssumpte(Mockito.anyString(), Mockito.anyString())).thenReturn(codiAssumptes);
 
 		// llistarOficinaVirtual
-		Oficina oficina = new Oficina();
+		var oficina = new Oficina();
 		oficina.setCodi("O00009390");
 		oficina.setNom(("DGTIC"));
 		Mockito.when(registrePluginMock.llistarOficinaVirtual(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong())).thenReturn(oficina);
 																																																																																				
 		// llistarOficines
-		List<Oficina> oficines = new ArrayList<Oficina>();
+		List<Oficina> oficines = new ArrayList<>();
 		oficines.add(oficina);
 		Mockito.when(registrePluginMock.llistarOficines(Mockito.anyString(), Mockito.anyLong())).thenReturn(oficines);
 
@@ -684,54 +645,32 @@ public class BaseServiceTest {
 	}
 
 	// TODO: Millorar per a poder utilitzar amb més casuístiques
-	protected NotificacioDtoV2 generarNotificacio(
-			String notificacioId,
-			ProcSerDto procediment,
-			EntitatDto entitat,
-			String organEmisor,
-			int numDestinataris,
-			boolean ambEnviamentPostal) throws IOException, DecoderException {
+	protected NotificacioDtoV2 generarNotificacio(String notificacioId, ProcSerDto procediment, EntitatDto entitat, String organEmisor, int numDestinataris, boolean ambEnviamentPostal) throws IOException, DecoderException {
+
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		NotificacioDtoV2 notificacio = new NotificacioDtoV2();
 		notificacio.setUsuariCodi("admin");
 		notificacio.setEmisorDir3Codi(organEmisor);
-		notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO);
-		notificacio.setConcepte(
-				"concepte_" + notificacioId);
-		notificacio.setDescripcio(
-				"descripcio_" + notificacioId);
+		notificacio.setEnviamentTipus(EnviamentTipus.NOTIFICACIO);
+		notificacio.setConcepte("concepte_" + notificacioId);
+		notificacio.setDescripcio("descripcio_" + notificacioId);
 		notificacio.setEnviamentDataProgramada(new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
 		notificacio.setRetard(5);
 		notificacio.setCaducitat(new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
 		DocumentDto document = new DocumentDto();
 		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 		document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
-		document.setHash(
-				Base64.encodeBase64String(
-						Hex.decodeHex(
-								DigestUtils.sha1Hex(arxiuBytes).toCharArray())));
+		document.setHash(Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha1Hex(arxiuBytes).toCharArray())));
 		document.setNormalitzat(false);
 		document.setGenerarCsv(false);
 		notificacio.setDocument(document);
 		notificacio.setProcediment(procediment);
 		notificacio.setOrganGestor("A00000000");
 		notificacio.setEntitat(entitat);
-		List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
-//		if (ambEnviamentPostal) {
-//			PagadorPostal pagadorPostal = new PagadorPostal();
-//			pagadorPostal.setDir3Codi("A04013511");
-//			pagadorPostal.setFacturacioClientCodi("ccFac_" + notificacioId);
-//			pagadorPostal.setContracteNum("pccNum_" + notificacioId);
-//			pagadorPostal.setContracteDataVigencia(new Date(0));
-//			notificacio.setPagadorPostal(pagadorPostal);
-//			PagadorCie pagadorCie = new PagadorCie();
-//			pagadorCie.setDir3Codi("A04013511");
-//			pagadorCie.setContracteDataVigencia(new Date(0));
-//			notificacio.setPagadorCie(pagadorCie);
-//		}
+		List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<>();
 		for (int i = 0; i < numDestinataris; i++) {
-			NotificacioEnviamentDtoV2 enviament = new NotificacioEnviamentDtoV2();
-			PersonaDto titular = PersonaDto.builder()
+			var enviament = new NotificacioEnviamentDtoV2();
+			var titular = PersonaDto.builder()
 					.interessatTipus(InteressatTipus.FISICA)
 					.nom("titularNom" + i)
 					.llinatge1("titLlinatge1_" + i)
@@ -740,8 +679,8 @@ public class BaseServiceTest {
 					.telefon("666010101")
 					.email("titular@gmail.com").build();
 			enviament.setTitular(titular);
-			List<PersonaDto> destinataris = new ArrayList<PersonaDto>();
-			PersonaDto destinatari = PersonaDto.builder()
+			List<PersonaDto> destinataris = new ArrayList<>();
+			var destinatari = PersonaDto.builder()
 					.interessatTipus(InteressatTipus.FISICA)
 					.nom("destinatariNom" + i)
 					.llinatge1("destLlinatge1_" + i)
@@ -751,35 +690,7 @@ public class BaseServiceTest {
 					.email("destinatari@gmail.com").build();
 			destinataris.add(destinatari);
 			enviament.setDestinataris(destinataris);
-//			if (ambEnviamentPostal) {
-//				EntregaPostal entregaPostal = new EntregaPostal();
-//				entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL);
-//				entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
-//				entregaPostal.setViaNom("Bas");
-//				entregaPostal.setNumeroCasa("25");
-//				entregaPostal.setNumeroQualificador("bis");
-//				entregaPostal.setPuntKm("pk01");
-//				entregaPostal.setApartatCorreus("0228");
-//				entregaPostal.setPortal("portal" + i);
-//				entregaPostal.setEscala("escala" + i);
-//				entregaPostal.setPlanta("planta" + i);
-//				entregaPostal.setPorta("porta" + i);
-//				entregaPostal.setBloc("bloc" + i);
-//				entregaPostal.setComplement("complement" + i);
-//				entregaPostal.setCodiPostal("07500");
-//				entregaPostal.setPoblacio("poblacio" + i);
-//				entregaPostal.setMunicipiCodi("07033");
-//				entregaPostal.setProvincia("07");
-//				entregaPostal.setPaisCodi("ES");
-//				entregaPostal.setLinea1("linea1_" + i);
-//				entregaPostal.setLinea2("linea2_" + i);
-//				entregaPostal.setCie(new Integer(8));
-//			}
-//			EntregaDehDto entregaDeh = new EntregaDehDto();
-//			entregaDeh.setObligat(true);
-//			entregaDeh.setProcedimentCodi("0000");
-//			enviament.setEntregaDeh(entregaDeh);
-			enviament.setServeiTipus(ServeiTipusEnumDto.URGENT);
+			enviament.setServeiTipus(ServeiTipus.URGENT);
 			enviaments.add(enviament);
 		}
 		notificacio.setEnviaments(enviaments);
@@ -787,17 +698,17 @@ public class BaseServiceTest {
 	}
 
 	private java.io.InputStream getContingutNotificacioAdjunt() {
-		return getClass().getResourceAsStream(
-                "/es/caib/notib/logic/notificacio_adjunt.pdf");
+		return getClass().getResourceAsStream("/es/caib/notib/logic/notificacio_adjunt.pdf");
 	}
 
 	private OrganGestorDto organGestorCreate(OrganGestorDto dto) {
-			EntitatEntity entitat = entitatRepository.getOne(dto.getEntitatId());
-			OrganGestorEstatEnum estat = dto.getEstat() != null ? dto.getEstat() : OrganGestorEstatEnum.V;
-			Map<String, OrganismeDto> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
-			OrganismeDto node = arbreUnitats.get(dto.getCodi());
-			String codiPare = node != null ? node.getPare() : null;
-			OrganGestorEntity.OrganGestorEntityBuilder organGestorBuilder = OrganGestorEntity.builder()
+
+			var entitat = entitatRepository.getOne(dto.getEntitatId());
+			var estat = dto.getEstat() != null ? dto.getEstat() : OrganGestorEstatEnum.V;
+			var arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+			var node = arbreUnitats.get(dto.getCodi());
+			var codiPare = node != null ? node.getPare() : null;
+			var organGestorBuilder = OrganGestorEntity.builder()
 					.codi(dto.getCodi())
 					.nom(dto.getNom())
 					.codiPare(codiPare)
@@ -809,21 +720,20 @@ public class BaseServiceTest {
 					.estat(estat.name())
 					.sir(dto.getSir());
 			if (dto.isEntregaCieActiva()) {
-				EntregaCieEntity entregaCie = new EntregaCieEntity(dto.getCieId(), dto.getOperadorPostalId());
+				var entregaCie = new EntregaCieEntity(dto.getCieId(), dto.getOperadorPostalId());
 				organGestorBuilder.entregaCie(entregaCieRepository.save(entregaCie));
 			}
 			return conversioTipusHelper.convertir(organGestorRepository.save(organGestorBuilder.build()), OrganGestorDto.class);
 	}
 
 		public OrganGestorDto organGestorDelete(Long entitatId, Long organId) {
-			EntitatEntity entitat = entitatRepository.getOne(entitatId);
-			OrganGestorEntity organGestorEntity = organGestorRepository.findByEntitatAndIds(entitat, Arrays.asList(new Long[]{organId})).get(0);
 
+			var entitat = entitatRepository.getOne(entitatId);
+			var organGestorEntity = organGestorRepository.findByEntitatAndIds(entitat, Arrays.asList(new Long[]{organId})).get(0);
 			// Eliminar permisos de l'òrgan
 			permisosHelper.deleteAcl(organId, OrganGestorEntity.class);
 			// Eliminar organ
 			organGestorRepository.delete(organGestorEntity);
-
 			return conversioTipusHelper.convertir(organGestorEntity, OrganGestorDto.class);
 	}
 
@@ -831,15 +741,11 @@ public class BaseServiceTest {
 	// Contrucción PaginacioParamsDto
 	// ///////////////////////////////////////////////////////////////////////////////////////////////
 
-	protected static PaginacioParamsDto getPaginacioDtoFromRequest(
-			Map<String, String[]> mapeigFiltres,
-			Map<String, String[]> mapeigOrdenacions) {
-		DatatablesParams params = new DatatablesParams();
-		logger.debug("Informació de la pàgina obtingudes de datatables (" +
-				"draw=" + params.getDraw() + ", " +
-				"start=" + params.getStart() + ", " +
-				"length=" + params.getLength() + ")");
-		PaginacioParamsDto paginacio = new PaginacioParamsDto();
+	protected static PaginacioParamsDto getPaginacioDtoFromRequest(Map<String, String[]> mapeigFiltres, Map<String, String[]> mapeigOrdenacions) {
+
+		var params = new DatatablesParams();
+		log.debug("Informació de la pàgina obtingudes de datatables (draw=" + params.getDraw() + ", start=" + params.getStart() + ", length=" + params.getLength() + ")");
+		var paginacio = new PaginacioParamsDto();
 		int paginaNum = params.getStart() / params.getLength();
 		paginacio.setPaginaNum(paginaNum);
 		if (params.getLength() != null && params.getLength().intValue() == -1) {
@@ -859,7 +765,7 @@ public class BaseServiceTest {
 					paginacio.afegirFiltre(
 							col,
 							params.getColumnsSearchValue().get(i));
-					logger.debug("Afegit filtre a la paginació (" +
+					log.debug("Afegit filtre a la paginació (" +
 							"columna=" + col + ", " +
 							"valor=" + params.getColumnsSearchValue().get(i) + ")");
 				}
@@ -867,22 +773,18 @@ public class BaseServiceTest {
 		}
 		for (int i = 0; i < params.getOrderColumn().size(); i++) {
 			int columnIndex = params.getOrderColumn().get(i);
-			String columna = params.getColumnsData().get(columnIndex);
-			OrdreDireccioDto direccio;
-			if ("asc".equals(params.getOrderDir().get(i)))
-				direccio = OrdreDireccioDto.ASCENDENT;
-			else
-				direccio = OrdreDireccioDto.DESCENDENT;
+			var columna = params.getColumnsData().get(columnIndex);
+			var direccio = "asc".equals(params.getOrderDir().get(i)) ? OrdreDireccioDto.ASCENDENT : OrdreDireccioDto.DESCENDENT;
 			String[] columnes = new String[] {columna};
 			if (mapeigOrdenacions != null && mapeigOrdenacions.get(columna) != null) {
 				columnes = mapeigOrdenacions.get(columna);
 			}
 			for (String col: columnes) {
 				paginacio.afegirOrdre(col, direccio);
-				logger.debug("Afegida ordenació a la paginació (columna=" + columna + ", direccio=" + direccio + ")");
+				log.debug("Afegida ordenació a la paginació (columna=" + columna + ", direccio=" + direccio + ")");
 			}
 		}
-		logger.debug("Informació de la pàgina sol·licitada (paginaNum=" + paginacio.getPaginaNum() + ", paginaTamany=" + paginacio.getPaginaTamany() + ")");
+		log.debug("Informació de la pàgina sol·licitada (paginaNum=" + paginacio.getPaginaNum() + ", paginaTamany=" + paginacio.getPaginaTamany() + ")");
 		return paginacio;
 	}
 	
@@ -918,6 +820,4 @@ public class BaseServiceTest {
 			columnsSearchRegex = Arrays.asList(false, false, false, false, false, false, false, false, false, false, false);
 		}
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
 }

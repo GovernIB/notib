@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class DatabaseItemTest<T> {
+
     @Getter
     protected Map<String, Object> objects = new HashMap<>();
     @Getter
@@ -47,6 +48,7 @@ public abstract class DatabaseItemTest<T> {
     }
 
     public void createAll(Long entitatId) throws Exception {
+
         for(String key : objects.keySet()) {
             if (!this.createdObjects.get(key)) {
                 T createdObject = this.create(this.objects.get(key), entitatId);
@@ -73,7 +75,7 @@ public abstract class DatabaseItemTest<T> {
     }
 
     public T create(T element) throws Exception {
-        return create(element, null);
+       return create(element, null);
     }
 
     @AllArgsConstructor

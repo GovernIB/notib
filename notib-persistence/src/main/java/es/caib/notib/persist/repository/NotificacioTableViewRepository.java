@@ -1,6 +1,6 @@
 package es.caib.notib.persist.repository;
 
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.persist.objectes.FiltreNotificacio;
@@ -150,7 +150,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("esProcedimentOrgansIdsNotibNull") boolean esProcedimentOrgansIdsNotibNull,
 			@Param("procedimentOrgansIdsNotib") List<String> procedimentOrgansIdsNotib,
 			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
-			@Param("enviamentTipus") NotificaEnviamentTipusEnumDto enviamentTipus,
+			@Param("enviamentTipus") EnviamentTipus enviamentTipus,
 			@Param("isConcepteNull") boolean isConcepteNull,
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull,
@@ -208,7 +208,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
 			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
-			@Param("enviamentTipus") NotificaEnviamentTipusEnumDto enviamentTipus,
+			@Param("enviamentTipus") EnviamentTipus enviamentTipus,
 			@Param("isConcepteNull") boolean isConcepteNull,
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull,
@@ -271,7 +271,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("isProcNull") boolean isProcNull,
 			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
 			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
-			@Param("enviamentTipus") NotificaEnviamentTipusEnumDto enviamentTipus,
+			@Param("enviamentTipus") EnviamentTipus enviamentTipus,
 			@Param("isConcepteNull") boolean isConcepteNull,
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull,
@@ -330,7 +330,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("entitatId") Long entitatId,
 			@Param("notificacioMassiva") NotificacioMassivaEntity notificacioMassiva,
 			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
-			@Param("enviamentTipus") NotificaEnviamentTipusEnumDto enviamentTipus,
+			@Param("enviamentTipus") EnviamentTipus enviamentTipus,
 			@Param("isConcepteNull") boolean isConcepteNull,
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull,
@@ -418,7 +418,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
 			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
-			@Param("enviamentTipus") NotificaEnviamentTipusEnumDto enviamentTipus,
+			@Param("enviamentTipus") EnviamentTipus enviamentTipus,
 			@Param("isConcepteNull") boolean isConcepteNull,
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull,

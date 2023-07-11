@@ -118,6 +118,9 @@ public class CacheHelper {
 			return organigrama;
 		}
 		var arrel = organGestorRepository.findByCodi(entitatDir3Codi);
+		if (arrel == null) {
+			return organigrama;
+		}
 		var organsMap = organsToMap(organs);
 		organToOrganigrama(arrel, organsMap, organigrama);
 		return organigrama;

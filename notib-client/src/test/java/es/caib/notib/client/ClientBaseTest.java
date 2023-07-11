@@ -147,7 +147,7 @@ public class ClientBaseTest {
 			entregaDeh.setObligat(true);
 			entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 			enviament.setEntregaDeh(entregaDeh);
-			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+			enviament.setServeiTipus(ServeiTipus.URGENT);
 			notificacio.getEnviaments().add(enviament);
 		}
 		return notificacio;
@@ -350,7 +350,7 @@ public class ClientBaseTest {
 				entregaDeh.setObligat(true);
 				entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 				enviament.setEntregaDeh(entregaDeh);
-				enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+				enviament.setServeiTipus(ServeiTipus.URGENT);
 				notificacio.getEnviaments().add(enviament);
 			}
 
@@ -494,7 +494,7 @@ public class ClientBaseTest {
 			entregaDeh.setObligat(true);
 			entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 			enviament.setEntregaDeh(entregaDeh);
-			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+			enviament.setServeiTipus(ServeiTipus.URGENT);
 			notificacio.getEnviaments().add(enviament);
 		}
 
@@ -656,7 +656,7 @@ public class ClientBaseTest {
 				entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 				enviament.setEntregaDeh(entregaDeh);
 			}
-			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+			enviament.setServeiTipus(ServeiTipus.URGENT);
 			notificacio.getEnviaments().add(enviament);
 		}
 

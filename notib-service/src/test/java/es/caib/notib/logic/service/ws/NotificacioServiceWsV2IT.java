@@ -8,7 +8,7 @@ import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
-import es.caib.notib.client.domini.NotificaServeiTipusEnumDto;
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.RespostaAlta;
@@ -378,7 +378,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 				.email("destinatari@gmail.com").build();
 		destinataris.add(destinatari);
 		enviament.setDestinataris(destinataris);
-		enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+		enviament.setServeiTipus(ServeiTipus.URGENT);
 //		enviament.setNotificaEstat(EnviamentEstat.NOTIB_PENDENT);
 		return enviament;
 	}

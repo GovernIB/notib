@@ -145,7 +145,7 @@ public class RestAltaNotificacio {
 			entregaDeh.setObligat(true);
 			entregaDeh.setProcedimentCodi("0000");
 			enviament.setEntregaDeh(entregaDeh);
-			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+			enviament.setServeiTipus(ServeiTipus.URGENT);
 			enviaments.add(enviament);
 		}
 		notificacio.setEnviaments(enviaments);

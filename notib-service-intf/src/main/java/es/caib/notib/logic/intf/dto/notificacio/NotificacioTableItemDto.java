@@ -4,7 +4,7 @@
 package es.caib.notib.logic.intf.dto.notificacio;
 
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
@@ -39,7 +39,7 @@ public class NotificacioTableItemDto {
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
 
-	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	private EnviamentTipus enviamentTipus;
 	private String numExpedient;
 	private String concepte;
 	private Date estatDate;

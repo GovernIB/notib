@@ -1,8 +1,8 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.service.BaseServiceTestV2;
@@ -180,7 +180,7 @@ public class NotificacioEventHelperIT extends BaseServiceTestV2 {
                     public void executar(ElementsCreats elementsCreats) throws Exception {
                         EntitatDto entitatCreate = elementsCreats.getEntitat();
                         ProcSerDto procedimentCreate = (ProcSerDto) elementsCreats.get("procediment");
-                        NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
+                        NotificacioV2 notificacioCreate = (NotificacioV2) elementsCreats.get("notificacio");
 
                         assertNotNull(procedimentCreate);
                         assertNotNull(entitatCreate);

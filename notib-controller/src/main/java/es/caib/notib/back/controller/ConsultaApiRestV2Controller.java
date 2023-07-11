@@ -1,11 +1,11 @@
 package es.caib.notib.back.controller;
 
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.rest.consulta.Arxiu;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
@@ -61,7 +61,7 @@ public class ConsultaApiRestV2Controller extends BaseController {
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular)
-				.tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO)
+				.tipus(EnviamentTipus.COMUNICACIO)
 				.estatFinal(null)
 				.basePath(basePath)
 				.pagina(pagina)
@@ -92,7 +92,7 @@ public class ConsultaApiRestV2Controller extends BaseController {
 		var basePath = location.toString();
 		ApiConsulta consulta = ApiConsulta.builder()
 				.dniTitular(dniTitular)
-				.tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO)
+				.tipus(EnviamentTipus.NOTIFICACIO)
 				.estatFinal(null)
 				.basePath(basePath)
 				.pagina(pagina)
@@ -123,7 +123,7 @@ public class ConsultaApiRestV2Controller extends BaseController {
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder()
 				.dniTitular(dniTitular)
-				.tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO)
+				.tipus(EnviamentTipus.COMUNICACIO)
 				.estatFinal(false)
 				.basePath(basePath)
 				.pagina(pagina)
@@ -154,7 +154,7 @@ public class ConsultaApiRestV2Controller extends BaseController {
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder()
 				.dniTitular(dniTitular)
-				.tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO)
+				.tipus(EnviamentTipus.NOTIFICACIO)
 				.estatFinal(false)
 				.basePath(basePath)
 				.pagina(pagina)
@@ -185,7 +185,7 @@ public class ConsultaApiRestV2Controller extends BaseController {
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder()
 				.dniTitular(dniTitular)
-				.tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO)
+				.tipus(EnviamentTipus.COMUNICACIO)
 				.estatFinal(true)
 				.basePath(basePath)
 				.pagina(pagina)
@@ -214,7 +214,7 @@ public class ConsultaApiRestV2Controller extends BaseController {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(true).basePath(basePath)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(true).basePath(basePath)
 				.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 				.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
 		var r = enviamentService.findEnviamentsV2(consulta);

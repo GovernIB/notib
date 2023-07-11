@@ -1,11 +1,11 @@
 package es.caib.notib.logic.intf.dto.notenviament;
 
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.EntregaDehDto;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
 import es.caib.notib.logic.intf.dto.cie.EntregaPostalDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,12 +18,12 @@ import java.util.Date;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
-public class EnviamentInfoDto extends NotificacioEnviamentDatatableDto{
+public class EnviamentInfo extends NotificacioEnviamentDatatableDto{
 
 	private Long id;
 	private EntregaPostalDto entregaPostal;
 	private EntregaDehDto entregaDeh;
-	private ServeiTipusEnumDto serveiTipus;
+	private ServeiTipus serveiTipus;
 
 	private String usuari;
 	private String referencia;

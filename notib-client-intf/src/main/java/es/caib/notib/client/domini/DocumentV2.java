@@ -22,6 +22,17 @@ import lombok.NoArgsConstructor;
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DocumentV2 {
+
+    // TODO ATRIBUTS AFEGITS A POSTERIORI. FER UNA HERENCIA PER DEIXAR-HO CORRECTE
+
+    private String id;
+    private String mediaType;
+    private boolean generarCsv;
+    private Long mida;
+    private String hash;
+
+    // TODO ****************************************************************************
+
     @JsonDeserialize(using = TrimStringDeserializer.class)
     private String arxiuId;
     @JsonDeserialize(using = TrimStringDeserializer.class)

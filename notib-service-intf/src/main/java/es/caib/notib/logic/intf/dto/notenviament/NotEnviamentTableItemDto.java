@@ -1,6 +1,6 @@
 package es.caib.notib.logic.intf.dto.notenviament;
 
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.PersonaDto;
@@ -24,7 +24,7 @@ public class NotEnviamentTableItemDto implements Serializable {
 
 	private String destinataris;
 	private Date notificaDataCaducitat;
-	private NotificaEnviamentTipusEnumDto tipusEnviament;
+	private EnviamentTipus tipusEnviament;
 
 	private String codiNotibEnviament;
 

@@ -1,7 +1,7 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
@@ -87,6 +87,7 @@ public class EmailNotificacioHelperTest {
 
 
 	private JavaMailSender getMailSender() {
+
 		JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
 		javaMailSender.setHost("correu.limit.es");
 		javaMailSender.setPort(25);
@@ -204,7 +205,7 @@ public class EmailNotificacioHelperTest {
 		PersonaEntity persona = PersonaEntity.builder().nom("Nom").llinatge1("Llinatge1").llinatge2("Llinatge2").email(EMAIL_DEST).build();
 
 		notificacioMock =  Mockito.mock(NotificacioEntity.class);
-		Mockito.when(notificacioMock.getEnviamentTipus()).thenReturn(NotificaEnviamentTipusEnumDto.NOTIFICACIO);
+		Mockito.when(notificacioMock.getEnviamentTipus()).thenReturn(EnviamentTipus.NOTIFICACIO);
 		Mockito.when(notificacioMock.getEntitat()).thenReturn(entidad);
 		Mockito.when(notificacioMock.getOrganGestor()).thenReturn(organGestor);
 		Mockito.when(notificacioMock.getProcediment()).thenReturn(procediment);
@@ -237,7 +238,7 @@ public class EmailNotificacioHelperTest {
 		ArxiuDto arxiu = ArxiuDto.builder().nom("buit.pdf").contingut(Files.readAllBytes(Paths.get(FILE_PATH))).build();
 
 		notificacioMock =  Mockito.mock(NotificacioEntity.class);
-		Mockito.when(notificacioMock.getEnviamentTipus()).thenReturn(NotificaEnviamentTipusEnumDto.COMUNICACIO);
+		Mockito.when(notificacioMock.getEnviamentTipus()).thenReturn(EnviamentTipus.COMUNICACIO);
 		Mockito.when(notificacioMock.getEntitat()).thenReturn(entidad);
 		Mockito.when(notificacioMock.getOrganGestor()).thenReturn(organGestor);
 		Mockito.when(notificacioMock.getProcediment()).thenReturn(procediment);

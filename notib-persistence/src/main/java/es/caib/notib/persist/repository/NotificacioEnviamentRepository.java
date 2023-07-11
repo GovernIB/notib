@@ -4,7 +4,7 @@
 package es.caib.notib.persist.repository;
 
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
@@ -295,7 +295,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("dataInicial") Date dataInicial,
 			@Param("esDataFinalNull") boolean esDataFinalNull,
 			@Param("dataFinal") Date dataFinal,
-			@Param("tipus") NotificaEnviamentTipusEnumDto tipus,
+			@Param("tipus") EnviamentTipus tipus,
 			@Param("esEstatFinalNull") boolean esEstatFinalNull,
 			@Param("estatFinal") Boolean estatFinal,
 			@Param("esVisibleCarpetaNull") boolean esVisibleCarpetaNull,
@@ -341,7 +341,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("dataInicial") Date dataInicial,
 			@Param("esDataFinalNull") boolean esDataFinalNull,
 			@Param("dataFinal") Date dataFinal,
-			@Param("tipus") NotificaEnviamentTipusEnumDto tipus,
+			@Param("tipus") EnviamentTipus tipus,
 			@Param("esEstatFinalNull") boolean esEstatFinalNull,
 			@Param("estatFinal") Boolean estatFinal,
 			@Param("esVisibleCarpetaNull") boolean esVisibleCarpetaNull,

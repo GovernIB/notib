@@ -11,7 +11,7 @@ import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
-import es.caib.notib.client.domini.NotificaServeiTipusEnumDto;
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.Persona;
@@ -157,7 +157,7 @@ public class ClientBaseTest {
 			entregaDeh.setObligat(true);
 			entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 			enviament.setEntregaDeh(entregaDeh);
-			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+			enviament.setServeiTipus(ServeiTipus.URGENT);
 			notificacio.getEnviaments().add(enviament);
 		}
 		return notificacio;
@@ -360,7 +360,7 @@ public class ClientBaseTest {
 				entregaDeh.setObligat(true);
 				entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 				enviament.setEntregaDeh(entregaDeh);
-				enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+				enviament.setServeiTipus(ServeiTipus.URGENT);
 				notificacio.getEnviaments().add(enviament);
 			}
 
@@ -504,7 +504,7 @@ public class ClientBaseTest {
 			entregaDeh.setObligat(true);
 			entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 			enviament.setEntregaDeh(entregaDeh);
-			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+			enviament.setServeiTipus(ServeiTipus.URGENT);
 			notificacio.getEnviaments().add(enviament);
 		}
 
@@ -666,7 +666,7 @@ public class ClientBaseTest {
 				entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 				enviament.setEntregaDeh(entregaDeh);
 			}
-			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+			enviament.setServeiTipus(ServeiTipus.URGENT);
 			notificacio.getEnviaments().add(enviament);
 		}
 

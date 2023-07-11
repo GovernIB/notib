@@ -25,6 +25,13 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EntregaPostal implements Serializable {
 
+    // TODO ATRIBUTS AFEGITS A POSTERIORI. FER UNA HERENCIA PER DEIXAR-HO CORRECTE
+
+    private NotificaDomiciliConcretTipus domiciliConcretTipus;
+
+    // TODO ****************************************************************************
+
+
     @JsonDeserialize(using = TrimStringDeserializer.class)
     protected String apartatCorreus;
     @JsonDeserialize(using = TrimStringDeserializer.class)

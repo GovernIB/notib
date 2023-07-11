@@ -1,16 +1,16 @@
 package es.caib.notib.logic.intf.dto.notificacio;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.dto.AuditoriaDto;
 import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.cie.CieDataDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDataDto;
-import es.caib.notib.logic.intf.dto.notenviament.EnviamentInfoDto;
+import es.caib.notib.logic.intf.dto.notenviament.EnviamentInfo;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDataDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +29,7 @@ import java.util.List;
 public class NotificacioInfoDto extends AuditoriaDto {
 
 	private Long id;
-	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	private EnviamentTipus enviamentTipus;
 	private String concepte;
 	private String descripcio;
 
@@ -48,7 +48,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	protected Date estatDate;
 	protected Date estatProcessatDate;
 	private String serveiTipus;
-	private List<EnviamentInfoDto> enviaments = new ArrayList<>();
+	private List<EnviamentInfo> enviaments = new ArrayList<>();
 	private String usuariCodi;
 	private String usuariNom;
 	private String motiu;
@@ -100,7 +100,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	public boolean isNotificaError() {
 
 		if (comunicacioSir) {
-			for (EnviamentInfoDto e : enviaments) {
+			for (EnviamentInfo e : enviaments) {
 				if (e.isNotificacioError()) {
 					notificaErrorDescripcio = e.getNotificacioErrorDescripcio();
 					return true;

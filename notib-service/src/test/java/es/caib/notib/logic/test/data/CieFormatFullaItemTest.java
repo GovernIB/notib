@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CieFormatFullaItemTest extends DatabaseItemTest<CieFormatFullaDto>{
+
     @Autowired
     protected PagadorCieFormatFullaService cieFormatFullaService;
     @Autowired

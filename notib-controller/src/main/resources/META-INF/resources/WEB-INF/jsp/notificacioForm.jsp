@@ -1438,7 +1438,7 @@
 					$("#retard").val(data.retard);
 					// Grups
 					var grups = data.grups;
-					var selGrups = $("#grupId");
+					var selGrups = $("#grupCodi");
 					selGrups.empty();
 					selGrups.append("<option value=\"\"></option>");
 					if (data.agrupable && grups && grups.length > 0) {
@@ -1615,7 +1615,7 @@
 			<!-- GRUP -->
 			<div id="grups" class="row <c:if test='${empty grups}'>hidden</c:if>">
 				<div class="col-md-12">
-					<not:inputSelect name="grupId" textKey="notificacio.form.camp.grup" optionItems="${grups}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2" />
+					<not:inputSelect name="grupCodi" textKey="notificacio.form.camp.grup" optionItems="${grups}" optionValueAttribute="codi" optionTextAttribute="nom" labelSize="2" />
 				</div>
 			</div>
 			<c:if test="${enviamentTipus == 'NOTIFICACIO'}">

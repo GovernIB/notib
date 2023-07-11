@@ -1,6 +1,6 @@
 package es.caib.notib.plugin.carpeta;
 
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.client.domini.EnviamentTipus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,7 +27,7 @@ public class MissatgeCarpetaParams {
     private String concepteNotificacio;
     private String descNotificacio;
     private String uuIdNotificacio;
-    private NotificaEnviamentTipusEnumDto tipus;
+    private EnviamentTipus tipus;
     private VincleInteressat vincleInteressat;
     private String codiSiaProcediment;
     private String nomProcediment;

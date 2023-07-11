@@ -65,6 +65,11 @@ public interface OrganGestorService {
 	boolean isUpdatingOrgans(EntitatDto entitatDto);
 
 	/**
+	 * Esborra els elements de la taula NOT_OG_SINC_REL
+	 */
+	void deleteHistoricSincronitzacio();
+
+	/**
 	 * Actualitza els organs gestors de la base de dades amb els de Dir3
 	 *
 	 * @param entitat Dto de l'entitat actual

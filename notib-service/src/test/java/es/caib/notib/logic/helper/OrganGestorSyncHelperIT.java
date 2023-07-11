@@ -154,59 +154,105 @@ public class OrganGestorSyncHelperIT {
         // Vigents
         Assert.assertEquals(22, organsVigents.size());
         Assert.assertTrue(conteOrgan(organsVigents, "EA0004518"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "EA0004518").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A000"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A000").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A001"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A001").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A002"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A002").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A101"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A101").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A102"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A102").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A103"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A103").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A104"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A104").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A105"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A105").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A109"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A109").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A110"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A110").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A114"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A114").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A115"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A115").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A116"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A116").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A118"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A118").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A119"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A119").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A014"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A014").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A121"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A121").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A016"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A016").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A017"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A017").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A018"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A018").getEstat()));
         Assert.assertTrue(conteOrgan(organsVigents, "A122"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsVigents, "A122").getEstat()));
 
         // Obsolets
         Assert.assertEquals(22, obsoleteUnitats.size());
 
+        // Extingides
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(obsoleteUnitats, "A007").getEstat()));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(obsoleteUnitats, "A117").getEstat()));
+
         // Dividits
         Assert.assertEquals(6, organsDividits.size());
         Assert.assertTrue(conteOrgan(organsDividits, "A003"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsDividits, "A003").getEstat()));
         Assert.assertTrue(conteOrgan(organsDividits, "A008"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsDividits, "A008").getEstat()));
         Assert.assertTrue(conteOrgan(organsDividits, "A011"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsDividits, "A011").getEstat()));
         Assert.assertTrue(conteOrgan(organsDividits, "A113"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsDividits, "A113").getEstat()));
         Assert.assertTrue(conteOrgan(organsDividits, "A012"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsDividits, "A012").getEstat()));
         Assert.assertTrue(conteOrgan(organsDividits, "A017"));
+        Assert.assertTrue(OrganGestorEstatEnum.V.equals(getOrgan(organsDividits, "A017").getEstat()));
 
         // Fusionats
         Assert.assertEquals(9, organsFusionats.size());
         Assert.assertTrue(conteOrgan(organsFusionats, "A004"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsFusionats, "A004").getEstat()));
         Assert.assertTrue(conteOrgan(organsFusionats, "A005"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsFusionats, "A005").getEstat()));
         Assert.assertTrue(conteOrgan(organsFusionats, "A107"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsFusionats, "A107").getEstat()));
         Assert.assertTrue(conteOrgan(organsFusionats, "A108"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsFusionats, "A108").getEstat()));
         Assert.assertTrue(conteOrgan(organsFusionats, "A009"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsFusionats, "A009").getEstat()));
         Assert.assertTrue(conteOrgan(organsFusionats, "A010"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsFusionats, "A010").getEstat()));
         Assert.assertTrue(conteOrgan(organsFusionats, "A111"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsFusionats, "A111").getEstat()));
         Assert.assertTrue(conteOrgan(organsFusionats, "A112"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsFusionats, "A112").getEstat()));
         Assert.assertTrue(conteOrgan(organsFusionats, "A019"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsFusionats, "A019").getEstat()));
 
         // Substituits
         Assert.assertEquals(5, organsSubstituits.size());
         Assert.assertTrue(conteOrgan(organsSubstituits, "A006"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsSubstituits, "A006").getEstat()));
         Assert.assertTrue(conteOrgan(organsSubstituits, "A106"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsSubstituits, "A106").getEstat()));
         Assert.assertTrue(conteOrgan(organsSubstituits, "A013"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsSubstituits, "A013").getEstat()));
         Assert.assertTrue(conteOrgan(organsSubstituits, "A015"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsSubstituits, "A015").getEstat()));
         Assert.assertTrue(conteOrgan(organsSubstituits, "A120"));
+        Assert.assertTrue(OrganGestorEstatEnum.E.equals(getOrgan(organsSubstituits, "A120").getEstat()));
 
 
         // Permisos
@@ -352,5 +398,14 @@ public class OrganGestorSyncHelperIT {
                 return true;
         }
         return false;
+    }
+
+    private OrganGestorEntity getOrgan(List<OrganGestorEntity> llista, String codi) {
+        for (OrganGestorEntity organ: llista) {
+            if (organ.getCodi().equals(codi)) {
+                return organ;
+            }
+        }
+        return null;
     }
 }

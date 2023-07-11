@@ -1,7 +1,7 @@
 package es.caib.notib.logic.intf.dto.cie;
 
+import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
-import es.caib.notib.logic.intf.dto.NotificaDomiciliViaTipusEnumDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +16,7 @@ import java.io.Serializable;
 public class EntregaPostalDto implements Serializable{
 
 	private NotificaDomiciliConcretTipus domiciliConcretTipus;
-	private NotificaDomiciliViaTipusEnumDto viaTipus;
+	private EntregaPostalVia viaTipus;
 	private String viaNom;
 	private String numeroCasa;
 	private String numeroQualificador;

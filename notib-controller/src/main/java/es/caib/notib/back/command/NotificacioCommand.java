@@ -7,21 +7,16 @@ import es.caib.notib.back.helper.CaducitatHelper;
 import es.caib.notib.back.helper.ConversioTipusHelper;
 import es.caib.notib.back.validation.ValidNotificacio;
 import es.caib.notib.back.validation.ValidPersonaValidator;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.logic.intf.dto.GrupDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.logic.intf.dto.PersonaDto;
+import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.client.domini.Persona;
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
-import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
-import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
-import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
-import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -53,7 +48,7 @@ public class NotificacioCommand {
 	@NotEmpty
 	private String organGestor;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
-	private TipusEnviamentEnumDto enviamentTipus;
+	private EnviamentTipus enviamentTipus;
 	@Size(min=3, max=226)
 	private String concepte;
 	@Size(max=1000)
@@ -67,7 +62,7 @@ public class NotificacioCommand {
 	private Long serveiId;
 	private String tipusProcSer = "PROCEDIMENT";
 	private String codiSia;
-	private Long grupId;
+	private String grupCodi;
 	@Size(max=64)
 	private String usuariCodi;
 	private String oficina;
@@ -83,7 +78,7 @@ public class NotificacioCommand {
 	private String observacions;
 	private boolean eliminarLogoPeu;
 	private boolean eliminarLogoCap;
-	private ServeiTipusEnumDto serveiTipus;
+	private ServeiTipus serveiTipus;
 //	protected NotificacioErrorTipusEnumDto notificaErrorTipus;
 	@Valid @NotEmpty
 	private List<EnviamentCommand> enviaments = new ArrayList<>();
@@ -134,49 +129,50 @@ public class NotificacioCommand {
 			}
 		}
 
-		if (NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(dto.getEnviamentTipus())) {
-			boolean aAdministracio = false;
-			for (NotificacioEnviamentDtoV2 enviament : dto.getEnviaments()) {
-				if (InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
-					aAdministracio = true;
-					break;
-				}
-			}
-			if (aAdministracio) {
-				command.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO_SIR);
-
-			} else {
-				command.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO);
-
-			}
-		} else {
-			command.setEnviamentTipus(TipusEnviamentEnumDto.NOTIFICACIO);
-		}
+//		if (NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(dto.getEnviamentTipus())) {
+//			boolean aAdministracio = false;
+//			for (NotificacioEnviamentDtoV2 enviament : dto.getEnviaments()) {
+//				if (InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
+//					aAdministracio = true;
+//					break;
+//				}
+//			}
+//			if (aAdministracio) {
+//				command.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO_SIR);
+//
+//			} else {
+//				command.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO);
+//
+//			}
+//		} else {
+//			command.setEnviamentTipus(TipusEnviamentEnumDto.NOTIFICACIO);
+//		}
 
 		if (dto.getCaducitat() != null) {
 			command.setCaducitatDiesNaturals(CaducitatHelper.getDiesEntreDates(dto.getCaducitat()));
 		}
 		return command;
 	}
-	public NotificacioDatabaseDto asDatabaseDto() {
+	public NotificacioV2 asNotificacioV2() {
 
-		NotificacioDatabaseDto dto = ConversioTipusHelper.convertir(this, NotificacioDatabaseDto.class);
-		ProcSerDto procedimentDto = new ProcSerDto();
-		if ("PROCEDIMENT".equals(tipusProcSer)) {
-//		if (procedimentId != null) {
-			procedimentDto.setId(this.getProcedimentId());
-		} else {
-			procedimentDto.setId(this.getServeiId());
-		}
-		dto.setProcediment(procedimentDto);
+		var dto = ConversioTipusHelper.convertir(this, NotificacioV2.class);
+//		ProcSerDto procedimentDto = new ProcSerDto();
+//		if ("PROCEDIMENT".equals(tipusProcSer)) {
+////		if (procedimentId != null) {
+//			procedimentDto.setId(this.getProcedimentId());
+//		} else {
+//			procedimentDto.setId(this.getServeiId());
+//		}
+		dto.setProcedimentId("PROCEDIMENT".equals(tipusProcSer) ? procedimentId : serveiId);
+//		dto.setProcediment(procedimentDto);
 
-		GrupDto grupDto = new GrupDto();
-		grupDto.setId(this.getGrupId());
-		dto.setGrup(grupDto);
+//		GrupDto grupDto = new GrupDto();
+//		grupDto.setId(this.getGrupId());
+		dto.setGrupCodi(grupCodi);
 
 		// Format de municipi i província
 		if (dto.getEnviaments() != null) {
-			for (NotEnviamentDatabaseDto enviament: dto.getEnviaments()) {
+			for (var enviament: dto.getEnviaments()) {
 				if (enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty()) {
 					enviament.getTitular().setEmail(enviament.getTitular().getEmail().replaceAll("\\s+", ""));
 				}
@@ -184,7 +180,7 @@ public class NotificacioCommand {
 				establecerCamposPersona(enviament.getTitular());
 
 				if (enviament.getDestinataris() != null) {
-					for (PersonaDto destinatari : enviament.getDestinataris()) {
+					for (var destinatari : enviament.getDestinataris()) {
 						if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty()) {
 							destinatari.setEmail(destinatari.getEmail().replaceAll("\\s+", ""));
 						}
@@ -197,7 +193,7 @@ public class NotificacioCommand {
 		return dto;
 	}
 	
-	private void establecerCamposPersona(PersonaDto persona) {
+	private void establecerCamposPersona(Persona persona) {
 		if (persona != null) {
 			if (InteressatTipus.FISICA.equals(persona.getInteressatTipus())) {
 				persona.setDir3Codi(null);

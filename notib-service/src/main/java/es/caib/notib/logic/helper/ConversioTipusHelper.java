@@ -27,10 +27,9 @@ import es.caib.notib.logic.intf.dto.cie.CieTableItemDto;
 import es.caib.notib.logic.intf.dto.cie.EntregaPostalDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalTableItemDto;
-import es.caib.notib.logic.intf.dto.notenviament.EnviamentInfoDto;
+import es.caib.notib.logic.intf.dto.notenviament.EnviamentInfo;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioInfoDto;
@@ -76,17 +75,13 @@ import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
-import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -120,9 +115,10 @@ public class ConversioTipusHelper {
 
 		mapperFactory.classMap(EntitatEntity.class, EntitatDto.class).byDefault().customize(new EntitatEntitytoMapper()).register();
 
-		mapperFactory.classMap(NotificacioEntity.class, NotificacioInfoDto.class).
-				field("organGestor.codi", "organGestorCodi").
-				field("organGestor.nom", "organGestorNom")
+		mapperFactory.classMap(NotificacioEntity.class, NotificacioInfoDto.class)
+				.field("organGestor.codi", "organGestorCodi")
+				.field("organGestor.nom", "organGestorNom")
+				.field("createdBy", "createdBy")
 				.customize(new CustomMapper<>() {
 					@Override
 					public void mapAtoB(NotificacioEntity a, NotificacioInfoDto b, MappingContext context) {
@@ -161,8 +157,8 @@ public class ConversioTipusHelper {
 				field("organGestor.codi", "organGestor").
 				field("organGestor.nom", "organGestorNom").byDefault().register();
 
-		mapperFactory.classMap(NotificacioEntity.class, NotificacioDatabaseDto.class).
-				field("organGestor.codi", "organGestorCodi").byDefault().register();
+//		mapperFactory.classMap(NotificacioEntity.class, NotificacioDatabaseDto.class).
+//				field("organGestor.codi", "organGestorCodi").byDefault().register();
 
 		mapperFactory.classMap(NotificacioTableEntity.class, NotificacioTableItemDto.class).byDefault()
 				.customize(new CustomMapper<>() {
@@ -216,7 +212,7 @@ public class ConversioTipusHelper {
 				field("notificacio.estat", "notificacioEstat").
 				customize(new NotificacioEnviamentEntitytoDatatableMapper()).byDefault().register();
 
-		mapperFactory.classMap(NotificacioEnviamentEntity.class, EnviamentInfoDto.class).
+		mapperFactory.classMap(NotificacioEnviamentEntity.class, EnviamentInfo.class).
 				field("notificacio.estat", "notificacioEstat").
 				customize(new NotificacioEnviamentEntitytoInfoMapper()).byDefault().register();
 
@@ -500,9 +496,9 @@ public class ConversioTipusHelper {
 		}
 	}
 
-	public class NotificacioEnviamentEntitytoInfoMapper extends CustomMapper<NotificacioEnviamentEntity, EnviamentInfoDto> {
+	public class NotificacioEnviamentEntitytoInfoMapper extends CustomMapper<NotificacioEnviamentEntity, EnviamentInfo> {
 		@Override
-		public void mapAtoB(NotificacioEnviamentEntity notificacioEnviamentEntity, EnviamentInfoDto notificacioEnviamentDto, MappingContext context) {
+		public void mapAtoB(NotificacioEnviamentEntity notificacioEnviamentEntity, EnviamentInfo notificacioEnviamentDto, MappingContext context) {
 
 			if (notificacioEnviamentEntity.isNotificaError()) {
 				var event = notificacioEnviamentEntity.getNotificacioErrorEvent();

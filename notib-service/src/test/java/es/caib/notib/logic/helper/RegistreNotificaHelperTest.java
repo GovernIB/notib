@@ -1,8 +1,8 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.persist.entity.EntitatEntity;
@@ -36,37 +36,23 @@ public class RegistreNotificaHelperTest {
 	@Mock
 	private ConfigHelper configHelper;
 	@Mock
-	private CallbackHelper callbackHelper;
-	@Mock
-	private ConversioTipusHelper conversioTipusHelper;
-	@Mock
 	private AuditHelper auditHelper;
-	@Mock
-	private EnviamentHelper enviamentHelper;
 	@Mock
 	private EnviamentTableHelper enviamentTableHelper;
 	@Mock
 	private NotificacioTableHelper notificacioTableHelper;
-
-	@Mock
-	EntitatEntity entitatMock;
 
 	@InjectMocks
 	private RegistreNotificaHelper registreNotificaHelper;
 	
 	@Before
 	public void setUp() throws RegistrePluginException {
-		Mockito.when(
-				pluginHelper.notificacioToAsientoRegistralBean(Mockito.any(NotificacioEntity.class), Mockito.<NotificacioEnviamentEntity>any(), Mockito.anyBoolean(), Mockito.anyBoolean())
-		).thenReturn(new AsientoRegistralBeanDto());
-		Mockito.when(
-				pluginHelper.notificacioEnviamentsToAsientoRegistralBean(Mockito.any(NotificacioEntity.class), Mockito.<NotificacioEnviamentEntity>anySet(), Mockito.anyBoolean())
-		).thenReturn(new AsientoRegistralBeanDto());
-		Mockito.when(
-				pluginHelper.crearAsientoRegistral(
-						Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.nullable(long.class), Mockito.anyLong(), Mockito.anyString(), Mockito.anyBoolean()
-				)
-		).thenReturn(new RespostaConsultaRegistre());
+		Mockito.when(pluginHelper.notificacioToAsientoRegistralBean(Mockito.any(NotificacioEntity.class), Mockito.<NotificacioEnviamentEntity>any(), Mockito.anyBoolean(), Mockito.anyBoolean()))
+				.thenReturn(new AsientoRegistralBeanDto());
+		Mockito.when(pluginHelper.notificacioEnviamentsToAsientoRegistralBean(Mockito.any(NotificacioEntity.class), Mockito.<NotificacioEnviamentEntity>anySet(), Mockito.anyBoolean()))
+				.thenReturn(new AsientoRegistralBeanDto());
+		Mockito.when(pluginHelper.crearAsientoRegistral(Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.nullable(long.class), Mockito.anyLong(), Mockito.anyString(), Mockito.anyBoolean()))
+				.thenReturn(new RespostaConsultaRegistre());
 		Mockito.when(configHelper.getConfigAsBoolean(Mockito.eq("es.caib.notib.emprar.sir"))).thenReturn(true);
 //		Mockito.when(conversioTipusHelper.convertir(Mockito.any(EntitatEntity.class), Mockito.any(Class.class))).thenReturn(new EntitatDto());
 
@@ -74,14 +60,13 @@ public class RegistreNotificaHelperTest {
 
 	@Test
 	public void whenRealitzarProcesRegistrar_GivenComunicacioSIRAAdministracio_ThenInclouDocumentsAndGeneraJustificant() throws RegistreNotificaException, RegistrePluginException {
+
 		// Given
-		EntitatEntity entidad = initEntitat();
+		var entidad = initEntitat();
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
-		NotificacioEnviamentEntity enviament = initEnviament(
-				initPersonaAdministracio(InteressatTipus.ADMINISTRACIO)
-		);
+		NotificacioEnviamentEntity enviament = initEnviament(initPersonaAdministracio(InteressatTipus.ADMINISTRACIO));
 		enviaments.add(enviament);
-		NotificacioEntity notificacio = initNotificacio(entidad, NotificaEnviamentTipusEnumDto.COMUNICACIO, enviaments);
+		var notificacio = initNotificacio(entidad, EnviamentTipus.COMUNICACIO, enviaments);
 		Mockito.doNothing().when(auditHelper).auditaNotificacio(Mockito.any(NotificacioEntity.class), Mockito.<AuditService.TipusOperacio>any(), Mockito.anyString());
 		Mockito.doNothing().when(notificacioTableHelper).actualitzarRegistre(Mockito.any(NotificacioEntity.class));
 
@@ -90,33 +75,24 @@ public class RegistreNotificaHelperTest {
 
 		// Then
 		// S'inclou el document
-		Mockito.verify(pluginHelper, Mockito.times(1)).notificacioToAsientoRegistralBean(
-				Mockito.eq(notificacio),
-				Mockito.eq(enviament),
-				Mockito.eq(true),
-				Mockito.eq(true)
-		);
+		Mockito.verify(pluginHelper, Mockito.times(1))
+				.notificacioToAsientoRegistralBean(Mockito.eq(notificacio), Mockito.eq(enviament), Mockito.eq(true), Mockito.eq(true));
 
 		// Es genera el justificant
-		Mockito.verify(pluginHelper, Mockito.times(1)).crearAsientoRegistral(
-				Mockito.anyString(),
-				Mockito.any(AsientoRegistralBeanDto.class),
-				Mockito.anyLong(),
-				Mockito.anyLong(),
-				Mockito.anyString(),
-				Mockito.eq(true)
+		Mockito.verify(pluginHelper, Mockito.times(1))
+				.crearAsientoRegistral(Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString(), Mockito.eq(true)
 		);
 	}
 
 	@Test
-	public void whenRealitzarProcesRegistrar_GivenNotificacio_ThenNoInclouDocumentsAndNoGeneraJustificant()
-			throws RegistreNotificaException, RegistrePluginException {
+	public void whenRealitzarProcesRegistrar_GivenNotificacio_ThenNoInclouDocumentsAndNoGeneraJustificant() throws RegistreNotificaException, RegistrePluginException {
+
 		// Given
-		EntitatEntity entidad = initEntitat();
+		var entidad = initEntitat();
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
-		NotificacioEnviamentEntity enviament = initEnviament(initPersonaAdministracio(InteressatTipus.ADMINISTRACIO));
+		var enviament = initEnviament(initPersonaAdministracio(InteressatTipus.ADMINISTRACIO));
 		enviaments.add(enviament);
-		NotificacioEntity notificacio = initNotificacio(entidad, NotificaEnviamentTipusEnumDto.NOTIFICACIO, enviaments);
+		NotificacioEntity notificacio = initNotificacio(entidad, EnviamentTipus.NOTIFICACIO, enviaments);
 		Mockito.doNothing().when(auditHelper).auditaEnviament(Mockito.any(NotificacioEnviamentEntity.class), Mockito.<AuditService.TipusOperacio>any(), Mockito.anyString());
 		Mockito.doNothing().when(enviamentTableHelper).actualitzarRegistre(Mockito.any(NotificacioEnviamentEntity.class));
 
@@ -125,49 +101,36 @@ public class RegistreNotificaHelperTest {
 
 		// Then
 		// S'inclou el document
-		Mockito.verify(pluginHelper, Mockito.times(1)).notificacioEnviamentsToAsientoRegistralBean(
-				Mockito.eq(notificacio),
-				Mockito.<NotificacioEnviamentEntity>anySet(),
-				Mockito.eq(false)
-		);
-
+		Mockito.verify(pluginHelper, Mockito.times(1))
+				.notificacioEnviamentsToAsientoRegistralBean(Mockito.eq(notificacio), Mockito.<NotificacioEnviamentEntity>anySet(), Mockito.eq(false));
 
 		// No es genera el justificant
-		Mockito.verify(pluginHelper, Mockito.times(1)).crearAsientoRegistral(
-				Mockito.anyString(),
-				Mockito.any(AsientoRegistralBeanDto.class),
-				Mockito.nullable(long.class),
-				Mockito.anyLong(),
-				Mockito.anyString(),
-				Mockito.eq(false)
-		);
+		Mockito.verify(pluginHelper, Mockito.times(1))
+				.crearAsientoRegistral(Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.nullable(long.class), Mockito.anyLong(), Mockito.anyString(), Mockito.eq(false));
 	}
 
-	private NotificacioEntity initNotificacio(EntitatEntity entitat,
-											  NotificaEnviamentTipusEnumDto enviamentTipus,
-											  HashSet<NotificacioEnviamentEntity> enviaments) {
+	private NotificacioEntity initNotificacio(EntitatEntity entitat, EnviamentTipus enviamentTipus, HashSet<NotificacioEnviamentEntity> enviaments) {
 
-		NotificacioEntity notificacio =  Mockito.mock(NotificacioEntity.class);
+		var notificacio =  Mockito.mock(NotificacioEntity.class);
 //		Mockito.when(notificacio.getEmisorDir3Codi()).thenReturn(ConfigTest.ENTITAT_DGTIC_DIR3CODI);
 		Mockito.when(notificacio.getId()).thenReturn(1L);
 		Mockito.when(notificacio.getEnviamentTipus()).thenReturn(enviamentTipus);
 		Mockito.when(notificacio.getEntitat()).thenReturn(entitat);
 		Mockito.when(notificacio.getEnviaments()).thenReturn(enviaments);
-
-		for (NotificacioEnviamentEntity enviament: enviaments) {
+		for (var enviament: enviaments) {
 			enviament.setNotificacio(notificacio);
 		}
-
 		return notificacio;
 	}
 
 	private NotificacioEnviamentEntity initEnviament(PersonaEntity titular) {
+
 		NotificacioEnviamentEntity enviament = Mockito.mock(NotificacioEnviamentEntity.class);
 		Mockito.when(enviament.getId()).thenReturn(1L);
 		Mockito.when(enviament.getTitular()).thenReturn(titular);
-
 		return enviament;
 	}
+
 	private EntitatEntity initEntitat() {
 		 return EntitatEntity.getBuilder("codi",
 				"nom",

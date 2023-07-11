@@ -3,6 +3,7 @@ package es.caib.notib.logic.service;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.consulta.DocumentConsultaV2;
 import es.caib.notib.client.domini.consulta.GenericInfo;
@@ -27,7 +28,6 @@ import es.caib.notib.logic.helper.ProcSerHelper;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentFiltreDto;
@@ -783,9 +783,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 			hasZeronotificaEnviamentIntent = false;
 		}
 		//Filtres camps procediment
-		NotificaEnviamentTipusEnumDto tipusEnviament = null;
+		EnviamentTipus tipusEnviament = null;
 		if (filtreDto.getEnviamentTipus() != null) {
-			tipusEnviament = NotificacioTipusEnviamentEnumDto.notificacio.equals(filtreDto.getEnviamentTipus()) ? NotificaEnviamentTipusEnumDto.NOTIFICACIO :  NotificaEnviamentTipusEnumDto.COMUNICACIO;
+			tipusEnviament = NotificacioTipusEnviamentEnumDto.notificacio.equals(filtreDto.getEnviamentTipus()) ? EnviamentTipus.NOTIFICACIO :  EnviamentTipus.COMUNICACIO;
 		}
 		return NotificacioEnviamentFiltre.builder()
 				.entitatId(new FiltreField<>(entitatId))
@@ -840,7 +840,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		private StringField codiProcediment;
 		private StringField grup;
 		private StringField usuari;
-		private FiltreField<NotificaEnviamentTipusEnumDto> enviamentTipus;
+		private FiltreField<EnviamentTipus> enviamentTipus;
 		private StringField concepte;
 		private StringField descripcio;
 		private StringField nifTitular;
@@ -955,7 +955,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				fila[4] = enviament.getNotificacio().getGrupCodi();
 				fila[5] = enviament.getNotificacio().getEmisorDir3Codi();
 				fila[6] = enviament.getCreatedBy().orElseThrow().getCodi();
-				fila[7] = enviament.getNotificacio().getEnviamentTipus().getText();
+				fila[7] = enviament.getNotificacio().getEnviamentTipus().name();
 				fila[8] = enviament.getNotificacio().getConcepte();
 				fila[9] = enviament.getNotificacio().getDescripcio();
 				fila[10] = enviament.getTitular().getNif();

@@ -4,11 +4,11 @@
 package es.caib.notib.logic.helper;
 
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.AuditService;
@@ -63,7 +63,7 @@ public class RegistreNotificaHelper {
 		}
 		ConfigHelper.setEntitatCodi(notificacioEntity.getEntitat().getCodi());
 		var enviarANotifica = false;
-		var isComunicacio = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus());
+		var isComunicacio = EnviamentTipus.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus());
 		var t0 = System.currentTimeMillis();
 		var desc = "Inici procés registrar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]";
 		var tipusEnv = new AccioParam("Tipus enviament: ", notificacioEntity.getEnviamentTipus().name());

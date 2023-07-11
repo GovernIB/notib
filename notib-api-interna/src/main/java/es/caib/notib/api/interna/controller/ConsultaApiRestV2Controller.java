@@ -1,11 +1,11 @@
 package es.caib.notib.api.interna.controller;
 
 import es.caib.notib.api.interna.openapi.interficies.ConsultaApiRestV2Intf;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.rest.consulta.Arxiu;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
@@ -55,7 +55,7 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(null).basePath(basePath)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(null).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
 		return enviamentService.findEnviamentsV2(consulta);
@@ -74,7 +74,7 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(null).basePath(basePath)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(null).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
 		return enviamentService.findEnviamentsV2(consulta);
@@ -93,7 +93,7 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(false).basePath(basePath)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(false).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
 		return enviamentService.findEnviamentsV2(consulta);
@@ -112,7 +112,7 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(false).basePath(basePath)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(false).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
 		return enviamentService.findEnviamentsV2(consulta);
@@ -131,7 +131,7 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(true).basePath(basePath)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(true).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
 		return enviamentService.findEnviamentsV2(consulta);
@@ -150,7 +150,7 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(true).basePath(basePath)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(true).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
 		return enviamentService.findEnviamentsV2(consulta);

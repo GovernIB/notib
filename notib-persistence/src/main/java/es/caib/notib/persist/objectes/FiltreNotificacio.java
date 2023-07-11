@@ -1,6 +1,6 @@
 package es.caib.notib.persist.objectes;
 
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.persist.entity.EntitatEntity;
 import lombok.Builder;
@@ -17,7 +17,7 @@ public class FiltreNotificacio {
     private boolean entitatIdNull;
     private Long entitatId;
     private boolean enviamentTipusNull;
-    private NotificaEnviamentTipusEnumDto enviamentTipus;
+    private EnviamentTipus enviamentTipus;
     private boolean concepteNull;
     private String concepte;
     private boolean estatNull;

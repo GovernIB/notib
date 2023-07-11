@@ -1,9 +1,9 @@
 package es.caib.notib.logic.service;
 
 import com.codahale.metrics.Timer;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.aspect.Audita;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
-import es.caib.notib.logic.cacheable.PermisosCacheable;
 import es.caib.notib.logic.cacheable.ProcSerCacheable;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
@@ -26,7 +26,6 @@ import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDataDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
@@ -43,7 +42,6 @@ import es.caib.notib.logic.intf.service.AuditService.TipusObjecte;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.service.PermisosService;
-import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.ServeiService;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.GrupProcSerEntity;
@@ -1085,26 +1083,25 @@ public class ServeiServiceImpl implements ServeiService {
 	}
 
 	@Override
-	public List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol, TipusEnviamentEnumDto enviamentTipus) {
+	public List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol, EnviamentTipus enviamentTipus) {
+
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		List<ServeiEntity> serveis;
-		if (RolEnumDto.NOT_ADMIN.equals(rol)) {
-			serveis = recuperarServeiSensePermis(entitat, organCodi);
-			// Eliminam els procediments inactius
-			Iterator<ServeiEntity> it = serveis.iterator();
-			while (it.hasNext()) {
-				ServeiEntity curr = it.next();
-				if (!curr.isActiu()) {
-					it.remove();
-				}
-			}
-			return serveisToCodiValorOrganGestorComuDto(serveis);
-		} else {
-			PermisEnum permis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
-					TipusEnviamentEnumDto.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO :
-							PermisEnum.NOTIFICACIO;
+		if (!RolEnumDto.NOT_ADMIN.equals(rol)) {
+			PermisEnum permis = EnviamentTipus.SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
+					EnviamentTipus.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
 			return recuperarServeiAmbPermis(entitat, permis, organCodi);
 		}
+		serveis = recuperarServeiSensePermis(entitat, organCodi);
+		// Eliminam els procediments inactius
+		Iterator<ServeiEntity> it = serveis.iterator();
+		while (it.hasNext()) {
+			ServeiEntity curr = it.next();
+			if (!curr.isActiu()) {
+				it.remove();
+			}
+		}
+		return serveisToCodiValorOrganGestorComuDto(serveis);
 	}
 
 //	@Override

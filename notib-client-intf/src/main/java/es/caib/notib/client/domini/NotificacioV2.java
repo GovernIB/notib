@@ -34,6 +34,14 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class NotificacioV2 implements Serializable {
 
+
+    // TODO ATRIBUTS AFEGITS A POSTERIORI. FER UNA HERENCIA PER DEIXAR-HO CORRECTE
+
+    private Long id;
+    private Long procedimentId;
+    private Long grupId;
+
+    // TODO ****************************************************************************
     /**
      * Codi Dir3 de l’organisme emisor
      * Camp obligatori

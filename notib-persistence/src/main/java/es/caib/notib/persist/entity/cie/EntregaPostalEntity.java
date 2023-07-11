@@ -5,7 +5,6 @@ import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliTipusEnumDto;
-import es.caib.notib.logic.intf.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.persist.audit.NotibAuditable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,7 +45,7 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "dom_via_tipus")
 	@Enumerated(EnumType.ORDINAL)
-	protected NotificaDomiciliViaTipusEnumDto domiciliViaTipus;
+	protected EntregaPostalVia domiciliViaTipus;
 	
 	@Column(name = "dom_via_nom", length = 50)
 	protected String domiciliViaNom;
@@ -126,7 +125,7 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 
 	public void update(EntregaPostal entregaPostal) {
 
-		domiciliViaTipus = toEnviamentViaTipusEnum(entregaPostal.getViaTipus());
+		domiciliViaTipus = entregaPostal.getViaTipus();
 		if (entregaPostal.getTipus() != null) {
 			switch (entregaPostal.getTipus()) {
 				case APARTAT_CORREUS:
@@ -176,10 +175,6 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 		this.domiciliCodiPostal = entregaPostal.getCodiPostal();
 		this.domiciliLinea1 = entregaPostal.getLinea1();
 		this.domiciliLinea2 = entregaPostal.getLinea2();
-	}
-
-	private NotificaDomiciliViaTipusEnumDto toEnviamentViaTipusEnum(EntregaPostalVia viaTipus) {
-		return viaTipus != null ? NotificaDomiciliViaTipusEnumDto.valueOf(viaTipus.name()) : null;
 	}
 
 	public String provinciaCodiFormatted(){

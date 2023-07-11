@@ -31,12 +31,9 @@ import es.caib.notib.logic.intf.dto.DocumentValidDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
-import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
-import es.caib.notib.logic.intf.dto.SignatureInfoDto;
 import es.caib.notib.logic.intf.dto.TipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
@@ -47,7 +44,6 @@ import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioServiceWs;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
-import es.caib.notib.logic.utils.MimeUtils;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -67,15 +63,11 @@ import es.caib.notib.persist.repository.PersonaRepository;
 import es.caib.notib.persist.repository.ProcSerOrganRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Base64;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
@@ -235,7 +227,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			}
 			// Enviament tipus
 			var enviamentTipus = getEnviamentTipus(notificacio);
-			var comunicacioSir = NotificaEnviamentTipusEnumDto.SIR.equals(enviamentTipus);
+			var comunicacioSir = EnviamentTipus.SIR.equals(enviamentTipus);
 			// Documents
 			document = documentHelper.getDocument(notificacio.getDocument());
 			if (comunicacioSir) {
@@ -534,7 +526,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				if (enviament.getEntregaPostal() != null) {
 					resposta.setAdressaPostal(enviament.getEntregaPostal().toString());
 				}
-				boolean esSir = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(enviament.getNotificacio().getEnviamentTipus()) &&
+				boolean esSir = EnviamentTipus.COMUNICACIO.equals(enviament.getNotificacio().getEnviamentTipus()) &&
 						InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus());
 				resposta.setEnviamentSir(esSir);
 
@@ -829,7 +821,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		resposta.setOficina(notificacio.getRegistreOficinaNom());
 		resposta.setLlibre(notificacio.getRegistreLlibreNom());
 		// SIR
-		boolean esSir = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacio.getEnviamentTipus()) &&
+		boolean esSir = EnviamentTipus.COMUNICACIO.equals(notificacio.getEnviamentTipus()) &&
 				InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus());
 		resposta.setEnviamentSir(esSir);
 		if (esSir && (isEnviament || notificacio.getEnviaments().size() == 1)) {
@@ -1076,17 +1068,15 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 	private EnviamentReferenciaV2 saveEnviament(EntitatEntity entitat, NotificacioEntity notificacioGuardada, Enviament enviament) {
 
-		ServeiTipusEnumDto serveiTipus = getServeiTipus(enviament);
+		var serveiTipus = getServeiTipus(enviament);
 		if (enviament.isEntregaPostalActiva() && enviament.getEntregaPostal() != null && enviament.getEntregaPostal().getTipus() == null) {
 			throw new ValidationException("ENTREGA_POSTAL", "L'entrega postal te el camp tipus buit");
 		}
 
-		PersonaEntity titular = saveTitular(enviament);
-		List<PersonaEntity> destinataris = getDestinataris(enviament);
-
-		NotificacioEnviamentEntity enviamentSaved = notificacioEnviamentRepository.saveAndFlush(
-				NotificacioEnviamentEntity.getBuilderV2(
-						enviament,
+		var titular = saveTitular(enviament);
+		var destinataris = getDestinataris(enviament);
+		var enviamentSaved = notificacioEnviamentRepository.saveAndFlush(
+				NotificacioEnviamentEntity.getBuilderV2(enviament,
 						entitat.isAmbEntregaDeh(),
 						serveiTipus,
 						notificacioGuardada,
@@ -1145,30 +1135,31 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		).incapacitat(enviament.getTitular().isIncapacitat()).build());
 	}
 
-	private ServeiTipusEnumDto getServeiTipus(Enviament enviament) {
+	private ServeiTipus getServeiTipus(Enviament enviament) {
 
 		if (enviament.getServeiTipus() == null) {
 			return null;
 		}
-		ServeiTipusEnumDto serveiTipus = ServeiTipusEnumDto.NORMAL;
-		if (NotificaServeiTipusEnumDto.URGENT.equals(enviament.getServeiTipus())) {
-			serveiTipus = ServeiTipusEnumDto.URGENT;
+		ServeiTipus serveiTipus = ServeiTipus.NORMAL;
+		if (ServeiTipus.URGENT.equals(enviament.getServeiTipus())) {
+			serveiTipus = ServeiTipus.URGENT;
 		}
 		return serveiTipus;
 	}
 
-	private NotificaEnviamentTipusEnumDto getEnviamentTipus(NotificacioV2 notificacio) {
-		NotificaEnviamentTipusEnumDto enviamentTipus = null;
+	private EnviamentTipus getEnviamentTipus(NotificacioV2 notificacio) {
+
+		EnviamentTipus enviamentTipus = null;
 		if (notificacio.getEnviamentTipus() != null) {
 			switch (notificacio.getEnviamentTipus()) {
 				case COMUNICACIO:
-					enviamentTipus = NotificaEnviamentTipusEnumDto.COMUNICACIO;
+					enviamentTipus = EnviamentTipus.COMUNICACIO;
 					break;
 				case NOTIFICACIO:
-					enviamentTipus = NotificaEnviamentTipusEnumDto.NOTIFICACIO;
+					enviamentTipus = EnviamentTipus.NOTIFICACIO;
 					break;
 				case SIR:
-					enviamentTipus = NotificaEnviamentTipusEnumDto.SIR;
+					enviamentTipus = EnviamentTipus.SIR;
 					break;
 			}
 			log.debug(">> [ALTA] enviament tipus: " + enviamentTipus);

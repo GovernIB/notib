@@ -3,7 +3,7 @@
  */
 package es.caib.notib.back.command;
 
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
@@ -25,7 +25,7 @@ public class NotificacioFiltreCommand {
 	
 	private Long entitatId;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
-	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	private EnviamentTipus enviamentTipus;
 	private NotificacioEstatEnumDto estat;
 	private String concepte;
 	private Date dataInici;

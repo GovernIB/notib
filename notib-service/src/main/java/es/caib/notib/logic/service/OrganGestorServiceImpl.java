@@ -420,6 +420,10 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		return progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError();
 	}
 
+	@Transactional
+	public void deleteHistoricSincronitzacio() {
+		organGestorRepository.deleteHistoricSincronitzacio();
+	}
 	@Override
 	@Transactional(timeout = 3600)
 	@SuppressWarnings("unchecked")

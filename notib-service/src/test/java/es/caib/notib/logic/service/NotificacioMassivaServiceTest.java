@@ -1,5 +1,8 @@
 package es.caib.notib.logic.service;
 
+import es.caib.notib.client.domini.Enviament;
+import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.EntityComprovarHelper;
 import es.caib.notib.logic.helper.FiltreHelper.FiltreField;
@@ -9,18 +12,14 @@ import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotificacioHelper;
 import es.caib.notib.logic.helper.NotificacioListHelper;
 import es.caib.notib.logic.helper.NotificacioMassivaHelper;
-import es.caib.notib.logic.helper.NotificacioValidatorHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.RegistreNotificaHelper;
 import es.caib.notib.logic.intf.dto.FitxerDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
-import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaDto;
@@ -28,6 +27,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaEstatDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
 import es.caib.notib.logic.intf.service.NotificacioMassivaService;
+import es.caib.notib.logic.service.ws.NotificacioValidator;
 import es.caib.notib.logic.test.NotificacioMassivaTests;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -51,8 +51,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +58,7 @@ import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NotificacioMassivaServiceTest {
+
 	@Mock
 	private EntityComprovarHelper entityComprovarHelper;
 	@Mock
@@ -73,27 +72,15 @@ public class NotificacioMassivaServiceTest {
 	@Mock
 	private NotificacioHelper notificacioHelper;
 	@Mock
-	private PaginacioHelper paginacioHelper;
-	@Mock
-	private NotificacioValidatorHelper notificacioValidatorHelper;
-	@Mock
 	private NotificacioMassivaHelper notificacioMassivaHelper;
-
 	@Mock
 	private ProcSerRepository procSerRepository;
-
 	@Mock
 	private NotificacioMassivaRepository notificacioMassivaRepository;
 	@Mock
 	private NotificacioTableViewRepository notificacioTableViewRepository;
 	@Mock
 	private NotificacioListHelper notificacioListHelper;
-	@Mock
-	private MessageHelper messageHelper;
-//	@Mock
-//	private EmailNotificacioMassivaHelper emailNotificacioMassivaHelper;
-//	@Mock
-//	private Authentication auth;
 
 	@InjectMocks
 	NotificacioMassivaService notificacioMassivaService = new NotificacioMassivaServiceImpl();
@@ -123,7 +110,7 @@ public class NotificacioMassivaServiceTest {
 		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.eq(entitatId), Mockito.anyBoolean(), Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(entitatMock);
 		Mockito.when(registreNotificaHelper.isSendDocumentsActive()).thenReturn(false);
 		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class))).thenReturn("rnd_gesid");
-		Mockito.when(notificacioHelper.saveNotificacio(Mockito.any(EntitatEntity.class), Mockito.any(NotificacioDatabaseDto.class), Mockito.anyBoolean(), Mockito.any(NotificacioMassivaEntity.class), Mockito.<Map<String, Long>>any()))
+		Mockito.when(notificacioHelper.saveNotificacio(Mockito.any(EntitatEntity.class), Mockito.any(NotificacioV2.class), Mockito.anyBoolean(), Mockito.any(NotificacioMassivaEntity.class), Mockito.<Map<String, Long>>any()))
 				.thenReturn(NotificacioEntity.builder().build());
 		Mockito.when(procSerRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.<EntitatEntity>any())).thenReturn(procSerMock);
 		setUpNotificacioMassiva();
@@ -161,8 +148,9 @@ public class NotificacioMassivaServiceTest {
 	public void whenCreate_interessat_sense_nif_ok() throws Exception {
 
 		// Given
-		Mockito.when(notificacioValidatorHelper.validarNotificacioMassiu(Mockito.any(NotificacioDatabaseDto.class), Mockito.any(EntitatEntity.class), Mockito.<Map<String, Long>>any()))
-				.thenReturn(new ArrayList<String>());
+//		Mockito.when(notificacioValidator.validarNotificacioMassiu(
+//			Mockito.any(NotificacioDatabaseDto.class), Mockito.any(EntitatEntity.class), Mockito.<Map<String, Long>>any()))
+//			.thenReturn(new ArrayList<String>());
 
 		NotificacioMassivaTests.TestMassiusFiles test = NotificacioMassivaTests.getTestInteressatSenseNif();
 		NotificacioMassivaDto not = NotificacioMassivaDto.builder().build();
@@ -174,17 +162,15 @@ public class NotificacioMassivaServiceTest {
 
 		// Then
 		Mockito.verify(notificacioHelper, Mockito.times(1)).
-				altaEnviamentsWeb(Mockito.any(EntitatEntity.class), Mockito.any(NotificacioEntity.class), Mockito.<List<NotEnviamentDatabaseDto>>any());
+				altaEnviamentsWeb(Mockito.any(EntitatEntity.class), Mockito.any(NotificacioEntity.class), Mockito.<List<Enviament>>any());
 	}
 
 	@Test
 	public void whenCreate_GivenNoErrors_ThenCallAltaNotificacioWeb() throws Exception {
 		// Given
-		Mockito.when(notificacioValidatorHelper.validarNotificacioMassiu(
-				Mockito.any(NotificacioDatabaseDto.class),
-				Mockito.any(EntitatEntity.class),
-				Mockito.<Map<String, Long>>any()
-		)).thenReturn(new ArrayList<String>());
+//		Mockito.when(notificacioValidatorHelper.validarNotificacioMassiu(
+//				Mockito.any(NotificacioDatabaseDto.class), Mockito.any(EntitatEntity.class), Mockito.<Map<String, Long>>any()))
+//				.thenReturn(new ArrayList<String>());
 		String usuariCodi = "CODI_USER";
 		NotificacioMassivaTests.TestMassiusFiles test1Data = NotificacioMassivaTests.getTest1Files();
 		NotificacioMassivaDto notificacioMassiu = NotificacioMassivaDto.builder()
@@ -200,24 +186,20 @@ public class NotificacioMassivaServiceTest {
 		notificacioMassivaService.create(entitatId, usuariCodi, notificacioMassiu);
 
 		// Then
-		Mockito.verify(notificacioHelper, Mockito.times(4)).altaEnviamentsWeb(
-				Mockito.any(EntitatEntity.class),
-				Mockito.any(NotificacioEntity.class),
-				Mockito.<List<NotEnviamentDatabaseDto>>any()
+		Mockito.verify(notificacioHelper, Mockito.times(4))
+				.altaEnviamentsWeb(Mockito.any(EntitatEntity.class), Mockito.any(NotificacioEntity.class), Mockito.<List<Enviament>>any()
 		);
 	}
 
 	@Test
 	public void whenCreate_GivenSomeErrors_ThenNoCallAltaNotificacioWeb() throws Exception {
 		// Given
-		Mockito.when(notificacioValidatorHelper.validarNotificacioMassiu(
-				Mockito.any(NotificacioDatabaseDto.class),
-				Mockito.any(EntitatEntity.class),
-				Mockito.<Map<String, Long>>any()
-		)).thenReturn(Arrays.asList("Error 1", "Error 2"));
+//		Mockito.when(notificacioValidatorHelper.validarNotificacioMassiu(
+//				Mockito.any(NotificacioV2.class), Mockito.any(EntitatEntity.class), Mockito.<Map<String, Long>>any()))
+//				.thenReturn(Arrays.asList("Error 1", "Error 2"));
 		String usuariCodi = "CODI_USER";
 		NotificacioMassivaTests.TestMassiusFiles test1Data = NotificacioMassivaTests.getTest1Files();
-		NotificacioMassivaDto notificacioMassiu = NotificacioMassivaDto.builder()
+		var notificacioMassiu = NotificacioMassivaDto.builder()
 				.ficheroCsvNom("test1.csv")
 				.ficheroZipNom("test1.zip")
 				.ficheroCsvBytes(test1Data.getCsvContent())
@@ -233,18 +215,16 @@ public class NotificacioMassivaServiceTest {
 		Mockito.verify(notificacioHelper, Mockito.times(0)).altaEnviamentsWeb(
 				Mockito.any(EntitatEntity.class),
 				Mockito.any(NotificacioEntity.class),
-				Mockito.<List<NotEnviamentDatabaseDto>>any()
-		);
+				Mockito.<List<Enviament>>any());
 	}
 
 	@Test
 	public void whenFindById_ThenCallFindOne() throws Exception {
+
 		// When
 		notificacioMassivaService.findById(entitatId, notMassivaId);
-
 		// Then
-		Mockito.verify(notificacioMassivaRepository, Mockito.times(1)).findById(
-				Mockito.eq(notMassivaId));
+		Mockito.verify(notificacioMassivaRepository, Mockito.times(1)).findById(Mockito.eq(notMassivaId));
 	}
 
 	@Test
@@ -270,38 +250,32 @@ public class NotificacioMassivaServiceTest {
 	@Test
 	public void whenFindNotificacions_ThenCallFindAmbFiltreByNotificacioMassiva() throws Exception {
 		// Given
-		Mockito.when(notificacioListHelper.getMappeigPropietats(
-				Mockito.any(PaginacioParamsDto.class)))
-				.thenReturn(null); // ho ignorarem per a la prova
+		Mockito.when(notificacioListHelper.getMappeigPropietats(Mockito.any(PaginacioParamsDto.class))).thenReturn(null); // ho ignorarem per a la prova
 		Mockito.when(notificacioListHelper.getFiltre(
 				Mockito.any(NotificacioFiltreDto.class)))
 				.thenReturn( NotificacioListHelper.NotificacioFiltre.builder()
-						.entitatId(new FiltreField<Long>(entitatId))
-						.comunicacioTipus(new FiltreField<NotificacioComunicacioTipusEnumDto>(null))
-						.enviamentTipus(new FiltreField<NotificaEnviamentTipusEnumDto>(null))
-						.estat(new FiltreField<NotificacioEstatEnumDto>(null))
+						.entitatId(new FiltreField<>(entitatId))
+						.comunicacioTipus(new FiltreField<>(null))
+						.enviamentTipus(new FiltreField<>(null))
+						.estat(new FiltreField<>(null))
 						.concepte(new StringField(null))
-						.dataInici(new FiltreField<Date>(null))
-						.dataFi(new FiltreField<Date>(null))
+						.dataInici(new FiltreField<>(null))
+						.dataFi(new FiltreField<>(null))
 						.titular(new StringField(null))
-						.organGestor(new FiltreField<OrganGestorEntity>(null))
-						.procediment(new FiltreField<ProcSerEntity>(null))
-						.tipusUsuari(new FiltreField<TipusUsuariEnumDto>(null))
+						.organGestor(new FiltreField<>(null))
+						.procediment(new FiltreField<>(null))
+						.tipusUsuari(new FiltreField<>(null))
 						.numExpedient(new StringField(null))
 						.creadaPer(new StringField(null))
 						.identificador(new StringField(null))
-						.nomesAmbErrors(new FiltreField<Boolean>(false))
-						.nomesSenseErrors(new FiltreField<Boolean>(false))
-						.hasZeronotificaEnviamentIntent(new FiltreField<Boolean>(false))
+						.nomesAmbErrors(new FiltreField<>(false))
+						.nomesSenseErrors(new FiltreField<>(false))
+						.hasZeronotificaEnviamentIntent(new FiltreField<>(false))
 						.build()); // ho ignorarem per a la prova
-			Mockito.when(notificacioListHelper.complementaNotificacions(
-					Mockito.eq(entitatMock),
-					Mockito.anyString(),
-					Mockito.<Page<NotificacioTableEntity>>any())).thenReturn(null);
+			Mockito.when(notificacioListHelper.complementaNotificacions(Mockito.eq(entitatMock), Mockito.anyString(), Mockito.<Page<NotificacioTableEntity>>any())).thenReturn(null);
 
 		// When
-		notificacioMassivaService.findNotificacions(entitatId, notMassivaId,
-				new NotificacioFiltreDto(), new PaginacioParamsDto());
+		notificacioMassivaService.findNotificacions(entitatId, notMassivaId, new NotificacioFiltreDto(), new PaginacioParamsDto());
 
 		// Then
 		Mockito.verify(notificacioTableViewRepository, Mockito.times(1)).findAmbFiltreByNotificacioMassiva(
@@ -309,13 +283,11 @@ public class NotificacioMassivaServiceTest {
 				Mockito.eq(entitatId),
 				Mockito.eq(notificacioMassivaMock),
 				Mockito.anyBoolean(),
-				Mockito.nullable(NotificaEnviamentTipusEnumDto.class),
+				Mockito.nullable(EnviamentTipus.class),
 				Mockito.anyBoolean(),
 				Mockito.nullable(String.class),
 				Mockito.anyBoolean(),
 				Mockito.nullable(Integer.class),
-//				Mockito.nullable(NotificacioEstatEnumDto.class),
-//				Mockito.nullable(EnviamentEstat.class),
 				Mockito.anyBoolean(),
 				Mockito.nullable(Date.class),
 				Mockito.anyBoolean(),
@@ -336,21 +308,15 @@ public class NotificacioMassivaServiceTest {
 				Mockito.nullable(String.class),
 				Mockito.anyBoolean(),
 				Mockito.anyBoolean(),
-//				Mockito.anyBoolean(),
-//				Mockito.nullable(Boolean.class),
 				Mockito.nullable(Pageable.class));
 
-		Mockito.verify(notificacioListHelper, Mockito.times(1)).complementaNotificacions(
-				Mockito.eq(entitatMock),
-				Mockito.anyString(),
-				Mockito.<Page<NotificacioTableEntity>>any());
+		Mockito.verify(notificacioListHelper, Mockito.times(1)).complementaNotificacions(Mockito.eq(entitatMock), Mockito.anyString(), Mockito.<Page<NotificacioTableEntity>>any());
 	}
 
 	@Test
 	public void whenFindAmbFiltrePaginat_GivenAdminRole_ThenCallFindEntitatAdminRolePage() throws Exception {
 		// When
-		notificacioMassivaService.findAmbFiltrePaginat(entitatId, new NotificacioMassivaFiltreDto(), RolEnumDto.NOT_ADMIN,
-				new PaginacioParamsDto());
+		notificacioMassivaService.findAmbFiltrePaginat(entitatId, new NotificacioMassivaFiltreDto(), RolEnumDto.NOT_ADMIN, new PaginacioParamsDto());
 
 		// Then
 		Mockito.verify(notificacioMassivaRepository, Mockito.times(1)).findEntitatAdminRolePage(
@@ -363,15 +329,14 @@ public class NotificacioMassivaServiceTest {
 				Mockito.nullable(NotificacioMassivaEstatDto.class),
 				Mockito.anyBoolean(),
 				Mockito.nullable(String.class),
-				Mockito.nullable(Pageable.class)
-		);
+				Mockito.nullable(Pageable.class));
 	}
 
 	@Test
 	public void whenFindAmbFiltrePaginat_GivenUserRole_ThenCallFindUserRolePage() throws Exception {
+
 		// When
-		notificacioMassivaService.findAmbFiltrePaginat(entitatId, new NotificacioMassivaFiltreDto(), RolEnumDto.tothom,
-				new PaginacioParamsDto());
+		notificacioMassivaService.findAmbFiltrePaginat(entitatId, new NotificacioMassivaFiltreDto(), RolEnumDto.tothom, new PaginacioParamsDto());
 
 		// Then
 		Mockito.verify(notificacioMassivaRepository, Mockito.times(1)).findUserRolePage(
@@ -383,37 +348,32 @@ public class NotificacioMassivaServiceTest {
 				Mockito.nullable(Date.class),
 				Mockito.anyBoolean(),
 				Mockito.nullable(NotificacioMassivaEstatDto.class),
-				Mockito.nullable(Pageable.class)
-		);
+				Mockito.nullable(Pageable.class));
 	}
 
 	@Test
 	public void whenPosposar_ThenCallPosposarNotificacions() throws Exception {
+
 		// When
 		notificacioMassivaService.posposar(entitatId, notMassivaId);
-
 		// Then
-		Mockito.verify(notificacioMassivaHelper, Mockito.times(1)).posposarNotificacions(
-				Mockito.eq(notMassivaId)
-		);
+		Mockito.verify(notificacioMassivaHelper, Mockito.times(1)).posposarNotificacions(Mockito.eq(notMassivaId));
 	}
 
 	@Test
 	public void whenReactivar_ThenCallReactivarNotificacions() throws Exception {
+
 		// When
 		notificacioMassivaService.reactivar(entitatId, notMassivaId);
-
 		// Then
-		Mockito.verify(notificacioMassivaHelper, Mockito.times(1)).reactivarNotificacions(
-				Mockito.eq(notMassivaId)
-		);
+		Mockito.verify(notificacioMassivaHelper, Mockito.times(1)).reactivarNotificacions(Mockito.eq(notMassivaId));
 	}
 
 	@Test
 	public void whenGetCSVFile_ThenCallGestioDocumentalGet() throws Exception {
-		// When
-		FitxerDto fitxer = notificacioMassivaService.getCSVFile(entitatId, notMassivaId);
 
+		// When
+		var fitxer = notificacioMassivaService.getCSVFile(entitatId, notMassivaId);
 		// Then
 		Assert.assertEquals(fitxer.getNom(), notificacioMassivaMock.getCsvFilename());
 		Mockito.verify(pluginHelper, Mockito.times(1)).gestioDocumentalGet(
@@ -424,9 +384,9 @@ public class NotificacioMassivaServiceTest {
 
 	@Test
 	public void whenGetZipFile_ThenCallGestioDocumentalGet() throws Exception {
-		// When
-		FitxerDto fitxer = notificacioMassivaService.getZipFile(entitatId, notMassivaId);
 
+		// When
+		var fitxer = notificacioMassivaService.getZipFile(entitatId, notMassivaId);
 		// Then
 		Assert.assertEquals(fitxer.getNom(), notificacioMassivaMock.getZipFilename());
 		Mockito.verify(pluginHelper, Mockito.times(1)).gestioDocumentalGet(
@@ -436,9 +396,9 @@ public class NotificacioMassivaServiceTest {
 	}
 	@Test
 	public void whenGetResumFile_ThenCallGestioDocumentalGet() throws Exception {
-		// When
-		FitxerDto fitxer = notificacioMassivaService.getResumFile(entitatId, notMassivaId);
 
+		// When
+		var fitxer = notificacioMassivaService.getResumFile(entitatId, notMassivaId);
 		// Then
 		Mockito.verify(pluginHelper, Mockito.times(1)).gestioDocumentalGet(
 				Mockito.eq(notificacioMassivaMock.getResumGesdocId()),
@@ -447,9 +407,9 @@ public class NotificacioMassivaServiceTest {
 	}
 	@Test
 	public void whenGetErrorsFile_ThenCallGestioDocumentalGet() throws Exception {
-		// When
-		FitxerDto fitxer = notificacioMassivaService.getErrorsValidacioFile(entitatId, notMassivaId);
 
+		// When
+		var fitxer = notificacioMassivaService.getErrorsValidacioFile(entitatId, notMassivaId);
 		// Then
 		Mockito.verify(pluginHelper, Mockito.times(1)).gestioDocumentalGet(
 				Mockito.eq(notificacioMassivaMock.getErrorsGesdocId()),

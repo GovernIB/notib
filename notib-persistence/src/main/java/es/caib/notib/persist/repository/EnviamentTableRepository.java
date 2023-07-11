@@ -1,7 +1,7 @@
 package es.caib.notib.persist.repository;
 
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.persist.entity.EntitatEntity;
@@ -125,7 +125,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("isDataCaducitatFiNull") boolean dataCaducitatFiNull,
 			@Param("dataCaducitatFi") Date dataCaducitatFi,
 			@Param("isTipusEnviamentNull") boolean isTipusEnviamentNull,
-			@Param("tipusEnviament") NotificaEnviamentTipusEnumDto tipusEnviament,
+			@Param("tipusEnviament") EnviamentTipus tipusEnviament,
 			@Param("isCsvNull") boolean isCsvNull,
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
@@ -240,7 +240,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("isDataCaducitatFiNull") boolean dataCaducitatFiNull,
 			@Param("dataCaducitatFi") Date dataCaducitatFi,
 			@Param("isTipusEnviamentNull") boolean isTipusEnviamentNull,
-			@Param("tipusEnviament") NotificaEnviamentTipusEnumDto tipusEnviament,
+			@Param("tipusEnviament") EnviamentTipus tipusEnviament,
 			@Param("isCsvNull") boolean isCsvNull,
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
@@ -342,7 +342,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("isDataCaducitatFiNull") boolean dataCaducitatFiNull,
 			@Param("dataCaducitatFi") Date dataCaducitatFi,
 			@Param("isTipusEnviamentNull") boolean isTipusEnviamentNull,
-			@Param("tipusEnviament") NotificaEnviamentTipusEnumDto tipusEnviament,
+			@Param("tipusEnviament") EnviamentTipus tipusEnviament,
 			@Param("isCsvNull") boolean isCsvNull,
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
@@ -490,7 +490,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("isDataCaducitatFiNull") boolean dataCaducitatFiNull,
 			@Param("dataCaducitatFi") Date dataCaducitatFi,
 			@Param("isTipusEnviamentNull") boolean isTipusEnviamentNull,
-			@Param("tipusEnviament") NotificaEnviamentTipusEnumDto tipusEnviament,
+			@Param("tipusEnviament") EnviamentTipus tipusEnviament,
 			@Param("isCsvNull") boolean isCsvNull,
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,

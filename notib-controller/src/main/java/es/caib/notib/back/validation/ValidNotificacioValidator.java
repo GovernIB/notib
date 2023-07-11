@@ -8,10 +8,8 @@ import es.caib.notib.back.command.PersonaCommand;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.EmailValidHelper;
 import es.caib.notib.back.helper.MessageHelper;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
-import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
@@ -77,7 +75,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 
 			//Validar si és comunicació
 			// TODO: Aquesta validació no té molt de sentit ara que hem dividit els formularis
-			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.COMUNICACIO || notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.COMUNICACIO_SIR && (notificacio.getEnviaments() != null)) {
+			if (notificacio.getEnviamentTipus() == EnviamentTipus.COMUNICACIO || notificacio.getEnviamentTipus() == EnviamentTipus.SIR && (notificacio.getEnviaments() != null)) {
 				for (var enviament : notificacio.getEnviaments()) {
 					if (enviament.getTitular().getInteressatTipus() == InteressatTipus.ADMINISTRACIO) {
 						comunicacioAmbAdministracio = true;
@@ -88,7 +86,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				}
 			}
 
-			if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(notificacio.getEnviamentTipus())) {
+			if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {
 				var organ = notificacio.getOrganGestor();
 				var o = organService.findByCodi(null, organ);
 				if (o != null) {
@@ -111,7 +109,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			boolean useProcediment = "PROCEDIMENT".equals(notificacio.getTipusProcSer());
 			Long procSer = useProcediment ? notificacio.getProcedimentId() : notificacio.getServeiId();
 
-			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.NOTIFICACIO && (procSer == null)) {
+			if (notificacio.getEnviamentTipus() == EnviamentTipus.NOTIFICACIO && (procSer == null)) {
 				valid = false;
 				if (useProcediment) {
 					var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.procediment", null, locale);
@@ -135,7 +133,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				}
 
 				var procedimentAmbGrups = procedimentService.procedimentAmbGrups(procSer);
-				if (procedimentAmbGrups && notificacio.getGrupId() == null) {
+				if (procedimentAmbGrups && notificacio.getGrupCodi() == null) {
 					valid = false;
 					var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.grup", null, locale);
 					context.buildConstraintViolationWithTemplate(msg).addNode("grupId").addConstraintViolation();
@@ -143,7 +141,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			}
 
 			// Validació caducitat
-			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.NOTIFICACIO) {
+			if (notificacio.getEnviamentTipus() == EnviamentTipus.NOTIFICACIO) {
 				if (notificacio.getCaducitat() == null) {
 					var msg = MessageHelper.getInstance().getMessage("NotNull", null, locale);
 					context.buildConstraintViolationWithTemplate(msg).addNode("caducitat").addConstraintViolation();

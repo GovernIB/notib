@@ -2,9 +2,9 @@ package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.helper.FiltreHelper.FiltreField;
 import es.caib.notib.logic.helper.FiltreHelper.StringField;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
@@ -317,7 +317,7 @@ public class NotificacioListHelper {
 
         private FiltreField<Long> entitatId;
         private FiltreField<NotificacioComunicacioTipusEnumDto> comunicacioTipus;
-        private FiltreField<NotificaEnviamentTipusEnumDto> enviamentTipus;
+        private FiltreField<EnviamentTipus> enviamentTipus;
         private FiltreField<NotificacioEstatEnumDto> estat;
         private StringField concepte;
         private FiltreField<Date> dataInici;

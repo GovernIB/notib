@@ -8,14 +8,11 @@ import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.TipusDocumentDto;
 import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
 import es.caib.notib.logic.intf.dto.TipusEnumDto;
-import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.test.data.ConfigTest;
 import es.caib.notib.logic.test.data.NotificacioItemTest;
-import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.registre.RegistrePluginException;
@@ -39,6 +36,7 @@ import static org.junit.Assert.assertNotNull;
 @ContextConfiguration(locations = {"/es/caib/notib/logic/application-context-test.xml"})
 @Transactional
 public class EnviamentServiceImplTest extends BaseServiceTest {
+
     private static final String ENTITAT_DGTIC_DIR3CODI = "EA0004518";
     private static final String ENTITAT_DGTIC_KEY = "MjkwNTc3Mjk0MjkyNTU3OTkyNA==";
 
@@ -57,12 +55,11 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
     ProcSerDto procedimentCreate;
     OrganGestorDto organGestorCreate;
 
-    @Autowired
-    private ConfigHelper configHelper;
 
 
     @Before
     public void setUp() throws SistemaExternException, IOException, DecoderException, RegistrePluginException {
+
         setDefaultConfigs();
         List<PermisDto> permisosEntitat = new ArrayList<PermisDto>();
         entitatCreate = new EntitatDto();
@@ -115,11 +112,10 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
         permisosProcediment.add(permisNotificacio);
 
         procedimentCreate.setPermisos(permisosProcediment);
-
         ConfigHelper.setEntitatCodi("test");
-
         System.setProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir", "/home/bgalmes/dades/notib-fs/");
     }
+
     @Test
     public void actualitzarEstat() {
         testCreantElements(
@@ -132,33 +128,31 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
                         configureMockGestioDocumentalPlugin();
                         autenticarUsuari("admin");
 
-                        EntitatDto entitatCreate = (EntitatDto)elementsCreats.get(0);
-                        ProcSerDto procedimentCreate = (ProcSerDto)elementsCreats.get(2);
+                        var entitatCreate = (EntitatDto)elementsCreats.get(0);
+                        var procedimentCreate = (ProcSerDto)elementsCreats.get(2);
                         assertNotNull(procedimentCreate);
                         assertNotNull(procedimentCreate.getId());
                         assertNotNull(entitatCreate);
                         assertNotNull(entitatCreate.getId());
                         String notificacioId = new Long(System.currentTimeMillis()).toString();
-                        NotificacioDatabaseDto notificacio = notificacioCreate.getRandomInstance();
+                        var notificacio = notificacioCreate.getRandomInstance();
 
-                        NotificacioDatabaseDto notificacioCreated = notificacioService.create(
-                                entitatCreate.getId(),
-                                notificacio);
+                        var notificacioCreated = notificacioService.create(entitatCreate.getId(), notificacio);
                         assertNotNull(notificacioCreated);
 
                         // Given: Un enviament qualsevol
-                        NotEnviamentDatabaseDto enviament = notificacioCreated.getEnviaments().get(0);
+                        var enviament = notificacioCreated.getEnviaments().get(0);
 
                         // When: Actualitzam l'estat de l'enviament
                         try {
                             enviamentService.actualitzarEstat(enviament.getId());
 
                             // Then: Comptadors d'intents a 0
-                            NotificacioEnviamentEntity envEntity = enviamentRepository.findById(enviament.getId()).orElseThrow();
+                            var envEntity = enviamentRepository.findById(enviament.getId()).orElseThrow();
                             assertEquals(0, envEntity.getNotificaIntentNum());
                             assertEquals(0, envEntity.getSirConsultaIntent());
 
-                        }finally {
+                        } finally {
                             notificacioService.delete(entitatCreate.getId(), notificacioCreated.getId());
                         }
                     }

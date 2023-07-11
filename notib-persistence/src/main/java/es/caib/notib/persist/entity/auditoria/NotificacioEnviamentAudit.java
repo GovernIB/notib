@@ -2,10 +2,10 @@ package es.caib.notib.persist.entity.auditoria;
 
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
 import es.caib.notib.persist.audit.NotibAuditoria;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
@@ -55,7 +55,7 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 	private String domicili;
 	@Column(name = "servei_tipus")
 	@Enumerated(EnumType.STRING)
-	private ServeiTipusEnumDto serveiTipus;
+	private ServeiTipus serveiTipus;
 	@Column(name = "cie")
 	private Integer cie;
 	@Column(name = "format_sobre", length = 10)

@@ -3,6 +3,7 @@ package es.caib.notib.logic.helper;
 import com.google.common.base.Strings;
 import com.itextpdf.text.pdf.PdfReader;
 import es.caib.notib.client.domini.DocumentTipus;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.OrigenEnum;
@@ -18,7 +19,6 @@ import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.InteresadoWsDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.RegistreAnnexDto;
@@ -1478,7 +1478,7 @@ public class PluginHelper {
 		//Salida
 		log.info("Preparant dades de sortida");
 		registre.setTipoRegistro(2L);
-		var tipusEnv = NotificaEnviamentTipusEnumDto.NOTIFICACIO == notificacio.getEnviamentTipus() ? "Notificacio" : "Comunicacio";
+		var tipusEnv = EnviamentTipus.NOTIFICACIO == notificacio.getEnviamentTipus() ? "Notificacio" : "Comunicacio";
 		registre.setResumen(tipusEnv + " - " + notificacio.getConcepte());
 		/* 1 = Documentació adjunta en suport Paper
 		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper

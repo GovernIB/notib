@@ -1,10 +1,10 @@
 package es.caib.notib.logic.service;
 
 import com.codahale.metrics.Timer;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -54,8 +54,6 @@ public class ConsusltaApiRestV2Test {
     private Timer.Context timer;
     @Mock
     Page<NotificacioEnviamentEntity> page;
-    @Mock
-    private Pageable pageableMock;
 
     private final String foo = "foo";
 
@@ -74,34 +72,31 @@ public class ConsusltaApiRestV2Test {
     @Test
     public void findEnviamentsV2() {
 
-        ApiConsulta consulta = ApiConsulta.builder().build();
+        var consulta = ApiConsulta.builder().build();
         Integer total = 100;
         Integer pagina = 0;
         Integer mida = 10;
         String nif = "12345678z";
         List<NotificacioEnviamentEntity> dades = new ArrayList<>();
         Mockito.when(notificacioEnviamentRepository.countEnviaments(Mockito.anyString(), anyBoolean(), Mockito.any(Date.class), anyBoolean(), Mockito.any(Date.class),
-                Mockito.any(NotificaEnviamentTipusEnumDto.class), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())).thenReturn(total);
-        Pageable pageable = PageRequest.of(pagina, mida);
+                Mockito.any(EnviamentTipus.class), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())).thenReturn(total);
+        var pageable = PageRequest.of(pagina, mida);
         Mockito.when(notificacioEnviamentRepository.findEnviaments(nif, true, null, true, null, null,
                 true, null, true, null, Mockito.any(Pageable.class))).thenReturn(page);
 
         RespostaConsultaV2 resposta = enviamentService.findEnviamentsV2(consulta);
-
         assertNotNull(resposta);
-//        assertNotNull(resposta.getResultat());
     }
 
     @Test
     public void getDocumentArxiu() {
 
-        DocumentEntity doc = new DocumentEntity();
-        NotificacioEntity not = NotificacioEntity.builder().document(doc).build();
-        ArxiuDto arxiu = ArxiuDto.builder().build();
-
+        var doc = new DocumentEntity();
+        var not = NotificacioEntity.builder().document(doc).build();
+        var arxiu = ArxiuDto.builder().build();
         Mockito.when(notificacioRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(not));
         Mockito.when(documentHelper.documentToArxiuDto(Mockito.anyString(), Mockito.any(DocumentEntity.class))).thenReturn(arxiu);
-        ArxiuDto d = notificacioService.getDocumentArxiu(1l);
+        var d = notificacioService.getDocumentArxiu(1L);
         assertNotNull(d);
         assertEquals(arxiu, d);
     }
@@ -110,10 +105,10 @@ public class ConsusltaApiRestV2Test {
     public void enviamentGetCertificacioArxiu() {
 
         byte [] c = new byte[0];
-        ArxiuDto arxiu = ArxiuDto.builder().nom("certificacio_" + foo + ".pdf").contingut(c).build();
-        NotificacioEnviamentEntity env = NotificacioEnviamentEntity.builder().notificaIdentificador(foo).notificaCertificacioArxiuId(foo).build();
+        var arxiu = ArxiuDto.builder().nom("certificacio_" + foo + ".pdf").contingut(c).build();
+        var env = NotificacioEnviamentEntity.builder().notificaIdentificador(foo).notificaCertificacioArxiuId(foo).build();
         Mockito.when(notificacioEnviamentRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(env));
-        ArxiuDto a = notificacioService.enviamentGetCertificacioArxiu(1l);
+        var a = notificacioService.enviamentGetCertificacioArxiu(1L);
         assertNotNull(a);
         assertEquals(a, arxiu);
     }
@@ -121,10 +116,9 @@ public class ConsusltaApiRestV2Test {
     @Test
     public void getJustificant() {
 
-
-        RespostaJustificantRecepcio resposta = crearRespostaJustificant(foo, false);
+        var resposta = crearRespostaJustificant(foo, false);
         Mockito.when(pluginHelper.obtenirJustificant(Mockito.anyString(), Mockito.anyString())).thenReturn(resposta);
-        byte [] justificant = enviamentService.getDocumentJustificant(Mockito.anyLong());
+        var justificant = enviamentService.getDocumentJustificant(Mockito.anyLong());
         assertNotNull(justificant);
         assertEquals(foo, new String(justificant));
     }
@@ -132,19 +126,19 @@ public class ConsusltaApiRestV2Test {
     @Test
     public void getJustificant_ofici_extern() {
 
-        RespostaJustificantRecepcio resposta = crearRespostaJustificant(foo, true);
+        var resposta = crearRespostaJustificant(foo, true);
         Mockito.when(pluginHelper.obtenirOficiExtern(Mockito.anyString(), Mockito.anyString())).thenReturn(resposta);
-        byte [] justificant = enviamentService.getDocumentJustificant(Mockito.anyLong());
+        var justificant = enviamentService.getDocumentJustificant(Mockito.anyLong());
         assertNotNull(justificant);
         assertEquals(foo, new String(justificant));
     }
 
     private RespostaJustificantRecepcio crearRespostaJustificant(String justificant, boolean oficiExtern) {
 
-        RespostaJustificantRecepcio resposta = new RespostaJustificantRecepcio();
+        var resposta = new RespostaJustificantRecepcio();
         resposta.setJustificant(justificant.getBytes());
-        NotificacioEntity not = NotificacioEntity.builder().emisorDir3Codi(justificant).build();
-        NotificacioEnviamentEntity env = NotificacioEnviamentEntity.builder().notificacio(not).registreNumeroFormatat(justificant).build();
+        var not = NotificacioEntity.builder().emisorDir3Codi(justificant).build();
+        var env = NotificacioEnviamentEntity.builder().notificacio(not).registreNumeroFormatat(justificant).build();
         if (oficiExtern) {
             env.setRegistreEstat(NotificacioRegistreEstatEnumDto.OFICI_EXTERN);
         }

@@ -35,7 +35,7 @@ public class PersonaHelper {
         return personaRepository.saveAndFlush(p);
     }
 
-    public PersonaEntity update(PersonaDto persona, boolean incapacitat) {
+    public PersonaEntity update(Persona persona, boolean incapacitat) {
 
         var personaEntity = personaRepository.findById(persona.getId()).orElseThrow();
         personaEntity.update(persona.getInteressatTipus(), persona.getEmail(), persona.getLlinatge1(), persona.getLlinatge2(), persona.getNif(), persona.getNom(),

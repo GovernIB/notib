@@ -9,7 +9,7 @@ import java.io.Serializable;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-public enum NotificaServeiTipusEnumDto implements Serializable {
+public enum ServeiTipus implements Serializable {
     NORMAL,
     URGENT
 }

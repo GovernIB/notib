@@ -9,9 +9,9 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import es.caib.notib.client.domini.ServeiTipus;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +24,7 @@ import lombok.Setter;
 public class EnviamentCommand {
 
 	private Long id;
-	private ServeiTipusEnumDto serveiTipus;
+	private ServeiTipus serveiTipus;
 	private Date caducitat;
 	@Valid @NotNull
 	private PersonaCommand titular;

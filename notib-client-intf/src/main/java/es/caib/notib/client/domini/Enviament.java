@@ -27,13 +27,20 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Enviament implements Serializable {
 
+    // TODO ATRIBUTS AFEGITS A POSTERIORI. FER UNA HERENCIA PER DEIXAR-HO CORRECTE
+
+    private Long id;
+    private EnviamentEstat notificaEstat;
+
+    // TODO ****************************************************************************
+
     private Persona titular;
     private List<Persona> destinataris;
     private boolean entregaPostalActiva;
     private EntregaPostal entregaPostal;
     private boolean entregaDehActiva;
     private EntregaDeh entregaDeh;
-    private NotificaServeiTipusEnumDto serveiTipus;
+    private ServeiTipus serveiTipus;
     private boolean perEmail;
 
     public List<Persona> getDestinataris() {
