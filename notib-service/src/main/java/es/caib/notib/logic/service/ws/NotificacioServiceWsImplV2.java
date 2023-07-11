@@ -44,6 +44,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioServiceWs;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
@@ -171,6 +172,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private ConfigHelper configHelper;
 	@Autowired
 	private AuditHelper auditHelper;
+
+	@Autowired
+	private EnviamentSmService enviamentSmService;
 
 	@Autowired
 	private NotificacioValidator notificacioValidator;
@@ -352,7 +356,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 			notificacioGuardada = notificacioRepository.saveAndFlush(notificacioGuardada);
 
-
 			// Enviament SÍNCRON
 			if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 				log.info(" [ALTA] Enviament SINCRON notificació [Id: " + notificacioGuardada.getId() + ", Estat: " + notificacioGuardada.getEstat() + "]");
@@ -365,6 +368,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				SemaforNotificacio.alliberar(notificacioGuardada.getId());
 			}
 
+			// SM
+			referencies.forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
 			return generaResposta(info, notificacioGuardada, referencies);
 		} catch (Exception ex) {
 			log.error("Error creant notificació", ex);
@@ -1347,7 +1352,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		dto.setOrigen(document.getOrigen() == null && utilizarMetadadesPerDefecte ? ORIGEN : document.getOrigen());
 		dto.setValidesa(document.getValidesa() == null && utilizarMetadadesPerDefecte ? VALIDESA : document.getValidesa());
 		dto.setTipoDocumental(document.getTipoDocumental() == null && utilizarMetadadesPerDefecte ? TIPUS_DOCUMENTAL : document.getTipoDocumental());
-		if (document.getModoFirma() != null && utilizarMetadadesPerDefecte) {
+		if (document.getModoFirma() != null || utilizarMetadadesPerDefecte) {
 			dto.setModoFirma(document.getModoFirma() != null ? document.getModoFirma() : MODE_FIRMA);
 		}
 

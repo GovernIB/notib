@@ -55,6 +55,7 @@ import es.caib.notib.logic.intf.exception.NotificacioMassivaException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.WriteCsvException;
 import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificacioMassivaService;
 import es.caib.notib.logic.intf.util.NifHelper;
 import es.caib.notib.logic.utils.CSVReader;
@@ -150,6 +151,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     private MessageHelper messageHelper;
     @Autowired
     private NotificacioEventRepository notificacioEventRepository;
+
+    @Autowired
+    private EnviamentSmService enviamentSmService;
 
     private static final int MAX_ENVIAMENTS = 999;
 
@@ -637,6 +641,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioMassivaServiceImpl.crearNotificacio");
         log.debug("[NOT-MASSIVA] Alta notificació de nova notificacio massiva");
         notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
+        // SM
+        notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
         notMassiva.joinNotificacio(notificacioEntity);
     }
 

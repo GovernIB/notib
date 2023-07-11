@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -32,6 +33,7 @@ import static es.caib.notib.logic.intf.statemachine.EnviamentSmEvent.*;
 @RequiredArgsConstructor
 @Configuration
 @EnableStateMachineFactory
+@EnableRetry
 public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentSmEstat, EnviamentSmEvent> {
 
 //    @Qualifier("smTaskScheduller")
@@ -40,7 +42,7 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
     private final StateMachineRuntimePersister<EnviamentSmEstat, EnviamentSmEvent, String> stateMachineRuntimePersister;
     // Actions
     private final Action<EnviamentSmEstat, EnviamentSmEvent> enviamentRegistreAction;
-    private final Action<EnviamentSmEstat, EnviamentSmEvent> notificaAction;
+//    private final Action<EnviamentSmEstat, EnviamentSmEvent> notificaAction;
     private final Action<EnviamentSmEstat, EnviamentSmEvent> enviamentNotificaAction;
 //    private final Action<EnviamentSmEstat, EnviamentSmEvent> enviamentEmailAction;
     private final Action<EnviamentSmEstat, EnviamentSmEvent> consultaNotificaIniciPoolingAction;
@@ -82,7 +84,8 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
                 .withChoice().source(REGISTRAT)
                     .first(SIR_PENDENT, isSir(), consultaSirIniciPoolingAction)
                     // .then(EMAIL_PENDENT, senseNif(), emailAction) --> Els emails s'envien en la notificació
-                    .last(NOTIFICA_PENDENT, notificaAction).and()
+                    //.last(NOTIFICA_PENDENT, notificaAction).and()
+                    .last(NOTIFICA_PENDENT, enviamentNotificaAction).and()
                 // Enviament notifica
                 .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_PENDENT).event(NT_ENVIAR).guard(uuidGuard()).action(enviamentNotificaAction).and()
                 .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_SENT).event(NT_SUCCESS).guard(uuidGuard()).action(consultaNotificaIniciPoolingAction).and()

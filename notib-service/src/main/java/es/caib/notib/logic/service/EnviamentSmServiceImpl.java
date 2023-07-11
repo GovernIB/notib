@@ -35,6 +35,8 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		var variables = sm.getExtendedState().getVariables();
 		variables.put(SmConstants.ENVIAMENT_TIPUS, enviament.getNotificacio().getEnviamentTipus().name());
 		variables.put(SmConstants.ENVIAMENT_SENSE_NIF, enviament.isPerEmail());
+		// Enviam a registre
+		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_ENVIAR);
 		return sm;
 	}
 

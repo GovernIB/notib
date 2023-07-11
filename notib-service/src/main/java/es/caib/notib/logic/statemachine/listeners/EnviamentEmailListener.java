@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
+import java.util.concurrent.Semaphore;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,16 +25,21 @@ public class EnviamentEmailListener {
 
     private final StateMachineService<EnviamentSmEstat, EnviamentSmEvent> stateMachineService;
 
+    private Semaphore semaphore = new Semaphore(5);
+
     @Transactional
     @JmsListener(destination = SmConstants.CUA_EMAIL, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveEnviamentEmail(@Payload EnviamentEmailRequest enviamentEmailRequest,
                                          @Headers MessageHeaders headers,
-                                         Message message) throws JMSException {
+                                         Message message) throws JMSException, InterruptedException {
         // Actualment els enviaments de avisos de notificacions per Email es realitzen des de la funcionalitat de norificar
         // per tant no s'utilitza aquest listener
 
         var enviament = enviamentEmailRequest.getEnviamentEmailDto();
         log.error("[SM] Rebut enviament per email <" + enviament + ">");
+
+        semaphore.acquire();
+        try {
 
 //        boolean emailSuccess = true;
 //
@@ -41,6 +47,9 @@ public class EnviamentEmailListener {
 //        sm.sendEvent(MessageBuilder.withPayload(emailSuccess ? EnviamentSmEvent.EM_SUCCESS : EnviamentSmEvent.EM_ERROR)
 //                .setHeader(SmConstants.ENVIAMENT_UUID_HEADER, enviament.getUuid())
 //                .build());
+        } finally {
+            semaphore.release();
+        }
         message.acknowledge();
 
     }

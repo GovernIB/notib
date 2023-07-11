@@ -200,6 +200,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var notificacioEntity = notificacioHelper.saveNotificacio(notData);
 			notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
 			auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceImpl.create");
+			// SM
+			notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
 			return conversioTipusHelper.convertir(notificacioEntity, NotificacioDatabaseDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -408,8 +410,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 
-			// TODO SM
-//			notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.registreEnviament(e.getNotificaReferencia()));
 
 //			### Realitzar el procés de registre i notific@
 			if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
@@ -423,6 +423,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 			notificacioTableHelper.actualitzarRegistre(notificacioEntity);
 			auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.UPDATE, UPDATE);
+
+			// SM
+			notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
 			return conversioTipusHelper.convertir(notificacioRepository.getOne(notificacio.getId()), NotificacioDatabaseDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

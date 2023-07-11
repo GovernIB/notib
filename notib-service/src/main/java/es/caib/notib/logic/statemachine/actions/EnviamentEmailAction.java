@@ -1,5 +1,6 @@
 package es.caib.notib.logic.statemachine.actions;
 
+import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentNotificaRequest;
@@ -9,13 +10,13 @@ import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
+import org.springframework.context.ApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
+//@Component
 @RequiredArgsConstructor
 public class EnviamentEmailAction implements Action<EnviamentSmEstat, EnviamentSmEvent> {
 
@@ -23,8 +24,13 @@ public class EnviamentEmailAction implements Action<EnviamentSmEstat, EnviamentS
 //    private final EnviamentEmailMapper enviamentEmailMapper;
     private final EnviamentNotificaMapper enviamentNotificaMapper;
     private final JmsTemplate jmsTemplate;
+    private final ApplicationContext applicationContext;
+
+    // No es pot injectar degut a error cíclic
+    private EnviamentSmService enviamentSmService;
 
     @Override
+//    @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 30000, multiplier = 10, maxDelay = 3600000))
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
@@ -53,5 +59,22 @@ public class EnviamentEmailAction implements Action<EnviamentSmEstat, EnviamentS
                 });
 
         log.debug("[SM] Enviada petició d'avís per email per l'enviament amb UUID " + enviamentUuid);
+    }
+
+//    @Recover
+    public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
+        log.error("[SM] Recover EnviamentEmailAction", t);
+        var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
+        log.error("[SM] Recover EnviamentEmailAction de enviament amb uuid=" + enviamentUuid);
+
+        // TODO: Modificar enviament amb error...
+
+
+        // Enviar event d'error a la màquina d'estats
+//        if (enviamentSmService == null) {
+//            enviamentSmService = applicationContext.getBean(EnviamentSmServiceImpl.class);
+//        }
+//        enviamentSmService.emailFailed(enviamentUuid);
+
     }
 }

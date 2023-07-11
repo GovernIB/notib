@@ -207,7 +207,6 @@ public class NotificacioHelper {
 			// Rellenar dades enviament titular
 			var env = NotificacioEnviamentEntity.getBuilderV2(enviament, entitat.isAmbEntregaDeh(), serveiTipus, notificacioEntity, titular, destinataris, UUID.randomUUID().toString()).build();
 			nouEnviament = notificacioEnviamentRepository.saveAndFlush(env);
-			enviamentSmService.altaEnviament(nouEnviament.getNotificaReferencia());
 			enviamentsCreats.add(nouEnviament);
 			enviamentTableHelper.crearRegistre(nouEnviament);
 			auditHelper.auditaEnviament(nouEnviament, TipusOperacio.CREATE, "NotificacioHelper.altaEnviamentsWeb");
@@ -215,7 +214,7 @@ public class NotificacioHelper {
 		notificacioEntity.getEnviaments().addAll(enviamentsCreats);
 
 		// TODO SM
-		// notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.registreEnviament(e.getNotificaReferencia()));
+		// notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
 
 		// Comprovar on s'ha d'enviar ara
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {

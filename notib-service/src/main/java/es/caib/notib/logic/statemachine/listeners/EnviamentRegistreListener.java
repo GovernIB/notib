@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import java.util.Date;
+import java.util.concurrent.Semaphore;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,45 +37,61 @@ public class EnviamentRegistreListener {
     private final NotificacioTableHelper notificacioTableHelper;
     private final AuditHelper auditHelper;
 
+    private Semaphore semaphore = new Semaphore(5);
+
     @Transactional
     @JmsListener(destination = SmConstants.CUA_REGISTRE, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveEnviamentRegistre(@Payload EnviamentRegistreRequest enviamentRegistreRequest,
                                          @Headers MessageHeaders headers,
-                                         Message message) throws JMSException, RegistreNotificaException {
+                                         Message message) throws JMSException, RegistreNotificaException, InterruptedException {
         var enviamentUuid = enviamentRegistreRequest.getEnviamentUuid();
+        log.debug("[SM] Rebut enviament de registre <" + enviamentUuid + ">");
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentRegistreRequest.getEnviamentUuid()).orElseThrow();
         var notificacio = enviament.getNotificacio();
         var numIntent = enviamentRegistreRequest.getNumIntent();
-        log.debug("[SM] Rebut enviament de registre <" + enviament + ">");
 
-        // Registrar enviament
-        boolean registreSuccess = registreSmHelper.registrarEnviament(enviament, numIntent);
+        semaphore.acquire();
+        try {
+            // Registrar enviament
+            boolean registreSuccess = registreSmHelper.registrarEnviament(enviament, numIntent);
 
-        // Actualitzar notificació
-        if (notificacioEnviamentRepository.areEnviamentsNotificacioRegistrats(notificacio.getId())) {
-            var isSir = notificacio.isComunicacioSir();
-            notificacio.updateEstat(isSir ? NotificacioEstatEnumDto.ENVIADA : NotificacioEstatEnumDto.REGISTRADA);
+            // Actualitzar notificació
+            if (notificacioEnviamentRepository.areEnviamentsNotificacioRegistrats(notificacio.getId())) {
+                var isSir = notificacio.isComunicacioSir();
+                notificacio.updateEstat(isSir ? NotificacioEstatEnumDto.ENVIADA : NotificacioEstatEnumDto.REGISTRADA);
 
-            // És possible que el registre ja retorni estats finals al registrar SIR?
-            if (notificacio.getEnviaments().stream().allMatch(e -> e.isRegistreEstatFinal())) {
-                var nouEstat = NotificacioEstatEnumDto.FINALITZADA;
-                //Marcar com a processada si la notificació s'ha fet des de una aplicació
-                if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {
-                    nouEstat = NotificacioEstatEnumDto.PROCESSADA;
+                // És possible que el registre ja retorni estats finals al registrar SIR?
+                if (notificacio.getEnviaments().stream().allMatch(e -> e.isRegistreEstatFinal())) {
+                    var nouEstat = NotificacioEstatEnumDto.FINALITZADA;
+                    //Marcar com a processada si la notificació s'ha fet des de una aplicació
+                    if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {
+                        nouEstat = NotificacioEstatEnumDto.PROCESSADA;
+                    }
+                    notificacio.updateEstat(nouEstat);
+                    notificacio.updateMotiu(enviament.getRegistreEstat().name());
+                    notificacio.updateEstatDate(new Date());
                 }
-                notificacio.updateEstat(nouEstat);
-                notificacio.updateMotiu(enviament.getRegistreEstat().name());
-                notificacio.updateEstatDate(new Date());
+
+                notificacioTableHelper.actualitzarRegistre(notificacio);
+                auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "RegistreNotificaHelper.realitzarProcesRegistrar");
             }
 
-            notificacioTableHelper.actualitzarRegistre(notificacio);
-            auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "RegistreNotificaHelper.realitzarProcesRegistrar");
-        }
+//            TEST
+//            var registreSuccess = new Random().nextBoolean();
+//            if (registreSuccess) {
+//                enviament.setRegistreData(new Date());
+//                notificacioEnviamentRepository.save(enviament);
+//            }
 
-        if (registreSuccess) {
-            enviamentSmService.registreSuccess(enviamentUuid);
-        } else {
+            if (registreSuccess) {
+                enviamentSmService.registreSuccess(enviamentUuid);
+            } else {
+                enviamentSmService.registreFailed(enviamentUuid);
+            }
+        } catch (Exception ex) {
             enviamentSmService.registreFailed(enviamentUuid);
+        } finally {
+            semaphore.release();
         }
         message.acknowledge();
 

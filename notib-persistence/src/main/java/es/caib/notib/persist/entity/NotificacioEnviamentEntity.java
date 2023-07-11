@@ -21,22 +21,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PreRemove;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -57,7 +42,10 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Getter
 @Setter
 @Entity
-@Table(name="not_notificacio_env")
+@Table(name="not_notificacio_env",
+		uniqueConstraints = {
+				@UniqueConstraint(columnNames = "notifica_ref")
+		})
 @EntityListeners(AuditingEntityListener.class)
 public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
@@ -96,7 +84,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	protected ServeiTipusEnumDto serveiTipus;
 
 	/* Notifica informació */
-	@Column(name = "notifica_ref", length = 36)
+	@Column(name = "notifica_ref", length = 36, unique = true)
 	protected String notificaReferencia;
 	
 	@Column(name = "notifica_id", length = 20)

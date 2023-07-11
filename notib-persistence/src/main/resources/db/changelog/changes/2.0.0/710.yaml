@@ -310,16 +310,21 @@ databaseChangeLog:
             referencedTableName: not_sm_transition
             referencedColumnNames: id
 
+        - addUniqueConstraint:
+            tableName: not_notificacio_env
+            constraintName: not_enviament_ref_uk
+            columnNames: notifica_ref
+
         - renameColumn:
             tableName: not_columnes
             oldColumnName: created_date
             newColumnName: data_enviament
-        - addColumn:
-            tableName: not_notificacio_env
-            columns:
-              - column:
-                  name: sm_estat
-                  type: varchar(64 ${varcharunit})
+#        - addColumn:
+#            tableName: not_notificacio_env
+#            columns:
+#              - column:
+#                  name: sm_estat
+#                  type: varchar(64 ${varcharunit})
         - update:
             tableName: not_acl_class
             columns:

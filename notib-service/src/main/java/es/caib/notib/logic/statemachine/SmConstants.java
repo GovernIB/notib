@@ -31,7 +31,9 @@ public class SmConstants {
     public static final String CUA_NOTIFICA = "qu_notifica";
     public static final String CUA_EMAIL = "qu_email";
     public static final String CUA_CONSULTA_ESTAT = "qu_estat";
+    public static final String CUA_POOLING_ESTAT = "qu_pool_estat";
     public static final String CUA_CONSULTA_SIR = "qu_sir";
+    public static final String CUA_POOLING_SIR = "qu_pool_sir";
 
     // Delay
     // 1er reintent 30min, 2on reintet 8h, successius 24h

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
+import java.util.concurrent.Semaphore;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,23 +28,34 @@ public class ConsultaNotificaListener {
     private final NotificacioEnviamentRepository notificacioEnviamentRepository;
     private final NotificacioService notificacioService;
 
+    private Semaphore semaphore = new Semaphore(5);
+
     @Transactional
     @JmsListener(destination = SmConstants.CUA_CONSULTA_ESTAT, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveEnviamentRegistre(@Payload ConsultaNotificaRequest consultaNotificaRequest,
                                          @Headers MessageHeaders headers,
-                                         Message message) throws JMSException {
+                                         Message message) throws JMSException, InterruptedException {
         var enviament = consultaNotificaRequest.getConsultaNotificaDto();
         log.debug("[SM] Rebut consulta estat a notifica <" + enviament + ">");
 
-        // Consultar enviament a notifica
-        notificacioService.enviamentRefrescarEstat(enviament.getId());
-        var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElseThrow();
-        boolean consultaSuccess = enviamentEntity.getNotificaIntentNum() == 0;
+        semaphore.acquire();
+        try {
+            // Consultar enviament a notifica
+            notificacioService.enviamentRefrescarEstat(enviament.getId());
+            var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElseThrow();
+            boolean consultaSuccess = enviamentEntity.getNotificaIntentNum() == 0;
+//            TEST
+//            var consultaSuccess = new Random().nextBoolean();
 
-        if (consultaSuccess) {
-            enviamentSmService.consultaSuccess(enviament.getUuid());
-        } else {
+            if (consultaSuccess) {
+                enviamentSmService.consultaSuccess(enviament.getUuid());
+            } else {
+                enviamentSmService.consultaFailed(enviament.getUuid());
+            }
+        } catch (Exception ex) {
             enviamentSmService.consultaFailed(enviament.getUuid());
+        } finally {
+            semaphore.release();
         }
         message.acknowledge();
 
