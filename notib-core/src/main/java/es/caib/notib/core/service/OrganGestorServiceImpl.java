@@ -578,6 +578,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					entitat.getDir3Codi(),
 					entitat.getDataActualitzacio(),
 					entitat.getDataSincronitzacio());
+
+			Map<String, List<NodeDir3>> mapVersionsUnitats = getMapVersionsUnitats(unitatsWs);
+
 			log.debug(prefix + "nombre d'unitats obtingutdes: " + unitatsWs.size());
 			progres.setProgres(2);
 			Long tf = System.currentTimeMillis();
@@ -708,6 +711,28 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		}
 
 		return new ArrayList[]{(ArrayList) obsoleteUnitats, (ArrayList) organsDividits, (ArrayList) organsFusionats, (ArrayList) organsSubstituits};
+	}
+
+	private Map<String, List<NodeDir3>> getMapVersionsUnitats(List<NodeDir3> unitatsWs) {
+		Map<String, List<NodeDir3>> unitats = new HashMap<>();
+		for (NodeDir3 unitat: unitatsWs) {
+			if (!unitats.containsKey(unitat.getCodi())) {
+				unitats.put(unitat.getCodi(), new ArrayList<NodeDir3>());
+			}
+			unitats.get(unitat.getCodi()).add(unitat);
+		}
+		for (Map.Entry<String, List<NodeDir3>> entry: unitats.entrySet()) {
+			Collections.sort(entry.getValue(), new Comparator<NodeDir3>() {
+				@Override
+				public int compare(NodeDir3 o1, NodeDir3 o2) {
+					if (o1.getVersio() == null) {
+						return -1;
+					}
+					return o1.getVersio().compareTo(o2.getVersio());
+				}
+			});
+		}
+		return unitats;
 	}
 
 	@SuppressWarnings({"deprecation", "unchecked"})
