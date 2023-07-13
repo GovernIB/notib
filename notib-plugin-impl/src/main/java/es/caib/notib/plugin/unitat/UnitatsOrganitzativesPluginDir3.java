@@ -142,6 +142,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 					(dataActualitzacio != null ? "&fechaActualizacion=" + sdf.format(dataActualitzacio) : "") +
 					(dataSincronitzacio != null ? "&fechaSincronizacion=" + sdf.format(dataSincronitzacio) : ""));
 			byte[] response = getResponse(url);
+//			response = getJson().getBytes();
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			if (response != null && response.length > 0) {
@@ -159,6 +160,11 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 					+ "pareCodi=" + pareCodi + ")", ex);
 		}
 	}
+
+//	private String getJson() throws IOException {
+//        byte[] encoded = Files.readAllBytes(Paths.get(""));
+//        return new String(encoded, StandardCharsets.UTF_8);
+//    }
 
 	@Override
 	public NodeDir3 findAmbCodi(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {

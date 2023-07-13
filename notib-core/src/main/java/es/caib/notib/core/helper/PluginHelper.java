@@ -80,6 +80,7 @@ import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -104,13 +105,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -1051,6 +1052,7 @@ public class PluginHelper {
 			configHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
 			List<NodeDir3> unitatsOrganitzatives = getUnitatsOrganitzativesPlugin().findAmbPare(pareCodi, dataActualitzacio, dataSincronitzacio);
+			removeUnitatsSubstitutedByItself(unitatsOrganitzatives);
 			if (unitatsOrganitzatives == null || unitatsOrganitzatives.isEmpty()) {
 				String errorMissatge = messageManager.getMessage("organgestor.actualitzacio.sense.canvis");
 				info.addParam("Resultat", "No s'han obtingut canvis.");
@@ -1067,6 +1069,29 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
 	}
+
+	/**
+	 * Remove from list unitats that are substituted by itself
+	 * for example if webservice returns two elements:
+	 *
+	 * UnitatOrganitzativa(codi=A00000010, estat=E, historicosUO=[A00000010])
+	 * UnitatOrganitzativa(codi=A00000010, estat=V, historicosUO=null)
+	 *
+	 * then remove the first one.
+	 * That way this transition can be treated by application the same way as transition CANVI EN ATRIBUTS
+	 */
+	private void removeUnitatsSubstitutedByItself(List<NodeDir3> unitatsOrganitzatives) {
+		if (CollectionUtils.isNotEmpty(unitatsOrganitzatives)) {
+			Iterator<NodeDir3> i = unitatsOrganitzatives.iterator();
+			while (i.hasNext()) {
+				NodeDir3 unitatOrganitzativa = i.next();
+				if (CollectionUtils.isNotEmpty(unitatOrganitzativa.getHistoricosUO()) && unitatOrganitzativa.getHistoricosUO().size() == 1 && unitatOrganitzativa.getHistoricosUO().get(0).equals(unitatOrganitzativa.getCodi())) {
+					i.remove();
+				}
+			}
+		}
+	}
+
 
 	public List<ObjetoDirectorio> llistarOrganismesPerEntitat(String entitatcodi) throws SistemaExternException {
 		
