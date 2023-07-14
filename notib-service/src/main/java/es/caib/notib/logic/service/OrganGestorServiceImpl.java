@@ -700,7 +700,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 			// Obtenir el llistat d'unitats que son totalment noves (no existeixen en BBDD): Creació
 			// ====================  NOUS ===================
-			List<UnitatOrganitzativaDto> unitatsNew = getNewFromWS(entitat, unitatsWS, mapVersionsUnitats, organsVigents);
+			List<UnitatOrganitzativaDto> unitatsNew = getNewFromWS(mapVersionsUnitats, splitMap, substMap, mergeMap);
 			return PrediccioSincronitzacio.builder().unitatsVigents(unitatsVigents).unitatsNew(unitatsNew).unitatsExtingides(unitatsExtingides).splitMap(splitMap)
 					.substMap(substMap).mergeMap(mergeMap).build();
 
@@ -840,7 +840,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	}
 
 	// Obtenir unitats organitzatives noves (No provenen de cap transició d'una altre unitat)
-	private List<UnitatOrganitzativaDto> getNewFromWS(Map<String, List<NodeDir3>> unitats, MultiMap splitMap,  MultiMap substMap, MultiMap mergeMap){
+	private List<UnitatOrganitzativaDto> getNewFromWS(Map<String, List<NodeDir3>> unitats, MultiValuedMap splitMap,  MultiValuedMap substMap, MultiValuedMap mergeMap){
 
 //		// converting from UnitatOrganitzativa to UnitatOrganitzativaDto
 		List<UnitatOrganitzativaDto> newUnitatsDto = new ArrayList<>();
@@ -862,7 +862,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		return newUnitatsDto;
 	}
 
-	private boolean contains(String key, MultiMap map) {
+	private boolean contains(String key, MultiValuedMap map) {
 
 		Set<UnitatOrganitzativaDto> keys = map.keySet();
 		for (UnitatOrganitzativaDto u : keys) {
