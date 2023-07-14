@@ -307,6 +307,10 @@ public class OrganGestorHelper {
 		for (NodeDir3 unitatWS : unitatsWs) {
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.historic", new Object[] {unitatWS.getCodi() + " - " + unitatWS.getDenominacio()}));
 			OrganGestorEntity unitat = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodi());
+			if (unitat == null) {
+				log.info("Unitat amb codi " + unitatWS.getCodi() + " no trobada a la bdd per l'entitat " + entitat.getCodi());
+				continue;
+			}
 			sincronizarHistoricsUnitat(unitat, unitatWS, entitat);
 			progres.setProgres(12 + (nombreUnitatsProcessades++ * 10 / nombreUnitatsTotal));
 			if (unitat != null && !OrganGestorEstatEnum.V.equals(unitat.getEstat())) {

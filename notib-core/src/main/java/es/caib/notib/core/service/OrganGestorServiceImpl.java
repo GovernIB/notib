@@ -765,7 +765,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 //			}
 
 			// Obtenir unitats actualment vigents en BBDD, però marcades com a obsoletes en la sincronització
-			List<UnitatOrganitzativaDto> unitatsVigentObsoleteDto = getObsoletesFromWS(entitat, unitatsWS, mapVersionsUnitats, organsVigents);
+			List<UnitatOrganitzativaDto> unitatsVigentObsoleteDto = getObsoletesFromWS(unitatsWS, mapVersionsUnitats);
 			List<UnitatOrganitzativaDto> unitatsExtingides = new ArrayList<>();
 
 			// Distinció entre divisió i (substitució o fusió)
@@ -840,7 +840,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 			// Obtenir el llistat d'unitats que son totalment noves (no existeixen en BBDD): Creació
 			// ====================  NOUS ===================
-			List<UnitatOrganitzativaDto> unitatsNew = getNewFromWS(entitat, unitatsWS, mapVersionsUnitats, organsVigents);
+			List<UnitatOrganitzativaDto> unitatsNew = getNewFromWS(mapVersionsUnitats, splitMap, substMap, mergeMap);
 
 			return PrediccioSincronitzacio.builder()
 					.unitatsVigents(unitatsVigents)
@@ -937,7 +937,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		}
 	}
 
-	private List<UnitatOrganitzativaDto> getObsoletesFromWS(EntitatEntity entitat, List<NodeDir3> unitatsWS, Map<String,List<NodeDir3>> unitats, List<OrganGestorEntity> organsVigents) {
+	private List<UnitatOrganitzativaDto> getObsoletesFromWS(List<NodeDir3> unitatsWS, Map<String,List<NodeDir3>> unitats) {
 
 		List<UnitatOrganitzativaDto> extingides = new ArrayList<>();
 		List<NodeDir3> nodes;
@@ -951,41 +951,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			}
 		}
 		return extingides;
-
-//		// Llista d'òrgans obsolets des del servei web, que eren vignets a la última sincronització (vigent a BBDD i obsolet al servei web)
-//		// No obtenim la llista d'òrgans obsolets directament de BBDD degut a que hi pot haver canvis acumulats:
-//		// si a la darrere sincrocització la unitat A cavia a B, i després a C, llavors en la BBDD tindrem A(vigent) però des del servei web tindrem: A(Extingit) -> B(Extingit) -> C(Vigent)
-//		// Només volem retornar A (no volem B) perquè la predicció ha de mostrar la transició (A -> C) [entre A (vigent a BBDD) i C (vigent al servei web)]
-//		List<NodeDir3> organsVigentObsolete = new ArrayList<>();
-//		for (OrganGestorEntity organVigent : organsVigents) {
-//			for (NodeDir3 unitatWS : unitatsWS) {
-//				if (organVigent.getCodi().equals(unitatWS.getCodi()) && !unitatWS.getEstat().equals("V")
-//						&& !organVigent.getCodi().equals(entitat.getDir3Codi())) {
-//					organsVigentObsolete.add(unitatWS);
-//				}
-//			}
-//		}
-//		log.debug("Consulta unitats obsolete ");
-//		for (NodeDir3 vigentObsolete : organsVigentObsolete) {
-//			log.debug(vigentObsolete.getCodi()+" "+vigentObsolete.getEstat()+" "+vigentObsolete.getHistoricosUO());
-//		}
-//		for (NodeDir3 vigentObsolete : organsVigentObsolete) {
-//
-//			// Fer que un òrgan obsolet apunti a l'últim òrgan/s al que ha fet la transició
-//			// El nom del camp historicosUO és totalment erroni, ja que el camp mostra unitats futures, no històric. Però així és com s'anomena al servei web, i no ho podem canviar.
-//			// El camp lastHistoricosUnitats hauria d'apuntar a la darrera unitat a la que ha fet la trasició. Necessitem trobar la darrera unitat de forma recursiva, perquè és possible que hi hagi canvis acumulats:
-//			// Si la darrera sincronització de la unitat A canvia a B, i després a C, des del servei web tindrés la unitat A apuntant a B (A -> B) i la unitat B apuntant a C (B -> C)
-//			// El que volem és afegir un punter directe des de la unitat A a la unitat C (A -> C)
-//			vigentObsolete.setLastHistoricosUnitats(getLastHistoricos(vigentObsolete, unitatsWS));
-//		}
-//		// converting from UnitatOrganitzativa to UnitatOrganitzativaDto
-//		List<UnitatOrganitzativaDto> unitatsVigentObsoleteDto = new ArrayList<>();
-//		for(NodeDir3 vigentObsolete : organsVigentObsolete){
-//			unitatsVigentObsoleteDto.add(conversioTipusHelper.convertir(
-//					vigentObsolete,
-//					UnitatOrganitzativaDto.class));
-//		}
-//		return unitatsVigentObsoleteDto;
 	}
 
 	// Obtenir unitats que no fan cap transició a cap altre unitat, però a la que se'ls canvia alguna propietat
@@ -1022,71 +987,38 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	}
 
 	// Obtenir unitats organitzatives noves (No provenen de cap transició d'una altre unitat)
-	private List<UnitatOrganitzativaDto> getNewFromWS(EntitatEntity entitat, List<NodeDir3> unitatsWS, Map<String, List<NodeDir3>> unitats, List<OrganGestorEntity> organsVigents){
-
-//		//List of new unitats that are vigent
-//		List<NodeDir3> vigentUnitatsWS = new ArrayList<>();
-//		//List of new unitats that are vigent and does not exist in database
-//		List<NodeDir3> vigentNotInDBUnitatsWS = new ArrayList<>();
-//		//List of new unitats (that are vigent, not pointed by any obsolete unitat and does not exist in database)
-//		List<NodeDir3> newUnitatsWS = new ArrayList<>();
-//		//Filtering to only obtain vigents
-//		for (NodeDir3 unitatWS : unitatsWS) {
-//			if (unitatWS.getEstat().equals("V") && !unitatWS.getCodi().equals(entitat.getDir3Codi())) {
-//				vigentUnitatsWS.add(unitatWS);
-//			}
-//		}
-//		// Filtering to only obtain vigents that does not already exist in database
-//		for (NodeDir3 vigentUnitat : vigentUnitatsWS) {
-//			boolean found = false;
-//			for (OrganGestorEntity vigentUnitatDB : organsVigents) {
-//				if (vigentUnitatDB.getCodi().equals(vigentUnitat.getCodi())) {
-//					found = true;
-//					break;
-//				}
-//			}
-//			if (found == false) {
-//				vigentNotInDBUnitatsWS.add(vigentUnitat);
-//			}
-//		}
-//		// Filtering to obtain unitats that are vigent, not pointed by any obsolete unitat and does not already exist in database
-//		for (NodeDir3 vigentNotInDBUnitatWS : vigentNotInDBUnitatsWS) {
-//			boolean pointed = false;
-//			for (NodeDir3 unitatWS : unitatsWS) {
-//				if(unitatWS.getHistoricosUO()!=null){
-//					for(String novaCodi: unitatWS.getHistoricosUO()){
-//						if(novaCodi.equals(vigentNotInDBUnitatWS.getCodi())){
-//							pointed = true;
-//							break;
-//						}
-//					}
-//				}
-//				if (pointed) break;
-//			}
-//			if (pointed == false) {
-//				newUnitatsWS.add(vigentNotInDBUnitatWS);
-//			}
-//		}
-//		// converting from UnitatOrganitzativa to UnitatOrganitzativaDto
-//		List<UnitatOrganitzativaDto> newUnitatsDto = new ArrayList<>();
-//		for (NodeDir3 vigent : newUnitatsWS){
-//			newUnitatsDto.add(conversioTipusHelper.convertir(
-//					vigent,
-//					UnitatOrganitzativaDto.class));
-//		}
+	private List<UnitatOrganitzativaDto> getNewFromWS(Map<String, List<NodeDir3>> unitats, MultiMap splitMap,  MultiMap substMap, MultiMap mergeMap){
 
 //		// converting from UnitatOrganitzativa to UnitatOrganitzativaDto
 		List<UnitatOrganitzativaDto> newUnitatsDto = new ArrayList<>();
 		List<NodeDir3> nodes;
 		NodeDir3 node;
+		boolean inMaps;
+		UnitatOrganitzativaDto unitat;
 		for (Map.Entry<String, List<NodeDir3>> entry : unitats.entrySet()){
 			nodes = entry.getValue();
 			node = nodes.get(nodes.size()-1);
-			if (organGestorRepository.findByCodi(entry.getKey()) == null && "V".equals(node.getEstat())) {
-				newUnitatsDto.add(conversioTipusHelper.convertir(node, UnitatOrganitzativaDto.class));
+			if (organGestorRepository.findByCodi(entry.getKey()) != null || "E".equals(node.getEstat())) {
+				continue;
 			}
+			unitat = conversioTipusHelper.convertir(node, UnitatOrganitzativaDto.class);
+			if(contains(entry.getKey(), splitMap) || contains(entry.getKey(), substMap) || contains(entry.getKey(), mergeMap)) {
+				continue;
+			}
+			newUnitatsDto.add(unitat);
 		}
 		return newUnitatsDto;
+	}
+
+	private boolean contains(String key, MultiMap map) {
+
+		Set<UnitatOrganitzativaDto> keys = map.keySet();
+		for (UnitatOrganitzativaDto u : keys) {
+			if (key.equals(u.getCodi())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	// Retorna la/les unitat/s a la que un organ obsolet ha fet la transició
