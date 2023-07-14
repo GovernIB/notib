@@ -30,6 +30,8 @@ public class NodeDir3 implements Serializable, Comparable<NodeDir3> {
 	@NonNull
 	@JsonProperty("codigo")
 	private String codi;
+	@JsonProperty("version")
+	private Integer versio;
 	@NonNull
 	@JsonProperty("denominacion")
 	private String denominacio;

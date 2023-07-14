@@ -18,4 +18,5 @@ import java.io.Serializable;
 public class UnitatOrganitzativa extends UnidadTF implements Serializable {
 
     private String denominacionCooficial;
+    private Integer version;
 }

@@ -192,6 +192,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	private NodeDir3 toNodeDir3(UnitatOrganitzativa unidadTF) {
 		return NodeDir3.builder()
 				.codi(unidadTF.getCodigo())
+				.versio(unidadTF.getVersion())
 				.denominacio(unidadTF.getDenominacion())
 				.denominacionCooficial(unidadTF.getDenominacionCooficial())
 				.estat(unidadTF.getCodigoEstadoEntidad())
