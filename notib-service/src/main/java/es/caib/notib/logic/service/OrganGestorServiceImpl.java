@@ -61,6 +61,7 @@ import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.collections4.MultiMap;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -839,19 +840,37 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	}
 
 	// Obtenir unitats organitzatives noves (No provenen de cap transició d'una altre unitat)
-	private List<UnitatOrganitzativaDto> getNewFromWS(EntitatEntity entitat, List<NodeDir3> unitatsWS, Map<String, List<NodeDir3>> unitats, List<OrganGestorEntity> organsVigents){
+	private List<UnitatOrganitzativaDto> getNewFromWS(Map<String, List<NodeDir3>> unitats, MultiMap splitMap,  MultiMap substMap, MultiMap mergeMap){
 
+//		// converting from UnitatOrganitzativa to UnitatOrganitzativaDto
 		List<UnitatOrganitzativaDto> newUnitatsDto = new ArrayList<>();
 		List<NodeDir3> nodes;
 		NodeDir3 node;
+		UnitatOrganitzativaDto unitat;
 		for (Map.Entry<String, List<NodeDir3>> entry : unitats.entrySet()){
 			nodes = entry.getValue();
 			node = nodes.get(nodes.size()-1);
-			if (organGestorRepository.findByCodi(entry.getKey()) == null && "V".equals(node.getEstat())) {
-				newUnitatsDto.add(conversioTipusHelper.convertir(node, UnitatOrganitzativaDto.class));
+			if (organGestorRepository.findByCodi(entry.getKey()) != null || "E".equals(node.getEstat())) {
+				continue;
 			}
+			unitat = conversioTipusHelper.convertir(node, UnitatOrganitzativaDto.class);
+			if(contains(entry.getKey(), splitMap) || contains(entry.getKey(), substMap) || contains(entry.getKey(), mergeMap)) {
+				continue;
+			}
+			newUnitatsDto.add(unitat);
 		}
 		return newUnitatsDto;
+	}
+
+	private boolean contains(String key, MultiMap map) {
+
+		Set<UnitatOrganitzativaDto> keys = map.keySet();
+		for (UnitatOrganitzativaDto u : keys) {
+			if (key.equals(u.getCodi())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	// Retorna la/les unitat/s a la que un organ obsolet ha fet la transició
