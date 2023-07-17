@@ -1,6 +1,7 @@
 package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.IdentificadorTextDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
@@ -9,6 +10,7 @@ import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.PrediccioSincronitzacio;
+import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.OperadorPostalService;
 import es.caib.notib.core.api.service.OrganGestorService;
@@ -34,7 +36,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,6 +107,22 @@ public class OrganGestorController extends BaseUserController{
 			MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
 		}
 		return DatatablesHelper.getDatatableResponse(request, organs, "codi");
+	}
+
+	@RequestMapping(value = "/export", method = RequestMethod.GET)
+	public String export(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		try {
+			FitxerDto fitxer = organGestorService.exportacio(entitatActual.getId());
+			writeFileToResponse(
+					fitxer.getNom(),
+					fitxer.getContingut(),
+					response);
+		} catch (NotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	@RequestMapping(method = RequestMethod.POST)

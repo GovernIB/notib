@@ -10,6 +10,7 @@ import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.xml.bind.ValidationException;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -238,4 +239,7 @@ public interface OrganGestorService {
 	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper, Object integracioHelper);
 
 	void sincronitzarOrganNomMultidioma(List<Long> idEntitat);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+    FitxerDto exportacio(Long entitatId) throws IOException;
 }

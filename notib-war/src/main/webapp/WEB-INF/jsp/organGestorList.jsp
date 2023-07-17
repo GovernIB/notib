@@ -240,6 +240,9 @@
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right">
+			<a id="organ-boto-export" class="btn btn-default" href="organgestor/export" title='<spring:message code="comu.boto.exportar"/>'>
+					<span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar"/>
+			</a>
 			<c:if test="${setOficina}">
 			<a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines/LLISTA"  onClick="bloquejar()"
 					title='<spring:message code="organgestor.list.boto.actualitzar.oficines.tooltip"/>'>

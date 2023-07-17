@@ -6,6 +6,7 @@ package es.caib.notib.core.ejb;
 import es.caib.notib.core.api.dto.Arbre;
 import es.caib.notib.core.api.dto.CodiValorEstatDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -28,6 +29,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 import javax.xml.bind.ValidationException;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -279,7 +281,13 @@ public class OrganGestorServiceBean implements OrganGestorService {
 		delegate.sincronitzarOrganNomMultidioma(ids);
 	}
 
-	@Override
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+    public FitxerDto exportacio(Long entitatId) throws IOException {
+        return delegate.exportacio(entitatId);
+    }
+
+    @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public OrganGestorDto update(OrganGestorDto dto) {
 		return delegate.update(dto);

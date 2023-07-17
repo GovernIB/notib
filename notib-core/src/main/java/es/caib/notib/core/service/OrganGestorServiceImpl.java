@@ -9,6 +9,7 @@ import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.CodiValorEstatDto;
 import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.LlibreDto;
@@ -77,9 +78,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.supercsv.io.CsvListWriter;
+import org.supercsv.io.ICsvListWriter;
+import org.supercsv.prefs.CsvPreference;
 
 import javax.annotation.Resource;
 import javax.xml.bind.ValidationException;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1971,4 +1977,62 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			log.error("Error sincronitzant els noms dels òrgans gestors", ex);
 		}
  	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public FitxerDto exportacio(Long entitatId) throws IOException {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		StringWriter writer = new StringWriter();
+		ICsvListWriter listWriter = new CsvListWriter(writer, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
+
+		try {
+			log.debug("Exportant informació dels Òrgans Gestors");
+
+			EntitatEntity entitatEntity = entitatRepository.findOne(entitatId);
+			entityComprovarHelper.comprovarPermisos(null, true, true, false);
+
+			List<OrganGestorEntity> organs = organGestorRepository.findByEntitat(entitatEntity);
+
+			// Genera les columnes
+			int numColumnes = 8;
+			String[] columnes = new String[numColumnes];
+			columnes[0] = "Codi";
+			columnes[1] = "Nom";
+			columnes[2] = "Nom ES";
+			columnes[3] = "Estat";
+			columnes[4] = "Codi pare";
+			columnes[5] = "Llibre";
+			columnes[6] = "Oficina SIR";
+			columnes[7] = "Entrega Cie";
+
+			listWriter.writeHeader(columnes);
+
+			for (OrganGestorEntity organ : organs) {
+				String[] fila = new String[numColumnes];
+				fila[0] = organ.getCodi();
+				fila[1] = organ.getNom();
+				fila[2] = organ.getNomEs();
+				fila[3] = organ.getEstat().name();
+				fila[4] = organ.getCodiPare();
+				fila[5] = organ.getLlibreNom();
+				fila[6] = organ.getOficina() != null ? organ.getOficina() + " - " + organ.getOficinaNom() : null;
+				fila[7] = organ.getEntregaCie() != null ? "SI" : "NO";
+				listWriter.write(fila);
+			}
+			listWriter.flush();
+
+			FitxerDto fitxer = new FitxerDto();
+			fitxer.setNom("organs.csv");
+			fitxer.setContentType("text/csv");
+			fitxer.setContingut(writer.toString().getBytes());
+
+			return fitxer;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+			if (listWriter != null) {
+				listWriter.close();
+			}
+		}
+	}
+
 }
