@@ -5,7 +5,6 @@ import es.caib.notib.client.domini.DocumentV2;
 import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
@@ -14,6 +13,7 @@ import es.caib.notib.logic.intf.dto.RegistreIdDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.exception.NoDocumentException;
 import es.caib.notib.logic.intf.exception.NoMetadadesException;
 import es.caib.notib.logic.intf.exception.NotFoundException;
@@ -220,7 +220,7 @@ public class NotificacioHelper {
 		}
 		return notificacioEntity;
 	}
-	public NotificacioEntity saveNotificacio(EntitatEntity entitat, NotificacioV2 notificacio, boolean checkProcedimentPermissions, NotificacioMassivaEntity notificacioMassivaEntity, Map<String, Long> documentsProcessatsMassiu) {
+	public NotificacioEntity saveNotificacio(EntitatEntity entitat, Notificacio notificacio, boolean checkProcedimentPermissions, NotificacioMassivaEntity notificacioMassivaEntity, Map<String, Long> documentsProcessatsMassiu) {
 
 		var notData = buildNotificacioData(entitat, notificacio, checkProcedimentPermissions, notificacioMassivaEntity, documentsProcessatsMassiu);
 		// Dades generals de la notificació
@@ -261,11 +261,11 @@ public class NotificacioHelper {
 		return notificacio;
 	}
 
-	public NotificacioData buildNotificacioData(EntitatEntity entitat, NotificacioV2 notificacio, boolean checkProcedimentPermissions) {
+	public NotificacioData buildNotificacioData(EntitatEntity entitat, Notificacio notificacio, boolean checkProcedimentPermissions) {
 		return buildNotificacioData(entitat, notificacio, checkProcedimentPermissions, null, null);
 	}
 
-	public NotificacioData buildNotificacioData(EntitatEntity entitat, NotificacioV2 notificacio, boolean checkProcedimentPermissions, NotificacioMassivaEntity notificacioMassivaEntity, Map<String, Long> documentsProcessatsMassiu) {
+	public NotificacioData buildNotificacioData(EntitatEntity entitat, Notificacio notificacio, boolean checkProcedimentPermissions, NotificacioMassivaEntity notificacioMassivaEntity, Map<String, Long> documentsProcessatsMassiu) {
 
 		log.debug("Construint les dades d'una notificació");
 		GrupEntity grupNotificacio = null;
@@ -326,7 +326,7 @@ public class NotificacioHelper {
 				.notificacioMassivaEntity(notificacioMassivaEntity).build();
 	}
 
-	private boolean isAllEnviamentsAAdministracio(NotificacioV2 notificacio) {
+	private boolean isAllEnviamentsAAdministracio(Notificacio notificacio) {
 
 		for(var enviament : notificacio.getEnviaments()) {
 			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
@@ -527,7 +527,7 @@ public class NotificacioHelper {
 	@Builder
 	public static class NotificacioData {
 
-		private NotificacioV2 notificacio;
+		private Notificacio notificacio;
 		private EntitatEntity entitat;
 		private GrupEntity grupNotificacio;
 		private OrganGestorEntity organGestor;

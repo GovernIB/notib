@@ -10,13 +10,13 @@ import es.caib.notib.back.validation.ValidPersonaValidator;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -153,9 +153,9 @@ public class NotificacioCommand {
 		}
 		return command;
 	}
-	public NotificacioV2 asNotificacioV2() {
+	public Notificacio asNotificacioV2() {
 
-		var dto = ConversioTipusHelper.convertir(this, NotificacioV2.class);
+		var dto = ConversioTipusHelper.convertir(this, Notificacio.class);
 //		ProcSerDto procedimentDto = new ProcSerDto();
 //		if ("PROCEDIMENT".equals(tipusProcSer)) {
 ////		if (procedimentId != null) {

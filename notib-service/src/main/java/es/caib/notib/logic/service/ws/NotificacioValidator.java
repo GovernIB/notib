@@ -5,7 +5,7 @@ import es.caib.notib.client.domini.DocumentV2;
 import es.caib.notib.client.domini.EntregaPostal;
 import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentTipus;
-import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.client.domini.Persona;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.CacheHelper;
@@ -60,7 +60,7 @@ public class NotificacioValidator implements Validator {
     private final ConfigHelper configHelper;
 
     @Setter
-    private NotificacioV2 notificacio;
+    private Notificacio notificacio;
     @Setter
     private EntitatEntity entitat;
     @Setter
@@ -76,12 +76,12 @@ public class NotificacioValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return NotificacioV2.class.equals(clazz);
+        return Notificacio.class.equals(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        NotificacioV2 notificacio = (NotificacioV2) target;
+        Notificacio notificacio = (Notificacio) target;
 
     }
 
@@ -393,6 +393,7 @@ public class NotificacioValidator implements Validator {
         if (Strings.isNullOrEmpty(document.getContingutBase64())) {
             return;
         }
+        // registreNotificaHelper.isSendDocumentsActive()
         if (dto.getOrigen() == null) {
             errors.rejectValue(doc + ".origen", error(DOCUMENT_METADADES_ORIGEN_NULL, l, prefix));
         }

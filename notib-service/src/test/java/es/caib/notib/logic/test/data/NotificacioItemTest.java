@@ -6,9 +6,9 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.ServeiTipus;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.test.AuthenticationTest;
@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.List;
 
 @Component
-public class NotificacioItemTest extends DatabaseItemTest<NotificacioV2>{
+public class NotificacioItemTest extends DatabaseItemTest<Notificacio>{
 
     @Autowired
     protected NotificacioService notificacioService;
@@ -41,12 +41,12 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioV2>{
     private String[] relatedFields = new String[]{ "procediment" };
 
     @Override
-    public NotificacioV2 create(Object element, Long entitatId) throws Exception{
-        return notificacioService.create(entitatId, (NotificacioV2) element);
+    public Notificacio create(Object element, Long entitatId) throws Exception{
+        return notificacioService.create(entitatId, (Notificacio) element);
     }
 
     @Override
-    public void delete(Long entitatId, NotificacioV2 object) {
+    public void delete(Long entitatId, Notificacio object) {
 
         authenticationTest.autenticarUsuari("admin");
         notificacioService.delete(entitatId, object.getId());
@@ -64,7 +64,7 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioV2>{
         }
     }
 
-    public static NotificacioV2 getRandomInstanceWithoutEnviaments() {
+    public static Notificacio getRandomInstanceWithoutEnviaments() {
 
         String notificacioId = Long.toString(System.currentTimeMillis());
         DocumentV2 document = new DocumentV2();
@@ -82,7 +82,7 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioV2>{
 
         Date caducitat = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
         Date enviamentDataProgramada = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
-        NotificacioV2 notCreated = NotificacioV2.builder()
+        Notificacio notCreated = Notificacio.builder()
                 .emisorDir3Codi(ConfigTest.ENTITAT_DGTIC_DIR3CODI)
                 .enviamentTipus(EnviamentTipus.NOTIFICACIO)
                 .enviamentDataProgramada(enviamentDataProgramada)
@@ -106,13 +106,13 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioV2>{
         return notCreated;
     }
 
-    public static NotificacioV2 getRandomInstance() {
+    public static Notificacio getRandomInstance() {
         return getRandomInstance(2);
     }
 
-    public static NotificacioV2 getRandomInstance(int numEnviaments) {
+    public static Notificacio getRandomInstance(int numEnviaments) {
 
-        NotificacioV2 notCreated = getRandomInstanceWithoutEnviaments();
+        Notificacio notCreated = getRandomInstanceWithoutEnviaments();
         List<Enviament> enviaments = new ArrayList<>();
         for (int i = 0; i < numEnviaments; i++) {
             Enviament enviament = getRandomEnviament(i);

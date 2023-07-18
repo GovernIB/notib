@@ -3,14 +3,12 @@ package es.caib.notib.logic.service;
 import es.caib.notib.client.domini.EntregaPostal;
 import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
-import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.logic.intf.dto.TipusEnumDto;
-import es.caib.notib.logic.intf.dto.cie.EntregaPostalDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.NotificacioService;
@@ -20,10 +18,8 @@ import es.caib.notib.logic.test.data.EntitatItemTest;
 import es.caib.notib.logic.test.data.NotificacioItemTest;
 import es.caib.notib.logic.test.data.ProcedimentItemTest;
 import es.caib.notib.persist.entity.EntitatEntity;
-import es.caib.notib.persist.entity.EnviamentTableEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
-import es.caib.notib.persist.entity.NotificacioTableEntity;
 import es.caib.notib.persist.entity.cie.EntregaPostalEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.EnviamentTableRepository;
@@ -254,8 +250,8 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 
 		configureMockGestioDocumentalPlugin();
 		var entitatCreate = database.entitat;
-		var notificacioCreate = (NotificacioV2) database.get("notificacio");
-		var notificacioEdicio = (NotificacioV2) SerializationUtils.clone(notificacioCreate);
+		var notificacioCreate = (Notificacio) database.get("notificacio");
+		var notificacioEdicio = (Notificacio) SerializationUtils.clone(notificacioCreate);
 		notificacioEdicio.setNumExpedient("FFF000");
 		notificacioEdicio.setConcepte("concepte edicio");
 		notificacioEdicio.setRetard(2);
@@ -274,8 +270,8 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 
 		// Given
 		var entitatCreate = database.entitat;
-		var notificacioDto = (NotificacioV2) database.get("notificacioCIE");
-		var notificacioEdicio = (NotificacioV2) SerializationUtils.clone(notificacioDto);
+		var notificacioDto = (Notificacio) database.get("notificacioCIE");
+		var notificacioEdicio = (Notificacio) SerializationUtils.clone(notificacioDto);
 		notificacioEdicio.setNumExpedient("FFF000");
 		notificacioEdicio.setConcepte("concepte edicio");
 		notificacioEdicio.setRetard(2);
@@ -304,8 +300,8 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 
 		// Given
 		var entitatCreate = database.entitat;
-		var notificacioDto = (NotificacioV2) database.get("notificacioCIEAmbEntregaPostal");
-		var notificacioEdicio = (NotificacioV2) SerializationUtils.clone(notificacioDto);
+		var notificacioDto = (Notificacio) database.get("notificacioCIEAmbEntregaPostal");
+		var notificacioEdicio = (Notificacio) SerializationUtils.clone(notificacioDto);
 		notificacioEdicio.setNumExpedient("FFF000");
 		notificacioEdicio.setConcepte("concepte edicio");
 		notificacioEdicio.setRetard(2);
@@ -373,7 +369,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 		authenticationTest.autenticarUsuari("admin");
 		// Given: Notificacio existent
 		EntitatDto entitat = database.entitat;
-		var notificacio = (NotificacioV2) database.get("notificacio");
+		var notificacio = (Notificacio) database.get("notificacio");
 		notificacioTableViewRepository.findById(notificacio.getId()).orElseThrow();
 		notificacio.setConcepte(nouValor);
 		notificacio.setNumExpedient(nouValor);
@@ -415,7 +411,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 		authenticationTest.autenticarUsuari("admin");
 		// Given: Notificacio existent
 		var entitat = database.entitat;
-		var notificacio = (NotificacioV2) database.get("notificacio");
+		var notificacio = (Notificacio) database.get("notificacio");
 		notificacioTableViewRepository.findById(notificacio.getId()).orElseThrow();
 
 		// When: eliminam la notificacio a la Base de dades
@@ -431,7 +427,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 	public void whenUptateNotificacio_thenResetRegistreEnviamentIntent() throws SistemaExternException, RegistreNotificaException {
 
 		configureMockGestioDocumentalPlugin();
-		var notificacioError = (NotificacioV2) database.get("notificacio");
+		var notificacioError = (Notificacio) database.get("notificacio");
 
 		// Given: notificacio pendent registrar amb nombre màxim de reintents
 		var notEntity = notificacioRepository.findById(notificacioError.getId()).orElseThrow();
@@ -452,7 +448,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 	public void whenUptateNotificacio_thenResetNotificaEnviamentIntent() throws SistemaExternException, RegistreNotificaException {
 
 		configureMockGestioDocumentalPlugin();
-		var notificacioError = (NotificacioV2) database.get("notificacio");
+		var notificacioError = (Notificacio) database.get("notificacio");
 
 		// Given: notificacio pendent registrar amb nombre màxim de reintents
 		var notEntity = notificacioRepository.findById(notificacioError.getId()).orElseThrow();
@@ -473,7 +469,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 	@Test(expected=Exception.class)
 	public void givenNotificacioNoFinalitzada_whenMarcarComProcessada_thenRaiseException() throws Exception {
 
-		var notificacio = (NotificacioV2) database.get("notificacio");
+		var notificacio = (Notificacio) database.get("notificacio");
 		// Given: notificacio amb estat distint a finalitzada
 		NotificacioEntity notEntity = notificacioRepository.findById(notificacio.getId()).orElseThrow();
 		notEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
@@ -487,7 +483,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 	@Test
 	public void givenNotificacioPermisProcessarProcediment_whenMarcarComProcessada() throws Exception {
 
-		var notificacio = (NotificacioV2) database.get("notificacioSensePermisos");
+		var notificacio = (Notificacio) database.get("notificacioSensePermisos");
 		var notEntity = notificacioRepository.findById(notificacio.getId()).orElseThrow();
 		notEntity.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 		notificacioRepository.saveAndFlush(notEntity);
@@ -510,7 +506,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 	@Test
 	public void givenNotificacioPermisProcessarOrgan_whenMarcarComProcessada() throws Exception {
 
-		var notificacio = (NotificacioV2) database.get("notificacioSensePermisos");
+		var notificacio = (Notificacio) database.get("notificacioSensePermisos");
 		var notEntity = notificacioRepository.findById(notificacio.getId()).orElseThrow();
 		notEntity.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 		notificacioRepository.saveAndFlush(notEntity);
@@ -533,7 +529,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 	@Test
 	public void givenNotificacioPermisProcessarProcedimentOrgan_whenMarcarComProcessada() throws Exception {
 
-		var notificacio = (NotificacioV2) database.get("notificacioSensePermisos");
+		var notificacio = (Notificacio) database.get("notificacioSensePermisos");
 		var notEntity = notificacioRepository.findById(notificacio.getId()).orElseThrow();
 		notEntity.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 		notificacioRepository.saveAndFlush(notEntity);
@@ -560,7 +556,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 	@Test(expected=Exception.class)
 	public void givenNotificacioSenseCapPermis_whenMarcarComProcessada() throws Exception {
 
-		var notificacio = (NotificacioV2) database.get("notificacioSensePermisos");
+		var notificacio = (Notificacio) database.get("notificacioSensePermisos");
 		var notEntity = notificacioRepository.findById(notificacio.getId()).orElseThrow();
 		notEntity.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 		notificacioRepository.saveAndFlush(notEntity);
@@ -577,7 +573,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 
 		var entitatCreate = database.entitat;
 		var procedimentCreate = (ProcSerDto) database.get("procediment");
-		var notificacioCreate = (NotificacioV2) database.get("notificacio");
+		var notificacioCreate = (Notificacio) database.get("notificacio");
 
 		configureMockUnitatsOrganitzativesPlugin();
 		configureMockRegistrePlugin();
@@ -589,7 +585,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 	public void notificacioEnviar() {
 	}
 
-	private void assertEqualsNotificacions(NotificacioV2 notificacioDto, NotificacioEntity notificacioEntity, int numEnviaments) {
+	private void assertEqualsNotificacions(Notificacio notificacioDto, NotificacioEntity notificacioEntity, int numEnviaments) {
 
 		// comprovar si les dades introduïdes són iguals a les que s'han posat a la base de dades
 		assertEquals(notificacioDto.getProcedimentCodi(), notificacioEntity.getProcediment().getCodi());

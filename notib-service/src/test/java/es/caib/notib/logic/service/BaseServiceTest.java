@@ -5,7 +5,6 @@ package es.caib.notib.logic.service;
 
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
@@ -29,6 +28,7 @@ import es.caib.notib.logic.intf.dto.cie.CieFormatFullaDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatSobreDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
@@ -286,9 +286,9 @@ public class BaseServiceTest {
 					var entitatCreada = pagadorCieFormatSobreService.create(pagadorCieId, (CieFormatSobreDto)element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
-				} else if(element instanceof NotificacioV2) {
+				} else if(element instanceof Notificacio) {
 					autenticarUsuari("admin");
-					var entitatCreada = notificacioService.create(entitatId, (NotificacioV2) element);
+					var entitatCreada = notificacioService.create(entitatId, (Notificacio) element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
 				} else {

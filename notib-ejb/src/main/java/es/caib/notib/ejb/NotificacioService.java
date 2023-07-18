@@ -3,7 +3,6 @@
  */
 package es.caib.notib.ejb;
 
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.DocumentDto;
@@ -27,6 +26,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
@@ -121,13 +121,13 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public NotificacioV2 create(Long entitatId, NotificacioV2 notificacio) throws RegistreNotificaException {
+	public Notificacio create(Long entitatId, Notificacio notificacio) throws RegistreNotificaException {
 		return getDelegateService().create(entitatId, notificacio);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public NotificacioV2 update(Long entitatId, NotificacioV2 notificacio, boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
+	public Notificacio update(Long entitatId, Notificacio notificacio, boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
 		return getDelegateService().update(entitatId, notificacio, isAdministradorEntitat);
 	}
 

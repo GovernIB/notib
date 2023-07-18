@@ -196,7 +196,7 @@ public class DocumentHelper {
         dto.setOrigen(document.getOrigen() == null && utilizarMetadadesPerDefecte ? ORIGEN : document.getOrigen());
         dto.setValidesa(document.getValidesa() == null && utilizarMetadadesPerDefecte ? VALIDESA : document.getValidesa());
         dto.setTipoDocumental(document.getTipoDocumental() == null && utilizarMetadadesPerDefecte ? TIPUS_DOCUMENTAL : document.getTipoDocumental());
-        if (document.getModoFirma() != null && utilizarMetadadesPerDefecte) {
+        if (document.getModoFirma() != null || utilizarMetadadesPerDefecte) {
             dto.setModoFirma(document.getModoFirma() != null ? document.getModoFirma() : MODE_FIRMA);
         }
 

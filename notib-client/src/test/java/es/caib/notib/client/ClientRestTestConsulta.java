@@ -30,9 +30,9 @@ import static org.junit.Assert.assertNotNull;
 public class ClientRestTestConsulta {
 
 	
-	private static final String URL = "http://localhost:8280/notib";
-	private static final String USERNAME = "admin";
-	private static final String PASSWORD = "admin";
+	private static final String URL = "http://localhost:8080/notibapi";
+	private static final String USERNAME = "u999000";
+	private static final String PASSWORD = "u999000";
 	private static final boolean BASIC_AUTH = false;
 	private static final String CLAU_XIFRAT = "P0rt4FI8";
 	
@@ -44,11 +44,7 @@ public class ClientRestTestConsulta {
 
 	@Before
 	public void setUp() throws IOException, DecoderException {
-		client = NotificacioRestClientFactory.getRestClient(
-				URL,
-				USERNAME,
-				PASSWORD,
-				BASIC_AUTH);
+		client = NotificacioRestClientFactory.getRestClient(URL, USERNAME, PASSWORD, BASIC_AUTH);
 	}
 	
 	@Test

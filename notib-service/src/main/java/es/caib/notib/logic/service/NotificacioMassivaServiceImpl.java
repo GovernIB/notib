@@ -9,7 +9,6 @@ import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.client.domini.ServeiTipus;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
@@ -44,6 +43,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaPrioritatDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaTableItemDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.exception.AccessDeniedException;
 import es.caib.notib.logic.intf.exception.InvalidCSVFileException;
 import es.caib.notib.logic.intf.exception.InvalidCSVFileNotificacioMassivaException;
@@ -253,7 +253,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             var numAltes = 0;
             var fila = 1;
             var notificacioMassivaEntity = registrarNotificacioMassiva(entitat, notificacioMassiva, linies.size());
-            NotificacioV2 notificacio;
+            Notificacio notificacio;
             String keyDocument;
             BindException errors;
             ProcSerEntity procediment;
@@ -668,7 +668,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         return registreNotificaHelper.isSendDocumentsActive() ? 23 : 19;
     }
 
-    private void crearNotificacio(EntitatEntity entitat, NotificacioV2 notificacio, NotificacioMassivaEntity notMassiva, Map<String, Long> documentsProcessatsMassiu) throws RegistreNotificaException {
+    private void crearNotificacio(EntitatEntity entitat, Notificacio notificacio, NotificacioMassivaEntity notMassiva, Map<String, Long> documentsProcessatsMassiu) throws RegistreNotificaException {
 
         log.debug("[NOT-MASSIVA] Creació de notificació de nova notificacio massiva");
         var notificacioEntity = notificacioHelper.saveNotificacio(entitat, notificacio,false, notMassiva, documentsProcessatsMassiu);
@@ -740,7 +740,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         return notMassiva;
     }
 
-    private String getKeyDocument(NotificacioV2 notificacio) {
+    private String getKeyDocument(Notificacio notificacio) {
 
         if (notificacio.getDocument() == null) {
             return null;
@@ -757,11 +757,11 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         return null;
     }
 
-    private NotificacioV2 csvLiniaToNotificacioV2(String[] linia, Date caducitat, EntitatEntity entitat, String usuariCodi, List<String> fileNames,
-                                                  byte[] ficheroZipBytes, Map<String, Long> documentsProcessatsMassiu, Integer fila) {
+    private Notificacio csvLiniaToNotificacioV2(String[] linia, Date caducitat, EntitatEntity entitat, String usuariCodi, List<String> fileNames,
+                                                byte[] ficheroZipBytes, Map<String, Long> documentsProcessatsMassiu, Integer fila) {
 
         log.debug("[NOT-MASSIVA] Construeix notificació de les dades del fitxer CSV");
-        var notV2 = new NotificacioV2();
+        var notV2 = new Notificacio();
         var envV2 = new Enviament();
         List<Enviament> envsV2 = new ArrayList<>();
         var document = new DocumentV2();
@@ -770,20 +770,12 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         try {
             notV2.setCaducitat(caducitat);
             // Organ gestor
-//            columna = messageHelper.getMessage("error.csv.to.notificacio.codi.organ.gestor.columna");
-//            missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.organ.gestor.missatge");
             notV2.setOrganGestor(linia[0]);
             // Entitat
-//            columna = "";
-//            missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.entitat.missatge");
             notV2.setEmisorDir3Codi(entitat.getDir3Codi());
             // Concepte
-//            columna = messageHelper.getMessage("error.csv.to.notificacio.codi.concepte.columna");
-//            missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.concepte.missatge");
             notV2.setConcepte(linia[1]);
             // Tipus enviament
-//            columna = messageHelper.getMessage("error.csv.to.notificacio.tipus.enviament.columna");
-//            missatge = messageHelper.getMessage("error.csv.to.notificacio.tipus.enviament.missatge");
             setTipusEnviament(notV2, linia[2]);
             // Grup
             notV2.setGrupCodi(null);
@@ -792,36 +784,23 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             // Usuari
             notV2.setUsuariCodi(usuariCodi);
             // Retard
-//            columna = messageHelper.getMessage("error.csv.to.notificacio.codi.retard.postal.columna");
-//            missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.retard.postal.missatge");
             setRetard(notV2, linia[15]);
             // Procediment
-//            columna = messageHelper.getMessage("error.csv.to.notificacio.codi.procediment.columna");
-//            missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.procediment.missatge");
-//            var procediment = new ProcSerDto();
-//            procediment.setCodi(linia[16]);
             notV2.setProcedimentCodi(linia[16]);
             // Fecha envío programado
-//            columna = messageHelper.getMessage("error.csv.to.notificacio.codi.data.enviament.programada.columna");
-//            missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.data.enviament.programada.missatge");
             setDataProgramada(notV2, linia[17]);
             // Document
-//            columna = messageHelper.getMessage("error.csv.to.notificacio.codi.document.columna");
-//            missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.document.missatge");
             var llegirMetadades = setDocument(notV2, document, linia, fileNames, ficheroZipBytes, documentsProcessatsMassiu);
             if (llegirMetadades) {
-//                columna = messageHelper.getMessage("error.csv.to.notificacio.codi.origen.columna");
-//                missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.origen.missatge");
                 setOrigen(notV2, linia[18]);
-//                columna = messageHelper.getMessage("error.csv.to.notificacio.codi.estat.elaboracio.columna");
-//                missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.estat.elaboracio.missatge");
                 setValidesa(notV2, linia[19]);
-//                columna = messageHelper.getMessage("error.csv.to.notificacio.codi.tipus.documental.columna");
-//                missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.tipus.documental.missatge");
                 setTipusDocumental(notV2, linia[20]);
-//                columna = messageHelper.getMessage("error.csv.to.notificacio.codi.pdf.firmat.columna");
-//                missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.pdf.firmat.missatge");
                 setModeFirma(notV2, linia[21]);
+            } else { //Metadades per defecte
+                setOrigen(notV2, OrigenEnum.ADMINISTRACIO.name());
+                setValidesa(notV2, ValidesaEnum.ORIGINAL.name());
+                setTipusDocumental(notV2, TipusDocumentalEnum.ALTRES.name());
+                setModeFirma(notV2, String.valueOf(false));
             }
             // Descripció
             notV2.setDescripcio(linia.length > 19 ? linia[22] : linia[18]);
@@ -829,35 +808,22 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
             // Referencia - Núm. expedient
             // TODO: #641 - Els enviaments massius encara que s'ompli el camp de "Referencia Emisor" al csv no es mostra al llistat de remeses al camp "Número expedient"
-//            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.referencia.columna");
-//            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.referencia.missatge");
             var referencia = (linia[3] != null && !linia[3].isEmpty()) ? linia[3] : null;
             notV2.setNumExpedient(referencia);
             // TODO assignar valor correcte a NotificaReferencai
-//            envV2.setNotificaReferencia(referencia); //si no se envía, Notific@ genera una
             envV2.setEntregaDehActiva(false); // De momento dejamos false
             // Servei tipus
-//            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.prioritat.servei.columna");
-//            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.prioritat.servei.missatge");
             setServeiTipus(notV2, envV2, linia[6]);
             // Titular /////////////
             var titular = new Persona();
             // Nom
-//            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.nom.columna");
-//            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.nom.missatge");
             titular.setNom(linia[7]);
             // Llinatges
-//            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.llinatges.columna");
-//            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.llinatges.missatge");
             titular.setLlinatge1(linia[8]); // vienen ap1 y ap2 juntos
             titular.setLlinatge2(null);
             // NIF
-//            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.cifnif.columna");
-//            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.cifnif.missatge");
             titular.setNif(linia[9]);
             // Email
-//            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.email.columna");
-//            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.email.missatge");
             titular.setEmail(linia[10]);
             // Interessat tipus
             missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.interessat.tipus.missatge");
@@ -875,13 +841,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 titular.setDocumentTipus(tipus);
             } else {
                 // Entrega postal
-//                columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.entrega.postal.columna");
-//                missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.entrega.postal.missatge");
                 setEntregaPostal(linia, entitat, envV2);
             }
             // Codi Dir3
-//            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.dir3.columna");
-//            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.dir3.missatge");
             titular.setDir3Codi(linia[11]);
             // Incapacitat
             titular.setIncapacitat(false);
@@ -895,7 +857,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         return notV2;
     }
 
-    private void setTipusEnviament(NotificacioV2 notificacio, String strTipusEnviament) {
+    private void setTipusEnviament(Notificacio notificacio, String strTipusEnviament) {
 
         if (Strings.isNullOrEmpty(strTipusEnviament)) {
             return;
@@ -915,22 +877,17 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         if ("S".equalsIgnoreCase(strTipusEnviament) || "SIR".equalsIgnoreCase(strTipusEnviament)) {
             notificacio.setEnviamentTipus(EnviamentTipus.COMUNICACIO);
         }
-//        notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
-//        notificacio.getErrors().add(messageHelper.getMessage("error.tipus.enviament.no.valid.a") + strTipusEnviament + messageHelper.getMessage("error.tipus.enviament.no.valid.b"));
     }
 
-    private void setRetard(NotificacioV2 notificacio, String strRetard) {
+    private void setRetard(Notificacio notificacio, String strRetard) {
 
         if (isEnter(strRetard)) {
             notificacio.setRetard(Integer.valueOf(strRetard));
-//            return;
+
         }
-//        if (strRetard != null) {
-//            notificacio.getErrors().add(messageHelper.getMessage("error.retard.no.valid.a") + strRetard + messageHelper.getMessage("error.retard.no.valid.b"));
-//        }
     }
 
-    private void setDataProgramada(NotificacioV2 notificacio, String strData) {
+    private void setDataProgramada(Notificacio notificacio, String strData) {
 
         try {
             notificacio.setEnviamentDataProgramada(!Strings.isNullOrEmpty(strData) ? new SimpleDateFormat("dd/MM/yyyy").parse(strData) : null);
@@ -940,7 +897,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         }
     }
 
-    private boolean setDocument(NotificacioV2 notificacio, DocumentV2 document, String[] linia, List<String> fileNames, byte[] ficheroZipBytes, Map<String, Long> documentsProcessatsMassiu) {
+    private boolean setDocument(Notificacio notificacio, DocumentV2 document, String[] linia, List<String> fileNames, byte[] ficheroZipBytes, Map<String, Long> documentsProcessatsMassiu) {
 
         var llegirMetadades = false;
         if (linia[4] == null || linia[4].isEmpty()) {
@@ -993,7 +950,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
             notificacio.setDocument(null);
             // TODO COMPROVAR SI AQUESTA VALIDACIO ES POT PASSAR AL VALIDATOR (I NOMÉS FER-LA EN LES MASSIVES)
-//            notificacio.getErrors().add(messageHelper.getMessage("error.document.no.trobat.dins.zip"));
             return llegirMetadades;
         }
         var uuidPattern = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$";
@@ -1021,7 +977,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         return llegirMetadades;
     }
 
-    private void setOrigen(NotificacioV2 notificacio, String strOrigen) {
+    private void setOrigen(Notificacio notificacio, String strOrigen) {
 
         // Origen
         if (Strings.isNullOrEmpty(strOrigen)) {
@@ -1037,10 +993,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         }
         notificacio.getDocument().setOrigen(OrigenEnum.CIUTADA);
         var msg = messageHelper.getMessage("error.valor.origen.no.valid.a") + strOrigen + messageHelper.getMessage("error.valor.origen.no.valid.b");
-//        notificacio.getErrors().add(msg);
     }
 
-    private void setValidesa(NotificacioV2 notificacio, String strValidesa) {
+    private void setValidesa(Notificacio notificacio, String strValidesa) {
 
         // Validesa
         if (Strings.isNullOrEmpty(strValidesa)) {
@@ -1059,10 +1014,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             return;
         }
         notificacio.getDocument().setValidesa(ValidesaEnum.ORIGINAL);
-//        notificacio.getErrors().add(messageHelper.getMessage("error.valor.validesa.no.valid.a") + strValidesa + messageHelper.getMessage("error.valor.validesa.no.valid.b"));
     }
 
-    private void setTipusDocumental(NotificacioV2 notificacio, String strTipus) {
+    private void setTipusDocumental(Notificacio notificacio, String strTipus) {
 
         // Tipo documental
         if (Strings.isNullOrEmpty(strTipus)) {
@@ -1086,7 +1040,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         notificacio.getDocument().setTipoDocumental(tipo);
     }
 
-    private void setModeFirma(NotificacioV2 notificacio, String strMode) {
+    private void setModeFirma(Notificacio notificacio, String strMode) {
 
         // PDF firmat
         if (Strings.isNullOrEmpty(strMode)) {
@@ -1098,10 +1052,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         }
         if ("NO".equalsIgnoreCase(strMode) || "FALSE".equalsIgnoreCase(strMode)) {
             notificacio.getDocument().setModoFirma(false);
-            return;
         }
-        var msg = messageHelper.getMessage("error.valor.validesa.no.valid.a") + strMode + messageHelper.getMessage("error.valor.validesa.no.valid.b");
-//        notificacio.getErrors().add(msg);
     }
 
     private void setEntregaPostal(String[] linia, EntitatEntity entitat, Enviament enviament) {
@@ -1118,7 +1069,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         enviament.setEntregaPostal(entregaPostal);
     }
 
-    private void setServeiTipus(NotificacioV2 notificacio, Enviament enviament, String strServeiTipus) {
+    private void setServeiTipus(Notificacio notificacio, Enviament enviament, String strServeiTipus) {
 
         if (Strings.isNullOrEmpty(strServeiTipus)) {
             return;
@@ -1132,18 +1083,15 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             return;
         }
         enviament.setServeiTipus(ServeiTipus.NORMAL);
-        var msg = messageHelper.getMessage("error.tipus.servei.no.valid.a") + strServeiTipus + messageHelper.getMessage("error.tipus.servei.no.valid.b");
-//        notificacio.getErrors().add(msg);
     }
 
-    private void setInteressatTipus(NotificacioV2 notificacio, Persona titular) {
+    private void setInteressatTipus(Notificacio notificacio, Persona titular) {
 
         if (Strings.isNullOrEmpty(titular.getNif()) && !Strings.isNullOrEmpty(titular.getEmail())) {
             titular.setInteressatTipus(InteressatTipus.FISICA_SENSE_NIF);
             return;
         }
         if (Strings.isNullOrEmpty(titular.getNif()) && Strings.isNullOrEmpty(titular.getEmail())) {
-//            notificacio.getErrors().add(messageHelper.getMessage("error.persona.sense.nif.no.email"));
             return;
         }
         if (NifHelper.isValidCif(titular.getNif())) {
@@ -1157,9 +1105,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         var lista = pluginHelper.unitatsPerCodi(titular.getNif());
         if (lista != null && !lista.isEmpty()) {
             titular.setInteressatTipus(InteressatTipus.ADMINISTRACIO);
-            return;
         }
-//        notificacio.getErrors().add(messageHelper.getMessage("error.nifcif.no.valid.a") + titular.getNif() + messageHelper.getMessage("error.nifcif.no.valid.b"));
     }
 
     public boolean isNumeric(String strNum) {

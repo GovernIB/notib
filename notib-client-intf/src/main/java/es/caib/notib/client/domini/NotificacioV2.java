@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import es.caib.notib.client.util.TrimStringDeserializer;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -25,7 +25,7 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonAutoDetect
@@ -34,14 +34,6 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class NotificacioV2 implements Serializable {
 
-
-    // TODO ATRIBUTS AFEGITS A POSTERIORI. FER UNA HERENCIA PER DEIXAR-HO CORRECTE
-
-    private Long id;
-    private Long procedimentId;
-    private Long grupId;
-
-    // TODO ****************************************************************************
     /**
      * Codi Dir3 de l’organisme emisor
      * Camp obligatori

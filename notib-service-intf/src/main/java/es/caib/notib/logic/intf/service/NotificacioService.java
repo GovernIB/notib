@@ -3,7 +3,6 @@
  */
 package es.caib.notib.logic.intf.service;
 
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.DocumentDto;
@@ -27,6 +26,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
@@ -50,7 +50,7 @@ public interface NotificacioService {
 	 * @throws RegistreNotificaException
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
-	NotificacioV2 create(Long entitatId, NotificacioV2 notificacio) throws RegistreNotificaException;
+	Notificacio create(Long entitatId, Notificacio notificacio) throws RegistreNotificaException;
 
 	/**
 	 * Esborra la notificació indicada per paràmetre
@@ -76,7 +76,7 @@ public interface NotificacioService {
 	 * @throws RegistreNotificaException Si hi ha hagut un error en el procés de registra/notificar
 	 */
 	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-	NotificacioV2 update(Long entitatId, NotificacioV2 notificacio, boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException;
+	Notificacio update(Long entitatId, Notificacio notificacio, boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException;
 	
 	/**
 	 * Consulta una notificació donat el seu id.

@@ -7,7 +7,6 @@ import com.google.common.base.Strings;
 import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
@@ -18,6 +17,7 @@ import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto.TipusAct
 import es.caib.notib.logic.intf.dto.cie.CieDataDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
@@ -186,7 +186,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional(rollbackFor=Exception.class)
 	@Override
-	public NotificacioV2 create(Long entitatId, NotificacioV2 notificacio) throws RegistreNotificaException {
+	public Notificacio create(Long entitatId, Notificacio notificacio) throws RegistreNotificaException {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
@@ -196,7 +196,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var notificacioEntity = notificacioHelper.saveNotificacio(notData);
 			notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
 			auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceImpl.create");
-			return conversioTipusHelper.convertir(notificacioEntity, NotificacioV2.class);
+			return conversioTipusHelper.convertir(notificacioEntity, Notificacio.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -247,7 +247,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Transactional
 	@Override
-	public NotificacioV2 update(Long entitatId, NotificacioV2 notificacio, boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
+	public Notificacio update(Long entitatId, Notificacio notificacio, boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
@@ -414,7 +414,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 			notificacioTableHelper.actualitzarRegistre(notificacioEntity);
 			auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.UPDATE, UPDATE);
-			return conversioTipusHelper.convertir(notificacioRepository.getOne(notificacio.getId()), NotificacioV2.class);
+			return conversioTipusHelper.convertir(notificacioRepository.getOne(notificacio.getId()), Notificacio.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

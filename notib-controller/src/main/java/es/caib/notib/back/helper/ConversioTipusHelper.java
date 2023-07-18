@@ -6,7 +6,6 @@ package es.caib.notib.back.helper;
 import es.caib.notib.client.domini.DocumentV2;
 import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.back.command.DocumentCommand;
@@ -14,6 +13,7 @@ import es.caib.notib.back.command.EntregapostalCommand;
 import es.caib.notib.back.command.EnviamentCommand;
 import es.caib.notib.back.command.NotificacioCommand;
 import es.caib.notib.back.command.PersonaCommand;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
@@ -108,11 +108,11 @@ public class ConversioTipusHelper {
 					}
 				}).register();
 
-		mapperFactory.classMap(NotificacioV2.class, NotificacioCommand.class)
+		mapperFactory.classMap(Notificacio.class, NotificacioCommand.class)
 				.byDefault()
 				.customize(new CustomMapper<>() {
 					@Override
-					public void mapAtoB(NotificacioV2 notificacioDto, NotificacioCommand notificacioCommand, MappingContext context) {
+					public void mapAtoB(Notificacio notificacioDto, NotificacioCommand notificacioCommand, MappingContext context) {
 						// Documents
 						var documents = new DocumentCommand[5];
 						documents[0] = DocumentCommand.asCommand(notificacioDto.getDocument());
@@ -124,7 +124,7 @@ public class ConversioTipusHelper {
 //						notificacioCommand.setTipusProcSer(notificacioDto.getProcediment() != null ? notificacioDto.getProcediment().getTipus().name() : null);
 					}
 					@Override
-					public void mapBtoA(NotificacioCommand notificacioCommand, NotificacioV2 notificacioDto, MappingContext context) {
+					public void mapBtoA(NotificacioCommand notificacioCommand, Notificacio notificacioDto, MappingContext context) {
 						// Documents
 						List<DocumentV2> documents = new ArrayList<>();
 						var document = DocumentCommand.asDto(notificacioCommand.getDocuments()[0]);

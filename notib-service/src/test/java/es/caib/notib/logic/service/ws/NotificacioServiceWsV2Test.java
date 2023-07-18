@@ -5,7 +5,6 @@ import es.caib.notib.client.domini.DocumentV2;
 import es.caib.notib.client.domini.EnviamentReferencia;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.client.domini.NotificacioEstatEnum;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.RespostaAlta;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.AuditHelper;
@@ -29,6 +28,7 @@ import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.service.GrupService;
@@ -291,7 +291,7 @@ public class NotificacioServiceWsV2Test {
 	// Test de validacions de alta de notificació
 	@ParameterizedTest(name = "[{index}] Validació error {1}")
 	@ArgumentsSource(NotificacioProvider.class)
-	public void whenAltaUuid_thenReturnErrorOrRespostaAltaOK(NotificacioV2 notificacio, int errorEsperat) throws IOException {
+	public void whenAltaUuid_thenReturnErrorOrRespostaAltaOK(Notificacio notificacio, int errorEsperat) throws IOException {
 		
 		// Given
 		switch (errorEsperat) {

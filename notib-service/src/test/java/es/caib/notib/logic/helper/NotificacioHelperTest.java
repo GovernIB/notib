@@ -4,9 +4,8 @@ import es.caib.notib.client.domini.DocumentV2;
 import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.ValidesaEnum;
-import es.caib.notib.logic.intf.dto.DocumentDto;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.GrupEntity;
@@ -111,7 +110,7 @@ public class NotificacioHelperTest {
 		document3.setNormalitzat(false);
 		document3.setGenerarCsv(true);
 		
-		var notificacio = NotificacioV2.builder()
+		var notificacio = Notificacio.builder()
                 .emisorDir3Codi(ConfigTest.ENTITAT_DGTIC_DIR3CODI)
                 .enviamentTipus(EnviamentTipus.NOTIFICACIO)
                 .enviamentDataProgramada(enviamentDataProgramada)

@@ -4,13 +4,13 @@
 package es.caib.notib.api.interna.controller;
 
 import es.caib.notib.client.domini.DadesConsulta;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaAlta;
 import es.caib.notib.client.domini.RespostaConsultaDadesRegistre;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviament;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacio;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -46,7 +46,7 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	@Operation(summary = "Registra i envia la notificació a Notific@.", description = "Retorna una llista amb els codis dels enviaments creats per poder consultar el seu estat posteriorment")
 	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Alta de notificació", content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RespostaAlta.class, description = "Informació de alta"))})})
 	@PostMapping(value = "/alta", produces = MediaType.APPLICATION_JSON_VALUE)
-	public RespostaAlta alta(@Parameter(description = "Objecte amb les dades necessàries per a generar una notificació", required = true) @RequestBody NotificacioV2 notificacio) {
+	public RespostaAlta alta(@Parameter(description = "Objecte amb les dades necessàries per a generar una notificació", required = true) @RequestBody Notificacio notificacio) {
 		try {
 			return notificacioServiceWs.alta(notificacio);
 		} catch (Exception e) {

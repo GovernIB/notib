@@ -38,6 +38,7 @@ import es.caib.notib.logic.intf.dto.TipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.JustificantService;
@@ -174,7 +175,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 	@Transactional
 	@Override
-	public RespostaAlta alta(NotificacioV2 notificacio) throws NotificacioServiceWsException {
+	public RespostaAlta alta(Notificacio notificacio) throws NotificacioServiceWsException {
 
 		var resposta = altaV2(notificacio);
 		return RespostaAlta.builder().identificador(resposta.getIdentificador()).estat(resposta.getEstat()).referencies(resposta.getReferenciesAsV1())
@@ -183,7 +184,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 	@Transactional
 	@Override
-	public RespostaAltaV2 altaV2(NotificacioV2 notificacio) throws NotificacioServiceWsException {
+	public RespostaAltaV2 altaV2(Notificacio notificacio) throws NotificacioServiceWsException {
 
 		var timer = metricsHelper.iniciMetrica();
 		// Generar informació per al monitor d'integracions
@@ -348,7 +349,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		}
 	}
 
-	private IntegracioInfo generateInfoAlta(NotificacioV2 notificacio) {
+	private IntegracioInfo generateInfoAlta(Notificacio notificacio) {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_CLIENT, "Alta de notificació", IntegracioAccioTipusEnumDto.RECEPCIO);
 
@@ -1147,7 +1148,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		return serveiTipus;
 	}
 
-	private EnviamentTipus getEnviamentTipus(NotificacioV2 notificacio) {
+	private EnviamentTipus getEnviamentTipus(Notificacio notificacio) {
 
 		EnviamentTipus enviamentTipus = null;
 		if (notificacio.getEnviamentTipus() != null) {

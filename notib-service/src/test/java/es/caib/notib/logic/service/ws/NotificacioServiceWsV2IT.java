@@ -9,12 +9,12 @@ import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.client.domini.ServeiTipus;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.RespostaAlta;
 import es.caib.notib.logic.helper.NotificaHelper;
 import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
@@ -164,7 +164,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		assertNotNull(procedimentCreate);
 		assertNotNull(procedimentCreate.getId());
 
-		NotificacioV2 notificacio = getRandomNotificacio(2);
+		Notificacio notificacio = getRandomNotificacio(2);
 		notificacio.setProcedimentCodi(procedimentCreate.getCodi());
 
 		RespostaAlta respostaAlta = notificacioService.alta(notificacio);
@@ -207,7 +207,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		assertNotNull(procedimentCreate);
 		assertNotNull(procedimentCreate.getId());
 
-		NotificacioV2 notificacio = getRandomNotificacio(1);
+		Notificacio notificacio = getRandomNotificacio(1);
 		notificacio.setProcedimentCodi(procedimentCreate.getCodi());
 
 		Enviament enviament = notificacio.getEnviaments().get(0);
@@ -255,7 +255,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		assertNotNull(procedimentCreate);
 		assertNotNull(procedimentCreate.getId());
 
-		NotificacioV2 notificacio = getRandomNotificacio(1);
+		Notificacio notificacio = getRandomNotificacio(1);
 		notificacio.setProcedimentCodi(procedimentCreate.getCodi());
 
 		// When
@@ -280,7 +280,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 
 	}
 
-	private void assertEqualsNotificacions(NotificacioV2 notificacioDto, NotificacioEntity notificacioEntity, int numEnviaments) {
+	private void assertEqualsNotificacions(Notificacio notificacioDto, NotificacioEntity notificacioEntity, int numEnviaments) {
 		// comprovar si les dades introduïdes són iguals a les que s'han posat a la base de dades
 		assertEquals(notificacioDto.getProcedimentCodi(), notificacioEntity.getProcediment().getCodi());
 		assertEquals(notificacioDto.getOrganGestor(), notificacioEntity.getOrganGestor().getCodi());
@@ -343,8 +343,8 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		}
 	}
 
-	public static NotificacioV2 getRandomNotificacio(int numEnviaments) {
-		NotificacioV2 notCreated = getRandomInstanceWithoutEnviaments();
+	public static Notificacio getRandomNotificacio(int numEnviaments) {
+		Notificacio notCreated = getRandomInstanceWithoutEnviaments();
 		List<Enviament> enviaments = new ArrayList<>();
 		for (int i = 0; i < numEnviaments; i++) {
 			Enviament enviament = getRandomEnviament(i);
@@ -383,7 +383,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		return enviament;
 	}
 
-	public static NotificacioV2 getRandomInstanceWithoutEnviaments() {
+	public static Notificacio getRandomInstanceWithoutEnviaments() {
 		String notificacioId = new Long(System.currentTimeMillis()).toString();
 
 		DocumentV2 document = new DocumentV2();
@@ -404,7 +404,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 
 		Date caducitat = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
 		Date enviamentDataProgramada = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
-		NotificacioV2 notCreated = NotificacioV2.builder()
+		Notificacio notCreated = Notificacio.builder()
 				.emisorDir3Codi(ConfigTest.ENTITAT_DGTIC_DIR3CODI)
 				.enviamentTipus(EnviamentTipus.NOTIFICACIO)
 				.enviamentDataProgramada(enviamentDataProgramada)
