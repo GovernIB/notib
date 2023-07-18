@@ -798,7 +798,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 			logger.debug("Consultant estat enviament amb referencia: " + referencia);
 			RespostaConsultaEstatEnviamentV2 resposta = RespostaConsultaEstatEnviamentV2.builder().referencia(referencia).build();
-			info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 			try {
 				if (enviament == null) {
 					resposta.setError(true);
@@ -808,6 +807,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					integracioHelper.addAccioError(info, "No existeix cap enviament amb l'identificador especificat");
 					return resposta;
 				}
+				info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 				if (enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null) {
 					info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 				}
