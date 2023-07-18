@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.cacheable.PermisosCacheable;
@@ -21,6 +22,7 @@ import es.caib.notib.logic.intf.dto.Arbre;
 import es.caib.notib.logic.intf.dto.ArbreNode;
 import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.LlibreDto;
@@ -70,9 +72,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.supercsv.io.CsvListWriter;
+import org.supercsv.io.ICsvListWriter;
+import org.supercsv.prefs.CsvPreference;
 
 import javax.annotation.Resource;
 import javax.xml.bind.ValidationException;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1509,14 +1516,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		try {
 			var entitats = ids != null ? entitatRepository.findByIds(ids) : entitatRepository.findAll();
 			for (var entitat : entitats) {
-				actualtizarNomM(entitat);
+				actualtizarNom(entitat);
 			}
 		} catch (Exception ex) {
 			log.error("Error sincronitzant els noms dels òrgans gestors", ex);
 		}
  	}
 
-	 public void actualtizarNomM(EntitatEntity entitat) {
+	 private void actualtizarNom(EntitatEntity entitat) {
 
 		 try {
 			 var nodesDir3 = pluginHelper.getOrganNomMultidioma(entitat);
@@ -1538,4 +1545,51 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			 log.error("Error sincronitzant els nom de l'entiat " + entitat.getCodi(), ex);
 		 }
 	 }
+
+	@Override
+	@Transactional(readOnly = true)
+	public FitxerDto exportacio(Long entitatId) throws IOException {
+
+		var timer = metricsHelper.iniciMetrica();
+		var writer = new StringWriter();
+		try (var listWriter = new CsvListWriter(writer, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE)) {
+			log.debug("Exportant informació dels Òrgans Gestors");
+			var entitatEntity = entitatRepository.findById(entitatId).orElseThrow();
+			entityComprovarHelper.comprovarPermisos(null, true, true, false);
+			var organs = organGestorRepository.findByEntitat(entitatEntity);
+			// Genera les columnes
+			int numColumnes = 8;
+			String[] columnes = new String[numColumnes];
+			columnes[0] = "Codi";
+			columnes[1] = "Nom";
+			columnes[2] = "Nom ES";
+			columnes[3] = "Estat";
+			columnes[4] = "Codi pare";
+			columnes[5] = "Llibre";
+			columnes[6] = "Oficina SIR";
+			columnes[7] = "Entrega Cie";
+			listWriter.writeHeader(columnes);
+			String[] fila;
+			for (var organ : organs) {
+				fila = new String[numColumnes];
+				fila[0] = organ.getCodi();
+				fila[1] = organ.getNom();
+				fila[2] = organ.getNomEs();
+				fila[3] = organ.getEstat().name();
+				fila[4] = organ.getCodiPare();
+				fila[5] = organ.getLlibreNom();
+				fila[6] = organ.getOficina() != null ? organ.getOficina() + " - " + organ.getOficinaNom() : null;
+				fila[7] = organ.getEntregaCie() != null ? "SI" : "NO";
+				listWriter.write(fila);
+			}
+			listWriter.flush();
+			var fitxer = new FitxerDto();
+			fitxer.setNom("organs.csv");
+			fitxer.setContentType("text/csv");
+			fitxer.setContingut(writer.toString().getBytes());
+			return fitxer;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
 }
