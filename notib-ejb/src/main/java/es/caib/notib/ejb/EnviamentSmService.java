@@ -54,6 +54,18 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreForward(String enviamentUuid) {
+		return getDelegateService().registreForward(enviamentUuid);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+    public boolean enviamentIsInRegistreErrorState(String enviamentUuid) {
+        return getDelegateService().enviamentIsInRegistreErrorState(enviamentUuid);
+    }
+
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaEnviament(String enviamentUuid) {
 		return getDelegateService().notificaEnviament(enviamentUuid);
 	}
@@ -74,6 +86,12 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaRetry(String enviamentUuid) {
 		return getDelegateService().notificaRetry(enviamentUuid);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaForward(String enviamentUuid) {
+		return getDelegateService().notificaForward(enviamentUuid);
 	}
 
 //	@Override
@@ -120,6 +138,12 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaForward(String enviamentUuid) {
+		return getDelegateService().consultaForward(enviamentUuid);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirConsulta(String enviamentUuid) {
 		return getDelegateService().sirConsulta(enviamentUuid);
 	}
@@ -140,6 +164,18 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirRetry(String enviamentUuid) {
 		return getDelegateService().sirRetry(enviamentUuid);
+	}
+
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+    public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirForward(String enviamentUuid) {
+        return getDelegateService().sirForward(enviamentUuid);
+    }
+
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public EnviamentSmEstat getEstatEnviament(String enviamentUuid) {
+		return getDelegateService().getEstatEnviament(enviamentUuid);
 	}
 
 	@Override

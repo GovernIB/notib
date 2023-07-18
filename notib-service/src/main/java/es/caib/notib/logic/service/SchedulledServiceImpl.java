@@ -1,24 +1,9 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
-import es.caib.notib.logic.helper.ConfigHelper;
-import es.caib.notib.logic.helper.EnviamentHelper;
-import es.caib.notib.logic.helper.IntegracioHelper;
-import es.caib.notib.logic.helper.MetricsHelper;
-import es.caib.notib.logic.helper.NotificaHelper;
-import es.caib.notib.logic.helper.NotificacioHelper;
-import es.caib.notib.logic.helper.OrganGestorHelper;
-import es.caib.notib.logic.helper.PluginHelper;
-import es.caib.notib.logic.helper.PropertiesConstants;
-import es.caib.notib.logic.helper.SemaforNotificacio;
+import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.exception.RegistreNotificaException;
-import es.caib.notib.logic.intf.service.EntitatService;
-import es.caib.notib.logic.intf.service.NotificacioService;
-import es.caib.notib.logic.intf.service.ProcedimentService;
-import es.caib.notib.logic.intf.service.SchedulledService;
-import es.caib.notib.logic.intf.service.ServeiService;
-import es.caib.notib.logic.threads.RegistrarThread;
+import es.caib.notib.logic.intf.service.*;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
@@ -40,9 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -74,8 +57,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Lazy
 	@Autowired
 	private NotificacioService notificacioService;
-	@Autowired
-	private NotificacioHelper notificacioHelper;
+//	@Autowired
+//	private NotificacioHelper notificacioHelper;
 	@Autowired
 	private ProcedimentService procedimentService;
 	@Autowired
@@ -95,133 +78,119 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Autowired
 	private MonitorIntegracioRepository monitorRepository;
 
-	// 1. Enviament de notificacions pendents al registre i notific@
-	////////////////////////////////////////////////////////////////
-	@Override
-	public void registrarEnviamentsPendents() throws RegistreNotificaException {
-
-		var timer = metricsHelper.iniciMetrica();
-		try {
-			log.info("[REG] Cercant notificacions pendents de registrar");
-			var pendents = notificacioService.getNotificacionsPendentsRegistrar();
-			if (pendents == null || pendents.isEmpty()) {
-				log.info("[REG] No hi ha notificacions pendents de registrar");
-				return;
-			}
-			log.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents");
-//			ExecutorService executorService = Executors.newFixedThreadPool(pendents.size());
-			RegistrarThread thread;
-//			Map<Long, Future<Boolean>> futurs = new HashMap<>();
-//			Future<Boolean> futur;
-			boolean multiThread = Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD));
-			for (Long pendent : pendents) {
-				if (multiThread) {
-					thread = new RegistrarThread(pendent, notificacioHelper);
-					thread.run();
-//					futur = executorService.submit(thread);
-//					futurs.put(pendent, futur);
-				} else {
-					log.info("[REG] >>> Realitzant registre de la notificació id: " + pendent);
-					notificacioHelper.registrarNotificar(pendent);
-				}
-			}
-//			Set<Long> keys = futurs.keySet();
-//			for (Long key : keys) {
-//				try {
-//					futurs.get(key).get();
-//				} catch (Exception ex) {
-//					log.error(String.format("[REG] Error registrant la notificacio ", key), ex);
+//	// 1. Enviament de notificacions pendents al registre i notific@
+//	////////////////////////////////////////////////////////////////
+//	@Override
+//	public void registrarEnviamentsPendents() throws RegistreNotificaException {
+//
+//		var timer = metricsHelper.iniciMetrica();
+//		try {
+//			log.info("[REG] Cercant notificacions pendents de registrar");
+//			var pendents = notificacioService.getNotificacionsPendentsRegistrar();
+//			if (pendents == null || pendents.isEmpty()) {
+//				log.info("[REG] No hi ha notificacions pendents de registrar");
+//				return;
+//			}
+//			log.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents");
+//			RegistrarThread thread;
+//			boolean multiThread = Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD));
+//			for (Long pendent : pendents) {
+//				if (multiThread) {
+//					thread = new RegistrarThread(pendent, notificacioHelper);
+//					thread.run();
+//				} else {
+//					log.info("[REG] >>> Realitzant registre de la notificació id: " + pendent);
+//					notificacioHelper.registrarNotificar(pendent);
 //				}
 //			}
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
+//	}
 
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
+//	// 2. Enviament de notificacions registrades a Notific@
+//	///////////////////////////////////////////////////////
+//	@Override
+//	public void notificaEnviamentsRegistrats() {
+//		var timer = metricsHelper.iniciMetrica();
+//		try {
+////			if (!isSemaforInUse() && isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
+//			if (isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
+//				log.info("[NOT] Cercant notificacions registrades pendents d'enviar a Notifica");
+//				List<Long> pendents = notificacioService.getNotificacionsPendentsEnviar();
+//				if (pendents != null && !pendents.isEmpty()) {
+//					log.info("[NOT] Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents");
+//					for (Long pendent: pendents) {
+//						log.info("[NOT] >>> Realitzant enviament a Notifica de la notificació amb id: " + pendent);
+//						if (SemaforNotificacio.isSemaforInUse(pendent)) {
+//							continue;
+//						}
+//						notificacioService.notificacioEnviar(pendent);
+//					}
+//				} else {
+//					log.info("[NOT] No hi ha notificacions pendents d'enviar a Notific@");
+//				}
+//			} else {
+//				log.info("[NOT] L'enviament de notificacions a Notific@ està deshabilitada");
+//			}
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
+//	}
 
-	// 2. Enviament de notificacions registrades a Notific@
-	///////////////////////////////////////////////////////
-	@Override
-	public void notificaEnviamentsRegistrats() {
-		var timer = metricsHelper.iniciMetrica();
-		try {
-//			if (!isSemaforInUse() && isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
-			if (isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
-				log.info("[NOT] Cercant notificacions registrades pendents d'enviar a Notifica");
-				List<Long> pendents = notificacioService.getNotificacionsPendentsEnviar();
-				if (pendents != null && !pendents.isEmpty()) {
-					log.info("[NOT] Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents");
-					for (Long pendent: pendents) {
-						log.info("[NOT] >>> Realitzant enviament a Notifica de la notificació amb id: " + pendent);
-						if (SemaforNotificacio.isSemaforInUse(pendent)) {
-							continue;
-						}
-						notificacioService.notificacioEnviar(pendent);
-					}
-				} else {
-					log.info("[NOT] No hi ha notificacions pendents d'enviar a Notific@");
-				}
-			} else {
-				log.info("[NOT] L'enviament de notificacions a Notific@ està deshabilitada");
-			}
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
+//	// 3. Actualització de l'estat dels enviaments amb l'estat de Notific@
+//	//////////////////////////////////////////////////////////////////
+//	@Override
+//	public void enviamentRefrescarEstatPendents() {
+//		var timer = metricsHelper.iniciMetrica();
+//		try {
+//			if (!notificaHelper.isAdviserActiu() && isTasquesActivesProperty() && isEnviamentActualitzacioEstatActiu() && notificaHelper.isConnexioNotificaDisponible()) {
+//				log.info("[EST] Cercant enviaments pendents de refrescar l'estat de Notifica");
+//				List<Long> pendents = notificacioService.getNotificacionsPendentsRefrescarEstat();
+//				if (pendents != null && !pendents.isEmpty()) {
+//					log.info("[EST] Realitzant refresc de l'estat de Notifica per a " + pendents.size() + " enviaments");
+//					for (Long pendent: pendents) {
+//						log.info("[EST] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + pendent + "]");
+//						notificacioService.enviamentRefrescarEstat(pendent);
+//					}
+//				} else {
+//					log.info("[EST] No hi ha enviaments pendents de refrescar l'estat de Notifica");
+//				}
+//			} else {
+//				log.info("[EST] L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
+//			}
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
+//	}
 
-	// 3. Actualització de l'estat dels enviaments amb l'estat de Notific@
-	//////////////////////////////////////////////////////////////////
-	@Override
-	public void enviamentRefrescarEstatPendents() {
-		var timer = metricsHelper.iniciMetrica();
-		try {
-			if (!notificaHelper.isAdviserActiu() && isTasquesActivesProperty() && isEnviamentActualitzacioEstatActiu() && notificaHelper.isConnexioNotificaDisponible()) {
-				log.info("[EST] Cercant enviaments pendents de refrescar l'estat de Notifica");
-				List<Long> pendents = notificacioService.getNotificacionsPendentsRefrescarEstat();
-				if (pendents != null && !pendents.isEmpty()) {
-					log.info("[EST] Realitzant refresc de l'estat de Notifica per a " + pendents.size() + " enviaments");
-					for (Long pendent: pendents) {
-						log.info("[EST] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + pendent + "]");
-						notificacioService.enviamentRefrescarEstat(pendent);
-					}
-				} else {
-					log.info("[EST] No hi ha enviaments pendents de refrescar l'estat de Notifica");
-				}
-			} else {
-				log.info("[EST] L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
-			}
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	// 4. Actualització de l'estat dels enviaments amb l'estat de enviat_sir
-	//////////////////////////////////////////////////////////////////
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	public void enviamentRefrescarEstatEnviatSir() {
-		var timer = metricsHelper.iniciMetrica();
-		try {
-			if (isTasquesActivesProperty() && isEnviamentActualitzacioEstatRegistreActiu()) {
-				log.info("[SIR] Cercant enviaments pendents de refrescar l'estat enviat SIR");
-				List<Long> pendents = notificacioService.getNotificacionsPendentsRefrescarEstatRegistre();
-				if (pendents != null && !pendents.isEmpty()) {
-					log.info("[SIR] Realitzant refresc de l'estat de enviat SIR per a " + pendents.size() + " enviaments");
-					for (Long pendent: pendents) {
-						log.info(">>> Consultat l'estat a registre de l'enviament: [Id: " + pendent + "]" + ", i actualitzant les dades a Notib.");
-						notificacioService.enviamentRefrescarEstatRegistre(pendent);
-					}
-				} else {
-					log.info("[SIR] No hi ha enviaments pendents de refrescar l'estat enviats a SIR");
-				}
-			} else {
-				log.info("[SIR] L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
-			}
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}	
-	}
-	
-	
+//	// 4. Actualització de l'estat dels enviaments amb l'estat de enviat_sir
+//	//////////////////////////////////////////////////////////////////
+//	@SuppressWarnings({ "unchecked", "rawtypes" })
+//	@Override
+//	public void enviamentRefrescarEstatEnviatSir() {
+//		var timer = metricsHelper.iniciMetrica();
+//		try {
+//			if (isTasquesActivesProperty() && isEnviamentActualitzacioEstatRegistreActiu()) {
+//				log.info("[SIR] Cercant enviaments pendents de refrescar l'estat enviat SIR");
+//				List<Long> pendents = notificacioService.getNotificacionsPendentsRefrescarEstatRegistre();
+//				if (pendents != null && !pendents.isEmpty()) {
+//					log.info("[SIR] Realitzant refresc de l'estat de enviat SIR per a " + pendents.size() + " enviaments");
+//					for (Long pendent: pendents) {
+//						log.info(">>> Consultat l'estat a registre de l'enviament: [Id: " + pendent + "]" + ", i actualitzant les dades a Notib.");
+//						notificacioService.enviamentRefrescarEstatRegistre(pendent);
+//					}
+//				} else {
+//					log.info("[SIR] No hi ha enviaments pendents de refrescar l'estat enviats a SIR");
+//				}
+//			} else {
+//				log.info("[SIR] L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
+//			}
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
+//	}
+
 	// 5. Actualització dels procediments a partir de la informació de Rolsac
 	/////////////////////////////////////////////////////////////////////////
 	@Override

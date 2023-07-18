@@ -12,34 +12,8 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.*;
-import es.caib.notib.logic.helper.AuditHelper;
-import es.caib.notib.logic.helper.CacheHelper;
-import es.caib.notib.logic.helper.CaducitatHelper;
-import es.caib.notib.logic.helper.ConfigHelper;
-import es.caib.notib.logic.helper.EnviamentTableHelper;
-import es.caib.notib.logic.helper.IntegracioHelper;
-import es.caib.notib.logic.helper.MetricsHelper;
-import es.caib.notib.logic.helper.NotificaHelper;
-import es.caib.notib.logic.helper.NotificacioHelper;
-import es.caib.notib.logic.helper.NotificacioTableHelper;
-import es.caib.notib.logic.helper.PermisosHelper;
-import es.caib.notib.logic.helper.PluginHelper;
-import es.caib.notib.logic.helper.RegistreNotificaHelper;
-import es.caib.notib.logic.helper.SemaforNotificacio;
-import es.caib.notib.logic.intf.dto.AccioParam;
-import es.caib.notib.logic.intf.dto.DocumentValidDto;
-import es.caib.notib.logic.intf.dto.FitxerDto;
-import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioInfo;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.logic.intf.dto.PermisDto;
-import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
-import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
-import es.caib.notib.logic.intf.dto.SignatureInfoDto;
-import es.caib.notib.logic.intf.dto.TipusEnumDto;
-import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.logic.helper.*;
+import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.ValidationException;
@@ -50,24 +24,8 @@ import es.caib.notib.logic.intf.service.NotificacioServiceWs;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.logic.utils.MimeUtils;
-import es.caib.notib.persist.entity.DocumentEntity;
-import es.caib.notib.persist.entity.EntitatEntity;
-import es.caib.notib.persist.entity.NotificacioEntity;
-import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
-import es.caib.notib.persist.entity.NotificacioEventEntity;
-import es.caib.notib.persist.entity.OrganGestorEntity;
-import es.caib.notib.persist.entity.PersonaEntity;
-import es.caib.notib.persist.entity.ProcSerEntity;
-import es.caib.notib.persist.entity.ProcSerOrganEntity;
-import es.caib.notib.persist.entity.ProcedimentEntity;
-import es.caib.notib.persist.repository.DocumentRepository;
-import es.caib.notib.persist.repository.EntitatRepository;
-import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
-import es.caib.notib.persist.repository.NotificacioRepository;
-import es.caib.notib.persist.repository.OrganGestorRepository;
-import es.caib.notib.persist.repository.PersonaRepository;
-import es.caib.notib.persist.repository.ProcSerOrganRepository;
-import es.caib.notib.persist.repository.ProcSerRepository;
+import es.caib.notib.persist.entity.*;
+import es.caib.notib.persist.repository.*;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
@@ -87,13 +45,7 @@ import javax.jws.WebService;
 import java.io.ByteArrayOutputStream;
 import java.security.GeneralSecurityException;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -355,18 +307,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			log.debug(">> [ALTA] enviaments creats");
 
 			notificacioGuardada = notificacioRepository.saveAndFlush(notificacioGuardada);
-
-			// Enviament SÍNCRON
-			if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
-				log.info(" [ALTA] Enviament SINCRON notificació [Id: " + notificacioGuardada.getId() + ", Estat: " + notificacioGuardada.getEstat() + "]");
-				synchronized(SemaforNotificacio.agafar(notificacioGuardada.getId())) {
-					boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioGuardada);
-					if (notificar) {
-						notificaHelper.notificacioEnviar(notificacioGuardada.getId());
-					}
-				}
-				SemaforNotificacio.alliberar(notificacioGuardada.getId());
-			}
 
 			// SM
 			referencies.forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));

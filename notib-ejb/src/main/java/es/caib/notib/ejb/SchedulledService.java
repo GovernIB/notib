@@ -3,7 +3,6 @@
  */
 package es.caib.notib.ejb;
 
-import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
@@ -26,29 +25,29 @@ public class SchedulledService extends AbstractService<es.caib.notib.logic.intf.
 //		getDelegateService().restartSchedulledTasks();
 //	}
 
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public void notificaEnviamentsRegistrats() {
-		getDelegateService().notificaEnviamentsRegistrats();
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+//	public void notificaEnviamentsRegistrats() {
+//		getDelegateService().notificaEnviamentsRegistrats();
+//	}
 
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public void registrarEnviamentsPendents() throws RegistreNotificaException {
-		getDelegateService().registrarEnviamentsPendents();
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+//	public void registrarEnviamentsPendents() throws RegistreNotificaException {
+//		getDelegateService().registrarEnviamentsPendents();
+//	}
 
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public void enviamentRefrescarEstatPendents() {
-		getDelegateService().enviamentRefrescarEstatPendents();
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+//	public void enviamentRefrescarEstatPendents() {
+//		getDelegateService().enviamentRefrescarEstatPendents();
+//	}
 
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public void enviamentRefrescarEstatEnviatSir() {
-		getDelegateService().enviamentRefrescarEstatEnviatSir();
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+//	public void enviamentRefrescarEstatEnviatSir() {
+//		getDelegateService().enviamentRefrescarEstatEnviatSir();
+//	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})

@@ -18,7 +18,7 @@ import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.PaisosDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.logic.intf.dto.ProvinciesDto;
-import es.caib.notib.logic.intf.dto.RegistreIdDto;
+import es.caib.notib.logic.intf.dto.RespostaAccio;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
@@ -284,7 +284,10 @@ public interface NotificacioService {
 	public ArxiuDto enviamentGetCertificacioArxiu(
 			Long enviamentId);
 
-	/**
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+    void refrescarEstatEnviamentASir(Long enviamentId);
+
+    /**
 	 * Prova de fer l'enviament d'una notificació pendent.
 	 * 
 	 * @param notificacioId
@@ -292,7 +295,7 @@ public interface NotificacioService {
 	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public boolean enviar(Long notificacioId);
+	public boolean enviarNotificacioANotifica(Long notificacioId);
 	
 	/**
 	 * Registra i notifica una notificació
@@ -303,7 +306,7 @@ public interface NotificacioService {
 	 * @throws RegistreNotificaException 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException;
+	public RespostaAccio<String> enviarNotificacioARegistre(Long notificacioId) throws RegistreNotificaException;
 
 	/**
 	 * Refresca l'estat d'un enviament (datat i certificació).

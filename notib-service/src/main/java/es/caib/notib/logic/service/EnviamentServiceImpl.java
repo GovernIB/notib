@@ -56,6 +56,7 @@ import es.caib.notib.logic.intf.rest.consulta.Transmissio;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentService;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
@@ -86,7 +87,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.supercsv.io.CsvListWriter;
@@ -168,6 +168,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private CallbackRepository callbackRepository;
 	@Autowired
 	private NotificaHelper notificaHelper;
+
+	@Autowired
+	private EnviamentSmService enviamentSmService;
 
 
 	private static final String CONSULTA_ENV_LOG = "Consulta els enviaments de les notificacións que te una entitat";
@@ -1429,12 +1432,20 @@ public class EnviamentServiceImpl implements EnviamentService {
 			// si l'enviament esta pendent de refrescar l'estat enviat SIR
 			if (enviament.isPendentRefrescarEstatRegistre()) {
 				notificacioService.enviamentRefrescarEstatRegistre(enviamentId);
+				enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+				if (enviament.isRegistreEstatFinal()) {
+					enviamentSmService.sirForward(enviament.getUuid());
+				}
 			}
 			return;
 		}
 		// si l'enviament esta pendent de refrescar estat a notifica
 		if (enviament.isPendentRefrescarEstatNotifica()) {
 			notificacioService.enviamentRefrescarEstat(enviamentId);
+			enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+			if (enviament.isNotificaEstatFinal()) {
+				enviamentSmService.consultaForward(enviament.getUuid());
+			}
 		}
 	}
 

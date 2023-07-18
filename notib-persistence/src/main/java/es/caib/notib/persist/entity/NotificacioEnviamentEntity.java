@@ -269,6 +269,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 //	@Enumerated(EnumType.STRING)
 //	private EnviamentSmEstat smEstat;
 
+	public String getUuid() {
+		return this.notificaReferencia;
+	}
+
 	public void setRegistreEstat(NotificacioRegistreEstatEnumDto registreEstat) {
 		this.registreEstat = registreEstat;
 	}

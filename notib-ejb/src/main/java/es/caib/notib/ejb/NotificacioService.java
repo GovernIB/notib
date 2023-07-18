@@ -18,7 +18,7 @@ import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.PaisosDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.logic.intf.dto.ProvinciesDto;
-import es.caib.notib.logic.intf.dto.RegistreIdDto;
+import es.caib.notib.logic.intf.dto.RespostaAccio;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
@@ -132,10 +132,16 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 		return getDelegateService().enviamentGetCertificacioArxiu(enviamentId);
 	}
 
-	@Override
+    @Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public boolean enviar(Long notificacioId) {
-		return getDelegateService().enviar(notificacioId);
+    public void refrescarEstatEnviamentASir(Long enviamentId) {
+        getDelegateService().refrescarEstatEnviamentASir(enviamentId);
+    }
+
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public boolean enviarNotificacioANotifica(Long notificacioId) {
+		return getDelegateService().enviarNotificacioANotifica(notificacioId);
 	}
 
 	@Override
@@ -220,8 +226,8 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException {
-		return getDelegateService().registrarNotificar(notificacioId);
+	public RespostaAccio<String> enviarNotificacioARegistre(Long notificacioId) throws RegistreNotificaException {
+		return getDelegateService().enviarNotificacioARegistre(notificacioId);
 	}
 
 	@Override

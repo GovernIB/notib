@@ -86,6 +86,8 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
                     // .then(EMAIL_PENDENT, senseNif(), emailAction) --> Els emails s'envien en la notificació
                     //.last(NOTIFICA_PENDENT, notificaAction).and()
                     .last(NOTIFICA_PENDENT, enviamentNotificaAction).and()
+                .withExternal().source(REGISTRE_PENDENT).target(REGISTRAT).event(RG_FORWARD).and()
+                .withExternal().source(REGISTRE_ERROR).target(REGISTRAT).event(RG_FORWARD).and()
                 // Enviament notifica
                 .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_PENDENT).event(NT_ENVIAR).guard(uuidGuard()).action(enviamentNotificaAction).and()
                 .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_SENT).event(NT_SUCCESS).guard(uuidGuard()).action(consultaNotificaIniciPoolingAction).and()
@@ -94,6 +96,8 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
                     .first(NOTIFICA_PENDENT, reintentsNotificaGuard, enviamentNotificaAction)
                     .last(NOTIFICA_ERROR).and()
                 .withExternal().source(NOTIFICA_ERROR).target(NOTIFICA_PENDENT).event(NT_RETRY).guard(uuidGuard()).action(enviamentNotificaAction).and()
+                .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_SENT).event(NT_FORWARD).and()
+                .withExternal().source(NOTIFICA_ERROR).target(NOTIFICA_SENT).event(NT_FORWARD).and()
                 // Consulta estat
                 .withExternal().source(NOTIFICA_SENT).target(NOTIFICA_SENT).event(CN_CONSULTAR).guard(uuidGuard()).action(consultaNotificaAction).and()
                 .withExternal().source(NOTIFICA_SENT).target(CONSULTA_ESTAT).event(CN_SUCCESS).guard(uuidGuard()).and()
@@ -106,6 +110,8 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
                     .then(NOTIFICA_SENT, reintentsConsultaNotificaGuard, consultaNotificaAction)
                     .last(CONSULTA_ERROR).and()
                 .withExternal().source(CONSULTA_ERROR).target(NOTIFICA_SENT).event(CN_RETRY).guard(uuidGuard()).action(consultaNotificaAction).and()
+                .withExternal().source(NOTIFICA_SENT).target(FI).event(CN_FORWARD).and()
+                .withExternal().source(CONSULTA_ERROR).target(FI).event(CN_FORWARD).and()
                 // Consulta SIR
                 .withExternal().source(SIR_PENDENT).target(SIR_PENDENT).event(SR_CONSULTAR).guard(uuidGuard()).action(consultaSirAction).and()
                 .withExternal().source(SIR_PENDENT).target(SIR_ESTAT).event(SR_SUCCESS).guard(uuidGuard()).and()
@@ -117,7 +123,9 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
                     .first(SIR_PENDENT, isSirCallback())
                     .then(SIR_PENDENT, reintentsConsultaSirGuard, consultaSirPoolingAction)
                     .last(SIR_ERROR).and()
-                .withExternal().source(SIR_ERROR).target(SIR_PENDENT).event(SR_RETRY).guard(uuidGuard()).action(consultaSirAction);
+                .withExternal().source(SIR_ERROR).target(SIR_PENDENT).event(SR_RETRY).guard(uuidGuard()).action(consultaSirAction).and()
+                .withExternal().source(SIR_PENDENT).target(FI).event(SR_FORWARD).and()
+                .withExternal().source(SIR_ERROR).target(FI).event(SR_FORWARD);
 
 //                // Enviament email
 //                .withExternal().source(EMAIL_PENDENT)   .target(EMAIL_PENDENT)          .event(EM_ENVIAR)       .guard(uuidGuard())             .action(enviamentEmailAction)         .and()

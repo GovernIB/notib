@@ -58,133 +58,133 @@ public class SchedulingConfig implements SchedulingConfigurer {
     }
 
     private void registerSchedulledTasks() {
-        // 1. Enviament de notificacions pendents al registre i notific@
-        ////////////////////////////////////////////////////////////////
-        final String registrarEnviamentsPendents = "registrarEnviamentsPendents";
-        monitorTasquesService.addTasca(registrarEnviamentsPendents);
-        taskRegistrar.addTriggerTask(
-                () -> {
-                    try {
-                        monitorTasquesService.inici(registrarEnviamentsPendents);
-                        schedulledService.registrarEnviamentsPendents();
-                        monitorTasquesService.fi(registrarEnviamentsPendents);
-                    } catch(Exception e) {
-                        monitorTasquesService.error(registrarEnviamentsPendents);
-                    }
-                },
-                triggerContext -> {
-                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_RATE), TimeUnit.MILLISECONDS);
-                    trigger.setFixedRate(true);
-                    // Només la primera vegada que s'executa
-                    Long registrarEnviamentsPendentsInitialDelayLong = 0L;
-                    if (primeraVez[0]) {
-                        registrarEnviamentsPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_INITIAL_DELAY);
-                        primeraVez[0] = false;
-                    }
-                    trigger.setInitialDelay(registrarEnviamentsPendentsInitialDelayLong);
-                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-                    monitorTasquesService.updateProperaExecucio(registrarEnviamentsPendents, millis);
-                    return nextExecution;
-                }
-        );
-        monitorTasquesService.addTasca(registrarEnviamentsPendents);
+//        // 1. Enviament de notificacions pendents al registre i notific@
+//        ////////////////////////////////////////////////////////////////
+//        final String registrarEnviamentsPendents = "registrarEnviamentsPendents";
+//        monitorTasquesService.addTasca(registrarEnviamentsPendents);
+//        taskRegistrar.addTriggerTask(
+//                () -> {
+//                    try {
+//                        monitorTasquesService.inici(registrarEnviamentsPendents);
+//                        schedulledService.registrarEnviamentsPendents();
+//                        monitorTasquesService.fi(registrarEnviamentsPendents);
+//                    } catch(Exception e) {
+//                        monitorTasquesService.error(registrarEnviamentsPendents);
+//                    }
+//                },
+//                triggerContext -> {
+//                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_RATE), TimeUnit.MILLISECONDS);
+//                    trigger.setFixedRate(true);
+//                    // Només la primera vegada que s'executa
+//                    Long registrarEnviamentsPendentsInitialDelayLong = 0L;
+//                    if (primeraVez[0]) {
+//                        registrarEnviamentsPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_INITIAL_DELAY);
+//                        primeraVez[0] = false;
+//                    }
+//                    trigger.setInitialDelay(registrarEnviamentsPendentsInitialDelayLong);
+//                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
+//                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
+//                    monitorTasquesService.updateProperaExecucio(registrarEnviamentsPendents, millis);
+//                    return nextExecution;
+//                }
+//        );
+//        monitorTasquesService.addTasca(registrarEnviamentsPendents);
 
-        // 2. Enviament de notificacions registrades a Notific@
-        ///////////////////////////////////////////////////////
-        final String notificaEnviamentsRegistrats = "notificaEnviamentsRegistrats";
-        monitorTasquesService.addTasca(notificaEnviamentsRegistrats);
-        taskRegistrar.addTriggerTask(
-                () -> {
-                    try {
-                        monitorTasquesService.inici(notificaEnviamentsRegistrats);
-                        schedulledService.notificaEnviamentsRegistrats();
-                        monitorTasquesService.fi(notificaEnviamentsRegistrats);
-                    } catch(Exception e) {
-                        monitorTasquesService.error(notificaEnviamentsRegistrats);
-                    }
-                },
-                triggerContext -> {
-                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_RATE), TimeUnit.MILLISECONDS);
-                    trigger.setFixedRate(true);
-                    // Només la primera vegada que s'executa
-                    Long notificaEnviamentsRegistratsInitialDelayLong = 0L;
-                    if (primeraVez[1]) {
-                        notificaEnviamentsRegistratsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_INITIAL_DELAY);
-                        primeraVez[1] = false;
-                    }
-                    trigger.setInitialDelay(notificaEnviamentsRegistratsInitialDelayLong);
-                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-                    monitorTasquesService.updateProperaExecucio(notificaEnviamentsRegistrats, millis);
-                    return nextExecution;
-                }
-        );
-        monitorTasquesService.addTasca(notificaEnviamentsRegistrats);
+//        // 2. Enviament de notificacions registrades a Notific@
+//        ///////////////////////////////////////////////////////
+//        final String notificaEnviamentsRegistrats = "notificaEnviamentsRegistrats";
+//        monitorTasquesService.addTasca(notificaEnviamentsRegistrats);
+//        taskRegistrar.addTriggerTask(
+//                () -> {
+//                    try {
+//                        monitorTasquesService.inici(notificaEnviamentsRegistrats);
+//                        schedulledService.notificaEnviamentsRegistrats();
+//                        monitorTasquesService.fi(notificaEnviamentsRegistrats);
+//                    } catch(Exception e) {
+//                        monitorTasquesService.error(notificaEnviamentsRegistrats);
+//                    }
+//                },
+//                triggerContext -> {
+//                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_RATE), TimeUnit.MILLISECONDS);
+//                    trigger.setFixedRate(true);
+//                    // Només la primera vegada que s'executa
+//                    Long notificaEnviamentsRegistratsInitialDelayLong = 0L;
+//                    if (primeraVez[1]) {
+//                        notificaEnviamentsRegistratsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_INITIAL_DELAY);
+//                        primeraVez[1] = false;
+//                    }
+//                    trigger.setInitialDelay(notificaEnviamentsRegistratsInitialDelayLong);
+//                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
+//                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
+//                    monitorTasquesService.updateProperaExecucio(notificaEnviamentsRegistrats, millis);
+//                    return nextExecution;
+//                }
+//        );
+//        monitorTasquesService.addTasca(notificaEnviamentsRegistrats);
 
-        // 3. Actualització de l'estat dels enviaments amb l'estat de Notific@
-        //////////////////////////////////////////////////////////////////
-        final String enviamentRefrescarEstatPendents = "enviamentRefrescarEstatPendents";
-        monitorTasquesService.addTasca(enviamentRefrescarEstatPendents);
-        taskRegistrar.addTriggerTask(
-                () -> {
-                    try {
-                        monitorTasquesService.inici(enviamentRefrescarEstatPendents);
-                        schedulledService.enviamentRefrescarEstatPendents();
-                        monitorTasquesService.fi(enviamentRefrescarEstatPendents);
-                    } catch(Exception e) {
-                        monitorTasquesService.error(enviamentRefrescarEstatPendents);
-                    }
-                },
-                triggerContext -> {
-                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_RATE), TimeUnit.MILLISECONDS);
-                    trigger.setFixedRate(true);
-                    // Només la primera vegada que s'executa
-                    Long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
-                    if (primeraVez[2]) {
-                        enviamentRefrescarEstatPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_INITIAL_DELAY);
-                        primeraVez[2] = false;
-                    }
-                    trigger.setInitialDelay(enviamentRefrescarEstatPendentsInitialDelayLong);
-                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-                    monitorTasquesService.updateProperaExecucio(enviamentRefrescarEstatPendents, millis);
-                    return nextExecution;
-                }
-        );
-        monitorTasquesService.addTasca(enviamentRefrescarEstatPendents);
+//        // 3. Actualització de l'estat dels enviaments amb l'estat de Notific@
+//        //////////////////////////////////////////////////////////////////
+//        final String enviamentRefrescarEstatPendents = "enviamentRefrescarEstatPendents";
+//        monitorTasquesService.addTasca(enviamentRefrescarEstatPendents);
+//        taskRegistrar.addTriggerTask(
+//                () -> {
+//                    try {
+//                        monitorTasquesService.inici(enviamentRefrescarEstatPendents);
+//                        schedulledService.enviamentRefrescarEstatPendents();
+//                        monitorTasquesService.fi(enviamentRefrescarEstatPendents);
+//                    } catch(Exception e) {
+//                        monitorTasquesService.error(enviamentRefrescarEstatPendents);
+//                    }
+//                },
+//                triggerContext -> {
+//                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_RATE), TimeUnit.MILLISECONDS);
+//                    trigger.setFixedRate(true);
+//                    // Només la primera vegada que s'executa
+//                    Long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
+//                    if (primeraVez[2]) {
+//                        enviamentRefrescarEstatPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_INITIAL_DELAY);
+//                        primeraVez[2] = false;
+//                    }
+//                    trigger.setInitialDelay(enviamentRefrescarEstatPendentsInitialDelayLong);
+//                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
+//                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
+//                    monitorTasquesService.updateProperaExecucio(enviamentRefrescarEstatPendents, millis);
+//                    return nextExecution;
+//                }
+//        );
+//        monitorTasquesService.addTasca(enviamentRefrescarEstatPendents);
 
-        // 4. Actualització de l'estat dels enviaments amb l'estat de enviat_sir
-        //////////////////////////////////////////////////////////////////
-        final String enviamentRefrescarEstatEnviatSir = "enviamentRefrescarEstatEnviatSir";
-        monitorTasquesService.addTasca(enviamentRefrescarEstatEnviatSir);
-        taskRegistrar.addTriggerTask(
-                () -> {
-                    try {
-                        monitorTasquesService.inici(enviamentRefrescarEstatEnviatSir);
-                        schedulledService.enviamentRefrescarEstatEnviatSir();
-                        monitorTasquesService.fi(enviamentRefrescarEstatEnviatSir);
-                    } catch(Exception e) {
-                        monitorTasquesService.error(enviamentRefrescarEstatEnviatSir);
-                    }
-                },
-                triggerContext -> {
-                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_RATE), TimeUnit.MILLISECONDS);
-                    trigger.setFixedRate(true);
-                    // Només la primera vegada que s'executa
-                    Long enviamentRefrescarEstatEnviatSirInitialDelayLong = 0L;
-                    if (primeraVez[3]) {
-                        enviamentRefrescarEstatEnviatSirInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_INITIAL_DELAY);
-                        primeraVez[3] = false;
-                    }
-                    trigger.setInitialDelay(enviamentRefrescarEstatEnviatSirInitialDelayLong);
-                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-                    monitorTasquesService.updateProperaExecucio(enviamentRefrescarEstatEnviatSir, millis);
-                    return nextExecution;
-                }
-        );
-        monitorTasquesService.addTasca(enviamentRefrescarEstatEnviatSir);
+//        // 4. Actualització de l'estat dels enviaments amb l'estat de enviat_sir
+//        //////////////////////////////////////////////////////////////////
+//        final String enviamentRefrescarEstatEnviatSir = "enviamentRefrescarEstatEnviatSir";
+//        monitorTasquesService.addTasca(enviamentRefrescarEstatEnviatSir);
+//        taskRegistrar.addTriggerTask(
+//                () -> {
+//                    try {
+//                        monitorTasquesService.inici(enviamentRefrescarEstatEnviatSir);
+//                        schedulledService.enviamentRefrescarEstatEnviatSir();
+//                        monitorTasquesService.fi(enviamentRefrescarEstatEnviatSir);
+//                    } catch(Exception e) {
+//                        monitorTasquesService.error(enviamentRefrescarEstatEnviatSir);
+//                    }
+//                },
+//                triggerContext -> {
+//                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_RATE), TimeUnit.MILLISECONDS);
+//                    trigger.setFixedRate(true);
+//                    // Només la primera vegada que s'executa
+//                    Long enviamentRefrescarEstatEnviatSirInitialDelayLong = 0L;
+//                    if (primeraVez[3]) {
+//                        enviamentRefrescarEstatEnviatSirInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_INITIAL_DELAY);
+//                        primeraVez[3] = false;
+//                    }
+//                    trigger.setInitialDelay(enviamentRefrescarEstatEnviatSirInitialDelayLong);
+//                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
+//                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
+//                    monitorTasquesService.updateProperaExecucio(enviamentRefrescarEstatEnviatSir, millis);
+//                    return nextExecution;
+//                }
+//        );
+//        monitorTasquesService.addTasca(enviamentRefrescarEstatEnviatSir);
 
         // 5. Actualització dels procediments a partir de la informació de Rolsac
         /////////////////////////////////////////////////////////////////////////

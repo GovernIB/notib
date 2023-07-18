@@ -156,7 +156,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             notificacio = notificacioService.findAmbId(notificacioId, isAdministrador(request));
             if(notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)) {
                 try {
-                    notificacioService.registrarNotificar(notificacioId);
+                    notificacioService.enviarNotificacioARegistre(notificacioId);
                 } catch (Exception ex) {
                     notificacionsError++;
                     mostraErrorReintentarNotificacio(request, notificacioId, notificacio, ex);
@@ -165,7 +165,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             }
             if (notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)) {
                 try {
-                    notificacioService.notificacioEnviar(notificacioId);
+                    notificacioService.enviarNotificacioANotifica(notificacioId);
                 } catch (Exception ex) {
                     notificacionsError++;
                     mostraErrorReintentarNotificacio(request, notificacioId, notificacio, ex);

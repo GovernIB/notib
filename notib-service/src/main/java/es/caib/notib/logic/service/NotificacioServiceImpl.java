@@ -4,57 +4,25 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.Enviament;
-import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.client.domini.OrigenEnum;
-import es.caib.notib.client.domini.TipusDocumentalEnum;
-import es.caib.notib.client.domini.ValidesaEnum;
+import es.caib.notib.client.domini.*;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
 import es.caib.notib.logic.intf.dto.cie.CieDataDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioInfoDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
+import es.caib.notib.logic.intf.dto.notificacio.*;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.exception.EnviamentSmEstatException;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
-import es.caib.notib.logic.intf.service.AplicacioService;
-import es.caib.notib.logic.intf.service.AuditService;
-import es.caib.notib.logic.intf.service.EnviamentSmService;
-import es.caib.notib.logic.intf.service.NotificacioService;
-import es.caib.notib.logic.intf.service.PermisosService;
-import es.caib.notib.persist.entity.CallbackEntity;
-import es.caib.notib.persist.entity.NotificacioEntity;
-import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
-import es.caib.notib.persist.entity.NotificacioEventEntity;
-import es.caib.notib.persist.entity.NotificacioTableEntity;
-import es.caib.notib.persist.entity.PersonaEntity;
-import es.caib.notib.persist.entity.ProcedimentEntity;
+import es.caib.notib.logic.intf.service.*;
+import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
+import es.caib.notib.persist.entity.*;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
 import es.caib.notib.persist.objectes.FiltreNotificacio;
-import es.caib.notib.persist.repository.CallbackRepository;
-import es.caib.notib.persist.repository.ColumnesRepository;
-import es.caib.notib.persist.repository.DocumentRepository;
-import es.caib.notib.persist.repository.EntitatRepository;
-import es.caib.notib.persist.repository.EnviamentTableRepository;
-import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
-import es.caib.notib.persist.repository.NotificacioEventRepository;
-import es.caib.notib.persist.repository.NotificacioRepository;
-import es.caib.notib.persist.repository.NotificacioTableViewRepository;
-import es.caib.notib.persist.repository.PersonaRepository;
-import es.caib.notib.persist.repository.ProcSerOrganRepository;
-import es.caib.notib.persist.repository.ProcedimentRepository;
+import es.caib.notib.persist.repository.*;
 import es.caib.notib.persist.repository.auditoria.NotificacioAuditRepository;
 import es.caib.notib.persist.repository.auditoria.NotificacioEnviamentAuditRepository;
 import es.caib.notib.plugin.unitat.CodiValor;
@@ -74,15 +42,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -410,17 +370,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 
-
-//			### Realitzar el procés de registre i notific@
-			if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
-				synchronized(SemaforNotificacio.agafar(notificacioEntity.getId())) {
-					boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioEntity);
-					if (notificar) {
-						notificaHelper.notificacioEnviar(notificacioEntity.getId());
-					}
-				}
-				SemaforNotificacio.alliberar(notificacioEntity.getId());
-			}
 			notificacioTableHelper.actualitzarRegistre(notificacioEntity);
 			auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.UPDATE, UPDATE);
 
@@ -1259,25 +1208,93 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public boolean enviar(Long notificacioId) {
+	public RespostaAccio<String> enviarNotificacioARegistre(Long notificacioId) throws RegistreNotificaException {
 
 		var timer = metricsHelper.iniciMetrica();
+		var resposta = new RespostaAccio<String>();
 		try {
-			log.debug("Intentant enviament de la notificació pendent (notificacioId=" + notificacioId + ")");
-			var notificacio = notificaHelper.notificacioEnviar(notificacioId);
-			return (notificacio != null && NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()));
+			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			notificacioEntity.getEnviaments().forEach(e -> {
+				EnviamentSmEstat estatEnviament = enviamentSmService.getEstatEnviament(e.getUuid());
+				try {
+					switch (estatEnviament) {
+						case REGISTRE_ERROR:
+							enviamentSmService.registreRetry(e.getUuid());
+							resposta.getExecutades().add(e.getUuid());
+							break;
+						case REGISTRE_PENDENT:
+							enviamentSmService.registreEnviament(e.getUuid());
+							resposta.getExecutades().add(e.getUuid());
+							break;
+						default:
+							resposta.getNoExecutables().add(e.getUuid());
+					}
+				} catch (Exception ex) {
+					resposta.getErrors().add(e.getUuid());
+				}
+			});
+//			return notificacioHelper.registrarNotificar(notificacioId);
+			return resposta;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional
 	@Override
-	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException {
+	public void refrescarEstatEnviamentASir(Long enviamentId) {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			return notificacioHelper.registrarNotificar(notificacioId);
+			log.debug("Intentant refrescar estat de l'enviament al registre (enviamentId=" + enviamentId + ")");
+			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+			EnviamentSmEstat estatEnviament = enviamentSmService.getEstatEnviament(enviament.getUuid());
+			switch (estatEnviament) {
+				case SIR_ERROR:
+					enviamentSmService.notificaRetry(enviament.getUuid());
+					break;
+				case SIR_PENDENT:
+					enviamentSmService.notificaEnviament(enviament.getUuid());
+					break;
+				default:
+					throw new EnviamentSmEstatException("Estat incorrecte per a refrescar l'estat SIR", estatEnviament);
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Transactional
+	@Override
+	public boolean enviarNotificacioANotifica(Long notificacioId) {
+
+		var timer = metricsHelper.iniciMetrica();
+		var resposta = new RespostaAccio<String>();
+		try {
+			log.debug("Intentant enviament de la notificació pendent (notificacioId=" + notificacioId + ")");
+			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			notificacioEntity.getEnviaments().forEach(e -> {
+				EnviamentSmEstat estatEnviament = enviamentSmService.getEstatEnviament(e.getUuid());
+				try {
+					switch (estatEnviament) {
+						case NOTIFICA_ERROR:
+							enviamentSmService.notificaRetry(e.getUuid());
+							resposta.getExecutades().add(e.getUuid());
+							break;
+						case NOTIFICA_PENDENT:
+							enviamentSmService.notificaEnviament(e.getUuid());
+							resposta.getExecutades().add(e.getUuid());
+							break;
+						default:
+							resposta.getNoExecutables().add(e.getUuid());
+					}
+				} catch (Exception ex) {
+					resposta.getErrors().add(e.getUuid());
+				}
+			});
+			return !resposta.getExecutades().isEmpty();
+//			var notificacio = notificaHelper.notificacioEnviar(notificacioId);
+//			return (notificacio != null && NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()));
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1291,9 +1308,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			log.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviamentId + ")");
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-			notificaHelper.enviamentRefrescarEstat(enviament.getId());
+			enviament = notificaHelper.enviamentRefrescarEstat(enviament.getId());
 			var estatDto = conversioTipusHelper.convertir(enviament, NotificacioEnviamenEstatDto.class);
 			estatCalcularCampsAddicionals(enviament, estatDto);
+			// SM
+			if (enviament.isNotificaEstatFinal()) {
+				enviamentSmService.consultaForward(enviament.getUuid());
+			}
 			return estatDto;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1533,9 +1554,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		var timer = metricsHelper.iniciMetrica();
 		var totBe = false;
 		try {
-			registreHelper.enviamentRefrescarEstatRegistre(enviamentId);
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+			enviament = registreHelper.enviamentRefrescarEstatRegistre(enviamentId);
 			totBe = enviament.getSirConsultaIntent() == 0;
+			// SM
+			if (enviament.isRegistreEstatFinal()) {
+				enviamentSmService.sirForward(enviament.getUuid());
+			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1704,7 +1729,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				|| NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) && !notificacio.isJustificantCreat()) {
 
 				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
-				notificacioEnviar(notificacioId);
+//				notificacioEnviar(notificacioId);
+				enviarNotificacioANotifica(notificacioId);
 				return true;
 			}
 		} catch (Exception e) {

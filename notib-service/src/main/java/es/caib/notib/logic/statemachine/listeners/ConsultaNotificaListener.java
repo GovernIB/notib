@@ -43,7 +43,7 @@ public class ConsultaNotificaListener {
             // Consultar enviament a notifica
             notificacioService.enviamentRefrescarEstat(enviament.getId());
             var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElseThrow();
-            boolean consultaSuccess = enviamentEntity.getNotificaIntentNum() == 0;
+            var consultaSuccess = enviamentEntity.getNotificaIntentNum() == 0;
 //            TEST
 //            var consultaSuccess = new Random().nextBoolean();
 

@@ -69,11 +69,27 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	}
 
 	@Override
+	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreRetry(String enviamentUuid) {
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_RETRY);
 		return sm;
+	}
+
+	@Override
+	@Transactional
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreForward(String enviamentUuid) {
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_FORWARD);
+		return sm;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean enviamentIsInRegistreErrorState(String enviamentUuid) {
+		return EnviamentSmEstat.REGISTRE_ERROR.equals(getEstatEnviament(enviamentUuid));
 	}
 
 	@Override
@@ -105,10 +121,20 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	}
 
 	@Override
+	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaRetry(String enviamentUuid) {
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_RETRY);
+		return sm;
+	}
+
+	@Override
+	@Transactional
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaForward(String enviamentUuid) {
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_FORWARD);
 		return sm;
 	}
 
@@ -171,10 +197,20 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	}
 
 	@Override
+	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaRetry(String enviamentUuid) {
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.CN_RETRY);
+		return sm;
+	}
+
+	@Override
+	@Transactional
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaForward(String enviamentUuid) {
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		sendEvent(enviamentUuid, sm, EnviamentSmEvent.CN_FORWARD);
 		return sm;
 	}
 
@@ -210,6 +246,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	}
 
 	@Override
+	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirRetry(String enviamentUuid) {
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
@@ -217,12 +254,27 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		return sm;
 	}
 
-	@Override
+    @Override
+	@Transactional
+    public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirForward(String enviamentUuid) {
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_FORWARD);
+		return sm;
+    }
+
+    @Override
 	@Transactional
 	public void remove(String enviamentUuid) {
 		stateMachineService.releaseStateMachine(enviamentUuid, true);
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public EnviamentSmEstat getEstatEnviament(String enviamentUuid) {
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid);
+		return sm.getState().getId();
+	}
 
 	private void sendEvent(String enviamentUuid, StateMachine<EnviamentSmEstat, EnviamentSmEvent> sm, EnviamentSmEvent event) {
 		var msg = MessageBuilder.withPayload(event)

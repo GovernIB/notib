@@ -19,6 +19,7 @@ import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
+import es.caib.notib.logic.intf.dto.RespostaAccio;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.missatges.Missatge;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
@@ -358,7 +359,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public String enviar(HttpServletRequest request, @PathVariable Long notificacioId, Model model) {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
-        var enviada = notificacioService.enviar(notificacioId);
+        var enviada = notificacioService.enviarNotificacioANotifica(notificacioId);
         emplenarModelNotificacioInfo(entitatActual, notificacioId, request,ACCIONS, model);
         model.addAttribute(PESTANYA_ACTIVA, ACCIONS);
         if (enviada) {
@@ -371,19 +372,13 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public String registrar(HttpServletRequest request, @PathVariable Long notificacioId, Model model) throws RegistreNotificaException {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
-        var registresIdDto = notificacioService.registrarNotificar(notificacioId);
+        RespostaAccio<String> resposta = notificacioService.enviarNotificacioARegistre(notificacioId);
         emplenarModelNotificacioInfo(entitatActual, notificacioId, request,ACCIONS, model);
-        if (registresIdDto == null || registresIdDto.isEmpty()) {
+        if (resposta.isEmpty() || !resposta.getErrors().isEmpty()) {
             MissatgesHelper.error(request, getMessage(request, "notificacio.controller.registrar.error"));
             return NOT_INFO;
         }
-        for (var registreIdDto : registresIdDto) {
-            if (registreIdDto.getNumero() != null || registreIdDto.getNumeroRegistreFormat() != null) {
-                MissatgesHelper.success(request, "(" + registreIdDto.getNumeroRegistreFormat() + ")" + getMessage(request,"notificacio.controller.registrar.ok"));
-                continue;
-            }
-            MissatgesHelper.error(request, getMessage(request, "notificacio.controller.registrar.error"));
-        }
+        resposta.getExecutades().forEach(e -> MissatgesHelper.success(request, "(" + e + ")" + getMessage(request,"notificacio.controller.registrar.ok")));
         model.addAttribute(PESTANYA_ACTIVA, ACCIONS);
         return NOT_INFO;
     }

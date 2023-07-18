@@ -1,17 +1,11 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.client.domini.Enviament;
-import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.client.domini.OrigenEnum;
-import es.caib.notib.client.domini.TipusDocumentalEnum;
-import es.caib.notib.client.domini.ValidesaEnum;
+import es.caib.notib.client.domini.*;
 import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.logic.intf.dto.RegistreIdDto;
 import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.NoDocumentException;
@@ -19,25 +13,8 @@ import es.caib.notib.logic.intf.exception.NoMetadadesException;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
-import es.caib.notib.logic.intf.service.EnviamentSmService;
-import es.caib.notib.persist.entity.DocumentEntity;
-import es.caib.notib.persist.entity.EntitatEntity;
-import es.caib.notib.persist.entity.GrupEntity;
-import es.caib.notib.persist.entity.NotificacioEntity;
-import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
-import es.caib.notib.persist.entity.NotificacioEventEntity;
-import es.caib.notib.persist.entity.NotificacioMassivaEntity;
-import es.caib.notib.persist.entity.OrganGestorEntity;
-import es.caib.notib.persist.entity.PersonaEntity;
-import es.caib.notib.persist.entity.ProcSerEntity;
-import es.caib.notib.persist.entity.ProcSerOrganEntity;
-import es.caib.notib.persist.repository.DocumentRepository;
-import es.caib.notib.persist.repository.GrupRepository;
-import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
-import es.caib.notib.persist.repository.NotificacioEventRepository;
-import es.caib.notib.persist.repository.NotificacioRepository;
-import es.caib.notib.persist.repository.OrganGestorRepository;
-import es.caib.notib.persist.repository.ProcSerOrganRepository;
+import es.caib.notib.persist.entity.*;
+import es.caib.notib.persist.repository.*;
 import es.caib.plugins.arxiu.api.ArxiuException;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
@@ -47,11 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -85,13 +58,7 @@ public class NotificacioHelper {
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
 	@Autowired
-	private RegistreNotificaHelper registreNotificaHelper;
-	@Autowired
 	private PersonaHelper personaHelper;
-	@Autowired
-	private NotificaHelper notificaHelper;
-	@Autowired
-	private EmailNotificacioSenseNifHelper emailNotificacioSenseNifHelper;
 	@Autowired
 	private NotificacioTableHelper notificacioTableHelper;
 	@Autowired
@@ -103,65 +70,6 @@ public class NotificacioHelper {
 	@Autowired
 	private MessageHelper messageHelper;
 
-	@Autowired
-	private EnviamentSmService enviamentSmService;
-
-	@PersistenceContext
-	private EntityManager entityManager;
-
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException {
-
-		log.info("Intentant registrar la notificació pendent (notificacioId=" + notificacioId + ")");
-		List<RegistreIdDto> registresIdDto = new ArrayList<>();
-		var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
-		log.info(" [REG] Inici registre notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
-		var startTime = System.nanoTime();
-		double elapsedTime;
-		synchronized(SemaforNotificacio.agafar(notificacioId)) {
-
-			log.info("Comprovant estat actual notificació (id: " + notificacio.getId() + ")...");
-			var estatActual = notificacio.getEstat();
-			log.info("Estat notificació [Id:" + notificacio.getId() + ", Estat: "+ estatActual + "]");
-			if (estatActual.equals(NotificacioEstatEnumDto.PENDENT)) {
-				// Registrar la notificació
-				var startTime2 = System.nanoTime();
-				var notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacio);
-				elapsedTime = (System.nanoTime() - startTime2) / 10e6;
-				log.info(" [TIMER-REG] Realitzar procés registrar [Id: " + notificacio.getId() + "]: " + elapsedTime + " ms");
-				for (var enviament: notificacio.getEnviaments()) {
-					registresIdDto.add(RegistreIdDto.builder().data(enviament.getRegistreData()).numeroRegistreFormat(enviament.getRegistreNumeroFormatat()).build());
-				}
-				if (notificar){
-					startTime2 = System.nanoTime();
-					// Enviar la notificació
-					var enviamentsSenseNifNoEnviats = notificacio.getEnviamentsPerEmailNoEnviats();
-					// 3 possibles casuístiques
-					// 1. Tots els enviaments a Notifica
-					if (enviamentsSenseNifNoEnviats.isEmpty()) {
-						notificaHelper.notificacioEnviar(notificacio.getId());
-					} else if (notificacio.getEnviamentsNoEnviats().size() <= enviamentsSenseNifNoEnviats.size()) {
-						// 2. Tots els enviaments per email
-						emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, true);
-					} else {
-						// 3. Una part dels enviaments a Notifica i l'altre via email
-						notificacio = notificaHelper.notificacioEnviar(notificacio.getId(), true);
-						// Fa falta enviar els restants per email
-						emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, false);
-					}
-					elapsedTime = (System.nanoTime() - startTime2) / 10e6;
-					log.info(" [TIMER-REG] Notificació enviar [Id: " + notificacio.getId() + "]: " + elapsedTime + " ms");
-				}
-			}
-		}
-		SemaforNotificacio.alliberar(notificacioId);
-		elapsedTime = (System.nanoTime() - startTime) / 10e6;
-		log.info(" [TIMER-REG] Temps global registrar notificar amb esperes concurrents [Id: " + notificacio.getId() + "]: " + elapsedTime + " ms");
-		log.info(" [REG] Fi registre notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
-		entityManager.flush();
-		entityManager.clear();
-		return registresIdDto;
-	}
 
 	public NotificacioEntity altaEnviamentsWeb(EntitatEntity entitat, NotificacioEntity notificacioEntity, List<NotEnviamentDatabaseDto> enviamentsDto) throws RegistreNotificaException {
 
@@ -213,19 +121,6 @@ public class NotificacioHelper {
 		}
 		notificacioEntity.getEnviaments().addAll(enviamentsCreats);
 
-		// TODO SM
-		// notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
-
-		// Comprovar on s'ha d'enviar ara
-		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
-			synchronized(SemaforNotificacio.agafar(notificacioEntity.getId())) {
-				var notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioEntity);
-				if (notificar) {
-					notificaHelper.notificacioEnviar(notificacioEntity.getId());
-				}
-			}
-			SemaforNotificacio.alliberar(notificacioEntity.getId());
-		}
 		return notificacioEntity;
 	}
 	public NotificacioEntity saveNotificacio(EntitatEntity entitat, NotificacioDatabaseDto notificacio, boolean checkProcedimentPermissions, NotificacioMassivaEntity notificacioMassivaEntity, Map<String, Long> documentsProcessatsMassiu) {
