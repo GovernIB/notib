@@ -346,7 +346,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Nif del titular no vàlid
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.getTitular().setNif("00000000A");
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -383,7 +383,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Nom del titular buid
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.getTitular().setNom(null);
 		env.getTitular().setLlinatge1(null);
 		env.getTitular().setLlinatge2(null);
@@ -584,7 +584,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Tipus de servei buid
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.setServeiTipus(null);
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -965,7 +965,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Punt kilomètric emplenat (el número de casa també està emplenat)
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setPuntKm("pk01");
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -1029,7 +1029,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Tipus de domicili buit
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setTipus(null);
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -1094,7 +1094,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Nom de la via buit
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setViaNom(null);
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -1158,7 +1158,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Tipus de via buid
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setViaTipus(null);
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -1224,7 +1224,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Número de casa buit (el punt kilomètric també està buid)
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setNumeroCasa(null);
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -1289,7 +1289,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Codi postal buid
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setCodiPostal(null);
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -1354,7 +1354,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Apartat de correus buit
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setApartatCorreus(null);
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -1418,7 +1418,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Codi de municipi buit
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setMunicipiCodi(null);
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -1482,7 +1482,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Codi de municipi no vàlid
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setMunicipiCodi("CODI");
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -1546,7 +1546,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// codi de provincia buit
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setProvincia(null);
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -1610,7 +1610,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Codi de província no vàlid
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setProvincia("99");
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -1675,7 +1675,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Codi de país buid
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setPaisCodi(null);
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -1740,7 +1740,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Codi de país no vàlid
-		Enviament env = notificacio.getEnviaments().get(0);
+		EnviamentV2 env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setPaisCodi("ZZ");
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -2034,8 +2034,8 @@ public class NotificaWsTestIntegracioRest {
 //		}
 
 		for (int i = 0; i < numEnviaments; i++) {
-			Enviament enviaments = new Enviament();
-			Persona titular = new Persona();
+			EnviamentV2 enviaments = new EnviamentV2();
+			PersonaV2 titular = new PersonaV2();
 			if (ambTipusInteressat) {
 				titular.setInteressatTipus(InteressatTipus.FISICA);
 			} else {
@@ -2048,10 +2048,10 @@ public class NotificaWsTestIntegracioRest {
 			titular.setTelefon("666010101");
 			titular.setEmail("departamentals1@dgtic.caib.es");
 			enviaments.setTitular(titular);
-			List<Persona> destinataris = new ArrayList<Persona>();
+			List<PersonaV2> destinataris = new ArrayList<PersonaV2>();
 
 			for (int k = 0; k < numDestinataris; k++) {
-				Persona destinatari = new Persona();
+				PersonaV2 destinatari = new PersonaV2();
 				if (ambTipusInteressat) {
 					destinatari.setInteressatTipus(InteressatTipus.FISICA);
 				} else {
@@ -2068,7 +2068,7 @@ public class NotificaWsTestIntegracioRest {
 			enviaments.getDestinataris().addAll(destinataris);
 			if (ambEnviamentPostal) {
 				enviaments.setEntregaPostalActiva(true);
-				EntregaPostal entregaPostal = new EntregaPostal();
+				EntregaPostalV2 entregaPostal = new EntregaPostalV2();
 				entregaPostal.setTipus(tipusEnviamentPostal);
 				if (tipusEnviamentPostal.equals(NotificaDomiciliConcretTipus.ESTRANGER)) {
 					entregaPostal.setPaisCodi("FR");

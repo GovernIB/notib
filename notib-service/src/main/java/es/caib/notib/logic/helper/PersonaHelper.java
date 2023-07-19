@@ -1,8 +1,8 @@
 package es.caib.notib.logic.helper;
 
 
-import es.caib.notib.client.domini.Persona;
 import es.caib.notib.logic.intf.dto.PersonaDto;
+import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.repository.PersonaRepository;
 import org.springframework.beans.factory.annotation.Autowired;

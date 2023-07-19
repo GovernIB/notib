@@ -132,7 +132,7 @@ public class NotificacioV2 implements Serializable {
      * Camp obligatori
      */
     @XmlElement(nillable = true)
-    private List<Enviament> enviaments;
+    private List<EnviamentV2> enviaments;
 
     /**
      * Enumerat que indica l’idioma de la notificació.
@@ -172,7 +172,7 @@ public class NotificacioV2 implements Serializable {
      */
     private DocumentV2 document5;
 
-    public List<Enviament> getEnviaments() {
+    public List<EnviamentV2> getEnviaments() {
         if (enviaments == null) {
             enviaments = new ArrayList<>();
         }
@@ -183,7 +183,7 @@ public class NotificacioV2 implements Serializable {
         if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
             if (enviaments != null) {
                 boolean sir = true;
-                for (Enviament enviament : enviaments) {
+                for (EnviamentV2 enviament : enviaments) {
                     if (!InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
                         sir = false;
                         break;
@@ -200,7 +200,7 @@ public class NotificacioV2 implements Serializable {
     // Mètodes per a validacions
     public List<String> getNifsEnviaments() {
         List<String> nifs = new ArrayList<>();
-        for(Enviament enviament: getEnviaments()) {
+        for(EnviamentV2 enviament: getEnviaments()) {
             nifs.addAll(enviament.getNifsEnviament());
         }
         return nifs;

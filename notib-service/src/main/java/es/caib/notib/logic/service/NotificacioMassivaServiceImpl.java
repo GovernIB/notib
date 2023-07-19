@@ -2,15 +2,11 @@ package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.DocumentTipus;
-import es.caib.notib.client.domini.DocumentV2;
-import es.caib.notib.client.domini.EntregaPostal;
-import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.OrigenEnum;
-import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.exception.DocumentNotFoundException;
@@ -33,6 +29,9 @@ import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.Document;
+import es.caib.notib.logic.intf.dto.notificacio.EntregaPostal;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaDataDto;
@@ -44,6 +43,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaPrioritatDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaTableItemDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
+import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.logic.intf.exception.AccessDeniedException;
 import es.caib.notib.logic.intf.exception.InvalidCSVFileException;
 import es.caib.notib.logic.intf.exception.InvalidCSVFileNotificacioMassivaException;
@@ -764,7 +764,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         var notV2 = new Notificacio();
         var envV2 = new Enviament();
         List<Enviament> envsV2 = new ArrayList<>();
-        var document = new DocumentV2();
+        var document = new Document();
         var missatge = "";
         var columna = "";
         try {
@@ -897,7 +897,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         }
     }
 
-    private boolean setDocument(Notificacio notificacio, DocumentV2 document, String[] linia, List<String> fileNames, byte[] ficheroZipBytes, Map<String, Long> documentsProcessatsMassiu) {
+    private boolean setDocument(Notificacio notificacio, Document document, String[] linia, List<String> fileNames, byte[] ficheroZipBytes, Map<String, Long> documentsProcessatsMassiu) {
 
         var llegirMetadades = false;
         if (linia[4] == null || linia[4].isEmpty()) {

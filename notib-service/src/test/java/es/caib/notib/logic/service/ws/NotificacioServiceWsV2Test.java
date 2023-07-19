@@ -1,7 +1,7 @@
 package es.caib.notib.logic.service.ws;
 
 import com.codahale.metrics.Timer;
-import es.caib.notib.client.domini.DocumentV2;
+import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.client.domini.EnviamentReferencia;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.client.domini.NotificacioEstatEnum;
@@ -60,7 +60,6 @@ import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
-import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
@@ -204,9 +203,9 @@ public class NotificacioServiceWsV2Test {
 	private AplicacioEntity aplicacioMock;
 	private DadesUsuari dadesUsuariMock;
 
-	private DocumentV2 document;
+	private Document document;
 
-	private Document documentArxiuMock;
+	private es.caib.plugins.arxiu.api.Document documentArxiuMock;
 	private DocumentEntity documentEntityMock;
 
 	@InjectMocks
@@ -238,7 +237,7 @@ public class NotificacioServiceWsV2Test {
 				.build();
 		((ProcSerEntity)serveiMock).setTipus(ProcSerTipusEnum.SERVEI);
 		procedimentOrganMock = ProcSerOrganEntity.getBuilder(procedimentMock, organGestorMock).build();
-		document = DocumentV2.builder().arxiuNom("document.pdf").uuid("00000000-0000-0000-0000-000000000000").normalitzat(false).build();;
+		document = Document.builder().arxiuNom("document.pdf").uuid("00000000-0000-0000-0000-000000000000").normalitzat(false).build();;
 		documentArxiuMock = initDocument(document.getUuid());
 		documentEntityMock = DocumentEntity.getBuilderV2(
 				document.getUuid(),
@@ -417,29 +416,25 @@ public class NotificacioServiceWsV2Test {
 	}
 
 
-	private Document initDocument(String identificador) throws IOException {
-		Document documentArxiu = new Document();
-		
+	private es.caib.plugins.arxiu.api.Document initDocument(String identificador) throws IOException {
+
+		var documentArxiu = new es.caib.plugins.arxiu.api.Document();
 		DocumentContingut contingut = new DocumentContingut();
 		contingut.setArxiuNom("arxiu.pdf");
 		contingut.setTipusMime("application/pdf");
 		contingut.setContingut(IOUtils.toByteArray(getClass().getResourceAsStream("/es/caib/notib/logic/arxiu.pdf")));
 		contingut.setTamany(contingut.getContingut().length);
 		documentArxiu.setContingut(contingut);
-		
 		documentArxiu.setEstat(DocumentEstat.DEFINITIU);
 		documentArxiu.setFirmes(null);
 		documentArxiu.setIdentificador(identificador);
-		
 		DocumentMetadades metadades = new DocumentMetadades();
 		metadades.setOrigen(ContingutOrigen.ADMINISTRACIO);
 		metadades.setEstatElaboracio(DocumentEstatElaboracio.ORIGINAL);
 		metadades.setTipusDocumental(DocumentTipus.INFORME);
 		documentArxiu.setMetadades(metadades);
-		
 		documentArxiu.setNom("Nombre Document Arxiu");
 		documentArxiu.setVersio("Version");
-
 		return documentArxiu;
 	}
 	

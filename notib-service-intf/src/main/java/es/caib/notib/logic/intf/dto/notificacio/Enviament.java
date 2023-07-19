@@ -1,8 +1,12 @@
 
-package es.caib.notib.client.domini;
+package es.caib.notib.logic.intf.dto.notificacio;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import es.caib.notib.client.domini.EntregaDeh;
+import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.client.domini.ServeiTipus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,12 +31,9 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Enviament implements Serializable {
 
-    // TODO ATRIBUTS AFEGITS A POSTERIORI. FER UNA HERENCIA PER DEIXAR-HO CORRECTE
 
     private Long id;
     private EnviamentEstat notificaEstat;
-
-    // TODO ****************************************************************************
 
     private Persona titular;
     private List<Persona> destinataris;

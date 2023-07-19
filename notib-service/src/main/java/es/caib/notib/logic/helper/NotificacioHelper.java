@@ -1,8 +1,6 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.DocumentV2;
-import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.OrigenEnum;
@@ -11,9 +9,11 @@ import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.intf.dto.RegistreIdDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.Document;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.exception.NoDocumentException;
 import es.caib.notib.logic.intf.exception.NoMetadadesException;
 import es.caib.notib.logic.intf.exception.NotFoundException;
@@ -38,7 +38,6 @@ import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.ProcSerOrganRepository;
 import es.caib.plugins.arxiu.api.ArxiuException;
-import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import lombok.Builder;
 import lombok.Getter;
@@ -336,7 +335,7 @@ public class NotificacioHelper {
 		return true;
 	}
 	
-	private DocumentEntity getDocumentEntity(DocumentV2 document, Map<String, Long> documentsProcessatsMassiu) {
+	private DocumentEntity getDocumentEntity(Document document, Map<String, Long> documentsProcessatsMassiu) {
 
 		DocumentEntity documentEntity = null;
 		if (document == null) {
@@ -359,10 +358,10 @@ public class NotificacioHelper {
 					( documentsProcessatsMassiu.containsKey(document.getUuid()) && // alta massiu web
 					documentsProcessatsMassiu.get(document.getUuid()) == null) ) {
 
-				var doc = new DocumentV2();
+				var doc = new Document();
 				var arxiuUuid = document.getUuid();
 				if (pluginHelper.isArxiuPluginDisponible()) {
-					Document documentArxiu ;
+					es.caib.plugins.arxiu.api.Document documentArxiu ;
 					try {
 						documentArxiu = pluginHelper.arxiuDocumentConsultar(arxiuUuid, null, true, true);
 					} catch (Exception ex) {
@@ -417,10 +416,10 @@ public class NotificacioHelper {
 					( documentsProcessatsMassiu.containsKey(document.getCsv()) && // alta massiu web
 					documentsProcessatsMassiu.get(document.getCsv()) == null) ) {
 
-				var doc = new DocumentV2();
+				var doc = new Document();
 				var arxiuCsv = document.getCsv();
 				if (pluginHelper.isArxiuPluginDisponible()) {
-					Document documentArxiu;
+					es.caib.plugins.arxiu.api.Document documentArxiu;
 					try {
 						documentArxiu = pluginHelper.arxiuDocumentConsultar(arxiuCsv, null, true, false);
 					} catch (Exception ex) {
@@ -497,7 +496,7 @@ public class NotificacioHelper {
 		return documentEntity;
 	}
 	
-	private Boolean recuperarMetadadesArxiu (Document documentArxiu, DocumentV2 document){
+	private Boolean recuperarMetadadesArxiu (es.caib.plugins.arxiu.api.Document documentArxiu, Document document){
 
 		if (documentArxiu == null) {
 			throw new NoDocumentException("No s'ha pogut obtenir el document de l'arxiu.");

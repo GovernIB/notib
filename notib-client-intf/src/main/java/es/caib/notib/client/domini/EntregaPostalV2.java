@@ -23,7 +23,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EntregaPostal implements Serializable {
+public class EntregaPostalV2 implements Serializable {
 
     // TODO ATRIBUTS AFEGITS A POSTERIORI. FER UNA HERENCIA PER DEIXAR-HO CORRECTE
 

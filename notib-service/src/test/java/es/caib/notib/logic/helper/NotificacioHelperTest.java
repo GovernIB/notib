@@ -1,10 +1,10 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.client.domini.DocumentV2;
-import es.caib.notib.client.domini.Enviament;
+import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.ValidesaEnum;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
@@ -19,7 +19,6 @@ import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.ProcSerOrganRepository;
 import es.caib.notib.logic.test.data.ConfigTest;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
-import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
@@ -92,19 +91,19 @@ public class NotificacioHelperTest {
 		var c = configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat");
 		var procediment = ProcedimentEntity.builder().codi("").nom("").retard(retard).caducitat(c).entitat(entitat).build();
 
-		var document = new DocumentV2();
+		var document = new Document();
 		document.setId(Long.toString(new Random().nextLong()));
 		document.setContingutBase64("/es/caib/notib/logic/arxiu.pdf");
 		document.setNormalitzat(false);
 		document.setGenerarCsv(false);
 		
-		var document2 = new DocumentV2();
+		var document2 = new Document();
 		document2.setId(Long.toString(new Random().nextLong()));
 		document2.setUuid(UUID.randomUUID().toString());
 		document2.setNormalitzat(false);
 		document2.setGenerarCsv(false);
 		
-		var document3 = new DocumentV2();
+		var document3 = new Document();
 		document3.setId(Long.toString(new Random().nextLong()));
 		document3.setCsv("54a27c163550ef2d5f3a8cd985a4ab949b6dfb5e66174a11c2bc979e0070090a");
 		document3.setNormalitzat(false);
@@ -120,7 +119,7 @@ public class NotificacioHelperTest {
                 .enviamentDataProgramada(new Date())
                 .retard(5)
                 .caducitat(caducitat)
-                .enviaments(new ArrayList<Enviament>())
+                .enviaments(new ArrayList<>())
                 .usuariCodi("admin")
                 .numExpedient("EXPEDIENTEX")
                 .idioma(Idioma.CA)
@@ -172,7 +171,7 @@ public class NotificacioHelperTest {
 		Mockito.when(pluginHelper.arxiuGetImprimible(Mockito.anyString(), Mockito.eq(false))).thenReturn(documentArxiuCsv.getContingut());
 		
 		Mockito.when(pluginHelper.isArxiuPluginDisponible()).thenReturn(Boolean.TRUE);
-		Mockito.when(pluginHelper.getModeFirma(Mockito.any(Document.class), Mockito.anyString())).thenReturn(1); //TRUE
+		Mockito.when(pluginHelper.getModeFirma(Mockito.any(es.caib.plugins.arxiu.api.Document.class), Mockito.anyString())).thenReturn(1); //TRUE
 		Mockito.when(pluginHelper.estatElaboracioToValidesa(Mockito.any(DocumentEstatElaboracio.class))).thenReturn(ValidesaEnum.ORIGINAL.getValor());
 				
 		// When	
@@ -194,34 +193,30 @@ public class NotificacioHelperTest {
 		assertNull(notificacioData.getDocument5Entity());
 	}
 	
-	private Document initDocument(String identificador) {
-		Document documentArxiu = new Document();
-		
-		DocumentContingut contingut = new DocumentContingut();
+	private es.caib.plugins.arxiu.api.Document initDocument(String identificador) {
+
+		var documentArxiu = new es.caib.plugins.arxiu.api.Document();
+		var contingut = new DocumentContingut();
 		contingut.setArxiuNom("arxiu.pdf");
 		contingut.setTipusMime("application/pdf");
 		contingut.setContingut("/es/caib/notib/logic/arxiu.pdf".getBytes());
 		contingut.setTamany(contingut.getContingut().length);
 		documentArxiu.setContingut(contingut);
-		
 		documentArxiu.setEstat(DocumentEstat.DEFINITIU);
 		documentArxiu.setFirmes(null);
 		documentArxiu.setIdentificador(identificador);
-		
-		DocumentMetadades metadades = new DocumentMetadades();
+		var metadades = new DocumentMetadades();
 		metadades.setOrigen(ContingutOrigen.ADMINISTRACIO);
 		metadades.setEstatElaboracio(DocumentEstatElaboracio.ORIGINAL);
 		metadades.setTipusDocumental(DocumentTipus.INFORME);
 		documentArxiu.setMetadades(metadades);
-		
 		documentArxiu.setNom("Nombre Document Arxiu");
 		documentArxiu.setVersio("Version");
-
 		return documentArxiu;
 	}
 	
 	
-	private DocumentEntity initDocumentEntity(DocumentV2 document, String documentGesdocId) {
+	private DocumentEntity initDocumentEntity(Document document, String documentGesdocId) {
 		return DocumentEntity.getBuilderV2(
 				documentGesdocId,
 				document.getArxiuNom(),

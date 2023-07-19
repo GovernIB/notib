@@ -1,14 +1,14 @@
 package es.caib.notib.logic.test.data;
 
-import es.caib.notib.client.domini.DocumentV2;
-import es.caib.notib.client.domini.Enviament;
+import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.ServeiTipus;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
+import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.test.AuthenticationTest;
@@ -67,7 +67,7 @@ public class NotificacioItemTest extends DatabaseItemTest<Notificacio>{
     public static Notificacio getRandomInstanceWithoutEnviaments() {
 
         String notificacioId = Long.toString(System.currentTimeMillis());
-        DocumentV2 document = new DocumentV2();
+        var document = new Document();
         try {
             byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
             document.setContingutBase64(Base64.getEncoder().encodeToString(arxiuBytes));
@@ -100,7 +100,7 @@ public class NotificacioItemTest extends DatabaseItemTest<Notificacio>{
 //				.motiu()
                 .numExpedient("EXPEDIENTEX")
                 .idioma(Idioma.CA)
-                .document(new DocumentV2())
+                .document(new Document())
                 .build();
         notCreated.setDocument(document);
         return notCreated;

@@ -36,6 +36,7 @@ import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
 import es.caib.notib.logic.intf.dto.TipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
@@ -99,10 +100,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
  */
 @Slf4j
 @Service
-@WebService(
-		name = "NotificacioServiceV2",
-		serviceName = "NotificacioServiceV2",
-		portName = "NotificacioServiceV2Port",
+@WebService(name = "NotificacioServiceV2", serviceName = "NotificacioServiceV2", portName = "NotificacioServiceV2Port",
 		targetNamespace = "http://www.caib.es/notib/ws/notificacio",
 		endpointInterface = "es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2")
 public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, NotificacioServiceWs {
@@ -532,7 +530,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				resposta.setEnviamentSir(esSir);
 
 				// INTERESSAT
-				Persona interessat = Persona.builder()
+				PersonaV2 interessat = PersonaV2.builder()
 						.interessatTipus(enviament.getTitular().getInteressatTipus())
 						.nom(enviament.getTitular().getNom())
 						.llinatge1(enviament.getTitular().getLlinatge1())
@@ -546,9 +544,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 						.build();
 				resposta.setInteressat(interessat);
 				if (enviament.getDestinataris() != null && !enviament.getDestinataris().isEmpty()) {
-					List<Persona> representants = new ArrayList<>();
+					List<PersonaV2> representants = new ArrayList<>();
 					for (PersonaEntity destinatari: enviament.getDestinataris()) {
-						Persona representant = Persona.builder()
+						PersonaV2 representant = PersonaV2.builder()
 								.interessatTipus(destinatari.getInteressatTipus())
 								.nom(destinatari.getNom())
 								.llinatge1(destinatari.getLlinatge1())
@@ -961,6 +959,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 	@Nullable
 	private NotificacioEntity getNotificacioByIdentificador(String identificador, RespostaBase resposta, IntegracioInfo info) {
+
 		Throwable t = null;
 		NotificacioEntity notificacio = null;
 		if (isValidUUID(identificador)) {
@@ -1104,8 +1103,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private List<PersonaEntity> getDestinataris(Enviament enviament) {
 		List<PersonaEntity> destinataris = new ArrayList<>();
 		if (enviament.getDestinataris() != null) {
-			for(Persona persona: enviament.getDestinataris()) {
-				PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilderV2(
+			for(var persona: enviament.getDestinataris()) {
+				var destinatari = personaRepository.save(PersonaEntity.getBuilderV2(
 						persona.getInteressatTipus(),
 						persona.getEmail(),
 						persona.getLlinatge1(),

@@ -1,27 +1,24 @@
-
-package es.caib.notib.client.domini;
+package es.caib.notib.logic.intf.dto.notificacio;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.TipusDocumentalEnum;
+import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.client.util.TrimStringDeserializer;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
-/**
- * Informació del document que s'envia amb la notificació.
- *
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Data
-@SuperBuilder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DocumentV2 {
+public class Document {
 
     private String id;
     private String mediaType;
@@ -67,6 +64,4 @@ public class DocumentV2 {
         if(csv != null && !csv.trim().isEmpty()) countSources++;
         return countSources;
     }
-
-
 }

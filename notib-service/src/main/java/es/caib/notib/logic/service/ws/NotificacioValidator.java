@@ -1,12 +1,11 @@
 package es.caib.notib.logic.service.ws;
 
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.DocumentV2;
-import es.caib.notib.client.domini.EntregaPostal;
-import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.logic.intf.dto.notificacio.Document;
+import es.caib.notib.logic.intf.dto.notificacio.EntregaPostal;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
-import es.caib.notib.client.domini.Persona;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
@@ -14,6 +13,7 @@ import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.intf.dto.DocumentValidDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
+import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.util.NifHelper;
@@ -132,20 +132,21 @@ public class NotificacioValidator implements Validator {
     private void validateProcediment() {
 
         // Procediment
+        var procCodi = "procedimentCodi";
         var procedimentCodi = notificacio.getProcedimentCodi();
         if (EnviamentTipus.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
             if (Strings.isNullOrEmpty(procedimentCodi)) {
-                errors.rejectValue("procedimentCodi", error(PROCSER_NULL, locale));
+                errors.rejectValue(procCodi, error(PROCSER_NULL, locale));
             } else if (procediment == null) {
-                errors.rejectValue("procedimentCodi", error(PROCSER_NO_EXIST, locale));
+                errors.rejectValue(procCodi, error(PROCSER_NO_EXIST, locale));
             }
         }
         if (!Strings.isNullOrEmpty(procedimentCodi) && procedimentCodi.length() > 9) {
-            errors.rejectValue("procedimentCodi", error(PROCSER_SIZE, locale));
+            errors.rejectValue(procCodi, error(PROCSER_SIZE, locale));
         }
         if (procediment != null) {
             if(!procediment.isActiu()) {
-                errors.rejectValue("procedimentCodi", error(PROCSER_INACTIU, locale));
+                errors.rejectValue(procCodi, error(PROCSER_INACTIU, locale));
             }
             if (ProcSerTipusEnum.SERVEI.equals(procediment.getTipus()) && EnviamentTipus.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
                 errors.reject(error(SERVEI_EN_NOTIFICACIO, locale));
@@ -237,7 +238,7 @@ public class NotificacioValidator implements Validator {
         var caractersNoValids = validFormat(notificacio.getConcepte());
         if (!caractersNoValids.isEmpty()) {
             String invalidChars = caractersNoValids.stream().map(String::valueOf).collect(Collectors.joining(", "));
-            errors.rejectValue("concepte", error(CONCEPTE_INVALID_CHARS, locale, new Object[] {invalidChars}));
+            errors.rejectValue("concepte", error(CONCEPTE_INVALID_CHARS, locale, invalidChars));
         }
     }
 
@@ -253,7 +254,7 @@ public class NotificacioValidator implements Validator {
         var caractersNoValids = validFormat(notificacio.getDescripcio());
         if (!caractersNoValids.isEmpty()) {
             var invalidChars = caractersNoValids.stream().map(String::valueOf).collect(Collectors.joining(", "));
-            errors.rejectValue("descripcio", error(DESCRIPCIO_INVALID_CHARS, locale, new Object[] {invalidChars}));
+            errors.rejectValue("descripcio", error(DESCRIPCIO_INVALID_CHARS, locale, invalidChars));
         }
         if (hasSaltLinia(notificacio.getDescripcio())) {
             errors.rejectValue("descripcio", error(DESCRIPCIO_SALTS_LINIA, locale));
@@ -348,7 +349,7 @@ public class NotificacioValidator implements Validator {
         }
     }
 
-    private void validateDocument(DocumentV2 document, DocumentValidDto dto, EnviamentTipus enviamentTipus, int numDocument, Errors errors, Locale l) {
+    private void validateDocument(Document document, DocumentValidDto dto, EnviamentTipus enviamentTipus, int numDocument, Errors errors, Locale l) {
 
         var doc = "document" + (numDocument > 1 ? numDocument : "");
         var prefix = "Document " + numDocument + " - ";
@@ -410,9 +411,8 @@ public class NotificacioValidator implements Validator {
 
     private void validateEnviaments() {
 
-        List<Enviament> enviaments = notificacio.getEnviaments();
-        String emisor = notificacio.getEmisorDir3Codi();
-
+        var enviaments = notificacio.getEnviaments();
+        var emisor = notificacio.getEmisorDir3Codi();
         if (enviaments == null || enviaments.isEmpty()) {
             errors.reject(error(ENVIAMENTS_NULL, locale));
             return;

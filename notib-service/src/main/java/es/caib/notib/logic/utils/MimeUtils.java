@@ -1,8 +1,8 @@
 package es.caib.notib.logic.utils;
 
 import com.google.common.io.Files;
-import es.caib.notib.client.domini.DocumentV2;
 import es.caib.notib.logic.intf.dto.mime.Mimes;
+import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.logic.intf.util.FitxerUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -83,7 +83,7 @@ public class MimeUtils {
         return Mimes.getFormatsNoSIR().contains(mime);
     }
 
-    public static boolean isFormatValid(DocumentV2 doc) {
+    public static boolean isFormatValid(Document doc) {
 
         String mime = getMimeTypeFromContingut(doc.getArxiuNom(), doc.getContingutBase64());
         return isFormatValid(mime, doc.getContingutBase64());

@@ -1,16 +1,15 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.DocumentV2;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.DocumentValidDto;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
+import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.logic.utils.MimeUtils;
 import es.caib.notib.persist.entity.DocumentEntity;
-import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -57,7 +56,7 @@ public class DocumentHelper {
         return null;
     }
 
-    public DocumentValidDto getDocument(DocumentV2 document) {
+    public DocumentValidDto getDocument(Document document) {
 
         DocumentValidDto documentDto = null;
         if (document == null || document.isEmpty() || !document.hasOnlyOneSource()) {
@@ -79,9 +78,9 @@ public class DocumentHelper {
         return dto;
     }
 
-    private DocumentValidDto getDocumentByUUID(DocumentV2 document, boolean utilizarMetadadesPerDefecte) {
-        var dto = new DocumentValidDto();
+    private DocumentValidDto getDocumentByUUID(Document document, boolean utilizarMetadadesPerDefecte) {
 
+        var dto = new DocumentValidDto();
         dto.setArxiuNom(document.getArxiuNom());
         dto.setUuid(document.getUuid());
         dto.setNormalitzat(document.isNormalitzat());
@@ -97,7 +96,7 @@ public class DocumentHelper {
         dto.setMediaType(contingut.getTipusMime());
         dto.setMida(contingut.getTamany());
 
-        Document doc = null;
+        es.caib.plugins.arxiu.api.Document doc = null;
         try {
             doc = pluginHelper.arxiuDocumentConsultar(document.getUuid(), null, true, true);
             if (doc.getMetadades() == null && !utilizarMetadadesPerDefecte) {
@@ -130,7 +129,7 @@ public class DocumentHelper {
         return dto;
     }
 
-    private DocumentValidDto getDocumentByCSV(DocumentV2 document, boolean utilizarMetadadesPerDefecte) {
+    private DocumentValidDto getDocumentByCSV(Document document, boolean utilizarMetadadesPerDefecte) {
         var dto = new DocumentValidDto();
 
         dto.setArxiuNom(document.getArxiuNom());
@@ -148,7 +147,7 @@ public class DocumentHelper {
         dto.setMediaType(contingut.getTipusMime());
         dto.setMida(contingut.getTamany());
 
-        Document doc = null;
+        es.caib.plugins.arxiu.api.Document doc = null;
         try {
             doc = pluginHelper.arxiuDocumentConsultar(document.getCsv(), null, true, false);
             if (doc.getMetadades() == null && !utilizarMetadadesPerDefecte) {
@@ -173,7 +172,7 @@ public class DocumentHelper {
         return dto;
     }
 
-    private DocumentValidDto getDocumentByContingut(DocumentV2 document, boolean utilizarMetadadesPerDefecte) {
+    private DocumentValidDto getDocumentByContingut(Document document, boolean utilizarMetadadesPerDefecte) {
         var dto = new DocumentValidDto();
 
         byte[] contingut = Base64.decodeBase64(document.getContingutBase64());

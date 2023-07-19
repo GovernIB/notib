@@ -3,7 +3,6 @@
  */
 package es.caib.notib.logic.intf.dto.notificacio;
 
-import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import lombok.Getter;

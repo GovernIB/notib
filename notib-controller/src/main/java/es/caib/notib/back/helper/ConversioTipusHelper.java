@@ -3,8 +3,6 @@
  */
 package es.caib.notib.back.helper;
 
-import es.caib.notib.client.domini.DocumentV2;
-import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.logic.intf.dto.PersonaDto;
@@ -13,6 +11,8 @@ import es.caib.notib.back.command.EntregapostalCommand;
 import es.caib.notib.back.command.EnviamentCommand;
 import es.caib.notib.back.command.NotificacioCommand;
 import es.caib.notib.back.command.PersonaCommand;
+import es.caib.notib.logic.intf.dto.notificacio.Document;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.CustomMapper;
@@ -126,7 +126,7 @@ public class ConversioTipusHelper {
 					@Override
 					public void mapBtoA(NotificacioCommand notificacioCommand, Notificacio notificacioDto, MappingContext context) {
 						// Documents
-						List<DocumentV2> documents = new ArrayList<>();
+						List<Document> documents = new ArrayList<>();
 						var document = DocumentCommand.asDto(notificacioCommand.getDocuments()[0]);
 						if (document != null) {
 							documents.add(document);

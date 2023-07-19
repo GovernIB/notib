@@ -3,7 +3,6 @@
  */
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.client.domini.EntregaPostal;
 import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
@@ -30,6 +29,7 @@ import es.caib.notib.logic.intf.dto.cie.OperadorPostalTableItemDto;
 import es.caib.notib.logic.intf.dto.notenviament.EnviamentInfo;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
+import es.caib.notib.logic.intf.dto.notificacio.EntregaPostal;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioInfoDto;

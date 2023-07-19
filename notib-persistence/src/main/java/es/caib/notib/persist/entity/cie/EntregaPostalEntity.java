@@ -1,10 +1,10 @@
 package es.caib.notib.persist.entity.cie;
 
-import es.caib.notib.client.domini.EntregaPostal;
 import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliTipusEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.EntregaPostal;
 import es.caib.notib.persist.audit.NotibAuditable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

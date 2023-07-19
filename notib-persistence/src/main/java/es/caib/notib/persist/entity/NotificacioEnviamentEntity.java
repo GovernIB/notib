@@ -1,12 +1,12 @@
 package es.caib.notib.persist.entity;
 
-import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
 import es.caib.notib.persist.audit.NotibAuditable;
 import es.caib.notib.persist.entity.cie.EntregaPostalEntity;
 import lombok.AllArgsConstructor;
@@ -511,7 +511,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
 
 	public static BuilderV2 getBuilderV2(
-			Enviament enviament, 
+			Enviament enviament,
 			boolean isAmbEntregaDeh,
 			ServeiTipus tipusServei,
 			NotificacioEntity notificacioGuardada,
@@ -531,7 +531,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public static class BuilderV2 {
 		NotificacioEnviamentEntity built;
 		BuilderV2(
-				Enviament enviament, 
+				Enviament enviament,
 				boolean isAmbEntregaDeh,
 				ServeiTipus tipusServei,
 				NotificacioEntity notificacioGuardada,

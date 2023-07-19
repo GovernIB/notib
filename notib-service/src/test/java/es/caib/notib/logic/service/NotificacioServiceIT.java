@@ -1,12 +1,12 @@
 package es.caib.notib.logic.service;
 
-import es.caib.notib.client.domini.EntregaPostal;
 import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.TipusEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.EntregaPostal;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
