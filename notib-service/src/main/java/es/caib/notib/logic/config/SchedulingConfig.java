@@ -58,135 +58,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
     }
 
     private void registerSchedulledTasks() {
-//        // 1. Enviament de notificacions pendents al registre i notific@
-//        ////////////////////////////////////////////////////////////////
-//        final String registrarEnviamentsPendents = "registrarEnviamentsPendents";
-//        monitorTasquesService.addTasca(registrarEnviamentsPendents);
-//        taskRegistrar.addTriggerTask(
-//                () -> {
-//                    try {
-//                        monitorTasquesService.inici(registrarEnviamentsPendents);
-//                        schedulledService.registrarEnviamentsPendents();
-//                        monitorTasquesService.fi(registrarEnviamentsPendents);
-//                    } catch(Exception e) {
-//                        monitorTasquesService.error(registrarEnviamentsPendents);
-//                    }
-//                },
-//                triggerContext -> {
-//                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_RATE), TimeUnit.MILLISECONDS);
-//                    trigger.setFixedRate(true);
-//                    // Només la primera vegada que s'executa
-//                    Long registrarEnviamentsPendentsInitialDelayLong = 0L;
-//                    if (primeraVez[0]) {
-//                        registrarEnviamentsPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_INITIAL_DELAY);
-//                        primeraVez[0] = false;
-//                    }
-//                    trigger.setInitialDelay(registrarEnviamentsPendentsInitialDelayLong);
-//                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-//                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-//                    monitorTasquesService.updateProperaExecucio(registrarEnviamentsPendents, millis);
-//                    return nextExecution;
-//                }
-//        );
-//        monitorTasquesService.addTasca(registrarEnviamentsPendents);
 
-//        // 2. Enviament de notificacions registrades a Notific@
-//        ///////////////////////////////////////////////////////
-//        final String notificaEnviamentsRegistrats = "notificaEnviamentsRegistrats";
-//        monitorTasquesService.addTasca(notificaEnviamentsRegistrats);
-//        taskRegistrar.addTriggerTask(
-//                () -> {
-//                    try {
-//                        monitorTasquesService.inici(notificaEnviamentsRegistrats);
-//                        schedulledService.notificaEnviamentsRegistrats();
-//                        monitorTasquesService.fi(notificaEnviamentsRegistrats);
-//                    } catch(Exception e) {
-//                        monitorTasquesService.error(notificaEnviamentsRegistrats);
-//                    }
-//                },
-//                triggerContext -> {
-//                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_RATE), TimeUnit.MILLISECONDS);
-//                    trigger.setFixedRate(true);
-//                    // Només la primera vegada que s'executa
-//                    Long notificaEnviamentsRegistratsInitialDelayLong = 0L;
-//                    if (primeraVez[1]) {
-//                        notificaEnviamentsRegistratsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_INITIAL_DELAY);
-//                        primeraVez[1] = false;
-//                    }
-//                    trigger.setInitialDelay(notificaEnviamentsRegistratsInitialDelayLong);
-//                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-//                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-//                    monitorTasquesService.updateProperaExecucio(notificaEnviamentsRegistrats, millis);
-//                    return nextExecution;
-//                }
-//        );
-//        monitorTasquesService.addTasca(notificaEnviamentsRegistrats);
-
-//        // 3. Actualització de l'estat dels enviaments amb l'estat de Notific@
-//        //////////////////////////////////////////////////////////////////
-//        final String enviamentRefrescarEstatPendents = "enviamentRefrescarEstatPendents";
-//        monitorTasquesService.addTasca(enviamentRefrescarEstatPendents);
-//        taskRegistrar.addTriggerTask(
-//                () -> {
-//                    try {
-//                        monitorTasquesService.inici(enviamentRefrescarEstatPendents);
-//                        schedulledService.enviamentRefrescarEstatPendents();
-//                        monitorTasquesService.fi(enviamentRefrescarEstatPendents);
-//                    } catch(Exception e) {
-//                        monitorTasquesService.error(enviamentRefrescarEstatPendents);
-//                    }
-//                },
-//                triggerContext -> {
-//                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_RATE), TimeUnit.MILLISECONDS);
-//                    trigger.setFixedRate(true);
-//                    // Només la primera vegada que s'executa
-//                    Long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
-//                    if (primeraVez[2]) {
-//                        enviamentRefrescarEstatPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_INITIAL_DELAY);
-//                        primeraVez[2] = false;
-//                    }
-//                    trigger.setInitialDelay(enviamentRefrescarEstatPendentsInitialDelayLong);
-//                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-//                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-//                    monitorTasquesService.updateProperaExecucio(enviamentRefrescarEstatPendents, millis);
-//                    return nextExecution;
-//                }
-//        );
-//        monitorTasquesService.addTasca(enviamentRefrescarEstatPendents);
-
-//        // 4. Actualització de l'estat dels enviaments amb l'estat de enviat_sir
-//        //////////////////////////////////////////////////////////////////
-//        final String enviamentRefrescarEstatEnviatSir = "enviamentRefrescarEstatEnviatSir";
-//        monitorTasquesService.addTasca(enviamentRefrescarEstatEnviatSir);
-//        taskRegistrar.addTriggerTask(
-//                () -> {
-//                    try {
-//                        monitorTasquesService.inici(enviamentRefrescarEstatEnviatSir);
-//                        schedulledService.enviamentRefrescarEstatEnviatSir();
-//                        monitorTasquesService.fi(enviamentRefrescarEstatEnviatSir);
-//                    } catch(Exception e) {
-//                        monitorTasquesService.error(enviamentRefrescarEstatEnviatSir);
-//                    }
-//                },
-//                triggerContext -> {
-//                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_RATE), TimeUnit.MILLISECONDS);
-//                    trigger.setFixedRate(true);
-//                    // Només la primera vegada que s'executa
-//                    Long enviamentRefrescarEstatEnviatSirInitialDelayLong = 0L;
-//                    if (primeraVez[3]) {
-//                        enviamentRefrescarEstatEnviatSirInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_INITIAL_DELAY);
-//                        primeraVez[3] = false;
-//                    }
-//                    trigger.setInitialDelay(enviamentRefrescarEstatEnviatSirInitialDelayLong);
-//                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-//                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-//                    monitorTasquesService.updateProperaExecucio(enviamentRefrescarEstatEnviatSir, millis);
-//                    return nextExecution;
-//                }
-//        );
-//        monitorTasquesService.addTasca(enviamentRefrescarEstatEnviatSir);
-
-        // 5. Actualització dels procediments a partir de la informació de Rolsac
+        // 1. Actualització dels procediments a partir de la informació de Rolsac
         /////////////////////////////////////////////////////////////////////////
         final String actualitzarProcediments = "actualitzarProcediments";
         monitorTasquesService.addTasca(actualitzarProcediments);
@@ -210,7 +83,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         );
         monitorTasquesService.addTasca(actualitzarProcediments);
 
-        // 6. Refrescar notificacions expirades
+        // 2. Refrescar notificacions expirades
         /////////////////////////////////////////////////////////////////////////
         final String refrescarNotificacionsExpirades = "refrescarNotificacionsExpirades";
         monitorTasquesService.addTasca(refrescarNotificacionsExpirades);
@@ -234,7 +107,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         );
         monitorTasquesService.addTasca(refrescarNotificacionsExpirades);
 
-        // 7. Callback de client
+        // 3. Callback de client
         /////////////////////////////////////////////////////////////////////////
         final String processarPendents = "processarPendents";
         monitorTasquesService.addTasca(processarPendents);
@@ -266,7 +139,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         );
         monitorTasquesService.addTasca(processarPendents);
 
-        // 8. Consulta certificació notificacions DEH finalitzades
+        // 4. Consulta certificació notificacions DEH finalitzades
         /////////////////////////////////////////////////////////////////////////
         final String enviamentRefrescarEstatDEH = "enviamentRefrescarEstatDEH";
         monitorTasquesService.addTasca(enviamentRefrescarEstatDEH);
@@ -298,7 +171,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         );
         monitorTasquesService.addTasca(enviamentRefrescarEstatDEH);
 
-        // 9. Consulta certificació notificacions CIE finalitzades
+        // 5. Consulta certificació notificacions CIE finalitzades
         /////////////////////////////////////////////////////////////////////////
         final String enviamentRefrescarEstatCIE = "enviamentRefrescarEstatCIE";
         monitorTasquesService.addTasca(enviamentRefrescarEstatCIE);
@@ -330,7 +203,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         );
         monitorTasquesService.addTasca(enviamentRefrescarEstatCIE);
 
-        // 10. Eliminiar arxius temporals
+        // 6. Eliminiar arxius temporals
         /////////////////////////////////////////////////////////////////////////
         final String eliminarDocumentsTemporals = "eliminarDocumentsTemporals";
         monitorTasquesService.addTasca(eliminarDocumentsTemporals);
@@ -356,7 +229,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         );
         monitorTasquesService.addTasca(eliminarDocumentsTemporals);
 
-        // 11. Actualització dels serveis a partir de la informació de Rolsac
+        // 7. Actualització dels serveis a partir de la informació de Rolsac
         /////////////////////////////////////////////////////////////////////////
         final String actualitzarServeis = "actualitzarServeis";
         monitorTasquesService.addTasca(actualitzarServeis);
@@ -380,7 +253,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         );
         monitorTasquesService.addTasca(actualitzarServeis);
 
-        // 12. Consulta de canvis en l'organigrama
+        // 8. Consulta de canvis en l'organigrama
         /////////////////////////////////////////////////////////////////////////
         final String consultaCanvisOrganigrama = "consultaCanvisOrganigrama";
         monitorTasquesService.addTasca(consultaCanvisOrganigrama);
@@ -407,7 +280,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         );
         monitorTasquesService.addTasca(consultaCanvisOrganigrama);
 
-        // 13. Eliminar entrades al monitor integracions antigues
+        // 9. Eliminar entrades al monitor integracions antigues
         /////////////////////////////////////////////////////////////////////////
         final String monitorIntegracionsEliminarAntics = "monitorIntegracionsEliminarAntics";
         monitorTasquesService.addTasca(monitorIntegracionsEliminarAntics);
@@ -437,7 +310,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         monitorTasquesService.addTasca(monitorIntegracionsEliminarAntics);
 
 
-        // 14. Actualitzar estat organs enviament table
+        // 10. Actualitzar estat organs enviament table
         /////////////////////////////////////////////////////////////////////////
         final String actualitzarEstatOrgansEnviamentTable = "actualitzarEstatOrgansEnviamentTable";
         monitorTasquesService.addTasca(actualitzarEstatOrgansEnviamentTable);

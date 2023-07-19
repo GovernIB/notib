@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
 
 /**
@@ -15,6 +16,7 @@ import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
+@Profile("!boot")
 @Configuration
 public class EjbClientConfig {
 

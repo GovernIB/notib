@@ -57,8 +57,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Lazy
 	@Autowired
 	private NotificacioService notificacioService;
-//	@Autowired
-//	private NotificacioHelper notificacioHelper;
 	@Autowired
 	private ProcedimentService procedimentService;
 	@Autowired
@@ -78,120 +76,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Autowired
 	private MonitorIntegracioRepository monitorRepository;
 
-//	// 1. Enviament de notificacions pendents al registre i notific@
-//	////////////////////////////////////////////////////////////////
-//	@Override
-//	public void registrarEnviamentsPendents() throws RegistreNotificaException {
-//
-//		var timer = metricsHelper.iniciMetrica();
-//		try {
-//			log.info("[REG] Cercant notificacions pendents de registrar");
-//			var pendents = notificacioService.getNotificacionsPendentsRegistrar();
-//			if (pendents == null || pendents.isEmpty()) {
-//				log.info("[REG] No hi ha notificacions pendents de registrar");
-//				return;
-//			}
-//			log.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents");
-//			RegistrarThread thread;
-//			boolean multiThread = Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD));
-//			for (Long pendent : pendents) {
-//				if (multiThread) {
-//					thread = new RegistrarThread(pendent, notificacioHelper);
-//					thread.run();
-//				} else {
-//					log.info("[REG] >>> Realitzant registre de la notificació id: " + pendent);
-//					notificacioHelper.registrarNotificar(pendent);
-//				}
-//			}
-//		} finally {
-//			metricsHelper.fiMetrica(timer);
-//		}
-//	}
-
-//	// 2. Enviament de notificacions registrades a Notific@
-//	///////////////////////////////////////////////////////
-//	@Override
-//	public void notificaEnviamentsRegistrats() {
-//		var timer = metricsHelper.iniciMetrica();
-//		try {
-////			if (!isSemaforInUse() && isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
-//			if (isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
-//				log.info("[NOT] Cercant notificacions registrades pendents d'enviar a Notifica");
-//				List<Long> pendents = notificacioService.getNotificacionsPendentsEnviar();
-//				if (pendents != null && !pendents.isEmpty()) {
-//					log.info("[NOT] Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents");
-//					for (Long pendent: pendents) {
-//						log.info("[NOT] >>> Realitzant enviament a Notifica de la notificació amb id: " + pendent);
-//						if (SemaforNotificacio.isSemaforInUse(pendent)) {
-//							continue;
-//						}
-//						notificacioService.notificacioEnviar(pendent);
-//					}
-//				} else {
-//					log.info("[NOT] No hi ha notificacions pendents d'enviar a Notific@");
-//				}
-//			} else {
-//				log.info("[NOT] L'enviament de notificacions a Notific@ està deshabilitada");
-//			}
-//		} finally {
-//			metricsHelper.fiMetrica(timer);
-//		}
-//	}
-
-//	// 3. Actualització de l'estat dels enviaments amb l'estat de Notific@
-//	//////////////////////////////////////////////////////////////////
-//	@Override
-//	public void enviamentRefrescarEstatPendents() {
-//		var timer = metricsHelper.iniciMetrica();
-//		try {
-//			if (!notificaHelper.isAdviserActiu() && isTasquesActivesProperty() && isEnviamentActualitzacioEstatActiu() && notificaHelper.isConnexioNotificaDisponible()) {
-//				log.info("[EST] Cercant enviaments pendents de refrescar l'estat de Notifica");
-//				List<Long> pendents = notificacioService.getNotificacionsPendentsRefrescarEstat();
-//				if (pendents != null && !pendents.isEmpty()) {
-//					log.info("[EST] Realitzant refresc de l'estat de Notifica per a " + pendents.size() + " enviaments");
-//					for (Long pendent: pendents) {
-//						log.info("[EST] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + pendent + "]");
-//						notificacioService.enviamentRefrescarEstat(pendent);
-//					}
-//				} else {
-//					log.info("[EST] No hi ha enviaments pendents de refrescar l'estat de Notifica");
-//				}
-//			} else {
-//				log.info("[EST] L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
-//			}
-//		} finally {
-//			metricsHelper.fiMetrica(timer);
-//		}
-//	}
-
-//	// 4. Actualització de l'estat dels enviaments amb l'estat de enviat_sir
-//	//////////////////////////////////////////////////////////////////
-//	@SuppressWarnings({ "unchecked", "rawtypes" })
-//	@Override
-//	public void enviamentRefrescarEstatEnviatSir() {
-//		var timer = metricsHelper.iniciMetrica();
-//		try {
-//			if (isTasquesActivesProperty() && isEnviamentActualitzacioEstatRegistreActiu()) {
-//				log.info("[SIR] Cercant enviaments pendents de refrescar l'estat enviat SIR");
-//				List<Long> pendents = notificacioService.getNotificacionsPendentsRefrescarEstatRegistre();
-//				if (pendents != null && !pendents.isEmpty()) {
-//					log.info("[SIR] Realitzant refresc de l'estat de enviat SIR per a " + pendents.size() + " enviaments");
-//					for (Long pendent: pendents) {
-//						log.info(">>> Consultat l'estat a registre de l'enviament: [Id: " + pendent + "]" + ", i actualitzant les dades a Notib.");
-//						notificacioService.enviamentRefrescarEstatRegistre(pendent);
-//					}
-//				} else {
-//					log.info("[SIR] No hi ha enviaments pendents de refrescar l'estat enviats a SIR");
-//				}
-//			} else {
-//				log.info("[SIR] L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
-//			}
-//		} finally {
-//			metricsHelper.fiMetrica(timer);
-//		}
-//	}
-
-	// 5. Actualització dels procediments a partir de la informació de Rolsac
+	// 1. Actualització dels procediments a partir de la informació de Rolsac
 	/////////////////////////////////////////////////////////////////////////
 	@Override
 	public void actualitzarProcediments() {
@@ -218,8 +103,22 @@ public class SchedulledServiceImpl implements SchedulledService {
 			metricsHelper.fiMetrica(timer);
 		}	
 	}
-	
-	//6. Consulta certificació notificacions DEH finalitzades
+
+	//2. Refrescar notificacions expirades
+	/////////////////////////////////////////////////////////////////////////
+	@Override
+	public void refrescarNotificacionsExpirades() {
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			log.info("[EXPIRATS] Refrescant notificacions expirades");
+			addAdminAuthentication();
+			enviamentHelper.refrescarEnviamentsExpirats();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	//4. Consulta certificació notificacions DEH finalitzades
 	//////////////////////////////////////////////////////////////////
 	@Override
 	public void enviamentRefrescarEstatDEH() {
@@ -246,7 +145,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 	}
 	
-	//7. Consulta certificació notificacions CIE finalitzades
+	//5. Consulta certificació notificacions CIE finalitzades
 	//////////////////////////////////////////////////////////////////
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -274,7 +173,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 	}
 	
-	//8. Esborra documents temporals
+	//6. Esborra documents temporals
 	//////////////////////////////////////////////////////////////////
 	@Override
 	public void eliminarDocumentsTemporals() {
@@ -301,7 +200,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 	}
 	
-	// 9. Actualització dels serveis a partir de la informació de Rolsac
+	// 7. Actualització dels serveis a partir de la informació de Rolsac
 	/////////////////////////////////////////////////////////////////////////
 	@Override
 	public void actualitzarServeis() {
@@ -329,6 +228,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}	
 	}
 
+	// 8. Consulta de canvis en l'organigrama
+	/////////////////////////////////////////////////////////////////////////
     @Override
     public void consultaCanvisOrganigrama() {
 		log.debug("Execució tasca periòdica: Actualitzar procedimetns");
@@ -341,6 +242,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
     }
 
+	// 9. Eliminar entrades al monitor integracions antigues
+	/////////////////////////////////////////////////////////////////////////
 	@Override
 	public void monitorIntegracionsEliminarAntics() {
 
@@ -366,6 +269,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 	}
 
+	// 10. Actualitzar estat organs enviament table
+	/////////////////////////////////////////////////////////////////////////
 	@Transactional
 	@Override
 	public void actualitzarEstatOrgansEnviamentTable() {
@@ -422,20 +327,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 		return baseDir.endsWith("/") ? baseDir + agrupacio : baseDir + "/" + agrupacio;
 	}
 
-	// Refrescar notificacions expirades
-	/////////////////////////////////////////////////////////////////////////
-	@Override
-	public void refrescarNotificacionsExpirades() {
-		var timer = metricsHelper.iniciMetrica();
-		try {
-			log.info("[EXPIRATS] Refrescant notificacions expirades");
-			addAdminAuthentication();
-			enviamentHelper.refrescarEnviamentsExpirats();
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
 	private void addAdminAuthentication() {
 
 		Principal principal = () -> "SCHEDULLER";
