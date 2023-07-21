@@ -118,7 +118,6 @@ public class ConversioTipusHelper {
 		mapperFactory.classMap(NotificacioEntity.class, NotificacioInfoDto.class)
 				.field("organGestor.codi", "organGestorCodi")
 				.field("organGestor.nom", "organGestorNom")
-				.field("createdBy", "createdBy")
 				.customize(new CustomMapper<>() {
 					@Override
 					public void mapAtoB(NotificacioEntity a, NotificacioInfoDto b, MappingContext context) {
@@ -529,6 +528,7 @@ public class ConversioTipusHelper {
 		@Override
 		public void mapAtoB(EnviamentTableEntity enviamentTableEntity, NotEnviamentTableItemDto notEnviamentTableItemDto, MappingContext context) {
 
+			notEnviamentTableItemDto.setCreatedDate(Date.from(enviamentTableEntity.getCreatedDate().orElseThrow().atZone(ZoneId.systemDefault()).toInstant()));
 			if (enviamentTableEntity.getDestinataris() == null || enviamentTableEntity.getDestinataris().isEmpty()) {
 				return;
 			}
