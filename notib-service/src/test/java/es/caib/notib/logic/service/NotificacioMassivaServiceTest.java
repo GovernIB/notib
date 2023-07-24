@@ -28,6 +28,7 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import es.caib.notib.persist.entity.NotificacioTableEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
+import es.caib.notib.persist.objectes.FiltreNotificacio;
 import es.caib.notib.persist.repository.NotificacioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
@@ -244,26 +245,28 @@ public class NotificacioMassivaServiceTest {
 	public void whenFindNotificacions_ThenCallFindAmbFiltreByNotificacioMassiva() throws Exception {
 		// Given
 		Mockito.when(notificacioListHelper.getMappeigPropietats(Mockito.any(PaginacioParamsDto.class))).thenReturn(null); // ho ignorarem per a la prova
-		Mockito.when(notificacioListHelper.getFiltre(
-				Mockito.any(NotificacioFiltreDto.class)))
-				.thenReturn( NotificacioListHelper.NotificacioFiltre.builder()
-						.entitatId(new FiltreField<>(entitatId))
-						.comunicacioTipus(new FiltreField<>(null))
-						.enviamentTipus(new FiltreField<>(null))
-						.estat(new FiltreField<>(null))
-						.concepte(new StringField(null))
-						.dataInici(new FiltreField<>(null))
-						.dataFi(new FiltreField<>(null))
-						.titular(new StringField(null))
-						.organGestor(new FiltreField<>(null))
-						.procediment(new FiltreField<>(null))
-						.tipusUsuari(new FiltreField<>(null))
-						.numExpedient(new StringField(null))
-						.creadaPer(new StringField(null))
-						.identificador(new StringField(null))
-						.nomesAmbErrors(new FiltreField<>(false))
-						.nomesSenseErrors(new FiltreField<>(false))
-						.hasZeronotificaEnviamentIntent(new FiltreField<>(false))
+//		var filtre = Mockito.any(NotificacioFiltreDto.class);
+//		var rol=  Mockito.any(RolEnumDto.class);
+//		var usuariCodi = Mockito.anyString();
+//		var rols = Mockito.any(List.class);
+		Mockito.when(notificacioListHelper.getFiltre(Mockito.any(NotificacioFiltreDto.class), Mockito.anyLong(), Mockito.any(RolEnumDto.class), Mockito.anyString(), Mockito.any(List.class)))
+				.thenReturn( FiltreNotificacio.builder()
+						.entitatId(entitatId)
+//						.comunicacioTipus(null)
+						.enviamentTipus(null)
+						.estatMask(null)
+						.concepte(null)
+						.dataInici(null)
+						.dataFi(null)
+						.titular(null)
+						.organCodi(null)
+						.procedimentCodi(null)
+						.tipusUsuari(null)
+						.numExpedient(null)
+						.creadaPer(null)
+						.identificador(null)
+						.nomesAmbErrors(false)
+						.nomesSenseErrors(false)
 						.build()); // ho ignorarem per a la prova
 			Mockito.when(notificacioListHelper.complementaNotificacions(Mockito.eq(entitatMock), Mockito.anyString(), Mockito.<Page<NotificacioTableEntity>>any())).thenReturn(null);
 
@@ -271,36 +274,36 @@ public class NotificacioMassivaServiceTest {
 		notificacioMassivaService.findNotificacions(entitatId, notMassivaId, new NotificacioFiltreDto(), new PaginacioParamsDto());
 
 		// Then
-		Mockito.verify(notificacioTableViewRepository, Mockito.times(1)).findAmbFiltreByNotificacioMassiva(
-				Mockito.anyBoolean(),
-				Mockito.eq(entitatId),
-				Mockito.eq(notificacioMassivaMock),
-				Mockito.anyBoolean(),
-				Mockito.nullable(EnviamentTipus.class),
-				Mockito.anyBoolean(),
-				Mockito.nullable(String.class),
-				Mockito.anyBoolean(),
-				Mockito.nullable(Integer.class),
-				Mockito.anyBoolean(),
-				Mockito.nullable(Date.class),
-				Mockito.anyBoolean(),
-				Mockito.nullable(Date.class),
-				Mockito.anyBoolean(),
-				Mockito.nullable(String.class),
-				Mockito.anyBoolean(),
-				Mockito.nullable(String.class),
-				Mockito.anyBoolean(),
-				Mockito.nullable(String.class),
-				Mockito.anyBoolean(),
-				Mockito.nullable(TipusUsuariEnumDto.class),
-				Mockito.anyBoolean(),
-				Mockito.nullable(String.class),
-				Mockito.anyBoolean(),
-				Mockito.nullable(String.class),
-				Mockito.anyBoolean(),
-				Mockito.nullable(String.class),
-				Mockito.anyBoolean(),
-				Mockito.anyBoolean(),
+		Mockito.verify(notificacioTableViewRepository, Mockito.times(1)).findAmbFiltreByNotificacioMassiva(Mockito.any(FiltreNotificacio.class),
+//				Mockito.anyBoolean(),
+//				Mockito.eq(entitatId),
+//				Mockito.eq(notificacioMassivaMock),
+//				Mockito.anyBoolean(),
+//				Mockito.nullable(EnviamentTipus.class),
+//				Mockito.anyBoolean(),
+//				Mockito.nullable(String.class),
+//				Mockito.anyBoolean(),
+//				Mockito.nullable(Integer.class),
+//				Mockito.anyBoolean(),
+//				Mockito.nullable(Date.class),
+//				Mockito.anyBoolean(),
+//				Mockito.nullable(Date.class),
+//				Mockito.anyBoolean(),
+//				Mockito.nullable(String.class),
+//				Mockito.anyBoolean(),
+//				Mockito.nullable(String.class),
+//				Mockito.anyBoolean(),
+//				Mockito.nullable(String.class),
+//				Mockito.anyBoolean(),
+//				Mockito.nullable(TipusUsuariEnumDto.class),
+//				Mockito.anyBoolean(),
+//				Mockito.nullable(String.class),
+//				Mockito.anyBoolean(),
+//				Mockito.nullable(String.class),
+//				Mockito.anyBoolean(),
+//				Mockito.nullable(String.class),
+//				Mockito.anyBoolean(),
+//				Mockito.anyBoolean(),
 				Mockito.nullable(Pageable.class));
 
 		Mockito.verify(notificacioListHelper, Mockito.times(1)).complementaNotificacions(Mockito.eq(entitatMock), Mockito.anyString(), Mockito.<Page<NotificacioTableEntity>>any());

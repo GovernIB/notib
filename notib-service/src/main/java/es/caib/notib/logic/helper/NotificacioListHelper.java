@@ -9,6 +9,7 @@ import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
+import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -21,6 +22,8 @@ import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.NotificacioTableEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
+import es.caib.notib.persist.objectes.FiltreNotificacio;
+import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.ProcedimentRepository;
@@ -32,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -56,7 +60,17 @@ public class NotificacioListHelper {
     private PaginacioHelper paginacioHelper;
     @Autowired
     private MessageHelper messageHelper;
+    @Autowired
+    private EntityComprovarHelper entityComprovarHelper;
+    @Autowired
+    private ProcSerHelper procedimentHelper;
+    @Autowired
+    private OrganGestorHelper organGestorHelper;
+    @Autowired
+    private OrganigramaHelper organigramaHelper;
 
+    @Autowired
+    private EntitatRepository entitatRepository;
     @Autowired
     private ProcedimentRepository procedimentRepository;
     @Autowired
@@ -273,66 +287,138 @@ public class NotificacioListHelper {
         item.setEstatString(estat.toString());
     }
 
-    public NotificacioFiltre getFiltre(NotificacioFiltreDto filtreDto) {
+    public FiltreNotificacio getFiltre(NotificacioFiltreDto f, Long entitatId, RolEnumDto rol, String usuariCodi, List<String> rols) {
 
         OrganGestorEntity organGestor = null;
-        if (filtreDto.getOrganGestor() != null && !filtreDto.getOrganGestor().isEmpty()) {
-            organGestor = organGestorRepository.findById(Long.parseLong(filtreDto.getOrganGestor())).orElse(null);
+        if (f.getOrganGestor() != null && !f.getOrganGestor().isEmpty()) {
+            organGestor = organGestorRepository.findById(Long.parseLong(f.getOrganGestor())).orElse(null);
         }
         ProcSerEntity procediment = null;
-        if (filtreDto.getProcedimentId() != null) {
-            procediment = procedimentRepository.findById(filtreDto.getProcedimentId()).orElse(null);
-        } else if (filtreDto.getServeiId() != null) {
-            procediment = serveiRepository.findById(filtreDto.getServeiId()).orElse(null);
+        if (f.getProcedimentId() != null) {
+            procediment = procedimentRepository.findById(f.getProcedimentId()).orElse(null);
+        } else if (f.getServeiId() != null) {
+            procediment = serveiRepository.findById(f.getServeiId()).orElse(null);
         }
-        var estat = filtreDto.getEstat();
-        boolean isEstatNull = estat == null;
+        var isUsuari = RolEnumDto.tothom.equals(rol);
+        var isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
+        var isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
+        var isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
+        var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat,false);
         var nomesSenseErrors = false;
-        var nomesAmbErrors = filtreDto.isNomesAmbErrors();
-        return NotificacioFiltre.builder()
-                .entitatId(new FiltreField<>(filtreDto.getEntitatId()))
-                .comunicacioTipus(new FiltreField<>(filtreDto.getComunicacioTipus()))
-                .enviamentTipus(new FiltreField<>(filtreDto.getEnviamentTipus()))
-                .estat(new FiltreField<>(estat, isEstatNull))
-                .concepte(new StringField(filtreDto.getConcepte()))
-                .dataInici(new FiltreField<>(FiltreHelper.toIniciDia(filtreDto.getDataInici())))
-                .dataFi(new FiltreField<>(FiltreHelper.toFiDia(filtreDto.getDataFi())))
-                .titular(new StringField(filtreDto.getTitular()))
-                .organGestor(new FiltreField<>(organGestor))
-                .procediment(new FiltreField<>(procediment))
-                .tipusUsuari(new FiltreField<>(filtreDto.getTipusUsuari()))
-                .numExpedient(new StringField(filtreDto.getNumExpedient()))
-                .creadaPer(new StringField(filtreDto.getCreadaPer()))
-                .identificador(new StringField(filtreDto.getIdentificador()))
-                .nomesAmbErrors(new FiltreField<>(nomesAmbErrors))
-                .nomesSenseErrors(new FiltreField<>(nomesSenseErrors))
-                .referencia(new StringField(filtreDto.getReferencia()))
-                .build();
+        var nomesAmbErrors = f.isNomesAmbErrors();
+        List<String> codisProcedimentsDisponibles = new ArrayList<>();
+        List<String> codisOrgansGestorsDisponibles = new ArrayList<>();
+        List<String> codisProcedimentsOrgans = new ArrayList<>();
+        if (isUsuari && entitatActual != null) {
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+            entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
+            // Procediments accessibles per qualsevol òrgan gestor
+            codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
+            // Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
+            codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
+            // Procediments comuns que es poden consultar per a òrgans gestors concrets
+            codisProcedimentsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitatActual.getId(), auth.getName(), PermisEnum.CONSULTA);
+        } else if (isAdminOrgan && entitatActual != null) {
+            codisProcedimentsDisponibles = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestor.getCodi());
+        }
+
+        var esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
+        var esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+        var esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
+        var organs = isAdminOrgan && organGestor != null ? organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestor.getCodi()) : null;
+        var entitatsActives = isSuperAdmin ? entitatRepository.findByActiva(true) : null;
+        var entitatFiltre = isUsuariEntitat || isUsuari ? entitatId : f.getEntitatId();
+        return FiltreNotificacio.builder()
+                .entitatIdNull(entitatFiltre == null)
+                .entitatId(entitatFiltre)
+                .entitat(entitatActual)
+                .enviamentTipusNull(f.getEnviamentTipus() == null)
+                .enviamentTipus(f.getEnviamentTipus())
+                .concepteNull(Strings.isNullOrEmpty(f.getConcepte()))
+                .concepte(f.getConcepte())
+                .estatNull(f.getEstat() == null)
+                .estatMask(f.getEstat() == null ? 0 : f.getEstat().getMask())
+                .dataIniciNull(f.getDataInici() == null)
+                .dataInici(f.getDataInici())
+                .dataFiNull(f.getDataFi() == null)
+                .dataFi(f.getDataFi())
+                .titularNull(Strings.isNullOrEmpty(f.getTitular()))
+                .titular(f.getTitular())
+                .organCodiNull(organGestor == null)
+                .organCodi(organGestor.getCodi())
+                .procedimentNull(procediment == null)
+                .procedimentCodi(procediment.getCodi())
+                .tipusUsuariNull(f.getTipusUsuari() == null)
+                .tipusUsuari(f.getTipusUsuari())
+                .numExpedientNull(Strings.isNullOrEmpty(f.getNumExpedient()))
+                .numExpedient(f.getNumExpedient())
+                .creadaPerNull(Strings.isNullOrEmpty(f.getCreadaPer()))
+                .creadaPer(f.getCreadaPer())
+                .identificadorNull(Strings.isNullOrEmpty(f.getIdentificador()))
+                .identificador(f.getIdentificador())
+                .nomesAmbErrors(nomesAmbErrors)
+                .nomesSenseErrors(nomesSenseErrors)
+                .referenciaNull(Strings.isNullOrEmpty(f.getReferencia()))
+                .referencia(f.getReferencia())
+                .isUsuari(isUsuari)
+                .procedimentsCodisNotibNull(esProcedimentsCodisNotibNull)
+                .procedimentsCodisNotib(esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles)
+                .grupsProcedimentCodisNotib(rols)
+                .organsGestorsCodisNotibNull(esOrgansGestorsCodisNotibNull)
+                .organsGestorsCodisNotib(esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles)
+                .procedimentOrgansIdsNotibNull(esProcedimentOrgansAmbPermisNull)
+                .procedimentOrgansIdsNotib(esProcedimentOrgansAmbPermisNull ?  null : codisProcedimentsOrgans)
+                .usuariCodi(usuariCodi)
+                .isSuperAdmin(isSuperAdmin)
+                .entitatsActives(entitatsActives)
+                .isAdminOrgan(isAdminOrgan)
+                .organs(organs)
+                .notMassivaIdNull(f.getNotMassivaId() == null)
+                .notMassivaId(f.getNotMassivaId()).build();
+//        return NotificacioFiltre.builder()
+//                .entitatId(new FiltreField<>(filtreDto.getEntitatId()))
+//                .comunicacioTipus(new FiltreField<>(filtreDto.getComunicacioTipus()))
+//                .enviamentTipus(new FiltreField<>(filtreDto.getEnviamentTipus()))
+//                .estat(new FiltreField<>(estat, isEstatNull))
+//                .concepte(new StringField(filtreDto.getConcepte()))
+//                .dataInici(new FiltreField<>(FiltreHelper.toIniciDia(filtreDto.getDataInici())))
+//                .dataFi(new FiltreField<>(FiltreHelper.toFiDia(filtreDto.getDataFi())))
+//                .titular(new StringField(filtreDto.getTitular()))
+//                .organGestor(new FiltreField<>(organGestor))
+//                .procediment(new FiltreField<>(procediment))
+//                .tipusUsuari(new FiltreField<>(filtreDto.getTipusUsuari()))
+//                .numExpedient(new StringField(filtreDto.getNumExpedient()))
+//                .creadaPer(new StringField(filtreDto.getCreadaPer()))
+//                .identificador(new StringField(filtreDto.getIdentificador()))
+//                .nomesAmbErrors(new FiltreField<>(nomesAmbErrors))
+//                .nomesSenseErrors(new FiltreField<>(nomesSenseErrors))
+//                .referencia(new StringField(filtreDto.getReferencia()))
+//                .build();
     }
 
-    @Builder
-    @Getter
-    @Setter
-    public static class NotificacioFiltre implements Serializable {
-
-        private FiltreField<Long> entitatId;
-        private FiltreField<NotificacioComunicacioTipusEnumDto> comunicacioTipus;
-        private FiltreField<EnviamentTipus> enviamentTipus;
-        private FiltreField<NotificacioEstatEnumDto> estat;
-        private StringField concepte;
-        private FiltreField<Date> dataInici;
-        private FiltreField<Date> dataFi;
-        private StringField titular;
-        private FiltreField<OrganGestorEntity> organGestor;
-        private FiltreField<ProcSerEntity> procediment;
-        private FiltreField<TipusUsuariEnumDto> tipusUsuari;
-        private StringField numExpedient;
-        private StringField creadaPer;
-        private StringField identificador;
-        private StringField referencia;
-        private FiltreField<Boolean> nomesAmbErrors;
-        private FiltreField<Boolean> nomesSenseErrors;
-        private FiltreField<Boolean> hasZeronotificaEnviamentIntent;
-    }
+//    @Builder
+//    @Getter
+//    @Setter
+//    public static class NotificacioFiltre implements Serializable {
+//
+//        private FiltreField<Long> entitatId;
+//        private FiltreField<NotificacioComunicacioTipusEnumDto> comunicacioTipus;
+//        private FiltreField<EnviamentTipus> enviamentTipus;
+//        private FiltreField<NotificacioEstatEnumDto> estat;
+//        private StringField concepte;
+//        private FiltreField<Date> dataInici;
+//        private FiltreField<Date> dataFi;
+//        private StringField titular;
+//        private FiltreField<OrganGestorEntity> organGestor;
+//        private FiltreField<ProcSerEntity> procediment;
+//        private FiltreField<TipusUsuariEnumDto> tipusUsuari;
+//        private StringField numExpedient;
+//        private StringField creadaPer;
+//        private StringField identificador;
+//        private StringField referencia;
+//        private FiltreField<Boolean> nomesAmbErrors;
+//        private FiltreField<Boolean> nomesSenseErrors;
+//        private FiltreField<Boolean> hasZeronotificaEnviamentIntent;
+//    }
 
 }

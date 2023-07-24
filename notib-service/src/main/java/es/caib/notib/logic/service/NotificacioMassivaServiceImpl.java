@@ -66,6 +66,7 @@ import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
+import es.caib.notib.persist.objectes.FiltreNotificacio;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
@@ -369,39 +370,39 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
         var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
         var pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
-        var filtreNetejat = notificacioListHelper.getFiltre(filtre);
-        var notificacions = notificacioTableViewRepository.findAmbFiltreByNotificacioMassiva(
-                filtreNetejat.getEntitatId().isNull(),
-                filtreNetejat.getEntitatId().getField(),
-                notificacioMassivaRepository.findById(notificacioMassivaId).orElse(null),
-                filtreNetejat.getEnviamentTipus().isNull(),
-                filtreNetejat.getEnviamentTipus().getField(),
-                filtreNetejat.getConcepte().isNull(),
-                filtreNetejat.getConcepte().getField(),
-                filtreNetejat.getEstat().isNull(),
-                filtreNetejat.getEstat().isNull() ? 0 : filtreNetejat.getEstat().getField().getMask(),
-                filtreNetejat.getDataInici().isNull(),
-                filtreNetejat.getDataInici().getField(),
-                filtreNetejat.getDataFi().isNull(),
-                filtreNetejat.getDataFi().getField(),
-                filtreNetejat.getTitular().isNull(),
-                filtreNetejat.getTitular().isNull() ? "" : filtreNetejat.getTitular().getField(),
-                filtreNetejat.getOrganGestor().isNull(),
-                filtreNetejat.getOrganGestor().isNull() ? "" : filtreNetejat.getOrganGestor().getField().getCodi(),
-                filtreNetejat.getProcediment().isNull(),
-                filtreNetejat.getProcediment().isNull() ? "" : filtreNetejat.getProcediment().getField().getCodi(),
-                filtreNetejat.getTipusUsuari().isNull(),
-                filtreNetejat.getTipusUsuari().getField(),
-                filtreNetejat.getNumExpedient().isNull(),
-                filtreNetejat.getNumExpedient().getField(),
-                filtreNetejat.getCreadaPer().isNull(),
-                filtreNetejat.getCreadaPer().getField(),
-                filtreNetejat.getIdentificador().isNull(),
-                filtreNetejat.getIdentificador().getField(),
-                filtreNetejat.getNomesAmbErrors().getField(),
-                filtreNetejat.getNomesSenseErrors().getField(),
-                pageable);
-
+        var f = notificacioListHelper.getFiltre(filtre, entitatId, null, null, null);
+        f.setNotificacioMassiva(notificacioMassivaRepository.findById(notificacioMassivaId).orElse(null));
+//        var f = FiltreNotificacio.builder()
+//            .entitatIdNull(filtreNetejat.getEntitatId().isNull())
+//            .entitatId(filtreNetejat.getEntitatId().getField())
+//            .notificacioMassiva(notificacioMassivaRepository.findById(notificacioMassivaId).orElse(null))
+//            .enviamentTipusNull(filtreNetejat.getEnviamentTipus().isNull())
+//            .enviamentTipus(filtreNetejat.getEnviamentTipus().getField())
+//            .concepteNull(filtreNetejat.getConcepte().isNull())
+//            .concepte(filtreNetejat.getConcepte().getField())
+//            .estatNull(filtreNetejat.getEstat().isNull())
+//            .estatMask(filtreNetejat.getEstat().isNull() ? 0 : filtreNetejat.getEstat().getField().getMask())
+//            .dataIniciNull(filtreNetejat.getDataInici().isNull())
+//            .dataInici(filtreNetejat.getDataInici().getField())
+//            .dataFiNull(filtreNetejat.getDataFi().isNull())
+//            .dataFi(filtreNetejat.getDataFi().getField())
+//            .titularNull(filtreNetejat.getTitular().isNull())
+//            .titular(filtreNetejat.getTitular().isNull() ? "" : filtreNetejat.getTitular().getField())
+//            .organCodiNull(filtreNetejat.getOrganGestor().isNull())
+//            .organCodi(filtreNetejat.getOrganGestor().isNull() ? "" : filtreNetejat.getOrganGestor().getField().getCodi())
+//            .procedimentNull(filtreNetejat.getProcediment().isNull())
+//            .procedimentCodi(filtreNetejat.getProcediment().isNull() ? "" : filtreNetejat.getProcediment().getField().getCodi())
+//            .tipusUsuariNull(filtreNetejat.getTipusUsuari().isNull())
+//            .tipusUsuari(filtreNetejat.getTipusUsuari().getField())
+//            .numExpedientNull(filtreNetejat.getNumExpedient().isNull())
+//            .numExpedient(filtreNetejat.getNumExpedient().getField())
+//            .creadaPerNull(filtreNetejat.getCreadaPer().isNull())
+//            .creadaPer(filtreNetejat.getCreadaPer().getField())
+//            .identificadorNull(filtreNetejat.getIdentificador().isNull())
+//            .identificador(filtreNetejat.getIdentificador().getField())
+//            .nomesAmbErrors(filtreNetejat.getNomesAmbErrors().getField())
+//            .nomesSenseErrors(filtreNetejat.getNomesSenseErrors().getField()).build();
+        var notificacions = notificacioTableViewRepository.findAmbFiltreByNotificacioMassiva(f, pageable);
         var auth = SecurityContextHolder.getContext().getAuthentication();
         return notificacioListHelper.complementaNotificacions(entitatActual, auth.getName(), notificacions);
     }

@@ -3,6 +3,7 @@ package es.caib.notib.persist.objectes;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.persist.entity.EntitatEntity;
+import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,7 @@ public class FiltreNotificacio {
 
     private boolean entitatIdNull;
     private Long entitatId;
+    private EntitatEntity entitat;
     private boolean enviamentTipusNull;
     private EnviamentTipus enviamentTipus;
     private boolean concepteNull;
@@ -59,4 +61,6 @@ public class FiltreNotificacio {
     private List<String> organs;
     private boolean notMassivaIdNull;
     private Long notMassivaId;
+
+    private NotificacioMassivaEntity notificacioMassiva;
 }

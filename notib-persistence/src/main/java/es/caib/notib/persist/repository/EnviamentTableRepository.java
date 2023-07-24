@@ -476,8 +476,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 	Page<EnviamentTableEntity> findAmbFiltre(FiltreEnviament filtre, Pageable pageable);
 
 
-	@Query( "select nenv.id from " +
-			"    EnviamentTableEntity nenv " +
+	@Query( "select nenv.id from EnviamentTableEntity nenv " +
 			"where " +
 			"    (:#{#filtre.entitat} = nenv.entitat) " +
 			"and (:#{#filtre.isUsuari} = false or (" +
@@ -508,15 +507,15 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:#{#filtre.estatNull} = true or nenv.estat = :#{#filtre.estat} or nenv.notificaEstat = :#{#filtre.notificaEstat})" +
 			"and (:#{#filtre.dataEnviamentFiNull} = true or nenv.createdDate <= :#{#filtre.dataEnviamentFi}) " +
 			"and (:#{#filtre.codiNotificaNull} = true or lower(CASE WHEN nenv.notificaIdentificador is null THEN '' ELSE nenv.notificaIdentificador END) like lower('%'||:#{#filtre.codiNotifica}||'%')) " +
-			"and (:#{#filtre.creadaPerNull} = true or lower(CASE WHEN nenv.createdBy.codi is null THEN '' ELSE nenv.createdBy.codi END) like lower('%'||:#{#filtre.createdByCodi}||'%')) " +
+			"and (:#{#filtre.creadaPerNull} = true or lower(CASE WHEN nenv.createdBy.codi is null THEN '' ELSE nenv.createdBy.codi END) like lower('%'||:#{#filtre.creadaPerCodi}||'%')) " +
 			"and (:#{#filtre.nifTitularNull} = true or lower(CASE WHEN nenv.titularNif is null THEN '' ELSE nenv.titularNif END) like lower('%'||:#{#filtre.nifTitular}||'%')) " +
 			"and (:#{#filtre.nomTitularNull} = true or lower(concat('[', nenv.titularLlinatge1, ' ', nenv.titularLlinatge2, ', ', nenv.titularNom,']')) like lower('%'||:#{#filtre.nomTitular}||'%')) " +
 			"and (:#{#filtre.emailTitularNull} = true or nenv.titularEmail = :#{#filtre.emailTitular}) " +
 			"and (:#{#filtre.dir3CodiNull} = true or lower(CASE WHEN nenv.organCodi is null THEN '' ELSE nenv.organCodi END) like lower('%'||:#{#filtre.dir3Codi}||'%')) " +
 			"and (:#{#filtre.numeroCertCorreusNull} = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:#{#filtre.numeroCertCorreus}||'%')) " +
-			"and (:#{#filtre.usuariNull} = true or nenv.usuariCodi like lower('%'||:usuari||'%')) " +
+			"and (:#{#filtre.usuariNull} = true or nenv.usuariCodi like lower('%'||:#{#filtre.usuari}||'%')) " +
 			"and (:#{#filtre.registreNumeroNull} = true or cast(nenv.registreNumero as string) like lower('%'||:#{#filtre.registreNumero}||'%')) " +
-			"and (:#{#filtre.referenciaNotificacioNull} = true or nenv.notificaReferencia like '%'||:#{#filtre.referenciaNotificacio}||'%') " +
+			"and (:#{#filtre.codiNotibEnviamentNull} = true or nenv.notificaReferencia like '%'||:#{#filtre.codiNotibEnviament}||'%') " +
 			"and (:#{#filtre.dataRegistreIniciNull} = true or nenv.registreData >= :#{#filtre.dataRegistreInici}) " +
 			"and (:#{#filtre.dataRegistreFiNull} = true or nenv.registreData <= :#{#filtre.dataRegistreFi})" +
 			"and (:#{#filtre.hasZeronotificaEnviamentIntentNull} = true or " +
