@@ -6,6 +6,7 @@ import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
@@ -618,18 +619,19 @@ public class PermisosServiceImpl implements PermisosService {
     // AFEGIR ORGANS FILLS
 
     private List<CodiValorDto> getOrgansAfegintFills(EntitatEntity entitat, Set<OrganGestorEntity> organs, PermisEnum permis) {
-        Set<CodiValorDto> resposta = new HashSet<>();
 
+        Set<CodiValorDto> resposta = new HashSet<>();
         boolean entitatPermesa = configHelper.getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
         boolean isOficinaOrganSir = !entitat.isOficinaEntitat() && PermisEnum.COMUNICACIO_SIR.equals(permis);
-
         Set<String> codis = new HashSet<>();
         for (OrganGestorEntity organ : organs) {
             codis.add(organ.getCodi());
         }
 
         for(OrganGestorEntity organ: organs) {
-
+            if (OrganGestorEstatEnum.E.equals(organ.getEstat())) {
+                continue;
+            }
             boolean excloure = isOficinaOrganSir && Strings.isNullOrEmpty(organ.getOficina());
             if ((entitatPermesa || !organ.getCodi().equals(entitat.getDir3Codi())) && !excloure) {
                 resposta.add(CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build());
