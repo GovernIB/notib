@@ -235,7 +235,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 			// Obtenir dades bàsiques per a la notificació
 			String emisorDir3Codi = notificacio.getEmisorDir3Codi();
-//			info.setCodiEntitat(emisorDir3Codi);
 			logger.debug(">> [ALTA] emisorDir3Codi: " + emisorDir3Codi);
 			EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
 			if (entitat != null) {
@@ -798,7 +797,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 			logger.debug("Consultant estat enviament amb referencia: " + referencia);
 			RespostaConsultaEstatEnviamentV2 resposta = RespostaConsultaEstatEnviamentV2.builder().referencia(referencia).build();
-			info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 			try {
 				if (enviament == null) {
 					resposta.setError(true);
