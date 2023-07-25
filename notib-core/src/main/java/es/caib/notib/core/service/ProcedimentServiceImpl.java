@@ -18,6 +18,7 @@ import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerFiltreDto;
@@ -1433,6 +1434,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				if (permisosProcOrgan != null && !permisosProcOrgan.isEmpty()) {
 					String organ = procedimentOrgan.getOrganGestor().getCodi();
 					String organNom = procedimentOrgan.getOrganGestor().getNom();
+					OrganGestorEstatEnum organEstat = procedimentOrgan.getOrganGestor().getEstat();
 					boolean tePermis = true;
 
 					if (organGestor != null)
@@ -1442,6 +1444,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						for (PermisDto permis : permisosProcOrgan) {
 							permis.setOrgan(organ);
 							permis.setOrganNom(organNom);
+							permis.setOrganEstat(organEstat);
 							permis.setPermetEdicio(tePermis);
 						}
 						permisos.addAll(permisosProcOrgan);

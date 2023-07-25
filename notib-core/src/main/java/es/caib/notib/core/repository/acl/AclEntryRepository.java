@@ -5,11 +5,9 @@ package es.caib.notib.core.repository.acl;
 
 import es.caib.notib.core.entity.acl.AclEntryEntity;
 import es.caib.notib.core.entity.acl.AclObjectIdentityEntity;
+import es.caib.notib.core.entity.acl.AclSidEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-import javax.ws.rs.Path;
 import java.util.List;
 
 /**
@@ -22,6 +20,8 @@ public interface AclEntryRepository extends JpaRepository<AclEntryEntity, Long> 
 
     AclEntryEntity findById(Long id);
     List<AclEntryEntity> findByAclObjectIdentity(AclObjectIdentityEntity objectIdentity);
+    Integer countByAclObjectIdentity(AclObjectIdentityEntity objectIdentity);
+    AclEntryEntity findByAclObjectIdentityAndSidAndMask(AclObjectIdentityEntity objectIdentity, AclSidEntity sid, Integer mask);
 
 //	@Query(	"select " +
 //			"    sid " +

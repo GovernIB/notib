@@ -59,7 +59,15 @@ pageContext.setAttribute(
 				<th data-col-name="tipus" data-renderer="enum(TipusEnumDto)" class="writing-horitzontal"><spring:message code="procediment.permis.columna.tipus"/></th>
 				<th data-col-name="nomSencerAmbCodi" class="writing-horitzontal nom-principal"><spring:message code="procediment.permis.columna.principal"/></th>
 				<th data-col-name="organ" data-visible="false">#</th>
-				<th data-col-name="organCodiNom" class="writing-horitzontal col-organ"><spring:message code="procediment.permis.columna.organ"/></th>
+				<th data-col-name="organEstat" data-visible="false"></th>
+				<th data-col-name="organCodiNom" class="writing-horitzontal col-organ" data-template="#cellOrganGestorTemplate"><spring:message code="procediment.permis.columna.organ"/>
+					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
+						{{:organCodiNom}}
+						{{if organEstat != 'V'}}
+							<span class="fa fa-warning text-danger" title="<spring:message code='notificacio.list.columna.organGestor.obsolet'/>"></span>{{/if}}
+ 					</script>
+				</th>
+<%--				<th data-col-name="organCodiNom" class="writing-horitzontal col-organ"><spring:message code="procediment.permis.columna.organ"/></th>--%>
 				<th data-col-name="read" data-template="#cellPermisReadTemplate" class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.consulta"/>: &#10;<spring:message code="procediment.permis.consulta.info"/>">
 					<span class="fa fa-search padding-icon"></span>
 <%--					<spring:message code="procediment.permis.columna.consulta"/>--%>

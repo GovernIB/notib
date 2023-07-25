@@ -669,13 +669,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 
 			// 6. Eliminar òrgans no utilitzats
-			log.debug(prefix + "Eliminant òrgans no utilitzats");
-			ti = tf;
-			progres.setFase(5);
-			progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.eliminar"));
+//			log.debug(prefix + "Eliminant òrgans no utilitzats");
+//			ti = tf;
+//			progres.setFase(5);
+//			progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.eliminar"));
 //			organGestorHelper.deleteExtingitsNoUtilitzats(obsoleteUnitats, progres);
-			progres.setProgres(90);
-			tf = System.currentTimeMillis();
+//			progres.setProgres(90);
+//			tf = System.currentTimeMillis();
 
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(tf - ti)}));
 			progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.eliminar.fi"));
@@ -686,7 +686,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			ti = tf;
 			progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.oficines"));
 			syncOficines(entitat.getDir3Codi(), progres);
-			progres.setProgres(45);
+			progres.setProgres(90);
 			tf = System.currentTimeMillis();
 
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(tf - ti)}));

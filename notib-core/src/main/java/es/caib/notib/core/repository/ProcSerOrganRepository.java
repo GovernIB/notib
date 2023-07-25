@@ -22,7 +22,8 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 	public ProcSerOrganEntity findByProcSerIdAndOrganGestorCodi(Long id, String organGestorCodi);
 
 	public List<ProcSerOrganEntity> findByProcSerId(Long procedimentId);
-	
+	public List<ProcSerOrganEntity> findByOrganGestorId(Long organGestorId);
+
 	@Query(	"select po " +
 			"from ProcSerOrganEntity po " +
 			"left outer join po.procSer pro " +
