@@ -125,6 +125,8 @@ public class ConversioTipusHelper {
 						if (d != null) {
 							b.setUsuariNom(d.getNomSencer());
 						}
+						var createdBy = convertir(a.getCreatedBy().orElseThrow(), UsuariDto.class);
+						b.setCreatedBy(createdBy);
 					}
 				}).byDefault().register();
 
