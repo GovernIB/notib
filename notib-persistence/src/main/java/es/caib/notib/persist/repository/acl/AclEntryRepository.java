@@ -5,9 +5,11 @@ package es.caib.notib.persist.repository.acl;
 
 import es.caib.notib.persist.entity.acl.AclEntryEntity;
 import es.caib.notib.persist.entity.acl.AclObjectIdentityEntity;
+import es.caib.notib.persist.entity.acl.AclSidEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -17,7 +19,11 @@ import java.util.List;
  */
 public interface AclEntryRepository extends JpaRepository<AclEntryEntity, Long> {
 
+    Optional<AclEntryEntity> findById(Long id);
     List<AclEntryEntity> findByAclObjectIdentity(AclObjectIdentityEntity objectIdentity);
+    Integer countByAclObjectIdentity(AclObjectIdentityEntity objectIdentity);
+    AclEntryEntity findByAclObjectIdentityAndSidAndMask(AclObjectIdentityEntity objectIdentity, AclSidEntity sid, Integer mask);
+
 
 //	@Query(	"select " +
 //			"    sid " +

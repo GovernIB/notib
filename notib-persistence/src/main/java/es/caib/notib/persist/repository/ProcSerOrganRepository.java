@@ -18,10 +18,12 @@ import java.util.List;
  */
 public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity, Long> {
 
-	public ProcSerOrganEntity findByProcSerIdAndOrganGestorId(Long id, Long organGestorId);
-	public ProcSerOrganEntity findByProcSerIdAndOrganGestorCodi(Long id, String organGestorCodi);
+	ProcSerOrganEntity findByProcSerIdAndOrganGestorId(Long id, Long organGestorId);
+	ProcSerOrganEntity findByProcSerIdAndOrganGestorCodi(Long id, String organGestorCodi);
 
-	public List<ProcSerOrganEntity> findByProcSerId(Long procedimentId);
+	List<ProcSerOrganEntity> findByProcSerId(Long procedimentId);
+
+	List<ProcSerOrganEntity> findByOrganGestorId(Long organGestorId);
 	
 	@Query(	"select po " +
 			"from ProcSerOrganEntity po " +
@@ -35,7 +37,7 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	public List<ProcSerOrganEntity> findProcedimentsOrganByEntitatAndGrup(
+	List<ProcSerOrganEntity> findProcedimentsOrganByEntitatAndGrup(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups);
 
@@ -57,10 +59,8 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	public Long countProcedimentsByEntitatAndGrupAndIds(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("grups") List<String> grups,
-			@Param("ids") List<Long> ids);
+	Long countProcedimentsByEntitatAndGrupAndIds(@Param("entitat") EntitatEntity entitat, @Param("grups") List<String> grups, @Param("ids") List<Long> ids);
+
 	@Query(	"select po " +
 			"from ProcSerOrganEntity po " +
 			"left outer join po.procSer pro " +

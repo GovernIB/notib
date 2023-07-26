@@ -16,7 +16,10 @@ import java.io.Serializable;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter @Setter @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true) @ToString
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 public class UsuariDto implements Serializable {
 
 	@Include

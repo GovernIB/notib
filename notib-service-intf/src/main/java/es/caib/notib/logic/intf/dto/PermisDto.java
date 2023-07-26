@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.intf.dto;
 
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -22,6 +23,7 @@ public class PermisDto implements Serializable {
 	private String principal;
 	private String organ;
 	private String organNom;
+	private OrganGestorEstatEnum organEstat;
 	private String nomSencerAmbCodi;
 	private TipusEnumDto tipus;
 	private boolean read;

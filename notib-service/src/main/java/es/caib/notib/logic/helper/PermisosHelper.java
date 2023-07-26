@@ -10,10 +10,14 @@ import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.TipusEnumDto;
 import es.caib.notib.persist.acl.NotibMutableAclService;
 import es.caib.notib.persist.entity.OrganGestorEntity;
+import es.caib.notib.persist.entity.ProcSerEntity;
+import es.caib.notib.persist.entity.ProcSerOrganEntity;
 import es.caib.notib.persist.entity.acl.AclClassEntity;
 import es.caib.notib.persist.entity.acl.AclEntryEntity;
 import es.caib.notib.persist.entity.acl.AclObjectIdentityEntity;
 import es.caib.notib.persist.entity.acl.AclSidEntity;
+import es.caib.notib.persist.repository.ProcSerOrganRepository;
+import es.caib.notib.persist.repository.ProcSerRepository;
 import es.caib.notib.persist.repository.acl.AclClassRepository;
 import es.caib.notib.persist.repository.acl.AclEntryRepository;
 import es.caib.notib.persist.repository.acl.AclObjectIdentityRepository;
@@ -65,6 +69,10 @@ import java.util.Set;
 @Component
 public class PermisosHelper {
 
+	@Autowired
+	private ProcSerRepository procSerRepository;
+	@Autowired
+	private ProcSerOrganRepository procSerOrganRepository;
 	@Resource
 	private LookupStrategy lookupStrategy;
 	@Resource
@@ -710,7 +718,9 @@ public class PermisosHelper {
 	public void actualitzarPermisosOrgansObsolets(List<NodeDir3> unitatsWs, List<OrganGestorEntity> organsDividits, List<OrganGestorEntity> organsFusionats,
 													List<OrganGestorEntity> organsSubstituits, ProgresActualitzacioDto progres) {
 
-		var classname = aclClassRepository.findByClassname("es.caib.notib.core.entity.OrganGestorEntity");
+		var classnameOrg = aclClassRepository.findByClassname("es.caib.notib.core.entity.OrganGestorEntity");
+		var classnameProcOrg = aclClassRepository.findByClassname("es.caib.notib.core.entity.ProcSerOrganEntity");
+
 		List<String> organsFusionatsProcessats = new ArrayList<>();
 		var nombreUnitatsTotal = unitatsWs.size();
 		var nombreUnitatsProcessades = 0;
@@ -729,14 +739,16 @@ public class PermisosHelper {
 				for (var origen: organsOrigen) {
 					organsFusionatsProcessats.add(origen.getCodi());
 				}
-				duplicaPermisos(classname, organsOrigen, organDesti);
+				duplicaPermisos(classnameOrg, organsOrigen, organDesti);
+				duplicaPermisosComuns(classnameProcOrg, organsOrigen, organDesti);
 				continue;
 			}
 
 			organOrigen = getOrgan(organsSubstituits, unitat.getCodi());
 			if (organOrigen != null) {
-				OrganGestorEntity organDesti = organOrigen.getNous().get(0);
-				duplicaPermisos(classname, organOrigen, organDesti);
+				var organDesti = organOrigen.getNous().get(0);
+				duplicaPermisos(classnameOrg, organOrigen, organDesti);
+				duplicaPermisosComuns(classnameProcOrg, organOrigen, organDesti);
 			}
 		}
 	}
@@ -781,17 +793,19 @@ public class PermisosHelper {
 			return;
 		}
 
-		AclObjectIdentityEntity objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organNou.getId());
+		var oidExistent = true;
+		var objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organNou.getId());
 		if (objectIdentityNou == null) {
 			objectIdentityNou = AclObjectIdentityEntity.builder().classname(classname).objectId(organNou.getId()).ownerSid(ownerSid).build();
 			aclObjectIdentityRepository.save(objectIdentityNou);
 			objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organNou.getId());
-
+			oidExistent = false;
 		}
 		if (objectIdentityNou == null) {
 			log.error("[DUP] Nou objectIdentity null.");
 			return;
 		}
+		int order = aclEntryRepository.countByAclObjectIdentity(objectIdentityNou);
 		for (AclEntryEntity permisAntic : permisosOrigen) {
 			if (permisAntic == null) {
 				continue;
@@ -800,17 +814,113 @@ public class PermisosHelper {
 				log.error("[DUP] Algun dels valors obligatoris del permis antic son nulls. Permis antic: SID=" + permisAntic.getSid() + ",MASK=" + permisAntic.getMask() + ";GRANTING=" + permisAntic.getGranting());
 				continue;
 			}
-			AclEntryEntity aclEntry = AclEntryEntity.builder()
-					.aclObjectIdentity(objectIdentityNou)
-					.sid(permisAntic.getSid())
-					.order(permisosDesti.size())
-					.mask(permisAntic.getMask())
-					.granting(permisAntic.getGranting())
-					.build();
-			if (permisAntic.equals(aclEntry)) {
-				continue;
+			var permisExist = oidExistent && aclEntryRepository.findByAclObjectIdentityAndSidAndMask(objectIdentityNou, permisAntic.getSid(), permisAntic.getMask()) != null;
+			if (!permisExist) {
+				AclEntryEntity aclEntry = AclEntryEntity.builder()
+						.aclObjectIdentity(objectIdentityNou)
+						.sid(permisAntic.getSid())
+						.order(order + permisosDesti.size())
+						.mask(permisAntic.getMask())
+						.granting(permisAntic.getGranting())
+						.build();
+				//
+				if (permisAntic.equals(aclEntry)) {
+					continue;
+				}
+				permisosDesti.add(aclEntry);
 			}
-			permisosDesti.add(aclEntry);
+		}
+	}
+
+	private void duplicaPermisosComuns(AclClassEntity classname, OrganGestorEntity organOrigen, OrganGestorEntity organDesti) {
+		duplicaPermisosComuns(classname, Arrays.asList(organOrigen), organDesti);
+	}
+
+	private void duplicaPermisosComuns(AclClassEntity classname, List<OrganGestorEntity> organsOrigen, OrganGestorEntity organDesti) {
+
+		Set<AclEntryEntity> permisosDesti = new HashSet<>();
+		Map<Long, Set<AclEntryEntity>> permisosProcediment = new HashMap<>();
+		AclSidEntity ownerSid = null;
+		for (OrganGestorEntity organOrigen: organsOrigen) {
+			// Procediments-organs
+			List<ProcSerOrganEntity> procSerOrgans = procSerOrganRepository.findByOrganGestorId(organOrigen.getId());
+			for(ProcSerOrganEntity procSerOrgan: procSerOrgans) {
+				Long procedimentId = procSerOrgan.getProcSer().getId();
+				AclObjectIdentityEntity objectIdentityAntic = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, procSerOrgan.getId());
+				if (objectIdentityAntic == null) {
+					continue;
+				}
+				if (ownerSid == null) {
+					ownerSid = objectIdentityAntic.getOwnerSid();
+				}
+				if (permisosProcediment.get(procedimentId) == null) {
+					permisosProcediment.put(procedimentId, new HashSet<AclEntryEntity>());
+				}
+				permisosProcediment.get(procedimentId).addAll(aclEntryRepository.findByAclObjectIdentity(objectIdentityAntic));
+			}
+		}
+		if (ownerSid == null) {
+			return;
+		}
+		duplicaEntradesPermisosComuns(classname, organDesti, ownerSid, permisosProcediment, permisosDesti);
+		aclEntryRepository.saveAll(permisosDesti);
+	}
+
+	private void duplicaEntradesPermisosComuns(AclClassEntity classname, OrganGestorEntity organNou, AclSidEntity ownerSid, Map<Long, Set<AclEntryEntity>> permisosProcediment, Set<AclEntryEntity> permisosDesti) {
+		if (classname == null || organNou == null || organNou.getId() == null || ownerSid == null || permisosProcediment == null) {
+			log.error("[DUP] Error al duplicar permisos algun dels valor obligatoris és nul. CLASSNAME=" + classname + ",ORGAN_NOU=" + organNou + ",OWNERSID=" + ownerSid);
+			return;
+		}
+
+		for (Map.Entry<Long, Set<AclEntryEntity>> permisosOrigen: permisosProcediment.entrySet()) {
+			var procedimentId = permisosOrigen.getKey();
+			var procedimentOrganNou = procSerOrganRepository.findByProcSerIdAndOrganGestorId(procedimentId, organNou.getId());
+			var oidExistent = true;
+			if (procedimentOrganNou == null) {
+				var procediment = procSerRepository.findById(procedimentId).orElseThrow();
+				procedimentOrganNou = ProcSerOrganEntity.getBuilder(procediment, organNou).build();
+				procedimentOrganNou = procSerOrganRepository.save(procedimentOrganNou);
+			}
+			AclObjectIdentityEntity objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, procedimentOrganNou.getId());
+			if (objectIdentityNou == null) {
+				objectIdentityNou = AclObjectIdentityEntity.builder()
+						.classname(classname)
+						.objectId(procedimentOrganNou.getId())
+						.ownerSid(ownerSid)
+						.build();
+				aclObjectIdentityRepository.saveAndFlush(objectIdentityNou);
+				objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organNou.getId());
+				oidExistent = false;
+			}
+			if (objectIdentityNou == null) {
+				log.error("[DUP] Nou objectIdentity null.");
+				return;
+			}
+			int order = aclEntryRepository.countByAclObjectIdentity(objectIdentityNou);
+			for (AclEntryEntity permisAntic : permisosOrigen.getValue()) {
+				if (permisAntic == null) {
+					continue;
+				}
+				if (permisAntic.getSid() == null || permisAntic.getMask() == null || permisAntic.getGranting() == null) {
+					log.error("[DUP] Algun dels valors obligatoris del permis antic son nulls. Permis antic: SID=" + permisAntic.getSid() + ",MASK=" + permisAntic.getMask() + ";GRANTING=" + permisAntic.getGranting());
+					continue;
+				}
+				boolean permisExist = oidExistent && aclEntryRepository.findByAclObjectIdentityAndSidAndMask(objectIdentityNou, permisAntic.getSid(), permisAntic.getMask()) != null;
+				if (!permisExist) {
+					AclEntryEntity aclEntry = AclEntryEntity.builder()
+							.aclObjectIdentity(objectIdentityNou)
+							.sid(permisAntic.getSid())
+							.order(order + permisosDesti.size())
+							.mask(permisAntic.getMask())
+							.granting(permisAntic.getGranting())
+							.build();
+					//
+					if (permisAntic.equals(aclEntry)) {
+						continue;
+					}
+					permisosDesti.add(aclEntry);
+				}
+			}
 		}
 	}
 

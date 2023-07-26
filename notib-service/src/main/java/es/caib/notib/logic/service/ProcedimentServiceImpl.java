@@ -30,6 +30,7 @@ import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.TipusAssumpteDto;
 import es.caib.notib.logic.intf.dto.TipusEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDataDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerFiltreDto;
@@ -1047,6 +1048,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			}
 			var organ = procedimentOrgan.getOrganGestor().getCodi();
 			var organNom = procedimentOrgan.getOrganGestor().getNom();
+			var organEstat = procedimentOrgan.getOrganGestor().getEstat();
 			var	tePermis = organGestor != null ? organsAmbPermis.contains(organ) : true;
 			if (!tePermis) {
 				continue;
@@ -1054,6 +1056,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			for (var permis : permisosProcOrgan) {
 				permis.setOrgan(organ);
 				permis.setOrganNom(organNom);
+				permis.setOrganEstat(organEstat);
 				permis.setPermetEdicio(tePermis);
 			}
 			permisos.addAll(permisosProcOrgan);
