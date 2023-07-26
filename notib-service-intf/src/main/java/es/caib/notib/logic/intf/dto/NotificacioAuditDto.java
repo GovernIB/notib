@@ -1,5 +1,6 @@
 package es.caib.notib.logic.intf.dto;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
@@ -21,7 +22,7 @@ public class NotificacioAuditDto {
     private TipusUsuariEnumDto tipusUsuari;
     private String usuari;
     private String emisor;
-    private NotificaEnviamentTipusEnumDto tipus;
+    private EnviamentTipus tipus;
     private Long entitatId;
     private String organ;
     private String procediment;

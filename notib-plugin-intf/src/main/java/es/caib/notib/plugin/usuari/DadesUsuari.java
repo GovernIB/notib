@@ -29,17 +29,14 @@ public class DadesUsuari implements Serializable {
 	private String email;
 
 	public String getNomSencer() {
+
 		if (nomSencer != null) {
 			return nomSencer;
-		} else if (nom != null) {
-			if (llinatges != null) {
-				return nom + " " + llinatges;
-			} else {
-				return nom;
-			}
-		} else {
+		}
+		if (nom == null) {
 			return null;
 		}
+		return llinatges != null ? nom + " " + llinatges :nom;
 	}
 	
 	public String getNomSencerAmbCodi() {

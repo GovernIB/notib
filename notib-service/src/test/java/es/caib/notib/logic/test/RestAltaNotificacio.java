@@ -83,7 +83,7 @@ public class RestAltaNotificacio {
 //		document.setGenerarCsv(false);
 		notificacio.setDocument(document);
 		notificacio.setProcedimentCodi("AJINCA");
-		List<Enviament> enviaments = new ArrayList<Enviament>();
+		List<EnviamentV2> enviaments = new ArrayList<EnviamentV2>();
 //		if (ambEnviamentPostal) {
 //			PagadorPostal pagadorPostal = new PagadorPostal();
 //			pagadorPostal.setDir3Codi("A04013511");
@@ -97,8 +97,8 @@ public class RestAltaNotificacio {
 ////			notificacio.setPagadorCie(pagadorCie);
 //		}
 		for (int i = 0; i < numDestinataris; i++) {
-			Enviament enviament = new Enviament();
-			Persona titular = new Persona();
+			EnviamentV2 enviament = new EnviamentV2();
+			PersonaV2 titular = new PersonaV2();
 			titular.setNom("titularNom" + i);
 			titular.setLlinatge1("titLlinatge1_" + i);
 			titular.setLlinatge2("titLlinatge2_" + i);
@@ -106,8 +106,8 @@ public class RestAltaNotificacio {
 			titular.setTelefon("666010101");
 			titular.setEmail("titular@gmail.com");
 			enviament.setTitular(titular);
-			List<Persona> destinataris = new ArrayList<Persona>();
-			Persona destinatari = new Persona();
+			List<PersonaV2> destinataris = new ArrayList<PersonaV2>();
+			PersonaV2 destinatari = new PersonaV2();
 			destinatari.setNom("destinatariNom" + i);
 			destinatari.setLlinatge1("destLlinatge1_" + i);
 			destinatari.setLlinatge2("destLlinatge2_" + i);
@@ -117,7 +117,7 @@ public class RestAltaNotificacio {
 			destinataris.add(destinatari);
 			enviament.setDestinataris(destinataris);
 			if (ambEnviamentPostal) {
-				EntregaPostal entregaPostal = new EntregaPostal();
+				EntregaPostalV2 entregaPostal = new EntregaPostalV2();
 				entregaPostal.setTipus(NotificaDomiciliConcretTipus.NACIONAL);
 				entregaPostal.setViaTipus(EntregaPostalVia.CALLE);
 				entregaPostal.setViaNom("Bas");
@@ -145,7 +145,7 @@ public class RestAltaNotificacio {
 			entregaDeh.setObligat(true);
 			entregaDeh.setProcedimentCodi("0000");
 			enviament.setEntregaDeh(entregaDeh);
-			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+			enviament.setServeiTipus(ServeiTipus.URGENT);
 			enviaments.add(enviament);
 		}
 		notificacio.setEnviaments(enviaments);

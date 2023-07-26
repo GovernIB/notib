@@ -9,13 +9,13 @@ import es.caib.notib.api.interna.openapi.model.notificacio.RespostaConsultaEstat
 import es.caib.notib.api.interna.openapi.model.notificacio.RespostaConsultaEstatNotificacioV2Api;
 import es.caib.notib.api.interna.openapi.model.notificacio.RespostaConsultaJustificantEnviamentApi;
 import es.caib.notib.client.domini.DadesConsulta;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaAltaV2;
 import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -45,7 +45,7 @@ public interface NotificacioApiRestV2Intf {
     @PostMapping(value = "/alta", produces = MediaType.APPLICATION_JSON_VALUE)
     public RespostaAltaV2 alta(
             @Parameter(description = "Objecte amb les dades necessàries per a donar d'alta una notificació", required = true, schema = @Schema(implementation = NotificacioV2Api.class))
-            @RequestBody NotificacioV2 notificacio);
+            @RequestBody Notificacio notificacio);
 
     @Operation(summary = "Consulta de la informació d'una notificació", description = "Retorna la informació sobre l'estat de l'enviament dins Notib o Notific@")
     @ApiResponses(value = {

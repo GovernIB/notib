@@ -6,6 +6,7 @@ package es.caib.notib.ejb;
 import es.caib.notib.logic.intf.dto.Arbre;
 import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
@@ -26,6 +27,7 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.xml.bind.ValidationException;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -48,6 +50,12 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 	@PermitAll
 	public boolean isUpdatingOrgans(EntitatDto entitatDto) {
 		return getDelegateService().isUpdatingOrgans(entitatDto);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public void deleteHistoricSincronitzacio() {
+		getDelegateService().deleteHistoricSincronitzacio();
 	}
 
 	@Override
@@ -124,11 +132,7 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
-			Long entitatId,
-			String organCodiDir3,
-			OrganGestorFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(Long entitatId, String organCodiDir3, OrganGestorFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findAmbFiltrePaginat(entitatId, organCodiDir3,filtre, paginacioParams);
 	}
 
@@ -188,16 +192,8 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public List<CodiValorEstatDto> getOrgansGestorsDisponiblesConsulta(
-			Long entitatId,
-			String usuari,
-			RolEnumDto rol,
-			String organ) {
-		return getDelegateService().getOrgansGestorsDisponiblesConsulta(
-				entitatId,
-				usuari,
-				rol,
-				organ);
+	public List<CodiValorEstatDto> getOrgansGestorsDisponiblesConsulta(Long entitatId, String usuari, RolEnumDto rol, String organ) {
+		return getDelegateService().getOrgansGestorsDisponiblesConsulta(entitatId, usuari, rol, organ);
 	}
 
 	@Override
@@ -232,8 +228,8 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@PermitAll
-	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper) {
-		getDelegateService().setServicesForSynctest(procSerSyncHelper, pluginHelper);
+	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper, Object integracioHelper) {
+		getDelegateService().setServicesForSynctest(procSerSyncHelper, pluginHelper, integracioHelper);
 	}
 
 	@Override
@@ -247,6 +243,12 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
     public Long getLastPermisosModificatsInstant() {
         return getDelegateService().getLastPermisosModificatsInstant();
     }
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	public FitxerDto exportacio(Long entitatId) throws IOException {
+		return getDelegateService().exportacio(entitatId);
+	}
 
     @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})

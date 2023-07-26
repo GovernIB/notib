@@ -3,8 +3,8 @@
  */
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.logic.intf.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -236,7 +236,7 @@ public abstract class AbstractNotificaHelper {
 		return false;
 	}
 
-	protected String viaTipusToString(NotificaDomiciliViaTipusEnumDto viaTipus) {
+	protected String viaTipusToString(EntregaPostalVia viaTipus) {
 		if (viaTipus != null) {
 			switch (viaTipus) {
 				case ALAMEDA:
@@ -332,6 +332,7 @@ public abstract class AbstractNotificaHelper {
 	}
 
 	protected XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
+
 		if (date == null) {
 			return null;
 		}
@@ -341,6 +342,7 @@ public abstract class AbstractNotificaHelper {
 		gc.setTime(date);
 		return DatatypeFactory.newInstance().newXMLGregorianCalendarDate(gc.get(Calendar.YEAR),gc.get(Calendar.MONTH) + 1,gc.get(Calendar.DAY_OF_MONTH),DatatypeConstants.FIELD_UNDEFINED);
 	}
+
 	protected Date toDate(XMLGregorianCalendar calendar) throws DatatypeConfigurationException {
 		if (calendar == null) {
 			return null;
@@ -349,6 +351,7 @@ public abstract class AbstractNotificaHelper {
 	}
 
 	protected String xifrarId(Long id) throws GeneralSecurityException {
+
 		// Si el mode test està actiu concatena la data actual a l'identificador de
 		// base de dades per a generar l'id de Notifica. Si no ho fessim així es
 		// duplicarien els ids de Notifica en cada execució del test i les cridades
@@ -362,6 +365,7 @@ public abstract class AbstractNotificaHelper {
 		return new String(Base64.encodeBase64(xifrat));
 	}
 	protected Long desxifrarId(String idXifrat) throws GeneralSecurityException {
+
 		Cipher cipher = Cipher.getInstance("RC4");
 		SecretKeySpec rc4Key = new SecretKeySpec(getClauXifratIdsProperty().getBytes(),"RC4");
 		cipher.init(Cipher.DECRYPT_MODE, rc4Key);

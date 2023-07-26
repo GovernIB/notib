@@ -1,9 +1,9 @@
 package es.caib.notib.logic.intf.dto.notenviament;
 
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.AuditoriaDto;
 import es.caib.notib.logic.intf.dto.EntregaDehDto;
 import es.caib.notib.logic.intf.dto.PersonaDto;
-import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
 import es.caib.notib.logic.intf.dto.cie.EntregaPostalDto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,7 +20,7 @@ import java.util.List;
 @Data
 public class EnviamentDto extends AuditoriaDto {
 
-	private ServeiTipusEnumDto serveiTipus;
+	private ServeiTipus serveiTipus;
 	private PersonaDto titular;
 	private List<PersonaDto> destinataris;
 	private boolean entregaPostalActiva;

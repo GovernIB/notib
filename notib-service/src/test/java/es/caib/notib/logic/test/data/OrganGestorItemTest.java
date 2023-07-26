@@ -13,6 +13,7 @@ import java.util.List;
 
 @Component
 public class OrganGestorItemTest extends DatabaseItemTest<OrganGestorDto>{
+
     @Autowired
     protected OrganGestorService organGestorService;
     @Autowired

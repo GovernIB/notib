@@ -42,15 +42,15 @@ public class RespostaConsultaEstatEnviamentV2 extends RespostaBase {
     private String dehNif;
     private boolean entragaPostalActiva;
     private String adressaPostal;
-    private Persona interessat;
+    private PersonaV2 interessat;
     @XmlElement(nillable = true)
-    private List<Persona> representants;
+    private List<PersonaV2> representants;
     private Registre registre;
     private Sir sir;
     private Datat datat;
     private Certificacio certificacio;
 
-    public List<Persona> getRepresentants() {
+    public List<PersonaV2> getRepresentants() {
         if (representants == null) {
             representants = new ArrayList<>();
         }

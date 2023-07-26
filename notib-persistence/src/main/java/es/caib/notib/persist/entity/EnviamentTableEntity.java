@@ -1,7 +1,7 @@
 package es.caib.notib.persist.entity;
 
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
@@ -53,7 +53,7 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	private NotificacioEntity notificacio;
 
 	@Column(name = "TIPUS_ENVIAMENT", nullable = false)
-	protected NotificaEnviamentTipusEnumDto tipusEnviament;
+	protected EnviamentTipus tipusEnviament;
 
 	@Column(name = "DESTINATARIS", length = 4000, nullable = false)
 	protected String destinataris;

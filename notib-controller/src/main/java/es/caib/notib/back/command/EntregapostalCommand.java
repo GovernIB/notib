@@ -1,7 +1,7 @@
 package es.caib.notib.back.command;
 
+import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
-import es.caib.notib.logic.intf.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.back.validation.ValidEntregaPostal;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +19,7 @@ import javax.validation.constraints.Size;
 public class EntregapostalCommand {
 
 	private NotificaDomiciliConcretTipus domiciliConcretTipus;
-	private NotificaDomiciliViaTipusEnumDto viaTipus;
+	private EntregaPostalVia viaTipus;
 	@Size(max=50)
 	private String viaNom;
 	@Size(max=5)

@@ -4,6 +4,7 @@
 package es.caib.notib.logic.intf.ws.notificacio;
 
 import es.caib.notib.client.domini.*;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 
 import javax.jws.WebParam;
 import javax.jws.WebService;
@@ -14,9 +15,7 @@ import javax.xml.bind.annotation.XmlElement;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@WebService(
-		name = "NotificacioServiceV2",
-		targetNamespace = "http://www.caib.es/notib/ws/notificacio")
+@WebService(name = "NotificacioServiceV2", targetNamespace = "http://www.caib.es/notib/ws/notificacio")
 public interface NotificacioServiceWsV2 {
 
 	/**
@@ -26,10 +25,10 @@ public interface NotificacioServiceWsV2 {
 	 *            Dades per a donar d'alta la notificació.
 	 * @return la llista de referencies generades per NOTIB (una per enviament)).
 	 */
-	RespostaAlta alta(@WebParam(name="notificacio") @XmlElement(required = true) NotificacioV2 notificacio) throws NotificacioServiceWsException;
+	RespostaAlta alta(@WebParam(name="notificacio") @XmlElement(required = true) Notificacio notificacio) throws NotificacioServiceWsException;
 
 
-    RespostaAltaV2 altaV2(@WebParam(name="notificacio") @XmlElement(required = true) NotificacioV2 notificacio) throws NotificacioServiceWsException;
+    RespostaAltaV2 altaV2(@WebParam(name="notificacio") @XmlElement(required = true) Notificacio notificacio) throws NotificacioServiceWsException;
 
     /**
 	 * Dona permís de consulta sobre un procediment.

@@ -3,6 +3,7 @@
  */
 package es.caib.notib.persist.entity.auditoria;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -48,7 +49,7 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 	private String emisor;
 	@Column(name = "tipus")
 	@Enumerated(EnumType.STRING)
-	private NotificaEnviamentTipusEnumDto tipus;
+	private EnviamentTipus tipus;
 
 	@Column(name = "entitat_id")
 	private Long entitatId;

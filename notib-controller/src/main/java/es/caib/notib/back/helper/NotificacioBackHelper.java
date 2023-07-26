@@ -5,6 +5,7 @@ package es.caib.notib.back.helper;
 
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -67,7 +68,7 @@ public class NotificacioBackHelper {
 		model.addAttribute("tipusUsuari", EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class, "es.caib.notib.logic.intf.dto.TipusUsuariEnumDto."));
 		model.addAttribute("notificacioEnviamentEstats", EnumHelper.getOptionsForEnum(EnviamentEstat.class, "es.caib.notib.client.domini.EnviamentEstat."));
 		model.addAttribute("notificacioComunicacioTipus", EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class, "es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto."));
-		model.addAttribute("notificacioEnviamentTipus", EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class, "es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto."));
+		model.addAttribute("notificacioEnviamentTipus", EnumHelper.getOptionsForEnum(EnviamentTipus.class, "es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto."));
 		model.addAttribute("mostrarColumnaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.columna.entitat"));
 		model.addAttribute("mostrarColumnaNumExpedient", aplicacioService.propertyGetByEntitat("es.caib.notib.columna.num.expedient"));
 	}

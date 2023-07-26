@@ -9,7 +9,7 @@ import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.client.domini.NotificacioEstatEnum;
 import es.caib.notib.client.domini.NotificacioV2;
-import es.caib.notib.client.domini.Persona;
+import es.caib.notib.client.domini.PersonaV2;
 import es.caib.notib.client.domini.RespostaAlta;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
@@ -492,7 +492,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	public void test1160() throws DatatypeConfigurationException, IOException, DecoderException {
 		// El servidor ha d'estar configurat amb: es.caib.notib.destinatari.multiple=false
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		Persona destinatari = new Persona();
+		PersonaV2 destinatari = new PersonaV2();
 		destinatari.setNom("aaa");
 		destinatari.setLlinatge1("bbb");
 		destinatari.setLlinatge2("ccc");

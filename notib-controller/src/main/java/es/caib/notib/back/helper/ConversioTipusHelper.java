@@ -4,19 +4,16 @@
 package es.caib.notib.back.helper;
 
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.logic.intf.dto.DocumentDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.logic.intf.dto.PersonaDto;
-import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
-import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.back.command.DocumentCommand;
 import es.caib.notib.back.command.EntregapostalCommand;
 import es.caib.notib.back.command.EnviamentCommand;
 import es.caib.notib.back.command.NotificacioCommand;
 import es.caib.notib.back.command.PersonaCommand;
+import es.caib.notib.logic.intf.dto.notificacio.Document;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
@@ -77,17 +74,17 @@ public class ConversioTipusHelper {
             }                   
         }).register();
 		
-		mapperFactory.classMap(EnviamentCommand.class, NotEnviamentDatabaseDto.class)
+		mapperFactory.classMap(EnviamentCommand.class, Enviament.class)
 			.fieldAToB("entregaPostal.activa", "entregaPostalActiva")
 			.field("entregaDeh.activa", "entregaDehActiva")
 			.byDefault()
-			.customize(new CustomMapper<EnviamentCommand, NotEnviamentDatabaseDto>() {
+			.customize(new CustomMapper<EnviamentCommand, Enviament>() {
 				@Override
-				public void mapAtoB(EnviamentCommand command, NotEnviamentDatabaseDto dto, MappingContext context) {
+				public void mapAtoB(EnviamentCommand command, Enviament dto, MappingContext context) {
 					// empty
 				}
 				@Override
-				public void mapBtoA(NotEnviamentDatabaseDto dto, EnviamentCommand command, MappingContext context) {
+				public void mapBtoA(Enviament dto, EnviamentCommand command, MappingContext context) {
 					var epCommand = command.getEntregaPostal() == null ? new EntregapostalCommand() : command.getEntregaPostal();
 					epCommand.setActiva(dto.getEntregaPostal() != null);
 					command.setEntregaPostal(epCommand);
@@ -111,11 +108,11 @@ public class ConversioTipusHelper {
 					}
 				}).register();
 
-		mapperFactory.classMap(NotificacioDtoV2.class, NotificacioCommand.class)
+		mapperFactory.classMap(Notificacio.class, NotificacioCommand.class)
 				.byDefault()
-				.customize(new CustomMapper<NotificacioDtoV2, NotificacioCommand>() {
+				.customize(new CustomMapper<>() {
 					@Override
-					public void mapAtoB(NotificacioDtoV2 notificacioDto, NotificacioCommand notificacioCommand, MappingContext context) {
+					public void mapAtoB(Notificacio notificacioDto, NotificacioCommand notificacioCommand, MappingContext context) {
 						// Documents
 						var documents = new DocumentCommand[5];
 						documents[0] = DocumentCommand.asCommand(notificacioDto.getDocument());
@@ -124,12 +121,12 @@ public class ConversioTipusHelper {
 						documents[3] = DocumentCommand.asCommand(notificacioDto.getDocument4());
 						documents[4] = DocumentCommand.asCommand(notificacioDto.getDocument5());
 						notificacioCommand.setDocuments(documents);
-						notificacioCommand.setTipusProcSer(notificacioDto.getProcediment() != null ? notificacioDto.getProcediment().getTipus().name() : null);
+//						notificacioCommand.setTipusProcSer(notificacioDto.getProcediment() != null ? notificacioDto.getProcediment().getTipus().name() : null);
 					}
 					@Override
-					public void mapBtoA(NotificacioCommand notificacioCommand, NotificacioDtoV2 notificacioDto, MappingContext context) {
+					public void mapBtoA(NotificacioCommand notificacioCommand, Notificacio notificacioDto, MappingContext context) {
 						// Documents
-						List<DocumentDto> documents = new ArrayList<>();
+						List<Document> documents = new ArrayList<>();
 						var document = DocumentCommand.asDto(notificacioCommand.getDocuments()[0]);
 						if (document != null) {
 							documents.add(document);
@@ -155,79 +152,79 @@ public class ConversioTipusHelper {
 						notificacioDto.setDocument3(documents.size() > 2 ? documents.get(2) : null);
 						notificacioDto.setDocument4(documents.size() > 3 ? documents.get(3) : null);
 						notificacioDto.setDocument5(documents.size() > 4 ? documents.get(4) : null);
-						if (TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacioCommand.getEnviamentTipus())){
-							notificacioDto.setEnviamentTipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO);
-						} else {
-							notificacioDto.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
-						}
+//						if (EnviamentTipus.NOTIFICACIO.equals(notificacioCommand.getEnviamentTipus())){
+//							notificacioDto.setEnviamentTipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO);
+//						} else {
+//							notificacioDto.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
+//						}
 
 					}
 				}).register();
 
-		mapperFactory.classMap(NotificacioDatabaseDto.class, NotificacioCommand.class)
-				.exclude("enviamentTipus")
-				.byDefault()
-				.customize(new CustomMapper<NotificacioDatabaseDto, NotificacioCommand>() {
-					@Override
-					public void mapAtoB(NotificacioDatabaseDto notificacioDto, NotificacioCommand notificacioCommand, MappingContext context) {
-						// Documents
-						var documents = new DocumentCommand[5];
-						documents[0] = DocumentCommand.asCommand(notificacioDto.getDocument());
-						documents[1] = DocumentCommand.asCommand(notificacioDto.getDocument2());
-						documents[2] = DocumentCommand.asCommand(notificacioDto.getDocument3());
-						documents[3] = DocumentCommand.asCommand(notificacioDto.getDocument4());
-						documents[4] = DocumentCommand.asCommand(notificacioDto.getDocument5());
-						notificacioCommand.setDocuments(documents);
-						if (NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacioDto.getEnviamentTipus())){
-							notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.NOTIFICACIO);
-							return;
-						}
-						notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO);
-						if (notificacioDto.getEnviaments() != null && !notificacioDto.getEnviaments().isEmpty() &&
-								notificacioDto.getEnviaments().get(0).getTitular()!= null){
-
-							var titular = notificacioDto.getEnviaments().get(0).getTitular();
-							if (InteressatTipus.ADMINISTRACIO.equals(titular.getInteressatTipus())) {
-								notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO_SIR);
-							}
-						}
-					}
-					@Override
-					public void mapBtoA(NotificacioCommand notificacioCommand, NotificacioDatabaseDto notificacioDto, MappingContext context) {
-						// Documents
-						List<DocumentDto> documents = new ArrayList<>();
-						var document = DocumentCommand.asDto(notificacioCommand.getDocuments()[0]);
-						if (document != null) {
-							documents.add(document);
-						}
-						var document2 = DocumentCommand.asDto(notificacioCommand.getDocuments()[1]);
-						if (document2 != null) {
-							documents.add(document2);
-						}
-						var document3 = DocumentCommand.asDto(notificacioCommand.getDocuments()[2]);
-						if (document3 != null) {
-							documents.add(document3);
-						}
-						var document4 = DocumentCommand.asDto(notificacioCommand.getDocuments()[3]);
-						if (document4 != null) {
-							documents.add(document4);
-						}
-						var document5 = DocumentCommand.asDto(notificacioCommand.getDocuments()[4]);
-						if (document5 != null)
-							documents.add(document5);
-						notificacioDto.setDocument(!documents.isEmpty() ? documents.get(0) : null);
-						notificacioDto.setDocument2(documents.size() > 1 ? documents.get(1) : null);
-						notificacioDto.setDocument3(documents.size() > 2 ? documents.get(2) : null);
-						notificacioDto.setDocument4(documents.size() > 3 ? documents.get(3) : null);
-						notificacioDto.setDocument5(documents.size() > 4 ? documents.get(4) : null);
-						notificacioDto.setOrganGestorCodi(notificacioCommand.getOrganGestor());
-						if (TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacioCommand.getEnviamentTipus())){
-							notificacioDto.setEnviamentTipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO);
-						} else {
-							notificacioDto.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
-						}
-					}
-				}).register();
+//		mapperFactory.classMap(NotificacioV2.class, NotificacioCommand.class)
+//				.exclude("enviamentTipus")
+//				.byDefault()
+//				.customize(new CustomMapper<NotificacioV2, NotificacioCommand>() {
+//					@Override
+//					public void mapAtoB(NotificacioV2 notificacioDto, NotificacioCommand notificacioCommand, MappingContext context) {
+//						// Documents
+//						var documents = new DocumentCommand[5];
+//						documents[0] = DocumentCommand.asCommand(notificacioDto.getDocument());
+//						documents[1] = DocumentCommand.asCommand(notificacioDto.getDocument2());
+//						documents[2] = DocumentCommand.asCommand(notificacioDto.getDocument3());
+//						documents[3] = DocumentCommand.asCommand(notificacioDto.getDocument4());
+//						documents[4] = DocumentCommand.asCommand(notificacioDto.getDocument5());
+//						notificacioCommand.setDocuments(documents);
+//						if (EnviamentTipus.NOTIFICACIO.equals(notificacioDto.getEnviamentTipus())){
+//							notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.NOTIFICACIO);
+//							return;
+//						}
+//						notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO);
+//						if (notificacioDto.getEnviaments() != null && !notificacioDto.getEnviaments().isEmpty() &&
+//								notificacioDto.getEnviaments().get(0).getTitular()!= null){
+//
+//							var titular = notificacioDto.getEnviaments().get(0).getTitular();
+//							if (InteressatTipus.ADMINISTRACIO.equals(titular.getInteressatTipus())) {
+//								notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO_SIR);
+//							}
+//						}
+//					}
+//					@Override
+//					public void mapBtoA(NotificacioCommand notificacioCommand, NotificacioV2 notificacioDto, MappingContext context) {
+//						// Documents
+//						List<DocumentV2> documents = new ArrayList<>();
+//						var document = DocumentCommand.asDto(notificacioCommand.getDocuments()[0]);
+//						if (document != null) {
+//							documents.add(document);
+//						}
+//						var document2 = DocumentCommand.asDto(notificacioCommand.getDocuments()[1]);
+//						if (document2 != null) {
+//							documents.add(document2);
+//						}
+//						var document3 = DocumentCommand.asDto(notificacioCommand.getDocuments()[2]);
+//						if (document3 != null) {
+//							documents.add(document3);
+//						}
+//						var document4 = DocumentCommand.asDto(notificacioCommand.getDocuments()[3]);
+//						if (document4 != null) {
+//							documents.add(document4);
+//						}
+//						var document5 = DocumentCommand.asDto(notificacioCommand.getDocuments()[4]);
+//						if (document5 != null)
+//							documents.add(document5);
+//						notificacioDto.setDocument(!documents.isEmpty() ? documents.get(0) : null);
+//						notificacioDto.setDocument2(documents.size() > 1 ? documents.get(1) : null);
+//						notificacioDto.setDocument3(documents.size() > 2 ? documents.get(2) : null);
+//						notificacioDto.setDocument4(documents.size() > 3 ? documents.get(3) : null);
+//						notificacioDto.setDocument5(documents.size() > 4 ? documents.get(4) : null);
+//						notificacioDto.setOrganGestor(notificacioCommand.getOrganGestor());
+//						if (TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacioCommand.getEnviamentTipus())){
+//							notificacioDto.setEnviamentTipus(EnviamentTipus.NOTIFICACIO);
+//						} else {
+//							notificacioDto.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
+//						}
+//					}
+//				}).register();
 	}
 
 	

@@ -4,7 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -37,37 +37,13 @@ public class NotificaV2HelperTest {
     @Mock
     private PluginHelper pluginHelper;
     @Mock
-    private ConversioTipusHelper conversioTipusHelper;
-    @Mock
-    private ProcedimentRepository procedimentRepository;
-    @Mock
-    private IntegracioHelper integracioHelper;
-    @Mock
-    private NotificacioEventHelper notificacioEventHelper;
-    @Mock
     protected ConfigHelper configHelper;
-    @Mock
-    private EmailNotificacioHelper emailNotificacioHelper;
-    @Mock
-    private NotificacioRepository notificacioRepository;
-    @Mock
-    private NotificacioHelper notificacioHelper;
-    @Mock
-    private NotificacioTableHelper notificacioTableHelper;
-    @Mock
-    private EnviamentHelper enviamentHelper;
-    @Mock
-    private EnviamentTableHelper enviamentTableHelper;
-    @Mock
-    private CallbackHelper callbackHelper;
     @InjectMocks
     private NotificaV2Helper notificaV2Helper;
 
     private NotificacioEntity notificacioMock;
     private EntitatEntity entitatMock;
     private NotificacioEnviamentEntity enviamentMock;
-
-    private final String MAX_INTENTS_CALLBACK = "10";
 
     private static final String NOTIFICA_WS_INFOENVIOV2_RESPONSE =
             "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
@@ -160,6 +136,7 @@ public class NotificaV2HelperTest {
 
     @Before
     public void setUp() throws Exception {
+
         Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.notifica.url"))).thenReturn("http://localhost:8181/notifica");
         Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.notifica.username"))).thenReturn("");
         Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.notifica.password"))).thenReturn("");
@@ -171,10 +148,10 @@ public class NotificaV2HelperTest {
         Mockito.when(notificacioMock.getEntitat()).thenReturn(entitatMock);
         Mockito.when(notificacioMock.getTipusUsuari()).thenReturn(TipusUsuariEnumDto.INTERFICIE_WEB);
 
-        UsuariEntity mockUser = Mockito.mock(UsuariEntity.class);
+        var mockUser = Mockito.mock(UsuariEntity.class);
 
         enviamentMock = NotificacioEnviamentEntity.builder()
-                .serveiTipus(ServeiTipusEnumDto.NORMAL)
+                .serveiTipus(ServeiTipus.NORMAL)
                 .notificacio(notificacioMock)
                 .notificaDataCreacio(new Date())
                 .notificaEstat(EnviamentEstat.EXPIRADA)
@@ -190,6 +167,7 @@ public class NotificaV2HelperTest {
 
     @Test
     public void givenEnviamentSenseCertificacio_whenEnviamentRefrescarEstat_ThenCallGestioDocumentalCreate() throws Exception {
+
         // Given
         WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("/notifica"))
                 .willReturn(WireMock.aResponse()
@@ -213,16 +191,11 @@ public class NotificaV2HelperTest {
         notificaV2Helper.enviamentRefrescarEstat(enviamentMock.getId(), true);
 
         // Then
-        Mockito.verify(pluginHelper).gestioDocumentalCreate(
-                Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS),
-                Mockito.any(byte[].class)
-        );
+        Mockito.verify(pluginHelper).gestioDocumentalCreate(Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS), Mockito.any(byte[].class));
 
-        Assert.assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2021-09-15 16:00:00"),
-                enviamentMock.getNotificaCertificacioData());
+        Assert.assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2021-09-15 16:00:00"), enviamentMock.getNotificaCertificacioData());
         Assert.assertEquals("ArxiuId", enviamentMock.getNotificaCertificacioArxiuId());
-        Assert.assertEquals("ZDc4N2MzNmZmYWQ2OWJjYTgwYTRkZDliZjk3YjdkZTUwYWQ2ZmQwMzkzNTM3MDkzMGQ0NDdhODBjMmYyYTJiMQ==",
-                enviamentMock.getNotificaCertificacioHash());
+        Assert.assertEquals("ZDc4N2MzNmZmYWQ2OWJjYTgwYTRkZDliZjk3YjdkZTUwYWQ2ZmQwMzkzNTM3MDkzMGQ0NDdhODBjMmYyYTJiMQ==", enviamentMock.getNotificaCertificacioHash());
         Assert.assertEquals("electronico", enviamentMock.getNotificaCertificacioOrigen());
         Assert.assertEquals("datos_metadatos", enviamentMock.getNotificaCertificacioMetadades());
         Assert.assertEquals("dasd-dsadad-asdasd-asda-sda-das", enviamentMock.getNotificaCertificacioCsv());
@@ -232,16 +205,12 @@ public class NotificaV2HelperTest {
 
     @Test
     public void givenEnviamentAmbCertificacioMesActual_whenEnviamentRefrescarEstat_ThenCallGestioDocumentalCreate() throws Exception {
+
         // Given
         WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("/notifica"))
-                .willReturn(WireMock.aResponse()
-                        .withStatus(HttpStatus.OK.value())
-                        .withHeader("Content-Type", MediaType.APPLICATION_XML_VALUE)
-                        .withBody(NOTIFICA_WS_INFOENVIOV2_RESPONSE)));
+        .willReturn(WireMock.aResponse().withStatus(HttpStatus.OK.value()).withHeader("Content-Type", MediaType.APPLICATION_XML_VALUE).withBody(NOTIFICA_WS_INFOENVIOV2_RESPONSE)));
 
-        Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS),
-                Mockito.any(byte[].class))).thenReturn("ArxiuId");
-
+        Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS), Mockito.any(byte[].class))).thenReturn("ArxiuId");
         Assert.assertNull(enviamentMock.getNotificaCertificacioData());
         Assert.assertNull(enviamentMock.getNotificaCertificacioArxiuId());
         Assert.assertNull(enviamentMock.getNotificaCertificacioHash());
@@ -270,16 +239,11 @@ public class NotificaV2HelperTest {
         notificaV2Helper.enviamentRefrescarEstat(enviamentMock.getId(), true);
 
         // Then
-        Mockito.verify(pluginHelper).gestioDocumentalCreate(
-                Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS),
-                Mockito.any(byte[].class)
-        );
+        Mockito.verify(pluginHelper).gestioDocumentalCreate(Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS), Mockito.any(byte[].class));
 
-        Assert.assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2021-09-15 16:00:00"),
-                enviamentMock.getNotificaCertificacioData());
+        Assert.assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2021-09-15 16:00:00"), enviamentMock.getNotificaCertificacioData());
         Assert.assertEquals("ArxiuId", enviamentMock.getNotificaCertificacioArxiuId());
-        Assert.assertEquals("ZDc4N2MzNmZmYWQ2OWJjYTgwYTRkZDliZjk3YjdkZTUwYWQ2ZmQwMzkzNTM3MDkzMGQ0NDdhODBjMmYyYTJiMQ==",
-                enviamentMock.getNotificaCertificacioHash());
+        Assert.assertEquals("ZDc4N2MzNmZmYWQ2OWJjYTgwYTRkZDliZjk3YjdkZTUwYWQ2ZmQwMzkzNTM3MDkzMGQ0NDdhODBjMmYyYTJiMQ==", enviamentMock.getNotificaCertificacioHash());
         Assert.assertEquals("electronico", enviamentMock.getNotificaCertificacioOrigen());
         Assert.assertEquals("datos_metadatos", enviamentMock.getNotificaCertificacioMetadades());
         Assert.assertEquals("dasd-dsadad-asdasd-asda-sda-das", enviamentMock.getNotificaCertificacioCsv());
@@ -289,15 +253,13 @@ public class NotificaV2HelperTest {
 
     @Test
     public void givenEnviamentAmbCertificacioActual_whenEnviamentRefrescarEstat_ThenDoNothing() throws Exception {
+
         // Given
         WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("/notifica"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK.value())
                         .withHeader("Content-Type", MediaType.APPLICATION_XML_VALUE)
                         .withBody(NOTIFICA_WS_INFOENVIOV2_RESPONSE)));
-
-//        Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS),
-//                Mockito.any(byte[].class))).thenReturn("ArxiuId");
 
         Assert.assertNull(enviamentMock.getNotificaCertificacioData());
         Assert.assertNull(enviamentMock.getNotificaCertificacioArxiuId());
@@ -320,20 +282,15 @@ public class NotificaV2HelperTest {
                 null,
                 null,
                 null,
-                null
-        );
+                null);
 
         // When
         notificaV2Helper.enviamentRefrescarEstat(enviamentMock.getId(), true);
 
         // Then
-        Mockito.verify(pluginHelper, Mockito.times(0)).gestioDocumentalCreate(
-                Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS),
-                Mockito.any(byte[].class)
-        );
+        Mockito.verify(pluginHelper, Mockito.times(0)).gestioDocumentalCreate(Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS), Mockito.any(byte[].class));
 
-        Assert.assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2021-09-15 16:00:00"),
-                enviamentMock.getNotificaCertificacioData());
+        Assert.assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2021-09-15 16:00:00"), enviamentMock.getNotificaCertificacioData());
 //        Assert.assertNull(enviamentMock.getNotificaCertificacioArxiuId());
         Assert.assertNull(enviamentMock.getNotificaCertificacioHash());
         Assert.assertNull(enviamentMock.getNotificaCertificacioOrigen());

@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import es.caib.notib.client.util.TrimStringDeserializer;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Informació del document que s'envia amb la notificació.
@@ -16,12 +16,19 @@ import lombok.NoArgsConstructor;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DocumentV2 {
+
+    private String id;
+    private String mediaType;
+    private boolean generarCsv;
+    private Long mida;
+    private String hash;
+
     @JsonDeserialize(using = TrimStringDeserializer.class)
     private String arxiuId;
     @JsonDeserialize(using = TrimStringDeserializer.class)

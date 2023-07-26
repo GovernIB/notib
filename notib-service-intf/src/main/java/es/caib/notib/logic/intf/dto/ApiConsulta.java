@@ -1,5 +1,6 @@
 package es.caib.notib.logic.intf.dto;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +16,7 @@ import java.util.Date;
 public class ApiConsulta {
 
     private String dniTitular;
-    private NotificaEnviamentTipusEnumDto tipus;
+    private EnviamentTipus tipus;
     private Boolean estatFinal;
     private String basePath;
     private Integer pagina;

@@ -1,20 +1,20 @@
 package es.caib.notib.logic.service.ws;
 
-import es.caib.notib.client.domini.DocumentV2;
-import es.caib.notib.client.domini.EntregaPostal;
+import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.client.domini.EntregaPostalVia;
-import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
-import es.caib.notib.client.domini.NotificaServeiTipusEnumDto;
-import es.caib.notib.client.domini.NotificacioV2;
-import es.caib.notib.client.domini.Persona;
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.RespostaAlta;
 import es.caib.notib.logic.helper.NotificaHelper;
 import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.notificacio.EntregaPostal;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
+import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
@@ -79,13 +79,9 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 	NotificacioTableViewRepository notificacioTableViewRepository;
 	@Autowired
 	private NotificaHelper notificaHelper;
-
 	@Autowired
 	NotificacioServiceWsV2 notificacioService = new NotificacioServiceWsImplV2();
-
-
 	EntitatDto entitatCreate;
-
 	@Autowired
 	ProcedimentItemTest procedimentCreator;
 	@Autowired
@@ -164,7 +160,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		assertNotNull(procedimentCreate);
 		assertNotNull(procedimentCreate.getId());
 
-		NotificacioV2 notificacio = getRandomNotificacio(2);
+		Notificacio notificacio = getRandomNotificacio(2);
 		notificacio.setProcedimentCodi(procedimentCreate.getCodi());
 
 		RespostaAlta respostaAlta = notificacioService.alta(notificacio);
@@ -207,10 +203,10 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		assertNotNull(procedimentCreate);
 		assertNotNull(procedimentCreate.getId());
 
-		NotificacioV2 notificacio = getRandomNotificacio(1);
+		Notificacio notificacio = getRandomNotificacio(1);
 		notificacio.setProcedimentCodi(procedimentCreate.getCodi());
 
-		Enviament enviament = notificacio.getEnviaments().get(0);
+		var enviament = notificacio.getEnviaments().get(0);
 		EntregaPostal entregaPostal = getEntregaPostalDtoRandomData();
 		enviament.setEntregaPostal(entregaPostal);
 		enviament.setEntregaPostalActiva(true);
@@ -255,7 +251,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		assertNotNull(procedimentCreate);
 		assertNotNull(procedimentCreate.getId());
 
-		NotificacioV2 notificacio = getRandomNotificacio(1);
+		Notificacio notificacio = getRandomNotificacio(1);
 		notificacio.setProcedimentCodi(procedimentCreate.getCodi());
 
 		// When
@@ -280,7 +276,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 
 	}
 
-	private void assertEqualsNotificacions(NotificacioV2 notificacioDto, NotificacioEntity notificacioEntity, int numEnviaments) {
+	private void assertEqualsNotificacions(Notificacio notificacioDto, NotificacioEntity notificacioEntity, int numEnviaments) {
 		// comprovar si les dades introduïdes són iguals a les que s'han posat a la base de dades
 		assertEquals(notificacioDto.getProcedimentCodi(), notificacioEntity.getProcediment().getCodi());
 		assertEquals(notificacioDto.getOrganGestor(), notificacioEntity.getOrganGestor().getCodi());
@@ -316,8 +312,8 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		assertEquals(notificacioDto.getDocument().getModoFirma(), notificacioEntity.getDocument().getModoFirma());
 
 		for (int i = 0; i < numEnviaments; i ++ ) {
-			Enviament enviament = notificacioDto.getEnviaments().get(i);
-			Enviament enviamentCreat = notificacioDto.getEnviaments().get(i);
+			var enviament = notificacioDto.getEnviaments().get(i);
+			var enviamentCreat = notificacioDto.getEnviaments().get(i);
 			assertEquals(enviament.getServeiTipus(), enviamentCreat.getServeiTipus());
 			assertEquals(enviament.getTitular().getNom(), enviamentCreat.getTitular().getNom());
 			assertEquals(enviament.getTitular().getLlinatge1(), enviamentCreat.getTitular().getLlinatge1());
@@ -343,11 +339,11 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		}
 	}
 
-	public static NotificacioV2 getRandomNotificacio(int numEnviaments) {
-		NotificacioV2 notCreated = getRandomInstanceWithoutEnviaments();
+	public static Notificacio getRandomNotificacio(int numEnviaments) {
+		Notificacio notCreated = getRandomInstanceWithoutEnviaments();
 		List<Enviament> enviaments = new ArrayList<>();
 		for (int i = 0; i < numEnviaments; i++) {
-			Enviament enviament = getRandomEnviament(i);
+			var enviament = getRandomEnviament(i);
 			enviaments.add(enviament);
 		}
 		notCreated.setEnviaments(enviaments);
@@ -357,8 +353,9 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 
 
 	public static Enviament getRandomEnviament(int i){
-		Enviament enviament = new Enviament();
-		Persona titular = Persona.builder()
+
+		var enviament = new Enviament();
+		var titular = Persona.builder()
 				.interessatTipus(InteressatTipus.FISICA)
 				.nom("titularNom" + i)
 				.llinatge1("titLlinatge1_" + i)
@@ -368,7 +365,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 				.email("titular@gmail.com").build();
 		enviament.setTitular(titular);
 		List<Persona> destinataris = new ArrayList<>();
-		Persona destinatari = Persona.builder()
+		var destinatari = Persona.builder()
 				.interessatTipus(InteressatTipus.FISICA)
 				.nom("destinatariNom" + i)
 				.llinatge1("destLlinatge1_" + i)
@@ -378,15 +375,15 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 				.email("destinatari@gmail.com").build();
 		destinataris.add(destinatari);
 		enviament.setDestinataris(destinataris);
-		enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+		enviament.setServeiTipus(ServeiTipus.URGENT);
 //		enviament.setNotificaEstat(EnviamentEstat.NOTIB_PENDENT);
 		return enviament;
 	}
 
-	public static NotificacioV2 getRandomInstanceWithoutEnviaments() {
-		String notificacioId = new Long(System.currentTimeMillis()).toString();
+	public static Notificacio getRandomInstanceWithoutEnviaments() {
 
-		DocumentV2 document = new DocumentV2();
+		String notificacioId = new Long(System.currentTimeMillis()).toString();
+		var document = new Document();
 		try {
 			byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 			document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
@@ -404,7 +401,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 
 		Date caducitat = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
 		Date enviamentDataProgramada = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
-		NotificacioV2 notCreated = NotificacioV2.builder()
+		Notificacio notCreated = Notificacio.builder()
 				.emisorDir3Codi(ConfigTest.ENTITAT_DGTIC_DIR3CODI)
 				.enviamentTipus(EnviamentTipus.NOTIFICACIO)
 				.enviamentDataProgramada(enviamentDataProgramada)
@@ -422,7 +419,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 //				.motiu()
 				.numExpedient("EXPEDIENTEX")
 				.idioma(Idioma.CA)
-				.document(new DocumentV2())
+				.document(new Document())
 				.build();
 		notCreated.setDocument(document);
 		return notCreated;

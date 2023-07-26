@@ -12,9 +12,9 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.DocumentDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
@@ -220,7 +220,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 		var titolCell = new PdfPCell();
 		var titolEnviamentMessage = messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.titol",
 				new Object[] {
-						(NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) && enviament.isPerEmail() ?  messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.titol.notificacio.email") + " " : "") + messageHelper.getMessage(ENVIAMENT_TIPUS_TEXT + notificacio.getEnviamentTipus().name()).toLowerCase(),
+						(EnviamentTipus.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) && enviament.isPerEmail() ?  messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.titol.notificacio.email") + " " : "") + messageHelper.getMessage(ENVIAMENT_TIPUS_TEXT + notificacio.getEnviamentTipus().name()).toLowerCase(),
 						numEnviament, 
 						notificacio.getEnviaments().size()});
 

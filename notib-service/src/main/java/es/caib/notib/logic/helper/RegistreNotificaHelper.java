@@ -4,14 +4,15 @@
 package es.caib.notib.logic.helper;
 
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.objectes.AssentamentRegistralParams;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.plugin.registre.RegistrePluginException;
@@ -62,7 +63,7 @@ public class RegistreNotificaHelper {
 		}
 		ConfigHelper.setEntitatCodi(notificacioEntity.getEntitat().getCodi());
 		var enviarANotifica = false;
-		var isComunicacio = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus());
+		var isComunicacio = EnviamentTipus.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus());
 		var t0 = System.currentTimeMillis();
 		var desc = "Inici procés registrar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]";
 		var tipusEnv = new AccioParam("Tipus enviament: ", notificacioEntity.getEnviamentTipus().name());
@@ -72,13 +73,18 @@ public class RegistreNotificaHelper {
 		var codiDir3 = notificacioEntity.getEntitat().getDir3CodiReg() != null  && !notificacioEntity.getEntitat().getDir3CodiReg().isEmpty() ? notificacioEntity.getEntitat().getDir3CodiReg() : notificacioEntity.getEntitat().getDir3Codi();
 		var totsAdministracio = isAllEnviamentsAAdministracio(notificacioEntity);
 		notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
+		AssentamentRegistralParams params;
+		var isSirActivat = isSirActivat();
+		var maxReintents = pluginHelper.getRegistreReintentsMaxProperty();
 		for(var enviament : notificacioEntity.getEnviaments() ) {
 			info.getParams().add(new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] Realitzant nou assentament registral de l'enviament: " + enviament.getId()));
 			if (enviament.getRegistreData() != null) {
 				continue;
 			}
 			try {
-				registrarEnviament(enviament, t0, info, isComunicacio, codiDir3, totsAdministracio);
+				params = AssentamentRegistralParams.builder().not(notificacioEntity).env(enviament).isSirActivat(isSirActivat).t0(t0).info(info)
+						.isComunicacio(isComunicacio).dir3Codi(codiDir3).totsAdministracio(totsAdministracio).errorMaxReintentsProperty(maxReintents).build();
+				registrarEnviament(params);
 			} catch (Exception ex) {
 				var errorDescripcio = "Hi ha hagut un error registrant l'enviament + " + enviament.getId();
 				log.error(errorDescripcio, ex);
@@ -99,13 +105,15 @@ public class RegistreNotificaHelper {
 		integracioHelper.addAccioOk(info);
 		return enviarANotifica;
 	}
+	// TODO: Reinitents per enviament, no per notificació!!--> Posar reintents de notificació després del for
 
-	private void registrarEnviament(NotificacioEnviamentEntity enviament, long t0, IntegracioInfo info, boolean isComunicacio, String codiDir3, boolean totsAdministracio) throws RegistrePluginException {
+	private void registrarEnviament(AssentamentRegistralParams params) throws RegistrePluginException {
 
-		var notificacioEntity = enviament.getNotificacio();
+		var notificacioEntity = params.getNot();
 		AccioParam accio;
 		var msg = "";
-		if (isSirActivat()) {
+		params.setSirActivat(isSirActivat());
+		if (params.isSirActivat()) {
 			accio = new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] " + notificacioEntity.getEnviamentTipus() + ": nou assentament registral + Notifica de la notificació: " + notificacioEntity.getId());
 			msg = " [TIMER-REG-NOT] (Sir activat) Creació assentament registrals per notificació [Id: " + notificacioEntity.getId() + "]: ";
 		} else {
@@ -114,112 +122,179 @@ public class RegistreNotificaHelper {
 			accio = new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] Realitzant nou assentament registral normal de la notificació: " + notificacioEntity.getId());
 			msg = " [TIMER-REG-NOT] Creació assentament registrals normal per notificació [Id: " + notificacioEntity.getId() + "]: ";
 		}
-		info.getParams().add(accio);
+		params.getInfo().getParams().add(accio);
 		long startTime = System.nanoTime();
 		double elapsedTime;
 		// Registre SIR
-		if (isSirActivat() && isComunicacio && totsAdministracio) {
+		if (params.isSirActivat() && params.isComSir() && params.isTotsAdministracio()) {
 			log.info(" [REG-NOT] Realitzant nou assentament registral per SIR");
-			info.getParams().add(new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] Realitzant nou assentament registral per SIR"));
-			crearAssentamentRegistralEnviamentComunicacioSIR(notificacioEntity, codiDir3, totsAdministracio, enviament, info, t0);
+			params.getInfo().getParams().add(new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] Realitzant nou assentament registral per SIR"));
+//			crearAssentamentRegistralEnviamentComunicacioSIR(notificacioEntity, codiDir3, totsAdministracio, enviament, info, t0);
+			params.setComSir(true);
+			crearAssentamentRegistral(params);
 			elapsedTime = (System.nanoTime() - startTime) / 10e6;
-			log.info(" [TIMER-REG-NOT] (Sir activat) Creació assentament registrals d'enviament de comunicació [NotId: " +
-					notificacioEntity.getId() + ", encId: " + enviament.getId()+ "]: " + elapsedTime + " ms");
+			var txt = " [TIMER-REG-NOT] (Sir activat) Creació assentament registrals d'enviament de comunicació [NotId: ";
+			log.info(txt + notificacioEntity.getId() + ", encId: " + params.getEnv().getId()+ "]: " + elapsedTime + " ms");
 			return;
 		}
 		// Registre NO SIR
-		crearAssentamentRegistralPerNotificacio(notificacioEntity, codiDir3, isComunicacio, isSirActivat(), info, t0, enviament);
+//		crearAssentamentRegistralPerNotificacio(notificacioEntity, codiDir3, isComunicacio, isSirActivat, info, t0, enviament);
+		params.setComSir(false);
+		crearAssentamentRegistral(params);
 		elapsedTime = (System.nanoTime() - startTime) / 10e6;
 		log.info(msg + elapsedTime + " ms");
 		log.info(" [REG-NOT] Fi procés Registrar-Notificar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
 	}
 
-	private void crearAssentamentRegistralPerNotificacio(NotificacioEntity notificacioEntity, String dir3Codi, boolean isComunicacio, boolean isSirActivat,
-														IntegracioInfo info, long t0, NotificacioEnviamentEntity enviament){
+	private void crearAssentamentRegistral(AssentamentRegistralParams params) {
 
-		//Crea assentament registral + Notific@
 		log.info(" >>> Nou assentament registral...");
+		var not = params.getNot();
+		var env = params.getEnv();
+		var isSirActivat = params.isSirActivat();
 		RespostaConsultaRegistre arbResposta;
+		var isComSir = params.isComSir();
 		try {
-			var inclouDocuments = isInclouDocuments(isComunicacio, isSirActivat, isAnyEnviamentsAAdministracio(notificacioEntity));
-			var generarJustificant = isGenerarJustificant(isComunicacio, isSirActivat, isAnyEnviamentsAAdministracio(notificacioEntity));
+
+			var inclouDocuments = isInclouDocuments(params.isComunicacio(), params.isSirActivat(), isAnyEnviamentsAAdministracio(params.getNot()));
+			var generarJustificant = isGenerarJustificant(params.isComunicacio(), isSirActivat, isAnyEnviamentsAAdministracio(not));
 			Set<NotificacioEnviamentEntity> enviamentSet = new HashSet<>();
-			enviamentSet.add(enviament);
-			var arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(notificacioEntity, enviamentSet, inclouDocuments);
-			var op = isSirActivat ? (isComunicacio ? 2L : 1L) : null; //### [SIR-DESACTIVAT = registre normal, SIR-ACTIVAT = notificació/comunicació]
-			arbResposta = pluginHelper.crearAsientoRegistral(dir3Codi, arb, op, notificacioEntity.getId(), enviament.getId() + "", generarJustificant);
-		} catch (Exception e) {
+			enviamentSet.add(env);
+			// Es comunicacio SIR: Este método crearAssentamentRegistralPerEnviament solo se llama para comunicaciones SIR.
+			var arb = isComSir ? pluginHelper.notificacioToAsientoRegistralBean(not, env, inclouDocuments, true)
+						: pluginHelper.notificacioEnviamentsToAsientoRegistralBean(not, enviamentSet, inclouDocuments);
+			var op = isComSir ? 2L : isSirActivat ? (params.isComunicacio() ? 2L : 1L) : null; //### [SIR-DESACTIVAT = registre normal, SIR-ACTIVAT = notificació/comunicació]
+			arbResposta = pluginHelper.crearAsientoRegistral(params.getDir3Codi(), arb, op, not.getId(), env.getId() + "", generarJustificant);
+		} catch (Exception ex) {
 			arbResposta = new RespostaConsultaRegistre();
 			arbResposta.setErrorCodi("ERROR");
-			arbResposta.setErrorDescripcio(e.getMessage());
+			arbResposta.setErrorDescripcio(ex.getMessage());
 		}
-		//Registrar event
-		var error = false;
-		String errorDescripcio = null;
-		var errorMaxReintents = false;
+		params.setArbResposta(arbResposta);
+		processarRespostaAsientoRegistral(params);
+		if (isComSir) {
+			notificacioEventHelper.addSirEnviamentEvent(env, params.isError(), params.getErrorDescripcio(), params.isErrorMaxReintents());
+		} else {
+			notificacioEventHelper.addRegistreEnviamentEvent(env, params.isError(), params.getErrorDescripcio(), params.isErrorMaxReintents());
+		}
+		callbackHelper.crearCallback(not, env, params.isError(), params.getErrorDescripcio());
+	}
+
+	private void processarRespostaAsientoRegistral(AssentamentRegistralParams params) {
+
+		var not = params.getNot();
+		var env = params.getEnv();
+		var info = params.getInfo();
+		var arbResposta = params.getArbResposta();
 		if(arbResposta.getErrorCodi() != null) {
 			log.info(" >>> ... ERROR: (" + arbResposta.getErrorCodi() + ") " + arbResposta.getErrorDescripcio());
-			error = true;
-			errorDescripcio = getErrorDescripcio(arbResposta.getErrorCodi(), arbResposta.getErrorDescripcio(), notificacioEntity.getRegistreEnviamentIntent());
-			errorMaxReintents = notificacioEntity.getRegistreEnviamentIntent() >= pluginHelper.getRegistreReintentsMaxProperty();
+			params.setError(true);
+			params.setErrorDescripcio(getErrorDescripcio(arbResposta.getErrorCodi(), arbResposta.getErrorDescripcio(), not.getRegistreEnviamentIntent()));
+			params.setErrorMaxReintents(not.getRegistreEnviamentIntent() >= params.getErrorMaxReintentsProperty());
 			var t1 = System.currentTimeMillis();
-			info.getParams().add(new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] Hi ha hagut un error realitzant el procés de registre (temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
+			info.getParams().add(new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] Hi ha hagut un error realitzant el procés de registre (temps=" + (t1 - params.getT0()) + "ms): " + arbResposta.getErrorDescripcio()));
+			return;
+		}
+		log.info(" >>> ... OK");
+		var totsAdministracio = params.isTotsAdministracio();
+		finalitzaRegistre(arbResposta, env, params.isComSir() && totsAdministracio);
+		//Comunicació + administració (SIR)
+		if (params.isComSir() && totsAdministracio) {
+			log.debug("Comunicació SIR --> actualitzar estat...");
+			not.updateEstat(NotificacioEstatEnumDto.ENVIADA);
+			registreHelper.enviamentUpdateDatat(arbResposta.getEstat(), arbResposta.getRegistreData(), arbResposta.getSirRecepecioData(),
+					arbResposta.getSirRegistreDestiData(), arbResposta.getRegistreNumeroFormatat(), env);
 		} else {
-			log.info(" >>> ... OK");
-			finalitzaRegistre(arbResposta, enviament, false);
-			var t1 = System.currentTimeMillis();
-			info.getParams().add(new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
 			info.getParams().add(new AccioParam(PROCES_DESC_PARAM, " Procedim a enviar la notificació a Notific@"));
 		}
-		notificacioEventHelper.addRegistreEnviamentEvent(enviament, error, errorDescripcio, errorMaxReintents);
-		callbackHelper.crearCallback(notificacioEntity, enviament, error, errorDescripcio);
+		var t1 = System.currentTimeMillis();
+		info.getParams().add(new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - params.getT0()) + "ms)"));
 	}
 
-	// TODO: Reinitents per enviament, no per notificació!!--> Posar reintents de notificació després del for
-
-	private void crearAssentamentRegistralEnviamentComunicacioSIR(NotificacioEntity notificacioEntity, String dir3Codi, boolean totsAdministracio,
-															NotificacioEnviamentEntity enviament, IntegracioInfo info, long t0) throws RegistrePluginException {
-
-		log.info(" >>> Nou assentament registral SIR...");
-		RespostaConsultaRegistre arbResposta;
-		try {
-			var generarJustificant =  isGenerarJustificant(true, true, isAnyEnviamentsAAdministracio(notificacioEntity));
-			var inclouDocuments = isInclouDocuments(true, true, enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO));
-			var arb = pluginHelper.notificacioToAsientoRegistralBean( notificacioEntity, enviament, inclouDocuments, true); // Es comunicacio SIR: Este método crearAssentamentRegistralPerEnviament solo se llama para comunicaciones SIR.
-			arbResposta = pluginHelper.crearAsientoRegistral(dir3Codi, arb,2L, notificacioEntity.getId(), String.valueOf(enviament.getId()), generarJustificant);
-		} catch (Exception e) {
-			arbResposta = new RespostaConsultaRegistre();
-			arbResposta.setErrorCodi("ERROR");
-			arbResposta.setErrorDescripcio(e.getMessage());
-		}
-		//Registrar event
-		var error = false;
-		String errorDescripcio = null;
-		var errorMaxReintents = false;
-		if(arbResposta.getErrorCodi() != null) {
-			log.info(" >>> ... ERROR: (" + arbResposta.getErrorCodi() + ") " + arbResposta.getErrorDescripcio());
-			error = true;
-			errorDescripcio = getErrorDescripcio(arbResposta.getErrorCodi(), arbResposta.getErrorDescripcio(), notificacioEntity.getRegistreEnviamentIntent());
-			errorMaxReintents = notificacioEntity.getRegistreEnviamentIntent() >= pluginHelper.getRegistreReintentsMaxProperty();
-			var t1 = System.currentTimeMillis();
-			info.getParams().add(new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] Hi ha hagut un error realitzant el procés de registre " +
-					"(temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
-		} else {
-			log.info(" >>> ... OK");
-			finalitzaRegistre(arbResposta, enviament, totsAdministracio);
-			//Comunicació + administració (SIR)
-			if (totsAdministracio) {
-				log.debug("Comunicació SIR --> actualitzar estat...");
-				notificacioEntity.updateEstat(NotificacioEstatEnumDto.ENVIADA);
-				registreHelper.enviamentUpdateDatat(arbResposta.getEstat(), arbResposta.getRegistreData(), arbResposta.getSirRecepecioData(),
-													arbResposta.getSirRegistreDestiData(), arbResposta.getRegistreNumeroFormatat(), enviament);
-			}
-			long t1 = System.currentTimeMillis();
-			info.getParams().add(new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
-		}
-		notificacioEventHelper.addSirEnviamentEvent(enviament, error, errorDescripcio, errorMaxReintents);
-		callbackHelper.crearCallback(notificacioEntity, enviament, error, errorDescripcio);
-	}
+//	private void crearAssentamentRegistralPerNotificacio(NotificacioEntity notificacioEntity, String dir3Codi, boolean isComunicacio, boolean isSirActivat,
+//														IntegracioInfo info, long t0, NotificacioEnviamentEntity enviament){
+//
+//		//Crea assentament registral + Notific@
+//		log.info(" >>> Nou assentament registral...");
+//		RespostaConsultaRegistre arbResposta;
+//		try {
+//			var inclouDocuments = isInclouDocuments(isComunicacio, isSirActivat, isAnyEnviamentsAAdministracio(notificacioEntity));
+//			var generarJustificant = isGenerarJustificant(isComunicacio, isSirActivat, isAnyEnviamentsAAdministracio(notificacioEntity));
+//			Set<NotificacioEnviamentEntity> enviamentSet = new HashSet<>();
+//			enviamentSet.add(enviament);
+//			var arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(notificacioEntity, enviamentSet, inclouDocuments);
+//			var op = isSirActivat ? (isComunicacio ? 2L : 1L) : null; //### [SIR-DESACTIVAT = registre normal, SIR-ACTIVAT = notificació/comunicació]
+//			arbResposta = pluginHelper.crearAsientoRegistral(dir3Codi, arb, op, notificacioEntity.getId(), enviament.getId() + "", generarJustificant);
+//		} catch (Exception e) {
+//			arbResposta = new RespostaConsultaRegistre();
+//			arbResposta.setErrorCodi("ERROR");
+//			arbResposta.setErrorDescripcio(e.getMessage());
+//		}
+//		//Registrar event
+//		var error = false;
+//		String errorDescripcio = null;
+//		var errorMaxReintents = false;
+//		if(arbResposta.getErrorCodi() != null) {
+//			log.info(" >>> ... ERROR: (" + arbResposta.getErrorCodi() + ") " + arbResposta.getErrorDescripcio());
+//			error = true;
+//			errorDescripcio = getErrorDescripcio(arbResposta.getErrorCodi(), arbResposta.getErrorDescripcio(), notificacioEntity.getRegistreEnviamentIntent());
+//			errorMaxReintents = notificacioEntity.getRegistreEnviamentIntent() >= pluginHelper.getRegistreReintentsMaxProperty();
+//			var t1 = System.currentTimeMillis();
+//			info.getParams().add(new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] Hi ha hagut un error realitzant el procés de registre (temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
+//		} else {
+//			log.info(" >>> ... OK");
+//			finalitzaRegistre(arbResposta, enviament, false);
+//			var t1 = System.currentTimeMillis();
+//			info.getParams().add(new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
+//			info.getParams().add(new AccioParam(PROCES_DESC_PARAM, " Procedim a enviar la notificació a Notific@"));
+//		}
+//		notificacioEventHelper.addRegistreEnviamentEvent(enviament, error, errorDescripcio, errorMaxReintents);
+//		callbackHelper.crearCallback(notificacioEntity, enviament, error, errorDescripcio);
+//	}
+//
+//	private void crearAssentamentRegistralEnviamentComunicacioSIR(NotificacioEntity notificacioEntity, String dir3Codi, boolean totsAdministracio,
+//															NotificacioEnviamentEntity enviament, IntegracioInfo info, long t0) throws RegistrePluginException {
+//
+//		log.info(" >>> Nou assentament registral SIR...");
+//		RespostaConsultaRegistre arbResposta;
+//		try {
+//			var generarJustificant =  isGenerarJustificant(true, true, isAnyEnviamentsAAdministracio(notificacioEntity));
+//			var inclouDocuments = isInclouDocuments(true, true, enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO));
+//			var arb = pluginHelper.notificacioToAsientoRegistralBean( notificacioEntity, enviament, inclouDocuments, true); // Es comunicacio SIR: Este método crearAssentamentRegistralPerEnviament solo se llama para comunicaciones SIR.
+//			arbResposta = pluginHelper.crearAsientoRegistral(dir3Codi, arb,2L, notificacioEntity.getId(), String.valueOf(enviament.getId()), generarJustificant);
+//		} catch (Exception e) {
+//			arbResposta = new RespostaConsultaRegistre();
+//			arbResposta.setErrorCodi("ERROR");
+//			arbResposta.setErrorDescripcio(e.getMessage());
+//		}
+//		//Registrar event
+//		var error = false;
+//		String errorDescripcio = null;
+//		var errorMaxReintents = false;
+//		if(arbResposta.getErrorCodi() != null) {
+//			log.info(" >>> ... ERROR: (" + arbResposta.getErrorCodi() + ") " + arbResposta.getErrorDescripcio());
+//			error = true;
+//			errorDescripcio = getErrorDescripcio(arbResposta.getErrorCodi(), arbResposta.getErrorDescripcio(), notificacioEntity.getRegistreEnviamentIntent());
+//			errorMaxReintents = notificacioEntity.getRegistreEnviamentIntent() >= pluginHelper.getRegistreReintentsMaxProperty();
+//			var t1 = System.currentTimeMillis();
+//			info.getParams().add(new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] Hi ha hagut un error realitzant el procés de registre " +
+//					"(temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
+//		} else {
+//			log.info(" >>> ... OK");
+//			finalitzaRegistre(arbResposta, enviament, totsAdministracio);
+//			//Comunicació + administració (SIR)
+//			if (totsAdministracio) {
+//				log.debug("Comunicació SIR --> actualitzar estat...");
+//				notificacioEntity.updateEstat(NotificacioEstatEnumDto.ENVIADA);
+//				registreHelper.enviamentUpdateDatat(arbResposta.getEstat(), arbResposta.getRegistreData(), arbResposta.getSirRecepecioData(),
+//													arbResposta.getSirRegistreDestiData(), arbResposta.getRegistreNumeroFormatat(), enviament);
+//			}
+//			long t1 = System.currentTimeMillis();
+//			info.getParams().add(new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
+//		}
+//		notificacioEventHelper.addSirEnviamentEvent(enviament, error, errorDescripcio, errorMaxReintents);
+//		callbackHelper.crearCallback(notificacioEntity, enviament, error, errorDescripcio);
+//	}
 
 	private String getErrorDescripcio(String codi, String descripcio, int intent) {
 

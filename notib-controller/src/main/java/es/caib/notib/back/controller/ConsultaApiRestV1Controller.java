@@ -1,8 +1,8 @@
 package es.caib.notib.back.controller;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.rest.consulta.Arxiu;
 import es.caib.notib.logic.intf.rest.consulta.Resposta;
 import es.caib.notib.logic.intf.service.EnviamentService;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -51,7 +50,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 		
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(null)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(null)
 					.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		var r = enviamentService.findEnviaments(consulta);
 		logoutSession(request, response);
@@ -71,7 +70,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(null)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(null)
 					.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		var r = enviamentService.findEnviaments(consulta);
 		logoutSession(request, response);
@@ -90,7 +89,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(false)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(false)
 					.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		var r = enviamentService.findEnviaments(consulta);
 		logoutSession(request, response);
@@ -109,7 +108,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(false)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(false)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		var r = enviamentService.findEnviaments(consulta);
 		logoutSession(request, response);
@@ -128,7 +127,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(true)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(true)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		var r = enviamentService.findEnviaments(consulta);
 		logoutSession(request, response);
@@ -147,7 +146,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
-		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(true)
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(true)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		var r = enviamentService.findEnviaments(consulta);
 		logoutSession(request, response);

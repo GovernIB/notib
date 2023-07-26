@@ -4,7 +4,6 @@
 package es.caib.notib.ejb.ws;
 
 import es.caib.notib.client.domini.DadesConsulta;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaAlta;
 import es.caib.notib.client.domini.RespostaAltaV2;
@@ -17,6 +16,7 @@ import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.ejb.AbstractService;
 import es.caib.notib.ejb.helper.UsuariAuthHelper;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import org.jboss.ws.api.annotation.WebContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +44,7 @@ import javax.xml.bind.annotation.XmlElement;
 		serviceName = "NotificacioServiceV2",
 		portName = "NotificacioServiceV2Port",
 		targetNamespace = "http://www.caib.es/notib/ws/notificacio")
-@WebContext(
-		contextRoot = "/notib/ws",
-		urlPattern = "/notificacioV2WS")
+@WebContext(contextRoot = "/notib/ws", urlPattern = "/notificacioV2WS")
 // TODO
 //		authMethod = "KEYCLOAK",
 //		transportGuarantee = "NONE",
@@ -65,25 +63,21 @@ public class NotificacioServiceWsV2 extends AbstractService<es.caib.notib.logic.
 	@Override
 	@WebMethod
 //	@WebResult(name = "respuesta")
-	public RespostaAlta alta(NotificacioV2 notificacio) {
-		usuariHelper.generarUsuariAutenticatEjb(
-				sessionContext,
-				true);
+	public RespostaAlta alta(Notificacio notificacio) {
+		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().alta(notificacio);
 	}
 
     @Override
 	@WebMethod
-    public RespostaAltaV2 altaV2(NotificacioV2 notificacio) throws NotificacioServiceWsException {
+    public RespostaAltaV2 altaV2(Notificacio notificacio) throws NotificacioServiceWsException {
         return getDelegateService().altaV2(notificacio);
     }
 
     @Override
 	@WebMethod
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(String identificador) {
-		usuariHelper.generarUsuariAutenticatEjb(
-				sessionContext,
-				true);
+		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().consultaEstatNotificacio(identificador);
 	}
 
@@ -96,9 +90,7 @@ public class NotificacioServiceWsV2 extends AbstractService<es.caib.notib.logic.
 	@Override
 	@WebMethod
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(String referencia) {
-		usuariHelper.generarUsuariAutenticatEjb(
-				sessionContext,
-				true);
+		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().consultaEstatEnviament(referencia);
 	}
 
@@ -111,16 +103,13 @@ public class NotificacioServiceWsV2 extends AbstractService<es.caib.notib.logic.
 	@Override
 	@WebMethod
 	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
-		usuariHelper.generarUsuariAutenticatEjb(
-				sessionContext,
-				true);
+		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().donarPermisConsulta(permisConsulta);
 	}
 	
 	@Override
 	@WebMethod
-	public RespostaConsultaDadesRegistre consultaDadesRegistre(
-			DadesConsulta dadesConsulta) {
+	public RespostaConsultaDadesRegistre consultaDadesRegistre(DadesConsulta dadesConsulta) {
 		return getDelegateService().consultaDadesRegistre(dadesConsulta);
 	}
 
@@ -132,8 +121,7 @@ public class NotificacioServiceWsV2 extends AbstractService<es.caib.notib.logic.
 
     @Override
 	@WebMethod
-	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(
-			@WebParam(name="identificador") @XmlElement(required = true) String identificador){
+	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(@WebParam(name="identificador") @XmlElement(required = true) String identificador){
 		return getDelegateService().consultaJustificantEnviament(identificador);
 
 	}

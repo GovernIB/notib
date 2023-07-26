@@ -97,77 +97,82 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		var info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
 
-		var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
-		log.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
-		info.setCodiEntitat(notificacio.getEntitat() != null ? notificacio.getEntitat().getCodi() : null);
-		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
-
-		// Validacions
-		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
-			log.error(" [NOT] la notificació no té l'estat REGISTRADA o ENVIADA AMB ERRORS.");
-			integracioHelper.addAccioError(info, "La notificació no està registrada, o enviada amb errors");
-			throw new ValidationException(notificacioId, NotificacioEntity.class, "La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA.name() + " o " + NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.name());
-		}
-		var error = false;
-		String errorDescripcio = null;
 		try {
-			log.info(" >>> Enviant notificació...");
-			var startTime = System.nanoTime();
-			double elapsedTime;
-			var resultadoAlta = enviaNotificacio(notificacio);
-			elapsedTime = (System.nanoTime() - startTime) / 10e6;
-			log.info(" [TIMER-NOT] Notificació enviar (enviaNotificacio SOAP-QUERY)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
-			notificacio.updateNotificaEnviamentData();
+			var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
+			log.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
+			info.setCodiEntitat(notificacio.getEntitat() != null ? notificacio.getEntitat().getCodi() : null);
+			notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
 
-			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
-				startTime = System.nanoTime();
-				log.info(" >>> ... OK");
-				if (!ambEnviamentPerEmail) {
-					notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
-				}
-				List<Long> enviamentsActualitzats = new ArrayList<>();
-				for (var resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
-					for (var enviament: notificacio.getEnviamentsPerNotifica()) {
-						var nif = enviament.getTitular().getNif();
-						if (nif != null && nif.equalsIgnoreCase(resultadoEnvio.getNifTitular()) && !enviamentsActualitzats.contains(enviament.getId())) {
-							enviamentsActualitzats.add(enviament.getId());
-							enviament.updateNotificaEnviada(resultadoEnvio.getIdentificador());
-							enviamentTableHelper.actualitzarRegistre(enviament);
-							auditHelper.auditaEnviament(enviament, TipusOperacio.UPDATE, "NotificaV2Helper.notificacioEnviar");
-							break;
+			// Validacions
+			if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
+				log.error(" [NOT] la notificació no té l'estat REGISTRADA o ENVIADA AMB ERRORS.");
+				integracioHelper.addAccioError(info, "La notificació no està registrada, o enviada amb errors");
+				throw new ValidationException(notificacioId, NotificacioEntity.class, "La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA.name() + " o " + NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.name());
+			}
+			var error = false;
+			String errorDescripcio = null;
+			try {
+				log.info(" >>> Enviant notificació...");
+				var startTime = System.nanoTime();
+				double elapsedTime;
+				var resultadoAlta = enviaNotificacio(notificacio);
+				elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				log.info(" [TIMER-NOT] Notificació enviar (enviaNotificacio SOAP-QUERY)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
+				notificacio.updateNotificaEnviamentData();
+
+				if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
+					startTime = System.nanoTime();
+					log.info(" >>> ... OK");
+					if (!ambEnviamentPerEmail) {
+						notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
+					}
+					List<Long> enviamentsActualitzats = new ArrayList<>();
+					for (var resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
+						for (var enviament: notificacio.getEnviamentsPerNotifica()) {
+							var nif = enviament.getTitular().isIncapacitat() ? enviament.getDestinataris().get(0).getNif() : enviament.getTitular().getNif();
+							if (nif != null && nif.equalsIgnoreCase(resultadoEnvio.getNifTitular()) && !enviamentsActualitzats.contains(enviament.getId())) {
+								enviamentsActualitzats.add(enviament.getId());
+								enviament.updateNotificaEnviada(resultadoEnvio.getIdentificador());
+								enviamentTableHelper.actualitzarRegistre(enviament);
+								auditHelper.auditaEnviament(enviament, TipusOperacio.UPDATE, "NotificaV2Helper.notificacioEnviar");
+								break;
+							}
 						}
 					}
-				}
-				if (pluginHelper.enviarCarpeta()) {
-					for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
-						pluginHelper.enviarNotificacioMobil(e);
+					if (pluginHelper.enviarCarpeta()) {
+						for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
+							pluginHelper.enviarNotificacioMobil(e);
+						}
 					}
+					elapsedTime = (System.nanoTime() - startTime) / 10e6;
+					log.info(" [TIMER-NOT] Notificació enviar (Preparar events)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
+					integracioHelper.addAccioOk(info);
+				} else {
+					error = true;
+					errorDescripcio = "Intent " + notificacio.getNotificaEnviamentIntent() + " \n\nError retornat per Notifica: [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
+					log.info(" >>> ... ERROR: " + errorDescripcio);
+					integracioHelper.addAccioError(info, errorDescripcio);
 				}
-				elapsedTime = (System.nanoTime() - startTime) / 10e6;
-				log.info(" [TIMER-NOT] Notificació enviar (Preparar events)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
-				integracioHelper.addAccioOk(info);
-			} else {
+			} catch (Exception ex) {
+				log.error(ex.getMessage(), ex);
 				error = true;
-				errorDescripcio = "Intent " + notificacio.getNotificaEnviamentIntent() + " \n\nError retornat per Notifica: [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
-				log.info(" >>> ... ERROR: " + errorDescripcio);
-				integracioHelper.addAccioError(info, errorDescripcio);
+				errorDescripcio = "Intent " + notificacio.getNotificaEnviamentIntent() + "\n\n" + (ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex));
+				integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 			}
+			var fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
+			if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat()) /*|| NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())*/)) {
+				notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
+			}
+			notificacioEventHelper.addNotificaEnviamentEvent(notificacio, error, errorDescripcio, fiReintents);
+			callbackHelper.updateCallbacks(notificacio, error, errorDescripcio);
+			log.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
+			notificacioTableHelper.actualitzarRegistre(notificacio);
+			auditHelper.auditaNotificacio(notificacio, TipusOperacio.UPDATE, "NotificaV2Helper.notificacioEnviar");
+			return notificacio;
 		} catch (Exception ex) {
-			log.error(ex.getMessage(), ex);
-			error = true;
-			errorDescripcio = "Intent " + notificacio.getNotificaEnviamentIntent() + "\n\n" + (ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex));
-			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
+			log.error("Error inesperat enviant la notificacio", ex);
+			throw ex;
 		}
-		var fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
-		if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat()) /*|| NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())*/)) {
-			notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
-		}
-		notificacioEventHelper.addNotificaEnviamentEvent(notificacio, error, errorDescripcio, fiReintents);
-		callbackHelper.updateCallbacks(notificacio, error, errorDescripcio);
-		log.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
-		notificacioTableHelper.actualitzarRegistre(notificacio);
-		auditHelper.auditaNotificacio(notificacio, TipusOperacio.UPDATE, "NotificaV2Helper.notificacioEnviar");
-		return notificacio;
 	}
 
 

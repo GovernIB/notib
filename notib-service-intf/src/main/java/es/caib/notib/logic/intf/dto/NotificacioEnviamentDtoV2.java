@@ -1,5 +1,7 @@
 package es.caib.notib.logic.intf.dto;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.cie.EntregaPostalDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -23,7 +25,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private List<PersonaDto> destinataris;
 	private EntregaPostalDto entregaPostal;
 	private EntregaDehDto entregaDeh;
-	private ServeiTipusEnumDto serveiTipus;
+	private ServeiTipus serveiTipus;
 	private String titularNomLlinatge;
 	private String destinatarisNomLlinatges;
 	private String titularEmail;
@@ -46,7 +48,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private String grupCodi;
 	private String emisorDir3Codi;
 	private String usuariCodi;
-	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	private EnviamentTipus enviamentTipus;
 	private String concepte;
 	private String descripcio;
 	private String llibre;

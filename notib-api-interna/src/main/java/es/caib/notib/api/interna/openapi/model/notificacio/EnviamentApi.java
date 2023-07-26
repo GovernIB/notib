@@ -1,7 +1,7 @@
 
 package es.caib.notib.api.interna.openapi.model.notificacio;
 
-import es.caib.notib.client.domini.NotificaServeiTipusEnumDto;
+import es.caib.notib.client.domini.ServeiTipus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
@@ -47,8 +47,8 @@ public class EnviamentApi {
                     "__Actualment en desús amb l'entrada en funcionament de la DEHú__")
     private EntregaDehApi entregaDeh;
 
-    @Schema(name = "serveiTipus", implementation = NotificaServeiTipusEnumDto.class, example = "NORMAL",
+    @Schema(name = "serveiTipus", implementation = ServeiTipus.class, example = "NORMAL",
             description = "Enumerat que indica la urgència que té l’enviament.")
-    private NotificaServeiTipusEnumDto serveiTipus;
+    private ServeiTipus serveiTipus;
 
 }

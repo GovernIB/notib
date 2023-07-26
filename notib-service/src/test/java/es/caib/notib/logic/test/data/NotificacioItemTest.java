@@ -1,14 +1,14 @@
 package es.caib.notib.logic.test.data;
 
+import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.logic.intf.dto.DocumentDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.logic.intf.dto.PersonaDto;
-import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
-import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.client.domini.ServeiTipus;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
+import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.test.AuthenticationTest;
@@ -28,7 +28,8 @@ import java.util.Date;
 import java.util.List;
 
 @Component
-public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto>{
+public class NotificacioItemTest extends DatabaseItemTest<Notificacio>{
+
     @Autowired
     protected NotificacioService notificacioService;
     @Autowired
@@ -40,14 +41,13 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
     private String[] relatedFields = new String[]{ "procediment" };
 
     @Override
-    public NotificacioDatabaseDto create(Object element, Long entitatId) throws Exception{
-        return notificacioService.create(
-                entitatId,
-                (NotificacioDatabaseDto) element);
+    public Notificacio create(Object element, Long entitatId) throws Exception{
+        return notificacioService.create(entitatId, (Notificacio) element);
     }
 
     @Override
-    public void delete(Long entitatId, NotificacioDatabaseDto object) {
+    public void delete(Long entitatId, Notificacio object) {
+
         authenticationTest.autenticarUsuari("admin");
         notificacioService.delete(entitatId, object.getId());
     }
@@ -58,22 +58,20 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
 //    }
 
     public void relateElement(String key, Object element) throws Exception{
+
         if (element instanceof ProcSerDto) {
-            getObject(key).setProcediment((ProcSerDto) element);
+            getObject(key).setProcedimentCodi(((ProcSerDto) element).getCodi());
         }
     }
 
-    public static NotificacioDatabaseDto getRandomInstanceWithoutEnviaments() {
-        String notificacioId = new Long(System.currentTimeMillis()).toString();
+    public static Notificacio getRandomInstanceWithoutEnviaments() {
 
-        DocumentDto document = new DocumentDto();
+        String notificacioId = Long.toString(System.currentTimeMillis());
+        var document = new Document();
         try {
             byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
             document.setContingutBase64(Base64.getEncoder().encodeToString(arxiuBytes));
-            document.setHash(
-                    Base64.getEncoder().encodeToString(
-                            Hex.decodeHex(
-                                    DigestUtils.sha1Hex(arxiuBytes).toCharArray())));
+            document.setHash(Base64.getEncoder().encodeToString(Hex.decodeHex(DigestUtils.sha1Hex(arxiuBytes).toCharArray())));
         } catch (IOException | DecoderException e) {
             e.printStackTrace();
         }
@@ -84,49 +82,50 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
 
         Date caducitat = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
         Date enviamentDataProgramada = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
-        NotificacioDatabaseDto notCreated = NotificacioDatabaseDto.builder()
+        Notificacio notCreated = Notificacio.builder()
                 .emisorDir3Codi(ConfigTest.ENTITAT_DGTIC_DIR3CODI)
-                .enviamentTipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO)
+                .enviamentTipus(EnviamentTipus.NOTIFICACIO)
                 .enviamentDataProgramada(enviamentDataProgramada)
                 .concepte("Test")
                 .descripcio("Test descripció")
-                .organGestorCodi("A00000000")
+                .organGestor("A00000000")
                 .enviamentDataProgramada(new Date())
                 .retard(5)
                 .caducitat(caducitat)
 //                .procediment(procediment)
 //				.procedimentCodiNotib()
 //                .grup(grupCreate)
-                .enviaments(new ArrayList<NotEnviamentDatabaseDto>())
+                .enviaments(new ArrayList<Enviament>())
                 .usuariCodi("admin")
 //				.motiu()
                 .numExpedient("EXPEDIENTEX")
                 .idioma(Idioma.CA)
-                .document(new DocumentDto())
+                .document(new Document())
                 .build();
         notCreated.setDocument(document);
         return notCreated;
     }
 
-    public static NotificacioDatabaseDto getRandomInstance() {
+    public static Notificacio getRandomInstance() {
         return getRandomInstance(2);
     }
 
-    public static NotificacioDatabaseDto getRandomInstance(int numEnviaments) {
-        NotificacioDatabaseDto notCreated = getRandomInstanceWithoutEnviaments();
-        List<NotEnviamentDatabaseDto> enviaments = new ArrayList<>();
+    public static Notificacio getRandomInstance(int numEnviaments) {
+
+        Notificacio notCreated = getRandomInstanceWithoutEnviaments();
+        List<Enviament> enviaments = new ArrayList<>();
         for (int i = 0; i < numEnviaments; i++) {
-            NotEnviamentDatabaseDto enviament = getRandomEnviament(i);
+            Enviament enviament = getRandomEnviament(i);
             enviaments.add(enviament);
         }
         notCreated.setEnviaments(enviaments);
-
         return notCreated;
     }
 
-    public static NotEnviamentDatabaseDto getRandomEnviament(int i){
-        NotEnviamentDatabaseDto enviament = new NotEnviamentDatabaseDto();
-        PersonaDto titular = PersonaDto.builder()
+    public static Enviament getRandomEnviament(int i){
+
+        var enviament = new Enviament();
+        var titular = Persona.builder()
                 .interessatTipus(InteressatTipus.FISICA)
                 .nom("titularNom" + i)
                 .llinatge1("titLlinatge1_" + i)
@@ -135,8 +134,8 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
                 .telefon("666010101")
                 .email("titular@gmail.com").build();
         enviament.setTitular(titular);
-        List<PersonaDto> destinataris = new ArrayList<PersonaDto>();
-        PersonaDto destinatari = PersonaDto.builder()
+        List<Persona> destinataris = new ArrayList<>();
+        var destinatari = Persona.builder()
                 .interessatTipus(InteressatTipus.FISICA)
                 .nom("destinatariNom" + i)
                 .llinatge1("destLlinatge1_" + i)
@@ -146,7 +145,7 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
                 .email("destinatari@gmail.com").build();
         destinataris.add(destinatari);
         enviament.setDestinataris(destinataris);
-        enviament.setServeiTipus(ServeiTipusEnumDto.URGENT);
+        enviament.setServeiTipus(ServeiTipus.URGENT);
         enviament.setNotificaEstat(EnviamentEstat.NOTIB_PENDENT);
         return enviament;
     }

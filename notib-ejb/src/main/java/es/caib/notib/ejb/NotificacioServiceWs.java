@@ -4,7 +4,6 @@
 package es.caib.notib.ejb;
 
 import es.caib.notib.client.domini.DadesConsulta;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaAlta;
 import es.caib.notib.client.domini.RespostaAltaV2;
@@ -16,6 +15,7 @@ import es.caib.notib.client.domini.RespostaConsultaEstatNotificacio;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.ejb.helper.UsuariAuthHelper;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -40,7 +40,7 @@ public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.in
 
 	@Override
 	@RolesAllowed({"NOT_APL"})
-	public RespostaAlta alta(NotificacioV2 notificacio) {
+	public RespostaAlta alta(Notificacio notificacio) {
 
 		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().alta(notificacio);
@@ -48,7 +48,7 @@ public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.in
 
     @Override
 	@RolesAllowed({"NOT_APL"})
-    public RespostaAltaV2 altaV2(NotificacioV2 notificacio) throws NotificacioServiceWsException {
+    public RespostaAltaV2 altaV2(Notificacio notificacio) throws NotificacioServiceWsException {
         return getDelegateService().altaV2(notificacio);
     }
 

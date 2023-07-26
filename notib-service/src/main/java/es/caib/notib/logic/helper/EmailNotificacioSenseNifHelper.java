@@ -1,9 +1,9 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.helper.EmailHelper.Attachment;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.ValidationException;
@@ -125,7 +125,7 @@ public class EmailNotificacioSenseNifHelper {
 				log.error(errorDescripcio);
 				return errorDescripcio;
 			}
-			return NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(enviament.getNotificacio().getEnviamentTipus()) ?
+			return EnviamentTipus.NOTIFICACIO.equals(enviament.getNotificacio().getEnviamentTipus()) ?
 					sendEmailInfoEnviamentNotificacioSenseNif(enviament) : sendEmailInfoEnviamentComunicacioSenseNif(enviament);
 		} catch (Exception ex) {
 			String errorDescripcio = "No s'ha pogut avisar per correu electrònic: " + ex;

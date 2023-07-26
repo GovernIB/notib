@@ -2,7 +2,7 @@ package es.caib.notib.logic.helper;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.Statuses;
-import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
@@ -21,24 +21,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 @Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class CallbackHelperTest {
+
     @Mock
     private AplicacioRepository aplicacioRepository;
-    @Mock
-    private NotificaHelper notificaHelper;
-    @Mock
-    private IntegracioHelper integracioHelper;
-    @Mock
-    private NotificacioEventHelper notificacioEventHelper;
     @Mock
     private RequestsHelper requestsHelper;
     @Mock
     private ConfigHelper configHelper;
-
-    @InjectMocks
-    private CallbackHelper callbackHelper;
-
     private AplicacioEntity aplicacio;
-
     private NotificacioEntity notificacioMock;
     private EntitatEntity entitatMock;
     private NotificacioEnviamentEntity enviamentMock;
@@ -47,39 +37,21 @@ public class CallbackHelperTest {
 
     @Before
     public void setUp() throws Exception {
-        Mockito.when(configHelper.getConfigAsInteger(Mockito.eq("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max"))).thenReturn(3);
 
+        Mockito.when(configHelper.getConfigAsInteger(Mockito.eq("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max"))).thenReturn(3);
         entitatMock = Mockito.mock(EntitatEntity.class);
         Mockito.when(entitatMock.getId()).thenReturn(2L);
-
-        aplicacio = AplicacioEntity.builder()
-                .usuariCodi("")
-                .callbackUrl("")
-                .activa(true)
-                .entitat(entitatMock)
-                .build();
-
+        aplicacio = AplicacioEntity.builder().usuariCodi("").callbackUrl("").activa(true).entitat(entitatMock).build();
         notificacioMock =  Mockito.mock(NotificacioEntity.class);
         Mockito.when(notificacioMock.getEntitat()).thenReturn(entitatMock);
-
-        UsuariEntity mockUser = Mockito.mock(UsuariEntity.class);
+        var mockUser = Mockito.mock(UsuariEntity.class);
         Mockito.when(mockUser.getCodi()).thenReturn("CODI_USER");
-
-        enviamentMock = NotificacioEnviamentEntity.builder()
-                .serveiTipus(ServeiTipusEnumDto.NORMAL)
-                .notificacio(notificacioMock)
-                .build();
+        enviamentMock = NotificacioEnviamentEntity.builder().serveiTipus(ServeiTipus.NORMAL).notificacio(notificacioMock).build();
         enviamentMock.setCreatedBy(mockUser);
-        Mockito.when(aplicacioRepository.findByUsuariCodiAndEntitatId(Mockito.anyString(),
-                Mockito.anyLong())).thenReturn(aplicacio);
-
-        ClientResponse responseMock = Mockito.mock(ClientResponse.class);
+        Mockito.when(aplicacioRepository.findByUsuariCodiAndEntitatId(Mockito.anyString(), Mockito.anyLong())).thenReturn(aplicacio);
+        var responseMock = Mockito.mock(ClientResponse.class);
         Mockito.when(responseMock.getStatusInfo()).thenReturn(Statuses.from(200, "OK"));
-
-        Mockito.when(requestsHelper.callbackAplicacioNotificaCanvi(
-                Mockito.anyString(), Mockito.any(NotificacioCanviClient.class))
-        ).thenReturn(responseMock);
-
+        Mockito.when(requestsHelper.callbackAplicacioNotificaCanvi(Mockito.anyString(), Mockito.any(NotificacioCanviClient.class))).thenReturn(responseMock);
         System.setProperty("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max", MAX_INTENTS_CALLBACK);
     }
 

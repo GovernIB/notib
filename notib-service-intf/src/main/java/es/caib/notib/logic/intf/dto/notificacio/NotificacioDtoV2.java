@@ -1,11 +1,11 @@
 package es.caib.notib.logic.intf.dto.notificacio;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.dto.AuditoriaDto;
 import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
@@ -27,7 +27,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 
 	private Long id;
 	private String emisorDir3Codi;
-	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	private EnviamentTipus enviamentTipus;
 	private String concepte;
 	private String descripcio;
 	private String organGestor;

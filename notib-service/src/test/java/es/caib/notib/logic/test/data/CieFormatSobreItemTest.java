@@ -8,7 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CieFormatSobreItemTest extends DatabaseItemTest<CieFormatSobreDto>{
+public class CieFormatSobreItemTest extends DatabaseItemTest<CieFormatSobreDto> {
+
     @Autowired
     protected PagadorCieFormatSobreService cieFormatSobreService;
     @Autowired
@@ -21,9 +22,7 @@ public class CieFormatSobreItemTest extends DatabaseItemTest<CieFormatSobreDto>{
 
     @Override
     public CieFormatSobreDto create(Object element, Long entitatId) throws Exception{
-        return cieFormatSobreService.create(
-                ((CieFormatSobreDto) element).getPagadorCieId(),
-                (CieFormatSobreDto) element);
+        return cieFormatSobreService.create(((CieFormatSobreDto) element).getPagadorCieId(), (CieFormatSobreDto) element);
     }
 
     @Override

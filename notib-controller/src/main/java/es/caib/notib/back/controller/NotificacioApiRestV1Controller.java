@@ -4,13 +4,13 @@
 package es.caib.notib.back.controller;
 
 import es.caib.notib.client.domini.DadesConsulta;
-import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaAlta;
 import es.caib.notib.client.domini.RespostaConsultaDadesRegistre;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviament;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacio;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +37,7 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	@PostMapping(value = "/alta", produces="application/json")
 	@ResponseStatus(HttpStatus.CREATED)
 	@ResponseBody
-	public RespostaAlta alta(@RequestBody NotificacioV2 notificacio, HttpServletRequest request, HttpServletResponse response) {
+	public RespostaAlta alta(@RequestBody Notificacio notificacio, HttpServletRequest request, HttpServletResponse response) {
 
 		try {
 			var r =  notificacioServiceWs.alta(notificacio);

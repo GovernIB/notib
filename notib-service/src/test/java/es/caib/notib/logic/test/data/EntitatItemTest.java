@@ -11,31 +11,32 @@ import java.util.List;
 
 @Component
 public class EntitatItemTest extends DatabaseItemTest<EntitatDto> {
+
     @Autowired
     protected EntitatService entitatService;
     @Autowired
     protected AuthenticationTest authenticationTest;
 
-
     public EntitatDto create(EntitatDto element) throws Exception{
+
         authenticationTest.autenticarUsuari("super");
         EntitatDto entitatCreada = entitatService.create(element);
         if (element.getPermisos() != null) {
             for (PermisDto permis: element.getPermisos()) {
-                entitatService.permisUpdate(
-                        entitatCreada.getId(),
-                        permis);
+                entitatService.permisUpdate(entitatCreada.getId(), permis);
             }
         }
         return entitatCreada;
     }
 
     public void delete(Long entitatId) {
+
         authenticationTest.autenticarUsuari("super");
         entitatService.delete(entitatId);
     }
 
     public static EntitatDto getRandomInstance() {
+
         EntitatDto entitatCreate = new EntitatDto();
         entitatCreate.setCodi("LIMIT");
         entitatCreate.setNom("Limit Tecnologies");

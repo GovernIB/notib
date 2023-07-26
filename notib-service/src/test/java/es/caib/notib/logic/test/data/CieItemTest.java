@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 @Component
-public class CieItemTest extends DatabaseItemTest<CieDataDto>{
+public class CieItemTest extends DatabaseItemTest<CieDataDto> {
+
     @Autowired
     protected PagadorCieService pagadorCieService;
     @Autowired

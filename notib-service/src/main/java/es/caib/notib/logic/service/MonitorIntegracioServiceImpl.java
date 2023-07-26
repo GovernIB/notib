@@ -70,8 +70,10 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 			log.debug("Consultant les darreres accions per a la integració ( codi=" + codi + ")");
 			var pageable = paginacioHelper.toSpringDataPageable(paginacio);
 			var entitatCodiNull = Strings.isNullOrEmpty(filtre.getEntitatCodi());
+			var entitatCodi = !entitatCodiNull ? filtre.getEntitatCodi() : "";
 			var appNull = Strings.isNullOrEmpty(filtre.getAplicacio());
-			var accions = monitorRepository.getByFiltre(codi, entitatCodiNull, filtre.getEntitatCodi(), appNull, filtre.getAplicacio(), pageable);
+			var app = !appNull ? filtre.getAplicacio() : "";
+			var accions = monitorRepository.getByFiltre(codi, entitatCodiNull, entitatCodi, appNull, app, pageable);
 			return paginacioHelper.toPaginaDto(accions, IntegracioAccioDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

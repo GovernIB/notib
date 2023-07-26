@@ -3,8 +3,8 @@
  */
 package es.caib.notib.persist.entity;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -102,7 +102,7 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private String notificaErrorDescripcio;
 
 	@Column(name = "env_tipus", nullable = false)
-	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	private EnviamentTipus enviamentTipus;
 
 	@Column(name = "registre_num_expedient", length = 80)
 	private String numExpedient;
@@ -165,7 +165,7 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private boolean hasEnviamentsPendentsRegistre;
 
 	public boolean isComunicacioSir() { // Per al mapping al DTO
-		if (!NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(this.getEnviamentTipus())) {
+		if (!EnviamentTipus.COMUNICACIO.equals(this.getEnviamentTipus())) {
 			return false;
 		}
 

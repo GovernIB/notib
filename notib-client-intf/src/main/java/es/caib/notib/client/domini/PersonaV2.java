@@ -29,7 +29,13 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Persona implements Serializable {
+public class PersonaV2 implements Serializable {
+
+    // TODO ATRIBUTS AFEGITS A POSTERIORI. FER UNA HERENCIA PER DEIXAR-HO CORRECTE
+
+    private Long id;
+
+    // TODO ****************************************************************************
 
     private boolean incapacitat;
     private InteressatTipus interessatTipus;

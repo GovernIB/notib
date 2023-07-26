@@ -3,10 +3,10 @@
  */
 package es.caib.notib.logic.intf.dto.notificacio;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.AuditoriaDto;
 import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
@@ -38,7 +38,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private String referencia;
 	private String cifEntitat;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
-	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	private EnviamentTipus enviamentTipus;
 	private Date enviamentDataProgramada;
 	private Date createdDate;
 	private String concepte;

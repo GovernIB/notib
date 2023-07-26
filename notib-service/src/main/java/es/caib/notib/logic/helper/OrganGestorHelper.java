@@ -126,6 +126,10 @@ public class OrganGestorHelper {
 		for (var unitatWS : unitatsWs) {
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.historic", new Object[] {unitatWS.getCodi() + " - " + unitatWS.getDenominacio()}));
 			var unitat = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodi());
+			if (unitat == null) {
+				log.info("Unitat amb codi " + unitatWS.getCodi() + " no trobada a la bdd per l'entitat " + entitat.getCodi());
+				continue;
+			}
 			sincronizarHistoricsUnitat(unitat, unitatWS, entitat);
 			progres.setProgres(12 + (nombreUnitatsProcessades++ * 10 / nombreUnitatsTotal));
 			if (unitat != null && !OrganGestorEstatEnum.V.equals(unitat.getEstat())) {
@@ -133,12 +137,14 @@ public class OrganGestorHelper {
 			}
 		}
 		progres.setProgres(22);
+		obsoleteUnitats.addAll(organGestorRepository.findByEntitatNoVigent(entitat));
 		// Definint tipus de transició
 		log.debug(prefix + "Sincronitzant unitats obsoletes");
 		nombreUnitatsProcessades = 0;
 		nombreUnitatsTotal = obsoleteUnitats.size();
 		for (var obsoleteUnitat : obsoleteUnitats) {
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.definir.transicio", new Object[] {obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom()}));
+			obsoleteUnitat.setEstat(OrganGestorEstatEnum.E);
 			if (obsoleteUnitat.getNous() == null || obsoleteUnitat.getNous().isEmpty()) {
 				obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.EXTINCIO);
 			} else if (obsoleteUnitat.getNous().size() > 1) {
@@ -153,8 +159,11 @@ public class OrganGestorHelper {
 					organsSubstituits.add(obsoleteUnitat);
 				}
 			}
-			log.debug(prefix + "Unitat extingida " + obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom());
-			obsoleteUnitat.setEstat(OrganGestorEstatEnum.E);
+			var nous = obsoleteUnitat.getNous();
+			if (nous != null && nous.contains(obsoleteUnitat)) {
+				log.debug(prefix + "Unitat dividia o fusionada " + obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom());
+				obsoleteUnitat.setEstat(OrganGestorEstatEnum.V);
+			}
 			progres.setProgres(22 + (nombreUnitatsProcessades++ * 5 / nombreUnitatsTotal));
 		}
 		var avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitat.getId(), ORGAN_NO_SYNC);
@@ -192,9 +201,9 @@ public class OrganGestorHelper {
 		// Venen les unitats ordenades, primer el pare i després els fills?
 		unitat = OrganGestorEntity.builder().codi(unitatWS.getCodi()).entitat(entitat).nom(nom).nomEs(unitatWS.getDenominacio())
 				.codiPare(unitatWS.getSuperior()).estat(unitatWS.getEstat()).build();
+		organGestorRepository.save(unitat);
 		updateLlibreAndOficina(unitat, entitat.getDir3Codi());
 		log.debug(prefix + "guardant nova unitat amb codi " + unitat.getCodi() + " - " + unitat.getNom());
-		organGestorRepository.save(unitat);
 		return unitat;
 	}
 
@@ -218,9 +227,25 @@ public class OrganGestorHelper {
 		OrganGestorEntity nova;
 		for (var historicoCodi : unidadWS.getHistoricosUO()) {
 			nova = organGestorRepository.findByEntitatAndCodi(entitat, historicoCodi);
+			if (unitat.getNous() != null && isAlreadyAddedToList(unitat.getNous(), nova)) {
+				//normally this shoudn't duplicate, it is added to deal with the result of call to WS DIR3 PRE in day 2023-06-21 with fechaActualizacion=[2023-06-15] which was probably incorrect
+				log.info("Detected duplication of transtition in DB. Unitat" + unitat.getCodi() + "already transitioned into " + nova.getCodi() + ". Probably caused by error in DIR3");
+				continue;
+			}
 			unitat.addNou(nova);
 			nova.addAntic(unitat);
 		}
+	}
+
+	private boolean isAlreadyAddedToList(List<OrganGestorEntity> organs, OrganGestorEntity organ) {
+
+		boolean contains = false;
+		for (OrganGestorEntity organGestorEntity : organs) {
+			if (organGestorEntity.getId().equals(organ.getId())) {
+				contains = true;
+			}
+		}
+		return contains;
 	}
 
 	@Transactional
@@ -285,5 +310,9 @@ public class OrganGestorHelper {
 		organ.setOficina(oficina.getCodi());
 		organ.setOficinaNom(oficina.getNom());
 		organGestorRepository.save(organ);
+	}
+
+	public void setServicesForSynctest(PluginHelper pluginHelper) {
+		this.pluginHelper = pluginHelper;
 	}
 }

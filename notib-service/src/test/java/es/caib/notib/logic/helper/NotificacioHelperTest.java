@@ -1,13 +1,11 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.logic.intf.dto.notificacio.Document;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.ValidesaEnum;
-import es.caib.notib.logic.intf.dto.DocumentDto;
-import es.caib.notib.logic.intf.dto.GrupDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
-import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.GrupEntity;
@@ -21,7 +19,6 @@ import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.ProcSerOrganRepository;
 import es.caib.notib.logic.test.data.ConfigTest;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
-import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
@@ -94,77 +91,54 @@ public class NotificacioHelperTest {
 		var c = configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat");
 		var procediment = ProcedimentEntity.builder().codi("").nom("").retard(retard).caducitat(c).entitat(entitat).build();
 
-//		ProcedimentEntity procediment = ProcedimentEntity.getBuilder(
-//				"",
-//				"",
-//				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
-//				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
-//				entitat,
-//				false,
-//				null, // organGestor
-//				null,
-//				null,
-//				null,
-//				null,
-//				false,
-//				false).build();
-		
-		ProcSerDto procedimentDto = new ProcSerDto();
-		procedimentDto.setId(1L);
-		
-		GrupDto grupDto = new GrupDto();
-		grupDto.setId(1L);
-		
-		DocumentDto document = new DocumentDto();
+		var document = new Document();
 		document.setId(Long.toString(new Random().nextLong()));
 		document.setContingutBase64("/es/caib/notib/logic/arxiu.pdf");
 		document.setNormalitzat(false);
 		document.setGenerarCsv(false);
 		
-		DocumentDto document2 = new DocumentDto();
+		var document2 = new Document();
 		document2.setId(Long.toString(new Random().nextLong()));
 		document2.setUuid(UUID.randomUUID().toString());
 		document2.setNormalitzat(false);
 		document2.setGenerarCsv(false);
 		
-		DocumentDto document3 = new DocumentDto();
+		var document3 = new Document();
 		document3.setId(Long.toString(new Random().nextLong()));
 		document3.setCsv("54a27c163550ef2d5f3a8cd985a4ab949b6dfb5e66174a11c2bc979e0070090a");
 		document3.setNormalitzat(false);
 		document3.setGenerarCsv(true);
 		
-		NotificacioDatabaseDto notificacio = NotificacioDatabaseDto.builder()
+		var notificacio = Notificacio.builder()
                 .emisorDir3Codi(ConfigTest.ENTITAT_DGTIC_DIR3CODI)
-                .enviamentTipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO)
+                .enviamentTipus(EnviamentTipus.NOTIFICACIO)
                 .enviamentDataProgramada(enviamentDataProgramada)
                 .concepte("Test")
                 .descripcio("Test descripció")
-                .organGestorCodi("A00000000")
+				.organGestor("A00000000")
                 .enviamentDataProgramada(new Date())
                 .retard(5)
                 .caducitat(caducitat)
-                .enviaments(new ArrayList<NotEnviamentDatabaseDto>())
+                .enviaments(new ArrayList<>())
                 .usuariCodi("admin")
                 .numExpedient("EXPEDIENTEX")
                 .idioma(Idioma.CA)
                 .document(document)
                 .document2(document2)
                 .document3(document3)
-                .procediment(procedimentDto)
-                .grup(grupDto)
+                .procedimentId(1L)
+                .grupId(1L)
                 .build();
 
-		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entitat).build();
-		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
-		GrupEntity grupNotificacio = GrupEntity.getBuilder(null, null, entitat, organGestor).build();
-		String documentGesdocId = "documentGesdocId";
-		
-		Document documentArxiuUuid = initDocument(document2.getUuid());
-		Document documentArxiuCsv = initDocument(document3.getCsv());
-		
-		DocumentEntity documentEntity = initDocumentEntity(document, documentGesdocId);
-		DocumentEntity documentEntity2 = initDocumentEntity(document2, documentGesdocId);
-		DocumentEntity documentEntity3 = initDocumentEntity(document3, documentGesdocId);
+		var organGestor = OrganGestorEntity.builder().entitat(entitat).build();
+		var procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
+		var grupNotificacio = GrupEntity.getBuilder(null, null, entitat, organGestor).build();
+		var documentGesdocId = "documentGesdocId";
+		var documentArxiuUuid = initDocument(document2.getUuid());
+		var documentArxiuCsv = initDocument(document3.getCsv());
+		var documentEntity = initDocumentEntity(document, documentGesdocId);
+		var documentEntity2 = initDocumentEntity(document2, documentGesdocId);
+		var documentEntity3 = initDocumentEntity(document3, documentGesdocId);
 		
 		// Mocks
 		Mockito.when(entityComprovarHelper.comprovarProcediment(Mockito.any(EntitatEntity.class), Mockito.anyLong())).thenReturn(procediment);
@@ -197,7 +171,7 @@ public class NotificacioHelperTest {
 		Mockito.when(pluginHelper.arxiuGetImprimible(Mockito.anyString(), Mockito.eq(false))).thenReturn(documentArxiuCsv.getContingut());
 		
 		Mockito.when(pluginHelper.isArxiuPluginDisponible()).thenReturn(Boolean.TRUE);
-		Mockito.when(pluginHelper.getModeFirma(Mockito.any(Document.class), Mockito.anyString())).thenReturn(1); //TRUE
+		Mockito.when(pluginHelper.getModeFirma(Mockito.any(es.caib.plugins.arxiu.api.Document.class), Mockito.anyString())).thenReturn(1); //TRUE
 		Mockito.when(pluginHelper.estatElaboracioToValidesa(Mockito.any(DocumentEstatElaboracio.class))).thenReturn(ValidesaEnum.ORIGINAL.getValor());
 				
 		// When	
@@ -219,36 +193,31 @@ public class NotificacioHelperTest {
 		assertNull(notificacioData.getDocument5Entity());
 	}
 	
-	private Document initDocument(String identificador) {
-		Document documentArxiu = new Document();
-		
-		DocumentContingut contingut = new DocumentContingut();
+	private es.caib.plugins.arxiu.api.Document initDocument(String identificador) {
+
+		var documentArxiu = new es.caib.plugins.arxiu.api.Document();
+		var contingut = new DocumentContingut();
 		contingut.setArxiuNom("arxiu.pdf");
 		contingut.setTipusMime("application/pdf");
 		contingut.setContingut("/es/caib/notib/logic/arxiu.pdf".getBytes());
 		contingut.setTamany(contingut.getContingut().length);
 		documentArxiu.setContingut(contingut);
-		
 		documentArxiu.setEstat(DocumentEstat.DEFINITIU);
 		documentArxiu.setFirmes(null);
 		documentArxiu.setIdentificador(identificador);
-		
-		DocumentMetadades metadades = new DocumentMetadades();
+		var metadades = new DocumentMetadades();
 		metadades.setOrigen(ContingutOrigen.ADMINISTRACIO);
 		metadades.setEstatElaboracio(DocumentEstatElaboracio.ORIGINAL);
 		metadades.setTipusDocumental(DocumentTipus.INFORME);
 		documentArxiu.setMetadades(metadades);
-		
 		documentArxiu.setNom("Nombre Document Arxiu");
 		documentArxiu.setVersio("Version");
-
 		return documentArxiu;
 	}
 	
 	
-	private DocumentEntity initDocumentEntity(DocumentDto document, String documentGesdocId) {
-		DocumentEntity documentEntity = DocumentEntity.getBuilderV2(
-//				document.getId(),
+	private DocumentEntity initDocumentEntity(Document document, String documentGesdocId) {
+		return DocumentEntity.getBuilderV2(
 				documentGesdocId,
 				document.getArxiuNom(),
 				document.isNormalitzat(),
@@ -259,13 +228,12 @@ public class NotificacioHelperTest {
 				document.getOrigen(),
 				document.getValidesa(),
 				document.getTipoDocumental(),
-				document.getModoFirma()
-			).build();
-		return documentEntity;
+				document.getModoFirma()).build();
 	}
 	
 	@After
 	public void tearDown() {
+
 		Mockito.reset(entityComprovarHelper);
 		Mockito.reset(organGestorHelper);
 		Mockito.reset(pluginHelper);

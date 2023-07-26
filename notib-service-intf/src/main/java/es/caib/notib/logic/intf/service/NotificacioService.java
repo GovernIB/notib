@@ -21,12 +21,12 @@ import es.caib.notib.logic.intf.dto.ProvinciesDto;
 import es.caib.notib.logic.intf.dto.RespostaAccio;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
@@ -45,52 +45,38 @@ public interface NotificacioService {
 	/**
 	 * Crea una nova notificació.
 	 *
-	 * @param notificacio
-	 *            Informació de la notificació a crear
+	 * @param notificacio Informació de la notificació a crear
 	 * @return La notificació amb l'id especificat.
 	 * @throws RegistreNotificaException
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
-	NotificacioDatabaseDto create(
-			Long entitatId,
-			NotificacioDatabaseDto notificacio) throws RegistreNotificaException;
+	Notificacio create(Long entitatId, Notificacio notificacio) throws RegistreNotificaException;
+
 	/**
 	 * Esborra la notificació indicada per paràmetre
 	 * 
-	 * @param entitatId
-	 *            Id de l'entitat actual
-	 * @param notificacioId
-	 *            Id de la notificació a eliminar
+	 * @param entitatId Id de l'entitat actual
+	 * @param notificacioId Id de la notificació a eliminar
 	 *            
 	 * @return La llista de notificacions actualitzada
-	 * @throws NotFoundException
-	 *              Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-	void delete(
-			Long entitatId,
-			Long notificacioId) throws NotFoundException;
+	void delete(Long entitatId, Long notificacioId) throws NotFoundException;
 	
 	/**
 	 * Actualitza la informació de la notificacio que tengui el mateix
 	 * id que l'especificat per paràmetre.
 	 * 
-	 * @param entitatId
-	 *            Id de l'entitat actual
-	 * @param notificacio
-	 *            Informació de la notificació a modificar
+	 * @param entitatId Id de l'entitat actual
+	 * @param notificacio Informació de la notificació a modificar
 	 *            
 	 * @return La notificacio amb les dades actualitzades
-	 * @throws NotFoundException
-	 *              Si no s'ha trobat l'objecte amb l'id especificat.
-	 * @throws RegistreNotificaException
-	 * 				Si hi ha hagut un error en el procés de registra/notificar
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws RegistreNotificaException Si hi ha hagut un error en el procés de registra/notificar
 	 */
 	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-	NotificacioDatabaseDto update(
-			Long entitatId,
-			NotificacioDatabaseDto notificacio,
-			boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException;
+	Notificacio update(Long entitatId, Notificacio notificacio, boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException;
 	
 	/**
 	 * Consulta una notificació donat el seu id.
@@ -100,9 +86,7 @@ public interface NotificacioService {
 	 * @return La notificació amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	NotificacioDtoV2 findAmbId(
-			Long id,
-			boolean isAdministrador);
+	NotificacioDtoV2 findAmbId(Long id, boolean isAdministrador);
 
 	/**
 	 * Consulta una notificació donat el seu id.
@@ -112,9 +96,7 @@ public interface NotificacioService {
 	 * @return La notificació amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	NotificacioInfoDto findNotificacioInfo(
-			Long id,
-			boolean isAdministrador);
+	NotificacioInfoDto findNotificacioInfo(Long id, boolean isAdministrador);
 
 	/**
 	 * Consulta de les notificacions segons els paràmetres del filtre.
@@ -126,20 +108,10 @@ public interface NotificacioService {
 	 * @return La pàgina amb les notificacions.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(
-			Long entitatId,
-			RolEnumDto rol,
-			String organGestorCodi,
-			String usuariCodi,
-			NotificacioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams);
+	PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioFiltreDto filtre, PaginacioParamsDto paginacioParams);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	List<Long> findIdsAmbFiltre(Long entitatId,
-								RolEnumDto rol,
-								String organGestorCodi,
-								String usuariCodi,
-								NotificacioFiltreDto filtre);
+	List<Long> findIdsAmbFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioFiltreDto filtre);
 	
 	/**
 	 * Consulta els nivells d'administració disponibles dins DIR3.
@@ -147,7 +119,7 @@ public interface NotificacioService {
 	 * @return Una llista amb el codi i el nom de la l'administració.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<CodiValorDto> llistarNivellsAdministracions();
+	List<CodiValorDto> llistarNivellsAdministracions();
 	
 	
 	/**
@@ -156,7 +128,7 @@ public interface NotificacioService {
 	 * @return Una llista amb el codi i el nom de la comunitat autònoma.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<CodiValorDto> llistarComunitatsAutonomes();
+	List<CodiValorDto> llistarComunitatsAutonomes();
 	
 	/**
 	 * Consulta els paisos disponibles dins DIR3.
@@ -164,7 +136,7 @@ public interface NotificacioService {
 	 * @return Una llista amb el codi i el nom de la localitat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<PaisosDto> llistarPaisos();
+	List<PaisosDto> llistarPaisos();
 	
 	
 	/**
@@ -173,7 +145,7 @@ public interface NotificacioService {
 	 * @return Una llista amb el codi i el nom de la provincia.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<ProvinciesDto> llistarProvincies();
+	List<ProvinciesDto> llistarProvincies();
 	
 	/**
 	 * Consulta les provincies.
@@ -193,7 +165,7 @@ public interface NotificacioService {
 	 * @return Una llista amb el codi i el nom de la localitat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<LocalitatsDto> llistarLocalitats(String codiProvincia);
+	List<LocalitatsDto> llistarLocalitats(String codiProvincia);
 	
 	
 	
@@ -205,84 +177,63 @@ public interface NotificacioService {
 	 * @return els events trobats.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public List<NotificacioEventDto> eventFindAmbNotificacio(
-			Long entitatId,
-			Long notificacioId);
+	List<NotificacioEventDto> eventFindAmbNotificacio(Long entitatId, Long notificacioId);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public List<NotificacioAuditDto> historicFindAmbNotificacio(
-			Long entitatId,
-			Long notificacioId);
+	List<NotificacioAuditDto> historicFindAmbNotificacio(Long entitatId, Long notificacioId);
 	
 	/**
 	 * Consulta l'últim event de callback d'una d'una notificació.
 	 * 
-	 * @param notificacioId
-	 *            Atribut id de la notificació.
+	 * @param notificacioId Atribut id de la notificació.
 	 * @return últim event de la notificació.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public NotificacioEventDto findUltimEventCallbackByNotificacio(Long notificacioId);
+	NotificacioEventDto findUltimEventCallbackByNotificacio(Long notificacioId);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public NotificacioEventDto findUltimEventRegistreByNotificacio(Long notificacioId);
+	NotificacioEventDto findUltimEventRegistreByNotificacio(Long notificacioId);
 	
 	/**
 	 * Consulta dels events del destinatari d'una notificació.
 	 * 
-	 * @param notificacioId
-	 *            Atribut id de la notificació.
-	 * @param enviamentId
-	 *            Atribut id de l'enviament.
+	 * @param notificacioId Atribut id de la notificació.
+	 * @param enviamentId Atribut id de l'enviament.
 	 * @return els destinataris trobats.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public List<NotificacioEventDto> eventFindAmbEnviament(
-			Long entitatId,
-			Long notificacioId,
-			Long enviamentId);
+	List<NotificacioEventDto> eventFindAmbEnviament(Long entitatId, Long notificacioId, Long enviamentId);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public List<NotificacioEnviamentAuditDto> historicFindAmbEnviament(
-			Long entitatId,
-			Long notificacioId,
-			Long enviamentId);
+	List<NotificacioEnviamentAuditDto> historicFindAmbEnviament(Long entitatId, Long notificacioId, Long enviamentId);
 	
 	/**
 	 * Retorna l'arxiu del document de la notificació.
 	 * 
-	 * @param notificacioId
-	 *            Atribut id de la notificació.
+	 * @param notificacioId Atribut id de la notificació.
 	 * @return el fitxer associat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_CARPETA')")
-	public ArxiuDto getDocumentArxiu(
-			Long notificacioId);
+	ArxiuDto getDocumentArxiu(Long notificacioId);
 
 	/**
 	 * Retorna l'arxiu del document de la notificació.
 	 *
-	 * @param notificacioId
-	 *            Atribut id de la notificació.
-	 * @param documentId
-	 *            Atribut id del document.
+	 * @param notificacioId Atribut id de la notificació.
+	 * @param documentId Atribut id del document.
 	 * @return el fitxer associat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_CARPETA')")
-	public ArxiuDto getDocumentArxiu(
-			Long notificacioId,
-			Long documentId);
+	ArxiuDto getDocumentArxiu(Long notificacioId, Long documentId);
 	
 	/**
 	 * Retorna l'arxiu de la certificació d'un enviament.
 	 * 
-	 * @param enviamentId
-	 *            Atribut id de l'enviament.
+	 * @param enviamentId Atribut id de l'enviament.
 	 * @return el fitxer de certificació associat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_CARPETA')")
-	public ArxiuDto enviamentGetCertificacioArxiu(
-			Long enviamentId);
+	ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
     void refrescarEstatEnviamentASir(Long enviamentId);
@@ -290,8 +241,7 @@ public interface NotificacioService {
     /**
 	 * Prova de fer l'enviament d'una notificació pendent.
 	 * 
-	 * @param notificacioId
-	 *            Atribut id de la notificació.
+	 * @param notificacioId Atribut id de la notificació.
 	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
@@ -300,8 +250,7 @@ public interface NotificacioService {
 	/**
 	 * Registra i notifica una notificació
 	 * 
-	 * @param notificacioId
-	 *            Atribut id de la notificació.
+	 * @param notificacioId Atribut id de la notificació.
 	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
 	 * @throws RegistreNotificaException 
 	 */
@@ -311,56 +260,43 @@ public interface NotificacioService {
 	/**
 	 * Refresca l'estat d'un enviament (datat i certificació).
 	 * 
-	 * @param enviamentId
-	 *            Atribut id de l'enviament.
+	 * @param enviamentId Atribut id de l'enviament.
 	 * @return l'estat de l'enviament.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(
-			Long entitatId,
-			Long enviamentId);
+	NotificacioEnviamenEstatDto enviamentRefrescarEstat(Long entitatId, Long enviamentId);
 
 	/**
 	 * Marca com a processada una notificació de forma manual.
 	 * 
-	 * @param notificacioId
-	 *            	Atribut id de la notificació que es vol processar.
-	 * @param motiu
-	 *         		el motiu per el que es vol marcar la notificació com a processada.
+	 * @param notificacioId Atribut id de la notificació que es vol processar.
+	 * @param motiu el motiu per el que es vol marcar la notificació com a processada.
 	 * @param isAdministrador Indica si l'usuari actual és administrador d'entitat
 	 * @return l'estat de l'enviament.
 	 * @throws Exception
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	String marcarComProcessada(
-			Long notificacioId,
-			String motiu,
-			boolean isAdministrador) throws Exception;
+	String marcarComProcessada(Long notificacioId, String motiu, boolean isAdministrador) throws Exception;
 
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	PaginaDto<NotificacioDto> findWithCallbackError(
-			NotificacioErrorCallbackFiltreDto filtre,
-			PaginacioParamsDto paginacioParams);
-	
+	PaginaDto<NotificacioDto> findWithCallbackError(NotificacioErrorCallbackFiltreDto filtre, PaginacioParamsDto paginacioParams);
 	/**
 	 * Reactiva les consultes d'estat a Notifica.
 	 * 
-	 * @param notificacioId
-	 *            Atribut id de la notificació.
+	 * @param notificacioId Atribut id de la notificació.
 	 * @return true si les consultes d'estat a notifica s'ha pogut reactivar o false en cas contrari.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public boolean reactivarConsulta(Long notificacioId);
+	boolean reactivarConsulta(Long notificacioId);
 	
 	/**
 	 * Reactiva les consultes d'estat a SIR.
 	 * 
-	 * @param notificacioId
-	 *            Atribut id de la notificació.
+	 * @param notificacioId Atribut id de la notificació.
 	 * @return true si les consultes d'estat a SIR s'ha pogut reactivar o false en cas contrari.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public boolean reactivarSir(Long notificacioId);
+	boolean reactivarSir(Long notificacioId);
 	
 	
 
@@ -378,15 +314,10 @@ public interface NotificacioService {
 	List<Long> getNotificacionsPendentsRefrescarEstatRegistre();
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(
-			Long entitatId,
-			NotificacioRegistreErrorFiltreDto filtre,
-			PaginacioParamsDto paginacioDtoFromRequest);
+	PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre, PaginacioParamsDto paginacioDtoFromRequest);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	List<Long> findNotificacionsIdAmbErrorRegistre(
-			Long entitatId,
-			NotificacioRegistreErrorFiltreDto filtre);
+	List<Long> findNotificacionsIdAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre);
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	void reactivarRegistre(Long notificacioId);
@@ -397,8 +328,7 @@ public interface NotificacioService {
 	/**
 	 * Consulta les administracions disponibles dins DIR3 a partir del codi.
 	 * 
-	 * @param text 
-	 * 				Text per la cerca
+	 * @param text Text per la cerca
 	 * @return Una llista amb les administracions cercades.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
@@ -407,8 +337,7 @@ public interface NotificacioService {
 	/**
 	 * Consulta les administracions disponibles dins DIR3 a partir de la denominació.
 	 * 
-	 * @param denominacio
-	 * 				denominacio per a filtrar
+	 * @param denominacio denominacio per a filtrar
 	 * @return Una llista amb les administracions cercades.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")

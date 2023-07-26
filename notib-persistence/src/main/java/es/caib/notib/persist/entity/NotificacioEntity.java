@@ -1,6 +1,7 @@
 package es.caib.notib.persist.entity;
 
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
@@ -65,7 +66,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	protected NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	
 	@Column(name = "env_tipus", nullable = false)
-	protected NotificaEnviamentTipusEnumDto enviamentTipus;
+	protected EnviamentTipus enviamentTipus;
 	
 	@Column(name = "env_data_prog")
 	@Temporal(TemporalType.DATE)
@@ -432,7 +433,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String emisorDir3Codi,
 			OrganGestorEntity organGestor,
 			NotificacioComunicacioTipusEnumDto comunicacioTipus,
-			NotificaEnviamentTipusEnumDto enviamentTipus,
+			EnviamentTipus enviamentTipus,
 			String concepte,
 			String descripcio,
 			Date enviamentDataProgramada,
@@ -484,7 +485,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String emisorDir3Codi,
 			OrganGestorEntity organGestor,
 			NotificacioComunicacioTipusEnumDto comunicacioTipus,
-			NotificaEnviamentTipusEnumDto enviamentTipus,
+			EnviamentTipus enviamentTipus,
 			String concepte,
 			String descripcio,
 			Date enviamentDataProgramada,
@@ -529,7 +530,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String emisorDir3Codi,
 				OrganGestorEntity organGestor,
 				NotificacioComunicacioTipusEnumDto comunicacioTipus,
-				NotificaEnviamentTipusEnumDto enviamentTipus,
+				EnviamentTipus enviamentTipus,
 				String concepte,
 				String descripcio,
 				Date enviamentDataProgramada,
@@ -670,17 +671,16 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	}
 
 	public boolean isComunicacioSir() { // Per al mapping al DTO
-//		if (!NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(this.getEnviamentTipus())) {
-//			return false;
-//		}
-//
-//		for(NotificacioEnviamentEntity enviament : this.getEnviaments()) {
-//			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
-//				return false;
-//			}
-//		}
-//		return true;
-		return NotificaEnviamentTipusEnumDto.SIR.equals(this.getEnviamentTipus());
+		if (!EnviamentTipus.COMUNICACIO.equals(this.getEnviamentTipus())) {
+			return false;
+		}
+
+		for(NotificacioEnviamentEntity enviament : this.getEnviaments()) {
+			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
+				return false;
+			}
+		}
+		return EnviamentTipus.SIR.equals(this.getEnviamentTipus());
 	}
 
 	@PreRemove

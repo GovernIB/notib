@@ -3,7 +3,7 @@
  */
 package es.caib.notib.logic.intf.dto.notificacio;
 
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +23,7 @@ public class NotificacioFiltreDto implements Serializable {
 	private Long notMassivaId;
 	private Long entitatId;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
-	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	private EnviamentTipus enviamentTipus;
 	private NotificacioEstatEnumDto estat;
 	private String concepte;
 	private Date dataInici;

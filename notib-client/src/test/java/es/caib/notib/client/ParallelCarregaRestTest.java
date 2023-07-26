@@ -3,13 +3,13 @@ package es.caib.notib.client;
 import es.caib.notib.client.domini.DadesConsulta;
 import es.caib.notib.client.domini.DocumentV2;
 import es.caib.notib.client.domini.EntregaDeh;
-import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentReferenciaV2;
 import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.client.domini.EnviamentV2;
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.client.domini.NotificaServeiTipusEnumDto;
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.NotificacioV2;
-import es.caib.notib.client.domini.Persona;
+import es.caib.notib.client.domini.PersonaV2;
 import es.caib.notib.client.domini.RespostaAltaV2;
 import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
@@ -114,10 +114,10 @@ public class ParallelCarregaRestTest {
                     .enviamentTipus(EnviamentTipus.NOTIFICACIO)
                     .usuariCodi("e18225486x")
 //                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
-                    .destinataris(Arrays.asList(new Persona[][]{
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build(),
-                                    Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build() },
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
+                    .destinataris(Arrays.asList(new PersonaV2[][]{
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build(),
+                                    PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build() },
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
                     .build();
 
             String id;
@@ -143,8 +143,8 @@ public class ParallelCarregaRestTest {
                     .enviamentTipus(EnviamentTipus.NOTIFICACIO)
                     .usuariCodi("e18225486x")
 //                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
-                    .destinataris(Arrays.asList(new Persona[][]{
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build() }}))
+                    .destinataris(Arrays.asList(new PersonaV2[][]{
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build() }}))
                     .build();
 
             String id;
@@ -169,9 +169,9 @@ public class ParallelCarregaRestTest {
                     .enviamentTipus(EnviamentTipus.NOTIFICACIO)
                     .usuariCodi("e18225486x")
 //                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
-                    .destinataris(Arrays.asList(new Persona[][]{
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build() },
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
+                    .destinataris(Arrays.asList(new PersonaV2[][]{
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build() },
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
                     .build();
 
             String id;
@@ -196,10 +196,10 @@ public class ParallelCarregaRestTest {
                     .enviamentTipus(EnviamentTipus.NOTIFICACIO)
                     .usuariCodi("e18225486x")
 //                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
-                    .destinataris(Arrays.asList(new Persona[][]{
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build()},
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build()},
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build()}}))
+                    .destinataris(Arrays.asList(new PersonaV2[][]{
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build()},
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build()},
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build()}}))
                     .build();
 
             String id;
@@ -224,10 +224,10 @@ public class ParallelCarregaRestTest {
                     .enviamentTipus(EnviamentTipus.COMUNICACIO)
                     .usuariCodi("e18225486x")
 //                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
-                    .destinataris(Arrays.asList(new Persona[][]{
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build(),
-                                    Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build() },
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
+                    .destinataris(Arrays.asList(new PersonaV2[][]{
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build(),
+                                    PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build() },
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
                     .build();
 
             String id;
@@ -252,8 +252,8 @@ public class ParallelCarregaRestTest {
                     .enviamentTipus(EnviamentTipus.COMUNICACIO)
                     .usuariCodi("e18225486x")
 //                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
-                    .destinataris(Arrays.asList(new Persona[][]{
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build() }}))
+                    .destinataris(Arrays.asList(new PersonaV2[][]{
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build() }}))
                     .build();
 
             String id;
@@ -278,9 +278,9 @@ public class ParallelCarregaRestTest {
                     .enviamentTipus(EnviamentTipus.COMUNICACIO)
                     .usuariCodi("e18225486x")
 //                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
-                    .destinataris(Arrays.asList(new Persona[][]{
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build() },
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
+                    .destinataris(Arrays.asList(new PersonaV2[][]{
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build() },
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
                     .build();
 
             String id;
@@ -305,10 +305,10 @@ public class ParallelCarregaRestTest {
                     .enviamentTipus(EnviamentTipus.COMUNICACIO)
                     .usuariCodi("e18225486x")
 //                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
-                    .destinataris(Arrays.asList(new Persona[][]{
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build(),
-                                    Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build() },
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
+                    .destinataris(Arrays.asList(new PersonaV2[][]{
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build(),
+                                    PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build() },
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
                     .build();
 
             String id;
@@ -333,10 +333,10 @@ public class ParallelCarregaRestTest {
                     .enviamentTipus(EnviamentTipus.NOTIFICACIO)
                     .usuariCodi("e18225486x")
 //                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
-                    .destinataris(Arrays.asList(new Persona[][]{
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build(),
-                                    Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build() },
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
+                    .destinataris(Arrays.asList(new PersonaV2[][]{
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build(),
+                                    PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build() },
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
                     .build();
 
             String id;
@@ -361,10 +361,10 @@ public class ParallelCarregaRestTest {
                     .enviamentTipus(EnviamentTipus.NOTIFICACIO)
                     .usuariCodi("e18225486x")
 //                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
-                    .destinataris(Arrays.asList(new Persona[][]{
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build(),
-                                    Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build() },
-                            {   Persona.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
+                    .destinataris(Arrays.asList(new PersonaV2[][]{
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build(),
+                                    PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build() },
+                            {   PersonaV2.builder().interessatTipus(InteressatTipus.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
                     .build();
 
             String id;
@@ -429,8 +429,8 @@ public class ParallelCarregaRestTest {
 
             notificacio.setDocument(document);
             notificacio.setProcedimentCodi(infoNot.getProcedimentCodi());
-            for (Persona[] persones: infoNot.getDestinataris()) {
-                Enviament enviament = new Enviament();
+            for (PersonaV2[] persones: infoNot.getDestinataris()) {
+                EnviamentV2 enviament = new EnviamentV2();
                 enviament.setTitular(persones[0]);
                 if (persones.length > 1) {
                     enviament.getDestinataris().add(persones[1]);
@@ -439,7 +439,7 @@ public class ParallelCarregaRestTest {
                 entregaDeh.setObligat(false);
                 entregaDeh.setProcedimentCodi(infoNot.getProcedimentCodi());
                 enviament.setEntregaDeh(entregaDeh);
-                enviament.setServeiTipus(NotificaServeiTipusEnumDto.NORMAL);
+                enviament.setServeiTipus(ServeiTipus.NORMAL);
                 notificacio.getEnviaments().add(enviament);
             }
             return notificacio;
@@ -458,7 +458,7 @@ public class ParallelCarregaRestTest {
             private String docUuid;
             private String docCsv;
             //            private NotificaDomiciliConcretTipusEnumDto tipusEntregaPostal; // --> No fem proves amb entrega postal
-            private List<Persona[]> destinataris;
+            private List<PersonaV2[]> destinataris;
         }
     }
 

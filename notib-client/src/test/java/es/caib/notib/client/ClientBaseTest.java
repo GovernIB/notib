@@ -84,8 +84,8 @@ public class ClientBaseTest {
 		notificacio.setDocument(document);
 		notificacio.setProcedimentCodi(ambEnviamentPostal ? IDENTIFICADOR_PROCEDIMENT_CIE : IDENTIFICADOR_PROCEDIMENT);
 		for (int i = 0; i < numDestinataris; i++) {
-			Enviament enviament = new Enviament();
-			Persona titular = new Persona();
+			EnviamentV2 enviament = new EnviamentV2();
+			PersonaV2 titular = new PersonaV2();
 			titular.setNom("Siòn");
 			titular.setLlinatge1("Andreu");
 			titular.setLlinatge2("Nadal");
@@ -99,7 +99,7 @@ public class ClientBaseTest {
 				titular.setDir3Codi(ENTITAT_DIR3CODI);
 			}
 			enviament.setTitular(titular);
-			Persona destinatari = new Persona();
+			PersonaV2 destinatari = new PersonaV2();
 			destinatari.setNom("melcior");
 			destinatari.setLlinatge1("Andreu");
 			destinatari.setLlinatge2("Nadal");
@@ -115,7 +115,7 @@ public class ClientBaseTest {
 				enviament.getDestinataris().add(destinatari);
 			}
 			if (ambEnviamentPostal) {
-				EntregaPostal entregaPostal = new EntregaPostal();
+				EntregaPostalV2 entregaPostal = new EntregaPostalV2();
 				if (NotificaDomiciliConcretTipus.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {
 					entregaPostal.setTipus(TIPUS_ENTREGA_POSTAL);
 					entregaPostal.setLinea1("linea1_" + i);
@@ -147,7 +147,7 @@ public class ClientBaseTest {
 			entregaDeh.setObligat(true);
 			entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 			enviament.setEntregaDeh(entregaDeh);
-			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+			enviament.setServeiTipus(ServeiTipus.URGENT);
 			notificacio.getEnviaments().add(enviament);
 		}
 		return notificacio;
@@ -288,8 +288,8 @@ public class ClientBaseTest {
 			}
 
 			for (int h = 0; h < numDestinataris; h++) {
-				Enviament enviament = new Enviament();
-				Persona titular = new Persona();
+				EnviamentV2 enviament = new EnviamentV2();
+				PersonaV2 titular = new PersonaV2();
 				titular.setNom("Siòn");
 				titular.setLlinatge1("Andreu");
 				titular.setLlinatge2("Nadal");
@@ -303,7 +303,7 @@ public class ClientBaseTest {
 					titular.setInteressatTipus(InteressatTipus.FISICA);
 				}
 				enviament.setTitular(titular);
-				Persona destinatari = new Persona();
+				PersonaV2 destinatari = new PersonaV2();
 				destinatari.setNom("melcior");
 				destinatari.setLlinatge1("Andreu");
 				destinatari.setLlinatge2("Nadal");
@@ -318,7 +318,7 @@ public class ClientBaseTest {
 				}
 				enviament.getDestinataris().add(destinatari);
 				if (ambEnviamentPostal) {
-					EntregaPostal entregaPostal = new EntregaPostal();
+					EntregaPostalV2 entregaPostal = new EntregaPostalV2();
 					if (NotificaDomiciliConcretTipus.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {
 						entregaPostal.setTipus(TIPUS_ENTREGA_POSTAL);
 						entregaPostal.setLinea1("linea1_" + h);
@@ -350,7 +350,7 @@ public class ClientBaseTest {
 				entregaDeh.setObligat(true);
 				entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 				enviament.setEntregaDeh(entregaDeh);
-				enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+				enviament.setServeiTipus(ServeiTipus.URGENT);
 				notificacio.getEnviaments().add(enviament);
 			}
 
@@ -432,8 +432,8 @@ public class ClientBaseTest {
 		}
 
 		for (int h = 0; h < numDestinataris; h++) {
-			Enviament enviament = new Enviament();
-			Persona titular = new Persona();
+			EnviamentV2 enviament = new EnviamentV2();
+			PersonaV2 titular = new PersonaV2();
 			titular.setNom("Siòn");
 			titular.setLlinatge1("Andreu");
 			titular.setLlinatge2("Nadal");
@@ -447,7 +447,7 @@ public class ClientBaseTest {
 				titular.setInteressatTipus(InteressatTipus.FISICA);
 			}
 			enviament.setTitular(titular);
-			Persona destinatari = new Persona();
+			PersonaV2 destinatari = new PersonaV2();
 			destinatari.setNom("melcior");
 			destinatari.setLlinatge1("Andreu");
 			destinatari.setLlinatge2("Nadal");
@@ -462,7 +462,7 @@ public class ClientBaseTest {
 			}
 			enviament.getDestinataris().add(destinatari);
 			if (ambEnviamentPostal) {
-				EntregaPostal entregaPostal = new EntregaPostal();
+				EntregaPostalV2 entregaPostal = new EntregaPostalV2();
 				if (NotificaDomiciliConcretTipus.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {
 					entregaPostal.setTipus(TIPUS_ENTREGA_POSTAL);
 					entregaPostal.setLinea1("linea1_" + h);
@@ -494,7 +494,7 @@ public class ClientBaseTest {
 			entregaDeh.setObligat(true);
 			entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 			enviament.setEntregaDeh(entregaDeh);
-			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+			enviament.setServeiTipus(ServeiTipus.URGENT);
 			notificacio.getEnviaments().add(enviament);
 		}
 
@@ -580,8 +580,8 @@ public class ClientBaseTest {
 		notificacio.setProcedimentCodi(ambEnviamentPostal ? IDENTIFICADOR_PROCEDIMENT_CIE : IDENTIFICADOR_PROCEDIMENT);
 
 		for (int i = 0; i < numEnviaments; i++) {
-			Enviament enviament = new Enviament();
-			Persona titular = new Persona();
+			EnviamentV2 enviament = new EnviamentV2();
+			PersonaV2 titular = new PersonaV2();
 			if (ambTipusInteressat) {
 				titular.setInteressatTipus(InteressatTipus.FISICA);
 			} else {
@@ -595,10 +595,10 @@ public class ClientBaseTest {
 			titular.setEmail("titular@gmail.com");
 			enviament.setTitular(titular);
 
-			List<Persona> destinataris = new ArrayList<Persona>();
+			List<PersonaV2> destinataris = new ArrayList<PersonaV2>();
 
 			for (int k = 0; k < numDestinataris; k++) {
-				Persona destinatari = new Persona();
+				PersonaV2 destinatari = new PersonaV2();
 				if (ambTipusInteressat) {
 					destinatari.setInteressatTipus(InteressatTipus.FISICA);
 				} else {
@@ -615,7 +615,7 @@ public class ClientBaseTest {
 			enviament.getDestinataris().addAll(destinataris);
 			if (ambEnviamentPostal) {
 				enviament.setEntregaPostalActiva(true);
-				EntregaPostal entregaPostal = new EntregaPostal();
+				EntregaPostalV2 entregaPostal = new EntregaPostalV2();
 				entregaPostal.setTipus(tipusEnviamentPostal);
 				if (tipusEnviamentPostal.equals(NotificaDomiciliConcretTipus.ESTRANGER)) {
 					entregaPostal.setPaisCodi("FR");
@@ -656,7 +656,7 @@ public class ClientBaseTest {
 				entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 				enviament.setEntregaDeh(entregaDeh);
 			}
-			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+			enviament.setServeiTipus(ServeiTipus.URGENT);
 			notificacio.getEnviaments().add(enviament);
 		}
 
