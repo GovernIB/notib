@@ -27,6 +27,7 @@ public class SmJmsConfig {
 
     @Bean // Serialize message content to json using TextMessage
     public MessageConverter jacksonJmsMessageConverter() {
+
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
         converter.setTargetType(MessageType.TEXT);
         converter.setTypeIdPropertyName("_type");
@@ -34,8 +35,8 @@ public class SmJmsConfig {
     }
 
     @Bean
-    public JmsListenerContainerFactory<?> jmsFactory(ConnectionFactory connectionFactory,
-                                                    DefaultJmsListenerContainerFactoryConfigurer configurer) {
+    public JmsListenerContainerFactory<?> jmsFactory(ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
+
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         // This provides all auto-configured defaults to this factory, including the message converter
 //        factory.setSessionTransacted(true);
@@ -47,6 +48,7 @@ public class SmJmsConfig {
 
     @Bean(initMethod = "start", destroyMethod = "stop")
     public BrokerService broker() throws Exception {
+
         final BrokerService broker = new BrokerService();
         broker.addConnector("vm://localhost");
         PersistenceAdapter persistenceAdapter = new KahaDBPersistenceAdapter();

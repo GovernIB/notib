@@ -44,6 +44,7 @@ public class EnviamentRegistreListener {
     public void receiveEnviamentRegistre(@Payload EnviamentRegistreRequest enviamentRegistreRequest,
                                          @Headers MessageHeaders headers,
                                          Message message) throws JMSException, RegistreNotificaException, InterruptedException {
+
         var enviamentUuid = enviamentRegistreRequest.getEnviamentUuid();
         log.debug("[SM] Rebut enviament de registre <" + enviamentUuid + ">");
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentRegistreRequest.getEnviamentUuid()).orElseThrow();
@@ -56,7 +57,7 @@ public class EnviamentRegistreListener {
             boolean registreSuccess = registreSmHelper.registrarEnviament(enviament, numIntent);
 
             // Actualitzar notificació
-            if (notificacioEnviamentRepository.areEnviamentsNotificacioRegistrats(notificacio.getId())) {
+            if (notificacioEnviamentRepository.areEnviamentsRegistrats(notificacio.getId()) == 1) {
                 var isSir = notificacio.isComunicacioSir();
                 notificacio.updateEstat(isSir ? NotificacioEstatEnumDto.ENVIADA : NotificacioEstatEnumDto.REGISTRADA);
 

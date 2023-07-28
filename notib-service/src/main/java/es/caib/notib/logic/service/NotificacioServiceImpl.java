@@ -932,7 +932,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		var timer = metricsHelper.iniciMetrica();
 		var resposta = new RespostaAccio<String>();
 		try {
-			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			var notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			notificacioEntity.getEnviaments().forEach(e -> {
 				EnviamentSmEstat estatEnviament = enviamentSmService.getEstatEnviament(e.getUuid());
 				try {
@@ -942,6 +942,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							resposta.getExecutades().add(e.getUuid());
 							break;
 						case REGISTRE_PENDENT:
+						case NOU:
 							enviamentSmService.registreEnviament(e.getUuid());
 							resposta.getExecutades().add(e.getUuid());
 							break;
@@ -1048,7 +1049,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		var timer = metricsHelper.iniciMetrica();
 		String resposta = null;
 		try {
-			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			var notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			ConfigHelper.setEntitatCodi(notificacioEntity.getEntitat().getCodi());
 			log.info("PRC >> Notificacio trobada");
 			if (!NotificacioEstatEnumDto.FINALITZADA.equals(notificacioEntity.getEstat())) {

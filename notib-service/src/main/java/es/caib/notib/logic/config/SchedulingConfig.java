@@ -337,9 +337,6 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
     }
 
-
-
-
     private long calcularDelay() {
 
         var cal = Calendar.getInstance();

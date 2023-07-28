@@ -14,7 +14,6 @@ import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.AnexoWsDto;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.InteresadoWsDto;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.EnviamentSirTipusDocumentEnviarEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
@@ -318,7 +317,7 @@ public abstract class EnviamentRegistreMapper {
         if (notificacio.getEntitat() != null) {
             configHelper.setEntitatCodi(notificacio.getEntitat().getCodi());
         }
-        var isComunicacioSir = NotificaEnviamentTipusEnumDto.SIR.equals(notificacio.getEnviamentTipus());
+        var isComunicacioSir = EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus());
         var isSirActivat = configHelper.getConfigAsBoolean("es.caib.notib.emprar.sir");
         var isSendDocumentsActive = configHelper.getConfigAsBoolean("es.caib.notib.plugin.registre.documents.enviar");
         var inclouDocuments = isSendDocumentsActive || (isSirActivat && isComunicacioSir);
@@ -485,7 +484,7 @@ public abstract class EnviamentRegistreMapper {
         if (enviament == null || enviament.getNotificacio() == null || enviament.getNotificacio().getEnviamentTipus() == null) {
             return null;
         }
-        return (NotificaEnviamentTipusEnumDto.NOTIFICACIO == enviament.getNotificacio().getEnviamentTipus() ? "Notificacio" : "Comunicacio") + " - " + enviament.getNotificacio().getConcepte();
+        return (EnviamentTipus.NOTIFICACIO == enviament.getNotificacio().getEnviamentTipus() ? "Notificacio" : "Comunicacio") + " - " + enviament.getNotificacio().getConcepte();
     }
 
     @Named("interessat")

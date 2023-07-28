@@ -75,6 +75,7 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
         transitions
                 // Registre
                 .withExternal().source(NOU).target(REGISTRE_PENDENT).event(RG_ENVIAR).guard(uuidGuard()).action(enviamentRegistreAction).and()
+                .withExternal().source(REGISTRE_PENDENT).target(REGISTRE_PENDENT).event(RG_ENVIAR).guard(uuidGuard()).action(enviamentRegistreAction).and()
                 .withExternal().source(REGISTRE_PENDENT).target(REGISTRAT).event(RG_SUCCESS).guard(uuidGuard()).and()
                 .withExternal().source(REGISTRE_PENDENT).target(REGISTRE_RETRY).event(RG_ERROR).guard(uuidGuard()).and()
                 .withChoice().source(REGISTRE_RETRY)
@@ -138,6 +139,7 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
 
     @Override
     public void configure(StateMachineConfigurationConfigurer<EnviamentSmEstat, EnviamentSmEvent> config) throws Exception {
+
         StateMachineListenerAdapter<EnviamentSmEstat, EnviamentSmEvent> adapter = new StateMachineListenerAdapter<>() {
             @Override
             public void stateChanged(State<EnviamentSmEstat, EnviamentSmEvent> from, State<EnviamentSmEstat, EnviamentSmEvent> to) {
@@ -145,18 +147,14 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
             }
         };
 
-        config
-                .withConfiguration()
-                    .listener(adapter)
-                    .taskScheduler(smTaskScheduler).and()
-                .withPersistence()
-                    .runtimePersister(stateMachineRuntimePersister);
+        config.withConfiguration().listener(adapter).taskScheduler(smTaskScheduler).and().withPersistence().runtimePersister(stateMachineRuntimePersister);
     }
 
     @Bean
     public StateMachineService<EnviamentSmEstat, EnviamentSmEvent> stateMachineService(
             StateMachineFactory<EnviamentSmEstat, EnviamentSmEvent> stateMachineFactory,
             StateMachineRuntimePersister<EnviamentSmEstat, EnviamentSmEvent, String> stateMachineRuntimePersister) {
+
         return new DefaultStateMachineService<>(stateMachineFactory, stateMachineRuntimePersister);
     }
 

@@ -13,6 +13,7 @@ import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.persist.entity.EntitatEntity;
@@ -536,6 +537,9 @@ public class PermisosServiceImpl implements PermisosService {
         List<String> codiFills;
         OrganGestorEntity organFill;
         for(var organ: organs) {
+            if (OrganGestorEstatEnum.E.equals(organ.getEstat())) {
+                continue;
+            }
             excloure = isOficinaOrganSir && Strings.isNullOrEmpty(organ.getOficina());
             if ((entitatPermesa || !organ.getCodi().equals(entitat.getDir3Codi())) && !excloure) {
                 resposta.add(CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build());

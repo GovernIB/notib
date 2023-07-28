@@ -5,10 +5,10 @@ package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
-import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.statemachine.mappers.EnviamentRegistreMapper;
@@ -44,6 +44,7 @@ public class RegistreSmHelper {
 	private final EnviamentRegistreMapper enviamentRegistreMapper;
 
 	public boolean registrarEnviament(NotificacioEnviamentEntity enviament, Integer numIntent) throws RegistreNotificaException {
+
 		log.info(" [REG] Assentament sortida (registre) per l'enviament " + enviament.getId());
 		long startTime = System.nanoTime();
 		var success = false;
@@ -52,8 +53,8 @@ public class RegistreSmHelper {
 		var entitat = notificacio.getEntitat();
 
 		var sirActivat = isSirActivat();
-		var enviamentSir = sirActivat && NotificaEnviamentTipusEnumDto.SIR.equals(notificacio.getEnviamentTipus());
-		var tipusOperacio = sirActivat ? (NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) ? 1L : 2L) : null; //### [SIR-DESACTIVAT = registre normal, SIR-ACTIVAT = notificació/comunicació]
+		var enviamentSir = sirActivat && EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus());
+		var tipusOperacio = sirActivat ? (EnviamentTipus.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) ? 1L : 2L) : null; //### [SIR-DESACTIVAT = registre normal, SIR-ACTIVAT = notificació/comunicació]
 
 		// Informació del monitor
 		var descInfo = "Inici procés registrar [Id: " + enviament.getId() + ", Estat: " + notificacio.getEstat() + "]";

@@ -47,30 +47,32 @@ public class EnviamentNotificaAction implements Action<EnviamentSmEstat, Enviame
     @Override
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 30000, multiplier = 10, maxDelay = 3600000))
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
+
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
 
         var notificacioRegistrada = enviament.getNotificacio().getEnviaments().stream().allMatch(e -> e.getRegistreData() != null);
-        if (notificacioRegistrada) {
-            jmsTemplate.convertAndSend(
-                    SmConstants.CUA_NOTIFICA,
-                    EnviamentNotificaRequest.builder()
-                            .enviamentNotificaDto(enviamentNotificaMapper.toDto(enviament))
-                            .numIntent(reintents + 1)
-                            .build(),
-                    m -> {
-                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));
-                        return m;
-                    });
-            log.debug("[SM] Enviada petició de notificació per l'enviament amb UUID " + enviamentUuid);
-        } else {
+        if (!notificacioRegistrada) {
             log.debug("[SM] Petició de notificació NO enviada degut a que no tots els enviaments estan registrats - enviament amb UUID " + enviamentUuid);
+            return;
         }
+        jmsTemplate.convertAndSend(
+                SmConstants.CUA_NOTIFICA,
+                EnviamentNotificaRequest.builder()
+                        .enviamentNotificaDto(enviamentNotificaMapper.toDto(enviament))
+                        .numIntent(reintents + 1)
+                        .build(),
+                m -> {
+                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));
+                    return m;
+                });
+        log.debug("[SM] Enviada petició de notificació per l'enviament amb UUID " + enviamentUuid);
     }
 
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
+
         log.error("[SM] Recover EnviamentNotificaAction", t);
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         log.error("[SM] Recover EnviamentNotificaAction de enviament amb uuid=" + enviamentUuid);

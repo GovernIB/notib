@@ -42,6 +42,7 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
     // No es pot injectar degut a error cíclic
     private EnviamentSmService enviamentSmService;
 
+
     @Override
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 30000, multiplier = 10, maxDelay = 3600000))
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
@@ -49,12 +50,11 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
 //        var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
 
-        jmsTemplate.convertAndSend(
-                SmConstants.CUA_REGISTRE,
+        jmsTemplate.convertAndSend(SmConstants.CUA_REGISTRE,
                 EnviamentRegistreRequest.builder()
-//                        .enviamentRegistreDto(enviamentRegistreMapper.toDto(enviament))
                         .enviamentUuid(enviamentUuid)
                         .numIntent(reintents + 1)
+//                        .enviamentRegistreDto(enviamentRegistreMapper.toDto(enviament))
                         .build(),
                 m -> {
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));
@@ -66,6 +66,7 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
 
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
+
         log.error("[SM] Recover EnviamentRegistreAction", t);
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         log.error("[SM] Recover EnviamentRegistreAction de enviament amb uuid=" + enviamentUuid);

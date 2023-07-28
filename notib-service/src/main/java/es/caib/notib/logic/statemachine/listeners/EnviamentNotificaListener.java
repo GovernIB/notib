@@ -36,6 +36,7 @@ public class EnviamentNotificaListener {
 
     private static Map<Long, Integer> notificacionsExecutades = new HashMap<>();
     public static synchronized boolean haDeExecutar(Long notificacioId, Integer intent) {
+
         var ultimIntent = notificacionsExecutades.get(notificacioId);
         if (ultimIntent == null || ultimIntent < intent) {
             notificacionsExecutades.put(notificacioId, intent);
@@ -52,6 +53,7 @@ public class EnviamentNotificaListener {
     public void receiveEnviamentNotifica(@Payload EnviamentNotificaRequest enviamentNotificaRequest,
                                          @Headers MessageHeaders headers,
                                          Message message) throws JMSException, InterruptedException {
+
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentNotificaRequest.getEnviamentNotificaDto().getUuid()).orElseThrow();
         var notificacio = enviament.getNotificacio();
         var numIntent = enviamentNotificaRequest.getNumIntent();

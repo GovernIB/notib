@@ -349,10 +349,11 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("visibleCarpeta") Boolean visibleCarpeta,
 			Pageable pageable);
 
-	@Query("from NotificacioEnviamentEntity where notificaReferencia = :enviamentUuid")
+	@Query(value = "from NotificacioEnviamentEntity where notificaReferencia = :enviamentUuid")
 	Optional<NotificacioEnviamentEntity> findByUuid(@Param("enviamentUuid") String enviamentUuid);
 
-	@Query("select count(e.id) = 0 from NotificacioEnviamentEntity e where e.notificacio.id = :notificacioId and e.registreData is null")
-	boolean areEnviamentsNotificacioRegistrats(@Param("notificacioId") Long notificacioId);
+//	@Query(value = "select count(e.id) = 0 from not_notificacio e where e.notificacio.id = :notificacioId and e.registre_data is null", nativeQuery = true)
+	@Query(value = "select CASE WHEN count(e.id) = 0 THEN 1 ELSE 0 END from NOT_NOTIFICACIO_ENV e where e.NOTIFICACIO_ID = :notificacioId and e.registre_data is NULL", nativeQuery = true)
+	int areEnviamentsRegistrats(@Param("notificacioId") Long notificacioId);
 
 }
