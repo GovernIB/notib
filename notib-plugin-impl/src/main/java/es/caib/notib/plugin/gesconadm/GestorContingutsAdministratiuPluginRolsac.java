@@ -433,15 +433,13 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		GcaProcediment dto = new GcaProcediment();
 		dto.setCodiSIA(procediment.getCodigoSIA());
 		dto.setNom(procediment.getNombre());
-		dto.setUnitatAdministrativacodi(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
+		dto.setUnitatAdministrativacodi(getUnitatAdministrativa(procediment.getOrganResolutori().getCodigo()));
 		dto.setDataActualitzacio(procediment.getFechaActualizacion());
 		//Com que Procediment ens ve amb Boolean i al nostre sistema ho tenim amb boolean primitiu, si es null ho tractam com false:
 		if (procediment.getComun()!=null) 
 			dto.setComu(procediment.getComun().booleanValue());	
 		else 
 			dto.setComu(false);
-//		dto.setUnidadAdministrativa(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
-//		dto.setUnitatAdministrativaPare(getUnitatAdministrativaArrel(procediment.getUnidadAdministrativa().getCodigo()));
 		return dto;
 	}
 
@@ -462,13 +460,6 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		dto.setComu(servei.isComun());
 		return dto;
 	}
-
-//	private GdaUnitatAdministrativa toDto(UnitatAdministrativa unitat) {
-//		GdaUnitatAdministrativa dto = new GdaUnitatAdministrativa();
-//		dto.setCodiDir3(unitat.getCodigoDIR3());
-//		dto.setNom(unitat.getNombre());
-//		return dto;
-//	}
 
 	private Client generarClient() {
 		Client jerseyClient = Client.create();
