@@ -566,6 +566,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			if (isUsuari) { // && !procedimentsCodisNotib.isEmpty()) {
 				List<String> codisProcedimentsDisponibles = new ArrayList<>();
 				List<String> codisOrgansGestorsDisponibles = new ArrayList<>();
+				List<String> codisOrgansGestorsComunsDisponibles = new ArrayList<>();
 				List<String> codisProcedimentsOrgans = new ArrayList<>();
 
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -576,12 +577,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 				// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
 				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, PermisEnum.CONSULTA);
+				codisOrgansGestorsComunsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, PermisEnum.COMUNS);
 
 				// Procediments comuns que es poden consultar per a òrgans gestors concrets
 				codisProcedimentsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitatEntity.getId(), auth.getName(), PermisEnum.CONSULTA);
 
 				boolean esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
 				boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+				boolean esOrgansGestorsComunsCodisNotibNull = (codisOrgansGestorsComunsDisponibles == null || codisOrgansGestorsComunsDisponibles.isEmpty());
 				boolean esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
 
 				pageEnviaments = enviamentTableRepository.find4UserRole(
@@ -641,6 +644,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 						esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
 						esOrgansGestorsCodisNotibNull,
 						esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+						esOrgansGestorsComunsCodisNotibNull,
+						esOrgansGestorsComunsCodisNotibNull ? null : codisOrgansGestorsComunsDisponibles,
 						esProcedimentOrgansAmbPermisNull,
 						esProcedimentOrgansAmbPermisNull ? null : codisProcedimentsOrgans,
 						aplicacioService.findRolsUsuariActual(),

@@ -89,14 +89,33 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:isNotificaReferenciaNull = true or nenv.notificaReferencia like '%'||:notificaReferencia||'%') "+
 			"and (:esDataRegistreIniciNull = true or nenv.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or nenv.registreData <= :dataRegistreFi) " +
-			"and ((:esProcedimentsCodisNotibNull = false and nenv.procedimentCodiNotib is not null and nenv.procedimentCodiNotib in (:procedimentsCodisNotib))" +	// Té permís sobre el procediment
-			"	or (:isOrgansGestorsCodisNotibNull = false and nenv.organCodi is not null and " +
-			"			(nenv.procedimentCodiNotib is null or (nenv.procedimentIsComu = true and nenv.procedimentRequirePermission = false)) and nenv.organCodi in (:organsGestorsCodisNotib)" +
-			"		) " + // Té permís sobre l'òrgan
-			"   or ((nenv.procedimentCodiNotib is null or nenv.procedimentIsComu = true) and nenv.usuariCodi = :usuariCodi)" + // És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
-			"   or 	(:esProcedimentOrgansIdsNotibNull = false and nenv.procedimentCodiNotib is not null and " +
-			"			CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:procedimentOrgansIdsNotib)" +
-			"		) " +	// Procediment comú amb permís de procediment-òrgan
+			"and (" +
+			// PERMISOS
+			// Iniciada pel propi usuari
+			"	nenv.usuariCodi = :usuariCodi " +
+			// Té permís consulta sobre el procediment
+			"	or (:esProcedimentsCodisNotibNull = false and nenv.procedimentCodiNotib is not null " +
+			"			and nenv.procedimentCodiNotib in (:procedimentsCodisNotib) and nenv.procedimentIsComu = false) " +
+			// Té permís consulta sobre l'òrgan
+			"	or (:esOrgansGestorsCodisNotibNull = false and nenv.organCodi is not null " +
+			"			and (nenv.procedimentIsComu = false or nenv.procedimentRequirePermission = false) " +
+			"			and nenv.organCodi in (:organsGestorsCodisNotib)) " +
+			// Procediment comú amb permís comú sobre l'òrgan
+			"	or (:esOrgansGestorsComunsCodisNotibNull = false and nenv.organCodi is not null " +
+			"			and nenv.procedimentIsComu = true and nenv.procedimentRequirePermission = false " +
+			"			and nenv.organCodi in (:organsGestorsComunsCodisNotib)) " +
+			// Procediment comú amb permís de procediment-òrgan
+			"   or (:esProcedimentOrgansIdsNotibNull = false and nenv.procedimentCodiNotib is not null " +
+			"			and CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:procedimentOrgansIdsNotib)" +
+			"		) " +
+//			"(:esProcedimentsCodisNotibNull = false and nenv.procedimentCodiNotib is not null and nenv.procedimentCodiNotib in (:procedimentsCodisNotib))" +	// Té permís sobre el procediment
+//			"	or (:esOrgansGestorsCodisNotibNull = false and nenv.organCodi is not null and " +
+//			"			(nenv.procedimentCodiNotib is null or (nenv.procedimentIsComu = true and nenv.procedimentRequirePermission = false)) and nenv.organCodi in (:organsGestorsCodisNotib)" +
+//			"		) " + // Té permís sobre l'òrgan
+//			"   or ((nenv.procedimentCodiNotib is null or nenv.procedimentIsComu = true) and nenv.usuariCodi = :usuariCodi)" + // És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
+//			"   or 	(:esProcedimentOrgansIdsNotibNull = false and nenv.procedimentCodiNotib is not null and " +
+//			"			CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:procedimentOrgansIdsNotib)" +
+//			"		) " +	// Procediment comú amb permís de procediment-òrgan
 			") " +
 			"and (nenv.grupCodi = null or (nenv.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
@@ -162,8 +181,10 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("dataRegistreFi") Date dataRegistreFi,
 			@Param("esProcedimentsCodisNotibNull") boolean esProcedimentsCodisNotibNull,
 			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
-			@Param("isOrgansGestorsCodisNotibNull") boolean isOrgansGestorsCodisNotibNull,
+			@Param("esOrgansGestorsCodisNotibNull") boolean esOrgansGestorsCodisNotibNull,
 			@Param("organsGestorsCodisNotib") List<String> organsGestorsCodisNotib,
+			@Param("esOrgansGestorsComunsCodisNotibNull") boolean esOrgansGestorsComunsCodisNotibNull,
+			@Param("organsGestorsComunsCodisNotib") List<? extends String> organsGestorsComunsCodisNotib,
 			@Param("esProcedimentOrgansIdsNotibNull") boolean esProcedimentOrgansIdsNotibNull,
 			@Param("procedimentOrgansIdsNotib") List<String> procedimentOrgansIdsNotib,
 			@Param("grupsProcedimentCodisNotib") List<String> grupsProcedimentCodisNotib,
