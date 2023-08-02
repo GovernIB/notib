@@ -654,6 +654,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 			List<String> codisProcedimentsDisponibles = new ArrayList<>();
 			List<String> codisOrgansGestorsDisponibles = new ArrayList<>();
+			List<String> codisOrgansGestorsComunsDisponibles = new ArrayList<>();
 			List<String> codisProcedimentsOrgans = new ArrayList<>();
 
 			if (isUsuari && entitatActual != null) {
@@ -664,6 +665,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 				// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
 				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
+				codisOrgansGestorsComunsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatActual, PermisEnum.COMUNS);
 
 				// Procediments comuns que es poden consultar per a òrgans gestors concrets
 				codisProcedimentsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitatActual.getId(), auth.getName(), PermisEnum.CONSULTA);
@@ -674,6 +676,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 			boolean esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
 			boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+			boolean esOrgansGestorsComunsCodisNotibNull = (codisOrgansGestorsComunsDisponibles == null || codisOrgansGestorsComunsDisponibles.isEmpty());
 			boolean esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
 
 			if (filtre == null || filtre.isEmpty()) {
@@ -687,6 +690,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							aplicacioService.findRolsUsuariActual(),
 							esOrgansGestorsCodisNotibNull,
 							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+							esOrgansGestorsComunsCodisNotibNull,
+							esOrgansGestorsComunsCodisNotibNull ? null : codisOrgansGestorsComunsDisponibles,
 							esProcedimentOrgansAmbPermisNull,
 							esProcedimentOrgansAmbPermisNull ?  null : codisProcedimentsOrgans,
 							entitatActual,
@@ -722,6 +727,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							aplicacioService.findRolsUsuariActual(),
 							esOrgansGestorsCodisNotibNull,
 							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+							esOrgansGestorsComunsCodisNotibNull,
+							esOrgansGestorsComunsCodisNotibNull ? null : codisOrgansGestorsComunsDisponibles,
 							esProcedimentOrgansAmbPermisNull,
 							esProcedimentOrgansAmbPermisNull ?  null : codisProcedimentsOrgans,
 							filtreNetejat.getEnviamentTipus().isNull(),
@@ -730,8 +737,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getConcepte().isNull() ? "" : filtreNetejat.getConcepte().getField(),
 							filtreNetejat.getEstat().isNull(),
 							filtreNetejat.getEstat().isNull() ? 0 : filtreNetejat.getEstat().getField().getMask(),
-//							!filtreNetejat.getEstat().isNull() ?
-//									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
 							filtreNetejat.getDataInici().isNull(),
 							filtreNetejat.getDataInici().getField(),
 							filtreNetejat.getDataFi().isNull(),
