@@ -263,6 +263,17 @@ public class OrganGestorController extends BaseUserController{
 //		}
 //	}
 
+	@RequestMapping(value = "/{organGestorId}/sincronitzar/{lloc}", method = RequestMethod.GET)
+	public String sincronitzar(HttpServletRequest request, @PathVariable Long organGestorId, @PathVariable String lloc, Model model) {
+		String redirect = "ARBRE".equalsIgnoreCase(lloc) ? "redirect:../../../organgestorArbre" : "redirect:../../../organgestor";
+		try {
+			organGestorService.sincronitzar(organGestorId);
+			return getAjaxControllerReturnValueSuccess(request, redirect, "organgestor.controller.sincronitzada.ok");
+		} catch (Exception ex) {
+			return getAjaxControllerReturnValueError(request, redirect, "organgestor.controller.sincronitzada.ko");
+		}
+	}
+
 	@RequestMapping(value = "/sync/dir3", method = RequestMethod.GET)
 	public String syncDir3(HttpServletRequest request, Model model) {
 

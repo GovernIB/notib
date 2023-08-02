@@ -533,6 +533,26 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	}
 
 	@Override
+	@Transactional
+	public void sincronitzar(Long organGestorId) {
+		OrganGestorEntity organGestor = organGestorRepository.findOne(organGestorId);
+		if (organGestor == null) {
+			throw new NotFoundException(organGestorId, OrganGestorEntity.class);
+		}
+		NodeDir3 unitat = pluginHelper.unitatOrganitzativaFindByCodi(
+				organGestor.getEntitat().getCodi(),
+				organGestor.getCodi(),
+				null,
+				null);
+
+		if (unitat == null) {
+			organGestor.setEstat(OrganGestorEstatEnum.E);
+			return;
+		}
+		organGestorHelper.sincronizarUnitat(unitat, organGestor.getEntitat());
+	}
+
+	@Override
 	@Transactional(timeout = 3600)
 	@SuppressWarnings("unchecked")
 	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto) throws Exception {

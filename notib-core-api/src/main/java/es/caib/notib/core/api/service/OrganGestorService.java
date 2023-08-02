@@ -58,6 +58,9 @@ public interface OrganGestorService {
 	 */
 	void deleteHistoricSincronitzacio();
 
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	void sincronitzar(Long organGestorId);
+
 	/**
 	 * Actualitza els organs gestors de la base de dades amb els de Dir3
 	 *
@@ -242,4 +245,5 @@ public interface OrganGestorService {
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
     FitxerDto exportacio(Long entitatId) throws IOException;
+
 }

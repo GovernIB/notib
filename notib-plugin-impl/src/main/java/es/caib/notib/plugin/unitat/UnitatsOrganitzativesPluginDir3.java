@@ -138,7 +138,8 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			List<NodeDir3> unitats = new ArrayList<>();
 			List<UnitatOrganitzativa> unidades = new ArrayList<>();
-			URL url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerArbolUnidades?codigo=" + pareCodi + "&denominacionCooficial=false" +
+			URL url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerArbolUnidades?codigo=" + pareCodi +
+					"&denominacionCooficial=false" +
 					(dataActualitzacio != null ? "&fechaActualizacion=" + sdf.format(dataActualitzacio) : "") +
 					(dataSincronitzacio != null ? "&fechaSincronizacion=" + sdf.format(dataSincronitzacio) : ""));
 			byte[] response = getResponse(url);
@@ -172,6 +173,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 		try {
 			UnitatOrganitzativa unidad = null;
 			URL url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerUnidad?codigo=" + pareCodi +
+					"&denominacionCooficial=false" +
 					(dataActualitzacio != null ? "&fechaActualizacion=" + dataActualitzacio : "") +
 					(dataSincronitzacio != null ? "&fechaSincronizacion=" + dataSincronitzacio : ""));
 			byte[] response = getResponse(url);

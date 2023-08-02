@@ -1070,6 +1070,30 @@ public class PluginHelper {
 		}
 	}
 
+	public NodeDir3 unitatOrganitzativaFindByCodi(String entitatCodi, String codi, Date dataActualitzacio, Date dataSincronitzacio) {
+
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS,
+				"Consulta llista d'unitats donat un codi",
+				IntegracioAccioTipusEnumDto.ENVIAMENT,
+				new AccioParam("codi", codi),
+				new AccioParam("fechaActualizacion", dataActualitzacio == null ? null : dataActualitzacio.toString()),
+				new AccioParam("fechaSincronizacion", dataSincronitzacio == null ? null : dataSincronitzacio.toString()));
+		try {
+			configHelper.setEntitatCodi(entitatCodi);
+			info.setCodiEntitat(entitatCodi);
+			NodeDir3 unitatOrganitzativa = getUnitatsOrganitzativesPlugin().findAmbCodi(codi, dataActualitzacio, dataSincronitzacio);
+			integracioHelper.addAccioOk(info);
+			return unitatOrganitzativa;
+		} catch (SistemaExternException sex) {
+			throw sex;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'unitats organitzatives";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
+		}
+	}
+
 	/**
 	 * Remove from list unitats that are substituted by itself
 	 * for example if webservice returns two elements:
