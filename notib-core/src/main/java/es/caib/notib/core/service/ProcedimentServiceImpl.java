@@ -1135,6 +1135,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				}
 			}
 
+			procediments = new ArrayList<>(new HashSet<>(procediments));
 			Collections.sort(procediments, new Comparator<CodiValorOrganGestorComuDto>() {
 				@Override
 				public int compare(CodiValorOrganGestorComuDto p1, CodiValorOrganGestorComuDto p2) {
@@ -1220,12 +1221,16 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 	private List<CodiValorOrganGestorComuDto> recuperarProcedimentAmbPermis(EntitatEntity entitat, PermisEnum permis, String organFiltre) {
 
+		List<CodiValorOrganGestorComuDto> procedimentsAmbPermis = new ArrayList<>();
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<CodiValorOrganGestorComuDto> procediments = permisosService.getProcedimentsAmbPermis(entitat.getId(), auth.getName(), permis);
-		if (organFiltre == null) {
-			return procediments;
+		if (procediments == null || procediments.isEmpty()) {
+			return procedimentsAmbPermis;
 		}
-		List<CodiValorOrganGestorComuDto> procedimentsAmbPermis = new ArrayList<>();
+		if (organFiltre == null) {
+			procedimentsAmbPermis.addAll(procediments);
+			return procedimentsAmbPermis;
+		}
 		List<String> organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
 		for (CodiValorOrganGestorComuDto procediment: procediments) {
 			if (organsFills.contains(procediment.getOrganGestor()) || procediment.isComu()) {

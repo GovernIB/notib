@@ -82,6 +82,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1077,6 +1078,7 @@ ServeiServiceImpl implements ServeiService{
 				}
 			}
 
+			serveis = new ArrayList<>(new HashSet<>(serveis));
 			Collections.sort(serveis, new Comparator<CodiValorOrganGestorComuDto>() {
 				@Override
 				public int compare(CodiValorOrganGestorComuDto p1, CodiValorOrganGestorComuDto p2) {
@@ -1173,12 +1175,16 @@ ServeiServiceImpl implements ServeiService{
 	}
 
 	private List<CodiValorOrganGestorComuDto> recuperarServeiAmbPermis(EntitatEntity entitat, PermisEnum permis, String organFiltre) {
+		List<CodiValorOrganGestorComuDto> serveisAmbPermis = new ArrayList<>();
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<CodiValorOrganGestorComuDto> serveis = permisosService.getServeisAmbPermis(entitat.getId(), auth.getName(), permis);
-		if (organFiltre == null) {
-			return serveis;
+		if (serveis == null || serveis.isEmpty()) {
+			return serveisAmbPermis;
 		}
-		List<CodiValorOrganGestorComuDto> serveisAmbPermis = new ArrayList<>();
+		if (organFiltre == null) {
+			serveisAmbPermis.addAll(serveis);
+			return serveisAmbPermis;
+		}
 		List<String> organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
 		for (CodiValorOrganGestorComuDto servei: serveis) {
 			if (organsFills.contains(servei.getOrganGestor())) {
