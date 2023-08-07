@@ -62,6 +62,12 @@ public class ProcedimentServiceBean implements ProcedimentService {
 
     @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
+    public ProcSerDto updateManual(Long id, boolean manual) throws NotFoundException {
+        return delegate.updateManual(id, manual);
+    }
+
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcSerDto delete(
 			Long entitatId, 
 			Long id,

@@ -188,7 +188,8 @@ ServeiServiceImpl implements ServeiService{
 							servei.getCodiAssumpte(),
 							servei.getCodiAssumpteNom(),
 							servei.isComu(),
-							servei.isRequireDirectPermission());
+							servei.isRequireDirectPermission(),
+							servei.isManual());
 
 			if (servei.isEntregaCieActiva()) {
 				EntregaCieEntity entregaCie = new EntregaCieEntity(servei.getCieId(), servei.getOperadorPostalId());
@@ -300,7 +301,8 @@ ServeiServiceImpl implements ServeiService{
 						servei.getCodiAssumpte(),
 						servei.getCodiAssumpteNom(),
 						servei.isComu(),
-						servei.isRequireDirectPermission());
+						servei.isRequireDirectPermission(),
+						servei.isManual());
 			serveiRepository.save(serveiEntity);
 
 			if (!servei.isEntregaCieActiva() && entregaCie != null) {
@@ -346,7 +348,21 @@ ServeiServiceImpl implements ServeiService{
 		}
     }
 
-    @Audita(entityType = TipusEntitat.SERVEI, operationType = TipusOperacio.DELETE, returnType = TipusObjecte.DTO)
+	@Override
+	@Transactional
+	public ProcSerDto updateManual(Long id, boolean manual) throws NotFoundException {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Actualitzant propietat manual d'un servei existent (id=" + id + ", manual=" + manual + ")");
+			ServeiEntity serveiEntity = serveiRepository.findOne(id);
+			serveiEntity.updateManual(manual);
+			return conversioTipusHelper.convertir(serveiEntity, ProcSerDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Audita(entityType = TipusEntitat.SERVEI, operationType = TipusOperacio.DELETE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
 	public ProcSerDto delete(
@@ -731,6 +747,7 @@ ServeiServiceImpl implements ServeiService{
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
+							filtre.isManual(),
 							pageable);
 
 				} else if (isAdministrador) {
@@ -745,6 +762,7 @@ ServeiServiceImpl implements ServeiService{
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
+							filtre.isManual(),
 							pageable);
 
 				} else if (organGestorActual != null) { // Administrador d'òrgan
@@ -761,6 +779,7 @@ ServeiServiceImpl implements ServeiService{
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
+							filtre.isManual(),
 							pageable);
 
 				}

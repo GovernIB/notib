@@ -300,6 +300,17 @@ public class ServeiController extends BaseUserController{
 		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "servei.controller.desactivada.ok");
 	}
 
+	@RequestMapping(value = "/{serveiId}/sync_manual", method = RequestMethod.GET)
+	public String manual(HttpServletRequest request, @PathVariable Long serveiId) {
+		serveiService.updateManual(serveiId, true);
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "procediment.controller.manual.ok");
+	}
+	@RequestMapping(value = "/{serveiId}/sync_auto", method = RequestMethod.GET)
+	public String auto(HttpServletRequest request, @PathVariable Long serveiId) {
+		serveiService.updateManual(serveiId, false);
+		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "procediment.controller.auto.ok");
+	}
+
 	@RequestMapping(value = "/{codiSia}/update", method = RequestMethod.GET)
 	public String actualitzarProcediment(HttpServletRequest request, @PathVariable String codiSia) {
 

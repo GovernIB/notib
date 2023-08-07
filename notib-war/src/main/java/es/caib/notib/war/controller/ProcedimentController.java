@@ -324,6 +324,17 @@ public class ProcedimentController extends BaseUserController{
 		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "procediment.controller.desactivada.ok");
 	}
 
+	@RequestMapping(value = "/{procedimentId}/sync_manual", method = RequestMethod.GET)
+	public String manual(HttpServletRequest request, @PathVariable Long procedimentId) {
+		procedimentService.updateManual(procedimentId, true);
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "procediment.controller.manual.ok");
+	}
+	@RequestMapping(value = "/{procedimentId}/sync_auto", method = RequestMethod.GET)
+	public String auto(HttpServletRequest request, @PathVariable Long procedimentId) {
+		procedimentService.updateManual(procedimentId, false);
+		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "procediment.controller.auto.ok");
+	}
+
 	@RequestMapping(value = "/{codiSia}/update", method = RequestMethod.GET)
 	public String actualitzarProcediment(HttpServletRequest request, @PathVariable String codiSia) {
 

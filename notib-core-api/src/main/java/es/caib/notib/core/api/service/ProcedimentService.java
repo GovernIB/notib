@@ -63,6 +63,22 @@ public interface ProcedimentService {
 			boolean actiu) throws NotFoundException;
 
 	/**
+	 * Marca el procediment amb l'id especificat com a manual/auto.
+	 *
+	 * @param id
+	 *            Atribut id del procediment a activar.
+	 * @param manual
+	 *            true si es vol amb sincronització manual o false en cas contrari.
+	 * @return El procediment modificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	public ProcSerDto updateManual(
+			Long id,
+			boolean manual) throws NotFoundException;
+
+	/**
 	 * Esborra el procediment amb el mateix id que l'especificat.
 	 * 
 	 * @param id

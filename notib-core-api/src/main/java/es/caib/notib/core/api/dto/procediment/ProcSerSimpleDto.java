@@ -26,6 +26,7 @@ public class ProcSerSimpleDto extends AuditoriaDto implements Serializable{
 	private String codiAssumpte;
 	private String codiAssumpteNom;
 	private boolean comu;
+	private boolean manual;
 	private Date ultimaActualitzacio;
 	private boolean entregaCieActiva;
 	private ProcSerTipusEnum tipus;

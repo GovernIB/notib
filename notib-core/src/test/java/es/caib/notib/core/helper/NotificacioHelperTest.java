@@ -102,6 +102,7 @@ public class NotificacioHelperTest {
 				null,
 				null,
 				false,
+				false,
 				false).build();
 		
 		ProcSerDto procedimentDto = new ProcSerDto();

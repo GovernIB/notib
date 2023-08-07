@@ -195,7 +195,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							procediment.getCodiAssumpte(),
 							procediment.getCodiAssumpteNom(),
 							procediment.isComu(),
-							procediment.isRequireDirectPermission());
+							procediment.isRequireDirectPermission(),
+							procediment.isManual());
 
 			if (procediment.isEntregaCieActiva()) {
 				EntregaCieEntity entregaCie = new EntregaCieEntity(procediment.getCieId(), procediment.getOperadorPostalId());
@@ -308,7 +309,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediment.getCodiAssumpte(),
 						procediment.getCodiAssumpteNom(),
 						procediment.isComu(),
-						procediment.isRequireDirectPermission());
+						procediment.isRequireDirectPermission(),
+						procediment.isManual());
 			procedimentRepository.save(procedimentEntity);
 
 			if (!procediment.isEntregaCieActiva() && entregaCie != null) {
@@ -354,7 +356,21 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
     }
 
-    @Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.DELETE, returnType = TipusObjecte.DTO)
+	@Override
+	@Transactional
+	public ProcSerDto updateManual(Long id, boolean manual) throws NotFoundException {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Actualitzant propietat manual d'un procediment existent (id=" + id + ", manual=" + manual + ")");
+			ProcedimentEntity procedimentEntity = procedimentRepository.findOne(id);
+			procedimentEntity.updateManual(manual);
+			return conversioTipusHelper.convertir(procedimentEntity, ProcSerDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.DELETE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
 	public ProcSerDto delete(
@@ -752,6 +768,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
+							filtre.isManual(),
 							pageable);
 
 				} else if (isAdministrador) {
@@ -766,6 +783,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
+							filtre.isManual(),
 							pageable);
 
 				} else if (organGestorActual != null) { // Administrador d'òrgan
@@ -782,6 +800,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
+							filtre.isManual(),
 							pageable);
 
 				}

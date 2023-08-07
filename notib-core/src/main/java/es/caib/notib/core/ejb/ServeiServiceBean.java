@@ -60,6 +60,12 @@ public class ServeiServiceBean implements ServeiService {
 		return delegate.updateActiu(id, actiu);
     }
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public ProcSerDto updateManual(Long id, boolean manual) throws NotFoundException {
+		return delegate.updateManual(id, manual);
+	}
+
     @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcSerDto delete(

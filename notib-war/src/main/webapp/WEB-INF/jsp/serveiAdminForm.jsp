@@ -282,6 +282,7 @@ $(document).ready(function() {
 				</div>
 				<not:inputCheckbox name="agrupar" textKey="procediment.form.camp.agrupar" labelSize="2"/>
 				<not:inputCheckbox name="requireDirectPermission" textKey="procediment.form.camp.requireDirectPermission" labelSize="2"/>
+				<not:inputCheckbox name="manual" textKey="procediment.form.camp.manual" labelSize="2"/>
 
 			</div>
 			<div role="tabpanel" class="tab-pane <c:if test='${not empty errorRegistre}'>active</c:if>" id="registreForm">

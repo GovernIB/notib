@@ -1,14 +1,13 @@
 package es.caib.notib.core.repository;
 
-import java.util.List;
-
+import es.caib.notib.core.entity.ProcedimentFormEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.notib.core.entity.ProcedimentFormEntity;
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -52,6 +51,7 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			" and (:isOrganGestorNull = true or pro.organGestor like :organ)" +
 			" and (:isEstatNull = true or pro.actiu = :estat)" +
 			" and (:isComu = false or pro.comu = true)" +
+			" and (:isManual = false or pro.manual = true)" +
 			" and (:isEntregaCieActiva = false or pro.entregaCieActiva != 0)")
 	Page<ProcedimentFormEntity> findAmbEntitatAndFiltre(
 			@Param("entitatId") Long entitatId,
@@ -65,6 +65,7 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			@Param("estat") Boolean estat,
 			@Param("isComu") boolean isComu,
 			@Param("isEntregaCieActiva") boolean isEntregaCieActiva,
+			@Param("isManual") boolean isManual,
 			Pageable paginacio);
 	
 	@Query(	"from " +
@@ -74,6 +75,7 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			" and (:isOrganGestorNull = true or pro.organGestor like :organ)" +
 			" and (:isEstatNull = true or pro.actiu = :estat)" +
 			" and (:isComu = false or pro.comu = true)" +
+			" and (:isManual = false or pro.manual = true)" +
 			" and (:isEntregaCieActiva = false or pro.entregaCieActiva != 0)")
 	Page<ProcedimentFormEntity> findAmbFiltre(
 			@Param("isCodiNull") boolean isCodiNull,
@@ -86,6 +88,7 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			@Param("estat") Boolean estat,
 			@Param("isComu") boolean isComu,
 			@Param("isEntregaCieActiva") boolean isEntregaCieActiva,
+			@Param("isManual") boolean isManual,
 			Pageable paginacio);
 
 	@Query(	"from " +
@@ -97,6 +100,7 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			" and ((pro.organGestor in (:organsGestors)) or pro.comu = true)" +
 			" and (:isEstatNull = true or pro.actiu = :estat)" +
 			" and (:isComu = false or pro.comu = true)" +
+			" and (:isManual = false or pro.manual = true)" +
 			" and (:isEntregaCieActiva = false or pro.entregaCieActiva != 0)")
 	Page<ProcedimentFormEntity> findAmbOrganGestorOrComuAndFiltre(
 			@Param("entitatId") Long entitatId,
@@ -111,6 +115,7 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			@Param("estat") Boolean estat,
 			@Param("isComu") boolean isComu,
 			@Param("isEntregaCieActiva") boolean isEntregaCieActiva,
+			@Param("isManual") boolean isManual,
 			Pageable paginacio);
 
 }

@@ -62,7 +62,8 @@ public class ProcSerUpdateHelper {
 				null,
 				null,
 				procedimentGda.isComu(),
-				false).build();
+				false,
+				procedimentGda.isManual()).build();
 		
 		procediment.updateDataActualitzacio(new Date());
 		return procedimentRepository.save(procediment);
@@ -96,7 +97,8 @@ public class ProcSerUpdateHelper {
 				null,
 				null,
 				serveiGda.isComu(),
-				false).build();
+				false,
+				serveiGda.isManual()).build();
 
 		servei.updateDataActualitzacio(new Date());
 		return serveiRepository.save(servei);
