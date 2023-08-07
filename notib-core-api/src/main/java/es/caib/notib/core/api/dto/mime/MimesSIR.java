@@ -1,10 +1,5 @@
 package es.caib.notib.core.api.dto.mime;
 
-import lombok.Getter;
-import sun.net.www.content.image.jpeg;
-import sun.net.www.content.image.png;
-import sun.net.www.content.text.plain;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

@@ -196,7 +196,7 @@ public class CacheHelper {
 	@CacheEvict(value = {"organsPermisPerProcedimentComu", "procserOrgansCodisAmbPermis"}, allEntries = true)
 	public void evictFindProcedimentsOrganWithPermis() {}
 	
-	@CacheEvict(value = {"organsAmbPermis"}, allEntries = true)
+	@CacheEvict(value = {"organsAmbPermis", "organsAmbPermisPerConsulta"}, allEntries = true)
 	public void evictFindOrgansGestorWithPermis() {}
 
 	@CacheEvict(value = "unitatPerCodi", allEntries = true)

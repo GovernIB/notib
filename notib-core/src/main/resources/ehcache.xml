@@ -48,6 +48,7 @@
 
 	<!-- Òrgans -->
 	<cache name="organsAmbPermis" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
+	<cache name="organsAmbPermisPerConsulta" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 	<cache name="organsPermisPerProcedimentComu" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 
 	<!-- Procediment-òrgan -->

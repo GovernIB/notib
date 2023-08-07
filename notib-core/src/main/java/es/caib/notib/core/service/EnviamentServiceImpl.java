@@ -269,7 +269,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			List<String> codisProcedimentsDisponibles = isUsuari && entitatEntity != null ? procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatEntity, PermisEnum.CONSULTA) : null;
 
 			// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
-			List<String> codisOrgansGestorsDisponibles = isUsuari && entitatEntity != null ? organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, PermisEnum.CONSULTA) : null;
+			List<String> codisOrgansGestorsDisponibles = isUsuari && entitatEntity != null ? organGestorHelper.findCodiOrgansGestorsWithPermisPerConsulta(auth, entitatEntity, PermisEnum.CONSULTA) : null;
 
 			// Procediments comuns que es poden consultar per a òrgans gestors concrets
 			List<String> codisProcedimentsOrgans = isUsuari && entitatEntity != null ? permisosService.getProcedimentsOrgansAmbPermis(entitatEntity.getId(), auth.getName(), PermisEnum.CONSULTA) : null;
@@ -576,8 +576,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatEntity, PermisEnum.CONSULTA);
 
 				// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
-				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, PermisEnum.CONSULTA);
-				codisOrgansGestorsComunsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, PermisEnum.COMUNS);
+				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermisPerConsulta(auth, entitatEntity, PermisEnum.CONSULTA);
+				codisOrgansGestorsComunsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermisPerConsulta(auth, entitatEntity, PermisEnum.COMUNS);
 
 				// Procediments comuns que es poden consultar per a òrgans gestors concrets
 				codisProcedimentsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitatEntity.getId(), auth.getName(), PermisEnum.CONSULTA);

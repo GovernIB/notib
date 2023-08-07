@@ -216,11 +216,14 @@ public class PermisosCacheable {
             List<EntitatEntity> entitatsAccessibles = entitatRepository.findByIds(entitatsIds);
             if (entitatsAccessibles != null) {
                 Cache cacheOrgansAmbPermis = cacheManager.getCache("organsAmbPermis");
+                Cache cacheOrgansAmbPermisPerConsulta = cacheManager.getCache("organsAmbPermisPerConsulta");
                 for (EntitatEntity entitatEntity : entitatsAccessibles) {
                     String cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
                     for (PermisEnum permis: PermisEnum.values()) {
                         if (cacheOrgansAmbPermis != null)
                             cacheOrgansAmbPermis.evict(cacheKeyPrefix.concat(permis.name()));
+                        if (cacheOrgansAmbPermisPerConsulta != null)
+                            cacheOrgansAmbPermisPerConsulta.evict(cacheKeyPrefix.concat(permis.name()));
                     }
                 }
             }

@@ -46,6 +46,7 @@ public class ProcSerCacheable {
             List<EntitatEntity> entitatsAccessibles = entitatRepository.findByIds(entitatsIds);
             if (entitatsAccessibles != null) {
                 Cache cacheOrgansAmbPermis = cacheManager.getCache("organsAmbPermis");
+                Cache cacheOrgansAmbPermisPerConsulta = cacheManager.getCache("organsAmbPermisPerConsulta");
                 Cache cacheProcsersAmbPermis = cacheManager.getCache("procsersAmbPermis");
                 Cache cacheProcedimentsAmbPermis = cacheManager.getCache("procedimentsAmbPermis");
                 Cache cacheServeisAmbPermis = cacheManager.getCache("serveisAmbPermis");
@@ -57,6 +58,7 @@ public class ProcSerCacheable {
                     String cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
                     for (PermisEnum permis: PermisEnum.values()) {
                         if (cacheOrgansAmbPermis != null) cacheOrgansAmbPermis.evict(cacheKeyPrefix.concat(permis.name()));
+                        if (cacheOrgansAmbPermisPerConsulta != null) cacheOrgansAmbPermisPerConsulta.evict(cacheKeyPrefix.concat(permis.name()));
                         if (cacheProcsersAmbPermis != null) cacheProcsersAmbPermis.evict(cacheKeyPrefix.concat(permis.name()));
                         if (cacheProcedimentsAmbPermis != null) cacheProcedimentsAmbPermis.evict(cacheKeyPrefix.concat(permis.name()));
                         if (cacheServeisAmbPermis != null) cacheServeisAmbPermis.evict(cacheKeyPrefix.concat(permis.name()));

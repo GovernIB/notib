@@ -158,7 +158,21 @@ public class PermisosServiceImpl implements PermisosService {
     }
 
     @Override
-    @CacheEvict(value = {"organsAmbPermis"}, allEntries = true)
+    @Cacheable(value = "organsAmbPermisPerConsulta", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
+    @Transactional(readOnly = true)
+    public List<CodiValorDto> getOrgansAmbPermisPerConsulta(Long entitatId, String usuariCodi, PermisEnum permis) {
+        try {
+            List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+            EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+            return getOrgansAmbPermisDirectePerConsulta(entitat, grups, permis);
+        } catch (Exception ex) {
+            log.error("Error obtenint permisos de " + permis.name() + " d'òrgan per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    @CacheEvict(value = {"organsAmbPermis", "organsAmbPermisPerConsulta"}, allEntries = true)
     public void evictGetOrgansAmbPermis() {
     }
 
@@ -490,6 +504,19 @@ public class PermisosServiceImpl implements PermisosService {
         return getOrgansAfegintFills(entitat, new HashSet<>(organs), permis);
     }
 
+    private List<CodiValorDto> getOrgansAmbPermisDirectePerConsulta(EntitatEntity entitat, List<String> grups, PermisEnum permis) {
+        Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
+
+        List<OrganGestorEntity> organs = getOrgansAmbPermis(
+                entitat,
+                permisos,
+                grups,
+                true);
+
+        // Afegim els òrgans fills
+        return getOrgansAfegintFills(entitat, new HashSet<>(organs), permis);
+    }
+
     private List<CodiValorDto> getOrgansAmbPermisPerNotificar(EntitatEntity entitat, List<String> grups, PermisEnum permis) {
         Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
 
@@ -548,14 +575,18 @@ public class PermisosServiceImpl implements PermisosService {
 
     // PERMIS DIRECTE
 
-    private List<OrganGestorEntity> getOrgansAmbPermis(EntitatEntity entitat, Permission[] permisos, List<String> grups) {
-        boolean consulta = ExtendedPermission.READ.equals(permisos[0]);
+    private List<OrganGestorEntity> getOrgansAmbPermis(EntitatEntity entitat, Permission[] permisos, List<String> grups, boolean consulta) {
         List<Long> organsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, permisos);
         return getListGivenIds(
                 organsAmbPermisIds,
                 consulta ? new OrgansPermisCommand() : new OrgansVigentsPermisCommand(),
                 entitat,
                 grups);
+    }
+
+    private List<OrganGestorEntity> getOrgansAmbPermis(EntitatEntity entitat, Permission[] permisos, List<String> grups) {
+        boolean consulta = ExtendedPermission.READ.equals(permisos[0]);
+        return getOrgansAmbPermis(entitat, permisos, grups, consulta);
     }
 
 

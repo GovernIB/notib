@@ -664,8 +664,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
 
 				// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
-				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
-				codisOrgansGestorsComunsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatActual, PermisEnum.COMUNS);
+				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermisPerConsulta(auth, entitatActual, PermisEnum.CONSULTA);
+				codisOrgansGestorsComunsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermisPerConsulta(auth, entitatActual, PermisEnum.COMUNS);
 
 				// Procediments comuns que es poden consultar per a òrgans gestors concrets
 				codisProcedimentsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitatActual.getId(), auth.getName(), PermisEnum.CONSULTA);
@@ -874,7 +874,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
 
 			// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
-			codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
+			codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermisPerConsulta(auth, entitatActual, PermisEnum.CONSULTA);
 
 			// Procediments comuns que es poden consultar per a òrgans gestors concrets
 			codisProcedimentsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitatActual.getId(), auth.getName(), PermisEnum.CONSULTA);
