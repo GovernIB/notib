@@ -291,27 +291,24 @@ public class ProcSerHelper {
 			if (procedimentEntity != null) {
 				procedimentEntity.setActiu(false);
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.desactivat"));
-//				System.out.println("SYNCPROC >>> Procediment " + procedimentEntity.getCodi() + " DESACTIVAT - No té codi SIA");
 			}
 			return false;
 		}
 
-		if (procedimentEntity != null) {
-			// Si el darrer pic que el varem actualitzar es posterior a la darrera actualització a GDA no fa falta actualitzar
-			if (procedimentEntity.getUltimaActualitzacio() != null && procedimentGda.getUltimaActualitzacio() != null &&
-					procedimentEntity.getUltimaActualitzacio().after(procedimentGda.getUltimaActualitzacio())
-					// Modificacio degut a que hem canviat el camp del que s'obté la unitat administrativa, i per tant si aquest camp ha canviat s'ha de
-					// processar el canvi, tot i que no hi hagin hagut modificacions des de l'última sincronització
-					&& !organHasChanged(procedimentGda, procedimentEntity)) {
-				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.data"));
-				progres.addSeparador();
-				procedimentEntity.setActiu(true);
-				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.activat"));
-//				System.out.println("SYNCPROC >>> Procediment " + procedimentEntity.getCodi() + " ACTIVAT - Sense modificacions");
-//				progres.incrementOperacionsRealitzades();
-				return false;
-			}
-		}
+//		if (procedimentEntity != null) {
+//			// Si el darrer pic que el varem actualitzar es posterior a la darrera actualització a GDA no fa falta actualitzar
+//			if (procedimentEntity.getUltimaActualitzacio() != null && procedimentGda.getUltimaActualitzacio() != null &&
+//					procedimentEntity.getUltimaActualitzacio().after(procedimentGda.getUltimaActualitzacio())
+//					// Modificacio degut a que hem canviat el camp del que s'obté la unitat administrativa, i per tant si aquest camp ha canviat s'ha de
+//					// processar el canvi, tot i que no hi hagin hagut modificacions des de l'última sincronització
+//					&& !organHasChanged(procedimentGda, procedimentEntity)) {
+//				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.data"));
+//				progres.addSeparador();
+//				procedimentEntity.setActiu(true);
+//				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.activat"));
+//				return false;
+//			}
+//		}
 
 		if (Strings.isNullOrEmpty(procedimentGda.getOrganGestor()) && procedimentGda.isComu()) {
 			return true;
