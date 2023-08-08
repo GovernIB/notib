@@ -501,7 +501,7 @@ public class PermisosServiceImpl implements PermisosService {
                 grups);
 
         // Afegim els òrgans fills
-        return getOrgansAfegintFills(entitat, new HashSet<>(organs), permis);
+        return getOrgansAfegintFills(entitat, new HashSet<>(organs), permis, true);
     }
 
     private List<CodiValorDto> getOrgansAmbPermisDirectePerConsulta(EntitatEntity entitat, List<String> grups, PermisEnum permis) {
@@ -514,7 +514,7 @@ public class PermisosServiceImpl implements PermisosService {
                 true);
 
         // Afegim els òrgans fills
-        return getOrgansAfegintFills(entitat, new HashSet<>(organs), permis);
+        return getOrgansAfegintFills(entitat, new HashSet<>(organs), permis, false);
     }
 
     private List<CodiValorDto> getOrgansAmbPermisPerNotificar(EntitatEntity entitat, List<String> grups, PermisEnum permis) {
@@ -560,7 +560,7 @@ public class PermisosServiceImpl implements PermisosService {
         }
 
         // Afegim els òrgans fills
-        List<CodiValorDto> o =  getOrgansAfegintFills(entitat, organs, permis);
+        List<CodiValorDto> o =  getOrgansAfegintFills(entitat, organs, permis, true);
 
         // Afegir procediments amb permis directe
         for (ProcSerEntity e : procSerAmbPermisDirecte) {
@@ -649,7 +649,7 @@ public class PermisosServiceImpl implements PermisosService {
 
     // AFEGIR ORGANS FILLS
 
-    private List<CodiValorDto> getOrgansAfegintFills(EntitatEntity entitat, Set<OrganGestorEntity> organs, PermisEnum permis) {
+    private List<CodiValorDto> getOrgansAfegintFills(EntitatEntity entitat, Set<OrganGestorEntity> organs, PermisEnum permis, boolean nomesVigents) {
 
         Set<CodiValorDto> resposta = new HashSet<>();
         boolean entitatPermesa = configHelper.getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
@@ -660,7 +660,7 @@ public class PermisosServiceImpl implements PermisosService {
         }
 
         for(OrganGestorEntity organ: organs) {
-            if (OrganGestorEstatEnum.E.equals(organ.getEstat())) {
+            if (nomesVigents && OrganGestorEstatEnum.E.equals(organ.getEstat())) {
                 continue;
             }
             boolean excloure = isOficinaOrganSir && Strings.isNullOrEmpty(organ.getOficina());
