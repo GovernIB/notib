@@ -303,6 +303,20 @@
         });
     });
 
+    function deselecciona() {
+
+        $(".seleccioCount").html(0);
+        $.ajax({
+            type: 'GET',
+            url: "<c:url value="/notificacio/deselect"/>",
+            // async: false,
+            success: function (data) {
+                $(".seleccioCount").html(data);
+                $('#notificacio').webutilDatatable('select-none');
+            }
+        });
+    }
+
     $(document).ready(function() {
 
         let $taula = $('#notificacio');
@@ -340,7 +354,8 @@
         });
 
         $("#filtrar").click(() => {
-            deseleccionar()
+            // deseleccionar()
+            deselecciona()
         });
 
         $('#btn-netejar-filtre').click(function() {
@@ -359,8 +374,9 @@
             $('#nomesAmbErrors').val(false);
             omplirProcediments();
             omplirServeis();
-            deseleccionar();
-            $('#form-filtre').submit();
+            // deseleccionar();
+            deselecciona();
+            // $('#form-filtre').submit();
         });
         $('#nomesAmbErrorsBtn').click(function() {
             nomesAmbErrors = !$(this).hasClass('active');
@@ -416,8 +432,8 @@
                         }
                     });
 
-                    console.debug(procedimentsComuns);
-                    console.debug(procedimentsOrgan);
+                    // console.debug(procedimentsComuns);
+                    // console.debug(procedimentsOrgan);
                     if (procedimentsComuns.length > 0) {
                         selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
                         $.each(procedimentsComuns, function(index, val) {
@@ -470,8 +486,8 @@
                         }
                     });
 
-                    console.debug(serveisComuns);
-                    console.debug(serveisOrgan);
+                    // console.debug(serveisComuns);
+                    // console.debug(serveisOrgan);
                     if (serveisComuns.length > 0) {
                         selServeis.append("<optgroup label='<spring:message code='notificacio.form.camp.servei.comuns'/>'>");
                         $.each(serveisComuns, function(index, val) {
