@@ -272,8 +272,11 @@ public class ProcSerHelper {
 			return false;
 		}
 			// Si el darrer pic que el varem actualitzar es posterior a la darrera actualització a GDA no fa falta actualitzar
-		if (procedimentEntity != null && (procedimentEntity.getUltimaActualitzacio() != null && procedimentGda.getUltimaActualitzacio() != null &&
-					procedimentEntity.getUltimaActualitzacio().after(procedimentGda.getUltimaActualitzacio()))) {
+		if (procedimentEntity != null && (procedimentEntity.getUltimaActualitzacio() != null && procedimentGda.getUltimaActualitzacio() != null
+				&& procedimentEntity.getUltimaActualitzacio().after(procedimentGda.getUltimaActualitzacio()))
+				// Modificacio degut a que hem canviat el camp del que s'obté la unitat administrativa, i per tant si aquest camp ha canviat s'ha de
+				// processar el canvi, tot i que no hi hagin hagut modificacions des de l'última sincronització
+				&& !organHasChanged(procedimentGda, procedimentEntity)) {
 
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.data"));
 				progres.addSeparador();
@@ -301,6 +304,12 @@ public class ProcSerHelper {
 			return false;
 		}
 		return true;
+	}
+
+	private boolean organHasChanged(ProcSerDataDto procedimentGda, ProcedimentEntity procedimentEntity) {
+		return !procedimentEntity.isComu() &&
+				(procedimentEntity.getOrganGestor() != null && !procedimentEntity.getOrganGestor().getCodi().equals(procedimentGda.getOrganGestor())) ||
+				(procedimentEntity.getOrganGestor() == null && !Strings.isNullOrEmpty(procedimentGda.getOrganGestor()));
 	}
 
 	private boolean serveiHasToBeUpdated(ProcSerDataDto serveiGda, ServeiEntity serveiEntity, List<String> codiOrgansGda, ProgresActualitzacioProcSer progres) {
