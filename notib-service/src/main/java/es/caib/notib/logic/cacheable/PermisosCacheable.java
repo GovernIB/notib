@@ -14,6 +14,7 @@ import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -149,11 +150,16 @@ public class PermisosCacheable {
             var entitatsAccessibles = entitatRepository.findByIds(entitatsIds);
             if (entitatsAccessibles != null) {
                 var cacheOrgansAmbPermis = cacheManager.getCache("organsAmbPermis");
+                var cacheOrgansAmbPermisPerConsulta = cacheManager.getCache("organsAmbPermisPerConsulta");
                 for (var entitatEntity : entitatsAccessibles) {
                     var cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
                     for (var permis: PermisEnum.values()) {
-                        if (cacheOrgansAmbPermis != null)
+                        if (cacheOrgansAmbPermis != null) {
                             cacheOrgansAmbPermis.evict(cacheKeyPrefix.concat(permis.name()));
+                        }
+                        if (cacheOrgansAmbPermisPerConsulta != null) {
+                            cacheOrgansAmbPermisPerConsulta.evict(cacheKeyPrefix.concat(permis.name()));
+                        }
                     }
                 }
             }

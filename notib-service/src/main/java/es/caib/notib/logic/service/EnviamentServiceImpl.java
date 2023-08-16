@@ -311,12 +311,15 @@ public class EnviamentServiceImpl implements EnviamentService {
 		// Procediments accessibles per qualsevol òrgan gestor
 		var codisProcedimentsDisponibles = isUsuari && entitatEntity != null ? procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatEntity, PermisEnum.CONSULTA) : null;
 		// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
-		var codisOrgansGestorsDisponibles = isUsuari && entitatEntity != null ? organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, PermisEnum.CONSULTA) : null;
+		var codisOrgansGestorsDisponibles = isUsuari && entitatEntity != null ? organGestorHelper.findCodiOrgansGestorsWithPermisPerConsulta(auth, entitatEntity, PermisEnum.CONSULTA) : null;
+		var codisOrgansGestorsComunsDisponibles = isUsuari && entitatEntity != null ? organGestorHelper.findCodiOrgansGestorsWithPermisPerConsulta(auth, entitatEntity, PermisEnum.COMUNS) : null;
 		// Procediments comuns que es poden consultar per a òrgans gestors concrets
 		var codisProcedimentsOrgans = isUsuari && entitatEntity != null ? permisosService.getProcedimentsOrgansAmbPermis(entitatEntity.getId(), auth.getName(), PermisEnum.CONSULTA) : null;
 		var esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
 		var esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+		boolean esOrgansGestorsComunsCodisNotibNull = (codisOrgansGestorsComunsDisponibles == null || codisOrgansGestorsComunsDisponibles.isEmpty());
 		var esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
+
 
 		var organs = isAdminOrgan ? organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatEntity.getDir3Codi(), organGestorCodi) : null;
 		if (isAdminOrgan && !Strings.isNullOrEmpty(organGestorCodi)) {
@@ -440,8 +443,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 				.referenciaNotificacio(filtreDto.getReferenciaNotificacio())
 				.procedimentsCodisNotibNull(esProcedimentsCodisNotibNull)
 				.procedimentsCodisNotib(!esProcedimentsCodisNotibNull ? codisProcedimentsOrgans : null)
-				.ogansGestorsCodisNotibNull(esOrgansGestorsCodisNotibNull)
+				.organsGestorsCodisNotibNull(esOrgansGestorsCodisNotibNull)
 				.organsGestorsCodisNotib(!esOrgansGestorsCodisNotibNull ? codisOrgansGestorsDisponibles : null)
+				.organsGestorsComunsCodisNotibNull(esOrgansGestorsComunsCodisNotibNull)
+				.organsGestorsComunsCodisNotib(codisOrgansGestorsComunsDisponibles)
 				.procedimentOrgansAmbPermisNull(esProcedimentOrgansAmbPermisNull)
 				.procedimentOrgansAmbPermis(!esProcedimentOrgansAmbPermisNull ? codisProcedimentsOrgans : null)
 				.organs(organs)

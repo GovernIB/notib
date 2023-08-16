@@ -112,19 +112,19 @@
                 $("#esborrar").hide();
                 $("#procediments").hide();
                 $("#serveis").hide();
-                $("#actualitzar").hide();
+                $("#sincronitzar").hide();
             } else {
                 $("#permisosPanel").show();
                 $("#esborrar").show();
                 $("#procediments").show();
                 $("#serveis").show();
-                $("#actualitzar").show();
+                $("#sincronitzar").show();
                 $('#permis-boto-nou').attr('href', "<c:url value="/organgestor/"/>" + ${id} + "/permis/new");
 
                 $("#esborrar").attr('href', "<c:url value="/organgestor/"/>" + "${organGestorCommand.codi}" + "/delete");
                 $("#procediments").attr('href', "<c:url value="/procediment/organ/"/>" + "${organGestorCommand.codi}");
                 $("#serveis").attr('href', "<c:url value="/servei/organ/"/>" + "${organGestorCommand.codi}");
-                $("#actualitzar").attr('href', "<c:url value="/organgestor/"/>" + "${organGestorCommand.codi}" + "/update");
+                $("#sincronitzar").attr('href', "<c:url value="/organgestor/"/>" + "${organGestorCommand.id}" + "/sincronitzar/ARBRE");
                 $("#permisos").off("draw.dt");
                 $("#permisos").on( "draw.dt", function () {
                     $.each($(".boto-permis"), function( key, permisionLink ) {
@@ -242,11 +242,11 @@
                     <span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.servei"/>
                 </a>
             </div>
-<%--            <div>--%>
-<%--                <a id="actualitzar" class="btn btn-default" href="" data-toggle="ajax" data-adjust-height="false" data-height="650px">--%>
-<%--                    <span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="organgestor.list.boto.actualitzar"/>--%>
-<%--                </a>--%>
-<%--            </div>--%>
+            <div>
+                <a id="sincronitzar" class="btn btn-default" href="" data-toggle="ajax" data-adjust-height="false" data-height="650px">
+                    <span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="organgestor.list.boto.synchronize"/>
+                </a>
+            </div>
             <button id="guardar" type="" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
         </div>
     </form:form>

@@ -144,6 +144,20 @@ public class PermisosServiceImpl implements PermisosService {
     }
 
     @Override
+    @Cacheable(value = "organsAmbPermisPerConsulta", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
+    @Transactional(readOnly = true)
+    public List<CodiValorDto> getOrgansAmbPermisPerConsulta(Long entitatId, String usuariCodi, PermisEnum permis) {
+        try {
+            var grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+            var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+            return getOrgansAmbPermisDirectePerConsulta(entitat, grups, permis);
+        } catch (Exception ex) {
+            log.error("Error obtenint permisos de " + permis.name() + " d'òrgan per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
+            throw ex;
+        }
+    }
+
+    @Override
     @CacheEvict(value = {"organsAmbPermis"}, allEntries = true)
     public void evictGetOrgansAmbPermis() {
     }
@@ -424,9 +438,17 @@ public class PermisosServiceImpl implements PermisosService {
     private List<CodiValorDto> getOrgansAmbPermisDirecte(EntitatEntity entitat, List<String> grups, PermisEnum permis) {
 
         var permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
-        List<OrganGestorEntity> organs = getOrgansAmbPermis(entitat, permisos, grups);
+        var organs = getOrgansAmbPermis(entitat, permisos, grups);
         // Afegim els òrgans fills
-        return getOrgansAfegintFills(entitat, new HashSet<>(organs), permis);
+        return getOrgansAfegintFills(entitat, new HashSet<>(organs), permis, true);
+    }
+
+    private List<CodiValorDto> getOrgansAmbPermisDirectePerConsulta(EntitatEntity entitat, List<String> grups, PermisEnum permis) {
+
+        var permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
+        var organs = getOrgansAmbPermis(entitat, permisos, grups, true);
+        // Afegim els òrgans fills
+        return getOrgansAfegintFills(entitat, new HashSet<>(organs), permis, false);
     }
 
     private List<CodiValorDto> getOrgansAmbPermisPerNotificar(EntitatEntity entitat, List<String> grups, PermisEnum permis) {
@@ -463,7 +485,7 @@ public class PermisosServiceImpl implements PermisosService {
             }
         }
         // Afegim els òrgans fills
-        var o =  getOrgansAfegintFills(entitat, organs, permis);
+        var o =  getOrgansAfegintFills(entitat, organs, permis, true);
         // Afegir procediments amb permis directe
         for (var e : procSerAmbPermisDirecte) {
             if (!entitat.getDir3Codi().equals(e.getOrganGestor().getCodi())) {
@@ -476,12 +498,18 @@ public class PermisosServiceImpl implements PermisosService {
 
     // PERMIS DIRECTE
 
-    private List<OrganGestorEntity> getOrgansAmbPermis(EntitatEntity entitat, Permission[] permisos, List<String> grups) {
+    private List<OrganGestorEntity> getOrgansAmbPermis(EntitatEntity entitat, Permission[] permisos, List<String> grups, boolean consulta) {
 
-        var consulta = BasePermission.READ.equals(permisos[0]);
         var organsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, permisos);
         return getListGivenIds(organsAmbPermisIds, consulta ? new OrgansPermisCommand() : new OrgansVigentsPermisCommand(), entitat, grups);
     }
+
+    private List<OrganGestorEntity> getOrgansAmbPermis(EntitatEntity entitat, Permission[] permisos, List<String> grups) {
+
+        var consulta = ExtendedPermission.READ.equals(permisos[0]);
+        return getOrgansAmbPermis(entitat, permisos, grups, consulta);
+    }
+
 
     // PERMÍS ORGANS COMUNS
 
@@ -524,49 +552,47 @@ public class PermisosServiceImpl implements PermisosService {
 
     // AFEGIR ORGANS FILLS
 
-    private List<CodiValorDto> getOrgansAfegintFills(EntitatEntity entitat, Set<OrganGestorEntity> organs, PermisEnum permis) {
+    private List<CodiValorDto> getOrgansAfegintFills(EntitatEntity entitat, Set<OrganGestorEntity> organs, PermisEnum permis, boolean nomesVigents) {
 
         Set<CodiValorDto> resposta = new HashSet<>();
-        var entitatPermesa = configHelper.getConfigAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
-        var isOficinaOrganSir = !entitat.isOficinaEntitat() && PermisEnum.COMUNICACIO_SIR.equals(permis);
+        boolean entitatPermesa = configHelper.getConfigAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
+        boolean isOficinaOrganSir = !entitat.isOficinaEntitat() && PermisEnum.COMUNICACIO_SIR.equals(permis);
         Set<String> codis = new HashSet<>();
-        for (var organ : organs) {
+        for (OrganGestorEntity organ : organs) {
             codis.add(organ.getCodi());
         }
-        boolean excloure;
-        List<String> codiFills;
-        OrganGestorEntity organFill;
-        for(var organ: organs) {
-            if (OrganGestorEstatEnum.E.equals(organ.getEstat())) {
+
+        for(OrganGestorEntity organ: organs) {
+            if (nomesVigents && OrganGestorEstatEnum.E.equals(organ.getEstat())) {
                 continue;
             }
-            excloure = isOficinaOrganSir && Strings.isNullOrEmpty(organ.getOficina());
+            boolean excloure = isOficinaOrganSir && Strings.isNullOrEmpty(organ.getOficina());
             if ((entitatPermesa || !organ.getCodi().equals(entitat.getDir3Codi())) && !excloure) {
                 resposta.add(CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build());
             }
             //buscar fills
-            codiFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organ.getCodi());
-            for (var fill : codiFills) {
+            List<String> codiFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organ.getCodi());
+            for (String fill : codiFills) {
                 if (codis.contains(fill)) {
                     continue;
                 }
-                organFill = organGestorRepository.findByCodi(fill);
-                if (organFill == null) {
-                    continue;
-                }
-                var excloureFill = isOficinaOrganSir && Strings.isNullOrEmpty(organFill.getOficina());
-                if (!excloureFill) {
-                    resposta.add(CodiValorDto.builder().codi(organFill.getCodi()).valor(organFill.getCodi() + " - " + organFill.getNom()).build());
+                OrganGestorEntity organFill = organGestorRepository.findByCodi(fill);
+                if (organFill != null) {
+                    boolean excloureFill = isOficinaOrganSir && Strings.isNullOrEmpty(organFill.getOficina());
+                    if (!excloureFill) {
+                        resposta.add(CodiValorDto.builder().codi(organFill.getCodi()).valor(organFill.getCodi() + " - " + organFill.getNom()).build());
+                    }
                 }
             }
         }
+
         List<CodiValorDto> organsAmbPermis = new ArrayList<>(resposta);
         if (!organsAmbPermis.isEmpty()) {
             organsAmbPermis.sort(Comparator.comparing(CodiValorDto::getValor));
         }
+
         return organsAmbPermis;
     }
-
     // PROCEDIMENTS I SERVEIS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public List<CodiValorOrganGestorComuDto> getProcSerAmPermis(Long entitatId, String usuariCodi, Permission[] permisos, ProcSerTipusEnum tipus, boolean incloureComuns, boolean removeInactius) {

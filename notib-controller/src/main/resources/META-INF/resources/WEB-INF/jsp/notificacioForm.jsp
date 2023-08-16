@@ -276,17 +276,17 @@
 	// events al canviar els valors de les variables
 	viewModel.ambEntregaCIEListener = function(val) {
 		if (val || this.ambEntregaDEH) {
-			console.debug("Mostra formulari entrega cie");
+			// console.debug("Mostra formulari entrega cie");
 			$(".entrega-activa").show();
 			$(".entrega-inactiva").hide();
 		} else {
 			$(".entrega-activa").hide();
 			$(".entrega-inactiva").show();
-			console.debug("Oculta formulari entrega cie");
+			// console.debug("Oculta formulari entrega cie");
 		}
 		// console.log(val);
 		if (val) {
-			console.debug("Entrega CIE activa");
+			// console.debug("Entrega CIE activa");
 			$(".entrega-cie-activa").show();
 		} else {
 			$(".entrega-cie-activa").hide();
@@ -804,7 +804,7 @@
 
 		$('#addDocument').click(function() {
 			let tipusDocumentDefault = $('#tipusDocumentDefault' + numDocuments).val();
-			console.debug(tipusDocumentDefault);
+			// console.debug(tipusDocumentDefault);
 			$("#tipusDocument_" + numDocuments).val(tipusDocumentDefault).trigger("change");
 			$('#document' + (numDocuments + 1)).removeClass('hidden');
 			numDocuments++;

@@ -7,6 +7,8 @@ import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.repository.query.Param;
+
 import java.util.Date;
 import java.util.List;
 
@@ -63,4 +65,7 @@ public class FiltreNotificacio {
     private Long notMassivaId;
 
     private NotificacioMassivaEntity notificacioMassiva;
+
+    private boolean esOrgansGestorsComunsCodisNotibNull;
+    private List<? extends String> organsGestorsComunsCodisNotib;
 }

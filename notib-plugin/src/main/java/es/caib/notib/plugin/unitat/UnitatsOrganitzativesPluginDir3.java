@@ -174,7 +174,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 
 		try {
 			UnitatOrganitzativa unidad = null;
-			var url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerUnidad?codigo=" + pareCodi +
+			var url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerUnidad?codigo=" + pareCodi + "&denominacionCooficial=false" +
 					(dataActualitzacio != null ? FECHA_ACT_PARAM + dataActualitzacio : "") +
 					(dataSincronitzacio != null ? FECHA_SINC_PARAM + dataSincronitzacio : ""));
 			var response = getResponse(url);

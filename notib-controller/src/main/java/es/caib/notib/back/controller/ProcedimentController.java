@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -253,6 +254,20 @@ public class ProcedimentController extends BaseUserController {
 
 		procedimentService.updateActiu(procedimentId, false);
 		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "procediment.controller.desactivada.ok");
+	}
+
+	@GetMapping(value = "/{procedimentId}/sync_manual")
+	public String manual(HttpServletRequest request, @PathVariable Long procedimentId) {
+
+		procedimentService.updateManual(procedimentId, true);
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "procediment.controller.manual.ok");
+	}
+
+	@GetMapping(value = "/{procedimentId}/sync_auto")
+	public String auto(HttpServletRequest request, @PathVariable Long procedimentId) {
+
+		procedimentService.updateManual(procedimentId, false);
+		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "procediment.controller.auto.ok");
 	}
 
 	@GetMapping(value = "/{codiSia}/update")

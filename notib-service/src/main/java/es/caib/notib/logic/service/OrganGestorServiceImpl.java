@@ -433,6 +433,22 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	public void deleteHistoricSincronitzacio() {
 		organGestorRepository.deleteHistoricSincronitzacio();
 	}
+
+	@Override
+	@Transactional
+	public void sincronitzar(Long organGestorId) {
+
+		var organGestor = organGestorRepository.findById(organGestorId).orElse(null);
+		if (organGestor == null) {
+			throw new NotFoundException(organGestorId, OrganGestorEntity.class);
+		}
+		var unitat = pluginHelper.unitatOrganitzativaFindByCodi(organGestor.getEntitat().getCodi(), organGestor.getCodi(), null, null);
+		if (unitat == null) {
+			organGestor.setEstat(OrganGestorEstatEnum.E);
+			return;
+		}
+		organGestorHelper.sincronizarUnitat(unitat, organGestor.getEntitat());
+	}
 	@Override
 	@Transactional(timeout = 3600)
 	@SuppressWarnings("unchecked")

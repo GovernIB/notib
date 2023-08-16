@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - property:
+      name: boolUnit
+      value: number(1,0)
+      dbms: oracle
+  - property:
+      name: boolUnit
+      value: bool
+      dbms: postgresql
+  - property:
+      name: booleanFalse
+      value: 0
+      dbms: oracle
+  - property:
+      name: booleanFalse
+      value: false
+      dbms: postgresql
+  - changeSet:
+      id: 1691389795884-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_procediment
+            columns:
+              - column:
+                  name: manual
+                  type: ${boolUnit}
+                  defaultValue: ${booleanFalse}

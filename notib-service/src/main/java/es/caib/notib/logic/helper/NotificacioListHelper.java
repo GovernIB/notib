@@ -309,13 +309,15 @@ public class NotificacioListHelper {
         List<String> codisProcedimentsDisponibles = new ArrayList<>();
         List<String> codisOrgansGestorsDisponibles = new ArrayList<>();
         List<String> codisProcedimentsOrgans = new ArrayList<>();
+        List<String> codisOrgansGestorsComunsDisponibles = new ArrayList<>();
         if (isUsuari && entitatActual != null) {
             var auth = SecurityContextHolder.getContext().getAuthentication();
             entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
             // Procediments accessibles per qualsevol òrgan gestor
             codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
             // Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
-            codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
+            codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermisPerConsulta(auth, entitatActual, PermisEnum.CONSULTA);
+            codisOrgansGestorsComunsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermisPerConsulta(auth, entitatActual, PermisEnum.COMUNS);
             // Procediments comuns que es poden consultar per a òrgans gestors concrets
             codisProcedimentsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitatActual.getId(), auth.getName(), PermisEnum.CONSULTA);
         } else if (isAdminOrgan && entitatActual != null) {
@@ -324,6 +326,7 @@ public class NotificacioListHelper {
 
         var esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
         var esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+        var esOrgansGestorsComunsCodisNotibNull = (codisOrgansGestorsComunsDisponibles == null || codisOrgansGestorsComunsDisponibles.isEmpty());
         var esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
         var organs = isAdminOrgan && organGestor != null ? organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestor.getCodi()) : null;
         var entitatsActives = isSuperAdmin ? entitatRepository.findByActiva(true) : null;
@@ -366,6 +369,8 @@ public class NotificacioListHelper {
                 .grupsProcedimentCodisNotib(rols)
                 .organsGestorsCodisNotibNull(esOrgansGestorsCodisNotibNull)
                 .organsGestorsCodisNotib(esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles)
+                .esOrgansGestorsComunsCodisNotibNull(esOrgansGestorsComunsCodisNotibNull)
+                .organsGestorsComunsCodisNotib(codisOrgansGestorsComunsDisponibles)
                 .procedimentOrgansIdsNotibNull(esProcedimentOrgansAmbPermisNull)
                 .procedimentOrgansIdsNotib(esProcedimentOrgansAmbPermisNull ?  null : codisProcedimentsOrgans)
                 .usuariCodi(usuariCodi)

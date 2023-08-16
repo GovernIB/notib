@@ -2,6 +2,7 @@ package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.AvisNivellEnumDto;
+import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.LlibreDto;
@@ -69,9 +70,9 @@ public class OrganGestorHelper {
 	public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
 
 
-	public List<String> findCodiOrgansGestorsWithPermis(Authentication auth, EntitatEntity entitat, PermisEnum permis) {
+	public List<String> findCodiOrgansGestorsWithPermisPerConsulta(Authentication auth, EntitatEntity entitat, PermisEnum permis) {
 
-		var organs = permisosService.getOrgansAmbPermis(entitat.getId(), auth.getName(), permis);
+		var organs = permisosService.getOrgansAmbPermisPerConsulta(entitat.getId(), auth.getName(), permis);
 		List<String> codis = new ArrayList<>();
 		for (var organ : organs) {
 			codis.add(organ.getCodi());
@@ -181,7 +182,7 @@ public class OrganGestorHelper {
 		entitat.setDataActualitzacio(ara);
 	}
 
-	private OrganGestorEntity sincronizarUnitat(NodeDir3 unitatWS, EntitatEntity entitat) {
+	public OrganGestorEntity sincronizarUnitat(NodeDir3 unitatWS, EntitatEntity entitat) {
 
 		if (unitatWS == null) {
 			return null;

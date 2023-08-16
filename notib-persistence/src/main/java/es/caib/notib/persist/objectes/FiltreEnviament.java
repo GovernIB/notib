@@ -7,6 +7,7 @@ import es.caib.notib.persist.entity.EntitatEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -78,7 +79,9 @@ public class FiltreEnviament {
 
     private boolean procedimentsCodisNotibNull;
     private List<String> procedimentsCodisNotib;
-    private boolean ogansGestorsCodisNotibNull;
+    private boolean organsGestorsCodisNotibNull;
+    private boolean organsGestorsComunsCodisNotibNull;
+    private List<? extends String> organsGestorsComunsCodisNotib;
     private List<String> organsGestorsCodisNotib;
     private boolean procedimentOrgansAmbPermisNull;
     private List<String> procedimentOrgansAmbPermis;

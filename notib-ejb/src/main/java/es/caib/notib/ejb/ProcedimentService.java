@@ -60,6 +60,12 @@ public class ProcedimentService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public ProcSerDto updateManual(Long id, boolean manual) throws NotFoundException {
+		return getDelegateService().updateManual(id, manual);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcSerDto delete(Long entitatId, Long id, boolean isAdminEntitat) throws NotFoundException {
 		return getDelegateService().delete(entitatId, id, isAdminEntitat);
 	}

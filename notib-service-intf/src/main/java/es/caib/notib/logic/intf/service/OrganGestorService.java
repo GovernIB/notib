@@ -71,6 +71,9 @@ public interface OrganGestorService {
 	 */
 	void deleteHistoricSincronitzacio();
 
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	void sincronitzar(Long organGestorId);
+
 	/**
 	 * Actualitza els organs gestors de la base de dades amb els de Dir3
 	 *
