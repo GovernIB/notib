@@ -64,6 +64,8 @@ public class Servei {
 	private Link servicioResponsable;
 	@JsonProperty("link_organoInstructor")
 	private Link organoInstructor;
+	@JsonProperty("link_unidadAdministrativa")
+	private Link unidadAdministrativa;
 	@JsonProperty("comun")
 	private boolean comun;
 	@JsonProperty("link_lopdInfoAdicional")
