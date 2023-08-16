@@ -329,7 +329,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		var dto = new GcaProcediment();
 		dto.setCodiSIA(procediment.getCodigoSIA());
 		dto.setNom(procediment.getNombre());
-		dto.setUnitatAdministrativacodi(getUnitatAdministrativa(procediment.getOrganResolutori().getCodigo()));
+		dto.setUnitatAdministrativacodi(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
 		dto.setDataActualitzacio(procediment.getFechaActualizacion());
 		//Com que Procediment ens ve amb Boolean i al nostre sistema ho tenim amb boolean primitiu, si es null ho tractam com false:
 		dto.setComu(procediment.getComun() != null && procediment.getComun());
