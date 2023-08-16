@@ -271,20 +271,20 @@ public class ProcSerHelper {
 			}
 			return false;
 		}
-			// Si el darrer pic que el varem actualitzar es posterior a la darrera actualització a GDA no fa falta actualitzar
-		if (procedimentEntity != null && (procedimentEntity.getUltimaActualitzacio() != null && procedimentGda.getUltimaActualitzacio() != null
-				&& procedimentEntity.getUltimaActualitzacio().after(procedimentGda.getUltimaActualitzacio()))
-				// Modificacio degut a que hem canviat el camp del que s'obté la unitat administrativa, i per tant si aquest camp ha canviat s'ha de
-				// processar el canvi, tot i que no hi hagin hagut modificacions des de l'última sincronització
-				&& !organHasChanged(procedimentGda, procedimentEntity)) {
-
-				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.data"));
-				progres.addSeparador();
-				procedimentEntity.setActiu(true);
-				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage(PROC_ACTIVAT));
-				return false;
-
-		}
+//			// Si el darrer pic que el varem actualitzar es posterior a la darrera actualització a GDA no fa falta actualitzar
+//		if (procedimentEntity != null && (procedimentEntity.getUltimaActualitzacio() != null && procedimentGda.getUltimaActualitzacio() != null
+//				&& procedimentEntity.getUltimaActualitzacio().after(procedimentGda.getUltimaActualitzacio()))
+//				// Modificacio degut a que hem canviat el camp del que s'obté la unitat administrativa, i per tant si aquest camp ha canviat s'ha de
+//				// processar el canvi, tot i que no hi hagin hagut modificacions des de l'última sincronització
+//				&& !organHasChanged(procedimentGda, procedimentEntity)) {
+//
+//				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.data"));
+//				progres.addSeparador();
+//				procedimentEntity.setActiu(true);
+//				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage(PROC_ACTIVAT));
+//				return false;
+//
+//		}
 
 		if (Strings.isNullOrEmpty(procedimentGda.getOrganGestor()) && procedimentGda.isComu()) {
 			return true;
