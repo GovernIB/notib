@@ -30,8 +30,7 @@ public interface ServeiService {
 	/**
 	 * Crea un nou servei.
 	 * 
-	 * @param servei
-	 *            Informació del servei a crear.
+	 * @param servei Informació del servei a crear.
 	 * @return El servei creat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
@@ -40,11 +39,9 @@ public interface ServeiService {
 	/**
 	 * Actualitza la informació del servei 
 	 * 
-	 * @param servei
-	 *            Informació del servei a modificar.
+	 * @param servei Informació del servei a modificar.
 	 * @return El servei modificat.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	ProcSerDto update(Long entitatId, ProcSerDataDto servei, boolean isAdmin, boolean isAdminEntitat) throws NotFoundException;
@@ -52,25 +49,31 @@ public interface ServeiService {
 	/**
 	 * Marca el servei amb l'id especificat com a actiu/inactiu.
 	 *
-	 * @param id
-	 *            Atribut id del servei a activar.
-	 * @param actiu
-	 *            true si es vol activar o false en cas contrari.
+	 * @param id Atribut id del servei a activar.
+	 * @param actiu true si es vol activar o false en cas contrari.
 	 * @return El servei modificat.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	ProcSerDto updateActiu(Long id, boolean actiu) throws NotFoundException;
 
 	/**
+	 * Marca el procediment amb l'id especificat com a manual/auto.
+	 *
+	 * @param id Atribut id del procediment a activar.
+	 * @param manual true si es vol amb sincronització manual o false en cas contrari.
+	 * @return El procediment modificat.
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	ProcSerDto updateManual(Long id, boolean manual) throws NotFoundException;
+
+	/**
 	 * Esborra el servei amb el mateix id que l'especificat.
 	 * 
-	 * @param id
-	 *            Atribut id del servei a esborrar.
+	 * @param id Atribut id del servei a esborrar.
 	 * @return El servei esborrat.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	ProcSerDto delete(Long entitatId, Long id, boolean isAdminEntitat) throws NotFoundException;

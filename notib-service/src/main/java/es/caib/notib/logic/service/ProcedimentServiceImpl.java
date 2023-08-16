@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.aspect.Audita;
@@ -180,7 +181,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			
 			var procedimentEntityBuilder = ProcedimentEntity.getBuilder(procediment.getCodi(), procediment.getNom(), procediment.getRetard(),
 					procediment.getCaducitat(), entitat, procediment.isAgrupar(), organGestor, procediment.getTipusAssumpte(), procediment.getTipusAssumpteNom(),
-					procediment.getCodiAssumpte(), procediment.getCodiAssumpteNom(), procediment.isComu(), procediment.isRequireDirectPermission());
+					procediment.getCodiAssumpte(), procediment.getCodiAssumpteNom(), procediment.isComu(), procediment.isRequireDirectPermission(), procediment.isManual());
 
 			if (procediment.isEntregaCieActiva()) {
 				var entregaCie = new EntregaCieEntity(procediment.getCieId(), procediment.getOperadorPostalId());
@@ -257,7 +258,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			}
 			procedimentEntity.update(procediment.getCodi(), procediment.getNom(), entitat, procediment.isEntregaCieActiva() ? entregaCie : null, procediment.getRetard(),
 						procediment.getCaducitat(), procediment.isAgrupar(), organGestor, procediment.getTipusAssumpte(), procediment.getTipusAssumpteNom(),
-						procediment.getCodiAssumpte(), procediment.getCodiAssumpteNom(), procediment.isComu(), procediment.isRequireDirectPermission());
+						procediment.getCodiAssumpte(), procediment.getCodiAssumpteNom(), procediment.isComu(), procediment.isRequireDirectPermission(), procediment.isManual());
 
 			procedimentRepository.save(procedimentEntity);
 			if (!procediment.isEntregaCieActiva() && entregaCie != null) {
@@ -295,7 +296,21 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 		}
     }
 
-    @Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.DELETE, returnType = TipusObjecte.DTO)
+	@Override
+	@Transactional
+	public ProcSerDto updateManual(Long id, boolean manual) throws NotFoundException {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			log.debug("Actualitzant propietat manual d'un procediment existent (id=" + id + ", manual=" + manual + ")");
+			ProcedimentEntity procedimentEntity = procedimentRepository.findById(id).orElseThrow();
+			procedimentEntity.updateManual(manual);
+			return conversioTipusHelper.convertir(procedimentEntity, ProcSerDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.DELETE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
 	public ProcSerDto delete(Long entitatId, Long id, boolean isAdminEntitat) throws NotFoundException {
@@ -594,6 +609,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
+							filtre.isManual(),
 							pageable);
 
 				} else if (isAdministrador) {
@@ -608,6 +624,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
+							filtre.isManual(),
 							pageable);
 
 				} else if (organGestorActual != null) { // Administrador d'òrgan
@@ -624,6 +641,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
+							filtre.isManual(),
 							pageable);
 
 				}

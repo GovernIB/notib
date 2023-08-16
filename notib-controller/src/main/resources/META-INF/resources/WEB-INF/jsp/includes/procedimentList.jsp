@@ -42,6 +42,8 @@
 			$('#entregaCieActiva').val(false);
 			$('#btn-comu').removeClass('active');
 			$('#comu').val(false);
+			$('#btn-manual').removeClass('active');
+			$('#manual').val(false);
 		});
 
 		loadOrgans($('#organGestor'), organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
@@ -54,6 +56,10 @@
 		$('#btn-comu').click(function() {
 			let entregaCieActiva = !$(this).hasClass('active');
 			$('#comu').val(entregaCieActiva);
+		})
+		$('#btn-manual').click(function() {
+			let manual = !$(this).hasClass('active');
+			$('#manual').val(manual);
 		})
 	});
 </script>
@@ -91,6 +97,12 @@
 						<span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.cie"/>
 					</button>
 					<not:inputHidden name="entregaCieActiva"/>
+				</div>
+				<div class="btn-group" role="group">
+					<button id="btn-manual" title="" class="btn btn-default <c:if test="${procSerFiltreCommand.manual}">active</c:if>" data-toggle="button">
+						<span class="fa fa-globe"></span> <spring:message code="procediment.filter.form.camp.manual"/>
+					</button>
+					<not:inputHidden name="manual"/>
 				</div>
 			</div>
 			<div class="col-md-2 pull-right">
@@ -169,10 +181,16 @@
 					{{if actiu}}<span class="fa fa-check"></span>{{/if}}
 				</script>
 		</th>
+		<th data-col-name="manual" data-template="#cellManualTemplate">
+			<spring:message code="procediment.list.columna.manual"/>
+			<script id="cellManualTemplate" type="text/x-jsrender">
+					{{if manual}}<span class="fa fa-check"></span>{{/if}}
+				</script>
+		</th>
 		<th data-col-name="agrupar" data-visible="false" id="agrupable"></th>
 
 		<c:if test="${not simplifiedView}">
-			<th data-col-name="grupsCount" data-template="#cellGrupsTemplate" data-orderable="false" width="10%">
+			<th data-col-name="grupsCount" data-template="#cellGrupsTemplate" data-orderable="false" width="2%">
 				<script id="cellGrupsTemplate" type="text/x-jsrender">
 					{{if agrupar != true}}
 						<button class="btn btn-default" disabled><span class="fa fa-users"></span>&nbsp;<spring:message code="procediment.list.boto.grups"/>&nbsp;</a>
@@ -181,23 +199,28 @@
 					{{/if}}
 					</script>
 			</th>
-			<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="10%">
+			<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="2%">
 				<script id="cellPermisosTemplate" type="text/x-jsrender">
 						<a href="${unitatCodiUrlPrefix}procediment/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="procediment.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
 					</script>
 			</th>
-			<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+			<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="2%">
 				<script id="cellAccionsTemplate" type="text/x-jsrender">
 					{^{if (~hlpIsAdministradorEntitat()) || (!~hlpIsAdministradorEntitat() && !comu) }}
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-							<ul class="dropdown-menu">
+							<ul class="dropdown-menu dropdown-menu-right">
 								<li><a href="${unitatCodiUrlPrefix}procediment/{{:codi}}/update" data-toggle="ajax"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="procediment.list.boto.actualitzar"/></a></li>
 								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}" data-toggle="modal" data-maximized="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								{{if !actiu}}
 								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
 								{{else}}
 								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
+								{{/if}}
+								{{if !manual}}
+								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/sync_manual" data-toggle="ajax"><span class="fa fa-hand-paper-o"></span>&nbsp;&nbsp;<spring:message code="procediment.list.boto.sync.manual"/></a></li>
+								{{else}}
+								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/sync_auto" data-toggle="ajax"><span class="fa fa-cog"></span>&nbsp;&nbsp;<spring:message code="procediment.list.boto.sync.auto"/></a></li>
 								{{/if}}
 								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>

@@ -445,7 +445,8 @@ public class PluginHelperTest {
 		return ProcedimentEntity.getBuilder("1", "",
 				configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard"),
 				configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat"),
-				entitatMock, false, null, /* organGestor */ null, null, null, null, false, false).build();
+				entitatMock, false, null, /* organGestor */ null, null, null, null, false,
+				false, false).build();
 	}
 	
 	private ProcSerOrganEntity initProcedimentOrgan (ProcedimentEntity procediment, OrganGestorEntity organGestor) {

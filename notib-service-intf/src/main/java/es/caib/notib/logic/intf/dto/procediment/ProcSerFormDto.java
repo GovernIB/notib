@@ -26,6 +26,7 @@ public class ProcSerFormDto extends AuditoriaDto implements Serializable{
 	private List<PermisDto> permisos;
 	private List<GrupDto> grups;
 	private boolean comu;
+	private boolean manual;
 
 	// 0 (Inactiva) / 1 (Activa per procediment) / 2 (Activa per òrgan gestor) / 3 (Activa per entitat)
 	protected int entregaCieActiva;

@@ -47,6 +47,7 @@ public class ProcSerCommand {
 	private boolean comu;
 	protected boolean requireDirectPermission;
 	private boolean actiu;
+	private boolean manual;
 
 	private boolean entregaCieActiva;
 	private Long operadorPostalId;

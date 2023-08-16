@@ -34,7 +34,8 @@ public class ProcedimentEntity extends ProcSerEntity {
 			String codiAssumpte,
 			String codiAssumpteNom,
 			boolean comu,
-			boolean requireDirectPermission) {
+			boolean requireDirectPermission,
+			boolean manual) {
 		return builder()
 				.codi(codi)
 				.nom(nom)
@@ -49,7 +50,8 @@ public class ProcedimentEntity extends ProcSerEntity {
 				.codiAssumpteNom(codiAssumpteNom)
 				.comu(comu)
 				.requireDirectPermission(requireDirectPermission)
-				.actiu(true);
+				.actiu(true)
+				.manual(manual);
 	}
 
 	

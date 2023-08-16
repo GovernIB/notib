@@ -22,6 +22,7 @@ public class ProcSerFiltreCommand {
 	private boolean comu;
 	private boolean entregaCieActiva;
 	private boolean actiu;
+	private boolean manual;
 	private ProcedimentEstat estat;
 	
 	

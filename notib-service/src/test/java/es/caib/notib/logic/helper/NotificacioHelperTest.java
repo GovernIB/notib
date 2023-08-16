@@ -89,7 +89,7 @@ public class NotificacioHelperTest {
 
 		var retard = configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard");
 		var c = configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat");
-		var procediment = ProcedimentEntity.builder().codi("").nom("").retard(retard).caducitat(c).entitat(entitat).build();
+		var procediment = ProcedimentEntity.builder().codi("").nom("").retard(retard).caducitat(c).entitat(entitat).manual(false).build();
 
 		var document = new Document();
 		document.setId(Long.toString(new Random().nextLong()));

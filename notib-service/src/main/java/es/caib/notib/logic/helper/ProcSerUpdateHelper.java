@@ -47,9 +47,11 @@ public class ProcSerUpdateHelper {
 
 		var retard = configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard");
 		var caducitat = configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat");
-		var procediment = ProcedimentEntity.getBuilder(procedimentGda.getCodi(), procedimentGda.getNom() != null ? procedimentGda.getNom().trim() : null,
-				retard, caducitat, entitat, false, procedimentGda.isComu() ? organGestorRepository.findByCodi(entitat.getDir3Codi()) : organGestor,
-				null, null, null, null, procedimentGda.isComu(), false).build();
+		var nom  =  procedimentGda.getNom() != null ? procedimentGda.getNom().trim() : null;
+		var organ = procedimentGda.isComu() ? organGestorRepository.findByCodi(entitat.getDir3Codi()) : organGestor;
+		var procediment = ProcedimentEntity.getBuilder(procedimentGda.getCodi(), nom, retard, caducitat, entitat, false, organ,
+				null, null, null, null, procedimentGda.isComu(),
+				false, procedimentGda.isManual()).build();
 		
 		procediment.updateDataActualitzacio(new Date());
 		return procedimentRepository.save(procediment);
@@ -69,9 +71,11 @@ public class ProcSerUpdateHelper {
 
 		var retard = configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard");
 		var caducitat = configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat");
-		var servei = ServeiEntity.getBuilder(serveiGda.getCodi(), serveiGda.getNom() != null ? serveiGda.getNom().trim() : null,
-				retard, caducitat, entitat, false, serveiGda.isComu() ? organGestorRepository.findByCodi(entitat.getDir3Codi()) : organGestor,
-				null, null, null, null, serveiGda.isComu(), false).build();
+		var nom = serveiGda.getNom() != null ? serveiGda.getNom().trim() : null;
+		var organ = serveiGda.isComu() ? organGestorRepository.findByCodi(entitat.getDir3Codi()) : organGestor;
+		var servei = ServeiEntity.getBuilder(serveiGda.getCodi(), nom, retard, caducitat, entitat, false, organ,
+				null, null, null, null, serveiGda.isComu(),
+				false, serveiGda.isManual()).build();
 
 		servei.updateDataActualitzacio(new Date());
 		return serveiRepository.save(servei);

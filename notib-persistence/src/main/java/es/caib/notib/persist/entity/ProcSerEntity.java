@@ -80,6 +80,9 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
     @Column(name = "actiu")
     protected boolean actiu;
 
+    @Column(name = "manual")
+    protected boolean manual;
+
     @Column(name = "ultima_act")
     @Temporal(TemporalType.DATE)
     protected Date ultimaActualitzacio;
@@ -194,7 +197,8 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
             String codiAssumpte,
             String codiAssumpteNom,
             boolean comu,
-            boolean requireDirectPermission) {
+            boolean requireDirectPermission,
+            boolean manual) {
         this.codi = codi;
         this.nom = nom;
         this.entitat = entitat;
@@ -209,12 +213,10 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
         this.codiAssumpteNom = codiAssumpteNom;
         this.comu=comu;
         this.requireDirectPermission = requireDirectPermission;
+        this.manual = manual;
     }
 
-    public void update(
-            String nom,
-            OrganGestorEntity organGestor,
-            boolean comu) {
+    public void update(String nom, OrganGestorEntity organGestor, boolean comu) {
         this.nom = nom;
         this.organGestor = organGestor;
         this.comu= comu;
@@ -224,9 +226,12 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
         this.ultimaActualitzacio = dataActualitzacio;
     }
 
-    public void updateActiu(
-            boolean actiu) {
+    public void updateActiu(boolean actiu) {
         this.actiu = actiu;
+    }
+
+    public void updateManual(boolean manual) {
+        this.manual = manual;
     }
 
     protected ProcSerEntity(ProcSerEntityBuilder<?, ?> b) {
@@ -255,6 +260,7 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
         this.entregaCie = b.entregaCie;
         this.organGestor = b.organGestor;
         this.actiu = true;
+        this.manual = b.manual;
     }
 
     private LocalDateTime toLocalDateTime(DateTime dateTime) {
@@ -278,6 +284,7 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
         private boolean comu;
         private boolean requireDirectPermission;
         private boolean actiu;
+        private boolean manual;
         private Date ultimaActualitzacio;
         private EntitatEntity entitat;
         private EntregaCieEntity entregaCie;
@@ -371,6 +378,11 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
 
         public B actiu(boolean actiu) {
             this.actiu = actiu;
+            return self();
+        }
+
+        public B manual(boolean manual) {
+            this.manual = manual;
             return self();
         }
 

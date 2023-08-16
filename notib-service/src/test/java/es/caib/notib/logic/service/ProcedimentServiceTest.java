@@ -146,6 +146,7 @@ public class ProcedimentServiceTest {
 				null,
 				null,
 				false,
+				false,
 				false).build();
 		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entitat).build();
 		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
@@ -163,7 +164,7 @@ public class ProcedimentServiceTest {
 		Mockito.when(procedimentFormRepository.findAmbEntitatAndFiltre(Mockito.nullable(Long.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class), 
 				Mockito.nullable(Boolean.class), Mockito.nullable(String.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class),
 				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class),
-				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Pageable.class)))
+				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Pageable.class)))
 			.thenReturn(procediments);
 //		Mockito.when(procedimentFormRepository.findAmbFiltre(Mockito.anyBoolean(), Mockito.anyString(), Mockito.anyBoolean(), 
 //				Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.any(Pageable.class))).thenReturn(procediments);
@@ -184,7 +185,7 @@ public class ProcedimentServiceTest {
 		Mockito.verify(procedimentFormRepository).findAmbEntitatAndFiltre(Mockito.nullable(Long.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class), 
 				Mockito.nullable(Boolean.class), Mockito.nullable(String.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class),
 				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class),
-				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Pageable.class));
+				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Pageable.class));
 	}
 	
 	// TODO: Falta generar más casos de test para admin d'organ y para superusuari con sus listas de permisos, etc. También sin filtre.

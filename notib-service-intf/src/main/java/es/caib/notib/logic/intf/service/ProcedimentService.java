@@ -50,7 +50,7 @@ public interface ProcedimentService {
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	 ProcSerDto update(Long entitatId, ProcSerDataDto procediment, boolean isAdmin, boolean isAdminEntitat) throws NotFoundException;
+	ProcSerDto update(Long entitatId, ProcSerDataDto procediment, boolean isAdmin, boolean isAdminEntitat) throws NotFoundException;
 
 	/**
 	 * Marca el procediment amb l'id especificat com a actiu/inactiu.
@@ -61,7 +61,18 @@ public interface ProcedimentService {
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	 ProcSerDto updateActiu(Long id, boolean actiu) throws NotFoundException;
+	ProcSerDto updateActiu(Long id, boolean actiu) throws NotFoundException;
+
+	/**
+	 * Marca el procediment amb l'id especificat com a manual/auto.
+	 *
+	 * @param id Atribut id del procediment a activar.
+	 * @param manual true si es vol amb sincronització manual o false en cas contrari.
+	 * @return El procediment modificat.
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	ProcSerDto updateManual(Long id, boolean manual) throws NotFoundException;
 
 	/**
 	 * Esborra el procediment amb el mateix id que l'especificat.
@@ -71,7 +82,7 @@ public interface ProcedimentService {
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	 ProcSerDto delete(Long entitatId, Long id, boolean isAdminEntitat) throws NotFoundException;
+	ProcSerDto delete(Long entitatId, Long id, boolean isAdminEntitat) throws NotFoundException;
 
 	/**
 	 * Consulta un procediment donat el seu id.
