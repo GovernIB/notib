@@ -181,7 +181,7 @@ public class OrganGestorHelper {
 		entitat.setDataActualitzacio(ara);
 	}
 
-	private OrganGestorEntity sincronizarUnitat(NodeDir3 unitatWS, EntitatEntity entitat) {
+	public OrganGestorEntity sincronizarUnitat(NodeDir3 unitatWS, EntitatEntity entitat) {
 
 		if (unitatWS == null) {
 			return null;
