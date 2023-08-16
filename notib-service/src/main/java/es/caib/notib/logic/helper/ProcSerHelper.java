@@ -283,6 +283,10 @@ public class ProcSerHelper {
 
 		}
 
+		if (Strings.isNullOrEmpty(procedimentGda.getOrganGestor()) && procedimentGda.isComu()) {
+			return true;
+		}
+
 		if (!codiOrgansGda.contains(procedimentGda.getOrganGestor())) {
 			// Si l'Organ gestor del procediment no existeix dins el nostre organigrama, no es guarda el procediment
 
