@@ -182,10 +182,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 	@Query( "from EnviamentTableEntity nenv " +
 			"where (:entitat = nenv.entitat) " +
 			"  and (nenv.organCodi is not null and nenv.organCodi in (:organs))")
-	Page<EnviamentTableEntity> find4OrganAdminRole(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("organs") List<String> organs,
-			Pageable pageable);
+	Page<EnviamentTableEntity> find4OrganAdminRole(@Param("entitat") EntitatEntity entitat, @Param("organs") List<String> organs, Pageable pageable);
 
 	@Query( "from" +
 			"    EnviamentTableEntity nenv " +
@@ -427,15 +424,32 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"where " +
 			"    (:#{#filtre.entitat} = nenv.entitat) " +
 			"and (:#{#filtre.isUsuari} = false or (" +
-			" ((:#{#filtre.procedimentsCodisNotibNull} = false and nenv.procedimentCodiNotib is not null and nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}))" +	// Té permís sobre el procediment
-			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and nenv.organCodi is not null and " +
-			"			(nenv.procedimentCodiNotib is null or (nenv.procedimentIsComu = true and nenv.procedimentRequirePermission = false)) and nenv.organCodi in (:#{#filtre.organsGestorsCodisNotib})" +
-			"		) " + // Té permís sobre l'òrgan
-			"   or ((nenv.procedimentCodiNotib is null or nenv.procedimentIsComu = true) and nenv.usuariCodi = :#{#filtre.usuariCodi})" + // És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
-			"   or 	(:#{#filtre.procedimentOrgansAmbPermisNull} = false and nenv.procedimentCodiNotib is not null and " +
-			"			CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:#{#filtre.procedimentOrgansAmbPermis})" +
-			"		) " +	// Procediment comú amb permís de procediment-òrgan
-			") " +
+			// PERMISOS
+			// Iniciada pel propi usuari
+			"	nenv.usuariCodi = :#{#filtre.usuariCodi} " +
+			// Té permís consulta sobre el procediment
+			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and nenv.procedimentCodiNotib is not null " +
+			"			and nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}) and nenv.procedimentIsComu = false) " +
+			// Té permís consulta sobre l'òrgan
+			"	or (:#{#filtre.organsGestorsCodisNotibNull} = false and nenv.organCodi is not null " +
+			"			and (nenv.procedimentIsComu = false or nenv.procedimentRequirePermission = false) " +
+			"			and nenv.organCodi in (:#{#filtre.organsGestorsCodisNotib})) " +
+			// Procediment comú amb permís comú sobre l'òrgan
+			"	or (:#{#filtre.organsGestorsComunsCodisNotibNull} = false and nenv.organCodi is not null " +
+			"			and nenv.procedimentIsComu = true and nenv.procedimentRequirePermission = false " +
+			"			and nenv.organCodi in (:#{#filtre.organsGestorsComunsCodisNotib})) " +
+			// Procediment comú amb permís de procediment-òrgan
+			"   or (:#{#filtre.procedimentOrgansAmbPermisNull} = false and nenv.procedimentCodiNotib is not null " +
+			"			and CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:#{#filtre.procedimentOrgansAmbPermis})" +
+			"		) " +
+//			"(:esProcedimentsCodisNotibNull = false and nenv.procedimentCodiNotib is not null and nenv.procedimentCodiNotib in (:procedimentsCodisNotib))" +	// Té permís sobre el procediment
+//			"	or (:esOrgansGestorsCodisNotibNull = false and nenv.organCodi is not null and " +
+//			"			(nenv.procedimentCodiNotib is null or (nenv.procedimentIsComu = true and nenv.procedimentRequirePermission = false)) and nenv.organCodi in (:organsGestorsCodisNotib)" +
+//			"		) " + // Té permís sobre l'òrgan
+//			"   or ((nenv.procedimentCodiNotib is null or nenv.procedimentIsComu = true) and nenv.usuariCodi = :usuariCodi)" + // És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
+//			"   or 	(:esProcedimentOrgansIdsNotibNull = false and nenv.procedimentCodiNotib is not null and " +
+//			"			CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:procedimentOrgansIdsNotib)" +
+//			"		) " +	// Procediment comú amb permís de procediment-òrgan
 			") " +
 			"and (nenv.grupCodi = null or (nenv.grupCodi in (:#{#filtre.rols}))) " +
 			") " +
@@ -480,15 +494,32 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"where " +
 			"    (:#{#filtre.entitat} = nenv.entitat) " +
 			"and (:#{#filtre.isUsuari} = false or (" +
-			" ((:#{#filtre.procedimentsCodisNotibNull} = false and nenv.procedimentCodiNotib is not null and nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}))" +	// Té permís sobre el procediment
-			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and nenv.organCodi is not null and " +
-			"			(nenv.procedimentCodiNotib is null or (nenv.procedimentIsComu = true and nenv.procedimentRequirePermission = false)) and nenv.organCodi in (:#{#filtre.organsGestorsCodisNotib})" +
-			"		) " + // Té permís sobre l'òrgan
-			"   or ((nenv.procedimentCodiNotib is null or nenv.procedimentIsComu = true) and nenv.usuariCodi = :#{#filtre.usuariCodi})" + // És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
-			"   or 	(:#{#filtre.procedimentOrgansAmbPermisNull} = false and nenv.procedimentCodiNotib is not null and " +
-			"			CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:#{#filtre.procedimentOrgansAmbPermis})" +
-			"		) " +	// Procediment comú amb permís de procediment-òrgan
-			") " +
+			// PERMISOS
+			// Iniciada pel propi usuari
+			"	nenv.usuariCodi = :#{#filtre.usuariCodi} " +
+			// Té permís consulta sobre el procediment
+			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and nenv.procedimentCodiNotib is not null " +
+			"			and nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}) and nenv.procedimentIsComu = false) " +
+			// Té permís consulta sobre l'òrgan
+			"	or (:#{#filtre.organsGestorsCodisNotibNull} = false and nenv.organCodi is not null " +
+			"			and (nenv.procedimentIsComu = false or nenv.procedimentRequirePermission = false) " +
+			"			and nenv.organCodi in (:#{#filtre.organsGestorsCodisNotib})) " +
+			// Procediment comú amb permís comú sobre l'òrgan
+			"	or (:#{#filtre.organsGestorsComunsCodisNotibNull} = false and nenv.organCodi is not null " +
+			"			and nenv.procedimentIsComu = true and nenv.procedimentRequirePermission = false " +
+			"			and nenv.organCodi in (:#{#filtre.organsGestorsComunsCodisNotib})) " +
+			// Procediment comú amb permís de procediment-òrgan
+			"   or (:#{#filtre.procedimentOrgansAmbPermisNull} = false and nenv.procedimentCodiNotib is not null " +
+			"			and CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:#{#filtre.procedimentOrgansAmbPermis})" +
+			"		) " +
+//			"(:esProcedimentsCodisNotibNull = false and nenv.procedimentCodiNotib is not null and nenv.procedimentCodiNotib in (:procedimentsCodisNotib))" +	// Té permís sobre el procediment
+//			"	or (:esOrgansGestorsCodisNotibNull = false and nenv.organCodi is not null and " +
+//			"			(nenv.procedimentCodiNotib is null or (nenv.procedimentIsComu = true and nenv.procedimentRequirePermission = false)) and nenv.organCodi in (:organsGestorsCodisNotib)" +
+//			"		) " + // Té permís sobre l'òrgan
+//			"   or ((nenv.procedimentCodiNotib is null or nenv.procedimentIsComu = true) and nenv.usuariCodi = :usuariCodi)" + // És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
+//			"   or 	(:esProcedimentOrgansIdsNotibNull = false and nenv.procedimentCodiNotib is not null and " +
+//			"			CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:procedimentOrgansIdsNotib)" +
+//			"		) " +	// Procediment comú amb permís de procediment-òrgan
 			") " +
 			"and (nenv.grupCodi = null or (nenv.grupCodi in (:#{#filtre.rols}))) " +
 			") " +
