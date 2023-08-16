@@ -51,6 +51,12 @@ public class PermisosService extends AbstractService<es.caib.notib.logic.intf.se
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public List<CodiValorDto> getOrgansAmbPermisPerConsulta(Long entitatId, String usuariCodi, PermisEnum permis) {
+		return getDelegateService().getOrgansAmbPermisPerConsulta(entitatId, usuariCodi, permis);
+	}
+
+	@Override
 	@PermitAll
 	public boolean hasUsrPermisOrgan(Long entitatId, String usr, String organCodi, PermisEnum permis) {
 		return getDelegateService().hasUsrPermisOrgan(entitatId, usr, organCodi, permis);

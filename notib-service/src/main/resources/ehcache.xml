@@ -68,6 +68,7 @@
 
 	<!-- Òrgans -->
 	<cache alias="organsAmbPermis" uses-template="default" />
+	<cache alias="organsAmbPermisPerConsulta"/>
 	<cache alias="organsPermisPerProcedimentComu" uses-template="default" />
 
 	<!-- Procediment-òrgan -->

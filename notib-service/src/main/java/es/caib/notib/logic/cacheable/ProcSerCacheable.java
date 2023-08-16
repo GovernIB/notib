@@ -7,6 +7,7 @@ import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
@@ -45,6 +46,7 @@ public class ProcSerCacheable {
             return;
         }
         var cacheOrgansAmbPermis = cacheManager.getCache("organsAmbPermis");
+        var cacheOrgansAmbPermisPerConsulta = cacheManager.getCache("organsAmbPermisPerConsulta");
         var cacheProcsersAmbPermis = cacheManager.getCache("procsersAmbPermis");
         var cacheProcedimentsAmbPermis = cacheManager.getCache("procedimentsAmbPermis");
         var cacheServeisAmbPermis = cacheManager.getCache("serveisAmbPermis");
@@ -57,6 +59,7 @@ public class ProcSerCacheable {
             cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
             for (var permis: PermisEnum.values()) {
                 if (cacheOrgansAmbPermis != null) { cacheOrgansAmbPermis.evict(cacheKeyPrefix.concat(permis.name()));}
+                if (cacheOrgansAmbPermisPerConsulta != null) { cacheOrgansAmbPermisPerConsulta.evict(cacheKeyPrefix.concat(permis.name())); }
                 if (cacheProcsersAmbPermis != null) { cacheProcsersAmbPermis.evict(cacheKeyPrefix.concat(permis.name()));}
                 if (cacheProcedimentsAmbPermis != null) { cacheProcedimentsAmbPermis.evict(cacheKeyPrefix.concat(permis.name()));}
                 if (cacheServeisAmbPermis != null) { cacheServeisAmbPermis.evict(cacheKeyPrefix.concat(permis.name()));}

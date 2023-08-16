@@ -301,8 +301,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 		// Procediments accessibles per qualsevol òrgan gestor
 		var codisProcedimentsDisponibles = isUsuari && entitatEntity != null ? procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatEntity, PermisEnum.CONSULTA) : null;
 		// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
-		var codisOrgansGestorsDisponibles = isUsuari && entitatEntity != null ? organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, PermisEnum.CONSULTA) : null;
-		var codisOrgansGestorsComunsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, PermisEnum.COMUNS);
+		var codisOrgansGestorsDisponibles = isUsuari && entitatEntity != null ? organGestorHelper.findCodiOrgansGestorsWithPermisPerConsulta(auth, entitatEntity, PermisEnum.CONSULTA) : null;
+		var codisOrgansGestorsComunsDisponibles = isUsuari && entitatEntity != null ? organGestorHelper.findCodiOrgansGestorsWithPermisPerConsulta(auth, entitatEntity, PermisEnum.COMUNS) : null;
 		// Procediments comuns que es poden consultar per a òrgans gestors concrets
 		var codisProcedimentsOrgans = isUsuari && entitatEntity != null ? permisosService.getProcedimentsOrgansAmbPermis(entitatEntity.getId(), auth.getName(), PermisEnum.CONSULTA) : null;
 		var esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
