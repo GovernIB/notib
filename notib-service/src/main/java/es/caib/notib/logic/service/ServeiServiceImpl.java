@@ -80,6 +80,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1069,12 +1070,8 @@ public class ServeiServiceImpl implements ServeiService {
 				}
 			}
 
-			Collections.sort(serveis, new Comparator<CodiValorOrganGestorComuDto>() {
-				@Override
-				public int compare(CodiValorOrganGestorComuDto p1, CodiValorOrganGestorComuDto p2) {
-					return p1.getValor().compareTo(p2.getValor());
-				}
-			});
+			serveis = new ArrayList<>(new HashSet<>(serveis));
+			serveis.sort(Comparator.comparing(CodiValorOrganGestorComuDto::getValor));
 			return serveis;
 
 		} finally {
@@ -1164,14 +1161,19 @@ public class ServeiServiceImpl implements ServeiService {
 	}
 
 	private List<CodiValorOrganGestorComuDto> recuperarServeiAmbPermis(EntitatEntity entitat, PermisEnum permis, String organFiltre) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<CodiValorOrganGestorComuDto> serveis = permisosService.getServeisAmbPermis(entitat.getId(), auth.getName(), permis);
-		if (organFiltre == null) {
-			return serveis;
-		}
+
 		List<CodiValorOrganGestorComuDto> serveisAmbPermis = new ArrayList<>();
-		List<String> organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
-		for (CodiValorOrganGestorComuDto servei: serveis) {
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		var serveis = permisosService.getServeisAmbPermis(entitat.getId(), auth.getName(), permis);
+		if (serveis == null || serveis.isEmpty()) {
+			return serveisAmbPermis;
+		}
+		if (organFiltre == null) {
+			serveisAmbPermis.addAll(serveis);
+			return serveisAmbPermis;
+		}
+		var organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
+		for (var servei: serveis) {
 			if (organsFills.contains(servei.getOrganGestor())) {
 				serveisAmbPermis.add(servei);
 			}
