@@ -9,11 +9,16 @@ import es.caib.notib.core.api.exception.PluginException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.util.UtilitatsNotib;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.support.RequestContext;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -28,6 +33,7 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public abstract class BaseRestController implements MessageSourceAware {
 
 	@Autowired
@@ -36,6 +42,13 @@ public abstract class BaseRestController implements MessageSourceAware {
 	protected NotificacioServiceWsV2 notificacioServiceWsV2;
 
 	MessageSource messageSource;
+
+	@ExceptionHandler
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public void handle(HttpMessageNotReadableException ex) {
+		log.error("Retornant HTTP 400 Bad Request", ex);
+		throw ex;
+	}
 
 	protected String getErrorDescripcio(Exception e) {
 		String errorDescripcio;
