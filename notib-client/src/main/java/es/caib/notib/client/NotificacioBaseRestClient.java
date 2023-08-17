@@ -33,6 +33,8 @@ public abstract class NotificacioBaseRestClient {
 	protected String username;
 	protected String password;
 
+	protected boolean debug = false;
+
 	protected boolean autenticacioBasic = true;
 	protected int connecTimeout = 20000;
 	protected int readTimeout = 120000;
@@ -69,6 +71,20 @@ public abstract class NotificacioBaseRestClient {
 
 	public boolean isAutenticacioBasic() {
 		return autenticacioBasic;
+	}
+
+	public void resetClient() {
+		jerseyClient = null;
+	}
+
+	public void enableDegub() {
+		this.debug = true;
+		jerseyClient = null;
+	}
+
+	public void disableDegub() {
+		this.debug = false;
+		jerseyClient = null;
 	}
 
 	protected Client generarClient(String urlAmbMetode) {

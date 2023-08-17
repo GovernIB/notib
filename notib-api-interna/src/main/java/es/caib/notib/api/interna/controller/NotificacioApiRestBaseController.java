@@ -8,7 +8,12 @@ import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.NotificacioServiceWs;
 import es.caib.notib.logic.intf.util.UtilitatsNotib;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.ejb.EJBAccessException;
 import javax.servlet.http.HttpServletRequest;
@@ -19,12 +24,20 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public abstract class NotificacioApiRestBaseController {
 
 	@Autowired
 	protected AplicacioService aplicacioService;
 	@Autowired
 	protected NotificacioServiceWs notificacioServiceWs;
+
+	@ExceptionHandler
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public void handle(HttpMessageNotReadableException ex) {
+		log.error("Retornant HTTP 400 Bad Request", ex);
+		throw ex;
+	}
 
 	protected String getErrorDescripcio(Exception e) {
 
