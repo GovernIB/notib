@@ -80,6 +80,10 @@ public abstract class NotificacioBaseRestClient {
 		return autenticacioBasic;
 	}
 
+	public void resetClient() {
+		jerseyClient = null;
+	}
+
 	protected Client generarClient(String urlAmbMetode) throws Exception {
 
 		if (jerseyClient != null) {

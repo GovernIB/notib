@@ -76,6 +76,10 @@ public abstract class NotificacioBaseRestClient {
 		}
 	}
 
+	public void resetClient() {
+		jerseyClient = null;
+	}
+
 	protected Client generarClient(String urlAmbMetode) throws Exception {
 
 		if (jerseyClient != null) {
