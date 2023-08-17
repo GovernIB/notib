@@ -84,6 +84,16 @@ public abstract class NotificacioBaseRestClient {
 		jerseyClient = null;
 	}
 
+	public void enableDegub() {
+		this.debug = true;
+		jerseyClient = null;
+	}
+
+	public void disableDegub() {
+		this.debug = false;
+		jerseyClient = null;
+	}
+
 	protected Client generarClient(String urlAmbMetode) throws Exception {
 
 		if (jerseyClient != null) {
