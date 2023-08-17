@@ -11,8 +11,8 @@ package es.caib.notib.client;
  */
 public class NotificacioRestClientFactory {
 
-	private static NotificacioRestClient clientV1;
-	private static NotificacioRestClientV2 clientV2;
+//	private static NotificacioRestClient clientV1;
+//	private static NotificacioRestClientV2 clientV2;
 
 	/**
 	 * Crea un client per a connectar-se amb la API REST v1 de NOTIB.
@@ -27,11 +27,10 @@ public class NotificacioRestClientFactory {
 	@Deprecated
 	public static NotificacioRestClient getRestClient(String baseUrl, String username, String password) {
 
-		if (clientV1 != null) {
-			return clientV1;
-		}
-		clientV1 = new NotificacioRestClient(baseUrl, username, password);
-		return clientV1;
+//		if (clientV1 != null) {
+//			return clientV1;
+//		}
+		return new NotificacioRestClient(baseUrl, username, password);
 	}
 
 	/**
@@ -47,11 +46,10 @@ public class NotificacioRestClientFactory {
 	@Deprecated
 	public static NotificacioRestClient getRestClient(String baseUrl, String username, String password, boolean autenticacioBasic) {
 
-		if (clientV1 != null) {
-			return clientV1;
-		}
-		clientV1 = new NotificacioRestClient(baseUrl, username, password, autenticacioBasic);
-		return clientV1;
+//		if (clientV1 != null) {
+//			return clientV1;
+//		}
+		return new NotificacioRestClient(baseUrl, username, password, autenticacioBasic);
 	}
 
 	/**
@@ -69,11 +67,10 @@ public class NotificacioRestClientFactory {
 	@Deprecated
 	public static NotificacioRestClient getRestClient(String baseUrl, String username, String password, boolean autenticacioBasic, int connecTimeout, int readTimeout) {
 
-		if (clientV1 != null) {
-			return clientV1;
-		}
-		clientV1 = new NotificacioRestClient(baseUrl, username, password, autenticacioBasic, connecTimeout, readTimeout);
-		return clientV1;
+//		if (clientV1 != null) {
+//			return clientV1;
+//		}
+		return new NotificacioRestClient(baseUrl, username, password, autenticacioBasic, connecTimeout, readTimeout);
 	}
 
 
@@ -91,11 +88,10 @@ public class NotificacioRestClientFactory {
 	 */
 	public static NotificacioRestClientV2 getRestClientV2(String baseUrl, String username, String password) {
 
-		if (clientV2 != null) {
-			return clientV2;
-		}
-		clientV2 = new NotificacioRestClientV2(baseUrl, username, password);
-		return clientV2;
+//		if (clientV2 != null) {
+//			return clientV2;
+//		}
+		return new NotificacioRestClientV2(baseUrl, username, password);
 	}
 
 	/**
@@ -109,11 +105,10 @@ public class NotificacioRestClientFactory {
 	 */
 	public static NotificacioRestClientV2 getRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic) {
 
-		if (clientV2 != null) {
-			return clientV2;
-		}
-		clientV2 = new NotificacioRestClientV2(baseUrl, username, password, autenticacioBasic);
-		return clientV2;
+//		if (clientV2 != null) {
+//			return clientV2;
+//		}
+		return new NotificacioRestClientV2(baseUrl, username, password, autenticacioBasic);
 	}
 
 	/**
@@ -129,10 +124,9 @@ public class NotificacioRestClientFactory {
 	 */
 	public static NotificacioRestClientV2 getRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic, int connecTimeout, int readTimeout) {
 
-		if (clientV2 != null) {
-			return clientV2;
-		}
-		clientV2 = new NotificacioRestClientV2(baseUrl, username, password, autenticacioBasic, connecTimeout, readTimeout);
-		return clientV2;
+//		if (clientV2 != null) {
+//			return clientV2;
+//		}
+		return new NotificacioRestClientV2(baseUrl, username, password, autenticacioBasic, connecTimeout, readTimeout);
 	}
 }

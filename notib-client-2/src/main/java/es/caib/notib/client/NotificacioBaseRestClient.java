@@ -31,6 +31,7 @@ public abstract class NotificacioBaseRestClient {
 	protected String username;
 	protected String password;
 
+	protected boolean debug = false;
 	protected boolean autenticacioBasic = true;
 	protected Integer connecTimeout = 20000;
 	protected Integer readTimeout = 120000;
@@ -64,6 +65,20 @@ public abstract class NotificacioBaseRestClient {
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
+	}
+
+	public void resetClient() {
+		jerseyClient = null;
+	}
+
+	public void enableDegub() {
+		this.debug = true;
+		jerseyClient = null;
+	}
+
+	public void disableDegub() {
+		this.debug = false;
+		jerseyClient = null;
 	}
 
 	protected Client generarClient() {
