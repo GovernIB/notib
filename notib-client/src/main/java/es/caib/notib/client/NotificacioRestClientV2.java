@@ -3,7 +3,6 @@
  */
 package es.caib.notib.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import es.caib.notib.client.domini.AppInfo;
@@ -132,12 +131,8 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public AppInfo getAppInfo() {
 		String urlAmbMetode = baseUrl + "/api/rest/appinfo";
 		try {
-			jerseyClient = generarClient(urlAmbMetode);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					get(String.class);
-			return getMapper().readValue(json, AppInfo.class);
+			jerseyClient = generarClient();
+			return clientGet(urlAmbMetode, AppInfo.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -154,16 +149,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public RespostaAltaV2 alta(NotificacioV2 notificacio) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/alta";
-			ObjectMapper mapper  = getMapper();
-			String body = mapper.writeValueAsString(notificacio);
-			jerseyClient = generarClient(urlAmbMetode);
-			logger.debug("Missatge REST enviat: " + body);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					post(String.class, body);
-			logger.debug("Missatge REST rebut: " + json);
-			return mapper.readValue(json, RespostaAltaV2.class);
+			return clientPost(urlAmbMetode, notificacio, RespostaAltaV2.class);
 		} catch (UniformInterfaceException ue) {
 			RespostaAltaV2 respostaAlta = new RespostaAltaV2();
 			ClientResponse response = ue.getResponse();
@@ -188,12 +174,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(String identificador) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
-			jerseyClient = generarClient(urlAmbMetode);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					get(String.class);
-			return getMapper().readValue(json, RespostaConsultaEstatNotificacioV2.class);
+			return clientGet(urlAmbMetode, RespostaConsultaEstatNotificacioV2.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -208,12 +189,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviament(String referencia) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
-			jerseyClient = generarClient(urlAmbMetode);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					get(String.class);
-			return getMapper().readValue(json, RespostaConsultaEstatEnviamentV2.class);
+			return clientGet(urlAmbMetode, RespostaConsultaEstatEnviamentV2.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -228,15 +204,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public RespostaConsultaDadesRegistreV2 consultaDadesRegistre(DadesConsulta dadesConsulta) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaDadesRegistre";
-			ObjectMapper mapper  = getMapper();
-			String body = mapper.writeValueAsString(dadesConsulta);
-			jerseyClient = generarClient(urlAmbMetode);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					post(String.class, body);
-			logger.debug("Missatge REST rebut: " + json);
-			return mapper.readValue(json, RespostaConsultaDadesRegistreV2.class);
+			return clientPost(urlAmbMetode, dadesConsulta, RespostaConsultaDadesRegistreV2.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -326,7 +294,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	}
 
 	private String getConsultaJsonString(Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida, String urlAmbMetode) throws Exception {
-		jerseyClient = generarClient(urlAmbMetode);
+		jerseyClient = generarClient();
 		String json = jerseyClient.
 				resource(urlAmbMetode).
 				queryParam("dataInicial", dataInicial != null ? sdf.format(dataInicial) : "").
