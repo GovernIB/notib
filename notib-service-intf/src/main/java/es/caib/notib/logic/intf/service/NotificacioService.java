@@ -255,7 +255,17 @@ public interface NotificacioService {
 	 * @throws RegistreNotificaException 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public RespostaAccio<String> enviarNotificacioARegistre(Long notificacioId) throws RegistreNotificaException;
+	RespostaAccio<String> enviarNotificacioARegistre(Long notificacioId) throws RegistreNotificaException;
+
+	/**
+	 * Reseteja els intents de regitre.
+	 * Registra i notifica una notificació
+	 *
+	 * @param notificacioId Atribut id de la notificació.
+	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	RespostaAccio<String> resetNotificacioARegistre(Long notificacioId);
 
 	/**
 	 * Refresca l'estat d'un enviament (datat i certificació).

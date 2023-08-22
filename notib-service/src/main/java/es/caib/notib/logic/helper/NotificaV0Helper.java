@@ -103,14 +103,14 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				integracioHelper.addAccioOk(info);
 			} else {
 				error = true;
-				errorDescripcio = "Intent " + notificacio.getNotificaEnviamentIntent() + " \n\nError retornat per Notifica: [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
+				errorDescripcio = "Error retornat per Notifica: [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
 				log.info(" >>> ... ERROR: " + errorDescripcio);
 				integracioHelper.addAccioError(info, errorDescripcio);
 			}
 		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
 			error = true;
-			errorDescripcio = "Intent " + notificacio.getNotificaEnviamentIntent() + " \n\n" + (ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex));
+			errorDescripcio = ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
 			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 		}
 		var fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
@@ -272,7 +272,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	private String getErrorDescripcio(int intent, Exception ex) {
 
 		// Generam el missatge d'error
-		return "Intent " + intent + "\n\n" + (ex instanceof ValidationException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex));
+		return ex instanceof ValidationException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
 	}
 
 	public ResultadoInfoEnvioV2 infoEnviament(NotificacioEnviamentEntity enviament) throws SistemaExternException {

@@ -81,7 +81,9 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
                 .withChoice().source(REGISTRE_RETRY)
                     .first(REGISTRE_PENDENT, reintentsRegistreGuard, enviamentRegistreAction)
                     .last(REGISTRE_ERROR).and()
+                .withExternal().source(REGISTRE_ERROR).target(REGISTRE_PENDENT).event(RG_RESET).guard(uuidGuard()).action(enviamentRegistreAction).and()
                 .withExternal().source(REGISTRE_ERROR).target(REGISTRE_PENDENT).event(RG_RETRY).guard(uuidGuard()).action(enviamentRegistreAction).and()
+                .withExternal().source(REGISTRE_PENDENT).target(REGISTRE_PENDENT).event(RG_RETRY).guard(uuidGuard()).action(enviamentRegistreAction).and()
                 .withChoice().source(REGISTRAT)
                     .first(SIR_PENDENT, isSir(), consultaSirIniciPoolingAction)
                     // .then(EMAIL_PENDENT, senseNif(), emailAction) --> Els emails s'envien en la notificació

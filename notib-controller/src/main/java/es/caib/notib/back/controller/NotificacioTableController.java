@@ -731,6 +731,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         for (var notificacioId : seleccio) {
             try {
                 notificacioService.reactivarRegistre(notificacioId);
+                notificacioService.resetNotificacioARegistre(notificacioId);
             } catch (Exception e) {
                 notificacionsError.add("[" + notificacioId + "]: " + e.getMessage());
             }

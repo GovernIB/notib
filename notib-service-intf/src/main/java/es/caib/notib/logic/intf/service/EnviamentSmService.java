@@ -29,6 +29,9 @@ public interface EnviamentSmService {
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreFailed(String enviamentUuid);
 
 	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreReset(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreRetry(String enviamentUuid);
 
 	@PreAuthorize("hasRole('tothom')")

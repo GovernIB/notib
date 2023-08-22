@@ -50,9 +50,7 @@ public class EnviamentNotificaListener {
 
     @Transactional
     @JmsListener(destination = SmConstants.CUA_NOTIFICA, containerFactory = SmConstants.JMS_FACTORY_ACK)
-    public void receiveEnviamentNotifica(@Payload EnviamentNotificaRequest enviamentNotificaRequest,
-                                         @Headers MessageHeaders headers,
-                                         Message message) throws JMSException, InterruptedException {
+    public void receiveEnviamentNotifica(@Payload EnviamentNotificaRequest enviamentNotificaRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentNotificaRequest.getEnviamentNotificaDto().getUuid()).orElseThrow();
         var notificacio = enviament.getNotificacio();

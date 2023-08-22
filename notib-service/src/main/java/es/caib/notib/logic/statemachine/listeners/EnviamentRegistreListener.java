@@ -62,7 +62,7 @@ public class EnviamentRegistreListener {
                 notificacio.updateEstat(isSir ? NotificacioEstatEnumDto.ENVIADA : NotificacioEstatEnumDto.REGISTRADA);
 
                 // És possible que el registre ja retorni estats finals al registrar SIR?
-                if (notificacio.getEnviaments().stream().allMatch(e -> e.isRegistreEstatFinal())) {
+                if (isSir && notificacio.getEnviaments().stream().allMatch(e -> e.isRegistreEstatFinal())) {
                     var nouEstat = NotificacioEstatEnumDto.FINALITZADA;
                     //Marcar com a processada si la notificació s'ha fet des de una aplicació
                     if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {

@@ -168,6 +168,12 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public RespostaAccio<String> resetNotificacioARegistre(Long notificacioId) {
+		return getDelegateService().resetNotificacioARegistre(notificacioId);
+	}
+
+	@Override
 	@RolesAllowed({"tothom"})
 	public List<ProvinciesDto> llistarProvincies() {
 		return getDelegateService().llistarProvincies();

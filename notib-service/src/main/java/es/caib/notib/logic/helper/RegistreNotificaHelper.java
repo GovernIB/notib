@@ -298,8 +298,7 @@ public class RegistreNotificaHelper {
 
 	private String getErrorDescripcio(String codi, String descripcio, int intent) {
 
-		var errorDescripcio = "intent " + intent + ": \n\n";
-		errorDescripcio += "Codi error: " + (codi != null ? codi : "Codi no proporcionat") + "\n";
+		var errorDescripcio = "Codi error: " + (codi != null ? codi : "Codi no proporcionat") + "\n";
 		errorDescripcio += descripcio != null ? descripcio : "El registre no aporta cap descripció de l'error";
 		return errorDescripcio;
 	}

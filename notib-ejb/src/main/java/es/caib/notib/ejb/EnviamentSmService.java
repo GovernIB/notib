@@ -48,6 +48,12 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreReset(String enviamentUuid) {
+		return getDelegateService().registreReset(enviamentUuid);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreRetry(String enviamentUuid) {
 		return getDelegateService().registreRetry(enviamentUuid);
 	}

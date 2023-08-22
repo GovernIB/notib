@@ -110,13 +110,7 @@ public class RegistreHelper {
 	private static String getErrorDescripcio(int intent, Exception ex) {
 
 		// Generam el missatge d'error
-		var errorDescripcio = "Intent " + intent + "\n\n";
-		if (ex instanceof ValidationException || ex instanceof RegistreNotificaException) {
-			errorDescripcio += ex.getMessage();
-		} else {
-			errorDescripcio += ExceptionUtils.getStackTrace(ex);
-		}
-		return errorDescripcio;
+		return ex instanceof ValidationException || ex instanceof RegistreNotificaException ? ex.getMessage(): ExceptionUtils.getStackTrace(ex);
 	}
 
 

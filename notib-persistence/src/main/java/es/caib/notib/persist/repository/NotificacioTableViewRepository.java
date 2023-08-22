@@ -88,7 +88,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"			and ntf.procedimentIsComu = true and ntf.procedimentRequirePermission = false " +
 			"			and ntf.organCodi in (:#{#filtre.organsGestorsComunsCodisNotib})) " +
 			// Procediment comú amb permís de procediment-òrgan
-			"   or (:esProcedimentOrgansIdsNotibNull = false and ntf.procedimentCodiNotib is not null " +
+			"   or (:#{#filtre.procedimentOrgansIdsNotibNull} = false and ntf.procedimentCodiNotib is not null " +
 			"			and CONCAT(ntf.procedimentCodiNotib, '-', ntf.organCodi) in (:#{#filtre.procedimentOrgansIdsNotib})" +
 			"		) " +
 			//
@@ -145,7 +145,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"			and ntf.procedimentIsComu = true and ntf.procedimentRequirePermission = false " +
 			"			and ntf.organCodi in (:#{#filtre.organsGestorsComunsCodisNotib})) " +
 			// Procediment comú amb permís de procediment-òrgan
-			"   or (:esProcedimentOrgansIdsNotibNull = false and ntf.procedimentCodiNotib is not null " +
+			"   or (:#{#filtre.procedimentOrgansIdsNotibNull} = false and ntf.procedimentCodiNotib is not null " +
 			"			and CONCAT(ntf.procedimentCodiNotib, '-', ntf.organCodi) in (:#{#filtre.procedimentOrgansIdsNotib})" +
 			"		) " +
 			//

@@ -495,14 +495,19 @@ public class NotificacioServiceImpl implements NotificacioService {
 			dto.setEnviadaDate(getEnviadaDate(notificacio));
 
 			// TODO RECUPERAR INFORMACIÓ DIRECTAMENT DE LES ENTITATS
-			var notificacioTableEntity = notificacioTableViewRepository.findById(id).orElse(null);
-			if (notificacioTableEntity == null) {
-				return dto;
-			}
+//			var notificacioTableEntity = notificacioTableViewRepository.findById(id).orElse(null);
+//			if (notificacioTableEntity == null) {
+//				return dto;
+//			}
 			var e = notificacioEventRepository.findLastErrorEventByNotificacioId(id);
 //			dto.notificaError(e != null);
-			dto.setNotificaErrorData(notificacioTableEntity.getNotificaErrorData());
-			dto.setNotificaErrorDescripcio(notificacioTableEntity.getNotificaErrorDescripcio());
+//			dto.setNotificaErrorData(notificacioTableEntity.getNotificaErrorData());
+//			dto.setNotificaErrorDescripcio(notificacioTableEntity.getNotificaErrorDescripcio());
+			if (e == null) {
+				return dto;
+			}
+			dto.setNotificaErrorData(e.getData());
+			dto.setNotificaErrorDescripcio(e.getErrorDescripcio());
 			return dto;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -954,6 +959,32 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			});
 //			return notificacioHelper.registrarNotificar(notificacioId);
+			return resposta;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Transactional
+	@Override
+	public RespostaAccio<String> resetNotificacioARegistre(Long notificacioId) {
+
+		var timer = metricsHelper.iniciMetrica();
+		var resposta = new RespostaAccio<String>();
+		try {
+			var notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			notificacioEntity.getEnviaments().forEach(e -> {
+				var estatEnviament = enviamentSmService.getEstatEnviament(e.getUuid());
+				try {
+					if (!EnviamentSmEstat.REGISTRE_ERROR.equals(estatEnviament)) {
+						return;
+					}
+					enviamentSmService.registreReset(e.getUuid());
+					resposta.getExecutades().add(e.getUuid());
+				} catch (Exception ex) {
+					resposta.getErrors().add(e.getUuid());
+				}
+			});
 			return resposta;
 		} finally {
 			metricsHelper.fiMetrica(timer);

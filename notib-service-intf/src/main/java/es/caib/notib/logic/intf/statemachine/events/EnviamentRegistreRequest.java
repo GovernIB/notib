@@ -1,6 +1,5 @@
 package es.caib.notib.logic.intf.statemachine.events;
 
-import es.caib.notib.logic.intf.statemachine.dto.EnviamentRegistreDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

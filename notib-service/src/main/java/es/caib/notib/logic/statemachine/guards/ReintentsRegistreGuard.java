@@ -19,6 +19,7 @@ public class ReintentsRegistreGuard implements Guard<EnviamentSmEstat, Enviament
 
     @Override
     public boolean evaluate(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
+
         var numReintentsActuals = (Integer) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
         var maxReintents = configHelper.getConfigAsInteger("es.caib.notib.tasca.registre.enviaments.reintents.maxim", 3);
         log.debug("[SM] Reintent per error de enviament a registre. Intent actual=" + numReintentsActuals + ", Max intents=" + maxReintents);

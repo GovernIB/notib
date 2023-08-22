@@ -5,8 +5,10 @@ import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
+import es.caib.notib.persist.repository.NotificacioEventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.service.StateMachineService;
@@ -25,6 +27,11 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	private final NotificacioEnviamentRepository notificacioEnviamentRepository;
 	private final StateMachineService<EnviamentSmEstat, EnviamentSmEvent> stateMachineService;
+
+	@Autowired
+	private NotificacioEventRepository eventRepository;
+	@Autowired
+	private NotificacioEnviamentRepository enviamentRepository;
 
 
 	@Override
@@ -73,10 +80,19 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	@Override
 	@Transactional
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreRetry(String enviamentUuid) {
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreReset(String enviamentUuid) {
 
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_RETRY);
+		return sm;
+	}
+
+	@Override
+	@Transactional
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreRetry(String enviamentUuid) {
+
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_RETRY);
 		return sm;
 	}

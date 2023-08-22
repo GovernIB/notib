@@ -46,18 +46,15 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
     @Override
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 30000, multiplier = 10, maxDelay = 3600000))
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
+
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
 //        var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
-
-        jmsTemplate.convertAndSend(SmConstants.CUA_REGISTRE,
-                EnviamentRegistreRequest.builder()
-                        .enviamentUuid(enviamentUuid)
-                        .numIntent(reintents + 1)
-//                        .enviamentRegistreDto(enviamentRegistreMapper.toDto(enviament))
-                        .build(),
+        var env = EnviamentRegistreRequest.builder().enviamentUuid(enviamentUuid).numIntent(reintents + 1).build();//.enviamentRegistreDto(enviamentRegistreMapper.toDto(enviament))
+        var isRetry = EnviamentSmEvent.RG_RETRY.equals(stateContext.getMessage().getPayload());
+        jmsTemplate.convertAndSend(SmConstants.CUA_REGISTRE, env,
                 m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));
+                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0);
                     return m;
                 });
 

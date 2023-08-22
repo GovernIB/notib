@@ -4,6 +4,7 @@ public enum EnviamentSmEvent {
     // ReGistrar
     RG_ENVIAR,
     RG_SUCCESS,
+    RG_RESET,
     RG_RETRY,
     RG_ERROR,
     RG_FORWARD,
