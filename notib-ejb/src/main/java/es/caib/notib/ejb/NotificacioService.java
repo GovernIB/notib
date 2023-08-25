@@ -120,6 +120,13 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public boolean resetNotificacioANotifica(Long notificacioId) {
+		return getDelegateService().resetNotificacioANotifica(notificacioId);
+	}
+
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(Long entitatId, Long enviamentId) {
 		return getDelegateService().enviamentRefrescarEstat(entitatId, enviamentId);

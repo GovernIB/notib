@@ -38,11 +38,11 @@ public class EnviamentNotificaListener {
     public static synchronized boolean haDeExecutar(Long notificacioId, Integer intent) {
 
         var ultimIntent = notificacionsExecutades.get(notificacioId);
-        if (ultimIntent == null || ultimIntent < intent) {
+//        if (ultimIntent == null || ultimIntent < intent) {
             notificacionsExecutades.put(notificacioId, intent);
             return true;
-        }
-        return false;
+//        }
+//        return false;
     }
     public static void netejaExecucio(Long notificacioId) {
         notificacionsExecutades.remove(notificacioId);
@@ -61,7 +61,7 @@ public class EnviamentNotificaListener {
         try {
             // Al notificar es processen tots els enviaments a l'hora. --> Notificacio
             // Per tant controlam que només s'executi el primer enviament de la notificació
-            if (haDeExecutar(notificacio.getId(), numIntent)) {
+             if (haDeExecutar(notificacio.getId(), numIntent)) {
                 notificacioService.notificacioEnviar(notificacio.getId());
 
                 for (var env : notificacio.getEnviaments()) {

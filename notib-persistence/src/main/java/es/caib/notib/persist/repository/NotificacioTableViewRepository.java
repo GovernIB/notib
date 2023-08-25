@@ -75,7 +75,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			" and  (" +
 			// PERMISOS
 			// Iniciada pel propi usuari
-			"   ntf.usuariCodi = :#{#filtre.usuariCodi} " +
+			" :#{#filtre.isUsuariEntitat} = true or " +
+			" ntf.usuariCodi = :#{#filtre.usuariCodi} " +
 			// Té permís consulta sobre el procediment
 			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null " +
 			"			and ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}) and ntf.procedimentIsComu = false) " +
@@ -123,7 +124,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:#{#filtre.identificadorNull} = true or ntf.notificaIds like concat('%', :#{#filtre.identificador}, '%')) " +
 			"and (:#{#filtre.nomesSenseErrors} = false or ntf.notificaErrorData is null) " +
 			"and (:#{#filtre.adminOrgan} = true or :#{#filtre.nomesAmbErrors} = false or ntf.notificaErrorData is not null) " +
-			"and (:#{#filtre.referenciaNull} = true or lower(ntf.referencia) like '%' || lower(:#{#filtre.referencia}) || '%')")
+			"and (:#{#filtre.referenciaNull} = true or lower(ntf.referencia) like '%' || lower(:#{#filtre.referencia}) || '%')"
+	)
     List<Long> findIdsAmbFiltre(FiltreNotificacio filtre);
 
 	@Query("select ntf from NotificacioTableEntity ntf " +
@@ -132,6 +134,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			" and  (" +
 			// PERMISOS
 			// Iniciada pel propi usuari
+			" :#{#filtre.isUsuariEntitat} = true or " +
 			"   ntf.usuariCodi = :#{#filtre.usuariCodi} " +
 			// Té permís consulta sobre el procediment
 			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null " +

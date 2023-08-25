@@ -452,7 +452,7 @@ public class EmailNotificacioSenseNifHelper {
 	}
 
 	private InputStream getCapsaleraLogoNotib() {
-		return getClass().getResourceAsStream("/es/caib/notib/core/justificant/logo.png");
+		return getClass().getResourceAsStream("/es/caib/notib/logic/justificant/logo.png");
 	}
 
 	private String getPeuLogo() {
@@ -464,7 +464,7 @@ public class EmailNotificacioSenseNifHelper {
 	}
 
 	private InputStream getCapsaleraDefaultLogoEntitat() {
-		return getClass().getResourceAsStream("/es/caib/notib/core/justificant/govern-logo.png");
+		return getClass().getResourceAsStream("/es/caib/notib/logic/justificant/govern-logo.png");
 	}
 
 	private String getNotBlankProperty(String property) {

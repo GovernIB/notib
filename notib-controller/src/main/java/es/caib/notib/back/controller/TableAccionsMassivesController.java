@@ -249,7 +249,9 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
         log.info("Reactivam consulta dels enviaments: " + StringUtils.join(seleccio, ", "));
         try {
-            enviamentService.reactivaConsultes(seleccio);
+            for (var notId : seleccio) {
+                notificacioService.resetNotificacioANotifica(notId);
+            }
             MissatgesHelper.info(request, getMessage(request, "enviament.controller.reactivar.consultes.OK"));
         } catch (Exception e) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.consultes.KO"));

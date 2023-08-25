@@ -57,14 +57,11 @@ public class EnviamentNotificaAction implements Action<EnviamentSmEstat, Enviame
             log.debug("[SM] Petició de notificació NO enviada degut a que no tots els enviaments estan registrats - enviament amb UUID " + enviamentUuid);
             return;
         }
-        jmsTemplate.convertAndSend(
-                SmConstants.CUA_NOTIFICA,
-                EnviamentNotificaRequest.builder()
-                        .enviamentNotificaDto(enviamentNotificaMapper.toDto(enviament))
-                        .numIntent(reintents + 1)
-                        .build(),
+        var env = EnviamentNotificaRequest.builder().enviamentNotificaDto(enviamentNotificaMapper.toDto(enviament)).numIntent(reintents + 1).build();
+        var isRetry = EnviamentSmEvent.NT_RETRY.equals(stateContext.getMessage().getPayload());
+        jmsTemplate.convertAndSend(SmConstants.CUA_NOTIFICA, env,
                 m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));
+                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0);
                     return m;
                 });
         log.debug("[SM] Enviada petició de notificació per l'enviament amb UUID " + enviamentUuid);

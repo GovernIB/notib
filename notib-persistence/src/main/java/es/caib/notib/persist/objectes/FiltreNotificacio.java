@@ -57,6 +57,7 @@ public class FiltreNotificacio {
     private boolean procedimentOrgansIdsNotibNull;
     private List<String> procedimentOrgansIdsNotib;
     private String usuariCodi;
+    private boolean isUsuariEntitat;
     private boolean isSuperAdmin;
     private List<EntitatEntity> entitatsActives;
     private boolean isAdminOrgan;

@@ -1028,6 +1028,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				EnviamentSmEstat estatEnviament = enviamentSmService.getEstatEnviament(e.getUuid());
 				try {
 					switch (estatEnviament) {
+						case NOTIFICA_RETRY:
 						case NOTIFICA_ERROR:
 							enviamentSmService.notificaRetry(e.getUuid());
 							resposta.getExecutades().add(e.getUuid());
@@ -1046,6 +1047,37 @@ public class NotificacioServiceImpl implements NotificacioService {
 			return !resposta.getExecutades().isEmpty();
 //			var notificacio = notificaHelper.notificacioEnviar(notificacioId);
 //			return (notificacio != null && NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()));
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Transactional
+	@Override
+	public boolean resetNotificacioANotifica(Long notificacioId) {
+
+		var timer = metricsHelper.iniciMetrica();
+		var resposta = new RespostaAccio<String>();
+		try {
+			log.debug("Reset enviament de la notificació pendent (notificacioId=" + notificacioId + ")");
+			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			notificacioEntity.getEnviaments().forEach(e -> {
+				var estatEnviament = enviamentSmService.getEstatEnviament(e.getUuid());
+				try {
+					if (!EnviamentSmEstat.NOTIFICA_ERROR.equals(estatEnviament)) {
+						return;
+					}
+					e.refreshNotificaConsulta();
+					var events = notificacioEventRepository.findByEnviamentAndTipusAndError(e, NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, true);
+					for (var event : events) {
+						event.setFiReintents(false);
+					}
+					enviamentSmService.notificaReset(e.getUuid());
+				} catch (Exception ex) {
+					resposta.getErrors().add(e.getUuid());
+				}
+			});
+			return !resposta.getExecutades().isEmpty();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

@@ -245,7 +245,17 @@ public interface NotificacioService {
 	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public boolean enviarNotificacioANotifica(Long notificacioId);
+	boolean enviarNotificacioANotifica(Long notificacioId);
+
+	/**
+	 * Reseteja els intents de la notificacio.
+	 * Prova de fer l'enviament d'una notificació pendent.
+	 *
+	 * @param notificacioId Atribut id de la notificació.
+	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	boolean resetNotificacioANotifica(Long notificacioId);
 	
 	/**
 	 * Registra i notifica una notificació

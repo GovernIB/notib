@@ -53,6 +53,9 @@ public interface EnviamentSmService {
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaRetry(String enviamentUuid);
 
 	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaReset(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaForward(String enviamentUuid);
 
 //	@PreAuthorize("hasRole('tothom')")

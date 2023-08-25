@@ -658,12 +658,13 @@ function loadOrgansGestors(urlCercaUnitats){
                     let local = ($('#organigrama').val().indexOf(item.codi) != -1) && !isPermesComunicacionsSirPropiaEntitat;
                     let clase = (i % 2 == 0 ? 'even' : 'odd');
                     let socSir = (item.sir ? textMessages['comu.si'] : textMessages['comu.no']);
-                    let comSir = enviamentTipus === 'COMUNICACIO_SIR' && !local && item.sir;
-                    if (enviamentTipus === 'COMUNICACIO_SIR' && !comSir) {
+                    let comSir = enviamentTipus === 'SIR' && !local && item.sir;
+                    if (enviamentTipus === 'SIR' && !comSir) {
                         clase += ' unselectable';
                     }
-                    list_html += '<tr class="' + clase + '" data-codi="' + item.codi + '" data-denominacio="' + item.nom + '" data-cif="' + item.cif + '">' +
-                        '<td width="85%">' + item.codi + ' - ' + item.nom + '</td>' +
+                    let nom = item.nom ? item.nom : item.nomEs;
+                    list_html += '<tr class="' + clase + '" data-codi="' + item.codi + '" data-denominacio="' + nom + '" data-cif="' + item.cif + '">' +
+                        '<td width="85%">' + item.codi + ' - ' + nom + '</td>' +
                         '<td>' + (socSir) + '</td>' +
                         '<td>';
                     if (enviamentTipus === 'NOTIFICACIO' || enviamentTipus === 'COMUNICACIO' || comSir) {

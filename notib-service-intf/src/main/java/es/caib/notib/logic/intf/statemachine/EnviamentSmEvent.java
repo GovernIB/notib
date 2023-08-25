@@ -17,6 +17,7 @@ public enum EnviamentSmEvent {
     // NoTificar
     NT_ENVIAR,
     NT_SUCCESS,
+    NT_RESET,
     NT_RETRY,
     NT_ERROR,
     NT_FORWARD,

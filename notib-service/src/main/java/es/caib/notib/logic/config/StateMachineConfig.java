@@ -67,6 +67,11 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
                 .states(EnumSet.allOf(EnviamentSmEstat.class))
                 .choice(REGISTRE_RETRY)
                 .choice(REGISTRAT)
+                .choice(NOTIFICA_RETRY)
+                .choice(CONSULTA_ESTAT)
+                .choice(CONSULTA_RETRY)
+                .choice(SIR_ESTAT)
+                .choice(SIR_RETRY)
                 .end(FI);
     }
 
@@ -98,7 +103,9 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
                 .withChoice().source(NOTIFICA_RETRY)
                     .first(NOTIFICA_PENDENT, reintentsNotificaGuard, enviamentNotificaAction)
                     .last(NOTIFICA_ERROR).and()
+                .withExternal().source(NOTIFICA_ERROR).target(NOTIFICA_PENDENT).event(NT_RESET).guard(uuidGuard()).action(enviamentNotificaAction).and()
                 .withExternal().source(NOTIFICA_ERROR).target(NOTIFICA_PENDENT).event(NT_RETRY).guard(uuidGuard()).action(enviamentNotificaAction).and()
+                .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_PENDENT).event(NT_RETRY).guard(uuidGuard()).action(enviamentRegistreAction).and()
                 .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_SENT).event(NT_FORWARD).and()
                 .withExternal().source(NOTIFICA_ERROR).target(NOTIFICA_SENT).event(NT_FORWARD).and()
                 // Consulta estat
@@ -145,7 +152,7 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
         StateMachineListenerAdapter<EnviamentSmEstat, EnviamentSmEvent> adapter = new StateMachineListenerAdapter<>() {
             @Override
             public void stateChanged(State<EnviamentSmEstat, EnviamentSmEvent> from, State<EnviamentSmEstat, EnviamentSmEvent> to) {
-                log.debug(String.format("[SM] Transició de %s a %s%n", from == null ? "cap" : from.getId(), to.getId()));
+                log.info(String.format("[SM] Transició de %s a %s%n", from == null ? "cap" : from.getId(), to.getId()));
             }
         };
 
@@ -181,7 +188,11 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
     }
 
     public Guard<EnviamentSmEstat, EnviamentSmEvent> uuidGuard() {
-        return ctx -> ctx.getMessageHeader(SmConstants.ENVIAMENT_UUID_HEADER) != null;
+
+        return ctx ->  {
+            var r= ctx.getMessageHeader(SmConstants.ENVIAMENT_UUID_HEADER) != null;
+            return r;
+        };
     }
 
 }

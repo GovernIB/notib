@@ -72,10 +72,9 @@ public class EnviamentRegistreListener {
                     notificacio.updateMotiu(enviament.getRegistreEstat().name());
                     notificacio.updateEstatDate(new Date());
                 }
-
-                notificacioTableHelper.actualitzarRegistre(notificacio);
-                auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "RegistreNotificaHelper.realitzarProcesRegistrar");
             }
+            notificacioTableHelper.actualitzarRegistre(notificacio);
+            auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "RegistreNotificaHelper.realitzarProcesRegistrar");
 
 //            TEST
 //            var registreSuccess = new Random().nextBoolean();

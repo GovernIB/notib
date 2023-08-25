@@ -15,7 +15,7 @@
 				<c:when test="${enviamentTipus == 'COMUNICACIO'}">
 					<spring:message code="notificacio.form.titol.crear.comunicacio"/>
 				</c:when>
-				<c:when test="${enviamentTipus == 'COMUNICACIO_SIR'}">
+				<c:when test="${enviamentTipus == 'SIR'}">
 					<spring:message code="notificacio.form.titol.crear.comunicacio.sir"/>
 				</c:when>
 				<c:otherwise>
@@ -30,7 +30,7 @@
 				<c:when test="${enviamentTipus == 'COMUNICACIO'}">
 					<spring:message code="notificacio.form.titol.modificar.comunicacio"/>
 				</c:when>
-				<c:when test="${enviamentTipus == 'COMUNICACIO_SIR'}">
+				<c:when test="${enviamentTipus == 'SIR'}">
 					<spring:message code="notificacio.form.titol.modificar.comunicacio.sir"/>
 				</c:when>
 				<c:otherwise>
@@ -45,7 +45,7 @@
 <c:set var="parametresRegistre"><spring:message code="notificacio.form.titol.parametresregistre"/></c:set>
 <c:set var="enviaments"><spring:message code="notificacio.form.titol.enviaments"/></c:set>
 <c:choose>
-	<c:when test="${enviamentTipus != 'COMUNICACIO_SIR'}">
+	<c:when test="${enviamentTipus != 'SIR'}">
 		<c:set var="titular"><spring:message code="notificacio.form.titol.enviaments.titular"/></c:set>
 		<c:set var="destinatarisTitol" scope="request"><spring:message code="notificacio.form.titol.enviaments.destinataris"/></c:set>
 		<c:set var="documentAvisKey">notificacio.for.camp.document.avis</c:set>
@@ -941,7 +941,7 @@
 				url: "<c:url value="/notificacio/organ/oficina/"/>"+ organ,
 				success: data => {
 					let e = "${enviamentTipus}"
-					if (data && !data.codi && e === 'COMUNICACIO_SIR') {
+					if (data && !data.codi && e === 'SIR') {
 						$("#organGestor").closest(".form-group").addClass("has-error");
 						let msg = "<spring:message code="notificacio.form.valid.organ.sense.oficina"/>"
 						$('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp' + msg+ '</p>').insertAfter($("#organGestor").closest(".form-group").find(".select2-container"));
@@ -1038,7 +1038,7 @@
 				$(incapacitat).addClass('hidden');
 				$(raoSocial).addClass('hidden');
 				$(docTipus).addClass('hidden');
-				if(enviamentTipus == 'COMUNICACIO_SIR'){
+				if(enviamentTipus == 'SIR'){
 					$(nifLabel).text(administracioLabelText);
 					$(nif).addClass('hidden');
 				}else{
@@ -1706,7 +1706,7 @@
 							<input type="hidden" name="enviaments[${j}].id" value="${enviament.id}"/>
 						
 							<!-- TIPUS DE SERVEI -->
-							<c:if test="${enviamentTipus != 'COMUNICACIO_SIR'}">
+							<c:if test="${enviamentTipus != 'SIR'}">
 							<div class="col-md-6">
 								<div class="form-group">
 									<label class="control-label col-xs-4" for="enviaments[${j}].serveiTipus"><spring:message code="notificacio.form.camp.serveitipus" /></label>
@@ -1747,7 +1747,7 @@
 										</div>
 										<input type="hidden" name="enviaments[${j}].titular.id" value="${enviament.titular.id}"/>
 										<!--  TIPUS INTERESSAT -->
-										<div class="col-md-6 interessatTipus<c:if test="${enviamentTipus == 'COMUNICACIO_SIR'}"> hidden</c:if>">
+										<div class="col-md-6 interessatTipus<c:if test="${enviamentTipus == 'SIR'}"> hidden</c:if>">
 											<not:inputSelect name="enviaments[${j}].titular.interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 										</div>
 
@@ -1779,7 +1779,7 @@
 										</div>
 										
 										<!-- EMAIL -->
-										<c:if test="${enviamentTipus != 'COMUNICACIO_SIR'}">
+										<c:if test="${enviamentTipus != 'SIR'}">
 										<div class="col-md-6 email">
 											<not:inputText name="enviaments[${j}].titular.email" textKey="notificacio.form.camp.titular.email" inputMaxLength="${emailSize}" showsize="true"/>
 										</div>
@@ -1812,7 +1812,7 @@
 							</div>
 							
 							<!-- DESTINATARIS -->
-							<c:if test="${enviamentTipus != 'COMUNICACIO_SIR'}">
+							<c:if test="${enviamentTipus != 'SIR'}">
 								<c:set var="enviament" value="${enviament}" scope="request" />
 								<c:import url="includes/destinatariForm.jsp"/>
 								<div class="col-md-12 separacio"></div>
@@ -1985,7 +1985,7 @@
 						</div>
 				</c:forEach>
 				</div>
-				<c:if test="${enviamentTipus != 'COMUNICACIO_SIR'}">
+				<c:if test="${enviamentTipus != 'SIR'}">
 					<div class="text-left vt10">
 						<div class="btn-group">
 							<input type="button" class="btn btn-default" id="addEnviament"
@@ -2065,7 +2065,7 @@
 					<hr/>
 				</div>
 	
-				<div id="docs-addicionals"<c:if test="${enviamentTipus != 'COMUNICACIO_SIR'}"> class="hidden"</c:if>>
+				<div id="docs-addicionals"<c:if test="${enviamentTipus != 'SIR'}"> class="hidden"</c:if>>
 					<!-- DOCUMENT 2 -->
 					<div id="document2" class="row hidden">
 						<div class="col-md-6">
@@ -2306,7 +2306,7 @@
 					</div>
 				</div>
 
-				<c:if test="${enviamentTipus == 'COMUNICACIO_SIR'}">
+				<c:if test="${enviamentTipus == 'SIR'}">
 				<div id="btn-documents" class="text-left vt10">
 					<input type="button" class="btn btn-default" id="addDocument" value="<spring:message code="notificacio.form.boto.nou.document"/>" />
 					<input type="button" class="btn btn-danger hidden" id="removeDocument" value="<spring:message code="notificacio.form.boto.remove.document"/>" />
@@ -2314,7 +2314,7 @@
 				</c:if>
 	
 				<!--  DOCUMENT NOTMALITZAT -->
-				<c:if test="${enviamentTipus != 'COMUNICACIO_SIR'}">
+				<c:if test="${enviamentTipus != 'SIR'}">
 				<div id="normalitzat" class="row">
 					<div class="col-md-12">
 						<not:inputCheckbox name="documents[0].normalitzat" textKey="notificacio.form.camp.normalitzat" info="true" messageInfo="notificacio.form.camp.normalitzat.info" labelSize="2" />
