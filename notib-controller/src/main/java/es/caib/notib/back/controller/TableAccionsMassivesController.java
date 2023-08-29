@@ -249,9 +249,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
         log.info("Reactivam consulta dels enviaments: " + StringUtils.join(seleccio, ", "));
         try {
-            for (var notId : seleccio) {
-                notificacioService.resetNotificacioANotifica(notId);
-            }
+            notificacioService.resetNotificacioANotifica(seleccio);
             MissatgesHelper.info(request, getMessage(request, "enviament.controller.reactivar.consultes.OK"));
         } catch (Exception e) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.consultes.KO"));
@@ -384,7 +382,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
     }
 
     protected boolean requestIsRemesesEnviamentMassiu(HttpServletRequest request) {
-        return request.getRequestURI().contains("/notib/notificacio/");
+        return request.getRequestURI().contains("/notibback/notificacio/");
     }
 
     protected Set<Long> getIdsEnviamentsSeleccionats(HttpServletRequest request) {

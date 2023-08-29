@@ -1054,29 +1054,31 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public boolean resetNotificacioANotifica(Long notificacioId) {
+	public boolean resetNotificacioANotifica(Set<Long> ids) {
 
 		var timer = metricsHelper.iniciMetrica();
 		var resposta = new RespostaAccio<String>();
 		try {
-			log.debug("Reset enviament de la notificació pendent (notificacioId=" + notificacioId + ")");
-			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
-			notificacioEntity.getEnviaments().forEach(e -> {
+//			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+//			notificacioEntity.getEnviaments().forEach(e -> {
+			for (var id : ids) {
+				log.debug("Reset enviament " + id + ")");
+				var e = enviamentRepository.findById(id).orElseThrow();
 				var estatEnviament = enviamentSmService.getEstatEnviament(e.getUuid());
 				try {
 					if (!EnviamentSmEstat.NOTIFICA_ERROR.equals(estatEnviament)) {
-						return;
+						continue;
 					}
 					e.refreshNotificaConsulta();
 					var events = notificacioEventRepository.findByEnviamentAndTipusAndError(e, NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, true);
 					for (var event : events) {
 						event.setFiReintents(false);
 					}
-					enviamentSmService.notificaReset(e.getUuid());
+					enviamentSmService.consultaReset(e.getUuid());
 				} catch (Exception ex) {
 					resposta.getErrors().add(e.getUuid());
 				}
-			});
+			}
 			return !resposta.getExecutades().isEmpty();
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1091,13 +1093,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			log.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviamentId + ")");
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-			enviament = notificaHelper.enviamentRefrescarEstat(enviament.getId());
-			var estatDto = conversioTipusHelper.convertir(enviament, NotificacioEnviamenEstatDto.class);
-			estatCalcularCampsAddicionals(enviament, estatDto);
 			// SM
 			if (enviament.isNotificaEstatFinal()) {
 				enviamentSmService.consultaForward(enviament.getUuid());
 			}
+			enviament = notificaHelper.enviamentRefrescarEstat(enviament.getId());
+			var estatDto = conversioTipusHelper.convertir(enviament, NotificacioEnviamenEstatDto.class);
+			estatCalcularCampsAddicionals(enviament, estatDto);
 			return estatDto;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1182,6 +1184,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			for(var enviament: notificacio.getEnviaments()) {
 				enviament.refreshNotificaConsulta();
+				enviamentSmService.consultaRetry(enviament.getUuid());
 			}
 			notificacioTableHelper.actualitzarRegistre(notificacio);
 			notificacioRepository.saveAndFlush(notificacio);

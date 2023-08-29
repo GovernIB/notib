@@ -77,6 +77,9 @@ public interface EnviamentSmService {
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaFailed(String enviamentUuid);
 
 	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaReset(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaRetry(String enviamentUuid);
 
 	@PreAuthorize("hasRole('tothom')")
@@ -92,14 +95,20 @@ public interface EnviamentSmService {
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirFailed(String enviamentUuid);
 
 	@PreAuthorize("hasRole('tothom')")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirReset(String enviamentUuid);
+
+	@PreAuthorize("hasRole('tothom')")
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirRetry(String enviamentUuid);
 
 	@PreAuthorize("hasRole('tothom')")
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirForward(String enviamentUuid);
+
+	//Us intern de la SM
 
 	@PreAuthorize("hasRole('tothom')")
 	EnviamentSmEstat getEstatEnviament(String enviamentUuid);
 
 	@PreAuthorize("hasRole('tothom')")
 	void remove(String enviamentUuid);
+
 }

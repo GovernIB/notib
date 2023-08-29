@@ -33,6 +33,7 @@ import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
@@ -255,7 +256,7 @@ public interface NotificacioService {
 	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	boolean resetNotificacioANotifica(Long notificacioId);
+	boolean resetNotificacioANotifica(Set<Long> ids);
 	
 	/**
 	 * Registra i notifica una notificació

@@ -226,6 +226,16 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	@Override
 	@Transactional
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaReset(String enviamentUuid) {
+
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		sendEvent(enviamentUuid, sm, EnviamentSmEvent.CN_RETRY);
+		return sm;
+	}
+
+	@Override
+	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaRetry(String enviamentUuid) {
 
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
@@ -279,10 +289,19 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	@Override
 	@Transactional
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirRetry(String enviamentUuid) {
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirReset(String enviamentUuid) {
 
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_RETRY);
+		return sm;
+	}
+
+	@Override
+	@Transactional
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirRetry(String enviamentUuid) {
+
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_RETRY);
 		return sm;
 	}

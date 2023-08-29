@@ -730,6 +730,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					event.setFiReintents(false);
 				}
 				auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "EnviamentServiceImpl.reactivaSir");
+				enviamentSmService.sirReset(enviament.getUuid());
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);

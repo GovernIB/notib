@@ -36,6 +36,7 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Implementació de NotificacioService com a EJB que empra una clase
@@ -121,8 +122,8 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public boolean resetNotificacioANotifica(Long notificacioId) {
-		return getDelegateService().resetNotificacioANotifica(notificacioId);
+	public boolean resetNotificacioANotifica(Set<Long> ids) {
+		return getDelegateService().resetNotificacioANotifica(ids);
 	}
 
 
