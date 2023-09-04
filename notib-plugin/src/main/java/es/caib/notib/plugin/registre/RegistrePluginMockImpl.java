@@ -62,7 +62,8 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		resposta.setRegistreData(data);
 		resposta.setRegistreNumero(String.valueOf(registre[1]));
 		resposta.setRegistreNumeroFormatat(registre[1] + "/" + registre[0]);
-		resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
+//		resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
+		resposta.setEstat(NotificacioRegistreEstatEnumDto.REBUTJAT);
 
 		if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR)) {
 			resposta.setSirRecepecioData(data);
@@ -77,7 +78,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	@Override
 	public RespostaConsultaRegistre obtenerAsientoRegistral(String codiDir3Entitat, String numeroRegistreFormatat, Long tipusOperacio, boolean ambAnnexos) {
 
-		boolean respostaAmbError = false;
+		boolean respostaAmbError = true;
 		RespostaConsultaRegistre respostaConsultaRegistre = new RespostaConsultaRegistre();
 		Date data = new Date();
 		Integer[] registre = readRegistreFile(data, true);
@@ -85,7 +86,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		respostaConsultaRegistre.setRegistreNumero(String.valueOf(registre[1]));
 		respostaConsultaRegistre.setRegistreData(data);
 		respostaConsultaRegistre.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
-		
+
 		 if (respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR))
 			 respostaConsultaRegistre.setSirRecepecioData(data);
 		 if (respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT) ||

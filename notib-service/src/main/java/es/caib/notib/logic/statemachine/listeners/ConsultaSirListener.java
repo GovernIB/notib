@@ -32,12 +32,10 @@ public class ConsultaSirListener {
 
     @Transactional
     @JmsListener(destination = SmConstants.CUA_CONSULTA_SIR, containerFactory = SmConstants.JMS_FACTORY_ACK)
-    public void receiveConsultaSir(@Payload ConsultaSirRequest consultaSirRequest,
-                                   @Headers MessageHeaders headers,
-                                   Message message) throws JMSException, InterruptedException {
+    public void receiveConsultaSir(@Payload ConsultaSirRequest consultaSirRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
+
         var enviament = consultaSirRequest.getConsultaSirDto();
         log.debug("[SM] Rebut consulta d'estat a Sir <" + enviament + ">");
-
         semaphore.acquire();
         try {
             // Consultar enviament a SIR

@@ -125,6 +125,7 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
                 // Consulta SIR
                 .withExternal().source(SIR_PENDENT).target(SIR_PENDENT).event(SR_CONSULTAR).guard(uuidGuard()).action(consultaSirAction).and()
                 .withExternal().source(SIR_PENDENT).target(SIR_ESTAT).event(SR_SUCCESS).guard(uuidGuard()).and()
+                .withExternal().source(SIR_ERROR).target(SIR_ESTAT).event(SR_SUCCESS).guard(uuidGuard()).and()
                 .withChoice().source(SIR_ESTAT)
                     .first(FI, isEstatFinal())
                     .last(SIR_PENDENT, consultaSirPoolingAction).and()
@@ -133,7 +134,9 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
                     .first(SIR_PENDENT, isSirCallback())
                     .then(SIR_PENDENT, reintentsConsultaSirGuard, consultaSirPoolingAction)
                     .last(SIR_ERROR).and()
-                .withExternal().source(SIR_ERROR).target(SIR_PENDENT).event(SR_RETRY).guard(uuidGuard()).action(consultaSirAction).and()
+                .withExternal().source(SIR_ERROR).target(SIR_PENDENT).event(SR_RESET).guard(uuidGuard()).action(consultaSirAction).and()
+                .withExternal().source(SIR_ERROR).target(SIR_ESTAT).event(SR_RETRY).guard(uuidGuard()).action(consultaSirAction).and()
+                .withExternal().source(SIR_PENDENT).target(SIR_PENDENT).event(SR_RETRY).guard(uuidGuard()).action(consultaSirAction).and()
                 .withExternal().source(SIR_PENDENT).target(FI).event(SR_FORWARD).and()
                 .withExternal().source(SIR_ERROR).target(FI).event(SR_FORWARD);
 

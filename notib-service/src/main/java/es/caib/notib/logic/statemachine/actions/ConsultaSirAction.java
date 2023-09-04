@@ -46,21 +46,17 @@ public class ConsultaSirAction implements Action<EnviamentSmEstat, EnviamentSmEv
     @Override
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 30000, multiplier = 10, maxDelay = 3600000))
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
+
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
-
-        jmsTemplate.convertAndSend(
-                SmConstants.CUA_CONSULTA_SIR,
-                ConsultaSirRequest.builder()
-                        .consultaSirDto(enviamentSirMapper.toDto(enviament))
-                        .numIntent(reintents + 1)
-                        .build(),
+        var env = ConsultaSirRequest.builder().consultaSirDto(enviamentSirMapper.toDto(enviament)).numIntent(reintents + 1).build();
+        var isRetry = EnviamentSmEvent.SR_RETRY.equals(stateContext.getMessage().getPayload());
+        jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_SIR, env,
                 m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));
+                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0);
                     return m;
                 });
-
         log.debug("[SM] Enviada consulta d'estat SIR per l'enviament amb UUID " + enviamentUuid);
     }
 

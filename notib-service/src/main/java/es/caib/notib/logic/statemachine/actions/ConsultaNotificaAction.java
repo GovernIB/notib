@@ -35,7 +35,6 @@ public class ConsultaNotificaAction implements Action<EnviamentSmEstat, Enviamen
     private final ConsultaNotificaMapper consultaNotificaMapper;
     private final ConfigHelper configHelper;
     private final NotificacioEventHelper notificacioEventHelper;
-    private final CallbackHelper callbackHelper;
     private final EnviamentTableHelper enviamentTableHelper;
     private final JmsTemplate jmsTemplate;
     private final ApplicationContext applicationContext;
@@ -46,16 +45,12 @@ public class ConsultaNotificaAction implements Action<EnviamentSmEstat, Enviamen
     @Override
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 30000, multiplier = 10, maxDelay = 3600000))
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
+
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
-
-        jmsTemplate.convertAndSend(
-                SmConstants.CUA_CONSULTA_ESTAT,
-                ConsultaNotificaRequest.builder()
-                        .consultaNotificaDto(consultaNotificaMapper.toDto(enviament))
-                        .numIntent(reintents + 1)
-                        .build(),
+        var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(consultaNotificaMapper.toDto(enviament)).numIntent(reintents + 1).build();
+        jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_ESTAT, consulta,
                 m -> {
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));
                     return m;
@@ -66,6 +61,7 @@ public class ConsultaNotificaAction implements Action<EnviamentSmEstat, Enviamen
 
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
+
         log.error("[SM] Recover ConsultaNotificaAction", t);
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         log.error("[SM] Recover ConsultaNotificaAction de enviament amb uuid=" + enviamentUuid);
@@ -88,7 +84,6 @@ public class ConsultaNotificaAction implements Action<EnviamentSmEstat, Enviamen
             enviamentSmService = applicationContext.getBean(EnviamentSmServiceImpl.class);
         }
         enviamentSmService.consultaFailed(enviamentUuid);
-
     }
 
     private Integer getMaxReintents() {

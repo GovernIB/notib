@@ -985,21 +985,23 @@ public class EnviamentServiceImpl implements EnviamentService {
 		if (enviament.getNotificacio().isComunicacioSir()) {
 			// si l'enviament esta pendent de refrescar l'estat enviat SIR
 			if (enviament.isPendentRefrescarEstatRegistre()) {
-				notificacioService.enviamentRefrescarEstatRegistre(enviamentId);
-				enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-				if (enviament.isRegistreEstatFinal()) {
-					enviamentSmService.sirForward(enviament.getUuid());
-				}
+				enviamentSmService.sirRetry(enviament.getUuid());
+//				notificacioService.enviamentRefrescarEstatRegistre(enviamentId);
+//				enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+//				if (enviament.isRegistreEstatFinal()) {
+//					enviamentSmService.sirForward(enviament.getUuid());
+//				}
 			}
 			return;
 		}
 		// si l'enviament esta pendent de refrescar estat a notifica
 		if (enviament.isPendentRefrescarEstatNotifica()) {
-			notificacioService.enviamentRefrescarEstat(enviamentId);
-			enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-			if (enviament.isNotificaEstatFinal()) {
-				enviamentSmService.consultaForward(enviament.getUuid());
-			}
+			enviamentSmService.consultaRetry(enviament.getUuid());
+//			notificacioService.enviamentRefrescarEstat(enviamentId);
+//			enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+//			if (enviament.isNotificaEstatFinal()) {
+//				enviamentSmService.consultaForward(enviament.getUuid());
+//			}
 		}
 	}
 

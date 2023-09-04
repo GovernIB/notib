@@ -30,6 +30,7 @@ public enum EnviamentSmEvent {
     // SIR
     SR_CONSULTAR,
     SR_SUCCESS,
+    SR_RESET,
     SR_RETRY,
     SR_ERROR,
     SR_FORWARD,

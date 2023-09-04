@@ -39,6 +39,43 @@ $(function() {
     });
 });
 
+function canviarEstat() {
+
+	$("#canviarEstat").prop("disabled", true);
+	let estat = $("#smEstats").val();
+	// e.preventDefault();
+	$.ajax({
+		url: '<c:url value="/notificacio/enviament/${enviamentId}/state/machine/set/estat/"/>' + estat,
+		success: data => {
+			$("#smEstats").prop("disabled", false);
+			let classe = data.ok ? "alert-success" : "alert-danger";
+			let div = '<div class="alert ' + classe +'"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +
+					'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
+			$("#contingut-missatges").append(div);
+			window.location.href = '<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}?pipellaActiva=stateMachine"/>';
+		},
+		error: err => console.error(err)
+	});
+}
+
+function enviarEvent() {
+
+	$("#enviarEvent").prop("disabled", true);
+	let event = $("#smEvents").val();
+	$.ajax({
+		url: '<c:url value="/notificacio/enviament/${enviamentId}/state/machine/enviar/event/"/>' + event,
+		success: data => {
+			$("#enviarEvent").prop("disabled", false);
+			let classe = data.ok ? "alert-success" : "alert-danger";
+			let div = '<div class="alert ' + classe +'"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +
+					'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
+			$("#contingut-missatges").append(div);
+			window.location.href = '<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}?pipellaActiva=stateMachine"/>';
+		},
+		error: err => console.error(err)
+	});
+}
+
 var eventTipus = [];
 <c:forEach var="tipus" items="${eventTipus}">
 eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
@@ -105,6 +142,19 @@ $(document).ready(function() {
 			error: err => console.error(err)
 		});
 	});
+	$("#guardarEvent").click(e => {
+
+		e.preventDefault();
+		$.ajax({
+			url: '<c:url value="/notificacio/enviament/${enviamentId}/state/machine/set/event"/>',
+			success: data => {
+				let msg = data ? "ok" : "error";
+				console.log(msg);
+			},
+			error: err => console.error(err)
+		});
+	});
+
 });
 </script>
 </head>
@@ -144,7 +194,7 @@ $(document).ready(function() {
 					<c:when test="${enviament.perEmail}">
 						<spring:message code="enviament.info.tab.estat.email"/>
 					</c:when>
-					<c:when test="${notificacio.enviamentTipus == 'COMUNICACIO' && enviament.titular.interessatTipus == 'ADMINISTRACIO'}">
+					<c:when test="${(notificacio.enviamentTipus == 'COMUNICACIO' || notificacio.enviamentTipus == 'SIR') && enviament.titular.interessatTipus == 'ADMINISTRACIO'}">
 						<spring:message code="enviament.info.tab.estat.sir"/>
 					</c:when>
 					<c:otherwise>
@@ -169,6 +219,13 @@ $(document).ready(function() {
 				<spring:message code="notificacio.info.tab.historic"/>
 			</a>
 		</li>
+		</c:if>
+		<c:if test="${isRolActualAdministrador}">
+			<li role="presentation"<c:if test="${pipellaActiva == 'stateMachine'}"> class="active"</c:if>>
+				<a href="#stateMachine" aria-controls="stateMachine" role="tab" data-toggle="tab">
+					<spring:message code="notificacio.info.tab.state.machine"/>
+				</a>
+			</li>
 		</c:if>
 	</ul>
 	<div class="tab-content">
@@ -443,7 +500,7 @@ $(document).ready(function() {
 			</c:if>
 			<c:if test="${enviament.notificacio.estat != 'PENDENT'}">
 				<c:choose>
-					<c:when test="${(notificacio.enviamentTipus == 'COMUNICACIO' && enviament.titular.interessatTipus == 'ADMINISTRACIO')}">
+					<c:when test="${((notificacio.enviamentTipus == 'COMUNICACIO' || notificacio.enviamentTipus == 'SIR')  && enviament.titular.interessatTipus == 'ADMINISTRACIO')}">
 						<p class="text-right" style="margin-top: 1em">
 							<button id="refrescarEstatSir" class="btn btn-default">
 								<span class="fa fa-refresh"></span>
@@ -620,7 +677,7 @@ $(document).ready(function() {
 					<spring:message code="enviament.info.estat.registre.no.enviada"/>
 				</div>
 				<c:if test="${enviament.notificacio.estat != 'PENDENT'}"><%-- TODO: Els dos botons que hi ha a continuació es poden eliminar --%>
-					<c:if test="${notificacio.enviamentTipus == 'COMUNICACIO'}">
+					<c:if test="${notificacio.enviamentTipus == 'COMUNICACIO' || notificacio.enviamentTipus == 'SIR'}">
 						<p class="well well-sm text-right" style="margin-top: 1em">
 							<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/comunicacioSeu"/>" class="btn btn-default">
 								<span class="fa fa-check-square-o"></span>
@@ -781,10 +838,49 @@ $(document).ready(function() {
 					<th data-col-name="notificacioErrorEvent" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificacioErrorEvent"/></th>
 					<th data-col-name="notificaError" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaError"/></th>
 					<th data-col-name="notificaDatatErrorDescripcio" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaDatatErrorDescripcio"/></th>
-
 				</tr>
 				</thead>
 			</table>
+		</div>
+		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'stateMachine'}"> active</c:if>" id="stateMachine">
+
+			<div class="" style="margin-top: 10px">
+
+				<div class="row ">
+
+					<div class="col-sm-2">
+						<strong><spring:message code="enviament.list.estat" /></strong>
+					</div>
+					<div class="col-sm-10">
+						${smInfo.estat}
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-sm-6" style="height: 100%">
+						<not:inputSelect name="smEstats" textKey="notificacio.info.tab.state.machine.nou.estat" optionItems="${smInfo.estats}"
+										 optionValueAttribute="codi" optionTextAttribute="valor" labelSize="2" emptyOption="true" optionMinimumResultsForSearch="2"/>
+					</div>
+					<div class="col-sm-2 text-right">
+						<a id="canviarEstat" onclick="canviarEstat()" class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
+							<spring:message code="notificacio.info.accio.enviar.boto" />
+						</a>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-6" style="height: 100%">
+						<not:inputSelect name="smEvents" textKey="notificacio.info.tab.state.machine.nou.event" optionItems="${smInfo.events}"
+										 optionValueAttribute="codi" optionTextAttribute="valor" labelSize="2" emptyOption="true" optionMinimumResultsForSearch="2"/>
+					</div>
+					<div class="col-sm-2 text-right">
+						<a id="enviarEvent" onclick="enviarEvent()" class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
+							<spring:message code="notificacio.info.accio.enviar.boto" />
+						</a>
+					</div>
+				</div>
+			</div>
+
+
 		</div>
 	</div>
 	<div id="modal-botons" class="text-right">

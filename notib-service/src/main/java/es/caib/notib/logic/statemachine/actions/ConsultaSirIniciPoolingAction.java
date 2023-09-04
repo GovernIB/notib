@@ -32,16 +32,15 @@ public class ConsultaSirIniciPoolingAction implements Action<EnviamentSmEstat, E
     @Override
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 30000, multiplier = 10, maxDelay = 3600000))
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
-        var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
 
-        jmsTemplate.convertAndSend(
-                SmConstants.CUA_POOLING_SIR,
-                enviamentUuid);
+        var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
+        jmsTemplate.convertAndSend(SmConstants.CUA_POOLING_SIR, enviamentUuid);
         log.debug("[SM] Inici pooling consulta a SIR");
     }
 
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
+
         log.error("[SM] Recover ConsultaSirIniciPoolingAction", t);
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         log.error("[SM] Recover ConsultaSirIniciPoolingAction de enviament amb uuid=" + enviamentUuid);

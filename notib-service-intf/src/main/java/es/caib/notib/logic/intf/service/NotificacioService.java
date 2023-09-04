@@ -27,6 +27,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.dto.stateMachine.StateMachineInfo;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;

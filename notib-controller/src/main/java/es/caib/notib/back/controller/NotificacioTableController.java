@@ -30,6 +30,7 @@ import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.CallbackService;
 import es.caib.notib.logic.intf.service.EnviamentService;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioService;
@@ -82,8 +83,6 @@ import java.util.zip.ZipOutputStream;
 public class NotificacioTableController extends TableAccionsMassivesController {
 
     @Autowired
-    private AplicacioService aplicacioService;
-    @Autowired
     private NotificacioService notificacioService;
     @Autowired
     private ProcedimentService procedimentService;
@@ -101,6 +100,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private PermisosService permisosService;
     @Autowired
     private CallbackService callbackService;
+    @Autowired
+    private EnviamentSmService envSmService;
 
     private static final  String NOTIFICACIONS_FILTRE = "notificacions_filtre";
     private static final String SESSION_ATTRIBUTE_SELECCIO = "NotificacioController.session.seleccio";
@@ -435,6 +436,38 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         return DatatablesHelper.getDatatableResponse(request, notificacioService.historicFindAmbEnviament(entitatActual.getId(), notificacioId, enviamentId));
+    }
+
+    @GetMapping(value = "/enviament/{enviamentId}/state/machine/set/estat/{estat}")
+    @ResponseBody
+    public Missatge enviamentStateMachineSetEstat(HttpServletRequest request, @PathVariable Long enviamentId, @PathVariable String estat) {
+
+        if (!RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
+            throw new SecurityException("Permís denegat");
+        }
+        log.info("estat nou: " + estat);
+        var ok = envSmService.canviarEstat(enviamentId, estat);
+//        if (totbe) {
+//            msg = getMessage(request, REFRESCAR_ESTAT_OK);
+//            MissatgesHelper.success(request, msg);
+//        } else {
+//            msg = getMessage(request, "notificacio.controller.refrescar.estat.error");
+//            MissatgesHelper.error(request, msg);
+//        }
+        var msg = getMessage(request, ok ? "notificacio.massiva.ok.validacio" : "avis.nivell.enum.ERROR");
+        return Missatge.builder().ok(ok).msg(msg).build();
+    }
+
+    @GetMapping(value = "/enviament/{enviamentId}/state/machine/enviar/event/{event}")
+    @ResponseBody
+    public Missatge enviamentStateMachineSetEvent(HttpServletRequest request, @PathVariable Long enviamentId, @PathVariable String event) {
+
+        if (!RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
+            throw new SecurityException("Permís denegat");
+        }
+        var ok = envSmService.enviarEvent(enviamentId, event);
+        var msg = getMessage(request, ok ? "notificacio.massiva.ok.validacio" : "avis.nivell.enum.ERROR");
+        return Missatge.builder().ok(ok).msg(msg).build();
     }
 
     @ResponseBody
@@ -852,6 +885,12 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         model.addAttribute("pipellaActiva", pipellaActiva);
         var enviament = enviamentService.enviamentFindAmbId(enviamentId);
         model.addAttribute("enviament", enviament);
+        if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
+            var info = envSmService.infoStateMachine(enviamentId);
+            model.addAttribute("smInfo", info);
+            model.addAttribute("smEstats", info.getEstats());
+            model.addAttribute("smEvents", info.getEvents());
+        }
         model.addAttribute(EVENT_TIPUS, EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class, EVENT_TIPUS_ENUM));
     }
 

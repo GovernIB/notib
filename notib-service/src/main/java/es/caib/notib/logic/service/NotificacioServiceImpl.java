@@ -26,6 +26,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.dto.stateMachine.StateMachineInfo;
 import es.caib.notib.logic.intf.exception.EnviamentSmEstatException;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
@@ -95,8 +96,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private NotificacioTableViewRepository notificacioTableViewRepository;
 	@Autowired
-	private EntitatRepository entitatRepository;
-	@Autowired
 	private DocumentRepository documentRepository;
 	@Autowired
 	private PersonaRepository personaRepository;
@@ -110,10 +109,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private EmailNotificacioHelper emailNotificacioHelper;
 	@Autowired
 	private UsuariHelper usuariHelper;
-	@Autowired
-	private RegistreNotificaHelper registreNotificaHelper;
-	@Autowired
-	private OrganigramaHelper organigramaHelper;
 	@Autowired
 	private RegistreHelper registreHelper;
 	@Autowired
@@ -134,10 +129,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private NotificacioListHelper notificacioListHelper;
 	@Autowired
 	private ConfigHelper configHelper;
-	@Autowired
-	private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private ProcSerHelper procedimentHelper;
 	@Autowired
 	private ProcSerOrganRepository procedimentOrganRepository;
 	@Autowired
@@ -879,6 +870,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
+
+
 	@Override
 	@Transactional(readOnly = true)
 	public ArxiuDto getDocumentArxiu(Long notificacioId) {
@@ -1037,6 +1030,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 							enviamentSmService.notificaEnviament(e.getUuid());
 							resposta.getExecutades().add(e.getUuid());
 							break;
+						case SIR_PENDENT:
+						case SIR_ERROR:
+							enviamentSmService.sirRetry(e.getUuid());
 						default:
 							resposta.getNoExecutables().add(e.getUuid());
 					}
@@ -1343,9 +1339,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 			enviament = registreHelper.enviamentRefrescarEstatRegistre(enviamentId);
 			totBe = enviament.getSirConsultaIntent() == 0;
-			// SM
-			if (enviament.isRegistreEstatFinal()) {
-				enviamentSmService.sirForward(enviament.getUuid());
+			if (totBe) {
+				enviamentSmService.sirSuccess(enviament.getUuid());
+			} else {
+				enviamentSmService.sirFailed(enviament.getUuid());
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1540,6 +1537,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 			notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
 			notificacio.resetIntentsNotificacio();
+			var enviaments = notificacio.getEnviaments();
+			for (var env : enviaments) {
+				if (EnviamentSmEstat.NOTIFICA_ERROR.equals(enviamentSmService.getEstat(env.getUuid()))) {
+					enviamentSmService.consultaRetry(env.getUuid());
+				}
+			}
 			// TODO VEURE PERQUE EL MÈTODE UPDATE DEL REPOSITORY NO FUNCIONA
 			var events = notificacioEventRepository.findEventsAmbFiReintentsByNotificacioId(notificacioId);
 			for (var e : events) {

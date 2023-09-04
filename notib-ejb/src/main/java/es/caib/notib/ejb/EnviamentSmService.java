@@ -3,6 +3,7 @@
  */
 package es.caib.notib.ejb;
 
+import es.caib.notib.logic.intf.dto.stateMachine.StateMachineInfo;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import org.springframework.context.annotation.Primary;
@@ -21,6 +22,28 @@ import javax.ejb.Stateless;
 @Stateless
 public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf.service.EnviamentSmService> implements es.caib.notib.logic.intf.service.EnviamentSmService {
 
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public EnviamentSmEstat getEstat(String enviamentUuid) {
+		return getDelegateService().getEstat(enviamentUuid);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public StateMachineInfo infoStateMachine(Long enviamentId) {
+		return getDelegateService().infoStateMachine(enviamentId);
+	}
+
+	@Override
+	public boolean canviarEstat(Long enviamentId, String estat) {
+		return getDelegateService().canviarEstat(enviamentId, estat);
+	}
+
+	@Override
+	public boolean enviarEvent(Long enviamentId, String event) {
+		return getDelegateService().enviarEvent(enviamentId, event);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
