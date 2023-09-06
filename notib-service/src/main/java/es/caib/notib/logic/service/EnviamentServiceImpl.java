@@ -290,7 +290,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 			var f = getFiltre(entitatId, filtre, usuariCodi, rol, organGestorCodi);
 			var pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
-			var pageEnviaments = enviamentTableRepository.findAmbFiltre(f, pageable);
+ 			var pageEnviaments = enviamentTableRepository.findAmbFiltre(f, pageable);
 			if(pageEnviaments == null || !pageEnviaments.hasContent()) {
 				pageEnviaments = new PageImpl<>(new ArrayList<>());
 			}
@@ -304,7 +304,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 		var isUsuari = RolEnumDto.tothom.equals(rol);
 		var isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
+		var isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
 		var isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
+		var entitatsActives = isSuperAdmin ? entitatRepository.findByActiva(true) : null;
 		var entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat, false);
 		var auth = SecurityContextHolder.getContext().getAuthentication();
 		entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
@@ -379,6 +381,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 		var creadaPer = filtreDto.getCreatedBy() != null ? filtreDto.getCreatedBy().getCodi() : null;
 		return FiltreEnviament.builder()
+				.entitatIdNull(isSuperAdmin)
 				.entitatId(entitatId)
 				.dataEnviamentIniciNull(dataEnviamentInici == null)
 				.dataEnviamentInici(dataEnviamentInici)
@@ -454,6 +457,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				.rols(aplicacioService.findRolsUsuariActual())
 				.usuariCodi(usuariCodi)
 				.isUsuari(isUsuari)
+				.entitatsActives(entitatsActives)
+				.isSuperAdmin(isSuperAdmin)
 				.isAdminOrgan(isAdminOrgan)
 				.build();
 	}

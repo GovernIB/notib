@@ -291,7 +291,8 @@ public class NotificacioListHelper {
 
         OrganGestorEntity organGestor = null;
         if (f.getOrganGestor() != null && !f.getOrganGestor().isEmpty()) {
-            organGestor = organGestorRepository.findById(Long.parseLong(f.getOrganGestor())).orElse(null);
+            organGestor = organGestorRepository.findByCodi(f.getOrganGestor());
+//            organGestor = organGestorRepository.findById(Long.parseLong(f.getOrganGestor())).orElse(null);
         }
         ProcSerEntity procediment = null;
         if (f.getProcedimentId() != null) {
@@ -320,8 +321,9 @@ public class NotificacioListHelper {
             codisOrgansGestorsComunsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermisPerConsulta(auth, entitatActual, PermisEnum.COMUNS);
             // Procediments comuns que es poden consultar per a òrgans gestors concrets
             codisProcedimentsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitatActual.getId(), auth.getName(), PermisEnum.CONSULTA);
-        } else if (isAdminOrgan && entitatActual != null) {
-            codisProcedimentsDisponibles = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestor.getCodi());
+        } else if (isAdminOrgan && entitatActual != null && organGestor != null) {
+            codisOrgansGestorsDisponibles = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestor.getCodi());
+//            codisProcedimentsDisponibles = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestor.getCodi());
         }
 
         var esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());

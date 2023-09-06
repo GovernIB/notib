@@ -127,6 +127,9 @@ public class ConversioTipusHelper {
 						}
 						var createdBy = convertir(a.getCreatedBy().orElseThrow(), UsuariDto.class);
 						b.setCreatedBy(createdBy);
+
+						b.setCreatedDate(Date.from(a.getCreatedDate().orElseThrow().atZone(ZoneId.systemDefault()).toInstant()));
+
 					}
 				}).byDefault().register();
 
@@ -355,8 +358,10 @@ public class ConversioTipusHelper {
 				.customize(new CustomMapper<>() {
 					@Override
 					public void mapAtoB(NotificacioAudit entity, NotificacioAuditDto dto, MappingContext context) {
+
 						entity.getCreatedBy().ifPresent(usuari -> dto.setCreatedBy(usuari.getCodi()));
 						entity.getLastModifiedBy().ifPresent(usuari -> dto.setLastModifiedBy(usuari.getCodi()));
+						dto.setCreatedDate(Date.from(entity.getCreatedDate().orElseThrow().atZone(ZoneId.systemDefault()).toInstant()));
 				}}).register();
 
 		mapperFactory.classMap(NotificacioEnviamentAudit.class, NotificacioEnviamentAuditDto.class).byDefault()
@@ -365,6 +370,7 @@ public class ConversioTipusHelper {
 						public void mapAtoB(NotificacioEnviamentAudit entity, NotificacioEnviamentAuditDto dto, MappingContext context) {
 							entity.getCreatedBy().ifPresent(usuari -> dto.setCreatedBy(usuari.getCodi()));
 							entity.getLastModifiedBy().ifPresent(usuari -> dto.setLastModifiedBy(usuari.getCodi()));
+							dto.setCreatedDate(Date.from(entity.getCreatedDate().orElseThrow().atZone(ZoneId.systemDefault()).toInstant()));
 						}
 					}).register();
 

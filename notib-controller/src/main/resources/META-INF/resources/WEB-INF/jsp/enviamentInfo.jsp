@@ -842,46 +842,47 @@ $(document).ready(function() {
 				</thead>
 			</table>
 		</div>
-		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'stateMachine'}"> active</c:if>" id="stateMachine">
 
-			<div class="" style="margin-top: 10px">
+		<c:if test="${isRolActualAdministrador}">
+			<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'stateMachine'}"> active</c:if>" id="stateMachine">
 
-				<div class="row ">
+				<div class="" style="margin-top: 30px">
 
-					<div class="col-sm-2">
-						<strong><spring:message code="enviament.list.estat" /></strong>
-					</div>
-					<div class="col-sm-10">
-						${smInfo.estat}
-					</div>
-				</div>
+					<div class="row " style="padding-left: 15px;">
 
-				<div class="row">
-					<div class="col-sm-6" style="height: 100%">
-						<not:inputSelect name="smEstats" textKey="notificacio.info.tab.state.machine.nou.estat" optionItems="${smInfo.estats}"
-										 optionValueAttribute="codi" optionTextAttribute="valor" labelSize="2" emptyOption="true" optionMinimumResultsForSearch="2"/>
+						<div class="col-sm-2">
+							<strong><spring:message code="enviament.list.estat" /></strong>
+						</div>
+						<div class="col-sm-10">
+							${smInfo.estat}
+						</div>
 					</div>
-					<div class="col-sm-2 text-right">
-						<a id="canviarEstat" onclick="canviarEstat()" class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
-							<spring:message code="notificacio.info.accio.enviar.boto" />
-						</a>
+
+					<div class="row" style="margin-top: 30px">
+						<div class="col-sm-6" style="height: 100%">
+							<not:inputSelect name="smEstats" textKey="notificacio.info.tab.state.machine.nou.estat" optionItems="${smInfo.estats}"
+											 optionValueAttribute="codi" optionTextAttribute="valor" labelSize="2" emptyOption="true" optionMinimumResultsForSearch="2"/>
+						</div>
+						<div class="col-sm-2 text-right">
+							<a id="canviarEstat" onclick="canviarEstat()" class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
+								<spring:message code="notificacio.info.accio.enviar.boto" />
+							</a>
+						</div>
 					</div>
-				</div>
-				<div class="row">
-					<div class="col-sm-6" style="height: 100%">
-						<not:inputSelect name="smEvents" textKey="notificacio.info.tab.state.machine.nou.event" optionItems="${smInfo.events}"
-										 optionValueAttribute="codi" optionTextAttribute="valor" labelSize="2" emptyOption="true" optionMinimumResultsForSearch="2"/>
-					</div>
-					<div class="col-sm-2 text-right">
-						<a id="enviarEvent" onclick="enviarEvent()" class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
-							<spring:message code="notificacio.info.accio.enviar.boto" />
-						</a>
+					<div class="row">
+						<div class="col-sm-6" style="height: 100%">
+							<not:inputSelect name="smEvents" textKey="notificacio.info.tab.state.machine.nou.event" optionItems="${smInfo.events}"
+											 optionValueAttribute="codi" optionTextAttribute="valor" labelSize="2" emptyOption="true" optionMinimumResultsForSearch="2"/>
+						</div>
+						<div class="col-sm-2 text-right">
+							<a id="enviarEvent" onclick="enviarEvent()" class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
+								<spring:message code="notificacio.info.accio.enviar.boto" />
+							</a>
+						</div>
 					</div>
 				</div>
 			</div>
-
-
-		</div>
+		</c:if>
 	</div>
 	<div id="modal-botons" class="text-right">
 		<a href="<c:url value="/notificacions"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>

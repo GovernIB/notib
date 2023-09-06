@@ -34,8 +34,4 @@ public class StateMachineInfo {
         }
     }
 
-//    @Override
-//    public String toString() {
-//        return ToStringBuilder.reflectionToString(this);
-//    }
 }

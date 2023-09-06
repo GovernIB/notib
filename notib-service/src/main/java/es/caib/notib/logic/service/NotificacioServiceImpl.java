@@ -560,6 +560,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			var pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
 			var rols = aplicacioService.findRolsUsuariActual();
+			filtre.setOrganGestor(organGestorCodi);
 			var f = notificacioListHelper.getFiltre(filtre, entitatId, rol, usuariCodi, rols);
 			var notificacions = notificacioTableViewRepository.findAmbFiltre(f, pageable);
  			return notificacioListHelper.complementaNotificacions(f.getEntitat(), usuariCodi, notificacions);
@@ -574,6 +575,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		try {
 			var rols = aplicacioService.findRolsUsuariActual();
+			filtre.setOrganGestor(organGestorCodi);
 			var f = notificacioListHelper.getFiltre(filtre, entitatId, rol, usuariCodi, rols);
 			return notificacioTableViewRepository.findIdsAmbFiltre(f);
 		} finally {

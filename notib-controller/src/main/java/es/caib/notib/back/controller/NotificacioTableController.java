@@ -447,13 +447,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
         log.info("estat nou: " + estat);
         var ok = envSmService.canviarEstat(enviamentId, estat);
-//        if (totbe) {
-//            msg = getMessage(request, REFRESCAR_ESTAT_OK);
-//            MissatgesHelper.success(request, msg);
-//        } else {
-//            msg = getMessage(request, "notificacio.controller.refrescar.estat.error");
-//            MissatgesHelper.error(request, msg);
-//        }
         var msg = getMessage(request, ok ? "notificacio.massiva.ok.validacio" : "avis.nivell.enum.ERROR");
         return Missatge.builder().ok(ok).msg(msg).build();
     }

@@ -50,7 +50,7 @@ public class EnviamentRegistreListener {
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentRegistreRequest.getEnviamentUuid()).orElseThrow();
         var notificacio = enviament.getNotificacio();
         var numIntent = enviamentRegistreRequest.getNumIntent();
-
+        notificacio.setRegistreEnviamentIntent(numIntent);
         semaphore.acquire();
         try {
             // Registrar enviament

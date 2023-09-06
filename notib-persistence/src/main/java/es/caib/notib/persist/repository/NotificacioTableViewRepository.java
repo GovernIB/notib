@@ -76,6 +76,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			// PERMISOS
 			// Iniciada pel propi usuari
 			" :#{#filtre.isUsuariEntitat} = true or " +
+			" :#{#filtre.isSuperAdmin} = true or " +
 			" ntf.usuariCodi = :#{#filtre.usuariCodi} " +
 			// Té permís consulta sobre el procediment
 			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null " +
@@ -135,6 +136,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			// PERMISOS
 			// Iniciada pel propi usuari
 			" :#{#filtre.isUsuariEntitat} = true or " +
+			" :#{#filtre.isSuperAdmin} = true or " +
 			"   ntf.usuariCodi = :#{#filtre.usuariCodi} " +
 			// Té permís consulta sobre el procediment
 			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null " +

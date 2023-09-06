@@ -277,7 +277,7 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
         }
         // Comprovam si es produeix un canvi d'òrgan gestor
         var nouOrgan = request.getParameter(RolHelper.REQUEST_PARAMETER_CANVI_ORGAN);
-        if (!Strings.isNullOrEmpty(nouOrgan)) {
+        if (Strings.isNullOrEmpty(nouOrgan)) {
             return;
         }
         try {

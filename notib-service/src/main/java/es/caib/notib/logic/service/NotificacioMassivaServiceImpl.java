@@ -376,36 +376,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         var pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
         var f = notificacioListHelper.getFiltre(filtre, entitatId, null, null, null);
         f.setNotificacioMassiva(notificacioMassivaRepository.findById(notificacioMassivaId).orElse(null));
-//        var f = FiltreNotificacio.builder()
-//            .entitatIdNull(filtreNetejat.getEntitatId().isNull())
-//            .entitatId(filtreNetejat.getEntitatId().getField())
-//            .notificacioMassiva(notificacioMassivaRepository.findById(notificacioMassivaId).orElse(null))
-//            .enviamentTipusNull(filtreNetejat.getEnviamentTipus().isNull())
-//            .enviamentTipus(filtreNetejat.getEnviamentTipus().getField())
-//            .concepteNull(filtreNetejat.getConcepte().isNull())
-//            .concepte(filtreNetejat.getConcepte().getField())
-//            .estatNull(filtreNetejat.getEstat().isNull())
-//            .estatMask(filtreNetejat.getEstat().isNull() ? 0 : filtreNetejat.getEstat().getField().getMask())
-//            .dataIniciNull(filtreNetejat.getDataInici().isNull())
-//            .dataInici(filtreNetejat.getDataInici().getField())
-//            .dataFiNull(filtreNetejat.getDataFi().isNull())
-//            .dataFi(filtreNetejat.getDataFi().getField())
-//            .titularNull(filtreNetejat.getTitular().isNull())
-//            .titular(filtreNetejat.getTitular().isNull() ? "" : filtreNetejat.getTitular().getField())
-//            .organCodiNull(filtreNetejat.getOrganGestor().isNull())
-//            .organCodi(filtreNetejat.getOrganGestor().isNull() ? "" : filtreNetejat.getOrganGestor().getField().getCodi())
-//            .procedimentNull(filtreNetejat.getProcediment().isNull())
-//            .procedimentCodi(filtreNetejat.getProcediment().isNull() ? "" : filtreNetejat.getProcediment().getField().getCodi())
-//            .tipusUsuariNull(filtreNetejat.getTipusUsuari().isNull())
-//            .tipusUsuari(filtreNetejat.getTipusUsuari().getField())
-//            .numExpedientNull(filtreNetejat.getNumExpedient().isNull())
-//            .numExpedient(filtreNetejat.getNumExpedient().getField())
-//            .creadaPerNull(filtreNetejat.getCreadaPer().isNull())
-//            .creadaPer(filtreNetejat.getCreadaPer().getField())
-//            .identificadorNull(filtreNetejat.getIdentificador().isNull())
-//            .identificador(filtreNetejat.getIdentificador().getField())
-//            .nomesAmbErrors(filtreNetejat.getNomesAmbErrors().getField())
-//            .nomesSenseErrors(filtreNetejat.getNomesSenseErrors().getField()).build();
         var notificacions = notificacioTableViewRepository.findAmbFiltreByNotificacioMassiva(f, pageable);
         var auth = SecurityContextHolder.getContext().getAuthentication();
         return notificacioListHelper.complementaNotificacions(entitatActual, auth.getName(), notificacions);
@@ -803,7 +773,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 setValidesa(notV2, linia[19]);
                 setTipusDocumental(notV2, linia[20]);
                 setModeFirma(notV2, linia[21]);
-            } else { //Metadades per defecte
+            } else if (notV2.getDocument() != null){ //Metadades per defecte
                 setOrigen(notV2, OrigenEnum.ADMINISTRACIO.name());
                 setValidesa(notV2, ValidesaEnum.ORIGINAL.name());
                 setTipusDocumental(notV2, TipusDocumentalEnum.ALTRES.name());

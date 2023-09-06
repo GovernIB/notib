@@ -17,6 +17,7 @@ import java.util.List;
 @Setter
 public class FiltreEnviament {
 
+    private boolean entitatIdNull;
     private Long entitatId;
     private boolean dataEnviamentIniciNull;
     private Date dataEnviamentInici;
@@ -91,6 +92,8 @@ public class FiltreEnviament {
     private String usuariCodi;
     private boolean isUsuari;
     private boolean isAdminOrgan;
+    private boolean isSuperAdmin;
+    private List<EntitatEntity> entitatsActives;
 
     public boolean isUsuari() {
         return isUsuari;

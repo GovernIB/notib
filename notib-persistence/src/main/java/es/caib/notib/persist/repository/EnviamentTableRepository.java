@@ -384,7 +384,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("isReferenciaNotificacioNull") boolean isReferenciaNotificacioNull,
 			@Param("referenciaNotificacio") String referenciaNotificacio,
 			Pageable pageable);
-	
+
 //	@Modifying
 //	@Query("update EnviamentTableEntity et " +
 //			"set et.organEstat = (SELECT og.estat from OrganGestorEntity og where og.codi = et.organCodi) " +
@@ -422,8 +422,10 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 
 	@Query( "select nenv from EnviamentTableEntity nenv " +
 			"where " +
-			"    (:#{#filtre.entitat} = nenv.entitat) " +
-			"and (:#{#filtre.isUsuari} = false or (" +
+			"    (:#{#filtre.entitatIdNull} = true or :#{#filtre.entitatId} = nenv.entitat.id) " +
+			"and (:#{#filtre.isSuperAdmin} = true or " +
+			" :#{#filtre.isUsuari} = false or " +
+			"(" +
 			// PERMISOS
 			// Iniciada pel propi usuari
 			"	nenv.usuariCodi = :#{#filtre.usuariCodi} " +
@@ -453,6 +455,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			") " +
 			"and (nenv.grupCodi = null or (nenv.grupCodi in (:#{#filtre.rols}))) " +
 			") " +
+			"and (:#{#filtre.isSuperAdmin} = false or nenv.entitat in (:#{#filtre.entitatsActives})) " +
 			"and (:#{#filtre.isAdminOrgan} = false or (nenv.organCodi is not null and nenv.organCodi in (:#{#filtre.organs})))" +
 			"and (:#{#filtre.dataEnviamentIniciNull} = true or nenv.createdDate >= :#{#filtre.dataEnviamentInici}) " +
 			"and (:#{#filtre.codiProcedimentNull} = true or lower(CASE WHEN nenv.procedimentCodiNotib is null THEN '' ELSE nenv.procedimentCodiNotib END) like lower('%'||:#{#filtre.codiProcediment}||'%')) " +
@@ -492,10 +495,11 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 
 	@Query( "select nenv.id from EnviamentTableEntity nenv " +
 			"where " +
-			"    (:#{#filtre.entitat} = nenv.entitat) " +
+			"    (:#{#filtre.entitatIdNull} = true or :#{#filtre.entitat} = nenv.entitat) " +
 			"and (:#{#filtre.isUsuari} = false or (" +
 			// PERMISOS
 			// Iniciada pel propi usuari
+			" :#{#filtre.isSuperAdmin} = true or " +
 			"	nenv.usuariCodi = :#{#filtre.usuariCodi} " +
 			// Té permís consulta sobre el procediment
 			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and nenv.procedimentCodiNotib is not null " +
@@ -523,6 +527,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			") " +
 			"and (nenv.grupCodi = null or (nenv.grupCodi in (:#{#filtre.rols}))) " +
 			") " +
+//			"and (:#{#filtre.isSuperAdmin} = false or nenv.entitat in (:#{#filtre.entitatsActives})) " +
 			"and (:#{#filtre.isAdminOrgan} = false or (nenv.organCodi is not null and nenv.organCodi in (:#{#filtre.organs})))" +
 			"and (:#{#filtre.dataEnviamentIniciNull} = true or nenv.createdDate >= :#{#filtre.dataEnviamentInici}) " +
 			"and (:#{#filtre.codiProcedimentNull} = true or lower(CASE WHEN nenv.procedimentCodiNotib is null THEN '' ELSE nenv.procedimentCodiNotib END) like lower('%'||:#{#filtre.codiProcediment}||'%')) " +
@@ -558,74 +563,5 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:#{#filtre.nomesAmbErrors} = false or nenv.hasErrors = false)"
 	)
 	List<Long> findIdsAmbFiltre(FiltreEnviament filtre);
-//			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
-//			@Param("codiProcediment") String codiProcediment,
-//			@Param("isGrupNull") boolean isGrupNull,
-//			@Param("grup") String grup,
-//			@Param("isConcepteNull") boolean isConcepteNull,
-//			@Param("concepte") String concepte,
-//			@Param("isDescripcioNull") boolean isDescripcioNull,
-//			@Param("descripcio") String descripcio,
-//			@Param("isDataProgramadaDisposicioIniciNull") boolean isDataProgramadaDisposicioIniciNull,
-//			@Param("dataProgramadaDisposicioInici") Date dataProgramadaDisposicioInici,
-//			@Param("isDataProgramadaDisposicioFiNull") boolean isDataProgramadaDisposicioFiNull,
-//			@Param("dataProgramadaDisposicioFi") Date dataProgramadaDisposicioFi,
-//			@Param("isDataCaducitatIniciNull") boolean isDataCaducitatIniciNull,
-//			@Param("dataCaducitatInici") Date dataCaducitatInici,
-//			@Param("isDataCaducitatFiNull") boolean dataCaducitatFiNull,
-//			@Param("dataCaducitatFi") Date dataCaducitatFi,
-//			@Param("isTipusEnviamentNull") boolean isTipusEnviamentNull,
-//			@Param("tipusEnviament") EnviamentTipus tipusEnviament,
-//			@Param("isCsvNull") boolean isCsvNull,
-//			@Param("csv") String csv,
-//			@Param("isEstatNull") boolean isEstatNull,
-//			@Param("estat") NotificacioEstatEnumDto estat,
-//			@Param("notificaEstat") EnviamentEstat notificaEstat,
-//			@Param("entitat") EntitatEntity entitat,
-//			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
-//			@Param("dataEnviamentInici") Date dataEnviamentInici,
-//			@Param("esDataEnviamentFiNull") boolean esDataEnviamentFiNull,
-//			@Param("dataEnviamentFi") Date dataEnviamentFi,
-//			@Param("esCodiNotificaNull") boolean esCodiNotificaNull,
-//			@Param("codiNotifica") String codiNotifica,
-//			@Param("esCreatedbyNull") boolean esCreatedbyNull,
-//			@Param("createdByCodi") String createdByCodi,
-//			@Param("esNifTitularNull") boolean esNifTitularNull,
-//			@Param("nifTitular") String nifTitular,
-//			@Param("esNomTitularNull") boolean esNomTitularNull,
-//			@Param("nomTitular") String nomTitular,
-//			@Param("esEmailTitularNull") boolean esEmailTitularNull,
-//			@Param("emailTitular") String emailTitular,
-//			@Param("esDir3CodiNull") boolean esdir3CodiNull,
-//			@Param("dir3Codi") String dir3Codi,
-//			@Param("isNumeroCertCorreusNull") boolean isNumeroCertCorreusNull,
-//			@Param("numeroCertCorreus") String numeroCertCorreus,
-//			@Param("isUsuariNull") boolean isUsuariNull,
-//			@Param("usuari") String usuari,
-//			@Param("isNumeroRegistreNull") boolean isNumeroRegistreNull,
-//			@Param("numeroRegistre") String numeroRegistre,
-//			@Param("isNotificaReferenciaNull") boolean isNotificaReferenciaNull,
-//			@Param("notificaReferencia") String notificaReferencia,
-//			@Param("esDataRegistreIniciNull") boolean esDataRegistreIniciNull,
-//			@Param("dataRegistreInici") Date dataRegistreInici,
-//			@Param("esDataRegistreFiNull") boolean esDataRegistreFiNull,
-//			@Param("dataRegistreFi") Date dataRegistreFi,
-//			@Param("nomesAmbErrors") boolean nomesAmbErrors,
-//			@Param("nomesSenseErrors") boolean nomesSenseErrors,
-//			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
-//			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
-//			@Param("isReferenciaNotificacioNull") boolean isReferenciaNotificacioNull,
-//			@Param("referenciaNotificacio") String referenciaNotificacio,
-//			@Param("esProcedimentsCodisNotibNull") boolean esProcedimentsCodisNotibNull,
-//			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
-//			@Param("isOrgansGestorsCodisNotibNull") boolean isOrgansGestorsCodisNotibNull,
-//			@Param("organsGestorsCodisNotib") List<String> organsGestorsCodisNotib,
-//			@Param("esProcedimentOrgansIdsNotibNull") boolean esProcedimentOrgansIdsNotibNull,
-//			@Param("procedimentOrgansIdsNotib") List<String> procedimentOrgansIdsNotib,
-//			@Param("grupsProcedimentCodisNotib") List<String> grupsProcedimentCodisNotib,
-//			@Param("usuariCodi") String usuariCodi,
-//			@Param("isUsuari") boolean isUsuari,
-//			@Param("isAdminOrgan") boolean isAdminOrgan,
-//			@Param("organs") List<String> organs);
 
 }
