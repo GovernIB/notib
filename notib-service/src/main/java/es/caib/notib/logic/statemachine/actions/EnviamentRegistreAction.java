@@ -72,7 +72,7 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         try {
             var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
             var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0) + 1;
-            var fiReintents = reintents >= getMaxReintents();
+            var fiReintents = reintents >= configHelper.getMaxReintentsRegistre();
             var errorDescripcio = StringUtils.truncate("Error al enviar l'event de creació de registre de sortida. " + t.getMessage() + "\n" + ExceptionUtils.getStackTrace(t), 2000);
 
             notificacioEventHelper.addRegistreEnviamentEvent(enviament, true, errorDescripcio, fiReintents);
@@ -89,7 +89,4 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         enviamentSmService.registreFailed(enviamentUuid);
     }
 
-    private Integer getMaxReintents() {
-        return configHelper.getConfigAsInteger("es.caib.notib.tasca.registre.enviaments.reintents.maxim");
-    }
 }

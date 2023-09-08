@@ -62,6 +62,26 @@ let count = 1;
 	enviamentsNom[${env.id}] = "<spring:message code="notificacio.info.seccio.enviaments" /> " + count;
 	count++;
 </c:forEach>
+
+function afegirSm() {
+
+	// $("#canviarEstat").prop("disabled", true);
+	// let estat = $("#smEstats").val();
+	// e.preventDefault();
+	$.ajax({
+		url: '<c:url value="/notificacio/${notificacio.id}/state/machine/afegir"/>',
+		success: data => {
+			// $("#smEstats").prop("disabled", false);
+			let classe = data.ok ? "alert-success" : "alert-danger";
+			let div = '<div class="alert ' + classe +'"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +
+					'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
+			$("#contingut-missatges").append(div);
+			window.location.href = '<not:modalUrl value="/notificacio/${notificacioId}/info?pipellaActiva=stateMachine"/>';
+		},
+		error: err => console.error(err)
+	});
+}
+
 $(document).ready(function() {
 
 	let $tableEvents = $('#table-events');
@@ -105,7 +125,7 @@ $(document).ready(function() {
 	    $('#enviar-btn').attr('disabled', true);
         window.location.href = '<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>';
 	    return false;    
-    });	
+    });
 	
 });
 </script>
@@ -196,6 +216,13 @@ $(document).ready(function() {
 			<li role="presentation" <c:if test='${activeTab == "historic"}'>class="active"</c:if>>
 				<a href="#historic" aria-controls="historic" role="tab" data-toggle="tab">
 					<spring:message code="notificacio.info.tab.historic" />
+				</a>
+			</li>
+		</c:if>
+		<c:if test="${isRolActualAdministrador and mostrarSmInfo}">
+			<li role="presentation"<c:if test="${activeTab == 'stateMachine'}"> class="active"</c:if>>
+				<a href="#stateMachine" aria-controls="stateMachine" role="tab" data-toggle="tab">
+					<spring:message code="notificacio.info.tab.state.machine"/>
 				</a>
 			</li>
 		</c:if>
@@ -1083,6 +1110,15 @@ $(document).ready(function() {
 				</thead>
 			</table>
 		</div>
+		<c:if test="${isRolActualAdministrador and mostrarSmInfo}">
+			<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'stateMachine'}"> active</c:if>" id="stateMachine">
+				<div class="" style="margin-top: 30px">
+					<a id="afegirSM" onclick="afegirSm()" class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
+						<spring:message code="notificacio.info.tab.state.machine.afegir" />
+					</a>
+				</div>
+			</div>
+		</c:if>
 	</div>
 	<div id="modal-botons" class="text-right">
 		<a href="<c:url value="/notificacio"/>" class="btn btn-default"

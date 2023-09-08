@@ -38,43 +38,42 @@ $(function() {
         return false;
     });
 });
+	function canviarEstat() {
 
-function canviarEstat() {
+		$("#canviarEstat").prop("disabled", true);
+		let estat = $("#smEstats").val();
+		// e.preventDefault();
+		$.ajax({
+			url: '<c:url value="/notificacio/enviament/${enviamentId}/state/machine/set/estat/"/>' + estat,
+			success: data => {
+				$("#smEstats").prop("disabled", false);
+				let classe = data.ok ? "alert-success" : "alert-danger";
+				let div = '<div class="alert ' + classe +'"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +
+						'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
+				$("#contingut-missatges").append(div);
+				window.location.href = '<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}?pipellaActiva=stateMachine"/>';
+			},
+			error: err => console.error(err)
+		});
+	}
 
-	$("#canviarEstat").prop("disabled", true);
-	let estat = $("#smEstats").val();
-	// e.preventDefault();
-	$.ajax({
-		url: '<c:url value="/notificacio/enviament/${enviamentId}/state/machine/set/estat/"/>' + estat,
-		success: data => {
-			$("#smEstats").prop("disabled", false);
-			let classe = data.ok ? "alert-success" : "alert-danger";
-			let div = '<div class="alert ' + classe +'"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +
-					'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
-			$("#contingut-missatges").append(div);
-			window.location.href = '<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}?pipellaActiva=stateMachine"/>';
-		},
-		error: err => console.error(err)
-	});
-}
+	function enviarEvent() {
 
-function enviarEvent() {
-
-	$("#enviarEvent").prop("disabled", true);
-	let event = $("#smEvents").val();
-	$.ajax({
-		url: '<c:url value="/notificacio/enviament/${enviamentId}/state/machine/enviar/event/"/>' + event,
-		success: data => {
-			$("#enviarEvent").prop("disabled", false);
-			let classe = data.ok ? "alert-success" : "alert-danger";
-			let div = '<div class="alert ' + classe +'"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +
-					'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
-			$("#contingut-missatges").append(div);
-			window.location.href = '<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}?pipellaActiva=stateMachine"/>';
-		},
-		error: err => console.error(err)
-	});
-}
+		$("#enviarEvent").prop("disabled", true);
+		let event = $("#smEvents").val();
+		$.ajax({
+			url: '<c:url value="/notificacio/enviament/${enviamentId}/state/machine/enviar/event/"/>' + event,
+			success: data => {
+				$("#enviarEvent").prop("disabled", false);
+				let classe = data.ok ? "alert-success" : "alert-danger";
+				let div = '<div class="alert ' + classe +'"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +
+						'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
+				$("#contingut-missatges").append(div);
+				window.location.href = '<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}?pipellaActiva=stateMachine"/>';
+			},
+			error: err => console.error(err)
+		});
+	}
 
 var eventTipus = [];
 <c:forEach var="tipus" items="${eventTipus}">
@@ -220,7 +219,7 @@ $(document).ready(function() {
 			</a>
 		</li>
 		</c:if>
-		<c:if test="${isRolActualAdministrador}">
+		<c:if test="${isRolActualAdministrador and not empty smInfo.estat}">
 			<li role="presentation"<c:if test="${pipellaActiva == 'stateMachine'}"> class="active"</c:if>>
 				<a href="#stateMachine" aria-controls="stateMachine" role="tab" data-toggle="tab">
 					<spring:message code="notificacio.info.tab.state.machine"/>
@@ -842,12 +841,10 @@ $(document).ready(function() {
 				</thead>
 			</table>
 		</div>
-
-		<c:if test="${isRolActualAdministrador}">
+		<c:if test="${isRolActualAdministrador and not empty smInfo.estat}">
 			<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'stateMachine'}"> active</c:if>" id="stateMachine">
 
 				<div class="" style="margin-top: 30px">
-
 					<div class="row " style="padding-left: 15px;">
 
 						<div class="col-sm-2">
@@ -857,7 +854,6 @@ $(document).ready(function() {
 							${smInfo.estat}
 						</div>
 					</div>
-
 					<div class="row" style="margin-top: 30px">
 						<div class="col-sm-6" style="height: 100%">
 							<not:inputSelect name="smEstats" textKey="notificacio.info.tab.state.machine.nou.estat" optionItems="${smInfo.estats}"

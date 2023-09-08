@@ -80,6 +80,8 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
         transitions
                 // Registre
                 .withExternal().source(NOU).target(REGISTRE_PENDENT).event(RG_ENVIAR).guard(uuidGuard()).action(enviamentRegistreAction).and()
+                .withExternal().source(NOU).target(NOTIFICA_PENDENT).event(NT_ENVIAR).guard(uuidGuard()).action(enviamentNotificaAction).and()
+                .withExternal().source(NOU).target(SIR_PENDENT).event(SR_RETRY).guard(uuidGuard()).action(consultaSirAction).and()
                 .withExternal().source(REGISTRE_PENDENT).target(REGISTRE_PENDENT).event(RG_ENVIAR).guard(uuidGuard()).action(enviamentRegistreAction).and()
                 .withExternal().source(REGISTRE_PENDENT).target(REGISTRAT).event(RG_SUCCESS).guard(uuidGuard()).and()
                 .withExternal().source(REGISTRE_PENDENT).target(REGISTRE_RETRY).event(RG_ERROR).guard(uuidGuard()).and()
@@ -100,6 +102,7 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
                 .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_PENDENT).event(NT_ENVIAR).guard(uuidGuard()).action(enviamentNotificaAction).and()
                 .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_SENT).event(NT_SUCCESS).guard(uuidGuard()).action(consultaNotificaIniciPoolingAction).and()
                 .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_RETRY).event(NT_ERROR).guard(uuidGuard()).and()
+                .withExternal().source(NOTIFICA_PENDENT).target(FI).event(NT_FI).guard(uuidGuard()).and()
                 .withChoice().source(NOTIFICA_RETRY)
                     .first(NOTIFICA_PENDENT, reintentsNotificaGuard, enviamentNotificaAction)
                     .last(NOTIFICA_ERROR).and()

@@ -6,8 +6,8 @@ import java.io.Serializable;
  * Enumerat que indica l'estat d'una notificació a dins NotIB.
  * 
  * Els possibles estats son:
- *  - PENDENT: Pendent d'enviament a Notifica.
- *  - ENVIADA: Enviada a Notifica.
+ *  - PENDENT: Pendent d'enviament a registre.
+ *  - ENVIADA: Enviada a Notifica o registrada SIR.
  *  - REGISTRADA: Enviada al registre.
  *  - FINALITZADA: Estat final de la notificació.
  * 
@@ -53,5 +53,13 @@ public enum NotificacioEstatEnumDto implements Serializable {
 
 	public static boolean isRegistrat(NotificacioEstatEnumDto estat) {
 		return !PENDENT.equals(estat);
+	}
+
+	public static boolean isEnviadaAmbErrors(NotificacioEstatEnumDto estat) {
+		return ENVIADA_AMB_ERRORS.equals(estat);
+	}
+
+	public static boolean isRegistrada(NotificacioEstatEnumDto estat) {
+		return REGISTRADA.equals(estat);
 	}
 }

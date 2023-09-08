@@ -108,6 +108,26 @@ public class ConfigHelper {
         return "[" + (!Strings.isNullOrEmpty(prefix) ? prefix : "NOTIB") + "]";
     }
 
+    @Transactional(readOnly = true)
+    public Integer getMaxReintentsRegistre() {
+        return getConfigAsInteger("es.caib.notib.tasca.registre.enviaments.reintents.maxim");
+    }
+
+    @Transactional(readOnly = true)
+    public Integer getMaxReintentsNotifca() {
+        return getConfigAsInteger("es.caib.notib.tasca.notifica.enviaments.reintents.maxim");
+    }
+    @Transactional(readOnly = true)
+    public Integer getMaxReintentsConsultaNotifica() {
+        return getConfigAsInteger("es.caib.notib.tasca.enviament.actualitzacio.estat.reintents.maxim");
+    }
+
+    @Transactional(readOnly = true)
+    public Integer getMaxReintentsConsultaSir() {
+        return getConfigAsInteger("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.reintents.maxim");
+    }
+
+
     private Optional<String> getPropietat(String entitatCodi, String globalKey) {
 
         String propertyValue = null;

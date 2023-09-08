@@ -438,6 +438,18 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return DatatablesHelper.getDatatableResponse(request, notificacioService.historicFindAmbEnviament(entitatActual.getId(), notificacioId, enviamentId));
     }
 
+    @GetMapping(value = "/{notificacioId}/state/machine/afegir")
+    @ResponseBody
+    public Missatge enviamentStateMachineAfegir(HttpServletRequest request, @PathVariable Long notificacioId) {
+
+        if (!RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
+            throw new SecurityException("Permís denegat");
+        }
+        var ok = envSmService.afegirNotificacio(notificacioId);
+        var msg = getMessage(request, ok ? "notificacio.massiva.ok.validacio" : "avis.nivell.enum.ERROR");
+        return Missatge.builder().ok(ok).msg(msg).build();
+    }
+
     @GetMapping(value = "/enviament/{enviamentId}/state/machine/set/estat/{estat}")
     @ResponseBody
     public Missatge enviamentStateMachineSetEstat(HttpServletRequest request, @PathVariable Long enviamentId, @PathVariable String estat) {
@@ -445,7 +457,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         if (!RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
             throw new SecurityException("Permís denegat");
         }
-        log.info("estat nou: " + estat);
         var ok = envSmService.canviarEstat(enviamentId, estat);
         var msg = getMessage(request, ok ? "notificacio.massiva.ok.validacio" : "avis.nivell.enum.ERROR");
         return Missatge.builder().ok(ok).msg(msg).build();
@@ -867,6 +878,12 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             permisGestio = permisosService.hasNotificacioPermis(notificacioId, entitatActual.getId(), getCodiUsuariActual(), PermisEnum.GESTIO);
             permisGestio = permisGestio || procedimentService.hasPermisProcediment(notificacio.getProcediment().getId(), PermisEnum.GESTIO);
         }
+
+        if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
+            var mostrarSmInfo = envSmService.mostrarAfegirStateMachine(notificacioId);
+            model.addAttribute("mostrarSmInfo", mostrarSmInfo);
+        }
+
         model.addAttribute("permisGestio", permisGestio);
         model.addAttribute("permisAdmin", request.isUserInRole("NOT_ADMIN"));
     }

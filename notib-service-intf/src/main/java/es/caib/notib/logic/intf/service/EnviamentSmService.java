@@ -23,7 +23,13 @@ public interface EnviamentSmService {
 	EnviamentSmEstat getEstat(String enviamentUuid);
 
 	@PreAuthorize("hasRole('NOT_SUPER')")
+	boolean mostrarAfegirStateMachine(Long notificacioId);
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	StateMachineInfo infoStateMachine(Long enviamentId);
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	boolean afegirNotificacio(Long notificacioId);
 
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	boolean canviarEstat(Long enviamentId, String estat);
@@ -57,6 +63,9 @@ public interface EnviamentSmService {
 
     @PreAuthorize("hasRole('tothom')")
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaEnviament(String enviamentUuid);
+
+    @PreAuthorize("hasRole('tothom')")
+	void notificaFi(String notificaReferencia);
 
 	@PreAuthorize("hasRole('tothom')")
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaSuccess(String enviamentUuid);
@@ -125,5 +134,4 @@ public interface EnviamentSmService {
 
 	@PreAuthorize("hasRole('tothom')")
 	void remove(String enviamentUuid);
-
 }

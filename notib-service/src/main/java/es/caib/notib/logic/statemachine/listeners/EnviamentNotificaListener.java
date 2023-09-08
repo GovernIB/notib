@@ -71,7 +71,11 @@ public class EnviamentNotificaListener {
                     var event = enviamentSuccess ? EnviamentSmEvent.NT_SUCCESS : EnviamentSmEvent.NT_ERROR;
                     switch (event) {
                         case NT_SUCCESS:
-                            enviamentSmService.notificaSuccess(env.getNotificaReferencia());
+                            if (env.isPerEmail()) {
+                                enviamentSmService.notificaFi(env.getNotificaReferencia());
+                            } else {
+                                enviamentSmService.notificaSuccess(env.getNotificaReferencia());
+                            }
                             break;
                         case NT_ERROR:
                             enviamentSmService.notificaFailed(env.getNotificaReferencia());

@@ -6,6 +6,7 @@ package es.caib.notib.ejb;
 import es.caib.notib.logic.intf.dto.stateMachine.StateMachineInfo;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import org.springframework.context.annotation.Primary;
 import org.springframework.statemachine.StateMachine;
 
@@ -31,8 +32,20 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
+	public boolean mostrarAfegirStateMachine(Long notificacioId) {
+		return getDelegateService().mostrarAfegirStateMachine(notificacioId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
 	public StateMachineInfo infoStateMachine(Long enviamentId) {
 		return getDelegateService().infoStateMachine(enviamentId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public boolean afegirNotificacio(Long notificacioId) {
+		return getDelegateService().afegirNotificacio(notificacioId);
 	}
 
 	@Override
@@ -97,6 +110,12 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaEnviament(String enviamentUuid) {
 		return getDelegateService().notificaEnviament(enviamentUuid);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public void notificaFi(String notificaReferencia) {
+		getDelegateService().notificaFi(notificaReferencia);
 	}
 
 	@Override

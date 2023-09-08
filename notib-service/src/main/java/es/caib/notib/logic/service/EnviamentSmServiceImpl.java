@@ -1,19 +1,24 @@
 package es.caib.notib.logic.service;
 
+import com.google.common.base.Strings;
+import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.stateMachine.StateMachineInfo;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
+import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.stateMachine.StateMachineRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.service.StateMachineService;
-import org.springframework.statemachine.state.State;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +36,11 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	@Resource
 	private MetricsHelper metricsHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
-	private final NotificacioEnviamentRepository notificacioEnviamentRepository;
+	private final NotificacioEnviamentRepository enviamentRepository;
+	private final NotificacioRepository notificacioRepository;
 	private final StateMachineRepository smRepository;
 	private final StateMachineService<EnviamentSmEstat, EnviamentSmEvent> stateMachineService;
 
@@ -43,14 +51,35 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	@Override
 	@Transactional(readOnly = true)
+	public boolean mostrarAfegirStateMachine(Long notificacioId) {
+
+		var not = notificacioRepository.findById(notificacioId).orElseThrow();
+		for (var env : not.getEnviaments()) {
+			var estat = smRepository.findEstatByMachineId(env.getUuid());
+			if (estat == null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public StateMachineInfo infoStateMachine(Long enviamentId) {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de la State Machine per l'enviament amb id" + enviamentId);
-			var uuId = notificacioEnviamentRepository.getUuidById(enviamentId);
+			var env = enviamentRepository.findById(enviamentId).orElseThrow();
 			var info = new StateMachineInfo();
-			info.setEstat(EnviamentSmEstat.valueOf(smRepository.findEstatByMachineId(uuId)));
+			var estat = smRepository.findEstatByMachineId(env.getUuid());
+			var notEstat = env.getNotificacio().getEstat();
+			var mostrar = isPendentRegistre(env) || NotificacioEstatEnumDto.isRegistrada(notEstat) || NotificacioEstatEnumDto.isEnviadaAmbErrors(notEstat);
+			info.setMostrar(mostrar);
+			if (Strings.isNullOrEmpty(estat) || !mostrar) {
+				return info;
+			}
+			info.setEstat(EnviamentSmEstat.valueOf(estat));
 			return info;
 		} catch (Exception ex) {
 			log.error("Error canviant l'estat de la màquina per l'enviament " + enviamentId, ex);
@@ -60,13 +89,117 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		}
 	}
 
+	private boolean isPendentRegistre(NotificacioEnviamentEntity env) {
+		return NotificacioEstatEnumDto.PENDENT.equals(env.getNotificacio().getEstat()) && env.getNotificacio().getRegistreEnviamentIntent() == 0 && !env.isNotificaError();
+	}
+
+	@Override
+	public boolean afegirNotificacio(Long notificacioId) {
+
+		try {
+			var not = notificacioRepository.findById(notificacioId).orElseThrow();
+			var estat = not.getEstat();
+			not.getEnviaments().forEach(e -> {
+				// S'HA DE FICAR ELS INTENTS ACTUALS A LA MÀQUINA.
+				if (!NotificacioEstatEnumDto.PENDENT.equals(estat) && !NotificacioEstatEnumDto.REGISTRADA.equals(estat) &&
+						!NotificacioEstatEnumDto.ENVIADA.equals(estat) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(estat)) {
+					return;
+				}
+				EnviamentSmEvent eventSm = null;
+				var intent = 0;
+				if (e.getRegistreData() == null) { // Pendent
+					// max reintents -> estat registre_error - posar intents màquina al màxim que és la propietat definida
+					// algun reintent o nou -> registre_pendent - cal també afegir el numero d'intents a la màquina rg_enviar
+					eventSm = not.getRegistreEnviamentIntent() < configHelper.getMaxReintentsRegistre() ? EnviamentSmEvent.RG_ENVIAR : EnviamentSmEvent.RG_ERROR;
+					intent = not.getRegistreEnviamentIntent();
+				} else if (e.isNotificaError()) { // Registrada
+					// si es notifica mateix cas que registre. Mirar intents i NT_ENVIAR o cap a NOTIFICA_ERROR
+					eventSm = e.getNotificaIntentNum() < configHelper.getMaxReintentsNotifca() ? EnviamentSmEvent.NT_ENVIAR : EnviamentSmEvent.NT_ERROR;
+					intent = e.getNotificaIntentNum();
+	//			} else if (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(estat) && e.isPerEmail()) { //Enviament registrat i pendent d'enviar per email
+	//				eventSm = e.getNotificaIntentNum() < configHelper.getMaxReintentsConsultaNotifica() ? EnviamentSmEvent.CN_CONSULTAR : EnviamentSmEvent.NT_ERROR;
+	//				intent = e.getNotificaIntentNum();
+				} else {// if (NotificacioEstatEnumDto.ENVIADA.equals(estat)) {
+					// Si es SIR mirar els reintents de consulta mirar el maxim de reintents. Si max reintents ? SR_CONSULTAR : SIR ERROR
+					// Si es enviada a notifica mirar si enviament té els intents esgotats de consulta ? NOTIFICA_ERROR : NOTIFICA_SENT
+					if (not.isComunicacioSir()) {
+						eventSm = e.getSirConsultaIntent() < configHelper.getMaxReintentsConsultaSir() ? EnviamentSmEvent.SR_CONSULTAR : EnviamentSmEvent.SR_ERROR;
+						intent = e.getSirConsultaIntent();
+					} else {
+						eventSm = e.getNotificaIntentNum() < configHelper.getMaxReintentsConsultaNotifica() ? EnviamentSmEvent.CN_CONSULTAR : EnviamentSmEvent.NT_ERROR;
+						intent = e.getNotificaIntentNum();
+					}
+				}
+				afegirEnviament(e, eventSm, intent);
+			});
+			return true;
+		} catch (Exception ex) {
+			log.error("Error afegint la notificacio " + notificacioId + " a la màquina d'estats");
+			return false;
+		}
+	}
+//
+//	@Override
+//	public void afegirNotificacio(Long notificacioId) {
+//
+//		var not = notificacioRepository.findById(notificacioId).orElseThrow();
+//		var estat = not.getEstat();
+//		not.getEnviaments().forEach(e -> {
+//			EnviamentSmEvent eventSm = null;
+//			var intent = 0;
+//			// S'HA DE FICAR ELS INTENTS ACTUALS A LA MÀQUINA.
+//			if (NotificacioEstatEnumDto.PENDENT.equals(estat)) {
+//				// max reintents -> estat registre_error - posar intents màquina al màxim que és la propietat definida
+//				// algun reintent o nou -> registre_pendent - cal també afegir el numero d'intents a la màquina rg_enviar
+//				eventSm = not.getRegistreEnviamentIntent() < configHelper.getMaxReintentsRegistre() ? EnviamentSmEvent.RG_ENVIAR : EnviamentSmEvent.RG_ERROR;
+//				intent = not.getRegistreEnviamentIntent();
+//			} else if (NotificacioEstatEnumDto.REGISTRADA.equals(estat)) {
+//				// si es notifica mateix cas que registre. Mirar intents i NT_ENVIAR o cap a NOTIFICA_ERROR
+//				eventSm = e.getNotificaIntentNum() < configHelper.getMaxReintentsNotifca() ? EnviamentSmEvent.NT_ENVIAR : EnviamentSmEvent.NT_ERROR;
+//				intent = e.getNotificaIntentNum();
+//			} else if (NotificacioEstatEnumDto.ENVIADA.equals(estat)) {
+//				// Si es SIR mirar els reintents de consulta mirar el maxim de reintents. Si max reintents ? SR_CONSULTAR : SIR ERROR
+//				// Si es enviada a notifica mirar si enviament té els intents esgotats de consulta ? NOTIFICA_ERROR : NOTIFICA_SENT
+//				if (not.isComunicacioSir()) {
+//					eventSm = e.getSirConsultaIntent() < configHelper.getMaxReintentsConsultaSir() ? EnviamentSmEvent.SR_CONSULTAR : EnviamentSmEvent.SR_ERROR;
+//					intent = e.getSirConsultaIntent();
+//				} else {
+//					eventSm = e.getNotificaIntentNum() < configHelper.getMaxReintentsConsultaNotifica() ? EnviamentSmEvent.CN_CONSULTAR : EnviamentSmEvent.NT_ERROR;
+//					intent = e.getNotificaIntentNum();
+//				}
+//			} else if (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(estat)) {
+//				if (e.isPerEmail()) {
+//					eventSm = e.getNotificaIntentNum() < configHelper.getMaxReintentsConsultaNotifica() ? EnviamentSmEvent.CN_CONSULTAR : EnviamentSmEvent.NT_ERROR;
+//					intent = e.getNotificaIntentNum();
+//				} else {
+////					var noRegistrada = e.getRegistreData() == null
+//				}
+//			}
+//			afegirEnviament(e, eventSm, intent);
+//		});
+//	}
+
+	private boolean afegirEnviament(NotificacioEnviamentEntity env, EnviamentSmEvent eventSm, int intent) {
+
+		try {
+			log.debug("Afegint a la màquina l'enviament amb id " + env.getUuid());
+			var sm = stateMachineService.acquireStateMachine(env.getUuid());
+			sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, intent);
+			sendEvent(env.getUuid(), sm, eventSm);
+			return true;
+		} catch (Exception ex) {
+			log.error("Error al afegir a la màquina l'enviament " + env.getUuid(), ex);
+			return false;
+		}
+	}
+
 	@Override
 	@Transactional
 	public boolean canviarEstat(Long enviamentId, String estat) {
 
 		try {
 			log.debug("Canviant a l'estat " + estat + " de la màquina per l'enviament amb id " + enviamentId);
-			var uuId = notificacioEnviamentRepository.getUuidById(enviamentId);
+			var uuId = enviamentRepository.getUuidById(enviamentId);
 			var maquina = smRepository.findByMachineId(uuId).orElseThrow();
 			maquina.setState(EnviamentSmEstat.valueOf(estat).name());
 			smRepository.save(maquina);
@@ -82,7 +215,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 		try {
 			log.debug("Enviant l'event " + event + " a la màquina per l'enviament amb id " + enviamentId);
-			var uuId = notificacioEnviamentRepository.getUuidById(enviamentId);
+			var uuId = enviamentRepository.getUuidById(enviamentId);
 			var sm = stateMachineService.acquireStateMachine(uuId, true);
 			sendEvent(uuId, sm, EnviamentSmEvent.valueOf(event));
 			return true;
@@ -97,7 +230,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid) {
 
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
-		var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
+		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 		var variables = sm.getExtendedState().getVariables();
 		variables.put(SmConstants.ENVIAMENT_TIPUS, enviament.getNotificacio().getEnviamentTipus().name());
 		variables.put(SmConstants.ENVIAMENT_SENSE_NIF, enviament.isPerEmail());
@@ -178,6 +311,14 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_ENVIAR);
 		return sm;
+	}
+
+	@Override
+	@Transactional
+	public void notificaFi(String enviamentUuid) {
+
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_FI);
 	}
 
 	@Override
@@ -272,7 +413,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaSuccess(String enviamentUuid) {
 
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
-		var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
+		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_ESTAT_FINAL,enviament.isNotificaEstatFinal());
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.CN_SUCCESS);
@@ -335,7 +476,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirSuccess(String enviamentUuid) {
 
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
-		var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
+		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_ESTAT_FINAL,enviament.isRegistreEstatFinal());
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_SUCCESS);

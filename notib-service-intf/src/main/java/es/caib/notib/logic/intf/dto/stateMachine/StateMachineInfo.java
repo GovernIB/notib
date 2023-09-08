@@ -18,9 +18,11 @@ import java.util.List;
 @AllArgsConstructor
 public class StateMachineInfo {
 
+    private boolean mostrar;
     private EnviamentSmEstat estat;
     private List<CodiValorDto> estats = new ArrayList<>();
     private List<CodiValorDto> events = new ArrayList<>();
+
 
     public StateMachineInfo() {
 
