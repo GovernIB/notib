@@ -85,7 +85,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>31.1-jre</version>
+            <version>${guava.version}</version>
         </dependency>
         <!-- Per a evitar el missatge "warning: unknown enum constant When.MAYBE" al generar javadoc -->
         <dependency>

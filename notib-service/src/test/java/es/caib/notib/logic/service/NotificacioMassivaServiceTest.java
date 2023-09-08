@@ -1,12 +1,7 @@
 package es.caib.notib.logic.service;
 
-import es.caib.notib.logic.intf.dto.notificacio.Enviament;
-import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
-import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.EntityComprovarHelper;
-import es.caib.notib.logic.helper.FiltreHelper.FiltreField;
-import es.caib.notib.logic.helper.FiltreHelper.StringField;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotificacioHelper;
 import es.caib.notib.logic.helper.NotificacioListHelper;
@@ -15,7 +10,8 @@ import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.RegistreNotificaHelper;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
-import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaEstatDto;
@@ -26,7 +22,6 @@ import es.caib.notib.logic.test.NotificacioMassivaTests;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioMassivaEntity;
-import es.caib.notib.persist.entity.NotificacioTableEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
 import es.caib.notib.persist.objectes.FiltreNotificacio;
 import es.caib.notib.persist.repository.NotificacioMassivaRepository;
@@ -41,7 +36,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.OutputStream;
@@ -268,7 +262,7 @@ public class NotificacioMassivaServiceTest {
 						.nomesAmbErrors(false)
 						.nomesSenseErrors(false)
 						.build()); // ho ignorarem per a la prova
-			Mockito.when(notificacioListHelper.complementaNotificacions(Mockito.eq(entitatMock), Mockito.anyString(), Mockito.<Page<NotificacioTableEntity>>any())).thenReturn(null);
+//			Mockito.when(notificacioListHelper.complementaNotificacions(Mockito.eq(entitatMock), Mockito.anyString(), Mockito.<Page<NotificacioTableEntity>>any())).thenReturn(null);
 
 		// When
 		notificacioMassivaService.findNotificacions(entitatId, notMassivaId, new NotificacioFiltreDto(), new PaginacioParamsDto());
@@ -306,7 +300,7 @@ public class NotificacioMassivaServiceTest {
 //				Mockito.anyBoolean(),
 				Mockito.nullable(Pageable.class));
 
-		Mockito.verify(notificacioListHelper, Mockito.times(1)).complementaNotificacions(Mockito.eq(entitatMock), Mockito.anyString(), Mockito.<Page<NotificacioTableEntity>>any());
+//		Mockito.verify(notificacioListHelper, Mockito.times(1)).complementaNotificacions(Mockito.eq(entitatMock), Mockito.anyString(), Mockito.<Page<NotificacioTableEntity>>any());
 	}
 
 	@Test

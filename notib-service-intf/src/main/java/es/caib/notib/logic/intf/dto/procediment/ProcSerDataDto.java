@@ -5,10 +5,10 @@ import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -18,7 +18,7 @@ import java.util.List;
  * DTO per a crear i editar procediments.
  *
  */
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter

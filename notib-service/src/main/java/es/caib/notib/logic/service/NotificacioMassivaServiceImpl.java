@@ -5,12 +5,13 @@ import es.caib.notib.client.domini.DocumentTipus;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
-import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.exception.DocumentNotFoundException;
 import es.caib.notib.logic.helper.AuditHelper;
+import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.DocumentHelper;
@@ -32,6 +33,7 @@ import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.logic.intf.dto.notificacio.EntregaPostal;
 import es.caib.notib.logic.intf.dto.notificacio.Enviament;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaDataDto;
@@ -42,7 +44,6 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaPrioritatDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaTableItemDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
-import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.logic.intf.exception.AccessDeniedException;
 import es.caib.notib.logic.intf.exception.InvalidCSVFileException;
@@ -57,6 +58,7 @@ import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificacioMassivaService;
 import es.caib.notib.logic.intf.util.NifHelper;
+import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.logic.service.ws.NotificacioValidator;
 import es.caib.notib.logic.utils.CSVReader;
 import es.caib.notib.logic.utils.ZipFileUtils;
@@ -67,7 +69,6 @@ import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
-import es.caib.notib.persist.objectes.FiltreNotificacio;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
@@ -161,6 +162,10 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     private NotificacioEventRepository notificacioEventRepository;
     @Autowired
     private NotificacioValidator notificacioValidator;
+    @Autowired
+    private CacheHelper cacheHelper;
+    @Autowired
+    private NotificacioTableMapper notificacioTableMapper;
 
     @Autowired
     private EnviamentSmService enviamentSmService;
@@ -376,39 +381,14 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         var pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
         var f = notificacioListHelper.getFiltre(filtre, entitatId, null, null, null);
         f.setNotificacioMassiva(notificacioMassivaRepository.findById(notificacioMassivaId).orElse(null));
-//        var f = FiltreNotificacio.builder()
-//            .entitatIdNull(filtreNetejat.getEntitatId().isNull())
-//            .entitatId(filtreNetejat.getEntitatId().getField())
-//            .notificacioMassiva(notificacioMassivaRepository.findById(notificacioMassivaId).orElse(null))
-//            .enviamentTipusNull(filtreNetejat.getEnviamentTipus().isNull())
-//            .enviamentTipus(filtreNetejat.getEnviamentTipus().getField())
-//            .concepteNull(filtreNetejat.getConcepte().isNull())
-//            .concepte(filtreNetejat.getConcepte().getField())
-//            .estatNull(filtreNetejat.getEstat().isNull())
-//            .estatMask(filtreNetejat.getEstat().isNull() ? 0 : filtreNetejat.getEstat().getField().getMask())
-//            .dataIniciNull(filtreNetejat.getDataInici().isNull())
-//            .dataInici(filtreNetejat.getDataInici().getField())
-//            .dataFiNull(filtreNetejat.getDataFi().isNull())
-//            .dataFi(filtreNetejat.getDataFi().getField())
-//            .titularNull(filtreNetejat.getTitular().isNull())
-//            .titular(filtreNetejat.getTitular().isNull() ? "" : filtreNetejat.getTitular().getField())
-//            .organCodiNull(filtreNetejat.getOrganGestor().isNull())
-//            .organCodi(filtreNetejat.getOrganGestor().isNull() ? "" : filtreNetejat.getOrganGestor().getField().getCodi())
-//            .procedimentNull(filtreNetejat.getProcediment().isNull())
-//            .procedimentCodi(filtreNetejat.getProcediment().isNull() ? "" : filtreNetejat.getProcediment().getField().getCodi())
-//            .tipusUsuariNull(filtreNetejat.getTipusUsuari().isNull())
-//            .tipusUsuari(filtreNetejat.getTipusUsuari().getField())
-//            .numExpedientNull(filtreNetejat.getNumExpedient().isNull())
-//            .numExpedient(filtreNetejat.getNumExpedient().getField())
-//            .creadaPerNull(filtreNetejat.getCreadaPer().isNull())
-//            .creadaPer(filtreNetejat.getCreadaPer().getField())
-//            .identificadorNull(filtreNetejat.getIdentificador().isNull())
-//            .identificador(filtreNetejat.getIdentificador().getField())
-//            .nomesAmbErrors(filtreNetejat.getNomesAmbErrors().getField())
-//            .nomesSenseErrors(filtreNetejat.getNomesSenseErrors().getField()).build();
         var notificacions = notificacioTableViewRepository.findAmbFiltreByNotificacioMassiva(f, pageable);
         var auth = SecurityContextHolder.getContext().getAuthentication();
-        return notificacioListHelper.complementaNotificacions(entitatActual, auth.getName(), notificacions);
+        var dtos = notificacioTableMapper.toNotificacionsTableItemDto(
+                notificacions.getContent(),
+                notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitatId, auth.getName()),
+                cacheHelper.findOrganigramaNodeByEntitat(f.getEntitat().getDir3Codi()));
+        return paginacioHelper.toPaginaDto(dtos, notificacions);
+//        return notificacioListHelper.complementaNotificacions(entitatActual, auth.getName(), notificacions);
     }
 
     private String[] trim(String[] linia) {

@@ -18,7 +18,6 @@ import es.caib.notib.logic.intf.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.logic.intf.dto.notificacio.Enviament;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -26,17 +25,36 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
-import es.caib.notib.logic.intf.dto.stateMachine.StateMachineInfo;
 import es.caib.notib.logic.intf.exception.EnviamentSmEstatException;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
-import es.caib.notib.logic.intf.service.*;
+import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
+import es.caib.notib.logic.intf.service.NotificacioService;
+import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
-import es.caib.notib.persist.entity.*;
+import es.caib.notib.logic.mapper.NotificacioMapper;
+import es.caib.notib.logic.mapper.NotificacioTableMapper;
+import es.caib.notib.persist.entity.CallbackEntity;
+import es.caib.notib.persist.entity.NotificacioEntity;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.entity.NotificacioEventEntity;
+import es.caib.notib.persist.entity.PersonaEntity;
+import es.caib.notib.persist.entity.ProcedimentEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
-import es.caib.notib.persist.objectes.FiltreNotificacio;
-import es.caib.notib.persist.repository.*;
+import es.caib.notib.persist.repository.CallbackRepository;
+import es.caib.notib.persist.repository.ColumnesRepository;
+import es.caib.notib.persist.repository.DocumentRepository;
+import es.caib.notib.persist.repository.EnviamentTableRepository;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
+import es.caib.notib.persist.repository.NotificacioEventRepository;
+import es.caib.notib.persist.repository.NotificacioRepository;
+import es.caib.notib.persist.repository.NotificacioTableViewRepository;
+import es.caib.notib.persist.repository.PersonaRepository;
+import es.caib.notib.persist.repository.ProcSerOrganRepository;
+import es.caib.notib.persist.repository.ProcedimentRepository;
 import es.caib.notib.persist.repository.auditoria.NotificacioAuditRepository;
 import es.caib.notib.persist.repository.auditoria.NotificacioEnviamentAuditRepository;
 import es.caib.notib.plugin.unitat.CodiValor;
@@ -56,7 +74,15 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -144,6 +170,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Autowired
 	private EnviamentSmService enviamentSmService;
+
+	@Autowired
+	private NotificacioMapper notificacioMapper;
+	@Autowired
+	private NotificacioTableMapper notificacioTableMapper;
 
 	private static final String DELETE = "NotificacioServiceImpl.delete";
 	private static final String UPDATE = "NotificacioServiceImpl.update";
@@ -562,7 +593,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var rols = aplicacioService.findRolsUsuariActual();
 			var f = notificacioListHelper.getFiltre(filtre, entitatId, rol, usuariCodi, rols);
 			var notificacions = notificacioTableViewRepository.findAmbFiltre(f, pageable);
- 			return notificacioListHelper.complementaNotificacions(f.getEntitat(), usuariCodi, notificacions);
+			var dtos = notificacioTableMapper.toNotificacionsTableItemDto(
+					notificacions.getContent(),
+					notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitatId, usuariCodi),
+					cacheHelper.findOrganigramaNodeByEntitat(f.getEntitat().getDir3Codi()));
+			return paginacioHelper.toPaginaDto(dtos, notificacions);
+// 			return notificacioListHelper.complementaNotificacions(f.getEntitat(), usuariCodi, notificacions);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -633,7 +669,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						paginacioHelper.toSpringDataPageable(paginacioParams));
 			}
 			return page != null && page.getContent() != null && !page.isEmpty() ?
-					paginacioHelper.toPaginaDto(page, NotificacioDto.class) : paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
+					paginacioHelper.toPaginaDto(page, NotificacioDto.class, notificacioMapper::toCallbackErrorDto) : paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1402,7 +1438,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 				
 			return page != null && page.getContent() != null && !page.getContent().isEmpty() ?
-					paginacioHelper.toPaginaDto(page, NotificacioDto.class): paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
+					paginacioHelper.toPaginaDto(page, NotificacioDto.class, notificacioMapper::toErrorRegistreDto): paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

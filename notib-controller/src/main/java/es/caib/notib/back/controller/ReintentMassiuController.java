@@ -62,6 +62,8 @@ public class ReintentMassiuController extends BaseUserController {
 	private static final String MASSIU_REGISTRE_FILTRE = "massiu_registre_filtre";
 	private static final String PROCEDIMENTS = "procediments";
 
+	// NOTIFICACIONS CALLBACK ERRÒNIES
+	// ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	@GetMapping(value = "/notificacions")
 	public String getNotificacions(HttpServletRequest request, Model model) {
@@ -69,7 +71,7 @@ public class ReintentMassiuController extends BaseUserController {
 		var mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
 		model.addAttribute("mantenirPaginacio", mantenirPaginacio);
 		model.addAttribute(getFiltre(request));
-		model.addAttribute(PROCEDIMENTS, procedimentService.findAll());
+		model.addAttribute(PROCEDIMENTS, procedimentService.findAllIdDesc());
 		model.addAttribute("notificacioEstats", EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class, "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto."));
 		model.addAttribute("notificacioEnviamentEstats", EnumHelper.getOptionsForEnum(EnviamentEstat.class, "es.caib.notib.client.domini.EnviamentEstat."));
 		return "contingutMassiuList";
@@ -79,7 +81,7 @@ public class ReintentMassiuController extends BaseUserController {
 	public String post(HttpServletRequest request, NotificacioErrorCallbackFiltreCommand notificacioErrorCallbackFiltreCommand, Model model) {
 
 		request.getSession().setAttribute(MASSIU_CALLBACK_FILTRE, NotificacioErrorCallbackFiltreCommand.asDto(notificacioErrorCallbackFiltreCommand));
-		model.addAttribute(PROCEDIMENTS, procedimentService.findAll());
+		model.addAttribute(PROCEDIMENTS, procedimentService.findAllIdDesc());
 		model.addAttribute("notificacioEstats", EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class, "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto."));
 		model.addAttribute("notificacioEnviamentEstats", EnumHelper.getOptionsForEnum(EnviamentEstat.class, "es.caib.notib.client.domini.EnviamentEstat."));
 		return "contingutMassiuList";
@@ -99,7 +101,8 @@ public class ReintentMassiuController extends BaseUserController {
 		var filtre = (NotificacioErrorCallbackFiltreDto) request.getSession().getAttribute(MASSIU_CALLBACK_FILTRE);
 		return filtre != null ? NotificacioErrorCallbackFiltreCommand.asCommand(filtre) : new NotificacioErrorCallbackFiltreCommand();
 	}
-	
+
+
 	@SuppressWarnings("unchecked")
 	@GetMapping(value = "/notificacions/reintentar")
 	public String reintentar(HttpServletRequest request, Model model) {
@@ -161,12 +164,13 @@ public class ReintentMassiuController extends BaseUserController {
 	}
 	
 	// REENVIAMENT A REGISTRE
+	// ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	@GetMapping(value = "/registre/notificacionsError")
 	public String getNotificacionsRegistreError(HttpServletRequest request, Model model) {
 
 		model.addAttribute(new NotificacioRegistreErrorFiltreCommand());
-		model.addAttribute(PROCEDIMENTS, procedimentService.findAll());
+		model.addAttribute(PROCEDIMENTS, procedimentService.findAllIdDesc());
 		return "registreMassiuList";
 	}
 	
@@ -174,7 +178,7 @@ public class ReintentMassiuController extends BaseUserController {
 	public String notificacionsRegistreError(HttpServletRequest request, NotificacioRegistreErrorFiltreCommand notificacioRegistreErrorFiltreCommand, Model model) {
 
 		request.getSession().setAttribute(MASSIU_REGISTRE_FILTRE, NotificacioRegistreErrorFiltreCommand.asDto(notificacioRegistreErrorFiltreCommand));
-		model.addAttribute(PROCEDIMENTS, procedimentService.findAll());
+		model.addAttribute(PROCEDIMENTS, procedimentService.findAllIdDesc());
 		return "registreMassiuList";
 	}
 	

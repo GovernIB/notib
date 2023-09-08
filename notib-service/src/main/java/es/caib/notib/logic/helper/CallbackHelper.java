@@ -218,6 +218,8 @@ public class CallbackHelper {
 		long elapsedTime = System.nanoTime() - start;
 		log.info("addCallbackEvent: "  + elapsedTime);
 		auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "CallbackHelper.notifica");
+		// Marcar per actualitzar
+		notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(notificacio.getId()).build());
 		return notificacio;
 	}
 

@@ -353,6 +353,30 @@ databaseChangeLog:
                   name: class
                   value: es.caib.notib.persist.entity.ProcSerOrganEntity
             where: class = 'es.caib.notib.core.entity.ProcSerOrganEntity'
+        - addColumn:
+            tableName: NOT_NOTIFICACIO_TABLE
+            columns:
+              - column:
+                  name: ESTAT_STRING
+                  type: varchar(2000 ${varcharUnit})
+              - column:
+                  name: DOCUMENT_ID
+                  type: bigint
+              - column:
+                  name: ENV_CER_DATA
+                  type: TIMESTAMP
+#              - column:
+#                  name: PERMIS_PROCESSAR
+#                  type: boolean
+#                  defaultValue: ${booleanFalse}
+              - column:
+                  name: REG_ENV_PENDENTS
+                  type: boolean
+                  defaultValue: ${booleanFalse}
+              - column:
+                  name: PER_ACTUALITZAR
+                  type: boolean
+                  defaultValue: ${booleanTrue}
         - insert:
             tableName: not_config
             columns:

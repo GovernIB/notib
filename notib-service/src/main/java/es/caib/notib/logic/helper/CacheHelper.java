@@ -152,7 +152,7 @@ public class CacheHelper {
 				codisFills.add(fill.getCodi());
 			}
 		}
-		var organisme = OrganismeDto.builder().codi(organ.getCodi()).nom(organ.getNom()).pare(organ.getCodiPare()).fills(codisFills).build();
+		var organisme = OrganismeDto.builder().codi(organ.getCodi()).nom(organ.getNom()).pare(organ.getCodiPare()).fills(codisFills).estat(organ.getEstat()).build();
 		organigrama.put(organ.getCodi(), organisme);
 		if (fills == null) {
 			return;
