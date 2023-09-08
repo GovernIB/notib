@@ -590,4 +590,5 @@ databaseChangeLog:
               CREATE SYNONYM state_exit_actions FOR not_state_exit_actions;
               CREATE SYNONYM state_state_actions FOR not_state_state_actions;
               CREATE SYNONYM transition_actions FOR not_transition_actions;
+              INSERT INTO NOT_PROCESSOS_INICIALS (id, codi, init) VALUES (5, 'AFEGIR_NOTIFICACIONS_MAQUINA_ESTATS', 1);
              "
