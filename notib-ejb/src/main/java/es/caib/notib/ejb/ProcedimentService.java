@@ -5,6 +5,7 @@ package es.caib.notib.ejb;
 
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.CodiAssumpteDto;
+import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
@@ -112,7 +113,13 @@ public class ProcedimentService extends AbstractService<es.caib.notib.logic.intf
 		return getDelegateService().findAll();
 	}
 
-	@Override
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+    public List<CodiValorDto> findAllIdDesc() {
+        return getDelegateService().findAllIdDesc();
+    }
+
+    @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public boolean procedimentEnUs(Long procedimentId) {
 		return getDelegateService().procedimentEnUs(procedimentId);

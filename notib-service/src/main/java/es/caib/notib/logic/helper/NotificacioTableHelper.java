@@ -84,6 +84,7 @@ public class NotificacioTableHelper {
                     .titular(titular.toString())
                     .notificaIds(notificaIds)
                     .estatMask(estatMask)
+                    .perActualitzar(true)
                     .build();
             notificacioTableViewRepository.save(tableViewItem);
         } catch (Exception ex) {
@@ -137,6 +138,7 @@ public class NotificacioTableHelper {
                 }
                 item.setEstat(not.getEstat());
             }
+            item.setPerActualitzar(true);
             notificacioTableViewRepository.saveAndFlush(item);
         } catch (Exception ex) {
             log.error("Error acutalitzant la informació de la notificació " + not.getId(), ex);
@@ -229,6 +231,7 @@ public class NotificacioTableHelper {
             tableViewItem.setTitular(titular.toString());
             tableViewItem.setNotificaIds(notificaIds.toString());
             tableViewItem.setEstatMask(estatMask);
+            tableViewItem.setPerActualitzar(true);
             notificacioTableViewRepository.saveAndFlush(tableViewItem);
             if (notificacio.getNotificacioMassivaEntity() == null) {
                 return;
@@ -238,6 +241,11 @@ public class NotificacioTableHelper {
         } catch (Exception ex) {
             log.error("No ha estat possible actualitzar la informació de la notificació " + notificacio.getId(), ex);
         }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+    public void actualitzarCampsLlistat(NotificacioTableEntity notificacioTable) {
+        notificacioTableViewRepository.save(notificacioTable);
     }
 
     public void updateMassiva(NotificacioMassivaEntity notificacioMassiva, NotificacioEstatEnumDto originalEstat, boolean originalHasError,

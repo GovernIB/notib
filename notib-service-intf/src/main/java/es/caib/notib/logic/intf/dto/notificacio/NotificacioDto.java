@@ -13,10 +13,10 @@ import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notenviament.EnviamentDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Date;
@@ -28,7 +28,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
@@ -40,7 +40,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private EnviamentTipus enviamentTipus;
 	private Date enviamentDataProgramada;
-	private Date createdDate;
+//	private Date createdDate;
 	private String concepte;
 //	private String pagadorCorreusCodiDir3;
 //	private String pagadorCorreusContracteNum;

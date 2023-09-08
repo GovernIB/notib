@@ -83,7 +83,11 @@ function returnEnviamentsStatusDiv(notificacioId) {
 	    	}
 	    	$('.estat_' + notificacioId).append(content);
 	    },
-		error: console.log("No s'han pogut recuperar els enviaments de la notificació: " + notificacioId)
+		error: (err) => {
+			console.error(err);
+			console.log("No s'han pogut recuperar els enviaments de la notificació: " + notificacioId);
+		}
+
 	})
 }
 
@@ -188,7 +192,7 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 	<form:form id="form-filtre" action="" method="post" cssClass="well" modelAttribute="notificacioErrorCallbackFiltreCommand" >
 		<div class="row">
 			<div class="col-md-4">
-				<not:inputSelect name="procedimentId" optionItems="${procediments}" optionValueAttribute="id" optionTextAttribute="descripcio" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
+				<not:inputSelect name="procedimentId" optionItems="${procediments}" optionValueAttribute="codi" optionTextAttribute="valor" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 			<div class="col-md-4">
 				<not:inputText name="concepte" inline="true" placeholderKey="notificacio.list.filtre.camp.concepte"/>
@@ -227,10 +231,10 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false">#</th>
-				<th data-col-name="tipusUsuari" data-visible="false">#</th>
-				<th data-col-name="errorLastCallback" data-visible="false">#</th>
-				<th data-col-name="notificacio.notificaError" data-visible="false"></th>
-				<th data-col-name="notificacio.notificaErrorDescripcio" data-visible="false"></th>
+<%--				<th data-col-name="tipusUsuari" data-visible="false">#</th>--%>
+<%--				<th data-col-name="errorLastCallback" data-visible="false">#</th>--%>
+<%--				<th data-col-name="notificaError" data-visible="false"></th>--%>
+<%--				<th data-col-name="notificaErrorDescripcio" data-visible="false"></th>--%>
 				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol" width="3%">
 
 					<script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
@@ -265,14 +269,14 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 						{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{if estat == 'PROCESSADA' && estatDate != ''}}
 							<br>
-							<p class="horaProcessat">{{:~eval('formatDate(' + estatDate+ ')')}}</p>
+							<p class="horaProcessat">{{:~eval('formatDate("' + estatDate+ '")')}}</p>
 						{{/if}}
 						{{if estat == 'FINALITZADA'}}
 							{{:~recuperarEstatEnviament(id)}}
 							<p class="estat_{{:id}}"  style="display:inline"></p>
 						{{/if}}
 
-						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>errorNotificaDescripcio}}"></span>{{/if}}
+<%--						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>errorNotificaDescripcio}}"></span>{{/if}}--%>
 					</script>
 				</th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="40px">

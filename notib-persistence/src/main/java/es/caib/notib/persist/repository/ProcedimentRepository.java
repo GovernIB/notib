@@ -1,5 +1,6 @@
 package es.caib.notib.persist.repository;
 
+import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcedimentEntity;
@@ -233,4 +234,7 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	@Modifying
 	@Query("update ProcedimentEntity pro set pro.actiu = :actiu where pro.codi = :codi")
 	public void updateActiu(@Param("codi") String codi, @Param("actiu") boolean actiu);
+
+	@Query("select new es.caib.notib.logic.intf.dto.CodiValorDto(''||pro.id, pro.codi||' - '||pro.nom) from ProcedimentEntity pro")
+	public List<CodiValorDto> findAllIdDesc();
 }

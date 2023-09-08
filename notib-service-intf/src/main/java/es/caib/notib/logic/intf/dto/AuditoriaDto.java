@@ -3,8 +3,11 @@
  */
 package es.caib.notib.logic.intf.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -15,16 +18,19 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 public class AuditoriaDto implements Serializable {
 
 	private static final String DATE_FORMAT = "dd/MM/yyyy HH:mm";
 
-	private UsuariDto createdBy;
-	private Date createdDate;
-	private UsuariDto lastModifiedBy;
-	private Date lastModifiedDate;
+	protected UsuariDto createdBy;
+	protected Date createdDate;
+	protected UsuariDto lastModifiedBy;
+	protected Date lastModifiedDate;
 
 	public String getCreatedDateAmbFormat() {
 		if (createdDate == null) return null;

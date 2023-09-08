@@ -16,6 +16,13 @@ INSERT INTO not_config (key, value, description, group_code, position, jboss_pro
 UPDATE NOT_CONFIG_TYPE SET VALUE = 'es.caib.notib.plugin.usuari.DadesUsuariPluginJdbc,es.caib.notib.plugin.usuari.DadesUsuariPluginLdap,es.caib.notib.plugin.usuari.DadesUsuariPluginMock,es.caib.notib.plugin.usuari.DadesUsuariPluginKeycloak' WHERE CODE = 'USUARIS_CLASS';
 UPDATE NOT_CONFIG SET VALUE = 'es.caib.notib.plugin.usuari.DadesUsuariPluginKeycloak' WHERE KEY = 'es.caib.notib.plugin.dades.usuari.class';
 
+ALTER TABLE NOT_NOTIFICACIO_TABLE ADD ESTAT_STRING VARCHAR2(512 CHAR);
+ALTER TABLE NOT_NOTIFICACIO_TABLE ADD DOCUMENT_ID NUMBER(38, 0);
+ALTER TABLE NOT_NOTIFICACIO_TABLE ADD ENV_CER_DATA TIMESTAMP;
+-- ALTER TABLE NOT_NOTIFICACIO_TABLE ADD PERMIS_PROCESSAR NUMBER(1) DEFAULT '0';
+ALTER TABLE NOT_NOTIFICACIO_TABLE ADD REG_ENV_PENDENTS NUMBER(1) DEFAULT 0;
+ALTER TABLE NOT_NOTIFICACIO_TABLE ADD PER_ACTUALITZAR NUMBER(1) DEFAULT 1;
+
 CREATE TABLE not_sm_state_machine (machine_id VARCHAR2(255 CHAR) NOT NULL, state VARCHAR2(255 CHAR), state_machine_context BLOB, CONSTRAINT PK_NOT_SM_STATE_MACHINE PRIMARY KEY (machine_id));
 
 GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_STATE_MACHINE TO WWW_NOTIB;

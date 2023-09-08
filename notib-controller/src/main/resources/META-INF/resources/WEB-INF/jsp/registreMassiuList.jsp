@@ -197,7 +197,7 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 		<div class="row">
 			<div class="col-md-4">
 				<not:inputSelect name="procedimentId" optionItems="${procediments}"
-								 optionValueAttribute="id" optionTextAttribute="nom"
+								 optionValueAttribute="codi" optionTextAttribute="valor"
 								 placeholderKey="notificacio.list.filtre.camp.procediment"
 								 inline="true"
 								 emptyOption="true" optionMinimumResultsForSearch="0"/>
@@ -234,9 +234,9 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false">#</th>
-				<th data-col-name="tipusUsuari" data-visible="false">#</th>
-				<th data-col-name="notificacio.notificaError" data-visible="false"></th>
-				<th data-col-name="notificacio.notificaErrorDescripcio" data-visible="false"></th>
+<%--				<th data-col-name="tipusUsuari" data-visible="false">#</th>--%>
+<%--				<th data-col-name="notificacio.notificaError" data-visible="false"></th>--%>
+<%--				<th data-col-name="notificacio.notificaErrorDescripcio" data-visible="false"></th>--%>
 				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol" width="3%">
 
 					<script id="cellEnviamentTipusTemplate" type="text/x-jsrender">

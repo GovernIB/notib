@@ -662,8 +662,8 @@
     <tr>
         <th data-col-name="id" data-visible="false">#</th>
         <th data-col-name="tipusUsuari" data-visible="false">#</th>
-        <th data-col-name="errorLastCallback" data-visible="false">#</th>
-        <th data-col-name="hasEnviamentsPendentsRegistre" data-visible="false">#</th>
+<%--        <th data-col-name="errorLastCallback" data-visible="false">#</th>--%>
+<%--        <th data-col-name="hasEnviamentsPendentsRegistre" data-visible="false">#</th>--%>
         <th data-col-name="notificaError" data-visible="false"></th>
         <th data-col-name="notificaErrorDescripcio" data-visible="false"></th>
         <th data-col-name="enviant" data-visible="false"></th>

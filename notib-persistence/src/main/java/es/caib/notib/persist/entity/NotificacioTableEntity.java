@@ -152,17 +152,20 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	@Column(name = "ESTAT_MASK")
 	private Integer estatMask;
 
-	@Setter
-	@Transient
+	@Column(name = "ESTAT_STRING", length = 512)
+	private String estatString;
+	@Column(name = "DOCUMENT_ID")
 	private Long documentId;
-
+	@Column(name = "ENV_CER_DATA")
+	private Date envCerData;
+	@Column(name = "REG_ENV_PENDENTS")
+	private boolean hasEnviamentsPendentsRegistre;
+	@Column(name = "PER_ACTUALITZAR")
+	private boolean perActualitzar;
 
 	@Setter
 	@Transient
 	private boolean permisProcessar;
-	@Setter
-	@Transient
-	private boolean hasEnviamentsPendentsRegistre;
 
 	public boolean isComunicacioSir() { // Per al mapping al DTO
 		if (!EnviamentTipus.COMUNICACIO.equals(this.getEnviamentTipus())) {

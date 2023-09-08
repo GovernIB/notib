@@ -17,6 +17,7 @@ public class OrganismeDto implements Serializable{
 	private String pare;
 	private List<String> fills = new ArrayList<>();
 	private Boolean sir;
+	private OrganGestorEstatEnum estat;
 	
 	public String getNomComplet() {
 		return codi + " - " + nom;

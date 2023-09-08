@@ -44,7 +44,7 @@ import javax.persistence.Id;
 		+ "			pro.comu as comu, "
 		+ "         pro.DIRECT_PERMISSION_REQUIRED as requireDirectPermission, "
 		+ "         pro.entitat as entitat_id, "
-		+ "         pro.actiu as actiu "
+		+ "         pro.actiu as actiu, "
 		+ "         pro.manual as manual "
 		+ " from	not_procediment pro "
 		+ " left outer join not_entitat ent on ent.id = pro.entitat "
