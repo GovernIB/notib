@@ -43,6 +43,11 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
+	public void afegirNotificacions() {
+		getDelegateService().afegirNotificacions();
+	}
+
+	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public boolean afegirNotificacio(Long notificacioId) {
 		return getDelegateService().afegirNotificacio(notificacioId);

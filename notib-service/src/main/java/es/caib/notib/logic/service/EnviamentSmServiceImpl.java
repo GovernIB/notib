@@ -89,6 +89,21 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		}
 	}
 
+	@Override
+	public void afegirNotificacions() {
+
+		log.info("Afegint notificacions no existents a la màquina amb estat PENDENT, ENVIADA, REGISTRADA O ENVIADA_AMB_ERROR");
+		var notificacions = notificacioRepository.findNotificacionsEnProgres("01/06/2023");
+		var size = notificacions.size();
+		for (var foo=0;foo<size;foo++) {
+			afegirNotificacio(notificacions.get(foo));
+			if (foo % 50 == 0) {
+				log.info("Processades 50 notificacions");
+			// provar EntityManager flush() cada cert nombre d'itaracions
+			}
+		}
+	}
+
 	private boolean isPendentRegistre(NotificacioEnviamentEntity env) {
 		return NotificacioEstatEnumDto.PENDENT.equals(env.getNotificacio().getEstat()) && env.getNotificacio().getRegistreEnviamentIntent() == 0 && !env.isNotificaError();
 	}
@@ -97,6 +112,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	public boolean afegirNotificacio(Long notificacioId) {
 
 		try {
+			log.debug("Afegint a la màquina la notificacio amb id " + notificacioId);
 			var not = notificacioRepository.findById(notificacioId).orElseThrow();
 			var estat = not.getEstat();
 			not.getEnviaments().forEach(e -> {
@@ -138,46 +154,6 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 			return false;
 		}
 	}
-//
-//	@Override
-//	public void afegirNotificacio(Long notificacioId) {
-//
-//		var not = notificacioRepository.findById(notificacioId).orElseThrow();
-//		var estat = not.getEstat();
-//		not.getEnviaments().forEach(e -> {
-//			EnviamentSmEvent eventSm = null;
-//			var intent = 0;
-//			// S'HA DE FICAR ELS INTENTS ACTUALS A LA MÀQUINA.
-//			if (NotificacioEstatEnumDto.PENDENT.equals(estat)) {
-//				// max reintents -> estat registre_error - posar intents màquina al màxim que és la propietat definida
-//				// algun reintent o nou -> registre_pendent - cal també afegir el numero d'intents a la màquina rg_enviar
-//				eventSm = not.getRegistreEnviamentIntent() < configHelper.getMaxReintentsRegistre() ? EnviamentSmEvent.RG_ENVIAR : EnviamentSmEvent.RG_ERROR;
-//				intent = not.getRegistreEnviamentIntent();
-//			} else if (NotificacioEstatEnumDto.REGISTRADA.equals(estat)) {
-//				// si es notifica mateix cas que registre. Mirar intents i NT_ENVIAR o cap a NOTIFICA_ERROR
-//				eventSm = e.getNotificaIntentNum() < configHelper.getMaxReintentsNotifca() ? EnviamentSmEvent.NT_ENVIAR : EnviamentSmEvent.NT_ERROR;
-//				intent = e.getNotificaIntentNum();
-//			} else if (NotificacioEstatEnumDto.ENVIADA.equals(estat)) {
-//				// Si es SIR mirar els reintents de consulta mirar el maxim de reintents. Si max reintents ? SR_CONSULTAR : SIR ERROR
-//				// Si es enviada a notifica mirar si enviament té els intents esgotats de consulta ? NOTIFICA_ERROR : NOTIFICA_SENT
-//				if (not.isComunicacioSir()) {
-//					eventSm = e.getSirConsultaIntent() < configHelper.getMaxReintentsConsultaSir() ? EnviamentSmEvent.SR_CONSULTAR : EnviamentSmEvent.SR_ERROR;
-//					intent = e.getSirConsultaIntent();
-//				} else {
-//					eventSm = e.getNotificaIntentNum() < configHelper.getMaxReintentsConsultaNotifica() ? EnviamentSmEvent.CN_CONSULTAR : EnviamentSmEvent.NT_ERROR;
-//					intent = e.getNotificaIntentNum();
-//				}
-//			} else if (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(estat)) {
-//				if (e.isPerEmail()) {
-//					eventSm = e.getNotificaIntentNum() < configHelper.getMaxReintentsConsultaNotifica() ? EnviamentSmEvent.CN_CONSULTAR : EnviamentSmEvent.NT_ERROR;
-//					intent = e.getNotificaIntentNum();
-//				} else {
-////					var noRegistrada = e.getRegistreData() == null
-//				}
-//			}
-//			afegirEnviament(e, eventSm, intent);
-//		});
-//	}
 
 	private boolean afegirEnviament(NotificacioEnviamentEntity env, EnviamentSmEvent eventSm, int intent) {
 

@@ -247,4 +247,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	@Query(	"select count(n.id) from NotificacioEntity n where n.organGestor = :organGestor")
 	Integer countByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);
 
+	@Query(value = "select nn.id FROM NOT_NOTIFICACIO nn WHERE nn.ESTAT  IN (0, 1, 2, 28) AND  nn.CREATEDDATE > TO_DATE(:data, 'dd/MM/yyyy')", nativeQuery = true)
+	List<Long> findNotificacionsEnProgres(@Param("data") String data);
+
 }

@@ -2,6 +2,7 @@ package es.caib.notib.logic.helper;
 
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.ConfigService;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import lombok.Synchronized;
@@ -32,6 +33,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     private AplicacioService aplicacioService;
     @Autowired
     private OrganGestorService organGestorService;
+    @Autowired
+    private EnviamentSmService smService;
 
     private Authentication auth;
 
@@ -54,6 +57,9 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                         break;
                     case SINCRONITZAR_ORGANS_NOMS_MULTIDIOMA:
                         organGestorService.sincronitzarOrganNomMultidioma(null);
+                        break;
+                    case AFEGIR_NOTIFICACIONS_MAQUINA_ESTATS:
+                        smService.afegirNotificacions();
                         break;
                     default:
                         log.error("Procés inicial no definit");
