@@ -182,6 +182,7 @@ public class PluginHelper {
 				errorDescripcio += " :" + ex.getCause().getMessage();
 			}
 			resposta.setErrorDescripcio(errorDescripcio);
+			resposta.setErrorCodi("3");
 		}
 		return resposta;
 	}

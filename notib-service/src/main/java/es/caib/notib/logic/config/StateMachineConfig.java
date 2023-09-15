@@ -81,7 +81,9 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
                 // Registre
                 .withExternal().source(NOU).target(REGISTRE_PENDENT).event(RG_ENVIAR).guard(uuidGuard()).action(enviamentRegistreAction).and()
                 .withExternal().source(NOU).target(NOTIFICA_PENDENT).event(NT_ENVIAR).guard(uuidGuard()).action(enviamentNotificaAction).and()
+                .withExternal().source(NOU).target(NOTIFICA_SENT).event(CN_CONSULTAR).guard(uuidGuard()).action(consultaNotificaAction).and()
                 .withExternal().source(NOU).target(SIR_PENDENT).event(SR_RETRY).guard(uuidGuard()).action(consultaSirAction).and()
+//                .withExternal().source(NOU).target(SIR_ESTAT).event(SR_CONSULTAR).guard(uuidGuard()).action(enviamentNotificaAction).and()
                 .withExternal().source(REGISTRE_PENDENT).target(REGISTRE_PENDENT).event(RG_ENVIAR).guard(uuidGuard()).action(enviamentRegistreAction).and()
                 .withExternal().source(REGISTRE_PENDENT).target(REGISTRAT).event(RG_SUCCESS).guard(uuidGuard()).and()
                 .withExternal().source(REGISTRE_PENDENT).target(REGISTRE_RETRY).event(RG_ERROR).guard(uuidGuard()).and()

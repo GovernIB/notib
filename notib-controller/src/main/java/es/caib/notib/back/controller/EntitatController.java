@@ -169,7 +169,7 @@ public class EntitatController extends BaseController {
 		}
 	}
 
-	@PostMapping
+	@RequestMapping(method = RequestMethod.POST)
 	public String save(HttpServletRequest request, @Valid EntitatCommand command, BindingResult bindingResult, Model model) throws NotFoundException, IOException {
 
 		if (bindingResult.hasErrors()) {
