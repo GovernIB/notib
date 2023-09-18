@@ -3,18 +3,14 @@
  */
 package es.caib.notib.back.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.back.command.IntegracioFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
-import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.IntegracioAccioDto;
 import es.caib.notib.logic.intf.dto.IntegracioDetall;
-import es.caib.notib.logic.intf.dto.IntegracioDto;
-import es.caib.notib.logic.intf.dto.PaginaDto;
-import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.service.MonitorIntegracioService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -25,12 +21,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Controlador per a la consulta d'accions de les integracions.
@@ -67,8 +60,20 @@ public class IntegracioController extends BaseUserController {
 		return getAmbCodi(request, "USUARIS", model);
 	}
 
+	@PostMapping
+	public String post(HttpServletRequest request, IntegracioFiltreCommand command, Model model) {
+		var codi = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
+		if (Strings.isNullOrEmpty(codi)) {
+			codi = "USUARIS";
+		}
+		return post(request, codi, command, model);
+	}
+
 	@PostMapping(value="/{codi}")
 	public String post(HttpServletRequest request, @PathVariable @NonNull String codi, IntegracioFiltreCommand command, Model model) {
+		if ("netejar".equals(request.getParameter("accio"))) {
+			command = new IntegracioFiltreCommand();
+		}
 
 		RequestSessionHelper.actualitzarObjecteSessio(request, INTEGRACIO_FILTRE, command);
 		return getAmbCodi(request, codi, model);
@@ -124,6 +129,8 @@ public class IntegracioController extends BaseUserController {
 		return monitorIntegracioService.detallIntegracio(id);
 	}
 
+
+	// Eliminar informació de integracions de la BBDD
 	@GetMapping(value = "/netejar")
 	public String netejar(HttpServletRequest request, Model model) {
 
