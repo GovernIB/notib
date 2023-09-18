@@ -1,20 +1,25 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<c:set var="commandName"/>
 <c:forEach var="attributeName" items="${pageContext.request.attributeNames}">
 	<c:if test="${not fn:contains(attributeName, '.') && fn:contains(attributeName, 'ommand')}">
-		<spring:hasBindErrors name="${attributeName}">
-			<c:if test="${not empty errors.globalErrors}">
-				<c:forEach var="error" items="${errors.globalErrors}">
-					<div class="alert alert-danger">
-						<button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>
-						<spring:message message="${error}"/>
-					</div>
-				</c:forEach>
-			</c:if>
-		</spring:hasBindErrors>
+		<c:set var="commandName" value="${attributeName}" />
 	</c:if>
 </c:forEach>
+
+<c:if test="${not empty commandName}">
+	<spring:hasBindErrors name="${commandName}">
+		<c:if test="${not empty errors.globalErrors}">
+			<c:forEach var="error" items="${errors.globalErrors}">
+				<div class="alert alert-danger">
+					<button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>
+					<spring:message message="${error}"/>
+				</div>
+			</c:forEach>
+		</c:if>
+	</spring:hasBindErrors>
+</c:if>
 <%
 	request.setAttribute(
 		"sessionErrors",
