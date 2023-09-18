@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.Arrays;
 
 @Getter
 @Setter
@@ -52,7 +53,7 @@ public class EnviamentAdviser implements Serializable {
         if (acusePDF != null) {
             aPdf = new es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse();
             if (acusePDF.getContenido() != null)
-                aPdf.setContenido(Base64.decodeBase64(acusePDF.getContenido()));
+                aPdf.setContenido(Base64.decodeBase64(Arrays.toString(acusePDF.getContenido())));
             aPdf.setHash(acusePDF.getHash());
             aPdf.setCsvResguardo(acusePDF.getCsvResguardo());
         }
@@ -61,7 +62,7 @@ public class EnviamentAdviser implements Serializable {
         if (acuseXML != null) {
             aXml = new es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse();
             if (acuseXML.getContenido() != null)
-                aXml.setContenido(Base64.decodeBase64(acuseXML.getContenido()));
+                aXml.setContenido(Base64.decodeBase64(Arrays.toString(acuseXML.getContenido())));
             aXml.setHash(acuseXML.getHash());
             aXml.setCsvResguardo(acuseXML.getCsvResguardo());
         }
@@ -115,7 +116,7 @@ public class EnviamentAdviser implements Serializable {
         if (acusePDF != null) {
             aPdf = new es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse();
             if (acusePDF.getContenido() != null)
-                aPdf.setContenido(Base64.decodeBase64(acusePDF.getContenido()));
+                aPdf.setContenido(Base64.decodeBase64(Arrays.toString(acusePDF.getContenido())));
             aPdf.setHash(acusePDF.getHash());
             aPdf.setCsvResguardo(acusePDF.getCsvResguardo());
         }
@@ -124,7 +125,7 @@ public class EnviamentAdviser implements Serializable {
         if (acuseXML != null) {
             aXml = new es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse();
             if (acuseXML.getContenido() != null)
-                aXml.setContenido(Base64.decodeBase64(acuseXML.getContenido()));
+                aXml.setContenido(Base64.decodeBase64(Arrays.toString(acuseXML.getContenido())));
             aXml.setHash(acuseXML.getHash());
             aXml.setCsvResguardo(acuseXML.getCsvResguardo());
         }

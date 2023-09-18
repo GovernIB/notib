@@ -105,7 +105,11 @@ public class ConversioTipusHelper {
 	private CallbackRepository callbackRepository;
 
 	public ConversioTipusHelper() {
-		mapperFactory = new DefaultMapperFactory.Builder().build();
+
+		MappingContext.Factory mappingContextFactory = new MappingContext.Factory();
+		mapperFactory= new DefaultMapperFactory.Builder().mappingContextFactory(mappingContextFactory).build();
+//		mapperFactory = new DefaultMapperFactory.Builder().build();
+
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DateTime, Date>() {
 					public Date convert(DateTime source, Type<? extends Date> destinationClass, MappingContext context) {

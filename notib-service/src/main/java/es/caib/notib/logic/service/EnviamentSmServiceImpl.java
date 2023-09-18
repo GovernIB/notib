@@ -75,8 +75,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 			var estat = smRepository.findEstatByMachineId(env.getUuid());
 			var notEstat = env.getNotificacio().getEstat();
 			var mostrar = isPendentRegistre(env) || NotificacioEstatEnumDto.isRegistrada(notEstat) || NotificacioEstatEnumDto.isEnviadaAmbErrors(notEstat);
-			info.setMostrar(mostrar);
-			if (Strings.isNullOrEmpty(estat) || !mostrar) {
+			if (Strings.isNullOrEmpty(estat)) {
 				return info;
 			}
 			info.setEstat(EnviamentSmEstat.valueOf(estat));
@@ -90,10 +89,11 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	}
 
 	@Override
+	@Transactional(readOnly=true)
 	public void afegirNotificacions() {
 
 		log.info("Afegint notificacions no existents a la màquina amb estat PENDENT, ENVIADA, REGISTRADA O ENVIADA_AMB_ERROR");
-		var notificacions = notificacioRepository.findNotificacionsEnProgres("01/06/2023");
+		var notificacions = notificacioRepository.findNotificacionsEnProgres("20/08/2023");
 		var size = notificacions.size();
 		for (var foo=0;foo<size;foo++) {
 			afegirNotificacio(notificacions.get(foo));
@@ -109,6 +109,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public boolean afegirNotificacio(Long notificacioId) {
 
 		try {
@@ -141,8 +142,8 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 					if (not.isComunicacioSir()) {
 						eventSm = e.getSirConsultaIntent() < configHelper.getMaxReintentsConsultaSir() ? EnviamentSmEvent.SR_CONSULTAR : EnviamentSmEvent.SR_ERROR;
 						intent = e.getSirConsultaIntent();
-					} else {
-						eventSm = e.getNotificaIntentNum() < configHelper.getMaxReintentsConsultaNotifica() ? EnviamentSmEvent.CN_CONSULTAR : EnviamentSmEvent.NT_ERROR;
+					} else if (!e.isNotificaEstatFinal()) { // No es processen les enviades correctament
+						eventSm = e.getNotificaIntentNum() < configHelper.getMaxReintentsConsultaNotifica() ? EnviamentSmEvent.CN_CONSULTAR : EnviamentSmEvent.CN_ERROR;
 						intent = e.getNotificaIntentNum();
 					}
 				}
