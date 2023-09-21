@@ -41,6 +41,8 @@ public class RegistreNotificaHelperTest {
 	private EnviamentTableHelper enviamentTableHelper;
 	@Mock
 	private NotificacioTableHelper notificacioTableHelper;
+	@Mock
+	private CallbackHelper callbackHelper;
 
 	@InjectMocks
 	private RegistreNotificaHelper registreNotificaHelper;
@@ -66,7 +68,7 @@ public class RegistreNotificaHelperTest {
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
 		NotificacioEnviamentEntity enviament = initEnviament(initPersonaAdministracio(InteressatTipus.ADMINISTRACIO));
 		enviaments.add(enviament);
-		var notificacio = initNotificacio(entidad, EnviamentTipus.COMUNICACIO, enviaments);
+		var notificacio = initNotificacio(entidad, EnviamentTipus.SIR, enviaments);
 		Mockito.doNothing().when(auditHelper).auditaNotificacio(Mockito.any(NotificacioEntity.class), Mockito.<AuditService.TipusOperacio>any(), Mockito.anyString());
 		Mockito.doNothing().when(notificacioTableHelper).actualitzarRegistre(Mockito.any(NotificacioEntity.class));
 
@@ -117,6 +119,7 @@ public class RegistreNotificaHelperTest {
 		Mockito.when(notificacio.getEnviamentTipus()).thenReturn(enviamentTipus);
 		Mockito.when(notificacio.getEntitat()).thenReturn(entitat);
 		Mockito.when(notificacio.getEnviaments()).thenReturn(enviaments);
+		Mockito.when(notificacio.isComunicacioSir()).thenReturn(EnviamentTipus.SIR.equals(enviamentTipus));
 		for (var enviament: enviaments) {
 			enviament.setNotificacio(notificacio);
 		}

@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import es.caib.notib.NotibApp;
 import es.caib.notib.logic.intf.dto.cie.CieDataDto;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatSobreDto;
@@ -13,17 +14,23 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.*;
 
 
 @Slf4j
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/es/caib/notib/logic/application-context-test.xml"})
-@Transactional
+@RunWith(SpringRunner.class)
+@SpringBootTest(
+		webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+		classes = NotibApp.class)
+@AutoConfigureMockMvc
+@ActiveProfiles({"test"})
+//@TestPropertySource(locations = "classpath:application.yaml")
+//@Transactional
 public class PagadorCieFormatSobreServiceTest extends BaseServiceTestV2 {
 
 	private CieFormatSobreDto createPagadorCieFormatSobre;
@@ -31,7 +38,7 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTestV2 {
 
 
 	@Autowired
-	protected PagadorCieFormatSobreService cieFormatSobreService;
+	protected PagadorCieFormatSobreService pagadorCieFormatSobreService;
 
 	private ElementsCreats database;
 	@Autowired
@@ -46,11 +53,8 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTestV2 {
 		CieDataDto cieDto = CieItemTest.getRandomInstance();
 		cieCreator.addObject("cie", cieDto);
 
-		database = createDatabase(EntitatItemTest.getRandomInstance(),
-				cieCreator,
-				cieFormatSobreCreator
-		);
-
+		configHelper.reloadDbProperties();
+		database = createDatabase(EntitatItemTest.getRandomInstance(), cieCreator, cieFormatSobreCreator);
 
 		CieDto cieCreated = (CieDto) database.get("cie");
 		createPagadorCieFormatSobre= new CieFormatSobreDto();
@@ -92,7 +96,7 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTestV2 {
 		authenticationTest.autenticarUsuari("admin");
 
 		updatePagadorCieFormatSobre.setId(formatSobreCreat.getId());
-		CieFormatSobreDto formatModificat = cieFormatSobreService.update(
+		CieFormatSobreDto formatModificat = pagadorCieFormatSobreService.update(
 				updatePagadorCieFormatSobre);
 
 		assertNotNull(formatModificat);
@@ -114,13 +118,13 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTestV2 {
 		CieFormatSobreDto formatSobreCreat = (CieFormatSobreDto) database.get("sobre1");
 		authenticationTest.autenticarUsuari("admin");
 
-		CieFormatSobreDto formatBorrat = cieFormatSobreService.delete(
+		CieFormatSobreDto formatBorrat = pagadorCieFormatSobreService.delete(
 				formatSobreCreat.getId());
 		comprobarPagadorCieFormatSobre(
 				createPagadorCieFormatSobre,
 				formatBorrat);
 		try {
-			cieFormatSobreService.findById(formatSobreCreat.getId());
+			pagadorCieFormatSobreService.findById(formatSobreCreat.getId());
 			fail("El format esborrat no s'hauria d'haver trobat");
 		}catch(NotFoundException expected) {
 		}
@@ -134,7 +138,7 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTestV2 {
 		authenticationTest.autenticarUsuari("admin");
 		CieFormatSobreDto formatSobreCreat = (CieFormatSobreDto) database.get("sobre1");
 
-		CieFormatSobreDto formatTrobat = cieFormatSobreService.findById(
+		CieFormatSobreDto formatTrobat = pagadorCieFormatSobreService.findById(
 				formatSobreCreat.getId());
 
 		assertNotNull(formatTrobat);

@@ -23,7 +23,7 @@ public class ConfigTypeEntity {
     @Column(name = "CODE", length = 128, nullable = false)
     private String code;
 
-    @Column(name = "VALUE", length = 2048, nullable = false)
+    @Column(name = "VALUE", length = 2048)
     private String value;
 
     public List<String> getValidValues() {

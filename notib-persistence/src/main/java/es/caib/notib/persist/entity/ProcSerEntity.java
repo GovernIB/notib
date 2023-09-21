@@ -93,7 +93,7 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
 
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "entitat")
-    @ForeignKey(name = "not_entitat_fk")
+    @ForeignKey(name = "not_procser_entitat_fk")
     protected EntitatEntity entitat;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
@@ -103,7 +103,7 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "organ_gestor", referencedColumnName = "codi")
-    @ForeignKey(name = "not_proc_organ_fk")
+    @ForeignKey(name = "not_procser_procorgan_fk")
     protected OrganGestorEntity organGestor;
 
     public boolean isEntregaCieVigent() {

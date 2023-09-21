@@ -1,0 +1,120 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /notibback
+  error:
+    path: /error
+
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1;NON_KEYWORDS=key,value,user,gruop;MODE=LEGACY
+    username: sa
+    password: sa
+  sql:
+    init:
+      mode: always
+  jpa:
+    show-sql: false
+    hibernate:
+#      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+#        format_sql: false
+  liquibase:
+    enabled: false
+  jta:
+    atomikos:
+      datasource:
+        concurrent-connection-validation:
+  mail:
+    host: correu.limit.es
+    username: proves_limit@limit.es
+    password: R8lmu-98TRN
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        smtp:
+          port: 25
+          auth: false
+#  mvc:
+#    view:
+#      prefix: /WEB_INF/jsp/
+#      suffix: .jsp
+#  freemarker:
+#    enabled: false
+  messages:
+    basename: messages
+  h2:
+    console:
+      enabled: true
+#keycloak:
+#  auth-server-url: http://localhost:8081/auth/
+#  ssl-required: external
+#  realm: GOIB
+#  resource: goib-default
+#  use-resource-role-mappings: false
+#  public-client: true
+#  principal-attribute: preferred_username
+#  verify-token-audience: true
+
+logging:
+  level:
+    root: INFO
+
+#PROPIETATS DE TEST
+es:
+  caib:
+    notib:
+      plugin:
+        dades:
+          usuari:
+            pluginsib:
+              userinformation:
+                keycloak:
+                  serverurl: http://localhost:8081/auth/
+                  realm: GOIB
+                  client_id: goib-ws
+                  client_id_for_user_autentication: goib-ws
+                  password_secret: 5d96d138-05a4-4087-9c91-52faa33b7b85
+        gesdoc:
+          filesystem:
+            base:
+              dir: /tmp/notib-fs
+      actualitzacio:
+        procediments:
+          cron: 0 0 0 * * *
+        serveis:
+          cron: 0 0 10 * * *
+      refrescar:
+        notificacions:
+          expirades:
+            cron: 0 0 20 * * *
+      tasca:
+        callback:
+          pendents:
+            periode: 300000
+            retard:
+              inicial: 150000
+        enviament:
+          deh:
+            actualitzacio:
+              certificacio:
+                periode: 300000
+                retard:
+                  inicial: 160000
+          cie:
+            actualitzacio:
+              certificacio:
+                periode: 300000
+                retard:
+                  inicial: 170000
+      notifica:
+        versio: 0
+        url: http://localhost:8080/mockNotificaWs

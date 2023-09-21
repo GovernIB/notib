@@ -4,6 +4,7 @@
 package es.caib.notib.persist.repository.config;
 
 import es.caib.notib.persist.entity.config.ConfigEntity;
+import es.caib.notib.persist.entity.config.ConfigTypeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -45,4 +46,8 @@ public interface ConfigRepository extends JpaRepository<ConfigEntity, String> {
     @Modifying
     @Query("DELETE FROM ConfigEntity c WHERE c.entitatCodi = :entitatCodi")
     int deleteByEntitatCodi(@Param("entitatCodi") String entitatCodi);
+
+    // For testing
+    @Query("FROM ConfigTypeEntity ct WHERE ct.value = :value")
+    ConfigTypeEntity findConfigTypeByValue(@Param("value") String value);
 }

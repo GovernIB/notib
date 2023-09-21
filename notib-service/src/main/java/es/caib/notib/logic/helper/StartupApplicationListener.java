@@ -9,6 +9,7 @@ import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
+@Profile("!test")
 @Slf4j
 @Component
 public class StartupApplicationListener implements ApplicationListener<ContextRefreshedEvent> {

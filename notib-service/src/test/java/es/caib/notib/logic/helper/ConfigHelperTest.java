@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MutablePropertySources;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -26,6 +28,8 @@ public class ConfigHelperTest {
     private ConfigRepository configRepository;
     @Mock
     private ConfigGroupRepository configGroupRepository;
+    @Mock
+    private ConfigurableEnvironment environment;
 
     @InjectMocks
     private ConfigHelper configHelper;
@@ -41,14 +45,24 @@ public class ConfigHelperTest {
     @Before
     public void setUp() throws Exception {
         ConfigHelper.setEntitatCodi(entitatCodi);
-        Mockito.when(configRepository.findById(Mockito.eq("PROPERTY_KEY"))).thenReturn(Optional.of(new ConfigEntity("PROPERTY_KEY", "PROPERTY_VALUE")));
-        Mockito.when(configRepository.findById(Mockito.eq(ConfigDto.prefix + configKey))).thenReturn(Optional.of(new ConfigEntity(ConfigDto.prefix + configKey, "valor_global")));
-        Mockito.when(configRepository.findById(Mockito.eq(ConfigDto.prefix + "." + entitatCodi + configKey))).thenReturn(Optional.of(new ConfigEntity(ConfigDto.prefix + "." + entitatCodi + configKey, "valor_entitat")));
+
+        Mockito.when(environment.getPropertySources()).thenReturn(new MutablePropertySources());
+        Mockito.when(environment.getProperty(Mockito.eq("PROPERTY_KEY"))).thenReturn("PROPERTY_VALUE");
+        Mockito.when(environment.getProperty(Mockito.eq(ConfigDto.prefix + configKey))).thenReturn("valor_global");
+        Mockito.when(environment.getProperty(Mockito.eq(ConfigDto.prefix + "." + entitatCodi + configKey))).thenReturn("valor_entitat");
+        Mockito.when(environment.getProperty(Mockito.eq("CONFIG_1_1_KEY"))).thenReturn("CONFIG_1_1");
+        Mockito.when(environment.getProperty(Mockito.eq("CONFIG_1_2_KEY"))).thenReturn("CONFIG_1_2");
+        Mockito.when(environment.getProperty(Mockito.eq("CONFIG_2_1_KEY"))).thenReturn("CONFIG_2_1");
+        Mockito.when(environment.getProperty(Mockito.eq("CONFIG_2_2_KEY"))).thenReturn("CONFIG_2_2");
+
+
+        configHelper.reloadDbProperties();
     }
 
     @Test
     public void getPropertyGlobal() throws Exception {
 
+        ConfigHelper.setEntitatCodi("NO_ENTITAT");
         String valorGlo = configHelper.getConfig(ConfigDto.prefix + configKey);
         Assert.assertEquals(valorGlobal, valorGlo);
     }
@@ -58,7 +72,6 @@ public class ConfigHelperTest {
 
         ConfigEntity config = new ConfigEntity(ConfigDto.prefix + configKey, "valor_global");
         config.setConfigurable(true);
-        Mockito.when(configRepository.findById(Mockito.eq(ConfigDto.prefix + configKey))).thenReturn(Optional.of(config));
         String valorEnt = configHelper.getConfig(ConfigDto.prefix + configKey);
         Assert.assertEquals(valorEntitat, valorEnt);
     }

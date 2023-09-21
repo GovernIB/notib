@@ -1,15 +1,25 @@
 package es.caib.notib.logic.service;
 
-import es.caib.notib.logic.intf.dto.*;
-import es.caib.notib.logic.intf.exception.NotFoundException;
+import es.caib.notib.NotibApp;
 import es.caib.notib.logic.helper.PermisosHelper;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.EntitatTipusEnumDto;
+import es.caib.notib.logic.intf.dto.GrupDto;
+import es.caib.notib.logic.intf.dto.PermisDto;
+import es.caib.notib.logic.intf.dto.TipusDocumentDto;
+import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
+import es.caib.notib.logic.intf.dto.TipusEnumDto;
+import es.caib.notib.logic.intf.exception.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -17,8 +27,13 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/es/caib/notib/logic/application-context-test.xml"})
+@Slf4j
+@RunWith(SpringRunner.class)
+@SpringBootTest(
+		webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+		classes = NotibApp.class)
+@AutoConfigureMockMvc
+@ActiveProfiles({"test"})
 @Transactional
 public class GrupServiceTest extends BaseServiceTest{
 	
@@ -33,7 +48,8 @@ public class GrupServiceTest extends BaseServiceTest{
 	
 	@Before
 	public void setUp() {
-		addConfig("es.caib.notib.metriques.generar", "false");
+		configHelper.reloadDbProperties();
+
 		entitatCreate = new EntitatDto();
 		entitatCreate.setCodi("LIMIT");
 		entitatCreate.setNom("Limit Tecnologies");
@@ -65,7 +81,7 @@ public class GrupServiceTest extends BaseServiceTest{
 		grupUpdate = new GrupDto();
 		grupUpdate.setCodi("Rol_2");
 		grupUpdate.setNom("Grupo2");
-		
+
 	}
 	
 	
@@ -210,8 +226,9 @@ public class GrupServiceTest extends BaseServiceTest{
 	
 	
 	@Test(expected = AccessDeniedException.class)
+//	@WithMockUser(username = "apl", authorities = {"NOT_APL"})
 	public void errorSiAccesAplCreate() {
-		autenticarUsuari("Apl");
+		autenticarUsuari("apl");
 		grupService.create(entitatCreate.getId(),grupCreate);
 	}
 	

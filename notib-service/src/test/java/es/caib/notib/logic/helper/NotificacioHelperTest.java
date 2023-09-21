@@ -1,23 +1,22 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.ValidesaEnum;
-import es.caib.notib.logic.intf.dto.notificacio.Enviament;
+import es.caib.notib.logic.helper.NotificacioHelper.NotificacioData;
+import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
+import es.caib.notib.logic.test.data.ConfigTest;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.GrupEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcSerOrganEntity;
 import es.caib.notib.persist.entity.ProcedimentEntity;
-import es.caib.notib.logic.helper.NotificacioHelper.NotificacioData;
 import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.notib.persist.repository.GrupRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.ProcSerOrganRepository;
-import es.caib.notib.logic.test.data.ConfigTest;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.DocumentEstat;
@@ -128,6 +127,7 @@ public class NotificacioHelperTest {
                 .document3(document3)
                 .procedimentId(1L)
                 .grupId(1L)
+				.grupCodi("grup")
                 .build();
 
 		var organGestor = OrganGestorEntity.builder().entitat(entitat).build();
@@ -153,7 +153,8 @@ public class NotificacioHelperTest {
 				Mockito.eq(false),
 				Mockito.eq(false))).thenReturn(procediment);
 //		Mockito.when(organGestorHelper.createOrganGestorFromNotificacio(Mockito.any(NotificacioDatabaseDto.class), Mockito.any(EntitatEntity.class))).thenReturn(organGestor);
-		Mockito.when(grupRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(grupNotificacio));
+//		Mockito.when(grupRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(grupNotificacio));
+		Mockito.when(grupRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class))).thenReturn(grupNotificacio);
 		Mockito.when(documentRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(documentEntity));
 		Mockito.when(documentRepository.save(Mockito.any(DocumentEntity.class))).thenReturn(documentEntity2, documentEntity3);
 		Mockito.when(organGestorRepository.findByCodi(Mockito.any(String.class))).thenReturn(organGestor);

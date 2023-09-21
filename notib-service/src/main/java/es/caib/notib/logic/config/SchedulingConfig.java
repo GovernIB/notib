@@ -218,7 +218,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     }
                 },
                 triggerContext -> {
-                    PeriodicTrigger trigger = new PeriodicTrigger(86400000l, TimeUnit.MILLISECONDS);
+                    PeriodicTrigger trigger = new PeriodicTrigger(86400000L, TimeUnit.MILLISECONDS);
                     trigger.setFixedRate(true);
                     trigger.setInitialDelay(calcularDelay());
                     Date nextExecution = trigger.nextExecutionTime(triggerContext);

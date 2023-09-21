@@ -6,11 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -43,12 +41,12 @@ public class OficinaEntity implements Serializable {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "entitat_id")
-    @ForeignKey(name = "not_entitat_fk")
+    @ForeignKey(name = "not_oficina_entitat_fk")
     private EntitatEntity entitat;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "organ_codi", referencedColumnName = "codi")
-    @ForeignKey(name = "not_proc_organ_fk")
+    @ForeignKey(name = "not_oficina_procorgan_fk")
     private OrganGestorEntity organGestor;
 
 }

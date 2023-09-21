@@ -1,13 +1,23 @@
 package es.caib.notib.logic.service;
 
+import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.TipusDocumentalEnum;
+import es.caib.notib.client.domini.ValidesaEnum;
+import es.caib.notib.logic.helper.AuditHelper;
+import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.DocumentHelper;
+import es.caib.notib.logic.helper.EmailNotificacioMassivaHelper;
 import es.caib.notib.logic.helper.EntityComprovarHelper;
+import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotificacioHelper;
 import es.caib.notib.logic.helper.NotificacioListHelper;
 import es.caib.notib.logic.helper.NotificacioMassivaHelper;
+import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.RegistreNotificaHelper;
+import es.caib.notib.logic.intf.dto.DocumentValidDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.Enviament;
@@ -17,29 +27,43 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaEstatDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificacioMassivaService;
+import es.caib.notib.logic.mapper.NotificacioTableMapper;
+import es.caib.notib.logic.service.ws.NotificacioValidator;
 import es.caib.notib.logic.test.NotificacioMassivaTests;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioMassivaEntity;
+import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
 import es.caib.notib.persist.objectes.FiltreNotificacio;
 import es.caib.notib.persist.repository.NotificacioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
+import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindException;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -64,11 +88,31 @@ public class NotificacioMassivaServiceTest {
 	@Mock
 	private ProcSerRepository procSerRepository;
 	@Mock
+	private OrganGestorRepository organGestorRepository;
+	@Mock
 	private NotificacioMassivaRepository notificacioMassivaRepository;
 	@Mock
 	private NotificacioTableViewRepository notificacioTableViewRepository;
 	@Mock
 	private NotificacioListHelper notificacioListHelper;
+	@Mock
+	private MessageHelper messageHelper;
+	@Mock
+	private DocumentHelper documentHelper;
+	@Mock
+	private NotificacioValidator notificacioValidator;
+	@Mock
+	private AuditHelper auditHelper;
+	@Mock
+	private EnviamentSmService enviamentSmService;
+	@Mock
+	private PaginacioHelper paginacioHelper;
+	@Mock
+	private CacheHelper cacheHelper;
+	@Mock
+	private NotificacioTableMapper notificacioTableMapper;
+	@Mock
+	private EmailNotificacioMassivaHelper emailNotificacioMassivaHelper;
 
 	@InjectMocks
 	NotificacioMassivaService notificacioMassivaService = new NotificacioMassivaServiceImpl();
@@ -76,6 +120,7 @@ public class NotificacioMassivaServiceTest {
 	Long entitatId = 2L;
 	EntitatEntity entitatMock;
 	ProcSerEntity procSerMock;
+	OrganGestorEntity organMock;
 
 	Long notMassivaId = 2L;
 	NotificacioMassivaEntity notificacioMassivaMock;
@@ -87,11 +132,29 @@ public class NotificacioMassivaServiceTest {
 	private static String email = "test@limit.com";
 	private static String codiUsuari = "CODI_USER";
 
+	private static DocumentValidDto document;
+
+	@BeforeClass
+	public static void setUpAll() throws IOException {
+		document = new DocumentValidDto();
+		byte[] contingut = IOUtils.toByteArray(NotificacioMassivaServiceTest.class.getResourceAsStream("/es/caib/notib/logic/arxiu.pdf"));
+		document.setArxiuNom("arxiu.pdf");
+		document.setMediaType("application/pdf");
+		document.setArxiuGestdocId("012345");
+		document.setMida(Long.valueOf(contingut.length));
+		document.setNormalitzat(false);
+		document.setOrigen(OrigenEnum.ADMINISTRACIO);
+		document.setValidesa(ValidesaEnum.ORIGINAL);
+		document.setTipoDocumental(TipusDocumentalEnum.ALTRES);
+		document.setModoFirma(false);
+	}
+
 	@Before
 	public void setUp() {
 
 		entitatMock = Mockito.mock(EntitatEntity.class);
 		procSerMock = Mockito.mock(ProcSerEntity.class);
+		organMock = Mockito.mock(OrganGestorEntity.class);
 		Mockito.when(entitatMock.getDir3Codi()).thenReturn(entitatCodiDir3);
 		Mockito.when(metricsHelper.iniciMetrica()).thenReturn(null);
 		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.eq(entitatId))).thenReturn(entitatMock);
@@ -99,8 +162,10 @@ public class NotificacioMassivaServiceTest {
 		Mockito.when(registreNotificaHelper.isSendDocumentsActive()).thenReturn(false);
 		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class))).thenReturn("rnd_gesid");
 		Mockito.when(notificacioHelper.saveNotificacio(Mockito.any(EntitatEntity.class), Mockito.any(Notificacio.class), Mockito.anyBoolean(), Mockito.any(NotificacioMassivaEntity.class), Mockito.<Map<String, Long>>any()))
-				.thenReturn(NotificacioEntity.builder().build());
+				.thenReturn(NotificacioEntity.builder().enviaments(new HashSet<>()).build());
 		Mockito.when(procSerRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.<EntitatEntity>any())).thenReturn(procSerMock);
+		Mockito.when(organGestorRepository.findByCodi(Mockito.anyString())).thenReturn(organMock);
+		Mockito.when(messageHelper.getMessage(Mockito.anyString())).thenReturn("Missatge mock");
 		setUpNotificacioMassiva();
 //		setUpAuthentication();
 	}
@@ -185,6 +250,10 @@ public class NotificacioMassivaServiceTest {
 //		Mockito.when(notificacioValidatorHelper.validarNotificacioMassiu(
 //				Mockito.any(NotificacioV2.class), Mockito.any(EntitatEntity.class), Mockito.<Map<String, Long>>any()))
 //				.thenReturn(Arrays.asList("Error 1", "Error 2"));
+		Mockito.doCallRealMethod().when(notificacioValidator).validate();
+		Mockito.doCallRealMethod().when(notificacioValidator).setNotificacio(Mockito.any(Notificacio.class));
+		Mockito.doCallRealMethod().when(notificacioValidator).setErrors(Mockito.any(BindException.class));
+//		Mockito.when(notificacioValidator.error(Mockito.anyInt(), Mockito.nullable(Locale.class), Mockito.nullable(List.class))).thenReturn("Mossatge mock");
 		String usuariCodi = "CODI_USER";
 		NotificacioMassivaTests.TestMassiusFiles test1Data = NotificacioMassivaTests.getTest1Files();
 		var notificacioMassiu = NotificacioMassivaDto.builder()
@@ -238,14 +307,17 @@ public class NotificacioMassivaServiceTest {
 	@Test
 	public void whenFindNotificacions_ThenCallFindAmbFiltreByNotificacioMassiva() throws Exception {
 		// Given
+		var authToken = new UsernamePasswordAuthenticationToken("user", "user", List.of(new SimpleGrantedAuthority("tothom")));
+		SecurityContextHolder.getContext().setAuthentication(authToken);
 		Mockito.when(notificacioListHelper.getMappeigPropietats(Mockito.any(PaginacioParamsDto.class))).thenReturn(null); // ho ignorarem per a la prova
 //		var filtre = Mockito.any(NotificacioFiltreDto.class);
 //		var rol=  Mockito.any(RolEnumDto.class);
 //		var usuariCodi = Mockito.anyString();
 //		var rols = Mockito.any(List.class);
-		Mockito.when(notificacioListHelper.getFiltre(Mockito.any(NotificacioFiltreDto.class), Mockito.anyLong(), Mockito.any(RolEnumDto.class), Mockito.anyString(), Mockito.any(List.class)))
+		Mockito.when(notificacioListHelper.getFiltre(Mockito.any(NotificacioFiltreDto.class), Mockito.anyLong(), Mockito.nullable(RolEnumDto.class), Mockito.nullable(String.class), Mockito.nullable(List.class)))
 				.thenReturn( FiltreNotificacio.builder()
 						.entitatId(entitatId)
+						.entitat(EntitatEntity.hiddenBuilder().dir3Codi("D3").build())
 //						.comunicacioTipus(null)
 						.enviamentTipus(null)
 						.estatMask(null)
@@ -262,6 +334,8 @@ public class NotificacioMassivaServiceTest {
 						.nomesAmbErrors(false)
 						.nomesSenseErrors(false)
 						.build()); // ho ignorarem per a la prova
+//		Page<NotificacioTableEntity> page = Page.empty();
+		Mockito.when(notificacioTableViewRepository.findAmbFiltreByNotificacioMassiva(Mockito.any(FiltreNotificacio.class), Mockito.nullable(Pageable.class))).thenReturn(Page.empty());
 //			Mockito.when(notificacioListHelper.complementaNotificacions(Mockito.eq(entitatMock), Mockito.anyString(), Mockito.<Page<NotificacioTableEntity>>any())).thenReturn(null);
 
 		// When
@@ -325,6 +399,8 @@ public class NotificacioMassivaServiceTest {
 	@Test
 	public void whenFindAmbFiltrePaginat_GivenUserRole_ThenCallFindUserRolePage() throws Exception {
 
+		var authToken = new UsernamePasswordAuthenticationToken("user", "user", List.of(new SimpleGrantedAuthority("tothom")));
+		SecurityContextHolder.getContext().setAuthentication(authToken);
 		// When
 		notificacioMassivaService.findAmbFiltrePaginat(entitatId, new NotificacioMassivaFiltreDto(), RolEnumDto.tothom, new PaginacioParamsDto());
 
