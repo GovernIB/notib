@@ -1058,9 +1058,7 @@ $(document).ready(function() {
 				</div>
 			</c:if>
 		</div>
-		<div role="tabpanel"
-			 class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>"
-			 id="historic">
+		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>" id="historic">
 			<table id="table-historic"
 				   data-toggle="datatable"
 				   data-url="<c:url value="/notificacio/${notificacio.id}/historic"/>"

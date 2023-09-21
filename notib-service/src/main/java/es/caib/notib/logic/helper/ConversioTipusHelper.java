@@ -363,8 +363,10 @@ public class ConversioTipusHelper {
 					@Override
 					public void mapAtoB(NotificacioAudit entity, NotificacioAuditDto dto, MappingContext context) {
 
-						entity.getCreatedBy().ifPresent(usuari -> dto.setCreatedBy(usuari.getCodi()));
-						entity.getLastModifiedBy().ifPresent(usuari -> dto.setLastModifiedBy(usuari.getCodi()));
+						dto.setCreatedBy(entity.getCreatedBy().isPresent() ? entity.getCreatedBy().get().getCodi() : null);
+						dto.setLastModifiedBy(entity.getLastModifiedBy().isPresent() ? entity.getLastModifiedBy().get().getCodi() : null);
+//						entity.getCreatedBy().ifPresent(usuari -> dto.setCreatedBy(usuari.getCodi()));
+//						entity.getLastModifiedBy().ifPresent(usuari -> dto.setLastModifiedBy(usuari.getCodi()));
 						dto.setCreatedDate(Date.from(entity.getCreatedDate().orElseThrow().atZone(ZoneId.systemDefault()).toInstant()));
 				}}).register();
 

@@ -17,6 +17,7 @@ import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
 import es.caib.notib.logic.intf.dto.adviser.EnviamentAdviser;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
 import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import javax.ws.rs.core.UriBuilder;
@@ -38,10 +39,10 @@ import static org.junit.Assert.assertNotNull;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NotificaAdviserRestTest {
 	
-	private static final String BASE_ADDRESS = "http://localhost:8280/notib";
+	private static final String BASE_ADDRESS = "http://localhost:8080/notibback";
 	private static final String ENDPOINT_ADDRESS = BASE_ADDRESS + "/adviser/sincronitzar";
-	private static final String USER = "admin";
-	private static final String PASS = "admin";
+	private static final String USER = "u999000";
+	private static final String PASS = "u999000";
 	private static final String EMISOR_DIR3 = "EA0004518";
 	private static final String CERIFICACIO_B64 =
 			  "JVBERi0xLjQKJcOkw7zDtsOfCjIgMCBvYmoKPDwvTGVuZ3RoIDMgMCBSL0ZpbHRlci9GbGF0ZURl"
@@ -663,7 +664,7 @@ public class NotificaAdviserRestTest {
 
 	private Client jerseyClient;
 	
-//	@Test
+	@Test
 	public void a_datadoOrganismoTest() throws Exception {
 
 		jerseyClient = generarClient(USER, PASS);
