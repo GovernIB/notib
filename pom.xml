@@ -14,7 +14,7 @@
 	<properties>
 		<keycloak.version>21.1.1</keycloak.version>
 		<orika.starter.version>2.4.6</orika.starter.version>
-		<sitemesh.version>2.4.2</sitemesh.version>
+		<sitemesh.version>2.5.0</sitemesh.version>
 		<openapi.version>1.6.15</openapi.version>
 		<java.compiler.version>11</java.compiler.version>
 		<maven.compiler.target>${java.compiler.version}</maven.compiler.target>

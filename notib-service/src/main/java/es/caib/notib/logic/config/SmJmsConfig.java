@@ -52,7 +52,7 @@ public class SmJmsConfig {
         final BrokerService broker = new BrokerService();
         broker.addConnector("vm://localhost");
         PersistenceAdapter persistenceAdapter = new KahaDBPersistenceAdapter();
-        File dir = new File(fileBaseDir + "/kaha"); //System.getProperty("user.home") + File.separator + "kaha");
+        File dir = new File(fileBaseDir + "/kaha");
         if (!dir.exists()) {
             dir.mkdirs();
         }
