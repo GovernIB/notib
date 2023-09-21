@@ -365,8 +365,6 @@ public class ConversioTipusHelper {
 
 						dto.setCreatedBy(entity.getCreatedBy().isPresent() ? entity.getCreatedBy().get().getCodi() : null);
 						dto.setLastModifiedBy(entity.getLastModifiedBy().isPresent() ? entity.getLastModifiedBy().get().getCodi() : null);
-//						entity.getCreatedBy().ifPresent(usuari -> dto.setCreatedBy(usuari.getCodi()));
-//						entity.getLastModifiedBy().ifPresent(usuari -> dto.setLastModifiedBy(usuari.getCodi()));
 						dto.setCreatedDate(Date.from(entity.getCreatedDate().orElseThrow().atZone(ZoneId.systemDefault()).toInstant()));
 				}}).register();
 
@@ -374,8 +372,9 @@ public class ConversioTipusHelper {
 				.customize(new CustomMapper<>() {
 						@Override
 						public void mapAtoB(NotificacioEnviamentAudit entity, NotificacioEnviamentAuditDto dto, MappingContext context) {
-							entity.getCreatedBy().ifPresent(usuari -> dto.setCreatedBy(usuari.getCodi()));
-							entity.getLastModifiedBy().ifPresent(usuari -> dto.setLastModifiedBy(usuari.getCodi()));
+
+							dto.setCreatedBy(entity.getCreatedBy().isPresent() ? entity.getCreatedBy().get().getCodi() : null);
+							dto.setLastModifiedBy(entity.getLastModifiedBy().isPresent() ? entity.getLastModifiedBy().get().getCodi() : null);
 							dto.setCreatedDate(Date.from(entity.getCreatedDate().orElseThrow().atZone(ZoneId.systemDefault()).toInstant()));
 						}
 					}).register();
