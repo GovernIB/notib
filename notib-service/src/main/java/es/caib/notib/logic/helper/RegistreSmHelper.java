@@ -128,6 +128,7 @@ public class RegistreSmHelper {
 		}
 		callbackHelper.crearCallback(notificacio, enviament, !success, errorDescripcio);
 		enviamentTableHelper.actualitzarRegistre(enviament);
+		auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "RegistreSmHelper.registrarEnviament");
 		return success;
 	}
 
@@ -147,7 +148,7 @@ public class RegistreSmHelper {
 			sirDestiData = arbResposta.getSirRegistreDestiData();
 		}
 		enviament.updateRegistreEstat(registreEstat, registreData, sirRecepcioData, sirDestiData, registreNum);
-		auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "RegistreNotificaHelper.realitzarProcesRegistrar");
+//		auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "RegistreSmHelper.registrarEnviament");
 	}
 
 

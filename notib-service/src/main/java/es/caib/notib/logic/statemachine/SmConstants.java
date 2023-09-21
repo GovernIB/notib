@@ -1,7 +1,5 @@
 package es.caib.notib.logic.statemachine;
 
-import liquibase.pro.packaged.L;
-
 public class SmConstants {
 
     public SmConstants() {
@@ -38,7 +36,7 @@ public class SmConstants {
     public static final String CUA_POOLING_SIR = "qu_pool_sir";
 
     // Delay
-    // 1er reintent 30min, 2on reintet 8h, successius 24h
+    // 1er reintent 30min, 2on reintent 8h, successius 24h
     public static Long delay(int reintent) {
         switch (reintent) {
             case 0: return 0L;

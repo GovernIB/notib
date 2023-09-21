@@ -389,7 +389,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 		var envios = new AltaRemesaEnvios();
 		Integer retardPostal = null;
-		ConfigHelper.setEntitatCodi(notificacio.getEntitat().getDir3Codi());
+		ConfigHelper.setEntitatCodi(notificacio.getEntitat().getCodi());
 		try {
 			if (!isCodiDir3Entitat() && notificacio.getOrganGestor() != null) {
 				envios.setCodigoOrganismoEmisor(notificacio.getOrganGestor().getCodi());
