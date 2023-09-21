@@ -74,7 +74,7 @@ public class EnviamentRegistreListener {
                 }
             }
             notificacioTableHelper.actualitzarRegistre(notificacio);
-            auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "RegistreNotificaHelper.realitzarProcesRegistrar");
+            auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "RegistreSmHelper.registrarEnviament");
 
 //            TEST
 //            var registreSuccess = new Random().nextBoolean();
