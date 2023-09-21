@@ -1,5 +1,5 @@
 
-package es.caib.notib.back.command.adviser;
+package es.caib.notib.api.interna.model.adviser;
 
 import lombok.Setter;
 
