@@ -108,9 +108,9 @@ public class DocumentHelper {
 
         if (doc != null && doc.getMetadades() != null) {
             dto.setOrigen(OrigenEnum.valorAsEnum(doc.getMetadades().getOrigen() != null ? doc.getMetadades().getOrigen().ordinal() : null));
-            dto.setValidesa(ValidesaEnum.valorAsEnum(PluginHelper.estatElaboracioToValidesa(doc.getMetadades().getEstatElaboracio())));
+            dto.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(doc.getMetadades().getEstatElaboracio())));
             dto.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(doc.getMetadades().getTipusDocumental() != null ? doc.getMetadades().getTipusDocumental().toString() : null));
-            dto.setModoFirma(PluginHelper.getModeFirma(doc, doc.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
+            dto.setModoFirma(pluginHelper.getModeFirma(doc, doc.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
             // Recuperar csv
             Map<String, Object> metadadesAddicionals = doc.getMetadades().getMetadadesAddicionals();
             if (metadadesAddicionals != null) {

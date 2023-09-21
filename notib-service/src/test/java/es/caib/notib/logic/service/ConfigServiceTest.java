@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.persist.entity.config.ConfigEntity;
 import es.caib.notib.logic.helper.CacheHelper;
@@ -33,6 +34,8 @@ public class ConfigServiceTest {
     private PluginHelper pluginHelper;
     @Mock
     private CacheHelper cacheHelper;
+    @Mock
+    private ConfigHelper configHelper;
 
     @InjectMocks
     private ConfigServiceImpl configService;

@@ -124,8 +124,4 @@
 
 	<context:component-scan base-package="es.caib.notib.logic.test" />
 
-	<import resource="classpath:es/caib/notib/logic/context/application-context-model.xml_" />
-	<import resource="classpath:es/caib/notib/logic/context/application-context-model-security.xml_" />
-
-
 </beans>

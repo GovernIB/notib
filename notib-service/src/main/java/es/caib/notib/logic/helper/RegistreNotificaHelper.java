@@ -63,7 +63,8 @@ public class RegistreNotificaHelper {
 		}
 		ConfigHelper.setEntitatCodi(notificacioEntity.getEntitat().getCodi());
 		var enviarANotifica = false;
-		var isComunicacio = EnviamentTipus.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus());
+		var isComunicacio = !EnviamentTipus.NOTIFICACIO.equals(notificacioEntity.getEnviamentTipus());
+		var isSir = notificacioEntity.isComunicacioSir();
 		var t0 = System.currentTimeMillis();
 		var desc = "Inici procés registrar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]";
 		var tipusEnv = new AccioParam("Tipus enviament: ", notificacioEntity.getEnviamentTipus().name());
@@ -82,8 +83,15 @@ public class RegistreNotificaHelper {
 				continue;
 			}
 			try {
-				params = AssentamentRegistralParams.builder().not(notificacioEntity).env(enviament).isSirActivat(isSirActivat).t0(t0).info(info)
-						.isComunicacio(isComunicacio).dir3Codi(codiDir3).totsAdministracio(totsAdministracio).errorMaxReintentsProperty(maxReintents).build();
+				params = AssentamentRegistralParams.builder()
+						.not(notificacioEntity)
+						.env(enviament)
+						.isSirActivat(isSirActivat).t0(t0).info(info)
+						.isComunicacio(isComunicacio)
+						.isComSir(isSir)
+						.dir3Codi(codiDir3)
+						.totsAdministracio(totsAdministracio)
+						.errorMaxReintentsProperty(maxReintents).build();
 				registrarEnviament(params);
 			} catch (Exception ex) {
 				var errorDescripcio = "Hi ha hagut un error registrant l'enviament + " + enviament.getId();
@@ -96,7 +104,6 @@ public class RegistreNotificaHelper {
 			enviamentTableHelper.actualitzarRegistre(env);
 		}
 		if (enviamentsRegistrats(notificacioEntity.getEnviaments())) {
-			var isSir = notificacioEntity.isComunicacioSir();
 			notificacioEntity.updateEstat(isSir ? NotificacioEstatEnumDto.ENVIADA : NotificacioEstatEnumDto.REGISTRADA);
 			enviarANotifica = !isSir;
 		}
@@ -130,7 +137,6 @@ public class RegistreNotificaHelper {
 			log.info(" [REG-NOT] Realitzant nou assentament registral per SIR");
 			params.getInfo().getParams().add(new AccioParam(PROCES_DESC_PARAM, " [REG-NOT] Realitzant nou assentament registral per SIR"));
 //			crearAssentamentRegistralEnviamentComunicacioSIR(notificacioEntity, codiDir3, totsAdministracio, enviament, info, t0);
-			params.setComSir(true);
 			crearAssentamentRegistral(params);
 			elapsedTime = (System.nanoTime() - startTime) / 10e6;
 			var txt = " [TIMER-REG-NOT] (Sir activat) Creació assentament registrals d'enviament de comunicació [NotId: ";

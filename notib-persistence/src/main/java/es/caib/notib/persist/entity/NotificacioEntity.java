@@ -172,25 +172,25 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	/*document*/
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "document2_id")
-	@ForeignKey(name = "not_document_notificacio_fk")
+	@ForeignKey(name = "not_document2_notificacio_fk")
 	protected DocumentEntity document2;
 
 	/*document*/
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "document3_id")
-	@ForeignKey(name = "not_document_notificacio_fk")
+	@ForeignKey(name = "not_document3_notificacio_fk")
 	protected DocumentEntity document3;
 
 	/*document*/
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "document4_id")
-	@ForeignKey(name = "not_document_notificacio_fk")
+	@ForeignKey(name = "not_document4_notificacio_fk")
 	protected DocumentEntity document4;
 
 	/*document*/
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "document5_id")
-	@ForeignKey(name = "not_document_notificacio_fk")
+	@ForeignKey(name = "not_document5_notificacio_fk")
 	protected DocumentEntity document5;
 
 	
@@ -670,6 +670,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	}
 
 	public boolean isComunicacioSir() { // Per al mapping al DTO
+		if (EnviamentTipus.SIR.equals(this.getEnviamentTipus())) {
+			return true;
+		}
+
 		if (!EnviamentTipus.COMUNICACIO.equals(this.getEnviamentTipus())) {
 			return false;
 		}
@@ -679,7 +683,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				return false;
 			}
 		}
-		return EnviamentTipus.SIR.equals(this.getEnviamentTipus());
+		return true;
 	}
 
 	@PreRemove

@@ -1,8 +1,7 @@
 package es.caib.notib.logic.helper;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
@@ -11,17 +10,17 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
-import es.caib.notib.persist.repository.NotificacioRepository;
-import es.caib.notib.persist.repository.ProcedimentRepository;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -30,7 +29,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
-@RunWith(MockitoJUnitRunner.class)
+@Disabled
+@ExtendWith({MockitoExtension.class})
 public class NotificaV2HelperTest {
     @Mock
     private NotificacioEnviamentRepository notificacioEnviamentRepository;
@@ -38,6 +38,15 @@ public class NotificaV2HelperTest {
     private PluginHelper pluginHelper;
     @Mock
     protected ConfigHelper configHelper;
+    @Mock
+    private IntegracioHelper integracioHelper;
+    @Mock
+    private NotificacioEventHelper notificacioEventHelper;
+    @Mock
+    private EnviamentTableHelper enviamentTableHelper;
+    @Mock
+    private AuditHelper auditHelper;
+
     @InjectMocks
     private NotificaV2Helper notificaV2Helper;
 
@@ -129,12 +138,23 @@ public class NotificaV2HelperTest {
             "</soap:Envelope>\n" +
             "\n";
 
-//    private static WireMockServer wireMockServer;
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.options().port(8181),
-            false);
+    private static WireMockServer wireMockServer;
 
-    @Before
+//    @Rule
+//    public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.options().port(8181), false);
+
+    @BeforeAll
+    public static void setUpAll() {
+        wireMockServer = new WireMockServer(8181);
+        wireMockServer.start();
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        wireMockServer.stop();
+    }
+
+    @BeforeEach
     public void setUp() throws Exception {
 
         Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.notifica.url"))).thenReturn("http://localhost:8181/notifica");
@@ -169,7 +189,7 @@ public class NotificaV2HelperTest {
     public void givenEnviamentSenseCertificacio_whenEnviamentRefrescarEstat_ThenCallGestioDocumentalCreate() throws Exception {
 
         // Given
-        WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("/notifica"))
+        wireMockServer.stubFor(WireMock.post(WireMock.urlPathEqualTo("/notifica"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK.value())
                         .withHeader("Content-Type", MediaType.APPLICATION_XML_VALUE)

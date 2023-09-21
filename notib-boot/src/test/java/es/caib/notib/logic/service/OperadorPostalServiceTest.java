@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import es.caib.notib.NotibApp;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
@@ -13,17 +14,23 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.*;
 
 
 @Slf4j
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/es/caib/notib/logic/application-context-test.xml"})
+@RunWith(SpringRunner.class)
+@SpringBootTest(
+		webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+		classes = NotibApp.class)
+@AutoConfigureMockMvc
+@ActiveProfiles({"test"})
 @Transactional
 public class OperadorPostalServiceTest extends BaseServiceTestV2 {
 
@@ -41,7 +48,7 @@ public class OperadorPostalServiceTest extends BaseServiceTestV2 {
 
 	@Before
 	public void setUp() throws Exception {
-		addConfig("es.caib.notib.metriques.generar", "false");
+		configHelper.reloadDbProperties();
 
 		crearPagadorPostal = new OperadorPostalDto();
 		crearPagadorPostal.setOrganismePagadorCodi(ConfigTest.DEFAULT_ORGAN_DIR3);

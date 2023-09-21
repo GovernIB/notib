@@ -29,6 +29,7 @@ import java.util.EnumSet;
 import static es.caib.notib.logic.intf.statemachine.EnviamentSmEstat.*;
 import static es.caib.notib.logic.intf.statemachine.EnviamentSmEvent.*;
 
+//@Profile("!testNoSm")
 @Slf4j
 @RequiredArgsConstructor
 @Configuration

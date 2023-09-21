@@ -421,7 +421,7 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
         if (dialect.contains("postgres")) {
 			return CLASS_IDENTITY_POSTGRES;
 		}
-        if (dialect.contains("hsql")) {
+        if (dialect.contains("hsql") || dialect.contains("h2")) {
 			return CLASS_IDENTITY_HSQL;
 		}
         throw new RuntimeException("Dialecte Hibernate no suportat pel mòdul ACL");
@@ -434,7 +434,7 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
         if (dialect.contains("postgres")) {
             return SID_IDENTITY_POSTGRES;
         }
-        if (dialect.contains("hsql")) {
+        if (dialect.contains("hsql") || dialect.contains("h2")) {
             return SID_IDENTITY_HSQL;
         }
         throw new RuntimeException("Dialecte Hibernate no suportat pel mòdul ACL");

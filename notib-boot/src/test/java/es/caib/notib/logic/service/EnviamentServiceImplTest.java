@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import es.caib.notib.NotibApp;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.intf.dto.EntitatDto;
@@ -16,13 +17,16 @@ import es.caib.notib.logic.test.data.NotificacioItemTest;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.registre.RegistrePluginException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.DecoderException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -32,8 +36,13 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/es/caib/notib/logic/application-context-test.xml"})
+@Slf4j
+@RunWith(SpringRunner.class)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+        classes = NotibApp.class)
+@AutoConfigureMockMvc
+@ActiveProfiles({"test"})
 @Transactional
 public class EnviamentServiceImplTest extends BaseServiceTest {
 
@@ -60,7 +69,8 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
     @Before
     public void setUp() throws SistemaExternException, IOException, DecoderException, RegistrePluginException {
 
-        setDefaultConfigs();
+        configHelper.reloadDbProperties();
+//        setDefaultConfigs();
         List<PermisDto> permisosEntitat = new ArrayList<PermisDto>();
         entitatCreate = new EntitatDto();
         entitatCreate.setCodi("LIMIT");
@@ -113,7 +123,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
 
         procedimentCreate.setPermisos(permisosProcediment);
         ConfigHelper.setEntitatCodi("test");
-        System.setProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir", "/home/bgalmes/dades/notib-fs/");
+//        System.setProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir", "/home/bgalmes/dades/notib-fs/");
     }
 
     @Test

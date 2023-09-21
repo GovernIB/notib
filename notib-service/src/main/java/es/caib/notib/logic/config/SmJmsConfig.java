@@ -18,6 +18,7 @@ import org.springframework.jms.support.converter.MessageType;
 import javax.jms.ConnectionFactory;
 import java.io.File;
 
+//@Profile("!testNoSm")
 @Configuration
 @EnableJms
 public class SmJmsConfig {

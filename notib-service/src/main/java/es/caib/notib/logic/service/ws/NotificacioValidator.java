@@ -862,10 +862,10 @@ public class NotificacioValidator implements Validator {
         return configHelper.getConfigAsBoolean(property);
     }
 
-    private String error(int code, Locale locale, Object... arguments) {
+    protected String error(int code, Locale locale, Object... arguments) {
         return messageHelper.getMessage("error.validacio." + code, arguments, locale);
     }
-    private String error(int code, String prefix, Locale locale, Object... arguments) {
+    protected String error(int code, String prefix, Locale locale, Object... arguments) {
         return prefix + ": " + messageHelper.getMessage("error.validacio." + code, arguments, locale);
     }
 }

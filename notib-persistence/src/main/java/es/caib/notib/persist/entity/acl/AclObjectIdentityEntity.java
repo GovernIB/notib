@@ -30,6 +30,9 @@ public class AclObjectIdentityEntity extends AbstractPersistable<Long> {
 	@Column(name = "object_id_identity", nullable = false)
 	private Long objectId;
 	@EqualsAndHashCode.Exclude
+	@Column(name = "parent_object", nullable = true)
+	private Long parentObject;
+	@EqualsAndHashCode.Exclude
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "owner_sid", nullable = false)
 	private AclSidEntity ownerSid;

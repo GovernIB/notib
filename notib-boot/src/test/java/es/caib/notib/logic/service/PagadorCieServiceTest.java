@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import es.caib.notib.NotibApp;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.cie.CieDataDto;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
@@ -13,16 +14,22 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.*;
 
 @Slf4j
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/es/caib/notib/logic/application-context-test.xml"})
+@RunWith(SpringRunner.class)
+@SpringBootTest(
+		webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+		classes = NotibApp.class)
+@AutoConfigureMockMvc
+@ActiveProfiles({"test"})
 @Transactional
 public class PagadorCieServiceTest extends BaseServiceTestV2 {
 	@Autowired
@@ -39,7 +46,7 @@ public class PagadorCieServiceTest extends BaseServiceTestV2 {
 	
 	@Before
 	public void setUp() throws Exception {
-		addConfig("es.caib.notib.metriques.generar", "false");
+		configHelper.reloadDbProperties();
 
 		createPagadorCie = CieItemTest.getRandomInstance();
 		cieCreator.addObject("cie", createPagadorCie);

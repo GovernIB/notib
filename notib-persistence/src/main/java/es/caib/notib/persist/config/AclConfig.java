@@ -198,7 +198,8 @@ public class AclConfig {
 				databaseType = "postgresql";
 			} else if (hibernateDialect.toLowerCase().contains("hsql")) {
 				databaseType = "hsql";
-			}
+			} else if (hibernateDialect.toLowerCase().contains("h2")) {
+				databaseType = "h2";}
 		}
 		// S'han hagut de modificar els mètodes retrieveObjectIdentityPrimaryKey i findChildren per a
 		// solucionar errors en les consultes quan el tipus de base de dades és PostgreSQL. Si forçam

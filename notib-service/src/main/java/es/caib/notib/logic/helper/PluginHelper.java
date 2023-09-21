@@ -1412,7 +1412,7 @@ public class PluginHelper {
 		}
 	}
 
-	public static String estatElaboracioToValidesa(DocumentEstatElaboracio estatElaboracio) {
+	public String estatElaboracioToValidesa(DocumentEstatElaboracio estatElaboracio) {
 
 		if (estatElaboracio == null) {
 			return ValidesaEnum.ORIGINAL.getValor(); // Valor per defecte
@@ -1429,7 +1429,7 @@ public class PluginHelper {
 				return ValidesaEnum.ORIGINAL.getValor();
 		}
 	}
-	public static Integer getModeFirma(Document document, String nom) {
+	public Integer getModeFirma(Document document, String nom) {
 		return nom != null && nom.toLowerCase().endsWith("pdf") && (document.getFirmes() != null && !document.getFirmes().isEmpty()) ? 1 : 0;
 	}
 

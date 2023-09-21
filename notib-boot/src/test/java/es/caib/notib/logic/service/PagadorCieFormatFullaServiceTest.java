@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import es.caib.notib.NotibApp;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatFullaDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
@@ -8,22 +9,25 @@ import es.caib.notib.logic.test.data.CieFormatFullaItemTest;
 import es.caib.notib.logic.test.data.CieItemTest;
 import es.caib.notib.logic.test.data.EntitatItemTest;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.*;
 
 
 @Slf4j
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/es/caib/notib/logic/application-context-test.xml"})
-@Transactional
+@RunWith(SpringRunner.class)
+@SpringBootTest(
+		webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+		classes = NotibApp.class)
+@AutoConfigureMockMvc
+@ActiveProfiles({"test"})
 public class PagadorCieFormatFullaServiceTest extends BaseServiceTestV2{
 
 	private CieFormatFullaDto createPagadorCieFormatFulla;
@@ -42,9 +46,10 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTestV2{
 	@Before
 	public void setUp()throws Exception {
 
-		addConfig("es.caib.notib.metriques.generar", "false");
 		var cieDto = CieItemTest.getRandomInstance();
 		cieCreator.addObject("cie", cieDto);
+
+		configHelper.reloadDbProperties();
 		database = createDatabase(EntitatItemTest.getRandomInstance(), cieCreator, cieFormatFullaCreator);
 
 		var cieCreated = (CieDto) database.get("cie");
@@ -62,14 +67,14 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTestV2{
 		database.elementsCreats.putAll(cieFormatFullaCreator.getObjects());
 	}
 
-	@After
-	public final void tearDown() {
-
-		destroyDatabase(database.getEntitat().getId(), cieCreator, cieFormatFullaCreator);
-		log.info("-------------------------------------------------------------------");
-		log.info("-- ...test \"" + currentTestDescription + "\" executat.");
-		log.info("-------------------------------------------------------------------");
-	}
+//	@After
+//	public final void tearDown() {
+//
+//		destroyDatabase(database.getEntitat().getId(), cieCreator, cieFormatFullaCreator);
+//		log.info("-------------------------------------------------------------------");
+//		log.info("-- ...test \"" + currentTestDescription + "\" executat.");
+//		log.info("-------------------------------------------------------------------");
+//	}
 
 	@Test
 	public void create() {
