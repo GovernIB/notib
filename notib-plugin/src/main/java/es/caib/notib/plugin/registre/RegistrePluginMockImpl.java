@@ -78,7 +78,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	@Override
 	public RespostaConsultaRegistre obtenerAsientoRegistral(String codiDir3Entitat, String numeroRegistreFormatat, Long tipusOperacio, boolean ambAnnexos) {
 
-		boolean respostaAmbError = true;
+		boolean respostaAmbError = false;
 		RespostaConsultaRegistre respostaConsultaRegistre = new RespostaConsultaRegistre();
 		Date data = new Date();
 		Integer[] registre = readRegistreFile(data, true);

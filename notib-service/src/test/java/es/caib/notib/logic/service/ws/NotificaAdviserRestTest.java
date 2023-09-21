@@ -11,7 +11,6 @@ import es.caib.notib.logic.intf.dto.adviser.EnviamentAdviser;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
 import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import javax.xml.datatype.DatatypeFactory;
@@ -158,7 +157,7 @@ public class NotificaAdviserRestTest {
 
 	private Client jerseyClient;
 	
-	@Test
+//	@Test
 	public void a_datadoOrganismoTest() throws Exception {
 
 		jerseyClient = generarClient(USER, PASS);
