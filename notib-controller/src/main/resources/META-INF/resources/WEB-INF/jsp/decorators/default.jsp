@@ -281,7 +281,7 @@
 										<li><a id="mo_integracions" href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
 										<li><a id="mo_excepcions" href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
 										<li><a id="mo_metriques" href="<c:url value="/metrics/list"/>"><spring:message code="decorator.menu.metriques"/></a></li>
-										<li><a id="mo_monitor" data-toggle="modal" data-maximized="true" id="botoMonitor" href="<c:url value="/modal/monitor"/>"><spring:message code='monitor.titol' /></a></li>
+										<li><a id="mo_monitor" data-toggle="modal" data-maximized="true" id="botoMonitor" href="<c:url value="/monitor"/>"><spring:message code='monitor.titol' /></a></li>
 									</ul>
 								</div>
 								<div class="btn-group">

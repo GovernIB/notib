@@ -2,6 +2,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 
 <html>
 <head>
@@ -167,7 +168,7 @@
 			$("#span-refresh-tasques").addClass('fa-circle-o-notch');
 			$("#span-refresh-tasques").addClass('fa-spin');
 			$.ajax({
-				url: "monitor/tasques",
+				url: "<c:url value='/monitor/tasques'/>",
 				dataType: 'json',
 				async: false,
 				success: function(data){
