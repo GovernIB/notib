@@ -52,6 +52,9 @@
 	<deployment>
 		<dependencies>
 			<module name="org.keycloak.keycloak-core" export="TRUE"/>
+			<module name="org.apache.cxf"/>
+			<module name="org.apache.cxf.impl"/>
+			<module name="org.apache.ws.security"/>
 		</dependencies>
 	</deployment>
 	<ear-subdeployments-isolated>false</ear-subdeployments-isolated>
