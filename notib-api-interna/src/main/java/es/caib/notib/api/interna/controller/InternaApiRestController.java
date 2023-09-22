@@ -5,6 +5,7 @@ package es.caib.notib.api.interna.controller;
 
 import es.caib.notib.api.interna.openapi.model.AppInfoApi;
 import es.caib.notib.client.domini.AppInfo;
+import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -70,5 +73,11 @@ public class InternaApiRestController {
 	@GetMapping(value = {"/rest/securedAppinfo"})
 	public AppInfo getAppInfoSecured(HttpServletRequest request) throws IOException {
 		return getAppInfo(request);
+	}
+
+	@Hidden
+	@PostMapping(value = {"/rest/notificaCanvi"})
+	public void notificaCanvi(@RequestBody NotificacioCanviClient contingut) {
+		log.info("Rebut callback: " + contingut.toString());
 	}
 }

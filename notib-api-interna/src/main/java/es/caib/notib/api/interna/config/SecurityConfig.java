@@ -67,6 +67,7 @@ public class SecurityConfig {
 			"/rest",
 			"/api/rest",
 			"/api/rest/appinfo",
+			"/api/rest/notificaCanvi",
 			"/api-docs",
 			"/api-docs/**",
 			"/webjars/**"

@@ -29,6 +29,7 @@
             <url-pattern>/rest</url-pattern>
             <url-pattern>/api/rest</url-pattern>
             <url-pattern>/api/rest/appinfo</url-pattern>
+            <url-pattern>/api/rest/notificaCanvi</url-pattern>
             <url-pattern>/swagger-resources/*</url-pattern>
             <url-pattern>/swagger-ui/*</url-pattern>
             <url-pattern>/swagger-config/*</url-pattern>
