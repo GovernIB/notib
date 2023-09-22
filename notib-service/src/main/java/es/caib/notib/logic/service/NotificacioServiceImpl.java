@@ -517,10 +517,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			dto.setEnviadaDate(getEnviadaDate(notificacio));
 
 			// TODO RECUPERAR INFORMACIÓ DIRECTAMENT DE LES ENTITATS
-//			var notificacioTableEntity = notificacioTableViewRepository.findById(id).orElse(null);
-//			if (notificacioTableEntity == null) {
-//				return dto;
-//			}
+			var notificacioTableEntity = notificacioTableViewRepository.findById(id).orElse(null);
+			if (notificacioTableEntity == null) {
+				return dto;
+			}
 			var e = notificacioEventRepository.findLastErrorEventByNotificacioId(id);
 //			dto.notificaError(e != null);
 //			dto.setNotificaErrorData(notificacioTableEntity.getNotificaErrorData());
@@ -529,7 +529,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				return dto;
 			}
 			dto.setNotificaErrorData(e.getData());
-			dto.setNotificaErrorDescripcio(e.getErrorDescripcio());
+//			dto.setNotificaErrorDescripcio(e.getErrorDescripcio());
+			dto.setNotificaErrorDescripcio(notificacioTableEntity.getNotificaErrorDescripcio());
 			return dto;
 		} finally {
 			metricsHelper.fiMetrica(timer);

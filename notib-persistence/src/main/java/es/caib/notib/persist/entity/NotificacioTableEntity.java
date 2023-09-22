@@ -168,6 +168,11 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private boolean permisProcessar;
 
 	public boolean isComunicacioSir() { // Per al mapping al DTO
+
+		if (EnviamentTipus.SIR.equals(getEnviamentTipus())) {
+			return true;
+		}
+
 		if (!EnviamentTipus.COMUNICACIO.equals(this.getEnviamentTipus())) {
 			return false;
 		}

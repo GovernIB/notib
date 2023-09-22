@@ -1192,6 +1192,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				organsGestorsDisponibles = recuperarOrgansPerProcedimentAmbPermis(usuari, entitat, PermisEnum.CONSULTA);
 			}
 			organsGestorsDisponibles.sort(Comparator.comparing(OrganGestorEntity::getNom));
+
 			String nom;
 			for (var organGestor : organsGestorsDisponibles) {
 				nom = organGestor.getCodi();
@@ -1200,7 +1201,10 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				}
 				organsGestors.add(CodiValorEstatDto.builder().id(organGestor.getId()).codi(organGestor.getCodi()).valor(nom).estat(organGestor.getEstat()).build());
 			}
-        	return organsGestors;
+			return organsGestors;
+		} catch (Exception ex) {
+			log.error("Error obtinguent els òrgans disponibles -> ", ex);
+			return new ArrayList<>();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

@@ -131,7 +131,7 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
                 // Consulta SIR
                 .withExternal().source(SIR_PENDENT).target(SIR_PENDENT).event(SR_CONSULTAR).guard(uuidGuard()).action(consultaSirAction).and()
                 .withExternal().source(SIR_PENDENT).target(SIR_ESTAT).event(SR_SUCCESS).guard(uuidGuard()).and()
-                .withExternal().source(SIR_ERROR).target(SIR_ESTAT).event(SR_SUCCESS).guard(uuidGuard()).and()
+//                .withExternal().source(SIR_ERROR).target(SIR_ESTAT).event(SR_SUCCESS).guard(uuidGuard()).and()
                 .withChoice().source(SIR_ESTAT)
                     .first(FI, isEstatFinal())
                     .last(SIR_PENDENT, consultaSirPoolingAction).and()

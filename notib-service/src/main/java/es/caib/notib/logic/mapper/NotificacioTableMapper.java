@@ -74,6 +74,7 @@ public abstract class NotificacioTableMapper {
             NotificacioTableEntity not,
             @Context List<String> codis,
             @Context Map<String, OrganismeDto> organs) {
+
         if (not == null) {
             return null;
         }
@@ -93,6 +94,7 @@ public abstract class NotificacioTableMapper {
 
     @AfterMapping
     protected void addColumnaEstat(NotificacioTableEntity not, @MappingTarget NotificacioTableItemDto dto) {
+
         if (not == null) {
             return;
         }

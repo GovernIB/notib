@@ -118,7 +118,7 @@ public class RegistreSmHelper {
 			errorMaxReintents = request.getNumIntent() >= pluginHelper.getRegistreReintentsMaxProperty();
 		} else {
 			log.info(" >>> ... OK");
-			finalitzaRegistre(arbResposta, enviament, false);
+			finalitzaRegistre(arbResposta, enviament, request.isEnviamentSir());
 			success = true;
 		}
 		if (request.isEnviamentSir()) {
