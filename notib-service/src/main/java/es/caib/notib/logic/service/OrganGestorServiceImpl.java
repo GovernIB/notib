@@ -1373,9 +1373,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			OrganGestorEntity organGestor;
 			OficinaEntity oficina;
 			for (OficinaDto ofi: oficines) {
-				organGestor = organGestorRepository.findByCodi(ofi.getOrganCodi());
-				oficina = OficinaEntity.builder().codi(ofi.getCodi()).nom(ofi.getNom()).sir(ofi.isSir()).actiu(true).organGestor(organGestor).entitat(entitat).build();
-				oficinaRepository.save(oficina);
+				try {
+					organGestor = organGestorRepository.findByCodi(ofi.getOrganCodi());
+					oficina = OficinaEntity.builder().codi(ofi.getCodi()).nom(ofi.getNom()).sir(ofi.isSir()).actiu(true).organGestor(organGestor).entitat(entitat).build();
+					oficinaRepository.save(oficina);
+				} catch (Exception ex) {
+					log.error("Error sincronitzant oficina " + ofi.getCodi(), ex);
+				}
 			}
 			addInfo(progres, info, messageHelper.getMessage("organgestor.actualitzacio.oficines.saved"));
 			progres.setProgres(95);

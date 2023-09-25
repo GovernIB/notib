@@ -305,16 +305,26 @@ public class ProcSerSyncHelper {
 		}
 		StringBuilder missatgeAvis = new StringBuilder();
 		for(var avisProc: avisosProcedimentsOrgans.entrySet()) {
-			missatgeAvis.append(" - Procediment '").append(avisProc.getKey()).append("': actualment a l'òrgan ").append(avisProc.getValue()[0])
-					.append(", i hauria de pertànyer a l'òrgan ").append(avisProc.getValue()[1]).append(" </br>");
+			missatgeAvis.append(" - Proc. ").append(avisProc.getKey()).append(" en òrgan ").append(avisProc.getValue()[0]).append(" enlloc de ").append(avisProc.getValue()[1]).append(" <br/>");
 		}
-		missatgeAvis.append("Realitzi una actualizació d'òrgans per a resoldre aquesta situació, o revisi la configuració dels procediments al repositori de procediments");
+		String missatge = ellipseString(missatgeAvis, 1600) + "<br/>Realitzi una actualizació d'òrgans per a resoldre aquesta situació, o revisi la configuració dels procediments al repositori de procediments";
 		var ara = new Date();
 		var calendar = Calendar.getInstance();
 		calendar.setTime(ara);
 		calendar.add(Calendar.YEAR, 1);
-		var avis = AvisEntity.getBuilder(ProcedimentServiceImpl.getPROCEDIMENT_ORGAN_NO_SYNC(), missatgeAvis.toString(), ara, calendar.getTime(), AvisNivellEnumDto.ERROR, true, entitatId).build();
+		var avis = AvisEntity.getBuilder(ProcedimentServiceImpl.getPROCEDIMENT_ORGAN_NO_SYNC(), missatge, ara, calendar.getTime(), AvisNivellEnumDto.ERROR, true, entitatId).build();
 		avisRepository.save(avis);
+	}
+
+	private String ellipseString(StringBuilder builder, int maxLength) {
+		String res;
+		if (builder.length() > maxLength) {
+			res = builder.substring(0, maxLength - 4) + "...";
+			// rem : extracted from other class, not sure why max-4 instead of max-3
+		} else {
+			res = builder.toString();
+		}
+		return res;
 	}
 
 	private int getTotalProcediments(String codiDir3) {
@@ -590,15 +600,14 @@ public class ProcSerSyncHelper {
 		}
 			StringBuilder missatgeAvis = new StringBuilder();
 			for(var avisProc: avisosProcedimentsOrgans.entrySet()) {
-				missatgeAvis.append(" - Servei '").append(avisProc.getKey()).append("': actualment a l'òrgan ").append(avisProc.getValue()[0])
-						.append(", i hauria de pertànyer a l'òrgan ").append(avisProc.getValue()[1]).append(" </br>");
+				missatgeAvis.append(" - Serv. '").append(avisProc.getKey()).append(" en òrgan ").append(avisProc.getValue()[0]).append(" enlloc de ").append(avisProc.getValue()[1]).append(" <br/>");
 			}
-			missatgeAvis.append("Realitzi una actualizació d'òrgans per a resoldre aquesta situació, o revisi la configuració dels procediments al repositori de procediments");
+			String missatge = ellipseString(missatgeAvis, 1600) + "<br/>Realitzi una actualizació d'òrgans per a resoldre aquesta situació, o revisi la configuració dels serveis al repositori de procediments";
 			var ara = new Date();
 			var calendar = Calendar.getInstance();
 			calendar.setTime(ara);
 			calendar.add(Calendar.YEAR, 1);
-			var avis = AvisEntity.getBuilder(ServeiServiceImpl.SERVEI_ORGAN_NO_SYNC, missatgeAvis.toString(), ara, calendar.getTime(), AvisNivellEnumDto.ERROR, true, entitatId).build();
+			var avis = AvisEntity.getBuilder(ServeiServiceImpl.SERVEI_ORGAN_NO_SYNC, missatge, ara, calendar.getTime(), AvisNivellEnumDto.ERROR, true, entitatId).build();
 			avisRepository.save(avis);
 	}
 

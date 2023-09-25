@@ -7,7 +7,6 @@ import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
@@ -234,9 +233,9 @@ public class OrganGestorController extends BaseUserController{
 		try {
 			var prediccio = organGestorService.predictSyncDir3OrgansGestors(entitat.getId());
 			model.addAttribute("isFirstSincronization", prediccio.isFirstSincronization());
-			model.addAttribute("splitMap", prediccio.getSplitMap());
-			model.addAttribute("mergeMap", prediccio.getMergeMap());
-			model.addAttribute("substMap", prediccio.getSubstMap());
+			model.addAttribute("splitMap", prediccio.getSplitMap() != null && !prediccio.getSplitMap().isEmpty() ? prediccio.getSplitMap() : null);
+			model.addAttribute("mergeMap", prediccio.getMergeMap() != null && !prediccio.getMergeMap().isEmpty() ? prediccio.getMergeMap() : null);
+			model.addAttribute("substMap", prediccio.getSubstMap() != null && !prediccio.getSubstMap().isEmpty() ? prediccio.getSubstMap() : null);
 			model.addAttribute("unitatsVigents", prediccio.getUnitatsVigents());
 			model.addAttribute("unitatsNew", prediccio.getUnitatsNew());
 			model.addAttribute("unitatsExtingides", prediccio.getUnitatsExtingides());

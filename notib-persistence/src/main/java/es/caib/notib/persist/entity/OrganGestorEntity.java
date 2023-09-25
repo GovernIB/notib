@@ -12,12 +12,10 @@ import lombok.Setter;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.NaturalId;
 import org.springframework.data.jpa.domain.AbstractPersistable;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
@@ -52,7 +50,7 @@ public class OrganGestorEntity extends AbstractPersistable<Long> implements Seri
 	@Column(name = "codi_pare", length = 64)
 	protected String codiPare;
 	
-	@Column(name = "nom", length = 1000)
+	@Column(name = "nom", length = 1000, nullable = false)
 	protected String nom;
 
 	@Column(name = "nom_es", length = 1000)
