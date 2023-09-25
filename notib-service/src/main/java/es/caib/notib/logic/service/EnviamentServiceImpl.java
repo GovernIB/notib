@@ -71,6 +71,7 @@ import es.caib.notib.persist.repository.EnviamentTableRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
+import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
 import lombok.Builder;
 import lombok.Getter;
@@ -135,6 +136,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private EnviamentTableRepository enviamentTableRepository;
+	@Autowired
+	private NotificacioTableViewRepository notificacioTableRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
@@ -1015,15 +1018,21 @@ public class EnviamentServiceImpl implements EnviamentService {
 	public void activarCallback(Long enviamentId) {
 
 		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-		if (enviament.getNotificacio().isTipusUsuariAplicacio()) {
-			log.info(String.format("[callback] Reactivam callback de l'enviment [id=%d]", enviamentId));
-			callbackHelper.reactivarCallback(enviament);
-			var event = notificacioEventRepository.findEventCallbackAmbFiReintentsByEnviamentId(enviamentId);
-			event.setFiReintents(false);
+		if (!enviament.getNotificacio().isTipusUsuariAplicacio()) {
+			var text = String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s)", enviamentId, enviament.getNotificacio().getTipusUsuari().toString());
+			log.info(text);
 			return;
 		}
-		var text = String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s)", enviamentId, enviament.getNotificacio().getTipusUsuari().toString());
-		log.info(text);
+		var event = notificacioEventRepository.findEventCallbackAmbFiReintentsByEnviamentId(enviamentId);
+		if (event == null) {
+			return;
+		}
+		log.info(String.format("[callback] Reactivam callback de l'enviment [id=%d]", enviamentId));
+
+		callbackHelper.reactivarCallback(enviament);
+		event.setFiReintents(false);
+		var not = notificacioTableRepository.findById(enviament.getNotificacio().getId());
+		not.orElseThrow().setPerActualitzar(true);
 	}
 
 	@Override

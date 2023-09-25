@@ -26,6 +26,10 @@
 	<script src="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.min.js"/>"></script>
 	<link href="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.css"/>" rel="stylesheet"></link>
 	<script src="<c:url value="/js/jquery.fileDownload.js"/>"></script>
+	<link href="<c:url value="/webjars/select2/4.0.5/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<not:modalHead/>
 <script type="text/javascript">
 
@@ -285,7 +289,8 @@ $(document).ready(function() {
 						<td width="30%"><strong><spring:message code="enviament.info.dada.estat"/></strong></td>
 						<td colspan="4">
 							<spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/>
-							<c:if test="${enviament.notificaError and enviament.notificaEstat != 'FINALITZADA' and enviament.notificaEstat != 'PROCESSADA'}">
+							<c:if test="${enviament.notificaError and enviament.notificaEstat != 'FINALITZADA' and enviament.notificaEstat != 'PROCESSADA'
+									and enviament.notificaEstat != 'NOTIFICADA'}">
 								<span class="fa fa-warning text-danger" title="<c:out value='${enviament.notificaErrorDescripcio}' escapeXml='true'/>"></span>
 							</c:if>
 							<c:if test="${enviament.fiReintents}">

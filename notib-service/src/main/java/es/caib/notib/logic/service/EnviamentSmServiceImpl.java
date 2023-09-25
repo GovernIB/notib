@@ -19,10 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.service.StateMachineService;
+import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 /**
  * Implementació del servei de gestió de enviaments.
@@ -38,6 +41,8 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	private MetricsHelper metricsHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	private final NotificacioEnviamentRepository enviamentRepository;
 	private final NotificacioRepository notificacioRepository;
@@ -72,13 +77,13 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 			log.debug("Consulta de la State Machine per l'enviament amb id" + enviamentId);
 			var env = enviamentRepository.findById(enviamentId).orElseThrow();
 			var info = new StateMachineInfo();
-			var estat = smRepository.findEstatByMachineId(env.getUuid());
-			var notEstat = env.getNotificacio().getEstat();
-			var mostrar = isPendentRegistre(env) || NotificacioEstatEnumDto.isRegistrada(notEstat) || NotificacioEstatEnumDto.isEnviadaAmbErrors(notEstat);
-			if (Strings.isNullOrEmpty(estat)) {
+			var estat = stateMachineService.acquireStateMachine(env.getUuid()).getState().getId();
+//			var notEstat = env.getNotificacio().getEstat();
+//			var mostrar = isPendentRegistre(env) || NotificacioEstatEnumDto.isRegistrada(notEstat) || NotificacioEstatEnumDto.isEnviadaAmbErrors(notEstat);
+			if (estat == null) {
 				return info;
 			}
-			info.setEstat(EnviamentSmEstat.valueOf(estat));
+			info.setEstat(estat);
 			return info;
 		} catch (Exception ex) {
 			log.error("Error canviant l'estat de la màquina per l'enviament " + enviamentId, ex);
@@ -96,10 +101,15 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		var notificacions = notificacioRepository.findNotificacionsEnProgres("20/08/2023");
 		var size = notificacions.size();
 		for (var foo=0;foo<size;foo++) {
-			afegirNotificacio(notificacions.get(foo));
+			try {
+				afegirNotificacio(notificacions.get(foo));
+			} catch (Exception ex) {
+				log.error("Error afegint a la maquina d'estast la notifiacio " + foo);
+			}
 			if (foo % 50 == 0) {
 				log.info("Processades 50 notificacions");
-			// provar EntityManager flush() cada cert nombre d'itaracions
+				// provar EntityManager.flush()
+				entityManager.flush();
 			}
 		}
 	}
@@ -177,9 +187,13 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		try {
 			log.debug("Canviant a l'estat " + estat + " de la màquina per l'enviament amb id " + enviamentId);
 			var uuId = enviamentRepository.getUuidById(enviamentId);
-			var maquina = smRepository.findByMachineId(uuId).orElseThrow();
-			maquina.setState(EnviamentSmEstat.valueOf(estat).name());
-			smRepository.save(maquina);
+//			var maquina = smRepository.findByMachineId(uuId).orElseThrow();
+//			maquina.setState(EnviamentSmEstat.valueOf(estat).name());
+//			smRepository.save(maquina);
+			var sm = stateMachineService.acquireStateMachine(uuId);
+			sm.getStateMachineAccessor().doWithAllRegions(access -> access
+					.resetStateMachine(new DefaultStateMachineContext<>(EnviamentSmEstat.valueOf(estat), null, null,null)));
+//			stateMachineService.releaseStateMachine(uuId);
 			return true;
 		} catch (Exception ex) {
 			log.error("Error canviant l'estat de la màquina per l'enviament " + enviamentId, ex);
@@ -193,7 +207,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		try {
 			log.debug("Enviant l'event " + event + " a la màquina per l'enviament amb id " + enviamentId);
 			var uuId = enviamentRepository.getUuidById(enviamentId);
-			var sm = stateMachineService.acquireStateMachine(uuId, true);
+			var sm = stateMachineService.acquireStateMachine(uuId);
 			sendEvent(uuId, sm, EnviamentSmEvent.valueOf(event));
 			return true;
 		} catch (Exception ex) {
@@ -243,6 +257,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		var reintents = (int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, reintents + 1);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_ERROR);
+		stateMachineService.releaseStateMachine(enviamentUuid);
 		return sm;
 	}
 
@@ -296,6 +311,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_FI);
+		stateMachineService.releaseStateMachine(enviamentUuid);
 	}
 
 	@Override
@@ -316,6 +332,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		var reintents = (int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, reintents + 1);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_ERROR);
+		stateMachineService.releaseStateMachine(enviamentUuid);
 		return sm;
 	}
 
@@ -405,6 +422,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		var reintents = (int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, reintents + 1);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.CN_ERROR);
+		stateMachineService.releaseStateMachine(enviamentUuid);
 		return sm;
 	}
 
@@ -435,6 +453,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.CN_FORWARD);
+		stateMachineService.releaseStateMachine(enviamentUuid);
 		return sm;
 	}
 
@@ -468,6 +487,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
  		var reintents = (int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, reintents + 1);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_ERROR);
+		stateMachineService.releaseStateMachine(enviamentUuid);
 		return sm;
 	}
 
@@ -497,6 +517,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_FORWARD);
+		stateMachineService.releaseStateMachine(enviamentUuid);
 		return sm;
     }
 

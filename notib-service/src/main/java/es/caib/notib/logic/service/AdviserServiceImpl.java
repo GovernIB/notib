@@ -183,7 +183,8 @@ public class AdviserServiceImpl implements AdviserService {
             return resultadoSincronizarEnvio;
         }
         var estat = enviament.getNotificacio().getEstat();
-        var isError = !NotificacioEstatEnumDto.FINALITZADA.equals(estat) && !NotificacioEstatEnumDto.PROCESSADA.equals(estat) && !Strings.isNullOrEmpty(eventErrorDescripcio);
+//        var isError = !NotificacioEstatEnumDto.FINALITZADA.equals(estat) && !NotificacioEstatEnumDto.PROCESSADA.equals(estat) && !Strings.isNullOrEmpty(eventErrorDescripcio);
+        var isError = !Strings.isNullOrEmpty(eventErrorDescripcio);
         if (tipoEntrega == DATAT || tipoEntrega == DATAT_CERT) {
             notificacioEventHelper.addAdviserDatatEvent(enviament, isError, eventErrorDescripcio);
         }

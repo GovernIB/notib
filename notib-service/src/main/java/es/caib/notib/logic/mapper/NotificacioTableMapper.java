@@ -201,7 +201,7 @@ public abstract class NotificacioTableMapper {
     }
 
     private String getCallbackError(NotificacioTableItemDto dto) {
-        int callbackFiReintents = eventRepository.countEventCallbackAmbFiReintentsByNotificacioId(dto.getId());
+            int callbackFiReintents = eventRepository.countEventCallbackAmbFiReintentsByNotificacioId(dto.getId());
         return callbackFiReintents > 0 ? " <span class=\"fa fa-warning text-info\" title=\"" + messageHelper.getMessage("callback.fi.reintents") + "\"></span>" : "";
     }
 

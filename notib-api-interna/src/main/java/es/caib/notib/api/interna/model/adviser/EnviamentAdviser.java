@@ -115,8 +115,9 @@ public class EnviamentAdviser implements Serializable {
         es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse aPdf = null;
         if (acusePDF != null) {
             aPdf = new es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse();
-            if (acusePDF.getContenido() != null)
-                aPdf.setContenido(Base64.getDecoder().decode(Arrays.toString(acusePDF.getContenido())));
+            if (acusePDF.getContenido() != null) {
+                aPdf.setContenido(Base64.getDecoder().decode(acusePDF.getContenido()));
+            }
             aPdf.setHash(acusePDF.getHash());
             aPdf.setCsvResguardo(acusePDF.getCsvResguardo());
         }
@@ -125,7 +126,7 @@ public class EnviamentAdviser implements Serializable {
         if (acuseXML != null) {
             aXml = new es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse();
             if (acuseXML.getContenido() != null)
-                aXml.setContenido(Base64.getDecoder().decode(Arrays.toString(acuseXML.getContenido())));
+                aXml.setContenido(Base64.getDecoder().decode(acuseXML.getContenido()));
             aXml.setHash(acuseXML.getHash());
             aXml.setCsvResguardo(acuseXML.getCsvResguardo());
         }

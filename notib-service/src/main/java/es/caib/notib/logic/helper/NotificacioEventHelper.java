@@ -166,10 +166,10 @@ public class NotificacioEventHelper {
     // Events d'enviament via Email
     // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void addEmailEnviamentEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio) {
+    public void addEmailEnviamentEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean fiReintents) {
 
          addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT)
-                .error(error).errorDescripcio(errorDescripcio).build());
+                .error(error).errorDescripcio(errorDescripcio).fiReintents(fiReintents).build());
     }
 
 
