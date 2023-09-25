@@ -92,6 +92,25 @@
     #nomesAmbErrorsBtn {
         margin-right: 10%;
     }
+
+    .cellEstat {
+        position: relative;
+    }
+    .cellEstat:hover > .hover-button {
+        display: block;
+    }
+    .hover-button {
+        position: absolute;
+        bottom: -5px;
+        right: 0px;
+        display: none;
+    }
+    .hover-button > a {
+        color: #ccc;
+    }
+    .hover-button > a:hover {
+        color: #888;
+    }
 </style>
 <script type="text/javascript">
     var myHelpers = {
@@ -715,8 +734,16 @@
         <th data-col-name="concepte" width="${ampladaConcepte}" ><spring:message code="notificacio.list.columna.concepte"/></th>
         <th data-col-name="estatDate" data-converter="datetime" data-visible="false"></th>
         <th data-col-name="estatProcessatDate" data-converter="datetime" data-visible="false"></th>
-        <th data-col-name="estatString" width="120px"><spring:message code="notificacio.list.columna.estat"/></th>
-        <%-- 				<th data-col-name="notificaEstat"  width="200px"><spring:message code="notificacio.form.camp.organGestor"/></th> --%>
+        <th data-col-name="estatString" data-template="#cellEstatTemplate" <c:if test="${isRolActualAdministradorEntitat}"> data-disable-events="true" </c:if>width="120px"><spring:message code="notificacio.list.columna.estat"/>
+            <script id="cellEstatTemplate" type="text/x-jsrender">
+                <div class="cellEstat">
+                    {{:estatString}}
+                    {^{if ~hlpIsAdministradorEntitat() }}
+                        <div class="hover-button"><a href="<c:url value="/notificacio/{{:id}}/updateEstatList"/>"><span class="fa fa-refresh"></span></a></div>
+                    {{/if}}
+                </div>
+            </script>
+        </th>
         <th data-col-name="createdByComplet" data-converter="String" width="150px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
         <th data-col-name="permisProcessar" data-visible="false">
         <th data-col-name="documentId" data-visible="false" style="visibility: hidden">

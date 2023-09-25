@@ -27,7 +27,6 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
-import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.CallbackService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
@@ -308,6 +307,13 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         model.addAttribute(command);
         model.addAttribute(IS_MASSIU, false);
         return MARCAR_PROCESSAT;
+    }
+
+    @GetMapping(value = "/{notificacioId}/updateEstatList")
+    public String updateEstatList(HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
+
+        notificacioService.updateEstatList(notificacioId);
+        return "redirect:../../notificacio";
     }
 
     @PostMapping(value = "/{notificacioId}/processar")

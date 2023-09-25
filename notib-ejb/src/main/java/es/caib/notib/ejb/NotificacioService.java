@@ -21,14 +21,13 @@ import es.caib.notib.logic.intf.dto.ProvinciesDto;
 import es.caib.notib.logic.intf.dto.RespostaAccio;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
-import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
-import es.caib.notib.logic.intf.dto.stateMachine.StateMachineInfo;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import org.springframework.context.annotation.Primary;
@@ -390,7 +389,13 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 		return getDelegateService().checkIfSignedAttached(contingut, nom, contentType);
 	}
 
-	@SuppressWarnings("rawtypes")
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+    public void updateEstatList(Long notificacioId) {
+        getDelegateService().updateEstatList(notificacioId);
+    }
+
+    @SuppressWarnings("rawtypes")
 	@Override
 	@PermitAll
 	public List<Long> getNotificacionsDEHPendentsRefrescarCert() {

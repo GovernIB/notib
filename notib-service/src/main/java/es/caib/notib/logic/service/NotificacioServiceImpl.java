@@ -1611,7 +1611,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
     }
 
-    @Override
+	@Override
+	@Transactional
+	public void updateEstatList(Long notificacioId) {
+		var item = notificacioTableViewRepository.findById(notificacioId).orElse(null);
+		if (item == null) {
+			return;
+		}
+		item.setPerActualitzar(true);
+	}
+
+	@Override
 	public void refrescarEnviamentsExpirats() {
 
 		var timer = metricsHelper.iniciMetrica();

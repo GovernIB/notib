@@ -1,6 +1,5 @@
 package es.caib.notib.logic.service;
 
-import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.cacheable.PermisosCacheable;
@@ -62,8 +61,6 @@ import es.caib.notib.persist.repository.ProcSerRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.collections4.MultiMap;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +70,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.supercsv.io.CsvListWriter;
-import org.supercsv.io.ICsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
 import javax.annotation.Resource;
@@ -1191,7 +1187,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			} else if (RolEnumDto.tothom.equals(rol)) {
 				organsGestorsDisponibles = recuperarOrgansPerProcedimentAmbPermis(usuari, entitat, PermisEnum.CONSULTA);
 			}
-			organsGestorsDisponibles.sort(Comparator.comparing(OrganGestorEntity::getNom));
+			organsGestorsDisponibles.sort(Comparator.comparing(OrganGestorEntity::getNom, Comparator.nullsLast(Comparator.naturalOrder())));
 
 			String nom;
 			for (var organGestor : organsGestorsDisponibles) {
