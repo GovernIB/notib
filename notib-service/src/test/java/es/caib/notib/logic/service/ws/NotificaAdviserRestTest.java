@@ -10,6 +10,7 @@ import es.caib.notib.logic.intf.dto.AdviserResponseDto;
 import es.caib.notib.logic.intf.dto.adviser.EnviamentAdviser;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
+import org.junit.Test;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestMethodOrder;
 
@@ -34,7 +35,7 @@ public class NotificaAdviserRestTest {
 	private static final String ENDPOINT_ADDRESS = BASE_ADDRESS + "/adviser/sincronitzar";
 	private static final String USER = "u999000";
 	private static final String PASS = "u999000";
-	private static final String EMISOR_DIR3 = "EA0004518";
+	private static final String EMISOR_DIR3 = "A04013498";
 	private static final String CERIFICACIO_B64 =
 			  "JVBERi0xLjQKJcOkw7zDtsOfCjIgMCBvYmoKPDwvTGVuZ3RoIDMgMCBSL0ZpbHRlci9GbGF0ZURl"
 			+ "Y29kZT4+CnN0cmVhbQp4nDPQM1Qo5ypUMFAwALJMLU31jBQsTAz1LBSKUrnCtRTyIHJAWJTO5RTC"
@@ -151,9 +152,8 @@ public class NotificaAdviserRestTest {
 			+ "PgpzdGFydHhyZWYKNTkyNAolJUVPRgo=";
 	private static final String CERIFICACIO_SHA1 = "b081c7abf42d5a8e5a4050958f28046bdf86158c";
 
-	private List<String> enviamentsIds= Arrays.asList(
-			"YHzpGhV7sxyue6OHGpPJ",
-			"KkL6rZmP385WDpQ17lui");
+//	private List<String> enviamentsIds = Arrays.asList("YHzpGhV7sxyue6OHGpPJ", "KkL6rZmP385WDpQ17lui");
+	private List<String> enviamentsIds = Arrays.asList("1V77kfbX3HGBbc1t5gd9");
 
 	private Client jerseyClient;
 	
@@ -171,6 +171,7 @@ public class NotificaAdviserRestTest {
 		Receptor receptor = new Receptor();
 		receptor.setNifReceptor("12345678Z");
 		receptor.setNombreReceptor("destinatariNom0 destLlinatge1_0 destLlinatge2_0");
+		receptor.setVinculoReceptor(BigInteger.ZERO);
 
 		// Acuse PDF
 		Acuse acusePDF = new Acuse();
@@ -180,7 +181,7 @@ public class NotificaAdviserRestTest {
 
 		EnviamentAdviser adviser = EnviamentAdviser.builder()
 				.organismoEmisor(EMISOR_DIR3)
-				.hIdentificador("39128285cf121cb00453")
+				.hIdentificador("rmznzBG7x84d1kE5k0aL")
 				.tipoEntrega(unmarshal("2"))
 				.modoNotificacion(unmarshal("5"))
 				.estado("notificada")
@@ -218,6 +219,7 @@ public class NotificaAdviserRestTest {
 		Receptor receptor = new Receptor();
 		receptor.setNifReceptor("12345678Z");
 		receptor.setNombreReceptor("destinatariNom0 destLlinatge1_0 destLlinatge2_0");
+		receptor.setVinculoReceptor(BigInteger.ZERO);
 
 		// Acuse PDF
 		Acuse acusePDF = new Acuse();
@@ -243,10 +245,7 @@ public class NotificaAdviserRestTest {
 
 			String body = mapper.writeValueAsString(adviser);
 
-			String json = jerseyClient
-					.resource(ENDPOINT_ADDRESS)
-					.type("application/json")
-					.post(String.class, body);
+			String json = jerseyClient.resource(ENDPOINT_ADDRESS).type("application/json").post(String.class, body);
 			System.out.println("Missatge REST rebut: " + json);
 			AdviserResponseDto resposta = mapper.readValue(json, AdviserResponseDto.class);
 
@@ -262,18 +261,18 @@ public class NotificaAdviserRestTest {
 //	@Test
 //	public void b_certificacionOrganismoTest() throws Exception {
 //		AdviserWS ws = this.getWS();
-//		
+//
 //		CertificadoRequest certificado = new CertificadoRequest();
-//		
+//
 //		certificado.setAcuseOSobre("acuse");
 //		certificado.setCertificacion(CERIFICACIO_B64);
 //		certificado.setHashSha1(CERIFICACIO_SHA1);
 //		certificado.setIdentificadorDestinatario("39128285cf121cb00453");
 //		certificado.setOrganismoEmisor(EMISOR_DIR3);
-//		
+//
 //		ws.certificacionOrganismo(
-//				certificado, 
-//				new Holder<String>(), 
+//				certificado,
+//				new Holder<String>(),
 //				new Holder<String>());
 //	}
 	

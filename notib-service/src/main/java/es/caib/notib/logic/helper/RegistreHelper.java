@@ -102,6 +102,7 @@ public class RegistreHelper {
 			callbackHelper.updateCallback(enviament, error, errorDescripcio);
 		}
 		log.info(fiActEstatRegistreText + enviament.getId() + estatText + enviament.getNotificaEstat() + "]");
+		notificacioTableHelper.actualitzarRegistre(notificacio);
 		enviamentTableHelper.actualitzarRegistre(enviament);
 		auditHelper.auditaEnviament(enviament, TipusOperacio.UPDATE, "RegistreHelper.enviamentRefrescarEstatRegistre");
 		return enviament;

@@ -12,6 +12,7 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
+import liquibase.pro.packaged.R;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +88,8 @@ public class EmailNotificacioSenseNifHelper {
 				enviamentTableHelper.actualitzarRegistre(enviament);
 				auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "EmailNotificacioSenseNifHelper.notificacioEnviarEmail");
 			}
-			notificacioEventHelper.addEmailEnviamentEvent(enviament, error != null, error);
+			var fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
+			notificacioEventHelper.addEmailEnviamentEvent(enviament, error != null, error, fiReintents) ;
 			callbackHelper.updateCallback(enviament, Strings.isNullOrEmpty(error), error);
 			hasErrors = hasErrors || error != null;
 		}

@@ -207,7 +207,7 @@ public class RegistreNotificaHelper {
 		//Comunicació + administració (SIR)
 		if (params.isComSir() && totsAdministracio) {
 			log.debug("Comunicació SIR --> actualitzar estat...");
-			not.updateEstat(NotificacioEstatEnumDto.ENVIADA);
+			not.updateEstat(NotificacioEstatEnumDto.ENVIAT_SIR);
 			registreHelper.enviamentUpdateDatat(arbResposta.getEstat(), arbResposta.getRegistreData(), arbResposta.getSirRecepecioData(),
 					arbResposta.getSirRegistreDestiData(), arbResposta.getRegistreNumeroFormatat(), env);
 		} else {

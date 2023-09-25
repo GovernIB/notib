@@ -54,11 +54,13 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
+	@RolesAllowed({"NOT_SUPER"})
 	public boolean canviarEstat(Long enviamentId, String estat) {
 		return getDelegateService().canviarEstat(enviamentId, estat);
 	}
 
 	@Override
+	@RolesAllowed({"NOT_SUPER"})
 	public boolean enviarEvent(Long enviamentId, String event) {
 		return getDelegateService().enviarEvent(enviamentId, event);
 	}

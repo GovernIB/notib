@@ -142,7 +142,7 @@ $(document).ready(function() {
 </style>
 </head>
 <body>
-	<c:if test="${notificacio.notificaError}">
+	<c:if test="${notificacio.notificaError and notificacio.estat != 'FINALITZADA' and notificacio.estat != 'PROCESSADA'}">
 		<div class="alert alert-danger well-sm">
 			<span class="fa fa-warning text-danger"></span>+
 			<c:choose>
@@ -360,7 +360,7 @@ $(document).ready(function() {
 										<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.${notificacio.estat}" />
 									</c:otherwise>
 								</c:choose>
-								<c:if test="${notificacio.notificaError}">
+								<c:if test="${notificacio.notificaError and notificacio.estat != 'FINALITZADA' and notificacio.estat != 'PROCESSADA'}">
 									<span class="fa fa-warning text-danger" title="<c:out value='${notificacio.notificaErrorDescripcio}' escapeXml='true'/>"></span>
 								</c:if>
 								<c:if test="${notificacio.fiReintents}">
@@ -663,7 +663,8 @@ $(document).ready(function() {
 														(<c:choose><c:when test="${notificacio.enviamentTipus == 'NOTIFICACIO'}"><spring:message code="notificacio.list.enviament.list.finalitzat.avis.email"/></c:when><c:otherwise><spring:message code="notificacio.list.enviament.list.finalitzat.email"/></c:otherwise></c:choose>)
 													</c:if>
 												</c:if>
-												<c:if test="${enviament.notificacioError and enviament.notificaEstat != 'FINALITZADA' and enviament.notificaEstat != 'PROCESSADA'}">
+												<c:if test="${enviament.notificacioError and enviament.notificaEstat != 'FINALITZADA' and enviament.notificaEstat != 'PROCESSADA'
+															and enviament.notificaEstat != 'NOTIFICADA'}">
 													<c:set var="errorTitle">
 														<c:choose>
 														<c:when test="${not empty enviament.notificacioErrorDescripcio}">
@@ -1003,7 +1004,8 @@ $(document).ready(function() {
 				</c:if>
 
 				<!-- Acció reprendre consulta d'estat SIR  - Estat == ENVIADA && notificaErrorTipus == ERROR_REINTENTS_SIR -->
-				<c:if test="${notificacio.estat == 'ENVIAT_SIR' && notificacio.notificaErrorTipus == 'ERROR_REINTENTS_SIR'}">
+<%--				<c:if test="${notificacio.estat == 'ENVIAT_SIR' && notificacio.notificaErrorTipus == 'ERROR_REINTENTS_SIR'}">--%>
+				<c:if test="${notificacio.estat == 'ENVIAT_SIR' && notificacio.fiReintents}">
 					<c:set var="algunaAccioDisponible" value="${true}" />
 					<li class="list-group-item">
 						<div class="row">
