@@ -382,7 +382,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
     }
 
     protected boolean requestIsRemesesEnviamentMassiu(HttpServletRequest request) {
-        return request.getRequestURI().contains("/notibback/notificacio/");
+        return request.getRequestURI().contains(request.getContextPath() + "/notificacio/");
     }
 
     protected Set<Long> getIdsEnviamentsSeleccionats(HttpServletRequest request) {

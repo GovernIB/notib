@@ -38,6 +38,7 @@
 		<docker.image.prefix>280421</docker.image.prefix>
 		<!--		<docker.image.name>notib</docker.image.name>-->
 		<junit.jupiter.version>5.9.3</junit.jupiter.version>
+		<notib.context>notib</notib.context>
 	</properties>
 	<modules>
 		<module>notib-boot</module>

@@ -41,7 +41,7 @@
                 let text = data.node.text.split('(');
                 text = text[text.length-1].split(')')[0];
                 $.ajax({
-                    url: "/notibback/organgestorArbre/organgestor/" + text,
+                    url: "<c:url value='/organgestorArbre/organgestor/'/>" + text,
                     success: organ => {
                         if (organ) {
                             $("#detall").html(organ);
@@ -110,7 +110,7 @@
                 $(".panel-heading:first").css({"display": "flex", "justify-content": "space-between"})
                 $(".panel-heading:first").append("<div><button id='canviarVistaOrganGestor' class='btn btn-primary'><spring:message code='boto.canviar.vista'/></button></div>");
                 $("#canviarVistaOrganGestor").click(function(){
-                    window.location.replace("/notibback/organgestor");
+                    window.location.replace("<c:url value='/organgestor'/>");
                 });
 
                 $("#organ-boto-update-oficines").on("click", () => bloquejar());

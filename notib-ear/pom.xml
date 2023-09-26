@@ -244,19 +244,19 @@
 						<webModule>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>notib-back</artifactId>
-							<contextRoot>/notibback</contextRoot>
+							<contextRoot>/${notib.context}back</contextRoot>
 							<bundleFileName>notib-back.war</bundleFileName>
 						</webModule>
 						<webModule>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>notib-api-interna</artifactId>
-							<contextRoot>/notibapi/interna</contextRoot>
+							<contextRoot>/${notib.context}api/interna</contextRoot>
 							<bundleFileName>notib-api-interna.war</bundleFileName>
 						</webModule>
 						<webModule>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>notib-api-externa</artifactId>
-							<contextRoot>/notibapi/externa</contextRoot>
+							<contextRoot>/${notib.context}api/externa</contextRoot>
 							<bundleFileName>notib-api-externa.war</bundleFileName>
 						</webModule>
 					</modules>

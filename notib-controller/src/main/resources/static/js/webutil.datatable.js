@@ -79,7 +79,7 @@
 				domPrefix = '<"row"<"col-md-' + colMd50p + '"i><"col-md-' + colMd50p + '"<"botons">>>';
 			}
 			let language = "es";
-			$.ajax({url: "/notibback/usuari/configuracio/idioma", async: false, success: (result) => {
+			$.ajax({url: webutilContextPath() + "/usuari/configuracio/idioma", async: false, success: (result) => {
 					language = result;
 				}});
 			//var language = window.navigator.userLanguage || window.navigator.language;

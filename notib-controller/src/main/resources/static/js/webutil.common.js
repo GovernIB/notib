@@ -1,6 +1,6 @@
 
 function webutilContextPath() {
-	return '/notibback';
+	return typeof ctxPath !== 'undefined' ? ctxPath : '/notibback';
 }
 function webutilModalTancarPath() {
 	return webutilContextPath() + '/modal/tancar';
