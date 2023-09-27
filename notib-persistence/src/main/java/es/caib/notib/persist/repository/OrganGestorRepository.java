@@ -155,8 +155,13 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 
 	@Query(	"select distinct og.codi " +
 			"  from OrganGestorEntity og " +
-			" where og.entitat.codi = :entitatCodi and og.estat <> es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.V")
+			" where og.entitat.codi = :entitatCodi and og.estat = es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.V")
 	public List<String> findCodiActiusByEntitat(@Param("entitatCodi") String entitatCodi);
+
+	@Query(	"select distinct og.codi " +
+			"  from OrganGestorEntity og " +
+			" where og.entitat.codi = :entitatCodi and og.estat <> es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.V")
+	public List<String> findCodiInactiusByEntitat(@Param("entitatCodi") String entitatCodi);
 
 	@Query(	" select " +
 			"	CASE WHEN count(og) > 0 THEN true ELSE false END " +

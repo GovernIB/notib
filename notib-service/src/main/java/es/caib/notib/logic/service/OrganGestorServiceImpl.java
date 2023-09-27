@@ -459,6 +459,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			log.debug(prefix + msg);
 			throw new Exception(msg);
 		}
+		var isFirstSincronization = entitat.getDataSincronitzacio() == null;
 		// Comprova si hi ha una altre instància del procés en execució
 		var progres = progresActualitzacio.get(entitat.getDir3Codi());
 		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
@@ -499,7 +500,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				codis.add(u.getCodi());
 			}
 			log.debug(prefix + "calculant unitats extingides");
-			obsoleteUnitats = calcularExtingides(entitat.getCodi(), codis);
+			obsoleteUnitats = calcularExtingides(entitat.getCodi(), codis, isFirstSincronization);
 			log.debug(prefix + "nombre d'unitats extingides: " + obsoleteUnitats.size());
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage(AUTO_TEMPS_TEXT, new Object[]{(tf - ti)}));
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canis.fi.resultat", new Object[]{unitatsWs.size()}));
@@ -585,6 +586,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			updateOrgansSessio();
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.fi"));
 		} catch (Exception ex) {
+			log.error("Error sincronitzant òrgans.", ex);
 			e = ex;
 			progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("organgestor.actualitzacio.error") + ex.getMessage());
 			throw ex;
@@ -646,10 +648,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			var unitatsWS = pluginHelper.unitatsOrganitzativesFindByPare(entitat.getCodi(), entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
 			// Obtenir els òrgans vigents a la BBDD
 			List<OrganGestorEntity> organsVigents = organGestorRepository.findByEntitatIdAndEstat(entitat.getId(), OrganGestorEstatEnum.V);
-//			log.debug("Consulta d'unitats vigents a DB");
-//			for(OrganGestorEntity organVigent: organsVigents){
-//				log.debug(organVigent.toString());
-//			}
 			// Obtenir unitats actualment vigents en BBDD, però marcades com a obsoletes en la sincronització
 			Map<String, List<NodeDir3>> mapVersionsUnitats = getMapVersionsUnitats(unitatsWS);
 			var unitatsVigentObsoleteDto = getObsoletesFromWS(entitat, unitatsWS, mapVersionsUnitats, organsVigents);
@@ -721,8 +719,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			// Obtenir el llistat d'unitats que son totalment noves (no existeixen en BBDD): Creació
 			// ====================  NOUS ===================
 			List<UnitatOrganitzativaDto> unitatsNew = getNewFromWS(mapVersionsUnitats, splitMap, substMap, mergeMap);
-			return PrediccioSincronitzacio.builder().unitatsVigents(unitatsVigents).unitatsNew(unitatsNew).unitatsExtingides(unitatsExtingides).splitMap(splitMap)
-					.substMap(substMap).mergeMap(mergeMap).build();
+			return PrediccioSincronitzacio.builder()
+					.unitatsVigents(unitatsVigents)
+					.unitatsNew(unitatsNew)
+					.unitatsExtingides(unitatsExtingides)
+					.splitMap(splitMap)
+					.substMap(substMap)
+					.mergeMap(mergeMap).build();
 
 		} catch (SistemaExternException sex) {
 			throw sex;
@@ -762,16 +765,16 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			}
 			codis.add(u.getCodi());
 		}
-		var extingides = calcularExtingides(entitat.getCodi(), codis);
+		var extingides = calcularExtingides(entitat.getCodi(), codis, true);
 		var ex = conversioTipusHelper.convertirList(extingides, UnitatOrganitzativaDto.class);
 		var n = conversioTipusHelper.convertirList(noves, UnitatOrganitzativaDto.class);
 		return PrediccioSincronitzacio.builder().isFirstSincronization(true).unitatsVigents(vigents).unitatsNew(n).unitatsExtingides(ex).build();
 	}
 
-	private List<OrganGestorEntity> calcularExtingides(String entitatCodi, List<String> codis) {
+	private List<OrganGestorEntity> calcularExtingides(String entitatCodi, List<String> codis, boolean firstSincronization) {
 
 		List<OrganGestorEntity> extingides = new ArrayList<>();
-		var organsAExtingir = organGestorRepository.findCodiActiusByEntitat(entitatCodi);
+		var organsAExtingir = firstSincronization ? organGestorRepository.findCodiActiusByEntitat(entitatCodi) : organGestorRepository.findCodiInactiusByEntitat(entitatCodi);
 		if (organsAExtingir.isEmpty()) {
 			return extingides;
 		}
@@ -781,6 +784,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		if (organsAExtingir.isEmpty())
 			return extingides;
 
+		return getExtingits(entitatCodi, organsAExtingir);
+	}
+
+	private List<OrganGestorEntity> getExtingits(String entitatCodi, List<String> organsAExtingir) {
+		List<OrganGestorEntity> extingides = new ArrayList<>();
 		var maxInSize = 1000;
 		var nParts = (organsAExtingir.size() / maxInSize) + 1;
 		var inici = 0;

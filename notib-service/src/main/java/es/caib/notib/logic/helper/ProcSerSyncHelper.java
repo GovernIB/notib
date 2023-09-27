@@ -19,6 +19,7 @@ import es.caib.notib.persist.repository.AvisRepository;
 import es.caib.notib.persist.repository.ProcedimentRepository;
 import es.caib.notib.persist.repository.ServeiRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -308,7 +309,7 @@ public class ProcSerSyncHelper {
 			missatgeAvis.append(" - Proc. ").append(avisProc.getKey()).append(" en òrgan ").append(avisProc.getValue()[0]).append(" enlloc de ").append(avisProc.getValue()[1]).append(" <br/>");
 		}
 		String missatge = ellipseString(missatgeAvis, 1600) + "<br/>Realitzi una actualizació d'òrgans per a resoldre aquesta situació, o revisi la configuració dels procediments al repositori de procediments";
-		var ara = new Date();
+		var ara = DateUtils.truncate(new Date(), Calendar.DATE);
 		var calendar = Calendar.getInstance();
 		calendar.setTime(ara);
 		calendar.add(Calendar.YEAR, 1);
@@ -603,7 +604,7 @@ public class ProcSerSyncHelper {
 				missatgeAvis.append(" - Serv. '").append(avisProc.getKey()).append(" en òrgan ").append(avisProc.getValue()[0]).append(" enlloc de ").append(avisProc.getValue()[1]).append(" <br/>");
 			}
 			String missatge = ellipseString(missatgeAvis, 1600) + "<br/>Realitzi una actualizació d'òrgans per a resoldre aquesta situació, o revisi la configuració dels serveis al repositori de procediments";
-			var ara = new Date();
+			var ara = DateUtils.truncate(new Date(), Calendar.DATE);
 			var calendar = Calendar.getInstance();
 			calendar.setTime(ara);
 			calendar.add(Calendar.YEAR, 1);

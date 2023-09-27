@@ -723,7 +723,7 @@ public class PermisosHelper {
 		// Actualitzam permisos en l'ordre en que ens arriben del Dir3
 		for (var unitat: unitatsWs) {
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.permisos.unitat", new Object[] {unitat.getCodi()}));
-			progres.setProgres(63 + (nombreUnitatsProcessades++ * 18)/nombreUnitatsTotal);
+			progres.setProgres(27 + (nombreUnitatsProcessades++ * 18)/nombreUnitatsTotal);
 			var organOrigen = getOrgan(organsDividits, unitat.getCodi());
 			if (organOrigen != null) {
 				continue;

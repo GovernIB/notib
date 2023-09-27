@@ -2,7 +2,6 @@ package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.AvisNivellEnumDto;
-import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.LlibreDto;
@@ -22,6 +21,7 @@ import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.ProcSerOrganRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
@@ -33,9 +33,10 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Helper per a convertir entities a dto
@@ -88,7 +89,7 @@ public class OrganGestorHelper {
 
 	public void consultaCanvisOrganigrama(EntitatEntity entitat) {
 
-		var ara = new Date();
+		var ara = DateUtils.truncate(new Date(), Calendar.DATE);
 		var calendar = Calendar.getInstance();
 		calendar.setTime(ara);
 		calendar.add(Calendar.YEAR, 1);
@@ -105,7 +106,7 @@ public class OrganGestorHelper {
 		avisRepository.save(avis);
 	}
 
-	@Transactional
+//	@Transactional
 	public void sincronitzarOrgans(Long entitatId, List<NodeDir3> unitatsWs, List<OrganGestorEntity> obsoleteUnitats, List<OrganGestorEntity> organsDividits,
 								   List<OrganGestorEntity> organsFusionats, List<OrganGestorEntity> organsSubstituits, ProgresActualitzacioDto progres) {
 
@@ -138,7 +139,9 @@ public class OrganGestorHelper {
 			}
 		}
 		progres.setProgres(22);
-		obsoleteUnitats.addAll(organGestorRepository.findByEntitatNoVigent(entitat));
+		Set<OrganGestorEntity> unitatsObsoletes = new HashSet<>(obsoleteUnitats);
+		unitatsObsoletes.addAll(organGestorRepository.findByEntitatNoVigent(entitat));
+		obsoleteUnitats = new ArrayList<>(unitatsObsoletes);
 		// Definint tipus de transició
 		log.debug(prefix + "Sincronitzant unitats obsoletes");
 		nombreUnitatsProcessades = 0;
@@ -200,8 +203,13 @@ public class OrganGestorHelper {
 			return unitat;
 		}
 		// Venen les unitats ordenades, primer el pare i després els fills?
-		unitat = OrganGestorEntity.builder().codi(unitatWS.getCodi()).entitat(entitat).nom(nom).nomEs(unitatWS.getDenominacio())
-				.codiPare(unitatWS.getSuperior()).estat(unitatWS.getEstat()).build();
+		unitat = OrganGestorEntity.builder()
+				.codi(unitatWS.getCodi())
+				.entitat(entitat)
+				.nom(nom)
+				.nomEs(unitatWS.getDenominacio())
+				.codiPare(unitatWS.getSuperior())
+				.estat(unitatWS.getEstat()).build();
 		organGestorRepository.save(unitat);
 		updateLlibreAndOficina(unitat, entitat.getDir3Codi());
 		log.debug(prefix + "guardant nova unitat amb codi " + unitat.getCodi() + " - " + unitat.getNom());
