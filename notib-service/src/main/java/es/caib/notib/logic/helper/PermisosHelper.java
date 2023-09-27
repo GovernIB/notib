@@ -586,11 +586,11 @@ public class PermisosHelper {
 					granted[i] = acl.isGranted(ps, sids, false);
 					ps.clear();
 				} catch (NotFoundException ex) {
-					log.error("Permis not found", ex);
+					log.debug("Permis not found", ex);
 				}
 			}
 		} catch (NotFoundException ex) {
-			log.error("Error verificant permisos", ex);
+			log.debug("Error verificant permisos", ex);
 		}
 		return granted;
 	}

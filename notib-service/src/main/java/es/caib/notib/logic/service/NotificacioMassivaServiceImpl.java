@@ -912,7 +912,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         if (fileNames.contains(arxiuNom)) { // Archivo físico
             document.setArxiuNom(arxiuNom);
             if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
-                    (documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
+                    (documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && documentsProcessatsMassiu.get(document.getArxiuNom()) != null)) {
 
                 arxiuBytes = ZipFileUtils.readZipFile(ficheroZipBytes, arxiuNom);
                 document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
