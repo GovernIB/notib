@@ -162,17 +162,17 @@ public abstract class AbstractNotificaHelper {
 			"enviado_deh",
 			"enviado_ci",
 			"entregado_op",
-			"leida",
+			"leida", // estat final comunicacio
 			"error",
 			"extraviada",
 			"fallecido",
-			"notificada",
+			"notificada", // estat final notificacio
 			"pendiente_envio",
 			"pendiente_cie",
 			"pendiente_deh",
 			"pendiente_sede",
-			"rehusada",
-			"expirada",
+			"rehusada", // estat final
+			"expirada", // estat final
 			"envio_programado",
 			"sin_informacion",
 			"anulada"};

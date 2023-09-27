@@ -1,6 +1,8 @@
 
 package es.caib.notib.logic.helper;
 
+import com.google.common.base.Strings;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -20,6 +22,9 @@ import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
+import liquibase.pro.packaged.Z;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -57,6 +62,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private EnviamentTableHelper enviamentTableHelper;
+	private MockPlay mockPlay;
 
 
 	@SneakyThrows
@@ -155,6 +161,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 
 		log.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		var notificacio = notificacioRepository.findById(enviament.getNotificacio().getId()).orElseThrow();
+		mockPlay = new MockPlay(notificacio.getConcepte());
 		var error = false;
 		String errorDescripcio = null;
 		var errorMaxReintents = false;
@@ -164,7 +171,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			var dataUltimaCertificacio = enviament.getNotificaCertificacioData();
 			enviament.updateNotificaDataRefrescEstat();
 			enviament.updateNotificaNovaConsulta(pluginHelper.getConsultaReintentsPeriodeProperty());
-			if (enviament.getNotificaIdentificador() == null) {
+			if (enviament.getNotificaIdentificador() == null || enviament.getNotificaIntentNum() < mockPlay.getIntentsConsulta()) {
 				log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				errorDescripcio = "L'enviament no té identificador de Notifica";
 				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
@@ -218,7 +225,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			}
 
 			var dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
-			var estat = getEstatNotifica(datatDarrer.getResultado());
+			var estat = mockPlay.getEstatConsulta() == null ? getEstatNotifica(datatDarrer.getResultado()) : mockPlay.getEstatConsulta();
 			log.info("Actualitzant informació enviament amb Datat...");
 			if (!dataDatat.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
 				var organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
@@ -319,10 +326,11 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 
 	public ResultadoAltaRemesaEnvios enviaNotificacio(NotificacioEntity notificacio) throws Exception {
 
+		mockPlay = new MockPlay(notificacio.getConcepte());
 		var resultat = new ResultadoAltaRemesaEnvios();
 		resultat.setCodigoRespuesta("000");
 		resultat.setDescripcionRespuesta("OK");
-		if (notificacio.getConcepte().startsWith("throwEx")) {
+		if (notificacio.getConcepte().startsWith("throwEx") || notificacio.getNotificaEnviamentIntent() < mockPlay.getIntentsEnviament()) {
 			throw new Exception("PROVA EXCEPCIO");
 		}
 		if (notificacio.getConcepte().startsWith("NError")) {
@@ -356,6 +364,53 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			sb.append(alphaNumericString.charAt(index));
 		} 
 		return sb.toString(); 
-	} 
+	}
+
+	@Getter
+	@Setter
+	private class MockPlay {
+
+		private int intentsEnviament;
+		private int intentsConsulta;
+		private EnviamentEstat estatConsulta;
+
+		// Format per jugar amb el mock ((E0;C0;estatConsulta))
+		public MockPlay(String concepte) {
+
+			if (!concepte.startsWith("((") || !concepte.contains("))")) {
+				return;
+			}
+			var str = concepte.substring(2, concepte.indexOf(")"));
+			var split = str.split(";");
+			if (split.length != 3) {
+				return;
+
+			}
+			var env = split[0];
+			if (!Strings.isNullOrEmpty(env)) {
+				try {
+					intentsEnviament = Integer.valueOf(env.substring(1));
+				} catch (Exception ex) {
+
+				}
+			}
+			var con = split[1];
+			if (!Strings.isNullOrEmpty(con)) {
+				try {
+					intentsConsulta = Integer.valueOf(con.substring(1));
+				} catch (Exception ex) {
+
+				}
+			}
+			var estat = split[2];
+			if (!Strings.isNullOrEmpty(estat)) {
+				try {
+					estatConsulta = EnviamentEstat.valueOf(estat.toUpperCase());
+				} catch (Exception ex) {
+					estatConsulta = null;
+				}
+			}
+		}
+	}
 
 }
