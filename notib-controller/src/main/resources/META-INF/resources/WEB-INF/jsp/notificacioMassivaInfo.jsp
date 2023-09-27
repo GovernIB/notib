@@ -64,9 +64,7 @@ $(document).ready(function() {
 	</ul>
 	<br />
 	<div class="tab-content">
-		<div role="tabpanel"
-			class="tab-pane active"
-			id="dades">
+		<div role="tabpanel" class="tab-pane active" id="dades">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">
@@ -138,12 +136,8 @@ $(document).ready(function() {
 				</div>
 			</c:if>
 		</div>
-		<div role="tabpanel"
-			class="tab-pane"
-			id="resum">
-			<table id="events"
-				class="table table-striped table-bordered"
-				style="width: 100%">
+		<div role="tabpanel" class="tab-pane" id="resum">
+			<table id="events" class="table table-striped table-bordered" style="width: 100%">
 				<thead>
 					<tr>
 						<th><strong><spring:message code="notificacio.massiva.info.resum.enviament.tipus" /></strong></th>
@@ -168,7 +162,7 @@ $(document).ready(function() {
 						<td>${notInfo.prioridadServicio}</td>
 						<td>${notInfo.nombre} ${notInfo.apellidos}
 						<c:choose>
-							<c:when test="${notInfo.cifNif}">
+							<c:when test="${not empty notInfo.cifNif}">
 								- ${notInfo.cifNif}</td>
 							</c:when>
 							<c:otherwise>

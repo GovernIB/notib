@@ -147,8 +147,9 @@ public class PaginacioHelper {
 		dto.setPrimera(true);
 		dto.setPosteriors(false);
 		dto.setDarrera(true);
-		dto.setContingut(targetType != null && !targetType.equals(llista.get(0).getClass()) ?
-				conversioTipusHelper.convertirList(llista, targetType) : (List<T>) llista);
+		var contingut = !llista.isEmpty() && targetType != null && !targetType.equals(llista.get(0).getClass()) ?
+						conversioTipusHelper.convertirList(llista, targetType) : (List<T>) llista;
+		dto.setContingut(contingut);
 		return dto;
 	}
 
