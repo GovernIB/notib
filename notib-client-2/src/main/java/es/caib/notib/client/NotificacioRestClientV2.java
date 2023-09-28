@@ -146,16 +146,6 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 			var r = wt.request(MediaType.APPLICATION_JSON).post(Entity.json(body)).readEntity(RespostaAltaV2.class);
 			log.debug("Missatge REST rebut: " + r);
 			return r;
-//		} catch (UniformInterfaceException ue) {
-//			RespostaAltaV2 respostaAlta = new RespostaAltaV2();
-//			ClientResponse response = ue.getResponse();
-//
-//			if (response != null && response.getStatus() == 401) {
-//				respostaAlta.setError(true);
-//				respostaAlta.setErrorDescripcio("[CLIENT] Hi ha hagut un problema d'autenticació: "  + ue.getMessage());
-//				return respostaAlta;
-//			}
-//			throw new RuntimeException(ue);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}

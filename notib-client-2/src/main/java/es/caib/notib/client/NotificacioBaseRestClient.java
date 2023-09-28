@@ -11,6 +11,7 @@ import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import lombok.extern.slf4j.Slf4j;
 import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.logging.LoggingFeature;
@@ -108,7 +109,7 @@ public abstract class NotificacioBaseRestClient {
 		if (debug) {
 			config.property(LoggingFeature.LOGGING_FEATURE_VERBOSITY_CLIENT, LoggingFeature.Verbosity.PAYLOAD_ANY);
 		}
-		var clientBuilder = ClientBuilder.newBuilder().withConfig(config);
+		var clientBuilder = JerseyClientBuilder.newBuilder().withConfig(config);
 		if (connecTimeout != null) {
 			clientBuilder.connectTimeout(connecTimeout, TimeUnit.MILLISECONDS);
 		}
