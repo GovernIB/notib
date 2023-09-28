@@ -1,0 +1,308 @@
+databaseChangeLog:
+  - property:
+      name: booleanFalse
+      value: 0
+      dbms: oracle
+  - property:
+      name: booleanFalse
+      value: false
+      dbms: postgresql
+  - property:
+      name: booleanTrue
+      value: 1
+      dbms: oracle
+  - property:
+      name: booleanTrue
+      value: true
+      dbms: postgresql
+  - property:
+      dbms: oracle
+      name: varcharUnit
+      value: CHAR
+  - property:
+      dbms: postgresql
+      name: varcharUnit
+      value: ''
+  - changeSet:
+      id: 1664181156088-1
+      author: limit
+      changes:
+        - createTable:
+            tableName: state_machine
+            columns:
+              - column:
+                  name: machine_id
+                  type: varchar(255 ${varcharUnit})
+                  constraints:
+                    primaryKey: true
+                    nullable: false"
+              - column:
+                  name: state
+                  type: varchar(255 ${varcharUnit})
+              - column:
+                 name: state_machine_context
+                 type: blob
+
+        - addUniqueConstraint:
+            tableName: not_notificacio_env
+            constraintName: not_enviament_ref_uk
+            columnNames: notifica_ref
+
+        - renameColumn:
+            tableName: not_columnes
+            oldColumnName: created_date
+            newColumnName: data_enviament
+#        - addColumn:
+#            tableName: not_notificacio_env
+#            columns:
+#              - column:
+#                  name: sm_estat
+#                  type: varchar(64 ${varcharunit})
+        - update:
+            tableName: not_acl_class
+            columns:
+              - column:
+                  name: class
+                  value: es.caib.notib.persist.entity.EntitatEntity
+            where: class = 'es.caib.notib.core.entity.EntitatEntity'
+        - update:
+            tableName: not_acl_class
+            columns:
+              - column:
+                  name: class
+                  value: es.caib.notib.persist.entity.OrganGestorEntity
+            where: class = 'es.caib.notib.core.entity.OrganGestorEntity'
+        - update:
+            tableName: not_acl_class
+            columns:
+              - column:
+                  name: class
+                  value: es.caib.notib.persist.entity.ProcedimentEntity
+            where: class = 'es.caib.notib.core.entity.ProcedimentEntity'
+        - update:
+            tableName: not_acl_class
+            columns:
+              - column:
+                  name: class
+                  value: es.caib.notib.persist.entity.ProcSerOrganEntity
+            where: class = 'es.caib.notib.core.entity.ProcSerOrganEntity'
+        - addColumn:
+            tableName: NOT_NOTIFICACIO_TABLE
+            columns:
+              - column:
+                  name: ESTAT_STRING
+                  type: varchar(2000 ${varcharUnit})
+              - column:
+                  name: DOCUMENT_ID
+                  type: bigint
+              - column:
+                  name: ENV_CER_DATA
+                  type: TIMESTAMP
+#              - column:
+#                  name: PERMIS_PROCESSAR
+#                  type: boolean
+#                  defaultValue: ${booleanFalse}
+              - column:
+                  name: REG_ENV_PENDENTS
+                  type: boolean
+                  defaultValue: ${booleanFalse}
+              - column:
+                  name: PER_ACTUALITZAR
+                  type: boolean
+                  defaultValue: ${booleanTrue}
+        - insert:
+            tableName: not_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.serverurl
+              - column:
+                  name: value
+                  value:
+              - column:
+                  name: description
+                  value: Url del servidor de keycloak
+              - column:
+                  name: group_code
+                  value: USUARIS
+              - column:
+                  name: position
+                  value: 6
+              - column:
+                  name: jboss_property
+                  value: ${booleanTrue}
+              - column:
+                  name: type_code
+                  value: TEXT
+              - column:
+                  name: configurable
+                  value: ${booleanFalse}
+        - insert:
+            tableName: not_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.realm
+              - column:
+                  name: value
+                  value:
+              - column:
+                  name: description
+                  value: Realm del keycloak
+              - column:
+                  name: group_code
+                  value: USUARIS
+              - column:
+                  name: position
+                  value: 7
+              - column:
+                  name: jboss_property
+                  value: ${booleanTrue}
+              - column:
+                  name: type_code
+                  value: TEXT
+              - column:
+                  name: configurable
+                  value: ${booleanFalse}
+        - insert:
+            tableName: not_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.client_id
+              - column:
+                  name: value
+                  value:
+              - column:
+                  name: description
+                  value: Client ID del keycloak
+              - column:
+                  name: group_code
+                  value: USUARIS
+              - column:
+                  name: position
+                  value: 8
+              - column:
+                  name: jboss_property
+                  value: ${booleanTrue}
+              - column:
+                  name: type_code
+                  value: TEXT
+              - column:
+                  name: configurable
+                  value: ${booleanFalse}
+        - insert:
+            tableName: not_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.client_id_for_user_autentication
+              - column:
+                  name: value
+                  value:
+              - column:
+                  name: description
+                  value: Client ID per autenticació del keycloak
+              - column:
+                  name: group_code
+                  value: USUARIS
+              - column:
+                  name: position
+                  value: 9
+              - column:
+                  name: jboss_property
+                  value: ${booleanTrue}
+              - column:
+                  name: type_code
+                  value: TEXT
+              - column:
+                  name: configurable
+                  value: ${booleanFalse}
+        - insert:
+            tableName: not_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.password_secret
+              - column:
+                  name: value
+                  value:
+              - column:
+                  name: description
+                  value: Secret del client de keycloak
+              - column:
+                  name: group_code
+                  value: USUARIS
+              - column:
+                  name: position
+                  value: 10
+              - column:
+                  name: jboss_property
+                  value: ${booleanTrue}
+              - column:
+                  name: type_code
+                  value: TEXT
+              - column:
+                  name: configurable
+                  value: ${booleanFalse}
+        - insert:
+            tableName: not_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.mapping.administrationID
+              - column:
+                  name: value
+                  value: NIF
+              - column:
+                  name: description
+                  value: Mapeig del administrationID de keycloak
+              - column:
+                  name: group_code
+                  value: USUARIS
+              - column:
+                  name: position
+                  value: 11
+              - column:
+                  name: jboss_property
+                  value: ${booleanFalse}
+              - column:
+                  name: type_code
+                  value: TEXT
+              - column:
+                  name: configurable
+                  value: ${booleanFalse}
+        - insert:
+            tableName: not_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.debug
+              - column:
+                  name: value
+                  value: false
+              - column:
+                  name: description
+                  value: Activar el debug del plugin de keycloak
+              - column:
+                  name: group_code
+                  value: USUARIS
+              - column:
+                  name: position
+                  value: 12
+              - column:
+                  name: jboss_property
+                  value: ${booleanFalse}
+              - column:
+                  name: type_code
+                  value: BOOL
+              - column:
+                  name: configurable
+                  value: ${booleanFalse}
+        - sql: "
+              UPDATE NOT_CONFIG_TYPE SET VALUE = 'es.caib.notib.plugin.usuari.DadesUsuariPluginJdbc,es.caib.notib.plugin.usuari.DadesUsuariPluginLdap,es.caib.notib.plugin.usuari.DadesUsuariPluginMock,es.caib.notib.plugin.usuari.DadesUsuariPluginKeycloak' WHERE CODE = 'USUARIS_CLASS';
+              UPDATE NOT_CONFIG SET VALUE = 'es.caib.notib.plugin.usuari.DadesUsuariPluginKeycloak' WHERE KEY = 'es.caib.notib.plugin.dades.usuari.class';
+              DELETE FROM NOT_ENTITAT_TIPUS_DOC netd WHERE TIPUS_DOC = 3;                 
+              GRANT SELECT, UPDATE, INSERT, DELETE ON STATE_MACHINE TO WWW_NOTIB;
+              INSERT INTO NOT_PROCESSOS_INICIALS (id, codi, init) VALUES (5, 'AFEGIR_NOTIFICACIONS_MAQUINA_ESTATS', 1);
+             "

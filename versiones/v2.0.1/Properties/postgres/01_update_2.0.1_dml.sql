@@ -1,4 +1,3 @@
-
 UPDATE not_acl_class SET class = 'es.caib.notib.persist.entity.EntitatEntity' WHERE class = 'es.caib.notib.core.entity.EntitatEntity';
 
 UPDATE not_acl_class SET class = 'es.caib.notib.persist.entity.OrganGestorEntity' WHERE class = 'es.caib.notib.core.entity.OrganGestorEntity';
@@ -6,7 +5,6 @@ UPDATE not_acl_class SET class = 'es.caib.notib.persist.entity.OrganGestorEntity
 UPDATE not_acl_class SET class = 'es.caib.notib.persist.entity.ProcedimentEntity' WHERE class = 'es.caib.notib.core.entity.ProcedimentEntity';
 
 UPDATE not_acl_class SET class = 'es.caib.notib.persist.entity.ProcSerOrganEntity' WHERE class = 'es.caib.notib.core.entity.ProcSerOrganEntity';
-
 
 INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.serverurl', NULL, 'Url del servidor de keycloak', 'USUARIS', '6', 'true', 'TEXT', 'false');
 
@@ -29,5 +27,3 @@ UPDATE NOT_CONFIG SET VALUE = 'es.caib.notib.plugin.usuari.DadesUsuariPluginKeyc
 DELETE FROM NOT_ENTITAT_TIPUS_DOC netd WHERE TIPUS_DOC = 3;
 
 INSERT INTO NOT_PROCESSOS_INICIALS (id, codi, init) VALUES (5, 'AFEGIR_NOTIFICACIONS_MAQUINA_ESTATS', 1);
-
-ALTER TABLE not_procediment ADD actiu BOOLEAN DEFAULT TRUE;
