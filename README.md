@@ -4,22 +4,22 @@
 > - Versió Estable: __notib-1.1.23__ (tag [NOTIB 1.1.23](https://github.com/GovernIB/notib/releases/tag/v1.1.23))
 > - Versió Desenvolupament: __notib-2.0.0__ (branca [notib-dev](https://github.com/GovernIB/notib/tree/notib-wip))  
 >  
-> - Versió actual del client REST: __1.1.23.2__
->   - Java7: ([notib-client-1.1.23.2.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client/1.1.23.2/notib-client-1.1.23.2.jar), [notib-client-intf-1.1.23.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.23/notib-client-intf-1.1.23.jar))  
+> - Versió actual del client REST: __1.1.23.3__
+>   - Java7: ([notib-client-1.1.23.3.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client/1.1.23.3/notib-client-1.1.23.3.jar), [notib-client-intf-1.1.23.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.23/notib-client-intf-1.1.23.jar))  
 >     ```
 >     <dependency>  
 >         <groupId>es.caib.notib</groupId>  
 >         <artifactId>notib-client</artifactId>  
->         <version>1.1.23.2</version>  
+>         <version>1.1.23.3</version>  
 >     </dependency>
 >     ```
->   - Java11: ([notib-client-2-1.1.23.2.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-2/1.1.23.2/notib-client-2-1.1.23.2.jar), [notib-client-intf-1.1.23.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.23/notib-client-intf-1.1.23.jar))  
+>   - Java11: ([notib-client-2-1.1.23.3.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-2/1.1.23.3/notib-client-2-1.1.23.3.jar), [notib-client-intf-1.1.23.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.23/notib-client-intf-1.1.23.jar))  
 >  
 >     ```
 >     <dependency>  
 >         <groupId>es.caib.notib</groupId>  
 >         <artifactId>notib-client-2</artifactId>  
->         <version>1.1.23.2</version>  
+>         <version>1.1.23.3</version>  
 >     </dependency>
 >     ```
 > - Configuració del client REST:
