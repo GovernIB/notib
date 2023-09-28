@@ -193,7 +193,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             return new NotificacioMassivaInfoDto();
         }
         List<NotificacioMassivaInfoDto.NotificacioInfo> info = new ArrayList<>();
-        var foo = 0;
+        var numNotificacio = 0;
         NotificacioMassivaInfoDto.NotificacioInfo.NotificacioInfoBuilder builder;
         for (var linea : linies) {
             builder = NotificacioMassivaInfoDto.NotificacioInfo.builder()
@@ -227,7 +227,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             }
 
             if (notificacioMassiva.getNotificacions() != null && !notificacioMassiva.getNotificacions().isEmpty()) {
-                NotificacioEntity not = notificacioMassiva.getNotificacions().get(foo);
+                NotificacioEntity not = notificacioMassiva.getNotificacions().get(numNotificacio);
                 StringBuilder error = new StringBuilder();
                 List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdAndErrorIsTrue(not.getId());
                 for (NotificacioEventEntity event : events) {
@@ -236,6 +236,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 builder.errorsExecucio(error.toString());
             }
             info.add(builder.build());
+            numNotificacio++;
         }
         var dto = conversioTipusHelper.convertir(notificacioMassiva, NotificacioMassivaInfoDto.class);
         dto.setSummary(info);
