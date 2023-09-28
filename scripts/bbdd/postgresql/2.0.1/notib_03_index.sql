@@ -1,0 +1,482 @@
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_NOTIFICACIO_PK" ON "NOTIB"."NOT_NOTIFICACIO" ("ID";
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_PAGADOR_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_PAGADOR_EK" ON "NOTIB"."NOT_NOTIFICACIO_MASSIVA" ("PAGADOR_POSTAL_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ENTITAT_AUDIT_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_ENTITAT_AUDIT_PK" ON "NOTIB"."NOT_ENTITAT_AUDIT" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ENVTBL_ENTITAT_IDX
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_ENVTBL_ENTITAT_IDX" ON "NOTIB"."NOT_NOTIFICACIO_ENV_TABLE" ("ENTITAT_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_PRO_ORGAN_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_PRO_ORGAN_PK" ON "NOTIB"."NOT_PRO_ORGAN" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ENTITAT_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_ENTITAT_PK" ON "NOTIB"."NOT_ENTITAT" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_GRUP_AUDIT_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_GRUP_AUDIT_PK" ON "NOTIB"."NOT_GRUP_AUDIT" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_PERSONA_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_PERSONA_PK" ON "NOTIB"."NOT_PERSONA" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_HIST_NOTIF_OID_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_HIST_NOTIF_OID_PK" ON "NOTIB"."NOT_HIST_NOTIF" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ORGAN_GESTOR_UK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_ORGAN_GESTOR_UK" ON "NOTIB"."NOT_ORGAN_GESTOR" ("CODI");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_FORMATS_FULLA_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_FORMATS_FULLA_PK" ON "NOTIB"."NOT_FORMATS_FULLA" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_UO_SINC_REL_MULT_UK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_UO_SINC_REL_MULT_UK" ON "NOTIB"."NOT_OG_SINC_REL" ("ANTIC_OG", "NOU_OG");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_PRO_GRUP_AUDIT_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_PRO_GRUP_AUDIT_PK" ON "NOTIB"."NOT_PRO_GRUP_AUDIT" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ENTREGA_CIE_OPERADOR_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_ENTREGA_CIE_OPERADOR_EK" ON "NOTIB"."NOT_ENTREGA_CIE" ("OPERADOR_POSTAL_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIF_ESTAT_I
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_NOTIF_ESTAT_I" ON "NOTIB"."NOT_NOTIFICACIO" ("ESTAT");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIFICACIO_AUDIT_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_NOTIFICACIO_AUDIT_PK" ON "NOTIB"."NOT_NOTIFICACIO_AUDIT" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIFICACIO_ENV_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_NOTIFICACIO_ENV_PK" ON "NOTIB"."NOT_NOTIFICACIO_ENV" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ENTITAT_TIPUS_DOC_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_ENTITAT_TIPUS_DOC_PK" ON "NOTIB"."NOT_ENTITAT_TIPUS_DOC" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ENTITAT_ENTREGA_CIE_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_ENTITAT_ENTREGA_CIE_EK" ON "NOTIB"."NOT_ENTITAT" ("ENTREGA_CIE_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ORGAN_GESTOR_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_ORGAN_GESTOR_PK" ON "NOTIB"."NOT_ORGAN_GESTOR" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_APLICACIO_AUDIT_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_APLICACIO_AUDIT_EK" ON "NOTIB"."NOT_APLICACIO_AUDIT" ("APLICACIO_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_APLICACIO_AUDIT_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_APLICACIO_AUDIT_PK" ON "NOTIB"."NOT_APLICACIO_AUDIT" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_CONFIG_TYPE_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_CONFIG_TYPE_PK" ON "NOTIB"."NOT_CONFIG_TYPE" ("CODE");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_PAGADOR_POSTAL_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_PAGADOR_POSTAL_PK" ON "NOTIB"."NOT_PAGADOR_POSTAL" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_CONFIG_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_CONFIG_PK" ON "NOTIB"."NOT_CONFIG" ("KEY");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIFICACIO_TABLE_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_NOTIFICACIO_TABLE_PK" ON "NOTIB"."NOT_NOTIFICACIO_TABLE" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIFICACIO_AUDIT_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_NOTIFICACIO_AUDIT_EK" ON "NOTIB"."NOT_NOTIFICACIO_AUDIT" ("NOTIFICACIO_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ENTREGA_CIE_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_ENTREGA_CIE_PK" ON "NOTIB"."NOT_ENTREGA_CIE" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIF_PROORGAN_FK_I
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_NOTIF_PROORGAN_FK_I" ON "NOTIB"."NOT_NOTIFICACIO" ("PROCEDIMENT_ORGAN_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIF_ORGAN_FK_I
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_NOTIF_ORGAN_FK_I" ON "NOTIB"."NOT_NOTIFICACIO" ("ORGAN_GESTOR");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_DOCUMENT_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_DOCUMENT_PK" ON "NOTIB"."NOT_DOCUMENT" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIF_PROCEDIMENT_FK_I
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_NOTIF_PROCEDIMENT_FK_I" ON "NOTIB"."NOT_NOTIFICACIO" ("PROCEDIMENT_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_PROCEDIMENT_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_PROCEDIMENT_EK" ON "NOTIB"."NOT_PRO_ORGAN" ("PROCEDIMENT_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_PAGADOR_CIE_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_PAGADOR_CIE_PK" ON "NOTIB"."NOT_PAGADOR_CIE" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ENTREGA_POSTAL_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_ENTREGA_POSTAL_PK" ON "NOTIB"."NOT_ENTREGA_POSTAL" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_PROCEDIMENT_AUDIT_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_PROCEDIMENT_AUDIT_PK" ON "NOTIB"."NOT_PROCEDIMENT_AUDIT" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_GRUP_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_GRUP_PK" ON "NOTIB"."NOT_GRUP" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ORGAN_ENTITAT_FK_I
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_ORGAN_ENTITAT_FK_I" ON "NOTIB"."NOT_ORGAN_GESTOR" ("ENTITAT");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ENTREGA_CIE_CIE_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_ENTREGA_CIE_CIE_EK" ON "NOTIB"."NOT_ENTREGA_CIE" ("CIE_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_TABLE_ENTITAT_INDEX
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_TABLE_ENTITAT_INDEX" ON "NOTIB"."NOT_NOTIFICACIO_TABLE" ("ENTITAT_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_MONINT_CODI_IDX
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_MONINT_CODI_IDX" ON "NOTIB"."NOT_MON_INT" ("CODI");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_APLICACIO_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_APLICACIO_PK" ON "NOTIB"."NOT_APLICACIO" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_COLUMNES_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_COLUMNES_PK" ON "NOTIB"."NOT_COLUMNES" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_CALLBACK_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_CALLBACK_PK" ON "NOTIB"."NOT_CALLBACK" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_MON_INT_PARAM_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_MON_INT_PARAM_PK" ON "NOTIB"."NOT_MON_INT_PARAM" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_HIST_PROC_OID_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_HIST_PROC_OID_PK" ON "NOTIB"."NOT_HIST_PROCEDIMENT" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_OFI_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_OFI_PK" ON "NOTIB"."NOT_OFICINA" ("CODI");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_PRO_GRUP_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_PRO_GRUP_PK" ON "NOTIB"."NOT_PRO_GRUP" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIFICACIO_UN
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_NOTIFICACIO_UN" ON "NOTIB"."NOT_NOTIFICACIO" ("REFERENCIA");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_FORMATS_SOBRE_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_FORMATS_SOBRE_PK" ON "NOTIB"."NOT_FORMATS_SOBRE" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_PROCEDIMENT_ENTREGA_CIE_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_PROCEDIMENT_ENTREGA_CIE_EK" ON "NOTIB"."NOT_PROCEDIMENT" ("ENTREGA_CIE_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_PROCESSOS_INICIALS_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_PROCESSOS_INICIALS_PK" ON "NOTIB"."NOT_PROCESSOS_INICIALS" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIFICACIO_EVENT_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_NOTIFICACIO_EVENT_PK" ON "NOTIB"."NOT_NOTIFICACIO_EVENT" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIFICACIO_MASSIVA_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_NOTIFICACIO_MASSIVA_PK" ON "NOTIB"."NOT_NOTIFICACIO_MASSIVA" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_CONFIG_GROUP_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_CONFIG_GROUP_PK" ON "NOTIB"."NOT_CONFIG_GROUP" ("CODE");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIFICACIO_TABLE_UN
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_NOTIFICACIO_TABLE_UN" ON "NOTIB"."NOT_NOTIFICACIO_TABLE" ("REFERENCIA");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ENV_ENTREGA_POSTAL_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_ENV_ENTREGA_POSTAL_EK" ON "NOTIB"."NOT_NOTIFICACIO_ENV" ("ENTREGA_POSTAL_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_PRO_GRUP_AUDIT_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_PRO_GRUP_AUDIT_EK" ON "NOTIB"."NOT_PRO_GRUP_AUDIT" ("PROGRUP_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_AVIS_DATA_FINAL_I
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_AVIS_DATA_FINAL_I" ON "NOTIB"."NOT_AVIS" ("DATA_FINAL");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIFICACIO_ENV_AUDIT_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_NOTIFICACIO_ENV_AUDIT_EK" ON "NOTIB"."NOT_NOTIFICACIO_ENV_AUDIT" ("ENVIAMENT_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_MON_INT_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_MON_INT_PK" ON "NOTIB"."NOT_MON_INT" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_AVIS_DATA_INICI_I
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_AVIS_DATA_INICI_I" ON "NOTIB"."NOT_AVIS" ("DATA_INICI");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_HIST_ENVI_OID_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_HIST_ENVI_OID_PK" ON "NOTIB"."NOT_HIST_ENVIAMENTS" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_USUARI_UK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_USUARI_UK" ON "NOTIB"."NOT_USUARI" ("CODI");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIFICACIO_ENV_AUDIT_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_NOTIFICACIO_ENV_AUDIT_PK" ON "NOTIB"."NOT_NOTIFICACIO_ENV_AUDIT" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ENTITAT_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_ENTITAT_EK" ON "NOTIB"."NOT_NOTIFICACIO_MASSIVA" ("ENTITAT_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_MONINT_DATA_IDX
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_MONINT_DATA_IDX" ON "NOTIB"."NOT_MON_INT" ("DATA");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_HIST_ORGAN_OID_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_HIST_ORGAN_OID_PK" ON "NOTIB"."NOT_HIST_ORGAN" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIFICACIO_EVENT
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_NOTIFICACIO_EVENT" ON "NOTIB"."NOT_NOTIFICACIO_EVENT" ("NOTIFICACIO_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_PROCEDIMENT_AUDIT_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_PROCEDIMENT_AUDIT_EK" ON "NOTIB"."NOT_PROCEDIMENT_AUDIT" ("PROCEDIMENT_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIF_PROCOD_I
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_NOTIF_PROCOD_I" ON "NOTIB"."NOT_NOTIFICACIO" ("PROC_CODI_NOTIB");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_TABLE_ENV_INDEX
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_TABLE_ENV_INDEX" ON "NOTIB"."NOT_NOTIFICACIO_ENV_TABLE" ("NOTIFICACIO_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_GRUP_AUDIT_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_GRUP_AUDIT_EK" ON "NOTIB"."NOT_GRUP_AUDIT" ("GRUP_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_PROCEDIMENT_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_PROCEDIMENT_PK" ON "NOTIB"."NOT_PROCEDIMENT" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ENTITAT_UK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_ENTITAT_UK" ON "NOTIB"."NOT_ENTITAT" ("CODI");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_AVIS_PK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE UNIQUE INDEX "NOT_AVIS_PK" ON "NOTIB"."NOT_AVIS" ("ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOT_TABLE_NOT_MASSIVA_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_NOT_TABLE_NOT_MASSIVA_EK" ON "NOTIB"."NOT_NOTIFICACIO_TABLE" ("NOTIFICACIO_MASSIVA_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ORGAN_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_ORGAN_EK" ON "NOTIB"."NOT_PRO_ORGAN" ("ORGANGESTOR_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ENTITAT_AUDIT_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_ENTITAT_AUDIT_EK" ON "NOTIB"."NOT_ENTITAT_AUDIT" ("ENTITAT_ID");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_NOTIF_USUARI_I
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_NOTIF_USUARI_I" ON "NOTIB"."NOT_NOTIFICACIO" ("USUARI_CODI");
+-- SQLINES DEMO *** ------------------------------------
+-- SQLINES DEMO *** T_ORGAN_ENTREGA_CIE_EK
+-- SQLINES DEMO *** ------------------------------------
+
+-- SQLINES LICENSE FOR EVALUATION USE ONLY
+CREATE INDEX "NOT_ORGAN_ENTREGA_CIE_EK" ON "NOTIB"."NOT_ORGAN_GESTOR" ("ENTREGA_CIE_ID");
