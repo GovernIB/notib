@@ -241,7 +241,7 @@ databaseChangeLog:
                   value: ${booleanTrue}
               - column:
                   name: type_code
-                  value: TEXT
+                  value: PASSWORD
               - column:
                   name: configurable
                   value: ${booleanFalse}
