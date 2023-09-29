@@ -12,7 +12,6 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
-import liquibase.pro.packaged.R;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;

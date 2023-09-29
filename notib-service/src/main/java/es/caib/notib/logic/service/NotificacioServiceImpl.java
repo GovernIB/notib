@@ -305,11 +305,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<Long> destinatarisIds = new ArrayList<>();
 			List<NotificacioEnviamentEntity> nousEnviaments = new ArrayList<>();
 			for(var enviament: notificacio.getEnviaments()) {
-				// TODO VEURE PERQUE S'UTILITZAVA EL codiPostalNorm
-//				if (enviament.getEntregaPostal() != null && Strings.isNullOrEmpty(enviament.getEntregaPostal().getCodiPostal())) {
-//						enviament.getEntregaPostal().setCodiPostal(enviament.getEntregaPostal().getCodiPostalNorm());
-//
-//				}
 				if (enviament.getTitular() != null) {
 					enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
 				}
@@ -483,7 +478,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				foo.add(messageHelper.getMessage("api.carpeta.send.notificacio.movil.error"));
 				dto.setNotificacionsMovilErrorDesc(foo);
 			}
-//			int callbackFiReintents = notificacioEventRepository.countEventCallbackAmbFiReintentsByNotificacioId(notificacio.getId());
 			if (callbackFiReintents > 0) {
 				dto.setCallbackFiReintents(true);
 				dto.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
@@ -515,21 +509,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 				dto.setNotificaErrorTipus(getErrorTipus(lastErrorEvent.get(0)));
 			}
 			dto.setEnviadaDate(getEnviadaDate(notificacio));
-
-			// TODO RECUPERAR INFORMACIÓ DIRECTAMENT DE LES ENTITATS
 			var notificacioTableEntity = notificacioTableViewRepository.findById(id).orElse(null);
 			if (notificacioTableEntity == null) {
 				return dto;
 			}
 			var e = notificacioEventRepository.findLastErrorEventByNotificacioId(id);
-//			dto.notificaError(e != null);
-//			dto.setNotificaErrorData(notificacioTableEntity.getNotificaErrorData());
-//			dto.setNotificaErrorDescripcio(notificacioTableEntity.getNotificaErrorDescripcio());
 			if (e == null) {
 				return dto;
 			}
 			dto.setNotificaErrorData(e.getData());
-//			dto.setNotificaErrorDescripcio(e.getErrorDescripcio());
 			dto.setNotificaErrorDescripcio(notificacioTableEntity.getNotificaErrorDescripcio());
 			return dto;
 		} finally {
@@ -600,7 +588,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 					notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitatId, usuariCodi),
 					cacheHelper.findOrganigramaNodeByEntitat(f.getEntitat().getDir3Codi()));
 			return paginacioHelper.toPaginaDto(dtos, notificacions);
-// 			return notificacioListHelper.complementaNotificacions(f.getEntitat(), usuariCodi, notificacions);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -990,7 +977,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 					resposta.getErrors().add(e.getUuid());
 				}
 			});
-//			return notificacioHelper.registrarNotificar(notificacioId);
 			return resposta;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1080,8 +1066,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			});
 			return !resposta.getExecutades().isEmpty();
-//			var notificacio = notificaHelper.notificacioEnviar(notificacioId);
-//			return (notificacio != null && NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()));
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1094,8 +1078,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 		var timer = metricsHelper.iniciMetrica();
 		var resposta = new RespostaAccio<String>();
 		try {
-//			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
-//			notificacioEntity.getEnviaments().forEach(e -> {
 			for (var id : ids) {
 				log.debug("Reset enviament " + id + ")");
 				var e = enviamentRepository.findById(id).orElseThrow();
@@ -1551,7 +1533,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				|| NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) && !notificacio.isJustificantCreat()) {
 
 				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
-//				notificacioEnviar(notificacioId);
 				enviarNotificacioANotifica(notificacioId);
 				return true;
 			}
@@ -1797,25 +1778,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid) {
 		
-		Document documentArxiu = new Document();
-		
+		Document documentArxiu = null;
 		try {
-			if (esUuid)
-				documentArxiu = pluginHelper.arxiuDocumentConsultar(identificador, null, true, true);
-			else
-				documentArxiu = pluginHelper.arxiuDocumentConsultar(identificador, null, true, false);
+			documentArxiu = pluginHelper.arxiuDocumentConsultar(identificador, null, true, esUuid);
 		} catch (Exception ex){
 			log.debug("S'ha produit un error obtenent els detalls del document con identificador: " + identificador, ex);
 			return null;
 			
 		}
-		
-		DocumentDto documentDto = new DocumentDto();
-		
+		var documentDto = new DocumentDto();
 		if (documentArxiu != null) {
-			
 			documentDto.setCsv(identificador);
-		
 			if (documentArxiu.getMetadades() != null) {
 				documentDto.setOrigen(OrigenEnum.valorAsEnum(documentArxiu.getMetadades().getOrigen().ordinal()));
 				documentDto.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(documentArxiu.getMetadades().getEstatElaboracio())));
@@ -1823,7 +1796,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				documentDto.setModoFirma(pluginHelper.getModeFirma(documentArxiu, documentArxiu.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
 			}
 		}
-		
-		return documentDto;	
+		return documentDto;
 	}
 }

@@ -672,7 +672,6 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de tots els procediments");
-//			return procedimentRepository.findAll().stream().map(p -> CodiValorDto.builder().codi(p.getId().toString()).valor(p.getNom()).build()).collect(Collectors.toList());
 			return procedimentRepository.findAllIdDesc();
 		} finally {
 			metricsHelper.fiMetrica(timer);

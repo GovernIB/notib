@@ -89,7 +89,7 @@ public class RegistreHelper {
 			log.infoWithoutTime(fiActEstatRegistreText + enviament.getId() + estatText + enviament.getNotificaEstat() + "]");
 		} catch (Exception ex) {
 			error = true;
-			errorDescripcio = getErrorDescripcio(enviament.getSirConsultaIntent(), ex);
+			errorDescripcio = getErrorDescripcio(ex);
 			logger.error(errorPrefix, ex);
 		}
 		var errorMaxReintents = false;
@@ -108,7 +108,7 @@ public class RegistreHelper {
 		return enviament;
 	}
 
-	private static String getErrorDescripcio(int intent, Exception ex) {
+	private static String getErrorDescripcio(Exception ex) {
 
 		// Generam el missatge d'error
 		return ex instanceof ValidationException || ex instanceof RegistreNotificaException ? ex.getMessage(): ExceptionUtils.getStackTrace(ex);

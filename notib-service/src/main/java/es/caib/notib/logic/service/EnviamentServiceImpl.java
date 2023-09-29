@@ -75,7 +75,6 @@ import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
@@ -90,7 +89,6 @@ import org.supercsv.io.ICsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.text.ParseException;
@@ -155,8 +153,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Autowired
 	private MetricsHelper metricsHelper;
 	@Autowired
-	private NotificacioService notificacioService;
-	@Autowired
 	private AuditHelper auditHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
@@ -170,12 +166,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Autowired
 	private EnviamentSmService enviamentSmService;
 
-
 	private static final String CONSULTA_ENV_LOG = "Consulta els enviaments de les notificacións que te una entitat";
 	private static final String FORMAT_DATA = "dd/MM/yyyy";
 	private static final String FORMAT_DATA_HORA = "dd/MM/yyyy HH:mm:ss";
-
-	private StateMachine<EnviamentSmEstat, EnviamentSmEvent> enviamentStateMachine;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -824,7 +817,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		return RespostaConsultaV2.builder()
 				.numeroElementsTotals(paginaEnviaments.getNumEnviaments())
 				.numeroElementsRetornats(paginaEnviaments.getNumeroEnviamentsRetornats())
-				.resultat(paginaEnviaments.getTransmissionsV2(consulta.getBasePath(), consulta.getIdioma().name().toLowerCase()))
+				.resultat(paginaEnviaments.getTransmissionsV2(consulta.getBasePath()))
 				.build();
 	}
 
@@ -1065,7 +1058,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			return enviaments != null ? enviaments.size() : 0;
 		}
 
-		public List<TransmissioV2> getTransmissionsV2(String basePath, String lang) {
+		public List<TransmissioV2> getTransmissionsV2(String basePath) {
 
 			if (enviaments == null) {
 				return new ArrayList<>();

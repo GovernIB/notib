@@ -22,7 +22,6 @@ import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
-import liquibase.pro.packaged.Z;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -262,7 +261,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			log.error(errorPrefix, ex);
 			error = true;
 			errorMaxReintents = enviament.getNotificaIntentNum() >= pluginHelper.getConsultaReintentsMaxProperty();
-			errorDescripcio = getErrorDescripcio(enviament.getNotificaIntentNum(), ex);
+			errorDescripcio = getErrorDescripcio(ex);
 			excepcio = ex;
 			log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		}
@@ -276,7 +275,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		return enviament;
 	}
 
-	private String getErrorDescripcio(int intent, Exception ex) {
+	private String getErrorDescripcio(Exception ex) {
 
 		// Generam el missatge d'error
 		return ex instanceof ValidationException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);

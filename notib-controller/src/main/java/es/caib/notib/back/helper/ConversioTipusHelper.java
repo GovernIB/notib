@@ -40,13 +40,11 @@ public class ConversioTipusHelper {
 	private static MapperFactory mapperFactory;
 
 	public ConversioTipusHelper() {
+
 		mapperFactory = new DefaultMapperFactory.Builder().compilerStrategy(new CustomJavassistCompilerStrategy()).build();
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DateTime, Date>() {
-					public Date convert(
-							DateTime source,
-							Type<? extends Date> destinationClass,
-							MappingContext mappingContext) {
+					public Date convert(DateTime source, Type<? extends Date> destinationClass, MappingContext mappingContext) {
 						return source.toDate();
 					}
 				});
@@ -81,7 +79,6 @@ public class ConversioTipusHelper {
 			.customize(new CustomMapper<EnviamentCommand, Enviament>() {
 				@Override
 				public void mapAtoB(EnviamentCommand command, Enviament dto, MappingContext context) {
-					// empty
 				}
 				@Override
 				public void mapBtoA(Enviament dto, EnviamentCommand command, MappingContext context) {
@@ -98,7 +95,6 @@ public class ConversioTipusHelper {
 				.customize(new CustomMapper<EnviamentCommand, NotificacioEnviamentDtoV2>() {
 					@Override
 					public void mapAtoB(EnviamentCommand command, NotificacioEnviamentDtoV2 dto, MappingContext context) {
-						// empty
 					}
 					@Override
 					public void mapBtoA(NotificacioEnviamentDtoV2 dto, EnviamentCommand command, MappingContext context) {
@@ -121,7 +117,6 @@ public class ConversioTipusHelper {
 						documents[3] = DocumentCommand.asCommand(notificacioDto.getDocument4());
 						documents[4] = DocumentCommand.asCommand(notificacioDto.getDocument5());
 						notificacioCommand.setDocuments(documents);
-//						notificacioCommand.setTipusProcSer(notificacioDto.getProcediment() != null ? notificacioDto.getProcediment().getTipus().name() : null);
 					}
 					@Override
 					public void mapBtoA(NotificacioCommand notificacioCommand, Notificacio notificacioDto, MappingContext context) {
@@ -152,79 +147,8 @@ public class ConversioTipusHelper {
 						notificacioDto.setDocument3(documents.size() > 2 ? documents.get(2) : null);
 						notificacioDto.setDocument4(documents.size() > 3 ? documents.get(3) : null);
 						notificacioDto.setDocument5(documents.size() > 4 ? documents.get(4) : null);
-//						if (EnviamentTipus.NOTIFICACIO.equals(notificacioCommand.getEnviamentTipus())){
-//							notificacioDto.setEnviamentTipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO);
-//						} else {
-//							notificacioDto.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
-//						}
-
 					}
 				}).register();
-
-//		mapperFactory.classMap(NotificacioV2.class, NotificacioCommand.class)
-//				.exclude("enviamentTipus")
-//				.byDefault()
-//				.customize(new CustomMapper<NotificacioV2, NotificacioCommand>() {
-//					@Override
-//					public void mapAtoB(NotificacioV2 notificacioDto, NotificacioCommand notificacioCommand, MappingContext context) {
-//						// Documents
-//						var documents = new DocumentCommand[5];
-//						documents[0] = DocumentCommand.asCommand(notificacioDto.getDocument());
-//						documents[1] = DocumentCommand.asCommand(notificacioDto.getDocument2());
-//						documents[2] = DocumentCommand.asCommand(notificacioDto.getDocument3());
-//						documents[3] = DocumentCommand.asCommand(notificacioDto.getDocument4());
-//						documents[4] = DocumentCommand.asCommand(notificacioDto.getDocument5());
-//						notificacioCommand.setDocuments(documents);
-//						if (EnviamentTipus.NOTIFICACIO.equals(notificacioDto.getEnviamentTipus())){
-//							notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.NOTIFICACIO);
-//							return;
-//						}
-//						notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO);
-//						if (notificacioDto.getEnviaments() != null && !notificacioDto.getEnviaments().isEmpty() &&
-//								notificacioDto.getEnviaments().get(0).getTitular()!= null){
-//
-//							var titular = notificacioDto.getEnviaments().get(0).getTitular();
-//							if (InteressatTipus.ADMINISTRACIO.equals(titular.getInteressatTipus())) {
-//								notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO_SIR);
-//							}
-//						}
-//					}
-//					@Override
-//					public void mapBtoA(NotificacioCommand notificacioCommand, NotificacioV2 notificacioDto, MappingContext context) {
-//						// Documents
-//						List<DocumentV2> documents = new ArrayList<>();
-//						var document = DocumentCommand.asDto(notificacioCommand.getDocuments()[0]);
-//						if (document != null) {
-//							documents.add(document);
-//						}
-//						var document2 = DocumentCommand.asDto(notificacioCommand.getDocuments()[1]);
-//						if (document2 != null) {
-//							documents.add(document2);
-//						}
-//						var document3 = DocumentCommand.asDto(notificacioCommand.getDocuments()[2]);
-//						if (document3 != null) {
-//							documents.add(document3);
-//						}
-//						var document4 = DocumentCommand.asDto(notificacioCommand.getDocuments()[3]);
-//						if (document4 != null) {
-//							documents.add(document4);
-//						}
-//						var document5 = DocumentCommand.asDto(notificacioCommand.getDocuments()[4]);
-//						if (document5 != null)
-//							documents.add(document5);
-//						notificacioDto.setDocument(!documents.isEmpty() ? documents.get(0) : null);
-//						notificacioDto.setDocument2(documents.size() > 1 ? documents.get(1) : null);
-//						notificacioDto.setDocument3(documents.size() > 2 ? documents.get(2) : null);
-//						notificacioDto.setDocument4(documents.size() > 3 ? documents.get(3) : null);
-//						notificacioDto.setDocument5(documents.size() > 4 ? documents.get(4) : null);
-//						notificacioDto.setOrganGestor(notificacioCommand.getOrganGestor());
-//						if (TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacioCommand.getEnviamentTipus())){
-//							notificacioDto.setEnviamentTipus(EnviamentTipus.NOTIFICACIO);
-//						} else {
-//							notificacioDto.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
-//						}
-//					}
-//				}).register();
 	}
 
 	

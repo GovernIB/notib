@@ -108,8 +108,6 @@ public class ConversioTipusHelper {
 
 		MappingContext.Factory mappingContextFactory = new MappingContext.Factory();
 		mapperFactory= new DefaultMapperFactory.Builder().mappingContextFactory(mappingContextFactory).build();
-//		mapperFactory = new DefaultMapperFactory.Builder().build();
-
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DateTime, Date>() {
 					public Date convert(DateTime source, Type<? extends Date> destinationClass, MappingContext context) {
@@ -164,9 +162,6 @@ public class ConversioTipusHelper {
 		mapperFactory.classMap(NotificacioEntity.class, NotificacioDtoV2.class).
 				field("organGestor.codi", "organGestor").
 				field("organGestor.nom", "organGestorNom").byDefault().register();
-
-//		mapperFactory.classMap(NotificacioEntity.class, NotificacioDatabaseDto.class).
-//				field("organGestor.codi", "organGestorCodi").byDefault().register();
 
 		mapperFactory.classMap(NotificacioTableEntity.class, NotificacioTableItemDto.class).byDefault()
 				.customize(new CustomMapper<>() {

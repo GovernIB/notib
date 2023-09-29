@@ -186,7 +186,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 		try {
 			log.info("Eliminant documents temporals del directori " + baseDir);
-//			esborrarTemporals(baseDir);
 			String command = SystemUtils.IS_OS_LINUX ?
 					"find " + baseDir + " -mindepth 1 -type f -mtime +1 -delete" :
 					"forfiles /p \"" + baseDir + "\" /s /d -1 /c \"cmd /c del /q @file\"";

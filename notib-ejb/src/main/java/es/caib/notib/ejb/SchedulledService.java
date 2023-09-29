@@ -19,36 +19,6 @@ import javax.ejb.Stateless;
 @Stateless
 public class SchedulledService extends AbstractService<es.caib.notib.logic.intf.service.SchedulledService> implements es.caib.notib.logic.intf.service.SchedulledService {
 
-//	@Override
-//	@RolesAllowed({"NOT_SUPER"})
-//	public void restartSchedulledTasks() {
-//		getDelegateService().restartSchedulledTasks();
-//	}
-
-//	@Override
-//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-//	public void notificaEnviamentsRegistrats() {
-//		getDelegateService().notificaEnviamentsRegistrats();
-//	}
-
-//	@Override
-//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-//	public void registrarEnviamentsPendents() throws RegistreNotificaException {
-//		getDelegateService().registrarEnviamentsPendents();
-//	}
-
-//	@Override
-//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-//	public void enviamentRefrescarEstatPendents() {
-//		getDelegateService().enviamentRefrescarEstatPendents();
-//	}
-
-//	@Override
-//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-//	public void enviamentRefrescarEstatEnviatSir() {
-//		getDelegateService().enviamentRefrescarEstatEnviatSir();
-//	}
-
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public void actualitzarProcediments() {

@@ -84,15 +84,6 @@ public interface EnviamentSmService {
 	@PreAuthorize("hasRole('tothom')")
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaForward(String enviamentUuid);
 
-//	@PreAuthorize("hasRole('tothom')")
-//	StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailEnviament(String enviamentUuid);
-//
-//	@PreAuthorize("hasRole('tothom')")
-//	StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailSuccess(String enviamentUuid);
-//
-//	@PreAuthorize("hasRole('tothom')")
-//	StateMachine<EnviamentSmEstat, EnviamentSmEvent> emailFailed(String enviamentUuid);
-
 	@PreAuthorize("hasRole('tothom')")
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> enviamentConsulta(String enviamentUuid);
 

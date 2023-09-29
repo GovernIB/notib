@@ -231,17 +231,18 @@ public class NotificacioValidator implements Validator {
     private void validateConcepte() {
 
         // Concepte
+        var concepte = "concepte";
         if (Strings.isNullOrEmpty(notificacio.getConcepte())) {
-            errors.rejectValue("concepte", error(CONCEPTE_NULL, locale));
+            errors.rejectValue(concepte, error(CONCEPTE_NULL, locale));
             return;
         }
         if (notificacio.getConcepte().length() > 240) {
-            errors.rejectValue("concepte", error(CONCEPTE_SIZE, locale));
+            errors.rejectValue(concepte, error(CONCEPTE_SIZE, locale));
         }
         var caractersNoValids = validFormat(notificacio.getConcepte());
         if (!caractersNoValids.isEmpty()) {
             String invalidChars = caractersNoValids.stream().map(String::valueOf).collect(Collectors.joining(", "));
-            errors.rejectValue("concepte", error(CONCEPTE_INVALID_CHARS, locale, invalidChars));
+            errors.rejectValue(concepte, error(CONCEPTE_INVALID_CHARS, locale, invalidChars));
         }
     }
 
@@ -447,8 +448,9 @@ public class NotificacioValidator implements Validator {
     }
 
     private void validateEnviament(Enviament enviament, EnviamentTipus enviamentTipus, String emisorDir3Codi, boolean entregaPostalActiva, boolean entregaDehActiva, int numEnviament, Errors errors, Locale l) {
-        String envName = "enviaments[" + numEnviament + "]";
-        String prefix = "Enviament " + (numEnviament + 1) + " - ";
+
+        var envName = "enviaments[" + numEnviament + "]";
+        var prefix = "Enviament " + (numEnviament + 1) + " - ";
         // Dades bàsiques
         validateDadesEnviament(enviament, envName, prefix, errors, l);
         // Titular
@@ -457,7 +459,7 @@ public class NotificacioValidator implements Validator {
         validateDestinataris(enviament, enviamentTipus, envName, prefix, errors, l);
         // Interessats sense Nifs
         if (enviament.getTitular() != null && !FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
-            boolean senseNif = Strings.isNullOrEmpty(enviament.getTitular().getNif());
+            var senseNif = Strings.isNullOrEmpty(enviament.getTitular().getNif());
             if (senseNif && enviament.getDestinataris() != null) {
                 for (var destinatari : enviament.getDestinataris()) {
                     senseNif = senseNif && Strings.isNullOrEmpty(destinatari.getNif());
@@ -483,7 +485,6 @@ public class NotificacioValidator implements Validator {
                 validateEntregaDeh(enviament, envName, prefix, errors, l);
             }
         }
-
     }
 
     private void validateDadesEnviament(Enviament enviament, String envName, String prefix, Errors errors, Locale l) {

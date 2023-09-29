@@ -10,8 +10,6 @@ package es.caib.notib.client; /**
  */
 public class NotificacioRestClientFactory {
 
-//	private static NotificacioRestClientV2 clientV2;
-
 
 	// API v2
 	// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,9 +25,6 @@ public class NotificacioRestClientFactory {
 	 */
 	public static NotificacioRestClientV2 getRestClientV2(String baseUrl, String username, String password) {
 
-//		if (clientV2 != null) {
-//			return clientV2;
-//		}
 		return new NotificacioRestClientV2(baseUrl, username, password);
 	}
 
@@ -44,9 +39,6 @@ public class NotificacioRestClientFactory {
 	 */
 	public static NotificacioRestClientV2 getRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic) {
 
-//		if (clientV2 != null) {
-//			return clientV2;
-//		}
 		return new NotificacioRestClientV2(baseUrl, username, password, autenticacioBasic);
 	}
 
@@ -63,9 +55,6 @@ public class NotificacioRestClientFactory {
 	 */
 	public static NotificacioRestClientV2 getRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic, int connecTimeout, int readTimeout) {
 
-//		if (clientV2 != null) {
-//			return clientV2;
-//		}
 		return new NotificacioRestClientV2(baseUrl, username, password, autenticacioBasic, connecTimeout, readTimeout);
 	}
 }

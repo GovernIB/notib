@@ -207,13 +207,6 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			built.arxiuGestdocId = arxiuGestdocId;
 			built.arxiuNom = arxiuNom;
 			built.csv = csv;
-//			String metadadesStr = "";
-//			Iterator it = metadades.entrySet().iterator();
-//		    while (it.hasNext()) {
-//		        Map.Entry pair = (Map.Entry)it.next();
-//		        metadadesStr += "<" + pair.getKey()+ ">" + pair.getValue() + "</" + pair.getKey() + ">";
-//		    }
-//			built.metadades = metadadesStr;
 			built.normalitzat = normalitzat;
 			built.uuid = uuid;
 			built.mediaType = media;

@@ -225,7 +225,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             if (messageHelper.getMessage("notificacio.massiva.cancelada").equals(linea[linea.length - 1])) {
                 builder.cancelada(true);
             }
-
             if (notificacioMassiva.getNotificacions() != null && !notificacioMassiva.getNotificacions().isEmpty()) {
                 NotificacioEntity not = notificacioMassiva.getNotificacions().get(numNotificacio);
                 StringBuilder error = new StringBuilder();
@@ -287,24 +286,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     documentsProcessatsMassiu.put(keyDocument, null);
                 }
 
-//                errors = notificacioValidatorHelper.validarNotificacioMassiu(notificacio, entitat, documentsProcessatsMassiu);
-//                try {
                 procediment = !Strings.isNullOrEmpty(notificacio.getProcedimentCodi()) ? procSerRepository.findByCodiAndEntitat(notificacio.getProcedimentCodi(), entitat) : null;
                 organGestor = !Strings.isNullOrEmpty(notificacio.getProcedimentCodi()) ? organGestorRepository.findByCodi(notificacio.getOrganGestor()) : null;
-//                    if (procediment == null && !NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacio.getEnviamentTipus())) {
-//                        errors.add(messageHelper.getMessage("error.validacio.1022"));
-//                    } else if (procediment != null && ProcSerTipusEnum.SERVEI.equals(procediment.getTipus()) && NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
-//                        errors.add(messageHelper.getMessage("error.validacio.1024"));
-//                    }
-//                    else if (procediment != null) {
-//                        notificacio.setProcediment(conversioTipusHelper.convertir(procediment, ProcSerDto.class));
-//                    }
-//                } catch (Exception ex) {
-//                    var msg = messageHelper.getMessage("error.obtenint.procediment.amb.codi") + notificacio.getProcedimentCodi();
-//                    log.error(msg, ex);
-//                    procediment = null;
-//                    errors.add(msg);
-//                }
                 document = documentHelper.getDocument(notificacio.getDocument());
                 if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {
                     document2 = documentHelper.getDocument(notificacio.getDocument2());
@@ -327,9 +310,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         notificacio.setProcedimentId(procediment.getId());
                         crearNotificacio(entitat, notificacio, notificacioMassivaEntity, documentsProcessatsMassiu);
                     } catch (DocumentNotFoundException | NoDocumentException ex) {
-//                        errors.add(messageHelper.getMessage("error.validacio.1077", new Object[]{""}));
                     } catch (NoMetadadesException ex) {
-//                        errors.add(messageHelper.getMessage("error.validacio.1078"));
                     }
                 }
 
@@ -389,7 +370,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitatId, auth.getName()),
                 cacheHelper.findOrganigramaNodeByEntitat(f.getEntitat().getDir3Codi()));
         return paginacioHelper.toPaginaDto(dtos, notificacions);
-//        return notificacioListHelper.complementaNotificacions(entitatActual, auth.getName(), notificacions);
     }
 
     private String[] trim(String[] linia) {
@@ -881,7 +861,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             notificacio.setEnviamentDataProgramada(!Strings.isNullOrEmpty(strData) ? new SimpleDateFormat("dd/MM/yyyy").parse(strData) : null);
         } catch (ParseException e) {
             notificacio.setEnviamentDataProgramada(null);
-//            notificacio.getErrors().add(messageHelper.getMessage("error.format.data.programada.a") + strData + messageHelper.getMessage("error.format.data.programada.b"));
         }
     }
 

@@ -1,6 +1,5 @@
 package es.caib.notib.logic.service;
 
-import com.google.common.base.Strings;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -78,8 +77,6 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 			var env = enviamentRepository.findById(enviamentId).orElseThrow();
 			var info = new StateMachineInfo();
 			var estat = stateMachineService.acquireStateMachine(env.getUuid()).getState().getId();
-//			var notEstat = env.getNotificacio().getEstat();
-//			var mostrar = isPendentRegistre(env) || NotificacioEstatEnumDto.isRegistrada(notEstat) || NotificacioEstatEnumDto.isEnviadaAmbErrors(notEstat);
 			if (estat == null) {
 				return info;
 			}
@@ -187,13 +184,9 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		try {
 			log.debug("Canviant a l'estat " + estat + " de la màquina per l'enviament amb id " + enviamentId);
 			var uuId = enviamentRepository.getUuidById(enviamentId);
-//			var maquina = smRepository.findByMachineId(uuId).orElseThrow();
-//			maquina.setState(EnviamentSmEstat.valueOf(estat).name());
-//			smRepository.save(maquina);
 			var sm = stateMachineService.acquireStateMachine(uuId);
 			sm.getStateMachineAccessor().doWithAllRegions(access -> access
 					.resetStateMachine(new DefaultStateMachineContext<>(EnviamentSmEstat.valueOf(estat), null, null,null)));
-//			stateMachineService.releaseStateMachine(uuId);
 			return true;
 		} catch (Exception ex) {
 			log.error("Error canviant l'estat de la màquina per l'enviament " + enviamentId, ex);
@@ -540,25 +533,4 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		var msg = MessageBuilder.withPayload(event).setHeader(SmConstants.ENVIAMENT_UUID_HEADER, enviamentUuid).build();
 		sm.sendEvent(msg);
 	}
-
-
-//	private StateMachine<EnviamentSmEstat, EnviamentSmEvent> smBuild(Long enviamentId) {
-//		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-//
-//		StateMachine<EnviamentSmEstat, EnviamentSmEvent> sm = stateMachineFactory.getStateMachine(Long.toString(enviament.getId()));
-//
-//		sm.stop();
-//		sm.getStateMachineAccessor()
-//				.doWithAllRegions(sma -> {
-//					sma.resetStateMachine(new DefaultStateMachineContext<>(enviament.getSmEstat(), null, null, null));
-//				});
-//		sm.start();
-//
-//		return sm;
-//	}
-
-//	@PostConstruct
-//	public void init() {
-//		enviamentStateMachine = stateMachineFactory.getStateMachine();
-//	}
 }

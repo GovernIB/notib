@@ -106,10 +106,13 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private static final String SESSION_ATTRIBUTE_SELECCIO = "NotificacioController.session.seleccio";
     private static final String NOT_INFO = "notificacioInfo";
     private static final String REDIRECT = "redirect:";
+    private static final String REDIRECT_NOTIFICACIO = "redirect:../../notificacio";
     private static final String REDIRECT_2_PARENTS = "redirect:../..";
     private static final String IS_MASSIU = "IS_MASSIU";
     private static final String MARCAR_PROCESSAT = "notificacioMarcarProcessat";
     private static final String EVENT_TIPUS = "eventTipus";
+    private static final String VALIDACIO_OK = "notificacio.massiva.ok.validacio";
+    private static final String ERROR_MSG = "avis.nivell.enum.ERROR";
     private static final String REFRESCAR_ESTAT_OK = "notificacio.controller.refrescar.estat.ok";
     private static final String PESTANYA_ACTIVA = "pestanyaActiva";
     private static final String ACCIONS = "accions";
@@ -118,6 +121,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private static final String SET_COOKIE = "Set-cookie";
     private static final String FILE_DOWNLOAD = "fileDownload=true; path=/";
     private static final String SELECCIO_BUIDA = "accio.massiva.seleccio.buida";
+    private static final String PERMIS_DENGAT = "Permís denegat";
 
 
     public NotificacioTableController() {
@@ -313,7 +317,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public String updateEstatList(HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
 
         notificacioService.updateEstatList(notificacioId);
-        return "redirect:../../notificacio";
+        return REDIRECT_NOTIFICACIO;
     }
 
     @PostMapping(value = "/{notificacioId}/processar")
@@ -325,14 +329,14 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 model.addAttribute(IS_MASSIU, false);
                 return MARCAR_PROCESSAT;
             }
-            var resposta = notificacioService.marcarComProcessada(notificacioId, command.getMotiu(), isAdminEntitat(request));
+            var resposta = notificacioService.marcarComProcessada(notificacioId, command.getMotiu(), isAdminEntitat());
             if (resposta != null) {
                 MissatgesHelper.warning(request, resposta);
             }
-            return getModalControllerReturnValueSuccess(request,"redirect:../../notificacio",REFRESCAR_ESTAT_OK);
+            return getModalControllerReturnValueSuccess(request, REDIRECT_NOTIFICACIO, REFRESCAR_ESTAT_OK);
         } catch (Exception ex) {
             log.error("Hi ha hagut un error processant la notificació", ex);
-            return getModalControllerReturnValueError(request, "redirect:../../notificacio","notificacio.controller.processar.ko", new Object[]{ex.toString()});
+            return getModalControllerReturnValueError(request, REDIRECT_NOTIFICACIO,"notificacio.controller.processar.ko", new Object[]{ex.toString()});
         }
 
     }
@@ -391,7 +395,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     }
 
     @GetMapping(value = "/{notificacioId}/reactivarconsulta")
-    public String reactivarconsulta(HttpServletRequest request, @PathVariable Long notificacioId, Model model) {
+    public String reactivarNotConsulta(HttpServletRequest request, @PathVariable Long notificacioId, Model model) {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var reactivat = notificacioService.reactivarConsulta(notificacioId);
@@ -404,7 +408,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     }
 
     @GetMapping(value = "/{notificacioId}/reactivarsir")
-    public String reactivarsir(HttpServletRequest request, @PathVariable Long notificacioId, Model model) {
+    public String reactivarComSir(HttpServletRequest request, @PathVariable Long notificacioId, Model model) {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var reactivat = notificacioService.reactivarSir(notificacioId);
@@ -424,7 +428,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @GetMapping(value = "/{notificacioId}/enviament/{enviamentId}")
     public String enviamentInfo(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId, @RequestParam(required = false) String pipellaActiva, Model model) {
-        emplenarModelEnviamentInfo(notificacioId, enviamentId, pipellaActiva != null ? pipellaActiva : "dades", model, request);
+        emplenarModelEnviamentInfo(notificacioId, enviamentId, pipellaActiva != null ? pipellaActiva : "dades", model);
         return "enviamentInfo";
     }
 
@@ -449,10 +453,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public Missatge enviamentStateMachineAfegir(HttpServletRequest request, @PathVariable Long notificacioId) {
 
         if (!RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
-            throw new SecurityException("Permís denegat");
+            throw new SecurityException(PERMIS_DENGAT);
         }
         var ok = envSmService.afegirNotificacio(notificacioId);
-        var msg = getMessage(request, ok ? "notificacio.massiva.ok.validacio" : "avis.nivell.enum.ERROR");
+        var msg = getMessage(request, ok ? VALIDACIO_OK : ERROR_MSG);
         return Missatge.builder().ok(ok).msg(msg).build();
     }
 
@@ -461,10 +465,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public Missatge enviamentStateMachineSetEstat(HttpServletRequest request, @PathVariable Long enviamentId, @PathVariable String estat) {
 
         if (!RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
-            throw new SecurityException("Permís denegat");
+            throw new SecurityException(PERMIS_DENGAT);
         }
         var ok = envSmService.canviarEstat(enviamentId, estat);
-        var msg = getMessage(request, ok ? "notificacio.massiva.ok.validacio" : "avis.nivell.enum.ERROR");
+        var msg = getMessage(request, ok ? VALIDACIO_OK : ERROR_MSG);
         return Missatge.builder().ok(ok).msg(msg).build();
     }
 
@@ -473,10 +477,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public Missatge enviamentStateMachineSetEvent(HttpServletRequest request, @PathVariable Long enviamentId, @PathVariable String event) {
 
         if (!RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
-            throw new SecurityException("Permís denegat");
+            throw new SecurityException(PERMIS_DENGAT);
         }
         var ok = envSmService.enviarEvent(enviamentId, event);
-        var msg = getMessage(request, ok ? "notificacio.massiva.ok.validacio" : "avis.nivell.enum.ERROR");
+        var msg = getMessage(request, ok ? VALIDACIO_OK : ERROR_MSG);
         return Missatge.builder().ok(ok).msg(msg).build();
     }
 
@@ -818,7 +822,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         String resposta;
         for (var notificacioId : seleccio) {
             try {
-                resposta = notificacioService.marcarComProcessada(notificacioId, command.getMotiu(), isAdminEntitat(request));
+                resposta = notificacioService.marcarComProcessada(notificacioId, command.getMotiu(), isAdminEntitat());
                 if (resposta != null) {
                     MissatgesHelper.warning(request, resposta);
                     continue;
@@ -828,7 +832,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 var error = "Hi ha hagut un error processant la notificació";
                 log.error(error, ex);
                 allOK = false;
-                MissatgesHelper.error(request, String.format(error + " (Id=%d): %s", notificacioId, ex.getMessage()));
+                MissatgesHelper.error(request, String.format("%s (Id=%d): %s", error, notificacioId, ex.getMessage()));
             }
         }
 
@@ -865,7 +869,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     private void emplenarModelNotificacioInfo(EntitatDto entitatActual, Long notificacioId, HttpServletRequest request, String pipellaActiva, Model model) {
 
-        var notificacio = notificacioService.findNotificacioInfo(notificacioId, isAdminEntitat(request));
+        var notificacio = notificacioService.findNotificacioInfo(notificacioId, isAdminEntitat());
         if (notificacio == null) {
             return;
         }
@@ -895,9 +899,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     }
 
 
-    private void emplenarModelEnviamentInfo(Long notificacioId, Long enviamentId, String pipellaActiva, Model model, HttpServletRequest request) {
+    private void emplenarModelEnviamentInfo(Long notificacioId, Long enviamentId, String pipellaActiva, Model model) {
 
-        model.addAttribute("notificacio", notificacioService.findAmbId(notificacioId, isAdminEntitat(request)));
+        model.addAttribute("notificacio", notificacioService.findAmbId(notificacioId, isAdminEntitat()));
         model.addAttribute("pipellaActiva", pipellaActiva);
         var enviament = enviamentService.enviamentFindAmbId(enviamentId);
         model.addAttribute("enviament", enviament);
@@ -910,7 +914,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         model.addAttribute(EVENT_TIPUS, EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class, EVENT_TIPUS_ENUM));
     }
 
-    private boolean isAdminEntitat(HttpServletRequest request) {
+    private boolean isAdminEntitat() {
         return RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
     }
 

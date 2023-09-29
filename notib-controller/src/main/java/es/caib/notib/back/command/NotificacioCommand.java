@@ -19,9 +19,8 @@ import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
@@ -38,6 +37,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */	
+@Slf4j
 @Getter @Setter
 @ValidNotificacio
 public class NotificacioCommand {
@@ -79,7 +79,6 @@ public class NotificacioCommand {
 	private boolean eliminarLogoPeu;
 	private boolean eliminarLogoCap;
 	private ServeiTipus serveiTipus;
-//	protected NotificacioErrorTipusEnumDto notificaErrorTipus;
 	@Valid @NotEmpty
 	private List<EnviamentCommand> enviaments = new ArrayList<>();
 
@@ -101,7 +100,7 @@ public class NotificacioCommand {
 		try {
 			return arxiu[i].getBytes();
 		} catch (IOException e) {
-			logger.error("No s'ha pogut recuperar el contingut del fitxer per validar");
+			log.error("No s'ha pogut recuperar el contingut del fitxer per validar");
 		}
 		return null;
 	}
@@ -128,26 +127,6 @@ public class NotificacioCommand {
 				command.setProcedimentId(dto.getProcediment().getId());
 			}
 		}
-
-//		if (NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(dto.getEnviamentTipus())) {
-//			boolean aAdministracio = false;
-//			for (NotificacioEnviamentDtoV2 enviament : dto.getEnviaments()) {
-//				if (InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
-//					aAdministracio = true;
-//					break;
-//				}
-//			}
-//			if (aAdministracio) {
-//				command.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO_SIR);
-//
-//			} else {
-//				command.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO);
-//
-//			}
-//		} else {
-//			command.setEnviamentTipus(TipusEnviamentEnumDto.NOTIFICACIO);
-//		}
-
 		if (dto.getCaducitat() != null) {
 			command.setCaducitatDiesNaturals(CaducitatHelper.getDiesEntreDates(dto.getCaducitat()));
 		}
@@ -156,38 +135,27 @@ public class NotificacioCommand {
 	public Notificacio asNotificacioV2() {
 
 		var dto = ConversioTipusHelper.convertir(this, Notificacio.class);
-//		ProcSerDto procedimentDto = new ProcSerDto();
-//		if ("PROCEDIMENT".equals(tipusProcSer)) {
-////		if (procedimentId != null) {
-//			procedimentDto.setId(this.getProcedimentId());
-//		} else {
-//			procedimentDto.setId(this.getServeiId());
-//		}
 		dto.setProcedimentId("PROCEDIMENT".equals(tipusProcSer) ? procedimentId : serveiId);
-//		dto.setProcediment(procedimentDto);
-
-//		GrupDto grupDto = new GrupDto();
-//		grupDto.setId(this.getGrupId());
 		dto.setGrupCodi(grupCodi);
 
 		// Format de municipi i província
-		if (dto.getEnviaments() != null) {
-			for (var enviament: dto.getEnviaments()) {
-				if (enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty()) {
-					enviament.getTitular().setEmail(enviament.getTitular().getEmail().replaceAll("\\s+", ""));
+		if (dto.getEnviaments() == null) {
+			return dto;
+		}
+		for (var enviament: dto.getEnviaments()) {
+			if (enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty()) {
+				enviament.getTitular().setEmail(enviament.getTitular().getEmail().replaceAll("\\s+", ""));
+			}
+			establecerCamposPersona(enviament.getTitular());
+			if (enviament.getDestinataris() == null) {
+				continue;
+			}
+			for (var destinatari : enviament.getDestinataris()) {
+				if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty()) {
+					destinatari.setEmail(destinatari.getEmail().replaceAll("\\s+", ""));
 				}
-
-				establecerCamposPersona(enviament.getTitular());
-
-				if (enviament.getDestinataris() != null) {
-					for (var destinatari : enviament.getDestinataris()) {
-						if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty()) {
-							destinatari.setEmail(destinatari.getEmail().replaceAll("\\s+", ""));
-						}
-						establecerCamposPersona(destinatari);
-						destinatari.setIncapacitat(Boolean.FALSE);
-					}
-				}
+				establecerCamposPersona(destinatari);
+				destinatari.setIncapacitat(Boolean.FALSE);
 			}
 		}
 		return dto;
@@ -219,7 +187,7 @@ public class NotificacioCommand {
 			Field concepte = this.getClass().getDeclaredField("concepte");
 			concepteSize = concepte.getAnnotation(Size.class).max();
 		} catch (Exception ex) {
-			logger.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
+			log.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
 		}
 		return concepteSize;
 	}
@@ -230,19 +198,12 @@ public class NotificacioCommand {
 			Field descripcio = this.getClass().getDeclaredField("descripcio");
 			descripcioSize = descripcio.getAnnotation(Size.class).max();
 		} catch (Exception ex) {
-			logger.error("No s'ha pogut recuperar la longitud de descripció: " + ex.getMessage());
+			log.error("No s'ha pogut recuperar la longitud de descripció: " + ex.getMessage());
 		}
 		return descripcioSize;
 	}
 	
 	public int getNomDefaultSize() {
-//		int concepteSize = 0;
-//		try {
-//			Field concepte = PersonaCommand.class.getDeclaredField("nom");
-//			concepteSize = concepte.getAnnotation(Size.class).max();
-//		} catch (Exception ex) {
-//			logger.error("No s'ha pogut recuperar la longitud del nom: " + ex.getMessage());
-//		}
 		return ValidPersonaValidator.MAX_SIZE_NOM;
 	}
 
@@ -256,7 +217,7 @@ public class NotificacioCommand {
 			Field concepte = PersonaCommand.class.getDeclaredField("llinatge1");
 			concepteSize = concepte.getAnnotation(Size.class).max();
 		} catch (Exception ex) {
-			logger.error("No s'ha pogut recuperar la longitud del llinatge 1: " + ex.getMessage());
+			log.error("No s'ha pogut recuperar la longitud del llinatge 1: " + ex.getMessage());
 		}
 		return concepteSize;
 	}
@@ -267,7 +228,7 @@ public class NotificacioCommand {
 			Field concepte = PersonaCommand.class.getDeclaredField("llinatge2");
 			concepteSize = concepte.getAnnotation(Size.class).max();
 		} catch (Exception ex) {
-			logger.error("No s'ha pogut recuperar la longitud del llinatge 2: " + ex.getMessage());
+			log.error("No s'ha pogut recuperar la longitud del llinatge 2: " + ex.getMessage());
 		}
 		return concepteSize;
 	}
@@ -278,7 +239,7 @@ public class NotificacioCommand {
 			Field concepte = PersonaCommand.class.getDeclaredField("email");
 			concepteSize = concepte.getAnnotation(Size.class).max();
 		} catch (Exception ex) {
-			logger.error("No s'ha pogut recuperar la longitud de l'email: " + ex.getMessage());
+			log.error("No s'ha pogut recuperar la longitud de l'email: " + ex.getMessage());
 		}
 		return concepteSize;
 	}
@@ -289,7 +250,7 @@ public class NotificacioCommand {
 			Field concepte = PersonaCommand.class.getDeclaredField("telefon");
 			concepteSize = concepte.getAnnotation(Size.class).max();
 		} catch (Exception ex) {
-			logger.error("No s'ha pogut recuperar la longitud del telèfon: " + ex.getMessage());
+			log.error("No s'ha pogut recuperar la longitud del telèfon: " + ex.getMessage());
 		}
 		return concepteSize;
 	}
@@ -299,8 +260,5 @@ public class NotificacioCommand {
 		return ToStringBuilder.reflectionToString(this);
 	}
 	
-	public interface NotificacioCaducitat {}
-	
-	private static final Logger logger = LoggerFactory.getLogger(NotificacioCommand.class);
 
 }

@@ -7,7 +7,6 @@ import es.caib.notib.persist.entity.EntitatEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.List;

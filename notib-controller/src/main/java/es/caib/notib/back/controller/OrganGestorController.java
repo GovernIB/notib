@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -69,6 +68,9 @@ public class OrganGestorController extends BaseUserController{
 	private static final String REDIRECT = "redirect:../../organgestor";
 	private static final String SET_LLIBRE = "setLlibre";
 	private static final String SET_OFICINA = "setOficina";
+	private static final String ARBRE = "ARBRE";
+	private static final String ARBRE_REDIRECT = "redirect:../../../organgestorArbre";
+	private static final String LIST_REDIRECT = "redirect:../../../organgestor";
 
 
 	@GetMapping
@@ -110,7 +112,7 @@ public class OrganGestorController extends BaseUserController{
 		return DatatablesHelper.getDatatableResponse(request, organs, "codi");
 	}
 
-	@RequestMapping(value = "/export", method = RequestMethod.GET)
+	@GetMapping(value = "/export")
 	public String export(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
@@ -213,7 +215,7 @@ public class OrganGestorController extends BaseUserController{
 	@GetMapping(value = "/{organGestorId}/sincronitzar/{lloc}")
 	public String sincronitzar(HttpServletRequest request, @PathVariable Long organGestorId, @PathVariable String lloc, Model model) {
 
-		String redirect = "ARBRE".equalsIgnoreCase(lloc) ? "redirect:../../../organgestorArbre" : "redirect:../../../organgestor";
+		String redirect = ARBRE.equalsIgnoreCase(lloc) ? ARBRE_REDIRECT : LIST_REDIRECT;
 		try {
 			organGestorService.sincronitzar(organGestorId);
 			return getAjaxControllerReturnValueSuccess(request, redirect, "organgestor.controller.sincronitzada.ok");
@@ -269,7 +271,7 @@ public class OrganGestorController extends BaseUserController{
 	public String syncOficinesSIR(HttpServletRequest request, @PathVariable String lloc, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
-		var redirect = "ARBRE".equalsIgnoreCase(lloc) ? "redirect:../../../organgestorArbre" : "redirect:../../../organgestor";
+		var redirect = ARBRE.equalsIgnoreCase(lloc) ? ARBRE_REDIRECT : LIST_REDIRECT;
 		try {
 			organGestorService.syncOficinesSIR(entitat.getId());
 			return getAjaxControllerReturnValueSuccess(request, redirect,"organgestor.list.boto.actualitzar.oficines.ok");
@@ -283,7 +285,7 @@ public class OrganGestorController extends BaseUserController{
 	public String syncNoms(HttpServletRequest request, @PathVariable String lloc, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
-		var redirect = "ARBRE".equalsIgnoreCase(lloc) ? "redirect:../../../organgestorArbre" : "redirect:../../../organgestor";
+		var redirect = ARBRE.equalsIgnoreCase(lloc) ? ARBRE_REDIRECT : LIST_REDIRECT;
 		try {
 			List<Long> ids = new ArrayList<>();
 			ids.add(entitat.getId());

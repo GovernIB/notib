@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -69,6 +68,7 @@ public class ServeiController extends BaseUserController{
 
 	private static final String SERVEIS_FILTRE = "serveis_filtre";
 	private static final String SERVEIS_FILTRE_MODAL = "serveis_filtre_modal";
+	private static final String REDIRECT_SERVEI = "redirect:../../servei";
 	private String currentFiltre = SERVEIS_FILTRE;
 
 	@GetMapping
@@ -173,7 +173,7 @@ public class ServeiController extends BaseUserController{
 		
 		if (procSerCommand.getId() != null) {
 			try {
-				serveiService.update(procSerCommand.getEntitatId(), ProcSerCommand.asDto(procSerCommand), isAdministrador(request), RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()));
+				serveiService.update(procSerCommand.getEntitatId(), ProcSerCommand.asDto(procSerCommand), isAdministrador(), RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()));
 			} catch(NotFoundException | ValidationException ev) {
 				log.debug("Error al actualitzar el procediment", ev);
 			}
@@ -200,16 +200,15 @@ public class ServeiController extends BaseUserController{
 	@GetMapping(value = "/{serveiId}/delete")
 	public String delete(HttpServletRequest request, @PathVariable Long serveiId) {
 
-		var redirect = "redirect:../../servei";
 		try {
 			var entitat = getEntitatActualComprovantPermisos(request);
 			if (serveiService.serveiEnUs(serveiId)) {
-				return getAjaxControllerReturnValueError(request, redirect, "servei.controller.esborrat.enUs");
+				return getAjaxControllerReturnValueError(request, REDIRECT_SERVEI, "servei.controller.esborrat.enUs");
 			}
 			serveiService.delete(entitat.getId(), serveiId, RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()));
-			return getAjaxControllerReturnValueSuccess(request, redirect, "servei.controller.esborrat.ok");
+			return getAjaxControllerReturnValueSuccess(request, REDIRECT_SERVEI, "servei.controller.esborrat.ok");
 		} catch (Exception e) {
-			return getAjaxControllerReturnValueError(request, redirect, "servei.controller.esborrat.ko", e);
+			return getAjaxControllerReturnValueError(request, REDIRECT_SERVEI, "servei.controller.esborrat.ko", e);
 		}
 	}
 
@@ -217,21 +216,21 @@ public class ServeiController extends BaseUserController{
 	public String enable(HttpServletRequest request, @PathVariable Long serveiId) {
 
 		serveiService.updateActiu(serveiId, true);
-		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "servei.controller.activada.ok");
+		return getAjaxControllerReturnValueSuccess(request, REDIRECT_SERVEI, "servei.controller.activada.ok");
 	}
 
 	@GetMapping(value = "/{serveiId}/disable")
 	public String disable(HttpServletRequest request, @PathVariable Long serveiId) {
 
 		serveiService.updateActiu(serveiId, false);
-		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "servei.controller.desactivada.ok");
+		return getAjaxControllerReturnValueSuccess(request,REDIRECT_SERVEI, "servei.controller.desactivada.ok");
 	}
 
 	@GetMapping(value = "/{serveiId}/sync_manual")
 	public String manual(HttpServletRequest request, @PathVariable Long serveiId) {
 
 		serveiService.updateManual(serveiId, true);
-		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "procediment.controller.manual.ok");
+		return getAjaxControllerReturnValueSuccess(request, REDIRECT_SERVEI, "procediment.controller.manual.ok");
 	}
 	@GetMapping(value = "/{serveiId}/sync_auto")
 	public String auto(HttpServletRequest request, @PathVariable Long serveiId) {
@@ -243,14 +242,13 @@ public class ServeiController extends BaseUserController{
 	@GetMapping(value = "/{codiSia}/update")
 	public String actualitzarProcediment(HttpServletRequest request, @PathVariable String codiSia) {
 
-		var urlResponse = "redirect:../../servei";
 		try {
 			var entitat = getEntitatActualComprovantPermisos(request);
 			var trobat = serveiService.actualitzarServei(codiSia, entitat);
-			return trobat ?  getAjaxControllerReturnValueSuccess(request, urlResponse, "servei.controller.update.ok")
-					:  getAjaxControllerReturnValueError(request, urlResponse, "servei.controller.update.no.trobat");
+			return trobat ?  getAjaxControllerReturnValueSuccess(request, REDIRECT_SERVEI, "servei.controller.update.ok")
+					:  getAjaxControllerReturnValueError(request, REDIRECT_SERVEI, "servei.controller.update.no.trobat");
 		} catch (Exception ex) {
-			return getAjaxControllerReturnValueError(request, urlResponse, "servei.controller.update.ko");
+			return getAjaxControllerReturnValueError(request, REDIRECT_SERVEI, "servei.controller.update.ko");
 		}
 	}
 	
@@ -303,7 +301,7 @@ public class ServeiController extends BaseUserController{
 		var entitat = getEntitatActualComprovantPermisos(request);
 		ProcSerDto servei = null;
 		if (serveiId != null) {
-			servei = serveiService.findById(entitat.getId(), isAdministrador(request), serveiId);
+			servei = serveiService.findById(entitat.getId(), isAdministrador(), serveiId);
 			if (servei != null && servei.getOrganGestor() != null) {
 				servei.setOrganGestorNom(servei.getOrganGestor() + " - " + servei.getOrganGestorNom());
 			}
@@ -336,7 +334,7 @@ public class ServeiController extends BaseUserController{
 		return "redirect:/servei/new";
 	}
 
-	private boolean isAdministrador(HttpServletRequest request) {
+	private boolean isAdministrador() {
 		return RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
 	}
 }

@@ -400,7 +400,7 @@ public class PermisosHelper {
 					DadesUsuari usuari = cacheHelper.findUsuariAmbCodi(principal);
 					if(usuari != null) {
 						permis.setNomSencerAmbCodi(usuari.getNomSencerAmbCodi()!=null?usuari.getNomSencerAmbCodi():principal);
-					}else {
+					} else {
 						permis.setNomSencerAmbCodi(principal);
 					}
 
@@ -788,7 +788,6 @@ public class PermisosHelper {
 			log.error("[DUP] Error al duplicar permisos algun dels valor obligatoris és nul. CLASSNAME=" + classname + ",ORGAN_NOU=" + organNou + ",OWNERSID=" + ownerSid);
 			return;
 		}
-
 		var oidExistent = true;
 		var objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organNou.getId());
 		if (objectIdentityNou == null) {
@@ -863,12 +862,12 @@ public class PermisosHelper {
 	}
 
 	private void duplicaEntradesPermisosComuns(AclClassEntity classname, OrganGestorEntity organNou, AclSidEntity ownerSid, Map<Long, Set<AclEntryEntity>> permisosProcediment, Set<AclEntryEntity> permisosDesti) {
+
 		if (classname == null || organNou == null || organNou.getId() == null || ownerSid == null || permisosProcediment == null) {
 			log.error("[DUP] Error al duplicar permisos algun dels valor obligatoris és nul. CLASSNAME=" + classname + ",ORGAN_NOU=" + organNou + ",OWNERSID=" + ownerSid);
 			return;
 		}
-
-		for (Map.Entry<Long, Set<AclEntryEntity>> permisosOrigen: permisosProcediment.entrySet()) {
+		for (var permisosOrigen: permisosProcediment.entrySet()) {
 			var procedimentId = permisosOrigen.getKey();
 			var procedimentOrganNou = procSerOrganRepository.findByProcSerIdAndOrganGestorId(procedimentId, organNou.getId());
 			var oidExistent = true;
@@ -877,13 +876,9 @@ public class PermisosHelper {
 				procedimentOrganNou = ProcSerOrganEntity.getBuilder(procediment, organNou).build();
 				procedimentOrganNou = procSerOrganRepository.save(procedimentOrganNou);
 			}
-			AclObjectIdentityEntity objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, procedimentOrganNou.getId());
+			var objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, procedimentOrganNou.getId());
 			if (objectIdentityNou == null) {
-				objectIdentityNou = AclObjectIdentityEntity.builder()
-						.classname(classname)
-						.objectId(procedimentOrganNou.getId())
-						.ownerSid(ownerSid)
-						.build();
+				objectIdentityNou = AclObjectIdentityEntity.builder().classname(classname).objectId(procedimentOrganNou.getId()).ownerSid(ownerSid).build();
 				aclObjectIdentityRepository.saveAndFlush(objectIdentityNou);
 				objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organNou.getId());
 				oidExistent = false;
@@ -893,7 +888,7 @@ public class PermisosHelper {
 				return;
 			}
 			int order = aclEntryRepository.countByAclObjectIdentity(objectIdentityNou);
-			for (AclEntryEntity permisAntic : permisosOrigen.getValue()) {
+			for (var permisAntic : permisosOrigen.getValue()) {
 				if (permisAntic == null) {
 					continue;
 				}
@@ -901,7 +896,7 @@ public class PermisosHelper {
 					log.error("[DUP] Algun dels valors obligatoris del permis antic son nulls. Permis antic: SID=" + permisAntic.getSid() + ",MASK=" + permisAntic.getMask() + ";GRANTING=" + permisAntic.getGranting());
 					continue;
 				}
-				boolean permisExist = oidExistent && aclEntryRepository.findByAclObjectIdentityAndSidAndMask(objectIdentityNou, permisAntic.getSid(), permisAntic.getMask()) != null;
+				var permisExist = oidExistent && aclEntryRepository.findByAclObjectIdentityAndSidAndMask(objectIdentityNou, permisAntic.getSid(), permisAntic.getMask()) != null;
 				if (!permisExist) {
 					AclEntryEntity aclEntry = AclEntryEntity.builder()
 							.aclObjectIdentity(objectIdentityNou)
@@ -910,7 +905,6 @@ public class PermisosHelper {
 							.mask(permisAntic.getMask())
 							.granting(permisAntic.getGranting())
 							.build();
-					//
 					if (permisAntic.equals(aclEntry)) {
 						continue;
 					}

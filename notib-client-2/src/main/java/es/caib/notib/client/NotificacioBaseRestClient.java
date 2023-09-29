@@ -10,13 +10,11 @@ import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import lombok.extern.slf4j.Slf4j;
 import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.jackson.JacksonFeature;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import java.util.concurrent.TimeUnit;

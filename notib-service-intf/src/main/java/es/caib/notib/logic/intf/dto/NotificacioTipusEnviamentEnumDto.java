@@ -23,6 +23,7 @@ public enum NotificacioTipusEnviamentEnumDto implements Serializable {
     }
 	
 	public static int getNumVal(NotificacioTipusEnviamentEnumDto tipus) {
+
 		if(tipus.toString().toUpperCase().equals("NOTIFICACIÓ")) {
 			return 0;
 		}else if(tipus.toString().toUpperCase().equals("COMUNICACIÓ")) {
@@ -33,10 +34,12 @@ public enum NotificacioTipusEnviamentEnumDto implements Serializable {
 	}
 	
 	public static int getNumVal(EnviamentTipus tipus) {
-		if(tipus.toString().toUpperCase().equals("NOTIFICACIO")) {
+
+		var t = tipus.toString().toUpperCase();
+		if(t.equals("NOTIFICACIO")) {
 			return 0;
 		}
-		if(tipus.toString().toUpperCase().equals("COMUNICACIO")) {
+		if(t.equals("COMUNICACIO")) {
 			return 1;
 		}
 		return 0;

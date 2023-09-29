@@ -842,15 +842,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 		// list of vigent unitats from webservice
 		List<NodeDir3> unitatsVigentsWithChangedAttributes = new ArrayList<>();
-//		for (var unitatV : organsVigents) {
 			for (var unitatWS : unitatsWS) {
-//				if (unitatV.getCodi().equals(unitatWS.getCodi()) && unitatWS.getEstat().equals("V")
-//						&& (unitatWS.getHistoricosUO() == null || unitatWS.getHistoricosUO().isEmpty()) && !unitatV.getCodi().equals(entitat.getDir3Codi())) {
-
 					unitatsVigentsWithChangedAttributes.add(unitatWS);
-//				}
 			}
-//		}
 		// converting from UnitatOrganitzativa to UnitatOrganitzativaDto
 		List<UnitatOrganitzativaDto> unitatsVigentsWithChangedAttributesDto = new ArrayList<>();
 		UnitatOrganitzativaDto unitatOrganitzativaDto;

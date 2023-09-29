@@ -16,7 +16,6 @@ import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.AdviserService;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
@@ -127,9 +126,7 @@ public class AdviserServiceImpl implements AdviserService {
                 integracioHelper.addAccioError(info, "No s'ha trobat cap enviament amb l'identificador especificat");
                 return resultadoSincronizarEnvio;
             }
-
             updateCodiEntitatPerInfoAndConfig(info, enviament);
-
             if (enviament.isNotificaEstatFinal()) {
                 var msg = "L'enviament amb identificador " + enviament.getNotificaIdentificador() + " ha rebut un callback de l'adviser de tipus " + tipoEntrega + " quan ja es troba en estat final." ;
                 log.debug(msg);
@@ -140,18 +137,15 @@ public class AdviserServiceImpl implements AdviserService {
                         if (receptor != null && !isBlank(receptor.getNifReceptor())) {
                             enviament.updateReceptorDatat(receptor.getNifReceptor(), receptor.getNombreReceptor());
                         }
-
                         setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
                         integracioHelper.addAccioError(info, "L'enviament ja es troba en un estat final");
                         eventErrorDescripcio = msg;
                         break;
-
                     case CERTIFICACIO:
                         log.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
                         certificacionOrganismo(acusePDF, modoNotificacion, identificador, enviament, resultadoSincronizarEnvio);
                         log.debug("Certificació guardada correctament.");
                         break;
-
                     default:
                         eventErrorDescripcio = msg;
                         break;
@@ -182,8 +176,6 @@ public class AdviserServiceImpl implements AdviserService {
             log.error("Error greu enviament o notificació son nulls ");
             return resultadoSincronizarEnvio;
         }
-        var estat = enviament.getNotificacio().getEstat();
-//        var isError = !NotificacioEstatEnumDto.FINALITZADA.equals(estat) && !NotificacioEstatEnumDto.PROCESSADA.equals(estat) && !Strings.isNullOrEmpty(eventErrorDescripcio);
         var isError = !Strings.isNullOrEmpty(eventErrorDescripcio);
         if (tipoEntrega == DATAT || tipoEntrega == DATAT_CERT) {
             notificacioEventHelper.addAdviserDatatEvent(enviament, isError, eventErrorDescripcio);

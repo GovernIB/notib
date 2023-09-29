@@ -98,15 +98,12 @@ public abstract class NotificacioTableMapper {
         if (not == null) {
             return;
         }
-
         // TODO: Modificar perActualitzar quan hi hagi un canvi
         if (not.isPerActualitzar()) {
             var enviaments = not.getEnviaments();
-
             if (dto.getDocumentId() == null) {
                 dto.setDocumentId(not.getNotificacio().getDocument() != null ? not.getNotificacio().getDocument().getId() : null);
             }
-
             if (enviaments != null && !enviaments.isEmpty()) {
                 for (var enviament: enviaments) {
                     if (enviament.getNotificaCertificacioData() != null) {
@@ -115,23 +112,19 @@ public abstract class NotificacioTableMapper {
                     }
                 }
             }
-
             dto.setErrorLastCallback(not.getNotificacio().isErrorLastCallback());
             dto.setEstatString(getColumnaEstat(dto, enviaments));
-
             // TODO: Fer-ho amb un servei apart amb transaccionalitat independent
             // Actualitzam l'entitat
             try {
                 not.setDocumentId(dto.getDocumentId());
                 not.setEnvCerData(dto.getEnvCerData());
                 not.setEstatString(dto.getEstatString());
-                //            not.setHasEnviamentsPendentsRegistre(dto.isHasEnviamentsPendentsRegistre());
                 not.setPerActualitzar(false);
                 notificacioTableHelper.actualitzarCampsLlistat(not);
             } catch (Exception ex) {
                 // TODO: Si no es pot actualitzar, no es fa res. Es calcularà en cada consulta com fins ara!
             }
-
         }
     }
 
@@ -266,18 +259,11 @@ public abstract class NotificacioTableMapper {
     }
 
     private String getNotificaEstats(NotificacioTableItemDto dto, Set<NotificacioEnviamentEntity> enviaments) {
+
         StringBuilder notificacioEstat = new StringBuilder();
-//        var hasEnviamentsPendents = false;
         for (NotificacioEnviamentEntity env : enviaments) {
             dto.updateEstatTipusCount(env.getNotificaEstat());
-//            if (!env.isNotificaEstatFinal() && EnviamentEstat.NOTIB_PENDENT.equals(env.getNotificaEstat())) {
-//                hasEnviamentsPendents = true;
-//            }
         }
-//        dto.setHasEnviamentsPendentsRegistre(hasEnviamentsPendents);
-
-        var padding = "; padding-left: 5px;";
-        var boxShadow = "box-shadow: inset 3px 0px 0px ";
         if (NotificacioEstatEnumDto.FINALITZADA.equals(dto.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(dto.getEstat())
                 || NotificacioEstatEnumDto.PROCESSADA.equals(dto.getEstat()) || dto.getContadorEstat().size() > 1) {
 

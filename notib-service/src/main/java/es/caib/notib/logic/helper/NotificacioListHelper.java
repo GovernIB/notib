@@ -34,8 +34,6 @@ public class NotificacioListHelper {
     @Autowired
     private PaginacioHelper paginacioHelper;
     @Autowired
-    private MessageHelper messageHelper;
-    @Autowired
     private EntityComprovarHelper entityComprovarHelper;
     @Autowired
     private ProcSerHelper procedimentHelper;
@@ -85,193 +83,11 @@ public class NotificacioListHelper {
         return codis;
     }
 
-//    public PaginaDto<NotificacioTableItemDto> complementaNotificacions(EntitatEntity entitatEntity, String usuariCodi, Page<NotificacioTableEntity> notificacions) {
-//
-//        if (notificacions == null) {
-//            return paginacioHelper.getPaginaDtoBuida(NotificacioTableItemDto.class);
-//        }
-//        List<String> codis = new ArrayList<>();
-//        var procSersAmbPermis = permisosService.getProcSersAmbPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
-//        var organs =  permisosService.getOrgansAmbPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
-//        if (procSersAmbPermis != null) {
-//            for (var procedimentOrgan : procSersAmbPermis) {
-//                codis.add(procedimentOrgan.getCodi());
-//            }
-//        }
-//        if (organs != null && !organs.isEmpty()) {
-//            for (var organ : organs) {
-//                codis.add(organ.getCodi());
-//            }
-//        }
-//        boolean permisProcessar;
-//        List<NotificacioTableItemDto> notificacionsDto = new ArrayList<>();
-//        NotificacioTableItemDto notificacio;
-//        Set<NotificacioEnviamentEntity> envs;
-//        NotificacioEnviamentEntity env;
-//        Long id;
-//        var nots = notificacions.getContent();
-//        var size = nots.size();
-//        NotificacioTableEntity not;
-//        for (var foo = 0; foo < size;foo++) {
-//            not = nots.get(foo);
-//            notificacio = crearTableItem(not);
-//            permisProcessar = false;
-//            if (notificacio.getProcedimentCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
-//                permisProcessar = codis.contains(notificacio.getProcedimentCodi()) || codis.contains(notificacio.getOrganCodi());
-//            }
-//            notificacio.setPermisProcessar(permisProcessar);
-//            envs = not.getEnviaments();
-//            prepararColumnaEstat(notificacio, envs);
-//            if (envs != null && !envs.isEmpty()) {
-//                env = envs.iterator().next();
-//                notificacio.setEnvCerData(env.getNotificaCertificacioData());
-//            }
-//            id = not != null && not.getNotificacio().getDocument() != null ? not.getNotificacio().getDocument().getId() : null;
-//            notificacio.setDocumentId(id);
-//            notificacio.setOrganEstat(not.getNotificacio().getOrganGestor() != null ? not.getNotificacio().getOrganGestor().getEstat() : null);
-//            notificacio.setErrorLastCallback(not.getNotificacio().isErrorLastCallback());
-//            notificacionsDto.add(notificacio);
-//        }
-//        return  paginacioHelper.toPaginaDto(notificacionsDto, notificacions);
-//    }
-//
-//    private NotificacioTableItemDto crearTableItem(NotificacioTableEntity n) {
-//            return NotificacioTableItemDto.builder().id(n.getId())
-//                .contadorEstat(new HashMap<>())
-//                .tipusUsuari(n.getTipusUsuari())
-//                .notificaErrorData(n.getNotificaErrorData())
-//                .notificaErrorDescripcio(n.getNotificaErrorDescripcio())
-//                .enviamentTipus(n.getEnviamentTipus())
-//                .numExpedient(n.getNumExpedient())
-//                .concepte(n.getConcepte())
-//                .estatDate(n.getEstatDate())
-//                .estat(n.getEstat())
-//                .createdByNom(n.getCreatedBy().isPresent() ? n.getCreatedBy().orElseThrow().getNom() : null)
-//                .createdByCodi(n.getCreatedBy().isPresent() ? n.getCreatedBy().orElseThrow().getCodi()  : null)
-//                .createdDate(Date.from(n.getCreatedDate().orElseThrow().atZone(ZoneId.systemDefault()).toInstant()))
-//                .permisProcessar(n.isPermisProcessar())
-//                .comunicacioSir(n.isComunicacioSir())
-//                .entitatNom(n.getEntitatNom())
-//                .procedimentCodi(n.getProcedimentCodi())
-//                .procedimentNom(n.getProcedimentNom())
-//                .procedimentTipus(n.getProcedimentTipus())
-//                .organCodi(n.getOrganCodi())
-//                .organNom(n.getOrganNom())
-//                .estatProcessatDate(n.getEstatProcessatDate())
-//                .enviadaDate(n.getEnviadaDate())
-//                .registreEnviamentIntent(n.getRegistreEnviamentIntent())
-//                .referencia(n.getReferencia())
-//                .build();
-//    }
-//
-//    private void prepararColumnaEstat(NotificacioTableItemDto item, Set<NotificacioEnviamentEntity> enviaments) {
-//
-//        StringBuilder estat = new StringBuilder(item.isEnviant() ? "<span class=\"fa fa-clock-o\"></span>" :
-//                NotificacioEstatEnumDto.PENDENT.equals(item.getEstat()) ? "<span class=\"fa fa-clock-o\"></span>" :
-//                        NotificacioEstatEnumDto.ENVIADA.equals(item.getEstat()) || NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(item.getEstat()) ? "<span class=\"fa fa-send-o\"></span>" :
-//                                NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) ? "<span class=\"fa fa-check\"></span>" :
-//                                        NotificacioEstatEnumDto.REGISTRADA.equals(item.getEstat()) ? "<span class=\"fa fa-file-o\"></span>" :
-//                                                NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) ? "<span class=\"fa fa-check-circle\"></span>" : "");
-//
-//        var nomEstat = " " + messageHelper.getMessage("es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto." + (item.isEnviant() ? NotificacioEstatEnumDto.ENVIANT.name() : item.getEstat().name())) + "";
-//        boolean isFinal = NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat());
-//        var e = !isFinal ? eventRepository.findLastErrorEventByNotificacioId(item.getId()) : null;
-////        String error = item.isNotificaError() ? " <span class=\"fa fa-warning text-danger\" title=\"" + htmlEscape(item.getNotificaErrorDescripcio()) + " \"></span>"
-////                        : e != null ? " <span class=\"fa fa-warning text-danger\" title=\"" + htmlEscape(e.getErrorDescripcio()) + " \"></span>" : "";
-//        var error = e != null && !Strings.isNullOrEmpty(e.getErrorDescripcio()) ? " <span class=\"fa fa-warning text-danger\" title=\""
-//                + (enviaments.size() == 1 ? htmlEscape(e.getErrorDescripcio()) : messageHelper.getMessage("error.notificacio.enviaments")) + " \"></span>" : "";
-//        error += TipusUsuariEnumDto.APLICACIO.equals(item.getTipusUsuari()) && item.isErrorLastCallback() ?
-//                " <span class=\"fa fa-exclamation-circle text-primary\" title=\"<spring:message code=\"notificacio.list.client.error/>\"></span>" : "";
-//
-//        List<NotificacioEventEntity> lastErrorEvent = eventRepository.findEventsAmbFiReintentsByNotificacioId(item.getId());
-//        StringBuilder m = new StringBuilder();
-//        if (lastErrorEvent != null && !lastErrorEvent.isEmpty()) {
-//            String msg;
-//            String tipus;
-//            var env = 1;
-//            for (var event : lastErrorEvent) {
-//                msg = messageHelper.getMessage("notificacio.event.fi.reintents");
-//                tipus = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + event.getTipus());
-//                m.append("Env ").append(env).append(": ").append(msg).append(" -> ").append(tipus).append("\n");
-//                env++;
-//            }
-//        }
-//        int callbackFiReintents = eventRepository.countEventCallbackAmbFiReintentsByNotificacioId(item.getId());
-//        var callbackMsg = callbackFiReintents > 0 ? "<span class=\"fa fa-warning text-info\" title=\"" + messageHelper.getMessage("callback.fi.reintents") + "\"></span>" : "";
-//        var fiReintents = !Strings.isNullOrEmpty(m.toString()) ? "<span class=\"fa fa-warning text-warning\" title=\"" + m + "\"></span>" : "";
-//
-//        var data = "\n";
-//        if ((NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat())) && item.getEstatDate() != null) {
-//            var df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-//            var d = df.format(item.getEstatDate());
-//            data += "<span class=\"horaProcessat\">" + d + "</span>\n";
-//        } else if (NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) && item.getEstatProcessatDate() != null) {
-//            var df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-//            String d = df.format(item.getEstatProcessatDate());
-//            data += "<span class=\"horaProcessat\">" + d + "</span>\n";
-//        }
-//        var notificaEstat = "";
-//        StringBuilder registreEstat = new StringBuilder();
-//        Map<String, Integer>  registres = new HashMap<>();
-//        var hasEnviamentsPendents = false;
-//        StringBuilder notificacioMovilMsg = new StringBuilder();
-//        int multipleApiCarpetaError = 0;
-//        for (NotificacioEnviamentEntity env : enviaments) {
-//            item.updateEstatTipusCount(env.getNotificaEstat());
-//            if (env.getRegistreEstat() != null) {
-//                if (registres.containsKey(env.getRegistreEstat().name())) {
-//                    Integer count = registres.get(env.getRegistreEstat().name());
-//                    count = count + 1;
-//                    registres.put(env.getRegistreEstat().name(), count);
-//                } else {
-//                    registres.put(env.getRegistreEstat().name(), 1);
-//                }
-//            }
-//            if (item.isComunicacioSir()) {
-//                NotificacioRegistreEstatEnumDto r = env.getRegistreEstat();
-//                registreEstat.append(env.getRegistreEstat() != null ? "<div><span style=\"padding-bottom:1px; background-color: " + r.getColor() + ";\" title=\"" +
-//                        messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto." + r)
-//                        + "\" class=\"label label-primary\">" + r.getBudget() + "</span></div>" : "");
-//            }
-//            if (!env.isNotificaEstatFinal() && EnviamentEstat.NOTIB_PENDENT.equals(env.getNotificaEstat())) {
-//                hasEnviamentsPendents = true;
-//            }
-//            if (env.isPerEmail() || env.getNotificaEstat() == null) {
-//                continue;
-//            }
-//            var eventCarpeta = eventRepository.findLastApiCarpetaByEnviamentId(env.getId());
-//            if (eventCarpeta != null && eventCarpeta.isError()) {
-//                multipleApiCarpetaError++;
-//                notificacioMovilMsg.append("<span style=\"color:#8a6d3b;\" class=\"fa fa-mobile fa-lg\" title=\"").append(eventCarpeta.getErrorDescripcio()).append("\"></span>\n");
-//            }
-//        }
-//        if (multipleApiCarpetaError > 1) {
-//            notificacioMovilMsg = new StringBuilder("<span style=\"color:#8a6d3b;\" class=\"fa fa-mobile fa-lg\" title=\"" + messageHelper.getMessage("api.carpeta.send.notificacio.movil.error") + "\"></span>\n");
-//        }
-//        item.setHasEnviamentsPendentsRegistre(hasEnviamentsPendents);
-//        notificaEstat = notificaEstat.length() > 0 ? notificaEstat.substring(0, notificaEstat.length()-2) : "";
-//        estat = new StringBuilder("<span>" + estat + nomEstat + error + "  " + fiReintents + callbackMsg + notificacioMovilMsg + "</span>");
-//        estat = new StringBuilder("<div class=\"flex-column\"><div style=\"display:flex; justify-content:space-between\">" + estat + (registreEstat.length() > 0 ? registreEstat.toString() : "")
-//                + "</div></div>" + data + notificaEstat);
-//        var padding = "; padding-left: 5px;";
-//        var boxShadow = "box-shadow: inset 3px 0px 0px ";
-//        if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat())
-//                || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) || notificaEstat.length() > 0 || item.getContadorEstat().size() > 1) {
-//
-//            for (Map.Entry<EnviamentEstat, Integer> entry : item.getContadorEstat().entrySet()) {
-//                estat.append("<div style=\"font-size:11px;").append(boxShadow).append(entry.getKey().getColor()).append(padding).append("\">").append(entry.getValue())
-//                        .append(" ").append(messageHelper.getMessage("es.caib.notib.client.domini.EnviamentEstat." + entry.getKey())).append("</div>");
-//            }
-//        }
-//        item.setEstatString(estat.toString());
-//    }
-
     public FiltreNotificacio getFiltre(NotificacioFiltreDto f, Long entitatId, RolEnumDto rol, String usuariCodi, List<String> rols) {
 
         OrganGestorEntity organGestor = null;
         if (f.getOrganGestor() != null && !f.getOrganGestor().isEmpty()) {
             organGestor = organGestorRepository.findByCodi(f.getOrganGestor());
-//            organGestor = organGestorRepository.findById(Long.parseLong(f.getOrganGestor())).orElse(null);
         }
         ProcSerEntity procediment = null;
         if (f.getProcedimentId() != null) {
@@ -302,7 +118,6 @@ public class NotificacioListHelper {
             codisProcedimentsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitatActual.getId(), auth.getName(), PermisEnum.CONSULTA);
         } else if (isAdminOrgan && entitatActual != null && organGestor != null) {
             codisOrgansGestorsDisponibles = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestor.getCodi());
-//            codisProcedimentsDisponibles = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestor.getCodi());
         }
 
         var esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());

@@ -87,7 +87,6 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-
 import static es.caib.notib.client.domini.InteressatTipus.ADMINISTRACIO;
 import static es.caib.notib.client.domini.InteressatTipus.FISICA_SENSE_NIF;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -105,7 +104,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 		endpointInterface = "es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2")
 public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, NotificacioServiceWs {
 
+
 	private static final Pattern UUID_REGEX_PATTERN = Pattern.compile("^[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$");
+//	private static final Pattern UUID_REGEX_PATTERN = Pattern.compile("/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g"); com.google.re2j.Pattern
 	private static final OrigenEnum ORIGEN = OrigenEnum.ADMINISTRACIO;
 	private static final ValidesaEnum VALIDESA = ValidesaEnum.ORIGINAL;
 	private static final TipusDocumentalEnum TIPUS_DOCUMENTAL = TipusDocumentalEnum.NOTIFICACIO;
@@ -744,7 +745,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			var resposta = new RespostaConsultaDadesRegistreV2();
 			NotificacioEntity notificacio = null;
 			String numeroRegistreFormatat = null;
-			String codiDir3Entitat = null;
 
 			// Donam prioritat a l'enviament
 			if (dadesConsulta.getReferencia() != null) {
@@ -1184,7 +1184,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		return documentEntity;
 	}
 
-	public static final Pattern EMAIL_REGEX = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$", Pattern.CASE_INSENSITIVE);
+//	public static final Pattern EMAIL_REGEX = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$", Pattern.CASE_INSENSITIVE);
 
 	@Data
 	@Builder

@@ -279,7 +279,7 @@ public class NotificacioFormController extends BaseUserController {
         var property = aplicacioService.propertyGetByEntitat("es.caib.notib.comunicacions.sir.internes", FALSE);
         model.addAttribute("isPermesComunicacionsSirPropiaEntitat", property);
         if (notificacioCommand.getProcedimentId() != null) {
-            procedimentActual = procedimentService.findById(entitatActual.getId(), isAdministrador(request), notificacioCommand.getProcedimentId());
+            procedimentActual = procedimentService.findById(entitatActual.getId(), isAdministrador(), notificacioCommand.getProcedimentId());
         }
         notificacioCommand.setUsuariCodi(getCodiUsuariActual());
         if (bindingResult.hasErrors()) {
@@ -517,7 +517,6 @@ public class NotificacioFormController extends BaseUserController {
 
         DocumentDto doc = null;
         var validacioIdCsv = notificacioService.validarIdCsv(csv);
-//        Boolean formatCsvValid = notificacioService.validarFormatCsv(csv); //TODO AQUEST VALIDACIO NOSE SI FUNCIONA
         if (validacioIdCsv) {
             doc = notificacioService.consultaDocumentIMetadades(csv, false);
         }
@@ -678,7 +677,6 @@ public class NotificacioFormController extends BaseUserController {
         }
         List<CodiValorOrganGestorComuDto> procedimentsDisponibles = procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organFiltreProcs, rol, tipusEnviament);
         List<CodiValorOrganGestorComuDto> serveisDisponibles = serveiService.getServeisOrganNotificables(entitatActual.getId(), organFiltreProcs, rol, tipusEnviament);
-
         List<CodiValorOrganGestorComuDto> procSerDisponibles = new ArrayList<>();
         procSerDisponibles.addAll(procedimentsDisponibles);
         procSerDisponibles.addAll(serveisDisponibles);
@@ -689,13 +687,11 @@ public class NotificacioFormController extends BaseUserController {
         } else if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
             var organGestorActual = getOrganGestorActual(request);
             organsGestors = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
-
         } else { // Rol usuari o altres
             var permis = tipusEnviament.equals(EnviamentTipus.SIR) ? PermisEnum.COMUNICACIO_SIR :
                                 tipusEnviament.equals(EnviamentTipus.COMUNICACIO) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
             codisValor = permisosService.getOrgansAmbPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), permis);
         }
-
         if (procSerDisponibles.isEmpty() && !procedimentService.hasProcedimentsComunsAndNotificacioPermission(entitatActual.getId(), tipusEnviament)) {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
         }
@@ -704,11 +700,9 @@ public class NotificacioFormController extends BaseUserController {
                 codisValor.add(CodiValorDto.builder().codi(o.getCodi()).valor(o.getCodi() + " " + o.getCodiNom()).build());
             }
         }
-
         if (codisValor == null || codisValor.isEmpty()) {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.organs"));
         }
-
         model.addAttribute("organsGestors", codisValor);
         model.addAttribute("procediments", procedimentsDisponibles);
         model.addAttribute("serveis", serveisDisponibles);
@@ -745,7 +739,7 @@ public class NotificacioFormController extends BaseUserController {
         model.addAttribute("documentTipus", EnumHelper.getOptionsForEnum(DocumentTipus.class, "es.caib.notib.logic.intf.dto.DocumentTipusEnum."));
     }
 
-    private boolean isAdministrador(HttpServletRequest request) {
+    private boolean isAdministrador() {
         return RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
     }
 

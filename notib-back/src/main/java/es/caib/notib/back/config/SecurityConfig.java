@@ -76,17 +76,17 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		return http
 				.cors(withDefaults())
-				.csrf((csrf) -> csrf.disable())
+				.csrf(csrf -> csrf.disable())
 				.addFilterBefore(preAuthenticatedProcessingFilter(), BasicAuthenticationFilter.class)
 				.authenticationProvider(preauthAuthProvider())
-				.logout((lo) -> lo.addLogoutHandler(getLogoutHandler())
+				.logout(lo -> lo.addLogoutHandler(getLogoutHandler())
 						.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 						.invalidateHttpSession(true).logoutSuccessUrl("/")
 						.permitAll(false))
-				.authorizeRequests((authz) -> authz.antMatchers(AUTH_WHITELIST)
+				.authorizeRequests(authz -> authz.antMatchers(AUTH_WHITELIST)
 						.permitAll()
 						.anyRequest().authenticated())
-				.headers((hd) -> hd.frameOptions().disable())
+				.headers(hd -> hd.frameOptions().disable())
 				.build();
 	}
 

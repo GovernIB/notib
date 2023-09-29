@@ -180,19 +180,19 @@ public class NotificacioV2 implements Serializable {
     }
 
     public EnviamentTipus getEnviamentTipus() {
-        if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
-            if (enviaments != null) {
-                boolean sir = true;
-                for (EnviamentV2 enviament : enviaments) {
-                    if (!InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
-                        sir = false;
-                        break;
-                    }
-                }
-                if (sir) {
-                    return EnviamentTipus.SIR;
+
+        if (!EnviamentTipus.COMUNICACIO.equals(enviamentTipus) && enviaments != null) {
+            boolean sir = true;
+            for (EnviamentV2 enviament : enviaments) {
+                if (!InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
+                    sir = false;
+                    break;
                 }
             }
+            if (sir) {
+                return EnviamentTipus.SIR;
+            }
+
         }
         return enviamentTipus;
     }

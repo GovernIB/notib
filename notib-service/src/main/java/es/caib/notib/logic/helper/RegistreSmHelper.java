@@ -110,11 +110,11 @@ public class RegistreSmHelper {
 			arbResposta.setErrorDescripcio(e.getMessage());
 		}
 		//Registrar event
-		var errorDescripcio = (String) null;
+		String errorDescripcio = null;
 		var errorMaxReintents = false;
 		if(arbResposta.getErrorCodi() != null) {
 			log.info(" >>> ... ERROR: (" + arbResposta.getErrorCodi() + ") " + arbResposta.getErrorDescripcio());
-			errorDescripcio = getErrorDescripcio(arbResposta.getErrorCodi(), arbResposta.getErrorDescripcio(), request.getNumIntent());
+			errorDescripcio = getErrorDescripcio(arbResposta.getErrorCodi(), arbResposta.getErrorDescripcio());
 			errorMaxReintents = request.getNumIntent() >= pluginHelper.getRegistreReintentsMaxProperty();
 		} else {
 			log.info(" >>> ... OK");
@@ -139,8 +139,8 @@ public class RegistreSmHelper {
 		var registreNum = arbResposta.getRegistreNumeroFormatat();
 		var registreData = arbResposta.getRegistreData();
 		var registreEstat = arbResposta.getEstat();
-		var sirRecepcioData = (Date) null;
-		var sirDestiData = (Date) null;
+		Date sirRecepcioData = null;
+		Date sirDestiData = null;
 		if (isEnviamentSir) {
 			enviament.setNotificaEstat(EnviamentEstat.ENVIAT_SIR);
 			// És possible que el registre ja retorni estats finals al registrar SIR?
@@ -148,11 +148,10 @@ public class RegistreSmHelper {
 			sirDestiData = arbResposta.getSirRegistreDestiData();
 		}
 		enviament.updateRegistreEstat(registreEstat, registreData, sirRecepcioData, sirDestiData, registreNum);
-//		auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "RegistreSmHelper.registrarEnviament");
 	}
 
 
-	private String getErrorDescripcio(String codi, String descripcio, int intent) {
+	private String getErrorDescripcio(String codi, String descripcio) {
 
 		var errorDescripcio = "Codi error: " + (codi != null ? codi : "Codi no proporcionat") + "\n";
 		errorDescripcio += descripcio != null ? descripcio : "El registre no aporta cap descripció de l'error";

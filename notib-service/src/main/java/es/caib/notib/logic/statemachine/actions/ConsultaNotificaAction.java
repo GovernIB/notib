@@ -1,6 +1,5 @@
 package es.caib.notib.logic.statemachine.actions;
 
-import es.caib.notib.logic.helper.CallbackHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.EnviamentTableHelper;
 import es.caib.notib.logic.helper.NotificacioEventHelper;

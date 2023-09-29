@@ -264,11 +264,6 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Transient
 	private String csvUuid;
 
-//	// State Machine
-//	@Column(name = "sm_estat")
-//	@Enumerated(EnumType.STRING)
-//	private EnviamentSmEstat smEstat;
-
 	public String getUuid() {
 		return this.notificaReferencia;
 	}

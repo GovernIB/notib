@@ -40,14 +40,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private EnviamentTipus enviamentTipus;
 	private Date enviamentDataProgramada;
-//	private Date createdDate;
 	private String concepte;
-//	private String pagadorCorreusCodiDir3;
-//	private String pagadorCorreusContracteNum;
-//	private String pagadorCorreusCodiClientFacturacio;
-//	private Date pagadorCorreusDataVigencia;
-//	private String pagadorCieCodiDir3;
-//	private Date pagadorCieDataVigencia;
 	private String procedimentDescripcioSia;
 	private String documentArxiuNom;
 	private String documentArxiuId;
@@ -59,7 +52,6 @@ public class NotificacioDto extends AuditoriaDto {
 	private boolean documentNormalitzat;
 	private boolean documentGenerarCsv;
 	private NotificacioEstatEnumDto estat;
-//	private EnviamentEstat notificaEstat;
 	private Date estatDate;
 	private Date notificaErrorData;
 	private NotificacioErrorTipusEnumDto notificaErrorTipus;
@@ -76,7 +68,6 @@ public class NotificacioDto extends AuditoriaDto {
 	private String registreTipusAssumpte;
 	private String registreRefExterna;
 	private String numExpedient;
-//	private OperadorPostalDto pagadorPostal;
 	private String usuariCodi;
 	private String registreObservacions;
 	private Date registreData;
