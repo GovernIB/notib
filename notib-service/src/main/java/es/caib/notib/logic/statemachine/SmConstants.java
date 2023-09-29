@@ -38,18 +38,18 @@ public class SmConstants {
     // Delay
     // 1er reintent 30min, 2on reintent 8h, successius 24h
     public static Long delay(int reintent) {
-        switch (reintent) {
-            case 0: return 0L;
-            case 1: return 500L;
-            case 2: return 10000L;
-            default: return 86400000L;
-        }
 //        switch (reintent) {
-//            case 0: return 0L;          // Inmediat
-//            case 1: return 1800000L;    // Delay de 30min
-//            case 2: return 28800000L;   // Delay de 8h
-//            default: return 86400000L;  // Delay de 24h
+//            case 0: return 0L;
+//            case 1: return 500L;
+//            case 2: return 10000L;
+//            default: return 86400000L;
 //        }
+        switch (reintent) {
+            case 0: return 0L;          // Inmediat
+            case 1: return 1800000L;    // Delay de 30min
+            case 2: return 28800000L;   // Delay de 8h
+            default: return 86400000L;  // Delay de 24h
+        }
     }
 
 }
