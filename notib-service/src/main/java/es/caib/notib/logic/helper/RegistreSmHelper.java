@@ -171,7 +171,7 @@ public class RegistreSmHelper {
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	private static class ReqAssentamentRegistral {
+	public static class ReqAssentamentRegistral {
 		private NotificacioEnviamentEntity enviament;
 		private String dir3CodiRegistre;
 		private Integer numIntent;
