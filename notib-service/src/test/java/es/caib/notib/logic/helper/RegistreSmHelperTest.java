@@ -7,6 +7,8 @@ import es.caib.notib.logic.statemachine.mappers.EnviamentRegistreMapper;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.entity.OrganGestorEntity;
+import es.caib.notib.persist.entity.ProcedimentEntity;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,30 +46,37 @@ public class RegistreSmHelperTest {
     private RegistreSmHelper registreSmHelper;
 
     private NotificacioEntity notificacio;
+    private ProcedimentEntity procediment;
+    private OrganGestorEntity organ;
     private NotificacioEnviamentEntity enviament;
     private EntitatEntity entitat;
     private RegistreSmHelper.ReqAssentamentRegistral request;
     private RespostaConsultaRegistre arbResposta;
     private AsientoRegistralBeanDto asientoRegistral;
     private Date dataResposta;
+    private String organCodi;
+    private String versio;
+    private String concepte;
+    private Long tipusRegistre;
+    private EnviamentTipus enviamentTipus;
 
     @Before
     public void setUp() throws Exception {
 
+        organCodi = "A04026953";
+        versio = "3.1";
+        tipusRegistre = 2L;
+        concepte = "Test";
         entitat = initEntitat();
         request = Mockito.mock(RegistreSmHelper.ReqAssentamentRegistral.class);
         Mockito.when(request.getTipusOperacio()).thenReturn(2L);
-        notificacio =  Mockito.mock(NotificacioEntity.class);
-        Mockito.when(notificacio.getId()).thenReturn(1L);
-        Mockito.when(notificacio.getEntitat()).thenReturn(entitat);
-        enviament = Mockito.mock(NotificacioEnviamentEntity.class);
-        Mockito.when(enviament.getId()).thenReturn(1L);
-        Mockito.when(enviament.getNotificacio()).thenReturn(notificacio);
+        initProcOrgan();
+        initNotificacio();
+        initEnviament();
+        initAsientoRegistral();
+        initReposta();
 //        Mockito.when(enviament.getTitular()).thenReturn(titular);
         Mockito.when(pluginHelper.getRegistreReintentsMaxProperty()).thenReturn(3);
-        asientoRegistral = Mockito.mock(AsientoRegistralBeanDto.class);
-        Mockito.when(enviamentRegistreMapper.toAsientoRegistral(enviament)).thenReturn(asientoRegistral);
-        initReposta();
 //        Mockito.when(
 //                pluginHelper.crearAsientoRegistral(
 //                request.getDir3CodiRegistre(),
@@ -88,6 +97,49 @@ public class RegistreSmHelperTest {
 
     }
 
+    private void initAsientoRegistral() {
+
+        asientoRegistral = Mockito.mock(AsientoRegistralBeanDto.class);
+        Mockito.when(asientoRegistral.getAplicacion()).thenReturn("RWE");
+        Mockito.when(asientoRegistral.getAplicacionTelematica()).thenReturn("NOTIB v.2.0.1");
+//        Mockito.when(asientoRegistral.getCodigoSia()).thenReturn();
+        Mockito.when(asientoRegistral.getUnidadTramitacionDestinoCodigo()).thenReturn(organCodi);
+        Mockito.when(asientoRegistral.getUnidadTramitacionDestinoDenominacion()).thenReturn(organCodi);
+        Mockito.when(asientoRegistral.getUnidadTramitacionOrigenCodigo()).thenReturn(organCodi);
+        Mockito.when(asientoRegistral.getUnidadTramitacionOrigenDenominacion()).thenReturn(organCodi);
+        Mockito.when(asientoRegistral.getResumen()).thenReturn(enviamentTipus + " - " + concepte);
+        Mockito.when(asientoRegistral.getVersion()).thenReturn(versio);
+        Mockito.when(asientoRegistral.getTipoRegistro()).thenReturn(tipusRegistre);
+        Mockito.when(enviamentRegistreMapper.toAsientoRegistral(enviament)).thenReturn(asientoRegistral);
+    }
+
+    private void initProcOrgan() {
+
+        organ =  Mockito.mock(OrganGestorEntity.class);
+        Mockito.when(organ.getCodi()).thenReturn(organCodi);
+        procediment =  Mockito.mock(ProcedimentEntity.class);
+        Mockito.when(procediment.getOrganGestor()).thenReturn(organ);
+    }
+
+    private void initNotificacio() {
+
+        notificacio =  Mockito.mock(NotificacioEntity.class);
+        enviamentTipus = EnviamentTipus.NOTIFICACIO;
+        Mockito.when(notificacio.getId()).thenReturn(1L);
+        Mockito.when(notificacio.getEntitat()).thenReturn(entitat);
+        Mockito.when(notificacio.getUsuariCodi()).thenReturn("admin");
+        Mockito.when(notificacio.getProcediment()).thenReturn(procediment);
+        Mockito.when(notificacio.getConcepte()).thenReturn(concepte);
+    }
+
+    private void initEnviament() {
+
+        enviament = Mockito.mock(NotificacioEnviamentEntity.class);
+        Mockito.when(enviament.getId()).thenReturn(1L);
+        Mockito.when(enviament.getNotificacio()).thenReturn(notificacio);
+        Mockito.when(enviament.getNotificacio()).thenReturn(notificacio);
+    }
+
     private void initReposta() {
 
         dataResposta = new Date();
@@ -97,13 +149,15 @@ public class RegistreSmHelperTest {
         Mockito.when(arbResposta.getRegistreNumeroFormatat()).thenReturn("170097/2023");
         Mockito.when(arbResposta.getRegistreNumero()).thenReturn("170097");
         Mockito.when(arbResposta.getRegistreData()).thenReturn(dataResposta);
+        Mockito.when(arbResposta.getSirRegistreDestiData()).thenReturn(dataResposta);
     }
 
     @Test
     public void check_parametres_entrada_sortida_notificacio() throws Exception {
 
         // Given
-        Mockito.when(notificacio.getEnviamentTipus()).thenReturn(EnviamentTipus.NOTIFICACIO);
+        enviamentTipus = EnviamentTipus.NOTIFICACIO;
+        Mockito.when(notificacio.getEnviamentTipus()).thenReturn(enviamentTipus);
         Mockito.when(configHelper.getConfigAsBoolean("es.caib.notib.emprar.sir")).thenReturn(false);
 
         // When
@@ -114,6 +168,14 @@ public class RegistreSmHelperTest {
         assertEquals("170097",arbResposta.getRegistreNumero());
         assertEquals("170097/2023",arbResposta.getRegistreNumeroFormatat());
         assertEquals(dataResposta,arbResposta.getRegistreData());
+        assertEquals(dataResposta,arbResposta.getSirRegistreDestiData());
+        assertEquals(asientoRegistral.getUnidadTramitacionDestinoCodigo(), organ.getCodi());
+        assertEquals(asientoRegistral.getUnidadTramitacionDestinoDenominacion(), organ.getCodi());
+        assertEquals(asientoRegistral.getUnidadTramitacionOrigenCodigo(), organ.getCodi());
+        assertEquals(asientoRegistral.getUnidadTramitacionOrigenDenominacion(), organ.getCodi());
+        assertEquals(asientoRegistral.getResumen(), enviamentTipus + " - " + notificacio.getConcepte());
+        assertEquals(asientoRegistral.getVersion(), "3.1");
+        assertEquals(asientoRegistral.getTipoRegistro(), tipusRegistre);
 
     }
 
@@ -121,7 +183,7 @@ public class RegistreSmHelperTest {
     public void check_parametres_entrada_sir() throws Exception {
 
         // Given
-        Mockito.when(notificacio.getEnviamentTipus()).thenReturn(EnviamentTipus.SIR);
+        Mockito.when(notificacio.getEnviamentTipus()).thenReturn(enviamentTipus);
         Mockito.when(configHelper.getConfigAsBoolean("es.caib.notib.emprar.sir")).thenReturn(true);
 
         // When
@@ -129,9 +191,9 @@ public class RegistreSmHelperTest {
 
         // Then
         assertTrue(resposta);
-        assertEquals("170097",arbResposta.getRegistreNumero());
-        assertEquals("170097/2023",arbResposta.getRegistreNumeroFormatat());
-        assertEquals(dataResposta,arbResposta.getRegistreData());
+        assertEquals("170097", arbResposta.getRegistreNumero());
+        assertEquals("170097/2023", arbResposta.getRegistreNumeroFormatat());
+        assertEquals(dataResposta, arbResposta.getRegistreData());
     }
 
     private EntitatEntity initEntitat() {
