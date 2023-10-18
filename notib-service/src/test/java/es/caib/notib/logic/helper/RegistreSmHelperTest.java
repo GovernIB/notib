@@ -194,6 +194,14 @@ public class RegistreSmHelperTest {
         assertEquals("170097", arbResposta.getRegistreNumero());
         assertEquals("170097/2023", arbResposta.getRegistreNumeroFormatat());
         assertEquals(dataResposta, arbResposta.getRegistreData());
+        assertEquals(dataResposta,arbResposta.getSirRegistreDestiData());
+        assertEquals(asientoRegistral.getUnidadTramitacionDestinoCodigo(), organ.getCodi());
+        assertEquals(asientoRegistral.getUnidadTramitacionDestinoDenominacion(), organ.getCodi());
+        assertEquals(asientoRegistral.getUnidadTramitacionOrigenCodigo(), organ.getCodi());
+        assertEquals(asientoRegistral.getUnidadTramitacionOrigenDenominacion(), organ.getCodi());
+        assertEquals(asientoRegistral.getResumen(), enviamentTipus + " - " + notificacio.getConcepte());
+        assertEquals(asientoRegistral.getVersion(), "3.1");
+        assertEquals(asientoRegistral.getTipoRegistro(), tipusRegistre);
     }
 
     private EntitatEntity initEntitat() {
