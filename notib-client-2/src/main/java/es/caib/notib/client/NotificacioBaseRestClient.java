@@ -82,7 +82,9 @@ public abstract class NotificacioBaseRestClient {
 	}
 
 	protected Client generarClient() {
-		return jerseyClient != null ? jerseyClient : crearClient();
+
+		jerseyClient = crearClient();
+		return jerseyClient;
 	}
 
 	protected Client crearClient() {
