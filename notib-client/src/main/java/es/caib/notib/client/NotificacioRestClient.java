@@ -118,13 +118,7 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 	public RespostaAlta alta(NotificacioV2 notificacio) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/alta";
-			ObjectMapper mapper  = getMapper();
-			String body = mapper.writeValueAsString(notificacio);
-			jerseyClient = generarClient(urlAmbMetode);
-			log.debug("Missatge REST enviat: " + body);
-			String json = jerseyClient.resource(urlAmbMetode).type("application/json").post(String.class, body);
-			log.debug("Missatge REST rebut: " + json);
-			return mapper.readValue(json, RespostaAlta.class);
+			return clientPost(urlAmbMetode, notificacio, RespostaAlta.class);
 		} catch (UniformInterfaceException ue) {
 			RespostaAlta respostaAlta = new RespostaAlta();
 			ClientResponse response = ue.getResponse();
@@ -148,9 +142,7 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(String identificador) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
-			jerseyClient = generarClient(urlAmbMetode);
-			String json = jerseyClient.resource(urlAmbMetode).type("application/json").get(String.class);
-			return getMapper().readValue(json, RespostaConsultaEstatNotificacio.class);
+			return clientGet(urlAmbMetode, RespostaConsultaEstatNotificacio.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -165,9 +157,7 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(String referencia) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
-			jerseyClient = generarClient(urlAmbMetode);
-			String json = jerseyClient.resource(urlAmbMetode).type("application/json").get(String.class);
-			return getMapper().readValue(json, RespostaConsultaEstatEnviament.class);
+			return clientGet(urlAmbMetode, RespostaConsultaEstatEnviament.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -182,12 +172,7 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 	public RespostaConsultaDadesRegistre consultaDadesRegistre(DadesConsulta dadesConsulta) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/consultaDadesRegistre";
-			ObjectMapper mapper  = getMapper();
-			String body = mapper.writeValueAsString(dadesConsulta);
-			jerseyClient = generarClient(urlAmbMetode);
-			String json = jerseyClient.resource(urlAmbMetode).type("application/json").post(String.class, body);
-			log.debug("Missatge REST rebut: " + json);
-			return mapper.readValue(json, RespostaConsultaDadesRegistre.class);
+			return clientPost(urlAmbMetode, dadesConsulta, RespostaConsultaDadesRegistre.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
