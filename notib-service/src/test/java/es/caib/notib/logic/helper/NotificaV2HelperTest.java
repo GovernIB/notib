@@ -10,6 +10,7 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -24,6 +25,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -182,10 +185,17 @@ public class NotificaV2HelperTest {
 
         Mockito.when(notificacioEnviamentRepository.findById(Mockito.eq(2L))).thenReturn(Optional.of(enviamentMock));
         Mockito.when(pluginHelper.getConsultaReintentsPeriodeProperty()).thenReturn(3);
-
+        TransactionSynchronizationManager.initSynchronization();
     }
 
+    @After
+    public void clear() {
+        TransactionSynchronizationManager.clear();
+    }
+
+
     @Test
+    @Transactional
     public void givenEnviamentSenseCertificacio_whenEnviamentRefrescarEstat_ThenCallGestioDocumentalCreate() throws Exception {
 
         // Given
