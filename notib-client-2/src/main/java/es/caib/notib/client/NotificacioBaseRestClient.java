@@ -92,9 +92,6 @@ public abstract class NotificacioBaseRestClient {
 
 	protected Client generarClient(String urlAmbMetode) throws Exception {
 
-		if (jerseyClient != null) {
-			return jerseyClient;
-		}
 		jerseyClient = generarClient();
 		return jerseyClient;
 	}
