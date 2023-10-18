@@ -1,10 +1,8 @@
-package es.caib.notib.core.clases;
+package es.caib.notib.core.threads;
 
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.helper.NotificacioHelper;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.concurrent.Callable;
 
 //@Component
 @Slf4j

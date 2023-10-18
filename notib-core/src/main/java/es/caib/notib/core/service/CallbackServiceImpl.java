@@ -2,7 +2,7 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.service.CallbackService;
-import es.caib.notib.core.clases.CallbackProcessarPendentsThread;
+import es.caib.notib.core.threads.CallbackProcessarPendentsThread;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.helper.CallbackHelper;

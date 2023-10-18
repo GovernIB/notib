@@ -1295,7 +1295,7 @@ public class PluginHelper {
 
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_FIRMASERV, 
-				"Firma en servidor d'un document", 
+				" Firma en servidor d'un document",
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("notificacioId", notificacio.getId().toString()),
 				new AccioParam("títol", fitxer.getNom()));
