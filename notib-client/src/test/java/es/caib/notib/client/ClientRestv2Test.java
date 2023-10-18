@@ -2,10 +2,13 @@ package es.caib.notib.client;
 
 import es.caib.notib.client.domini.*;
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;
 import org.junit.Test;
 
+
 import javax.xml.datatype.DatatypeConfigurationException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -182,7 +185,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		// Given
 
 		// When
-		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament("2b3538f5-bf9a-4db1-8f9c-9e984320d31f");
+		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament("9550bf76-a283-4f95-bb20-d9feb82218ea");
 		if (resposta.isError()) {
 			System.out.println(">>> Reposta amb error: " + resposta.getErrorDescripcio());
 		} else {
@@ -193,8 +196,11 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertFalse(resposta.isError());
 		assertNull(resposta.getErrorDescripcio());
 
-//		FileOutputStream outputStream = new FileOutputStream("/justificant.pdf");
-//		outputStream.write(new BASE64Decoder().decodeBuffer(new String(resposta.getJustificant().getContingut())));
+		System.out.println("Fitxer base64: " + resposta.getJustificant().getContingut());
+		System.out.println("Fitxer string base64: " + new String(resposta.getJustificant().getContingut()));
+//
+		FileOutputStream outputStream = new FileOutputStream("/tmp/justificant.pdf");
+		outputStream.write(Base64.decodeBase64(new String(resposta.getJustificant().getContingut())));
 	}
 
 	@Test
@@ -779,8 +785,8 @@ public class ClientRestv2Test extends ClientBaseTest {
 	@Test
 	public void consultaEstatNotificacioTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
-//		String referencia = "43573ddf-4f26-40d9-ae80-5bc9dcafbb96";
-		String referencia = "02c8c4fb-d83d-4686-a21b-ddb30d43c5bf";
+		String referencia = "43573ddf-4f26-40d9-ae80-5bc9dcafbb96";
+//		String referencia = "c33f68e4-77ad-4c1c-8977-4fa76a94c50d";
 
 		// When
 		RespostaConsultaEstatNotificacioV2 respostaConsultaEstatNotificacio = client.consultaEstatNotificacio(referencia);
@@ -799,7 +805,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	public void consultaEstatEnviamentTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 //		String referencia = "a4256bed-292b-4ad1-bb84-05f8f14a7f1c";
-		String referencia = "f791cfe9-8e79-4af0-9935-0b72d1a6b6cb";
+		String referencia = "cc4bd9f9-d82d-441e-9550-c0b807b71cd6";
 
 		// When
 		RespostaConsultaEstatEnviamentV2 respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
@@ -814,17 +820,17 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
 
 		// SEGONA PETICIÓ AMB diferent sessió??
-		client = NotificacioRestClientFactory.getRestClientV2(
-				URL,
-				USERNAME,
-				PASSWORD,
-				true);
-		respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
-		if (respostaConsultaEstatEnviament.isError()) {
-			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
-		} else {
-			System.out.println(">>> Reposta Ok");
-		}
+//		client = NotificacioRestClientFactory.getRestClientV2(
+//				URL,
+//				USERNAME,
+//				PASSWORD,
+//				true);
+//		respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
+//		if (respostaConsultaEstatEnviament.isError()) {
+//			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
+//		} else {
+//			System.out.println(">>> Reposta Ok");
+//		}
 
 	}
 
@@ -832,7 +838,8 @@ public class ClientRestv2Test extends ClientBaseTest {
 	public void consultaDadesRegistreTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
-		dadesConsulta.setReferencia("a1741ac2-066c-4b1c-8411-8a2e689f14b9");
+//		dadesConsulta.setReferencia("a1741ac2-066c-4b1c-8411-8a2e689f14b9");
+		dadesConsulta.setReferencia("cc4bd9f9-d82d-441e-9550-c0b807b71cd6");
 		dadesConsulta.setAmbJustificant(true);
 
 		// When
