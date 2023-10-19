@@ -479,7 +479,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 							List.class,  
 							CodiValor.class));
 			Collections.sort(provincies);
-			return provincies;
+			return afegirZerosProvincies(provincies);
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'han pogut consultar les províncies via REST",
@@ -506,12 +506,25 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 							List.class,  
 							CodiValor.class));
 			Collections.sort(provincies);
-			return provincies;
+			return afegirZerosProvincies(provincies);
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'han pogut consultar les comunitats autònomes via REST",
 					ex);
 		}
+	}
+
+	private List<CodiValor> afegirZerosProvincies(List<CodiValor> provincies) {
+
+		String id;
+		for (CodiValor provincia: provincies) {
+			id = provincia.getId();
+			if (id.length() < 2) {
+				id = StringUtils.leftPad(id, 2, "0");
+			}
+			provincia.setId(id);
+		}
+		return provincies;
 	}
 
 
@@ -533,14 +546,14 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			CollectionType collection = TypeFactory.defaultInstance().constructCollectionType(List.class, CodiValor.class);
 			List<CodiValor> localitats = mapper.readValue(httpConnection.getInputStream(), collection);
 			Collections.sort(localitats);
-			codiProvincia = codiProvincia.length() < 2 ? 0 + codiProvincia : codiProvincia;
+			String cp = codiProvincia.length() < 2 ? 0 + codiProvincia : codiProvincia;
 			String id;
 			for (CodiValor localitat: localitats) {
 				id = localitat.getId();
 				if (id.length() < 4) {
 					id = StringUtils.leftPad(id, 4, "0");
 				}
-				localitat.setId(codiProvincia + id);
+				localitat.setId(cp + id);
 			}
 			return localitats;
 		} catch (Exception ex) {
