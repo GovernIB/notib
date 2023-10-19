@@ -150,16 +150,6 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/alta";
 			return clientPost(urlAmbMetode, notificacio, RespostaAltaV2.class);
-		} catch (UniformInterfaceException ue) {
-			RespostaAltaV2 respostaAlta = new RespostaAltaV2();
-			ClientResponse response = ue.getResponse();
-
-			if (response != null && response.getStatus() == 401) {
-				respostaAlta.setError(true);
-				respostaAlta.setErrorDescripcio("[CLIENT] Hi ha hagut un problema d'autenticació: "  + ue.getMessage());
-				return respostaAlta;
-			}
-			throw new RuntimeException(ue);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
