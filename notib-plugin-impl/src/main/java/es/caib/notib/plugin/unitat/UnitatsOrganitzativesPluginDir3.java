@@ -6,6 +6,7 @@ package es.caib.notib.plugin.unitat;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import es.caib.dir3caib.ws.api.catalogo.CatPais;
 import es.caib.dir3caib.ws.api.oficina.OficinaTF;
@@ -14,6 +15,7 @@ import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.plugin.SistemaExternException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -515,6 +517,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 
 	@Override
 	public List<CodiValor> localitats(String codiProvincia) throws SistemaExternException {
+
 		try {
 			URL url = new URL(getServiceUrl() + SERVEI_CATALEG 
 					+ "localidades/provincia/entidadGeografica?"
@@ -527,17 +530,21 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			httpConnection.setDoOutput(true);
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			List<CodiValor> localitats = mapper.readValue(
-					httpConnection.getInputStream(), 
-					TypeFactory.defaultInstance().constructCollectionType(
-							List.class,  
-							CodiValor.class));
+			CollectionType collection = TypeFactory.defaultInstance().constructCollectionType(List.class, CodiValor.class);
+			List<CodiValor> localitats = mapper.readValue(httpConnection.getInputStream(), collection);
 			Collections.sort(localitats);
+			codiProvincia = codiProvincia.length() < 2 ? 0 + codiProvincia : codiProvincia;
+			String id;
+			for (CodiValor localitat: localitats) {
+				id = localitat.getId();
+				if (id.length() < 4) {
+					id = StringUtils.leftPad(id, 4, "0");
+				}
+				localitat.setId(codiProvincia + id);
+			}
 			return localitats;
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'han pogut consultar les localitats via REST",
-					ex);
+			throw new SistemaExternException("No s'han pogut consultar les localitats via REST", ex);
 		}
 	}
 	
