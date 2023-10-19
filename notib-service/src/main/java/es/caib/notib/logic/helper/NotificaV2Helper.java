@@ -590,21 +590,23 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			if (enviament.getEntregaPostal() != null) {
 				var entregaPostal = new EntregaPostal();
 				var procedimentNotificacio = notificacio.getProcediment();
-				if (procedimentNotificacio != null && procedimentNotificacio.getEntregaCie() != null) {
-					var entregaCieEntity = procedimentNotificacio.getEntregaCie();
-					if (entregaCieEntity.getOperadorPostal() != null) {
-						var pagadorPostal = new OrganismoPagadorPostal();
-						pagadorPostal.setCodigoDIR3Postal(entregaCieEntity.getOperadorPostal().getOrganGestor().getCodi());
-						pagadorPostal.setCodClienteFacturacionPostal(entregaCieEntity.getOperadorPostal().getFacturacioClientCodi());
-						pagadorPostal.setNumContratoPostal(entregaCieEntity.getOperadorPostal().getContracteNum());
-						pagadorPostal.setFechaVigenciaPostal(toXmlGregorianCalendar(entregaCieEntity.getOperadorPostal().getContracteDataVig()));
-						entregaPostal.setOrganismoPagadorPostal(pagadorPostal);
-					}
-					if (entregaCieEntity.getCie() != null) {
-						var pagadorCie = new OrganismoPagadorCIE();
-						pagadorCie.setCodigoDIR3CIE(entregaCieEntity.getCie().getOrganGestor().getCodi());
-						pagadorCie.setFechaVigenciaCIE(toXmlGregorianCalendar(entregaCieEntity.getCie().getContracteDataVig()));
-						entregaPostal.setOrganismoPagadorCIE(pagadorCie);
+				if (procedimentNotificacio != null) {
+					var entregaCieEntity = procedimentNotificacio.getEntregaCieEfectiva();
+					if (entregaCieEntity != null) {
+						if (entregaCieEntity.getOperadorPostal() != null) {
+							var pagadorPostal = new OrganismoPagadorPostal();
+							pagadorPostal.setCodigoDIR3Postal(entregaCieEntity.getOperadorPostal().getOrganGestor().getCodi());
+							pagadorPostal.setCodClienteFacturacionPostal(entregaCieEntity.getOperadorPostal().getFacturacioClientCodi());
+							pagadorPostal.setNumContratoPostal(entregaCieEntity.getOperadorPostal().getContracteNum());
+							pagadorPostal.setFechaVigenciaPostal(toXmlGregorianCalendar(entregaCieEntity.getOperadorPostal().getContracteDataVig()));
+							entregaPostal.setOrganismoPagadorPostal(pagadorPostal);
+						}
+						if (entregaCieEntity.getCie() != null) {
+							var pagadorCie = new OrganismoPagadorCIE();
+							pagadorCie.setCodigoDIR3CIE(entregaCieEntity.getCie().getOrganGestor().getCodi());
+							pagadorCie.setFechaVigenciaCIE(toXmlGregorianCalendar(entregaCieEntity.getCie().getContracteDataVig()));
+							entregaPostal.setOrganismoPagadorCIE(pagadorCie);
+						}
 					}
 				}
 				var entregaPostalEntity = enviament.getEntregaPostal();

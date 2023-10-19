@@ -6,6 +6,7 @@ package es.caib.notib.plugin.unitat;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import es.caib.dir3caib.ws.api.catalogo.CatPais;
 import es.caib.dir3caib.ws.api.oficina.OficinaTF;
@@ -14,6 +15,7 @@ import es.caib.notib.plugin.SistemaExternException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.xml.ws.BindingProvider;
 import java.io.IOException;
@@ -429,7 +431,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			List<CodiValor> provincies = mapper.readValue(httpConnection.getInputStream(), TypeFactory.defaultInstance().constructCollectionType(List.class, CodiValor.class));
 			Collections.sort(provincies);
-			return provincies;
+			return afegirZerosProvincies(provincies);
 		} catch (Exception ex) {
 			throw new SistemaExternException("No s'han pogut consultar les províncies via REST", ex);
 		}
@@ -448,27 +450,52 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			List<CodiValor> provincies = mapper.readValue(httpConnection.getInputStream(), TypeFactory.defaultInstance().constructCollectionType(List.class, CodiValor.class));Collections.sort(provincies);
-			return provincies;
+			return afegirZerosProvincies(provincies);
 		} catch (Exception ex) {
 			throw new SistemaExternException("No s'han pogut consultar les comunitats autònomes via REST", ex);
 		}
+	}
+
+	private List<CodiValor> afegirZerosProvincies(List<CodiValor> provincies) {
+
+		String id;
+		for (CodiValor provincia: provincies) {
+			id = provincia.getId();
+			if (id.length() < 2) {
+				id = StringUtils.leftPad(id, 2, "0");
+			}
+			provincia.setId(id);
+		}
+		return provincies;
 	}
 
 	@Override
 	public List<CodiValor> localitats(String codiProvincia) throws SistemaExternException {
 
 		try {
-			var path = getServiceUrl() + SERVEI_CATALEG + "localidades/provincia/entidadGeografica?codigoProvincia=" + codiProvincia + "&codigoEntidadGeografica=01";
-			URL url = new URL(path);
-			log.debug(URL + url);
-			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
+			var url = new URL(getServiceUrl() + SERVEI_CATALEG
+					+ "localidades/provincia/entidadGeografica?"
+					+ "codigoProvincia=" + codiProvincia
+					+ "&codigoEntidadGeografica=01");
+			log.debug("URL: " + url);
+			var httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
 			httpConnection.setDoOutput(true);
-			ObjectMapper mapper = new ObjectMapper();
+			var mapper = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			List<CodiValor> localitats = mapper.readValue(httpConnection.getInputStream(), TypeFactory.defaultInstance().constructCollectionType(List.class, CodiValor.class));
+			CollectionType collection = TypeFactory.defaultInstance().constructCollectionType(List.class, CodiValor.class);
+			List<CodiValor> localitats = mapper.readValue(httpConnection.getInputStream(), collection);
 			Collections.sort(localitats);
+			String cp = codiProvincia.length() < 2 ? 0 + codiProvincia : codiProvincia;
+			String id;
+			for (var localitat: localitats) {
+				id = localitat.getId();
+				if (id.length() < 4) {
+					id = StringUtils.leftPad(id, 4, "0");
+				}
+				localitat.setId(cp + id);
+			}
 			return localitats;
 		} catch (Exception ex) {
 			throw new SistemaExternException("No s'han pogut consultar les localitats via REST", ex);
