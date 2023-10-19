@@ -12,12 +12,14 @@ import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.handler.EnviamentEmailNotificacioHandler;
 import es.caib.notib.core.repository.NotificacioRepository;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -138,16 +140,18 @@ public abstract class AbstractNotificaHelper {
 			notificacio.updateEstatDate(new Date());
 			notificacioHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "AbstractNotificaHelper.enviamentUpdateDatat");
 
-			logger.info("Envio correu en cas d'usuaris no APLICACIÓ");
 			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
-				long startTime = System.nanoTime();
-				try {
-					emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
-				} catch (Exception ex) {
-					throw new Exception("Hi ha hagut un error preparant mail notificació (prepararEnvioEmailNotificacio) [Id: " + enviament.getId() + "]", ex);
-				}
-				double elapsedTime = (System.nanoTime() - startTime) / 10e6;
-				logger.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
+				logger.info("Envio correu en cas d'usuaris INTERFICIE WEB");
+//				long startTime = System.nanoTime();
+//				try {
+					EnviamentEmailNotificacioHandler emailThread = EnviamentEmailNotificacioHandler.builder().emailNotificacioHelper(emailNotificacioHelper).notificacio(notificacio).build();
+					TransactionSynchronizationManager.registerSynchronization(emailThread);
+//					emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
+//				} catch (Exception ex) {
+//					throw new Exception("Hi ha hagut un error preparant mail notificació (prepararEnvioEmailNotificacio) [Id: " + enviament.getId() + "]", ex);
+//				}
+//				double elapsedTime = (System.nanoTime() - startTime) / 10e6;
+//				logger.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
 			}
 			
 //			//Marcar com a processada si la notificació s'ha fet des de una aplicació

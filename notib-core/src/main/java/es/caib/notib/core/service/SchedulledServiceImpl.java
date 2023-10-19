@@ -9,7 +9,7 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.SchedulledService;
 import es.caib.notib.core.api.service.ServeiService;
-import es.caib.notib.core.clases.RegistrarThread;
+import es.caib.notib.core.threads.RegistrarThread;
 import es.caib.notib.core.config.SchedulingConfig;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;

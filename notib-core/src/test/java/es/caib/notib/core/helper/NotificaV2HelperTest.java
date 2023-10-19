@@ -10,9 +10,11 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.core.handler.EnviamentEmailNotificacioHandler;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -25,6 +27,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -65,6 +69,7 @@ public class NotificaV2HelperTest {
     private NotificacioEntity notificacioMock;
     private EntitatEntity entitatMock;
     private NotificacioEnviamentEntity enviamentMock;
+    private EnviamentEmailNotificacioHandler enviamentEmailNotificacioHandler;
 
     private final String MAX_INTENTS_CALLBACK = "10";
 
@@ -185,10 +190,20 @@ public class NotificaV2HelperTest {
         Mockito.when(notificacioEnviamentRepository.findOne(Mockito.eq(2L))).thenReturn(enviamentMock);
         Mockito.when(pluginHelper.getConsultaReintentsPeriodeProperty()).thenReturn(3);
 
+        TransactionSynchronizationManager.initSynchronization();
+
+    }
+
+    @After
+    public void clear() {
+        TransactionSynchronizationManager.clear();
     }
 
     @Test
+    @Transactional
     public void givenEnviamentSenseCertificacio_whenEnviamentRefrescarEstat_ThenCallGestioDocumentalCreate() throws Exception {
+
+
         // Given
         WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("/notifica"))
                 .willReturn(WireMock.aResponse()
