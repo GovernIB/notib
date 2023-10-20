@@ -6,7 +6,6 @@ package es.caib.notib.logic.helper;
 import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.email.EmailConstants;
-import es.caib.notib.logic.handler.EnviamentEmailNotificacioHandler;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -145,21 +144,8 @@ public abstract class AbstractNotificaHelper {
 			auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "AbstractNotificaHelper.enviamentUpdateDatat");
 
 			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
-				log.info("Envio correu en cas d'usuaris INTERFICIE WEB");
-//				long startTime = System.nanoTime();
-//				try {
-
-				// Send a message with a POJO - the template reuse the message converter
-				log.info("Sending an email message.");
+				log.info("Enviar email en cas d'usuaris INTERFICIE WEB");
 				jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_CONSULTA_ESTAT, notificacio.getId());
-//				var emailThread = EnviamentEmailNotificacioHandler.builder().emailNotificacioHelper(emailNotificacioHelper).notificacio(notificacio).build();
-//				TransactionSynchronizationManager.registerSynchronization(emailThread);
-//					emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
-//				} catch (Exception ex) {
-//					throw new Exception("Hi ha hagut un error preparant mail notificació (prepararEnvioEmailNotificacio) [Id: " + enviament.getId() + "]", ex);
-//				}
-//				double elapsedTime = (System.nanoTime() - startTime) / 10e6;
-//				log.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
 			}
 		}
 		// Actualitzar màscara d'estats
