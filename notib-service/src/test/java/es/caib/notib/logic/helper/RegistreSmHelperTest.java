@@ -23,7 +23,8 @@ import java.util.Date;
 import static org.junit.Assert.*;
 
 
-@RunWith(MockitoJUnitRunner.class)
+//@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class RegistreSmHelperTest {
 
     @Mock

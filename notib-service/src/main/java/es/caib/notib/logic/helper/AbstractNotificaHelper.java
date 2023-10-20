@@ -5,6 +5,7 @@ package es.caib.notib.logic.helper;
 
 import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.handler.EnviamentEmailNotificacioHandler;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
@@ -17,6 +18,7 @@ import es.caib.notib.persist.repository.NotificacioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
@@ -41,44 +43,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
 import java.util.TreeSet;
-import es.caib.notib.client.domini.EntregaPostalVia;
-import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
-import es.caib.notib.logic.intf.exception.SistemaExternException;
-import es.caib.notib.logic.intf.service.AuditService;
-import es.caib.notib.persist.entity.NotificacioEntity;
-import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
-import es.caib.notib.persist.repository.NotificacioRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Base64;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeConstants;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFactory;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
-import java.security.GeneralSecurityException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Mètodes comuns per a accedir a Notific@.
@@ -99,6 +64,8 @@ public abstract class AbstractNotificaHelper {
 	protected NotificacioTableHelper notificacioTableHelper;
 	@Autowired
 	protected AuditHelper auditHelper;
+	@Autowired
+	protected  JmsTemplate jmsTemplate;
 
 	private boolean modeTest;
 
@@ -181,8 +148,12 @@ public abstract class AbstractNotificaHelper {
 				log.info("Envio correu en cas d'usuaris INTERFICIE WEB");
 //				long startTime = System.nanoTime();
 //				try {
-				var emailThread = EnviamentEmailNotificacioHandler.builder().emailNotificacioHelper(emailNotificacioHelper).notificacio(notificacio).build();
-				TransactionSynchronizationManager.registerSynchronization(emailThread);
+
+				// Send a message with a POJO - the template reuse the message converter
+				log.info("Sending an email message.");
+				jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_CONSULTA_ESTAT, notificacio.getId());
+//				var emailThread = EnviamentEmailNotificacioHandler.builder().emailNotificacioHelper(emailNotificacioHelper).notificacio(notificacio).build();
+//				TransactionSynchronizationManager.registerSynchronization(emailThread);
 //					emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
 //				} catch (Exception ex) {
 //					throw new Exception("Hi ha hagut un error preparant mail notificació (prepararEnvioEmailNotificacio) [Id: " + enviament.getId() + "]", ex);
