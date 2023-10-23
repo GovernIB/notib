@@ -321,7 +321,7 @@ $(document).ready(function() {
 						<c:if test="${notificacio.caducitat != null}">
 							<tr>
 								<td><strong><spring:message code="notificacio.info.dada.caducitat"/></strong></td>
-								<td><fmt:formatDate value="${notificacio.caducitat}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
+								<td><fmt:formatDate value="${notificacio.caducitat}" pattern="dd/MM/yyyy" /></td>
 							</tr>
 						</c:if>
 						<tr>
