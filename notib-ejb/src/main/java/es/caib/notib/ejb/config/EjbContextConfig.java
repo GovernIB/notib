@@ -51,7 +51,7 @@ public class EjbContextConfig {
 	private String dataSourceJndiName;
 	@Value("${spring.jpa.properties.hibernate.dialect:es.caib.notib.persist.dialect.OracleCaibDialect}")
 	private String hibernateDialect;
-	@Value("${spring.jpa.hibernate.ddl-auto:mome}")
+	@Value("${spring.jpa.hibernate.ddl-auto:none}")
 	private String hibernateDdlAuto;
 	@Value("${spring.jpa.show-sql:false}")
 	private String showSql;

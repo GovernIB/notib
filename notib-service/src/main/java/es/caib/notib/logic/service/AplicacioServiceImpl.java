@@ -409,6 +409,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public void propagateDbProperties() {
 		configHelper.reloadDbProperties();
+		schedulingConfig.restartSchedulledTasksWithDelay();
 	}
 
 

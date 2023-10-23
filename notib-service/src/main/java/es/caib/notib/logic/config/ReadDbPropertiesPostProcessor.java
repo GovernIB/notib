@@ -45,7 +45,11 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
             }
             log.info("... Finalitzada la càrega de propietats");
             log.info("Afegint les propietats carregades de base de dades al entorn...");
-            environment.getPropertySources().addFirst(new MapPropertySource(DBAPP_PROPERTIES, propertySource));
+            if (environment.getPropertySources().contains(DBAPP_PROPERTIES)) {
+                environment.getPropertySources().replace(DBAPP_PROPERTIES, new MapPropertySource(DBAPP_PROPERTIES, propertySource));
+            } else {
+                environment.getPropertySources().addFirst(new MapPropertySource(DBAPP_PROPERTIES, propertySource));
+            }
             log.info("...Propietats afegides");
         } catch (Exception ex) {
             log.error("No s'han pogut carregar les propietats de la BBDD", ex);

@@ -47,4 +47,5 @@ public interface SchedulledService {
 	void monitorIntegracionsEliminarAntics();
 
 	void actualitzarEstatOrgansEnviamentTable();
+
 }
