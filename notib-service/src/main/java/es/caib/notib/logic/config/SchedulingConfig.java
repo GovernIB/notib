@@ -67,6 +67,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
     	taskRegistrar.setScheduler(taskScheduler);
         this.taskRegistrar = taskRegistrar;
+        configHelper.schedullingLoadDbProperties();
         registerSchedulledTasks();
     }
 

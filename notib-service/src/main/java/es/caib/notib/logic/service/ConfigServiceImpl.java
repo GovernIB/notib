@@ -123,7 +123,7 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void crearPropietatsConfigPerEntitats() {
 
         var configs = configRepository.findByEntitatCodiIsNullAndConfigurableIsTrue();

@@ -15,6 +15,7 @@ import org.springframework.core.env.CompositePropertySource;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -230,6 +231,11 @@ public class ConfigHelper {
             throw new RuntimeException(msg);
         }
         return split.length < 2 ? split.length == 0 ? null : split[0] : (ConfigDto.prefix + "." + entitatCodi + split[1]);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void schedullingLoadDbProperties() {
+        reloadDbProperties();
     }
 
     public void reloadDbProperties() {

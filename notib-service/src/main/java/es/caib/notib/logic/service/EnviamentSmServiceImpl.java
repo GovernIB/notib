@@ -20,6 +20,7 @@ import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -91,7 +92,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly=true, propagation = Propagation.REQUIRES_NEW)
 	public void afegirNotificacions() {
 
 		log.info("Afegint notificacions no existents a la màquina amb estat PENDENT, ENVIADA, REGISTRADA O ENVIADA_AMB_ERROR");
