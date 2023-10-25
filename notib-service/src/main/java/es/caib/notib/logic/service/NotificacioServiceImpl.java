@@ -1595,11 +1595,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	@Transactional
 	public void updateEstatList(Long notificacioId) {
+
 		var item = notificacioTableViewRepository.findById(notificacioId).orElse(null);
 		if (item == null) {
 			return;
 		}
+		notificacioTableHelper.actualitzarRegistre(item.getNotificacio());
 		item.setPerActualitzar(true);
+		notificacioTableViewRepository.save(item);
 	}
 
 	@Override

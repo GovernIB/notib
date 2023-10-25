@@ -233,7 +233,7 @@ public class NotibController implements ErrorController {
 	@PostConstruct
 	public void propagateDbProperties() {
 
-		aplicacioService.propagateDbProperties();
+//		aplicacioService.propagateDbProperties();
 		MissatgesHelper.setManifestAtributsMap(getManifestAttributes());
 	}
 
