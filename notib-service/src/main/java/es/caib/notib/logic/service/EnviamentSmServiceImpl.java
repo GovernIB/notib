@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import com.google.common.base.Strings;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -117,7 +118,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional
 	public boolean afegirNotificacio(Long notificacioId) {
 
 		try {
@@ -137,7 +138,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 					// algun reintent o nou -> registre_pendent - cal també afegir el numero d'intents a la màquina rg_enviar
 					eventSm = not.getRegistreEnviamentIntent() < configHelper.getMaxReintentsRegistre() ? EnviamentSmEvent.RG_ENVIAR : EnviamentSmEvent.RG_ERROR;
 					intent = not.getRegistreEnviamentIntent();
-				} else if (e.isNotificaError()) { // Registrada
+				} else if (!not.isComunicacioSir() && (e.isNotificaError() || Strings.isNullOrEmpty(e.getNotificaIdentificador()))) { // Registrada
 					// si es notifica mateix cas que registre. Mirar intents i NT_ENVIAR o cap a NOTIFICA_ERROR
 					eventSm = e.getNotificaIntentNum() < configHelper.getMaxReintentsNotifca() ? EnviamentSmEvent.NT_ENVIAR : EnviamentSmEvent.NT_ERROR;
 					intent = e.getNotificaIntentNum();

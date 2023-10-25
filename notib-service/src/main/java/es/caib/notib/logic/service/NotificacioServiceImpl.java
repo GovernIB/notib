@@ -1600,7 +1600,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 		if (item == null) {
 			return;
 		}
-		notificacioTableHelper.actualitzarRegistre(item.getNotificacio());
+		try {
+			var not = item.getNotificacio();
+			notificacioTableHelper.actualitzarRegistre(not);
+			for (var env : not.getEnviaments()) {
+				enviamentTableHelper.actualitzarRegistre(env);
+			}
+		} catch (Exception ex) {
+			log.error("Error actualitzant les taules auxiliars de la notificacio i l'enviament", ex);
+		}
 		item.setPerActualitzar(true);
 		notificacioTableViewRepository.save(item);
 	}
