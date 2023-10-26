@@ -54,7 +54,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
 
-	@Value("${es.caib.notib.security.mappableRoles:NOT_SUPER,NOT_ADMIN,NOT_CARPETA,NOT_APL,tothom}")
+	@Value("${es.caib.notib.security.mappableRoles:NOT_SUPER,NOT_ADMIN,NOT_CARPETA,NOT_APL}")
 	private String mappableRoles;
 	@Value("${es.caib.notib.security.useResourceRoleMappings:false}")
 	private boolean useResourceRoleMappings;
@@ -138,6 +138,9 @@ public class SecurityConfig {
 			@Override
 			public PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails buildDetails(HttpServletRequest context) {
 				var j2eeUserRoles = getUserRoles(context);
+				if (!j2eeUserRoles.contains("tothom")) {
+					j2eeUserRoles.add("tothom");
+				}
 				logger.debug("Roles from ServletRequest for " + context.getUserPrincipal().getName() + ": " + j2eeUserRoles);
 				PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails result;
 				if (context.getUserPrincipal() instanceof KeycloakPrincipal) {

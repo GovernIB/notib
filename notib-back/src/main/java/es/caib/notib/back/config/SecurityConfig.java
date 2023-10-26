@@ -149,6 +149,11 @@ public class SecurityConfig {
 			@Override
 			public PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails buildDetails(HttpServletRequest context) {
 				Collection<String> j2eeUserRoles = getUserRoles(context);
+				// Afegit el rol tothom a qualsevol usuari autenticat per a mantenir el sistema de menus
+				// amb usuari i administrador d'òrgan, sense necessitat de canviar-ho
+				if (!j2eeUserRoles.contains("tothom")) {
+					j2eeUserRoles.add("tothom");
+				}
 				logger.debug("Roles from ServletRequest for " + context.getUserPrincipal().getName() + ": " + j2eeUserRoles);
 				PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails result;
 				if (context.getUserPrincipal() instanceof KeycloakPrincipal) {

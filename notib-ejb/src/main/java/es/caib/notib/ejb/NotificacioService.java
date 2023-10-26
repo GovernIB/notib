@@ -49,25 +49,25 @@ import java.util.Set;
 public class NotificacioService extends AbstractService<es.caib.notib.logic.intf.service.NotificacioService> implements es.caib.notib.logic.intf.service.NotificacioService {
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public NotificacioDtoV2 findAmbId(Long id, boolean isAdministrador) {
 		return getDelegateService().findAmbId(id, isAdministrador);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public NotificacioInfoDto findNotificacioInfo(Long id, boolean isAdministrador) {
 		return getDelegateService().findNotificacioInfo(id, isAdministrador);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public List<NotificacioEventDto> eventFindAmbNotificacio(Long entitatId, Long notificacioId) {
 		return getDelegateService().eventFindAmbNotificacio(entitatId, notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public List<NotificacioAuditDto> historicFindAmbNotificacio(Long entitatId, Long notificacioId) {
 		return getDelegateService().historicFindAmbNotificacio(entitatId, notificacioId);
 	}
@@ -79,122 +79,122 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<NotificacioEventDto> eventFindAmbEnviament(Long entitatId, Long notificacioId, Long enviamentId) {
 		return getDelegateService().eventFindAmbEnviament(entitatId, notificacioId, enviamentId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<NotificacioEnviamentAuditDto> historicFindAmbEnviament(Long entitatId, Long notificacioId, Long enviamentId) {
 		return getDelegateService().historicFindAmbEnviament(entitatId, notificacioId, enviamentId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public ArxiuDto getDocumentArxiu(Long notificacioId) {
 		return getDelegateService().getDocumentArxiu(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public ArxiuDto getDocumentArxiu(Long notificacioId, Long documentId) {
 		return getDelegateService().getDocumentArxiu(notificacioId, documentId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId) {
 		return getDelegateService().enviamentGetCertificacioArxiu(enviamentId);
 	}
 
     @Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
     public void refrescarEstatEnviamentASir(Long enviamentId) {
         getDelegateService().refrescarEstatEnviamentASir(enviamentId);
     }
 
     @Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public boolean enviarNotificacioANotifica(Long notificacioId) {
 		return getDelegateService().enviarNotificacioANotifica(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public boolean resetNotificacioANotifica(Set<Long> ids) {
 		return getDelegateService().resetNotificacioANotifica(ids);
 	}
 
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(Long entitatId, Long enviamentId) {
 		return getDelegateService().enviamentRefrescarEstat(entitatId, enviamentId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public Notificacio create(Long entitatId, Notificacio notificacio) throws RegistreNotificaException {
 		return getDelegateService().create(entitatId, notificacio);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public Notificacio update(Long entitatId, Notificacio notificacio, boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
 		return getDelegateService().update(entitatId, notificacio, isAdministradorEntitat);
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public void delete(Long entitatId, Long notificacioId) throws NotFoundException {
 		getDelegateService().delete(entitatId, notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findAmbFiltrePaginat(entitatId, rol, organGestorCodi, usuariCodi, filtre, paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public List<Long> findIdsAmbFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioFiltreDto filtre) {
 		return getDelegateService().findIdsAmbFiltre(entitatId, rol, organGestorCodi, usuariCodi, filtre);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public String marcarComProcessada(Long enviamentId, String motiu, boolean isAdministrador) throws Exception {
 		return getDelegateService().marcarComProcessada(enviamentId, motiu, isAdministrador);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public RespostaAccio<String> enviarNotificacioARegistre(Long notificacioId) throws RegistreNotificaException {
 		return getDelegateService().enviarNotificacioARegistre(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public RespostaAccio<String> resetNotificacioARegistre(Long notificacioId) {
 		return getDelegateService().resetNotificacioARegistre(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<ProvinciesDto> llistarProvincies() {
 		return getDelegateService().llistarProvincies();
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<LocalitatsDto> llistarLocalitats(String codiProvincia) {
 		return getDelegateService().llistarLocalitats(codiProvincia);
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<PaisosDto> llistarPaisos() {
 		return getDelegateService().llistarPaisos();
 	}
@@ -255,13 +255,13 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public boolean reactivarConsulta(Long notificacioId) {
 		return getDelegateService().reactivarConsulta(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public boolean reactivarSir(Long notificacioId) {
 		return getDelegateService().reactivarSir(notificacioId);
 	}
@@ -309,7 +309,7 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio,
 											 Long comunitatAutonoma, Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi) {
 		return getDelegateService().cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
@@ -317,44 +317,44 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public List<OrganGestorDto> unitatsPerCodi(String codi) {
 		return getDelegateService().unitatsPerCodi(codi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public List<OrganGestorDto> unitatsPerDenominacio(String denominacio) {
 		return getDelegateService().unitatsPerDenominacio(denominacio);
 
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<CodiValorDto> llistarNivellsAdministracions() {
 		return getDelegateService().llistarNivellsAdministracions();
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<CodiValorDto> llistarComunitatsAutonomes() {
 		return getDelegateService().llistarComunitatsAutonomes();
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<ProvinciesDto> llistarProvincies(String codiCA) {
 		return getDelegateService().llistarProvincies(codiCA);
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid) {
 		return getDelegateService().consultaDocumentIMetadades(identificador, esUuid);
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public boolean validarIdCsv (String idCsv) {
 		return getDelegateService().validarIdCsv(idCsv);
 	}
@@ -372,25 +372,25 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public boolean reenviarNotificacioAmbErrors(Long notificacioId) {
 		return getDelegateService().reenviarNotificacioAmbErrors(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public boolean reactivarNotificacioAmbErrors(Long notificacioId) {
 		return getDelegateService().reactivarNotificacioAmbErrors(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public SignatureInfoDto checkIfSignedAttached(byte[] contingut, String nom, String contentType) {
 		return getDelegateService().checkIfSignedAttached(contingut, nom, contentType);
 	}
 
     @Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
     public void updateEstatList(Long notificacioId) {
         getDelegateService().updateEstatList(notificacioId);
     }

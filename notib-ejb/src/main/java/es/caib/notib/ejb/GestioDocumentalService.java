@@ -19,18 +19,18 @@ import javax.ejb.Stateless;
 public class GestioDocumentalService extends AbstractService<es.caib.notib.logic.intf.service.GestioDocumentalService> implements es.caib.notib.logic.intf.service.GestioDocumentalService {
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public String guardarArxiuTemporal(String nom){
 		return getDelegateService().guardarArxiuTemporal(nom);
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public byte[] obtenirArxiuTemporal(String arxiuGestdocId) {
 		return getDelegateService().obtenirArxiuTemporal(arxiuGestdocId);
 	}
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public byte[] obtenirArxiuNotificacio(String arxiuGestdocId) {
 		return getDelegateService().obtenirArxiuNotificacio(arxiuGestdocId);
 	}

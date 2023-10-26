@@ -28,97 +28,97 @@ import java.util.List;
 public class GrupService extends AbstractService<es.caib.notib.logic.intf.service.GrupService> implements es.caib.notib.logic.intf.service.GrupService {
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public GrupDto create(Long entitatId, GrupDto grup) {
 		return getDelegateService().create(entitatId, grup);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public GrupDto update(GrupDto grup) throws NotFoundException {
 		return getDelegateService().update(grup);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public GrupDto delete(Long id) throws NotFoundException {
 		return getDelegateService().delete(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public List<GrupDto> deleteGrupsProcediment(List<GrupDto> grups) throws NotFoundException {
 		return getDelegateService().deleteGrupsProcediment(grups);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public GrupDto findById(Long entitatId, Long id) {
 		return getDelegateService().findById(entitatId, id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public PaginaDto<ProcSerGrupDto> findByProcSer(Long entitatId, Long procedimentId, PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findByProcSer(entitatId, procedimentId, paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<GrupDto> findByProcedimentAndUsuariGrups(Long procedimentId) {
 		return getDelegateService().findByProcedimentAndUsuariGrups(procedimentId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public ProcSerGrupDto findProcedimentGrupById(Long entitatId, Long procedimentGrupId) {
 		return getDelegateService().findProcedimentGrupById(entitatId, procedimentGrupId);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public Boolean existProcedimentGrupByGrupId(Long entitatId, Long grupId) {
 		return getDelegateService().existProcedimentGrupByGrupId(entitatId, grupId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<GrupDto> findByEntitat(Long entitatId) {
 		return getDelegateService().findByEntitat(entitatId);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<GrupDto> findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor) {
 		return getDelegateService().findByEntitatAndOrganGestor(entitat, organGestor);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public PaginaDto<GrupDto> findAmbFiltrePaginat(Long entitatId, GrupFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findAmbFiltrePaginat(entitatId, filtre, paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<GrupDto> findAll() {
 		return getDelegateService().findAll();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public PaginaDto<GrupDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findAllPaginat(paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public GrupDto findByCodi(String grupCodi, Long entitatId) {
 		return getDelegateService().findByCodi(grupCodi,entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<GrupDto> findGrupsByProcSer(Long procedimentId) {
 		return getDelegateService().findGrupsByProcSer(procedimentId);
 	}

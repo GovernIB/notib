@@ -83,7 +83,7 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public boolean organGestorEnUs(Long organId) {
 		return getDelegateService().organGestorEnUs(organId);
 	}
@@ -95,7 +95,7 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public OrganGestorDto findById(Long entitatId, Long id) {
 		return getDelegateService().findById(entitatId, id);
 	}
@@ -113,31 +113,31 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<CodiValorEstatDto> findOrgansGestorsCodiByEntitat(Long entitatId) {
 		return getDelegateService().findOrgansGestorsCodiByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findByProcedimentIds(List<Long> procedimentIds) {
 		return getDelegateService().findByProcedimentIds(procedimentIds);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findByCodisAndEstat(List<String> codisOrgans, OrganGestorEstatEnum estat) {
 		return getDelegateService().findByCodisAndEstat(codisOrgans, estat);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findDescencentsByCodi(Long entitatId, String organCodi) {
 		return getDelegateService().findDescencentsByCodi(entitatId, organCodi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(Long entitatId, String organCodiDir3, OrganGestorFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findAmbFiltrePaginat(entitatId, organCodiDir3,filtre, paginacioParams);
 	}
@@ -179,55 +179,55 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<OrganismeDto> findOrganismes(EntitatDto entitat) {
 		return getDelegateService().findOrganismes(entitat);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<OrganismeDto> findOrganismes(EntitatDto entitat, OrganGestorDto organGestor) {
 		return getDelegateService().findOrganismes(entitat, organGestor);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public LlibreDto getLlibreOrganisme(Long entitatId, String organGestorDir3Codi) {
 		return getDelegateService().getLlibreOrganisme(entitatId, organGestorDir3Codi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<CodiValorEstatDto> getOrgansGestorsDisponiblesConsulta(Long entitatId, String usuari, RolEnumDto rol, String organ) {
 		return getDelegateService().getOrgansGestorsDisponiblesConsulta(entitatId, usuari, rol, organ);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public Arbre<OrganGestorDto> generarArbreOrgans(EntitatDto entitat, OrganGestorFiltreDto filtres, boolean isAdminOrgan, OrganGestorDto organActual) {
 		return getDelegateService().generarArbreOrgans(entitat, filtres, isAdminOrgan, organActual);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<OrganGestorDto> getOrgansAsList(EntitatDto entitat) {
 		return getDelegateService().getOrgansAsList(entitat);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<OrganGestorDto> getOrgansAsList() {
 		return getDelegateService().getOrgansAsList();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public OrganGestorDto getOrganNou(String codiSia) {
 		return getDelegateService().getOrganNou(codiSia);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public boolean hasPermisOrgan(Long entitatId, String organCodi, PermisEnum permis) {
 		return getDelegateService().hasPermisOrgan(entitatId, organCodi, permis);
 	}
@@ -257,13 +257,13 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 	}
 
     @Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public OrganGestorDto update(OrganGestorDto dto) {
 		return getDelegateService().update(dto);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<OficinaDto> getOficinesSIR(Long entitatId, String organGestorDir3Codi, boolean isFiltre) {
 		return getDelegateService().getOficinesSIR(entitatId, organGestorDir3Codi, isFiltre);
 	}

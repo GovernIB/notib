@@ -26,7 +26,7 @@ public class SchedulledService extends AbstractService<es.caib.notib.logic.intf.
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public void refrescarNotificacionsExpirades() {
 		getDelegateService().refrescarNotificacionsExpirades();
 	}

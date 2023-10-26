@@ -31,48 +31,48 @@ import java.util.List;
 public class OperadorPostalService extends AbstractService<es.caib.notib.logic.intf.service.OperadorPostalService> implements es.caib.notib.logic.intf.service.OperadorPostalService {
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public OperadorPostalDto upsert(Long entitatId, OperadorPostalDataDto postal) {
 		return getDelegateService().upsert(entitatId, postal);}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public OperadorPostalDto delete(Long id) throws NotFoundException {
 		return getDelegateService().delete(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public OperadorPostalDto findById(Long id) {
 		return getDelegateService().findById(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(Long entitatId, OperadorPostalFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findAmbFiltrePaginat(entitatId, filtre, paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<OperadorPostalDto> findAll() {
 		return getDelegateService().findAll();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<IdentificadorTextDto> findAllIdentificadorText() {
 		return getDelegateService().findAllIdentificadorText();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat) {
 		return null;
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
 		return getDelegateService().findNoCaducatsByEntitat(entitat);
 	}
@@ -84,19 +84,19 @@ public class OperadorPostalService extends AbstractService<es.caib.notib.logic.i
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public PaginaDto<OperadorPostalDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findAllPaginat(paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public List<OperadorPostalDto> findByEntitat(Long entitatId) {
 		return getDelegateService().findByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public Object findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor) {
 		return getDelegateService().findByEntitatAndOrganGestor(entitat, organGestor);
 	}

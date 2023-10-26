@@ -41,86 +41,86 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public List<Long> findIdsAmbFiltre(Long entitatId, RolEnumDto rol, String usuariCodi, String organGestorCodi, NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException {
 		return getDelegateService().findIdsAmbFiltre(entitatId, rol, usuariCodi, organGestorCodi, filtre);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioEnviamentFiltreDto filtre, PaginacioParamsDto paginacio) throws ParseException {
 		return getDelegateService().enviamentFindByEntityAndFiltre(entitatId, rol, organGestorCodi, usuariCodi, filtre, paginacio);
 	}
 
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public List<NotificacioEnviamentDatatableDto> enviamentFindAmbNotificacio(Long notificacioId) {
 		return getDelegateService().enviamentFindAmbNotificacio(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public Set<Long> findIdsByNotificacioIds(Collection<Long> notificacionsIds) {
 		return getDelegateService().findIdsByNotificacioIds(notificacionsIds);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId) {
 		return getDelegateService().enviamentFindAmbId(enviamentId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public List<NotificacioEventDto> eventFindAmbNotificacio(Long notificacioId) {
 		return getDelegateService().eventFindAmbNotificacio(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public void columnesCreate(String codiUsuari, Long entitatId, ColumnesDto columnes) {
 		getDelegateService().columnesCreate(codiUsuari, entitatId, columnes);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public void columnesUpdate(Long entitatId, ColumnesDto columnes) {
 		getDelegateService().columnesUpdate(entitatId, columnes);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public ColumnesDto getColumnesUsuari(Long entitatId, String codiUsuari) {
 		return getDelegateService().getColumnesUsuari(entitatId, codiUsuari);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public FitxerDto exportacio(Long entitatId, Collection<Long> enviamentIds, String format) throws IOException, NotFoundException, ParseException {
 		return getDelegateService().exportacio(entitatId, enviamentIds, format);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public NotificacioEnviamentDtoV2 getOne(Long entitatId) {
 		return getDelegateService().getOne(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public byte[] getDocumentJustificant(Long enviamentId) {
 		return getDelegateService().getDocumentJustificant(enviamentId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public void reactivaConsultes(Set<Long> enviaments) {
 		getDelegateService().reactivaConsultes(enviaments);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public void reactivaSir(Set<Long> enviaments) {
 		getDelegateService().reactivaSir(enviaments);
 	}

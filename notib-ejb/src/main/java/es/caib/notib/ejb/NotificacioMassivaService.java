@@ -89,7 +89,7 @@ public class NotificacioMassivaService extends AbstractService<es.caib.notib.log
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException {
 		return getDelegateService().getModelDadesCarregaMassiuCSV();
 	}
@@ -101,18 +101,18 @@ public class NotificacioMassivaService extends AbstractService<es.caib.notib.log
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public NotificacioMassivaDataDto create(Long entitatId, String usuariCodi,
 			NotificacioMassivaDto notificacioMassiu) throws RegistreNotificaException {
 		return getDelegateService().create(entitatId, usuariCodi, notificacioMassiu);
 	}
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public void delete(Long entitatId, Long notificacioMassivaId) {
 		getDelegateService().delete(entitatId, notificacioMassivaId);
 	}
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public PaginaDto<NotificacioMassivaTableItemDto> findAmbFiltrePaginat(Long entitatId, NotificacioMassivaFiltreDto filtre, RolEnumDto rol, PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findAmbFiltrePaginat(entitatId, filtre, rol, paginacioParams);
 	}

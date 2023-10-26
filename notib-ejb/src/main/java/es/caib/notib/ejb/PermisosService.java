@@ -27,31 +27,31 @@ import java.util.List;
 public class PermisosService extends AbstractService<es.caib.notib.logic.intf.service.PermisosService> implements es.caib.notib.logic.intf.service.PermisosService {
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public Boolean hasPermisNotificacio(Long entitatId, String usuariCodi) {
 		return getDelegateService().hasPermisNotificacio(entitatId, usuariCodi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public Boolean hasPermisComunicacio(Long entitatId, String usuariCodi) {
 		return getDelegateService().hasPermisComunicacio(entitatId, usuariCodi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public Boolean hasPermisComunicacioSir(Long entitatId, String usuariCodi) {
 		return getDelegateService().hasPermisComunicacioSir(entitatId, usuariCodi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<CodiValorDto> getOrgansAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		return getDelegateService().getOrgansAmbPermis(entitatId, usuariCodi, permis);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<CodiValorDto> getOrgansAmbPermisPerConsulta(Long entitatId, String usuariCodi, PermisEnum permis) {
 		return getDelegateService().getOrgansAmbPermisPerConsulta(entitatId, usuariCodi, permis);
 	}
@@ -63,19 +63,19 @@ public class PermisosService extends AbstractService<es.caib.notib.logic.intf.se
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<String> getOrgansCodisAmbPermisPerProcedimentComu(Long entitatId, String usuariCodi, PermisEnum permis, ProcSerDto procSetDto) {
 		return getDelegateService().getOrgansCodisAmbPermisPerProcedimentComu(entitatId, usuariCodi, permis, procSetDto);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<String> getProcedimentsOrgansAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		return getDelegateService().getProcedimentsOrgansAmbPermis(entitatId, usuariCodi, permis);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<CodiValorOrganGestorComuDto> getProcSersAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		return getDelegateService().getProcSersAmbPermis(entitatId, usuariCodi, permis);
 	}
@@ -87,25 +87,25 @@ public class PermisosService extends AbstractService<es.caib.notib.logic.intf.se
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<CodiValorOrganGestorComuDto> getProcedimentsAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		return getDelegateService().getProcedimentsAmbPermis(entitatId, usuariCodi, permis);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<CodiValorOrganGestorComuDto> getServeisAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		return getDelegateService().getServeisAmbPermis(entitatId, usuariCodi, permis);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public boolean hasNotificacioPermis(Long notId, Long entitat, String usuari, PermisEnum permis) {
 		return getDelegateService().hasNotificacioPermis(notId, entitat, usuari, permis);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public void evictGetOrgansAmbPermis() {
 
 	}

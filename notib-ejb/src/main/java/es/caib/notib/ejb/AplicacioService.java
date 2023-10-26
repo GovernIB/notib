@@ -24,49 +24,49 @@ import java.util.List;
 public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.service.AplicacioService> implements es.caib.notib.logic.intf.service.AplicacioService {
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public void actualitzarEntitatThreadLocal(String entitatCodi) {
 		getDelegateService().actualitzarEntitatThreadLocal(entitatCodi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public void processarAutenticacioUsuari() {
 		getDelegateService().processarAutenticacioUsuari();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public UsuariDto getUsuariActual() {
 		return getDelegateService().getUsuariActual();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public List<String> findRolsUsuariAmbCodi(String usuariCodi) {
 		return getDelegateService().findRolsUsuariAmbCodi(usuariCodi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public List<String> findRolsUsuariActual() {
 		return getDelegateService().findRolsUsuariActual();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public UsuariDto findUsuariAmbCodi(String codi) {
 		return getDelegateService().findUsuariAmbCodi(codi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public String getIdiomaUsuariActual() {
 		return getDelegateService().getIdiomaUsuariActual();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public List<UsuariDto> findUsuariAmbText(String text) {
 		return getDelegateService().findUsuariAmbText(text);
 	}
@@ -94,61 +94,61 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public String propertyGetByEntitat(String property) {
 		return getDelegateService().propertyGetByEntitat(property);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public String propertyGet(String property) {
 		return getDelegateService().propertyGet(property);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public String propertyGet(String property, String defaultValue) {
 		return getDelegateService().propertyGet(property, defaultValue);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public String propertyGetByEntitat(String property, String defaultValue) {
 		return getDelegateService().propertyGetByEntitat(property, defaultValue);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public boolean existeixUsuariNotib(String codi) {
 		return getDelegateService().existeixUsuariNotib(codi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public boolean existeixUsuariSeycon(String codi) {
 		return getDelegateService().existeixUsuariSeycon(codi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public void crearUsuari(String codi) {
 		getDelegateService().crearUsuari(codi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public UsuariDto updateUsuariActual(UsuariDto usuariDto) {
 		return getDelegateService().updateUsuariActual(usuariDto);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public void updateRolUsuariActual(String rol) {
 		getDelegateService().updateRolUsuariActual(rol);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	@RolesAllowed("**")
 	public void updateEntitatUsuariActual(Long entitat) {
 		getDelegateService().updateEntitatUsuariActual(entitat);
 	}

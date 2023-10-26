@@ -28,19 +28,19 @@ public class JustificantService extends AbstractService<es.caib.notib.logic.intf
 		return getDelegateService().generarJustificantEnviament(notificacioId, sequence);
 	}
 
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public FitxerDto generarJustificantEnviament(Long notificacioId, Long entitatId, String sequence) throws JustificantException {
 		return getDelegateService().generarJustificantEnviament(notificacioId, entitatId, sequence);
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public FitxerDto generarJustificantComunicacioSIR(Long notificacioId, Long entitatId, String sequence) throws JustificantException {
 		return getDelegateService().generarJustificantComunicacioSIR(notificacioId, entitatId, sequence);
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public ProgresDescarregaDto consultaProgresGeneracioJustificant(String sequence) throws JustificantException {
 		return getDelegateService().consultaProgresGeneracioJustificant(sequence);
 	}

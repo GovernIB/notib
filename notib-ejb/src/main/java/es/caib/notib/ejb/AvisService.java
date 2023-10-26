@@ -56,13 +56,13 @@ public class AvisService extends AbstractService<es.caib.notib.logic.intf.servic
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "NOT_SUPER"})
+	@RolesAllowed("**")
 	public List<AvisDto> findActive() {
 		return getDelegateService().findActive();
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<AvisDto> findActiveAdmin(Long entitatId) {
 		return getDelegateService().findActiveAdmin(entitatId);
 	}

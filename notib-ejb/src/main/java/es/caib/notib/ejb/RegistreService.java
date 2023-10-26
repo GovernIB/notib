@@ -17,7 +17,7 @@ import javax.ejb.Stateless;
 public class RegistreService extends AbstractService<es.caib.notib.logic.intf.service.RegistreService> implements es.caib.notib.logic.intf.service.RegistreService {
 
 	@Override
-	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
+	@RolesAllowed("**")
 	public void registrarSortida(RegistreAnotacioDto registreAnotacio) {
 		getDelegateService().registrarSortida(registreAnotacio);
 	}

@@ -37,19 +37,19 @@ import java.util.List;
 public class ServeiService extends AbstractService<es.caib.notib.logic.intf.service.ServeiService> implements es.caib.notib.logic.intf.service.ServeiService {
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public ProcSerDto create(Long entitatId, ProcSerDataDto servei) {
 		return getDelegateService().create(entitatId, servei);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public ProcSerDto update(Long entitatId, ProcSerDataDto servei, boolean isAdmin, boolean isAdminEntitat) throws NotFoundException {
 		return getDelegateService().update(entitatId, servei, isAdmin, isAdminEntitat);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public ProcSerDto updateActiu(Long id, boolean actiu) throws NotFoundException {
 		return getDelegateService().updateActiu(id, actiu);
 	}
@@ -60,97 +60,97 @@ public class ServeiService extends AbstractService<es.caib.notib.logic.intf.serv
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public ProcSerDto delete(Long entitatId, Long id, boolean isAdminEntitat) throws NotFoundException {
 		return getDelegateService().delete(entitatId, id, isAdminEntitat);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public ProcSerDto findById(Long entitatId, boolean isAdministrador, Long id) throws NotFoundException {
 		return getDelegateService().findById(entitatId, isAdministrador, id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public ProcSerDto findByCodi(Long entitatId, String codiServei) throws NotFoundException {
 		return getDelegateService().findByCodi(entitatId, codiServei);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<ProcSerSimpleDto> findByEntitat(Long entitatId) {
 		return getDelegateService().findByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<ProcSerSimpleDto> findByOrganGestorIDescendents(Long entitatId, OrganGestorDto organGestor) {
 		return getDelegateService().findByOrganGestorIDescendents(entitatId, organGestor);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<ProcSerDto> findByOrganGestorIDescendentsAndComu(Long id, OrganGestorDto organGestor) {
 		return getDelegateService().findByOrganGestorIDescendentsAndComu(id, organGestor);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public PaginaDto<ProcSerFormDto> findAmbFiltrePaginat(Long entitatId, boolean isUsuari, boolean isUsuariEntitat, boolean isAdministrador, OrganGestorDto organGestorActual, ProcSerFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findAmbFiltrePaginat(entitatId, isUsuari, isUsuariEntitat, isAdministrador, organGestorActual, filtre, paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<ProcSerDto> findAll() {
 		return getDelegateService().findAll();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public boolean serveiEnUs(Long serveiId) {
 		return getDelegateService().serveiEnUs(serveiId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public boolean serveiAmbGrups(Long serveiId) {
 		return getDelegateService().serveiAmbGrups(serveiId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<ProcSerGrupDto> findAllGrups() {
 		return getDelegateService().findAllGrups();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<ProcSerGrupDto> findGrupsByEntitat(Long entitatId) {
 		return getDelegateService().findGrupsByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<ProcSerDto> findServeis(Long entitatId, List<String> grups) {
 		return getDelegateService().findServeis(entitatId, grups);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<ProcSerDto> findServeisSenseGrups(Long entitatId) {
 		return getDelegateService().findServeisSenseGrups(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<ProcSerDto> findServeisAmbGrups(Long entitatId, List<String> grups) {
 		return getDelegateService().findServeisAmbGrups(entitatId, grups);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public boolean hasAnyServeisWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
 		return getDelegateService().hasAnyServeisWithPermis(entitatId, grups, permis);
 	}
@@ -162,7 +162,7 @@ public class ServeiService extends AbstractService<es.caib.notib.logic.intf.serv
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<CodiValorOrganGestorComuDto> getServeisOrgan(Long entitatId, String organCodi, Long organFiltre, RolEnumDto rol, PermisEnum permis) {
 		return getDelegateService().getServeisOrgan(entitatId, organCodi, organFiltre, rol, permis);
 	}
@@ -196,7 +196,7 @@ public class ServeiService extends AbstractService<es.caib.notib.logic.intf.serv
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public ProcSerDto findByNom(
 			Long entitatId,
 			String nomServei) throws NotFoundException {

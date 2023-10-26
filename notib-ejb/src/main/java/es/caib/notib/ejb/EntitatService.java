@@ -70,37 +70,37 @@ public class EntitatService extends AbstractService<es.caib.notib.logic.intf.ser
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public EntitatDto findById(Long id) {
 		return getDelegateService().findById(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public EntitatDto findByCodi(String codi) {
 		return getDelegateService().findByCodi(codi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public EntitatDto findByDir3codi(String dir3Codi) {
 		return getDelegateService().findByDir3codi(dir3Codi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<EntitatDto> findAll() {
 		return getDelegateService().findAll();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN"})
+	@RolesAllowed("**")
 	public PaginaDto<EntitatDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findAllPaginat(paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public List<EntitatDto> findAccessiblesUsuariActual(String rolActual) {
 		return getDelegateService().findAccessiblesUsuariActual(rolActual);
 	}
@@ -124,19 +124,19 @@ public class EntitatService extends AbstractService<es.caib.notib.logic.intf.ser
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public boolean hasPermisUsuariEntitat() {
 		return getDelegateService().hasPermisUsuariEntitat();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public boolean hasPermisAdminEntitat() {
 		return getDelegateService().hasPermisAdminEntitat();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed("**")
 	public boolean hasPermisAplicacioEntitat() {
 		return getDelegateService().hasPermisAplicacioEntitat();
 	}
@@ -154,13 +154,13 @@ public class EntitatService extends AbstractService<es.caib.notib.logic.intf.ser
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public List<TipusDocumentDto> findTipusDocumentByEntitat(Long entitatId) {
 		return getDelegateService().findTipusDocumentByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed("**")
 	public TipusDocumentEnumDto findTipusDocumentDefaultByEntitat(Long entitatId) {
 		return getDelegateService().findTipusDocumentDefaultByEntitat(entitatId);
 	}
@@ -178,13 +178,13 @@ public class EntitatService extends AbstractService<es.caib.notib.logic.intf.ser
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public LlibreDto getLlibreEntitat(String dir3Codi) {
 		return getDelegateService().getLlibreEntitat(dir3Codi);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatCodi) {
 		return getDelegateService().findOrganigramaByEntitat(entitatCodi);
 	}

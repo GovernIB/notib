@@ -21,9 +21,6 @@
 	<security-role>
 		<role-name>NOT_APL</role-name>
 	</security-role>
-	<security-role>
-		<role-name>tothom</role-name>
-	</security-role>
 
 	<security-constraint>
 		<display-name>Unauthenticated areas</display-name>
@@ -52,7 +49,7 @@
 			<url-pattern>/*</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
-			<role-name>*</role-name>
+			<role-name>**</role-name>
 		</auth-constraint>
 	</security-constraint>
 

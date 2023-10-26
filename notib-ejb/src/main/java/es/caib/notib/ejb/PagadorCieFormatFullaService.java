@@ -21,43 +21,43 @@ import java.util.List;
 public class PagadorCieFormatFullaService extends AbstractService<es.caib.notib.logic.intf.service.PagadorCieFormatFullaService> implements es.caib.notib.logic.intf.service.PagadorCieFormatFullaService {
 
     @Override
-    @RolesAllowed({"NOT_ADMIN", "tothom",})
+    @RolesAllowed({"NOT_ADMIN", "**",})
     public CieFormatFullaDto create(Long pagadorCieId, CieFormatFullaDto formatSobre) {
         return getDelegateService().create(pagadorCieId, formatSobre);
     }
 
     @Override
-    @RolesAllowed({"NOT_ADMIN", "tothom",})
+    @RolesAllowed({"NOT_ADMIN", "**",})
     public CieFormatFullaDto update(CieFormatFullaDto formatSobre) throws NotFoundException {
         return getDelegateService().update(formatSobre);
     }
 
     @Override
-    @RolesAllowed({"NOT_ADMIN", "tothom",})
+    @RolesAllowed({"NOT_ADMIN", "**",})
     public CieFormatFullaDto delete(Long id) throws NotFoundException {
         return getDelegateService().delete(id);
     }
 
     @Override
-    @RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+    @RolesAllowed("**")
     public CieFormatFullaDto findById(Long id) {
         return getDelegateService().findById(id);
     }
 
     @Override
-    @RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+    @RolesAllowed("**")
     public List<CieFormatFullaDto> findAll() {
         return getDelegateService().findAll();
     }
 
     @Override
-    @RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+    @RolesAllowed("**")
     public PaginaDto<CieFormatFullaDto> findAllPaginat(Long pagadorCieId, PaginacioParamsDto paginacioParams) {
         return getDelegateService().findAllPaginat(pagadorCieId, paginacioParams);
     }
 
     @Override
-    @RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+    @RolesAllowed("**")
     public List<CieFormatFullaDto> findFormatFullaByPagadorCie(Long pagadorCieId) {
         return getDelegateService().findFormatFullaByPagadorCie(pagadorCieId);
     }

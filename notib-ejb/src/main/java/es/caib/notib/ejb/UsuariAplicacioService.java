@@ -42,43 +42,43 @@ public class UsuariAplicacioService extends AbstractService<es.caib.notib.logic.
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
+	@RolesAllowed("**")
 	public AplicacioDto findById(Long aplicacioId) {
 		return getDelegateService().findById(aplicacioId);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
+	@RolesAllowed("**")
 	public AplicacioDto findByEntitatAndId(Long entitatId, Long aplicacioId) {
 		return getDelegateService().findByEntitatAndId(entitatId, aplicacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
+	@RolesAllowed("**")
 	public AplicacioDto findByUsuariCodi(String usuariCodi) {
 		return getDelegateService().findByUsuariCodi(usuariCodi);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
+	@RolesAllowed("**")
 	public AplicacioDto findByEntitatAndUsuariCodi(Long entitatId, String usuariCodi) {
 		return getDelegateService().findByEntitatAndUsuariCodi(entitatId, usuariCodi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN"})
+	@RolesAllowed("**")
 	public PaginaDto<AplicacioDto> findPaginat(PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findPaginat(paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN"})
+	@RolesAllowed("**")
 	public PaginaDto<AplicacioDto> findPaginatByEntitat(Long entitatId, PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findPaginatByEntitat(entitatId, paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN"})
+	@RolesAllowed("**")
 	public AplicacioDto findByEntitatAndText(Long entitatId, String text) {
 		return getDelegateService().findByEntitatAndText(entitatId, text);
 	}
