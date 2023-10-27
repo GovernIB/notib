@@ -1,5 +1,0 @@
-<system-properties>
-    <property name="es.caib.notib.properties" value="${jboss.home.dir}/../webapps/config/notib_jboss.properties"/>
-    <property name="es.caib.notib.system.properties" value="${jboss.home.dir}/../webapps/config/notib_jboss_system.properties"/>
-    <property name="com.sun.jersey.server.impl.cdi.lookupExtensionInBeanManager" value="true"/>
-</system-properties>
