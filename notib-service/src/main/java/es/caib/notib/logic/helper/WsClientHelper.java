@@ -42,7 +42,7 @@ public class WsClientHelper<T> {
 							throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
 
 		var url = wsdlResourceUrl;
-		var wsdl = "?wsdl";
+		var wsdl = ".wsdl";
 		if (url == null) {
 			url = !endpoint.endsWith(wsdl) ? new URL(endpoint + wsdl) : new URL(endpoint);
 		}

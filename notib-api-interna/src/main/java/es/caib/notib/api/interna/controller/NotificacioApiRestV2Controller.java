@@ -12,8 +12,10 @@ import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,6 +32,7 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @RestController
 @RequestMapping("/notificacio/v2")
 public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseController implements NotificacioApiRestV2Intf {
@@ -40,6 +43,9 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 		try {
 			return notificacioServiceWs.altaV2(notificacio);
 		} catch (Exception e) {
+			var usr = SecurityContextHolder.getContext().getAuthentication().getName();
+			var rols = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+			log.error("Error donant d'alta la notificació usuari: " + usr + " rols : " + rols, e);
 			return RespostaAltaV2.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
 		}
 	}

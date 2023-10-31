@@ -1762,7 +1762,11 @@ public class PluginHelper {
 			return signatureInfoDto;
 		} catch (Exception e) {
 			var throwable = ExceptionUtils.getRootCause(e) != null ? ExceptionUtils.getRootCause(e) : e;
-			if (throwable.getMessage().contains("El formato de la firma no es valido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)") || throwable.getMessage().contains("El formato de la firma no es válido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)") || throwable.getMessage().contains("El documento OOXML no está firmado(urn:oasis:names:tc:dss:1.0:resultmajor:ResponderError)")) {
+			var isNull = throwable == null || Strings.isNullOrEmpty(throwable.getMessage());
+			if (!isNull && (throwable.getMessage().contains("El formato de la firma no es valido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)")
+					|| throwable.getMessage().contains("El formato de la firma no es válido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)")
+					|| throwable.getMessage().contains("El documento OOXML no está firmado(urn:oasis:names:tc:dss:1.0:resultmajor:ResponderError)"))) {
+
 				info.addParam("Document firmat", "false");
 				info.addParam("Error de firma", "false");
 				info.addParam("Missatge d'error", throwable.getMessage());
