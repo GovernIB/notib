@@ -17,8 +17,19 @@ import org.fundaciobit.apisib.apifirmasimple.v1.jersey.ApiFirmaEnServidorSimpleJ
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
@@ -36,6 +47,8 @@ import java.util.Properties;
 
 	public FirmaSimpleServidorPluginPortafib(Properties properties) {
 		this.properties = properties;
+		logProperties(properties);
+		logCertificates();
 	}
 
 	@Override
@@ -51,11 +64,18 @@ import java.util.Properties;
 			byte[] contingut, 
 			String tipusDocumental) {
 
+		String endpoint = getPropertyEndpoint();
+		String username = getPropertyUsername();
+		String password = getPropertyPassword();
+
+		logger.info("[FirmaServidor] Endpoint: " + endpoint);
+		logger.info("[FirmaServidor] Usuari: " + username);
+
 		ApiFirmaEnServidorSimple api = new ApiFirmaEnServidorSimpleJersey(
-				getPropertyEndpoint(),
-				getPropertyUsername(),
-				getPropertyPassword());
-		
+				endpoint,
+				username,
+				password);
+
 		FirmaSimpleFile fileToSign = new FirmaSimpleFile(nom, "application/pdf", contingut);
 
 		FirmaSimpleSignatureResult result;
@@ -197,4 +217,85 @@ import java.util.Properties;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(FirmaSimpleServidorPluginPortafib.class);
+
+
+
+
+	// LOGS
+
+	private void logProperties(Properties properties) {
+		logger.info("[FirmaServidor] Propietats");
+		logger.info("[FirmaServidor] ===================================================================");
+		if (properties == null || properties.isEmpty()) {
+			logger.info("[FirmaServidor] Sense propietats");
+		} else {
+			for (String propertyName : properties.stringPropertyNames()) {
+				logger.info("[FirmaServidor] Propietat '" + propertyName + "': " + getPropertyValue(properties, propertyName));
+			}
+		}
+		logger.info("[FirmaServidor] ===================================================================");
+	}
+
+	private String getPropertyValue(Properties properties, String propertyName) {
+		if (propertyName.contains("passw") || propertyName.contains("contrasenya")) {
+			return "********";
+		}
+		return properties.getProperty(propertyName);
+	}
+
+	private void logCertificates() {
+		logger.info("[FirmaServidor] Certificats");
+		logger.info("[FirmaServidor] ===================================================================");
+
+		try {
+			KeyStore keyStore = loadKeyStore();
+
+			Enumeration<String> aliasEnumeration = keyStore.aliases();
+			List<String> aliases = Collections.list(aliasEnumeration);
+
+			if (aliases == null || aliases.isEmpty()) {
+				logger.info("[FirmaServidor] Sense certificats");
+			} else {
+				for (String alias : aliases) {
+					Certificate certificate = keyStore.getCertificate(alias);
+					logger.info("[FirmaServidor] Certificat '" + alias + "': " + certificate.toString());
+				}
+			}
+
+			logger.info("[FirmaServidor] Default trustManagers");
+			logger.info("[FirmaServidor] ===================================================================");
+
+			TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+			trustManagerFactory.init((KeyStore) null);
+
+			List<TrustManager> trustManagers = Arrays.asList(trustManagerFactory.getTrustManagers());
+			for (TrustManager trustManager: trustManagers) {
+				if (trustManager instanceof X509TrustManager) {
+					X509Certificate[] acceptedIssuers = ((X509TrustManager) trustManager).getAcceptedIssuers();
+					for (X509Certificate certificate: acceptedIssuers) {
+						logger.info("[FirmaServidor] Certificat: " + certificate.toString());
+					}
+				}
+			}
+
+		} catch (Exception ex) {
+			logger.error("[FirmaServidor] S'ha produït un error al obtenir els certificats.", ex);
+		}
+		logger.info("[FirmaServidor] ===================================================================");
+	}
+
+	private KeyStore loadKeyStore() throws Exception {
+		String truststore = System.getProperty("javax.net.ssl.trustStore");
+		String truststorePass = System.getProperty("javax.net.ssl.trustStorePassword");
+
+		String truststorePath = truststore.replace("/", File.separator);
+		FileInputStream is = new FileInputStream(truststorePath);
+
+		KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+		keystore.load(is, truststorePass.toCharArray());
+
+		return keystore;
+	}
+
+
 }

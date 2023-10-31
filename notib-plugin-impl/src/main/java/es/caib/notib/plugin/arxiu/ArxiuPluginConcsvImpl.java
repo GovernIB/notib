@@ -385,7 +385,8 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 					this.getPropertyContrasenya(),
 					this.getPropertyTimeoutConnect(),
 					this.getPropertyTimeoutRead(),
-					false);
+					false,
+					"debug");
 		}
 
 		return this.arxiuClient;
