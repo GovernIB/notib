@@ -689,7 +689,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private NotificaWsV2PortType getNotificaWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
 
 		return new WsClientHelper<NotificaWsV2PortType>().generarClientWs(
-				getClass().getResource("/es/caib/notib/core/wsdl/NotificaWsV21.wsdl"), getNotificaUrlProperty(),
+				getClass().getResource("/es/caib/notib/logic/wsdl/NotificaWsV21.wsdl"),    getNotificaUrlProperty(),
 				new QName("https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/","NotificaWsV2Service"),
 				getUsernameProperty(), getPasswordProperty(),true, NotificaWsV2PortType.class, new ApiKeySOAPHandlerV2(apiKey));
 	}

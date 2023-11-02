@@ -31,8 +31,8 @@ public class NotificaWsService
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL("file:/home/siona/git/notib/notib-core/src/main/resources/es/caib/notib/core/wsdl/NotificaWS.wsdl");
-        } catch (MalformedURLException ex) {
+            url = NotificaWsService.class.getResource("/es/caib/notib/logic/wsdl/NotificaWsV21.wsdl");
+        } catch (Exception ex) {
             e = new WebServiceException(ex);
         }
         NOTIFICAWSSERVICE_WSDL_LOCATION = url;

@@ -694,7 +694,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 			// Distinció entre substitució i fusió
 			Set<UnitatOrganitzativaDto> keysMergeOrSubst = mergeOrSubstMap.keySet();
-			MultiValuedMap mergeMap = new ArrayListValuedHashMap();
+			MultiValuedMap<UnitatOrganitzativaDto, UnitatOrganitzativaDto> mergeMap = new ArrayListValuedHashMap<>();
 			MultiValuedMap substMap = new ArrayListValuedHashMap();
 			List<UnitatOrganitzativaDto> values;
 			for (UnitatOrganitzativaDto mergeOrSubstKey : keysMergeOrSubst) {
@@ -712,6 +712,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					mergeMap.put(mergeOrSubstKey, value);
 				}
 			}
+
 			// Obtenir llistat d'unitats que ara estan vigents en BBDD, i després de la sincronització continuen vigents, però amb les propietats canviades
 			// ====================  CANVIS EN ATRIBUTS ===================
 			unitatsVigents = getVigentsFromWebService(entitat, unitatsWS, organsVigents);
