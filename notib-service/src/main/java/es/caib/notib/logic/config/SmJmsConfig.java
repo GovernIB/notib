@@ -56,6 +56,7 @@ public class SmJmsConfig {
 
     @Bean
     public ActiveMQConnectionFactory connectionFactory(){
+
         ActiveMQConnectionFactory connectionFactory = new  ActiveMQConnectionFactory();
         connectionFactory.setTrustAllPackages(true);
         connectionFactory.setBrokerURL(BROKER_URL);

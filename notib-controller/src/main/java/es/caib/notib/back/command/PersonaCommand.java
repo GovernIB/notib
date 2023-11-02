@@ -1,5 +1,6 @@
 package es.caib.notib.back.command;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.DocumentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.PersonaDto;
@@ -59,6 +60,18 @@ public class PersonaCommand {
 
 	public String getNif() {
 		return nif != null && nif.trim().length() != 0 ? Character.isDigit(nif.trim().charAt(0)) && nif.trim().length() < 9 ? afegirZerosNif() : nif.trim() : null;
+	}
+
+	public void setNomInput(String nomInput) {
+
+		this.nomInput = nomInput;
+		nom = nomInput;
+	}
+
+	public void setRaoSocialInput(String raoSocialInput) {
+
+		this.raoSocialInput = raoSocialInput;
+		raoSocial = raoSocialInput;
 	}
 
 	private String afegirZerosNif() {
