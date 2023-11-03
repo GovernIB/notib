@@ -385,7 +385,7 @@ public class NotificacioFormController extends BaseUserController {
 
     @PostMapping(value = "/valida/firma")
     @ResponseBody
-    public FirmaValidDto validaFirmaDocument(HttpServletRequest request, @RequestParam(value = "fitxer") MultipartFile fitxer) throws IOException {
+    public FirmaValidDto validaFirmaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer) throws IOException {
 
         var nom = fitxer.getOriginalFilename();
         var content = fitxer.getBytes();

@@ -15,6 +15,10 @@ spring:
     basename: messages
   liquibase:
     contexts: undefined
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
 
 #springdoc:
 #  packages-to-scan: es.caib.notib.api.interna.controller
