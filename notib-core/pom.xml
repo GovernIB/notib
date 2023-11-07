@@ -558,6 +558,10 @@
 			<id>jboss</id>
 			<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
 		</repository>
+		<repository>
+			<id>JBoss Releases Repository</id>
+			<url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
+		</repository>
 	    <repository>
 	       <id>github-governib-maven-repos</id>
 	       <name>GovernIB Maven Repository</name>
