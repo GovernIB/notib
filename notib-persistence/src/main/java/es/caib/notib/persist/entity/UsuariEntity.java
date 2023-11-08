@@ -118,6 +118,17 @@ public class UsuariEntity implements Serializable {
 		return true;
 	}
 
+	public String getNomSencer() {
+
+		if (nomSencer != null) {
+			return nomSencer;
+		}
+		if (nom == null) {
+			return null;
+		}
+		return llinatges != null ? nom + " " + llinatges :nom;
+	}
+
 	private static final long serialVersionUID = -6657066865382086237L;
 
 }

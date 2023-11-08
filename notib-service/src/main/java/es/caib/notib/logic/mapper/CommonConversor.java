@@ -1,5 +1,6 @@
 package es.caib.notib.logic.mapper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.persist.entity.ProcSerEntity;
@@ -20,15 +21,12 @@ public abstract class CommonConversor {
         if (usuari == null || !usuari.isPresent()) {
             return null;
         }
-        return UsuariDto.builder().codi(usuari.get().getCodi()).nom(usuari.get().getNom()).build();
+        return UsuariDto.builder().codi(usuari.get().getCodi()).nom(usuari.get().getNomSencer()).build();
     }
 
     @Named("optionalUserName")
     public String getOptionalUserName(Optional<UsuariEntity> usuari) {
-        if (usuari == null || !usuari.isPresent()) {
-            return null;
-        }
-        return usuari.get().getNom();
+        return usuari != null && usuari.isPresent() ? usuari.get().getNomSencer() : null;
     }
 
     @Named("optionalUserCode")

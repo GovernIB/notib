@@ -431,7 +431,7 @@ public class ConversioTipusHelper {
 				return;
 			}
 			if (usuariEntity.getLlinatges() != null && !usuariEntity.getLlinatges().isEmpty() && usuariEntity.getLlinatges().trim().length() > 0) {
-				usuariDto.setNom(usuariEntity.getNom() + " " + usuariEntity.getLlinatges());
+				usuariDto.setNom(usuariEntity.getNomSencer());
 			}
 		}
 	}
