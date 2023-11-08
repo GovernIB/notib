@@ -1,6 +1,7 @@
 package es.caib.notib.api.interna.controller;
 
 import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.rest.consulta.Arxiu;
@@ -88,7 +89,11 @@ public class ConsultaApiRestV1Controller {
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(null)
 								.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
-		return enviamentService.findEnviaments(consulta);
+		try {
+			return enviamentService.findEnviaments(consulta);
+		} catch (Exception e) {
+			return Resposta.builder().error(true).errorDescripcio(e.getMessage()).errorData(new Date()).build();
+		}
 	}
 
 	@GetMapping(value="/comunicacions/{dniTitular}/pendents", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -111,7 +116,11 @@ public class ConsultaApiRestV1Controller {
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(false)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
-		return enviamentService.findEnviaments(consulta);
+		try {
+			return enviamentService.findEnviaments(consulta);
+		} catch (Exception e) {
+			return Resposta.builder().error(true).errorDescripcio(e.getMessage()).errorData(new Date()).build();
+		}
 	}
 
 	@GetMapping(value="/notificacions/{dniTitular}/pendents", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -134,7 +143,11 @@ public class ConsultaApiRestV1Controller {
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(false)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
-		return enviamentService.findEnviaments(consulta);
+		try {
+			return enviamentService.findEnviaments(consulta);
+		} catch (Exception e) {
+			return Resposta.builder().error(true).errorDescripcio(e.getMessage()).errorData(new Date()).build();
+		}
 	}
 
 	@GetMapping(value="/comunicacions/{dniTitular}/llegides", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -157,7 +170,11 @@ public class ConsultaApiRestV1Controller {
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(true)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
-		return enviamentService.findEnviaments(consulta);
+		try {
+			return enviamentService.findEnviaments(consulta);
+		} catch (Exception e) {
+			return Resposta.builder().error(true).errorDescripcio(e.getMessage()).errorData(new Date()).build();
+		}
 	}
 
 	@GetMapping(value="/notificacions/{dniTitular}/llegides", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -180,7 +197,11 @@ public class ConsultaApiRestV1Controller {
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(true)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
-		return enviamentService.findEnviaments(consulta);
+		try {
+			return enviamentService.findEnviaments(consulta);
+		} catch (Exception e) {
+			return Resposta.builder().error(true).errorDescripcio(e.getMessage()).errorData(new Date()).build();
+		}
 	}
 
 	@GetMapping(value="/document/{notificacioId}", produces = MediaType.APPLICATION_JSON_VALUE)

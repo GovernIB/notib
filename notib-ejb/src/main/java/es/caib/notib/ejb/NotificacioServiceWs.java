@@ -34,15 +34,15 @@ import javax.xml.bind.annotation.XmlElement;
 @Stateless
 public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2> implements es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2 {
 
-	@Autowired
-	private UsuariAuthHelper usuariHelper;
+//	@Autowired
+//	private UsuariAuthHelper usuariHelper;
 
 
 	@Override
 	@RolesAllowed({"NOT_APL"})
 	public RespostaAlta alta(Notificacio notificacio) {
 
-		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
+//		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().alta(notificacio);
 	}
 
@@ -56,7 +56,7 @@ public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.in
 	@RolesAllowed({"NOT_APL"})
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(String identificador) {
 
-		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
+//		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().consultaEstatNotificacio(identificador);
 	}
 
@@ -70,7 +70,7 @@ public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.in
 	@RolesAllowed({"NOT_APL"})
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(String referencia) {
 
-		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
+//		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().consultaEstatEnviament(referencia);
 	}
 
@@ -84,7 +84,7 @@ public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.in
 	@RolesAllowed({"NOT_APL"})
 	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
 
-		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
+//		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().donarPermisConsulta(permisConsulta);
 	}
 	

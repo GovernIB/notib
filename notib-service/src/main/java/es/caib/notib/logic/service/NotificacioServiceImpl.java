@@ -1586,7 +1586,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			return pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, nom, contentType);
+			var info = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, nom, contentType);
+			return info;
+		} catch (Exception ex) {
+			log.error("Error detectant la signatura", ex);
+			throw ex;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

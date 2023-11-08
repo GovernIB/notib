@@ -916,6 +916,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				info.setCodiEntitat(entitat.getCodi());
 				integracioHelper.addAplicacioAccioParam(info, entitat.getId());
 				var procediment = procSerRepository.findByEntitatAndCodiProcediment(entitat, permisConsulta.getProcedimentCodi());
+				if (procediment == null) {
+					integracioHelper.addAccioError(info, "Procediment inexistent");
+					return false;
+				}
 				var permisos = permisosHelper.findPermisos(procediment.getId(), ProcedimentEntity.class);
 				if (permisos == null || permisos.isEmpty()) {
 					PermisDto permisNou = new PermisDto();

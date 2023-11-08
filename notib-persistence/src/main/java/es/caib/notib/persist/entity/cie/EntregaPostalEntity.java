@@ -126,6 +126,7 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 	public void update(EntregaPostal entregaPostal) {
 
 		domiciliViaTipus = entregaPostal.getViaTipus();
+		domiciliConcretTipus = NotificaDomiciliConcretTipus.NACIONAL;
 		if (entregaPostal.getTipus() != null) {
 			switch (entregaPostal.getTipus()) {
 				case APARTAT_CORREUS:
@@ -133,9 +134,6 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 					break;
 				case ESTRANGER:
 					domiciliConcretTipus = NotificaDomiciliConcretTipus.ESTRANGER;
-					break;
-				case NACIONAL:
-					domiciliConcretTipus = NotificaDomiciliConcretTipus.NACIONAL;
 					break;
 				case SENSE_NORMALITZAR:
 					domiciliConcretTipus = NotificaDomiciliConcretTipus.SENSE_NORMALITZAR;

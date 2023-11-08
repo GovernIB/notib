@@ -3,6 +3,7 @@ package es.caib.notib.api.interna.controller;
 import es.caib.notib.api.interna.openapi.interficies.ConsultaApiRestV2Intf;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.client.domini.RespostaConsultaEstatEnviament;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
@@ -33,7 +34,7 @@ import java.util.Date;
 @RestController
 @Slf4j
 @RequestMapping("/consulta/v2")
-public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
+public class ConsultaApiRestV2Controller  extends NotificacioApiRestBaseController implements ConsultaApiRestV2Intf {
 
 	@Autowired
 	private EnviamentService enviamentService;
@@ -77,7 +78,11 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(null).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
-		return enviamentService.findEnviamentsV2(consulta);
+		try {
+			return enviamentService.findEnviamentsV2(consulta);
+		} catch (Exception e) {
+			return RespostaConsultaV2.builder().error(true).errorDescripcio(e.getMessage()).errorData(new Date()).build();
+		}
 	}
 
 	@GetMapping(value="/comunicacions/{dniTitular}/pendents", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -96,7 +101,11 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(false).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
-		return enviamentService.findEnviamentsV2(consulta);
+		try {
+			return enviamentService.findEnviamentsV2(consulta);
+		} catch (Exception e) {
+			return RespostaConsultaV2.builder().error(true).errorDescripcio(e.getMessage()).errorData(new Date()).build();
+		}
 	}
 
 	@GetMapping(value="/notificacions/{dniTitular}/pendents", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -115,7 +124,11 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(false).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
-		return enviamentService.findEnviamentsV2(consulta);
+		try {
+			return enviamentService.findEnviamentsV2(consulta);
+		} catch (Exception e) {
+			return RespostaConsultaV2.builder().error(true).errorDescripcio(e.getMessage()).errorData(new Date()).build();
+		}
 	}
 
 	@GetMapping(value="/comunicacions/{dniTitular}/llegides", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -134,7 +147,11 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(true).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
-		return enviamentService.findEnviamentsV2(consulta);
+		try {
+			return enviamentService.findEnviamentsV2(consulta);
+		} catch (Exception e) {
+			return RespostaConsultaV2.builder().error(true).errorDescripcio(e.getMessage()).errorData(new Date()).build();
+		}
 	}
 
 	@GetMapping(value="/notificacions/{dniTitular}/llegides", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -153,7 +170,11 @@ public class ConsultaApiRestV2Controller implements ConsultaApiRestV2Intf {
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(true).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
-		return enviamentService.findEnviamentsV2(consulta);
+		try {
+			return enviamentService.findEnviamentsV2(consulta);
+		} catch (Exception e) {
+			return RespostaConsultaV2.builder().error(true).errorDescripcio(e.getMessage()).errorData(new Date()).build();
+		}
 	}
 
 	@GetMapping(value="/document/{notificacioId}", produces = MediaType.APPLICATION_JSON_VALUE)

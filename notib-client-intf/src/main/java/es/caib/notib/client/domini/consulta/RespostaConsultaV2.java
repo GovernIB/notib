@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -15,8 +16,12 @@ import java.util.List;
 @ToString
 public class RespostaConsultaV2 {
 
-	int numeroElementsTotals;
-	int numeroElementsRetornats;
-	List<TransmissioV2> resultat;
+	private int numeroElementsTotals;
+	private int numeroElementsRetornats;
+	private List<TransmissioV2> resultat;
+	private boolean error;
+	private String errorDescripcio;
+	private Date errorData;
+
 	
 }

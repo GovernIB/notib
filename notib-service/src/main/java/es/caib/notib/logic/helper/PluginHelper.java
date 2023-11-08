@@ -2158,6 +2158,9 @@ public class PluginHelper {
 			case "FIRMA":
 				firmaServidorPlugin = new HashMap<>();
 				break;
+			case "VALIDATE_SIGNATURE":
+				validaSignaturaPlugins = new HashMap<>();
+				break;
 			case "GESCONADM":
 				gestorDocumentalAdministratiuPlugin = new HashMap<>();
 				break;
@@ -2169,6 +2172,9 @@ public class PluginHelper {
 				break;
 			case "DIR3":
 				unitatsOrganitzativesPlugin = new HashMap<>();
+				break;
+			case "CARPETA":
+				carpetaPlugin = new HashMap<>();
 				break;
 			default:
 				break;
