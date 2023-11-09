@@ -11,6 +11,7 @@
 	pageContext.setAttribute("sessionEntitats", sessionScopedContext.getEntitatsAccessibles());
 	pageContext.setAttribute("entitatActual", sessionScopedContext.getEntitatActual());
 	pageContext.setAttribute("requestParameterCanviEntitat", es.caib.notib.back.helper.RolHelper.REQUEST_PARAMETER_CANVI_ENTITAT);
+	pageContext.setAttribute("usuariActual", sessionScopedContext.getUsuariActual());
 	pageContext.setAttribute("rolActual", sessionScopedContext.getRolActual());
 	pageContext.setAttribute("rolsUsuariActual", sessionScopedContext.getRolsDisponibles());
 	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual()));
@@ -250,7 +251,7 @@
 						<a id="dd_user" href="#" data-toggle="dropdown">
 							<span class="fa fa-user"></span>
 							<c:choose>
-								<c:when test="${not empty dadesUsuariActual}">${dadesUsuariActual.nom}</c:when>
+								<c:when test="${not empty usuariActual}">${usuariActual.nom}</c:when>
 								<c:otherwise>${pageContext.request.userPrincipal.name}</c:otherwise>
 							</c:choose>
 							<span class="caret caret-white"></span>
