@@ -350,7 +350,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		var dto = new GcaServei();
 		dto.setCodiSIA(servei.getCodigoSIA());
 		dto.setNom(servei.getNombre());
-		dto.setUnitatAdministrativacodi(getUnitatAdministrativa(servei.getUnidadAdministrativa().getCodigo()));
+		dto.setUnitatAdministrativacodi(getUnitatAdministrativa(servei.getOrganoInstructor().getCodigo()));
 		dto.setDataActualitzacio(servei.getFechaActualizacion());
 		dto.setComu(servei.isComun());
 		return dto;
