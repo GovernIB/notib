@@ -43,7 +43,7 @@ public interface EnviamentSmService {
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid);
 
 	@PreAuthorize("hasRole('tothom')")
-	StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreEnviament(String enviamentUuid);
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreEnviament(String enviamentUuid, boolean retry);
 
 	@PreAuthorize("hasRole('tothom')")
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreSuccess(String enviamentUuid);
@@ -64,7 +64,7 @@ public interface EnviamentSmService {
     boolean enviamentIsInRegistreErrorState(String enviamentUuid);
 
     @PreAuthorize("hasRole('tothom')")
-	StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaEnviament(String enviamentUuid);
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaEnviament(String enviamentUuid, boolean retry);
 
     @PreAuthorize("hasRole('tothom')")
 	void notificaFi(String notificaReferencia);

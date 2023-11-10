@@ -32,7 +32,7 @@ public class NotificaAction implements Action<EnviamentSmEstat, EnviamentSmEvent
         var notificacioRegistrada = enviament.getNotificacio().getEnviaments().stream().allMatch(e -> e.getRegistreData() != null);
         if (notificacioRegistrada) {
 //            enviamentSmService.notificaEnviament(enviamentUuid);
-            enviament.getNotificacio().getEnviaments().forEach(e -> enviamentSmService.notificaEnviament(e.getNotificaReferencia()));
+            enviament.getNotificacio().getEnviaments().forEach(e -> enviamentSmService.notificaEnviament(e.getNotificaReferencia(), false));
             log.debug("[SM] Tots els enviaments de la notificació estan registrats. S'ha d'avançar la màquina d'estats - enviament amb UUID " + enviamentUuid);
         }
     }

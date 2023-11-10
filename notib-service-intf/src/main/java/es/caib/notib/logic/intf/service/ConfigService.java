@@ -60,5 +60,7 @@ public interface ConfigService {
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	String getPropertyValue(String key);
 
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	void carregarDelaysReintentsRemeses();
 }
 

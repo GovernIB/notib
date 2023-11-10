@@ -62,4 +62,9 @@ public class ConfigService extends AbstractService<es.caib.notib.logic.intf.serv
 	public String getPropertyValue(String key) {
 		return getDelegateService().getPropertyValue(key);
 	}
+
+	@Override
+	public void carregarDelaysReintentsRemeses() {
+		getDelegateService().carregarDelaysReintentsRemeses();
+	}
 }

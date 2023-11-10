@@ -50,15 +50,17 @@ public class EnviamentNotificaAction implements Action<EnviamentSmEstat, Enviame
 
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
-        var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
-
+        var variables = stateContext.getExtendedState().getVariables();
+        var reintents = (int) variables.getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
         var notificacioRegistrada = enviament.getNotificacio().getEnviaments().stream().allMatch(e -> e.getRegistreData() != null);
         if (!notificacioRegistrada) {
             log.debug("[SM] Petició de notificació NO enviada degut a que no tots els enviaments estan registrats - enviament amb UUID " + enviamentUuid);
             return;
         }
         var env = EnviamentNotificaRequest.builder().enviamentNotificaDto(enviamentNotificaMapper.toDto(enviament)).numIntent(reintents + 1).build();
-        var isRetry = EnviamentSmEvent.NT_RETRY.equals(stateContext.getMessage().getPayload());
+        var retry = (boolean) variables.getOrDefault(SmConstants.NT_RETRY, false);
+        var isRetry = EnviamentSmEvent.NT_RETRY.equals(stateContext.getMessage().getPayload()) || retry;
+        variables.put(SmConstants.RG_RETRY, false);
         jmsTemplate.convertAndSend(SmConstants.CUA_NOTIFICA, env,
                 m -> {
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0);

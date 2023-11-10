@@ -70,6 +70,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                 aplicacioService.updateProcesInicialExecutat(proces);
             }
             configService.actualitzarPropietatsJBossBdd();
+            configService.carregarDelaysReintentsRemeses();
         } catch (Exception ex) {
             log.error("Error executant els processos inicials", ex);
         }

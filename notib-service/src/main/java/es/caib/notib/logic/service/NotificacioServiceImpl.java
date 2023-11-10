@@ -951,7 +951,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public RespostaAccio<String> enviarNotificacioARegistre(Long notificacioId) throws RegistreNotificaException {
+	public RespostaAccio<String> enviarNotificacioARegistre(Long notificacioId, boolean retry) throws RegistreNotificaException {
 
 		var timer = metricsHelper.iniciMetrica();
 		var resposta = new RespostaAccio<String>();
@@ -967,7 +967,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							break;
 						case REGISTRE_PENDENT:
 						case NOU:
-							enviamentSmService.registreEnviament(e.getUuid());
+							enviamentSmService.registreEnviament(e.getUuid(), retry);
 							resposta.getExecutades().add(e.getUuid());
 							break;
 						default:
@@ -1011,7 +1011,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public void refrescarEstatEnviamentASir(Long enviamentId) {
+	public void refrescarEstatEnviamentASir(Long enviamentId, boolean retry) {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
@@ -1023,7 +1023,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					enviamentSmService.notificaRetry(enviament.getUuid());
 					break;
 				case SIR_PENDENT:
-					enviamentSmService.notificaEnviament(enviament.getUuid());
+					enviamentSmService.notificaEnviament(enviament.getUuid(), retry);
 					break;
 				default:
 					throw new EnviamentSmEstatException("Estat incorrecte per a refrescar l'estat SIR", estatEnviament);
@@ -1035,7 +1035,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public boolean enviarNotificacioANotifica(Long notificacioId) {
+	public boolean enviarNotificacioANotifica(Long notificacioId, boolean retry) {
 
 		var timer = metricsHelper.iniciMetrica();
 		var resposta = new RespostaAccio<String>();
@@ -1052,7 +1052,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							resposta.getExecutades().add(e.getUuid());
 							break;
 						case NOTIFICA_PENDENT:
-							enviamentSmService.notificaEnviament(e.getUuid());
+							enviamentSmService.notificaEnviament(e.getUuid(), retry);
 							resposta.getExecutades().add(e.getUuid());
 							break;
 						case SIR_PENDENT:
@@ -1533,7 +1533,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				|| NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) && !notificacio.isJustificantCreat()) {
 
 				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
-				enviarNotificacioANotifica(notificacioId);
+				enviarNotificacioANotifica(notificacioId, true);
 				return true;
 			}
 		} catch (Exception e) {

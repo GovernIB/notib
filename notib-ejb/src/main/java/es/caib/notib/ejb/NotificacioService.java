@@ -110,14 +110,14 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
     @Override
 	@RolesAllowed("**")
-    public void refrescarEstatEnviamentASir(Long enviamentId) {
-        getDelegateService().refrescarEstatEnviamentASir(enviamentId);
+    public void refrescarEstatEnviamentASir(Long enviamentId, boolean retry) {
+        getDelegateService().refrescarEstatEnviamentASir(enviamentId, retry);
     }
 
     @Override
 	@RolesAllowed("**")
-	public boolean enviarNotificacioANotifica(Long notificacioId) {
-		return getDelegateService().enviarNotificacioANotifica(notificacioId);
+	public boolean enviarNotificacioANotifica(Long notificacioId, boolean retry) {
+		return getDelegateService().enviarNotificacioANotifica(notificacioId, retry);
 	}
 
 	@Override
@@ -171,8 +171,8 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed("**")
-	public RespostaAccio<String> enviarNotificacioARegistre(Long notificacioId) throws RegistreNotificaException {
-		return getDelegateService().enviarNotificacioARegistre(notificacioId);
+	public RespostaAccio<String> enviarNotificacioARegistre(Long notificacioId, boolean retry) throws RegistreNotificaException {
+		return getDelegateService().enviarNotificacioARegistre(notificacioId, retry);
 	}
 
 	@Override

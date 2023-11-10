@@ -35,20 +35,21 @@ public class SmConstants {
     public static final String CUA_CONSULTA_SIR = "qu_sir";
     public static final String CUA_POOLING_SIR = "qu_pool_sir";
 
-    // Delay
-    // 1er reintent 30min, 2on reintent 8h, successius 24h
+    public static final String RG_RETRY = "rg_retry";
+    public static final String NT_RETRY = "nt_retry";
+
+    public static Long INTENT2;
+    public static Long INTENT3;
+    public static Long INTENT4;
+
+
     public static Long delay(int reintent) {
-//        switch (reintent) {
-//            case 0: return 0L;
-//            case 1: return 500L;
-//            case 2: return 10000L;
-//            default: return 86400000L;
-//        }
+
         switch (reintent) {
-            case 0: return 0L;          // Inmediat
-            case 1: return 1800000L;    // Delay de 30min
-            case 2: return 28800000L;   // Delay de 8h
-            default: return 86400000L;  // Delay de 24h
+            case 0: return 0L;// Inmediat
+            case 1: return INTENT2 != null ? INTENT2 : 1800000L;    // Per defecte delay de 30min
+            case 2: return INTENT3 != null ? INTENT3 : 28800000L;   // Per defecte delay de 8h
+            default: return INTENT4 != null ? INTENT4 : 86400000L;  // Per defecte delay de 24h
         }
     }
 

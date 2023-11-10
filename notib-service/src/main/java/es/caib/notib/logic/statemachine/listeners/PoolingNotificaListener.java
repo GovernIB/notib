@@ -25,14 +25,10 @@ public class PoolingNotificaListener {
 
     @Transactional
     @JmsListener(destination = SmConstants.CUA_POOLING_ESTAT, containerFactory = SmConstants.JMS_FACTORY_ACK)
-    public void receiveConsultaSir(@Payload String enviamentUuid,
-                                   @Headers MessageHeaders headers,
-                                   Message message) throws JMSException, InterruptedException {
+    public void receiveConsultaSir(@Payload String enviamentUuid, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
-        if (!isAdviserActiu()) {
-            enviamentSmService.enviamentConsulta(enviamentUuid);
-            log.debug("[SM] Iniciat pooling de consulta d'estat a Notifica de l'enviament amb UUID " + enviamentUuid);
-        }
+        enviamentSmService.enviamentConsulta(enviamentUuid);
+        log.debug("[SM] Iniciat pooling de consulta d'estat a Notifica de l'enviament amb UUID " + enviamentUuid);
         message.acknowledge();
 
     }

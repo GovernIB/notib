@@ -227,9 +227,11 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	@Override
 	@Transactional
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreEnviament(String enviamentUuid) {
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreEnviament(String enviamentUuid, boolean retry) {
 
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		var variables = sm.getExtendedState().getVariables();
+		variables.put(SmConstants.RG_RETRY, retry);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_ENVIAR);
 		return sm;
 	}
@@ -293,9 +295,10 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	@Override
 	@Transactional
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaEnviament(String enviamentUuid) {
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaEnviament(String enviamentUuid, boolean retry) {
 
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		sm.getExtendedState().getVariables().put(SmConstants.NT_RETRY, retry);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_ENVIAR);
 		return sm;
 	}

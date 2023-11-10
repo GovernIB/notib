@@ -72,8 +72,8 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed("**")
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreEnviament(String enviamentUuid) {
-		return getDelegateService().registreEnviament(enviamentUuid);
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreEnviament(String enviamentUuid, boolean retry) {
+		return getDelegateService().registreEnviament(enviamentUuid, retry);
 	}
 
 	@Override
@@ -114,8 +114,8 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 
     @Override
 	@RolesAllowed("**")
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaEnviament(String enviamentUuid) {
-		return getDelegateService().notificaEnviament(enviamentUuid);
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaEnviament(String enviamentUuid, boolean retry) {
+		return getDelegateService().notificaEnviament(enviamentUuid, retry);
 	}
 
 	@Override

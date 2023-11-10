@@ -9,6 +9,7 @@ import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.dto.config.ConfigGroupDto;
 import es.caib.notib.logic.intf.service.ConfigService;
+import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.persist.entity.config.ConfigEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.config.ConfigGroupRepository;
@@ -64,6 +65,9 @@ public class ConfigServiceImpl implements ConfigService {
         pluginHelper.resetPlugins(configEntity.getGroupCode());
         NotificacioEventHelper.clearNotificaConsultaActiva();
         cacheHelper.clearAllCaches();
+        if ("es.caib.notib.state.machine.delay".equals(property.getKey())) {
+            carregarDelaysReintentsRemeses();
+        }
         return conversioTipusHelper.convertir(configEntity, ConfigDto.class);
     }
 
@@ -160,6 +164,26 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     public String getPropertyValue(String key) {
         return configHelper.getConfig(key);
+    }
+
+    @Override
+    public void carregarDelaysReintentsRemeses() {
+
+        try {
+            var delay = configHelper.getConfig("es.caib.notib.state.machine.delay");
+            if (Strings.isNullOrEmpty(delay)) {
+                return;
+            }
+            var split = delay.split(";");
+            if (split.length != 3) {
+                return;
+            }
+            SmConstants.INTENT2 = Long.valueOf(split[0]);
+            SmConstants.INTENT3 = Long.valueOf(split[1]);
+            SmConstants.INTENT4 = Long.valueOf(split[2]);
+        } catch (Exception ex) {
+            log.error("Error carregant els delays per la state machine", ex);
+        }
     }
 
     private void processPropertyValues(ConfigGroupDto cGroup) {

@@ -48,10 +48,12 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
-//        var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
-        var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
+        var variables = stateContext.getExtendedState().getVariables();
+        var reintents = (int) variables.getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
         var env = EnviamentRegistreRequest.builder().enviamentUuid(enviamentUuid).numIntent(reintents + 1).build();//.enviamentRegistreDto(enviamentRegistreMapper.toDto(enviament))
-        var isRetry = EnviamentSmEvent.RG_RETRY.equals(stateContext.getMessage().getPayload());
+        var retry = (boolean) variables.getOrDefault(SmConstants.RG_RETRY, false);
+        var isRetry = EnviamentSmEvent.RG_RETRY.equals(stateContext.getMessage().getPayload()) || retry;
+        variables.put(SmConstants.RG_RETRY, false);
         jmsTemplate.convertAndSend(SmConstants.CUA_REGISTRE, env,
                 m -> {
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0);

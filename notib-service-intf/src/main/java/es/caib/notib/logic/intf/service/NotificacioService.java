@@ -237,7 +237,7 @@ public interface NotificacioService {
 	ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-    void refrescarEstatEnviamentASir(Long enviamentId);
+    void refrescarEstatEnviamentASir(Long enviamentId, boolean retry);
 
     /**
 	 * Prova de fer l'enviament d'una notificació pendent.
@@ -246,7 +246,7 @@ public interface NotificacioService {
 	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	boolean enviarNotificacioANotifica(Long notificacioId);
+	boolean enviarNotificacioANotifica(Long notificacioId, boolean retry);
 
 	/**
 	 * Reseteja els intents de la notificacio.
@@ -266,7 +266,7 @@ public interface NotificacioService {
 	 * @throws RegistreNotificaException 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	RespostaAccio<String> enviarNotificacioARegistre(Long notificacioId) throws RegistreNotificaException;
+	RespostaAccio<String> enviarNotificacioARegistre(Long notificacioId, boolean retry) throws RegistreNotificaException;
 
 	/**
 	 * Reseteja els intents de regitre.

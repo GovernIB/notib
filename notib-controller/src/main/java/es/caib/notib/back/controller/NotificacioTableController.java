@@ -370,7 +370,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public String enviar(HttpServletRequest request, @PathVariable Long notificacioId, Model model) {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
-        var enviada = notificacioService.enviarNotificacioANotifica(notificacioId);
+        var enviada = notificacioService.enviarNotificacioANotifica(notificacioId, true);
         emplenarModelNotificacioInfo(entitatActual, notificacioId, request,ACCIONS, model);
         model.addAttribute(PESTANYA_ACTIVA, ACCIONS);
         if (enviada) {
@@ -383,7 +383,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public String registrar(HttpServletRequest request, @PathVariable Long notificacioId, Model model) throws RegistreNotificaException {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
-        RespostaAccio<String> resposta = notificacioService.enviarNotificacioARegistre(notificacioId);
+        RespostaAccio<String> resposta = notificacioService.enviarNotificacioARegistre(notificacioId, true);
         emplenarModelNotificacioInfo(entitatActual, notificacioId, request,ACCIONS, model);
         if (resposta.isEmpty() || !resposta.getErrors().isEmpty()) {
             MissatgesHelper.error(request, getMessage(request, "notificacio.controller.registrar.error"));
