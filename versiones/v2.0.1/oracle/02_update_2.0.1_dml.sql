@@ -19,4 +19,4 @@ DELETE FROM NOT_ENTITAT_TIPUS_DOC netd WHERE TIPUS_DOC = 3;
 INSERT INTO NOT_PROCESSOS_INICIALS (id, codi, init) VALUES (5, 'AFEGIR_NOTIFICACIONS_MAQUINA_ESTATS', 1);
 
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.pooling.delay', '', 'Temps espera abans no inicia el pooling de la remesa', 'GENERAL', 0, 0, 'INT', 1);
-INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.state.machine.delay', '', 'Temps espera entre intents. Segon intent, tercer intent, quart intent i següents', 'GENERAL', 0, 0, 'TEXT', 1);
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.state.machine.delay', '', 'Temps espera entre reintents en milisegons. (Format: 1er;2n;3er)', 'GENERAL', 0, 0, 'TEXT', 1);
