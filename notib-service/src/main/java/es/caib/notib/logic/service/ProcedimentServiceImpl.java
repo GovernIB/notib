@@ -99,6 +99,8 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 	@Resource
 	private ProcSerRepository procSerRepository;
 	@Resource
+	private ProcSerOrganRepository procSerOrganRepository;
+	@Resource
 	private ProcedimentFormRepository procedimentFormRepository;
 	@Resource
 	private OrganGestorRepository organGestorRepository;
@@ -314,6 +316,8 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			for (var grupProcedimentEntity : grupsDelProcediment) {
 				grupProcedimentRepository.delete(grupProcedimentEntity);
 			}
+
+			procSerOrganRepository.deleteByProcSerId(id);
 			//Eliminar procediment
 			procedimentRepository.deleteById(procedimentEntity.getId());
 			permisosHelper.revocarPermisosEntity(id,ProcedimentEntity.class);
