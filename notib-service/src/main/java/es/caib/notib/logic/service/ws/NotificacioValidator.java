@@ -147,7 +147,9 @@ public class NotificacioValidator implements Validator {
         if (!Strings.isNullOrEmpty(procedimentCodi) && procedimentCodi.length() > 9) {
             errors.rejectValue(procCodi, error(PROCSER_SIZE, locale));
         }
-        if (procediment != null) {
+        if (procediment == null) {
+            errors.rejectValue(procCodi, error(PROCSER_NO_EXIST, locale));
+        } else {
             if(!procediment.isActiu()) {
                 errors.rejectValue(procCodi, error(PROCSER_INACTIU, locale));
             }
