@@ -101,6 +101,11 @@ public class NotificacioMassivaService extends AbstractService<es.caib.notib.log
 	}
 
 	@Override
+	public void iniciar(Long id) {
+		getDelegateService().iniciar(id);
+	}
+
+	@Override
 	@RolesAllowed("**")
 	public NotificacioMassivaDataDto create(Long entitatId, String usuariCodi,
 			NotificacioMassivaDto notificacioMassiu) throws RegistreNotificaException {

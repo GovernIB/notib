@@ -179,7 +179,7 @@ public class ConversioTipusHelper {
 							@Override
 							public void mapAtoB(NotificacioMassivaEntity entity, NotificacioMassivaTableItemDto dto, MappingContext context) {
 								entity.getCreatedBy().ifPresent(usuari -> {
-									dto.setCreatedByNom(usuari.getNom());
+									dto.setCreatedByNom(usuari.getNomSencer());
 									dto.setCreatedByCodi(usuari.getCodi());
 								});
 								var data = entity.getCreatedDate().orElseThrow();

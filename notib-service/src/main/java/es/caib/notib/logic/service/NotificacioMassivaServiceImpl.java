@@ -69,6 +69,7 @@ import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
+import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
@@ -76,6 +77,7 @@ import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.PagadorPostalRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
+import liquibase.pro.packaged.D;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -84,6 +86,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.supercsv.io.CsvListWriter;
@@ -138,6 +141,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     private DocumentHelper documentHelper;
     @Autowired
     private NotificacioMassivaHelper notificacioMassivaHelper;
+    @Autowired
+    private DocumentRepository documentRepository;
     @Autowired
     private ProcSerRepository procSerRepository;
     @Autowired
@@ -255,6 +260,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             checkCSVContent(linies, csvHeader);
             var fileNames = ZipFileUtils.readZipFileNames(notificacioMassiva.getFicheroZipBytes());
             Map<String, Long> documentsProcessatsMassiu = new HashMap<>(); // key: csv/uuid/arxiuFisicoNom - value: documentEntity.getId()
+            Map<String, Document> documents = new HashMap<>(); // key: csv/uuid/arxiuFisicoNom - value: documentEntity.getId()
             csvHeader.add("Errores");
             var listWriterErrors = initCsvWritter(writerListErrors);
             var listWriterInforme = initCsvWritter(writerListInforme);
@@ -279,7 +285,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 }
                 linia = trim(linia);
                 notificacio = csvLiniaToNotificacioV2(linia, notificacioMassiva.getCaducitat(), entitat, usuariCodi, fileNames,
-                                                        notificacioMassiva.getFicheroZipBytes(),documentsProcessatsMassiu, fila++);
+                                                        notificacioMassiva.getFicheroZipBytes(),documentsProcessatsMassiu, documents, fila++);
 
                 keyDocument = getKeyDocument(notificacio);
                 if (keyDocument != null && !documentsProcessatsMassiu.containsKey(keyDocument)) {
@@ -294,6 +300,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     document3 = documentHelper.getDocument(notificacio.getDocument3());
                     document4 = documentHelper.getDocument(notificacio.getDocument4());
                     document5 = documentHelper.getDocument(notificacio.getDocument5());
+                }
+                if (Strings.isNullOrEmpty(notificacio.getDocument().getContingutBase64())) {
+                    notificacioValidator.setValidarDocuments(false);
                 }
                 var docs = new DocumentValidDto[] { document, document2, document3, document4, document5 };
                 errors = new BindException(notificacio, "notificacio");
@@ -493,6 +502,21 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         }
     }
 
+    @Override
+    @Transactional
+    public void iniciar(Long id) {
+
+        try {
+            var massiva = notificacioMassivaRepository.findById(id).orElseThrow();
+            massiva.getNotificacions().forEach(n -> n.getEnviaments().forEach(e -> {
+                Thread t = new Thread(() -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
+                t.start();
+            }));
+        } catch (Exception ex) {
+            log.error("Error inicialitant la màquina d'estats per la notificacio massiva " + id);
+        }
+    }
+
     @Transactional
     public byte [] afegirErrorsProcessat(NotificacioMassivaEntity massiva, byte[] contingut, boolean fitxerErrors) {
 
@@ -642,7 +666,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         log.debug("[NOT-MASSIVA] Alta notificació de nova notificacio massiva");
         notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
         // SM
-        notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
+//        notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
         notMassiva.joinNotificacio(notificacioEntity);
     }
 
@@ -726,7 +750,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     }
 
     private Notificacio csvLiniaToNotificacioV2(String[] linia, Date caducitat, EntitatEntity entitat, String usuariCodi, List<String> fileNames,
-                                                byte[] ficheroZipBytes, Map<String, Long> documentsProcessatsMassiu, Integer fila) {
+                                                byte[] ficheroZipBytes, Map<String, Long> documentsProcessatsMassiu, Map<String, Document> documents, Integer fila) {
 
         log.debug("[NOT-MASSIVA] Construeix notificació de les dades del fitxer CSV");
         var notV2 = new Notificacio();
@@ -758,7 +782,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             // Fecha envío programado
             setDataProgramada(notV2, linia[17]);
             // Document
-            var llegirMetadades = setDocument(notV2, document, linia, fileNames, ficheroZipBytes, documentsProcessatsMassiu);
+            var llegirMetadades = setDocument(notV2, document, linia, fileNames, ficheroZipBytes, documentsProcessatsMassiu, documents);
             if (llegirMetadades) {
                 setOrigen(notV2, linia[18]);
                 setValidesa(notV2, linia[19]);
@@ -864,7 +888,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         }
     }
 
-    private boolean setDocument(Notificacio notificacio, Document document, String[] linia, List<String> fileNames, byte[] ficheroZipBytes, Map<String, Long> documentsProcessatsMassiu) {
+    private boolean setDocument(Notificacio notificacio, Document document, String[] linia, List<String> fileNames, byte[] ficheroZipBytes,
+                                Map<String, Long> documentsProcessatsMassiu, Map<String, Document> documents) {
 
         var llegirMetadades = false;
         if (linia[4] == null || linia[4].isEmpty()) {
@@ -892,7 +917,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         if (fileNames.contains(arxiuNom)) { // Archivo físico
             document.setArxiuNom(arxiuNom);
             if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
-                    (documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && documentsProcessatsMassiu.get(document.getArxiuNom()) != null)) {
+                    (documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
 
                 arxiuBytes = ZipFileUtils.readZipFile(ficheroZipBytes, arxiuNom);
                 document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
@@ -904,6 +929,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 if (registreNotificaHelper.isSendDocumentsActive()) {
                     llegirMetadades = true;
                 }
+                documents.put(arxiuNom, document);
             }
             notificacio.setDocument(document);
             return llegirMetadades;

@@ -21,6 +21,7 @@ import es.caib.notib.logic.intf.exception.InvalidCSVFileNotificacioMassivaExcept
 import es.caib.notib.logic.intf.exception.MaxLinesExceededException;
 import es.caib.notib.logic.intf.exception.NotificacioMassivaException;
 import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.GestioDocumentalService;
 import es.caib.notib.logic.intf.service.NotificacioMassivaService;
 import es.caib.notib.logic.intf.service.NotificacioService;
@@ -65,6 +66,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
 
     @Autowired
     private NotificacioMassivaService notificacioMassivaService;
+    @Autowired
+    private EnviamentSmService smService;
     @Autowired
     private NotificacioService notificacioService;
     @Autowired
@@ -304,7 +307,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
 
         try {
             log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Processant dades del formulari. ");
-            notificacioMassivaService.create(entitat.getId(), getCodiUsuariActual(),notificacioMassivaCommand.asDto(gestioDocumentalService));
+            var massiva = notificacioMassivaService.create(entitat.getId(), getCodiUsuariActual(),notificacioMassivaCommand.asDto(gestioDocumentalService));
+            notificacioMassivaService.iniciar(massiva.getId());
         } catch (Exception ex) {
             log.error("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Excepció al processar les dades del formulari", ex);
             log.error(ExceptionUtils.getStackTrace(ex));

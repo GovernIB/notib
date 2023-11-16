@@ -180,4 +180,7 @@ public interface NotificacioMassivaService {
 	 * @param notificacioMassivaId Identificador de la notificacio massiva que es vol cancelar
 	 */
 	void cancelar(Long entitatId, Long notificacioMassivaId) throws Exception;
+
+	@PreAuthorize("hasRole('tothom')")
+	void iniciar(Long id);
 }

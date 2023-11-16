@@ -11,6 +11,7 @@ import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
+import es.caib.notib.persist.repository.NotificacioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.stateMachine.StateMachineRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	private final NotificacioEnviamentRepository enviamentRepository;
 	private final NotificacioRepository notificacioRepository;
+	private final NotificacioMassivaRepository notificacioMassivaRepository;
 	private final StateMachineRepository smRepository;
 	private final StateMachineService<EnviamentSmEstat, EnviamentSmEvent> stateMachineService;
 

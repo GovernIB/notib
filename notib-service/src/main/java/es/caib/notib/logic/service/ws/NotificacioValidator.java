@@ -73,6 +73,8 @@ public class NotificacioValidator implements Validator {
     private Errors errors;
     @Setter
     private Locale locale;
+    @Setter
+    private boolean validarDocuments = true;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -99,7 +101,9 @@ public class NotificacioValidator implements Validator {
         validateOrgan();
         validateDadesBasiquesNotificacio();
         validateUsuari();
-        validateDocuments();
+        if (validarDocuments) {
+            validateDocuments();
+        }
         validateEnviaments();
     }
 
