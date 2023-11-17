@@ -141,6 +141,9 @@ public class NotificacioValidator implements Validator {
         // Procediment
         var procCodi = "procedimentCodi";
         var procedimentCodi = notificacio.getProcedimentCodi();
+        if ((EnviamentTipus.COMUNICACIO.equals(notificacio.getEnviamentTipus()) || EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) && procediment == null) {
+            return;
+        }
         if (EnviamentTipus.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
             if (Strings.isNullOrEmpty(procedimentCodi)) {
                 errors.rejectValue(procCodi, error(PROCSER_NULL, locale));
@@ -151,7 +154,7 @@ public class NotificacioValidator implements Validator {
         if (!Strings.isNullOrEmpty(procedimentCodi) && procedimentCodi.length() > 9) {
             errors.rejectValue(procCodi, error(PROCSER_SIZE, locale));
         }
-        if (procediment == null) {
+        if (procediment == null ) {
             errors.rejectValue(procCodi, error(PROCSER_NO_EXIST, locale));
         } else {
             if(!procediment.isActiu()) {

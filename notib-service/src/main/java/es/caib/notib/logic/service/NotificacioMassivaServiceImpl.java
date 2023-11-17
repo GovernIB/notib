@@ -198,7 +198,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             return new NotificacioMassivaInfoDto();
         }
         List<NotificacioMassivaInfoDto.NotificacioInfo> info = new ArrayList<>();
-        var numNotificacio = 0;
+            var numNotificacio = 0;
         NotificacioMassivaInfoDto.NotificacioInfo.NotificacioInfoBuilder builder;
         for (var linea : linies) {
             builder = NotificacioMassivaInfoDto.NotificacioInfo.builder()
@@ -240,7 +240,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 builder.errorsExecucio(error.toString());
             }
             info.add(builder.build());
-            numNotificacio++;
+//            numNotificacio++;
         }
         var dto = conversioTipusHelper.convertir(notificacioMassiva, NotificacioMassivaInfoDto.class);
         dto.setSummary(info);
