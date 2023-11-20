@@ -154,7 +154,7 @@ public class NotificacioEventHelper {
     public void addNotificaEnviamentEvent(NotificacioEntity notificacio, boolean error, String errorDescripcio, boolean errorMaxReintents) {
 
         for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-            if (InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+            if (enviament.isPerEmail()) {
                 continue;
             }
             addEvent(EventInfo.builder()
