@@ -198,7 +198,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             return new NotificacioMassivaInfoDto();
         }
         List<NotificacioMassivaInfoDto.NotificacioInfo> info = new ArrayList<>();
-            var numNotificacio = 0;
+        var numNotificacio = 0;
         NotificacioMassivaInfoDto.NotificacioInfo.NotificacioInfoBuilder builder;
         for (var linea : linies) {
             builder = NotificacioMassivaInfoDto.NotificacioInfo.builder()
@@ -226,11 +226,13 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             if (linea.length >=24) { // si hi ha les metadades
                 builder.origen(linea[18]).estadoElaboracion(linea[19]).tipoDocumental(linea[20]).pdfFirmado(linea[21]);
             }
-            builder.errores(linea[linea.length - 1]);
+            var errores = linea[linea.length - 1];
+            builder.errores(errores);
             if (messageHelper.getMessage("notificacio.massiva.cancelada").equals(linea[linea.length - 1])) {
                 builder.cancelada(true);
             }
-            if (notificacioMassiva.getNotificacions() != null && !notificacioMassiva.getNotificacions().isEmpty()) {
+            if (notificacioMassiva.getNotificacions() != null && !notificacioMassiva.getNotificacions().isEmpty()
+                && "OK".equalsIgnoreCase(errores)) {
                 NotificacioEntity not = notificacioMassiva.getNotificacions().get(numNotificacio);
                 StringBuilder error = new StringBuilder();
                 List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdAndErrorIsTrue(not.getId());
@@ -238,9 +240,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     error.append(!Strings.isNullOrEmpty(event.getErrorDescripcio()) ? "\n" + event.getErrorDescripcio() : "");
                 }
                 builder.errorsExecucio(error.toString());
+                numNotificacio++;
             }
             info.add(builder.build());
-//            numNotificacio++;
         }
         var dto = conversioTipusHelper.convertir(notificacioMassiva, NotificacioMassivaInfoDto.class);
         dto.setSummary(info);
