@@ -101,6 +101,7 @@ public class NotificacioMassivaService extends AbstractService<es.caib.notib.log
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void iniciar(Long id) {
 		getDelegateService().iniciar(id);
 	}

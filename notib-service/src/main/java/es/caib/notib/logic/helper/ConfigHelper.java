@@ -9,6 +9,7 @@ import es.caib.notib.persist.entity.config.ConfigGroupEntity;
 import es.caib.notib.persist.repository.config.ConfigGroupRepository;
 import es.caib.notib.persist.repository.config.ConfigRepository;
 import lombok.extern.slf4j.Slf4j;
+import ma.glasnost.orika.MapEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.CompositePropertySource;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import static es.caib.notib.logic.config.ReadDbPropertiesPostProcessor.DBAPP_PROPERTIES;
 
@@ -273,12 +275,14 @@ public class ConfigHelper {
         var properties = new Properties();
         environment.getPropertySources().stream().forEach(ps -> {
             if (ps instanceof MapPropertySource) {
-                properties.putAll(((MapPropertySource) ps).getSource());
+                properties.putAll(((MapPropertySource) ps).getSource().entrySet().stream().filter(x -> x.getValue() != null)
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             }
             if (ps instanceof CompositePropertySource) {
                 ((CompositePropertySource) ps).getPropertySources().stream().forEach( cps -> {
                     if (cps instanceof MapPropertySource) {
-                        properties.putAll(((MapPropertySource) cps).getSource());
+                        properties.putAll(((MapPropertySource) cps).getSource().entrySet().stream().filter(x -> x.getValue() != null)
+                                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
                     }
                 });
             }
