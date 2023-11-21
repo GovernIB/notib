@@ -295,7 +295,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 }
 
                 procediment = !Strings.isNullOrEmpty(notificacio.getProcedimentCodi()) ? procSerRepository.findByCodiAndEntitat(notificacio.getProcedimentCodi(), entitat) : null;
-                organGestor = !Strings.isNullOrEmpty(notificacio.getProcedimentCodi()) ? organGestorRepository.findByCodi(notificacio.getOrganGestor()) : null;
+                organGestor = !Strings.isNullOrEmpty(notificacio.getOrganGestor()) ? organGestorRepository.findByCodi(notificacio.getOrganGestor()) : null;
                 document = documentHelper.getDocument(notificacio.getDocument());
                 if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {
                     document2 = documentHelper.getDocument(notificacio.getDocument2());
@@ -318,7 +318,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 notificacioValidator.validate();
                 if (!errors.hasErrors()) {
                     try {
-                        notificacio.setProcedimentId(procediment.getId());
+                        if (procediment != null) {
+                            notificacio.setProcedimentId(procediment.getId());
+                        }
                         crearNotificacio(entitat, notificacio, notificacioMassivaEntity, documentsProcessatsMassiu);
                     } catch (DocumentNotFoundException | NoDocumentException ex) {
                     } catch (NoMetadadesException ex) {

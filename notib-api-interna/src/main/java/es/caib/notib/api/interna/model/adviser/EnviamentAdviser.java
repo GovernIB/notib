@@ -17,9 +17,13 @@ import java.util.Base64;
 public class EnviamentAdviser implements Serializable {
 
     private String organismoEmisor;
+    @NotNull
     private String hIdentificador;
+    @NotNull
     private BigInteger tipoEntrega;
+    @NotNull
     private BigInteger modoNotificacion;
+    @NotNull
     private String estado;
     private XMLGregorianCalendar fechaEstado;
     @NotNull
@@ -35,6 +39,10 @@ public class EnviamentAdviser implements Serializable {
     private String descripcionRespuesta;
     @Valid
     private Opciones opcionesResultadoSincronizarEnvio;
+
+    public void sethIdentificador(String hIdentificador) {
+        this.hIdentificador = hIdentificador;
+    }
 
     public es.caib.notib.logic.intf.dto.adviser.EnviamentAdviser asDto() {
 

@@ -119,7 +119,7 @@ public class AdviserServiceImpl implements AdviserService {
         NotificacioEnviamentEntity enviament = null;
         String eventErrorDescripcio = null;
         try {
-            enviament = notificacioEnviamentRepository.findByNotificaIdentificador(identificador);
+             enviament = notificacioEnviamentRepository.findByNotificaIdentificador(identificador);
             if (enviament == null) {
                 log.error(ERROR_CALLBACK_NOTIFICA + identificador + "): No s'ha trobat cap enviament amb l'identificador especificat (" + identificador + ").");
                 setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.ERROR_IDENTIFICADOR);
