@@ -145,15 +145,29 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 					}
 					List<Long> enviamentsActualitzats = new ArrayList<>();
-					for (ResultadoEnvio resultadoEnvio : resultadoAlta.getResultadoEnvios().getItem()) {
-						for (NotificacioEnviamentEntity enviament : notificacio.getEnviamentsPerNotifica()) {
+					List<String> identificadorsNoUtilitzats = new ArrayList<>();
+					for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
+						boolean assignat = false;
+						for (NotificacioEnviamentEntity enviament: notificacio.getEnviamentsPerNotifica()) {
 							String nif = enviament.getTitular().isIncapacitat() ? enviament.getDestinataris().get(0).getNif() : enviament.getTitular().getNif();
 							if (nif != null && nif.equalsIgnoreCase(resultadoEnvio.getNifTitular()) && !enviamentsActualitzats.contains(enviament.getId())) {
 								enviamentsActualitzats.add(enviament.getId());
 								enviament.updateNotificaEnviada(resultadoEnvio.getIdentificador());
 								enviamentTableHelper.actualitzarRegistre(enviament);
 								enviamentHelper.auditaEnviament(enviament, TipusOperacio.UPDATE, "NotificaV2Helper.notificacioEnviar");
+								assignat = true;
 								break;
+							}
+						}
+						if (!assignat) {
+							identificadorsNoUtilitzats.add(resultadoEnvio.getIdentificador());
+						}
+					}
+					if (!identificadorsNoUtilitzats.isEmpty()) {
+						int i = 0;
+						for (NotificacioEnviamentEntity enviament: notificacio.getEnviamentsPerNotifica()) {
+							if (enviament.getNotificaIdentificador() == null && i < identificadorsNoUtilitzats.size()) {
+								enviament.updateNotificaEnviada(identificadorsNoUtilitzats.get(i++));
 							}
 						}
 					}
