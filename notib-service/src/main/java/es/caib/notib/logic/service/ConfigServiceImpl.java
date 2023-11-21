@@ -178,9 +178,9 @@ public class ConfigServiceImpl implements ConfigService {
             if (split.length != 3) {
                 return;
             }
-            SmConstants.INTENT2 = Long.valueOf(split[0]);
-            SmConstants.INTENT3 = Long.valueOf(split[1]);
-            SmConstants.INTENT4 = Long.valueOf(split[2]);
+            SmConstants.INTENT2 = Long.valueOf(split[0].trim());
+            SmConstants.INTENT3 = Long.valueOf(split[1].trim());
+            SmConstants.INTENT4 = Long.valueOf(split[2].trim());
         } catch (Exception ex) {
             log.error("Error carregant els delays per la state machine", ex);
         }

@@ -127,7 +127,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 					}
 					List<Long> enviamentsActualitzats = new ArrayList<>();
+					List<String> identificadorsNoUtilitzats = new ArrayList<>();
 					for (var resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
+						boolean assignat = false;
 						for (var enviament: notificacio.getEnviamentsPerNotifica()) {
 							var nif = enviament.getTitular().isIncapacitat() ? enviament.getDestinataris().get(0).getNif() : enviament.getTitular().getNif();
 							if (nif != null && nif.equalsIgnoreCase(resultadoEnvio.getNifTitular()) && !enviamentsActualitzats.contains(enviament.getId())) {
@@ -135,10 +137,23 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 								enviament.updateNotificaEnviada(resultadoEnvio.getIdentificador());
 								enviamentTableHelper.actualitzarRegistre(enviament);
 								auditHelper.auditaEnviament(enviament, TipusOperacio.UPDATE, "NotificaV2Helper.notificacioEnviar");
+								assignat = true;
 								break;
 							}
 						}
+						if (!assignat) {
+							identificadorsNoUtilitzats.add(resultadoEnvio.getIdentificador());
+						}
 					}
+					if (!identificadorsNoUtilitzats.isEmpty()) {
+						int i = 0;
+						for (var enviament: notificacio.getEnviamentsPerNotifica()) {
+							if (enviament.getNotificaIdentificador() == null && i < identificadorsNoUtilitzats.size()) {
+								enviament.updateNotificaEnviada(identificadorsNoUtilitzats.get(i++));
+							}
+						}
+					}
+
 					if (pluginHelper.enviarCarpeta()) {
 						for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
 							pluginHelper.enviarNotificacioMobil(e);

@@ -9,7 +9,6 @@ import es.caib.notib.persist.entity.config.ConfigGroupEntity;
 import es.caib.notib.persist.repository.config.ConfigGroupRepository;
 import es.caib.notib.persist.repository.config.ConfigRepository;
 import lombok.extern.slf4j.Slf4j;
-import ma.glasnost.orika.MapEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.CompositePropertySource;
