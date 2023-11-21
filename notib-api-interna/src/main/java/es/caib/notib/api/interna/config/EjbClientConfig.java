@@ -24,6 +24,10 @@ public class EjbClientConfig {
 	private static final String EJB_JNDI_SUFFIX = "";
 
 	@Bean
+	public LocalStatelessSessionProxyFactoryBean adviserServiceWs() {
+		return getLocalEjbFactoyBean(AdviserServiceWs.class);
+	}
+	@Bean
 	public LocalStatelessSessionProxyFactoryBean adviserService() {
 		return getLocalEjbFactoyBean(AdviserService.class);
 	}

@@ -70,7 +70,9 @@ public class SecurityConfig {
 			"/api/rest/notificaCanvi",
 			"/api-docs",
 			"/api-docs/**",
-			"/webjars/**"
+			"/webjars/**",
+			"/adviser",
+			"/adviser/**"
 	};
 
 	@Bean
