@@ -91,6 +91,8 @@ public class ServeiServiceImpl implements ServeiService {
 	@Resource
 	private ServeiRepository serveiRepository;
 	@Resource
+	private ProcSerOrganRepository procSerOrganRepository;
+	@Resource
 	private ServeiFormRepository serveiFormRepository;
 	@Resource
 	private OrganGestorRepository organGestorRepository;
@@ -322,6 +324,7 @@ public class ServeiServiceImpl implements ServeiService {
 			for (var grupServeiEntity : grupsDelServei) {
 				grupServeiRepository.delete(grupServeiEntity);
 			}
+			procSerOrganRepository.deleteByProcSerId(id);
 			//Eliminar servei
 			serveiRepository.delete(serveiEntity);
 			permisosHelper.revocarPermisosEntity(id, ProcedimentEntity.class);
