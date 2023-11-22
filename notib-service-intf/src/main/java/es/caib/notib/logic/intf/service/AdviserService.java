@@ -8,7 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 public interface AdviserService {
 
 
-    @PreAuthorize("hasRole('NOT_APL')")
+    @PreAuthorize("hasRole('tothom') or hasRole('NOT_APL')")
     public ResultadoSincronizarEnvio sincronizarEnvio(SincronizarEnvio sincronizarEnvio);
 
 }
