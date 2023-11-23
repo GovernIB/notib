@@ -13,11 +13,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author Limit Tecnologies
  */
 @Configuration
+//@Configuration("apiInternaWebMvcConfig")
+//@DependsOn("apiInternaEjbClientConfig")
 public class WebMvcConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**");
+		registry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
 	}
+//	public void addCorsMappings(CorsRegistry registry) {
+//		registry.addMapping("/**");
+//	}
 
 }
