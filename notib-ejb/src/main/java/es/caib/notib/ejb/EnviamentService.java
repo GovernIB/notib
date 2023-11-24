@@ -144,13 +144,13 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public void activarCallback(Long enviamentId) {
 		getDelegateService().activarCallback(enviamentId);
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public List<Long> enviarCallback(Set<Long> notificacions) throws Exception {
 		return getDelegateService().enviarCallback(notificacions);
 	}

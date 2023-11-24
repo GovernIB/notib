@@ -60,7 +60,7 @@ public interface NotificacioMassivaService {
 	 * @param notificacioMassiu Dades de la notificació massiva que es vol donar d'alta
 	 * @throws RegistreNotificaException
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	NotificacioMassivaDataDto create(Long entitatId, String usuariCodi, NotificacioMassivaDto notificacioMassiu) throws RegistreNotificaException;
 
 	/**
@@ -69,7 +69,7 @@ public interface NotificacioMassivaService {
 	 * @param entitatId Entitat actual
 	 * @param notificacioMassivaId Identificador de la notificació massiva a esborrar
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	void delete(Long entitatId, Long notificacioMassivaId);
 
 	/**
@@ -85,7 +85,7 @@ public interface NotificacioMassivaService {
 	 *                        ordre dels registres, ...)
 	 * @return La página consultada.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	PaginaDto<NotificacioMassivaTableItemDto> findAmbFiltrePaginat(Long entitatId, NotificacioMassivaFiltreDto filtre, RolEnumDto rol, PaginacioParamsDto paginacioParams);
 
 	/**
@@ -170,7 +170,7 @@ public interface NotificacioMassivaService {
 	 * @throws NoSuchFileException Si no es troba el fitxer
 	 * @throws IOException Si no es pot llegir el fitxer
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException;
 
 	/**
@@ -181,6 +181,6 @@ public interface NotificacioMassivaService {
 	 */
 	void cancelar(Long entitatId, Long notificacioMassivaId) throws Exception;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	void iniciar(Long id);
 }

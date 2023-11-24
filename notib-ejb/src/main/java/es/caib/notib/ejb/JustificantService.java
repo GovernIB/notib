@@ -23,7 +23,7 @@ import javax.ejb.Stateless;
 public class JustificantService extends AbstractService<es.caib.notib.logic.intf.service.JustificantService> implements es.caib.notib.logic.intf.service.JustificantService {
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public FitxerDto generarJustificantEnviament(Long notificacioId, String sequence) throws JustificantException {
 		return getDelegateService().generarJustificantEnviament(notificacioId, sequence);
 	}

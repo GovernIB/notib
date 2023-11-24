@@ -29,7 +29,7 @@ public interface OperadorPostalService {
 	 * 				Informació del pagador postal a crear
 	 * @return	El pagador postal creat
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	OperadorPostalDto upsert(Long entitatId, OperadorPostalDataDto postal);
 
 	/**
@@ -41,7 +41,7 @@ public interface OperadorPostalService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	OperadorPostalDto delete(Long id) throws NotFoundException;
 
 	/**
@@ -51,7 +51,7 @@ public interface OperadorPostalService {
 	 *            Codi del procediment a trobar.
 	 * @return El pagador postal amb el codi especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	OperadorPostalDto findById(Long id);
 
 	/**
@@ -65,7 +65,7 @@ public interface OperadorPostalService {
 	 *            	Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb els pagadors postals.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(
 			Long entitatId,
 			OperadorPostalFiltreDto filtre,
@@ -76,19 +76,19 @@ public interface OperadorPostalService {
 	 * 
 	 * @return La llista dels pagadors postals.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	List<OperadorPostalDto> findAll();
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	List<IdentificadorTextDto> findAllIdentificadorText();
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitatId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitatId, String organCodi, boolean isAdminOrgan);
 
 	/**
@@ -96,10 +96,10 @@ public interface OperadorPostalService {
 	 * 
 	 * @return La llista dels pagadors postals.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	List<OperadorPostalDto> findByEntitat(Long entitatId);
 
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	Object findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor);
 
 	/**
@@ -109,7 +109,7 @@ public interface OperadorPostalService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina de pagadors postals.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	PaginaDto<OperadorPostalDto> findAllPaginat(PaginacioParamsDto paginacioParams);
 
 }

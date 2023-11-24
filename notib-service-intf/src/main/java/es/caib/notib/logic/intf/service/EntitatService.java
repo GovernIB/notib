@@ -90,7 +90,7 @@ public interface EntitatService {
 	 *            Atribut id de l'entitat a trobar.
 	 * @return L'entitat amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public EntitatDto findById(Long id);
 
 	/**
@@ -100,7 +100,7 @@ public interface EntitatService {
 	 *            Codi de l'entitat a trobar.
 	 * @return L'entitat amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public EntitatDto findByCodi(String codi);
 
 	/**
@@ -110,7 +110,7 @@ public interface EntitatService {
 	 *            Codi DIR3 de l'entitat a trobar.
 	 * @return L'entitat amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public EntitatDto findByDir3codi(String dir3Codi);
 
 	/**
@@ -118,7 +118,7 @@ public interface EntitatService {
 	 * 
 	 * @return La llista d'entitats.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public List<EntitatDto> findAll();
 	
 	/**
@@ -128,7 +128,7 @@ public interface EntitatService {
 	 *            Atribut id de l'entitat.
 	 * @return L'entitat amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<TipusDocumentDto> findTipusDocumentByEntitat(Long entitatId);
 	
 	/**
@@ -138,7 +138,7 @@ public interface EntitatService {
 	 *            Atribut id de l'entitat.
 	 * @return L'entitat amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public TipusDocumentEnumDto findTipusDocumentDefaultByEntitat(Long entitatId);
 	
 
@@ -149,7 +149,7 @@ public interface EntitatService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina d'entitats.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<EntitatDto> findAllPaginat(PaginacioParamsDto paginacioParams);
 
 	/**
@@ -157,7 +157,7 @@ public interface EntitatService {
 	 * 
 	 * @return El llistat d'entitats.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public List<EntitatDto> findAccessiblesUsuariActual(String rolActual);
 
 	/**
@@ -165,7 +165,7 @@ public interface EntitatService {
 	 * 
 	 * @return El llistat d'entitats.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean hasPermisUsuariEntitat();
 	
 	/**
@@ -173,7 +173,7 @@ public interface EntitatService {
 	 * 
 	 * @return El llistat d'entitats.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean hasPermisAdminEntitat();
 	
 	/**
@@ -181,7 +181,7 @@ public interface EntitatService {
 	 * 
 	 * @return El llistat d'entitats.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean hasPermisAplicacioEntitat();
 	
 	/**
@@ -189,7 +189,7 @@ public interface EntitatService {
 	 * 
 	 * @return El un booleà per a cada rol: Usuari, Administrador d'entitats i Aplicació.
 	 */
-//	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+//	@PreAuthorize("isAuthenticated()")
 	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual();
 	/**
 	 * Consulta els permisos de l'entitat.
@@ -244,16 +244,16 @@ public interface EntitatService {
 	public List<OficinaDto> findOficinesEntitat(
 			String dir3codi);
 	
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	byte[] getCapLogo() throws NoSuchFileException, IOException;
 	
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	byte[] getPeuLogo() throws NoSuchFileException, IOException;
 	
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	LlibreDto getLlibreEntitat(String dir3Codi);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatCodi);
 
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")

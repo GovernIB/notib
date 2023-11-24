@@ -62,7 +62,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return L'aplicació amb l'identificador assenyalat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public AplicacioDto findById(Long aplicacioId);
 	
 	/**
@@ -73,14 +73,14 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return L'aplicació amb l'identificador assenyalat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public AplicacioDto findByEntitatAndId(Long entitatId, Long aplicacioId);
 	
 	/**
 	 * Consulta una aplicació a partir del codi.
 	 * @return L'aplicació amb el codi assenyalat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public AplicacioDto findByUsuariCodi(String usuariCodi);
 	
 	/**
@@ -91,7 +91,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return L'aplicació amb el codi assenyalat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public AplicacioDto findByEntitatAndUsuariCodi(Long entitatId, String usuariCodi);
 	
 	/**
@@ -102,7 +102,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return L'aplicació que coincideix  amb el text introduït.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_SUPER')")
+	@PreAuthorize("isAuthenticated()")
 	public AplicacioDto findByEntitatAndText(Long entitatId, String text);
 	
 	/**
@@ -112,7 +112,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return La pàgina d'aplicacions.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<AplicacioDto> findPaginat(PaginacioParamsDto paginacioParams);
 	
 	/**
@@ -122,7 +122,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return La pàgina d'aplicacions.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<AplicacioDto> findPaginatByEntitat(Long entitatId, PaginacioParamsDto paginacioParams);
 	
 	/**

@@ -81,7 +81,7 @@ public class PermisosService extends AbstractService<es.caib.notib.logic.intf.se
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public List<CodiValorOrganGestorComuDto> getProcSerComuns(Long entitatId, List<String> grups, boolean removeInactius, ProcSerTipusEnum tipus) {
 		return getDelegateService().getProcSerComuns(entitatId, grups, removeInactius, tipus);
 	}

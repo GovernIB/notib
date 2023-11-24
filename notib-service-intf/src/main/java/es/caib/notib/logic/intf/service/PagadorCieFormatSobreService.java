@@ -24,7 +24,7 @@ public interface PagadorCieFormatSobreService {
 	 * 				Informació del pagador cie a crear
 	 * @return	El pagador cie creat
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public CieFormatSobreDto create(Long pagadorCieId, CieFormatSobreDto formatSobre);
 
 	/**
@@ -35,7 +35,7 @@ public interface PagadorCieFormatSobreService {
 	 * @return
 	 * @throws NotFoundException
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public CieFormatSobreDto update(CieFormatSobreDto formatSobre) throws NotFoundException;
 
 	/**
@@ -47,7 +47,7 @@ public interface PagadorCieFormatSobreService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public CieFormatSobreDto delete(Long id) throws NotFoundException;
 
 	/**
@@ -57,7 +57,7 @@ public interface PagadorCieFormatSobreService {
 	 *            Codi del procediment a trobar.
 	 * @return El pagador cie amb el codi especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public CieFormatSobreDto findById(Long id);
 
 	
@@ -66,7 +66,7 @@ public interface PagadorCieFormatSobreService {
 	 * 
 	 * @return La llista dels pagadors cie.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public List<CieFormatSobreDto> findAll();
 	
 	/**
@@ -74,7 +74,7 @@ public interface PagadorCieFormatSobreService {
 	 * 
 	 * @return La llista dels pagadors cie.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	public List<CieFormatSobreDto> findFormatSobreByPagadorCie(Long pagadorCieId);
 
 	/**
@@ -84,7 +84,7 @@ public interface PagadorCieFormatSobreService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina de pagadors cie.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<CieFormatSobreDto> findAllPaginat(Long pagadorCieId, PaginacioParamsDto paginacioParams);
 
 	
