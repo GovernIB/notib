@@ -390,8 +390,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 		var rols = new String[auth.getAuthorities().size()];
 		var index = 0;
+		var rolsBdd = usuariRepository.getNotibRolsDisponibles(auth.getName());
+//		rolsBdd.retainAll(auth.getAuthorities());
 		for (var grantedAuthority: auth.getAuthorities()) {
-			rols[index++] = grantedAuthority.getAuthority();
+			if (rolsBdd.contains(grantedAuthority.getAuthority())) {
+				rols[index++] = grantedAuthority.getAuthority();
+			}
 		}
 		dto.setRols(rols);
 		return dto;
