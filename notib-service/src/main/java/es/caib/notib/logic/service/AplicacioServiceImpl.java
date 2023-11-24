@@ -28,6 +28,7 @@ import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -385,19 +386,14 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 		var dto = conversioTipusHelper.convertir(usuari, UsuariDto.class);
 		var auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth.getAuthorities() == null) {
+		if (auth.getAuthorities() == null || auth.getAuthorities().isEmpty()) {
 			return dto;
 		}
-		var rols = new String[auth.getAuthorities().size()];
-		var index = 0;
-		var rolsBdd = usuariRepository.getNotibRolsDisponibles(auth.getName());
-//		rolsBdd.retainAll(auth.getAuthorities());
-		for (var grantedAuthority: auth.getAuthorities()) {
-			if (rolsBdd.contains(grantedAuthority.getAuthority())) {
-				rols[index++] = grantedAuthority.getAuthority();
-			}
-		}
-		dto.setRols(rols);
+		var rols = usuariRepository.getNotibRolsDisponibles(auth.getName());
+		var rolsAplicacio = List.of("NOT_SUPER", "NOT_ADMIN", "NOT_CARPETA", "NOT_APL");
+		rols.addAll(rolsAplicacio);
+		rols.retainAll(auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+		dto.setRols(rols.toArray(String[]::new));
 		return dto;
 	}
 

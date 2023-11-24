@@ -132,7 +132,7 @@ public class NotificacioValidator implements Validator {
             aplicacio = aplicacioRepository.findByEntitatIdAndUsuariCodi(entitat.getId(), usuariCodi);
         }
         if (aplicacio == null) {
-            errors.reject(error(APLICACIO_NO_EXIST, locale, notificacio.getEmisorDir3Codi()));
+            errors.reject(error(APLICACIO_NO_EXIST, locale, usuariCodi, notificacio.getEmisorDir3Codi()));
         }
     }
 

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 /**
@@ -40,6 +41,6 @@ public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 
 	@Query(value = "SELECT DISTINCT rol FROM  (SELECT nas.SID AS rol  FROM NOT_ACL_SID nas WHERE nas.PRINCIPAL = 0 " +
 			"UNION SELECT ng.CODI AS rol FROM NOT_GRUP ng)", nativeQuery = true)
-	List<String> getNotibRolsDisponibles(@Param("codi") String codi);
+	Set<String> getNotibRolsDisponibles(@Param("codi") String codi);
 
 }
