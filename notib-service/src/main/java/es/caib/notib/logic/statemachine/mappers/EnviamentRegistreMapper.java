@@ -356,8 +356,6 @@ public abstract class EnviamentRegistreMapper {
             var enviarContingut = !isComunicacioSir || (isComunicacioSir && (TOT.equals(getEnviamentSirTipusDocumentEnviar()) || BINARI.equals(getEnviamentSirTipusDocumentEnviar())));
             var isUuid = document.getUuid() != null;
             var isCsv = document.getCsv() != null;
-            var isContingut = document.getContingutBase64() != null;
-
             if(isUuid || isCsv) {
                 var csv = document.getCsv();
                 var docDetall = pluginHelper.arxiuDocumentConsultar(isUuid ? document.getUuid() : document.getCsv(), null, enviarContingut, isUuid);
@@ -397,6 +395,7 @@ public abstract class EnviamentRegistreMapper {
                 return builder.build();
             }
 
+            var isContingut = !Strings.isNullOrEmpty(document.getArxiuGestdocId());
             if(isContingut) {
                 var output = new ByteArrayOutputStream();
                 pluginHelper.gestioDocumentalGet(document.getArxiuGestdocId(), pluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, output);
