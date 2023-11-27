@@ -18,6 +18,8 @@ import java.util.GregorianCalendar;
 @Mapper(componentModel = "spring")
 public interface DocumentMapper {
 
+    @Mapping(target = "tipoDocumento", constant = "02")
+    @Mapping(source = "titol", target = "titulo")
     @Mapping(source = "nom", target = "nombreFicheroAnexado")
     @Mapping(source = "contingut", target = "ficheroAnexado")
     @Mapping(source = "mimeType", target = "tipoMIMEFicheroAnexado")
