@@ -1,6 +1,7 @@
 package es.caib.notib.logic.statemachine.mappers;
 
 import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.intf.dto.AnexoWsDto;
 import es.caib.notib.logic.intf.statemachine.dto.DocumentRegistreDto;
@@ -23,12 +24,17 @@ public interface DocumentMapper {
     @Mapping(source = "nom", target = "nombreFicheroAnexado")
     @Mapping(source = "contingut", target = "ficheroAnexado")
     @Mapping(source = "mimeType", target = "tipoMIMEFicheroAnexado")
-    @Mapping(source = "tipusDocumental", target = "tipoDocumental")
+    @Mapping(source = "tipusDocumental", target = "tipoDocumental", qualifiedByName = "tipoDocumental")
     @Mapping(source = "origen", target = "origenCiudadanoAdmin", qualifiedByName = "origen")
     @Mapping(source = "validesa", target = "validezDocumento", qualifiedByName = "validesa")
     @Mapping(source = "modeFirma", target = "modoFirma", qualifiedByName = "modeFirma")
     @Mapping(source = "dataCaptura", target = "fechaCaptura", qualifiedByName = "dataCaptura")
     AnexoWsDto toAnexoWs(DocumentRegistreDto document);
+
+    @Named("tipoDocumental")
+    default String getOrigen(TipusDocumentalEnum tipus) {
+       return tipus != null ? tipus.getValor() : TipusDocumentalEnum.NOTIFICACIO.getValor();
+    }
 
     @Named("origen")
     default Integer getOrigen(OrigenEnum origen) {
