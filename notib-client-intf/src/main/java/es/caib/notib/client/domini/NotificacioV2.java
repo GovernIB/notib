@@ -181,7 +181,7 @@ public class NotificacioV2 implements Serializable {
 
     public EnviamentTipus getEnviamentTipus() {
 
-        if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus) || enviaments == null) {
+        if (EnviamentTipus.NOTIFICACIO.equals(enviamentTipus) || enviaments == null) {
             return enviamentTipus;
         }
         boolean sir = true;

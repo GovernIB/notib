@@ -70,7 +70,7 @@ public class MimeUtils {
     private static String getMimeType(String arxiuNom, byte[] contingut, String suffix) throws IOException {
 
         if (Strings.isNullOrEmpty(arxiuNom)) {
-            return null;
+            arxiuNom = Long.toString(System.nanoTime());
         }
         File tmp = File.createTempFile(arxiuNom, suffix);
         Files.write(contingut, tmp);
