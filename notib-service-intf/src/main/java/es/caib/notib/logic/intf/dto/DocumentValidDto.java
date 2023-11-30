@@ -3,9 +3,15 @@ package es.caib.notib.logic.intf.dto;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter @Setter
 public class DocumentValidDto {
 

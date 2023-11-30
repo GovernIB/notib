@@ -11,9 +11,9 @@ import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.logic.utils.MimeUtils;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.plugins.arxiu.api.DocumentContingut;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
@@ -22,12 +22,11 @@ import java.util.Map;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DocumentHelper {
 
-    @Autowired
-    private PluginHelper pluginHelper;
-    @Autowired
-    private ConfigHelper configHelper;
+    private final PluginHelper pluginHelper;
+    private final ConfigHelper configHelper;
 
     private static final OrigenEnum ORIGEN = OrigenEnum.ADMINISTRACIO;
     private static final ValidesaEnum VALIDESA = ValidesaEnum.ORIGINAL;

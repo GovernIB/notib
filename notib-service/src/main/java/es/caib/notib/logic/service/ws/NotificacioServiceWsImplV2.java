@@ -166,9 +166,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private NotificacioValidator notificacioValidator;
 
 	// Per test
-
 	public void setNotificacioValidator(NotificacioValidator notificacioValidator) {
 		this.notificacioValidator = notificacioValidator;
+	}
+	public void setDocumentHelperTest(DocumentHelper documentHelper) {
+		this.documentHelper = documentHelper;
 	}
 
 
