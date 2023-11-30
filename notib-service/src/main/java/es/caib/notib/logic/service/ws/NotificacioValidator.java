@@ -141,7 +141,8 @@ public class NotificacioValidator implements Validator {
         // Procediment
         var procCodi = "procedimentCodi";
         var procedimentCodi = notificacio.getProcedimentCodi();
-        if ((EnviamentTipus.COMUNICACIO.equals(notificacio.getEnviamentTipus()) || EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) && procediment == null) {
+        if ((EnviamentTipus.COMUNICACIO.equals(notificacio.getEnviamentTipus()) || EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus()))
+                && procediment == null && Strings.isNullOrEmpty(procedimentCodi)) {
             return;
         }
         if (EnviamentTipus.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
@@ -786,6 +787,9 @@ public class NotificacioValidator implements Validator {
             }
             if (Strings.isNullOrEmpty(entregaPostal.getPoblacio())) {
                 errors.rejectValue(envName + ".poblacio", error(POSTAL_POBLACIO_NULL, l, prefix, tipus));
+            }
+            if (Strings.isNullOrEmpty(entregaPostal.getPaisCodi())) {
+                errors.rejectValue(envName + ".paisCodi", error(POSTAL_PAIS_CODI_NULL, l, prefix, tipus));
             }
         }
         if(isEstranger) {

@@ -34,6 +34,9 @@ public class ClientBaseTest {
 	protected static final String USUARI_CODI = "e18225486x";
 	protected static final NotificaDomiciliConcretTipus TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipus.NACIONAL;
 
+	protected static boolean ENVIAMENT_AMB_DESTINATARIS = false;
+	protected static int NUM_DESTINATARIS = 1;
+
 	// LOCAL data
 //	Entitat: A04013511 (DGTIC) ò A04003003 (Govern)
 //	protected static final String ENTITAT_DIR3CODI = "A04003003";
@@ -45,17 +48,25 @@ public class ClientBaseTest {
 
 	// DEV data
 	protected static final String ENTITAT_DIR3CODI = "A04003003";
-	protected static final String ORGAN_CODI = "A04013529";
-	protected static final String ORGAN_CODI_CIE = "A04013529";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "874105"; // DEV
-	//	protected static final String IDENTIFICADOR_PROCEDIMENT = "207982"; // LOCAL
-	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "874106"; // DEV
+
+//	protected static final String ENTITAT_DESACTIVADA = "A04013511"; // DEV
+	protected static final String ENTITAT_DESACTIVADA = "A17002943"; // LOCAL
+
+//	protected static final String ENTITAT_ERROR = "test1"; // DEV
+	protected static final String ENTITAT_ERROR = "test"; // LOCAL
+	protected static final String ORGAN_CODI = "A04027005";
+
+//	protected static final String ORGAN_CODI_CIE = "A04027005"; // DEV
+	protected static final String ORGAN_CODI_CIE = "A04027052"; // LOCAL
+
+//	protected static final String IDENTIFICADOR_PROCEDIMENT = "894623"; // DEV
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "894623"; // LOCAL
+
+//	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "894623"; // DEV
+	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "877558"; // Local
 
 
-	protected NotificacioV2 generarNotificacioV2(
-			String notificacioId,
-			int numDestinataris,
-			boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException, DecoderException {
+	protected NotificacioV2 generarNotificacioV2(String notificacioId, int numEnviaments, boolean ambEnviamentPostal) throws IOException {
 
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		NotificacioV2 notificacio = new NotificacioV2();
@@ -83,36 +94,35 @@ public class ClientBaseTest {
 
 		notificacio.setDocument(document);
 		notificacio.setProcedimentCodi(ambEnviamentPostal ? IDENTIFICADOR_PROCEDIMENT_CIE : IDENTIFICADOR_PROCEDIMENT);
-		for (int i = 0; i < numDestinataris; i++) {
+		for (int i = 0; i < numEnviaments; i++) {
 			EnviamentV2 enviament = new EnviamentV2();
 			PersonaV2 titular = new PersonaV2();
-			titular.setNom("Siòn");
-			titular.setLlinatge1("Andreu");
-			titular.setLlinatge2("Nadal");
-			titular.setTelefon("666010101");
+			titular.setNom("NomTitular" + numEnviaments);
+			titular.setLlinatge1("Llinatge1Titular" + numEnviaments);
+			titular.setLlinatge2("Llinatge2Titular" + numEnviaments);
 			if (i == 0) {
 				titular.setNif("00000000T");
-				titular.setEmail("sandreu@limit.es");
 			}
 			titular.setInteressatTipus(i != 0 ? InteressatTipus.FISICA_SENSE_NIF : InteressatTipus.FISICA);
 			if (titular.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 				titular.setDir3Codi(ENTITAT_DIR3CODI);
 			}
 			enviament.setTitular(titular);
-			PersonaV2 destinatari = new PersonaV2();
-			destinatari.setNom("melcior");
-			destinatari.setLlinatge1("Andreu");
-			destinatari.setLlinatge2("Nadal");
-			destinatari.setNif("18225486x");
-			destinatari.setTelefon("666020202");
-			destinatari.setEmail("sandreu@limit.es");
+			if (ENVIAMENT_AMB_DESTINATARIS) {
+
+				for (int foo=0;foo<NUM_DESTINATARIS;foo++) {
+					PersonaV2 destinatari = new PersonaV2();
+					destinatari.setNom("NomDestinatari" + foo);
+					destinatari.setLlinatge1("Llinatge1Destintari" + foo);
+					destinatari.setLlinatge2("Llinatge2Destintari");
+					destinatari.setNif("12345678z");
 //			destinatari.setInteressatTipus(InteressatTipus.ADMINISTRACIO);
-			destinatari.setInteressatTipus(InteressatTipus.FISICA);
-			if (destinatari.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
-				destinatari.setDir3Codi(ORGAN_SIR_CODI);
-			}
-			if (i == 0) {
-				enviament.getDestinataris().add(destinatari);
+					destinatari.setInteressatTipus(InteressatTipus.FISICA);
+					if (destinatari.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
+						destinatari.setDir3Codi(ORGAN_SIR_CODI);
+					}
+					enviament.getDestinataris().add(destinatari);
+				}
 			}
 			if (ambEnviamentPostal) {
 				EntregaPostalV2 entregaPostal = new EntregaPostalV2();
@@ -161,6 +171,11 @@ public class ClientBaseTest {
 	protected InputStream getContingutNotificacioAdjuntTxt() {
 		return getClass().getResourceAsStream(
 				"/es/caib/notib/client/notificacio_adjunt.txt");
+	}
+
+	protected InputStream getContingutNotificacioAdjuntZip() {
+		return getClass().getResourceAsStream(
+				"/es/caib/notib/client/blank.zip");
 	}
 
 	protected InputStream getContingutNotificacioAdjuntGrande() {

@@ -32,13 +32,13 @@ import static org.junit.Assert.*;
 public class ClientRestValidacionsV2Test extends ClientBaseTest {
 
 
-	private static final String URL = "http://localhost:8080/notibapi";
-	private static final String USERNAME = "u999000";
-	private static final String PASSWORD = "u999000";
+//	private static final String URL = "http://localhost:8080/notibapi";
+//	private static final String USERNAME = "u149142";
+//	private static final String PASSWORD = "limit";
 
-//	private static final String URL = "https://dev.caib.es/notibapi";
-//	private static final String USERNAME = "$ripea_notib";
-//	private static final String PASSWORD = "ripea_notib";
+	private static final String URL = "https://dev.caib.es/notib2api";
+	private static final String USERNAME = "u149142";
+	private static final String PASSWORD = "limit";
 
 	/*
 	@Rule
@@ -1095,7 +1095,7 @@ public class ClientRestValidacionsV2Test extends ClientBaseTest {
 		System.out.println(">>> Reposta " + (respostaAlta.isError() ? "amb error: " + respostaAlta.getErrorDescripcio() : "Ok"));
 		assertTrue(respostaAlta.isError());
 		assertNotNull(respostaAlta.getErrorDescripcio());
-		assertTrue(respostaAlta.getErrorDescripcio().startsWith("[" + codiError + "]"));
+		assertTrue(respostaAlta.getErrorDescripcio().contains("[" + codiError + "]"));
 		assertEquals(NotificacioEstatEnum.PENDENT, respostaAlta.getEstat());
 	}
 

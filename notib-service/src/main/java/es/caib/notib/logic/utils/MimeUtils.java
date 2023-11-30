@@ -1,5 +1,6 @@
 package es.caib.notib.logic.utils;
 
+import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import es.caib.notib.logic.intf.dto.mime.Mimes;
 import es.caib.notib.logic.intf.dto.notificacio.Document;
@@ -35,9 +36,9 @@ public class MimeUtils {
             var suffix = "";
             return getMimeType(arxiuNom, contingut, suffix);
         } catch (IOException ex) {
-            String err = "Error obtenint el tipus MIME del document " + arxiuNom;
+            String err = "Error obtenint el tipus MIME del document " + arxiuNom + ex.getMessage();
             log.error(err, ex);
-            throw new RuntimeException(err);
+            return null;
         }
     }
 
@@ -67,6 +68,10 @@ public class MimeUtils {
     }
 
     private static String getMimeType(String arxiuNom, byte[] contingut, String suffix) throws IOException {
+
+        if (Strings.isNullOrEmpty(arxiuNom)) {
+            return null;
+        }
         File tmp = File.createTempFile(arxiuNom, suffix);
         Files.write(contingut, tmp);
         Tika tika = new Tika();
