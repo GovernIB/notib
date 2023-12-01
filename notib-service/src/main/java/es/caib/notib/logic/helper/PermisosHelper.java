@@ -304,6 +304,7 @@ public class PermisosHelper {
 		var auth = SecurityContextHolder.getContext().getAuthentication();
 		List<Sid> sids = new ArrayList<>();
 		sids.add(new PrincipalSid(auth.getName()));
+		sids.add(new GrantedAuthoritySid("tothom"));
 		for (var ga: auth.getAuthorities()) {
 			sids.add(new GrantedAuthoritySid(ga.getAuthority()));
 		}
@@ -569,6 +570,7 @@ public class PermisosHelper {
 
 		List<Sid> sids = new ArrayList<>();
 		sids.add(new PrincipalSid(auth.getName()));
+		sids.add(new GrantedAuthoritySid("tothom"));
 		for (var ga: auth.getAuthorities()) {
 			sids.add(new GrantedAuthoritySid(ga.getAuthority()));
 		}
