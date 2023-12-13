@@ -4,6 +4,7 @@ package es.caib.notib.logic.wsdl.notificaV2;
 import java.math.BigInteger;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -13,8 +14,11 @@ import javax.xml.ws.ResponseWrapper;
 import es.caib.notib.logic.wsdl.notificaV2.common.Opciones;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.Certificacion;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.Datados;
+import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.InfoEnvioLigero;
+import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.RespuestaInfoEnvioLigero;
 import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.Acuse;
 import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.Receptor;
+import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.RespuestaSincronizarEnvioOE;
 
 
 /**
@@ -50,9 +54,9 @@ public interface SincronizarEnvioWsPortType {
      * @param identificador
      */
     @WebMethod(action = "sincronizarEnvioOE")
-    @RequestWrapper(localName = "sincronizarEnvioOE", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/sincronizarEnvioOE", className = "es.gob.administracionelectronica.notifica.ws.sincronizarenvio._1_0.sincronizarenviooe.SincronizarEnvioOE")
-    @ResponseWrapper(localName = "respuestaSincronizarEnvioOE", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/sincronizarEnvioOE", className = "es.gob.administracionelectronica.notifica.ws.sincronizarenvio._1_0.sincronizarenviooe.RespuestaSincronizarEnvioOE")
-    public void sincronizarEnvioOE(
+    @RequestWrapper(localName = "sincronizarEnvioOE", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/sincronizarEnvioOE", className = "es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.SincronizarEnvioOE")
+    @ResponseWrapper(localName = "respuestaSincronizarEnvioOE", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/sincronizarEnvioOE", className = "es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.RespuestaSincronizarEnvioOE")
+    public RespuestaSincronizarEnvioOE sincronizarEnvioOE(
         @WebParam(name = "organismoEmisor", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/sincronizarEnvioOE")
         String organismoEmisor,
         @WebParam(name = "identificador", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/sincronizarEnvioOE")
@@ -82,6 +86,19 @@ public interface SincronizarEnvioWsPortType {
         @WebParam(name = "opcionesRespuestaSincronizarOE", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/sincronizarEnvioOE", mode = WebParam.Mode.OUT)
         Holder<Opciones> opcionesRespuestaSincronizarOE);
 
+
+    /**
+     *
+     * @param infoEnvioLigero
+     * @return returns es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.InfoEnvioLigero
+     */
+    @WebMethod(action = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/infoEnvioLigero")
+    @WebResult(name = "infoEnvioLigero", targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/infoEnvioLigero", partName = "respuestaInfoEnvioLigero")
+    public RespuestaInfoEnvioLigero infoEnvioLigero(
+        @WebParam(name = "infoEnvioLigero", targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/infoEnvioLigero", partName = "infoEnvioLigero")
+        InfoEnvioLigero infoEnvioLigero);
+
+
     /**
      * 
      * @param descripcionRespuesta
@@ -96,31 +113,31 @@ public interface SincronizarEnvioWsPortType {
      * @param codigoRespuesta
      * @param identificador
      */
-    @WebMethod(action = "infoEnvioLigero")
-    @RequestWrapper(localName = "infoEnvioLigero", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", className = "es.gob.administracionelectronica.notifica.ws.sincronizarenvio._1_0.infoenvioligero.InfoEnvioLigero")
-    @ResponseWrapper(localName = "respuestaInfoEnvioLigero", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", className = "es.gob.administracionelectronica.notifica.ws.sincronizarenvio._1_0.infoenvioligero.RespuestaInfoEnvioLigero")
-    public void infoEnvioLigero(
-        @WebParam(name = "identificador", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", mode = WebParam.Mode.INOUT)
-        Holder<String> identificador,
-        @WebParam(name = "referenciaEmisor", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero")
-        String referenciaEmisor,
-        @WebParam(name = "codigoDir3", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero")
-        String codigoDir3,
-        @WebParam(name = "nivelDetalle", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero")
-        BigInteger nivelDetalle,
-        @WebParam(name = "opcionesInfoEnvioLigero", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero")
-        Opciones opcionesInfoEnvioLigero,
-        @WebParam(name = "codigoRespuesta", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", mode = WebParam.Mode.OUT)
-        Holder<String> codigoRespuesta,
-        @WebParam(name = "descripcionRespuesta", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", mode = WebParam.Mode.OUT)
-        Holder<String> descripcionRespuesta,
-        @WebParam(name = "estado", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", mode = WebParam.Mode.OUT)
-        Holder<String> estado,
-        @WebParam(name = "datados", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", mode = WebParam.Mode.OUT)
-        Holder<Datados> datados,
-        @WebParam(name = "certificacion", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", mode = WebParam.Mode.OUT)
-        Holder<Certificacion> certificacion,
-        @WebParam(name = "opcionesRespuestaInfoEnvioLigero", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", mode = WebParam.Mode.OUT)
-        Holder<Opciones> opcionesRespuestaInfoEnvioLigero);
+//    @WebMethod(action = "infoEnvioLigero")
+//    @RequestWrapper(localName = "infoEnvioLigero", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", className = "es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.InfoEnvioLigero")
+//    @ResponseWrapper(localName = "respuestaInfoEnvioLigero", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", className = "es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.RespuestaInfoEnvioLigero")
+//    public RespuestaInfoEnvioLigero infoEnvioLigero(
+//        @WebParam(name = "identificador", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", mode = WebParam.Mode.INOUT)
+//        Holder<String> identificador,
+//        @WebParam(name = "referenciaEmisor", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero")
+//        String referenciaEmisor,
+//        @WebParam(name = "codigoDir3", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero")
+//        String codigoDir3,
+//        @WebParam(name = "nivelDetalle", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero")
+//        BigInteger nivelDetalle,
+//        @WebParam(name = "opcionesInfoEnvioLigero", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero")
+//        Opciones opcionesInfoEnvioLigero,
+//        @WebParam(name = "codigoRespuesta", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", mode = WebParam.Mode.OUT)
+//        Holder<String> codigoRespuesta,
+//        @WebParam(name = "descripcionRespuesta", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", mode = WebParam.Mode.OUT)
+//        Holder<String> descripcionRespuesta,
+//        @WebParam(name = "estado", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", mode = WebParam.Mode.OUT)
+//        Holder<String> estado,
+//        @WebParam(name = "datados", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", mode = WebParam.Mode.OUT)
+//        Holder<Datados> datados,
+//        @WebParam(name = "certificacion", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", mode = WebParam.Mode.OUT)
+//        Holder<Certificacion> certificacion,
+//        @WebParam(name = "opcionesRespuestaInfoEnvioLigero", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero", mode = WebParam.Mode.OUT)
+//        Holder<Opciones> opcionesRespuestaInfoEnvioLigero);
 
 }
