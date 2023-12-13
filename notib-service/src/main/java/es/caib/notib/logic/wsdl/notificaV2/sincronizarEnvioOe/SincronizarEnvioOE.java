@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
-import es.gob.administracionelectronica.notifica.ws.sincronizarenvio._1_0.common.Opciones;
+import es.caib.notib.logic.wsdl.notificaV2.common.Opciones;
 
 
 /**

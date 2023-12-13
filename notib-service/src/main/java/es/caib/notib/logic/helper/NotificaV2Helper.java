@@ -289,7 +289,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		var infoEnvio = new InfoEnvioV2();
 		infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
 		var apiKey = enviament.getNotificacio().getEntitat().getApiKey();
-		var resultadoInfoEnvio = getNotificaWs(apiKey).infoEnvioV2(infoEnvio);
+		var resultadoInfoEnvio = getNotificaWs(apiKey).infoEnvioLigero(infoEnvio);
 		if (resultadoInfoEnvio.getDatados() == null) {
 			var errorDescripcio = "La resposta rebuda de Notifica no conté informació de datat";
 			integracioHelper.addAccioError(info, errorDescripcio);
