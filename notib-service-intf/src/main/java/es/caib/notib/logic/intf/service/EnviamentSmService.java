@@ -43,6 +43,9 @@ public interface EnviamentSmService {
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid);
 
 	@PreAuthorize("isAuthenticated()")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid, Long delay);
+
+	@PreAuthorize("isAuthenticated()")
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreEnviament(String enviamentUuid, boolean retry);
 
 	@PreAuthorize("isAuthenticated()")

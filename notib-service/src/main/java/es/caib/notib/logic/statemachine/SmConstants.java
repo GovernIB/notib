@@ -13,6 +13,8 @@ public class SmConstants {
 
     // EXTENDED
     public static final String ENVIAMENT_TIPUS = "ex_tipus";
+    public static final String ENVIAMENT_DELAY = "enviament_delay";
+    public static final Long MASSIU_DELAY = 5000L;
     public static final String ENVIAMENT_SENSE_NIF = "ex_sense_nif";
     public static final String ENVIAMENT_ESTAT_FINAL = "ex_final";
 //    public static final String ADVISER_ACTIU = "ex_adviser";
@@ -42,6 +44,12 @@ public class SmConstants {
     public static Long INTENT3;
     public static Long INTENT4;
 
+    public static Long delay(int reintent, Long delay) {
+        if (delay > 0) {
+            return delay;
+        }
+        return delay(reintent);
+    }
 
     public static Long delay(int reintent) {
 

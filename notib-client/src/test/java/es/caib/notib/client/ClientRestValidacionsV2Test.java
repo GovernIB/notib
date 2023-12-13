@@ -421,6 +421,29 @@ public class ClientRestValidacionsV2Test extends ClientBaseTest {
 		enviaNotificacioError(notificacio, "1080");
 	}
 
+	@Test
+	public void test1081() throws DatatypeConfigurationException, IOException, DecoderException {
+
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.getDocument().setValidesa(null);
+		enviaNotificacioError(notificacio, "1080");
+	}
+
+	@Test
+	public void test1082() throws DatatypeConfigurationException, IOException, DecoderException {
+
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.getDocument().setTipoDocumental(null);
+		enviaNotificacioError(notificacio, "1080");
+	}
+
+	@Test
+	public void test1083() throws DatatypeConfigurationException, IOException, DecoderException {
+
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.getDocument().setModoFirma(null);
+		enviaNotificacioError(notificacio, "1080");
+	}
 	// del 1080 al 1083 no pot donar error ja que s'assignen les per defecte si venen null
 
 	@Test

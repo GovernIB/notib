@@ -43,17 +43,28 @@ public interface NotificaWsV2PortType {
         @WebParam(name = "altaRemesaEnvios", targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/altaRemesaEnvios", partName = "altaRemesaEnvios")
         AltaRemesaEnvios altaRemesaEnvios);
 
+//    /**
+//     *
+//     * @param infoEnvioV2
+//     * @return
+//     *     returns es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2
+//     */
+//    @WebMethod(action = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/infoEnvioV2")
+//    @WebResult(name = "resultadoInfoEnvioV2", targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/infoEnvioV2", partName = "resultadoInfoEnvioV2")
+//    public ResultadoInfoEnvioV2 infoEnvioV2(
+//        @WebParam(name = "infoEnvioV2", targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/infoEnvioV2", partName = "infoEnvioV2")
+//        InfoEnvioV2 infoEnvioV2);
+
     /**
-     * 
-     * @param infoEnvioV2
-     * @return
-     *     returns es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2
+     *
+     * @param infoEnvioLigero
+     * @return returns es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioLigero
      */
-    @WebMethod(action = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/infoEnvioV2")
-    @WebResult(name = "resultadoInfoEnvioV2", targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/infoEnvioV2", partName = "resultadoInfoEnvioV2")
-    public ResultadoInfoEnvioV2 infoEnvioV2(
-        @WebParam(name = "infoEnvioV2", targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/infoEnvioV2", partName = "infoEnvioV2")
-        InfoEnvioV2 infoEnvioV2);
+    @WebMethod(action = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/infoEnvioLigero")
+    @WebResult(name = "resultadoInfoEnvioV2", targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/infoEnvioLigero", partName = "resultadoInfoEnvioV2")
+    public ResultadoInfoEnvioV2 infoEnvioLigero(
+            @WebParam(name = "infoEnvioV2", targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/infoEnvioLigero", partName = "infoEnvioLigero")
+            InfoEnvioV2 infoEnvioLigero);
 
     /**
      * 

@@ -215,6 +215,21 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	@Override
 	@Transactional
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid, Long delay) {
+
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
+		var variables = sm.getExtendedState().getVariables();
+		variables.put(SmConstants.ENVIAMENT_TIPUS, enviament.getNotificacio().getEnviamentTipus().name());
+		variables.put(SmConstants.ENVIAMENT_SENSE_NIF, enviament.isPerEmail());
+		variables.put(SmConstants.ENVIAMENT_DELAY, delay);
+		// Enviam a registre
+		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_ENVIAR);
+		return sm;
+	}
+
+	@Override
+	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid) {
 
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);

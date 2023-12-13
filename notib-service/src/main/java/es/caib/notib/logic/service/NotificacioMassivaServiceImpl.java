@@ -60,6 +60,7 @@ import es.caib.notib.logic.intf.service.NotificacioMassivaService;
 import es.caib.notib.logic.intf.util.NifHelper;
 import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.logic.service.ws.NotificacioValidator;
+import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.CSVReader;
 import es.caib.notib.logic.utils.ZipFileUtils;
 import es.caib.notib.persist.entity.EntitatEntity;
@@ -249,7 +250,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         return dto;
     }
 
-    @Transactional(rollbackFor=Exception.class, timeout = 900)
+    @Transactional(rollbackFor=Exception.class, timeout = 3600)
     @Override
     public NotificacioMassivaDataDto create(Long entitatId, @NonNull String usuariCodi, @NonNull NotificacioMassivaDto notificacioMassiva) throws RegistreNotificaException {
 
@@ -511,9 +512,10 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     public void iniciar(Long id) {
 
         try {
+            var delay = configHelper.getConfigAsLong("es.caib.notib.massives.state.machine.inici.delay", SmConstants.MASSIU_DELAY);
             var massiva = notificacioMassivaRepository.findById(id).orElseThrow();
             massiva.getNotificacions().forEach(n -> n.getEnviaments().forEach(e -> {
-                Thread t = new Thread(() -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
+                Thread t = new Thread(() -> enviamentSmService.altaEnviament(e.getNotificaReferencia(), delay));
                 t.start();
             }));
         } catch (Exception ex) {
@@ -648,9 +650,11 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         if (linies.isEmpty()) {
             throw new InvalidCSVFileNotificacioMassivaException("El fitxer CSV està buid.");
         }
-        if (linies.size() > MAX_ENVIAMENTS) {
-            log.debug(String.format("[NOT-MASSIVA] El fitxer CSV conté més de les %d línies permeses.", MAX_ENVIAMENTS));
-            throw new MaxLinesExceededException(String.format("S'ha superat el màxim nombre de línies permès (%d) per al CSV de càrrega massiva.", MAX_ENVIAMENTS));
+        var maxFilles = configHelper.getConfig("es.caib.notib.massives.maxim.files");
+        var maxEnviaments = !Strings.isNullOrEmpty(maxFilles) ? Long.parseLong(maxFilles) : MAX_ENVIAMENTS;
+        if (linies.size() > maxEnviaments) {
+            log.debug(String.format("[NOT-MASSIVA] El fitxer CSV conté més de les %d línies permeses.", maxEnviaments));
+            throw new MaxLinesExceededException(String.format("S'ha superat el màxim nombre de línies permès (%d) per al CSV de càrrega massiva.", maxEnviaments));
         }
         if (csvHeader.size() < numberRequiredColumns()) {
             var msg = String.format("El fitxer CSV no conté totes les columnes necessaries. Nombre de columnes requerides: %d. Nombre de columnes trobades %d", numberRequiredColumns(), csvHeader.size());

@@ -136,7 +136,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				if (procedimentAmbGrups && notificacio.getGrupCodi() == null) {
 					valid = false;
 					var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.grup", null, locale);
-					context.buildConstraintViolationWithTemplate(msg).addNode("grupId").addConstraintViolation();
+					context.buildConstraintViolationWithTemplate(msg).addNode("grupCodi").addConstraintViolation();
 				}
 			}
 
