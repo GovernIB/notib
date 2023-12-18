@@ -45,10 +45,7 @@ public class SmConstants {
     public static Long INTENT4;
 
     public static Long delay(int reintent, Long delay) {
-        if (delay > 0) {
-            return delay;
-        }
-        return delay(reintent);
+        return Math.max(delay(reintent), delay);
     }
 
     public static Long delay(int reintent) {

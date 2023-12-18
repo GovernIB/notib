@@ -31,6 +31,7 @@ public class EnviamentNotificaListener {
     private final EnviamentSmService enviamentSmService;
     private final NotificacioEnviamentRepository notificacioEnviamentRepository;
     private final NotificacioService notificacioService;
+//    private final NotificacioTableHelper notificacioTableHelper;
 
     private Semaphore semaphore = new Semaphore(5);
 
@@ -88,6 +89,7 @@ public class EnviamentNotificaListener {
                         NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
                     netejaExecucio(notificacio.getId());
                 }
+//                notificacioTableHelper.actualitzarRegistre(notificacio);
             }
         } catch (Exception ex) {
             notificacio.getEnviaments().forEach(e -> enviamentSmService.notificaFailed(e.getNotificaReferencia()));

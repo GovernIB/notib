@@ -78,7 +78,6 @@ import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.PagadorPostalRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
-import liquibase.pro.packaged.D;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -87,7 +86,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.supercsv.io.CsvListWriter;
@@ -110,6 +108,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -512,9 +511,11 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     public void iniciar(Long id) {
 
         try {
-            var delay = configHelper.getConfigAsLong("es.caib.notib.massives.state.machine.inici.delay", SmConstants.MASSIU_DELAY);
+            AtomicInteger enviamentCounter = new AtomicInteger(1);
+            var globalDelay = configHelper.getConfigAsLong("es.caib.notib.massives.state.machine.inici.delay", SmConstants.MASSIU_DELAY);
             var massiva = notificacioMassivaRepository.findById(id).orElseThrow();
             massiva.getNotificacions().forEach(n -> n.getEnviaments().forEach(e -> {
+                var delay = enviamentCounter.getAndIncrement() * globalDelay;
                 Thread t = new Thread(() -> enviamentSmService.altaEnviament(e.getNotificaReferencia(), delay));
                 t.start();
             }));

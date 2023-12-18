@@ -2039,10 +2039,10 @@
 					<div id="input-origen-arxiu_0" class="col-md-6 hidden">
 						<c:choose>
 							<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
-								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="test"/>
+								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="test"/>
 							</c:when>
 							<c:otherwise>
-								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_0}"/>
+								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_0}"/>
 							</c:otherwise>
 						</c:choose>
 					</div>
@@ -2102,10 +2102,10 @@
 						<div id="input-origen-arxiu_1" class="col-md-6 hidden">
 							<c:choose>
 								<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
-									<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_1}"/>
+									<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_1}"/>
 								</c:when>
 								<c:otherwise>
-									<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_1}"/>
+									<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_1}"/>
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -2161,10 +2161,10 @@
 						<div id="input-origen-arxiu_2" class="col-md-6 hidden">
 							<c:choose>
 								<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
-									<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_2}"/>
+									<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_2}"/>
 								</c:when>
 								<c:otherwise>
-									<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_2}"/>
+									<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_2}"/>
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -2222,10 +2222,10 @@
 						<div id="input-origen-arxiu_3" class="col-md-6 hidden">
 							<c:choose>
 								<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
-									<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_3}"/>
+									<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_3}"/>
 								</c:when>
 								<c:otherwise>
-									<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_3}"/>
+									<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_3}"/>
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -2281,10 +2281,10 @@
 						<div id="input-origen-arxiu_4" class="col-md-6 hidden">
 							<c:choose>
 								<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
-									<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_4}"/>
+									<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_4}"/>
 								</c:when>
 								<c:otherwise>
-									<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_4}"/>
+									<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_4}"/>
 								</c:otherwise>
 							</c:choose>
 						</div>

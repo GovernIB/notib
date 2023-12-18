@@ -73,7 +73,7 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 	@Override
 	@RolesAllowed("**")
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid, Long delay) {
-		return getDelegateService().altaEnviament(enviamentUuid);
+		return getDelegateService().altaEnviament(enviamentUuid, delay);
 	}
 
 	@Override

@@ -55,9 +55,11 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         var isRetry = EnviamentSmEvent.RG_RETRY.equals(stateContext.getMessage().getPayload()) || retry;
         variables.put(SmConstants.RG_RETRY, false);
         var delayMassiu = (long) variables.getOrDefault(SmConstants.ENVIAMENT_DELAY, 0);
+        var delay = !isRetry ? SmConstants.delay(reintents, delayMassiu) : 0;
+        variables.put(SmConstants.ENVIAMENT_DELAY, 0);
         jmsTemplate.convertAndSend(SmConstants.CUA_REGISTRE, env,
                 m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents, delayMassiu) : 0);
+                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
                     return m;
                 });
 
