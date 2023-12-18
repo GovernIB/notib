@@ -195,7 +195,7 @@ public class ConfigServiceImpl implements ConfigService {
             }
             if (config.isJbossProperty()) {
                 // Les propietats de Jboss es llegeixen del fitxer de properties i si no estan definides prenen el valor especificat a la base de dades.
-                config.setValue(configHelper.getConfig(config.getKey(), config.getValue()));
+                config.setValue(configHelper.getConfigGlobal(config.getKey(), config.getValue()));
             }
         }
         if (cGroup.getInnerConfigs() == null || cGroup.getInnerConfigs().isEmpty()) {
