@@ -23,7 +23,7 @@ public class CallbackProcessarPendentsThread implements Callable<Boolean> {
     @Override
     public Boolean call() throws Exception {
 
-        log.info("[REG] >>> Realitzant registre de la notificació amb id enviamentId");
+        log.info("[Callback] >>> Realitzant callback de la notificació amb id " + enviamentId);
         try {
             return callbackHelper.notifica(enviamentId);
         } catch (Exception e) {

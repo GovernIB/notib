@@ -15,4 +15,5 @@ public class StreamHelper {
         AtomicInteger counter = new AtomicInteger(start);
         return item -> consumer.accept(counter.getAndIncrement(), item);
     }
+
 }
