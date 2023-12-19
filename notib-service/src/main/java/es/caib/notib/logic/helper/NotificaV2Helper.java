@@ -294,7 +294,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		var infoEnvio = new InfoEnvioLigero();
 		infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
 		var apiKey = enviament.getNotificacio().getEntitat().getApiKey();
-		var resultadoInfoEnvio = getSincronizarEnvio(apiKey).infoEnvioLigero(infoEnvio);
+		var resultadoInfoEnvio = getSincronizarEnvioWs(apiKey).infoEnvioLigero(infoEnvio);
 		if (resultadoInfoEnvio.getDatados() == null) {
 			var errorDescripcio = "La resposta rebuda de Notifica no conté informació de datat";
 			integracioHelper.addAccioError(info, errorDescripcio);
@@ -709,17 +709,27 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private NotificaWsV2PortType getNotificaWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
 
 		return new WsClientHelper<NotificaWsV2PortType>().generarClientWs(
-				getClass().getResource("/es/caib/notib/logic/wsdl/NotificaWsV21.wsdl"),    getNotificaUrlProperty(),
+				getClass().getResource("/es/caib/notib/logic/wsdl/NotificaWsV21.wsdl"),
+				getNotificaUrlProperty(),
 				new QName("https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/","NotificaWsV2Service"),
-				getUsernameProperty(), getPasswordProperty(),true, NotificaWsV2PortType.class, new ApiKeySOAPHandlerV2(apiKey));
+				getUsernameProperty(),
+				getPasswordProperty(),
+				true,
+				NotificaWsV2PortType.class,
+				new ApiKeySOAPHandlerV2(apiKey));
 	}
 
-	private SincronizarEnvioWsPortType getSincronizarEnvio(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
+	private SincronizarEnvioWsPortType getSincronizarEnvioWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
 
 		return new WsClientHelper<SincronizarEnvioWsPortType>().generarClientWs(
-				getClass().getResource("/es/caib/notib/logic/wsdl/SincronizarEnvio.wsdl"),    getNotificaUrlProperty(),
-				new QName("https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/","SincronizarEnvioWsService"),
-				getUsernameProperty(), getPasswordProperty(),true, SincronizarEnvioWsPortType.class, new ApiKeySOAPHandlerV2(apiKey));
+				getClass().getResource("/es/caib/notib/logic/wsdl/SincronizarEnvio.wsdl"),
+				getNotificaUrlProperty(),
+				new QName("http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/","SincronizarEnvioWsService"),
+				getUsernameProperty(),
+				getPasswordProperty(),
+				true,
+				SincronizarEnvioWsPortType.class,
+				new ApiKeySOAPHandlerV2(apiKey));
 	}
 
 
