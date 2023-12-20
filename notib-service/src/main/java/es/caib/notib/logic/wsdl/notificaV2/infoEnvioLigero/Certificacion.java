@@ -1,11 +1,14 @@
 
 package es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero;
 
+import es.caib.notib.logic.wsdl.notificaV2.common.Opciones;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import es.caib.notib.logic.wsdl.notificaV2.common.Opciones;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
@@ -46,7 +49,9 @@ public class Certificacion {
     protected Acuse acusePDF;
     protected Acuse acuseXML;
     @XmlElement(required = true)
-    protected String fechaCertificacion;
+    @XmlSchemaType(name = "dateTime")
+    protected XMLGregorianCalendar fechaCertificacion;
+//    protected String fechaCertificacion;
     @XmlElement(required = true)
     protected String origen;
     protected String metadatos;
@@ -108,7 +113,7 @@ public class Certificacion {
      *     {@link String }
      *     
      */
-    public String getFechaCertificacion() {
+    public XMLGregorianCalendar getFechaCertificacion() {
         return fechaCertificacion;
     }
 
@@ -120,7 +125,7 @@ public class Certificacion {
      *     {@link String }
      *     
      */
-    public void setFechaCertificacion(String value) {
+    public void setFechaCertificacion(XMLGregorianCalendar value) {
         this.fechaCertificacion = value;
     }
 

@@ -4,7 +4,9 @@ package es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
@@ -43,7 +45,9 @@ import javax.xml.bind.annotation.XmlType;
 public class Datado {
 
     @XmlElement(required = true)
-    protected String fecha;
+    @XmlSchemaType(name = "dateTime")
+    protected XMLGregorianCalendar fecha;
+//    protected String fecha;
     @XmlElement(required = true)
     protected String resultado;
     @XmlElement(required = true)
@@ -60,7 +64,7 @@ public class Datado {
      *     {@link String }
      *     
      */
-    public String getFecha() {
+    public XMLGregorianCalendar getFecha() {
         return fecha;
     }
 
@@ -72,7 +76,7 @@ public class Datado {
      *     {@link String }
      *     
      */
-    public void setFecha(String value) {
+    public void setFecha(XMLGregorianCalendar value) {
         this.fecha = value;
     }
 

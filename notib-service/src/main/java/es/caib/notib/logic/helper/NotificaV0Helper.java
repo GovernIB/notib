@@ -34,13 +34,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -189,11 +186,11 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 
 			Datado datatDarrer = null;
 			for (var datado: resultadoInfoEnvio.getDatados().getDatado()) {
-				var datatData = dateFormat.parse(datado.getFecha());
+				var datatData = toDate(datado.getFecha());
 				if (datatDarrer == null) {
 					datatDarrer = datado;
 				} else if (datado.getFecha() != null) {
-					var datatDarrerData = dateFormat.parse(datatDarrer.getFecha());
+					var datatDarrerData = toDate(datatDarrer.getFecha());
 					if (datatData.after(datatDarrerData)) {
 						datatDarrer = datado;
 					}
@@ -211,7 +208,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				log.info("Actualitzant informació enviament amb certificació...");
 				var certificacio = resultadoInfoEnvio.getCertificacion();
 				ConfigHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
-				var dataCertificacio = dateFormat.parse(certificacio.getFechaCertificacion());
+				var dataCertificacio = toDate(certificacio.getFechaCertificacion());
 				if (!dataCertificacio.equals(dataUltimaCertificacio)) {
 //					var decodificat = certificacio.getContenidoCertificacion();
 //					String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, decodificat);
@@ -292,8 +289,9 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			var datats = new Datados();
 			var datat = new Datado();
 			DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-			var today = Calendar.getInstance().getTime();
-			var date = df.format(today);
+//			var today = Calendar.getInstance().getTime();
+//			var date = df.format(today);
+			var date = DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar());
 			datat.setFecha(date);
 			datat.setNifReceptor(enviament.getTitular().getNif());
 			datat.setNombreReceptor(enviament.getTitular().getNom()

@@ -42,7 +42,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
 import java.util.TreeSet;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * Mètodes comuns per a accedir a Notific@.
@@ -341,7 +340,7 @@ public abstract class AbstractNotificaHelper {
 		return DatatypeFactory.newInstance().newXMLGregorianCalendarDate(gc.get(Calendar.YEAR),gc.get(Calendar.MONTH) + 1,gc.get(Calendar.DAY_OF_MONTH),DatatypeConstants.FIELD_UNDEFINED);
 	}
 
-	protected Date toDate(XMLGregorianCalendar calendar) throws DatatypeConfigurationException {
+	protected Date toDate(XMLGregorianCalendar calendar) {
 		if (calendar == null) {
 			return null;
 		}
@@ -411,6 +410,9 @@ public abstract class AbstractNotificaHelper {
 	}
 	protected String getNotificaUrlProperty() {
 		return configHelper.getConfig("es.caib.notib.notifica.url");
+	}
+	protected String getNotificaSincronitzarUrlProperty() {
+		return configHelper.getConfig("es.caib.notib.notifica.sincronitzar.url");
 	}
 	protected String getUsernameProperty() {
 		return configHelper.getConfig("es.caib.notib.notifica.username");

@@ -42,3 +42,5 @@ UPDATE NOT_CONFIG SET POSITION = 15, CONFIGURABLE = false WHERE KEY = 'es.caib.n
 UPDATE NOT_CONFIG SET POSITION = 16, CONFIGURABLE = false WHERE KEY = 'es.caib.notib.monitor.integracions.eliminar.periode';
 UPDATE NOT_CONFIG SET POSITION = 17, CONFIGURABLE = false WHERE KEY = 'es.caib.notib.monitor.integracions.eliminar.anterior.dies';
 UPDATE NOT_CONFIG SET POSITION = 18, CONFIGURABLE = false WHERE KEY = 'es.caib.notib.document.consulta.id.csv.mida.min';
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.notifica.sincronitzar.url', '', 'URL de sincronització de Notific@', 'NOTIFICA', '2', '1', 'TEXT', false);
