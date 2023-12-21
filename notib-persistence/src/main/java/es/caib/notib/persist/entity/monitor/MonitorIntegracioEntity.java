@@ -3,6 +3,7 @@ package es.caib.notib.persist.entity.monitor;
 
 import es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,7 +39,8 @@ public class MonitorIntegracioEntity extends AbstractPersistable<Long> {
     private static int ERROR_DESC_MAX_LENGTH = 1024;
 
     @Column(name = "codi", length = 64, nullable = false, unique = true)
-    private String codi;
+    @Enumerated(EnumType.STRING)
+    private IntegracioCodiEnum codi;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "data", nullable = false)

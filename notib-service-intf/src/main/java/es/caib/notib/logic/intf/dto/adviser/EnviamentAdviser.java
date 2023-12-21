@@ -1,7 +1,8 @@
 package es.caib.notib.logic.intf.dto.adviser;
 
-import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import es.caib.notib.logic.intf.ws.adviser.common.Opciones;
+import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ import java.math.BigInteger;
 public class EnviamentAdviser implements Serializable {
 
     private String organismoEmisor;
+    @JsonProperty("hIdentificador")
     private String hIdentificador;
     private BigInteger tipoEntrega;
     private BigInteger modoNotificacion;

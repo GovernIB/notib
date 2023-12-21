@@ -9,10 +9,10 @@ import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.HibernateHelper;
-import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.AnexoWsDto;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.InteresadoWsDto;
 import es.caib.notib.logic.intf.dto.notificacio.EnviamentSirTipusDocumentEnviarEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -418,7 +418,7 @@ public abstract class EnviamentRegistreMapper {
             return null;
         } catch (Exception ex) {
             var msg = "Error obtenint les dades del document '" + (document != null ? document.getId() : "") + "': " + ex.getMessage();
-            throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, msg, ex.getCause());
+            throw new SistemaExternException(IntegracioCodiEnum.REGISTRE.name(), msg, ex.getCause());
         }
     }
 

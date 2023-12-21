@@ -10,6 +10,7 @@ import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
+import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
@@ -65,6 +66,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.jms.JmsException;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -175,6 +178,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private NotificacioMapper notificacioMapper;
 	@Autowired
 	private NotificacioTableMapper notificacioTableMapper;
+	@Autowired
+	protected JmsTemplate jmsTemplate;
 
 	private static final String DELETE = "NotificacioServiceImpl.delete";
 	private static final String UPDATE = "NotificacioServiceImpl.update";
@@ -1151,7 +1156,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 			var usuari = usuariHelper.getUsuariAutenticat();
 			if (usuari != null && notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
-				resposta = emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacioEntity);
+				try {
+					jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_NOTIFICACIO, notificacioId);
+				} catch (JmsException ex) {
+					log.error("Hi ha hagut un error al intentar enviar el correu electrònic de la notificació amb id: ." + notificacioId, ex);
+					resposta = "No s'ha pogut avisar per correu electrònic: " + ex.getMessage();
+				}
 			}
 			log.info("PRC >> Email enviat si s'escau");
 			notificacioRepository.saveAndFlush(notificacioEntity);

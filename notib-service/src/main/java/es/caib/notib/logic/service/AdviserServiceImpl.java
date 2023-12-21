@@ -12,6 +12,7 @@ import es.caib.notib.logic.helper.NotificacioEventHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
@@ -273,7 +274,7 @@ public class AdviserServiceImpl implements AdviserService {
 
     @NotNull
     private static IntegracioInfo generateInfoEnvio(SincronizarEnvio sincronizarEnvio, String identificador, SimpleDateFormat sdf, Date dataEstat) {
-        return new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA, "Recepció de canvi de notificació via Adviser",
+        return new IntegracioInfo(IntegracioCodiEnum.NOTIFICA, "Recepció de canvi de notificació via Adviser",
                 IntegracioAccioTipusEnumDto.RECEPCIO,
                 new AccioParam("Organisme emisor", sincronizarEnvio.getOrganismoEmisor()),
                 new AccioParam("Identificador", (identificador != null ? identificador : "")),

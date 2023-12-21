@@ -4,8 +4,8 @@
 package es.caib.notib.ejb;
 
 import es.caib.notib.logic.intf.dto.IntegracioAccioDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioDetall;
-import es.caib.notib.logic.intf.dto.IntegracioDto;
 import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,19 +27,13 @@ public class MonitorIntegracioService extends AbstractService<es.caib.notib.logi
 
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
-	public List<IntegracioDto> integracioFindAll() {
-		return getDelegateService().integracioFindAll();
-	}
-
-	@Override
-	@RolesAllowed({"NOT_SUPER"})
-	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) {
+	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(IntegracioCodiEnum codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) {
 		return getDelegateService().integracioFindDarreresAccionsByCodi(codi, paginacio, filtre);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
-	public Map<String, Integer> countErrors() {
+	public Map<IntegracioCodiEnum, Integer> countErrors() {
 		return getDelegateService().countErrors();
 	}
 

@@ -6,6 +6,7 @@ package es.caib.notib.logic.helper;
 import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.email.EmailConstants;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -17,6 +18,7 @@ import es.caib.notib.persist.repository.NotificacioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
@@ -143,8 +145,12 @@ public abstract class AbstractNotificaHelper {
 			auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "AbstractNotificaHelper.enviamentUpdateDatat");
 
 			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
-				log.info("Enviar email en cas d'usuaris INTERFICIE WEB");
-				jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_CONSULTA_ESTAT, notificacio.getId());
+				try {
+					log.info("Enviar email en cas d'usuaris INTERFICIE WEB");
+					jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_NOTIFICACIO, notificacio.getId());
+				} catch (JmsException ex) {
+					log.error("Hi ha hagut un error al intentar enviar el correu electrònic de la notificació amb id: ." + notificacio.getId(), ex);
+				}
 			}
 		}
 		// Actualitzar màscara d'estats
@@ -368,7 +374,7 @@ public abstract class AbstractNotificaHelper {
 		cipher.init(Cipher.DECRYPT_MODE, rc4Key);
 
 		if (idXifrat.length() < 11) {
-			throw new SistemaExternException(IntegracioHelper.INTCODI_CLIENT, "La longitud mínima del identificador xifrat ha de ser 11 caràcters.");
+			throw new SistemaExternException(IntegracioCodiEnum.CALLBACK.name(), "La longitud mínima del identificador xifrat ha de ser 11 caràcters.");
 		}
 
 		byte[] desxifrat = cipher.doFinal(Base64.decodeBase64(idXifrat.getBytes()));

@@ -10,8 +10,8 @@ import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioDetall;
-import es.caib.notib.logic.intf.dto.IntegracioDto;
 import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Map;
 
 
@@ -50,20 +49,8 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	private MonitorIntegracioParamRepository paramRepository;
 
 	@Override
-	public List<IntegracioDto> integracioFindAll() {
-
-		var timer = metricsHelper.iniciMetrica();
-		try {
-			log.debug("Consultant les integracions");
-			return integracioHelper.findAll();
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-
-	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) {
+	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(IntegracioCodiEnum codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
@@ -82,7 +69,7 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public Map<String, Integer> countErrors() {
+	public Map<IntegracioCodiEnum, Integer> countErrors() {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
