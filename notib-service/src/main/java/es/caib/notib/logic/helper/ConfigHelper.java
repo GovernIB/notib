@@ -152,7 +152,7 @@ public class ConfigHelper {
         if (propertyValue != null) {
             return Optional.of(propertyValue);
         }
-        log.error("No s'ha trobat la propietat -> key global: " + globalKey + " key entitat: " + entitatKey);
+        log.warn("No s'ha trobat la propietat -> key global: " + globalKey + " key entitat: " + entitatKey);
         return Optional.empty();
     }
 

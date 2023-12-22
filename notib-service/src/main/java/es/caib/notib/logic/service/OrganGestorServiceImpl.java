@@ -23,6 +23,7 @@ import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
@@ -593,7 +594,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		} finally {
 			progres.setProgres(100);
 			progres.setFinished(true);
-			var info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Actualització d'òrgans gestors",
+			var info = new IntegracioInfo(IntegracioCodiEnum.UNITATS, "Actualització d'òrgans gestors",
 					IntegracioAccioTipusEnumDto.PROCESSAR, new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
 			info.setCodiEntitat(entitatDto.getCodi());
 			for (var inf: progres.getInfo()) {
@@ -731,7 +732,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		} catch (SistemaExternException sex) {
 			throw sex;
 		} catch (Exception ex) {
-			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, "No ha estat possible obtenir la predicció de canvis de unitats organitzatives", ex);
+			throw new SistemaExternException(IntegracioCodiEnum.UNITATS.name(), "No ha estat possible obtenir la predicció de canvis de unitats organitzatives", ex);
 		}
 	}
 
@@ -926,7 +927,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 							+ ") té l'estat (" + unitat.getEstat() + ") i l'històrica (" + historicCodi
 							+ ") però no s'ha retornat la unitat orgánica (" + historicCodi
 							+ ") en el resultat de la consulta del WS ni en la BBDD.";
-					throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
+					throw new SistemaExternException(IntegracioCodiEnum.UNITATS.name(), errorMissatge);
 				}
 			} else if (historicCodi.equals(unitat.getCodi())) {
 				// EXAMPLE:
@@ -1357,7 +1358,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private void syncOficines(String entitatDir3Codi, ProgresActualitzacioDto progres) {
 
 		var desc = "Actualització d'oficines SIR per l'entitat " + entitatDir3Codi;
-		var info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, desc, IntegracioAccioTipusEnumDto.PROCESSAR);
+		var info = new IntegracioInfo(IntegracioCodiEnum.UNITATS, desc, IntegracioAccioTipusEnumDto.PROCESSAR);
 		try {
 			// Obtenim l'entitat
 			var entitat = entitatRepository.findByDir3Codi(entitatDir3Codi);
