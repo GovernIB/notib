@@ -31,7 +31,7 @@ public class ClientBaseTest {
 	protected static final String LLIBRE = "L16";
 	protected static final String OFICINA = "O00009390";
 	protected static final String IDIOMA = "ca";
-	protected static final String USUARI_CODI = "e18225486x";
+	protected static final String USUARI_CODI = "u999000";
 	protected static final NotificaDomiciliConcretTipus TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipus.NACIONAL;
 
 	protected static boolean ENVIAMENT_AMB_DESTINATARIS = false;
@@ -39,34 +39,30 @@ public class ClientBaseTest {
 
 	// LOCAL data
 //	Entitat: A04013511 (DGTIC) ò A04003003 (Govern)
-//	protected static final String ENTITAT_DIR3CODI = "A04003003";
-//	protected static final String ORGAN_CODI = "A04035948";
-//	protected static final String ORGAN_CODI_CIE = "A04026958"; // LOCAL
-//	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292"; // LOCAL
-//	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "215981"; // LOCAL
+	protected static final String ENTITAT_DIR3CODI = "A04003003";
+	protected static final String ENTITAT_DESACTIVADA = "A17002943"; // LOCAL
+    protected static final String ENTITAT_ERROR = "test"; // LOCAL
+	protected static final String ORGAN_CODI = "A04035948";
+	protected static final String ORGAN_CODI_CIE = "A04026958"; // LOCAL
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292"; // LOCAL
+	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "215981"; // LOCAL
 
 
 	// DEV data
-	protected static final String ENTITAT_DIR3CODI = "A04003003";
-
-//	protected static final String ENTITAT_DESACTIVADA = "A04013511"; // DEV
-	protected static final String ENTITAT_DESACTIVADA = "A17002943"; // LOCAL
-
-//	protected static final String ENTITAT_ERROR = "test1"; // DEV
-	protected static final String ENTITAT_ERROR = "test"; // LOCAL
-	protected static final String ORGAN_CODI = "A04027005";
-
-//	protected static final String ORGAN_CODI_CIE = "A04027005"; // DEV
-	protected static final String ORGAN_CODI_CIE = "A04027052"; // LOCAL
-
-//	protected static final String IDENTIFICADOR_PROCEDIMENT = "894623"; // DEV
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "894623"; // LOCAL
-
-//	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "894623"; // DEV
-	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "877558"; // Local
+//	protected static final String ENTITAT_DIR3CODI = "A04003003";
+//	protected static final String ENTITAT_DESACTIVADA = "A04013511";
+//	protected static final String ENTITAT_ERROR = "test1";
+//	protected static final String ORGAN_CODI = "A04013529";
+//	protected static final String ORGAN_CODI_CIE = "A04013529";
+//	protected static final String IDENTIFICADOR_PROCEDIMENT = "874105"; // DEV
+//	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "874106"; // DEV
 
 
-	protected NotificacioV2 generarNotificacioV2(String notificacioId, int numEnviaments, boolean ambEnviamentPostal) throws IOException {
+
+	protected NotificacioV2 generarNotificacioV2(
+			String notificacioId,
+			int numEnviaments,
+			boolean ambEnviamentPostal) throws IOException {
 
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		NotificacioV2 notificacio = new NotificacioV2();
@@ -104,6 +100,7 @@ public class ClientBaseTest {
 				titular.setNif("00000000T");
 			}
 			titular.setInteressatTipus(i != 0 ? InteressatTipus.FISICA_SENSE_NIF : InteressatTipus.FISICA);
+//			titular.setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 			if (titular.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 				titular.setDir3Codi(ENTITAT_DIR3CODI);
 			}

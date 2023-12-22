@@ -64,9 +64,6 @@
 			<subsystem name="jsf"/>
 		</exclude-subsystems>
 		<dependencies>
-<!--			<module name="deployment.notib-service-intf"/>-->
-<!--			<module name="deployment.notib-client-intf"/>-->
-<!--			<module name="deployment.notib-api-libs"/>-->
 			<module name="jdk.management"/>
 		</dependencies>
 	</sub-deployment>

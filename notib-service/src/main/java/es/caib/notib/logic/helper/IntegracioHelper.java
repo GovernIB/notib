@@ -148,7 +148,7 @@ public class IntegracioHelper {
 		try {
 			var usuari = usuariRepository.findById(auth.getName()).orElse(null);
 			if (usuari == null) {
-				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari no trobat a la bdd");
+				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari " + auth.getName() + "no trobat a la bbdd");
 				return usuariNomCodi;
 			}
 			return usuari.getNom() + " (" + usuari.getCodi() + ")";

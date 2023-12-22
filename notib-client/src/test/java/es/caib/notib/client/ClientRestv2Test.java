@@ -30,14 +30,16 @@ import static org.junit.Assert.*;
 public class ClientRestv2Test extends ClientBaseTest {
 
 	//	private static final String URL = "http://localhost:8080/notib";
-//	private static final String URL = "http://localhost:8280/notibapi";
+	private static final String URL = "http://localhost:8080/notibapi";
 //	private static final String USERNAME = "admin";
 //	private static final String PASSWORD = "admin";
+	private static final String USERNAME = "u999000";
+	private static final String PASSWORD = "u999000";
 
 
-	private static final String URL = "https://dev.caib.es/notibapi";
-	private static final String USERNAME = "$ripea_notib";
-	private static final String PASSWORD = "ripea_notib";
+//	private static final String URL = "https://dev.caib.es/notibapi";
+//	private static final String USERNAME = "$ripea_notib";
+//	private static final String PASSWORD = "ripea_notib";
 
 	// Indicar si el servidor esta configurat en mode síncron
 	private static final boolean SYNC_MODE = false;
