@@ -308,7 +308,7 @@ function mostrarEntregaPostal(className) {
     if ($(element).is(':checked') && concepteLength > 50) {
         var longitidInfo = $('.entregaPostal_info_' + enviament_id_num);
         $(longitidInfo).slideDown(1000);
-    };
+    }
 
     if($('.entregaPostal_'+enviament_id_num).css('display') != 'none') {
         $('.entregaPostal_'+enviament_id_num).hide();

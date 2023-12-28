@@ -1415,6 +1415,7 @@
 		}
 		if (procediment == '') {
 			$("#organGestor").prop("disabled", false);
+			$("#metodeEntrega").css("display", "none");
 		} else {
 			$.ajax({
 				type: 'GET',
@@ -1452,6 +1453,8 @@
 					}
 
 					viewModel.ambEntregaCIE = data.entregaCieActiva;
+					console.log(viewModel)
+					$("#metodeEntrega").css("display", data.entregaCieActiva || viewModel.ambEntregaDEH ? "block" : "none");
 					if (!data.entregaCieVigent) {
 						$("#entregaPostalCaducada").show();
 					} else {
@@ -1817,8 +1820,7 @@
 								<c:import url="includes/destinatariForm.jsp"/>
 								<div class="col-md-12 separacio"></div>
 							</c:if>
-							
-							<div class="metodeEntrega">
+							<div id="metodeEntrega" class="metodeEntrega" style="display:none">
 								<div class="col-md-12 title-envios">
 									<div class="title-container entrega">
 										<label> ${metodeEntrega} </label>
