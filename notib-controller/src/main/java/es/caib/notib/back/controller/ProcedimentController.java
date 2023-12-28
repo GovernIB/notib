@@ -308,10 +308,7 @@ public class ProcedimentController extends BaseUserController {
 			return "procedimentsActualitzacioForm";
 		}
 		
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"/procedimentsActualitzacioForm",
-				"procediment.controller.update.auto.ok");
+		return getAjaxControllerReturnValueSuccess(request, "/procedimentsActualitzacioForm", "procediment.controller.update.auto.ok");
 	}
 	
 	@GetMapping(value = "/update/auto/progres")
@@ -329,6 +326,7 @@ public class ProcedimentController extends BaseUserController {
 			return procSerFiltreCommand;
 		}
 		procSerFiltreCommand = new ProcSerFiltreCommand();
+		procSerFiltreCommand.setEstat(ProcedimentEstat.ACTIU);
 		RequestSessionHelper.actualitzarObjecteSessio(request, this.currentFiltre, procSerFiltreCommand);
 		return procSerFiltreCommand;
 	}

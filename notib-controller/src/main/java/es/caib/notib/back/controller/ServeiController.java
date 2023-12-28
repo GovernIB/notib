@@ -51,7 +51,7 @@ import java.util.List;
 @Slf4j
 @Controller
 @RequestMapping("/servei")
-public class ServeiController extends BaseUserController{
+public class ServeiController extends BaseUserController {
 
 	@Autowired
 	private ServeiService serveiService;
@@ -82,12 +82,12 @@ public class ServeiController extends BaseUserController{
 		model.addAttribute("procedimentEstats", EnumHelper.getOptionsForEnum(ProcedimentEstat.class, "es.caib.notib.logic.intf.dto.procediment.ProcedimentEstat."));
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
 		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false")));
-		
+
 		return "serveiListPage";
 	}
 
 	@GetMapping(value = "/filtre/codi/{serveiCodi}")
-	public String getFiltratByOrganGestor(HttpServletRequest request,  @PathVariable String serveiCodi, Model model) {
+	public String getFiltratByOrganGestor(HttpServletRequest request, @PathVariable String serveiCodi, Model model) {
 
 		currentFiltre = SERVEIS_FILTRE;
 		var procSerFiltreCommand = getFiltreCommand(request);
@@ -112,14 +112,14 @@ public class ServeiController extends BaseUserController{
 		return "serveiListModal";
 	}
 
-	private List<CodiValorEstatDto> findOrgansGestorsAccessibles (EntitatDto entitatActual, OrganGestorDto organGestorActual) {
+	private List<CodiValorEstatDto> findOrgansGestorsAccessibles(EntitatDto entitatActual, OrganGestorDto organGestorActual) {
 
 		if (organGestorActual == null) {
 			return organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
 		}
 		var organsDto = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
 		List<CodiValorEstatDto> organsGestors = new ArrayList<>();
-		for (var organ: organsDto) {
+		for (var organ : organsDto) {
 			organsGestors.add(CodiValorEstatDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
 		}
 		return organsGestors;
@@ -127,8 +127,8 @@ public class ServeiController extends BaseUserController{
 
 	@GetMapping(value = "/datatable")
 	@ResponseBody
-	public DatatablesResponse datatable(HttpServletRequest request ) {
-		
+	public DatatablesResponse datatable(HttpServletRequest request) {
+
 		var isUsuari = RolHelper.isUsuariActualUsuari(sessionScopedContext.getRolActual());
 		var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
 		var isAdministrador = RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
@@ -144,19 +144,19 @@ public class ServeiController extends BaseUserController{
 		}
 		return DatatablesHelper.getDatatableResponse(request, serveis, "id");
 	}
-	
+
 	@GetMapping(value = "/new")
 	public String newGet(HttpServletRequest request, Model model) {
 		return formGet(request, null, model);
 	}
-	
+
 	@PostMapping
 	public String post(HttpServletRequest request, ProcSerFiltreCommand command, Model model) {
-		
+
 		RequestSessionHelper.actualitzarObjecteSessio(request, this.currentFiltre, command);
 		return "serveiListPage";
 	}
-	
+
 	@PostMapping(value = "/newOrModify")
 	public String save(HttpServletRequest request, @Valid ProcSerCommand procSerCommand, BindingResult bindingResult, Model model) {
 
@@ -170,11 +170,11 @@ public class ServeiController extends BaseUserController{
 			model.addAttribute("cieList", cieList);
 			return "serveiAdminForm";
 		}
-		
+
 		if (procSerCommand.getId() != null) {
 			try {
 				serveiService.update(procSerCommand.getEntitatId(), ProcSerCommand.asDto(procSerCommand), isAdministrador(), RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()));
-			} catch(NotFoundException | ValidationException ev) {
+			} catch (NotFoundException | ValidationException ev) {
 				log.debug("Error al actualitzar el procediment", ev);
 			}
 			return getModalControllerReturnValueSuccess(request, "redirect:../servei", "servei.controller.modificat.ok");
@@ -182,13 +182,13 @@ public class ServeiController extends BaseUserController{
 		serveiService.create(procSerCommand.getEntitatId(), ProcSerCommand.asDto(procSerCommand));
 		return getModalControllerReturnValueSuccess(request, "redirect:../servei", "servei.controller.creat.ok");
 	}
-	
+
 	@GetMapping(value = "/{serveiId}")
 	public String formGet(HttpServletRequest request, @PathVariable Long serveiId, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
 		var servei = emplenarModelServei(request, serveiId, model);
-		var procSerCommand = servei != null ?ProcSerCommand.asCommand(servei) : new ProcSerCommand();
+		var procSerCommand = servei != null ? ProcSerCommand.asCommand(servei) : new ProcSerCommand();
 		model.addAttribute(procSerCommand);
 		var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("operadorPostalList", operadorPostalList);
@@ -196,7 +196,7 @@ public class ServeiController extends BaseUserController{
 		model.addAttribute("cieList", cieList);
 		return "serveiAdminForm";
 	}
-	
+
 	@GetMapping(value = "/{serveiId}/delete")
 	public String delete(HttpServletRequest request, @PathVariable Long serveiId) {
 
@@ -223,7 +223,7 @@ public class ServeiController extends BaseUserController{
 	public String disable(HttpServletRequest request, @PathVariable Long serveiId) {
 
 		serveiService.updateActiu(serveiId, false);
-		return getAjaxControllerReturnValueSuccess(request,REDIRECT_SERVEI, "servei.controller.desactivada.ok");
+		return getAjaxControllerReturnValueSuccess(request, REDIRECT_SERVEI, "servei.controller.desactivada.ok");
 	}
 
 	@GetMapping(value = "/{serveiId}/sync_manual")
@@ -232,11 +232,12 @@ public class ServeiController extends BaseUserController{
 		serveiService.updateManual(serveiId, true);
 		return getAjaxControllerReturnValueSuccess(request, REDIRECT_SERVEI, "procediment.controller.manual.ok");
 	}
+
 	@GetMapping(value = "/{serveiId}/sync_auto")
 	public String auto(HttpServletRequest request, @PathVariable Long serveiId) {
 
 		serveiService.updateManual(serveiId, false);
-		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "procediment.controller.auto.ok");
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "procediment.controller.auto.ok");
 	}
 
 	@GetMapping(value = "/{codiSia}/update")
@@ -245,13 +246,13 @@ public class ServeiController extends BaseUserController{
 		try {
 			var entitat = getEntitatActualComprovantPermisos(request);
 			var trobat = serveiService.actualitzarServei(codiSia, entitat);
-			return trobat ?  getAjaxControllerReturnValueSuccess(request, REDIRECT_SERVEI, "servei.controller.update.ok")
-					:  getAjaxControllerReturnValueError(request, REDIRECT_SERVEI, "servei.controller.update.no.trobat");
+			return trobat ? getAjaxControllerReturnValueSuccess(request, REDIRECT_SERVEI, "servei.controller.update.ok")
+					: getAjaxControllerReturnValueError(request, REDIRECT_SERVEI, "servei.controller.update.no.trobat");
 		} catch (Exception ex) {
 			return getAjaxControllerReturnValueError(request, REDIRECT_SERVEI, "servei.controller.update.ko");
 		}
 	}
-	
+
 	@GetMapping(value = "/update/auto")
 	public String actualitzacioAutomaticaGet(HttpServletRequest request, Model model) {
 
@@ -259,10 +260,10 @@ public class ServeiController extends BaseUserController{
 		model.addAttribute("isUpdatingProcediments", serveiService.isUpdatingServeis(entitat));
 		return "serveisActualitzacioForm";
 	}
-	
+
 	@PostMapping(value = "/update/auto")
 	public String actualitzacioAutomaticaPost(HttpServletRequest request, Model model) {
-				
+
 		var entitat = getEntitatActualComprovantPermisos(request);
 		try {
 			serveiService.actualitzaServeis(entitat);
@@ -277,7 +278,7 @@ public class ServeiController extends BaseUserController{
 		}
 		return getAjaxControllerReturnValueSuccess(request, "/serveisActualitzacioForm", "procediment.controller.update.auto.ok");
 	}
-	
+
 	@GetMapping(value = "/update/auto/progres")
 	@ResponseBody
 	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
@@ -288,11 +289,13 @@ public class ServeiController extends BaseUserController{
 
 	private ProcSerFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
-		var procSerFiltreCommand = (ProcSerFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, currentFiltre);
-		if (procSerFiltreCommand == null) {
-			procSerFiltreCommand = new ProcSerFiltreCommand();
-			RequestSessionHelper.actualitzarObjecteSessio(request, currentFiltre, procSerFiltreCommand);
+		var procSerFiltreCommand = (ProcSerFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(request, currentFiltre);
+		if (procSerFiltreCommand != null) {
+			return procSerFiltreCommand;
 		}
+		procSerFiltreCommand = new ProcSerFiltreCommand();
+		procSerFiltreCommand.setEstat(ProcedimentEstat.ACTIU);
+		RequestSessionHelper.actualitzarObjecteSessio(request, currentFiltre, procSerFiltreCommand);
 		return procSerFiltreCommand;
 	}
 	
