@@ -149,6 +149,8 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private String titular;
 	@Column(name = "NOTIFICA_IDS", length = 1024)
 	private String notificaIds;
+	@Column(name = "REGISTRE_NUMS", length = 1024)
+	private String registreNums;
 	@Column(name = "ESTAT_MASK")
 	private Integer estatMask;
 

@@ -5,6 +5,7 @@ import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.CacheHelper;
+import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.DocumentHelper;
 import es.caib.notib.logic.helper.EmailNotificacioMassivaHelper;
@@ -55,6 +56,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -113,6 +115,10 @@ public class NotificacioMassivaServiceTest {
 	private NotificacioTableMapper notificacioTableMapper;
 	@Mock
 	private EmailNotificacioMassivaHelper emailNotificacioMassivaHelper;
+	@Mock
+	private ConfigHelper configHelper;
+	@Mock
+	private JmsTemplate jmsTemplate;
 
 	@InjectMocks
 	NotificacioMassivaService notificacioMassivaService = new NotificacioMassivaServiceImpl();

@@ -43,6 +43,8 @@ public class FiltreNotificacio {
     private String creadaPer;
     private boolean identificadorNull;
     private String identificador;
+    private boolean registreNumNull;
+    private String registreNum;
     private boolean nomesAmbErrors;
     private boolean nomesSenseErrors;
     private boolean referenciaNull;

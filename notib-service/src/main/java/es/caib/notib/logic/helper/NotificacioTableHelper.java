@@ -1,5 +1,6 @@
 package es.caib.notib.logic.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -83,6 +84,7 @@ public class NotificacioTableHelper {
                     .referencia(notificacio.getReferencia())
                     .titular(titular.toString())
                     .notificaIds(notificaIds)
+                    .registreNums("")
                     .estatMask(estatMask)
                     .perActualitzar(true)
                     .build();
@@ -182,8 +184,9 @@ public class NotificacioTableHelper {
             }
 
             // Camps calcaulats a partir de valors dels enviaments
-            StringBuilder titular = new StringBuilder();
-            StringBuilder notificaIds = new StringBuilder();
+            var titular = new StringBuilder();
+            var notificaIds = new StringBuilder();
+            var registreNums = new StringBuilder();
             Integer estatMask = 0;
             if (notificacio.getEnviaments() != null) {
                 for (var e : notificacio.getEnviaments()) {
@@ -192,6 +195,9 @@ public class NotificacioTableHelper {
                     }
                     if (e.getNotificaIdentificador() != null) {
                         notificaIds.append(e.getNotificaIdentificador()).append(", ");
+                    }
+                    if (!Strings.isNullOrEmpty(e.getRegistreNumeroFormatat())) {
+                        registreNums.append(e.getRegistreNumeroFormatat()).append(", ");
                     }
                     // Estat de la notificacio
                     if ((estatMask & e.getNotificacio().getEstat().getMask()) == 0) {
@@ -230,6 +236,7 @@ public class NotificacioTableHelper {
             tableViewItem.setEnviadaDate(getEnviadaDate(notificacio));
             tableViewItem.setTitular(titular.toString());
             tableViewItem.setNotificaIds(notificaIds.toString());
+            tableViewItem.setRegistreNums(registreNums.toString());
             tableViewItem.setEstatMask(estatMask);
             tableViewItem.setPerActualitzar(true);
             notificacioTableViewRepository.saveAndFlush(tableViewItem);

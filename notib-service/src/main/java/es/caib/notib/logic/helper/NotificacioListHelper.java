@@ -155,6 +155,8 @@ public class NotificacioListHelper {
                 .creadaPer(f.getCreadaPer())
                 .identificadorNull(Strings.isNullOrEmpty(f.getIdentificador()))
                 .identificador(f.getIdentificador())
+                .registreNumNull(Strings.isNullOrEmpty(f.getRegistreNum()))
+                .registreNum(f.getRegistreNum())
                 .nomesAmbErrors(nomesAmbErrors)
                 .nomesSenseErrors(nomesSenseErrors)
                 .referenciaNull(Strings.isNullOrEmpty(f.getReferencia()))

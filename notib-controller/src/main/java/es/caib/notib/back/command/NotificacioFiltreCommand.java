@@ -38,6 +38,7 @@ public class NotificacioFiltreCommand {
 	private String numExpedient;
 	private String creadaPer;
 	private String identificador;
+	private String registreNum;
 	private String referencia;
 	private boolean nomesAmbErrors;
 	

@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_notificacio_table
+            columns:
+              - column:
+                  name: REGISTRE_NUMS
+                  type: varchar(1024 ${varcharUnit})
+
+        - sql: "UPDATE NOT_NOTIFICACIO_TABLE SET REGISTRE_NUMS = (select listagg(E.REGISTRE_NUMERO_FORMATAT , ', ') WITHIN GROUP (ORDER BY E.ID) FROM NOT_NOTIFICACIO_ENV E WHERE E.NOTIFICACIO_ID = NOT_NOTIFICACIO_TABLE.ID);"
