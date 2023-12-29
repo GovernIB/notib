@@ -35,6 +35,7 @@ public interface ServeiFormRepository extends JpaRepository<ServeiFormEntity, Lo
 			" and (:isEstatNull = true or pro.actiu = :estat)" +
 			" and (:isComu = false or pro.comu = true)" +
 			" and (:isManual = false or pro.manual = true)" +
+			" and (:isRequireDirectPermission = false or pro.requireDirectPermission = true)" +
 			" and (:isEntregaCieActiva = false or pro.entregaCieActiva != 0)")
 	Page<ServeiFormEntity> findAmbEntitatAndFiltre(
             @Param("entitatId") Long entitatId,
@@ -49,6 +50,7 @@ public interface ServeiFormRepository extends JpaRepository<ServeiFormEntity, Lo
             @Param("isComu") boolean isComu,
             @Param("isEntregaCieActiva") boolean isEntregaCieActiva,
 			@Param("isManual") boolean isManual,
+			@Param("isRequireDirectPermission") boolean isRequireDirectPermission,
             Pageable paginacio);
 	
 	@Query(	"from " +
@@ -59,6 +61,7 @@ public interface ServeiFormRepository extends JpaRepository<ServeiFormEntity, Lo
 			" and (:isEstatNull = true or pro.actiu = :estat)" +
 			" and (:isComu = false or pro.comu = true)" +
 			" and (:isManual = false or pro.manual = true)" +
+			" and (:isRequireDirectPermission = false or pro.requireDirectPermission = true)" +
 			" and (:isEntregaCieActiva = false or pro.entregaCieActiva != 0)")
 	Page<ServeiFormEntity> findAmbFiltre(
             @Param("isCodiNull") boolean isCodiNull,
@@ -72,6 +75,7 @@ public interface ServeiFormRepository extends JpaRepository<ServeiFormEntity, Lo
             @Param("isComu") boolean isComu,
             @Param("isEntregaCieActiva") boolean isEntregaCieActiva,
 			@Param("isManual") boolean isManual,
+			@Param("isRequireDirectPermission") boolean isRequireDirectPermission,
             Pageable paginacio);
 
 	@Query(	"from " +
@@ -84,6 +88,7 @@ public interface ServeiFormRepository extends JpaRepository<ServeiFormEntity, Lo
 			" and (:isEstatNull = true or pro.actiu = :estat)" +
 			" and (:isComu = false or pro.comu = true)" +
 			" and (:isManual = false or pro.manual = true)" +
+			" and (:isRequireDirectPermission = false or pro.requireDirectPermission = true)" +
 			" and (:isEntregaCieActiva = false or pro.entregaCieActiva != 0)")
 	Page<ServeiFormEntity> findAmbOrganGestorOrComuAndFiltre(
             @Param("entitatId") Long entitatId,
@@ -99,6 +104,7 @@ public interface ServeiFormRepository extends JpaRepository<ServeiFormEntity, Lo
             @Param("isComu") boolean isComu,
             @Param("isEntregaCieActiva") boolean isEntregaCieActiva,
 			@Param("isManual") boolean isManual,
+			@Param("isRequireDirectPermission") boolean isRequireDirectPermission,
             Pageable paginacio);
 
 }

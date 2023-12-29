@@ -644,6 +644,7 @@ public class ServeiServiceImpl implements ServeiService {
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
 							filtre.isManual(),
+							filtre.isRequireDirectPermission(),
 							pageable);
 
 				} else if (isAdministrador) {
@@ -659,6 +660,7 @@ public class ServeiServiceImpl implements ServeiService {
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
 							filtre.isManual(),
+							filtre.isRequireDirectPermission(),
 							pageable);
 
 				} else if (organGestorActual != null) { // Administrador d'òrgan
@@ -676,6 +678,7 @@ public class ServeiServiceImpl implements ServeiService {
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
 							filtre.isManual(),
+							filtre.isRequireDirectPermission(),
 							pageable);
 
 				}

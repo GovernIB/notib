@@ -22,5 +22,6 @@ public class ProcSerFiltreDto extends AuditoriaDto implements Serializable {
 	private boolean comu;
 	private boolean manual;
 	private boolean entregaCieActiva;
+	private boolean requireDirectPermission;
 	private ProcedimentEstat estat;
 }

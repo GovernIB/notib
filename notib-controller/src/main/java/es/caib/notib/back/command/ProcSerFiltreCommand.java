@@ -23,6 +23,7 @@ public class ProcSerFiltreCommand {
 	private boolean entregaCieActiva;
 	private boolean actiu;
 	private boolean manual;
+	private boolean requireDirectPermission;
 	private ProcedimentEstat estat;
 	
 	

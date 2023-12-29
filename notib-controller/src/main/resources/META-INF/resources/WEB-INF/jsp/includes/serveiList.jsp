@@ -34,16 +34,20 @@
 				} else if (type == 'checkbox' || type == 'radio') {
 					this.checked = false;
 				} else if (tag == 'select') {
-					this.selectedIndex = 0;
+					this.selectedIndex = this.name === "estat" ? 1 : 0;
 				}
 			});
-			$('#form-filtre').submit();
+			$("#estat").change();
+			$("#organGestor").change();
 			$('#btn-entregaCieActiva').removeClass('active');
 			$('#entregaCieActiva').val(false);
 			$('#btn-comu').removeClass('active');
 			$('#comu').val(false);
 			$('#btn-manual').removeClass('active');
 			$('#manual').val(false);
+			$('#btn-requireDirectPermission').removeClass('active');
+			$('#requireDirectPermission').val(false);
+			$('#form-filtre').submit();
 		});
 
 		loadOrgans($('#organGestor'), organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
@@ -52,15 +56,19 @@
 		$('#btn-entregaCieActiva').click(function() {
 			let entregaCieActiva = !$(this).hasClass('active');
 			$('#entregaCieActiva').val(entregaCieActiva);
-		})
+		});
 		$('#btn-comu').click(function() {
 			let entregaCieActiva = !$(this).hasClass('active');
 			$('#comu').val(entregaCieActiva);
-		})
+		});
 		$('#btn-manual').click(function() {
 			let manual = !$(this).hasClass('active');
 			$('#manual').val(manual);
-		})
+		});
+		$('#btn-requireDirectPermission').click(function() {
+			let requireDirectPermission = !$(this).hasClass('active');
+			$('#requireDirectPermission').val(requireDirectPermission);
+		});
 	});
 </script>
 
@@ -103,10 +111,16 @@
 					</button>
 					<not:inputHidden name="manual"/>
 				</div>
+				<div class="btn-group" role="group">
+					<button id="btn-requireDirectPermission" title="" class="btn btn-default <c:if test="${procSerFiltreCommand.requireDirectPermission}">active</c:if>" data-toggle="button">
+						<span class="fa fa-pencil"></span> <spring:message code="procediment.filter.form.camp.require.direct.permision"/>
+					</button>
+					<not:inputHidden name="requireDirectPermission"/>
+				</div>
 			</div>
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
-					<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+					<button id="btnNetejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 				</div>
 			</div>

@@ -600,6 +600,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
 							filtre.isManual(),
+							filtre.isRequireDirectPermission(),
 							pageable);
 
 				} else if (isAdministrador) {
@@ -615,6 +616,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
 							filtre.isManual(),
+							filtre.isRequireDirectPermission(),
 							pageable);
 
 				} else if (organGestorActual != null) { // Administrador d'òrgan
@@ -632,6 +634,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
 							filtre.isManual(),
+							filtre.isRequireDirectPermission(),
 							pageable);
 
 				}
