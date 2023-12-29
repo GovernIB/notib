@@ -147,6 +147,7 @@ public abstract class NotificacioTableMapper {
         var columnaEstat = new StringBuilder("<div class=\"flex-column\">")
                 .append("<div style=\"display:flex; justify-content:space-between\">")
                 .append("<span>")
+                .append(registreEstat)
                 .append(iconaEstat)
                 .append(nomEstat)
                 .append(eventError)
@@ -154,7 +155,6 @@ public abstract class NotificacioTableMapper {
                 .append(callbackError)
                 .append(notificaMovilError)
                 .append("</span>")
-                .append(registreEstat)
                 .append("</div>")
                 .append("</div>")
                 .append(dataEstat)
@@ -249,9 +249,9 @@ public abstract class NotificacioTableMapper {
             for (NotificacioEnviamentEntity env : enviaments) {
                 NotificacioRegistreEstatEnumDto regEstat = env.getRegistreEstat();
                 if (regEstat != null) {
-                    registreEstat.append("<div><span style=\"padding-bottom:1px; background-color: " + regEstat.getColor() + ";\" title=\"" +
+                    registreEstat.append("<span style=\"margin-right: 3px;\"><span style=\"padding-bottom:1px; background-color: " + regEstat.getColor() + ";\" title=\"" +
                             messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto." + regEstat)
-                            + "\" class=\"label label-primary\">" + regEstat.getBudget() + "</span></div>");
+                            + "\" class=\"label label-primary\">" + regEstat.getBudget() + "</span></span>");
                 }
             }
         }
