@@ -11,6 +11,6 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum TipusEnumDto implements Serializable {
-	USUARI,
-	ROL
+	ROL,
+	USUARI
 }
