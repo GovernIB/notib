@@ -75,6 +75,9 @@ public class NotificacioValidator implements Validator {
     private Locale locale;
     @Setter
     private boolean validarDocuments = true;
+    @Setter
+    private boolean massiva;
+
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -101,9 +104,7 @@ public class NotificacioValidator implements Validator {
         validateOrgan();
         validateDadesBasiquesNotificacio();
         validateUsuari();
-        if (validarDocuments) {
-            validateDocuments();
-        }
+        validateDocuments();
         validateEnviaments();
     }
 
@@ -126,6 +127,9 @@ public class NotificacioValidator implements Validator {
 
     private void validateAplicacio() {
 
+        if (massiva) {
+            return;
+        }
         var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
         AplicacioEntity aplicacio = null;
         if (entitat != null && usuariCodi != null) {
@@ -323,6 +327,9 @@ public class NotificacioValidator implements Validator {
 
     private void validateDocuments() {
 
+        if (!validarDocuments) {
+            return;
+        }
         if (notificacio.getDocument() == null) {
             errors.reject(error(DOCUMENT_NULL, locale));
             return;

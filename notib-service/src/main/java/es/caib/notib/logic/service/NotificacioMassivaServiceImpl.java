@@ -237,7 +237,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             if (messageHelper.getMessage("notificacio.massiva.cancelada").equals(linea[linea.length - 1])) {
                 builder.cancelada(true);
             }
-            if (notificacioMassiva.getNotificacions() != null && !notificacioMassiva.getNotificacions().isEmpty()
+             if (notificacioMassiva.getNotificacions() != null && !notificacioMassiva.getNotificacions().isEmpty()
                 && "OK".equalsIgnoreCase(errores)) {
                 NotificacioEntity not = notificacioMassiva.getNotificacions().get(numNotificacio);
                 StringBuilder error = new StringBuilder();
@@ -287,6 +287,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             DocumentValidDto document3 = null;
             DocumentValidDto document4 = null;
             DocumentValidDto document5 = null;
+            notificacioValidator.setMassiva(true);
             for (var linia : linies) {
                 if (linia.length < numberRequiredColumns()) {
                     break;
