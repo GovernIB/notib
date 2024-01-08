@@ -3,6 +3,7 @@
  */
 package es.caib.notib.back.controller;
 
+import es.caib.notib.back.command.AtributError;
 import es.caib.notib.back.helper.AjaxHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.ModalHelper;
@@ -17,6 +18,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Controlador base que implementa funcionalitats comunes.
@@ -175,5 +177,16 @@ public abstract class BaseController implements MessageSourceAware {
 
 	public void setMessageSource(MessageSource messageSource) {
 		this.messageSource = messageSource;
+	}
+
+	public String getErrorMsg(HttpServletRequest request, List<AtributError> errors) {
+
+		StringBuilder msg = new StringBuilder();
+		for (var error : errors) {
+			msg.append("<div>");
+			msg.append(getMessage(request, error.getAtribut())).append(" - ").append(getMessage(request, error.getError()));
+			msg.append("</div>");
+		}
+		return msg.toString();
 	}
 }

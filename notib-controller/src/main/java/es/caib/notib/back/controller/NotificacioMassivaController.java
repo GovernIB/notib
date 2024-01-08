@@ -67,8 +67,6 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @Autowired
     private NotificacioMassivaService notificacioMassivaService;
     @Autowired
-    private EnviamentSmService smService;
-    @Autowired
     private NotificacioService notificacioService;
     @Autowired
     private OperadorPostalService operadorPostalService;
@@ -103,6 +101,9 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     public String post(HttpServletRequest request, NotificacioMassivaFiltreCommand command, Model model) {
 
         RequestSessionHelper.actualitzarObjecteSessio(request, TABLE_FILTRE, command);
+        if (!command.getErrors().isEmpty()) {
+            MissatgesHelper.error(request, getErrorMsg(request, command.getErrors()));
+        }
         return "notificacioMassivaList";
     }
 
@@ -111,8 +112,12 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     public DatatablesHelper.DatatablesResponse datatable(HttpServletRequest request) {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
-        var filtre = getFiltreCommand(request).asDto();
+        var command = getFiltreCommand(request);
         var notificacions = new PaginaDto<NotificacioMassivaTableItemDto>();
+        if (!command.getErrors().isEmpty()) {
+            return DatatablesHelper.getDatatableResponse(request, notificacions);
+        }
+        var filtre = command.asDto();
         try {
             var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
             var paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
@@ -237,9 +242,13 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     }
 
     @PostMapping(value = "/{id}/remeses")
-    public String consultarRemesesUpdateFiltre(HttpServletRequest request, NotificacioFiltreCommand command, Model model) {
+    public String consultarRemesesUpdateFiltre(HttpServletRequest request, NotificacioFiltreCommand command, Model model, @PathVariable Long id) {
 
         RequestSessionHelper.actualitzarObjecteSessio(request, TABLE_NOTIFICACIONS_FILTRE, command);
+        if (!command.getErrors().isEmpty()) {
+            MissatgesHelper.error(request, getErrorMsg(request, command.getErrors()));
+        }
+        model.addAttribute("notificacioMassivaId", id);
         return "notificacioMassivaNotificacionsList";
     }
 
@@ -248,8 +257,12 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     public DatatablesHelper.DatatablesResponse consultarRemesesDatatable(HttpServletRequest request, @PathVariable Long id) {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
-        var filtre = notificacioListHelper.getFiltreCommand(request, TABLE_NOTIFICACIONS_FILTRE).asDto();
+        var command = notificacioListHelper.getFiltreCommand(request, TABLE_NOTIFICACIONS_FILTRE);
         var notificacions = new PaginaDto<NotificacioTableItemDto>();
+        if (!command.getErrors().isEmpty()) {
+            return DatatablesHelper.getDatatableResponse(request, notificacions, "id", SESSION_ATTRIBUTE_SELECCIO);
+        }
+        var filtre = command.asDto();
         try {
             notificacions = notificacioMassivaService.findNotificacions(entitatActual.getId(), id, filtre, DatatablesHelper.getPaginacioDtoFromRequest(request));
         } catch (SecurityException e) {

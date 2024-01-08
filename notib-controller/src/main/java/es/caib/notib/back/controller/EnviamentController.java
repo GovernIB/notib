@@ -110,13 +110,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 			RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENT_ID, command.getId());
 		}
 		if (!command.getErrors().isEmpty()) {
-			StringBuilder msg = new StringBuilder();
-			for (var error : command.getErrors()) {
-				msg.append("<div>");
-				msg.append(getMessage(request, error.getAtribut())).append(" - ").append(getMessage(request, error.getError()));
-				msg.append("</div>");
-			}
-			MissatgesHelper.error(request, msg.toString());
+			MissatgesHelper.error(request, getErrorMsg(request, command.getErrors()));
 		}
 		return "redirect:enviament";
 	}

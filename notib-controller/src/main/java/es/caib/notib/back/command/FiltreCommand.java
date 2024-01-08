@@ -1,6 +1,8 @@
 package es.caib.notib.back.command;
 
+import com.google.common.base.Strings;
 import es.caib.notib.back.controller.BaseController;
+import es.caib.notib.back.helper.MessageHelper;
 import lombok.Getter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +21,7 @@ public class FiltreCommand {
 
     public void validarData(String data, String atribut) {
 
-        if (data == null) {
+        if (Strings.isNullOrEmpty(data)) {
             return;
         }
         try {
@@ -43,15 +45,4 @@ public class FiltreCommand {
             errors.add(AtributError.builder().atribut(atribut).error("filtre.error.data.format.invalid").build());
         }
     }
-
-//    public String getErrorMsg(HttpServletRequest request) {
-//
-//        StringBuilder msg = new StringBuilder();
-//        for (var error : errors) {
-//            msg.append("<div>");
-//            msg.append(getMessage(request, error.getAtribut())).append(" - ").append(getMessage(request, error.getError()));
-//            msg.append("</div>");
-//        }
-//        return msg.toString();
-//    }
 }

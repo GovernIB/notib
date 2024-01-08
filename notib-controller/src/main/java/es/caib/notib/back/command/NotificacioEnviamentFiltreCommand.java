@@ -57,6 +57,42 @@ public class NotificacioEnviamentFiltreCommand extends FiltreCommand {
 		this.dataEnviamentFi = dataEnviamentFi;
 	}
 
+	public void setDataProgramadaDisposicioInici(String dataProgramadaDisposicioInici) {
+
+		validarData(dataProgramadaDisposicioInici, "enviament.list.dataProgramadaDisposicio.inici");
+		this.dataProgramadaDisposicioInici = dataProgramadaDisposicioInici;
+	}
+
+	public void setDataProgramadaDisposicioFi(String dataProgramadaDisposicioFi) {
+
+		validarData(dataProgramadaDisposicioFi, "enviament.list.dataProgramadaDisposicio.fi");
+		this.dataProgramadaDisposicioFi = dataProgramadaDisposicioFi;
+	}
+
+	public void setDataRegistreInici(String dataRegistreInici) {
+
+		validarData(dataRegistreInici, "enviament.list.dataRegistre.inici");
+		this.dataRegistreInici = dataRegistreInici;
+	}
+
+	public void setDataRegistreFi(String dataRegistreFi) {
+
+		validarData(dataRegistreFi, "enviament.list.dataRegistre.fi");
+		this.dataRegistreFi = dataRegistreFi;
+	}
+
+	public void setDataCaducitatInici(String dataCaducitatInici) {
+
+		validarData(dataCaducitatInici, "enviament.list.dataCaducitat.inici");
+		this.dataCaducitatInici = dataCaducitatInici;
+	}
+
+	public void setDataCaducitatFi(String dataCaducitatFi) {
+
+		validarData(dataCaducitatFi, "enviament.list.dataCaducitat.fi");
+		this.dataCaducitatFi = dataCaducitatFi;
+	}
+
 	
 	public static NotificacioEnviamentFiltreCommand asCommand(NotificacioEnviamentFiltreDto dto) {
 		return ConversioTipusHelper.convertir(dto, NotificacioEnviamentFiltreCommand.class);

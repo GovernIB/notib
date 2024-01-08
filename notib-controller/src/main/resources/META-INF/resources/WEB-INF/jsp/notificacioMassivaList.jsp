@@ -126,7 +126,7 @@
 		data-default-dir="desc"
 		class="table table-striped table-bordered"
 		style="width:100%"
-		data-filter="#filtre"
+<%--		data-filter="#filtre"--%>
 		data-save-state="true"
 		data-botons-template="#botonsTemplate"
 		data-mantenir-paginacio="true">
