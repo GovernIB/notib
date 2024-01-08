@@ -47,6 +47,7 @@ public class NotificacioBackHelper {
 	public NotificacioFiltreCommand getFiltreCommand(HttpServletRequest request, String keyAttr) {
 
 		NotificacioFiltreCommand notificacioFiltreCommand = (NotificacioFiltreCommand) request.getSession().getAttribute(keyAttr);
+		
 		if (notificacioFiltreCommand != null) {
 			return notificacioFiltreCommand;
 		}

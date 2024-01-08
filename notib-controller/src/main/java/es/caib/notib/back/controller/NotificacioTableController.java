@@ -147,8 +147,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var organGestorActual = getOrganGestorActual(request);
-        var notificacioFiltreCommand = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
-        model.addAttribute(notificacioFiltreCommand);
+        var filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
+        model.addAttribute(filtre);
         notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
         return "notificacioList";
     }
@@ -174,6 +174,15 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public String post(HttpServletRequest request, NotificacioFiltreCommand command, Model model) {
 
         RequestSessionHelper.actualitzarObjecteSessio(request, NOTIFICACIONS_FILTRE, command);
+        if (!command.getErrors().isEmpty()) {
+            StringBuilder msg = new StringBuilder();
+            for (var error : command.getErrors()) {
+                msg.append("<div>");
+                msg.append(getMessage(request, error.getAtribut())).append(" - ").append(getMessage(request, error.getError()));
+                msg.append("</div>");
+            }
+            MissatgesHelper.error(request, msg.toString());
+        }
         model.addAttribute("notificacioFiltreCommand", command);
         model.addAttribute("nomesAmbErrors", command.isNomesAmbErrors());
         return "notificacioList";
@@ -184,8 +193,12 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public DatatablesResponse datatable(HttpServletRequest request) {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
-        var filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE).asDto();
         var notificacions = new PaginaDto<NotificacioTableItemDto>();
+        var filtreCommand = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
+        if (!filtreCommand.getErrors().isEmpty()) {
+            return DatatablesHelper.getDatatableResponse(request, notificacions, "id", SESSION_ATTRIBUTE_SELECCIO);
+        }
+        var filtre = filtreCommand.asDto();
         var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
         var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
         String organGestorCodi = null;

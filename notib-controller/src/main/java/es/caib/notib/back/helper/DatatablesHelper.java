@@ -113,7 +113,8 @@ public class DatatablesHelper {
 		log.debug("Generant informació de resposta per datatable (numero=" + pagina.getNumero() + ", tamany=" + pagina.getTamany() + ", total=" + pagina.getTotal() + ", elementsTotal=" + pagina.getElementsTotal() + ")");
 		if (bindingResult != null && bindingResult.hasErrors()) {
 			var emptyResponse = getDatatableResponse(request, null, (List<T>)null, null);
-			emptyResponse.setFiltreFormResponse(AjaxHelper.generarAjaxFormErrors(null, bindingResult));return emptyResponse;
+			emptyResponse.setFiltreFormResponse(AjaxHelper.generarAjaxFormErrors(null, bindingResult));
+			return emptyResponse;
 		}
 		var params = new DatatablesParams(request);
 		var response = new DatatablesResponse();

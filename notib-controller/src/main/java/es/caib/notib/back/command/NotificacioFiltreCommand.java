@@ -21,7 +21,7 @@ import java.util.Date;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
-public class NotificacioFiltreCommand {
+public class NotificacioFiltreCommand extends FiltreCommand {
 	
 	private Long entitatId;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
@@ -41,7 +41,20 @@ public class NotificacioFiltreCommand {
 	private String registreNum;
 	private String referencia;
 	private boolean nomesAmbErrors;
-	
+	private boolean hasErrors;
+
+	public void setDataInici(Date dataInici) {
+
+		validarData(dataInici, "notificacio.list.filtre.camp.datainici");
+		this.dataInici = dataInici;
+	}
+
+	public void setDataFi(Date dataFi) {
+
+		validarData(dataFi, "notificacio.list.filtre.camp.datafi");
+		this.dataFi = dataFi;
+	}
+
 	public static NotificacioFiltreCommand asCommand(NotificacioFiltreDto dto) {
 		return dto != null ? ConversioTipusHelper.convertir(dto, NotificacioFiltreCommand.class ) : null;
 	}

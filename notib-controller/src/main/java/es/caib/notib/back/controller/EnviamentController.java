@@ -100,14 +100,23 @@ public class EnviamentController extends TableAccionsMassivesController {
 	}
 
 	@PostMapping
-	public String post(HttpServletRequest request, @Valid NotificacioEnviamentFiltreCommand filtreCommand, BindingResult bindingResult, Model model,
+	public String post(HttpServletRequest request, @Valid NotificacioEnviamentFiltreCommand command, BindingResult bindingResult, Model model,
 					   @RequestParam(value = "accio", required = false) String accio) {
 
-		RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENTS_FILTRE, filtreCommand);
+		RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENTS_FILTRE, command);
 		var enviamentId = (Long)RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_ID);
-		if (enviamentId == null || !enviamentId.equals(filtreCommand.getId())) {
+		if (enviamentId == null || !enviamentId.equals(command.getId())) {
 			RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
-			RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENT_ID, filtreCommand.getId());
+			RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENT_ID, command.getId());
+		}
+		if (!command.getErrors().isEmpty()) {
+			StringBuilder msg = new StringBuilder();
+			for (var error : command.getErrors()) {
+				msg.append("<div>");
+				msg.append(getMessage(request, error.getAtribut())).append(" - ").append(getMessage(request, error.getError()));
+				msg.append("</div>");
+			}
+			MissatgesHelper.error(request, msg.toString());
 		}
 		return "redirect:enviament";
 	}
@@ -118,6 +127,9 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 		var filtreEnviaments = getFiltreCommand(request);
 		var enviaments = new PaginaDto<NotEnviamentTableItemDto>();
+		if (!filtreEnviaments.getErrors().isEmpty()) {
+			return DatatablesHelper.getDatatableResponse(request, enviaments,"id", SESSION_ATTRIBUTE_SELECCIO);
+		}
 		var isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
 		String organGestorCodi = null;
 		try {

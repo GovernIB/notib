@@ -14,7 +14,7 @@ import es.caib.notib.back.helper.ConversioTipusHelper;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Data
-public class NotificacioEnviamentFiltreCommand {
+public class NotificacioEnviamentFiltreCommand extends FiltreCommand {
 	
 	private Long id;
 	private String dataEnviamentInici;
@@ -44,6 +44,18 @@ public class NotificacioEnviamentFiltreCommand {
 	private String csvUuid;
 	private NotificacioEstatEnumDto estat;
 	private String referenciaNotificacio;
+
+	public void setDataEnviamentInici(String dataEnviamentInici) {
+
+		validarData(dataEnviamentInici, "enviament.list.dataenviament.inici");
+		this.dataEnviamentInici = dataEnviamentInici;
+	}
+
+	public void setDataEnviamentFi(String dataEnviamentFi) {
+
+		validarData(dataEnviamentFi, "enviament.list.dataenviament.fi");
+		this.dataEnviamentFi = dataEnviamentFi;
+	}
 
 	
 	public static NotificacioEnviamentFiltreCommand asCommand(NotificacioEnviamentFiltreDto dto) {

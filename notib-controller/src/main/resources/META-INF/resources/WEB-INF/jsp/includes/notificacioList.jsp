@@ -670,7 +670,7 @@
         class="table table-striped table-bordered"
         style="width:100%"
         data-row-info="true"
-        data-filter="#form-filtre"
+<%--        data-filter="#form-filtre"--%>
         data-save-state="true"
         data-mantenir-paginacio="true"
         data-paging-style-x="true"
