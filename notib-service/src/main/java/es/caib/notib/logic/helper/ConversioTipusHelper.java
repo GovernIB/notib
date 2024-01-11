@@ -400,7 +400,18 @@ public class ConversioTipusHelper {
 				field("organGestor.codi", "organCodi").byDefault().register();
 
 		mapperFactory.classMap(NotificacioEventEntity.class, NotificacioEventDto.class).
-				field("enviament.id", "enviamentId").byDefault().register();
+				field("enviament.id", "enviamentId")
+				.customize(new CustomMapper<>() {
+					@Override
+					public void mapAtoB(NotificacioEventEntity entity, NotificacioEventDto dto, MappingContext context) {
+
+						entity.getCreatedBy().ifPresent(usuari -> {
+							var usr = new UsuariDto();
+							usr.setNom(usuari.getNomSencer());
+							usr.setCodi(usuari.getCodi());
+							dto.setCreatedBy(usr);
+						});
+					}}).register();
 
 		defineConverters();
 	}
