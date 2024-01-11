@@ -1,9 +1,15 @@
 // Basat en http://stefangabos.ro/jquery/jquery-plugin-boilerplate-revisited/
 (function($) {
 
+	let length = 10;
+	$.ajax({url: webutilContextPath() + "/usuari/num/elements/pagina/defecte",
+		async: false,
+		success: elements => {
+		length = elements;
+	}});
 	$.webutilDatatable = function(element, options) {
 		var defaults = {
-			pageLength: 10,
+			pageLength: length,
 			lengthMenu: [10, 20, 50, 100, 250],
 			infoEnabled: true,
 			infoType: 'botons', // 'botons', 'search'
