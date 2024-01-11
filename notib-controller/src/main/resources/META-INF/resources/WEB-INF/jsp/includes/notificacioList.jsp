@@ -344,8 +344,13 @@
         });
 
         $taula.on('init.dt', function () {
+
+            $("#notificacio_wrapper").prepend('<button id="expandAll" class="btn btn-default"><span class="fa fa-caret-square-o-down"></span> <spring:message code="organgestor.arbre.expandeix"/> </button>');
+            $("#notificacio_wrapper").prepend('<button id="closeAll" class="btn btn-default"><span class="fa fa-caret-square-o-up"></span> <spring:message code="organgestor.arbre.contrau"/></button>');
+
             let $btnDesplegarEnvs = $('#btn-desplegar-envs');
-            $btnDesplegarEnvs.on('click', function() {
+            $("#expandAll").on("click", () => {
+
                 var shown = $btnDesplegarEnvs.find("span").hasClass('fa-caret-up');
                 $taula.dataTable().api().rows().every( function ( rowIdx, tableLoop, rowLoop ) {
                     var rowData = this.data();
@@ -354,21 +359,32 @@
                     if (!shown && !isCollapsed) {
                         $('<tr data-row-info="true"><td colspan="' + $parentTr.children().length + '"></td></tr>').insertAfter($parentTr);
                         mostraEnviamentsNotificacio($('td', $parentTr.next()), rowData)
-                    } else if (shown) {
-                        // accedim d'aquesta manera als tr per no haver de modificar el codi de webutil.datatable
-                        $(".table-enviaments").closest("tr").remove();
                     }
                 });
                 if (!shown) {
                     $btnDesplegarEnvs.find("span").toggleClass('fa-caret-up');
                     $(".btn-rowInfo").find("span").removeClass('fa-caret-down');
                     $(".btn-rowInfo").find("span").addClass('fa-caret-up');
-                } else {
-                    $btnDesplegarEnvs.find("span").removeClass('fa-caret-up');
-                    $btnDesplegarEnvs.find("span").addClass('fa-caret-down');
-                    $(".btn-rowInfo").find("span").removeClass('fa-caret-up');
-                    $(".btn-rowInfo").find("span").addClass('fa-caret-down');
                 }
+            });
+            $("#closeAll").on("click", () => {
+                    debugger;
+                    var shown = $btnDesplegarEnvs.find("span").hasClass('fa-caret-up');
+                    $taula.dataTable().api().rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                        var rowData = this.data();
+                        let $parentTr = $("#" + this.id());
+                        let isCollapsed = $parentTr.find("td:last span").hasClass('fa-caret-up')
+                        if (shown) {
+                            // accedim d'aquesta manera als tr per no haver de modificar el codi de webutil.datatable
+                            $(".table-enviaments").closest("tr").remove();
+                        }
+                    });
+                    if (shown) {
+                        $btnDesplegarEnvs.find("span").removeClass('fa-caret-up');
+                        $btnDesplegarEnvs.find("span").addClass('fa-caret-down');
+                        $(".btn-rowInfo").find("span").removeClass('fa-caret-up');
+                        $(".btn-rowInfo").find("span").addClass('fa-caret-down');
+                    }
             });
         });
 
@@ -623,6 +639,8 @@
 </form:form>
 
 <script id="botonsTemplate" type="text/x-jsrender">
+
+        </div>
 		<div class="text-right">
 			<div class="btn-group">
                 <button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
@@ -651,9 +669,6 @@
                         </c:if>
 					</ul>
 				</div>
-			</div>
-			<div class="btn-group">
-				 <button id="btn-desplegar-envs" class="btn btn-default"><spring:message code="notificacio.list.boto.desplegar"/> <span class="fa fa-caret-down"></span></button>
 			</div>
 		</div>
 	</script>
