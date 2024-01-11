@@ -872,19 +872,16 @@ $(document).ready(function() {
 						<th data-col-name="errorDescripcio" data-visible="false"></th>
 						<th data-col-name="fiReintents" data-visible="false"></th>
 <%--						<th data-col-name="callbackEstat" data-visible="false"></th>--%>
-						<th data-col-name="createdBy.nom" data-orderable="false"><spring:message
-								code="notificacio.event.list.columna.usuari" /></th>
-						<th data-col-name="data" data-converter="datetime"
-							data-orderable="false"><spring:message
-								code="notificacio.event.list.columna.data" /></th>
-						<th data-col-name="tipus" data-template="#cellTipus"
-							data-orderable="false"><spring:message
-								code="notificacio.event.list.columna.tipus" /> <script
-								id="cellTipus" type="text/x-jsrender">
-							{{:~eval('eventTipus["' + tipus + '"]')}}
+						<th data-col-name="createdBy.nom" data-orderable="false"><spring:message code="notificacio.event.list.columna.usuari" /></th>
+						<th data-col-name="data" data-converter="datetime" data-orderable="false"><spring:message code="notificacio.event.list.columna.data" /></th>
+						<th data-col-name="tipus" data-template="#cellTipus" data-orderable="false">
+							<spring:message code="notificacio.event.list.columna.tipus" />
+							<script id="cellTipus" type="text/x-jsrender">
+								{{:~eval('eventTipus["' + tipus + '"]')}}
 <%--							{{if enviamentAssociat}}<span class="label label-default pull-right" title="<spring:message code="notificacio.event.list.info.associat"/>">E</span>{{/if}}--%>
 <%--							{{if callbackEstat == 'PENDENT' && ~eval('notificacioApp') == 'true'}}<span style="padding-right:4px; color:#666;" class="fa fa-clock-o pull-right" title="<spring:message code="notificacio.event.list.info.pendent"/>"></span>{{/if}}--%>
-						</script></th>
+							</script>
+						</th>
 <%--						<c:if test="${notificacio.tipusUsuari == 'APLICACIO'}">--%>
 <%--							<th data-col-name="callbackEstat" data-visible="false"></th>--%>
 <%--							<th data-col-name="callbackIntents" data-visible="false"><spring:message--%>

@@ -92,7 +92,7 @@ public class AdviserServiceImpl implements AdviserService {
         var timer = metricsHelper.iniciMetrica();
         try {
             var identificador = sincronizarEnvio.getIdentificador();
-            var sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+            var sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             var dataEstat = toDate(sincronizarEnvio.getFechaEstado());
 
             generateInfoLog(sincronizarEnvio, identificador, sdf, dataEstat);
@@ -139,7 +139,8 @@ public class AdviserServiceImpl implements AdviserService {
                             enviament.updateReceptorDatat(receptor.getNifReceptor(), receptor.getNombreReceptor());
                         }
                         setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
-                        integracioHelper.addAccioError(info, "L'enviament ja es troba en un estat final");
+                        info.addParam("Nota", "L'enviament ja es troba en un estat final");
+                        integracioHelper.addAccioOk(info);
                         eventErrorDescripcio = msg;
                         break;
                     case CERTIFICACIO:
@@ -277,7 +278,7 @@ public class AdviserServiceImpl implements AdviserService {
         return new IntegracioInfo(IntegracioCodiEnum.NOTIFICA, "Recepció de canvi de notificació via Adviser",
                 IntegracioAccioTipusEnumDto.RECEPCIO,
                 new AccioParam("Organisme emisor", sincronizarEnvio.getOrganismoEmisor()),
-                new AccioParam("Identificador", (identificador != null ? identificador : "")),
+                new AccioParam("Identificador Notifica", (identificador != null ? identificador : "")),
                 new AccioParam("Tipus d'entrega", String.valueOf(sincronizarEnvio.getTipoEntrega())),
                 new AccioParam("Mode de notificació", String.valueOf(sincronizarEnvio.getModoNotificacion())),
                 new AccioParam("Estat", sincronizarEnvio.getEstado()),
