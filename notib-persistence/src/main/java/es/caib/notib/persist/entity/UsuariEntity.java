@@ -58,6 +58,8 @@ public class UsuariEntity implements Serializable {
 	private Long ultimaEntitat;
 	@Column(name="idioma", length = 2)
 	private String idioma;
+	@Column(name="NUM_ELEMENTS_PAGINA_DEFECTE", length=3)
+	private String numElementsPaginaDefecte;
 	
 	@Version
 	private long version = 0;
@@ -78,6 +80,7 @@ public class UsuariEntity implements Serializable {
 		this.rebreEmailsNotificacioCreats = usuari.isRebreEmailsNotificacioCreats();
 		this.idioma = usuari.getIdioma();
 		this.emailAlt = usuari.getEmailAlt();
+		this.numElementsPaginaDefecte = usuari.numElementsPaginaDefecte;
 	}
 	
 	public void updateUltimRol(String ultimRol) {
@@ -87,11 +90,6 @@ public class UsuariEntity implements Serializable {
 	public void updateUltimaEntitat(Long ultimaEntitat) {
 		this.ultimaEntitat = ultimaEntitat;
 	}
-
-	
-//	public static UsuariEntityBuilder getBuilder(String codi, String email,	String idioma) {
-//		return hiddenBuilder().codi(codi).email(email).idioma(idioma);
-//	}
 
 	@Override
 	public int hashCode() {

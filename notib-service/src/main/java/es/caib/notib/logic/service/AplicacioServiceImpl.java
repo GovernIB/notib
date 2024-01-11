@@ -6,6 +6,7 @@ package es.caib.notib.logic.service;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.NumElementsPaginaDefecte;
 import es.caib.notib.logic.cacheable.PermisosCacheable;
 import es.caib.notib.logic.cacheable.ProcSerCacheable;
 import es.caib.notib.logic.config.SchedulingConfig;
@@ -146,8 +147,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			log.debug("Actualitzant configuració de usuari actual");
 			var usuari = usuariRepository.findById(dto.getCodi()).orElseThrow();
-			usuari.update(UsuariEntity.builder().rebreEmailsNotificacio(dto.getRebreEmailsNotificacio()).emailAlt(dto.getEmailAlt())
-					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats()).idioma(dto.getIdioma()).build());
+			var usr = UsuariEntity.builder()
+					.rebreEmailsNotificacio(dto.getRebreEmailsNotificacio())
+					.emailAlt(dto.getEmailAlt())
+					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats()).idioma(dto.getIdioma())
+					.numElementsPaginaDefecte(dto.getNumElementsPaginaDefecte().name()).build();
+			usuari.update(usr);
 			return toUsuariDtoAmbRols(usuari);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -429,6 +434,18 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void updateProcesInicialExecutat(ProcessosInicialsEnum proces) {
 		processosInicialsRepository.updateInit(proces, false);
+	}
+
+	@Override
+	public Integer getNumElementsPaginaDefecte() {
+		try {
+
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			return NumElementsPaginaDefecte.valueOf(usuariRepository.getNumElementsPaginaDefecte(auth.getName())).getElements();
+		} catch (Exception ex) {
+			log.error("Error obtinguent el número d'elements per pàgina per defecte");
+			return 10;
+		}
 	}
 
 }

@@ -201,4 +201,10 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 		getDelegateService().updateProcesInicialExecutat(proces);
 	}
 
+	@Override
+	@PermitAll
+	public Integer getNumElementsPaginaDefecte() {
+		return getDelegateService().getNumElementsPaginaDefecte();
+	}
+
 }

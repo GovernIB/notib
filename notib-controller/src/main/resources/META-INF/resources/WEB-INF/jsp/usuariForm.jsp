@@ -15,22 +15,23 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<not:modalHead/>
 <script type="text/javascript">
-$(document).ready(function() {
 
-	$("#rols").prop("disabled", true);
+	$(document).ready(function() {
 
-	 $("#rebreEmailsNotificacio").change(() => {
-	 	if (!$("#rebreEmailsNotificacio").prop('checked')) {
-			$("#rebreEmailsNotificacioCreats").prop("checked", false);
-		}
-	 });
+		$("#rols").prop("disabled", true);
 
-	$("#rebreEmailsNotificacioCreats").change(() => {
-		if ($("#rebreEmailsNotificacioCreats").prop("checked")) {
-			$("#rebreEmailsNotificacio").prop("checked", true);
-		}
+		 $("#rebreEmailsNotificacio").change(() => {
+			if (!$("#rebreEmailsNotificacio").prop('checked')) {
+				$("#rebreEmailsNotificacioCreats").prop("checked", false);
+			}
+		 });
+
+		$("#rebreEmailsNotificacioCreats").change(() => {
+			if ($("#rebreEmailsNotificacioCreats").prop("checked")) {
+				$("#rebreEmailsNotificacio").prop("checked", true);
+			}
+		});
 	});
-});
 </script>
 </head>
 <body>
@@ -45,6 +46,7 @@ $(document).ready(function() {
 		<not:inputCheckbox name="rebreEmailsNotificacio" textKey="usuari.form.camp.rebre.emails.notificacio"/>
 		<not:inputCheckbox name="rebreEmailsNotificacioCreats" textKey="usuari.form.camp.rebre.emails.notificacio.creats"/>
 		<not:inputSelect name="idioma" optionItems="${idiomaEnumOptions}" textKey="usuari.form.camp.idioma" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="false"/>
+		<not:inputSelect name="numElementsPaginaDefecte" optionItems="${numElementsPaginaDefecte}" optionValueAttribute="value" optionTextKeyAttribute="text" textKey="usuari.form.camp.elements.pagina.defecte"/>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/usuari/configuracio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

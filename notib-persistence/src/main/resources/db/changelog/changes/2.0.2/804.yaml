@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_usuari
+            columns:
+              - column:
+                  name: NUM_ELEMENTS_PAGINA_DEFECTE
+                  type: varchar(30 ${varcharUnit})
+                  defaultValue: 'DEU'
