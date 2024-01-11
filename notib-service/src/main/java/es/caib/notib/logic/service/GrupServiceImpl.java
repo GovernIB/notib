@@ -46,7 +46,7 @@ public class GrupServiceImpl implements GrupService{
 	@Resource
 	private OrganigramaHelper organigramaHelper;
 	@Resource
-	private GrupRepository grupReposity;
+	private GrupRepository grupRepository;
 	@Resource
 	private GrupProcSerRepository grupProcSerRepository;
 	@Resource
@@ -67,7 +67,7 @@ public class GrupServiceImpl implements GrupService{
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al grup i que es administrador de l'organ indicat
 			var organGestor = grup.getOrganGestorId() != null ? entityComprovarHelper.comprovarOrganGestor(entitat, grup.getOrganGestorId()) : null ;
-			var grupEntity = grupReposity.save(GrupEntity.getBuilder(grup.getCodi(), grup.getNom(), entitat, organGestor).build());
+			var grupEntity = grupRepository.save(GrupEntity.getBuilder(grup.getCodi(), grup.getNom(), entitat, organGestor).build());
 			return conversioTipusHelper.convertir(grupEntity, GrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -85,7 +85,7 @@ public class GrupServiceImpl implements GrupService{
 			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al grup i que es administrador de l'organ indicat
 			var grupEntity = entityComprovarHelper.comprovarGrup(grup.getId());
 			grupEntity.update(grup.getCodi(), grup.getNom());
-			grupReposity.save(grupEntity);
+			grupRepository.save(grupEntity);
 			return conversioTipusHelper.convertir(grupEntity, GrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -101,7 +101,7 @@ public class GrupServiceImpl implements GrupService{
 		try {
 			//TODO: Si es tothom comprovar que és administrador d'Organ i que es administrador de l'organ del grup que vol eliminar
 			var grupEntity = entityComprovarHelper.comprovarGrup(id);
-			grupReposity.delete(grupEntity);
+			grupRepository.delete(grupEntity);
 			return conversioTipusHelper.convertir(grupEntity, GrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -129,7 +129,7 @@ public class GrupServiceImpl implements GrupService{
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId) : null;
-			var grupEntity = grupReposity.findByCodiAndEntitat(grupCodi, entitat);
+			var grupEntity = grupRepository.findByCodiAndEntitat(grupCodi, entitat);
 			return conversioTipusHelper.convertir(grupEntity, GrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -156,7 +156,7 @@ public class GrupServiceImpl implements GrupService{
 				}
 				rols = cacheHelper.findRolsUsuariAmbCodi(usuariGrup.getCodi());
 				if (grupProcediment.getGrup() != null && rols.contains(grupProcediment.getGrup().getCodi())) {
-					grups.add(conversioTipusHelper.convertir(grupReposity.findById(grupProcediment.getGrup().getId()).orElseThrow(), GrupDto.class));
+					grups.add(conversioTipusHelper.convertir(grupRepository.findById(grupProcediment.getGrup().getId()).orElseThrow(), GrupDto.class));
 				}
 			}
 			return grups;
@@ -175,7 +175,7 @@ public class GrupServiceImpl implements GrupService{
 			var procSer = procSerRepository.findById(procSerId).orElseThrow();
 			var grupsProcediment = grupProcSerRepository.findByProcSer(procSer);
 			for (var grupProcediment : grupsProcediment) {
-				grups.add(conversioTipusHelper.convertir(grupReposity.findById(grupProcediment.getGrup().getId()).orElseThrow(), GrupDto.class));
+				grups.add(conversioTipusHelper.convertir(grupRepository.findById(grupProcediment.getGrup().getId()).orElseThrow(), GrupDto.class));
 			}
 			return grups;
 		} finally {
@@ -239,7 +239,7 @@ public class GrupServiceImpl implements GrupService{
 		try {
 			//TODO: Si es tothom comprovar que és administrador d'Organ i que es administrador de l'organ del grup que vol eliminar
 			var grupsEntity = entityComprovarHelper.comprovarGrups(grups);
-			grupReposity.deleteAll(grupsEntity);
+			grupRepository.deleteAll(grupsEntity);
 			return grups;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -253,7 +253,7 @@ public class GrupServiceImpl implements GrupService{
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			return conversioTipusHelper.convertirList(grupReposity.findByEntitat(entitat), GrupDto.class);
+			return conversioTipusHelper.convertirList(grupRepository.findByEntitat(entitat), GrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -266,7 +266,7 @@ public class GrupServiceImpl implements GrupService{
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
-			return conversioTipusHelper.convertirList(grupReposity.findByEntitatIdAndOrganGestorCodiIn(entitat.getId(), organsFills), GrupDto.class);
+			return conversioTipusHelper.convertirList(grupRepository.findByEntitatIdAndOrganGestorCodiIn(entitat.getId(), organsFills), GrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -285,12 +285,12 @@ public class GrupServiceImpl implements GrupService{
 			var isNullFiltreCodi = filtre.getCodi() == null || filtre.getCodi().isEmpty();
 			var params =  paginacioHelper.toSpringDataPageable(paginacioParams);
 			if (filtre.getOrganGestorId() == null) {
-				grup = grupReposity.findByCodiNotNullFiltrePaginat(isNullFiltreCodi, filtre.getCodi(), entitat, params);
+				grup = grupRepository.findByCodiNotNullFiltrePaginat(isNullFiltreCodi, filtre.getCodi(), entitat, params);
 				return paginacioHelper.toPaginaDto(grup, GrupDto.class);
 			}
 			var organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, filtre.getOrganGestorId());
 			organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
-			grup = grupReposity.findByCodiNotNullFiltrePaginatWithOrgan(isNullFiltreCodi, filtre.getCodi(), organsFills, entitat, params);
+			grup = grupRepository.findByCodiNotNullFiltrePaginatWithOrgan(isNullFiltreCodi, filtre.getCodi(), organsFills, entitat, params);
 			return paginacioHelper.toPaginaDto(grup, GrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

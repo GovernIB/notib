@@ -9,59 +9,75 @@ import org.supercsv.prefs.CsvPreference;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 @Slf4j
 public class CSVReader {
 
-    public static List<String[]> readFile(byte[] fitxer) {
-
-        List<String[]> linies = new ArrayList<>();
-        ICsvListReader listReader;
-        try {
-            var bais = new ByteArrayInputStream(fitxer);
-            var detectedCharset = UniversalDetector.detectCharset(bais);
-            if(detectedCharset == null) {
-                detectedCharset = "UTF-8";
-            }
-            var reader = new InputStreamReader( new ByteArrayInputStream(fitxer), detectedCharset);
-            listReader = new CsvListReader(reader, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
-            List<String> linia;
-            var index = 0;
-            while ((linia = listReader.read()) != null ) {
-                if (index > 0) {
-                    linies.add(linia.toArray(new String[]{}));
-                }
-                index++;
-            }
-            if( listReader != null ) {
-                listReader.close();
-            }
-            return linies;
-        } catch (IOException e) {
-            log.debug("S'ha produït un error a l'llegir el fitxer CSV.", e);
-            return null;
+    public static ICsvListReader setupCSVListReader(byte[] file) throws IOException {
+        var bais = new ByteArrayInputStream(file);
+        var detectedCharset = UniversalDetector.detectCharset(bais);
+        if (detectedCharset == null) {
+            detectedCharset = "UTF-8";
         }
+        var reader = new InputStreamReader(new ByteArrayInputStream(file), detectedCharset);
+        return new CsvListReader(reader, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
     }
-    public static List<String> readHeader(byte[] fitxer) {
 
-        ICsvListReader listReader;
-        try {
-            var bais = new ByteArrayInputStream(fitxer);
-            var detectedCharset = UniversalDetector.detectCharset(bais);
-            if(detectedCharset == null) {
-                detectedCharset = "UTF-8";
-            }
-            var reader = new InputStreamReader( new ByteArrayInputStream(fitxer), detectedCharset);
-            listReader = new CsvListReader(reader, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
-            List<String> res = listReader.read();
-            listReader.close();
-            return  res;
+    public static <T> T readLinesFromCSVFile(byte[] file, Function<ICsvListReader, T> fn) {
+        T result;
+        try (var listReader = setupCSVListReader(file)) {
+            result = fn.apply(listReader);
         } catch (IOException e) {
             log.debug("S'ha produït un error a l'llegir el fitxer CSV.", e);
             return null;
         }
+        return result;
+    }
+
+    public static List<List<String>> readFile(byte[] file) {
+        return readLinesFromCSVFile(file, listReader -> {
+            var lines = new ArrayList<List<String>>();
+            List<String> line;
+            try {
+                while ((line = listReader.read()) != null) {
+                    lines.add(line);
+                }
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            return lines;
+        });
+    }
+
+    public static List<List<String>> readBody(byte[] file) {
+        return readLinesFromCSVFile(file, listReader -> {
+            var lines = new ArrayList<List<String>>();
+            var index = new AtomicInteger(0);
+            List<String> line;
+            try {
+                while ((line = listReader.read()) != null) {
+                    if (index.getAndIncrement() > 0) {
+                        lines.add(line);
+                    }
+                }
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            return lines;
+        });
+    }
+
+    public static List<String> readHeader(byte[] file) {
+        return readLinesFromCSVFile(file, listReader -> {
+            try {
+                return listReader.read();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 }

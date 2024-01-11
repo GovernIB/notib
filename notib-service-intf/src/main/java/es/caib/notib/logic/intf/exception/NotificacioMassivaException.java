@@ -26,4 +26,10 @@ public class NotificacioMassivaException extends RuntimeException {
 		this.columna = columna;
 	}
 
+	public NotificacioMassivaException(
+			String message,
+			Throwable throwable) {
+		super(message, throwable);
+	}
+
 }

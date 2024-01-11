@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.*;
+import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.CaducitatHelper;
@@ -18,13 +19,13 @@ import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.DocumentHelper;
 import es.caib.notib.logic.helper.EnviamentTableHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
+import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotificaHelper;
 import es.caib.notib.logic.helper.NotificacioHelper;
 import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.helper.PluginHelper;
-import es.caib.notib.logic.helper.RegistreNotificaHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.DocumentValidDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
@@ -37,13 +38,13 @@ import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
 import es.caib.notib.logic.intf.dto.TipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.Enviament;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AuditService;
-import es.caib.notib.logic.intf.service.NotificacioServiceWs;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.JustificantService;
+import es.caib.notib.logic.intf.service.NotificacioServiceWs;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.persist.entity.DocumentEntity;
@@ -56,8 +57,11 @@ import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
 import es.caib.notib.persist.entity.ProcSerOrganEntity;
 import es.caib.notib.persist.entity.ProcedimentEntity;
+import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
+import es.caib.notib.persist.repository.GrupProcSerRepository;
+import es.caib.notib.persist.repository.GrupRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
@@ -105,7 +109,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 		endpointInterface = "es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2")
 public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, NotificacioServiceWs {
 
-
 	private static final Pattern UUID_REGEX_PATTERN = Pattern.compile("^[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$");
 //	private static final Pattern UUID_REGEX_PATTERN = Pattern.compile("/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g"); com.google.re2j.Pattern
 	private static final OrigenEnum ORIGEN = OrigenEnum.ADMINISTRACIO;
@@ -134,6 +137,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
 	@Autowired
+	private GrupProcSerRepository grupProcSerRepository;
+	@Autowired
+	private GrupRepository grupRepository;
+	@Autowired
+	private AplicacioRepository aplicacioRepository;
+	@Autowired
 	private PermisosHelper permisosHelper;
 	@Autowired
 	private NotificaHelper notificaHelper;
@@ -141,8 +150,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private EnviamentTableHelper enviamentTableHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
-	@Autowired
-	private RegistreNotificaHelper registreNotificaHelper;
+//	@Autowired
+//	private RegistreNotificaHelper registreNotificaHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired
@@ -159,17 +168,23 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private DocumentHelper documentHelper;
 	@Autowired
 	private AuditHelper auditHelper;
+	@Autowired
+	private MessageHelper messageHelper;
+	@Autowired
+	private OrganGestorCachable organGestorCachable;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	@Autowired
 	private EnviamentSmService enviamentSmService;
 
-	@Autowired
-	private NotificacioValidator notificacioValidator;
+//	@Autowired
+//	private NotificacioValidator notificacioValidator;
 
 	// Per test
-	public void setNotificacioValidator(NotificacioValidator notificacioValidator) {
-		this.notificacioValidator = notificacioValidator;
-	}
+//	public void setNotificacioValidator(NotificacioValidator notificacioValidator) {
+//		this.notificacioValidator = notificacioValidator;
+//	}
 	public void setDocumentHelperTest(DocumentHelper documentHelper) {
 		this.documentHelper = documentHelper;
 	}
@@ -268,6 +283,15 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			// Validació
 			var errors = new BindException(notificacio, "notificacio");
 			var docs = new DocumentValidDto[] { document, document2, document3, document4, document5 };
+			var notificacioValidator = new NotificacioValidator(
+					aplicacioRepository,
+					grupRepository,
+					procSerRepository,
+					grupProcSerRepository,
+					messageHelper,
+					cacheHelper,
+					organGestorCachable,
+					configHelper);
 			notificacioValidator.setNotificacio(notificacio);
 			notificacioValidator.setEntitat(entitat);
 			notificacioValidator.setProcediment(procediment);

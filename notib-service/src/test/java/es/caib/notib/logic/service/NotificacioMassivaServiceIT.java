@@ -104,7 +104,7 @@ public class NotificacioMassivaServiceIT extends BaseServiceTestV2 {
         Mockito.verify(gestioDocumentalPluginMock, Mockito.times(4)).update(Mockito.anyString(), Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES),
                 fileContentCaptor.capture());
         ByteArrayInputStream fileContent = fileContentCaptor.getValue();
-        List<String[]> linies = CSVReader.readFile(IOUtils.toByteArray(fileContent));
+        List<List<String>> linies = CSVReader.readBody(IOUtils.toByteArray(fileContent));
 
         List<String> errorsEsperats = Arrays.asList(
 //                "1000", "1001", "1010", "1011",  -- Aquests errors no es poden provar, són de l'entitat
@@ -128,11 +128,11 @@ public class NotificacioMassivaServiceIT extends BaseServiceTestV2 {
         );
 
         int i = 0;
-        for (String [] fila : linies) {
+        for (List<String> fila : linies) {
             Assert.assertNotEquals(
                     "No s'ha trobat l'error de la fila " + (i+2) + " s'esperava: " + errorsEsperats.get(i),
-                    fila[22], "OK");
-            String errorCode = fila[22].substring(1, 5);
+                    fila.get(22), "OK");
+            String errorCode = fila.get(22).substring(1, 5);
             Assert.assertEquals(errorsEsperats.get(i), errorCode);
             System.out.println(errorCode);
             i++;
@@ -159,13 +159,13 @@ public class NotificacioMassivaServiceIT extends BaseServiceTestV2 {
         Mockito.verify(gestioDocumentalPluginMock, Mockito.times(4)).update(Mockito.anyString(), Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES),
                 fileContentCaptor.capture());
         ByteArrayInputStream fileContent = fileContentCaptor.getValue();
-        List<String[]> linies = CSVReader.readFile(IOUtils.toByteArray(fileContent));
+        List<List<String>> linies = CSVReader.readBody(IOUtils.toByteArray(fileContent));
 
         int correctCount = 0;
         int errorCount = 0;
-        for (String [] fila : linies) {
-            System.out.println(fila[22]);
-            if (fila[22].trim().substring(0, 2).equals("OK")) {
+        for (List<String> fila : linies) {
+            System.out.println(fila.get(22));
+            if (fila.get(22).trim().substring(0, 2).equals("OK")) {
                 correctCount++;
             } else {
                 errorCount ++;

@@ -215,7 +215,7 @@ public class NotificacioServiceWsV2Test {
  	@BeforeEach
 	public void setUp() throws IOException {
 
-		((NotificacioServiceWsImplV2)notificacioService).setNotificacioValidator(new NotificacioValidator(aplicacioRepository, grupService, messageHelper, cacheHelper, organGestorCachable, configHelper));
+//		((NotificacioServiceWsImplV2)notificacioService).setNotificacioValidator(new NotificacioValidator(aplicacioRepository, grupService, messageHelper, cacheHelper, organGestorCachable, configHelper));
 		((NotificacioServiceWsImplV2)notificacioService).setDocumentHelperTest(new DocumentHelper(pluginHelper, configHelper));
 		entitatMock = EntitatEntity.hiddenBuilder().codi("GOIB").nom("Govern de les Illes Balears").tipus(EntitatTipusEnumDto.GOVERN).dir3Codi(ENTITAT_DIR3CODI).activa(true).apiKey("xxxxxx").ambEntregaDeh(false).llibreEntitat(false).oficinaEntitat(false).build();
 		aplicacioMock = AplicacioEntity.builder().entitat(entitatMock).activa(true).usuariCodi(APP_CODI).callbackUrl("http://callback.url").build();

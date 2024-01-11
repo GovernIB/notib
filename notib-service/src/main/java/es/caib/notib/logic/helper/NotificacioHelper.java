@@ -7,20 +7,34 @@ import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
-import es.caib.notib.logic.intf.dto.RegistreIdDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.logic.intf.dto.notificacio.Enviament;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.NoDocumentException;
 import es.caib.notib.logic.intf.exception.NoMetadadesException;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
-import es.caib.notib.persist.entity.*;
-import es.caib.notib.persist.repository.*;
+import es.caib.notib.persist.entity.DocumentEntity;
+import es.caib.notib.persist.entity.EntitatEntity;
+import es.caib.notib.persist.entity.GrupEntity;
+import es.caib.notib.persist.entity.NotificacioEntity;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.entity.NotificacioEventEntity;
+import es.caib.notib.persist.entity.NotificacioMassivaEntity;
+import es.caib.notib.persist.entity.OrganGestorEntity;
+import es.caib.notib.persist.entity.PersonaEntity;
+import es.caib.notib.persist.entity.ProcSerEntity;
+import es.caib.notib.persist.entity.ProcSerOrganEntity;
+import es.caib.notib.persist.repository.DocumentRepository;
+import es.caib.notib.persist.repository.GrupRepository;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
+import es.caib.notib.persist.repository.NotificacioEventRepository;
+import es.caib.notib.persist.repository.NotificacioRepository;
+import es.caib.notib.persist.repository.OrganGestorRepository;
+import es.caib.notib.persist.repository.ProcSerOrganRepository;
 import es.caib.plugins.arxiu.api.ArxiuException;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import lombok.Builder;
@@ -222,10 +236,10 @@ public class NotificacioHelper {
 
 		log.trace("Processam documents");
 		var documentEntity = getDocumentEntity(notificacio.getDocument(), documentsProcessatsMassiu);
-		var document2Entity = getDocumentEntity(notificacio.getDocument2(), null);
-		var document3Entity = getDocumentEntity(notificacio.getDocument3(), null);
-		var document4Entity = getDocumentEntity(notificacio.getDocument4(), null);
-		var document5Entity = getDocumentEntity(notificacio.getDocument5(), null);
+		var document2Entity = getDocumentEntity(notificacio.getDocument2());
+		var document3Entity = getDocumentEntity(notificacio.getDocument3());
+		var document4Entity = getDocumentEntity(notificacio.getDocument4());
+		var document5Entity = getDocumentEntity(notificacio.getDocument5());
 		if (documentEntity == null) {
 			throw new NoDocumentException(messageHelper.getMessage("error.alta.remesa.sense.document"));
 		}
@@ -243,7 +257,11 @@ public class NotificacioHelper {
 		}
 		return true;
 	}
-	
+
+	private DocumentEntity getDocumentEntity(Document document) {
+		return getDocumentEntity(document, null);
+	}
+
 	private DocumentEntity getDocumentEntity(Document document, Map<String, Long> documentsProcessatsMassiu) {
 
 		DocumentEntity documentEntity = null;
@@ -252,20 +270,14 @@ public class NotificacioHelper {
 		}
 		String documentGesdocId = null;
 		if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
-			log.trace("Processam document gestió documental");
-			if ( documentsProcessatsMassiu == null || //alta de notificacio web
-					!documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
-					( documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && // alta massiu web
-					documentsProcessatsMassiu.get(document.getArxiuNom()) == null) ) {
 
+			log.trace("Processam document gestió documental");
+			if (isDocumentNotProcessat(document.getArxiuNom(), documentsProcessatsMassiu)) {
 				documentGesdocId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, Base64.decodeBase64(document.getContingutBase64()));
 			}
 		} else if (document.getUuid() != null) {
 			log.trace("Processam document desde UUID");
-			if ( documentsProcessatsMassiu == null || //alta de notificacio web
-					!documentsProcessatsMassiu.containsKey(document.getUuid()) ||
-					( documentsProcessatsMassiu.containsKey(document.getUuid()) && // alta massiu web
-					documentsProcessatsMassiu.get(document.getUuid()) == null) ) {
+			if (isDocumentNotProcessat(document.getUuid(), documentsProcessatsMassiu)) {
 
 				var doc = new Document();
 				var arxiuUuid = document.getUuid();
@@ -320,10 +332,7 @@ public class NotificacioHelper {
 			}
 		} else if (document.getCsv() != null) {
 			log.trace("Processam document desde CSV");
-			if ( documentsProcessatsMassiu == null || //alta de notificacio web
-					!documentsProcessatsMassiu.containsKey(document.getCsv()) ||
-					( documentsProcessatsMassiu.containsKey(document.getCsv()) && // alta massiu web
-					documentsProcessatsMassiu.get(document.getCsv()) == null) ) {
+			if (isDocumentNotProcessat(document.getCsv(), documentsProcessatsMassiu)) {
 
 				var doc = new Document();
 				var arxiuCsv = document.getCsv();
@@ -404,7 +413,14 @@ public class NotificacioHelper {
 		}
 		return documentEntity;
 	}
-	
+
+	private static boolean isDocumentNotProcessat(String documentKey, Map<String, Long> documentsProcessatsMassiu) {
+		return documentsProcessatsMassiu == null || //alta de notificacio web
+				!documentsProcessatsMassiu.containsKey(documentKey) ||
+				(documentsProcessatsMassiu.containsKey(documentKey) && // alta massiu web
+						documentsProcessatsMassiu.get(documentKey) == null);
+	}
+
 	private Boolean recuperarMetadadesArxiu (es.caib.plugins.arxiu.api.Document documentArxiu, Document document){
 
 		if (documentArxiu == null) {

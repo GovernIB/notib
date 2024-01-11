@@ -30,6 +30,8 @@ public class NotificacioMassivaInfoDto extends NotificacioMassivaDataDto {
         private String enviamentTipus;
         private String referenciaEmisor;
         private String nombreFichero;
+        private String uuidFichero;
+        private String csvFichero;
         private String normalizado;
         private String prioridadServicio;
         private String nombre;

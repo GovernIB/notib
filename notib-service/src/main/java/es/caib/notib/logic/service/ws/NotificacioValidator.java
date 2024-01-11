@@ -2,35 +2,37 @@ package es.caib.notib.logic.service.ws;
 
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentTipus;
-import es.caib.notib.logic.intf.dto.notificacio.Document;
-import es.caib.notib.logic.intf.dto.notificacio.EntregaPostal;
-import es.caib.notib.logic.intf.dto.notificacio.Enviament;
-import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.intf.dto.DocumentValidDto;
-import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
+import es.caib.notib.logic.intf.dto.notificacio.Document;
+import es.caib.notib.logic.intf.dto.notificacio.EntregaPostal;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
-import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.util.NifHelper;
 import es.caib.notib.logic.utils.MimeUtils;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
+import es.caib.notib.persist.entity.GrupEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
+import es.caib.notib.persist.repository.GrupProcSerRepository;
+import es.caib.notib.persist.repository.GrupRepository;
+import es.caib.notib.persist.repository.ProcSerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -46,14 +48,17 @@ import static es.caib.notib.client.domini.InteressatTipus.*;
 import static es.caib.notib.client.domini.NotificaDomiciliConcretTipus.*;
 import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.*;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class NotificacioValidator implements Validator {
 
     public static final Pattern EMAIL_REGEX = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$", Pattern.CASE_INSENSITIVE);
 
     private final AplicacioRepository aplicacioRepository;
-    private final GrupService grupService;
+//    private final GrupService grupService;
+    private final GrupRepository grupRepository;
+    private final ProcSerRepository procSerRepository;
+    private final GrupProcSerRepository grupProcSerRepository;
     private final MessageHelper messageHelper;
     private final CacheHelper cacheHelper;
     private final OrganGestorCachable organGestorCachable;
@@ -191,12 +196,13 @@ public class NotificacioValidator implements Validator {
         if (procediment == null || !procediment.isAgrupar()) {
             return;
         }
-        var grupNotificacio = grupService.findByCodi(notificacio.getGrupCodi(), entitat.getId());
+//        var grupNotificacio = grupService.findByCodi(notificacio.getGrupCodi(), entitat.getId());
+        var grupNotificacio = grupRepository.findByCodiAndEntitat(grupCodi, entitat);;
         if (grupNotificacio == null) {
             errors.rejectValue(grupCodi, error(GRUP_INEXISTENT, locale, notificacio.getGrupCodi()));
             return;
         }
-        List<GrupDto> grupsProcediment = grupService.findByProcedimentAndUsuariGrups(procediment.getId());
+        var grupsProcediment = getGrupsByProcedimentAndUsuari(procediment.getId());
         if (grupsProcediment == null || grupsProcediment.isEmpty()) {
             errors.rejectValue(grupCodi, error(GRUP_EN_PROCEDIMENT_NO_AGRUPADA, locale));
             return;
@@ -204,6 +210,24 @@ public class NotificacioValidator implements Validator {
         if(!grupsProcediment.contains(grupNotificacio)) {
             errors.rejectValue(grupCodi, error(GRUP_NO_ASSIGNAT, locale, notificacio.getGrupCodi()));
         }
+    }
+
+    private List<GrupEntity> getGrupsByProcedimentAndUsuari(Long procedimentId) {
+        List<GrupEntity> grups = new ArrayList<>();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        var procediment = procSerRepository.findById(procedimentId).orElseThrow();
+        var grupsProcediment = grupProcSerRepository.findByProcSer(procediment);
+        for (var grupProcediment : grupsProcediment) {
+            var usuariGrup = cacheHelper.findUsuariAmbCodi(auth.getName());
+            if (usuariGrup == null) {
+                continue;
+            }
+            var rols = cacheHelper.findRolsUsuariAmbCodi(usuariGrup.getCodi());
+            if (grupProcediment.getGrup() != null && rols.contains(grupProcediment.getGrup().getCodi())) {
+                grups.add(grupProcediment.getGrup());
+            }
+        }
+        return grups;
     }
 
     private void validateOrgan() {
