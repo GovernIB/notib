@@ -134,22 +134,24 @@ public class AdviserServiceImpl implements AdviserService {
                 // DATAT
                 switch (tipoEntrega) {
                     case DATAT:
-                        log.warn("Error al processar petició datadoOrganismo dins el callback de Notifica (L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
+//                        log.warn("Error al processar petició datadoOrganismo dins el callback de Notifica (L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
+                        info.addParam("Nota", "L'enviament ja es troba en un estat final");
                         if (receptor != null && !isBlank(receptor.getNifReceptor())) {
                             enviament.updateReceptorDatat(receptor.getNifReceptor(), receptor.getNombreReceptor());
                         }
                         setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
-                        info.addParam("Nota", "L'enviament ja es troba en un estat final");
+//                        eventErrorDescripcio = msg;
                         integracioHelper.addAccioOk(info);
-                        eventErrorDescripcio = msg;
                         break;
                     case CERTIFICACIO:
                         log.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
                         certificacionOrganismo(acusePDF, modoNotificacion, identificador, enviament, resultadoSincronizarEnvio);
                         log.debug("Certificació guardada correctament.");
+                        integracioHelper.addAccioOk(info);
                         break;
                     default:
                         eventErrorDescripcio = msg;
+                        integracioHelper.addAccioError(info, "Tipus d'entrega " + tipoEntrega + " no reconeguda");
                         break;
                 }
             } else {
