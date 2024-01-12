@@ -106,6 +106,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			} else {
 				usuari.update(dadesUsuari.getNom(), dadesUsuari.getLlinatges(), dadesUsuari.getEmail());
 			}
+			cacheHelper.evictUsuariByCodi(usuari.getCodi());
 			permisosCacheable.clearAuthenticationPermissionsCaches(auth);
 			procedimentsCacheable.clearAuthenticationProcedimentsCaches(auth);
 		} finally {

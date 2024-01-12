@@ -215,6 +215,11 @@ public class CacheHelper {
 		// evictUsuariByCodi
 	}
 
+	@CacheEvict(value = "usuariByCodi",  key="#usuariCodi")
+	public void evictUsuariByCodi(final String usuariCodi) {
+		// evictUsuariByCodi
+	}
+
 	@CacheEvict(value = "unitatPerCodi", allEntries = true)
 	public void evictUnitatPerCodi() {
 		// evictUnitatPerCodi

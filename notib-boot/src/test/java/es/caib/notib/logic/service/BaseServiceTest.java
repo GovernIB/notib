@@ -195,6 +195,7 @@ public class BaseServiceTest {
 		if (usuariEntity == null) {
 			usuariRepository.save(UsuariEntity.builder().codi(usuariCodi).email(usuariCodi + "@mail.com").idioma("CA").nom(usuariCodi).llinatges(usuariCodi).build());
 		}
+		cacheHelper.evictUsuariByCodi(usuariCodi);
 		log.debug("... usuari " + usuariCodi + " autenticat correctament");
 	}
 
