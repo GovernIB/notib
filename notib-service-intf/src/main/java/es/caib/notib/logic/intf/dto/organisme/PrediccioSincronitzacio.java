@@ -31,6 +31,9 @@ public class PrediccioSincronitzacio {
     public Map<UnitatOrganitzativaDto, List<UnitatOrganitzativaDto>> getSplitMap() {
 
         Map<UnitatOrganitzativaDto, List<UnitatOrganitzativaDto>>  map = new HashMap<>();
+        if (splitMap == null) {
+            return map;
+        }
         var keys = splitMap.keys();
         for (var key : keys) {
             map.put( key, (List<UnitatOrganitzativaDto>) splitMap.get(key));
@@ -41,6 +44,9 @@ public class PrediccioSincronitzacio {
     public Map<UnitatOrganitzativaDto, List<UnitatOrganitzativaDto>> getMergeMap() {
 
         Map<UnitatOrganitzativaDto, List<UnitatOrganitzativaDto>>  map = new HashMap<>();
+        if (mergeMap == null) {
+            return map;
+        }
         var keys = mergeMap.keys();
         for (var key : keys) {
             map.put( key, (List<UnitatOrganitzativaDto>) mergeMap.get(key));
@@ -51,6 +57,9 @@ public class PrediccioSincronitzacio {
     public Map<UnitatOrganitzativaDto, List<UnitatOrganitzativaDto>> getSubstMap() {
 
         Map<UnitatOrganitzativaDto, List<UnitatOrganitzativaDto>>  map = new HashMap<>();
+        if (substMap == null) {
+            return map;
+        }
         var keys = substMap.keys();
         for (var key : keys) {
             map.put( key, (List<UnitatOrganitzativaDto>) substMap.get(key));

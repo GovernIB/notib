@@ -123,7 +123,8 @@ public class AdviserServiceImpl implements AdviserService {
              enviament = notificacioEnviamentRepository.findByNotificaIdentificador(identificador);
             if (enviament == null) {
                 log.error(ERROR_CALLBACK_NOTIFICA + identificador + "): No s'ha trobat cap enviament amb l'identificador especificat (" + identificador + ").");
-                setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.ERROR_IDENTIFICADOR);
+                var forcarOk = configHelper.getConfigAsBoolean("es.caib.notib.adviser.forcar.resposta.ok");
+                setResultadoEnvio(resultadoSincronizarEnvio, forcarOk ? ResultatEnviamentEnum.OK : ResultatEnviamentEnum.ERROR_IDENTIFICADOR);
                 integracioHelper.addAccioError(info, "No s'ha trobat cap enviament amb l'identificador especificat");
                 return resultadoSincronizarEnvio;
             }
