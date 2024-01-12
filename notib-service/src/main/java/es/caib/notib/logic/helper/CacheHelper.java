@@ -6,8 +6,10 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.persist.entity.OficinaEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
+import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.repository.OficinaRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
+import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.usuari.DadesUsuari;
@@ -46,6 +48,8 @@ public class CacheHelper {
 
 	@Resource
 	private OrganGestorRepository organGestorRepository;
+	@Resource
+	private UsuariRepository usuariRepository;
 	@Resource
 	private OficinaRepository oficinaRepository;
 	private PluginHelper pluginHelper;
@@ -126,6 +130,11 @@ public class CacheHelper {
 		return organigrama;
 	}
 
+	@Cacheable(value = "findUsuariByCodi", key="#usuariCodi")
+	public UsuariEntity findUsuariByCodi(final String usuariCodi) {
+		return usuariRepository.findByCodi(usuariCodi);
+	}
+
 	private HashMap<String, List<OrganGestorEntity>> organsToMap(final List<OrganGestorEntity> organs) {
 
 		HashMap<String, List<OrganGestorEntity>> organsMap = new HashMap<>();
@@ -199,6 +208,11 @@ public class CacheHelper {
 	@CacheEvict(value = {"organsAmbPermis", "organsAmbPermisPerConsulta"}, allEntries = true)
 	public void evictFindOrgansGestorWithPermis() {
 		//evictFindOrgansGestorWithPermis
+	}
+
+	@CacheEvict(value = "usuariByCodi", allEntries = true)
+	public void evictUsuariByCodi() {
+		// evictUsuariByCodi
 	}
 
 	@CacheEvict(value = "unitatPerCodi", allEntries = true)
