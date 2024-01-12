@@ -411,7 +411,7 @@ public class ConversioTipusHelper {
 							usr.setCodi(usuari.getCodi());
 							dto.setCreatedBy(usr);
 						});
-					}}).register();
+					}}).byDefault().register();
 
 		defineConverters();
 	}
