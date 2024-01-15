@@ -310,4 +310,5 @@ databaseChangeLog:
               INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.massives.state.machine.inici.delay', '', 'Temps espera (ms) per iniciar cada fila de les notificacions massives.', 'GENERAL', 0, 0, 'INT', 1);
               INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.massives.maxim.files', '', 'Nombre màxim de files en les notificacions massives', 'GENERAL', 0, 0, 'INT', 1);
               ALTER TABLE NOT_ENTREGA_POSTAL MODIFY DOM_POBLACIO VARCHAR2(255);
+               INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.adviser.forcar.resposta.ok', 'false', 'Forçar adviser resposta OK', 'GENERAL', 0, 0, 'BOOL', 1);
              "

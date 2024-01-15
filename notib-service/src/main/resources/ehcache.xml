@@ -31,6 +31,7 @@
 
 	<!-- USUARI -->
 	<cache alias="usuariAmbCodi" uses-template="default"/>
+	<cache alias="findUsuariByCodi" uses-template="default"/>
 	<cache alias="rolsAmbCodi" uses-template="default"/>
 	<cache alias="entitatsUsuari" uses-template="default"><expiry><ttl unit="seconds">43200</ttl></expiry></cache>
 	<cache alias="organsGestorsUsuari" uses-template="default"/>

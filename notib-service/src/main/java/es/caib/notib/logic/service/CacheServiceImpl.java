@@ -72,6 +72,7 @@ public class CacheServiceImpl implements CacheService {
 		ordreCaches.put("organsAmbPermisPerConsulta", 28);
 		ordreCaches.put("organsPermisPerProcedimentComu", 29);
 		ordreCaches.put("procserOrgansCodisAmbPermis", 30);
+		ordreCaches.put("findUsuariByCodi", 1);
 	}
 
 

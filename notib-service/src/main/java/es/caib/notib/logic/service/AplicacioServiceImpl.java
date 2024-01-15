@@ -107,6 +107,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			} else {
 				usuari.update(dadesUsuari.getNom(), dadesUsuari.getLlinatges(), dadesUsuari.getEmail());
 			}
+			cacheHelper.evictUsuariByCodi(usuari.getCodi());
 			permisosCacheable.clearAuthenticationPermissionsCaches(auth);
 			procedimentsCacheable.clearAuthenticationProcedimentsCaches(auth);
 		} finally {
@@ -197,7 +198,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			var auth = SecurityContextHolder.getContext().getAuthentication();
 			log.debug("Obtenint usuari actual");
-			return auth != null ? toUsuariDtoAmbRols(usuariRepository.findById(auth.getName()).orElse(null)) : null;
+			return auth != null ? toUsuariDtoAmbRols(cacheHelper.findUsuariByCodi(auth.getName())) : null;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
