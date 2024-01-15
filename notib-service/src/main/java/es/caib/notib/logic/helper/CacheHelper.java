@@ -210,12 +210,12 @@ public class CacheHelper {
 		//evictFindOrgansGestorWithPermis
 	}
 
-	@CacheEvict(value = "usuariByCodi", allEntries = true)
+	@CacheEvict(value = "findUsuariByCodi", allEntries = true)
 	public void evictUsuariByCodi() {
 		// evictUsuariByCodi
 	}
 
-	@CacheEvict(value = "usuariByCodi",  key="#usuariCodi")
+	@CacheEvict(value = "findUsuariByCodi",  key="#usuariCodi")
 	public void evictUsuariByCodi(final String usuariCodi) {
 		// evictUsuariByCodi
 	}
