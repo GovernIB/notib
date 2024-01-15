@@ -185,7 +185,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 	}
 	
-	@Transactional(readOnly = true)
+
 	@Override
 	public UsuariDto getUsuariActual() {
 

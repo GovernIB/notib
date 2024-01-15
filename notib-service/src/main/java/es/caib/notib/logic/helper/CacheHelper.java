@@ -21,6 +21,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.cache.Cache;
@@ -130,6 +131,7 @@ public class CacheHelper {
 		return organigrama;
 	}
 
+	@Transactional(readOnly = true)
 	@Cacheable(value = "findUsuariByCodi", key="#usuariCodi")
 	public UsuariEntity findUsuariByCodi(final String usuariCodi) {
 		return usuariRepository.findByCodi(usuariCodi);
