@@ -149,6 +149,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			var usuari = usuariRepository.findById(dto.getCodi()).orElseThrow();
 			usuari.update(UsuariEntity.builder().rebreEmailsNotificacio(dto.getRebreEmailsNotificacio()).emailAlt(dto.getEmailAlt())
 					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats()).idioma(dto.getIdioma()).build());
+			cacheHelper.evictUsuariByCodi(usuari.getCodi());
 			return toUsuariDtoAmbRols(usuari);
 		} finally {
 			metricsHelper.fiMetrica(timer);

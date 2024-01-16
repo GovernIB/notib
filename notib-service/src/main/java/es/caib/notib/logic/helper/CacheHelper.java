@@ -4,9 +4,11 @@ import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
+import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OficinaEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.UsuariEntity;
+import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.OficinaRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
@@ -52,6 +54,8 @@ public class CacheHelper {
 	@Resource
 	private UsuariRepository usuariRepository;
 	@Resource
+	private EntitatRepository entitatRepository;
+	@Resource
 	private OficinaRepository oficinaRepository;
 	private PluginHelper pluginHelper;
 	@Resource
@@ -86,6 +90,7 @@ public class CacheHelper {
 		return pluginHelper.llistarLlibreOrganisme(codiDir3Entitat, codiDir3Organ);
 	}
 
+	@Transactional(readOnly = true)
 	@Cacheable(value = "oficinesSIRUnitat", key="#codiDir3Organ")
 	public List<OficinaDto> getOficinesSIRUnitat(Map<String, OrganismeDto> arbreUnitats, String codiDir3Organ) {
 
@@ -136,6 +141,13 @@ public class CacheHelper {
 	public UsuariEntity findUsuariByCodi(final String usuariCodi) {
 		return usuariRepository.findByCodi(usuariCodi);
 	}
+
+	@Transactional(readOnly = true)
+	@Cacheable(value = "findEntitatByCodi", key="#codiDir3Entitat")
+	public EntitatEntity findEntitatByCodi(final String codiDir3Entitat) {
+		return entitatRepository.findByDir3Codi(codiDir3Entitat);
+	}
+
 
 	private HashMap<String, List<OrganGestorEntity>> organsToMap(final List<OrganGestorEntity> organs) {
 
@@ -219,6 +231,11 @@ public class CacheHelper {
 
 	@CacheEvict(value = "findUsuariByCodi",  key="#usuariCodi")
 	public void evictUsuariByCodi(final String usuariCodi) {
+		// evictUsuariByCodi
+	}
+
+	@CacheEvict(value = "findEntitatByCodi", allEntries = true)
+	public void evictEntitatByCodi() {
 		// evictUsuariByCodi
 	}
 

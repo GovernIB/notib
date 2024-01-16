@@ -28,6 +28,8 @@
 	</cache-template>
 
 	<cache alias="aclCache" uses-template="default"><expiry><ttl unit="seconds">600</ttl></expiry></cache>
+	<!-- Entitat -->
+	<cache alias="findEntitatByCodi" uses-template="default"/>
 
 	<!-- USUARI -->
 	<cache alias="usuariAmbCodi" uses-template="default"/>
