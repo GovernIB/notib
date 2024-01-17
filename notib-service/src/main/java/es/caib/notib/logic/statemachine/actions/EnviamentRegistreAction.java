@@ -57,13 +57,14 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         var delay = !isRetry ? SmConstants.delay(reintents, delayMassiu) : 0;
         variables.put(SmConstants.RG_RETRY, false);
         variables.put(SmConstants.ENVIAMENT_DELAY, 0);
+        log.debug("[SM] Enviant peticio de registre per l'enviament amb UUID " + enviamentUuid + " delay " + delay + "ms");
         jmsTemplate.convertAndSend(SmConstants.CUA_REGISTRE, env,
                 m -> {
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
                     return m;
                 });
 
-        log.debug("[SM] Enviada petició de registre per l'enviament amb UUID " + enviamentUuid);
+        log.debug("[SM] Enviada peticio de registre per l'enviament amb UUID " + enviamentUuid);
     }
 
     @Recover
