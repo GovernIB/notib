@@ -53,10 +53,11 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         var env = EnviamentRegistreRequest.builder().enviamentUuid(enviamentUuid).numIntent(reintents + 1).build();//.enviamentRegistreDto(enviamentRegistreMapper.toDto(enviament))
         var retry = (boolean) variables.getOrDefault(SmConstants.RG_RETRY, false);
         var isRetry = EnviamentSmEvent.RG_RETRY.equals(stateContext.getMessage().getPayload()) || retry;
+        log.debug("[SM] Enviament registre acction enviament " + enviamentUuid);
         var delayMassiu = (long) variables.getOrDefault(SmConstants.ENVIAMENT_DELAY, 0L);
-        var delay = !isRetry ? SmConstants.delay(reintents, delayMassiu) : 0;
+        var delay = !isRetry ? SmConstants.delay(reintents, delayMassiu) : 0L;
         variables.put(SmConstants.RG_RETRY, false);
-        variables.put(SmConstants.ENVIAMENT_DELAY, 0);
+        variables.put(SmConstants.ENVIAMENT_DELAY, 0L);
         log.debug("[SM] Enviant peticio de registre per l'enviament amb UUID " + enviamentUuid + " delay " + delay + "ms");
         jmsTemplate.convertAndSend(SmConstants.CUA_REGISTRE, env,
                 m -> {

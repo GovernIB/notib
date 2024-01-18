@@ -53,11 +53,14 @@ public class EnviamentRegistreListener {
         notificacio.setRegistreEnviamentIntent(numIntent);
         semaphore.acquire();
         try {
+            log.debug("[SM] Enviament de registre <" + enviamentUuid + "> registrant ");
             // Registrar enviament
             boolean registreSuccess = registreSmHelper.registrarEnviament(enviament, numIntent);
+            log.debug("[SM] Enviament de registre <" + enviamentUuid + "> registrat ");
 
             // Actualitzar notificació
             if (notificacioEnviamentRepository.areEnviamentsRegistrats(notificacio.getId()) == 1) {
+                log.debug("[SM] Enviament de registre <" + enviamentUuid + "> actualitzant notificacio");
                 var isSir = notificacio.isComunicacioSir();
                 notificacio.updateEstat(isSir ? NotificacioEstatEnumDto.ENVIAT_SIR : NotificacioEstatEnumDto.REGISTRADA);
 
@@ -73,7 +76,9 @@ public class EnviamentRegistreListener {
                     notificacio.updateEstatDate(new Date());
                 }
             }
+            log.debug("[SM] Enviament de registre <" + enviamentUuid + "> actualitzant registre");
             notificacioTableHelper.actualitzarRegistre(notificacio);
+            log.debug("[SM] Enviament de registre <" + enviamentUuid + "> audita notificacio");
             auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "RegistreSmHelper.registrarEnviament");
 
 //            TEST
@@ -82,17 +87,21 @@ public class EnviamentRegistreListener {
 //                enviament.setRegistreData(new Date());
 //                notificacioEnviamentRepository.save(enviament);
 //            }
-
+            log.debug("[SM] Enviament de registre <" + enviamentUuid + "> is success " + registreSuccess);
             if (registreSuccess) {
+                log.debug("[SM] Enviament de registre <" + enviamentUuid + "> success ");
                 enviamentSmService.registreSuccess(enviamentUuid);
             } else {
+                log.debug("[SM] Enviament de registre <" + enviamentUuid + "> failed ");
                 enviamentSmService.registreFailed(enviamentUuid);
             }
         } catch (Exception ex) {
+            log.debug("[SM] Enviament de registre <" + enviamentUuid + "> error ", ex);
             enviamentSmService.registreFailed(enviamentUuid);
         } finally {
             semaphore.release();
         }
+        log.debug("[SM] Enviament de registre <" + enviamentUuid + "> completat");
         message.acknowledge();
 
     }

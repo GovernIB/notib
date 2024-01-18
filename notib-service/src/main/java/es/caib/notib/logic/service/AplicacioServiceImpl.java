@@ -26,6 +26,7 @@ import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.persist.repository.acl.AclSidRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.activemq.broker.BrokerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.GrantedAuthority;
@@ -73,7 +74,14 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private MessageHelper messageHelper;
 	@Autowired
 	private SchedulingConfig schedulingConfig;
+	@Autowired
+	private BrokerService brokerService;
 
+	public void restartSmBroker() throws Exception {
+
+		brokerService.stop();
+		brokerService.start(true);
+	}
 
 
 	@Override
