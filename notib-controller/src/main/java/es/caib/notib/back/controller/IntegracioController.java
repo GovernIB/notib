@@ -10,9 +10,12 @@ import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
+import es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto;
+import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioDetall;
 import es.caib.notib.logic.intf.dto.IntegracioDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.MonitorIntegracioService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +67,6 @@ public class IntegracioController extends BaseUserController {
 		if ("netejar".equals(request.getParameter("accio"))) {
 			command = new IntegracioFiltreCommand();
 		}
-
 		RequestSessionHelper.actualitzarObjecteSessio(request, INTEGRACIO_FILTRE, command);
 		return getAmbCodi(request, codi, model);
 	}
@@ -92,6 +94,8 @@ public class IntegracioController extends BaseUserController {
 		model.addAttribute("codiActual", codi);
 		model.addAttribute("integracions", integracions);
 		RequestSessionHelper.actualitzarObjecteSessio(request, INTEGRACIO_FILTRE, command);
+		model.addAttribute("integracioEstats", EnumHelper.getOptionsForEnum(IntegracioAccioEstatEnumDto.class, "es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto."));
+		model.addAttribute("integracioTipus", EnumHelper.getOptionsForEnum(IntegracioAccioTipusEnumDto.class, "es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto."));
 		model.addAttribute("codiActual", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE));
 		log.info(String.format("[INTEGRACIONS] - Carregant dades de %s", codi));
 		return "integracioList";

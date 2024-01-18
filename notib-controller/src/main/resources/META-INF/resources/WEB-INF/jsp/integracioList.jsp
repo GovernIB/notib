@@ -99,11 +99,29 @@
 		<div class="col-md-2">
 			<not:inputText name="entitatCodi" inline="true" placeholderKey="integracio.filtre.codi.entitat"/>
 		</div>
+		<div class="col-md-2">
+			<not:inputSelect id="estat" name="estat" optionItems="${integracioEstats}" optionValueAttribute="value"
+							 optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>
+		</div>
+<%--		<div class="col-md-2">--%>
+<%--			<not:inputSelect id="tipus" name="tipus" optionItems="${integracioTipus}" optionValueAttribute="value"--%>
+<%--							 optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>--%>
+<%--		</div>--%>
+<%--		<div class="col-md-4">--%>
+<%--			<not:inputText name="descripcio" inline="true"  placeholderKey="notificacio.list.filtre.camp.concepte"/>--%>
+<%--		</div>--%>
+<%--		<div class="col-md-2">--%>
+<%--			<not:inputDate name="dataInici" placeholderKey="notificacio.list.filtre.camp.datainici" inline="true" required="false" />--%>
+<%--		</div>--%>
+<%--		<div class="col-md-2">--%>
+<%--			<not:inputDate name="dataFi" placeholderKey="notificacio.list.filtre.camp.datafi" inline="true" required="false" />--%>
+<%--		</div>--%>
 		<c:if test="${'CALLBACK' == codiActual}">
 			<div class="col-md-2">
 				<not:inputText name="aplicacio" inline="true" placeholderKey="integracio.filtre.codi.aplicacio"/>
 			</div>
 		</c:if>
+
 		<div class="col-md-2 pull-right">
 			<div class="pull-right">
 				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
