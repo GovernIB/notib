@@ -63,7 +63,7 @@ public class EnviamentNotificaAction implements Action<EnviamentSmEstat, Enviame
         variables.put(SmConstants.RG_RETRY, false);
         jmsTemplate.convertAndSend(SmConstants.CUA_NOTIFICA, env,
                 m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0);
+                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0L);
                     return m;
                 });
         log.debug("[SM] Enviada petició de notificació per l'enviament amb UUID " + enviamentUuid);

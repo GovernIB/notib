@@ -54,7 +54,7 @@ public class ConsultaSirAction implements Action<EnviamentSmEstat, EnviamentSmEv
         var isRetry = EnviamentSmEvent.SR_RETRY.equals(stateContext.getMessage().getPayload());
         jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_SIR, env,
                 m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0);
+                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0L);
                     return m;
                 });
         log.debug("[SM] Enviada consulta d'estat SIR per l'enviament amb UUID " + enviamentUuid);
