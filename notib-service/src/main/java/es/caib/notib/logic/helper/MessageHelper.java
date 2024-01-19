@@ -68,13 +68,19 @@ public class MessageHelper implements MessageSourceAware {
 	}
 
 	private String getIdiomaUsuariActual() {
+
+		var defecte = "ca";
 		try {
 			var auth = SecurityContextHolder.getContext().getAuthentication();
-			return auth != null ? cacheHelper.findUsuariByCodi(auth.getName()).getIdioma() : null;
+			if (auth == null) {
+				return defecte;
+			}
+			var usr = cacheHelper.findUsuariByCodi(auth.getName());
+			return usr != null ? usr.getIdioma() : "ca";
 		} catch (Exception ex) {
 			log.error("Error obtenint l'idioma de l'usuari actual ", ex);
 		}
-		return null;
+		return defecte;
 	}
 
 	public String getMessage(String key, Object[] vars) {

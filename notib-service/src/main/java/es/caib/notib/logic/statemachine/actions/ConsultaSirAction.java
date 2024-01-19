@@ -25,6 +25,8 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -60,6 +62,7 @@ public class ConsultaSirAction implements Action<EnviamentSmEstat, EnviamentSmEv
         log.debug("[SM] Enviada consulta d'estat SIR per l'enviament amb UUID " + enviamentUuid);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
         log.error("[SM] Recover ConsultaSirAction", t);
