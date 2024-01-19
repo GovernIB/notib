@@ -60,7 +60,7 @@ public class ConsultaNotificaAction implements Action<EnviamentSmEstat, Enviamen
         log.debug("[SM] Enviada petició de consulta d'estat a notifica per l'enviament amb UUID " + enviamentUuid);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 

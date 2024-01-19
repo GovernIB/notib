@@ -40,7 +40,7 @@ public class ConsultaSirIniciPoolingAction implements Action<EnviamentSmEstat, E
         log.debug("[SM] Inici pooling consulta a SIR");
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 

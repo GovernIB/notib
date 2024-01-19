@@ -67,9 +67,10 @@ public class ConsultaSirPoolingAction implements Action<EnviamentSmEstat, Enviam
         log.debug("[SM] Enviada consulta d'estat SIR per l'enviament amb UUID " + enviamentUuid);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
+
         log.error("[SM] Recover ConsultaSirPoolingAction", t);
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         log.error("[SM] Recover ConsultaSirPoolingAction de enviament amb uuid=" + enviamentUuid);

@@ -75,7 +75,7 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         log.debug("[SM] Enviada peticio de registre per l'enviament amb UUID " + enviamentUuid);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 

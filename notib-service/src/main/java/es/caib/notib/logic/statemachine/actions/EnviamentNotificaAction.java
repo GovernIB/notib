@@ -71,7 +71,7 @@ public class EnviamentNotificaAction implements Action<EnviamentSmEstat, Enviame
         log.debug("[SM] Enviada petició de notificació per l'enviament amb UUID " + enviamentUuid);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
