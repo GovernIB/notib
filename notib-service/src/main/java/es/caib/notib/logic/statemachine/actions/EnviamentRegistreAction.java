@@ -56,7 +56,12 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         var retry = (boolean) variables.getOrDefault(SmConstants.RG_RETRY, false);
         var isRetry = EnviamentSmEvent.RG_RETRY.equals(stateContext.getMessage().getPayload()) || retry;
         log.debug("[SM] Enviament registre acction enviament " + enviamentUuid);
-        var delayMassiu = (Long) variables.getOrDefault(SmConstants.ENVIAMENT_DELAY, 0L);
+        var delayMassiu = 0L;
+        try {
+            delayMassiu = (Long) variables.getOrDefault(SmConstants.ENVIAMENT_DELAY, 0L);
+        } catch (Exception ex) {
+            log.error("Excepcio no controlada al obtenir la variable ENVIAMENT_DELAY per l'enviament " + enviamentUuid, ex);
+        }
         var delay = !isRetry ? SmConstants.delay(reintents, delayMassiu) : 0L;
         variables.put(SmConstants.RG_RETRY, false);
         variables.put(SmConstants.ENVIAMENT_DELAY, 0L);
