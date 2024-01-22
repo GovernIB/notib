@@ -26,6 +26,8 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -63,12 +65,13 @@ public class EnviamentNotificaAction implements Action<EnviamentSmEstat, Enviame
         variables.put(SmConstants.RG_RETRY, false);
         jmsTemplate.convertAndSend(SmConstants.CUA_NOTIFICA, env,
                 m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0);
+                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0L);
                     return m;
                 });
         log.debug("[SM] Enviada petició de notificació per l'enviament amb UUID " + enviamentUuid);
     }
 
+    @Transactional
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 

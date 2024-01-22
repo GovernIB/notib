@@ -207,4 +207,10 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 		return getDelegateService().getNumElementsPaginaDefecte();
 	}
 
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public void restartSmBroker() throws Exception {
+		getDelegateService().restartSmBroker();
+	}
+
 }

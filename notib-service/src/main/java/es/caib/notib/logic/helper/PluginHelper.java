@@ -143,6 +143,8 @@ public class PluginHelper {
 	private NotificacioEventHelper eventHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private CacheHelper cacheHelper;
 	@Resource
 	private MessageHelper messageManager;
 	@Resource
@@ -335,7 +337,8 @@ public class PluginHelper {
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Tipus d'assumpte", tipusAssumpte));
 		try {
-			var entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+//			var entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			var entitat = cacheHelper.findEntitatByCodi(codiDir3Entitat);
 			if (entitat == null) {
 				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
 			}
@@ -482,7 +485,8 @@ public class PluginHelper {
 
 		try {
 			var llibreDto = new LlibreDto();
-			var entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+//			var entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			var entitat = cacheHelper.findEntitatByCodi(codiDir3Entitat);
 			if (entitat == null) {
 				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat + "no trobada");
 			}

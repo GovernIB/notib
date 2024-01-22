@@ -217,6 +217,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid, Long delay) {
 
+		log.debug("[SM] Alta enviament " + enviamentUuid + " delay " + delay);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 		var variables = sm.getExtendedState().getVariables();
@@ -232,6 +233,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid) {
 
+		log.debug("[SM] Alta enviament " + enviamentUuid);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 		var variables = sm.getExtendedState().getVariables();
@@ -246,6 +248,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreEnviament(String enviamentUuid, boolean retry) {
 
+		log.debug("[SM] Registre enviament " + enviamentUuid + " retry " + retry);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var variables = sm.getExtendedState().getVariables();
 		variables.put(SmConstants.RG_RETRY, retry);
@@ -257,6 +260,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreSuccess(String enviamentUuid) {
 
+		log.debug("[SM] Registre succes enviament " + enviamentUuid);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_SUCCESS);
@@ -267,6 +271,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreFailed(String enviamentUuid) {
 
+		log.debug("[SM] Registre failed enviament " + enviamentUuid);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var reintents = (int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, reintents + 1);
@@ -279,6 +284,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreReset(String enviamentUuid) {
 
+		log.debug("[SM] Registre reset enviament " + enviamentUuid);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_RETRY);
@@ -289,6 +295,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreRetry(String enviamentUuid) {
 
+		log.debug("[SM] Registre retry enviament " + enviamentUuid);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_RETRY);
 		return sm;
@@ -298,6 +305,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreForward(String enviamentUuid) {
 
+		log.debug("[SM] Registre forward enviament " + enviamentUuid);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_FORWARD);
@@ -553,6 +561,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	private void sendEvent(String enviamentUuid, StateMachine<EnviamentSmEstat, EnviamentSmEvent> sm, EnviamentSmEvent event) {
 
 		var msg = MessageBuilder.withPayload(event).setHeader(SmConstants.ENVIAMENT_UUID_HEADER, enviamentUuid).build();
+		log.debug("[SM] Sent event " + msg.getPayload().name() + " enviament " + enviamentUuid);
 		sm.sendEvent(msg);
 	}
 }

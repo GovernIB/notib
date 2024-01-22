@@ -24,6 +24,8 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -53,19 +55,27 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         var env = EnviamentRegistreRequest.builder().enviamentUuid(enviamentUuid).numIntent(reintents + 1).build();//.enviamentRegistreDto(enviamentRegistreMapper.toDto(enviament))
         var retry = (boolean) variables.getOrDefault(SmConstants.RG_RETRY, false);
         var isRetry = EnviamentSmEvent.RG_RETRY.equals(stateContext.getMessage().getPayload()) || retry;
-        var delayMassiu = (long) variables.getOrDefault(SmConstants.ENVIAMENT_DELAY, 0L);
-        var delay = !isRetry ? SmConstants.delay(reintents, delayMassiu) : 0;
+        log.debug("[SM] Enviament registre acction enviament " + enviamentUuid);
+        var delayMassiu = 0L;
+        try {
+            delayMassiu = (Long) variables.getOrDefault(SmConstants.ENVIAMENT_DELAY, 0L);
+        } catch (Exception ex) {
+            log.error("Excepcio no controlada al obtenir la variable ENVIAMENT_DELAY per l'enviament " + enviamentUuid, ex);
+        }
+        var delay = !isRetry ? SmConstants.delay(reintents, delayMassiu) : 0L;
         variables.put(SmConstants.RG_RETRY, false);
-        variables.put(SmConstants.ENVIAMENT_DELAY, 0);
+        variables.put(SmConstants.ENVIAMENT_DELAY, 0L);
+        log.debug("[SM] Enviant peticio de registre per l'enviament amb UUID " + enviamentUuid + " delay " + delay + "ms");
         jmsTemplate.convertAndSend(SmConstants.CUA_REGISTRE, env,
                 m -> {
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
                     return m;
                 });
 
-        log.debug("[SM] Enviada petició de registre per l'enviament amb UUID " + enviamentUuid);
+        log.debug("[SM] Enviada peticio de registre per l'enviament amb UUID " + enviamentUuid);
     }
 
+    @Transactional
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 

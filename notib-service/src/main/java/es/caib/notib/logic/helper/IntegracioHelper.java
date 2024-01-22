@@ -43,6 +43,8 @@ public class IntegracioHelper {
 	private MonitorIntegracioRepository monitorRepository;
 	@Autowired
 	private MonitorIntegracioParamRepository monitorParamRepository;
+	@Autowired
+	private CacheHelper cacheHelper;
 
 
 	public Map<IntegracioCodiEnum, Integer> countErrorsGroupByCodi() {
@@ -146,7 +148,8 @@ public class IntegracioHelper {
 			return usuariNomCodi;
 		}
 		try {
-			var usuari = usuariRepository.findById(auth.getName()).orElse(null);
+//			var usuari = usuariRepository.findById(auth.getName()).orElse(null);
+			var usuari = cacheHelper.findUsuariByCodi(auth.getName());
 			if (usuari == null) {
 				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari " + auth.getName() + "no trobat a la bbdd");
 				return usuariNomCodi;

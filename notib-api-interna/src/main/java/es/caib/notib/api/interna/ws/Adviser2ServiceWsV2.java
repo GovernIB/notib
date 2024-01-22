@@ -38,7 +38,7 @@ import static es.caib.notib.api.interna.config.ServiceInstancesConfig.getAdviser
 		portName = es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2.SERVICE_NAME + "Port",
 		targetNamespace = es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2.NAMESPACE_URI)
 @WebContext(
-		contextRoot = "/" + AdviserConstants.NOTIB_CONTEXT + "api/externa",
+		contextRoot = "/" + AdviserConstants.NOTIB_CONTEXT + "api/interna",
 		urlPattern = "/adviser")
 public class Adviser2ServiceWsV2 implements es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2 {
 
