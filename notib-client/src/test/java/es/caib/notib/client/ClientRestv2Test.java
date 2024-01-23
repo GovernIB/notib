@@ -58,11 +58,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 //		System.setProperty("javax.net.ssl.trustStore", keystorePath);
 //		System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
 
-		client = NotificacioRestClientFactory.getRestClientV2(
-				URL,
-				USERNAME,
-				PASSWORD,
-				true); //tomcat = true jboss = false/true
+		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, true, false); //tomcat = true jboss = false/true
 	}
 
 	@Test

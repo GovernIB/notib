@@ -84,13 +84,14 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	 * @param autenticacioBasic Indica si utilitzar autenticació tipus basic. Si té el valor false, utilitzarà autenticació tipus Form (per defecte en entorn CAIB)
 	 * @version 2.0
 	 */
-	public NotificacioRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic) {
+	public NotificacioRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic, boolean debug) {
 
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
 		this.password = password;
 		this.autenticacioBasic = autenticacioBasic;
+		this.debug = debug;
 	}
 
 	/**
@@ -104,7 +105,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	 * @param readTimeout Timeout de lectura en milisegons
 	 * @version 2.0
 	 */
-	public NotificacioRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic, int connecTimeout, int readTimeout) {
+	public NotificacioRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic, int connecTimeout, int readTimeout, boolean debug) {
 
 		super();
 		this.baseUrl = baseUrl;
@@ -113,6 +114,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 		this.autenticacioBasic = autenticacioBasic;
 		this.connecTimeout = connecTimeout;
 		this.readTimeout = readTimeout;
+		this.debug = debug;
 	}
 
 	public AppInfo getAppInfo() {
