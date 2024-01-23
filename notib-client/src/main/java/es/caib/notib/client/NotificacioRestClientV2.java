@@ -114,7 +114,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	public AppInfo getAppInfo() {
 
-		String urlAmbMetode = baseUrl + "/api/rest/appinfo";
+		String urlAmbMetode = baseUrl + "/interna/api/rest/appinfo";
 		try {
 			jerseyClient = generarClient();
 			return clientGet(urlAmbMetode, AppInfo.class);

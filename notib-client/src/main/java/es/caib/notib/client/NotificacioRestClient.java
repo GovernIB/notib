@@ -68,29 +68,6 @@ public class NotificacioRestClient extends NotificacioBaseRestClient {
 	}
 
 	/**
-	 * Constructor per a crear un client per a connectar-se amb la API REST v1 de NOTIB.
-	 *
-	 * @param baseUrl URL de NOTIB al que es vol connectar. Ex. https://notib_server:8080/notib
-	 * @param username Nom de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
-	 * @param password Contrassenya de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
-	 * @param autenticacioBasic Indica si utilitzar autenticació tipus basic. Si té el valor false, utilitzarà autenticació tipus Form (per defecte en entorn CAIB)
-	 * @param connecTimeout Timeout de connexio en milisegons
-	 * @param readTimeout Timeout de lectura en milisegons
-	 * @version 1.0
-	 */
-	public NotificacioRestClient(String baseUrl, String username, String password, boolean autenticacioBasic, int connecTimeout, int readTimeout) {
-		
-		super();
-		this.baseUrl = baseUrl;
-		this.username = username;
-		this.password = password;
-		this.autenticacioBasic = autenticacioBasic;
-		this.connecTimeout = connecTimeout;
-		this.readTimeout = readTimeout;
-	}
-
-
-	/**
 	 * Mètode per a donar d'alta una Notificació/Comunicació a Notib
 	 *
 	 * @param notificacio Objecte amb tota la informació necessària per donar d'alta la notificació (veure documentació)
