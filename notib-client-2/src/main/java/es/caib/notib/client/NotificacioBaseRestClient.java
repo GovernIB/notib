@@ -13,6 +13,7 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.logging.LoggingFeature;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
@@ -96,6 +97,9 @@ public abstract class NotificacioBaseRestClient {
 			config.register(HttpAuthenticationFeature.basic(username, password));
 		}
 		config.register(ResponseClientFilter.class);
+		if (debug) {
+			config.property(LoggingFeature.LOGGING_FEATURE_VERBOSITY_CLIENT, LoggingFeature.Verbosity.PAYLOAD_ANY);
+		}
 		var clientBuilder = new JerseyClientBuilder().withConfig(config);
 		if (connecTimeout != null) {
 			clientBuilder.connectTimeout(connecTimeout, TimeUnit.MILLISECONDS);

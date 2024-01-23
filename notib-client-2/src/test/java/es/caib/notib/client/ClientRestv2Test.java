@@ -55,7 +55,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 //		System.setProperty("javax.net.ssl.trustStore", keystorePath);
 //		System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
 
-		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, true); //tomcat = true jboss = false/true
+		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, true, false); //tomcat = true jboss = false/true
 	}
 
 	@Test
@@ -691,27 +691,17 @@ public class ClientRestv2Test extends ClientBaseTest {
 		// When
 		RespostaConsultaEstatEnviamentV2 respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
 		assertNotNull(respostaConsultaEstatEnviament);
-		if (respostaConsultaEstatEnviament.isError()) {
-			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
-		} else {
-			System.out.println(">>> Reposta Ok");
-		}
+		var msg = respostaConsultaEstatEnviament.isError() ? ">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio() : ">>> Reposta Ok";
+		System.out.println(msg);
 		System.out.println(">>> Informació enviament: " + respostaConsultaEstatEnviament.toString());
 		assertFalse(respostaConsultaEstatEnviament.isError());
 		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
 
 		// SEGONA PETICIÓ AMB diferent sessió??
-		client = NotificacioRestClientFactory.getRestClientV2(
-				URL,
-				USERNAME,
-				PASSWORD,
-				true);
+		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, true, false);
 		respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
-		if (respostaConsultaEstatEnviament.isError()) {
-			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
-		} else {
-			System.out.println(">>> Reposta Ok");
-		}
+		msg = respostaConsultaEstatEnviament.isError() ? ">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio() : ">>> Reposta Ok";
+		System.out.println(msg);
 
 	}
 

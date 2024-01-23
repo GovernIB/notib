@@ -44,10 +44,8 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	 * @param password Contrassenya de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
 	 * @version 2.0
 	 */
-	public NotificacioRestClientV2(
-			String baseUrl,
-			String username,
-			String password) {
+	public NotificacioRestClientV2(String baseUrl, String username, String password) {
+
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
@@ -65,12 +63,8 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	 * @param readTimeout Timeout de lectura en milisegons
 	 * @version 2.0
 	 */
-	public NotificacioRestClientV2(
-			String baseUrl,
-			String username,
-			String password,
-			int connecTimeout,
-			int readTimeout) {
+	public NotificacioRestClientV2(String baseUrl, String username, String password, int connecTimeout, int readTimeout) {
+
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
@@ -89,16 +83,14 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	 * @param autenticacioBasic Indica si utilitzar autenticació tipus basic. Si té el valor false, utilitzarà autenticació tipus Form (per defecte en entorn CAIB)
 	 * @version 2.0
 	 */
-	public NotificacioRestClientV2(
-			String baseUrl,
-			String username,
-			String password,
-			boolean autenticacioBasic) {
+	public NotificacioRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic, boolean debug) {
+
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
 		this.password = password;
 		this.autenticacioBasic = autenticacioBasic;
+		this.debug = debug;
 	}
 
 	/**
@@ -112,13 +104,8 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	 * @param readTimeout Timeout de lectura en milisegons
 	 * @version 2.0
 	 */
-	public NotificacioRestClientV2(
-			String baseUrl,
-			String username,
-			String password,
-			boolean autenticacioBasic,
-			int connecTimeout,
-			int readTimeout) {
+	public NotificacioRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic, int connecTimeout, int readTimeout, boolean debug) {
+
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
@@ -126,9 +113,11 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 		this.autenticacioBasic = autenticacioBasic;
 		this.connecTimeout = connecTimeout;
 		this.readTimeout = readTimeout;
+		this.debug = debug;
 	}
 
 	public AppInfo getAppInfo() {
+
 		String urlAmbMetode = baseUrl + "/api/rest/appinfo";
 		try {
 			jerseyClient = generarClient();
@@ -150,6 +139,16 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/alta";
 			return clientPost(urlAmbMetode, notificacio, RespostaAltaV2.class);
+		} catch (UniformInterfaceException ue) {
+			RespostaAltaV2 respostaAlta = new RespostaAltaV2();
+			ClientResponse response = ue.getResponse();
+
+			if (response != null && response.getStatus() == 401) {
+				respostaAlta.setError(true);
+				respostaAlta.setErrorDescripcio("[CLIENT] Hi ha hagut un problema d'autenticació: "  + ue.getMessage());
+				return respostaAlta;
+			}
+			throw new RuntimeException(ue);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
