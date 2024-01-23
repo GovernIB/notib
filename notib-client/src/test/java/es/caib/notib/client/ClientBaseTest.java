@@ -42,10 +42,10 @@ public class ClientBaseTest {
 	protected static final String ENTITAT_DIR3CODI = "A04003003";
 	protected static final String ENTITAT_DESACTIVADA = "A17002943"; // LOCAL
     protected static final String ENTITAT_ERROR = "test"; // LOCAL
-	protected static final String ORGAN_CODI = "A04035948";
-	protected static final String ORGAN_CODI_CIE = "A04026958"; // LOCAL
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292"; // LOCAL
-	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "215981"; // LOCAL
+	protected static final String ORGAN_CODI = "A04027005";
+	protected static final String ORGAN_CODI_CIE = "A04019898"; // LOCAL
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "894623"; // LOCAL
+	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "877908"; // LOCAL
 
 
 	// DEV data

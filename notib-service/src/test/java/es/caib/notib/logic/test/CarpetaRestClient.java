@@ -40,35 +40,17 @@ public class CarpetaRestClient {
 	private String username;
 	private String password;
 
-	private boolean autenticacioBasic = true;
-
 	public CarpetaRestClient() {}
-	public CarpetaRestClient(
-			String baseUrl,
-			String username,
-			String password) {
+	public CarpetaRestClient(String baseUrl, String username, String password) {
+
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
 		this.password = password;
-	}
-	
-	public CarpetaRestClient(
-			String baseUrl,
-			String username,
-			String password,
-			boolean autenticacioBasic) {
-		super();
-		this.baseUrl = baseUrl;
-		this.username = username;
-		this.password = password;
-		this.autenticacioBasic = autenticacioBasic;
 	}
 
-	public Resposta consultaNotificacions(
-			String nif,
-			Integer pagina,
-			Integer mida) {
+	public Resposta consultaNotificacions(String nif, Integer pagina, Integer mida) {
+
 		try {
 			String urlAmbMetode = baseUrl + CARPETA_SERVICE_PATH + "/notificacions/" + nif;
 			String paginacio = "";
@@ -77,16 +59,9 @@ public class CarpetaRestClient {
 			}
 			Client jerseyClient = generarClient();
 			if (username != null) {
-				autenticarClient(
-						jerseyClient,
-						urlAmbMetode,
-						username,
-						password);
+				autenticarClient(jerseyClient, urlAmbMetode, username, password);
 			}
-			String json = jerseyClient.
-					resource(urlAmbMetode + paginacio).
-					type("application/json").
-					get(String.class);
+			String json = jerseyClient.resource(urlAmbMetode + paginacio).type("application/json").get(String.class);
 			ObjectMapper mapper  = new ObjectMapper();
 			return mapper.readValue(json, Resposta.class);
 		} catch (Exception ex) {
@@ -94,32 +69,20 @@ public class CarpetaRestClient {
 		}
 	}
 	
-	public Arxiu consultaDocument(
-			Long notificacioId) {
+	public Arxiu consultaDocument(Long notificacioId) {
+
 		try {
 			String urlAmbMetode = baseUrl + CARPETA_SERVICE_PATH + "/document/" + notificacioId;
 			Client jerseyClient = generarClient();
 			if (username != null) {
-				autenticarClient(
-						jerseyClient,
-						urlAmbMetode,
-						username,
-						password);
+				autenticarClient(jerseyClient, urlAmbMetode, username, password);
 			}
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					get(String.class);
+			String json = jerseyClient.resource(urlAmbMetode).type("application/json").get(String.class);
 			ObjectMapper mapper  = new ObjectMapper();
 			return mapper.readValue(json, Arxiu.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
-	}
-
-	
-	public boolean isAutenticacioBasic() {
-		return autenticacioBasic;
 	}
 
 	private Client generarClient() {
@@ -135,7 +98,7 @@ public class CarpetaRestClient {
 						ClientResponse response = getNext().handle(request);
 						if (response.getCookies() != null) {
 							if (cookies == null) {
-								cookies = new ArrayList<Object>();
+								cookies = new ArrayList<>();
 							}
 							cookies.addAll(response.getCookies());
 						}
@@ -152,45 +115,20 @@ public class CarpetaRestClient {
 
 				        if (resp.getStatusInfo().getFamily() != Response.Status.Family.REDIRECTION) {
 				            return resp;
-				        } else {
-				            String redirectTarget = resp.getHeaders().getFirst("Location");
-				            request.setURI(UriBuilder.fromUri(redirectTarget).build());
-				            return ch.handle(request);
 				        }
+						String redirectTarget = resp.getHeaders().getFirst("Location");
+						request.setURI(UriBuilder.fromUri(redirectTarget).build());
+						return ch.handle(request);
 					}
 				}
 		);
 		return jerseyClient;
 	}
 
-	private void autenticarClient(
-			Client jerseyClient,
-			String urlAmbMetode,
-			String username,
-			String password) throws InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
-		if (!autenticacioBasic) {
-			logger.debug(
-					"Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
-					"urlAmbMetode=" + urlAmbMetode + ", " +
-					"username=" + username +
-					"password=********)");
-			jerseyClient.resource(urlAmbMetode).get(String.class);
-			Form form = new Form();
-			form.putSingle("j_username", username);
-			form.putSingle("j_password", password);
-			jerseyClient.
-			resource(baseUrl + "/j_security_check").
-			type("application/x-www-form-urlencoded").
-			post(form);
-		} else {
-			logger.debug(
-					"Autenticant REST amb autenticació de tipus HTTP basic (" +
-					"urlAmbMetode=" + urlAmbMetode + ", " +
-					"username=" + username +
-					"password=********)");
-			jerseyClient.addFilter(
-					new HTTPBasicAuthFilter(username, password));
-		}
+	private void autenticarClient(Client jerseyClient, String urlAmbMetode, String username, String password) throws InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
+
+			logger.debug("Autenticant REST amb autenticació de tipus HTTP basic (urlAmbMetode=" + urlAmbMetode + ", username=" + username + "password=********)");
+			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(CarpetaRestClient.class);

@@ -80,16 +80,14 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	 * @param baseUrl URL de NOTIB al que es vol connectar. Ex. https://notib_server:8080/notib
 	 * @param username Nom de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
 	 * @param password Contrassenya de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
-	 * @param autenticacioBasic Indica si utilitzar autenticació tipus basic. Si té el valor false, utilitzarà autenticació tipus Form (per defecte en entorn CAIB)
 	 * @version 2.0
 	 */
-	public NotificacioRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic, boolean debug) {
+	public NotificacioRestClientV2(String baseUrl, String username, String password, boolean debug) {
 
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
 		this.password = password;
-		this.autenticacioBasic = autenticacioBasic;
 		this.debug = debug;
 	}
 
@@ -99,18 +97,16 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	 * @param baseUrl URL de NOTIB al que es vol connectar. Ex. https://notib_server:8080/notib
 	 * @param username Nom de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
 	 * @param password Contrassenya de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
-	 * @param autenticacioBasic Indica si utilitzar autenticació tipus basic. Si té el valor false, utilitzarà autenticació tipus Form (per defecte en entorn CAIB)
 	 * @param connecTimeout Timeout de connexio en milisegons
 	 * @param readTimeout Timeout de lectura en milisegons
 	 * @version 2.0
 	 */
-	public NotificacioRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic, int connecTimeout, int readTimeout, boolean debug) {
+	public NotificacioRestClientV2(String baseUrl, String username, String password, int connecTimeout, int readTimeout, boolean debug) {
 
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
 		this.password = password;
-		this.autenticacioBasic = autenticacioBasic;
 		this.connecTimeout = connecTimeout;
 		this.readTimeout = readTimeout;
 		this.debug = debug;
@@ -118,7 +114,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	public AppInfo getAppInfo() {
 
-		String urlAmbMetode = baseUrl + "/api/rest/appinfo";
+		String urlAmbMetode = baseUrl + "/interna/api/rest/appinfo";
 		try {
 			jerseyClient = generarClient();
 			return clientGet(urlAmbMetode, AppInfo.class);

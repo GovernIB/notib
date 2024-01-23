@@ -58,7 +58,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 //		System.setProperty("javax.net.ssl.trustStore", keystorePath);
 //		System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
 
-		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, true, false); //tomcat = true jboss = false/true
+		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, false); //tomcat = true jboss = false/true
 	}
 
 	@Test
@@ -783,8 +783,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	@Test
 	public void consultaEstatNotificacioTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
-		String referencia = "43573ddf-4f26-40d9-ae80-5bc9dcafbb96";
-//		String referencia = "c33f68e4-77ad-4c1c-8977-4fa76a94c50d";
+		String referencia = "3b455842-056a-4af7-8946-1a333d5ba9a9";
 
 		// When
 		RespostaConsultaEstatNotificacioV2 respostaConsultaEstatNotificacio = client.consultaEstatNotificacio(referencia);
@@ -802,8 +801,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	@Test
 	public void consultaEstatEnviamentTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
-//		String referencia = "a4256bed-292b-4ad1-bb84-05f8f14a7f1c";
-		String referencia = "cc4bd9f9-d82d-441e-9550-c0b807b71cd6";
+		String referencia = "49b0c90a-8a87-48dc-a14e-5e3aaa844f27";
 
 		// When
 		RespostaConsultaEstatEnviamentV2 respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
@@ -836,8 +834,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	public void consultaDadesRegistreTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
-//		dadesConsulta.setReferencia("a1741ac2-066c-4b1c-8411-8a2e689f14b9");
-		dadesConsulta.setReferencia("cc4bd9f9-d82d-441e-9550-c0b807b71cd6");
+		dadesConsulta.setReferencia("49b0c90a-8a87-48dc-a14e-5e3aaa844f27");
 		dadesConsulta.setAmbJustificant(true);
 
 		// When
@@ -863,7 +860,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	@Test
 	public void consultaJustificantTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
-		String identificador = "651cd3b5-562d-4323-bf33-85304c8b8fa6";
+		String identificador = "3b455842-056a-4af7-8946-1a333d5ba9a9";
 
 		// When
 		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament(identificador);

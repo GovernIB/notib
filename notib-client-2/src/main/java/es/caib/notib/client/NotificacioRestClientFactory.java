@@ -34,12 +34,11 @@ public class NotificacioRestClientFactory {
 	 * @param baseUrl Url de Notib
 	 * @param username Usuari de tipus aplicació amb el que es vol interactuar amb Notib
 	 * @param password Contrasenya de l'usuari
-	 * @param autenticacioBasic Indica si utilitzar autenticació basic. En cas negatiu s'utilitzarà autenticació form (per defecte en entorn CAIB).
 	 * @return Client per a interactuar amb Notib. El client per defecte està configurat timeouts de 20s de connexió i 2 min de lectura
 	 */
-	public static NotificacioRestClientV2 getRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic, boolean debug) {
+	public static NotificacioRestClientV2 getRestClientV2(String baseUrl, String username, String password, boolean debug) {
 
-		return new NotificacioRestClientV2(baseUrl, username, password, autenticacioBasic, debug);
+		return new NotificacioRestClientV2(baseUrl, username, password, debug);
 	}
 
 	/**
@@ -48,13 +47,12 @@ public class NotificacioRestClientFactory {
 	 * @param baseUrl Url de Notib
 	 * @param username Usuari de tipus aplicació amb el que es vol interactuar amb Notib
 	 * @param password Contrasenya de l'usuari
-	 * @param autenticacioBasic Indica si utilitzar autenticació basic. En cas negatiu s'utilitzarà autenticació form (per defecte en entorn CAIB).
 	 * @param connecTimeout Timeout de connexió en milisegons
 	 * @param readTimeout Timeout de lectura en milisegons
 	 * @return Client per a interactuar amb Notib.
 	 */
-	public static NotificacioRestClientV2 getRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic, int connecTimeout, int readTimeout, boolean debug) {
+	public static NotificacioRestClientV2 getRestClientV2(String baseUrl, String username, String password, int connecTimeout, int readTimeout, boolean debug) {
 
-		return new NotificacioRestClientV2(baseUrl, username, password, autenticacioBasic, connecTimeout, readTimeout, debug);
+		return new NotificacioRestClientV2(baseUrl, username, password, connecTimeout, readTimeout, debug);
 	}
 }
