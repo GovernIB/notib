@@ -53,7 +53,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 
 	@Before
 	public void setUp() throws IOException, DecoderException, DatatypeConfigurationException {
-		client = NotificacioRestClientFactory.getRestClient(URL, USERNAME, PASSWORD, true);
+		client = NotificacioRestClientFactory.getRestClient(URL, USERNAME, PASSWORD);
 	}
 
 	@Test

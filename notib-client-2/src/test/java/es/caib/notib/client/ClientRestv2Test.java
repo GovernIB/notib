@@ -55,7 +55,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 //		System.setProperty("javax.net.ssl.trustStore", keystorePath);
 //		System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
 
-		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, true, false); //tomcat = true jboss = false/true
+		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, false); //tomcat = true jboss = false/true
 	}
 
 	@Test
@@ -698,7 +698,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
 
 		// SEGONA PETICIÓ AMB diferent sessió??
-		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, true, false);
+		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, false);
 		respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
 		msg = respostaConsultaEstatEnviament.isError() ? ">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio() : ">>> Reposta Ok";
 		System.out.println(msg);

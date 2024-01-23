@@ -100,7 +100,7 @@ public class ParallelCarregaRestTest {
             String keystorePath = ClientRestTest.class.getResource("/es/caib/notib/client/truststore.jks").toURI().getPath();
             System.setProperty("javax.net.ssl.trustStore", keystorePath);
             System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
-            client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, false, false);
+            client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, false);
         }
 
         @Test

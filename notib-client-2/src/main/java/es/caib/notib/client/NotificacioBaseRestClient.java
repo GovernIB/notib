@@ -33,7 +33,6 @@ public abstract class NotificacioBaseRestClient {
 	protected String password;
 
 	protected boolean debug = false;
-	protected boolean autenticacioBasic = true;
 	protected Integer connecTimeout = 20000;
 	protected Integer readTimeout = 120000;
 	protected Client jerseyClient;
