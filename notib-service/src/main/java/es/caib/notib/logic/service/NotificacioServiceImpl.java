@@ -431,7 +431,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			entityComprovarHelper.comprovarPermisos(null, false, false, false);
 			var enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
 			notificacio.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
-			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
+//			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
 			return conversioTipusHelper.convertir(notificacio, NotificacioDtoV2.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -452,7 +452,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
 			notificacio.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
 			// Emplena els atributs registreLlibreNom i registreOficinaNom
-			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
+//			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
 			var dto = conversioTipusHelper.convertir(notificacio, NotificacioInfoDto.class);
 			//CALLBACKS
 			var pendents = callbackRepository.findByNotificacioIdAndEstatOrderByDataDesc(notificacio.getId(), CallbackEstatEnumDto.PENDENT);
