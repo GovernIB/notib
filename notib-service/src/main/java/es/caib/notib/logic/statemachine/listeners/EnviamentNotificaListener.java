@@ -6,6 +6,7 @@ import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentNotificaRequest;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,13 +54,20 @@ public class EnviamentNotificaListener {
     @JmsListener(destination = SmConstants.CUA_NOTIFICA, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveEnviamentNotifica(@Payload EnviamentNotificaRequest enviamentNotificaRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
-        var enviament = notificacioEnviamentRepository.findByUuid(enviamentNotificaRequest.getEnviamentNotificaDto().getUuid()).orElseThrow();
-        var notificacio = enviament.getNotificacio();
-        var numIntent = enviamentNotificaRequest.getNumIntent();
-        log.debug("[SM] Rebut enviament a notifica <" + enviament + ">");
+        NotificacioEntity notificacio = null;
+        var enviament = enviamentNotificaRequest.getEnviamentNotificaDto();
+        if (enviament != null && enviament.getUuid() != null) {
+            log.debug("[SM] Rebut enviament a notifica <" + enviament.getUuid() + ">");
+        } else {
+            log.error("[SM] Rebut enviament notifica sense Enviament");
+        }
 
         semaphore.acquire();
         try {
+            var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElseThrow();
+            notificacio = enviamentEntity.getNotificacio();
+            var numIntent = enviamentNotificaRequest.getNumIntent();
+
             // Al notificar es processen tots els enviaments a l'hora. --> Notificacio
             // Per tant controlam que només s'executi el primer enviament de la notificació
              if (haDeExecutar(notificacio.getId(), numIntent)) {
@@ -92,7 +100,9 @@ public class EnviamentNotificaListener {
 //                notificacioTableHelper.actualitzarRegistre(notificacio);
             }
         } catch (Exception ex) {
-            notificacio.getEnviaments().forEach(e -> enviamentSmService.notificaFailed(e.getNotificaReferencia()));
+            if (notificacio != null) {
+                notificacio.getEnviaments().forEach(e -> enviamentSmService.notificaFailed(e.getNotificaReferencia()));
+            }
         } finally {
             semaphore.release();
         }

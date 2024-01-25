@@ -35,7 +35,11 @@ public class ConsultaSirListener {
     public void receiveConsultaSir(@Payload ConsultaSirRequest consultaSirRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
         var enviament = consultaSirRequest.getConsultaSirDto();
-        log.debug("[SM] Rebut consulta d'estat a Sir <" + enviament + ">");
+        if (enviament != null && enviament.getUuid() != null) {
+            log.debug("[SM] Rebut consulta d'estat a Sir <" + enviament.getUuid() + ">");
+        } else {
+            log.error("[SM] Rebuda consulta d'estat a Sir sense Enviament");
+        }
         semaphore.acquire();
         try {
             // Consultar enviament a SIR

@@ -28,12 +28,16 @@ public class PoolingSirListener {
     public void receiveConsultaSir(@Payload String enviamentUuid,
                                    @Headers MessageHeaders headers,
                                    Message message) throws JMSException, InterruptedException {
-        var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
+        try {
+            var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 
-        var notificacioRegistrada = enviament.getNotificacio().getEnviaments().stream().allMatch(e -> e.getRegistreData() != null);
-        if (notificacioRegistrada) {
-            enviament.getNotificacio().getEnviaments().forEach(e -> enviamentSmService.sirConsulta(e.getNotificaReferencia()));
-            log.debug("[SM] Tots els enviaments de la notificació estan registrats. S'ha d'avançar la màquina d'estats - enviament amb UUID " + enviamentUuid);
+            var notificacioRegistrada = enviament.getNotificacio().getEnviaments().stream().allMatch(e -> e.getRegistreData() != null);
+            if (notificacioRegistrada) {
+                enviament.getNotificacio().getEnviaments().forEach(e -> enviamentSmService.sirConsulta(e.getNotificaReferencia()));
+                log.debug("[SM] Tots els enviaments de la notificació estan registrats. S'ha d'avançar la màquina d'estats - enviament amb UUID " + enviamentUuid);
+            }
+        } catch (Exception ex) {
+            log.error("[SM] Error en el pooling Sir de l'enviament <" + enviamentUuid + ">");
         }
         message.acknowledge();
 

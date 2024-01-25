@@ -36,7 +36,11 @@ public class ConsultaNotificaListener {
                                          @Headers MessageHeaders headers,
                                          Message message) throws JMSException, InterruptedException {
         var enviament = consultaNotificaRequest.getConsultaNotificaDto();
-        log.debug("[SM] Rebut consulta estat a notifica <" + enviament + ">");
+        if (enviament != null && enviament.getUuid() != null) {
+            log.debug("[SM] Rebut consulta d'estat a notifica <" + enviament.getUuid() + ">");
+        } else {
+            log.error("[SM] Rebuda consulta d'estat a notifica sense Enviament");
+        }
 
         semaphore.acquire();
         try {
@@ -53,7 +57,9 @@ public class ConsultaNotificaListener {
                 enviamentSmService.consultaFailed(enviament.getUuid());
             }
         } catch (Exception ex) {
-            enviamentSmService.consultaFailed(enviament.getUuid());
+            if (enviament != null && enviament.getUuid() != null) {
+                enviamentSmService.consultaFailed(enviament.getUuid());
+            }
         } finally {
             semaphore.release();
         }

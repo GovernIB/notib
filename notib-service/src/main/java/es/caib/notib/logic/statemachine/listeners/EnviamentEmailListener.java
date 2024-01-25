@@ -36,7 +36,11 @@ public class EnviamentEmailListener {
         // per tant no s'utilitza aquest listener
 
         var enviament = enviamentEmailRequest.getEnviamentEmailDto();
-        log.error("[SM] Rebut enviament per email <" + enviament + ">");
+        if (enviament != null && enviament.getUuid() != null) {
+            log.error("[SM] Rebut enviament per email <" + enviament.getUuid() + ">");
+        } else {
+            log.error("[SM] Rebut enviament per emial sense Enviament");
+        }
 
         semaphore.acquire();
         try {

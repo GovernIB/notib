@@ -46,13 +46,18 @@ public class EnviamentRegistreListener {
                                          Message message) throws JMSException, RegistreNotificaException, InterruptedException {
 
         var enviamentUuid = enviamentRegistreRequest.getEnviamentUuid();
-        log.debug("[SM] Rebut enviament de registre <" + enviamentUuid + ">");
-        var enviament = notificacioEnviamentRepository.findByUuid(enviamentRegistreRequest.getEnviamentUuid()).orElseThrow();
-        var notificacio = enviament.getNotificacio();
-        var numIntent = enviamentRegistreRequest.getNumIntent();
-        notificacio.setRegistreEnviamentIntent(numIntent);
+        if (enviamentUuid != null) {
+            log.debug("[SM] Rebut enviament de registre <" + enviamentUuid + ">");
+        } else {
+            log.error("[SM] Rebut enviament de registre sense Enviament");
+        }
+
         semaphore.acquire();
         try {
+            var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
+            var notificacio = enviament.getNotificacio();
+            var numIntent = enviamentRegistreRequest.getNumIntent();
+            notificacio.setRegistreEnviamentIntent(numIntent);
             log.debug("[SM] Enviament de registre <" + enviamentUuid + "> registrant ");
             // Registrar enviament
             boolean registreSuccess = registreSmHelper.registrarEnviament(enviament, numIntent);
@@ -96,8 +101,10 @@ public class EnviamentRegistreListener {
                 enviamentSmService.registreFailed(enviamentUuid);
             }
         } catch (Exception ex) {
-            log.debug("[SM] Enviament de registre <" + enviamentUuid + "> error ", ex);
-            enviamentSmService.registreFailed(enviamentUuid);
+            if (enviamentUuid != null) {
+                log.debug("[SM] Enviament de registre <" + enviamentUuid + "> error ", ex);
+                enviamentSmService.registreFailed(enviamentUuid);
+            }
         } finally {
             semaphore.release();
         }
