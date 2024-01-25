@@ -52,6 +52,7 @@ public class SmJmsConfig {
 //        factory.setSessionTransacted(true);
         factory.setConnectionFactory(new PooledConnectionFactory(BROKER_URL));
         factory.setSessionAcknowledgeMode(JmsProperties.AcknowledgeMode.CLIENT.getMode());
+        factory.setConcurrency("5-50");
         configurer.configure(factory, connectionFactory);
         // You could still override some settings if necessary.
         return factory;
