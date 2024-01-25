@@ -50,6 +50,7 @@ public class ConsultaSirAction implements Action<EnviamentSmEstat, EnviamentSmEv
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
+        log.debug("[SM] EnviamentNotificaAction enviament " + enviamentUuid);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
         var env = ConsultaSirRequest.builder().consultaSirDto(enviamentSirMapper.toDto(enviament)).numIntent(reintents + 1).build();

@@ -89,6 +89,9 @@ public class SmJmsConfig {
 
     @Bean
     public JmsTemplate jmsTemplate() {
-        return new JmsTemplate(new PooledConnectionFactory(BROKER_URL));
+
+        var jmsTemplate = new JmsTemplate(new PooledConnectionFactory(BROKER_URL));
+        jmsTemplate.setMessageConverter(jacksonJmsMessageConverter());
+        return jmsTemplate;
     }
 }

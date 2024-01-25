@@ -138,6 +138,7 @@ public class RegistreSmHelper {
 	}
 
 	private void finalitzaRegistre(RespostaConsultaRegistre arbResposta, NotificacioEnviamentEntity enviament, boolean isEnviamentSir) {
+
 		if (arbResposta == null) {
 			return;
 		}

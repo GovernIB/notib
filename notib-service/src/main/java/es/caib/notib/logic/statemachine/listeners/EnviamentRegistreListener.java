@@ -41,9 +41,7 @@ public class EnviamentRegistreListener {
 
     @Transactional
     @JmsListener(destination = SmConstants.CUA_REGISTRE, containerFactory = SmConstants.JMS_FACTORY_ACK)
-    public void receiveEnviamentRegistre(@Payload EnviamentRegistreRequest enviamentRegistreRequest,
-                                         @Headers MessageHeaders headers,
-                                         Message message) throws JMSException, RegistreNotificaException, InterruptedException {
+    public void receiveEnviamentRegistre(@Payload EnviamentRegistreRequest enviamentRegistreRequest, @Headers MessageHeaders headers, Message message) throws JMSException, RegistreNotificaException, InterruptedException {
 
         var enviamentUuid = enviamentRegistreRequest.getEnviamentUuid();
         if (enviamentUuid != null) {

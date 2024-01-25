@@ -39,23 +39,21 @@ public class ConsultaNotificaPoolingAction implements Action<EnviamentSmEstat, E
     @Override
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 30000, multiplier = 10, maxDelay = 3600000))
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
-        var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
-        if (!isAdviserActiu()) {
-            var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 
-            jmsTemplate.convertAndSend(
-                    SmConstants.CUA_CONSULTA_ESTAT,
-                    ConsultaNotificaRequest.builder()
-                            .consultaNotificaDto(consultaNotificaMapper.toDto(enviament))
-                            .numIntent(1)
-                            .build(),
-                    m -> {
-                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, refrescarPeriode());
-                        return m;
-                    });
-
-            log.debug("[SM] Enviada petició de consulta d'estat a notifica per pooling l'enviament amb UUID " + enviamentUuid);
+        if (isAdviserActiu()) {
+            return;
         }
+        var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
+        log.debug("[SM] ConsultaNotificaPoolingAction enviament " + enviamentUuid);
+        var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
+        var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(consultaNotificaMapper.toDto(enviament)).numIntent(1).build();
+        jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_ESTAT, consulta,
+                m -> {
+                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, refrescarPeriode());
+                    return m;
+                });
+
+        log.debug("[SM] Enviada petició de consulta d'estat a notifica per pooling l'enviament amb UUID " + enviamentUuid);
     }
 
     @Recover

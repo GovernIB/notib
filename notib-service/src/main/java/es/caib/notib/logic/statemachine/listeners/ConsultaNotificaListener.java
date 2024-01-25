@@ -32,9 +32,8 @@ public class ConsultaNotificaListener {
 
     @Transactional
     @JmsListener(destination = SmConstants.CUA_CONSULTA_ESTAT, containerFactory = SmConstants.JMS_FACTORY_ACK)
-    public void receiveEnviamentRegistre(@Payload ConsultaNotificaRequest consultaNotificaRequest,
-                                         @Headers MessageHeaders headers,
-                                         Message message) throws JMSException, InterruptedException {
+    public void receiveEnviamentRegistre(@Payload ConsultaNotificaRequest consultaNotificaRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
+
         var enviament = consultaNotificaRequest.getConsultaNotificaDto();
         if (enviament != null && enviament.getUuid() != null) {
             log.debug("[SM] Rebut consulta d'estat a notifica <" + enviament.getUuid() + ">");
