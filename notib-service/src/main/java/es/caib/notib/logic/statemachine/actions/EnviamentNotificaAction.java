@@ -51,6 +51,7 @@ public class EnviamentNotificaAction implements Action<EnviamentSmEstat, Enviame
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
+        log.debug("[SM] EnviamentNotificaAction enviament " + enviamentUuid);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var variables = stateContext.getExtendedState().getVariables();
         var reintents = (int) variables.getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);

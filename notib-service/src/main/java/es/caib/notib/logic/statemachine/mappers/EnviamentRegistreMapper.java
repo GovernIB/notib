@@ -10,6 +10,7 @@ import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.HibernateHelper;
 import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.RegistreSmHelper;
 import es.caib.notib.logic.intf.dto.AnexoWsDto;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
@@ -153,6 +154,7 @@ public abstract class EnviamentRegistreMapper {
 
         // LLibre
         CodiNomDto llibre = getLlibreRegistre(notificacio);
+        RegistreSmHelper.llibres.put(llibre.getCodi(), llibre.getNom());
         asientoRegistralBeanDto.setLibroCodigo(llibre != null ? llibre.getCodi() : null);
 
         // Oficina

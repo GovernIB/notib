@@ -40,6 +40,7 @@ public class ConsultaNotificaIniciPoolingAction implements Action<EnviamentSmEst
             return;
         }
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
+        log.debug("[SM] ConsultaNotificaPoolingAction enviament " + enviamentUuid);
         var delay = configHelper.getConfigAsLong("es.caib.notib.pooling.delay", DELAY_DEFECTE);
         jmsTemplate.convertAndSend(SmConstants.CUA_POOLING_ESTAT, enviamentUuid, m -> {
             m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);

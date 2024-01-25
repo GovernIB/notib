@@ -24,17 +24,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Helper per a interactuar amb la versió 2 del servei web de Notific@.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class RegistreSmHelper {
-	
+
 	private final PluginHelper pluginHelper;
 	private final IntegracioHelper integracioHelper;
 	private final EnviamentTableHelper enviamentTableHelper;
@@ -43,6 +45,8 @@ public class RegistreSmHelper {
 	private final AuditHelper auditHelper;
 	private final CallbackHelper callbackHelper;
 	private final EnviamentRegistreMapper enviamentRegistreMapper;
+
+	public static Map<String, String> llibres = new HashMap<>();
 
 	public boolean registrarEnviament(NotificacioEnviamentEntity enviament, Integer numIntent) throws RegistreNotificaException {
 
@@ -134,6 +138,7 @@ public class RegistreSmHelper {
 	}
 
 	private void finalitzaRegistre(RespostaConsultaRegistre arbResposta, NotificacioEnviamentEntity enviament, boolean isEnviamentSir) {
+
 		if (arbResposta == null) {
 			return;
 		}
@@ -149,6 +154,9 @@ public class RegistreSmHelper {
 			sirDestiData = arbResposta.getSirRegistreDestiData();
 		}
 		enviament.updateRegistreEstat(registreEstat, registreData, sirRecepcioData, sirDestiData, registreNum);
+		enviament.getNotificacio().setRegistreLlibreNom(llibres.get(arbResposta.getCodiLlibre()));
+		enviament.getNotificacio().setRegistreOficinaNom(arbResposta.getOficinaDenominacio());
+		llibres.remove(arbResposta.getCodiLlibre());
 	}
 
 
