@@ -203,13 +203,17 @@ public abstract class NotificacioTableMapper {
     }
 
     private String getEventError(NotificacioTableItemDto dto, int enviamentsSize) {
+
         var error = "";
-
-        boolean isFinal = NotificacioEstatEnumDto.PROCESSADA.equals(dto.getEstat()) || NotificacioEstatEnumDto.FINALITZADA.equals(dto.getEstat());
-        var eventError = !isFinal ? eventRepository.findLastErrorEventByNotificacioId(dto.getId()) : null;
-
+//        boolean isFinal = NotificacioEstatEnumDto.PROCESSADA.equals(dto.getEstat()) || NotificacioEstatEnumDto.FINALITZADA.equals(dto.getEstat());
+//        var eventError = !isFinal ? eventRepository.findLastErrorEventByNotificacioId(dto.getId()) : null;
+        var eventError = eventRepository.findLastEventByNotificacioId(dto.getId());
         if (eventError != null && !Strings.isNullOrEmpty(eventError.getErrorDescripcio())) {
-            error = " <span class=\"fa fa-warning text-danger\" title=\"" + (enviamentsSize == 1 ? htmlEscape(eventError.getErrorDescripcio()) : getMessage + "error.notificacio.enviaments" + fiGetMessage)+ " \"></span>";
+            var desc = eventError.getErrorDescripcio();
+            if (desc.length() > 500) {
+                desc = desc.substring(0, 500);
+            }
+            error = " <span class=\"fa fa-warning text-danger\" title=\"" + (enviamentsSize == 1 ? htmlEscape(desc) : getMessage + "error.notificacio.enviaments" + fiGetMessage)+ " \"></span>";
         }
         if (TipusUsuariEnumDto.APLICACIO.equals(dto.getTipusUsuari()) && dto.isErrorLastCallback()) {
             error += " <span class=\"fa fa-exclamation-circle text-primary\" title=\"" +  getMessage + "notificacio.list.client.error" + fiGetMessage + "\"></span>";

@@ -223,7 +223,7 @@ $(document).ready(function() {
 			</a>
 		</li>
 		</c:if>
-		<c:if test="${isRolActualAdministrador and not empty smInfo.estat}">
+		<c:if test="${(isRolActualAdministrador or isRolActualAdministradorEntitat) and not empty smInfo.estat}">
 			<li role="presentation"<c:if test="${pipellaActiva == 'stateMachine'}"> class="active"</c:if>>
 				<a href="#stateMachine" aria-controls="stateMachine" role="tab" data-toggle="tab">
 					<spring:message code="notificacio.info.tab.state.machine"/>
@@ -846,9 +846,11 @@ $(document).ready(function() {
 				</thead>
 			</table>
 		</div>
-		<c:if test="${isRolActualAdministrador and not empty smInfo.estat}">
+		<c:if test="${(isRolActualAdministrador or isRolActualAdministradorEntitat) and not empty smInfo.estat}">
 			<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'stateMachine'}"> active</c:if>" id="stateMachine">
-
+				<div class="alert alert-danger">
+					<spring:message code="enviament.state.machine.alert"/>
+				</div>
 				<div class="" style="margin-top: 30px">
 					<div class="row " style="padding-left: 15px;">
 
