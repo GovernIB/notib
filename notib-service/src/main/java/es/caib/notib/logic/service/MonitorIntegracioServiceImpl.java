@@ -60,7 +60,9 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 			var entitatCodi = !entitatCodiNull ? filtre.getEntitatCodi() : "";
 			var appNull = Strings.isNullOrEmpty(filtre.getAplicacio());
 			var app = !appNull ? filtre.getAplicacio() : "";
-			var accions = monitorRepository.getByFiltre(codi, entitatCodiNull, entitatCodi, appNull, app, pageable);
+			var descNull = Strings.isNullOrEmpty(filtre.getDescripcio());
+			var desc = filtre.getDescripcio();
+			var accions = monitorRepository.getByFiltre(codi, entitatCodiNull, entitatCodi, appNull, app, descNull, desc, pageable);
 			return paginacioHelper.toPaginaDto(accions, IntegracioAccioDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

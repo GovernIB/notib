@@ -22,12 +22,15 @@ public interface MonitorIntegracioRepository extends JpaRepository<MonitorIntegr
             "where n.codi = :codi " +
             "and (:isCodiEntitatNull = true or lower(n.codiEntitat) like concat('%', lower(:codiEntitat), '%')) " +
             "and (:isAplicacioNull = true or lower(n.aplicacio) like concat('%', lower(:aplicacio), '%')) " +
+            "and (:isDescripcioNull = true or lower(n.descripcio) like concat('%', lower(:descripcio), '%')) " +
             "order by n.data desc ")
     Page<MonitorIntegracioEntity> getByFiltre(@Param("codi") IntegracioCodiEnum codi,
                                               @Param("isCodiEntitatNull") boolean isCodiEntitatNull,
                                               @Param("codiEntitat") String codiEntitat,
                                               @Param("isAplicacioNull") boolean isAplicacioNull,
                                               @Param("aplicacio") String aplicacio,
+                                              @Param("isDescripcioNull") boolean isDescripcioNull,
+                                              @Param("descripcio") String descripcio,
                                               Pageable pageable);
 
     int countByCodiAndEstat(@Param("codi") IntegracioCodiEnum codi, @Param("estat")IntegracioAccioEstatEnumDto estat);
