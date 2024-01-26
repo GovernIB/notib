@@ -46,7 +46,7 @@ public class RegistreSmHelper {
 	private final CallbackHelper callbackHelper;
 	private final EnviamentRegistreMapper enviamentRegistreMapper;
 
-	public static Map<String, String> llibres = new HashMap<>();
+	public static Map<Long, String[]> llibreOficina = new HashMap<>();
 
 	public boolean registrarEnviament(NotificacioEnviamentEntity enviament, Integer numIntent) throws RegistreNotificaException {
 
@@ -154,9 +154,13 @@ public class RegistreSmHelper {
 			sirDestiData = arbResposta.getSirRegistreDestiData();
 		}
 		enviament.updateRegistreEstat(registreEstat, registreData, sirRecepcioData, sirDestiData, registreNum);
-		enviament.getNotificacio().setRegistreLlibreNom(llibres.get(arbResposta.getCodiLlibre()));
-		enviament.getNotificacio().setRegistreOficinaNom(arbResposta.getOficinaDenominacio());
-		llibres.remove(arbResposta.getCodiLlibre());
+		var valors = llibreOficina.get(enviament.getNotificacio().getId());
+		if (valors == null) {
+			return;
+		}
+		enviament.getNotificacio().setRegistreLlibreNom(valors[0]);
+		enviament.getNotificacio().setRegistreOficinaNom(valors[1]);
+		llibreOficina.remove(enviament.getNotificacio().getId());
 	}
 
 
