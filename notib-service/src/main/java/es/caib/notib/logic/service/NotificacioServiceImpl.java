@@ -63,6 +63,7 @@ import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -76,6 +77,7 @@ import javax.annotation.Resource;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -901,6 +903,20 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
+	@Override
+	public byte[] getDiagramaMaquinaEstats() throws IOException{
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			var input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/logic/stateMachine/diagramaStateMachine.png");
+			assert input != null;
+			return IOUtils.toByteArray(input);
+		} catch (IOException ex) {
+            throw new IOException("Arxiu no trobat", ex);
+        } finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
 
 
 	@Override

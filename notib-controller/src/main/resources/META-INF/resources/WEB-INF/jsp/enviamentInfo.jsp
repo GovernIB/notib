@@ -157,7 +157,6 @@ $(document).ready(function() {
 			error: err => console.error(err)
 		});
 	});
-
 });
 </script>
 </head>
@@ -851,7 +850,14 @@ $(document).ready(function() {
 				<div class="alert alert-danger">
 					<spring:message code="enviament.state.machine.alert"/>
 				</div>
-				<div class="" style="margin-top: 30px">
+				<div class="row flex-justify-end" style="padding-right:20px">
+					<a href="<c:url value="/notificacio/descarregar/diagrama/state/machine"/>" class="btn btn-info btn-sm fileDownloadSimpleRichExperience"
+					   title="<spring:message code="notificacio.info.tab.state.machine.descarregar.diagrama"/>">
+						<spring:message code="notificacio.info.tab.state.machine.descarregar.diagrama"/>
+						<span class="fa fa-download"></span>
+					</a>
+				</div>
+				<div class="flex-column" style="margin-top: 30px; gap: 10px;">
 					<div class="row " style="padding-left: 15px;">
 
 						<div class="col-sm-2">
@@ -883,6 +889,42 @@ $(document).ready(function() {
 							</a>
 						</div>
 					</div>
+					<strong style=" margin-top:20px"><spring:message code="notificacio.info.tab.state.machine.titol.taula" /></strong>
+					<table id="llegenda-estats" class="table table-striped table-bordered" style="width: 100%;">
+						<thead>
+							<tr>
+								<th><spring:message code="notificacio.info.tab.state.machine.taula.estat.origen.header"/></th>
+								<th><spring:message code="notificacio.info.tab.state.machine.taula.event.header"/></th>
+								<th><spring:message code="notificacio.info.tab.state.machine.taula.accio.resultant.header"/></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr><td>NOU</td><td>RG_ENVIAR</td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.resultant.registrar"/></td></tr>
+							<tr><td>REGISTRE_ERROR</td><td>RG_RESET</td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.reset.intents.registre"/></td></tr>
+							<tr><td>REGISTRE_ERROR</td><td>RG_RETRY</td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.reintentar.registre"/></td></tr>
+							<tr><td>REGISTRE_PENDENT</td><td>RG_RETRY</td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.reintentar.registre"/></td></tr>
+							<tr><td>REGISTRE_PENDENT</td><td>RG_ERROR</td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.error.registre"/></td></tr>
+							<tr><td>REGISTRE_PENDENT</td><td>RG_SUCCESS</td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.registre.ok"/></td></tr>
+							<tr><td>NOTIFICA_PENDENT</td><td>NT_ENVIAR</td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.enviar.notifica"/><</td></tr>
+							<tr><td>NOTIFICA_PENDENT</td><td>NT_SUCCESS</td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.notifica.ok"/></td></tr>
+							<tr><td>NOTIFICA_PENDENT</td><td>NT_ERROR</td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.notifica.error"/></td></tr>
+							<tr><td>NOTIFICA_PENDENT</td><td>NT_RETRY</td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.reintent.notifica"/></td></tr>
+							<tr><td>NOTIFICA_PENDENT</td><td>NT_FI</td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.finalitza.remesa"/></td></tr>
+							<tr><td>NOTIFICA_ERROR </td><td> NT_RESET </td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.reset.intents.notifica"/></td></tr>
+							<tr><td>NOTIFICA_ERROR </td><td> NT_RETRY </td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.reintent.notifica"/></td></tr>
+							<tr><td>NOTIFICA_SENT </td><td> CN_CONSULTAR </td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.consulta.estat.enviament"/></td></tr>
+							<tr><td>NOTIFICA_SENT </td><td> CN_SUCCESS </td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.consulta.estat.enviament.ok"/></td></tr>
+							<tr><td>NOTIFICA_SENT </td><td> CN_ERROR </td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.consulta.estat.enviament.error"/></td></tr>
+							<tr><td>CONSULTA_ERROR </td><td> CN_RETRY </td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.reintentar.consulta.estat.enviament"/></td></tr>
+							<tr><td>CONSULTA_ERROR </td><td> CN_FORWARD </td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.finalitza.remesa"/></td></tr>
+							<tr><td>SIR_PENDENT </td><td> SR_CONSULTAR </td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.consulta.enviament.sir"/></td></tr>
+							<tr><td>SIR_PENDENT </td><td> SR_SUCCESS </td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.consulta.enviament.sir.ok"/></td></tr>
+							<tr><td>SIR_PENDENT </td><td> SR_RESET </td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.consulta.enviament.sir.error"/></td></tr>
+							<tr><td>SIR_PENDENT </td><td> SR_RETRY </td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.reintentar.consulta.enviament.sir"/></td></tr>
+							<tr><td>SIR_PENDENT </td><td> SR_FORWARD </td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.finalitzar.comunicacio.sir"/></td></tr>
+							<tr><td>SIR_ERROR </td><td> SR_FORWARD </td><td><spring:message code="notificacio.info.tab.state.machine.taula.accio.finalitzar.comunicacio.sir"/></td></tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</c:if>

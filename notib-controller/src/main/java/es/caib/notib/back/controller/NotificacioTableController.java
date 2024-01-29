@@ -520,6 +520,18 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return Missatge.builder().ok(totbe).msg(msg).build();
     }
 
+    @GetMapping(value = "/descarregar/diagrama/state/machine")
+    @ResponseBody
+    public void descarregarDiagramaStateMachine(HttpServletResponse response) throws IOException {
+
+        response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
+        try {
+            writeFileToResponse("diagramaStateMachine.png", notificacioService.getDiagramaMaquinaEstats(), response);
+        } catch (Exception ex) {
+            log.debug("Error al obtenir la plantilla de el model de dades CSV de càrrega massiva", ex);
+        }
+    }
+
     @GetMapping(value = "/{notificacioId}/documentDescarregar/{documentId}")
     @ResponseBody
     public void documentDescarregar(HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long documentId) throws IOException {
@@ -905,7 +917,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         model.addAttribute("pipellaActiva", pipellaActiva);
         var enviament = enviamentService.enviamentFindAmbId(enviamentId);
         model.addAttribute("enviament", enviament);
-        if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
+        if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual()) || RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual())) {
             var info = envSmService.infoStateMachine(enviamentId);
             model.addAttribute("smInfo", info);
             model.addAttribute("smEstats", info.getEstats());

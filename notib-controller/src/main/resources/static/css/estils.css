@@ -293,6 +293,11 @@ table.dataTable tr.datatable-dades-carregant div {
 	flex-direction: column;
 }
 
+.flex-justify-end {
+	display: flex;
+	justify-content: end;
+}
+
 .flex-column-center {
 	display: flex;
 	flex-direction: column;
