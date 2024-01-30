@@ -32,6 +32,7 @@ import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -207,6 +208,9 @@ public interface NotificacioService {
 
 	@PreAuthorize("isAuthenticated()")
 	List<NotificacioEnviamentAuditDto> historicFindAmbEnviament(Long entitatId, Long notificacioId, Long enviamentId);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	byte[] getDiagramaMaquinaEstats() throws IOException;
 	
 	/**
 	 * Retorna l'arxiu del document de la notificació.

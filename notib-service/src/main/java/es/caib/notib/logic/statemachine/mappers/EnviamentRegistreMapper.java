@@ -139,6 +139,7 @@ public abstract class EnviamentRegistreMapper {
 
     @AfterMapping
     protected void beforeSet(NotificacioEnviamentEntity enviament, @MappingTarget AsientoRegistralBeanDto asientoRegistralBeanDto) {
+
         if (enviament == null) {
             return;
         }
@@ -152,15 +153,19 @@ public abstract class EnviamentRegistreMapper {
         asientoRegistralBeanDto.setUnidadTramitacionDestinoCodigo(organ);
         asientoRegistralBeanDto.setUnidadTramitacionDestinoDenominacion(organ);
 
+        String[] valors = new String[2];
         // LLibre
         CodiNomDto llibre = getLlibreRegistre(notificacio);
-        RegistreSmHelper.llibres.put(llibre.getCodi(), llibre.getNom());
         asientoRegistralBeanDto.setLibroCodigo(llibre != null ? llibre.getCodi() : null);
+        valors[0] = llibre.getNom();
 
         // Oficina
         CodiNomDto oficina = getOficinaRegistre(notificacio);
         asientoRegistralBeanDto.setEntidadRegistralOrigenCodigo(oficina != null ? oficina.getCodi() : null);
         asientoRegistralBeanDto.setEntidadRegistralOrigenDenominacion(oficina != null ? oficina.getNom() : null);
+        valors[1] = oficina.getNom();
+
+        RegistreSmHelper.llibreOficina.put(notificacio.getId(), valors);
 
         // Interessat
         var interessat = getInteressatRegistre(enviament);

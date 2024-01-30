@@ -219,7 +219,7 @@ $(document).ready(function() {
 				</a>
 			</li>
 		</c:if>
-		<c:if test="${isRolActualAdministrador and mostrarSmInfo}">
+		<c:if test="${(isRolActualAdministrador or isRolActualAdministradorEntitat) and mostrarSmInfo}">
 			<li role="presentation"<c:if test="${activeTab == 'stateMachine'}"> class="active"</c:if>>
 				<a href="#stateMachine" aria-controls="stateMachine" role="tab" data-toggle="tab">
 					<spring:message code="notificacio.info.tab.state.machine"/>
@@ -308,7 +308,7 @@ $(document).ready(function() {
 						</c:if>
 						<c:if test="${notificacio.estatDate != null}">
 							<tr>
-								<td><strong><spring:message code="notificacio.info.dada.finalitzada.dada"/></strong></td>
+								<td><strong><spring:message code="notificacio.info.dada.finalitzada.data"/></strong></td>
 								<td><fmt:formatDate value="${notificacio.estatDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
 							</tr>
 						</c:if>
@@ -360,7 +360,8 @@ $(document).ready(function() {
 										<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.${notificacio.estat}" />
 									</c:otherwise>
 								</c:choose>
-								<c:if test="${notificacio.notificaError and notificacio.estat != 'FINALITZADA' and notificacio.estat != 'PROCESSADA'}">
+<%--								<c:if test="${notificacio.notificaError and notificacio.estat != 'FINALITZADA' and notificacio.estat != 'PROCESSADA'}">--%>
+								<c:if test="${not empty notificacio.notificaErrorData}">
 									<span class="fa fa-warning text-danger" title="<c:out value='${notificacio.notificaErrorDescripcio}' escapeXml='true'/>"></span>
 								</c:if>
 								<c:if test="${notificacio.fiReintents}">
@@ -1107,8 +1108,11 @@ $(document).ready(function() {
 				</thead>
 			</table>
 		</div>
-		<c:if test="${isRolActualAdministrador and mostrarSmInfo}">
+		<c:if test="${(isRolActualAdministrador or isRolActualAdministradorEntitat) and mostrarSmInfo}">
 			<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'stateMachine'}"> active</c:if>" id="stateMachine">
+				<div class="alert alert-danger">
+					<spring:message code="enviament.state.machine.alert"/>
+				</div>
 				<div class="" style="margin-top: 30px">
 					<a id="afegirSM" onclick="afegirSm()" class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
 						<spring:message code="notificacio.info.tab.state.machine.afegir" />
