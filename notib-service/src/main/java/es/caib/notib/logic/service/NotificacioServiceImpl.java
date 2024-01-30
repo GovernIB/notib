@@ -77,6 +77,7 @@ import javax.annotation.Resource;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -903,7 +904,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	@Override
-	public byte[] getDiagramaMaquinaEstats() throws IOException{
+	public byte[] getDiagramaMaquinaEstats() throws IOException {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
