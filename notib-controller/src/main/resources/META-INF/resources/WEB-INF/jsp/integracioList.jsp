@@ -231,8 +231,8 @@
 	</div>
 <script>
 	$(document).ready(() =>   {
-		$('#btn-netejar-filtre').click(() => {
-			$(':input', $('#form-filtre')).each((x, y) => {
+		$('#btnNetejar').click(() => {
+			$(':input', $('#filtre')).each((x, y) => {
 				let type = y.type, tag = y.tagName.toLowerCase();
 				if (type === 'text') {
 					y.value = '';
@@ -241,7 +241,7 @@
 					y.selectedIndex = 0;
 				}
 			});
-			$('#form-filtre').submit();
+			$('#filtre').submit();
 		});
 	});
 </script>
