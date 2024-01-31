@@ -8,7 +8,9 @@ import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
+import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.RegistreService;
+import es.caib.notib.logic.intf.statemachine.dto.ConsultaSirDto;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import java.util.Date;
 public class RegistreServiceImpl implements RegistreService {
 
     private final EnviamentSmService enviamentSmService;
+    private final NotificacioService notificacioService;
     private final NotificacioEnviamentRepository notificacioEnviamentRepository;
     private final RegistreSmHelper registreSmHelper;
     private final NotificacioTableHelper notificacioTableHelper;
@@ -37,9 +40,10 @@ public class RegistreServiceImpl implements RegistreService {
 
     @Transactional
     @Override
-    public void enviarRegistre(String enviamentUuid, EnviamentRegistreRequest enviamentRegistreRequest) {
+    public void enviarRegistre(EnviamentRegistreRequest enviamentRegistreRequest) {
 
-        try{
+        var enviamentUuid = enviamentRegistreRequest.getEnviamentUuid();
+        try {
             var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
             var notificacio = enviament.getNotificacio();
             var numIntent = enviamentRegistreRequest.getNumIntent();
@@ -91,6 +95,28 @@ public class RegistreServiceImpl implements RegistreService {
                 log.debug("[SM] Enviament de registre <" + enviamentUuid + "> error ", ex);
                 enviamentSmService.registreFailed(enviamentUuid);
             }
+        }
+    }
+
+    @Transactional
+    @Override
+    public void consultaSir(ConsultaSirDto enviament) {
+
+        try {
+            // Consultar enviament a SIR
+            notificacioService.enviamentRefrescarEstatRegistre(enviament.getId());
+            var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElseThrow();
+            boolean consultaSuccess = enviamentEntity.getSirConsultaIntent() == 0;
+    //            TEST
+    //            var consultaSuccess = new Random().nextBoolean();
+
+            if (consultaSuccess) {
+                enviamentSmService.sirSuccess(enviament.getUuid());
+            } else {
+                enviamentSmService.sirFailed(enviament.getUuid());
+            }
+        } catch (Exception ex) {
+            enviamentSmService.sirFailed(enviament.getUuid());
         }
     }
 }

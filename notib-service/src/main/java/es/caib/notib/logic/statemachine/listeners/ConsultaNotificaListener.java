@@ -1,6 +1,7 @@
 package es.caib.notib.logic.statemachine.listeners;
 
 import es.caib.notib.logic.intf.service.EnviamentSmService;
+import es.caib.notib.logic.intf.service.NotificaService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.statemachine.SmConstants;
@@ -23,14 +24,11 @@ import java.util.concurrent.Semaphore;
 @Component
 public class ConsultaNotificaListener {
 
-//    private final StateMachineService<EnviamentSmEstat, EnviamentSmEvent> stateMachineService;
-    private final EnviamentSmService enviamentSmService;
-    private final NotificacioEnviamentRepository notificacioEnviamentRepository;
-    private final NotificacioService notificacioService;
 
+    private final NotificaService notificaService;
     private Semaphore semaphore = new Semaphore(5);
 
-    @Transactional
+
     @JmsListener(destination = SmConstants.CUA_CONSULTA_ESTAT, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveEnviamentRegistre(@Payload ConsultaNotificaRequest consultaNotificaRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
@@ -43,22 +41,7 @@ public class ConsultaNotificaListener {
 
         semaphore.acquire();
         try {
-            // Consultar enviament a notifica
-            notificacioService.enviamentRefrescarEstat(enviament.getId());
-            var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElseThrow();
-            var consultaSuccess = enviamentEntity.getNotificaIntentNum() == 0;
-//            TEST
-//            var consultaSuccess = new Random().nextBoolean();
-
-            if (consultaSuccess) {
-                enviamentSmService.consultaSuccess(enviament.getUuid());
-            } else {
-                enviamentSmService.consultaFailed(enviament.getUuid());
-            }
-        } catch (Exception ex) {
-            if (enviament != null && enviament.getUuid() != null) {
-                enviamentSmService.consultaFailed(enviament.getUuid());
-            }
+            notificaService.consultaEstatEnviament(enviament);
         } finally {
             semaphore.release();
         }
