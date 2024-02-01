@@ -3,7 +3,9 @@
  */
 package es.caib.notib.back.helper;
 
+import es.caib.notib.back.command.IntegracioFiltreCommand;
 import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.back.command.DocumentCommand;
@@ -24,6 +26,8 @@ import ma.glasnost.orika.metadata.Type;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -147,6 +151,28 @@ public class ConversioTipusHelper {
 						notificacioDto.setDocument3(documents.size() > 2 ? documents.get(2) : null);
 						notificacioDto.setDocument4(documents.size() > 3 ? documents.get(3) : null);
 						notificacioDto.setDocument5(documents.size() > 4 ? documents.get(4) : null);
+					}
+				}).register();
+
+		mapperFactory.classMap(IntegracioFiltreCommand.class, IntegracioFiltreDto.class)
+				.byDefault()
+				.customize(new CustomMapper<IntegracioFiltreCommand, IntegracioFiltreDto>() {
+					@Override
+					public void mapAtoB(IntegracioFiltreCommand command, IntegracioFiltreDto dto, MappingContext context) {
+
+						var sf = new SimpleDateFormat("dd/MM/yyyy");
+						Date dataInici = null;
+						try {
+							dataInici = command.getDataInici() != null ? sf.parse(command.getDataInici()) : null;
+							dto.setDataInici(dataInici);
+						} catch (Exception ex) {
+						}
+						Date dataFi = null;
+						try {
+							dataFi = command.getDataFi() != null ? sf.parse(command.getDataFi()) : null;
+							dto.setDataFi(dataFi);
+						} catch (Exception ex) {
+						}
 					}
 				}).register();
 	}

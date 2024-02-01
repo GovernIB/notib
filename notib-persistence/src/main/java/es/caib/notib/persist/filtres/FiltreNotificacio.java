@@ -1,4 +1,4 @@
-package es.caib.notib.persist.objectes;
+package es.caib.notib.persist.filtres;
 
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;

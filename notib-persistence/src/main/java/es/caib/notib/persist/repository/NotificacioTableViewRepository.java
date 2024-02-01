@@ -1,7 +1,7 @@
 package es.caib.notib.persist.repository;
 
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
-import es.caib.notib.persist.objectes.FiltreNotificacio;
+import es.caib.notib.persist.filtres.FiltreNotificacio;
 import es.caib.notib.persist.entity.NotificacioTableEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

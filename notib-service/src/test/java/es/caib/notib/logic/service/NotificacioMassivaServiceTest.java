@@ -38,7 +38,7 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
-import es.caib.notib.persist.objectes.FiltreNotificacio;
+import es.caib.notib.persist.filtres.FiltreNotificacio;
 import es.caib.notib.persist.repository.NotificacioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;

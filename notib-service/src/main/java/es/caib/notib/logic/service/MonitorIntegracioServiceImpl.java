@@ -16,6 +16,8 @@ import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.service.MonitorIntegracioService;
+import es.caib.notib.logic.utils.DatesUtils;
+import es.caib.notib.persist.filtres.FiltreMonitorIntegracio;
 import es.caib.notib.persist.repository.monitor.MonitorIntegracioParamRepository;
 import es.caib.notib.persist.repository.monitor.MonitorIntegracioRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Calendar;
 import java.util.Map;
 
 
@@ -57,12 +60,27 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 			log.debug("Consultant les darreres accions per a la integració ( codi=" + codi + ")");
 			var pageable = paginacioHelper.toSpringDataPageable(paginacio);
 			var entitatCodiNull = Strings.isNullOrEmpty(filtre.getEntitatCodi());
-			var entitatCodi = !entitatCodiNull ? filtre.getEntitatCodi() : "";
 			var appNull = Strings.isNullOrEmpty(filtre.getAplicacio());
-			var app = !appNull ? filtre.getAplicacio() : "";
-			var descNull = Strings.isNullOrEmpty(filtre.getDescripcio());
-			var desc = filtre.getDescripcio();
-			var accions = monitorRepository.getByFiltre(codi, entitatCodiNull, entitatCodi, appNull, app, descNull, desc, pageable);
+			filtre.setDataFi(DatesUtils.incrementarDataFiSiMateixDia(filtre.getDataInici(), filtre.getDataFi()));
+
+			var f = FiltreMonitorIntegracio.builder()
+					.codi(codi)
+					.codiEntitatNull(Strings.isNullOrEmpty(filtre.getEntitatCodi()))
+					.codiEntitat(!entitatCodiNull ? filtre.getEntitatCodi() : "")
+					.aplicacioNull(Strings.isNullOrEmpty(filtre.getAplicacio()))
+					.aplicacio(!appNull ? filtre.getAplicacio() : "")
+					.descripcioNull(Strings.isNullOrEmpty(filtre.getDescripcio()))
+					.descripcio(filtre.getDescripcio())
+					.dataIniciNull(filtre.getDataInici() == null)
+					.dataInici(filtre.getDataInici())
+					.dataFiNull(filtre.getDataFi() == null)
+					.dataFi(filtre.getDataFi())
+					.tipusNull(filtre.getTipus() == null)
+					.tipus(filtre.getTipus())
+					.estatNull(filtre.getEstat() == null)
+					.estat(filtre.getEstat())
+					.build();
+			var accions = monitorRepository.getByFiltre(f, pageable);
 			return paginacioHelper.toPaginaDto(accions, IntegracioAccioDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

@@ -3,6 +3,7 @@ package es.caib.notib.persist.repository.monitor;
 import es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioEntity;
+import es.caib.notib.persist.filtres.FiltreMonitorIntegracio;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,19 +20,16 @@ public interface MonitorIntegracioRepository extends JpaRepository<MonitorIntegr
 
     @Transactional
     @Query("from MonitorIntegracioEntity n " +
-            "where n.codi = :codi " +
-            "and (:isCodiEntitatNull = true or lower(n.codiEntitat) like concat('%', lower(:codiEntitat), '%')) " +
-            "and (:isAplicacioNull = true or lower(n.aplicacio) like concat('%', lower(:aplicacio), '%')) " +
-            "and (:isDescripcioNull = true or lower(n.descripcio) like concat('%', lower(:descripcio), '%')) " +
+            "where n.codi = :#{#filtre.codi} " +
+            "and (:#{#filtre.codiEntitatNull} = true or lower(n.codiEntitat) like concat('%', lower(:#{#filtre.codiEntitat}), '%')) " +
+            "and (:#{#filtre.aplicacioNull} = true or lower(n.aplicacio) like concat('%', lower(:#{#filtre.aplicacio}), '%')) " +
+            "and (:#{#filtre.descripcioNull} = true or lower(n.descripcio) like concat('%', lower(:#{#filtre.descripcio}), '%')) " +
+            "and (:#{#filtre.dataIniciNull} = true or n.data >= :#{#filtre.dataInici}) " +
+            "and (:#{#filtre.dataFiNull} = true or n.data <= :#{#filtre.dataFi}) "+
+            "and (:#{#filtre.tipusNull} = true or n.tipus = :#{#filtre.tipus}) " +
+            "and (:#{#filtre.estatNull} = true or n.estat = :#{#filtre.estat}) " +
             "order by n.data desc ")
-    Page<MonitorIntegracioEntity> getByFiltre(@Param("codi") IntegracioCodiEnum codi,
-                                              @Param("isCodiEntitatNull") boolean isCodiEntitatNull,
-                                              @Param("codiEntitat") String codiEntitat,
-                                              @Param("isAplicacioNull") boolean isAplicacioNull,
-                                              @Param("aplicacio") String aplicacio,
-                                              @Param("isDescripcioNull") boolean isDescripcioNull,
-                                              @Param("descripcio") String descripcio,
-                                              Pageable pageable);
+    Page<MonitorIntegracioEntity> getByFiltre(FiltreMonitorIntegracio filtre, Pageable pageable);
 
     int countByCodiAndEstat(@Param("codi") IntegracioCodiEnum codi, @Param("estat")IntegracioAccioEstatEnumDto estat);
 

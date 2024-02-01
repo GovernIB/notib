@@ -13,12 +13,12 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class IntegracioFiltreCommand {
+public class IntegracioFiltreCommand extends FiltreCommand {
 
     private String entitatCodi;
     private String aplicacio;
-    private Date dataInici;
-    private Date dataFi;
+    private String dataInici;
+    private String dataFi;
     private String descripcio;
     private IntegracioAccioTipusEnumDto tipus;
     private IntegracioAccioEstatEnumDto estat;
