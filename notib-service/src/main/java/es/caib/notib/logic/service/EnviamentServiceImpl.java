@@ -56,6 +56,7 @@ import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.PermisosService;
+import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.ColumnesEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
@@ -217,6 +218,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 			log.info("Consulta ids d'enviament, accions massives");
 			entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
 			var f = getFiltre(entitatId, filtre, usuariCodi, rol, organGestorCodi);
+			f.setDataEnviamentFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataEnviamentInici(), f.getDataEnviamentFi()));
+			f.setDataProgramadaDisposicioFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataProgramadaDisposicioInici(), f.getDataProgramadaDisposicioFi()));
+			f.setDataCaducitatFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataCaducitatInici(), f.getDataCaducitatFi()));
 			return enviamentTableRepository.findIdsAmbFiltre(f);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -281,6 +285,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 			mapeigPropietatsOrdenacio.put("referenciaNotificacio", new String[] {"referenciaNotificacio"});
 
 			var f = getFiltre(entitatId, filtre, usuariCodi, rol, organGestorCodi);
+			f.setDataEnviamentFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataEnviamentInici(), f.getDataEnviamentFi()));
+			f.setDataCaducitatFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataCaducitatInici(), f.getDataCaducitatFi()));
+			f.setDataProgramadaDisposicioFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataProgramadaDisposicioInici(), f.getDataProgramadaDisposicioFi()));
 			var pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
  			var pageEnviaments = enviamentTableRepository.findAmbFiltre(f, pageable);
 			if(pageEnviaments == null || !pageEnviaments.hasContent()) {

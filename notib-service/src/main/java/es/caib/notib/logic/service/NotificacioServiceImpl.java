@@ -38,6 +38,7 @@ import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.mapper.NotificacioMapper;
 import es.caib.notib.logic.mapper.NotificacioTableMapper;
+import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
@@ -589,6 +590,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var rols = aplicacioService.findRolsUsuariActual();
 			filtre.setOrganGestor(organGestorCodi);
 			var f = notificacioListHelper.getFiltre(filtre, entitatId, rol, usuariCodi, rols);
+			f.setDataFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataInici(), f.getDataFi()));
 			var notificacions = notificacioTableViewRepository.findAmbFiltre(f, pageable);
 			var dtos = notificacioTableMapper.toNotificacionsTableItemDto(
 					notificacions.getContent(),
@@ -608,6 +610,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var rols = aplicacioService.findRolsUsuariActual();
 			filtre.setOrganGestor(organGestorCodi);
 			var f = notificacioListHelper.getFiltre(filtre, entitatId, rol, usuariCodi, rols);
+			f.setDataFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataInici(), f.getDataFi()));
 			return notificacioTableViewRepository.findIdsAmbFiltre(f);
 		} finally {
 			log.error("Eror obtinguent els ids amb filtre de les remeses")
