@@ -8,7 +8,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
-import es.caib.notib.persist.objectes.FiltreNotificacio;
+import es.caib.notib.persist.filtres.FiltreNotificacio;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;

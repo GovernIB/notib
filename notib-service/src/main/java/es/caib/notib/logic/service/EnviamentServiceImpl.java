@@ -61,7 +61,7 @@ import es.caib.notib.persist.entity.ColumnesEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
-import es.caib.notib.persist.objectes.FiltreEnviament;
+import es.caib.notib.persist.filtres.FiltreEnviament;
 import es.caib.notib.persist.repository.CallbackRepository;
 import es.caib.notib.persist.repository.ColumnesRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
