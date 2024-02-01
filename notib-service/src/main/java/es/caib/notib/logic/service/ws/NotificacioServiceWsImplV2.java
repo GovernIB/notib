@@ -29,6 +29,7 @@ import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.DocumentValidDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
@@ -166,9 +167,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private NotificacioValidator notificacioValidator;
 
 	// Per test
-
 	public void setNotificacioValidator(NotificacioValidator notificacioValidator) {
 		this.notificacioValidator = notificacioValidator;
+	}
+	public void setDocumentHelperTest(DocumentHelper documentHelper) {
+		this.documentHelper = documentHelper;
 	}
 
 
@@ -344,7 +347,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 	private IntegracioInfo generateInfoAlta(Notificacio notificacio) {
 
-		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_CLIENT, "Alta de notificació", IntegracioAccioTipusEnumDto.RECEPCIO);
+		IntegracioInfo info = new IntegracioInfo(IntegracioCodiEnum.CALLBACK, "Alta de notificació", IntegracioAccioTipusEnumDto.RECEPCIO);
 
 		ObjectMapper mapper  = new ObjectMapper();
 		Map<String, Object> notificaAtributMap = new HashMap<>();
@@ -401,7 +404,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consultant estat notificacio amb identificador: " + identificador);
-			var info = new IntegracioInfo(IntegracioHelper.INTCODI_CLIENT, "Consulta de l'estat d'una notificació", IntegracioAccioTipusEnumDto.RECEPCIO, new AccioParam("Identificador xifrat de la notificacio", identificador));
+			var info = new IntegracioInfo(IntegracioCodiEnum.CALLBACK, "Consulta de l'estat d'una notificació", IntegracioAccioTipusEnumDto.RECEPCIO, new AccioParam("Identificador xifrat de la notificacio", identificador));
 			var resposta = RespostaConsultaEstatNotificacioV2.builder().identificador(identificador).build();
 			try {
 				var notificacio = getNotificacioByIdentificador(identificador, resposta, info);
@@ -494,7 +497,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consultant estat enviament amb referencia: " + referencia);
-			IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_CLIENT,"Consulta de l'estat d'un enviament", IntegracioAccioTipusEnumDto.RECEPCIO);
+			IntegracioInfo info = new IntegracioInfo(IntegracioCodiEnum.CALLBACK,"Consulta de l'estat d'un enviament", IntegracioAccioTipusEnumDto.RECEPCIO);
 			RespostaConsultaEstatEnviamentV2 resposta = RespostaConsultaEstatEnviamentV2.builder().referencia(referencia).build();
 
 			try {
@@ -737,7 +740,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			}
 
 			IntegracioInfo info = new IntegracioInfo(
-					IntegracioHelper.INTCODI_CLIENT,
+					IntegracioCodiEnum.CALLBACK,
 					"Consulta de les dades de registre",
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					new AccioParam("Dades de la consulta", json));
@@ -835,7 +838,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			IntegracioInfo info = new IntegracioInfo(
-					IntegracioHelper.INTCODI_CLIENT,
+					IntegracioCodiEnum.CALLBACK,
 					"Consulta de la justificació d'una notificació",
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					new AccioParam("Identificador xifrat de la notificacio", identificador));
@@ -899,7 +902,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			}
 
 			IntegracioInfo info = new IntegracioInfo(
-					IntegracioHelper.INTCODI_CLIENT,
+					IntegracioCodiEnum.CALLBACK,
 					"Donar permis de consulta",
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					new AccioParam("Permís", json));

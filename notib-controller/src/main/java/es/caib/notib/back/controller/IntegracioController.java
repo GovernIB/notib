@@ -10,7 +10,9 @@ import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioDetall;
+import es.caib.notib.logic.intf.dto.IntegracioDto;
 import es.caib.notib.logic.intf.service.MonitorIntegracioService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controlador per a la consulta d'accions de les integracions.
@@ -40,20 +44,6 @@ public class IntegracioController extends BaseUserController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "IntegracioController.session.filtre";
 	private static final String INTEGRACIO_FILTRE = "integracio_filtre";
-
-	enum IntegracioEnumDto {
-		USUARIS,
-		REGISTRE,
-		NOTIFICA,
-		ARXIU,
-		CALLBACK,
-		GESDOC,
-		UNITATS,
-		GESCONADM,
-		PROCEDIMENTS,
-		FIRMASERV,
-		VALIDASIG
-	}
 
 	@GetMapping
 	public String get(HttpServletRequest request, Model model) {
@@ -82,20 +72,15 @@ public class IntegracioController extends BaseUserController {
 	@GetMapping(value = "/{codi}")
 	public String getAmbCodi(HttpServletRequest request, @PathVariable @NonNull String codi, Model model) {
 
-		var integracions = monitorIntegracioService.integracioFindAll();
+		List<IntegracioDto> integracions = new ArrayList<>();
 		// Consulta el número d'errors per codi d'integracio
 		try {
 			var errors = monitorIntegracioService.countErrors();
-			for (var integracio : integracions) {
-				for (var integracioEnum : IntegracioEnumDto.values()) {
-					if (integracio.getCodi().equals(integracioEnum.name())) {
-						integracio.setNom(EnumHelper.getOneOptionForEnum(IntegracioEnumDto.class, "integracio.list.pipella." + integracio.getCodi()).getText());
-					}
-				}
-				if (errors.containsKey(integracio.getCodi())) {
-					integracio.setNumErrors(errors.get(integracio.getCodi()).intValue());
-				}
-			}
+			IntegracioCodiEnum.stream().forEach(integracioCodi -> integracions.add(IntegracioDto.builder()
+					.codi(integracioCodi)
+					.nom(EnumHelper.getOneOptionForEnum(IntegracioCodiEnum.class, "integracio.list.pipella." + integracioCodi).getText())
+					.numErrors(errors.get(integracioCodi))
+					.build()));
 		} catch (Exception ex) {
 			var msg = "Error contant el nombre d'integracions amb error";
 			log.error(msg, ex);
@@ -119,7 +104,7 @@ public class IntegracioController extends BaseUserController {
 		var paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
 		var codi = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
 		var filtre = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
-		var accions = monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, filtre != null ? filtre.asDto() : null);
+		var accions = monitorIntegracioService.integracioFindDarreresAccionsByCodi(IntegracioCodiEnum.valueOf(codi), paginacio, filtre != null ? filtre.asDto() : null);
 		return DatatablesHelper.getDatatableResponse(request, accions);
 	}
 

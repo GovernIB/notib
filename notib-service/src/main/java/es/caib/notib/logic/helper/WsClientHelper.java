@@ -3,31 +3,40 @@
  */
 package es.caib.notib.logic.helper;
 
-import java.io.ByteArrayOutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
-
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
-import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Utilitat per a instanciar clients per al servei d'enviament
@@ -52,11 +61,52 @@ public class WsClientHelper<T> {
 		// Configura l'adreça del servei
 		var endpointAddress = !endpoint.endsWith(wsdl) ? endpoint : endpoint.substring(0, endpoint.length() - wsdl.length());
 		bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointAddress);
-		// Configura l'autenticació si és necessària
-		if (username != null && !username.isEmpty()) {
+
+		// Verifica si CXF es troba disponible
+		boolean cxfDisponible = true;
+		try {
+			Class.forName("org.apache.cxf.endpoint.Client");
+		} catch( ClassNotFoundException e ) {
+			cxfDisponible = false;
+		}
+
+		if (cxfDisponible) {
+			var client = ClientProxy.getClient(servicePort);
+			if (username != null && !username.isEmpty()) {
+				// Create a Map for the security properties
+				var props = new HashMap<String, Object>();
+				props.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
+				// Specify a CallbackHandler to handle username and password information
+				//				props.put(WSHandlerConstants.PW_CALLBACK_REF, new UserPasswordCallbackHandler());
+				props.put(WSHandlerConstants.PW_CALLBACK_REF, new CallbackHandler() {
+					@Override
+					public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+						Arrays.stream(callbacks).filter(WSPasswordCallback.class::isInstance)
+								.map(WSPasswordCallback.class::cast)
+								.forEach(callback -> callback.setPassword(password));
+					}
+				});
+				props.put(WSHandlerConstants.USER, username);
+				// Specify a password type
+				props.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+				// Add nonce and timestamp
+				props.put(WSHandlerConstants.ADD_USERNAMETOKEN_NONCE, "true");
+				props.put(WSHandlerConstants.ADD_USERNAMETOKEN_CREATED, "true");
+				// Add a WSS4J interceptor to the client's outgoing interceptor chain
+				WSS4JOutInterceptor wssOut = new WSS4JOutInterceptor(props);
+				client.getOutInterceptors().add(wssOut);
+			}
+			if (disableCxfChunking) {
+				var http = (HTTPConduit) client.getConduit();
+				var httpClientPolicy = new HTTPClientPolicy();
+				httpClientPolicy.setAllowChunking(false);
+				http.setClient(httpClientPolicy);
+			}
+		} else {
 			bindingProvider.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, username);
 			bindingProvider.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, password);
 		}
+
 		// Configura el log de les peticions
 		@SuppressWarnings("rawtypes")
 		List<Handler> handlerChain = new ArrayList<>();
@@ -71,24 +121,14 @@ public class WsClientHelper<T> {
 			if (handler != null) {
 				handlerChain.add(handler);
 			}
+//			if (logMissatgesActiu) {
+//				handlerChain.add(new SOAPLoggingHandler(WsClientHelper.class));
+//			}
 		}
 		bindingProvider.getBinding().setHandlerChain(handlerChain);
 		if (soapAction != null) {
 			bindingProvider.getRequestContext().put(BindingProvider.SOAPACTION_USE_PROPERTY, true);
 			bindingProvider.getRequestContext().put(BindingProvider.SOAPACTION_URI_PROPERTY, soapAction);
-		}
-		if (disableCxfChunking) {
-			try {
-				// Verifica si CXF es troba disponible
-				Class.forName("org.apache.cxf.endpoint.Client");
-				var client = ClientProxy.getClient(servicePort);
-				var http = (HTTPConduit) client.getConduit();
-				var httpClientPolicy = new HTTPClientPolicy();
-				httpClientPolicy.setAllowChunking(false);
-				http.setClient(httpClientPolicy);
-			} catch( ClassNotFoundException e ) {
-				// Si CXF no es troba disponible no fa res
-			}
 		}
 		return servicePort;
 	}
@@ -154,4 +194,5 @@ public class WsClientHelper<T> {
 			LOGGER.debug(sb.toString());
 		}
 	}
+
 }

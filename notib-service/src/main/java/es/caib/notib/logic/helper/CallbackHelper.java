@@ -4,12 +4,13 @@ import com.sun.jersey.api.client.ClientResponse;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
+import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.AuditService;
-import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -150,7 +151,7 @@ public class CallbackHelper {
 
 		var callback = callbackRepository.findByEnviamentId(env.getId());
 		var notificacio = env.getNotificacio();
-		var info = new IntegracioInfo(IntegracioHelper.INTCODI_CLIENT, "Enviament d'avís de canvi d'estat", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodiEnum.CALLBACK, "Enviament d'avís de canvi d'estat", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de l'enviament", String.valueOf(env.getId())),
 				new AccioParam("Identificador de la notificació", String.valueOf(notificacio.getId())));
 
@@ -250,7 +251,7 @@ public class CallbackHelper {
 			errorMessage = "La aplicació " + aplicacio.getUsuariCodi() + " no està activa";
 		}
 		if (errorMessage != null) {
-			var info = new IntegracioInfo(IntegracioHelper.INTCODI_CLIENT, "Enviament d'avís de canvi d'estat", IntegracioAccioTipusEnumDto.ENVIAMENT,
+			var info = new IntegracioInfo(IntegracioCodiEnum.CALLBACK, "Enviament d'avís de canvi d'estat", IntegracioAccioTipusEnumDto.ENVIAMENT,
 					new AccioParam("Identificador del callback", String.valueOf(callback.getId())),
 					new AccioParam("Codi aplicació", aplicacio != null ? aplicacio.getUsuariCodi() : ""),
 					new AccioParam("Identificador de la notificacio", String.valueOf(enviament.getNotificacio().getId()))

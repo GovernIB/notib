@@ -35,6 +35,7 @@ import org.springframework.context.annotation.Primary;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -88,6 +89,12 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	@RolesAllowed("**")
 	public List<NotificacioEnviamentAuditDto> historicFindAmbEnviament(Long entitatId, Long notificacioId, Long enviamentId) {
 		return getDelegateService().historicFindAmbEnviament(entitatId, notificacioId, enviamentId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	public byte[] getDiagramaMaquinaEstats() throws IOException  {
+		return getDelegateService().getDiagramaMaquinaEstats();
 	}
 
 	@Override

@@ -3,10 +3,8 @@ package es.caib.notib.logic.helper;
 import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
-import es.caib.notib.persist.entity.AplicacioEntity;
-import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioEntity;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioParamEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
@@ -16,7 +14,6 @@ import es.caib.notib.persist.repository.monitor.MonitorIntegracioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -46,51 +43,14 @@ public class IntegracioHelper {
 	private MonitorIntegracioRepository monitorRepository;
 	@Autowired
 	private MonitorIntegracioParamRepository monitorParamRepository;
+	@Autowired
+	private CacheHelper cacheHelper;
 
-	public static final String INTCODI_USUARIS = "USUARIS";
-	public static final String INTCODI_REGISTRE = "REGISTRE";
-	public static final String INTCODI_NOTIFICA = "NOTIFICA";
-	public static final String INTCODI_ARXIU = "ARXIU";
-	public static final String INTCODI_CLIENT = "CALLBACK";
-	public static final String INTCODI_GESDOC = "GESDOC";
-	public static final String INTCODI_UNITATS = "UNITATS";
-	public static final String INTCODI_GESCONADM = "GESCONADM";
-	public static final String INTCODI_PROCEDIMENT = "PROCEDIMENTS";
-	public static final String INTCODI_FIRMASERV = "FIRMASERV";
-	public static final String INTCODI_VALIDASIG = "VALIDASIG";
-	public static final String CARPETA = "CARPETA";
 
-	public List<IntegracioDto> findAll() {
+	public Map<IntegracioCodiEnum, Integer> countErrorsGroupByCodi() {
 
-		List<IntegracioDto> integracions = new ArrayList<>();
-		integracions.add(novaIntegracio(INTCODI_USUARIS));
-		integracions.add(novaIntegracio(INTCODI_REGISTRE));
-		integracions.add(novaIntegracio(INTCODI_NOTIFICA));
-		integracions.add(novaIntegracio(INTCODI_ARXIU));
-		integracions.add(novaIntegracio(INTCODI_CLIENT));
-		integracions.add(novaIntegracio(INTCODI_GESDOC));
-		integracions.add(novaIntegracio(INTCODI_UNITATS));
-		integracions.add(novaIntegracio(INTCODI_GESCONADM));
-		integracions.add(novaIntegracio(INTCODI_PROCEDIMENT));
-		integracions.add(novaIntegracio(INTCODI_FIRMASERV));
-		integracions.add(novaIntegracio(INTCODI_VALIDASIG));
-		return integracions;
-	}
-
-	public Map<String, Integer> countErrorsGroupByCodi() {
-
-		Map<String ,Integer> errorsGroupByCodi = new HashMap<>();
-		errorsGroupByCodi.put(INTCODI_USUARIS,countErrors(INTCODI_USUARIS));
-		errorsGroupByCodi.put(INTCODI_REGISTRE,countErrors(INTCODI_REGISTRE));
-		errorsGroupByCodi.put(INTCODI_NOTIFICA,countErrors(INTCODI_NOTIFICA));
-		errorsGroupByCodi.put(INTCODI_ARXIU,countErrors(INTCODI_ARXIU));
-		errorsGroupByCodi.put(INTCODI_CLIENT,countErrors(INTCODI_CLIENT));
-		errorsGroupByCodi.put(INTCODI_GESDOC,countErrors(INTCODI_GESDOC));
-		errorsGroupByCodi.put(INTCODI_UNITATS,countErrors(INTCODI_UNITATS));
-		errorsGroupByCodi.put(INTCODI_GESCONADM,countErrors(INTCODI_GESCONADM));
-		errorsGroupByCodi.put(INTCODI_PROCEDIMENT,countErrors(INTCODI_PROCEDIMENT));
-		errorsGroupByCodi.put(INTCODI_FIRMASERV,countErrors(INTCODI_FIRMASERV));
-		errorsGroupByCodi.put(INTCODI_VALIDASIG,countErrors(INTCODI_VALIDASIG));
+		Map<IntegracioCodiEnum ,Integer> errorsGroupByCodi = new HashMap<>();
+		IntegracioCodiEnum.stream().forEach(codi -> errorsGroupByCodi.put(codi, countErrors(codi)));
 		return errorsGroupByCodi;
 	}
 
@@ -154,7 +114,7 @@ public class IntegracioHelper {
 		}
 	}
 
-	private Integer countErrors(String codi) {
+	private Integer countErrors(IntegracioCodiEnum codi) {
 		return monitorRepository.countByCodiAndEstat(codi, IntegracioAccioEstatEnumDto.ERROR);
 	}
 
@@ -188,9 +148,10 @@ public class IntegracioHelper {
 			return usuariNomCodi;
 		}
 		try {
-			var usuari = usuariRepository.findById(auth.getName()).orElse(null);
+//			var usuari = usuariRepository.findById(auth.getName()).orElse(null);
+			var usuari = cacheHelper.findUsuariByCodi(auth.getName());
 			if (usuari == null) {
-				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari no trobat a la bdd");
+				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari " + auth.getName() + "no trobat a la bbdd");
 				return usuariNomCodi;
 			}
 			return usuari.getNom() + " (" + usuari.getCodi() + ")";
@@ -198,36 +159,6 @@ public class IntegracioHelper {
 			log.error("[Error Integració] Error al buscar l'usuari " + usuariNomCodi);
 			return usuariNomCodi;
 		}
-	}
-
-	private IntegracioDto novaIntegracio(String codi) {
-
-		var integracio = new IntegracioDto();
-		integracio.setCodi(codi);
-		if (INTCODI_USUARIS.equals(codi)) {
-			integracio.setNom("Usuaris");
-		} else if (INTCODI_REGISTRE.equals(codi)) {
-			integracio.setNom("Registre");
-		} else if (INTCODI_NOTIFICA.equals(codi)) {
-			integracio.setNom("Notifica");
-		} else if (INTCODI_ARXIU.equals(codi)) {
-			integracio.setNom("Arxiu");
-		} else if (INTCODI_CLIENT.equals(codi)) {
-			integracio.setNom("Callback de client");
-		} else if (INTCODI_GESDOC.equals(codi)) {
-			integracio.setNom("Gestor documental");
-		} else if (INTCODI_UNITATS.equals(codi)) {
-			integracio.setNom("Unitats organitzatives");
-		} else if (INTCODI_GESCONADM.equals(codi)) {
-			integracio.setNom("Rolsac");
-		} else if (INTCODI_PROCEDIMENT.equals(codi)) {
-				integracio.setNom("Procediments");
-		} else if (INTCODI_FIRMASERV.equals(codi)) {
-			integracio.setNom("Firma servidor");
-		} else if (INTCODI_VALIDASIG.equals(codi)) {
-			integracio.setNom("Validacio firma");
-		}
-		return integracio;
 	}
 
 	public void addAplicacioAccioParam(IntegracioInfo info, Long entitatId) {

@@ -19,18 +19,19 @@ public class EmailNotificacioMassivaHelper extends EmailHelper<NotificacioMassiv
 	@Resource
 	private MessageHelper messageHelper;
 
-	public String sendMail(@NonNull NotificacioMassivaEntity item, @NonNull String email, @NonNull byte[] fileResumContent, @NonNull byte[] fileErrorsContent) throws Exception {
+	public void sendMail(@NonNull NotificacioMassivaEntity item, @NonNull String email, @NonNull byte[] fileResumContent, @NonNull byte[] fileErrorsContent) throws Exception {
 
-		try {
+//		try {
 			email = email.replaceAll("\\s+","");
 			sendEmailNotificacio(email, item, Arrays.asList(new Attachment("resum.csv", fileResumContent), new Attachment("errors.csv", fileErrorsContent)));
-		} catch (Exception ex) {
-			var errorDescripcio = "No s'ha pogut avisar per correu electrònic: " + ex;
-			log.error(errorDescripcio);
-			return errorDescripcio;
-		}
-		return null;
+//		} catch (Exception ex) {
+//			var errorDescripcio = "No s'ha pogut avisar per correu electrònic: " + ex;
+//			log.error(errorDescripcio);
+//			return errorDescripcio;
+//		}
+//		return null;
 	}
+
 	@Override
 	protected String getMailHtmlBody(NotificacioMassivaEntity item) {
 

@@ -32,10 +32,10 @@ public interface AvisService {
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	PaginaDto<AvisDto> findPaginat(PaginacioParamsDto paginacioParams);
 
-	@PreAuthorize("hasRole('tothom') or hasRole('NOT_SUPER')")
+	@PreAuthorize("isAuthenticated()")
 	List<AvisDto> findActive();
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	List<AvisDto> findActiveAdmin(Long entitatId);
 
 }

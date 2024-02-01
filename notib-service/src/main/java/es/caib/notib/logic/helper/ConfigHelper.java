@@ -62,6 +62,9 @@ public class ConfigHelper {
     public String getConfigGlobal(String propietatGlobal) {
         return environment.getProperty(propietatGlobal);
     }
+    public String getConfigGlobal(String propietatGlobal, String defaultValue) {
+        return getPropietatGlobal(propietatGlobal).orElse(defaultValue);
+    }
     public String getConfigByEntitat(String entitatCodi, String propietatGlobal) {
         return getPropietat(entitatCodi, propietatGlobal).orElseThrow(() -> new NotDefinedConfigException(propietatGlobal));
     }
@@ -129,6 +132,10 @@ public class ConfigHelper {
         return getConfigAsInteger("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.reintents.maxim");
     }
 
+    private Optional<String> getPropietatGlobal(String globalKey) {
+        var propertyValue = environment.getProperty(globalKey);
+        return propertyValue != null ? Optional.of(propertyValue) : Optional.empty();
+    }
 
     private Optional<String> getPropietat(String entitatCodi, String globalKey) {
 
@@ -145,7 +152,7 @@ public class ConfigHelper {
         if (propertyValue != null) {
             return Optional.of(propertyValue);
         }
-        log.error("No s'ha trobat la propietat -> key global: " + globalKey + " key entitat: " + entitatKey);
+        log.warn("No s'ha trobat la propietat -> key global: " + globalKey + " key entitat: " + entitatKey);
         return Optional.empty();
     }
 

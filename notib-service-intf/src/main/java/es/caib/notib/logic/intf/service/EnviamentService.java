@@ -46,7 +46,7 @@ public interface EnviamentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	List<Long> findIdsAmbFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException;
 
 	/**
@@ -61,7 +61,7 @@ public interface EnviamentService {
 	 * 
 	 * @throws ParseException
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(
 			Long entitatId,
 			RolEnumDto rol,
@@ -77,7 +77,7 @@ public interface EnviamentService {
 	 *            Atribut id de la notificació.
 	 * @return els destinataris trobats.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	List<NotificacioEnviamentDatatableDto> enviamentFindAmbNotificacio(Long notificacioId);
 
 	/**
@@ -86,7 +86,7 @@ public interface EnviamentService {
 	 * @param notificacionsIds  Atribut id de la notificació.
 	 * @return els identificadors dels enviaments.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	Set<Long> findIdsByNotificacioIds(Collection<Long> notificacionsIds);
 
 	/**
@@ -96,7 +96,7 @@ public interface EnviamentService {
 	 *            Atribut id de l'enviament.
 	 * @return el destinatari trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId);
 
 	/**
@@ -106,7 +106,7 @@ public interface EnviamentService {
 	 *            Atribut id de la notificació.
 	 * @return els events trobats.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	List<NotificacioEventDto> eventFindAmbNotificacio(Long notificacioId);
 
 
@@ -123,7 +123,7 @@ public interface EnviamentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	FitxerDto exportacio(Long entitatId, Collection<Long> enviamentIds, String format) throws IOException, NotFoundException, ParseException;
 	
 	/**
@@ -133,7 +133,7 @@ public interface EnviamentService {
 	 *            Attribut amb les columnes a visualitzar.
 	 * @return columnes que s'han de visualitzar.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	void columnesCreate(String codiUsuari, Long entitatId, ColumnesDto columnes);
 	
 	/**
@@ -143,17 +143,17 @@ public interface EnviamentService {
 	 *            Attribut amb les columnes a visualitzar.
 	 * @return columnes que s'han de visualitzar.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void columnesUpdate(Long entitatId, ColumnesDto columnes);
 	
 	/**
 	 * Obté les columnes visibles per un usuari i entitat
 	 * @return columnes que s'han de visualitzar.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ColumnesDto getColumnesUsuari(Long entitatId, String codiUsuari);
 	
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	NotificacioEnviamentDtoV2 getOne(Long enviamentId);
 
 	/**
@@ -163,7 +163,7 @@ public interface EnviamentService {
 	 *            id de l'enviament registrat.
 	 * @return document justificant descarregat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_CARPETA')")
+	@PreAuthorize("isAuthenticated()")
 	byte[] getDocumentJustificant(Long enviamentId);
 
 	/**
@@ -172,7 +172,7 @@ public interface EnviamentService {
 	 * @param enviaments
 	 *            Llistat de atributs id dels enviaments
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	void reactivaConsultes(Set<Long> enviaments);
 	
 	/**
@@ -181,7 +181,7 @@ public interface EnviamentService {
 	 * @param enviaments
 	 *            Llistat de atributs id dels enviaments
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	void reactivaSir(Set<Long> enviaments);
 	
 	@PreAuthorize("hasRole('NOT_CARPETA') or hasRole('NOT_SUPER')")
@@ -195,7 +195,7 @@ public interface EnviamentService {
 	 * @param enviamentId
 	 *            id de l'enviament.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	void actualitzarEstat(Long enviamentId);
 
 	/**
@@ -204,7 +204,7 @@ public interface EnviamentService {
 	 * @param enviamentId
 	 *            id de l'enviament.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	void activarCallback(Long enviamentId);
 
 	/**
@@ -213,7 +213,7 @@ public interface EnviamentService {
 	 * @param notificacions
 	 *            id de l'enviament.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	List<Long> enviarCallback(Set<Long> notificacions) throws Exception;
 
 }

@@ -5,6 +5,7 @@ import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificaRespostaDatatDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -14,11 +15,11 @@ import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoEnvios;
-import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.Certificacion;
-import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.Datado;
-import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.Datados;
-import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.InfoEnvioV2;
-import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
+import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.Certificacion;
+import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.Datado;
+import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.Datados;
+import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.InfoEnvioLigero;
+import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.RespuestaInfoEnvioLigero;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
@@ -34,10 +35,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.io.InputStream;
-import java.util.Calendar;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
 /**
@@ -63,12 +64,13 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	private EnviamentTableHelper enviamentTableHelper;
 	private MockPlay mockPlay;
 
+	private final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 	@SneakyThrows
 	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
 
 		Thread.sleep(1000);
-		var info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodiEnum.NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
 
 		var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
@@ -175,7 +177,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				errorDescripcio = "L'enviament no té identificador de Notifica";
 				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 			}
-			var infoEnvio = new InfoEnvioV2();
+			var infoEnvio = new InfoEnvioLigero();
 			infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
 			var resultadoInfoEnvio = infoEnviament(enviament);
 			if (resultadoInfoEnvio.getDatados() == null) {
@@ -209,12 +211,12 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				ConfigHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
 				var dataCertificacio = toDate(certificacio.getFechaCertificacion());
 				if (!dataCertificacio.equals(dataUltimaCertificacio)) {
-					var decodificat = certificacio.getContenidoCertificacion();
-					String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, decodificat);
-					log.info("Actualitzant certificació enviament...");
-					enviament.updateNotificaCertificacio(dataCertificacio, gestioDocumentalId, certificacio.getHash(), certificacio.getOrigen(), certificacio.getMetadatos(),
-							certificacio.getCsv(), certificacio.getMime(), Integer.parseInt(certificacio.getSize()), null, null, null);
-
+//					var decodificat = certificacio.getContenidoCertificacion();
+//					String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, decodificat);
+//					log.info("Actualitzant certificació enviament...");
+//					enviament.updateNotifivcaCertificacio(dataCertificacio, gestioDocumentalId, certificacio.getHash(), certificacio.getOrigen(), certificacio.getMetadatos(),
+//							certificacio.getCsv(), certificacio.getMime(), Integer.parseInt(certificacio.getSize()), null, null, null);
+//
 					log.info("Fi actualització certificació. Creant nou event per certificació...");
 					//Crea un nou event
 					notificacioEventHelper.addAdviserCertificacioEvent(enviament, false, null);
@@ -223,35 +225,35 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				log.info("Enviament actualitzat");
 			}
 
-			var dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
-			var estat = mockPlay.getEstatConsulta() == null ? getEstatNotifica(datatDarrer.getResultado()) : mockPlay.getEstatConsulta();
-			log.info("Actualitzant informació enviament amb Datat...");
-			if (!dataDatat.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
-				var organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
-				var organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
-				enviament.updateNotificaInformacio(
-						dataDatat,
-						toDate(resultadoInfoEnvio.getFechaPuestaDisposicion()),
-						toDate(resultadoInfoEnvio.getFechaCaducidad()),
-						(organismoEmisor != null) ? organismoEmisor.getCodigo() : null,
-						(organismoEmisor != null) ? organismoEmisor.getDescripcionCodigoDIR() : null,
-						(organismoEmisor != null) ? organismoEmisor.getNifDIR() : null,
-						(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
-						(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
-						(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
-				if (estat.name() != null) {
-					log.info("Nou estat: " + estat.name());
-				}
-				//Crea un nou event
-				log.info("Creant nou event per Datat...");
-				notificacioEventHelper.addAdviserDatatEvent(enviament, false, null);
-				callbackHelper.updateCallback(enviament, false, null);
-				log.info("Actualitzant Datat enviament...");
-				enviamentUpdateDatat(estat, toDate(datatDarrer.getFecha()), null, datatDarrer.getOrigen(), datatDarrer.getNifReceptor(),
-						datatDarrer.getNombreReceptor(), null, null, enviament);
-				log.info("Fi actualització Datat");
-
-			}
+//			var dataDatat = dateFormat.parse(resultadoInfoEnvio.getFechaCreacion());
+//			var estat = mockPlay.getEstatConsulta() == null ? getEstatNotifica(datatDarrer.getResultado()) : mockPlay.getEstatConsulta();
+//			log.info("Actualitzant informació enviament amb Datat...");
+//			if (!dataDatat.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
+//				var organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
+//				var organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
+//				enviament.updateNotificaInformacio(
+//						dataDatat,
+//						toDate(resultadoInfoEnvio.getFechaPuestaDisposicion()),
+//						toDate(resultadoInfoEnvio.getFechaCaducidad()),
+//						(organismoEmisor != null) ? organismoEmisor.getCodigo() : null,
+//						(organismoEmisor != null) ? organismoEmisor.getDescripcionCodigoDIR() : null,
+//						(organismoEmisor != null) ? organismoEmisor.getNifDIR() : null,
+//						(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
+//						(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
+//						(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
+//				if (estat.name() != null) {
+//					log.info("Nou estat: " + estat.name());
+//				}
+//				//Crea un nou event
+//				log.info("Creant nou event per Datat...");
+//				notificacioEventHelper.addAdviserDatatEvent(enviament, false, null);
+//				callbackHelper.updateCallback(enviament, false, null);
+//				log.info("Actualitzant Datat enviament...");
+//				enviamentUpdateDatat(estat, dateFormat.parse(datatDarrer.getFecha()), null, datatDarrer.getOrigen(), datatDarrer.getNifReceptor(),
+//						datatDarrer.getNombreReceptor(), null, null, enviament);
+//				log.info("Fi actualització Datat");
+//
+//			}
 			log.info("Enviament actualitzat");
 			enviament.refreshNotificaConsulta();
 			log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
@@ -281,12 +283,15 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		return ex instanceof ValidationException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
 	}
 
-	public ResultadoInfoEnvioV2 infoEnviament(NotificacioEnviamentEntity enviament) throws SistemaExternException {
+	public RespuestaInfoEnvioLigero infoEnviament(NotificacioEnviamentEntity enviament) throws SistemaExternException {
 
-		var resultat = new ResultadoInfoEnvioV2();
+		var resultat = new RespuestaInfoEnvioLigero();
 		try {
 			var datats = new Datados();
 			var datat = new Datado();
+			DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+//			var today = Calendar.getInstance().getTime();
+//			var date = df.format(today);
 			var date = DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar());
 			datat.setFecha(date);
 			datat.setNifReceptor(enviament.getTitular().getNif());
@@ -299,20 +304,20 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			resultat.setDatados(datats);
 			var certificacio = new Certificacion();
 			certificacio.setFechaCertificacion(date);
-			certificacio.setHash("b081c7abf42d5a8e5a4050958f28046bdf86158c");
+//			certificacio.setHash("b081c7abf42d5a8e5a4050958f28046bdf86158c");
 			certificacio.setOrigen("electronico");
-			certificacio.setCsv("dasd-dsadad-asdasd-asda-sda-das");
-			certificacio.setMime("application/pdf");
+//			certificacio.setCsv("dasd-dsadad-asdasd-asda-sda-das");
+//			certificacio.setMime("application/pdf");
 			var arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
-			certificacio.setContenidoCertificacion(arxiuBytes);
-			certificacio.setSize(String.valueOf(arxiuBytes.length));
+//			certificacio.setContenidoCertificacion(arxiuBytes);
+//			certificacio.setSize(String.valueOf(arxiuBytes.length));
 			resultat.setCertificacion(certificacio);
-			resultat.setFechaCreacion(date);
-			resultat.setFechaPuestaDisposicion(date);
-			var cal = date.toGregorianCalendar();
-			cal.add(Calendar.DAY_OF_MONTH, 1);
-			XMLGregorianCalendar dataCaducitat = DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
-			resultat.setFechaCaducidad(dataCaducitat);
+//			resultat.setFechaCreacion(date);
+//			resultat.setFechaPuestaDisposicion(date);
+//			var cal = date.toGregorianCalendar();
+//			cal.add(Calendar.DAY_OF_MONTH, 1);
+//			XMLGregorianCalendar dataCaducitat = DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
+//			resultat.setFechaCaducidad(dataCaducitat);
 		} catch (Exception ex) {
 			log.error("Error obtinguent la info de l'enviament", ex);
 		}

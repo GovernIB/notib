@@ -9,10 +9,11 @@ import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.HibernateHelper;
-import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.RegistreSmHelper;
 import es.caib.notib.logic.intf.dto.AnexoWsDto;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.InteresadoWsDto;
 import es.caib.notib.logic.intf.dto.notificacio.EnviamentSirTipusDocumentEnviarEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -138,6 +139,7 @@ public abstract class EnviamentRegistreMapper {
 
     @AfterMapping
     protected void beforeSet(NotificacioEnviamentEntity enviament, @MappingTarget AsientoRegistralBeanDto asientoRegistralBeanDto) {
+
         if (enviament == null) {
             return;
         }
@@ -151,14 +153,19 @@ public abstract class EnviamentRegistreMapper {
         asientoRegistralBeanDto.setUnidadTramitacionDestinoCodigo(organ);
         asientoRegistralBeanDto.setUnidadTramitacionDestinoDenominacion(organ);
 
+        String[] valors = new String[2];
         // LLibre
         CodiNomDto llibre = getLlibreRegistre(notificacio);
         asientoRegistralBeanDto.setLibroCodigo(llibre != null ? llibre.getCodi() : null);
+        valors[0] = llibre.getNom();
 
         // Oficina
         CodiNomDto oficina = getOficinaRegistre(notificacio);
         asientoRegistralBeanDto.setEntidadRegistralOrigenCodigo(oficina != null ? oficina.getCodi() : null);
         asientoRegistralBeanDto.setEntidadRegistralOrigenDenominacion(oficina != null ? oficina.getNom() : null);
+        valors[1] = oficina.getNom();
+
+        RegistreSmHelper.llibreOficina.put(notificacio.getId(), valors);
 
         // Interessat
         var interessat = getInteressatRegistre(enviament);
@@ -325,26 +332,26 @@ public abstract class EnviamentRegistreMapper {
         if (inclouDocuments && notificacio.getDocument() != null) {
             List<DocumentRegistreDto> documents = new ArrayList<>();
             if (notificacio.getDocument() != null) {
-                documents.add(getDocumentRegistre(notificacio.getDocument(), isComunicacioSir));
+                documents.add(getDocumentRegistre(notificacio.getDocument(), 1, isComunicacioSir));
             }
             if (notificacio.getDocument2() != null) {
-                documents.add(getDocumentRegistre(notificacio.getDocument2(), isComunicacioSir));
+                documents.add(getDocumentRegistre(notificacio.getDocument2(), 2, isComunicacioSir));
             }
             if (notificacio.getDocument3() != null) {
-                documents.add(getDocumentRegistre(notificacio.getDocument3(), isComunicacioSir));
+                documents.add(getDocumentRegistre(notificacio.getDocument3(), 3, isComunicacioSir));
             }
             if (notificacio.getDocument4() != null) {
-                documents.add(getDocumentRegistre(notificacio.getDocument4(), isComunicacioSir));
+                documents.add(getDocumentRegistre(notificacio.getDocument4(), 4, isComunicacioSir));
             }
             if (notificacio.getDocument5() != null) {
-                documents.add(getDocumentRegistre(notificacio.getDocument5(), isComunicacioSir));
+                documents.add(getDocumentRegistre(notificacio.getDocument5(), 5, isComunicacioSir));
             }
             return documents;
         }
         return null;
     }
 
-    protected DocumentRegistreDto getDocumentRegistre(DocumentEntity document, boolean isComunicacioSir) {
+    protected DocumentRegistreDto getDocumentRegistre(DocumentEntity document, int idx, boolean isComunicacioSir) {
 
         if (document == null) {
             return null;
@@ -356,7 +363,8 @@ public abstract class EnviamentRegistreMapper {
             var enviarContingut = !isComunicacioSir || (isComunicacioSir && (TOT.equals(getEnviamentSirTipusDocumentEnviar()) || BINARI.equals(getEnviamentSirTipusDocumentEnviar())));
             var isUuid = document.getUuid() != null;
             var isCsv = document.getCsv() != null;
-            var isContingut = document.getContingutBase64() != null;
+            var isContingut = !Strings.isNullOrEmpty(document.getArxiuGestdocId());
+            var titol = "Annex " + idx;
 
             if(isUuid || isCsv) {
                 var csv = document.getCsv();
@@ -375,6 +383,7 @@ public abstract class EnviamentRegistreMapper {
                 }
 
                 DocumentRegistreDtoBuilder builder = DocumentRegistreDto.builder()
+                        .titol(titol)
                         .csv(csv)
                         .nom(document.getArxiuNom());
                 if (enviarContingut && docDetall.getContingut() != null) {
@@ -401,6 +410,7 @@ public abstract class EnviamentRegistreMapper {
                 var output = new ByteArrayOutputStream();
                 pluginHelper.gestioDocumentalGet(document.getArxiuGestdocId(), pluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, output);
                 return DocumentRegistreDto.builder()
+                        .titol(titol)
                         .nom(document.getArxiuNom())
                         .contingut(output.toByteArray())
                         .mimeType(document.getMediaType())
@@ -415,7 +425,7 @@ public abstract class EnviamentRegistreMapper {
             return null;
         } catch (Exception ex) {
             var msg = "Error obtenint les dades del document '" + (document != null ? document.getId() : "") + "': " + ex.getMessage();
-            throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, msg, ex.getCause());
+            throw new SistemaExternException(IntegracioCodiEnum.REGISTRE.name(), msg, ex.getCause());
         }
     }
 

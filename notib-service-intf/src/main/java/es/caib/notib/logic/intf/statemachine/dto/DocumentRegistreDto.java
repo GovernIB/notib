@@ -15,6 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class DocumentRegistreDto {
+    protected String titol;
     protected String nom;
     protected byte[] contingut;
     protected String mimeType;

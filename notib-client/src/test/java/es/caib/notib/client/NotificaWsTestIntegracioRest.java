@@ -62,10 +62,7 @@ public class NotificaWsTestIntegracioRest {
 //				"https://dev.caib.es/notib",
 //				"$ripea_notib",
 //				"ripea_notib");
-		client = NotificacioRestClientFactory.getRestClient(
-				"http://localhost:8081/notib",
-				"usuari2",
-				"usuari2");
+		client = NotificacioRestClientFactory.getRestClient("http://localhost:8081/notib", "usuari2", "usuari2");
 	}
 	
 	@Before

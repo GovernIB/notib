@@ -1,7 +1,7 @@
 package es.caib.notib.logic.exception;
 
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
-import es.caib.notib.logic.helper.IntegracioHelper;
 
 /**
  * Excepció que es llança quan hi ha un error consultant un document a l'arxiu.
@@ -15,7 +15,7 @@ public class DocumentNotFoundException extends SistemaExternException {
 
 	public DocumentNotFoundException(String tipusCodi, String codi, Throwable cause) {
 
-		super(IntegracioHelper.INTCODI_ARXIU, String.format("Error al plugin d'arxiu digital: no s'ha pogut obtenir el document amb el codi %s: %s", tipusCodi, codi), cause);
+		super(IntegracioCodiEnum.ARXIU.name(), String.format("Error al plugin d'arxiu digital: no s'ha pogut obtenir el document amb el codi %s: %s", tipusCodi, codi), cause);
 		this.tipusCodi = tipusCodi;
 		this.codi = codi;
 	}

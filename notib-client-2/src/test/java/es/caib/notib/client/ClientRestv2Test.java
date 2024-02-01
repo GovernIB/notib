@@ -28,9 +28,12 @@ import static org.junit.Assert.*;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ClientRestv2Test extends ClientBaseTest {
 
-	private static final String URL = "http://localhost:8080/notibapi";
-	private static final String USERNAME = "u999000";
-	private static final String PASSWORD = "u999000";
+//	private static final String URL = "http://localhost:8080/notibapi";
+//	private static final String USERNAME = "u999000";
+//	private static final String PASSWORD = "u999000";
+	private static final String URL = "https://dev.caib.es/notib2api";
+	private static final String USERNAME = "e18225486x";
+	private static final String PASSWORD = "limit";
 
 
 	// Indicar si el servidor esta configurat en mode síncron
@@ -52,7 +55,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 //		System.setProperty("javax.net.ssl.trustStore", keystorePath);
 //		System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
 
-		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, true); //tomcat = true jboss = false/true
+		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, false); //tomcat = true jboss = false/true
 	}
 
 	@Test
@@ -682,33 +685,23 @@ public class ClientRestv2Test extends ClientBaseTest {
 	@Test
 	public void consultaEstatEnviamentTest() throws DatatypeConfigurationException, IOException {
 		// Given
-//		String referencia = "a4256bed-292b-4ad1-bb84-05f8f14a7f1c";
-		String referencia = "8f7271df-e62a-4754-945c-9e52259f646e";
+//		String referencia = "8f7271df-e62a-4754-945c-9e52259f646e";
+		String referencia = "c6ebf96f-f0f1-4f2c-b39c-cfd61510ba46";
 
 		// When
 		RespostaConsultaEstatEnviamentV2 respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
 		assertNotNull(respostaConsultaEstatEnviament);
-		if (respostaConsultaEstatEnviament.isError()) {
-			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
-		} else {
-			System.out.println(">>> Reposta Ok");
-		}
+		var msg = respostaConsultaEstatEnviament.isError() ? ">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio() : ">>> Reposta Ok";
+		System.out.println(msg);
 		System.out.println(">>> Informació enviament: " + respostaConsultaEstatEnviament.toString());
 		assertFalse(respostaConsultaEstatEnviament.isError());
 		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
 
 		// SEGONA PETICIÓ AMB diferent sessió??
-		client = NotificacioRestClientFactory.getRestClientV2(
-				URL,
-				USERNAME,
-				PASSWORD,
-				true);
+		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, false);
 		respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
-		if (respostaConsultaEstatEnviament.isError()) {
-			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
-		} else {
-			System.out.println(">>> Reposta Ok");
-		}
+		msg = respostaConsultaEstatEnviament.isError() ? ">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio() : ">>> Reposta Ok";
+		System.out.println(msg);
 
 	}
 

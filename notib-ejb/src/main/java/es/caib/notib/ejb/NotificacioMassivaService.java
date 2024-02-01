@@ -34,56 +34,58 @@ import java.nio.file.NoSuchFileException;
 public class NotificacioMassivaService extends AbstractService<es.caib.notib.logic.intf.service.NotificacioMassivaService> implements es.caib.notib.logic.intf.service.NotificacioMassivaService {
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public void posposar(Long entitatId, Long notificacioMassivaId) {
 		getDelegateService().posposar(entitatId, notificacioMassivaId);
 	}
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public void reactivar(Long entitatId, Long notificacioMassivaId) {
 		getDelegateService().reactivar(entitatId, notificacioMassivaId);
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public NotificacioMassivaDataDto findById(Long entitatId, Long id) {
 		return getDelegateService().findById(entitatId, id);
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public PaginaDto<NotificacioTableItemDto> findNotificacions(Long entitatId, Long notificacioMassivaId, NotificacioFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findNotificacions(entitatId, notificacioMassivaId, filtre, paginacioParams);
 	}
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public NotificacioMassivaInfoDto getNotificacioMassivaInfo(Long entitatId, Long notificacioMassivaId) {
 		return getDelegateService().getNotificacioMassivaInfo(entitatId, notificacioMassivaId);
 	}
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public FitxerDto getCSVFile(Long entitatId, Long notificacioMassivaId) {
 		return getDelegateService().getCSVFile(entitatId, notificacioMassivaId);
 	}
+
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public FitxerDto getZipFile(Long entitatId, Long notificacioMassivaId) {
 		return getDelegateService().getZipFile(entitatId, notificacioMassivaId);
 	}
+
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public FitxerDto getResumFile(Long entitatId, Long notificacioMassivaId) {
 		return getDelegateService().getResumFile(entitatId, notificacioMassivaId);
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public FitxerDto getErrorsValidacioFile(Long entitatId, Long notificacioMassivaId) {
 		return getDelegateService().getErrorsValidacioFile(entitatId, notificacioMassivaId);
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public FitxerDto getErrorsExecucioFile(Long entitatId, Long notificacioMassivaId) {
 		return getDelegateService().getErrorsExecucioFile(entitatId, notificacioMassivaId);
 	}
@@ -95,7 +97,7 @@ public class NotificacioMassivaService extends AbstractService<es.caib.notib.log
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public void cancelar(Long entitatId, Long notificacioMassivaId) throws Exception {
 		getDelegateService().cancelar(entitatId, notificacioMassivaId);
 	}

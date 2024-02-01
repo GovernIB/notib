@@ -44,7 +44,7 @@ public class ClientRestTestConsulta {
 
 	@Before
 	public void setUp() throws IOException, DecoderException {
-		client = NotificacioRestClientFactory.getRestClient(URL, USERNAME, PASSWORD, BASIC_AUTH);
+		client = NotificacioRestClientFactory.getRestClient(URL, USERNAME, PASSWORD);
 	}
 	
 	@Test

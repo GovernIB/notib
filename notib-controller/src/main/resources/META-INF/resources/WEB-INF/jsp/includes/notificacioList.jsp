@@ -279,7 +279,7 @@
                         contingutTbody += " (<spring:message code="notificacio.list.enviament.list.finalitzat.email"/>)"
                     }
                 }
-                if (data[i].notificacioError && data[i].notificacioEstat !== "FINALITZADA" && data[i].notificacioEstat !== "PROCESSADA") {
+                if (data[i].notificacioError && data[i].notificaEstat !== "FINALITZADA" && data[i].notificaEstat !== "PROCESSADA") {
                     var errorTitle = '';
                     if (data[i].notificacioErrorDescripcio) {
                         errorTitle = data[i].notificacioErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

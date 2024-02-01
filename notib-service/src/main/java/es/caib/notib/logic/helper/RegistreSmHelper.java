@@ -8,6 +8,7 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.AuditService;
@@ -23,17 +24,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Helper per a interactuar amb la versió 2 del servei web de Notific@.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class RegistreSmHelper {
-	
+
 	private final PluginHelper pluginHelper;
 	private final IntegracioHelper integracioHelper;
 	private final EnviamentTableHelper enviamentTableHelper;
@@ -42,6 +45,8 @@ public class RegistreSmHelper {
 	private final AuditHelper auditHelper;
 	private final CallbackHelper callbackHelper;
 	private final EnviamentRegistreMapper enviamentRegistreMapper;
+
+	public static Map<Long, String[]> llibreOficina = new HashMap<>();
 
 	public boolean registrarEnviament(NotificacioEnviamentEntity enviament, Integer numIntent) throws RegistreNotificaException {
 
@@ -62,7 +67,7 @@ public class RegistreSmHelper {
 		var sirActivatInfo = new AccioParam("Sir activat", String.valueOf(isSirActivat()));
 		var codiDir3Registre = !Strings.isNullOrEmpty(entitat.getDir3CodiReg()) ? entitat.getDir3CodiReg() : entitat.getDir3Codi();
 		var accioInfo = new AccioParam("Procés descripció: ", " [REG] Realitzant nou assentament registral" + (enviamentSir ? " SIR " : " ") + "de l'enviament: " + enviament.getId());
-		var info = new IntegracioInfo(IntegracioHelper.INTCODI_REGISTRE, descInfo, IntegracioAccioTipusEnumDto.ENVIAMENT, tipusEnvInfo, sirActivatInfo, accioInfo);
+		var info = new IntegracioInfo(IntegracioCodiEnum.REGISTRE, descInfo, IntegracioAccioTipusEnumDto.ENVIAMENT, tipusEnvInfo, sirActivatInfo, accioInfo);
 
 		// Registre SIR
 		try {
@@ -133,6 +138,7 @@ public class RegistreSmHelper {
 	}
 
 	private void finalitzaRegistre(RespostaConsultaRegistre arbResposta, NotificacioEnviamentEntity enviament, boolean isEnviamentSir) {
+
 		if (arbResposta == null) {
 			return;
 		}
@@ -148,6 +154,13 @@ public class RegistreSmHelper {
 			sirDestiData = arbResposta.getSirRegistreDestiData();
 		}
 		enviament.updateRegistreEstat(registreEstat, registreData, sirRecepcioData, sirDestiData, registreNum);
+		var valors = llibreOficina.get(enviament.getNotificacio().getId());
+		if (valors == null) {
+			return;
+		}
+		enviament.getNotificacio().setRegistreLlibreNom(valors[0]);
+		enviament.getNotificacio().setRegistreOficinaNom(valors[1]);
+		llibreOficina.remove(enviament.getNotificacio().getId());
 	}
 
 

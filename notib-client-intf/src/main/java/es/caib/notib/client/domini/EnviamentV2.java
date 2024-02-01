@@ -37,7 +37,11 @@ public class EnviamentV2 implements Serializable {
     private boolean perEmail;
 
     public List<PersonaV2> getDestinataris() {
-        return destinataris != null ? destinataris : new ArrayList<PersonaV2>();
+
+        if (destinataris == null) {
+            destinataris = new ArrayList<>();
+        }
+        return destinataris;
     }
 
     public Collection<String> getNifsEnviament() {

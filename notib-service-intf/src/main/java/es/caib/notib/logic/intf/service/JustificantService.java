@@ -28,7 +28,7 @@ public interface JustificantService {
      * @throws JustificantException
      *      S'aixeca aquesta excepció quan hi ha un error durant la generació del document del justificant
      */
-    @PreAuthorize("hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     FitxerDto generarJustificantEnviament(Long notificacioId, String sequence) throws JustificantException;
 
     /**
@@ -49,7 +49,7 @@ public interface JustificantService {
      * @throws JustificantException
      *      S'aixeca aquesta excepció quan hi ha un error durant la generació del document del justificant
      */
-    @PreAuthorize("hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     FitxerDto generarJustificantEnviament(Long notificacioId, Long entitatId, String sequence) throws JustificantException;
 
     /**
@@ -70,7 +70,7 @@ public interface JustificantService {
      * @throws JustificantException
      *      S'aixeca aquesta excepció quan hi ha un error durant la generació del document del justificant
      */
-    @PreAuthorize("hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     FitxerDto generarJustificantComunicacioSIR(Long notificacioId, Long entitatId, String sequence) throws JustificantException;
 
     /**
@@ -83,7 +83,7 @@ public interface JustificantService {
      * @return
      *          Objecte amb la informació del progrés.
      */
-    @PreAuthorize("hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     ProgresDescarregaDto consultaProgresGeneracioJustificant(String sequence);
 
 }

@@ -23,7 +23,7 @@ public interface PermisosService {
      * @param usuariCodi Codi de l'usuari
      * @return {@code true} si l'usuari té permís per a realitzar una notificació en l'entitat. {@code false} en cas contrari
      */
-    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     Boolean hasPermisNotificacio(Long entitatId, String usuariCodi);
 
     /**
@@ -33,7 +33,7 @@ public interface PermisosService {
      * @param usuariCodi Codi de l'usuari
      * @return {@code true} si l'usuari té permís de comunicació en l'entitat. {@code false} en cas contrari
      */
-    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     Boolean hasPermisComunicacio(Long entitatId, String usuariCodi);
 
     /**
@@ -43,7 +43,7 @@ public interface PermisosService {
      * @param usuariCodi Codi de l'usuari
      * @return {@code true} si l'usuari té permís de comunicació sense procediment en l'entitat. {@code false} en cas contrari
      */
-//    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//    @PreAuthorize("isAuthenticated()")
 //    Boolean hasPermisComunicacioSenseProcediment(Long entitatId, String usuariCodi);
 
     /**
@@ -53,47 +53,47 @@ public interface PermisosService {
      * @param usuariCodi Codi de l'usuari
      * @return {@code true} si l'usuari té permís per a realitzar una comunicació SIR en l'entitat. {@code false} en cas contrari
      */
-    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     Boolean hasPermisComunicacioSir(Long entitatId, String usuariCodi);
 
-    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     List<CodiValorDto> getOrgansAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
-    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     List<CodiValorDto> getOrgansAmbPermisPerConsulta(Long entitatId, String usuariCodi, PermisEnum permis);
 
-    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     boolean hasUsrPermisOrgan(Long entitatId, String usr, String organCodi, PermisEnum permis);
 
-//    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//    @PreAuthorize("isAuthenticated()")
 //    List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(Long entitatId, String usuariCodi, TipusEnviamentEnumDto enviamentTipus);
 //
-//    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//    @PreAuthorize("isAuthenticated()")
 //    List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(Long entitatId, String usuariCodi, TipusEnviamentEnumDto enviamentTipus);
 
     // Obté òrgans amb permís per notificar per un procediment comú
-    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     List<String> getOrgansCodisAmbPermisPerProcedimentComu(Long entitatId, String usuariCodi, PermisEnum permis, ProcSerDto procSetDto);
 
-    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     List<String> getProcedimentsOrgansAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
-    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     List<CodiValorOrganGestorComuDto> getProcSersAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
-    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     List<CodiValorOrganGestorComuDto> getProcSerComuns(Long entitatId, List<String> grups, boolean removeInactius, ProcSerTipusEnum tipus);
 
-    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     List<CodiValorOrganGestorComuDto> getProcedimentsAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
-    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     List<CodiValorOrganGestorComuDto> getServeisAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
-    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     boolean hasNotificacioPermis(Long notId, Long entitat, String usuari, PermisEnum permis);
 
-    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     void evictGetOrgansAmbPermis();
 }
 

@@ -24,9 +24,9 @@ public interface CallbackService {
 	 * @param notId Atribut id de la notificació.
 	 * @return els events trobats.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
     boolean reintentarCallback(Long notId);
 
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	boolean findByNotificacio(Long notId);
 }

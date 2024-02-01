@@ -295,8 +295,7 @@ public class ProcedimentService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@PermitAll
-	public List<String> findProcedimentsOrganCodiWithPermisByProcediment(
-			ProcSerDto procediment, String entitatCodi, List<ProcSerOrganDto> procedimentsOrgans) {
+	public List<String> findProcedimentsOrganCodiWithPermisByProcediment(ProcSerDto procediment, String entitatCodi, List<ProcSerOrganDto> procedimentsOrgans) {
 		return getDelegateService().findProcedimentsOrganCodiWithPermisByProcediment(procediment, entitatCodi, procedimentsOrgans);
 	}
 

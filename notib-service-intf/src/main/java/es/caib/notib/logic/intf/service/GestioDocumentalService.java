@@ -17,13 +17,13 @@ public interface GestioDocumentalService {
 	 * 
 	 * @return el id
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	String guardarArxiuTemporal(String string);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	byte[] obtenirArxiuTemporal(String arxiuGestdocId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	byte[] obtenirArxiuNotificacio(String arxiuGestdocId);
 
 }

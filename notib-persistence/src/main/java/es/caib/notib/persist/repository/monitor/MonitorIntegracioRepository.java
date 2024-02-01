@@ -1,6 +1,7 @@
 package es.caib.notib.persist.repository.monitor;
 
 import es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,18 +19,18 @@ public interface MonitorIntegracioRepository extends JpaRepository<MonitorIntegr
 
     @Transactional
     @Query("from MonitorIntegracioEntity n " +
-            "where lower(n.codi) like concat('%', lower(:codi),'%') " +
+            "where n.codi = :codi " +
             "and (:isCodiEntitatNull = true or lower(n.codiEntitat) like concat('%', lower(:codiEntitat), '%')) " +
             "and (:isAplicacioNull = true or lower(n.aplicacio) like concat('%', lower(:aplicacio), '%')) " +
             "order by n.data desc ")
-    Page<MonitorIntegracioEntity> getByFiltre(@Param("codi") String codi,
+    Page<MonitorIntegracioEntity> getByFiltre(@Param("codi") IntegracioCodiEnum codi,
                                               @Param("isCodiEntitatNull") boolean isCodiEntitatNull,
                                               @Param("codiEntitat") String codiEntitat,
                                               @Param("isAplicacioNull") boolean isAplicacioNull,
                                               @Param("aplicacio") String aplicacio,
                                               Pageable pageable);
 
-    int countByCodiAndEstat(@Param("codi") String codi, @Param("estat")IntegracioAccioEstatEnumDto estat);
+    int countByCodiAndEstat(@Param("codi") IntegracioCodiEnum codi, @Param("estat")IntegracioAccioEstatEnumDto estat);
 
     List<MonitorIntegracioEntity> findByDataLessThan(@Param("llindar") Date llindar);
 
@@ -44,7 +45,7 @@ public interface MonitorIntegracioRepository extends JpaRepository<MonitorIntegr
     void eliminarAntics(@Param("ids") List<Long> ids);
 
     @Modifying
-    void deleteByCodiAndCodiEntitat(@Param("codi") String codi, @Param("codiEntitat") String codiEntitat);
+    void deleteByCodiAndCodiEntitat(@Param("codi") IntegracioCodiEnum codi, @Param("codiEntitat") String codiEntitat);
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     MonitorIntegracioEntity save(@Param("integracio") MonitorIntegracioEntity integracio);

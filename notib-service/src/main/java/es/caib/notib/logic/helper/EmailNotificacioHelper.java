@@ -1,15 +1,20 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
+import es.caib.notib.logic.intf.dto.AccioParam;
+import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.persist.entity.NotificacioEntity;
-import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Mètodes per a l'enviament de correus.
@@ -21,31 +26,46 @@ import java.util.*;
 public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 
 	@Resource ProcSerHelper procSerHelper;
+	@Resource IntegracioHelper integracioHelper;
 
 	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws Exception {
 
-		try {
-			var destinataris = obtenirCodiDestinatarisPerProcediment(notificacio);
-			if (destinataris == null || destinataris.isEmpty()) {
-				log.info(String.format("La notificació (Id= %d) no té candidats per a enviar el correu electrònic", notificacio.getId()));
-				return null;
+		var destinataris = obtenirCodiDestinatarisPerProcediment(notificacio);
+		if (destinataris == null || destinataris.isEmpty()) {
+			log.info(String.format("La notificació (Id= %d) no té candidats per a enviar el correu electrònic", notificacio.getId()));
+			return "No s'han trobat destinataris";
+		}
+		// TODO: Optimitzar per enviar un únic email
+		int numEnviamentsErronis = 0;
+		for (var usuariDto : destinataris) {
+			var info = new IntegracioInfo(
+					IntegracioCodiEnum.EMAIL,
+					"Enviament de email per notificació a un destinatari",
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					new AccioParam("Identificador de la notificacio", String.valueOf(notificacio.getId())),
+					new AccioParam("Destinatari", usuariDto.getNom()),
+					new AccioParam("Correu electrònic", usuariDto.getEmail()));
+			info.setCodiEntitat(notificacio.getEntitat().getCodi());
+			if (usuariDto.getEmail() == null || usuariDto.getEmail().isEmpty()) {
+				log.error("usuari sense email. Codi: " + usuariDto.getCodi());
+				integracioHelper.addAccioError(info, "Destinatari " + usuariDto.getNom() + " no té email");
+				numEnviamentsErronis++;
+				continue;
 			}
-			for (var usuariDto : destinataris) {
-				if (usuariDto.getEmail() == null || usuariDto.getEmail().isEmpty()) {
-					log.error("usuari sense email. Codi: " + usuariDto.getCodi());
-					continue;
-				}
+
+			try {
 				var email = !Strings.isNullOrEmpty(usuariDto.getEmailAlt()) ? usuariDto.getEmailAlt() : usuariDto.getEmail();
 				email = email.replaceAll("\\s+","");
 				log.info(String.format("Enviant correu notificació (Id= %d) a %s", notificacio.getId(), email));
 				sendEmailNotificacio(email, notificacio);
+				integracioHelper.addAccioOk(info);
+			} catch (Exception ex) {
+				log.error("No s'ha pogut avisar per correu electrònic a: " + usuariDto.getNom(), ex);
+				integracioHelper.addAccioError(info, "Error enviant email", ex);
+				numEnviamentsErronis++;
 			}
-			return null;
-		} catch (Exception ex) {
-			var errorDescripcio = "No s'ha pogut avisar per correu electrònic: " + ex;
-			log.error(errorDescripcio);
-			return errorDescripcio;
 		}
+		return numEnviamentsErronis > 0 ? numEnviamentsErronis + " emails de " + destinataris.size() + " han produït error" : "Tots els emails enviats correctament";
 	}
 
 	private List<UsuariDto> obtenirCodiDestinatarisPerProcediment(NotificacioEntity notificacio) {

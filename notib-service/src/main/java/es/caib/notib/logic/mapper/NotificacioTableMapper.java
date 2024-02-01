@@ -20,6 +20,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
@@ -28,6 +29,7 @@ import org.mapstruct.MappingTarget;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +46,9 @@ public abstract class NotificacioTableMapper {
     private static final String ICONA_REGISTRADA = "<span class=\"fa fa-file-o\"></span>";
     private static final String ICONA_PROCESSADA = "<span class=\"fa fa-check-circle\"></span>";
     private static final String SENSE_ICONA = "";
+
+    private static final String getMessage = "<getMessage>";
+    private static final String fiGetMessage = "</getMessage>";
 
 
     @Autowired
@@ -100,31 +105,50 @@ public abstract class NotificacioTableMapper {
         }
         // TODO: Modificar perActualitzar quan hi hagi un canvi
         if (not.isPerActualitzar()) {
-            var enviaments = not.getEnviaments();
-            if (dto.getDocumentId() == null) {
-                dto.setDocumentId(not.getNotificacio().getDocument() != null ? not.getNotificacio().getDocument().getId() : null);
-            }
-            if (enviaments != null && !enviaments.isEmpty()) {
-                for (var enviament: enviaments) {
-                    if (enviament.getNotificaCertificacioData() != null) {
-                        dto.setEnvCerData(enviament.getNotificaCertificacioData());
-                        break;
-                    }
+            actualitzar(not, dto);
+        }
+
+        var estat = not.getEstatString();
+        var codis = StringUtils.substringsBetween(estat, getMessage, fiGetMessage);
+        List<String> traduccions = new ArrayList<>();
+        if (codis == null) {
+            return;
+        }
+        for (var codi : codis) {
+            traduccions.add(messageHelper.getMessage(codi));
+        }
+        for (var traduccio : traduccions) {
+            estat = estat.replaceFirst(getMessage + ".*?" + fiGetMessage, traduccio);
+        }
+        dto.setEstatString(estat);
+    }
+
+    private void actualitzar(NotificacioTableEntity not, NotificacioTableItemDto dto) {
+
+        var enviaments = not.getEnviaments();
+        if (dto.getDocumentId() == null) {
+            dto.setDocumentId(not.getNotificacio().getDocument() != null ? not.getNotificacio().getDocument().getId() : null);
+        }
+        if (enviaments != null && !enviaments.isEmpty()) {
+            for (var enviament: enviaments) {
+                if (enviament.getNotificaCertificacioData() != null) {
+                    dto.setEnvCerData(enviament.getNotificaCertificacioData());
+                    break;
                 }
             }
-            dto.setErrorLastCallback(not.getNotificacio().isErrorLastCallback());
-            dto.setEstatString(getColumnaEstat(dto, enviaments));
-            // TODO: Fer-ho amb un servei apart amb transaccionalitat independent
-            // Actualitzam l'entitat
-            try {
-                not.setDocumentId(dto.getDocumentId());
-                not.setEnvCerData(dto.getEnvCerData());
-                not.setEstatString(dto.getEstatString());
-                not.setPerActualitzar(false);
-                notificacioTableHelper.actualitzarCampsLlistat(not);
-            } catch (Exception ex) {
-                // TODO: Si no es pot actualitzar, no es fa res. Es calcularà en cada consulta com fins ara!
-            }
+        }
+        dto.setErrorLastCallback(not.getNotificacio().isErrorLastCallback());
+        dto.setEstatString(getColumnaEstat(dto, enviaments));
+        // TODO: Fer-ho amb un servei apart amb transaccionalitat independent
+        // Actualitzam l'entitat
+        try {
+            not.setDocumentId(dto.getDocumentId());
+            not.setEnvCerData(dto.getEnvCerData());
+            not.setEstatString(dto.getEstatString());
+            not.setPerActualitzar(false);
+            notificacioTableHelper.actualitzarCampsLlistat(not);
+        } catch (Exception ex) {
+            // TODO: Si no es pot actualitzar, no es fa res. Es calcularà en cada consulta com fins ara!
         }
     }
 
@@ -175,38 +199,42 @@ public abstract class NotificacioTableMapper {
     }
 
     private String getNomEstat(NotificacioTableItemDto dto) {
-        return " " + messageHelper.getMessage("es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto." + (dto.isEnviant() ? NotificacioEstatEnumDto.ENVIANT.name() : dto.getEstat().name())) + "";
+        return " " + getMessage + "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto." + (dto.isEnviant() ? NotificacioEstatEnumDto.ENVIANT.name() : dto.getEstat().name()) + fiGetMessage;
     }
 
     private String getEventError(NotificacioTableItemDto dto, int enviamentsSize) {
+
         var error = "";
-
-        boolean isFinal = NotificacioEstatEnumDto.PROCESSADA.equals(dto.getEstat()) || NotificacioEstatEnumDto.FINALITZADA.equals(dto.getEstat());
-        var eventError = !isFinal ? eventRepository.findLastErrorEventByNotificacioId(dto.getId()) : null;
-
+//        boolean isFinal = NotificacioEstatEnumDto.PROCESSADA.equals(dto.getEstat()) || NotificacioEstatEnumDto.FINALITZADA.equals(dto.getEstat());
+//        var eventError = !isFinal ? eventRepository.findLastErrorEventByNotificacioId(dto.getId()) : null;
+        var eventError = eventRepository.findLastEventByNotificacioId(dto.getId());
         if (eventError != null && !Strings.isNullOrEmpty(eventError.getErrorDescripcio())) {
-            error = " <span class=\"fa fa-warning text-danger\" title=\"" + (enviamentsSize == 1 ? htmlEscape(eventError.getErrorDescripcio()) : messageHelper.getMessage("error.notificacio.enviaments")) + " \"></span>";
+            var desc = eventError.getErrorDescripcio();
+            if (desc.length() > 500) {
+                desc = desc.substring(0, 500);
+            }
+            error = " <span class=\"fa fa-warning text-danger\" title=\"" + (enviamentsSize == 1 ? htmlEscape(desc) : getMessage + "error.notificacio.enviaments" + fiGetMessage)+ " \"></span>";
         }
         if (TipusUsuariEnumDto.APLICACIO.equals(dto.getTipusUsuari()) && dto.isErrorLastCallback()) {
-            error += " <span class=\"fa fa-exclamation-circle text-primary\" title=\"" + messageHelper.getMessage("notificacio.list.client.error") + "\"></span>";
+            error += " <span class=\"fa fa-exclamation-circle text-primary\" title=\"" +  getMessage + "notificacio.list.client.error" + fiGetMessage + "\"></span>";
         }
         return error;
     }
 
     private String getCallbackError(NotificacioTableItemDto dto) {
             int callbackFiReintents = eventRepository.countEventCallbackAmbFiReintentsByNotificacioId(dto.getId());
-        return callbackFiReintents > 0 ? " <span class=\"fa fa-warning text-info\" title=\"" + messageHelper.getMessage("callback.fi.reintents") + "\"></span>" : "";
+        return callbackFiReintents > 0 ? " <span class=\"fa fa-warning text-info\" title=\"" + getMessage + "callback.fi.reintents" + fiGetMessage + "\"></span>" : "";
     }
 
     private String getFiReintentsError(NotificacioTableItemDto dto) {
         List<NotificacioEventEntity> lastErrorEvent = eventRepository.findEventsAmbFiReintentsByNotificacioId(dto.getId());
         StringBuilder fiReintentsError = new StringBuilder();
         if (lastErrorEvent != null && !lastErrorEvent.isEmpty()) {
-            String msg = messageHelper.getMessage("notificacio.event.fi.reintents");
+            String msg = getMessage + "notificacio.event.fi.reintents" + fiGetMessage;
             String tipus;
             int env = 1;
             for (var event : lastErrorEvent) {
-                tipus = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + event.getTipus());
+                tipus = getMessage + "es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + event.getTipus() + fiGetMessage;
                 fiReintentsError.append("Env ").append(env++).append(": ").append(msg).append(" -> ").append(tipus).append("\n");
             }
         }
@@ -227,7 +255,7 @@ public abstract class NotificacioTableMapper {
             }
         }
         if (multipleApiCarpetaError > 1) {
-            notificacioMovilMsg = new StringBuilder("<span style=\"color:#8a6d3b;\" class=\"fa fa-mobile fa-lg\" title=\"" + messageHelper.getMessage("api.carpeta.send.notificacio.movil.error") + "\"></span>\n");
+            notificacioMovilMsg = new StringBuilder("<span style=\"color:#8a6d3b;\" class=\"fa fa-mobile fa-lg\" title=\"" + getMessage + "api.carpeta.send.notificacio.movil.error" + fiGetMessage + "\"></span>\n");
         }
         return notificacioMovilMsg.length() > 0 ? notificacioMovilMsg.toString() : "";
     }
@@ -250,7 +278,7 @@ public abstract class NotificacioTableMapper {
                 NotificacioRegistreEstatEnumDto regEstat = env.getRegistreEstat();
                 if (regEstat != null) {
                     registreEstat.append("<div><span style=\"padding-bottom:1px; background-color: " + regEstat.getColor() + ";\" title=\"" +
-                            messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto." + regEstat)
+                            getMessage + "es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto." + regEstat + fiGetMessage
                             + "\" class=\"label label-primary\">" + regEstat.getBudget() + "</span></div>");
                 }
             }
@@ -269,7 +297,7 @@ public abstract class NotificacioTableMapper {
 
             for (Map.Entry<EnviamentEstat, Integer> entry : dto.getContadorEstat().entrySet()) {
                 notificacioEstat.append("<div style=\"font-size:11px; box-shadow: inset 3px 0px 0px ").append(entry.getKey().getColor()).append("; padding-left: 5px;").append("\">")
-                        .append(entry.getValue()).append(" ").append(messageHelper.getMessage("es.caib.notib.client.domini.EnviamentEstat." + entry.getKey()))
+                        .append(entry.getValue()).append(" ").append(getMessage + "es.caib.notib.client.domini.EnviamentEstat." + entry.getKey() + fiGetMessage)
                         .append("</div>");
             }
         }

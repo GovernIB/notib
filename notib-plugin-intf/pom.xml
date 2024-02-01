@@ -131,5 +131,10 @@
 			<name>GovernIB Maven Repository</name>
 			<url>https://governib.github.io/maven/maven/</url>
 		</repository>
+		<repository>
+			<id>jboss-thirdparty-releases</id>
+			<name>JBoss 3rd-party Repository</name>
+			<url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/</url>
+		</repository>
 	</repositories>
 </project>

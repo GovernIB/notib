@@ -29,14 +29,17 @@ public class EnviamentEmailListener {
 
     @Transactional
     @JmsListener(destination = SmConstants.CUA_EMAIL, containerFactory = SmConstants.JMS_FACTORY_ACK)
-    public void receiveEnviamentEmail(@Payload EnviamentEmailRequest enviamentEmailRequest,
-                                         @Headers MessageHeaders headers,
-                                         Message message) throws JMSException, InterruptedException {
+    public void receiveEnviamentEmail(@Payload EnviamentEmailRequest enviamentEmailRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
+
         // Actualment els enviaments de avisos de notificacions per Email es realitzen des de la funcionalitat de norificar
         // per tant no s'utilitza aquest listener
 
         var enviament = enviamentEmailRequest.getEnviamentEmailDto();
-        log.error("[SM] Rebut enviament per email <" + enviament + ">");
+        if (enviament != null && enviament.getUuid() != null) {
+            log.error("[SM] Rebut enviament per email <" + enviament.getUuid() + ">");
+        } else {
+            log.error("[SM] Rebut enviament per emial sense Enviament");
+        }
 
         semaphore.acquire();
         try {

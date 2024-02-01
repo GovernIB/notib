@@ -89,15 +89,20 @@ public class SchedulledServiceImpl implements SchedulledService {
 				if (entitats != null && !entitats.isEmpty()) {
 					log.info("[PRO] Realitzant actualització de procediments per a " + entitats.size() + " entitats");
 					for (EntitatDto entitat: entitats) {
-						log.info(">>> Actualitzant procedimetns de la entitat: " + entitat.getNom());
-						ConfigHelper.setEntitatCodi(entitat.getCodi());
-						procedimentService.actualitzaProcediments(entitat);
+						log.info(">>> Actualitzant procediments de la entitat: " + entitat.getNom());
+						try {
+							ConfigHelper.setEntitatCodi(entitat.getCodi());
+							procedimentService.actualitzaProcediments(entitat);
+							log.info(">>> Procediments actualitzats de la entitat: " + entitat.getNom());
+						} catch (Exception ex) {
+							log.error(">>> No s'han pogut actualitzar els procediments de l'entitat " + entitat.getNom(), ex);
+						}
 					}
 				} else {
 					log.info("[PRO] No hi ha entitats per actualitzar");
 				}
 			} else {
-				log.info("[PRO] L'actualització de procedimetns està deshabilitada");
+				log.info("[PRO] L'actualització de procediments està deshabilitada");
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);

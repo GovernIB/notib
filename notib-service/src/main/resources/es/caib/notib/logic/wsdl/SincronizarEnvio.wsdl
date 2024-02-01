@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:act="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/sincronizarEnvioOE"
+                  xmlns:iel="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero"
+                  name="SincronizarEnvioWs"
+                  xmlns:tns="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/"
+                  xmlns:com="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/common"
+                  targetNamespace="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/">
+    <wsdl:types>
+        <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    xmlns:com="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/common"
+                    targetNamespace="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/common"
+                    elementFormDefault="qualified">
+            <complexType name="Opciones">
+                <sequence>
+                    <element name="opcion" type="com:Opcion" maxOccurs="100"/>
+                </sequence>
+            </complexType>
+            <complexType name="Opcion">
+                <simpleContent>
+                    <extension base="xsd:string">
+                        <attribute name="tipo" type="xsd:string" use="required"/>
+                    </extension>
+                </simpleContent>
+            </complexType>
+            <simpleType name="TipoEnvio">
+                <restriction base="xsd:integer">
+                    <enumeration value="1">
+                        <annotation><documentation>
+                            Comunicaciones
+                        </documentation></annotation>
+                    </enumeration>
+                    <enumeration value="2">
+                        <annotation><documentation>
+                            Notificaciones
+                        </documentation></annotation>
+                    </enumeration>
+                </restriction>
+            </simpleType>
+            <complexType name="HashDocumento">
+                <sequence>
+                    <element name="hash" type="xsd:string"/>
+                    <element name="algoritmoHash" type="xsd:string"/>
+                </sequence>
+            </complexType>
+        </xsd:schema>
+        <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    xmlns:act="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/sincronizarEnvioOE"
+                    xmlns:com="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/common"
+                    targetNamespace="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/sincronizarEnvioOE"
+                    elementFormDefault="qualified">
+            <element name="sincronizarEnvioOE" type="act:SincronizarEnvioOE"/>
+            <complexType name="SincronizarEnvioOE">
+                <sequence>
+                    <element name="organismoEmisor" type="xsd:string"/>
+                    <element name="identificador" type="xsd:string"/>
+                    <element name="tipoEntrega" type="act:TipoEntrega"/>
+                    <element name="modoNotificacion" type="act:TipoModoNotificacion"/>
+                    <element name="estado" type="xsd:string"/>
+                    <element name="fechaEstado" type="xsd:dateTime"/>
+                    <element name="motivo" type="xsd:string" minOccurs="0"/>
+                    <element name="receptor" type="act:Receptor" minOccurs="0"/>
+                    <element name="acusePDF" type="act:Acuse" minOccurs="0"/>
+                    <element name="acuseXML" type="act:Acuse" minOccurs="0"/>
+                    <element name="opcionesSincronizarEnvioOE" type="com:Opciones" minOccurs="0"/>
+                </sequence>
+            </complexType>
+            <complexType name="Receptor">
+                <sequence>
+                    <element name="nifReceptor" type="xsd:string"/>
+                    <element name="nombreReceptor" type="xsd:string"/>
+                    <element name="vinculoReceptor" type="act:TipoVinculo"/>
+                    <element name="csvRepresentante" type="xsd:string" minOccurs="0"/>
+                    <element name="nifRepresentante" type="xsd:string" minOccurs="0"/>
+                    <element name="nombreRepresentante" type="xsd:string" minOccurs="0"/>
+                </sequence>
+            </complexType>
+            <simpleType name="TipoVinculo">
+                <restriction base="integer">
+                    <enumeration value="1">
+                        <annotation><documentation>
+                            Titular
+                        </documentation></annotation>
+                    </enumeration>
+                    <enumeration value="2">
+                        <annotation><documentation>
+                            Destinatario
+                        </documentation></annotation>
+                    </enumeration>
+                    <enumeration value="3">
+                        <annotation><documentation>
+                            Apoderado
+                        </documentation></annotation>
+                    </enumeration>
+                    <enumeration value="4">
+                        <annotation><documentation>
+                            Funcionario Habilitado
+                        </documentation></annotation>
+                    </enumeration>
+                    <enumeration value="5">
+                        <annotation><documentation>
+                            Otros
+                        </documentation></annotation>
+                    </enumeration>
+                </restriction>
+            </simpleType>
+            <complexType name="Acuse">
+                <sequence>
+                    <element name="contenido" type="xsd:base64Binary"/>
+                    <element name="hash" type="xsd:string"/>
+                    <element name="referenciaPdfAcuse" type="xsd:string" minOccurs="0"/>
+                </sequence>
+            </complexType>
+            <simpleType name="TipoModoNotificacion">
+                <restriction base="integer">
+                    <enumeration value="1">
+                        <annotation><documentation>
+                            Comparecencia espontánea
+                        </documentation></annotation>
+                    </enumeration>
+                    <enumeration value="2">
+                        <annotation><documentation>
+                            Postal
+                        </documentation></annotation>
+                    </enumeration>
+                    <enumeration value="3">
+                        <annotation><documentation>
+	                        Gestor organismo emisor
+                        </documentation></annotation>
+                    </enumeration>
+		                <enumeration value="4">
+			                <annotation><documentation>
+				                Sede
+			                </documentation></annotation>
+		                </enumeration>
+                </restriction>
+            </simpleType>
+            <simpleType name="TipoEntrega">
+                <restriction base="integer">
+                    <enumeration value="1">
+                        <annotation><documentation>
+                            Envío de Datado
+                        </documentation></annotation>
+                    </enumeration>
+                    <enumeration value="2">
+                        <annotation><documentation>
+                            Envio de Certificación
+                        </documentation></annotation>
+                    </enumeration>
+                    <enumeration value="3">
+                        <annotation><documentation>
+                            Envío de Datado y Certificación
+                        </documentation></annotation>
+                    </enumeration>
+                </restriction>
+            </simpleType>
+            <element name="respuestaSincronizarEnvioOE" type="act:RespuestaSincronizarEnvioOE"/>
+            <complexType name="RespuestaSincronizarEnvioOE">
+                <sequence>
+                    <element name="codigoRespuesta" type="xsd:string"/>
+                    <element name="descripcionRespuesta" type="xsd:string"/>
+                    <element name="estado" type="xsd:string" minOccurs="0"/>
+                    <element name="fechaEstado" type="xsd:dateTime" minOccurs="0"/>
+                    <element name="opcionesRespuestaSincronizarOE" type="com:Opciones" minOccurs="0"/>
+                </sequence>
+            </complexType>
+        </xsd:schema>
+        <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    xmlns:iel="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero"
+                    xmlns:com="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/common"
+                    targetNamespace="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero"
+                    elementFormDefault="qualified">
+            <element name="infoEnvioLigero" type="iel:InfoEnvioLigero"/>
+            <complexType name="InfoEnvioLigero">
+                <all>
+                    <element name="identificador" type="xsd:string" minOccurs="0"/>
+                    <element name="referenciaEmisor" type="string" minOccurs="0"/>
+                    <element name="codigoDir3" type="xsd:string" minOccurs="0"/>
+                    <element name="nivelDetalle" type="iel:NivelDetalle"/>
+                    <element name="opcionesInfoEnvioLigero" type="com:Opciones" minOccurs="0"/>
+                </all>
+            </complexType>
+            <element name="respuestaInfoEnvioLigero" type="iel:RespuestaInfoEnvioLigero"/>
+            <complexType name="RespuestaInfoEnvioLigero">
+                <sequence>
+                    <element name="codigoRespuesta" type="xsd:string"/>
+                    <element name="descripcionRespuesta" type="xsd:string"/>
+                    <element name="identificador" type="xsd:string" minOccurs="0"/>
+                    <element name="estado" type="xsd:string" minOccurs="0"/>
+                    <element name="datados" type="iel:Datados" minOccurs="0"/>
+                    <element name="certificacion" type="iel:Certificacion" minOccurs="0"/>
+                    <element name="opcionesRespuestaInfoEnvioLigero" type="com:Opciones" minOccurs="0"/>
+                </sequence>
+            </complexType>
+            <complexType name="Datados">
+                <sequence>
+                    <element name="datado" type="iel:Datado" maxOccurs="100"/>
+                </sequence>
+            </complexType>
+            <complexType name="Datado">
+                <sequence>
+                    <element name="fecha" type="xsd:string"/>
+                    <element name="resultado" type="xsd:string"/>
+                    <element name="origen" type="xsd:string"/>
+                    <element name="nombreReceptor" type="xsd:string" minOccurs="0"/>
+                    <element name="nifReceptor" type="xsd:string" minOccurs="0"/>
+                    <element name="descripcionError" type="xsd:string" minOccurs="0"/>
+                </sequence>
+            </complexType>
+            <complexType name="Certificacion">
+                <sequence>
+                    <element name="acusePDF" type="iel:Acuse" minOccurs="0"/>
+                    <element name="acuseXML" type="iel:Acuse" minOccurs="0"/>
+                    <element name="fechaCertificacion" type="xsd:string"/>
+                    <element name="origen" type="xsd:string"/>
+                    <element name="metadatos" type="xsd:string" minOccurs="0"/>
+                    <element name="opcionesCertificacion" type="com:Opciones" minOccurs="0"/>
+                </sequence>
+            </complexType>
+            <complexType name="Acuse">
+                <sequence>
+                    <element name="contenido" type="xsd:base64Binary"/>
+                    <element name="hash" type="xsd:string"/>
+                    <element name="csv" type="xsd:string" minOccurs="0"/>
+                    <element name="referenciaAcuse" type="xsd:string" minOccurs="0"/>
+                </sequence>
+            </complexType>
+            <simpleType name="NivelDetalle">
+                <restriction base="xsd:integer">
+                    <enumeration value="1">
+                        <annotation>
+                            <documentation>
+                                Solo Estado
+                            </documentation>
+                        </annotation>
+                    </enumeration>
+                    <enumeration value="2">
+                        <annotation>
+                            <documentation>
+                                Estado + Datados
+                            </documentation>
+                        </annotation>
+                    </enumeration>
+                    <enumeration value="3">
+                        <annotation>
+                            <documentation>
+                                Estado + Datados + Certificación
+                            </documentation>
+                        </annotation>
+                    </enumeration>
+                </restriction>
+            </simpleType>
+        </xsd:schema>
+    </wsdl:types>
+
+    <wsdl:message name="sincronizarEnvioOERequest">
+        <wsdl:part name="sincronizarEnvioOE" element="act:sincronizarEnvioOE"/>
+    </wsdl:message>
+    <wsdl:message name="sincronizarEnvioOEResponse">
+        <wsdl:part name="respuestaSincronizarEnvioOE" element="act:respuestaSincronizarEnvioOE"/>
+    </wsdl:message>
+    <wsdl:message name="infoEnvioLigeroRequest">
+        <wsdl:part name="infoEnvioLigero" element="iel:infoEnvioLigero"/>
+    </wsdl:message>
+    <wsdl:message name="infoEnvioLigeroResponse">
+        <wsdl:part name="respuestaInfoEnvioLigero" element="iel:respuestaInfoEnvioLigero"/>
+    </wsdl:message>
+
+    <wsdl:portType name="SincronizarEnvioWsPortType">
+        <wsdl:operation name="sincronizarEnvioOE">
+            <wsdl:input message="tns:sincronizarEnvioOERequest"/>
+            <wsdl:output message="tns:sincronizarEnvioOEResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="infoEnvioLigero">
+            <wsdl:input message="tns:infoEnvioLigeroRequest"/>
+            <wsdl:output message="tns:infoEnvioLigeroResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="SincronizarEnvioWsBinding" type="tns:SincronizarEnvioWsPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="sincronizarEnvioOE">
+            <soap:operation soapAction="sincronizarEnvioOE"/>
+            <wsdl:input>
+                <soap:body use="literal" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="infoEnvioLigero">
+            <soap:operation soapAction="infoEnvioLigero"/>
+            <wsdl:input>
+                <soap:body use="literal" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="SincronizarEnvioWsService">
+        <wsdl:port name="SincronizarEnvioWsPort" binding="tns:SincronizarEnvioWsBinding">
+            <soap:address location="https://se-notificaws.redsara.es/ws/sincronizarEnvioWs"/>
+        </wsdl:port>
+    </wsdl:service>
+
+</wsdl:definitions>
+

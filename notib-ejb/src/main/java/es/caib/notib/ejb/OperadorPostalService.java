@@ -78,7 +78,7 @@ public class OperadorPostalService extends AbstractService<es.caib.notib.logic.i
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitatId, String organCodi, boolean isAdminOrgan) {
 		return getDelegateService().findNoCaducatsByEntitatAndOrgan(entitatId, organCodi, isAdminOrgan);
 	}

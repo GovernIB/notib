@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 /**
@@ -22,24 +23,24 @@ import java.util.Optional;
  */
 public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 
-	public UsuariEntity findByCodi(String codi);
+	UsuariEntity findByCodi(String codi);
 
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	@Query("from UsuariEntity u where u.codi = :codi")
-	public Optional<UsuariEntity> getByCodiReadOnlyNewTransaction(@Param("codi") String codi);
+	Optional<UsuariEntity> getByCodiReadOnlyNewTransaction(@Param("codi") String codi);
 
 
-	@Query(   "select "
-			+ "    u "
-			+ "from "
-			+ "    UsuariEntity u "
+	@Query(   "select u from UsuariEntity u "
 			+ "where lower(u.nom) like concat('%', lower(:text), '%') "
-			+ "or	lower(u.codi) like concat('%', lower(:text), '%')"
-			+ "order by "
-			+ "    u.nom desc")
-	public List<UsuariEntity> findByText(@Param("text") String text);
+			+ "or (u.codi) like concat('%', lower(:text), '%')"
+			+ "order by u.nom desc")
+	List<UsuariEntity> findByText(@Param("text") String text);
 
 	@Query("select u.idioma from UsuariEntity u where u.codi = :codi")
 	String getIdiomaUsuari(@Param("codi") String codi);
+
+	@Query(value = "SELECT DISTINCT rol FROM  (SELECT nas.SID AS rol  FROM NOT_ACL_SID nas WHERE nas.PRINCIPAL = 0 " +
+			"UNION SELECT ng.CODI AS rol FROM NOT_GRUP ng)", nativeQuery = true)
+	Set<String> getNotibRolsDisponibles(@Param("codi") String codi);
 
 }

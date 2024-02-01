@@ -5,12 +5,14 @@ import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
 import es.caib.notib.logic.wsdl.notificaV2.NotificaWsV2PortType;
+import es.caib.notib.logic.wsdl.notificaV2.SincronizarEnvioWsPortType;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.AltaRemesaEnvios;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.Destinatarios;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.Documento;
@@ -24,9 +26,9 @@ import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorCIE;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorPostal;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.Persona;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
-import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.Datado;
-import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.InfoEnvioV2;
-import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
+import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.Datado;
+import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.InfoEnvioLigero;
+import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.RespuestaInfoEnvioLigero;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
@@ -51,6 +53,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
+import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
@@ -60,6 +63,8 @@ import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -91,10 +96,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Autowired
 	private EnviamentTableHelper enviamentTableHelper;
 
+	private final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
 
 	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
 
- 		var info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
+ 		var info = new IntegracioInfo(IntegracioCodiEnum.NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
 
 		try {
@@ -152,6 +159,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 								enviament.updateNotificaEnviada(identificadorsNoUtilitzats.get(i++));
 							}
 						}
+					}
+
+					// Amb el canvi de infoEnvioV2 cap a infoLigero, ara no es disposa dels camps de cada de caducitat i de disposició.
+					// Per això les emplenem aquí, amb les dades amb que hem realitzat la petició.
+					Date dataCaducitat = notificacio.getCaducitat();
+					Date dataDisposicio = notificacio.getEnviamentDataProgramada() != null ? notificacio.getEnviamentDataProgramada() : toDate(resultadoAlta.getFechaCreacion().getValue());
+					for (var enviament: notificacio.getEnviamentsPerNotifica()) {
+						enviament.setNotificaDataCaducitat(dataCaducitat);
+						enviament.setNotificaDataDisposicio(dataDisposicio);
 					}
 
 					if (pluginHelper.enviarCarpeta()) {
@@ -216,7 +232,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	private NotificacioEnviamentEntity enviamentRefrescarEstat(@NonNull NotificacioEnviamentEntity enviament, boolean raiseExceptions) throws Exception {
 
-		var info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA,"Consultar estat d'un enviament", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodiEnum.NOTIFICA,"Consultar estat d'un enviament", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de l'enviament", String.valueOf(enviament.getId())));
 
 		log.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
@@ -250,7 +266,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				log.info(" [EST] Notifica no té cap certificació de l'enviament [Id: " + enviament.getId() + "] ...");
 			}
 			log.info(" [EST] Actualitzant informació enviament amb Datat...");
-			var dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
+			var dataDatat = toDate(darrerDatat.getFecha());
 			var estat = getEstatNotifica(darrerDatat.getResultado());
 			if (!dataDatat.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
 				actualitzaDatatEnviament(resultadoInfoEnvio, enviament, darrerDatat);
@@ -284,12 +300,13 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return ex instanceof ValidationException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
 	}
 
-	private ResultadoInfoEnvioV2 getNotificaResultadoInfoEnvio(NotificacioEnviamentEntity enviament, IntegracioInfo info) throws Exception {
+	private RespuestaInfoEnvioLigero getNotificaResultadoInfoEnvio(NotificacioEnviamentEntity enviament, IntegracioInfo info) throws Exception {
 
-		var infoEnvio = new InfoEnvioV2();
+		var infoEnvio = new InfoEnvioLigero();
 		infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
+		infoEnvio.setNivelDetalle(BigInteger.valueOf(3L));
 		var apiKey = enviament.getNotificacio().getEntitat().getApiKey();
-		var resultadoInfoEnvio = getNotificaWs(apiKey).infoEnvioV2(infoEnvio);
+		var resultadoInfoEnvio = getSincronizarEnvioWs(apiKey).infoEnvioLigero(infoEnvio);
 		if (resultadoInfoEnvio.getDatados() == null) {
 			var errorDescripcio = "La resposta rebuda de Notifica no conté informació de datat";
 			integracioHelper.addAccioError(info, errorDescripcio);
@@ -298,7 +315,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return resultadoInfoEnvio;
 	}
 
-	private Datado getDarrerDatat(ResultadoInfoEnvioV2 resultadoInfoEnvio, NotificacioEnviamentEntity enviament, IntegracioInfo info) throws DatatypeConfigurationException {
+	private Datado getDarrerDatat(RespuestaInfoEnvioLigero resultadoInfoEnvio, NotificacioEnviamentEntity enviament, IntegracioInfo info) throws DatatypeConfigurationException, ParseException {
 
 		info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 		if (resultadoInfoEnvio.getDatados() == null) {
@@ -328,7 +345,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return datatDarrer;
 	}
 
-	private void actualitzaCertificacio(ResultadoInfoEnvioV2 resultadoInfoEnvio, NotificacioEnviamentEntity enviament, Datado darrerDatat) throws DatatypeConfigurationException {
+	private void actualitzaCertificacio(RespuestaInfoEnvioLigero resultadoInfoEnvio, NotificacioEnviamentEntity enviament, Datado darrerDatat) throws DatatypeConfigurationException, ParseException {
 
 		var dataUltimaCertificacio = enviament.getNotificaCertificacioData();
 		var certificacio = resultadoInfoEnvio.getCertificacion();
@@ -338,14 +355,25 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			log.info(" [EST] El certificat de l'enviament ja estava actualitzat");
 			return;
 		}
-		var decodificat = certificacio.getContenidoCertificacion();
+		var acuse = certificacio.getAcusePDF();
+		var decodificat = acuse.getContenido();
 		if (enviament.getNotificaCertificacioArxiuId() != null) {
 			pluginHelper.gestioDocumentalDelete(enviament.getNotificaCertificacioArxiuId(), PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
 		}
 		var gestioDocumentalId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, decodificat);
 		log.info(" [EST] Actualitzant certificació enviament...");
-		enviament.updateNotificaCertificacio(dataCertificacio, gestioDocumentalId, certificacio.getHash(), certificacio.getOrigen(), certificacio.getMetadatos(),
-				certificacio.getCsv(), certificacio.getMime(), Integer.parseInt(certificacio.getSize()), null, null, null);
+		enviament.updateNotificaCertificacio(
+				dataCertificacio,
+				gestioDocumentalId,
+				acuse.getHash(),
+				certificacio.getOrigen(),
+				certificacio.getMetadatos(),
+				acuse.getCsv(),
+				"application/pdf",
+				acuse.getContenido().length,
+				null,
+				null,
+				null);
 
 		log.info(" [EST] Fi actualització certificació. Creant nou event per certificació...");
 		//Crea un nou event
@@ -353,22 +381,23 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		callbackHelper.updateCallback(enviament, false, null);
 	}
 
-	private void actualitzaDatatEnviament(ResultadoInfoEnvioV2 resultadoInfoEnvio, NotificacioEnviamentEntity enviament, Datado darrerDatat) throws Exception {
+	private void actualitzaDatatEnviament(RespuestaInfoEnvioLigero resultadoInfoEnvio, NotificacioEnviamentEntity enviament, Datado darrerDatat) throws Exception {
 
-		var dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
+		var dataDatat = toDate(darrerDatat.getFecha());
 		var estat = getEstatNotifica(darrerDatat.getResultado());
-		var organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
-		var organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
-		enviament.updateNotificaInformacio(
-				dataDatat,
-				toDate(resultadoInfoEnvio.getFechaPuestaDisposicion()),
-				toDate(resultadoInfoEnvio.getFechaCaducidad()),
-				(organismoEmisor != null) ? organismoEmisor.getCodigo() : null,
-				(organismoEmisor != null) ? organismoEmisor.getDescripcionCodigoDIR() : null,
-				(organismoEmisor != null) ? organismoEmisor.getNifDIR() : null,
-				(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
-				(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
-				(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
+		enviament.setNotificaDataCreacio(dataDatat);
+//		var organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
+//		var organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
+//		enviament.updateNotificaInformacio(
+//				dataDatat,
+//				toDate(resultadoInfoEnvio.getFechaPuestaDisposicion()),
+//				toDate(resultadoInfoEnvio.getFechaCaducidad()),
+//				(organismoEmisor != null) ? organismoEmisor.getCodigo() : null,
+//				(organismoEmisor != null) ? organismoEmisor.getDescripcionCodigoDIR() : null,
+//				(organismoEmisor != null) ? organismoEmisor.getNifDIR() : null,
+//				(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
+//				(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
+//				(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
 		if (estat != null) {
 			log.info(" [EST] Nou estat: " + estat.name());
 		}
@@ -378,8 +407,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		callbackHelper.updateCallback(enviament, false, null);
 		log.info(" [EST] L'event s'ha guardat correctament...");
 		log.info(" [EST] Actualitzant Datat enviament...");
-		enviamentUpdateDatat(estat, toDate(darrerDatat.getFecha()), null, darrerDatat.getOrigen(), darrerDatat.getNifReceptor(),
-				darrerDatat.getNombreReceptor(), null, null, enviament);
+		enviamentUpdateDatat(estat,
+				toDate(darrerDatat.getFecha()),
+				null,
+				darrerDatat.getOrigen(),
+				darrerDatat.getNifReceptor(),
+				darrerDatat.getNombreReceptor(),
+				null,
+				null,
+				enviament);
 		log.info(" [EST] Fi actualització Datat");
 	}
 
@@ -425,8 +461,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				var formatter = new SimpleDateFormat("dd/MM/yyyy");
 				var today = new Date();
 				var todayWithZeroTime = formatter.parse(formatter.format(today));
-				var DataProgramadaWithZeroTime = formatter.parse(formatter.format(notificacio.getEnviamentDataProgramada()));
-				if (DataProgramadaWithZeroTime.after(todayWithZeroTime)) {
+				var dataProgramadaWithZeroTime = formatter.parse(formatter.format(notificacio.getEnviamentDataProgramada()));
+				if (dataProgramadaWithZeroTime.after(todayWithZeroTime)) {
 					envios.setFechaEnvioProgramado(toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
 				}
 			}
@@ -704,10 +740,32 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private NotificaWsV2PortType getNotificaWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
 
 		return new WsClientHelper<NotificaWsV2PortType>().generarClientWs(
-				getClass().getResource("/es/caib/notib/logic/wsdl/NotificaWsV21.wsdl"),    getNotificaUrlProperty(),
+				getClass().getResource("/es/caib/notib/logic/wsdl/NotificaWsV21.wsdl"),
+				getNotificaUrlProperty(),
 				new QName("https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/","NotificaWsV2Service"),
-				getUsernameProperty(), getPasswordProperty(),true, NotificaWsV2PortType.class, new ApiKeySOAPHandlerV2(apiKey));
+				getUsernameProperty(),
+				getPasswordProperty(),
+				true,
+				NotificaWsV2PortType.class,
+				new ApiKeySOAPHandlerV2(apiKey));
 	}
+
+	private SincronizarEnvioWsPortType getSincronizarEnvioWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
+
+		return new WsClientHelper<SincronizarEnvioWsPortType>().generarClientWs(
+				getClass().getResource("/es/caib/notib/logic/wsdl/SincronizarEnvio.wsdl"),
+				getNotificaSincronitzarUrlProperty(),
+				new QName("http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/","SincronizarEnvioWsService"),
+				apiKey,	// Username
+				apiKey,	// Password
+				null,
+				false,
+				true,
+				SincronizarEnvioWsPortType.class,
+				new Handler[0]);
+	}
+
+
 
 	private static class ApiKeySOAPHandlerV2 implements SOAPHandler<SOAPMessageContext> {
 		private final String apiKey;

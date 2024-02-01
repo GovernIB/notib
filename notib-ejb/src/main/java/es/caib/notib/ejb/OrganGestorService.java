@@ -41,13 +41,13 @@ import java.util.List;
 public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf.service.OrganGestorService> implements es.caib.notib.logic.intf.service.OrganGestorService {
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi) {
 		return getDelegateService().getProgresActualitzacio(dir3Codi);
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public boolean isUpdatingOrgans(EntitatDto entitatDto) {
 		return getDelegateService().isUpdatingOrgans(entitatDto);
 	}
@@ -101,7 +101,7 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public OrganGestorDto findByCodi(Long entitatId, String codi) {
 		return getDelegateService().findByCodi(entitatId, codi);
 	}
@@ -143,37 +143,37 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public List<PermisDto> permisFind(Long entitatId, Long id) throws NotFoundException {
 		return getDelegateService().permisFind(entitatId, id);
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findAccessiblesByUsuariActual() {
 		return getDelegateService().findAccessiblesByUsuariActual();
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findAccessiblesByUsuariAndEntitatActual(Long entitatId) {
 		return getDelegateService().findAccessiblesByUsuariAndEntitatActual(entitatId);
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public List<PermisDto> permisFind(Long entitatId, Long id, PaginacioParamsDto paginacioParams) throws NotFoundException {
 		return getDelegateService().permisFind(entitatId, id, paginacioParams);
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public void permisUpdate(Long entitatId, Long id, boolean isAdminOrgan, PermisDto permis) throws NotFoundException, ValidationException {
 		getDelegateService().permisUpdate(entitatId, id, isAdminOrgan, permis);
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public void permisDelete(Long entitatId, Long id, Long permisId) throws NotFoundException {
 		getDelegateService().permisDelete(entitatId, id, permisId);
 	}
@@ -233,19 +233,19 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper, Object integracioHelper) {
 		getDelegateService().setServicesForSynctest(procSerSyncHelper, pluginHelper, integracioHelper);
 	}
 
 	@Override
-	@PermitAll
+	@RolesAllowed("**")
 	public void sincronitzarOrganNomMultidioma(List<Long> ids) {
 		getDelegateService().sincronitzarOrganNomMultidioma(ids);
 	}
 
     @Override
-	@PermitAll
+	@RolesAllowed("**")
     public Long getLastPermisosModificatsInstant() {
         return getDelegateService().getLastPermisosModificatsInstant();
     }

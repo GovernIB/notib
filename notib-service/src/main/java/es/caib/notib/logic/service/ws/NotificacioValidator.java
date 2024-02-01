@@ -75,6 +75,9 @@ public class NotificacioValidator implements Validator {
     private Locale locale;
     @Setter
     private boolean validarDocuments = true;
+    @Setter
+    private boolean massiva;
+
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -101,9 +104,7 @@ public class NotificacioValidator implements Validator {
         validateOrgan();
         validateDadesBasiquesNotificacio();
         validateUsuari();
-        if (validarDocuments) {
-            validateDocuments();
-        }
+        validateDocuments();
         validateEnviaments();
     }
 
@@ -126,13 +127,16 @@ public class NotificacioValidator implements Validator {
 
     private void validateAplicacio() {
 
+        if (massiva) {
+            return;
+        }
         var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
         AplicacioEntity aplicacio = null;
         if (entitat != null && usuariCodi != null) {
             aplicacio = aplicacioRepository.findByEntitatIdAndUsuariCodi(entitat.getId(), usuariCodi);
         }
         if (aplicacio == null) {
-            errors.reject(error(APLICACIO_NO_EXIST, locale, notificacio.getEmisorDir3Codi()));
+            errors.reject(error(APLICACIO_NO_EXIST, locale, usuariCodi, notificacio.getEmisorDir3Codi()));
         }
     }
 
@@ -141,7 +145,8 @@ public class NotificacioValidator implements Validator {
         // Procediment
         var procCodi = "procedimentCodi";
         var procedimentCodi = notificacio.getProcedimentCodi();
-        if ((EnviamentTipus.COMUNICACIO.equals(notificacio.getEnviamentTipus()) || EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) && procediment == null) {
+        if ((EnviamentTipus.COMUNICACIO.equals(notificacio.getEnviamentTipus()) || EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus()))
+                && procediment == null && Strings.isNullOrEmpty(procedimentCodi)) {
             return;
         }
         if (EnviamentTipus.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
@@ -322,6 +327,9 @@ public class NotificacioValidator implements Validator {
 
     private void validateDocuments() {
 
+        if (!validarDocuments) {
+            return;
+        }
         if (notificacio.getDocument() == null) {
             errors.reject(error(DOCUMENT_NULL, locale));
             return;
@@ -786,6 +794,9 @@ public class NotificacioValidator implements Validator {
             }
             if (Strings.isNullOrEmpty(entregaPostal.getPoblacio())) {
                 errors.rejectValue(envName + ".poblacio", error(POSTAL_POBLACIO_NULL, l, prefix, tipus));
+            }
+            if (Strings.isNullOrEmpty(entregaPostal.getPaisCodi())) {
+                errors.rejectValue(envName + ".paisCodi", error(POSTAL_PAIS_CODI_NULL, l, prefix, tipus));
             }
         }
         if(isEstranger) {

@@ -37,11 +37,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -64,6 +62,8 @@ import java.util.List;
 @RequestMapping("/notificacio/massiva")
 public class NotificacioMassivaController extends TableAccionsMassivesController {
 
+    @Autowired
+    private AplicacioService aplicacioService;
     @Autowired
     private NotificacioMassivaService notificacioMassivaService;
     @Autowired
@@ -266,6 +266,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         notificacioMassiuCommand.setCaducitat(CaducitatHelper.sumarDiesNaturals(10));
         model.addAttribute("notificacioMassivaCommand", notificacioMassiuCommand);
         model.addAttribute("emailSize", notificacioMassiuCommand.getEmailDefaultSize());
+        model.addAttribute("maxFiles", aplicacioService.propertyGet("es.caib.notib.massives.maxim.files", "999"));
         return getNotificacioMassivaForm(entitat, request, model);
     }
 
@@ -288,6 +289,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
                 log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Error formulari: " + error.toString());
             }
             model.addAttribute("emailSize", notificacioMassivaCommand.getEmailDefaultSize());
+            model.addAttribute("maxFiles", aplicacioService.propertyGet("es.caib.notib.massives.maxim.files", "999"));
             var csvMultipartFile = notificacioMassivaCommand.getFicheroCsv();
             if (csvMultipartFile != null && !csvMultipartFile.isEmpty()) {
                 var contingutBase64 = Base64.encodeBase64String(csvMultipartFile.getBytes());

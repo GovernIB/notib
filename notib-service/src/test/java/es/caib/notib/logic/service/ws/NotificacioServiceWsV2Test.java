@@ -1,7 +1,6 @@
 package es.caib.notib.logic.service.ws;
 
 import com.codahale.metrics.Timer;
-import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.client.domini.EnviamentReferencia;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.client.domini.NotificacioEstatEnum;
@@ -21,6 +20,7 @@ import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.RegistreNotificaHelper;
+import es.caib.notib.logic.intf.dto.DocumentValidDto;
 import es.caib.notib.logic.intf.dto.EntitatTipusEnumDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -28,9 +28,11 @@ import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
+import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
@@ -161,8 +163,8 @@ public class NotificacioServiceWsV2Test {
 	private AuditHelper auditHelper;
 	@Mock
 	private MessageHelper messageHelper;
-	@Mock
-	private  DocumentHelper documentHelper;
+//	@Mock
+//	private  DocumentHelper documentHelper;
 
 	// Autowired de NotificacioValidator
 	@Mock
@@ -187,9 +189,8 @@ public class NotificacioServiceWsV2Test {
 	private NotificacioEnviamentEntity enviamentSavedMock;
 	@Mock
 	private NotificacioEventEntity notificacioEventEntityMock;
-
-//	@Spy
-//	private NotificacioValidator notificacioValidator; // = new NotificacioValidator(aplicacioRepository, grupService, messageHelper, cacheHelper, organGestorCachable, configHelper);
+	@Mock
+	private EnviamentSmService enviamentSmService;
 
 
 	private EntitatEntity entitatMock;
@@ -215,6 +216,7 @@ public class NotificacioServiceWsV2Test {
 	public void setUp() throws IOException {
 
 		((NotificacioServiceWsImplV2)notificacioService).setNotificacioValidator(new NotificacioValidator(aplicacioRepository, grupService, messageHelper, cacheHelper, organGestorCachable, configHelper));
+		((NotificacioServiceWsImplV2)notificacioService).setDocumentHelperTest(new DocumentHelper(pluginHelper, configHelper));
 		entitatMock = EntitatEntity.hiddenBuilder().codi("GOIB").nom("Govern de les Illes Balears").tipus(EntitatTipusEnumDto.GOVERN).dir3Codi(ENTITAT_DIR3CODI).activa(true).apiKey("xxxxxx").ambEntregaDeh(false).llibreEntitat(false).oficinaEntitat(false).build();
 		aplicacioMock = AplicacioEntity.builder().entitat(entitatMock).activa(true).usuariCodi(APP_CODI).callbackUrl("http://callback.url").build();
 		organGestorMock = OrganGestorEntity.builder().codi(ORGAN_CODI).nom("Direcció General de Política Lingüística").entitat(entitatMock).build();
@@ -255,6 +257,7 @@ public class NotificacioServiceWsV2Test {
 
 		lenient().when(auth.getName()).thenReturn(APP_CODI);
 		lenient().doNothing().when(metricsHelper).fiMetrica(nullable(Timer.Context.class));
+		lenient().when(enviamentSmService.altaEnviament(anyString())).thenReturn(null);
 		lenient().when(metricsHelper.iniciMetrica()).thenReturn(null);
 		lenient().doNothing().when(integracioHelper).addAplicacioAccioParam(nullable(IntegracioInfo.class), nullable(Long.class));
 		lenient().doNothing().when(integracioHelper).addAccioError(nullable(IntegracioInfo.class), nullable(String.class));
@@ -324,13 +327,17 @@ public class NotificacioServiceWsV2Test {
 			case USUARI_INEXISTENT:
 				when(cacheHelper.findUsuariAmbCodi(eq("NO_EXIST"))).thenReturn(null);
 				break;
+			case DOCUMENT_FORMAT_INVALID:
+				break;
 			case DOCUMENT_FORMAT_SIR_INVALID:
 				organGestorMock.setOficina("Oficina");
 				break;
 			case DOCUMENT_ERROR_OBTENINT:
+				var docErrorObtenir = DocumentValidDto.builder().mediaType("application/pdf").errorFitxer(true).build();
 				lenient().when(pluginHelper.arxiuGetImprimible(eq("00000000-0000-0000-0000-00000000000E"), eq(true))).thenThrow(new RuntimeException("Error obtenint fitxer"));
 				break;
 			case DOCUMENT_ERROR_OBTENINT_METADADES:
+				var docErrorMetadades = DocumentValidDto.builder().mediaType("application/pdf").errorFitxer(false).errorMetadades(true).build();
 				lenient().when(configHelper.getConfigAsBoolean(eq("es.caib.notib.document.metadades.por.defecto"))).thenReturn(false);
 				lenient().when(pluginHelper.arxiuDocumentConsultar(eq("00000000-0000-0000-0000-0000000000ME"), nullable(String.class), eq(true), eq(true))).thenThrow(new RuntimeException("Error obtenint metadades"));
 				lenient().when(pluginHelper.arxiuDocumentConsultar(eq("00000000-0000-0000-0000-0000000000MN"), nullable(String.class), eq(true), eq(true))).thenReturn(null);
@@ -383,7 +390,6 @@ public class NotificacioServiceWsV2Test {
 			case POSTAL_ENTREGA_INACTIVA:
 				organGestorPostalMock.setEntregaCie(null);
 				break;
-
 		}
 
 		// When

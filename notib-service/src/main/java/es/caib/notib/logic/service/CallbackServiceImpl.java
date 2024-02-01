@@ -56,6 +56,7 @@ public class CallbackServiceImpl implements CallbackService {
 			var pendents = callbackRepository.findEnviamentIdPendents(page);
 			if (pendents.isEmpty()) {
 				log.info("[Callback] No hi ha notificacions pendents d'enviar. ");
+				return;
 			}
 			log.info("[Callback] Inici de les notificacions pendents cap a les aplicacions.");
 			var errors = 0;

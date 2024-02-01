@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class IntegracioInfo {
 
-	String codi;
+	IntegracioCodiEnum codi;
 	String codiEntitat;
 	String descripcio;
 	String aplicacio;
@@ -20,7 +20,7 @@ public class IntegracioInfo {
 	Long tempsInici;
 	List<AccioParam> params = new ArrayList<AccioParam>();
 	
-	public IntegracioInfo(String codi, String descripcio, IntegracioAccioTipusEnumDto tipus, AccioParam... params) {
+	public IntegracioInfo(IntegracioCodiEnum codi, String descripcio, IntegracioAccioTipusEnumDto tipus, AccioParam... params) {
 
 		super();
 		this.tempsInici = System.currentTimeMillis();

@@ -29,7 +29,7 @@ public interface PagadorCieService {
 	 * 				Informació del pagador cie a crear
 	 * @return	El pagador cie creat
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	CieDto upsert(Long entitatId, CieDataDto cie);
 
 	/**
@@ -41,7 +41,7 @@ public interface PagadorCieService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	CieDto delete(Long id) throws NotFoundException;
 
 	/**
@@ -51,7 +51,7 @@ public interface PagadorCieService {
 	 *            Codi del procediment a trobar.
 	 * @return El pagador cie amb el codi especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	CieDto findById(Long id);
 
 	/**
@@ -76,16 +76,16 @@ public interface PagadorCieService {
 	 * 
 	 * @return La llista dels pagadors cie.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	List<CieDto> findAll();
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	List<IdentificadorTextDto> findAllIdentificadorText();
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
     List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat);
 
     List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitat, String organCodi, boolean isAdminOrgan);
@@ -95,10 +95,10 @@ public interface PagadorCieService {
 	 *
 	 * @return La llista dels pagadors postals.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("isAuthenticated()")
 	List<CieDto> findByEntitat(Long entitatId);
 
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	Object findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor);
 
 	/**
@@ -108,7 +108,7 @@ public interface PagadorCieService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina de pagadors cie.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	PaginaDto<CieDto> findAllPaginat(PaginacioParamsDto paginacioParams);
 
 }

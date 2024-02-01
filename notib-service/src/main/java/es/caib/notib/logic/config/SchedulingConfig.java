@@ -19,6 +19,8 @@ import org.springframework.scheduling.support.PeriodicTrigger;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Configuration
 @EnableAsync
@@ -37,11 +39,19 @@ public class SchedulingConfig implements SchedulingConfigurer {
     @Autowired
     private MonitorTasquesService monitorTasquesService;
 
+    private static String ACTUALIZAR_PROCEDIM_DEFCRON = "0 30 1 * * *";
+    private static String ACTUALITZAR_SERVEIS_DEFCRON = "0 00 2 * * *";
+    private static String CONS_CANVIS_ORGANIG_DEFCRON = "0 30 2 * * *";
+    private static String ACTUAL_ESTAT_ORGANS_DEFCRON = "0 00 3 * * *";
+    private static String REFRESCAR_NOT_EXPIR_DEFCRON = "0 30 3 * * *";
+    private static String MONITOR_BUIDA_DADES_DEFCRON = "0 30 4 * * *";
+
     private static Integer CALLBACK_CLIENT = 0;
     private static Integer CERT_DEH = 1;
     private static Integer CERT_CIE = 2;
+    private static Integer ARXIUS_TMP = 3;
 
-    private static Boolean[] primeraVez = {Boolean.TRUE, Boolean.TRUE, Boolean.TRUE};
+    private static Boolean[] primeraVez = {Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE};
     private ScheduledTaskRegistrar taskRegistrar;
 
     public void restartSchedulledTasks() {
@@ -74,279 +84,202 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
     private void registerSchedulledTasks() {
 
+        Supplier<SchedulledService> schedulledServiceSupplier = () -> schedulledService;
+        Supplier<CallbackService> callbackServiceSupplier = () -> callbackService;
+
         // 1. Actualització dels procediments a partir de la informació de Rolsac
         /////////////////////////////////////////////////////////////////////////
-        final String actualitzarProcediments = "actualitzarProcediments";
-        monitorTasquesService.addTasca(actualitzarProcediments);
-        taskRegistrar.addTriggerTask(
-                () -> {
-                    try {
-                        monitorTasquesService.inici(actualitzarProcediments);
-                        schedulledService.actualitzarProcediments();
-                        monitorTasquesService.fi(actualitzarProcediments);
-                    } catch(Exception e) {
-                        monitorTasquesService.error(actualitzarProcediments);
-                    }
-                },
-                triggerContext -> {
-                    CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ACTUALITZAR_PROCEDIMENTS_CRON, "0 00 3 * * *"));
-                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-                    monitorTasquesService.updateProperaExecucio(actualitzarProcediments, millis);
-                    return nextExecution;
-                }
-        );
-        monitorTasquesService.addTasca(actualitzarProcediments);
+        registerCronTask(
+                "actualitzarProcediments",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().actualitzarProcediments(),
+                PropertiesConstants.ACTUALITZAR_PROCEDIMENTS_CRON,
+                ACTUALIZAR_PROCEDIM_DEFCRON);
 
         // 2. Refrescar notificacions expirades
         /////////////////////////////////////////////////////////////////////////
-        final String refrescarNotificacionsExpirades = "refrescarNotificacionsExpirades";
-        monitorTasquesService.addTasca(refrescarNotificacionsExpirades);
-        taskRegistrar.addTriggerTask(
-                () -> {
-                    try {
-                        monitorTasquesService.inici(refrescarNotificacionsExpirades);
-                        schedulledService.refrescarNotificacionsExpirades();
-                        monitorTasquesService.fi(refrescarNotificacionsExpirades);
-                    } catch(Exception e) {
-                        monitorTasquesService.error(refrescarNotificacionsExpirades);
-                    }
-                },
-                triggerContext -> {
-                    CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.REFRESCAR_NOTIFICACIONS_EXPIRADES_CRON, "0 15 3 * * *"));
-                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-                    monitorTasquesService.updateProperaExecucio(refrescarNotificacionsExpirades, millis);
-                    return nextExecution;
-                }
-        );
-        monitorTasquesService.addTasca(refrescarNotificacionsExpirades);
+        registerCronTask(
+                "refrescarNotificacionsExpirades",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().refrescarNotificacionsExpirades(),
+                PropertiesConstants.REFRESCAR_NOTIFICACIONS_EXPIRADES_CRON,
+                REFRESCAR_NOT_EXPIR_DEFCRON);
 
         // 3. Callback de client
         /////////////////////////////////////////////////////////////////////////
-        final String processarPendents = "processarPendents";
-        monitorTasquesService.addTasca(processarPendents);
-        taskRegistrar.addTriggerTask(
-                () -> {
-                    try {
-                        monitorTasquesService.inici(processarPendents);
-                        callbackService.processarPendents();
-                        monitorTasquesService.fi(processarPendents);
-                    } catch(Exception e) {
-                        monitorTasquesService.error(processarPendents);
-                    }
-                },
-                triggerContext -> {
-                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.PROCESSAR_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
-                    trigger.setFixedRate(true);
-                    // Només la primera vegada que s'executa
-                    Long processarPendentsInitialDelayLong = 0L;
-                    if (primeraVez[CALLBACK_CLIENT]) {
-                        processarPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.PROCESSAR_PENDENTS_INITIAL_DELAY, 300000L);
-                        primeraVez[CALLBACK_CLIENT] = false;
-                    }
-                    trigger.setInitialDelay(processarPendentsInitialDelayLong);
-                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-                    monitorTasquesService.updateProperaExecucio(processarPendents, millis);
-                    return nextExecution;
-                }
-        );
-        monitorTasquesService.addTasca(processarPendents);
+        registerPeriodicTask(
+                "processarPendents",
+                callbackServiceSupplier,
+                (Supplier<CallbackService> s) -> s.get().processarPendents(),
+                PropertiesConstants.PROCESSAR_PENDENTS_RATE,
+                300000L,
+                CALLBACK_CLIENT,
+                PropertiesConstants.PROCESSAR_PENDENTS_INITIAL_DELAY,
+                300000L);
 
         // 4. Consulta certificació notificacions DEH finalitzades
         /////////////////////////////////////////////////////////////////////////
-        final String enviamentRefrescarEstatDEH = "enviamentRefrescarEstatDEH";
-        monitorTasquesService.addTasca(enviamentRefrescarEstatDEH);
-        taskRegistrar.addTriggerTask(
-                () -> {
-                    try {
-                        monitorTasquesService.inici(enviamentRefrescarEstatDEH);
-                        schedulledService.enviamentRefrescarEstatDEH();
-                        monitorTasquesService.fi(enviamentRefrescarEstatDEH);
-                    } catch(Exception e) {
-                        monitorTasquesService.error(enviamentRefrescarEstatDEH);
-                    }
-                },
-                triggerContext -> {
-                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
-                    trigger.setFixedRate(true);
-                    // Només la primera vegada que s'executa
-                    Long enviamentRefrescarCertPendentsInitialDelayLong = 0L;
-                    if (primeraVez[CERT_DEH]) {
-                        enviamentRefrescarCertPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY, 360000L);
-                        primeraVez[CERT_DEH] = false;
-                    }
-                    trigger.setInitialDelay(enviamentRefrescarCertPendentsInitialDelayLong);
-                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-                    monitorTasquesService.updateProperaExecucio(enviamentRefrescarEstatDEH, millis);
-                    return nextExecution;
-                }
-        );
-        monitorTasquesService.addTasca(enviamentRefrescarEstatDEH);
+        registerPeriodicTask(
+                "enviamentRefrescarEstatDEH",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().enviamentRefrescarEstatDEH(),
+                PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_RATE,
+                300000L,
+                CERT_DEH,
+                PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY,
+                360000L);
 
         // 5. Consulta certificació notificacions CIE finalitzades
         /////////////////////////////////////////////////////////////////////////
-        final String enviamentRefrescarEstatCIE = "enviamentRefrescarEstatCIE";
-        monitorTasquesService.addTasca(enviamentRefrescarEstatCIE);
-        taskRegistrar.addTriggerTask(
-                () -> {
-                    try {
-                        monitorTasquesService.inici(enviamentRefrescarEstatCIE);
-                        schedulledService.enviamentRefrescarEstatCIE();
-                        monitorTasquesService.fi(enviamentRefrescarEstatCIE);
-                    } catch(Exception e) {
-                        monitorTasquesService.error(enviamentRefrescarEstatCIE);
-                    }
-                },
-                triggerContext -> {
-                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
-                    trigger.setFixedRate(true);
-                    // Només la primera vegada que s'executa
-                    Long enviamentRefrescarCertPendentsInitialDelayLong = 0L;
-                    if (primeraVez[CERT_CIE]) {
-                        enviamentRefrescarCertPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY, 420000L);
-                        primeraVez[CERT_CIE] = false;
-                    }
-                    trigger.setInitialDelay(enviamentRefrescarCertPendentsInitialDelayLong);
-                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-                    monitorTasquesService.updateProperaExecucio(enviamentRefrescarEstatCIE, millis);
-                    return nextExecution;
-                }
-        );
-        monitorTasquesService.addTasca(enviamentRefrescarEstatCIE);
+        registerPeriodicTask(
+                "enviamentRefrescarEstatCIE",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().enviamentRefrescarEstatCIE(),
+                PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE,
+                300000L,
+                CERT_CIE,
+                PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY,
+                420000L);
 
         // 6. Eliminiar arxius temporals
         /////////////////////////////////////////////////////////////////////////
-        final String eliminarDocumentsTemporals = "eliminarDocumentsTemporals";
-        monitorTasquesService.addTasca(eliminarDocumentsTemporals);
-        taskRegistrar.addTriggerTask(
-                () -> {
-                    try {
-                        monitorTasquesService.inici(eliminarDocumentsTemporals);
-                        schedulledService.eliminarDocumentsTemporals();
-                        monitorTasquesService.fi(eliminarDocumentsTemporals);
-                    } catch(Exception e) {
-                        monitorTasquesService.error(eliminarDocumentsTemporals);
-                    }
-                },
-                triggerContext -> {
-                    PeriodicTrigger trigger = new PeriodicTrigger(86400000L, TimeUnit.MILLISECONDS);
-                    trigger.setFixedRate(true);
-                    trigger.setInitialDelay(calcularDelay());
-                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-                    monitorTasquesService.updateProperaExecucio(eliminarDocumentsTemporals, millis);
-                    return nextExecution;
-                }
-        );
-        monitorTasquesService.addTasca(eliminarDocumentsTemporals);
+        registerPeriodicTask(
+                "eliminarDocumentsTemporals",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().eliminarDocumentsTemporals(),
+                86400000L,
+                ARXIUS_TMP,
+                calcularDelay());
 
         // 7. Actualització dels serveis a partir de la informació de Rolsac
         /////////////////////////////////////////////////////////////////////////
-        final String actualitzarServeis = "actualitzarServeis";
-        monitorTasquesService.addTasca(actualitzarServeis);
-        taskRegistrar.addTriggerTask(
-                () -> {
-                    try {
-                        monitorTasquesService.inici(actualitzarServeis);
-                        schedulledService.actualitzarServeis();
-                        monitorTasquesService.fi(actualitzarServeis);
-                    } catch(Exception e) {
-                        monitorTasquesService.error(actualitzarServeis);
-                    }
-                },
-                triggerContext -> {
-                    CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ACTUALITZAR_SERVEIS_CRON, "0 30 3 * * *"));
-                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-                    monitorTasquesService.updateProperaExecucio(actualitzarServeis, millis);
-                    return nextExecution;
-                }
-        );
-        monitorTasquesService.addTasca(actualitzarServeis);
+        registerCronTask(
+                "actualitzarServeis",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().actualitzarServeis(),
+                PropertiesConstants.ACTUALITZAR_SERVEIS_CRON,
+                ACTUALITZAR_SERVEIS_DEFCRON);
 
         // 8. Consulta de canvis en l'organigrama
         /////////////////////////////////////////////////////////////////////////
-        final String consultaCanvisOrganigrama = "consultaCanvisOrganigrama";
-        monitorTasquesService.addTasca(consultaCanvisOrganigrama);
-        taskRegistrar.addTriggerTask(
-                () -> {
-                    try {
-                        monitorTasquesService.inici(consultaCanvisOrganigrama);
-                        schedulledService.consultaCanvisOrganigrama();
-                        monitorTasquesService.fi(consultaCanvisOrganigrama);
-                    } catch(Exception e) {
-                        monitorTasquesService.error(consultaCanvisOrganigrama);
-                    }
-                },
-                triggerContext -> {
-                    String cron = configHelper.getConfig(PropertiesConstants.CONSULTA_CANVIS_ORGANIGRAMA);
-                    if (cron == null)
-                        cron = "0 45 2 * * *";
-                    CronTrigger trigger = new CronTrigger(cron);
-                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-                    monitorTasquesService.updateProperaExecucio(consultaCanvisOrganigrama, millis);
-                    return nextExecution;
-                }
-        );
-        monitorTasquesService.addTasca(consultaCanvisOrganigrama);
+        registerCronTask(
+                "consultaCanvisOrganigrama",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().consultaCanvisOrganigrama(),
+                PropertiesConstants.CONSULTA_CANVIS_ORGANIGRAMA,
+                CONS_CANVIS_ORGANIG_DEFCRON);
 
         // 9. Eliminar entrades al monitor integracions antigues
         /////////////////////////////////////////////////////////////////////////
-        final String monitorIntegracionsEliminarAntics = "monitorIntegracionsEliminarAntics";
-        monitorTasquesService.addTasca(monitorIntegracionsEliminarAntics);
-        taskRegistrar.addTriggerTask(
-                () -> {
-                    try {
-                        monitorTasquesService.inici(monitorIntegracionsEliminarAntics);
-                        schedulledService.monitorIntegracionsEliminarAntics();
-                        monitorTasquesService.fi(monitorIntegracionsEliminarAntics);
-                    } catch(Exception e) {
-                        monitorTasquesService.error(monitorIntegracionsEliminarAntics);
-                    }
-                },
-                triggerContext -> {
-
-                    String dies = configHelper.getConfig(PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_PERIODE_EXECUCIO, "0 30  1 * * *");
-                    CronTrigger trigger = new CronTrigger(dies);
-                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
-                    monitorTasquesService.updateProperaExecucio(monitorIntegracionsEliminarAntics, millis);
-                    return nextExecution;
-                }
-        );
-        monitorTasquesService.addTasca(monitorIntegracionsEliminarAntics);
-
+        registerCronTask(
+                "monitorIntegracionsEliminarAntics",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().monitorIntegracionsEliminarAntics(),
+                PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_PERIODE_EXECUCIO,
+                MONITOR_BUIDA_DADES_DEFCRON);
 
         // 10. Actualitzar estat organs enviament table
         /////////////////////////////////////////////////////////////////////////
-        final String actualitzarEstatOrgansEnviamentTable = "actualitzarEstatOrgansEnviamentTable";
-        monitorTasquesService.addTasca(actualitzarEstatOrgansEnviamentTable);
+        registerCronTask(
+                "actualitzarEstatOrgansEnviamentTable",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().actualitzarEstatOrgansEnviamentTable(),
+                PropertiesConstants.ACTUALITZAR_ESTAT_ORGANS,
+                ACTUAL_ESTAT_ORGANS_DEFCRON);
+
+    }
+
+    private <T> void registerCronTask(String taskName,
+                                      Supplier<T> supplier,
+                                      Consumer<Supplier<T>> method,
+                                      String cronConfig,
+                                      String defualtCron) {
+        monitorTasquesService.addTasca(taskName);
         taskRegistrar.addTriggerTask(
-                () -> {
-                    try {
-                        monitorTasquesService.inici(actualitzarEstatOrgansEnviamentTable);
-                        schedulledService.actualitzarEstatOrgansEnviamentTable();
-                        monitorTasquesService.fi(actualitzarEstatOrgansEnviamentTable);
-                    } catch(Exception e) {
-                        monitorTasquesService.error(actualitzarEstatOrgansEnviamentTable);
-                    }
-                },
+                () -> executeSchedulledMethod(supplier, method, taskName),
                 triggerContext -> {
-                    String cron = "0 30 3 * * *";
-                    CronTrigger trigger = new CronTrigger(cron);
+                    // Creating a trigger here
+                    CronTrigger trigger = new CronTrigger(configHelper.getConfig(cronConfig, defualtCron));
+                    // Compute the next execution time
                     Date nextExecution = trigger.nextExecutionTime(triggerContext);
                     Long millis = nextExecution.getTime() - System.currentTimeMillis();
-                    monitorTasquesService.updateProperaExecucio(actualitzarEstatOrgansEnviamentTable, millis);
+                    monitorTasquesService.updateProperaExecucio(taskName, millis);
                     return nextExecution;
-                }
-        );
-        monitorTasquesService.addTasca(actualitzarEstatOrgansEnviamentTable);
+                });
+        monitorTasquesService.addTasca(taskName);
+    }
 
+    private <T> void registerPeriodicTask(String taskName,
+                                          Supplier<T> supplier,
+                                          Consumer<Supplier<T>> method,
+                                          String periodeConfig,
+                                          Long defualtPeriode,
+                                          Integer operation,
+                                          String delayConfig,
+                                          Long defaultDelay) {
+        monitorTasquesService.addTasca(taskName);
+        taskRegistrar.addTriggerTask(
+                () -> executeSchedulledMethod(supplier, method, taskName),
+                triggerContext -> {
+                    // Creating a trigger here
+                    PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(periodeConfig, defualtPeriode), TimeUnit.MILLISECONDS);
+                    trigger.setFixedRate(true);
+                    // Compute initial delay (only first time)
+                    Long processarPendentsInitialDelayLong = 0L;
+                    if (primeraVez[operation]) {
+                        processarPendentsInitialDelayLong = configHelper.getConfigAsLong(delayConfig, defaultDelay);
+                        primeraVez[operation] = false;
+                    }
+                    trigger.setInitialDelay(processarPendentsInitialDelayLong);
+                    // Compute the next execution time
+                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
+                    monitorTasquesService.updateProperaExecucio(taskName, millis);
+                    return nextExecution;
+                });
+        monitorTasquesService.addTasca(taskName);
+    }
+
+    private <T> void registerPeriodicTask(String taskName,
+                                          Supplier<T> supplier,
+                                          Consumer<Supplier<T>> method,
+                                          Long periode,
+                                          Integer opeation,
+                                          Long delay) {
+        monitorTasquesService.addTasca(taskName);
+        taskRegistrar.addTriggerTask(
+                () -> executeSchedulledMethod(supplier, method, taskName),
+                triggerContext -> {
+                    // Creating a trigger here
+                    PeriodicTrigger trigger = new PeriodicTrigger(periode, TimeUnit.MILLISECONDS);
+                    trigger.setFixedRate(true);
+                    // Compute initial delay (only first time)
+                    if (primeraVez[opeation]) {
+                        trigger.setInitialDelay(delay);
+                        primeraVez[opeation] = false;
+                    }
+                    // Compute the next execution time
+                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
+                    monitorTasquesService.updateProperaExecucio(taskName, millis);
+                    return nextExecution;
+                });
+        monitorTasquesService.addTasca(taskName);
+    }
+
+    private <T> void executeSchedulledMethod(
+            Supplier<T> supplier,
+            Consumer<Supplier<T>> method,
+            String methodToExecute){
+        try {
+//            Supplier<SchedulledService> schedulledServiceSupplier = () -> schedulledService;
+            log.info("[SCH] Iniciant tansca en segon pla: " + methodToExecute);
+            monitorTasquesService.inici(methodToExecute);
+            method.accept(supplier);
+            monitorTasquesService.fi(methodToExecute);
+        } catch(Exception e) {
+            monitorTasquesService.error(methodToExecute);
+        }
     }
 
     private long calcularDelay() {

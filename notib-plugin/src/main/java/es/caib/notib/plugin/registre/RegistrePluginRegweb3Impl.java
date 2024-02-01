@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.registre;
 
+import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.InteresadoWsDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
@@ -55,7 +56,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		} catch (Exception e) {
 			log.error(ERROR_TO_RESPOSTA_CONSULTA, e);
 			rc.setErrorCodi("2");
-			rc.setErrorDescripcio(e.getMessage());
+			rc.setErrorDescripcio(!Strings.isNullOrEmpty(e.getMessage()) ? e.getMessage() : e.getCause().getMessage());
 			return rc;
 		}
 	}
@@ -238,6 +239,8 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		resposta.setMotivo(ar.getMotivo());
 		resposta.setCodigoEntidadRegistralProcesado(ar.getCodigoEntidadRegistralProcesado());
 		resposta.setDecodificacionEntidadRegistralProcesado(ar.getDecodificacionEntidadRegistralProcesado());
+		resposta.setOficinaDenominacio(ar.getEntidadDenominacion());
+		resposta.setCodiLlibre(ar.getLibroCodigo());
 		switch(ar.getEstado().intValue()) {
 			case 1:
 				resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);

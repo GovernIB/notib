@@ -3,10 +3,13 @@
  */
 package es.caib.notib.logic.intf.dto;
 
-import java.io.Serializable;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.io.Serializable;
 
 
 /**
@@ -14,10 +17,12 @@ import lombok.Setter;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Builder
+@AllArgsConstructor @NoArgsConstructor
 @Getter @Setter
 public class IntegracioDto implements Serializable {
 
-	private String codi;
+	private IntegracioCodiEnum codi;
 	private String nom;
 	private int numErrors;
 

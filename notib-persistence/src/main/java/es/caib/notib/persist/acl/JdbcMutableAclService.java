@@ -95,7 +95,7 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
         try (var conn = dataSource.getConnection()){
             dialect = conn.getMetaData().getDatabaseProductName().toLowerCase();
         } catch (Exception ex) {
-            log.error("JdbcMutableAclService: No ha estat possible obtenir les metadades de la connexió");
+            log.warn("JdbcMutableAclService: No ha estat possible obtenir les metadades de la connexió");
 
         }
         Assert.notNull(aclCache, "AclCache required");

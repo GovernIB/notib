@@ -26,8 +26,10 @@ import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.persist.repository.acl.AclSidRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.activemq.broker.BrokerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -72,7 +74,14 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private MessageHelper messageHelper;
 	@Autowired
 	private SchedulingConfig schedulingConfig;
+	@Autowired
+	private BrokerService brokerService;
 
+	public void restartSmBroker() throws Exception {
+
+		brokerService.stop();
+		brokerService.start(true);
+	}
 
 
 	@Override
@@ -105,6 +114,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			} else {
 				usuari.update(dadesUsuari.getNom(), dadesUsuari.getLlinatges(), dadesUsuari.getEmail());
 			}
+			cacheHelper.evictUsuariByCodi(usuari.getCodi());
 			permisosCacheable.clearAuthenticationPermissionsCaches(auth);
 			procedimentsCacheable.clearAuthenticationProcedimentsCaches(auth);
 		} finally {
@@ -147,6 +157,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			var usuari = usuariRepository.findById(dto.getCodi()).orElseThrow();
 			usuari.update(UsuariEntity.builder().rebreEmailsNotificacio(dto.getRebreEmailsNotificacio()).emailAlt(dto.getEmailAlt())
 					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats()).idioma(dto.getIdioma()).build());
+			cacheHelper.evictUsuariByCodi(usuari.getCodi());
 			return toUsuariDtoAmbRols(usuari);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -183,7 +194,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 	}
 	
-	@Transactional(readOnly = true)
+
 	@Override
 	public UsuariDto getUsuariActual() {
 
@@ -191,7 +202,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			var auth = SecurityContextHolder.getContext().getAuthentication();
 			log.debug("Obtenint usuari actual");
-			return auth != null ? toUsuariDtoAmbRols(usuariRepository.findById(auth.getName()).orElse(null)) : null;
+			return auth != null ? toUsuariDtoAmbRols(cacheHelper.findUsuariByCodi(auth.getName())) : null;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -385,15 +396,14 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 		var dto = conversioTipusHelper.convertir(usuari, UsuariDto.class);
 		var auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth.getAuthorities() == null) {
+		if (auth.getAuthorities() == null || auth.getAuthorities().isEmpty()) {
 			return dto;
 		}
-		var rols = new String[auth.getAuthorities().size()];
-		var index = 0;
-		for (var grantedAuthority: auth.getAuthorities()) {
-			rols[index++] = grantedAuthority.getAuthority();
-		}
-		dto.setRols(rols);
+		var rols = usuariRepository.getNotibRolsDisponibles(auth.getName());
+		var rolsAplicacio = List.of("NOT_SUPER", "NOT_ADMIN", "NOT_CARPETA", "NOT_APL");
+		rols.addAll(rolsAplicacio);
+		rols.retainAll(auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+		dto.setRols(rols.toArray(String[]::new));
 		return dto;
 	}
 

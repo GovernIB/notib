@@ -27,6 +27,7 @@ public class PoolingNotificaListener {
     @JmsListener(destination = SmConstants.CUA_POOLING_ESTAT, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveConsultaSir(@Payload String enviamentUuid, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
+        log.debug("[SM] PoolingNotificaListener enviament " + enviamentUuid);
         enviamentSmService.enviamentConsulta(enviamentUuid);
         log.debug("[SM] Iniciat pooling de consulta d'estat a Notifica de l'enviament amb UUID " + enviamentUuid);
         message.acknowledge();

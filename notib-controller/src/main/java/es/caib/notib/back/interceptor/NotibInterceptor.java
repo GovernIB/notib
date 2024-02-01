@@ -328,7 +328,7 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
     private List<EntitatDto> getEntitatsAccessibles() {
         var rolActual = sessionScopedContext.getRolActual();
         if (rolActual == null) {
-            rolActual = "";
+            rolActual = "tothom";
         }
         var entitatsAccessibles = entitatService.findAccessiblesUsuariActual(rolActual);
         sessionScopedContext.setInstantEntitatsCarregades(System.currentTimeMillis());

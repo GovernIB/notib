@@ -10,6 +10,7 @@ import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
+import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
@@ -62,9 +63,12 @@ import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.jms.JmsException;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,6 +77,7 @@ import javax.annotation.Resource;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -175,6 +180,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private NotificacioMapper notificacioMapper;
 	@Autowired
 	private NotificacioTableMapper notificacioTableMapper;
+	@Autowired
+	protected JmsTemplate jmsTemplate;
 
 	private static final String DELETE = "NotificacioServiceImpl.delete";
 	private static final String UPDATE = "NotificacioServiceImpl.update";
@@ -426,7 +433,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			entityComprovarHelper.comprovarPermisos(null, false, false, false);
 			var enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
 			notificacio.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
-			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
+//			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
 			return conversioTipusHelper.convertir(notificacio, NotificacioDtoV2.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -447,7 +454,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
 			notificacio.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
 			// Emplena els atributs registreLlibreNom i registreOficinaNom
-			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
+//			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
 			var dto = conversioTipusHelper.convertir(notificacio, NotificacioInfoDto.class);
 			//CALLBACKS
 			var pendents = callbackRepository.findByNotificacioIdAndEstatOrderByDataDesc(notificacio.getId(), CallbackEstatEnumDto.PENDENT);
@@ -896,6 +903,20 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
+	@Override
+	public byte[] getDiagramaMaquinaEstats() throws IOException{
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			var input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/logic/stateMachine/diagramaStateMachine.png");
+			assert input != null;
+			return IOUtils.toByteArray(input);
+		} catch (IOException ex) {
+            throw new IOException("Arxiu no trobat", ex);
+        } finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
 
 
 	@Override
@@ -1151,7 +1172,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 			var usuari = usuariHelper.getUsuariAutenticat();
 			if (usuari != null && notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
-				resposta = emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacioEntity);
+				try {
+					jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_NOTIFICACIO, notificacioId);
+				} catch (JmsException ex) {
+					log.error("Hi ha hagut un error al intentar enviar el correu electrònic de la notificació amb id: ." + notificacioId, ex);
+					resposta = "No s'ha pogut avisar per correu electrònic: " + ex.getMessage();
+				}
 			}
 			log.info("PRC >> Email enviat si s'escau");
 			notificacioRepository.saveAndFlush(notificacioEntity);
