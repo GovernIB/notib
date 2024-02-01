@@ -92,7 +92,7 @@ public class AdviserServiceImpl implements AdviserService {
         var timer = metricsHelper.iniciMetrica();
         try {
             var identificador = sincronizarEnvio.getIdentificador();
-            var sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+            var sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             var dataEstat = toDate(sincronizarEnvio.getFechaEstado());
 
             generateInfoLog(sincronizarEnvio, identificador, sdf, dataEstat);
@@ -123,7 +123,8 @@ public class AdviserServiceImpl implements AdviserService {
              enviament = notificacioEnviamentRepository.findByNotificaIdentificador(identificador);
             if (enviament == null) {
                 log.error(ERROR_CALLBACK_NOTIFICA + identificador + "): No s'ha trobat cap enviament amb l'identificador especificat (" + identificador + ").");
-                setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.ERROR_IDENTIFICADOR);
+                var forcarOk = configHelper.getConfigAsBoolean("es.caib.notib.adviser.forcar.resposta.ok");
+                setResultadoEnvio(resultadoSincronizarEnvio, forcarOk ? ResultatEnviamentEnum.OK : ResultatEnviamentEnum.ERROR_IDENTIFICADOR);
                 integracioHelper.addAccioError(info, "No s'ha trobat cap enviament amb l'identificador especificat");
                 return resultadoSincronizarEnvio;
             }
@@ -134,21 +135,24 @@ public class AdviserServiceImpl implements AdviserService {
                 // DATAT
                 switch (tipoEntrega) {
                     case DATAT:
-                        log.warn("Error al processar petició datadoOrganismo dins el callback de Notifica (L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
+//                        log.warn("Error al processar petició datadoOrganismo dins el callback de Notifica (L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
+                        info.addParam("Nota", "L'enviament ja es troba en un estat final");
                         if (receptor != null && !isBlank(receptor.getNifReceptor())) {
                             enviament.updateReceptorDatat(receptor.getNifReceptor(), receptor.getNombreReceptor());
                         }
                         setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
-                        integracioHelper.addAccioError(info, "L'enviament ja es troba en un estat final");
-                        eventErrorDescripcio = msg;
+//                        eventErrorDescripcio = msg;
+                        integracioHelper.addAccioOk(info);
                         break;
                     case CERTIFICACIO:
                         log.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
                         certificacionOrganismo(acusePDF, modoNotificacion, identificador, enviament, resultadoSincronizarEnvio);
                         log.debug("Certificació guardada correctament.");
+                        integracioHelper.addAccioOk(info);
                         break;
                     default:
                         eventErrorDescripcio = msg;
+                        integracioHelper.addAccioError(info, "Tipus d'entrega " + tipoEntrega + " no reconeguda");
                         break;
                 }
             } else {
@@ -277,7 +281,7 @@ public class AdviserServiceImpl implements AdviserService {
         return new IntegracioInfo(IntegracioCodiEnum.NOTIFICA, "Recepció de canvi de notificació via Adviser",
                 IntegracioAccioTipusEnumDto.RECEPCIO,
                 new AccioParam("Organisme emisor", sincronizarEnvio.getOrganismoEmisor()),
-                new AccioParam("Identificador", (identificador != null ? identificador : "")),
+                new AccioParam("Identificador Notifica", (identificador != null ? identificador : "")),
                 new AccioParam("Tipus d'entrega", String.valueOf(sincronizarEnvio.getTipoEntrega())),
                 new AccioParam("Mode de notificació", String.valueOf(sincronizarEnvio.getModoNotificacion())),
                 new AccioParam("Estat", sincronizarEnvio.getEstado()),

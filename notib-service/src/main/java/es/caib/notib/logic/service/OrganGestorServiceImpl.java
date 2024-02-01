@@ -69,6 +69,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
@@ -447,7 +448,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		organGestorHelper.sincronizarUnitat(unitat, organGestor.getEntitat());
 	}
 	@Override
-	@Transactional(timeout = 3600)
+	@Transactional(timeout = 3600, propagation = Propagation.REQUIRES_NEW)
 	@SuppressWarnings("unchecked")
 	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto) throws Exception {
 

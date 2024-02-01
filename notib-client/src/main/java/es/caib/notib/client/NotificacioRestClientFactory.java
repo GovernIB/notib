@@ -33,32 +33,15 @@ public class NotificacioRestClientFactory {
 	 * @param baseUrl Url de Notib
 	 * @param username Usuari de tipus aplicació amb el que es vol interactuar amb Notib
 	 * @param password Contrasenya de l'usuari
-	 * @param autenticacioBasic Indica si utilitzar autenticació basic. En cas negatiu s'utilitzarà autenticació form (per defecte en entorn CAIB).
-	 * @return Client per a interactuar amb Notib. El client per defecte està configurat timeouts de 20s de connexió i 2 min de lectura
-	 * @deprecated
-	 */
-	@Deprecated
-	public static NotificacioRestClient getRestClient(String baseUrl, String username, String password, boolean autenticacioBasic) {
-
-		return new NotificacioRestClient(baseUrl, username, password, autenticacioBasic);
-	}
-
-	/**
-	 * Crea un client per a connectar-se amb la API REST v1 de NOTIB.
-	 *
-	 * @param baseUrl Url de Notib
-	 * @param username Usuari de tipus aplicació amb el que es vol interactuar amb Notib
-	 * @param password Contrasenya de l'usuari
-	 * @param autenticacioBasic Indica si utilitzar autenticació basic. En cas negatiu s'utilitzarà autenticació form (per defecte en entorn CAIB).
 	 * @param connecTimeout Timeout de connexió en milisegons
 	 * @param readTimeout Timeout de lectura en milisegons
 	 * @return Client per a interactuar amb Notib.
 	 * @deprecated
 	 */
 	@Deprecated
-	public static NotificacioRestClient getRestClient(String baseUrl, String username, String password, boolean autenticacioBasic, int connecTimeout, int readTimeout) {
+	public static NotificacioRestClient getRestClient(String baseUrl, String username, String password, int connecTimeout, int readTimeout) {
 
-		return new NotificacioRestClient(baseUrl, username, password, autenticacioBasic, connecTimeout, readTimeout);
+		return new NotificacioRestClient(baseUrl, username, password, connecTimeout, readTimeout);
 	}
 
 
@@ -86,12 +69,11 @@ public class NotificacioRestClientFactory {
 	 * @param baseUrl Url de Notib
 	 * @param username Usuari de tipus aplicació amb el que es vol interactuar amb Notib
 	 * @param password Contrasenya de l'usuari
-	 * @param autenticacioBasic Indica si utilitzar autenticació basic. En cas negatiu s'utilitzarà autenticació form (per defecte en entorn CAIB).
 	 * @return Client per a interactuar amb Notib. El client per defecte està configurat timeouts de 20s de connexió i 2 min de lectura
 	 */
-	public static NotificacioRestClientV2 getRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic) {
+	public static NotificacioRestClientV2 getRestClientV2(String baseUrl, String username, String password, boolean debug) {
 
-		return new NotificacioRestClientV2(baseUrl, username, password, autenticacioBasic);
+		return new NotificacioRestClientV2(baseUrl, username, password, debug);
 	}
 
 	/**
@@ -100,13 +82,12 @@ public class NotificacioRestClientFactory {
 	 * @param baseUrl Url de Notib
 	 * @param username Usuari de tipus aplicació amb el que es vol interactuar amb Notib
 	 * @param password Contrasenya de l'usuari
-	 * @param autenticacioBasic Indica si utilitzar autenticació basic. En cas negatiu s'utilitzarà autenticació form (per defecte en entorn CAIB).
 	 * @param connecTimeout Timeout de connexió en milisegons
 	 * @param readTimeout Timeout de lectura en milisegons
 	 * @return Client per a interactuar amb Notib.
 	 */
-	public static NotificacioRestClientV2 getRestClientV2(String baseUrl, String username, String password, boolean autenticacioBasic, int connecTimeout, int readTimeout) {
+	public static NotificacioRestClientV2 getRestClientV2(String baseUrl, String username, String password, int connecTimeout, int readTimeout, boolean debug) {
 
-		return new NotificacioRestClientV2(baseUrl, username, password, autenticacioBasic, connecTimeout, readTimeout);
+		return new NotificacioRestClientV2(baseUrl, username, password, connecTimeout, readTimeout, debug);
 	}
 }

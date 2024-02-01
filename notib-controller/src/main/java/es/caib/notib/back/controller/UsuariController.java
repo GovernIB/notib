@@ -6,6 +6,7 @@ package es.caib.notib.back.controller;
 import es.caib.notib.back.command.UsuariCommand;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.EnumHelper;
+import es.caib.notib.client.domini.NumElementsPaginaDefecte;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,14 @@ public class UsuariController extends BaseController {
 		var usuari = aplicacioService.getUsuariActual();
 		model.addAttribute(UsuariCommand.asCommand(usuari));
 		model.addAttribute("idiomaEnumOptions", EnumHelper.getOptionsForEnum(Idioma.class,"usuari.form.camp.idioma.enum."));
+		model.addAttribute("numElementsPaginaDefecte", EnumHelper.getOptionsForEnum(NumElementsPaginaDefecte.class,"usuari.form.camp.elements.pagina.perdefecte.enum."));
 		return "usuariForm";
+	}
+
+	@GetMapping(value = "/num/elements/pagina/defecte")
+	@ResponseBody
+	public Integer getNumElementsPaginaDefecte(HttpServletRequest request, Model model) {
+		return aplicacioService.getNumElementsPaginaDefecte();
 	}
 
 	@PostMapping(value = "/configuracio")
@@ -65,6 +73,7 @@ public class UsuariController extends BaseController {
 			command.setCodi(uc.getCodi());
 			command.setRols(uc.getRols());
 			command.setNif(uc.getNif());
+			command.setNumElementsPaginaDefecte(uc.getNumElementsPaginaDefecte());
 			model.addAttribute(command);
 			model.addAttribute("idiomaEnumOptions", EnumHelper.getOptionsForEnum(Idioma.class,"usuari.form.camp.idioma.enum."));
 			return "usuariForm";

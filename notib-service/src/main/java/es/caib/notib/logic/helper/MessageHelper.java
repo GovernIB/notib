@@ -27,6 +27,9 @@ public class MessageHelper implements MessageSourceAware {
 	private MessageSource messageSource;
 	@Autowired
 	private UsuariRepository usuariRepository;
+	@Autowired
+	private CacheHelper cacheHelper;
+
 
 	public String getMessage(String[] keys, Object[] vars, Locale locale) {
 
@@ -65,13 +68,19 @@ public class MessageHelper implements MessageSourceAware {
 	}
 
 	private String getIdiomaUsuariActual() {
+
+		var defecte = "ca";
 		try {
 			var auth = SecurityContextHolder.getContext().getAuthentication();
-			return auth != null ? usuariRepository.getIdiomaUsuari(auth.getName()) : null;
+			if (auth == null) {
+				return defecte;
+			}
+			var usr = cacheHelper.findUsuariByCodi(auth.getName());
+			return usr != null ? usr.getIdioma() : "ca";
 		} catch (Exception ex) {
 			log.error("Error obtenint l'idioma de l'usuari actual ", ex);
 		}
-		return null;
+		return defecte;
 	}
 
 	public String getMessage(String key, Object[] vars) {

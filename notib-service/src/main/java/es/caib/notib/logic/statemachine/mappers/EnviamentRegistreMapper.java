@@ -10,6 +10,7 @@ import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.HibernateHelper;
 import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.RegistreSmHelper;
 import es.caib.notib.logic.intf.dto.AnexoWsDto;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
@@ -138,6 +139,7 @@ public abstract class EnviamentRegistreMapper {
 
     @AfterMapping
     protected void beforeSet(NotificacioEnviamentEntity enviament, @MappingTarget AsientoRegistralBeanDto asientoRegistralBeanDto) {
+
         if (enviament == null) {
             return;
         }
@@ -151,14 +153,19 @@ public abstract class EnviamentRegistreMapper {
         asientoRegistralBeanDto.setUnidadTramitacionDestinoCodigo(organ);
         asientoRegistralBeanDto.setUnidadTramitacionDestinoDenominacion(organ);
 
+        String[] valors = new String[2];
         // LLibre
         CodiNomDto llibre = getLlibreRegistre(notificacio);
         asientoRegistralBeanDto.setLibroCodigo(llibre != null ? llibre.getCodi() : null);
+        valors[0] = llibre.getNom();
 
         // Oficina
         CodiNomDto oficina = getOficinaRegistre(notificacio);
         asientoRegistralBeanDto.setEntidadRegistralOrigenCodigo(oficina != null ? oficina.getCodi() : null);
         asientoRegistralBeanDto.setEntidadRegistralOrigenDenominacion(oficina != null ? oficina.getNom() : null);
+        valors[1] = oficina.getNom();
+
+        RegistreSmHelper.llibreOficina.put(notificacio.getId(), valors);
 
         // Interessat
         var interessat = getInteressatRegistre(enviament);

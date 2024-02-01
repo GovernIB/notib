@@ -6,6 +6,7 @@ package es.caib.notib.back.command;
 import java.io.Serializable;
 
 import es.caib.notib.back.validation.ValidUsuari;
+import es.caib.notib.client.domini.NumElementsPaginaDefecte;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import es.caib.notib.logic.intf.dto.UsuariDto;
@@ -32,6 +33,7 @@ public class UsuariCommand implements Serializable {
 	private String[] rols;
 	private Boolean rebreEmailsNotificacio;
 	private Boolean rebreEmailsNotificacioCreats;
+	private NumElementsPaginaDefecte numElementsPaginaDefecte;
 
 	public static UsuariCommand asCommand(UsuariDto dto) {
 		return ConversioTipusHelper.convertir(dto, UsuariCommand.class);

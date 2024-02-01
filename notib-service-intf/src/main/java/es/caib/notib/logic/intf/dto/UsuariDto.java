@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.intf.dto;
 
+import es.caib.notib.client.domini.NumElementsPaginaDefecte;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -40,6 +41,7 @@ public class UsuariDto implements Serializable {
 	private Long ultimaEntitat;
 	private Boolean rebreEmailsNotificacio;
 	private Boolean rebreEmailsNotificacioCreats;
+	private NumElementsPaginaDefecte numElementsPaginaDefecte;
 
 	private static final long serialVersionUID = -139254994389509932L;
 

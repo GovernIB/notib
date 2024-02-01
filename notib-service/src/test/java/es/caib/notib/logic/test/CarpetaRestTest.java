@@ -30,11 +30,7 @@ public class CarpetaRestTest {
 
 //	@Before
 	public void setUp() throws IOException, DecoderException {
-		client = new CarpetaRestClient(
-				URL,
-				USERNAME,
-				PASSWORD,
-				true);
+		client = new CarpetaRestClient(URL, USERNAME, PASSWORD);
 	}
 
 //	@Test

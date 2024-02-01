@@ -173,6 +173,7 @@ public interface AplicacioService {
 
 	String getMissatgeErrorAccesAdmin();
 
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	void restartSchedulledTasks();
 
 	public void propagateDbProperties();
@@ -184,4 +185,9 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	void updateProcesInicialExecutat(ProcessosInicialsEnum proces);
 
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	void restartSmBroker() throws Exception;
+
+	@PreAuthorize("isAuthenticated()")
+    Integer getNumElementsPaginaDefecte();
 }

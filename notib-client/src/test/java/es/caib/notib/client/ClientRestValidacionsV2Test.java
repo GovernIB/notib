@@ -38,8 +38,8 @@ public class ClientRestValidacionsV2Test extends ClientBaseTest {
 
 
 	private static final String URL = "http://localhost:8080/notibapi";
-	private static final String USERNAME = "u990000";
-	private static final String PASSWORD = "u990000";
+	private static final String USERNAME = "u999000";
+	private static final String PASSWORD = "u999000";
 
 //	private static final String URL = "https://dev.caib.es/notib2api";
 //	private static final String USERNAME = "";
@@ -54,7 +54,7 @@ public class ClientRestValidacionsV2Test extends ClientBaseTest {
 
 	@Before
 	public void setUp() throws IOException, DecoderException, DatatypeConfigurationException {
-		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, true);
+		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, false);
 	}
 
 	@Test

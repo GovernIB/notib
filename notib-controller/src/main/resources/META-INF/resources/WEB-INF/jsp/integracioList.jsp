@@ -11,6 +11,17 @@
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<link href="<c:url value="/webjars/datatables.net-select-bs/1.1.2/css/select.bootstrap.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/datatables.net-select/1.1.2/js/dataTables.select.min.js"/>"></script>
+	<link href="<c:url value="/webjars/select2/4.0.5/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script>
+	<script src="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.min.js"/>"></script>
+	<link href="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.css"/>" rel="stylesheet"></link>
+	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
@@ -18,7 +29,6 @@
 </head>
 <body>
 <script>
-	<%--var data = ${data};--%>
 
 	function formate_date(timestamp, converter) {
 		if (converter.indexOf('date') === 0 || converter.indexOf('time') != -1) {
@@ -91,6 +101,19 @@
 				}
 			});
 		});
+
+		$('#btnNetejar').click(() => {
+			$(':input', $('#filtre')).each((x, y) => {
+				let type = y.type, tag = y.tagName.toLowerCase();
+				if (type === 'text') {
+					y.value = '';
+				}
+				if (tag === 'select') {
+					y.selectedIndex = 0;
+				}
+			});
+			$('#filtre').submit();
+		});
 	});
 </script>
 
@@ -99,11 +122,29 @@
 		<div class="col-md-2">
 			<not:inputText name="entitatCodi" inline="true" placeholderKey="integracio.filtre.codi.entitat"/>
 		</div>
+		<div class="col-md-2">
+			<not:inputSelect name="estat" optionItems="${integracioEstats}" optionValueAttribute="value"
+							 optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>
+		</div>
+		<div class="col-md-2">
+			<not:inputSelect name="tipus" optionItems="${integracioTipus}" optionValueAttribute="value"
+							 optionTextKeyAttribute="text" emptyOption="true" placeholderKey="integracio.list.columna.tipus" inline="true"/>
+		</div>
+		<div class="col-md-2">
+			<not:inputText name="descripcio" inline="true" placeholderKey="integracio.list.columna.descripcio"/>
+		</div>
+		<div class="col-md-2">
+			<not:inputDate name="dataInici" inline="true" placeholderKey="notificacio.list.filtre.camp.datainici" required="false"/>
+		</div>
+		<div class="col-md-2">
+			<not:inputDate name="dataFi" inline="true" placeholderKey="notificacio.list.filtre.camp.datafi" required="false"/>
+		</div>
 		<c:if test="${'CALLBACK' == codiActual}">
 			<div class="col-md-2">
 				<not:inputText name="aplicacio" inline="true" placeholderKey="integracio.filtre.codi.aplicacio"/>
 			</div>
 		</c:if>
+
 		<div class="col-md-2 pull-right">
 			<div class="pull-right">
 				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -206,20 +247,4 @@
 			</div>
 		</div>
 	</div>
-<script>
-	$(document).ready(() =>   {
-		$('#btn-netejar-filtre').click(() => {
-			$(':input', $('#form-filtre')).each((x, y) => {
-				let type = y.type, tag = y.tagName.toLowerCase();
-				if (type === 'text') {
-					y.value = '';
-				}
-				if (tag === 'select') {
-					y.selectedIndex = 0;
-				}
-			});
-			$('#form-filtre').submit();
-		});
-	});
-</script>
 </body>

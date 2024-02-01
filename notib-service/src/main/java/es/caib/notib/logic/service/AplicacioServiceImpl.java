@@ -6,6 +6,7 @@ package es.caib.notib.logic.service;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.NumElementsPaginaDefecte;
 import es.caib.notib.logic.cacheable.PermisosCacheable;
 import es.caib.notib.logic.cacheable.ProcSerCacheable;
 import es.caib.notib.logic.config.SchedulingConfig;
@@ -26,6 +27,7 @@ import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.persist.repository.acl.AclSidRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.activemq.broker.BrokerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.GrantedAuthority;
@@ -73,7 +75,14 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private MessageHelper messageHelper;
 	@Autowired
 	private SchedulingConfig schedulingConfig;
+	@Autowired
+	private BrokerService brokerService;
 
+	public void restartSmBroker() throws Exception {
+
+		brokerService.stop();
+		brokerService.start(true);
+	}
 
 
 	@Override
@@ -106,6 +115,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			} else {
 				usuari.update(dadesUsuari.getNom(), dadesUsuari.getLlinatges(), dadesUsuari.getEmail());
 			}
+			cacheHelper.evictUsuariByCodi(usuari.getCodi());
 			permisosCacheable.clearAuthenticationPermissionsCaches(auth);
 			procedimentsCacheable.clearAuthenticationProcedimentsCaches(auth);
 		} finally {
@@ -146,8 +156,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			log.debug("Actualitzant configuració de usuari actual");
 			var usuari = usuariRepository.findById(dto.getCodi()).orElseThrow();
-			usuari.update(UsuariEntity.builder().rebreEmailsNotificacio(dto.getRebreEmailsNotificacio()).emailAlt(dto.getEmailAlt())
-					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats()).idioma(dto.getIdioma()).build());
+			var usr = UsuariEntity.builder()
+					.rebreEmailsNotificacio(dto.getRebreEmailsNotificacio())
+					.emailAlt(dto.getEmailAlt())
+					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats()).idioma(dto.getIdioma())
+					.numElementsPaginaDefecte(dto.getNumElementsPaginaDefecte().name()).build();
+			usuari.update(usr);
+            cacheHelper.evictUsuariByCodi(usuari.getCodi());
 			return toUsuariDtoAmbRols(usuari);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -184,7 +199,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 	}
 	
-	@Transactional(readOnly = true)
+
 	@Override
 	public UsuariDto getUsuariActual() {
 
@@ -192,7 +207,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			var auth = SecurityContextHolder.getContext().getAuthentication();
 			log.debug("Obtenint usuari actual");
-			return auth != null ? toUsuariDtoAmbRols(usuariRepository.findById(auth.getName()).orElse(null)) : null;
+			return auth != null ? toUsuariDtoAmbRols(cacheHelper.findUsuariByCodi(auth.getName())) : null;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -429,6 +444,18 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void updateProcesInicialExecutat(ProcessosInicialsEnum proces) {
 		processosInicialsRepository.updateInit(proces, false);
+	}
+
+	@Override
+	public Integer getNumElementsPaginaDefecte() {
+		try {
+
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			return NumElementsPaginaDefecte.valueOf(usuariRepository.getNumElementsPaginaDefecte(auth.getName())).getElements();
+		} catch (Exception ex) {
+			log.error("Error obtinguent el número d'elements per pàgina per defecte");
+			return 10;
+		}
 	}
 
 }

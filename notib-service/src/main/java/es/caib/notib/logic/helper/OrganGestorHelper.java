@@ -286,7 +286,7 @@ public class OrganGestorHelper {
 		}
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+//	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void processarOficinaOrgan(IntegracioInfo info, Map<String, OrganismeDto> arbreUnitats, OrganGestorEntity organ) {
 
 		List<OficinaDto> oficines;

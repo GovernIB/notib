@@ -6,7 +6,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.EnviamentTableEntity;
-import es.caib.notib.persist.objectes.FiltreEnviament;
+import es.caib.notib.persist.filtres.FiltreEnviament;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

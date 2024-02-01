@@ -39,6 +39,9 @@ public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 	@Query("select u.idioma from UsuariEntity u where u.codi = :codi")
 	String getIdiomaUsuari(@Param("codi") String codi);
 
+	@Query("select u.numElementsPaginaDefecte from UsuariEntity u where u.codi = :codi")
+	String getNumElementsPaginaDefecte(@Param("codi") String codi);
+
 	@Query(value = "SELECT DISTINCT rol FROM  (SELECT nas.SID AS rol  FROM NOT_ACL_SID nas WHERE nas.PRINCIPAL = 0 " +
 			"UNION SELECT ng.CODI AS rol FROM NOT_GRUP ng)", nativeQuery = true)
 	Set<String> getNotibRolsDisponibles(@Param("codi") String codi);

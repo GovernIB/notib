@@ -25,6 +25,8 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -48,20 +50,23 @@ public class ConsultaSirAction implements Action<EnviamentSmEstat, EnviamentSmEv
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
+        log.debug("[SM] EnviamentNotificaAction enviament " + enviamentUuid);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
         var env = ConsultaSirRequest.builder().consultaSirDto(enviamentSirMapper.toDto(enviament)).numIntent(reintents + 1).build();
         var isRetry = EnviamentSmEvent.SR_RETRY.equals(stateContext.getMessage().getPayload());
         jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_SIR, env,
                 m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0);
+                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0L);
                     return m;
                 });
         log.debug("[SM] Enviada consulta d'estat SIR per l'enviament amb UUID " + enviamentUuid);
     }
 
+    @Transactional
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
+
         log.error("[SM] Recover ConsultaSirAction", t);
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         log.error("[SM] Recover ConsultaSirAction de enviament amb uuid=" + enviamentUuid);

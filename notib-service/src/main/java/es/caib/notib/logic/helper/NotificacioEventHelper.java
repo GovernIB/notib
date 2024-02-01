@@ -90,7 +90,6 @@ public class NotificacioEventHelper {
                 }
             }
         }
-
         // Si no es tracta d'un event únic, o aquest encara no existeix, es crea un event nou
         if (crearNouEvent) {
             event = NotificacioEventEntity.builder().notificacio(eventInfo.getEnviament().getNotificacio()).enviament(eventInfo.getEnviament())

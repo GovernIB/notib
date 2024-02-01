@@ -16,6 +16,8 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -34,10 +36,12 @@ public class ConsultaSirIniciPoolingAction implements Action<EnviamentSmEstat, E
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
+        log.debug("[SM] ConsultaSirIniciPoolingAction enviament " + enviamentUuid);
         jmsTemplate.convertAndSend(SmConstants.CUA_POOLING_SIR, enviamentUuid);
         log.debug("[SM] Inici pooling consulta a SIR");
     }
 
+    @Transactional
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
