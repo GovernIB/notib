@@ -481,7 +481,10 @@
 					if(plugin.settings.mantenirPaginacio){
 						dataTableOptions = $.extend({
 							stateLoadCallback: function(settings) {
-								let json = JSON.parse( sessionStorage.getItem( 'DataTables_' + settings.sInstance ) )
+								let json = JSON.parse(sessionStorage.getItem( 'DataTables_' + settings.sInstance));
+								if (!json) {
+									return json;
+								}
 								json.length = json.length !== length ? length : json.length;
 								return json;
 							}
