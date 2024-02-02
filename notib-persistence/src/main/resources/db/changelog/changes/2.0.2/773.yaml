@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - property:
+      name: boolean.type
+      value: number(1,0)
+      dbms: oracle
+  - property:
+      name: boolean.type
+      value: boolean
+      dbms: postgresql
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - dropColumn:
+            tableName: NOT_COLUMNES
+            columnName: TITULAR_NIF
+        - addColumn:
+            tableName: NOT_COLUMNES
+            columns:
+              - column:
+                  name: DATA_CREACIO
+                  type: ${boolean.type}
+                  defaultValue: 0

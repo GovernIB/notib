@@ -52,6 +52,9 @@ input[type='checkbox']:checked{
 		<div class="row col-xs-12">
 			<div class="row col-xs-6">
 				<div class="col-md-3">
+					<not:inputCheckboxGros name="dataCreacio" textKey="enviament.list.datacreacio" labelSize="10"/>
+				</div>
+				<div class="col-md-3">
 					<not:inputCheckboxGros name="dataEnviament" textKey="enviament.list.dataenviament" labelSize="10" />
 				</div>
 				<div class="col-md-3">
@@ -80,9 +83,6 @@ input[type='checkbox']:checked{
 				</div>
 				<div class="col-md-3">
 					<not:inputCheckbox name="descripcio" textKey="enviament.list.descripcio" labelSize="10"/>
-				</div>
-				<div class="col-md-2">
-					<not:inputCheckbox name="titularNif" textKey="enviament.list.niftitular" labelSize="10"/>
 				</div>
 				<div class="col-md-2">
 					<not:inputCheckbox name="referenciaNotificacio" textKey="enviament.list.identificador.notificacio" labelSize="10"/>

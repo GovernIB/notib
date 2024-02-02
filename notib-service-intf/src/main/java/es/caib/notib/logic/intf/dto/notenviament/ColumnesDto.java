@@ -7,6 +7,7 @@ import java.io.Serializable;
 public class ColumnesDto implements Serializable{
 
 	private Long id;
+	private boolean dataCreacio;
 	private boolean dataEnviament;
 	private boolean dataProgramada;
 	private boolean notIdentificador;
@@ -17,8 +18,7 @@ public class ColumnesDto implements Serializable{
 	private boolean enviamentTipus; 
 	private boolean concepte; 
 	private boolean descripcio; 
-	private boolean titularNif; 
-	private boolean titularNomLlinatge; 
+	private boolean titularNomLlinatge;
 	private boolean titularEmail;
 	private boolean destinataris; 
 	private boolean llibreRegistre; 

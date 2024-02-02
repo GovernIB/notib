@@ -318,7 +318,7 @@ public class NotificacioTableHelper {
     // PRIVATE METHODS
     ////
 
-    private Date getEnviadaDate(NotificacioEntity notificacio) {
+    public Date getEnviadaDate(NotificacioEntity notificacio) {
 
         try {
             if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {

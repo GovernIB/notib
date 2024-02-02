@@ -13,6 +13,7 @@ import es.caib.notib.back.helper.ConversioTipusHelper;
 public class ColumnesCommand {
 
 	private Long id;
+	private boolean dataCreacio;
 	private boolean dataEnviament;
 	private boolean dataProgramada;
 	private boolean notIdentificador;
@@ -23,8 +24,7 @@ public class ColumnesCommand {
 	private boolean enviamentTipus; 
 	private boolean concepte; 
 	private boolean descripcio; 
-	private boolean titularNif; 
-	private boolean titularNomLlinatge; 
+	private boolean titularNomLlinatge;
 	private boolean titularEmail;
 	private boolean destinataris; 
 	private boolean llibreRegistre; 

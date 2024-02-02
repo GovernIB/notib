@@ -613,13 +613,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 			if (columnes == null) {
 				columnes = new ColumnesDto();
 				columnes.setDataEnviament(true);
-				columnes.setCodiNotibEnviament(true);
+				columnes.setDir3Codi(true);
 				columnes.setProCodi(true);
-				columnes.setGrupCodi(true);
-				columnes.setEnviamentTipus(true);
 				columnes.setConcepte(true);
-				columnes.setTitularNif(true);
 				columnes.setTitularNomLlinatge(true);
+				columnes.setEstat(true);
 			}
 			// Dades generals de la notificació
 			ColumnesEntity columnesEntity = ColumnesEntity.builder()
@@ -633,7 +631,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 					.enviamentTipus(columnes.isEnviamentTipus())
 					.concepte(columnes.isConcepte())
 					.descripcio(columnes.isDescripcio())
-					.titularNif(columnes.isTitularNif())
 					.titularNomLlinatge(columnes.isTitularNomLlinatge())
 					.titularEmail(columnes.isTitularEmail())
 					.destinataris(columnes.isDestinataris())
