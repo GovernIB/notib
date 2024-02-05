@@ -336,7 +336,7 @@ public class NotificacioTableHelper {
                     && (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)
                         || !notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)
                         || !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
-                return notificacio.getNotificaEnviamentNotificaData();
+                return notificacio.getNotificaEnviamentData();
             }
         } catch (Exception ex) {
             log.error("Error actualitzant la data d'enviament a la taula del llistat", ex);

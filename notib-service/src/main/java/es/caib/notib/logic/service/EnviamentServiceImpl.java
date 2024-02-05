@@ -273,7 +273,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			mapeigPropietatsOrdenacio.put("concepte", new String[] {"concepte"});
 			mapeigPropietatsOrdenacio.put("descripcio", new String[] {"descripcio"});
 			mapeigPropietatsOrdenacio.put("titularNif", new String[] {"titularNif"});
-			mapeigPropietatsOrdenacio.put("titularNomLlinatge", new String[] {"concat(titularLlinatge1, titularLlinatge2, titularNom)"});
+			mapeigPropietatsOrdenacio.put("titularNomLlinatge", new String[] {"titularNomLlinatge"});
 			mapeigPropietatsOrdenacio.put("titularEmail", new String[] {"titularEmail"});
 			mapeigPropietatsOrdenacio.put("llibre", new String[] {"registreLlibreNom"});
 			mapeigPropietatsOrdenacio.put("registreNumero", new String[] {"registreNumero"});
@@ -288,6 +288,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			f.setDataEnviamentFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataEnviamentInici(), f.getDataEnviamentFi()));
 			f.setDataCaducitatFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataCaducitatInici(), f.getDataCaducitatFi()));
 			f.setDataProgramadaDisposicioFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataProgramadaDisposicioInici(), f.getDataProgramadaDisposicioFi()));
+			setOrdresCampsCompostos(paginacioParams);
 			var pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
  			var pageEnviaments = enviamentTableRepository.findAmbFiltre(f, pageable);
 			if(pageEnviaments == null || !pageEnviaments.hasContent()) {
@@ -295,8 +296,41 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 			return paginacioHelper.toPaginaDto(pageEnviaments, NotEnviamentTableItemDto.class);
 		} finally {
-			metricsHelper.fiMetrica(timer);
+				metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	private void setOrdresCampsCompostos(PaginacioParamsDto paginacioParams) {
+
+		var addOrdres = false;
+		var direccio = PaginacioParamsDto.OrdreDireccioDto.DESCENDENT;
+		for (var ordre : paginacioParams.getOrdres()) {
+
+			if ("procedimentCodiNom".equals(ordre.getCamp())) {
+				ordre.setCamp("procedimentCodiNotib");
+				continue;
+			}
+			if ("organCodiNom".equals(ordre.getCamp())) {
+				ordre.setCamp("emisorDir3Codi");
+				continue;
+			}
+			if ("enviadaDate".equals(ordre.getCamp())) {
+				ordre.setCamp("registreData");
+				continue;
+			}
+			if ("titularNomLlinatge".equals(ordre.getCamp())) {
+				ordre.setCamp("titularNom");
+				addOrdres = true;
+				direccio = ordre.getDireccio();
+			}
+		}
+		if (!addOrdres) {
+			return;
+		}
+		var ordre = new PaginacioParamsDto.OrdreDto("titularLlinatge1", direccio);
+		paginacioParams.getOrdres().add(ordre);
+		ordre = new PaginacioParamsDto.OrdreDto("titularLlinatge2", direccio);
+		paginacioParams.getOrdres().add(ordre);
 	}
 
 	public FiltreEnviament getFiltre(Long entitatId, NotificacioEnviamentFiltreDto filtreDto, String usuariCodi, RolEnumDto rol, String organGestorCodi) throws ParseException {
@@ -328,6 +362,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 		organs = organs != null && !organs.isEmpty() ? organs : null;
 
+		Date dataCreacioInici = null;
+		Date dataCreacioFi = null;
 		Date dataEnviamentInici = null;
 		Date dataEnviamentFi = null;
 		Date dataProgramadaDisposicioInici = null;
@@ -337,6 +373,12 @@ public class EnviamentServiceImpl implements EnviamentService {
 		Date dataCaducitatInici = null;
 		Date dataCaducitatFi = null;
 
+		if (!Strings.isNullOrEmpty(filtreDto.getDataCreacioInici())) {
+			dataCreacioInici = FiltreHelper.toIniciDia(new SimpleDateFormat(FORMAT_DATA).parse(filtreDto.getDataCreacioInici()));
+		}
+		if (!Strings.isNullOrEmpty(filtreDto.getDataCreacioFi())) {
+			dataCreacioFi = FiltreHelper.toFiDia(new SimpleDateFormat(FORMAT_DATA).parse(filtreDto.getDataCreacioFi()));
+		}
 		if (!Strings.isNullOrEmpty(filtreDto.getDataEnviamentInici())) {
 			dataEnviamentInici = FiltreHelper.toIniciDia(new SimpleDateFormat(FORMAT_DATA).parse(filtreDto.getDataEnviamentInici()));
 		}
@@ -382,6 +424,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 		return FiltreEnviament.builder()
 				.entitatIdNull(isSuperAdmin)
 				.entitatId(entitatId)
+				.dataCreacioIniciNull(dataCreacioInici == null)
+				.dataCreacioInici(dataCreacioInici)
+				.dataCreacioFiNull(dataCreacioFi == null)
+				.dataCreacioFi(dataCreacioFi)
 				.dataEnviamentIniciNull(dataEnviamentInici == null)
 				.dataEnviamentInici(dataEnviamentInici)
 				.dataEnviamentFiNull(dataEnviamentFi == null)
