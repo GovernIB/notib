@@ -21,3 +21,4 @@ databaseChangeLog:
                   name: DATA_CREACIO
                   type: ${boolean.type}
                   defaultValue: 0
+        - sql: "UPDATE NOT_NOTIFICACIO_ENV_TABLE t SET REGISTRE_DATA = (SELECT nne.REGISTRE_DATA FROM NOT_NOTIFICACIO_ENV nne WHERE t.id = nne.id)"
