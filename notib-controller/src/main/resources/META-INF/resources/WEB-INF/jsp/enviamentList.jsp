@@ -214,14 +214,33 @@ function getCookie(cname) {
 			<tr>
 				<th data-col-name="id" data-visible="false"></th>
 				<c:choose>
-					<c:when test = "${columnes.dataEnviament == true}">
+					<c:when test = "${columnes.dataCreacio == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.dataEnviament == false}">
+					<c:when test = "${columnes.dataCreacio == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="createdDate" data-converter="date" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataenviament"/>
+				<th data-col-name="createdDate" data-converter="date" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.datacreacio"/>
+					<script id="dataTemplate" type="text/x-jsrender">
+						<div class="from-group">
+							<div class="input-group vdivide">
+    							<input name="dataCreacioInici" value="${filtreEnviaments.dataCreacioInici}" type="text" class="form-control data" placeholder="Inici">
+    							<div class="input-group-addon div-filter-data-sep"></div>
+    							<input name="dataCreacioFi" value="${filtreEnviaments.dataCreacioFi}" type="text" class="form-control data" placeholder="Final">
+							</div>
+						</div>
+					</script>
+				</th>
+				<c:choose>
+					<c:when test = "${columnes.dataEnviament == true}">
+						<c:set value="true" var="visible"></c:set>
+					</c:when>
+					<c:when test = "${columnes.dataEnviament == false}">
+						<c:set value="false" var="visible"></c:set>
+					</c:when>
+				</c:choose>
+				<th data-col-name="enviadaDate" data-converter="date" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataenviament"/>
 					<script id="dataTemplate" type="text/x-jsrender">
 						<div class="from-group">
 							<div class="input-group vdivide">
@@ -275,7 +294,7 @@ function getCookie(cname) {
 					</c:when>
 				</c:choose>
 				<th data-col-name="procedimentTipus" data-visible="false"></th>
-				<th data-col-name="procedimentCodiNotib" data-template="#cellProcedimentTemplate" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codiprocediment"/>
+				<th data-col-name="procedimentCodiNom" data-template="#cellProcedimentTemplate" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codiprocediment"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="codiProcediment" value="${filtreEnviaments.codiProcediment}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codiprocediment"/>"/>
@@ -284,7 +303,7 @@ function getCookie(cname) {
 					<script id="cellProcedimentTemplate" type="text/x-jsrender">
 						{{if procedimentTipus == 'PROCEDIMENT'}}<span class="label label-primary">P</span>{{/if}}
 						{{if procedimentTipus == 'SERVEI'}}<span class="label label-warning">S</span>{{/if}}
-						{{:procedimentCodiNotib}}
+						{{:procedimentCodiNom}}
 					</script>
 				</th>
 				<c:choose>
@@ -311,14 +330,14 @@ function getCookie(cname) {
 					</c:when>
 				</c:choose>
 				<th data-col-name="organEstat" data-visible="false"></th>
-				<th data-col-name="organCodi" data-template="#cellOrganGestorTemplate" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dir3codi"/>
+				<th data-col-name="organCodiNom" data-template="#cellOrganGestorTemplate" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dir3codi"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="dir3Codi" value="${filtreEnviaments.dir3Codi}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.dir3codi"/>"/>
 						</div>
 					</script>
 					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
-						{{:organCodi}}
+						{{:organCodiNom}}
 						{{if organEstat != 'V'}}
 							<span class="fa fa-warning text-danger" title="<spring:message code='enviament.list.organGestor.obsolet'/>"></span>{{/if}}
  					</script>
@@ -365,21 +384,6 @@ function getCookie(cname) {
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="descripcio" value="${filtreEnviaments.descripcio}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.descripcio"/>"/>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.titularNif == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.titularNif == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="titularNif" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.niftitular"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="nifTitular" value="${filtreEnviaments.nifTitular}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.niftitular"/>"/>
 						</div>
 					</script>
 				</th>

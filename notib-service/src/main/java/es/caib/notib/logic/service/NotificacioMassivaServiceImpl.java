@@ -48,6 +48,7 @@ import es.caib.notib.logic.objectes.MassivaFile;
 import es.caib.notib.logic.service.ws.NotificacioValidator;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.CSVReader;
+import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
@@ -675,6 +676,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         var dataIniciNull = filtre.getDataInici() == null;
         var dataFiNull = filtre.getDataFi() == null;
         var estatProcessNull = filtre.getEstatProces() == null;
+        filtre.setDataFi(DatesUtils.incrementarDataFiSiMateixDia(filtre.getDataInici(), filtre.getDataFi()));
         return notificacioMassivaRepository.findUserRolePage(entitat, auth.getName(), dataIniciNull, filtre.getDataInici(), dataFiNull, filtre.getDataFi(),
                 estatProcessNull, filtre.getEstatProces(), paginacioHelper.toSpringDataPageable(paginacioParams));
     }
@@ -685,6 +687,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         var dataFiNull = filtre.getDataFi() == null;
         var estatProcessNull = filtre.getEstatProces() == null;
         var createdByNull = Strings.isNullOrEmpty(filtre.getCreatedByCodi());
+        filtre.setDataFi(DatesUtils.incrementarDataFiSiMateixDia(filtre.getDataInici(), filtre.getDataFi()));
         return notificacioMassivaRepository.findEntitatAdminRolePage(entitat, dataIniciNull, filtre.getDataInici(), dataFiNull, filtre.getDataFi(), estatProcessNull,
                 filtre.getEstatProces(), createdByNull, filtre.getCreatedByCodi(), paginacioHelper.toSpringDataPageable(paginacioParams));
     }

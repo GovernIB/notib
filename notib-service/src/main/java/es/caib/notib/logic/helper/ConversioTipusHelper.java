@@ -103,6 +103,8 @@ public class ConversioTipusHelper {
 	private MessageHelper messageHelper;
 	@Autowired
 	private CallbackRepository callbackRepository;
+	@Autowired
+	private NotificacioTableHelper notificacioTableHelper;
 
 	public ConversioTipusHelper() {
 
@@ -548,6 +550,9 @@ public class ConversioTipusHelper {
 		public void mapAtoB(EnviamentTableEntity enviamentTableEntity, NotEnviamentTableItemDto notEnviamentTableItemDto, MappingContext context) {
 
 			notEnviamentTableItemDto.setCreatedDate(Date.from(enviamentTableEntity.getCreatedDate().orElseThrow().atZone(ZoneId.systemDefault()).toInstant()));
+			notEnviamentTableItemDto.setEnviadaDate(notificacioTableHelper.getEnviadaDate(enviamentTableEntity.getNotificacio()));
+			notEnviamentTableItemDto.setProcedimentNom(enviamentTableEntity.getNotificacio().getProcediment().getNom());
+			notEnviamentTableItemDto.setOrganNom(enviamentTableEntity.getNotificacio().getOrganGestor().getNom());
 			if (enviamentTableEntity.getDestinataris() == null || enviamentTableEntity.getDestinataris().isEmpty()) {
 				return;
 			}

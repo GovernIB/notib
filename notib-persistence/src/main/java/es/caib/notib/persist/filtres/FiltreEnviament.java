@@ -18,6 +18,10 @@ public class FiltreEnviament {
 
     private boolean entitatIdNull;
     private Long entitatId;
+    private boolean dataCreacioIniciNull;
+    private Date dataCreacioInici;
+    private boolean dataCreacioFiNull;
+    private Date dataCreacioFi;
     private boolean dataEnviamentIniciNull;
     private Date dataEnviamentInici;
     private boolean dataEnviamentFiNull;

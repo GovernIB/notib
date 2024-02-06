@@ -21,6 +21,7 @@ public class NotEnviamentTableItemDto implements Serializable {
 
 	private Long id;
 	private Date createdDate;
+	private Date enviadaDate;
 
 	private String destinataris;
 	private Date notificaDataCaducitat;
@@ -38,10 +39,14 @@ public class NotEnviamentTableItemDto implements Serializable {
 
 	//Info notificació
 	private Date enviamentDataProgramada;
+	private String procedimentNom;
 	private String procedimentCodiNotib;
+	private String procedimentCodiNom;
 	private ProcSerTipusEnum procedimentTipus;
 	private String grupCodi;
+	private String organNom;
 	private String organCodi;
+	private String organCodiNom;
 	private OrganGestorEstatEnum organEstat;
 	private String usuariCodi;
 	private String concepte;
@@ -70,6 +75,14 @@ public class NotEnviamentTableItemDto implements Serializable {
 			return NotificacioEstatEnumDto.ENVIANT;
 		}
 		return this.estat;
+	}
+
+	public String getProcedimentCodiNom() {
+		return procedimentCodiNotib + " - " + procedimentNom;
+	}
+
+	public String getOrganCodiNom() {
+		return organCodi + " - " + organNom;
 	}
 
 	public String getTitularNomLlinatge() {

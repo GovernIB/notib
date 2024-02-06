@@ -17,6 +17,8 @@ import es.caib.notib.back.helper.ConversioTipusHelper;
 public class NotificacioEnviamentFiltreCommand extends FiltreCommand {
 	
 	private Long id;
+	private String dataCreacioInici;
+	private String dataCreacioFi;
 	private String dataEnviamentInici;
 	private String dataEnviamentFi;
 	private String dataProgramadaDisposicioInici;

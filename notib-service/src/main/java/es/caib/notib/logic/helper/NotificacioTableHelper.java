@@ -318,7 +318,7 @@ public class NotificacioTableHelper {
     // PRIVATE METHODS
     ////
 
-    private Date getEnviadaDate(NotificacioEntity notificacio) {
+    public Date getEnviadaDate(NotificacioEntity notificacio) {
 
         try {
             if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {
@@ -336,7 +336,7 @@ public class NotificacioTableHelper {
                     && (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)
                         || !notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)
                         || !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
-                return notificacio.getNotificaEnviamentNotificaData();
+                return notificacio.getNotificaEnviamentData();
             }
         } catch (Exception ex) {
             log.error("Error actualitzant la data d'enviament a la taula del llistat", ex);

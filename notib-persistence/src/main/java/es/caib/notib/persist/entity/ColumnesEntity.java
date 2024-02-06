@@ -35,6 +35,8 @@ import javax.persistence.Table;
 @EntityListeners(AuditingEntityListener.class)
 public class ColumnesEntity extends NotibAuditable<Long> {
 
+	@Column(name="data_creacio")
+	private boolean dataCreacio;
 	@Column(name="data_enviament")
 	private boolean dataEnviament;
 	@Column(name="data_programada")
@@ -54,9 +56,7 @@ public class ColumnesEntity extends NotibAuditable<Long> {
 	@Column(name="concepte")
 	private boolean concepte; 
 	@Column(name="descripcio")
-	private boolean descripcio; 
-	@Column(name="titular_nif")
-	private boolean titularNif; 
+	private boolean descripcio;
 	@Column(name="titular_nom_llinatge")
 	private boolean titularNomLlinatge; 
 	@Column(name="titular_email")
@@ -101,6 +101,7 @@ public class ColumnesEntity extends NotibAuditable<Long> {
 
 	public void update(ColumnesDto col) {
 
+		dataCreacio = col.isDataCreacio();
 		dataEnviament = col.isDataEnviament();
 		dataProgramada = col.isDataProgramada();
 		notIdentificador = col.isNotIdentificador();
@@ -111,7 +112,6 @@ public class ColumnesEntity extends NotibAuditable<Long> {
 		enviamentTipus = col.isEnviamentTipus();
 		concepte = col.isConcepte();
 		descripcio = col.isDescripcio();
-		titularNif = col.isTitularNif();
 		titularNomLlinatge = col.isTitularNomLlinatge();
 		titularEmail = col.isTitularEmail();
 		destinataris = col.isDestinataris();
