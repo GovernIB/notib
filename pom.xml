@@ -43,7 +43,7 @@
 		<notib.context>notib</notib.context>
 	</properties>
 	<modules>
-		<module>notib-boot</module>
+<!--		<module>notib-boot</module>-->
 		<module>notib-back</module>
 		<module>notib-service</module>
 		<module>notib-service-intf</module>
@@ -59,7 +59,7 @@
 		<module>notib-client-intf</module>
 
 		<module>notib-ear</module>
-		<module>notib-controller</module>
+<!--		<module>notib-controller</module>-->
         <!--		<module>notib-lib-common</module>-->
 	</modules>
 	<build>

@@ -15,8 +15,10 @@ public interface ConfigService {
 
 	public static final String APP_PROPERTIES = "es.caib.notib.properties";
 	public static final String APP_SYSTEM_PROPERTIES = "es.caib.notib.system.properties";
+	public static final String APP_NAME = "notib";
+	public static final String BASE_PACKAGE = "es.caib." + APP_NAME;
 
-	/**
+    /**
 	 * Actualitza el valor d'una propietat de configuració.
 	 *
 	 * @param property Informació que es vol actualitzar.

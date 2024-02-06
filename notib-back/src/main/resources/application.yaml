@@ -1,0 +1,41 @@
+server:
+  servlet:
+    context-path: /notibback
+  error:
+    path: /error
+  forward-headers-strategy: framework
+spring:
+  mvc:
+    view:
+      prefix: /WEB_INF/jsp/
+      suffix: .jsp
+  freemarker:
+    enabled: false
+  messages:
+    basename: messages
+  liquibase:
+    contexts: undefined
+    enabled: false
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.Oracle10gDialect
+        hbm2ddl:
+          auto: none
+        show_sql: false
+        format_sql: true
+        use_sql_comments: true
+    open-in-view: false
+  sql:
+    init:
+      mode: never
+#springdoc:
+#  packages-to-scan: es.caib.notib.api.interna.controller
+#  api-docs.path: /api-docs
+#  swagger-ui:
+#    path: /rest
+#    operationsSorter: method

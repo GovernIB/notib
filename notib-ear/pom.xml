@@ -54,9 +54,23 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
+			<artifactId>notib-back</artifactId>
+			<version>${project.version}</version>
+			<classifier>classes</classifier>
+<!--			<type>pom</type>-->
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>notib-api-interna</artifactId>
 			<version>${project.version}</version>
 			<type>war</type>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>notib-api-interna</artifactId>
+			<version>${project.version}</version>
+			<classifier>classes</classifier>
+<!--			<type>pom</type>-->
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -64,136 +78,29 @@
 			<version>${project.version}</version>
 			<type>war</type>
 		</dependency>
-		<!--
-			 La següent dependència ja està inclosa a dins el .war. Només s'inclou aquí per a que l'ear
-			 contengui les seves dependències. Després s'haurà d'excloure el fitxer notib-controller*.jar
-			 de dins la carpeta lib per a evitar conflictes per classes duplicades.
-		-->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>notib-controller</artifactId>
+			<artifactId>notib-api-externa</artifactId>
 			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-				<!--
-					Excloem la dependència de keycloak perquè si no ho feim ens dona errors en les classes
-					org.keycloak.* perquè estan carregades a dos classloaders diferents.
-				-->
-				<exclusion>
-					<groupId>org.keycloak</groupId>
-					<artifactId>keycloak-core</artifactId>
-				</exclusion>
-			</exclusions>
+			<classifier>classes</classifier>
+<!--			<type>pom</type>-->
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>notib-service-intf</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>notib-plugin-intf</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.reactivestreams</groupId>
+			<artifactId>reactive-streams</artifactId>
 		</dependency>
 	</dependencies>
-	
-	<profiles>
-		<profile>
-			<id>ejb_container</id>
-			<activation>
-				<file>
-					<missing>../notib-back/appserv_tomcat</missing>
-				</file>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-<!-- 			<properties> -->
-<!-- 				<jboss.directory>/home/siona/Feina/Server/jboss-eap-5.2-dgtic/jboss-as/server/notib/deploycaib</jboss.directory> -->
-<!-- 			</properties> -->
-			<dependencies>
-				<dependency>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-antrun-plugin</artifactId>
-					<version>1.7</version>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>3.1.0</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<configuration>
-									<target>
-<!-- 										<copy file="${basedir}/target/notib.ear" tofile="${jboss.directory}/notib.ear" /> -->
-										<echo message=" " level="info" />
-										<echo message=" " level="info" />
-										<echo message="|      _____                      _ _          _     __                       _ ____   ____   _____ _____    |" level="info" />
-										<echo message="|     / ____|                    (_) |        | |   / _|                     | |  _ \ / __ \ / ____/ ____|   |" level="info" />
-										<echo message="|    | |     ___  _ __ ___  _ __  _| | ___  __| |  | |_ ___  _ __            | | |_) | |  | | (___| (___     |" level="info" />
-										<echo message="|    | |    / _ \| '_ ` _ \| '_ \| | |/ _ \/ _` |  |  _/ _ \| '__|       _   | |  _ -| |  | |\___ \\___ \    |" level="info" />
-										<echo message="|    | |___| (_) | | | | | | |_) | | |  __/ (_| |  | || (_) | |         | |__| | |_) | |__| |____) |___) |   |" level="info" />
-										<echo message="|     \_____\___/|_| |_| |_| .__/|_|_|\___|\__,_|  |_| \___/|_|          \____/|____/ \____/|_____/_____/    |" level="info" />
-										<echo message="|                          | |                                                                               |" level="info" />
-										<echo message="|                          |_|                                                                               |" level="info" />
-										<echo message=" " level="info" />
-									</target>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>servlet_container</id>
-			<activation>
-				<file>
-					<exists>../notib-back/appserv_tomcat</exists>
-				</file>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-antrun-plugin</artifactId>
-					<version>3.1.0</version>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.7</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<configuration>
-									<tasks>
-										<echo message=" " level="info"/>
-										<echo message=" " level="info"/>
-										<echo message="|      _____                      _ _          _     __                  _______ ____  __  __  _____       _______    |" level="info"/>
-										<echo message="|     / ____|                    (_) |        | |   / _|                |__   __/ __ \|  \/  |/ ____|   /\|__   __|   |" level="info"/>
-										<echo message="|    | |     ___  _ __ ___  _ __  _| | ___  __| |  | |_ ___  _ __          | | | |  | | \  / | |       /  \  | |      |" level="info"/>
-										<echo message="|    | |    / _ \| '_ ` _ \| '_ \| | |/ _ \/ _` |  |  _/ _ \| '__|         | | | |  | | |\/| | |      / /\ \ | |      |" level="info"/>
-										<echo message="|    | |___| (_) | | | | | | |_) | | |  __/ (_| |  | || (_) | |            | | | |__| | |  | | |____ / ____ \| |      |" level="info"/>
-										<echo message="|     \_____\___/|_| |_| |_| .__/|_|_|\___|\__,_|  |_| \___/|_|            |_|  \____/|_|  |_|\_____/_/    \_\_|      |" level="info"/>
-										<echo message="|                          | |                                                                                        |" level="info"/>
-										<echo message="|                          |_|                                                                                        |" level="info"/>
-										<echo message=" " level="info"/>
-									</tasks>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-			<repositories>
-		    </repositories>
-		</profile>
-	</profiles>
-		
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -219,12 +126,13 @@
 				<artifactId>maven-ear-plugin</artifactId>
 				<version>3.2.0</version>
 				<configuration>
-					<finalName>notib</finalName>
+<!--					<finalName>notib</finalName>-->
 					<generateApplicationXml>true</generateApplicationXml>
 					<defaultLibBundleDir>/lib</defaultLibBundleDir>
 					<includeLibInApplicationXml>false</includeLibInApplicationXml>
-					<packagingExcludes>lib/es.caib.notib-notib-controller-*.jar</packagingExcludes>
 					<version>6</version>
+					<skinnyWars>true</skinnyWars>
+					<packagingExcludes>lib/es.caib.notib-notib-api-*,lib/es.caib.notib-notib-back-*</packagingExcludes>
 					<initializeInOrder>true</initializeInOrder>
 					<archive>
 						<manifestEntries>
@@ -260,7 +168,6 @@
 							<bundleFileName>notib-api-externa.war</bundleFileName>
 						</webModule>
 					</modules>
-<!--					<defaultJavaBundleDir>lib/</defaultJavaBundleDir>-->
 				</configuration>
 			</plugin>
 			<plugin>

@@ -4,7 +4,9 @@
 package es.caib.notib.api.interna.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -14,15 +16,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 //@Configuration("apiInternaWebMvcConfig")
-//@DependsOn("apiInternaEjbClientConfig")
+@DependsOn("ejbClientConfig")
 public class WebMvcConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
 	}
-//	public void addCorsMappings(CorsRegistry registry) {
-//		registry.addMapping("/**");
-//	}
+
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {}
 
 }
