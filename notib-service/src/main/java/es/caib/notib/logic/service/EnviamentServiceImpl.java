@@ -38,7 +38,6 @@ import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
-import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -57,7 +56,6 @@ import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.utils.DatesUtils;
-import es.caib.notib.persist.entity.ColumnesEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
@@ -649,83 +647,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 	}
 
-	@Override
-	public void columnesCreate(String codiUsuari, Long entitatId, ColumnesDto columnes) {
-
-		var timer = metricsHelper.iniciMetrica();
-		try {
-			var entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId);
-			var usuariEntity = usuariRepository.findByCodi(codiUsuari);
-			if (columnes == null) {
-				columnes = new ColumnesDto();
-				columnes.setDataEnviament(true);
-				columnes.setDir3Codi(true);
-				columnes.setProCodi(true);
-				columnes.setConcepte(true);
-				columnes.setTitularNomLlinatge(true);
-				columnes.setEstat(true);
-			}
-			// Dades generals de la notificació
-			ColumnesEntity columnesEntity = ColumnesEntity.builder()
-					.dataEnviament(columnes.isDataEnviament())
-					.dataProgramada(columnes.isDataProgramada())
-					.notIdentificador(columnes.isNotIdentificador())
-					.proCodi(columnes.isProCodi())
-					.grupCodi(columnes.isGrupCodi())
-					.dir3Codi(columnes.isDir3Codi())
-					.usuari(columnes.isUsuari())
-					.enviamentTipus(columnes.isEnviamentTipus())
-					.concepte(columnes.isConcepte())
-					.descripcio(columnes.isDescripcio())
-					.titularNomLlinatge(columnes.isTitularNomLlinatge())
-					.titularEmail(columnes.isTitularEmail())
-					.destinataris(columnes.isDestinataris())
-					.llibreRegistre(columnes.isLlibreRegistre())
-					.numeroRegistre(columnes.isNumeroRegistre())
-					.dataRegistre(columnes.isDataRegistre())
-					.dataCaducitat(columnes.isDataCaducitat())
-					.codiNotibEnviament(columnes.isCodiNotibEnviament())
-					.numCertificacio(columnes.isNumCertificacio())
-					.csvUuid(columnes.isCsvUuid())
-					.estat(columnes.isEstat())
-					.entitat(entitatEntity)
-					.user(usuariEntity).build();
-	
-			columnesRepository.saveAndFlush(columnesEntity);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Transactional
-	@Override
-	public void columnesUpdate(Long entitatId, ColumnesDto columnes) {
-
-		var timer = metricsHelper.iniciMetrica();
-		try {
-			var columnesEntity = columnesRepository.findById(columnes.getId()).orElseThrow();
-			columnesEntity.update(columnes);
-			columnesRepository.saveAndFlush(columnesEntity);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-		
-	@Transactional(readOnly = true)	
-	@Override
-	public ColumnesDto getColumnesUsuari(Long entitatId, String codiUsuari) {
-
-		var timer = metricsHelper.iniciMetrica();
-		try {
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			var usuari = usuariRepository.findByCodi(codiUsuari);
-			var columnes = columnesRepository.findByEntitatAndUser(entitat, usuari);
-			return conversioTipusHelper.convertir(columnes, ColumnesDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
 	@Override
 	@Transactional(readOnly = true)
 	public List<NotificacioEventDto> eventFindAmbNotificacio(Long notificacioId) {

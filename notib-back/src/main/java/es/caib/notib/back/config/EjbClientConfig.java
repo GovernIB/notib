@@ -132,6 +132,10 @@ public class EjbClientConfig {
 	public LocalStatelessSessionProxyFactoryBean usuariAplicacioService() {
 		return getLocalEjbFactoyBean(UsuariAplicacioService.class);
 	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean columnesService() {
+		return getLocalEjbFactoyBean(ColumnesService.class);
+	}
 
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {
 		String jndiName = EJB_JNDI_PREFIX + serviceClass.getSimpleName() + EJB_JNDI_SUFFIX;

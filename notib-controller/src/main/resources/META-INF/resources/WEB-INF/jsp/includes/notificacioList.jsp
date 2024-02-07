@@ -642,7 +642,8 @@
         </div>
 		<div class="text-right">
 			<div class="btn-group">
-            <button id="btn-desplegar-envs" class="btn btn-default" style="display:none"><spring:message code="notificacio.list.boto.desplegar"/> <span class="fa fa-caret-down"></span></button>
+                <a href="<c:url value="/notificacio/visualitzar"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default"><span class="fa fa-eye-slash"></span> <spring:message code="enviament.list.show"/></a>
+<%--                <button id="btn-desplegar-envs" class="btn btn-default" style="display:none"><spring:message code="notificacio.list.boto.desplegar"/> <span class="fa fa-caret-down"></span></button>--%>
                 <button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
 				<button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
 				<div class="btn-group">
@@ -719,6 +720,7 @@
         <%-- <th data-col-name="notificaEnviamentData" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>--%>
         <th data-col-name="createdDate" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.creadael"/></th>
         <th data-col-name="enviadaDate" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>
+        <th data-col-name="numRegistre"><spring:message code="notificacio.list.columna.num.registre"/></th>
         <c:if test="${mostraEntitat}">
             <th data-col-name="entitatNom" width="170px"><spring:message code="notificacio.list.columna.entitat"/></th>
         </c:if>
@@ -749,6 +751,7 @@
             <th data-col-name="numExpedient" width="170px"><spring:message code="notificacio.list.columna.num.expedient"/></th>
         </c:if>
         <th data-col-name="concepte" width="${ampladaConcepte}" ><spring:message code="notificacio.list.columna.concepte"/></th>
+        <th data-col-name="interessats"><spring:message code="notificacio.list.columna.interessats"/></th>
         <th data-col-name="estatDate" data-converter="datetime" data-visible="false"></th>
         <th data-col-name="estatProcessatDate" data-converter="datetime" data-visible="false"></th>
         <th data-col-name="estatString" data-template="#cellEstatTemplate" <c:if test="${isRolActualAdministradorEntitat}"> data-disable-events="true" </c:if>width="120px"><spring:message code="notificacio.list.columna.estat"/>

@@ -1,6 +1,7 @@
 package es.caib.notib.back.controller;
 
 import com.google.common.base.Strings;
+import es.caib.notib.back.command.ColumnesCommand;
 import es.caib.notib.back.command.MarcarProcessatCommand;
 import es.caib.notib.back.command.NotificacioFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
@@ -21,6 +22,7 @@ import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
 import es.caib.notib.logic.intf.dto.RespostaAccio;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.Taula;
 import es.caib.notib.logic.intf.dto.missatges.Missatge;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
@@ -28,6 +30,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.CallbackService;
+import es.caib.notib.logic.intf.service.ColumnesService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.GrupService;
@@ -101,6 +104,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private CallbackService callbackService;
     @Autowired
     private EnviamentSmService envSmService;
+    @Autowired
+    private ColumnesService columnesService;
 
     private static final  String NOTIFICACIONS_FILTRE = "notificacions_filtre";
     private static final String SESSION_ATTRIBUTE_SELECCIO = "NotificacioController.session.seleccio";
@@ -213,6 +218,27 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return DatatablesHelper.getDatatableResponse(request, notificacions, "id", SESSION_ATTRIBUTE_SELECCIO);
     }
 
+
+    @GetMapping(value = "/visualitzar")
+    public String visualitzar(HttpServletRequest request, Model model) {
+
+        var entitat = sessionScopedContext.getEntitatActual();
+        var columnes = columnesService.getColumnesUsuari(entitat.getId(), getCodiUsuariActual(), Taula.ENVIAMENTS);
+        model.addAttribute(columnes != null ? ColumnesCommand.asCommand(columnes) : new ColumnesCommand());
+        return "remesesColumns";
+    }
+
+    @PostMapping(value = "/visualitzar/save")
+    public String save(HttpServletRequest request, @Valid ColumnesCommand columnesCommand, BindingResult bindingResult, Model model) {
+
+        var entitat = sessionScopedContext.getEntitatActual();
+        if (bindingResult.hasErrors()) {
+            return "remesesColumns";
+        }
+        model.addAttribute(new NotificacioFiltreCommand());
+        columnesService.columnesUpdate(entitat.getId(), ColumnesCommand.asDto(columnesCommand));
+        return getModalControllerReturnValueSuccess(request, "redirect:notificacio", "enviament.controller.modificat.ok");
+    }
 
     /**
      * Obté el llistat de procediments que es pot consultar les seves notificacions.

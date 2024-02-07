@@ -3,6 +3,7 @@
  */
 package es.caib.notib.persist.entity;
 
+import es.caib.notib.logic.intf.dto.Taula;
 import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
 import es.caib.notib.persist.audit.NotibAuditable;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;

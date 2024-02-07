@@ -69,6 +69,9 @@ public class NotificacioTableItemDto {
 	private Long documentId;
 	private Date envCerData;
 	private String referencia;
+
+	private String interessats;
+	private String numRegistre;
 //
 //	private int nTramitacio;
 //	private int nCompareixenca;
