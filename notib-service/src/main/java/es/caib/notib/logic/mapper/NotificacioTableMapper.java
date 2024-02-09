@@ -70,15 +70,9 @@ public abstract class NotificacioTableMapper {
     @Mapping(target = "organEstat", source = "params.organEstat")
     public abstract NotificacioTableItemDto toNotificacioTableItemDto(NotificacioTableEntity not, NotificacioTableItemConversioParams params);
 
-    public abstract List<NotificacioTableItemDto> toNotificacionsTableItemDto(
-            List<NotificacioTableEntity> nots,
-            @Context List<String> codis,
-            @Context Map<String, OrganismeDto> organs);
+    public abstract List<NotificacioTableItemDto> toNotificacionsTableItemDto(List<NotificacioTableEntity> nots, @Context List<String> codis, @Context Map<String, OrganismeDto> organs);
 
-    public NotificacioTableItemDto mapNotificacioTableItemDtoContext(
-            NotificacioTableEntity not,
-            @Context List<String> codis,
-            @Context Map<String, OrganismeDto> organs) {
+    public NotificacioTableItemDto mapNotificacioTableItemDtoContext(NotificacioTableEntity not, @Context List<String> codis, @Context Map<String, OrganismeDto> organs) {
 
         if (not == null) {
             return null;
@@ -130,12 +124,19 @@ public abstract class NotificacioTableMapper {
             dto.setDocumentId(not.getNotificacio().getDocument() != null ? not.getNotificacio().getDocument().getId() : null);
         }
         if (enviaments != null && !enviaments.isEmpty()) {
-            for (var enviament: enviaments) {
-                if (enviament.getNotificaCertificacioData() != null) {
-                    dto.setEnvCerData(enviament.getNotificaCertificacioData());
-                    break;
+            StringBuilder numRegistre = new StringBuilder();
+            StringBuilder interessats = new StringBuilder();
+            var certificacioData = false;
+            for (var env : enviaments) {
+                if (env.getNotificaCertificacioData() != null && !certificacioData) {
+                    dto.setEnvCerData(env.getNotificaCertificacioData());
+                    certificacioData = true;
                 }
+                numRegistre.append(env.getRegistreNumeroFormatat()).append(",");
+                interessats.append(env.getTitular().getNomSencer()).append(",");
             }
+            dto.setNumRegistre(numRegistre.substring(0, numRegistre.length()-1));
+            dto.setInteressats(interessats.substring(0, interessats.length()-1));
         }
         dto.setErrorLastCallback(not.getNotificacio().isErrorLastCallback());
         dto.setEstatString(getColumnaEstat(dto, enviaments));
@@ -150,6 +151,15 @@ public abstract class NotificacioTableMapper {
         } catch (Exception ex) {
             // TODO: Si no es pot actualitzar, no es fa res. Es calcularà en cada consulta com fins ara!
         }
+    }
+
+    private String getNumRegistre(Set<NotificacioEnviamentEntity> enviaments) {
+
+        var numRegistre = "";
+        for (var env : enviaments) {
+            numRegistre = env.getRegistreNumeroFormatat() + ",";
+        }
+        return numRegistre.substring(0, numRegistre.length()-1);
     }
 
     private String getColumnaEstat(NotificacioTableItemDto dto, Set<NotificacioEnviamentEntity> enviaments) {

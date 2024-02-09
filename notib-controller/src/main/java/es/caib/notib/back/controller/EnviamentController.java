@@ -90,7 +90,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 		model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
 		if(entitatActual != null) {
 			var codiUsuari = getCodiUsuariActual();
-			columnes = columnesService.getColumnesUsuari(entitatActual.getId(), codiUsuari, Taula.ENVIAMENTS);
+			columnes = columnesService.getColumnesUsuari(entitatActual.getId(), codiUsuari);
 			if (columnes == null) {
 				columnesService.columnesCreate(codiUsuari, entitatActual.getId(), columnes);
 			}
@@ -153,7 +153,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 	public String visualitzar(HttpServletRequest request, Model model) {
 
 		var entitat = sessionScopedContext.getEntitatActual();
-		var columnes = columnesService.getColumnesUsuari(entitat.getId(), getCodiUsuariActual(), Taula.ENVIAMENTS);
+		var columnes = columnesService.getColumnesUsuari(entitat.getId(), getCodiUsuariActual());
 		model.addAttribute(columnes != null ? ColumnesCommand.asCommand(columnes) : new ColumnesCommand());
 		return "enviamentColumns";
 	}

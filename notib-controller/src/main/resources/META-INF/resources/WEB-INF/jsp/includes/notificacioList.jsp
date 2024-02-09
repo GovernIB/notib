@@ -643,7 +643,7 @@
 		<div class="text-right">
 			<div class="btn-group">
                 <a href="<c:url value="/notificacio/visualitzar"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default"><span class="fa fa-eye-slash"></span> <spring:message code="enviament.list.show"/></a>
-<%--                <button id="btn-desplegar-envs" class="btn btn-default" style="display:none"><spring:message code="notificacio.list.boto.desplegar"/> <span class="fa fa-caret-down"></span></button>--%>
+                <button id="btn-desplegar-envs" class="btn btn-default" style="display:none"><spring:message code="notificacio.list.boto.desplegar"/> <span class="fa fa-caret-down"></span></button>
                 <button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
 				<button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
 				<div class="btn-group">
@@ -718,53 +718,67 @@
             </script>
         </th>
         <%-- <th data-col-name="notificaEnviamentData" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>--%>
-        <th data-col-name="createdDate" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.creadael"/></th>
-        <th data-col-name="enviadaDate" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>
-        <th data-col-name="numRegistre"><spring:message code="notificacio.list.columna.num.registre"/></th>
+        <c:if test = "${columnes.dataCreacio == true}">
+            <th data-col-name="createdDate" data-converter="datetime"   width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.creadael"/></th>
+        </c:if>
+        <c:if test = "${columnes.dataEnviament == true}">
+            <th data-col-name="enviadaDate" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>
+        </c:if>
+        <c:if test = "${columnes.numRegistre == true}">
+            <th data-col-name="numRegistre"><spring:message code="notificacio.list.columna.num.registre"/></th>
+        </c:if>
         <c:if test="${mostraEntitat}">
             <th data-col-name="entitatNom" width="170px"><spring:message code="notificacio.list.columna.entitat"/></th>
         </c:if>
-        <%--th data-col-name="comunicacioTipus" data-template="#cellComunicacioTipusTemplate">
-            <spring:message code="notificacio.list.columna.tipus.comunicacio"/>
-            <script id="cellComunicacioTipusTemplate" type="text/x-jsrender">
-                {{:~eval('comunicacioTipus["' + comunicacioTipus + '"]')}}
-            </script>
-        </th--%>
         <th data-col-name="organEstat" data-visible="false"></th>
-        <th data-col-name="organGestorDesc" data-template="#cellOrganGestorTemplate" width="200px"><spring:message code="notificacio.form.camp.organEmisor"/>
-            <script id="cellOrganGestorTemplate" type="text/x-jsrender">
-						{{:organGestorDesc}}
-						{{if organEstat != 'V'}}
-							<span class="fa fa-warning text-danger" title="<spring:message code='notificacio.list.columna.organGestor.obsolet'/>"></span>{{/if}}
- 					</script>
-        </th>
+        <c:if test = "${columnes.organEmisor == true}">
+            <th data-col-name="organGestorDesc" data-template="#cellOrganGestorTemplate" width="200px"><spring:message code="notificacio.form.camp.organEmisor"/>
+                <script id="cellOrganGestorTemplate" type="text/x-jsrender">
+                    {{:organGestorDesc}}
+                    {{if organEstat != 'V'}}
+                        <span class="fa fa-warning text-danger" title="<spring:message code='notificacio.list.columna.organGestor.obsolet'/>"></span>{{/if}}
+                </script>
+            </th>
+        </c:if>
         <th data-col-name="procedimentTipus" data-visible="false"></th>
         <th data-col-name="estat" data-visible="false"></th>
-        <th data-col-name="procedimentDesc" data-template="#cellProcedimentTemplate" width="200px"><spring:message code="notificacio.list.columna.procediment"/>
-            <script id="cellProcedimentTemplate" type="text/x-jsrender">
-                {{if procedimentTipus == 'PROCEDIMENT'}}<span class="label label-primary">P</span>{{/if}}
-                {{if procedimentTipus == 'SERVEI'}}<span class="label label-warning">S</span>{{/if}}
-                {{:procedimentDesc}}
-            </script>
-        </th>
-        <c:if test="${mostrarColumnaNumExpedient}">
-            <th data-col-name="numExpedient" width="170px"><spring:message code="notificacio.list.columna.num.expedient"/></th>
+        <c:if test = "${columnes.procSerCodi == true}">
+            <th data-col-name="procedimentDesc" data-template="#cellProcedimentTemplate" width="200px"><spring:message code="notificacio.list.columna.procediment"/>
+                <script id="cellProcedimentTemplate" type="text/x-jsrender">
+                    {{if procedimentTipus == 'PROCEDIMENT'}}<span class="label label-primary">P</span>{{/if}}
+                    {{if procedimentTipus == 'SERVEI'}}<span class="label label-warning">S</span>{{/if}}
+                    {{:procedimentDesc}}
+                </script>
+            </th>
         </c:if>
-        <th data-col-name="concepte" width="${ampladaConcepte}" ><spring:message code="notificacio.list.columna.concepte"/></th>
-        <th data-col-name="interessats"><spring:message code="notificacio.list.columna.interessats"/></th>
+        <c:if test="${mostrarColumnaNumExpedient}">
+            <c:if test = "${columnes.numExpedient == true}">
+                <th data-col-name="numExpedient" width="170px"><spring:message code="notificacio.list.columna.num.expedient"/></th>
+            </c:if>
+        </c:if>
+        <c:if test = "${columnes.concepte == true}">
+            <th data-col-name="concepte" width="${ampladaConcepte}" ><spring:message code="notificacio.list.columna.concepte"/></th>
+        </c:if>
+        <c:if test = "${columnes.interessats == true}">
+            <th data-col-name="interessats"><spring:message code="notificacio.list.columna.interessats"/></th>
+        </c:if>
         <th data-col-name="estatDate" data-converter="datetime" data-visible="false"></th>
         <th data-col-name="estatProcessatDate" data-converter="datetime" data-visible="false"></th>
-        <th data-col-name="estatString" data-template="#cellEstatTemplate" <c:if test="${isRolActualAdministradorEntitat}"> data-disable-events="true" </c:if>width="120px"><spring:message code="notificacio.list.columna.estat"/>
-            <script id="cellEstatTemplate" type="text/x-jsrender">
-                <div class="cellEstat">
-                    {{:estatString}}
-                    {^{if ~hlpIsAdministradorEntitat() }}
-                        <div class="hover-button"><a href="<c:url value="/notificacio/{{:id}}/updateEstatList"/>"><span class="fa fa-refresh"></span></a></div>
-                    {{/if}}
-                </div>
-            </script>
-        </th>
-        <th data-col-name="createdByComplet" data-converter="String" width="150px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
+        <c:if test = "${columnes.estat == true}">
+            <th data-col-name="estatString" data-template="#cellEstatTemplate" <c:if test="${isRolActualAdministradorEntitat}"> data-disable-events="true" </c:if>width="120px"><spring:message code="notificacio.list.columna.estat"/>
+                <script id="cellEstatTemplate" type="text/x-jsrender">
+                    <div class="cellEstat">
+                        {{:estatString}}
+                        {^{if ~hlpIsAdministradorEntitat() }}
+                            <div class="hover-button"><a href="<c:url value="/notificacio/{{:id}}/updateEstatList"/>"><span class="fa fa-refresh"></span></a></div>
+                        {{/if}}
+                    </div>
+                </script>
+            </th>
+        </c:if>
+        <c:if test = "${columnes.creadaPer == true}">
+            <th data-col-name="createdByComplet" data-converter="String" width="150px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
+        </c:if>
         <th data-col-name="permisProcessar" data-visible="false">
         <th data-col-name="documentId" data-visible="false" style="visibility: hidden">
             <%--        <th data-col-name="enviamentId" data-visible="false" style="visibility: hidden">--%>

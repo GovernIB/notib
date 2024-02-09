@@ -2,6 +2,7 @@ package es.caib.notib.back.controller;
 
 import com.google.common.base.Strings;
 import es.caib.notib.back.command.ColumnesCommand;
+import es.caib.notib.back.command.ColumnesRemesesCommand;
 import es.caib.notib.back.command.MarcarProcessatCommand;
 import es.caib.notib.back.command.NotificacioFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
@@ -25,6 +26,7 @@ import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.Taula;
 import es.caib.notib.logic.intf.dto.missatges.Missatge;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
+import es.caib.notib.logic.intf.dto.notificacio.ColumnesRemeses;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
@@ -154,6 +156,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var organGestorActual = getOrganGestorActual(request);
         var filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
         model.addAttribute(filtre);
+        var codiUsuari = getCodiUsuariActual();
+        var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), codiUsuari);
+        model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
         notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
         return "notificacioList";
     }
@@ -178,10 +183,14 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @PostMapping
     public String post(HttpServletRequest request, NotificacioFiltreCommand command, Model model) {
 
+        var entitatActual = getEntitatActualComprovantPermisos(request);
         RequestSessionHelper.actualitzarObjecteSessio(request, NOTIFICACIONS_FILTRE, command);
         if (!command.getErrors().isEmpty()) {
             MissatgesHelper.error(request, getErrorMsg(request, command.getErrors()));
         }
+        var codiUsuari = getCodiUsuariActual();
+        var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), codiUsuari);
+        model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
         model.addAttribute("notificacioFiltreCommand", command);
         model.addAttribute("nomesAmbErrors", command.isNomesAmbErrors());
         return "notificacioList";
@@ -223,20 +232,20 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public String visualitzar(HttpServletRequest request, Model model) {
 
         var entitat = sessionScopedContext.getEntitatActual();
-        var columnes = columnesService.getColumnesUsuari(entitat.getId(), getCodiUsuariActual(), Taula.ENVIAMENTS);
-        model.addAttribute(columnes != null ? ColumnesCommand.asCommand(columnes) : new ColumnesCommand());
+        var columnes = columnesService.getColumnesRemeses(entitat.getId(), getCodiUsuariActual());
+        model.addAttribute(columnes != null ? ColumnesRemesesCommand.asCommand(columnes) : new ColumnesCommand());
         return "remesesColumns";
     }
 
     @PostMapping(value = "/visualitzar/save")
-    public String save(HttpServletRequest request, @Valid ColumnesCommand columnesCommand, BindingResult bindingResult, Model model) {
+    public String save(HttpServletRequest request, @Valid ColumnesRemesesCommand columnesCommand, BindingResult bindingResult, Model model) {
 
         var entitat = sessionScopedContext.getEntitatActual();
         if (bindingResult.hasErrors()) {
             return "remesesColumns";
         }
         model.addAttribute(new NotificacioFiltreCommand());
-        columnesService.columnesUpdate(entitat.getId(), ColumnesCommand.asDto(columnesCommand));
+        columnesService.updateColumnesRemeses(entitat.getId(), ColumnesRemesesCommand.asDto(columnesCommand));
         return getModalControllerReturnValueSuccess(request, "redirect:notificacio", "enviament.controller.modificat.ok");
     }
 

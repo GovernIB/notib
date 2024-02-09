@@ -62,3 +62,4 @@ databaseChangeLog:
                   name: estat_remesa
                   type: ${boolean.type}
                   defaultValue: 1
+        - sql: "UPDATE NOT_NOTIFICACIO_TABLE SET PER_ACTUALITZAR = 1;"

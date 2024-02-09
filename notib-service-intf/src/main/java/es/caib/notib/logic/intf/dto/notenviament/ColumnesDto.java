@@ -4,7 +4,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class ColumnesDto implements Serializable{
+public class ColumnesDto implements Serializable {
 
 	private Long id;
 	private boolean dataCreacio;

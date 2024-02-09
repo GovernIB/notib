@@ -5,6 +5,7 @@ import es.caib.notib.logic.helper.EntityComprovarHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.intf.dto.Taula;
 import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
+import es.caib.notib.logic.intf.dto.notificacio.ColumnesRemeses;
 import es.caib.notib.logic.intf.service.ColumnesService;
 import es.caib.notib.persist.entity.ColumnesEntity;
 import es.caib.notib.persist.repository.ColumnesRemesesRepository;
@@ -31,6 +32,85 @@ public class ColumnesServiceImpl implements ColumnesService {
     private ColumnesRemesesRepository columnesRemesesRepository;
     @Autowired
     private UsuariRepository usuariRepository;
+
+    @Override
+    public void createColumnesRemeses(String codiUsuari, Long entitatId, ColumnesRemeses columnes) {
+
+        var timer = metricsHelper.iniciMetrica();
+        try {
+//            var entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId);
+//            var usuariEntity = usuariRepository.findByCodi(codiUsuari);
+//            if (columnes == null) {
+//                columnes = new ColumnesDto();
+//                columnes.setDataEnviament(true);
+//                columnes.setDir3Codi(true);
+//                columnes.setProCodi(true);
+//                columnes.setConcepte(true);
+//                columnes.setTitularNomLlinatge(true);
+//                columnes.setEstat(true);
+//            }
+//            // Dades generals de la notificació
+//            ColumnesEntity columnesEntity = ColumnesEntity.builder()
+//                    .dataEnviament(columnes.isDataEnviament())
+//                    .dataProgramada(columnes.isDataProgramada())
+//                    .notIdentificador(columnes.isNotIdentificador())
+//                    .proCodi(columnes.isProCodi())
+//                    .grupCodi(columnes.isGrupCodi())
+//                    .dir3Codi(columnes.isDir3Codi())
+//                    .usuari(columnes.isUsuari())
+//                    .enviamentTipus(columnes.isEnviamentTipus())
+//                    .concepte(columnes.isConcepte())
+//                    .descripcio(columnes.isDescripcio())
+//                    .titularNomLlinatge(columnes.isTitularNomLlinatge())
+//                    .titularEmail(columnes.isTitularEmail())
+//                    .destinataris(columnes.isDestinataris())
+//                    .llibreRegistre(columnes.isLlibreRegistre())
+//                    .numeroRegistre(columnes.isNumeroRegistre())
+//                    .dataRegistre(columnes.isDataRegistre())
+//                    .dataCaducitat(columnes.isDataCaducitat())
+//                    .codiNotibEnviament(columnes.isCodiNotibEnviament())
+//                    .numCertificacio(columnes.isNumCertificacio())
+//                    .csvUuid(columnes.isCsvUuid())
+//                    .estat(columnes.isEstat())
+//                    .entitat(entitatEntity)
+//                    .user(usuariEntity).build();
+//
+//            columnesRepository.saveAndFlush(columnesEntity);
+        } finally {
+            metricsHelper.fiMetrica(timer);
+        }
+    }
+
+    @Override
+    public void updateColumnesRemeses(Long entitatId, ColumnesRemeses columnes) {
+
+        var timer = metricsHelper.iniciMetrica();
+        try {
+            var columnesEntity = columnesRemesesRepository.findById(columnes.getId()).orElseThrow();
+            columnesEntity.update(columnes);
+            columnesRemesesRepository.saveAndFlush(columnesEntity);
+        } finally {
+            metricsHelper.fiMetrica(timer);
+        }
+
+    }
+
+    @Override
+    public ColumnesRemeses getColumnesRemeses(Long entitatId, String codiUsuari) {
+        var timer = metricsHelper.iniciMetrica();
+        try {
+            var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+            var usuari = usuariRepository.findByCodi(codiUsuari);
+            var columnes = columnesRemesesRepository.findByEntitatAndUser(entitat, usuari);
+            if (columnes == null) {
+                columnesCreate(codiUsuari, entitatId, null);
+                columnes = columnesRemesesRepository.findByEntitatAndUser(entitat, usuari);
+            }
+            return conversioTipusHelper.convertir(columnes, ColumnesRemeses.class);
+        } finally {
+            metricsHelper.fiMetrica(timer);
+        }
+    }
 
     @Override
     public void columnesCreate(String codiUsuari, Long entitatId, ColumnesDto columnes) {
@@ -97,7 +177,7 @@ public class ColumnesServiceImpl implements ColumnesService {
 
     @Transactional(readOnly = true)
     @Override
-    public ColumnesDto getColumnesUsuari(Long entitatId, String codiUsuari, Taula taula) {
+    public ColumnesDto getColumnesUsuari(Long entitatId, String codiUsuari) {
 
         var timer = metricsHelper.iniciMetrica();
         try {
