@@ -44,7 +44,7 @@ public class ConsultaApiRestV1Controller {
 	private EnviamentService enviamentService;
 	@Autowired
 	private NotificacioService notificacioService;
-	private static final String PATH = "/api/consulta/v1";
+	private static final String PATH = "/consulta/v1";
 	
 	@GetMapping(value="/comunicacions/{dniTitular}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "Consulta totes les comunicacions d'un titular donat el seu dni", description = "Retorna informació de totes les comunicacions d'un titular, i el seu estat")
