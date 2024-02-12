@@ -43,7 +43,7 @@ public class ConsultaApiRestV2Controller extends BaseController {
 	@Autowired
 	private NotificacioService notificacioService;
 
-	private static final String PATH = "/api/consulta/v1";
+	private static final String PATH = "/consulta/v1";
 
 	
 	@GetMapping(value="/comunicacions/{dniTitular}", produces = "application/json")
