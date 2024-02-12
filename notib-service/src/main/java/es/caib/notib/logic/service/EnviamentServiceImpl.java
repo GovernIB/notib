@@ -792,16 +792,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 		var dataInicial = consulta.getDataInicial() != null ? FiltreHelper.toIniciDia(consulta.getDataInicial()) : null;
 		var dataFinal = consulta.getDataFinal() != null ? FiltreHelper.toFiDia(consulta.getDataFinal()) : null;
-		var numEnviaments = notificacioEnviamentRepository.countEnviaments(consulta.getDniTitular(),
-				dataInicial == null,
-				dataInicial,
-				dataFinal == null,
-				dataFinal,
-				consulta.getTipus(),
-				consulta.getEstatFinal() == null,
-				consulta.getEstatFinal(),
-				consulta.getVisibleCarpeta() == null,
-				consulta.getVisibleCarpeta());
 		var enviaments = notificacioEnviamentRepository.findEnviaments(
 				consulta.getDniTitular(),
 				dataInicial == null,
@@ -815,6 +805,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				consulta.getVisibleCarpeta(),
 				getPageable(consulta.getPagina(), consulta.getMida()));
 
+		var numEnviaments = (int) enviaments.getTotalElements();
 		return PaginaEnviaments.builder().messageHelper(messageHelper).numEnviaments(numEnviaments).enviaments(enviaments.getContent()).locale(new Locale(consulta.getIdioma().name())).build();
 	}
 
