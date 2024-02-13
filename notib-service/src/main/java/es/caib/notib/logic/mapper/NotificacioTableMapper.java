@@ -144,7 +144,7 @@ public abstract class NotificacioTableMapper {
             not.setDocumentId(dto.getDocumentId());
             not.setEnvCerData(dto.getEnvCerData());
             not.setEstatString(dto.getEstatString());
-            not.setRegistreNums(registreNums.substring(0, registreNums.length()-1));
+            not.setRegistreNums(registreNums.substring(0, registreNums.length()-2));
             not.setPerActualitzar(false);
             notificacioTableHelper.actualitzarCampsLlistat(not);
         } catch (Exception ex) {
