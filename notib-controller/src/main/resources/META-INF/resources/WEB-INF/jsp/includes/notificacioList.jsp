@@ -725,7 +725,7 @@
             <th data-col-name="enviadaDate" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>
         </c:if>
         <c:if test = "${columnes.numRegistre == true}">
-            <th data-col-name="numRegistre"><spring:message code="notificacio.list.columna.num.registre"/></th>
+            <th data-col-name="registreNums"><spring:message code="notificacio.list.columna.num.registre"/></th>
         </c:if>
         <c:if test="${mostraEntitat}">
             <th data-col-name="entitatNom" width="170px"><spring:message code="notificacio.list.columna.entitat"/></th>
@@ -760,7 +760,7 @@
             <th data-col-name="concepte" width="${ampladaConcepte}" ><spring:message code="notificacio.list.columna.concepte"/></th>
         </c:if>
         <c:if test = "${columnes.interessats == true}">
-            <th data-col-name="interessats"><spring:message code="notificacio.list.columna.interessats"/></th>
+            <th data-col-name="titular"><spring:message code="notificacio.list.columna.interessats"/></th>
         </c:if>
         <th data-col-name="estatDate" data-converter="datetime" data-visible="false"></th>
         <th data-col-name="estatProcessatDate" data-converter="datetime" data-visible="false"></th>

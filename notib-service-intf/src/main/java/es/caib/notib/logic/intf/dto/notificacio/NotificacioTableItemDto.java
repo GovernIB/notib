@@ -70,8 +70,8 @@ public class NotificacioTableItemDto {
 	private Date envCerData;
 	private String referencia;
 
-	private String interessats;
-	private String numRegistre;
+	private String titular;
+	private String registreNums;
 //
 //	private int nTramitacio;
 //	private int nCompareixenca;

@@ -123,20 +123,18 @@ public abstract class NotificacioTableMapper {
         if (dto.getDocumentId() == null) {
             dto.setDocumentId(not.getNotificacio().getDocument() != null ? not.getNotificacio().getDocument().getId() : null);
         }
+        var registreNums = new StringBuilder();
         if (enviaments != null && !enviaments.isEmpty()) {
-            StringBuilder numRegistre = new StringBuilder();
-            StringBuilder interessats = new StringBuilder();
-            var certificacioData = false;
+            var certificacio = false;
             for (var env : enviaments) {
-                if (env.getNotificaCertificacioData() != null && !certificacioData) {
+                if (env.getNotificaCertificacioData() != null && !certificacio) {
                     dto.setEnvCerData(env.getNotificaCertificacioData());
-                    certificacioData = true;
+                    certificacio = true;
                 }
-                numRegistre.append(env.getRegistreNumeroFormatat()).append(",");
-                interessats.append(env.getTitular().getNomSencer()).append(",");
+                if (!Strings.isNullOrEmpty(env.getRegistreNumeroFormatat())) {
+                    registreNums.append(env.getRegistreNumeroFormatat()).append(", ");
+                }
             }
-            dto.setNumRegistre(numRegistre.substring(0, numRegistre.length()-1));
-            dto.setInteressats(interessats.substring(0, interessats.length()-1));
         }
         dto.setErrorLastCallback(not.getNotificacio().isErrorLastCallback());
         dto.setEstatString(getColumnaEstat(dto, enviaments));
@@ -146,20 +144,12 @@ public abstract class NotificacioTableMapper {
             not.setDocumentId(dto.getDocumentId());
             not.setEnvCerData(dto.getEnvCerData());
             not.setEstatString(dto.getEstatString());
+            not.setRegistreNums(registreNums.substring(0, registreNums.length()-1));
             not.setPerActualitzar(false);
             notificacioTableHelper.actualitzarCampsLlistat(not);
         } catch (Exception ex) {
             // TODO: Si no es pot actualitzar, no es fa res. Es calcularà en cada consulta com fins ara!
         }
-    }
-
-    private String getNumRegistre(Set<NotificacioEnviamentEntity> enviaments) {
-
-        var numRegistre = "";
-        for (var env : enviaments) {
-            numRegistre = env.getRegistreNumeroFormatat() + ",";
-        }
-        return numRegistre.substring(0, numRegistre.length()-1);
     }
 
     private String getColumnaEstat(NotificacioTableItemDto dto, Set<NotificacioEnviamentEntity> enviaments) {
