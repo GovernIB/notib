@@ -1,4 +1,4 @@
-package es.caib.notib.logic.intf.rest.consulta;
+package es.caib.notib.client.domini.consulta;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

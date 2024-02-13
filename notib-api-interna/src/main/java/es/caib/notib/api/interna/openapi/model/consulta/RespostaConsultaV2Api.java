@@ -3,6 +3,7 @@ package es.caib.notib.api.interna.openapi.model.consulta;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -15,5 +16,10 @@ public class RespostaConsultaV2Api {
 	int numeroElementsRetornats;
 	@Schema(name = "resultat", description = "Llistat de les notificacions retornades")
 	List<TransmissioV2Api> resultat;
-	
+	@Schema(name = "error", description = "Error en la consulta")
+	private boolean error;
+	@Schema(name = "errorDescripcio", description = "Descripció de l'error")
+	private String errorDescripcio;
+	@Schema(name = "errorData", description = "Data de l'error")
+	private Date errorData;
 }

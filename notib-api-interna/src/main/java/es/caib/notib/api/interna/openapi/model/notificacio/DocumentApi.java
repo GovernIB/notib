@@ -36,8 +36,8 @@ public class DocumentApi {
     @Schema(name = "csv", implementation = String.class, example = "aa10b27d8e221cf923715f01e01f515fa7cfec1322b6b49644a27a00461defea",
             description = "Codi csv que es pot utilitzar per tal d’obtenir el document imprimible del sistema d’arxiu\n" +
                     " * Obligatori si no està informat l’enllaç extern, el contingut en Base64 o l'uuid.")
-
     private String csv;
+
     @Size(max = 256)
     @Schema(name = "url", implementation = String.class, example = "http://server_path/document/123456.pdf",
             description = "Enllaç extern on es troba el document de l’enviament.\n" +

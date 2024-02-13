@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @Schema(name = "GenericInfo")
 public class GenericInfoApi {
+    
     @Schema(name = "codi", implementation = String.class, example = "codi", description = "Codi de l'element")
     String codi;
     @Schema(name = "nom", implementation = String.class, example = "nom", description = "Nom de l'element")
