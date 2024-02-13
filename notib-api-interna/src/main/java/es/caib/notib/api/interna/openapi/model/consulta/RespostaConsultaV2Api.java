@@ -16,10 +16,10 @@ public class RespostaConsultaV2Api {
 	int numeroElementsRetornats;
 	@Schema(name = "resultat", description = "Llistat de les notificacions retornades")
 	List<TransmissioV2Api> resultat;
-	@Schema(name = "error", description = "Error en la consulta")
+	@Schema(name = "error", implementation = Boolean.class, example = "false", description = "Error en la consulta")
 	private boolean error;
-	@Schema(name = "errorDescripcio", description = "Descripció de l'error")
+	@Schema(name = "errorDescripcio", implementation = String.class, example = "java.lang.NullPointerException", description = "Descripció de l'error")
 	private String errorDescripcio;
-	@Schema(name = "errorData", description = "Data de l'error")
+	@Schema(name = "errorData", implementation = Date.class, example = "2023-05-29T07:32:03.526+0000", description = "Data de l'error")
 	private Date errorData;
 }
