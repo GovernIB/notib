@@ -24,17 +24,21 @@ import static org.junit.Assert.*;
 public class ClientRestCarpetav2Test {
 
 
-	private static final String URL = "http://localhost:8280/notibapi";
-	private static final String USERNAME = "admin";
-	private static final String PASSWORD = "admin";
+//	private static final String URL = "http://localhost:8280/notibapi";
+//	private static final String USERNAME = "admin";
+//	private static final String PASSWORD = "admin";
 
 //	private static final String URL = "https://dev.caib.es/notib";
 //	private static final String USERNAME = "$carpeta_notib";
 //	private static final String PASSWORD = "carpeta_notib";
 
+	private static final String URL = "https://se.caib.es/notibapi";
+	private static final String USERNAME = "$notib_carpeta";
+	private static final String PASSWORD = "notib_carpeta";
+
 	private static final String DNI_TITULAR = "18225486x";
-	private static final String DATA_INICI = "07/02/2022";
-	private static final String DATA_FI = "07/10/2022";
+	private static final String DATA_INICI = "13/02/2023";
+	private static final String DATA_FI = "13/02/2024";
 	private static final Boolean VISIBLE = true;
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
