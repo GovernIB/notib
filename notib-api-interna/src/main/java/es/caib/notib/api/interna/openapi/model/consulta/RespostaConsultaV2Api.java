@@ -9,11 +9,11 @@ import java.util.List;
 @Schema(name = "RespostaConsultaV2")
 public class RespostaConsultaV2Api {
 
-	@Schema(name = "emisor", implementation = Integer.class, example = "127", description = "Número total de notificacions, segons el filtre aplicat")
+	@Schema(name = "numeroElementsTotals", implementation = Integer.class, example = "127", description = "Número total de notificacions, segons el filtre aplicat")
 	int numeroElementsTotals;
-	@Schema(name = "emisor", implementation = Integer.class, example = "10", description = "Número de notificacions retornades, depenent de la paginació")
+	@Schema(name = "numeroElementsRetornats", implementation = Integer.class, example = "10", description = "Número de notificacions retornades, depenent de la paginació")
 	int numeroElementsRetornats;
-	@Schema(name = "emisor", description = "Llistat de les notificacions retornades")
+	@Schema(name = "resultat", description = "Llistat de les notificacions retornades")
 	List<TransmissioV2Api> resultat;
 	
 }
