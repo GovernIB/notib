@@ -54,7 +54,7 @@ public class ConsultaApiRestV2Controller  extends NotificacioApiRestBaseControll
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(null).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
@@ -73,7 +73,7 @@ public class ConsultaApiRestV2Controller  extends NotificacioApiRestBaseControll
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(null).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
