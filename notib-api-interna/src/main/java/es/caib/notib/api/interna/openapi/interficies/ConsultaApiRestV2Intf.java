@@ -4,7 +4,7 @@ import es.caib.notib.api.interna.openapi.model.consulta.ArxiuApi;
 import es.caib.notib.api.interna.openapi.model.consulta.RespostaConsultaV2Api;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
-import es.caib.notib.logic.intf.rest.consulta.Arxiu;
+import es.caib.notib.client.domini.consulta.Arxiu;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

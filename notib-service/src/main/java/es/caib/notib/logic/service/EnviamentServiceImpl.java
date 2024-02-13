@@ -1213,7 +1213,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				nom = personaEntity.getRaoSocial();
 			}
 			return PersonaConsultaV2.builder()
-					.tipus(GenericInfo.builder().codi(tipus.name()).nom(messageHelper.getMessage("InteressatTipus." + tipus.name())).build())
+					.tipus(GenericInfo.builder().codi(tipus.name()).nom(messageHelper.getMessage("interessatTipusEnumDto." + tipus.name())).build())
 					.nom(nom)
 					.llinatge1(personaEntity.getLlinatge1())
 					.llinatge2(personaEntity.getLlinatge2())

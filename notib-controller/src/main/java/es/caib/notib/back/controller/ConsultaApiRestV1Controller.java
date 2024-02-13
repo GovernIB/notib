@@ -3,7 +3,7 @@ package es.caib.notib.back.controller;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
-import es.caib.notib.logic.intf.rest.consulta.Arxiu;
+import es.caib.notib.client.domini.consulta.Arxiu;
 import es.caib.notib.logic.intf.rest.consulta.Resposta;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
+@Deprecated
 @Controller
 @Slf4j
 @RequestMapping("/api/consulta/v1")

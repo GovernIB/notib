@@ -12,6 +12,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class GenericInfo {
+
     String codi;
     String nom;
     String descripcio;

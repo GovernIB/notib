@@ -3,7 +3,6 @@
  */
 package es.caib.notib.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import es.caib.notib.client.domini.AppInfo;
@@ -16,6 +15,7 @@ import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.notib.client.domini.consulta.Arxiu;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import lombok.extern.slf4j.Slf4j;
 
@@ -273,6 +273,48 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/notificacions/" + dniTitular + "/llegides";
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
 			return getMapper().readValue(json, RespostaConsultaV2.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	public Arxiu getDocument(String notificacioId) {
+
+		try {
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/document/" + notificacioId;
+			jerseyClient = generarClient();
+			String json = jerseyClient.resource(urlAmbMetode)
+					.queryParam("notificacioId", notificacioId != null ? notificacioId : "")
+					.type("application/json").get(String.class);
+			return getMapper().readValue(json, Arxiu.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	public Arxiu getCertificacio(String enviamentId) {
+
+		try {
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/certificacio/" + enviamentId;
+			jerseyClient = generarClient();
+			String json = jerseyClient.resource(urlAmbMetode).
+					queryParam("enviamentId", enviamentId != null ? enviamentId : "")
+					.type("application/json").get(String.class);
+			return getMapper().readValue(json, Arxiu.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	public Arxiu getJustificant(String enviamentId) {
+
+		try {
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/justificant/" + enviamentId;
+			jerseyClient = generarClient();
+			String json = jerseyClient.resource(urlAmbMetode).
+					queryParam("enviamentId", enviamentId != null ? enviamentId : "")
+					.type("application/json").get(String.class);
+			return getMapper().readValue(json, Arxiu.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}

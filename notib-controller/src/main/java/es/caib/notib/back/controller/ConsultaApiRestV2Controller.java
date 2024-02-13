@@ -6,7 +6,7 @@ import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
-import es.caib.notib.logic.intf.rest.consulta.Arxiu;
+import es.caib.notib.client.domini.consulta.Arxiu;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.util.CaseInsensitiveEnumEditor;
@@ -30,9 +30,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.net.URI;
 import java.util.Date;
 
+@Deprecated
 @Controller
 @Slf4j
 @RequestMapping("/api/consulta/v2")
@@ -43,7 +43,7 @@ public class ConsultaApiRestV2Controller extends BaseController {
 	@Autowired
 	private NotificacioService notificacioService;
 
-	private static final String PATH = "/api/consulta/v1";
+	private static final String PATH = "/api/consulta/v2";
 
 	
 	@GetMapping(value="/comunicacions/{dniTitular}", produces = "application/json")

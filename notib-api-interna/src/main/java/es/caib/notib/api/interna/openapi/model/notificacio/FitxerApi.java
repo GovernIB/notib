@@ -16,17 +16,13 @@ import java.io.Serializable;
 @Schema(name = "Fitxer")
 public class FitxerApi implements Serializable {
 
-    @Schema(name = "titular", implementation = String.class, example = "document",
-            description = "Titular")
+    @Schema(name = "nom", implementation = String.class, example = "document", description = "Nom del fitxer")
     private String nom;
-    @Schema(name = "contentType", implementation = String.class, example = "application/pdf",
-            description = "Tipus de contingut del fitxer")
+    @Schema(name = "contentType", implementation = String.class, example = "application/pdf", description = "Tipus de contingut del fitxer")
     private String contentType;
-    @Schema(name = "contingut", implementation = String.class,
-            description = "Contingut del fitxer")
+    @Schema(name = "contingut", implementation = String.class, description = "Contingut del fitxer")
     private byte[] contingut;
-    @Schema(name = "tamany", implementation = Long.class, example = "4265384",
-            description = "Mida del fitxer")
+    @Schema(name = "tamany", implementation = Long.class, example = "4265384", description = "Mida del fitxer")
     private long tamany;
 
 }
