@@ -718,12 +718,13 @@ public class NotificacioFormController extends BaseUserController {
             interessatsTipus = new Enum<?>[]{ InteressatTipus.ADMINISTRACIO };
             interessatsTipusDest = new Enum<?>[]{ InteressatTipus.ADMINISTRACIO };
         } else if (EnviamentTipus.COMUNICACIO.equals(tipusEnviament)) {
-            interessatsTipus = new Enum<?>[]{ InteressatTipus.FISICA, InteressatTipus.FISICA_SENSE_NIF, InteressatTipus.ADMINISTRACIO, InteressatTipus.JURIDICA, };
+            interessatsTipus = new Enum<?>[]{ InteressatTipus.FISICA, InteressatTipus.FISICA_SENSE_NIF, InteressatTipus.JURIDICA, };
             interessatsTipusDest = new Enum<?>[]{ InteressatTipus.FISICA, InteressatTipus.JURIDICA };
         } else {
             interessatsTipus = new Enum<?>[]{ InteressatTipus.FISICA, InteressatTipus.FISICA_SENSE_NIF, InteressatTipus.ADMINISTRACIO, InteressatTipus.JURIDICA };
             interessatsTipusDest = new Enum<?>[]{ InteressatTipus.FISICA, InteressatTipus.JURIDICA };
         }
+
         model.addAttribute("interessatTipus", EnumHelper.getOrderedOptionsForEnum(InteressatTipus.class,"es.caib.notib.logic.intf.dto.InteressatTipus.", interessatsTipus));
         model.addAttribute("interessatTipusDest", EnumHelper.getOrderedOptionsForEnum(InteressatTipus.class,"es.caib.notib.logic.intf.dto.InteressatTipus.", interessatsTipusDest));
         model.addAttribute("entregaPostalTipus", EnumHelper.getOptionsForEnum(NotificaDomiciliConcretTipus.class,"es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus."));

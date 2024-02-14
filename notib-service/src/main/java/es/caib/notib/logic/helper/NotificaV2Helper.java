@@ -607,7 +607,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				titular.setApellidos(concatenarLlinatges(enviament.getTitular().getLlinatge1(), enviament.getTitular().getLlinatge2()));
 				titular.setTelefono(enviament.getTitular().getTelefon());
 				titular.setEmail(InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) ? null : enviament.getTitular().getEmail());
-				if (enviament.getTitular().getInteressatTipus().equals(InteressatTipus.JURIDICA)) {
+				var interessatTipus = enviament.getTitular().getInteressatTipus();
+				if (InteressatTipus.JURIDICA.equals(interessatTipus) || InteressatTipus.ADMINISTRACIO.equals(interessatTipus) ) {
 					titular.setRazonSocial(enviament.getTitular().getRaoSocial());
 				} else {
 					titular.setNombre(enviament.getTitular().getNom());
