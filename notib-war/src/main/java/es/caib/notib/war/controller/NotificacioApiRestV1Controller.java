@@ -6,6 +6,7 @@ package es.caib.notib.war.controller;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import es.caib.notib.client.domini.AplicacioClientVersio;
 import es.caib.notib.client.domini.DadesConsulta;
 import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.PermisConsulta;
@@ -45,6 +46,7 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 							 @RequestBody NotificacioV2 notificacio, HttpServletRequest request, HttpServletResponse response) {
 
 		try {
+			aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V1));
 			RespostaAlta r =  notificacioServiceWsV2.alta(notificacio);
 			logoutSession(request, response);
 			return r;
@@ -61,6 +63,7 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
 
 		try {
+			aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V1));
 			String identificador = extractIdentificador(request);
 			if (identificador.isEmpty()) {
 				String err = "No s'ha informat cap identificador de la notificació";
@@ -81,6 +84,7 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	@ResponseBody
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
 
+		aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V1));
 		String referencia = extractIdentificador(request);
 		try {
 			if (referencia.isEmpty()) {
@@ -103,6 +107,7 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	public RespostaConsultaDadesRegistre consultaDadesRegistre(@ApiParam(name = "dadesConsulta", value = "Objecte amb les dades necessàries per consultar les dades de registre d'una notificació o enviament", required = false)
 															   @RequestBody DadesConsulta dadesConsulta, HttpServletRequest request, HttpServletResponse response) {
 
+		aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V1));
 		try {
 			RespostaConsultaDadesRegistre r = notificacioServiceWsV2.consultaDadesRegistre(dadesConsulta);
 			logoutSession(request, response);
@@ -118,6 +123,8 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	@ApiParam(name = "identificador", value = "Identificador de la notificació a consultar", required = true)
 	@ResponseBody
 	public RespostaConsultaJustificantEnviament consultaJustificantV1(HttpServletRequest request) {
+
+		aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V1));
 		return consultaJustificant(request);
 	}
 
@@ -127,6 +134,8 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	@ResponseBody
 	public String donarPermisConsultaV1(@ApiParam(name = "permisConsulta", value = "Objecte amb les dades necessàries per donar el permís", required = true)
 										@RequestBody PermisConsulta permisConsulta, HttpServletRequest request, HttpServletResponse response) {
+
+		aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V1));
 		String r = donarPermisConsulta(permisConsulta);
 		logoutSession(request, response);
 		return r;

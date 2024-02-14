@@ -332,6 +332,7 @@ body {
 											<li><a id="mc_restats" href="<c:url value="/notificacio/refrescarEstatNotifica"/>" title="<spring:message code="decorator.menu.expirades.ajuda"/>" data-toggle="modal" data-height="350px"><spring:message code="decorator.menu.expirades"/> </a></li>
 											<li><a id="mc_propietats" href="<c:url value="/config"/>" title="<spring:message code="decorator.menu.config.properties"/>"> <spring:message code="decorator.menu.config.properties"/></a></li>
 											<li><a id="mc_scheduler" href="<c:url value="/api/scheduling/restart"/>" title="<spring:message code="decorator.menu.reinici.scheduler"/>"> <spring:message code="decorator.menu.reinici.scheduler"/></a></li>
+											<li><a id="mc_usuaris_aplicacio_clients" data-toggle="modal" data-maximized="true" id="botoUsuarisAplicacioClients" href="<c:url value="/modal/usuari/usuaris/aplicacio/clients"/>"><spring:message code='decorator.menu.usuaris.aplicacio.clients' /></a></li>
 										</ul>
 									</div>
 									<a id="ma_avisos" href="<c:url value="/avis"/>" class="btn btn-primary"><spring:message code="decorator.menu.avisos"/></a>

@@ -4,6 +4,7 @@
 package es.caib.notib.war.controller;
 
 import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.core.api.dto.AplicacioDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.war.command.UsuariCommand;
@@ -25,7 +26,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Controlador per al manteniment de regles.
@@ -107,5 +111,12 @@ public class UsuariController extends BaseController {
 		} catch (Exception e) {
 			return getAjaxControllerReturnValueError(request, "redirect:/", "usuari.controller.refresh.roles.error");
 		}
+	}
+
+	@RequestMapping(value = "/usuaris/aplicacio/clients", method = RequestMethod.GET)
+	public String getUsarisAplicacioClients(HttpServletRequest request, Model model) {
+
+		model.addAttribute("aplicacionsClients", aplicacioService.getAplicacionsClients().values());
+		return "usuarisAplicacioClients";
 	}
 }

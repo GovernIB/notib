@@ -3,6 +3,9 @@
  */
 package es.caib.notib.api.interna.controller;
 
+import es.caib.notib.client.domini.AplicacioClientInfo;
+import es.caib.notib.client.domini.AplicacioClientTipus;
+import es.caib.notib.client.domini.AplicacioClientVersio;
 import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.core.api.exception.PluginException;
@@ -147,6 +150,12 @@ public abstract class BaseRestController implements MessageSourceAware {
 
 	public void setMessageSource(MessageSource messageSource) {
 		this.messageSource = messageSource;
+	}
+
+	protected AplicacioClientInfo getAplicacioClientInfo(AplicacioClientVersio versio) {
+
+		String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+		return AplicacioClientInfo.builder().usuariCodi(usuariCodi).tipus(AplicacioClientTipus.BASIC).versio(versio).build();
 	}
 
 }

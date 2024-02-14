@@ -3,11 +3,15 @@
  */
 package es.caib.notib.war.controller;
 
+import es.caib.notib.client.domini.AplicacioClientInfo;
+import es.caib.notib.client.domini.AplicacioClientTipus;
+import es.caib.notib.client.domini.AplicacioClientVersio;
 import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.util.UtilitatsNotib;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -23,6 +27,7 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public abstract class NotificacioApiRestBaseController extends BaseController {
 
 	@Autowired
@@ -80,5 +85,16 @@ public abstract class NotificacioApiRestBaseController extends BaseController {
 			resposta = getErrorDescripcio(e);
 		}
 		return resposta;
+	}
+
+	protected AplicacioClientInfo getAplicacioClientInfo(AplicacioClientVersio versio) {
+
+		try {
+			String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+			return AplicacioClientInfo.builder().usuariCodi(usuariCodi).tipus(AplicacioClientTipus.FORM).versio(versio).build();
+		} catch (Exception ex) {
+			log.error("Error getAplicacioClientInfo " + ex);
+			return AplicacioClientInfo.builder().usuariCodi("NO USER").tipus(AplicacioClientTipus.FORM).versio(versio).build();
+		}
 	}
 }

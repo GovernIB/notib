@@ -7,6 +7,8 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.AplicacioClientInfo;
+import es.caib.notib.core.api.dto.AplicacioDto;
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
 import es.caib.notib.core.api.dto.ProcessosInicialsEnum;
 import es.caib.notib.core.api.dto.UsuariDto;
@@ -14,6 +16,7 @@ import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.cacheable.ProcSerCacheable;
+import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.ProcesosInicialsEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.CacheHelper;
@@ -22,10 +25,12 @@ import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.ExcepcioLogHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.ProcessosInicialsRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.core.repository.acl.AclSidRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +41,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -70,6 +79,29 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private ConfigHelper configHelper;
 	@Autowired
 	private MessageHelper messageHelper;
+
+	public static Map<String, Set<AplicacioClientInfo>> aplicacionsClients = new HashMap<>();
+
+	@Override
+	public Map<String, Set<AplicacioClientInfo>> getAplicacionsClients() {
+		return aplicacionsClients;
+	}
+
+	public void addAplicacioClient(AplicacioClientInfo info) {
+
+		try {
+			if (aplicacionsClients.containsKey(info.getUsuariCodi())) {
+				aplicacionsClients.get(info.getUsuariCodi()).add(info);
+				return;
+			}
+
+			Set<AplicacioClientInfo> aplicacions = new HashSet<>();
+			aplicacions.add(info);
+			aplicacionsClients.put(info.getUsuariCodi(), aplicacions);
+		} catch (Exception ex) {
+			logger.error("Error al afegir la info de aplicacio del client", ex);
+		}
+	}
 
 	@Override
 	public void actualitzarEntitatThreadLocal(String entitatCodi) {

@@ -3,6 +3,8 @@
  */
 package es.caib.notib.core.ejb;
 
+import es.caib.notib.client.domini.AplicacioClientInfo;
+import es.caib.notib.core.api.dto.AplicacioDto;
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
 import es.caib.notib.core.api.dto.ProcessosInicialsEnum;
 import es.caib.notib.core.api.dto.UsuariDto;
@@ -14,6 +16,8 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementació de AplicacioService com a EJB que empra una clase
@@ -27,6 +31,16 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Autowired
 	AplicacioService delegate;
+
+	@Override
+	public Map<String, Set<AplicacioClientInfo>> getAplicacionsClients() {
+		return delegate.getAplicacionsClients();
+	}
+
+	@Override
+	public void addAplicacioClient(AplicacioClientInfo info) {
+		delegate.addAplicacioClient(info);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})

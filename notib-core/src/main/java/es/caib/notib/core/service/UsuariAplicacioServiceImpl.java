@@ -6,6 +6,7 @@ package es.caib.notib.core.service;
 import javax.annotation.Resource;
 
 import com.google.common.base.Strings;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -32,7 +33,9 @@ import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.repository.AplicacioRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació del servei de gestió d'usuaris.

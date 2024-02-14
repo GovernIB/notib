@@ -6,6 +6,7 @@ package es.caib.notib.api.interna.controller;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import es.caib.notib.client.domini.AplicacioClientVersio;
 import es.caib.notib.client.domini.DadesConsulta;
 import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.PermisConsulta;
@@ -53,6 +54,7 @@ public class NotificacioApiRestV1Controller extends BaseRestController {
 			@RequestBody NotificacioV2 notificacio) {
 
 		try {
+			aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V1));
 			return notificacioServiceWsV2.alta(notificacio);
 		} catch (Exception e) {
 			return RespostaAlta.builder()
@@ -78,6 +80,7 @@ public class NotificacioApiRestV1Controller extends BaseRestController {
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
 			HttpServletRequest request) throws UnsupportedEncodingException {
 
+		aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V1));
 		String identificador = extractIdentificador(request);
 		try {
 			if (identificador.isEmpty()) {
@@ -113,6 +116,7 @@ public class NotificacioApiRestV1Controller extends BaseRestController {
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(
 			HttpServletRequest request) throws UnsupportedEncodingException {
 
+		aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V1));
 		String referencia = extractIdentificador(request);
 		try {
 			if (referencia.isEmpty()) {
@@ -147,7 +151,9 @@ public class NotificacioApiRestV1Controller extends BaseRestController {
 					value = "Objecte amb les dades necessàries per consultar les dades de registre d'una notificació o enviament",
 					required = false)
 			@RequestBody DadesConsulta dadesConsulta) {
+
 		try {
+			aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V1));
 			return notificacioServiceWsV2.consultaDadesRegistre(dadesConsulta);
 		} catch (Exception e) {
 			return RespostaConsultaDadesRegistre.builder()
@@ -171,6 +177,8 @@ public class NotificacioApiRestV1Controller extends BaseRestController {
 			required = true)
 	@ResponseBody
 	public RespostaConsultaJustificantEnviament consultaJustificantV1(HttpServletRequest request) {
+
+		aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V1));
 		return consultaJustificant(request);
 	}
 
@@ -189,6 +197,8 @@ public class NotificacioApiRestV1Controller extends BaseRestController {
 					value = "Objecte amb les dades necessàries per donar el permís",
 					required = true)
 			@RequestBody PermisConsulta permisConsulta) {
+
+		aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V1));
 		return donarPermisConsulta(permisConsulta);
 	}
 }

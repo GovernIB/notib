@@ -3,6 +3,8 @@
  */
 package es.caib.notib.core.api.service;
 
+import es.caib.notib.client.domini.AplicacioClientInfo;
+import es.caib.notib.core.api.dto.AplicacioDto;
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
 import es.caib.notib.core.api.dto.ProcessosInicialsEnum;
 import es.caib.notib.core.api.dto.UsuariDto;
@@ -10,6 +12,8 @@ import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Declaració dels mètodes comuns de l'aplicació.
@@ -18,6 +22,9 @@ import java.util.List;
  */
 public interface AplicacioService {
 
+	Map<String, Set<AplicacioClientInfo>> getAplicacionsClients();
+
+	void addAplicacioClient(AplicacioClientInfo info);
 
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
 	void actualitzarEntitatThreadLocal(String entitat);

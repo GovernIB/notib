@@ -6,6 +6,9 @@ package es.caib.notib.api.interna.controller;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import es.caib.notib.client.domini.AplicacioClientInfo;
+import es.caib.notib.client.domini.AplicacioClientTipus;
+import es.caib.notib.client.domini.AplicacioClientVersio;
 import es.caib.notib.client.domini.DadesConsulta;
 import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.PermisConsulta;
@@ -14,7 +17,9 @@ import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.notib.core.api.dto.EntitatDto;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,6 +58,7 @@ public class NotificacioApiRestV2Controller extends BaseRestController {
 			@RequestBody NotificacioV2 notificacio) {
 
 		try {
+			aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V2));
 			return notificacioServiceWsV2.altaV2(notificacio);
 		} catch (Exception e) {
 			return RespostaAltaV2.builder()
@@ -79,6 +85,7 @@ public class NotificacioApiRestV2Controller extends BaseRestController {
 	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(
 			HttpServletRequest request) throws UnsupportedEncodingException {
 
+		aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V2));
 		String identificador = extractIdentificador(request);
 		try {
 			if (identificador.isEmpty()) {
@@ -114,6 +121,7 @@ public class NotificacioApiRestV2Controller extends BaseRestController {
 	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviament(
 			HttpServletRequest request) throws UnsupportedEncodingException {
 
+		aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V2));
 		String referencia = extractIdentificador(request);
 		try {
 			if (referencia.isEmpty()) {
@@ -148,7 +156,9 @@ public class NotificacioApiRestV2Controller extends BaseRestController {
 					value = "Objecte amb les dades necessàries per consultar les dades de registre d'una notificació o enviament",
 					required = false)
 			@RequestBody DadesConsulta dadesConsulta) {
+
 		try {
+			aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V2));
 			return notificacioServiceWsV2.consultaDadesRegistreV2(dadesConsulta);
 		} catch (Exception e) {
 			return RespostaConsultaDadesRegistreV2.builder()
@@ -172,6 +182,8 @@ public class NotificacioApiRestV2Controller extends BaseRestController {
 			required = true)
 	@ResponseBody
 	public RespostaConsultaJustificantEnviament consultaJustificantV2(HttpServletRequest request) {
+
+		aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V2));
 		return consultaJustificant(request);
 	}
 
@@ -190,6 +202,8 @@ public class NotificacioApiRestV2Controller extends BaseRestController {
 					value = "Objecte amb les dades necessàries per donar el permís",
 					required = true)
 			@RequestBody PermisConsulta permisConsulta) {
+
+		aplicacioService.addAplicacioClient(getAplicacioClientInfo(AplicacioClientVersio.V2));
 		return donarPermisConsulta(permisConsulta);
 	}
 }
