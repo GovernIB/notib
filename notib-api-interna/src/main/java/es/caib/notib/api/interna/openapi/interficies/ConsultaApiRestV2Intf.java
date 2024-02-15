@@ -34,11 +34,11 @@ public interface ConsultaApiRestV2Intf {
 			HttpServletRequest request,
 			@Parameter(name = "dniTitular", description = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
-			@Parameter(name = "dataInicial", description = "Data inicial d'enviament a consultar", required = false)
-			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataInicial,
-			@Parameter(name = "dataFinal", description = "Datfa final d'enviament a consultar", required = false)
-			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
-			@Parameter(name = "visibleCarpeta", description = "Filtrar per visible a carpeta. Si s'indica el valor si, només es retornaran enviaments amb estats visibles per la carpeta. Si s'indica el valor no, es retornaran tots els enviaments independentment de si els seus estats son visible o no a la carpeta.", content = { @Content(schema = @Schema( implementation = Boolean.class, defaultValue = "si", allowableValues = "[si, no]"))})
+			@Parameter(name = "dataInicial", description = "Data inicial d'enviament a consultar", content = { @Content(schema = @Schema( implementation = Date.class, format = "date"))}, required = false)
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@Parameter(name = "dataFinal", description = "Datfa final d'enviament a consultar", content = { @Content(schema = @Schema( implementation = Date.class, format = "date"))}, required = false)
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
+			@Parameter(name = "visibleCarpeta", description = "Filtrar per visible a carpeta. Si s'indica el valor si, només es retornaran enviaments amb estats visibles per la carpeta. Si s'indica el valor no, es retornaran tots els enviaments independentment de si els seus estats son visible o no a la carpeta.", content = { @Content(schema = @Schema( implementation = Boolean.class, defaultValue = "si", allowableValues = "[si, no, true, false, 1, 0]"))})
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
 			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = Idioma.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
 			@RequestParam (value = "lang", required = false) Idioma lang,
@@ -54,10 +54,10 @@ public interface ConsultaApiRestV2Intf {
 			HttpServletRequest request,
 			@Parameter(name = "dniTitular", description = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
-			@Parameter(name = "dataInicial", description = "Data inicial d'enviament a consultar", required = false)
-			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataInicial,
-			@Parameter(name = "dataFinal", description = "Data final d'enviament a consultar", required = false)
-			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
+			@Parameter(name = "dataInicial", description = "Data inicial d'enviament a consultar", content = { @Content(schema = @Schema( implementation = Date.class, format = "date"))}, required = false)
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@Parameter(name = "dataFinal", description = "Datfa final d'enviament a consultar", content = { @Content(schema = @Schema( implementation = Date.class, format = "date"))}, required = false)
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
 			@Parameter(name = "visibleCarpeta", description = "Filtrar per visible a carpeta. Si s'indica el valor si, només es retornaran enviaments amb estats visibles per la carpeta. Si s'indica el valor no, es retornaran tots els enviaments independentment de si els seus estats son visible o no a la carpeta.", content = { @Content(schema = @Schema( implementation = Boolean.class, defaultValue = "si", allowableValues = "[si, no]"))})
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
 			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = Idioma.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
@@ -74,10 +74,10 @@ public interface ConsultaApiRestV2Intf {
 			HttpServletRequest request,
 			@Parameter(name = "dniTitular", description = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
-			@Parameter(name = "dataInicial", description = "Data inicial d'enviament a consultar", required = false)
-			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataInicial,
-			@Parameter(name = "dataFinal", description = "Data final d'enviament a consultar", required = false)
-			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
+			@Parameter(name = "dataInicial", description = "Data inicial d'enviament a consultar", content = { @Content(schema = @Schema( implementation = Date.class, format = "date"))}, required = false)
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@Parameter(name = "dataFinal", description = "Datfa final d'enviament a consultar", content = { @Content(schema = @Schema( implementation = Date.class, format = "date"))}, required = false)
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
 			@Parameter(name = "visibleCarpeta", description = "Filtrar per visible a carpeta. Si s'indica el valor si, només es retornaran enviaments amb estats visibles per la carpeta. Si s'indica el valor no, es retornaran tots els enviaments independentment de si els seus estats son visible o no a la carpeta.", content = { @Content(schema = @Schema( implementation = Boolean.class, defaultValue = "si", allowableValues = "[si, no]"))})
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
 			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = Idioma.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
@@ -94,10 +94,10 @@ public interface ConsultaApiRestV2Intf {
 			HttpServletRequest request,
 			@Parameter(name = "dniTitular", description = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
-			@Parameter(name = "dataInicial", description = "Data inicial d'enviament a consultar", required = false)
-			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataInicial,
-			@Parameter(name = "dataFinal", description = "Data final d'enviament a consultar", required = false)
-			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
+			@Parameter(name = "dataInicial", description = "Data inicial d'enviament a consultar", content = { @Content(schema = @Schema( implementation = Date.class, format = "date"))}, required = false)
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@Parameter(name = "dataFinal", description = "Datfa final d'enviament a consultar", content = { @Content(schema = @Schema( implementation = Date.class, format = "date"))}, required = false)
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
 			@Parameter(name = "visibleCarpeta", description = "Filtrar per visible a carpeta. Si s'indica el valor si, només es retornaran enviaments amb estats visibles per la carpeta. Si s'indica el valor no, es retornaran tots els enviaments independentment de si els seus estats son visible o no a la carpeta.", content = { @Content(schema = @Schema( implementation = Boolean.class, defaultValue = "si", allowableValues = "[si, no]"))})
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
 			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = Idioma.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
@@ -114,10 +114,10 @@ public interface ConsultaApiRestV2Intf {
 			HttpServletRequest request,
 			@Parameter(name = "dniTitular", description = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
-			@Parameter(name = "dataInicial", description = "Data inicial d'enviament a consultar", required = false)
-			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataInicial,
-			@Parameter(name = "dataFinal", description = "Data final d'enviament a consultar", required = false)
-			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
+			@Parameter(name = "dataInicial", description = "Data inicial d'enviament a consultar", content = { @Content(schema = @Schema( implementation = Date.class, format = "date"))}, required = false)
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@Parameter(name = "dataFinal", description = "Datfa final d'enviament a consultar", content = { @Content(schema = @Schema( implementation = Date.class, format = "date"))}, required = false)
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
 			@Parameter(name = "visibleCarpeta", description = "Filtrar per visible a carpeta. Si s'indica el valor si, només es retornaran enviaments amb estats visibles per la carpeta. Si s'indica el valor no, es retornaran tots els enviaments independentment de si els seus estats son visible o no a la carpeta.", content = { @Content(schema = @Schema( implementation = Boolean.class, defaultValue = "si", allowableValues = "[si, no]"))})
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
 			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = Idioma.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
@@ -134,10 +134,10 @@ public interface ConsultaApiRestV2Intf {
 			HttpServletRequest request,
 			@Parameter(name = "dniTitular", description = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
-			@Parameter(description = "Data inicial d'enviament a consultar")
-			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataInicial,
-			@Parameter(description = "Data final d'enviament a consultar")
-			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
+			@Parameter(name = "dataInicial", description = "Data inicial d'enviament a consultar", content = { @Content(schema = @Schema( implementation = Date.class, format = "date"))}, required = false)
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@Parameter(name = "dataFinal", description = "Datfa final d'enviament a consultar", content = { @Content(schema = @Schema( implementation = Date.class, format = "date"))}, required = false)
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
 			@Parameter(name = "visibleCarpeta", description = "Filtrar per visible a carpeta. Si s'indica el valor si, només es retornaran enviaments amb estats visibles per la carpeta. Si s'indica el valor no, es retornaran tots els enviaments independentment de si els seus estats son visible o no a la carpeta.", content = { @Content(schema = @Schema( implementation = Boolean.class, defaultValue = "si", allowableValues = "[si, no]"))})
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
 			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = Idioma.class, defaultValue = "ca", allowableValues = "[ca, es]"))})

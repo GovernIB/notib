@@ -12,6 +12,7 @@ import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.client.domini.consulta.TransmissioV2;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.CallbackHelper;
+import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.EntityComprovarHelper;
 import es.caib.notib.logic.helper.FiltreHelper;
@@ -55,10 +56,7 @@ import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
-import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.PermisosService;
-import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
-import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.persist.entity.ColumnesEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
@@ -81,7 +79,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.supercsv.io.CsvListWriter;
@@ -789,6 +786,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 	public byte[] getDocumentJustificant(Long enviamentId) {
 		
 		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+		try {
+			ConfigHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
+		} catch (Exception ex) {
+			log.error("No s'ha pogut definir l'entitat actual.", ex);
+		}
 		if (enviament.getRegistreEstat() != null && enviament.getRegistreEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_EXTERN)) {
 			return pluginHelper.obtenirOficiExtern(enviament.getNotificacio().getEmisorDir3Codi(), enviament.getRegistreNumeroFormatat()).getJustificant();
 		}

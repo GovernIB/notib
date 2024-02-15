@@ -926,8 +926,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var nomDocumentDefault = "document";
-			var entity = notificacioRepository.findById(notificacioId).orElseThrow();
-			var document = entity.getDocument();
+			var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
+			try {
+				ConfigHelper.setEntitatCodi(notificacio.getEntitat().getCodi());
+			} catch (Exception ex) {
+				log.error("No s'ha pogut definir l'entitat actual.", ex);
+			}
+			var document = notificacio.getDocument();
 			return documentHelper.documentToArxiuDto(nomDocumentDefault, document);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -941,6 +946,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var nomDocumentDefault = "document";
+			try {
+				var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
+				ConfigHelper.setEntitatCodi(notificacio.getEntitat().getCodi());
+			} catch (Exception ex) {
+				log.error("No s'ha pogut definir l'entitat actual.", ex);
+			}
 			var document = documentRepository.findById(documentId).orElse(null);
 			return documentHelper.documentToArxiuDto(nomDocumentDefault, document);
 		} finally {
@@ -955,6 +966,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+			try {
+				ConfigHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
+			} catch (Exception ex) {
+				log.error("No s'ha pogut definir l'entitat actual.", ex);
+			}
 			// #779: Obtenim la certificació de forma automàtica
 			if (enviament.getNotificaCertificacioArxiuId() == null) {
 				enviament = notificaHelper.enviamentRefrescarEstat(enviamentId);
