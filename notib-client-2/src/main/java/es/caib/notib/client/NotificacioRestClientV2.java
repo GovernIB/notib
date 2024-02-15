@@ -337,14 +337,15 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	private String getConsultaJsonString(Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida, String urlAmbMetode)  {
 
 		jerseyClient = generarClient();
-		var wt = jerseyClient.target(urlAmbMetode);
-		wt.queryParam("dataInicial", dataInicial != null ? sdf.format(dataInicial) : "").
-		queryParam("dataFinal", dataInicial != null ? sdf.format(dataFinal) : "").
-		queryParam("visibleCarpeta", visibleCarpeta != null ? (visibleCarpeta ? "si" : "no") : "").
-		queryParam("lang", lang != null ? lang.name() : "").
-		queryParam("pagina", pagina != null ? pagina.toString() : "").
-		queryParam("mida", mida != null ? mida.toString() : "");
-		return wt.request(MediaType.APPLICATION_JSON).get(String.class);
+		return jerseyClient.target(urlAmbMetode)
+				.queryParam("dataInicial", dataInicial != null ? sdf.format(dataInicial) : "")
+				.queryParam("dataFinal", dataInicial != null ? sdf.format(dataFinal) : "")
+				.queryParam("visibleCarpeta", visibleCarpeta != null ? (visibleCarpeta ? "si" : "no") : "")
+				.queryParam("lang", lang != null ? lang.name() : "")
+				.queryParam("pagina", pagina != null ? pagina.toString() : "")
+				.queryParam("mida", mida != null ? mida.toString() : "")
+				.request(MediaType.APPLICATION_JSON)
+				.get(String.class);
 	}
 
 }
