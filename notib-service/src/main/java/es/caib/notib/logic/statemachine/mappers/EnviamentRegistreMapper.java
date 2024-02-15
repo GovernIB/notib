@@ -476,9 +476,7 @@ public abstract class EnviamentRegistreMapper {
 
     @Named("idioma")
     protected Long getIdioma(Idioma idioma) {
-        if (idioma == null)
-            return 0L;
-        return Long.valueOf(idioma.ordinal());
+        return idioma != null ? Long.valueOf(idioma.ordinal()) : 1L;
     }
 
     @Named("observacions")
