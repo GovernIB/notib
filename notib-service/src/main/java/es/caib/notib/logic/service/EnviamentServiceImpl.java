@@ -12,6 +12,7 @@ import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.client.domini.consulta.TransmissioV2;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.CallbackHelper;
+import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.EntityComprovarHelper;
 import es.caib.notib.logic.helper.FiltreHelper;
@@ -56,6 +57,7 @@ import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.utils.DatesUtils;
+import es.caib.notib.persist.entity.ColumnesEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
@@ -294,7 +296,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 			return paginacioHelper.toPaginaDto(pageEnviaments, NotEnviamentTableItemDto.class);
 		} finally {
-				metricsHelper.fiMetrica(timer);
+            metricsHelper.fiMetrica(timer);
 		}
 	}
 
@@ -756,6 +758,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 	public byte[] getDocumentJustificant(Long enviamentId) {
 		
 		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+		try {
+			ConfigHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
+		} catch (Exception ex) {
+			log.error("No s'ha pogut definir l'entitat actual.", ex);
+		}
 		if (enviament.getRegistreEstat() != null && enviament.getRegistreEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_EXTERN)) {
 			return pluginHelper.obtenirOficiExtern(enviament.getNotificacio().getEmisorDir3Codi(), enviament.getRegistreNumeroFormatat()).getJustificant();
 		}
