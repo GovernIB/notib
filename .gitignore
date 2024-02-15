@@ -8,3 +8,17 @@
 /.idea
 /notib.iml
 /docker-compose.yml
+/activemq-data/localhost/scheduler/db-1.log
+/activemq-data/localhost/scheduler/scheduleDB.redo
+/activemq-data/localhost/scheduler/scheduleDB.data
+/activemq-data/localhost/scheduler/lock
+/doc/.$StateMachine2.drawio.bkp
+/doc/StateMachine2.drawio
+/doc/.~lock.NOTIB_manualNotificaV0Helper.odt#
+/doc/.$StateMachine2.drawio.dtmp
+/notib-core/notib-core.iml
+/notib-core-api/notib-core-api.iml
+/notib-lib-common/notib-lib-common.iml
+/notib-plugin-impl/notib-plugin-impl.iml
+/notib-war/notib-war.iml
+/notib-persistence/derby.log
