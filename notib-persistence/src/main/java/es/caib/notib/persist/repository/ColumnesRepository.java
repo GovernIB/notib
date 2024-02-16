@@ -3,6 +3,7 @@
  */
 package es.caib.notib.persist.repository;
 
+import es.caib.notib.logic.intf.dto.Taula;
 import org.springframework.data.jpa.repository.JpaRepository;
 import es.caib.notib.persist.entity.ColumnesEntity;
 import es.caib.notib.persist.entity.EntitatEntity;

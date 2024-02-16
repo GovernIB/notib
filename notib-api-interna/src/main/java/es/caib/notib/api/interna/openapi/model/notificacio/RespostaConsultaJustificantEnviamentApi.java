@@ -13,8 +13,7 @@ import lombok.Getter;
 @Schema(name = "RespostaConsultaJustificantEnviament")
 public class RespostaConsultaJustificantEnviamentApi extends RespostaBaseApi {
 
-    @Schema(name = "justificant", implementation = FitxerApi.class,
-            description = "Fitxer del justificant")
+    @Schema(name = "justificant", implementation = FitxerApi.class, description = "Fitxer del justificant")
     private FitxerApi justificant;
 
 }

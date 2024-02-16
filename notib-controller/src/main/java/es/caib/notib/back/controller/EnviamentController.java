@@ -14,9 +14,11 @@ import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.Taula;
 import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.ColumnesService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -53,6 +55,8 @@ public class EnviamentController extends TableAccionsMassivesController {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private EnviamentService enviamentService;
+	@Autowired
+	private ColumnesService columnesService;
 
 
 	public EnviamentController() {
@@ -86,9 +90,9 @@ public class EnviamentController extends TableAccionsMassivesController {
 		model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
 		if(entitatActual != null) {
 			var codiUsuari = getCodiUsuariActual();
-			columnes = enviamentService.getColumnesUsuari(entitatActual.getId(), codiUsuari);
+			columnes = columnesService.getColumnesUsuari(entitatActual.getId(), codiUsuari);
 			if (columnes == null) {
-				enviamentService.columnesCreate(codiUsuari, entitatActual.getId(), columnes);
+				columnesService.columnesCreate(codiUsuari, entitatActual.getId(), columnes);
 			}
 		} else {
 			MissatgesHelper.error(request, getMessage(request, "enviament.controller.entitat.cap.creada"));
@@ -149,7 +153,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 	public String visualitzar(HttpServletRequest request, Model model) {
 
 		var entitat = sessionScopedContext.getEntitatActual();
-		var columnes = enviamentService.getColumnesUsuari(entitat.getId(), getCodiUsuariActual());
+		var columnes = columnesService.getColumnesUsuari(entitat.getId(), getCodiUsuariActual());
 		model.addAttribute(columnes != null ? ColumnesCommand.asCommand(columnes) : new ColumnesCommand());
 		return "enviamentColumns";
 	}
@@ -159,10 +163,10 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 		var entitat = sessionScopedContext.getEntitatActual();
 		if (bindingResult.hasErrors()) {
-			return "procedimentAdminForm";
+			return "enviamentColumns";
 		}
 		model.addAttribute(new NotificacioFiltreCommand());
-		enviamentService.columnesUpdate(entitat.getId(), ColumnesCommand.asDto(columnesCommand));
+		columnesService.columnesUpdate(entitat.getId(), ColumnesCommand.asDto(columnesCommand));
 		return getModalControllerReturnValueSuccess(request, "redirect:enviament", "enviament.controller.modificat.ok");
 	}
 

@@ -1,19 +1,19 @@
 package es.caib.notib.api.interna.controller;
 
 import es.caib.notib.api.interna.openapi.interficies.ConsultaApiRestV2Intf;
+import es.caib.notib.api.interna.util.EnhancedBooleanEditor;
+import es.caib.notib.api.interna.util.EnhancedDateEditor;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
-import es.caib.notib.client.domini.RespostaConsultaEstatEnviament;
+import es.caib.notib.client.domini.consulta.Arxiu;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
-import es.caib.notib.logic.intf.rest.consulta.Arxiu;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.util.CaseInsensitiveEnumEditor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
 
@@ -41,20 +42,20 @@ public class ConsultaApiRestV2Controller  extends NotificacioApiRestBaseControll
 	@Autowired
 	private NotificacioService notificacioService;
 
-	private static final String PATH = "/api/consulta/v2";
+	private static final String PATH = "/consulta/v2";
 
 	@GetMapping(value="/comunicacions/{dniTitular}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaV2 comunicacionsByTitular(
 			HttpServletRequest request,
 			@PathVariable String dniTitular,
-			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataInicial,
-			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
 			@RequestParam (value = "lang", required = false) Idioma lang,
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(null).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
@@ -66,14 +67,14 @@ public class ConsultaApiRestV2Controller  extends NotificacioApiRestBaseControll
 	public RespostaConsultaV2 notificacionsByTitular(
 			HttpServletRequest request,
 			@PathVariable String dniTitular,
-			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataInicial,
-			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
 			@RequestParam (value = "lang", required = false) Idioma lang,
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(null).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
@@ -89,8 +90,8 @@ public class ConsultaApiRestV2Controller  extends NotificacioApiRestBaseControll
 	public RespostaConsultaV2 comunicacionsPendentsByTitular(
 			HttpServletRequest request,
 			@PathVariable String dniTitular,
-			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataInicial,
-			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
 			@RequestParam (value = "lang", required = false) Idioma lang,
 			@RequestParam(value = "pagina", required = false) Integer pagina,
@@ -112,8 +113,8 @@ public class ConsultaApiRestV2Controller  extends NotificacioApiRestBaseControll
 	public RespostaConsultaV2 notificacionsPendentsByTitular(
 			HttpServletRequest request,
 			@PathVariable String dniTitular,
-			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataInicial,
-			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
 			@RequestParam (value = "lang", required = false) Idioma lang,
 			@RequestParam(value = "pagina", required = false) Integer pagina,
@@ -135,8 +136,8 @@ public class ConsultaApiRestV2Controller  extends NotificacioApiRestBaseControll
 	public RespostaConsultaV2 comunicacionsLlegidesByTitular(
 			HttpServletRequest request,
 			@PathVariable String dniTitular,
-			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataInicial,
-			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
 			@RequestParam (value = "lang", required = false) Idioma lang,
 			@RequestParam(value = "pagina", required = false) Integer pagina,
@@ -158,8 +159,8 @@ public class ConsultaApiRestV2Controller  extends NotificacioApiRestBaseControll
 	public RespostaConsultaV2 notificacionsLlegidesByTitular(
 			HttpServletRequest request,
 			@PathVariable String dniTitular,
-			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataInicial,
-			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
 			@RequestParam (value = "lang", required = false) Idioma lang,
 			@RequestParam(value = "pagina", required = false) Integer pagina,
@@ -247,6 +248,7 @@ public class ConsultaApiRestV2Controller  extends NotificacioApiRestBaseControll
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
 		binder.registerCustomEditor(Idioma.class, new CaseInsensitiveEnumEditor(Idioma.class));
-		binder.registerCustomEditor(Boolean.class, new CustomBooleanEditor("si", "no", false));
+		binder.registerCustomEditor(Boolean.class, new EnhancedBooleanEditor("si", "no", true));
+		binder.registerCustomEditor(Date.class, new EnhancedDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
 	}
 }

@@ -12,7 +12,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.apache.commons.codec.DecoderException;
 
-import es.caib.notib.logic.intf.rest.consulta.Arxiu;
+import es.caib.notib.client.domini.consulta.Arxiu;
 import es.caib.notib.logic.intf.rest.consulta.Resposta;
 
 /**

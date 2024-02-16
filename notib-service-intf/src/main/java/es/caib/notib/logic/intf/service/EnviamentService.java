@@ -126,33 +126,6 @@ public interface EnviamentService {
 	@PreAuthorize("isAuthenticated()")
 	FitxerDto exportacio(Long entitatId, Collection<Long> enviamentIds, String format) throws IOException, NotFoundException, ParseException;
 	
-	/**
-	 * Crea les columnes s'han de mostrar
-	 * 
-	 * @param columnes
-	 *            Attribut amb les columnes a visualitzar.
-	 * @return columnes que s'han de visualitzar.
-	 */
-	@PreAuthorize("isAuthenticated()")
-	void columnesCreate(String codiUsuari, Long entitatId, ColumnesDto columnes);
-	
-	/**
-	 * Actualitza les columnes s'han de mostrar
-	 * 
-	 * @param columnes
-	 *            Attribut amb les columnes a visualitzar.
-	 * @return columnes que s'han de visualitzar.
-	 */
-	@PreAuthorize("isAuthenticated()")
-	public void columnesUpdate(Long entitatId, ColumnesDto columnes);
-	
-	/**
-	 * Obté les columnes visibles per un usuari i entitat
-	 * @return columnes que s'han de visualitzar.
-	 */
-	@PreAuthorize("isAuthenticated()")
-	public ColumnesDto getColumnesUsuari(Long entitatId, String codiUsuari);
-	
 	@PreAuthorize("isAuthenticated()")
 	NotificacioEnviamentDtoV2 getOne(Long enviamentId);
 

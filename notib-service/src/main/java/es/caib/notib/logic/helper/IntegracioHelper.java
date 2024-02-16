@@ -141,7 +141,7 @@ public class IntegracioHelper {
 
 		var auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth == null || Strings.isNullOrEmpty(auth.getName())) {
-			return "";
+			return "Sistema";
 		}
 		var usuariNomCodi = auth.getName();
 		if (!obtenirUsuari) {
@@ -154,7 +154,7 @@ public class IntegracioHelper {
 				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari " + auth.getName() + "no trobat a la bbdd");
 				return usuariNomCodi;
 			}
-			return usuari.getNom() + " (" + usuari.getCodi() + ")";
+			return usuari.getNomSencer() + " (" + usuari.getCodi() + ")";
 		} catch (Exception ex) {
 			log.error("[Error Integració] Error al buscar l'usuari " + usuariNomCodi);
 			return usuariNomCodi;

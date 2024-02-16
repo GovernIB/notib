@@ -70,15 +70,9 @@ public abstract class NotificacioTableMapper {
     @Mapping(target = "organEstat", source = "params.organEstat")
     public abstract NotificacioTableItemDto toNotificacioTableItemDto(NotificacioTableEntity not, NotificacioTableItemConversioParams params);
 
-    public abstract List<NotificacioTableItemDto> toNotificacionsTableItemDto(
-            List<NotificacioTableEntity> nots,
-            @Context List<String> codis,
-            @Context Map<String, OrganismeDto> organs);
+    public abstract List<NotificacioTableItemDto> toNotificacionsTableItemDto(List<NotificacioTableEntity> nots, @Context List<String> codis, @Context Map<String, OrganismeDto> organs);
 
-    public NotificacioTableItemDto mapNotificacioTableItemDtoContext(
-            NotificacioTableEntity not,
-            @Context List<String> codis,
-            @Context Map<String, OrganismeDto> organs) {
+    public NotificacioTableItemDto mapNotificacioTableItemDtoContext(NotificacioTableEntity not, @Context List<String> codis, @Context Map<String, OrganismeDto> organs) {
 
         if (not == null) {
             return null;
@@ -129,11 +123,16 @@ public abstract class NotificacioTableMapper {
         if (dto.getDocumentId() == null) {
             dto.setDocumentId(not.getNotificacio().getDocument() != null ? not.getNotificacio().getDocument().getId() : null);
         }
+        var registreNums = new StringBuilder();
         if (enviaments != null && !enviaments.isEmpty()) {
-            for (var enviament: enviaments) {
-                if (enviament.getNotificaCertificacioData() != null) {
-                    dto.setEnvCerData(enviament.getNotificaCertificacioData());
-                    break;
+            var certificacio = false;
+            for (var env : enviaments) {
+                if (env.getNotificaCertificacioData() != null && !certificacio) {
+                    dto.setEnvCerData(env.getNotificaCertificacioData());
+                    certificacio = true;
+                }
+                if (!Strings.isNullOrEmpty(env.getRegistreNumeroFormatat())) {
+                    registreNums.append(env.getRegistreNumeroFormatat()).append(", ");
                 }
             }
         }
@@ -145,6 +144,7 @@ public abstract class NotificacioTableMapper {
             not.setDocumentId(dto.getDocumentId());
             not.setEnvCerData(dto.getEnvCerData());
             not.setEstatString(dto.getEstatString());
+            not.setRegistreNums(registreNums.substring(0, registreNums.length()-2));
             not.setPerActualitzar(false);
             notificacioTableHelper.actualitzarCampsLlistat(not);
         } catch (Exception ex) {

@@ -120,4 +120,6 @@
 			id="MonitorTasquesService"
 			jndi-name="notib/MonitorTasquesServiceBean/local"
 			business-interface="es.caib.notib.logic.intf.service.MonitorTasquesService"/>
+
+	<jee:local-slsb id="ColumnesService" jndi-name="notib/ColumnesServiceBean/local" business-interface="es.caib.notib.logic.intf.service.ColumnesService"/>
 </beans>

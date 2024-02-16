@@ -2,11 +2,15 @@
 (function($) {
 
 	let length = 10;
-	$.ajax({url: webutilContextPath() + "/usuari/num/elements/pagina/defecte",
-		async: false,
-		success: elements => {
-		length = elements;
-	}});
+	try {
+		$.ajax({url: webutilContextPath() + "/usuari/num/elements/pagina/defecte",
+			async: false,
+			success: elements => {
+			length = elements;
+		}});
+	} catch (e) {
+
+	}
 	$.webutilDatatable = function(element, options) {
 		var defaults = {
 			pageLength: length,

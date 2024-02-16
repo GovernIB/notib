@@ -86,6 +86,10 @@ $(document).ready(function() {
 							<td><fmt:formatDate value="${info.caducitat}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
 						</tr>
 						<tr>
+							<td><strong><spring:message code="notificacio.massiva.info.data.creacio" /></strong></td>
+							<td><fmt:formatDate value="${info.createdDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
+						</tr>
+						<tr>
 							<td><strong><spring:message code="notificacio.massiva.info.dada.email" /></strong></td>
 							<td>${info.email}</td>
 						</tr>

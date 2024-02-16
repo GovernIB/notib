@@ -34,6 +34,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaDataDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaTableItemDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
@@ -220,6 +221,9 @@ public class ConversioTipusHelper {
 		mapperFactory.classMap(NotificacioEnviamentEntity.class, EnviamentInfo.class).
 				field("notificacio.estat", "notificacioEstat").
 				customize(new NotificacioEnviamentEntitytoInfoMapper()).byDefault().register();
+
+		mapperFactory.classMap(NotificacioMassivaEntity.class, NotificacioMassivaInfoDto.class).
+				customize(new NotificacioMassivaEntityDtoV2Mapper()).byDefault().register();
 
 		mapperFactory.classMap(EntregaPostalDto.class, EntregaPostal.class).
 				field("domiciliConcretTipus", "tipus").byDefault().register();
@@ -542,6 +546,14 @@ public class ConversioTipusHelper {
 			var notificacio = notificacioEnviamentEntity.getNotificacio();
 			var enviant = errorEvent == null && notificacio.getRegistreEnviamentIntent() == 0 && notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT);
 			notificacioEnviamentDto.setEnviant(enviant);
+		}
+	}
+
+	public class NotificacioMassivaEntityDtoV2Mapper extends CustomMapper<NotificacioMassivaEntity, NotificacioMassivaInfoDto> {
+		@Override
+		public void mapAtoB(NotificacioMassivaEntity entity, NotificacioMassivaInfoDto dto, MappingContext context) {
+
+			dto.setCreatedDate(Date.from(entity.getCreatedDate().orElseThrow().atZone(ZoneId.systemDefault()).toInstant()));
 		}
 	}
 

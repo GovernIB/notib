@@ -1,10 +1,9 @@
 package es.caib.notib.api.interna.controller;
 
 import es.caib.notib.client.domini.EnviamentTipus;
-import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
-import es.caib.notib.logic.intf.rest.consulta.Arxiu;
+import es.caib.notib.client.domini.consulta.Arxiu;
 import es.caib.notib.logic.intf.rest.consulta.Resposta;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
@@ -44,7 +43,7 @@ public class ConsultaApiRestV1Controller {
 	private EnviamentService enviamentService;
 	@Autowired
 	private NotificacioService notificacioService;
-	private static final String PATH = "/api/consulta/v1";
+	private static final String PATH = "/consulta/v1";
 	
 	@GetMapping(value="/comunicacions/{dniTitular}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "Consulta totes les comunicacions d'un titular donat el seu dni", description = "Retorna informació de totes les comunicacions d'un titular, i el seu estat")

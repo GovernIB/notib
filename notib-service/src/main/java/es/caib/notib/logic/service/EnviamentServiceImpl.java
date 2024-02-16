@@ -12,6 +12,7 @@ import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.client.domini.consulta.TransmissioV2;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.CallbackHelper;
+import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.EntityComprovarHelper;
 import es.caib.notib.logic.helper.FiltreHelper;
@@ -38,7 +39,6 @@ import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
-import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -296,7 +296,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 			return paginacioHelper.toPaginaDto(pageEnviaments, NotEnviamentTableItemDto.class);
 		} finally {
-				metricsHelper.fiMetrica(timer);
+            metricsHelper.fiMetrica(timer);
 		}
 	}
 
@@ -650,83 +650,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 
 	@Override
-	public void columnesCreate(String codiUsuari, Long entitatId, ColumnesDto columnes) {
-
-		var timer = metricsHelper.iniciMetrica();
-		try {
-			var entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId);
-			var usuariEntity = usuariRepository.findByCodi(codiUsuari);
-			if (columnes == null) {
-				columnes = new ColumnesDto();
-				columnes.setDataEnviament(true);
-				columnes.setDir3Codi(true);
-				columnes.setProCodi(true);
-				columnes.setConcepte(true);
-				columnes.setTitularNomLlinatge(true);
-				columnes.setEstat(true);
-			}
-			// Dades generals de la notificació
-			ColumnesEntity columnesEntity = ColumnesEntity.builder()
-					.dataEnviament(columnes.isDataEnviament())
-					.dataProgramada(columnes.isDataProgramada())
-					.notIdentificador(columnes.isNotIdentificador())
-					.proCodi(columnes.isProCodi())
-					.grupCodi(columnes.isGrupCodi())
-					.dir3Codi(columnes.isDir3Codi())
-					.usuari(columnes.isUsuari())
-					.enviamentTipus(columnes.isEnviamentTipus())
-					.concepte(columnes.isConcepte())
-					.descripcio(columnes.isDescripcio())
-					.titularNomLlinatge(columnes.isTitularNomLlinatge())
-					.titularEmail(columnes.isTitularEmail())
-					.destinataris(columnes.isDestinataris())
-					.llibreRegistre(columnes.isLlibreRegistre())
-					.numeroRegistre(columnes.isNumeroRegistre())
-					.dataRegistre(columnes.isDataRegistre())
-					.dataCaducitat(columnes.isDataCaducitat())
-					.codiNotibEnviament(columnes.isCodiNotibEnviament())
-					.numCertificacio(columnes.isNumCertificacio())
-					.csvUuid(columnes.isCsvUuid())
-					.estat(columnes.isEstat())
-					.entitat(entitatEntity)
-					.user(usuariEntity).build();
-	
-			columnesRepository.saveAndFlush(columnesEntity);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Transactional
-	@Override
-	public void columnesUpdate(Long entitatId, ColumnesDto columnes) {
-
-		var timer = metricsHelper.iniciMetrica();
-		try {
-			var columnesEntity = columnesRepository.findById(columnes.getId()).orElseThrow();
-			columnesEntity.update(columnes);
-			columnesRepository.saveAndFlush(columnesEntity);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-		
-	@Transactional(readOnly = true)	
-	@Override
-	public ColumnesDto getColumnesUsuari(Long entitatId, String codiUsuari) {
-
-		var timer = metricsHelper.iniciMetrica();
-		try {
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			var usuari = usuariRepository.findByCodi(codiUsuari);
-			var columnes = columnesRepository.findByEntitatAndUser(entitat, usuari);
-			return conversioTipusHelper.convertir(columnes, ColumnesDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
 	@Transactional(readOnly = true)
 	public List<NotificacioEventDto> eventFindAmbNotificacio(Long notificacioId) {
 
@@ -835,6 +758,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 	public byte[] getDocumentJustificant(Long enviamentId) {
 		
 		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+		try {
+			ConfigHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
+		} catch (Exception ex) {
+			log.error("No s'ha pogut definir l'entitat actual.", ex);
+		}
 		if (enviament.getRegistreEstat() != null && enviament.getRegistreEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_EXTERN)) {
 			return pluginHelper.obtenirOficiExtern(enviament.getNotificacio().getEmisorDir3Codi(), enviament.getRegistreNumeroFormatat()).getJustificant();
 		}
@@ -871,16 +799,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 		var dataInicial = consulta.getDataInicial() != null ? FiltreHelper.toIniciDia(consulta.getDataInicial()) : null;
 		var dataFinal = consulta.getDataFinal() != null ? FiltreHelper.toFiDia(consulta.getDataFinal()) : null;
-		var numEnviaments = notificacioEnviamentRepository.countEnviaments(consulta.getDniTitular(),
-				dataInicial == null,
-				dataInicial,
-				dataFinal == null,
-				dataFinal,
-				consulta.getTipus(),
-				consulta.getEstatFinal() == null,
-				consulta.getEstatFinal(),
-				consulta.getVisibleCarpeta() == null,
-				consulta.getVisibleCarpeta());
 		var enviaments = notificacioEnviamentRepository.findEnviaments(
 				consulta.getDniTitular(),
 				dataInicial == null,
@@ -894,6 +812,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				consulta.getVisibleCarpeta(),
 				getPageable(consulta.getPagina(), consulta.getMida()));
 
+		var numEnviaments = (int) enviaments.getTotalElements();
 		return PaginaEnviaments.builder().messageHelper(messageHelper).numEnviaments(numEnviaments).enviaments(enviaments.getContent()).locale(new Locale(consulta.getIdioma().name())).build();
 	}
 
@@ -1301,7 +1220,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				nom = personaEntity.getRaoSocial();
 			}
 			return PersonaConsultaV2.builder()
-					.tipus(GenericInfo.builder().codi(tipus.name()).nom(messageHelper.getMessage("InteressatTipus." + tipus.name())).build())
+					.tipus(GenericInfo.builder().codi(tipus.name()).nom(messageHelper.getMessage("interessatTipusEnumDto." + tipus.name())).build())
 					.nom(nom)
 					.llinatge1(personaEntity.getLlinatge1())
 					.llinatge2(personaEntity.getLlinatge2())

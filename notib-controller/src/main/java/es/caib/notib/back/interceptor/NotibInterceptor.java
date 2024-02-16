@@ -294,21 +294,21 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
 
     // Carregar avisos
     private void processarAvisos(HttpServletRequest request) {
+
         // Només es carregarà si l'usuari té rols per accedir a l'aplicació
         var rolsDisponibles = sessionScopedContext.getRolsDisponibles();
         var rolsAvisos = List.of(ROLE_USUARI, ROLE_ADMIN_ENTITAT, ROLE_ADMIN_ORGAN, ROLE_SUPER);
-        if (Collections.disjoint(rolsDisponibles, rolsAvisos))
+        if (Collections.disjoint(rolsDisponibles, rolsAvisos)) {
             return;
-
-        // TODO: recarregar quan es modifiquen els avisos
+        }
         // Es carregaran només si encara no s'han carregat, o si hi ha un canvi de rol
         var canviRol = !Strings.isNullOrEmpty(request.getParameter(RolHelper.REQUEST_PARAMETER_CANVI_ROL));
-        if ((sessionScopedContext.getAvisos() != null || RequestSessionHelper.isError(request)) && !canviRol)
+        var isNotSuper = RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
+        if ((sessionScopedContext.getAvisos() != null || RequestSessionHelper.isError(request)) && !canviRol && !isNotSuper) {
             return;
-
+        }
         sessionScopedContext.setAvisos(RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()) ?
-                avisService.findActiveAdmin(sessionScopedContext.getEntitatActualId()) :
-                avisService.findActive());
+                avisService.findActiveAdmin(sessionScopedContext.getEntitatActualId()) : avisService.findActive());
     }
 
 

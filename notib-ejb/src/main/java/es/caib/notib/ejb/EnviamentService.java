@@ -13,7 +13,6 @@ import es.caib.notib.logic.intf.dto.NotificacioEventDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
-import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
@@ -75,24 +74,6 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 	@RolesAllowed("**")
 	public List<NotificacioEventDto> eventFindAmbNotificacio(Long notificacioId) {
 		return getDelegateService().eventFindAmbNotificacio(notificacioId);
-	}
-
-	@Override
-	@RolesAllowed("**")
-	public void columnesCreate(String codiUsuari, Long entitatId, ColumnesDto columnes) {
-		getDelegateService().columnesCreate(codiUsuari, entitatId, columnes);
-	}
-
-	@Override
-	@RolesAllowed("**")
-	public void columnesUpdate(Long entitatId, ColumnesDto columnes) {
-		getDelegateService().columnesUpdate(entitatId, columnes);
-	}
-
-	@Override
-	@RolesAllowed("**")
-	public ColumnesDto getColumnesUsuari(Long entitatId, String codiUsuari) {
-		return getDelegateService().getColumnesUsuari(entitatId, codiUsuari);
 	}
 
 	@Override

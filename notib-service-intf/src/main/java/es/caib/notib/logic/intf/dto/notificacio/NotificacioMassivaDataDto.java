@@ -16,9 +16,11 @@ import java.util.Date;
 @AllArgsConstructor
 @Data
 public class NotificacioMassivaDataDto extends AuditoriaDto {
+
     private Long id;
     private String csvFilename;
     private String zipFilename;
+    private Date createdDate;
     private Date caducitat;
     private String email;
     private OperadorPostalDto pagadorPostal;

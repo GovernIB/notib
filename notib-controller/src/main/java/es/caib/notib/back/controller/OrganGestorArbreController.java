@@ -143,7 +143,7 @@ public class OrganGestorArbreController extends BaseUserController {
             if (o == null || (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, codi, PermisEnum.ADMIN))) {
                 throw new NotFoundException(codi, OrganGestorDto.class);
             }
-            o.setEstatTraduccio(MessageHelper.getInstance().getMessage("es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum." + o.getEstat()));
+            o.setEstatTraduccio(getMessage(request,"es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum." + o.getEstat(),null));
             omplirModel(model, entitat, o);
         } catch (Exception ex) {
             var msg = getMessage(request, "organgestor.detall.error", new Object[] {

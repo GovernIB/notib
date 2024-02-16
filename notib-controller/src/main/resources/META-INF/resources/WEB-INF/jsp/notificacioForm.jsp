@@ -1088,8 +1088,6 @@
 				$(emailLabel).text(emailLabelText);
 				$(raoSocialInput).show();
 				$(nomInput).hide();
-				$(dir3codi).removeClass('hidden');
-				$(dir3Label).html(dir3LabelText);
 			}
 
 			if((raoSocialDesc != null && raoSocialDesc != "") && (dir3Desc != null && dir3Desc != "")){
