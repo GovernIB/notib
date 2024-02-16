@@ -229,7 +229,7 @@
 						<dt><spring:message code="integracio.detall.camp.estat"/></dt>
 						<dd id="integracio-estat"></dd>
 						<dt class="integracio-parameters"><spring:message code="integracio.detall.camp.params"/></dt>
-						<dd id="integracio-parameters-list" class="integracio-parameters">
+						<dd id="integracio-parameters-list" class="integracio-parameters" style="max-height: 300px; overflow: auto; margin-bottom: 15px;">
 						</dd>
 						<dt class="integracio-error"><spring:message code="integracio.detall.camp.error.desc"/></dt>
 						<dd id="integracio-errorDescripcio" class="integracio-error"></dd>
