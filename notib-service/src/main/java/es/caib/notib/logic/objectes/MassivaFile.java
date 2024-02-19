@@ -409,13 +409,13 @@ public class MassivaFile {
             }
 
             // CSV
-            if (document == null && !Strings.isNullOrEmpty(documentUuid) && !documentMap.containsKey(documentCsv)) {
+            if (document == null && !Strings.isNullOrEmpty(documentCsv) && !documentMap.containsKey(documentCsv)) {
                 document = Document.builder()
                         .csv(documentCsv)
                         .normalitzat(normalitzat != null ? normalitzat : false)
                         .generarCsv(false)
                         .build();
-                documentMap.put(documentUuid, document);
+                documentMap.put(documentCsv, document);
             }
 
             if (document != null) {
@@ -431,7 +431,7 @@ public class MassivaFile {
 
     private Boolean getBoolea(String valor) {
         if (Strings.isNullOrEmpty(valor)) {
-            return null;
+            return false;
         }
         switch (valor.toUpperCase()) {
             case "SI":

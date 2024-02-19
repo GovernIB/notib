@@ -44,6 +44,7 @@ import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificacioMassivaService;
 import es.caib.notib.logic.mapper.NotificacioTableMapper;
+import es.caib.notib.logic.objectes.MassivaColumnsEnum;
 import es.caib.notib.logic.objectes.MassivaFile;
 import es.caib.notib.logic.service.ws.NotificacioValidator;
 import es.caib.notib.logic.statemachine.SmConstants;
@@ -68,7 +69,6 @@ import es.caib.notib.persist.repository.ProcSerRepository;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.jms.JmsException;
@@ -94,6 +94,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -283,7 +284,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 var procediment = !Strings.isNullOrEmpty(notificacio.getProcedimentCodi()) ? procSerRepository.findByCodiAndEntitat(notificacio.getProcedimentCodi(), entitat) : null;
                 var organGestor = !Strings.isNullOrEmpty(notificacio.getOrganGestor()) ? organGestorRepository.findByCodi(notificacio.getOrganGestor()) : null;
                 var document = documentHelper.getDocument(notificacio.getDocument());
-
+                // En massives només podem tenir un document
 //                if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {
 //                    document2 = documentHelper.getDocument(notificacio.getDocument2());
 //                    document3 = documentHelper.getDocument(notificacio.getDocument3());
@@ -622,13 +623,33 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
         var timer = metricsHelper.iniciMetrica();
         try {
-            var path = registreNotificaHelper.isSendDocumentsActive() ?  "modelo_datos_carga_masiva_metadades.csv" : "modelo_datos_carga_masiva.csv";
-            var input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/logic/plantillas/" + path);
-            assert input != null;
-            return IOUtils.toByteArray(input);
+//            var path = registreNotificaHelper.isSendDocumentsActive() ?  "modelo_datos_carga_masiva_metadades.csv" : "modelo_datos_carga_masiva.csv";
+//            var input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/logic/plantillas/" + path);
+//            assert input != null;
+//            return IOUtils.toByteArray(input);
+            return generateModelCsv().getBytes();
         } finally {
             metricsHelper.fiMetrica(timer);
         }
+    }
+
+    private String generateModelCsv() {
+        Boolean sendDocumentsActive = registreNotificaHelper.isSendDocumentsActive();
+        String headerName = Stream.of(MassivaColumnsEnum.values())
+                .filter(e -> sendDocumentsActive || !e.name().startsWith("META_"))
+                .map(MassivaColumnsEnum::getNom)
+                .collect(Collectors.joining(";"));
+        String headerDesc = Stream.of(MassivaColumnsEnum.values())
+                .filter(e -> sendDocumentsActive || !e.name().startsWith("META_"))
+                .map(MassivaColumnsEnum::getDescripcio)
+                .collect(Collectors.joining(";"));
+
+        String exampleRow = Stream.of(MassivaColumnsEnum.values())
+                .filter(e -> sendDocumentsActive || !e.name().startsWith("META_"))
+                .map(MassivaColumnsEnum::getExemple)
+                .collect(Collectors.joining(";"));
+
+        return headerName + "\n" + headerDesc + "\n" + exampleRow;
     }
 
 //    private void checkCSVContent(List<String[]> linies, List<String> csvHeader) {

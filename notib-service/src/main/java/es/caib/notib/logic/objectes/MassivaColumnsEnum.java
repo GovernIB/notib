@@ -8,7 +8,7 @@ public enum MassivaColumnsEnum {
 
     UNITAT_EMISORA( "Codigo Unidad Remisora",   "Codi DIR3 de la unitat remisora",                                                                  "E04975701"),
     CONCEPTE(       "Concepto",                 "Text amb el concepte de l'enviament",                                                              "Concepte"),
-    TIPUS_ENV(      "Tipo de Envio",            "Tips d'enviamnt (C|Comunicacio|Comunicacion / N|Notificacio|Notificacion / S|Sir)",                "Notificacio"),
+    TIPUS_ENV(      "Tipo de Envio",            "Tipus d'enviament (C|Comunicacio|Comunicacion / N|Notificacio|Notificacion / S|Sir)",                "Notificacio"),
     REF_EMISOR(     "Referencia Emisor",        "Referencia única proveída per l'emisor (número d'expedient)",                                                           "NOTIF2103021"),
     FITXER_NOM(     "Nombre Fichero",           "Nom del document a notificar, inclòs en el zip de documents (aquest camp exclou el de UUID i CSV)","fitxer.pdf"),
     FITXER_UUID(    "UUID Fichero",             "UUID de l'arxiu del document a notificar (aquest camp exclou el de nom i CSV)",                    "f1c9f8c8-d326-4315-8a8f-0ec23b970ae5"),
@@ -47,7 +47,7 @@ public enum MassivaColumnsEnum {
         return nom;
     }
 
-    private String getDescripcio() {
+    public String getDescripcio() {
         return descripcio;
     }
 
