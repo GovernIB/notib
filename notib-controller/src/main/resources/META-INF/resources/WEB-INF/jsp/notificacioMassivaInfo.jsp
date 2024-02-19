@@ -74,12 +74,18 @@ $(document).ready(function() {
 				<table class="table table-bordered" style="width: 100%">
 					<tbody>
 						<tr>
-							<td width="30%"><strong><spring:message code="notificacio.massiva.info.dada.csv.filename" /></strong></td>
-							<td>${info.csvFilename}</td>
+							<td width="30%"><strong><spring:message code="notificacio.massiva.info.dada.csv.filename"/></strong></td>
+							<td>
+								<a id="download-csv" title="<spring:message code="notificacio.massiva.info.dada.csv.filename"/>"
+								   href="<c:url value="/notificacio/massiva/${info.id}/csv/download"/>" target="_blank">${info.csvFilename}</a>
+							</td>
 						</tr>
 						<tr>
-							<td><strong><spring:message code="notificacio.massiva.info.dada.zip.filename" /></strong></td>
-							<td>${info.zipFilename}</td>
+							<td><strong><spring:message code="notificacio.massiva.info.dada.zip.filename"/></strong></td>
+							<td>
+								<a id="download-zip" title="<spring:message code="notificacio.massiva.info.dada.zip.filename"/>"
+								   href="<c:url value="/notificacio/massiva/${info.id}/zip/download"/>" target="_blank">${info.zipFilename}</a>
+							</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="notificacio.massiva.info.dada.caducitat" /></strong></td>

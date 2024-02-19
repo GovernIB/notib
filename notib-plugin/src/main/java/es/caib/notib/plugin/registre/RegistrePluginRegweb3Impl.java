@@ -164,7 +164,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		ar.setExpone(dto.getExpone());
 		ar.setId(dto.getId());
 		ar.setIdentificadorIntercambio(dto.getIdentificadorIntercambio());
-		ar.setIdioma(dto.getIdioma() != null ? dto.getIdioma() : 1L);
+		ar.setIdioma(dto.getIdioma() != null && dto.getIdioma() != 0L ? dto.getIdioma() : 1L);
 		ar.setLibroCodigo(dto.getLibroCodigo());
 		ar.setMotivo(dto.getMotivo());
 		ar.setNumeroExpediente(dto.getNumeroExpediente());
