@@ -370,9 +370,12 @@ public class MassivaFile {
         for (List<String> enviamentCsv: enviamentsCsv) {
             Document document = null;
 
-            var documentNom = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.FITXER_NOM));
-            var documentUuid = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.FITXER_UUID));
-            var documentCsv = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.FITXER_CSV));
+            var fitxerNomIndex = headerColumns.get(MassivaColumnsEnum.FITXER_NOM);
+            var fitxerUuidIndex = headerColumns.get(MassivaColumnsEnum.FITXER_UUID);
+            var fitxerCsvIndex = headerColumns.get(MassivaColumnsEnum.FITXER_CSV);
+            var documentNom = fitxerNomIndex != null ? enviamentCsv.get(fitxerNomIndex) : null;
+            var documentUuid = fitxerUuidIndex != null ? enviamentCsv.get(fitxerUuidIndex) : null;
+            var documentCsv = fitxerCsvIndex != null ? enviamentCsv.get(fitxerCsvIndex) : null;
             var normalitzat = getBoolea(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.FITXER_NORMAL)));
 
             // Document físic
@@ -555,11 +558,20 @@ public class MassivaFile {
             throw new MaxLinesExceededException(String.format("S'ha superat el màxim nombre de línies permès (%d) per al CSV de càrrega massiva.", maxEnviaments));
         }
 
-        if (!misingColumns.isEmpty()) {
+        if (!misingColumns.isEmpty() && !checkMissingColumnsFileColumns()) {
             var msg = "El fitxer CSV no conté totes les columnes necessaries. Columnes que falten: " +
                     getMissingColumns().stream().map(MassivaColumnsEnum::getNom).collect(Collectors.joining(", "));
             throw new InvalidCSVFileNotificacioMassivaException(msg);
         }
+    }
+
+    public boolean checkMissingColumnsFileColumns() {
+        long countNeededColumns = misingColumns.stream()
+                .filter(column -> column.equals(MassivaColumnsEnum.FITXER_NOM) ||
+                        column.equals(MassivaColumnsEnum.FITXER_UUID) ||
+                        column.equals(MassivaColumnsEnum.FITXER_CSV))
+                .count();
+        return countNeededColumns <= 2 && misingColumns.size() == countNeededColumns;
     }
 
 //    private ICsvListWriter writeCsvHeader(ICsvListWriter listWriter) {
