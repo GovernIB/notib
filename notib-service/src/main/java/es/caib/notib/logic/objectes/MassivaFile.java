@@ -170,32 +170,57 @@ public class MassivaFile {
                         .collect(Collectors.joining("\n"));
             }
 
+            var unitatEmiIndex = headerColumns.get(MassivaColumnsEnum.UNITAT_EMISORA);
+            var concepteIndex = headerColumns.get(MassivaColumnsEnum.CONCEPTE);
+            var tipusEnvIndex = headerColumns.get(MassivaColumnsEnum.TIPUS_ENV);
+            var refEmisorIndex = headerColumns.get(MassivaColumnsEnum.REF_EMISOR);
+            var fitxerNomIndex = headerColumns.get(MassivaColumnsEnum.FITXER_NOM);
+            var fitxerUuidIndex = headerColumns.get(MassivaColumnsEnum.FITXER_UUID);
+            var fitxerCsvIndex = headerColumns.get(MassivaColumnsEnum.FITXER_CSV);
+            var normalitzatIndex = headerColumns.get(MassivaColumnsEnum.FITXER_NORMAL);
+            var prioritatIndex = headerColumns.get(MassivaColumnsEnum.PRIORITAT);
+            var nomIndex = headerColumns.get(MassivaColumnsEnum.DEST_NOM);
+            var llinatgesIndex = headerColumns.get(MassivaColumnsEnum.DEST_LLINATGES);
+            var numDocIndex = headerColumns.get(MassivaColumnsEnum.DEST_DOC);
+            var emailIndex = headerColumns.get(MassivaColumnsEnum.DEST_EMAIL);
+            var unitatDestIndex = headerColumns.get(MassivaColumnsEnum.UNITAT_DESTI);
+            var linia1Index = headerColumns.get(MassivaColumnsEnum.ADDR_LIN1);
+            var linia2Index = headerColumns.get(MassivaColumnsEnum.ADDR_LIN2);
+            var cpIndex = headerColumns.get(MassivaColumnsEnum.ADDR_CP);
+            var retardIndex = headerColumns.get(MassivaColumnsEnum.RETARD);
+            var procedimentIndex = headerColumns.get(MassivaColumnsEnum.PROCEDIMENT);
+            var dataProgIndex = headerColumns.get(MassivaColumnsEnum.DATA_PROG);
+            var descripcioIndex = headerColumns.get(MassivaColumnsEnum.DESCRIPCIO);
+            var origenIndex = headerColumns.get(MassivaColumnsEnum.META_ORIGEN);
+            var estatElaIndex = headerColumns.get(MassivaColumnsEnum.META_ESTAT_ELAB);
+            var tipusDocIndex = headerColumns.get(MassivaColumnsEnum.META_TIPUS_DOC);
+            var firmatIndex = headerColumns.get(MassivaColumnsEnum.META_FIRMAT);
             NotificacioInfo enviamentInfo = NotificacioInfo.builder()
-                    .codiDir3UnidadRemisora(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.UNITAT_EMISORA)))
-                    .concepto(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.CONCEPTE)))
-                    .enviamentTipus(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.TIPUS_ENV)))
-                    .referenciaEmisor(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.REF_EMISOR)))
-                    .nombreFichero(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.FITXER_NOM)))
-                    .uuidFichero(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.FITXER_UUID)))
-                    .csvFichero(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.FITXER_CSV)))
-                    .normalizado(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.FITXER_NORMAL)))
-                    .prioridadServicio(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PRIORITAT)))
-                    .nombre(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DEST_NOM)))
-                    .apellidos(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DEST_LLINATGES)))
-                    .cifNif(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DEST_DOC)))
-                    .email(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DEST_EMAIL)))
-                    .codigoDestino(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.UNITAT_DESTI)))
-                    .linea1(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.ADDR_LIN1)))
-                    .linea2(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.ADDR_LIN2)))
-                    .codigoPostal(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.ADDR_CP)))
-                    .retardoPostal(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.RETARD)))
-                    .codigoProcedimiento(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PROCEDIMENT)))
-                    .fechaEnvioProgramado(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DATA_PROG)))
-                    .descripcio(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DESCRIPCIO)))
-                    .origen(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.META_ORIGEN)))
-                    .estadoElaboracion(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.META_ESTAT_ELAB)))
-                    .tipoDocumental(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.META_TIPUS_DOC)))
-                    .pdfFirmado(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.META_FIRMAT)))
+                    .codiDir3UnidadRemisora(unitatEmiIndex != null ? enviamentCsv.get(unitatEmiIndex) : null)
+                    .concepto(concepteIndex != null ? enviamentCsv.get(concepteIndex) : null)
+                    .enviamentTipus(tipusEnvIndex != null ? enviamentCsv.get(tipusEnvIndex) : null)
+                    .referenciaEmisor(refEmisorIndex != null ? enviamentCsv.get(refEmisorIndex) : null)
+                    .nombreFichero(fitxerNomIndex != null ? enviamentCsv.get(fitxerNomIndex)  : null)
+                    .uuidFichero(fitxerUuidIndex != null ? enviamentCsv.get(fitxerUuidIndex) : null)
+                    .csvFichero(fitxerCsvIndex != null ? enviamentCsv.get(fitxerCsvIndex) : null)
+                    .normalizado(normalitzatIndex != null ? enviamentCsv.get(normalitzatIndex) : null)
+                    .prioridadServicio(prioritatIndex != null ? enviamentCsv.get(prioritatIndex) : null)
+                    .nombre(nomIndex != null ? enviamentCsv.get(nomIndex) : null)
+                    .apellidos(llinatgesIndex != null ? enviamentCsv.get(llinatgesIndex) : null)
+                    .cifNif(numDocIndex != null ? enviamentCsv.get(numDocIndex) : null)
+                    .email(emailIndex != null ? enviamentCsv.get(emailIndex) : null)
+                    .codigoDestino(unitatDestIndex != null ? enviamentCsv.get(unitatDestIndex) : null)
+                    .linea1(linia1Index != null ? enviamentCsv.get(linia1Index) : null)
+                    .linea2(linia2Index != null ? enviamentCsv.get(linia2Index) : null)
+                    .codigoPostal(cpIndex != null ? enviamentCsv.get(cpIndex) : null)
+                    .retardoPostal(retardIndex != null ? enviamentCsv.get(retardIndex) : null)
+                    .codigoProcedimiento(procedimentIndex != null ? enviamentCsv.get(procedimentIndex) : null)
+                    .fechaEnvioProgramado(dataProgIndex != null ? enviamentCsv.get(dataProgIndex) : null)
+                    .descripcio(descripcioIndex != null ? enviamentCsv.get(descripcioIndex) : null)
+                    .origen(origenIndex != null ? enviamentCsv.get(origenIndex) : null)
+                    .estadoElaboracion(estatElaIndex != null ? enviamentCsv.get(estatElaIndex) : null)
+                    .tipoDocumental(tipusDocIndex != null ? enviamentCsv.get(tipusDocIndex) : null)
+                    .pdfFirmado(firmatIndex != null ? enviamentCsv.get(firmatIndex) : null)
                     .errores(errors)
                     .cancelada(cancelada)
                     .errorsExecucio(errorsExecucio)
@@ -517,15 +542,6 @@ public class MassivaFile {
     }
 
     private Map<MassivaColumnsEnum, Integer> getHeaderColumns() {
-//        var columnes = new HashMap<MassivaColumnsEnum, Integer>();
-//        IntStream.range(0, header.size()).forEach(idx -> {
-//            MassivaColumnsEnum columna = MassivaColumnsEnum.fromNom(header.get(idx));
-//            if (columna != null) {
-//                columnes.put(columna, idx);
-//            }
-//        });
-//        return columnes;
-
         return IntStream.range(0, headerCsv.size()).boxed()
                 .filter(this::columnExist)
                 .collect(Collectors.toMap(idx -> MassivaColumnsEnum.fromNom(headerCsv.get(idx)), Function.identity()));
@@ -573,35 +589,6 @@ public class MassivaFile {
                 .count();
         return countNeededColumns <= 2 && misingColumns.size() == countNeededColumns;
     }
-
-//    private ICsvListWriter writeCsvHeader(ICsvListWriter listWriter) {
-//
-//        var csvHeader = new ArrayList<>(headerCsv);
-//        csvHeader.add("Errores");
-//
-//        try {
-//            listWriter.writeHeader(csvHeader.toArray(new String[0]));
-//            return listWriter;
-//        } catch (IOException e) {
-//            log.error("S'ha produït un error a l'escriure la capçalera de l'fitxer CSV.", e);
-//            throw new WriteCsvException(messageHelper.getMessage("error.escriure.capcalera.fitxer.csv"));
-//        }
-//    }
-//
-//    private void writeCsvLinia(ICsvListWriter listWriter, List<String> linia, List<String> errors) {
-//
-//        var liniaAmbErrors = new ArrayList<>(linia);
-//        if (errors != null && !errors.isEmpty()) {
-//            liniaAmbErrors.add(errors.stream().collect(Collectors.joining(", ")));
-//        }
-//
-//        try {
-//            listWriter.write(liniaAmbErrors);
-//        } catch (IOException e) {
-//            log.error("S'ha produït un error a l'escriure la línia en el fitxer CSV.", e);
-//            throw new WriteCsvException(messageHelper.getMessage("error.escriure.linia.fitxer.csv"));
-//        }
-//    }
 
     private Long getMaximEnviaments() {
         return configHelper.getConfigAsLong("es.caib.notib.massives.maxim.files", MAX_ENVIAMENTS);

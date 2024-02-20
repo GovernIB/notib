@@ -20,6 +20,7 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Deprecated
 public abstract class NotificacioApiRestBaseController extends BaseController {
 
 	@Autowired

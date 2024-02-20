@@ -29,6 +29,7 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Deprecated
 @Controller
 @RequestMapping("/api/services/notificacioV22")
 public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseController {

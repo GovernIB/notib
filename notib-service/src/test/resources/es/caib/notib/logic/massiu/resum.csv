@@ -1,0 +1,6 @@
+Codigo Unidad Remisora;Concepto;Tipo de Envio;Referencia Emisor;Nombre Fichero;Normalizado;Prioridad Servicio;Nombre;APELLIDOS;CIF/NIF;Email;Codigo destino;Linea 1;Linea 2;Codigo Postal;Retardo Postal;Codigo Procedimiento;Fecha Envio Programado;Descripcion;Errores
+A04027397;Linia extraordinaria CAIB-ISBA 2020;Notificacion;C001_2020;IMP_P._RESOL_MOD_EXT_2020_CAT.pdf;Si;Normal;INTELLIGENT BEAUTY SALON SLU;;B57767311;rmm@easycut.es;;;;;0;2279924;;;OK
+A04027397;Linia extraordinaria CAIB-ISBA 2020;Notificacion;C002_2020;IMP_P._RESOL_MOD_EXT_2020_CAT.pdf;Si;Normal;JUNGLE BOATS TRIPS SL.;;B16601304;mariajosebonetportillo02@gmail.com;;;;;0;2279924;;;OK
+A04027397;Linia extraordinaria CAIB-ISBA 2020;Notificacion;C003_2020;IMP_P._RESOL_MOD_EXT_2020_CAT.pdf;Si;Normal;CRISTALEX M.R. SON BUGADELLAS SL;;B57470387;cristalex@cristalex.es;;;;;0;2279924;;;OK
+A04027397;Linia extraordinaria CAIB-ISBA 2020;Notificacion;C004_2020;IMP_P._RESOL_MOD_EXT_2020_CAT.pdf;Si;Normal;SEBASTIAN;OLIVER PRATS;42962988T;OLIVER@OLIVERMETAL.COM;;;;;0;2279924;;;OK
+A04027397;Linia extraordinaria CAIB-ISBA 2020;Notificacion;C005_2020;IMP_P._RESOL_MOD_EXT_2020_CAT.pdf;Si;Normal;EMPRESA;;Y4628017V;EMPRESA@GMAIL.COM;;;;;0;2279924;;;[1131] El camp 'llinatge1' de la persona física titular d'un enviament no pot ser null en el cas de persones físiques.

@@ -1,2 +1,2 @@
-Codigo Unidad Remisora;Concepto;Tipo de Envio;Referencia Emisor;Nombre Fichero;Normalizado;Prioridad Servicio;Nombre;APELLIDOS;CIF/NIF;Email;Codigo destino;Tipo documento;Línea 2;Codigo Postal;Retardo Postal;Código Procedimiento;Fecha Envio Programado;Descripción
-A04003746;Activitat 4;Comunicacion;SIDSAM2107023;blank.pdf;Si;Normal;Test;Tester;;test@@limit.com;L01280796;PASSAPORT;123424;37891;0;1;;Descripció Test
+Codigo Unidad Remisora;Concepto;Tipo de Envio;Referencia Emisor;Nombre Fichero;Normalizado;Prioridad Servicio;Nombre;APELLIDOS;CIF/NIF;Email;Codigo destino;Tipo documento;Línea 1;Línea 2;Codigo Postal;Retardo Postal;Código Procedimiento;Fecha Envio Programado;Descripción
+A04003746;Activitat 4;Comunicacion;SIDSAM2107023;blank.pdf;Si;Normal;Test;Tester;;test@@limit.com;L01280796;PASSAPORT;;123424;37891;0;1;;Descripció Test

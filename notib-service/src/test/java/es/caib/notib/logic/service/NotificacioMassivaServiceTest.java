@@ -43,6 +43,7 @@ import es.caib.notib.persist.repository.NotificacioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
+import es.caib.notib.plugin.usuari.DadesUsuari;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -60,15 +61,21 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.BindException;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NotificacioMassivaServiceTest {
@@ -162,16 +169,20 @@ public class NotificacioMassivaServiceTest {
 		procSerMock = Mockito.mock(ProcSerEntity.class);
 		organMock = Mockito.mock(OrganGestorEntity.class);
 		Mockito.when(entitatMock.getDir3Codi()).thenReturn(entitatCodiDir3);
+		Mockito.when(entitatMock.isActiva()).thenReturn(true);
+		Mockito.when(procSerMock.isActiu()).thenReturn(true);
 		Mockito.when(metricsHelper.iniciMetrica()).thenReturn(null);
 		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.eq(entitatId))).thenReturn(entitatMock);
 		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.eq(entitatId), Mockito.anyBoolean(), Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(entitatMock);
-		Mockito.when(registreNotificaHelper.isSendDocumentsActive()).thenReturn(false);
+//		Mockito.when(registreNotificaHelper.isSendDocumentsActive()).thenReturn(false);
 		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class))).thenReturn("rnd_gesid");
 		Mockito.when(notificacioHelper.saveNotificacio(Mockito.any(EntitatEntity.class), Mockito.any(Notificacio.class), Mockito.anyBoolean(), Mockito.any(NotificacioMassivaEntity.class), Mockito.<Map<String, Long>>any()))
 				.thenReturn(NotificacioEntity.builder().enviaments(new HashSet<>()).build());
 		Mockito.when(procSerRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.<EntitatEntity>any())).thenReturn(procSerMock);
 		Mockito.when(organGestorRepository.findByCodi(Mockito.anyString())).thenReturn(organMock);
 		Mockito.when(messageHelper.getMessage(Mockito.anyString())).thenReturn("Missatge mock");
+		Mockito.when(configHelper.getConfigAsLong(eq("es.caib.notib.massives.maxim.files"), eq(999L))).thenReturn(999L);
+		Mockito.when(cacheHelper.findUsuariAmbCodi(anyString())).thenReturn(DadesUsuari.builder().codi(codiUsuari).build());
 		setUpNotificacioMassiva();
 //		setUpAuthentication();
 	}
@@ -207,6 +218,7 @@ public class NotificacioMassivaServiceTest {
 	public void whenCreate_interessat_sense_nif_ok() throws Exception {
 
 		// Given
+		Mockito.when(organMock.getCodi()).thenReturn("A04003746");
 //		Mockito.when(notificacioValidator.validarNotificacioMassiu(
 //			Mockito.any(NotificacioDatabaseDto.class), Mockito.any(EntitatEntity.class), Mockito.<Map<String, Long>>any()))
 //			.thenReturn(new ArrayList<String>());
@@ -227,6 +239,7 @@ public class NotificacioMassivaServiceTest {
 	@Test
 	public void whenCreate_GivenNoErrors_ThenCallAltaNotificacioWeb() throws Exception {
 		// Given
+		Mockito.when(organMock.getCodi()).thenReturn("E04975701");
 //		Mockito.when(notificacioValidatorHelper.validarNotificacioMassiu(
 //				Mockito.any(NotificacioDatabaseDto.class), Mockito.any(EntitatEntity.class), Mockito.<Map<String, Long>>any()))
 //				.thenReturn(new ArrayList<String>());
@@ -256,9 +269,9 @@ public class NotificacioMassivaServiceTest {
 //		Mockito.when(notificacioValidatorHelper.validarNotificacioMassiu(
 //				Mockito.any(NotificacioV2.class), Mockito.any(EntitatEntity.class), Mockito.<Map<String, Long>>any()))
 //				.thenReturn(Arrays.asList("Error 1", "Error 2"));
-		Mockito.doCallRealMethod().when(notificacioValidator).validate();
-		Mockito.doCallRealMethod().when(notificacioValidator).setNotificacio(Mockito.any(Notificacio.class));
-		Mockito.doCallRealMethod().when(notificacioValidator).setErrors(Mockito.any(BindException.class));
+//		Mockito.doCallRealMethod().when(notificacioValidator).validate();
+//		Mockito.doCallRealMethod().when(notificacioValidator).setNotificacio(Mockito.any(Notificacio.class));
+//		Mockito.doCallRealMethod().when(notificacioValidator).setErrors(Mockito.any(BindException.class));
 //		Mockito.when(notificacioValidator.error(Mockito.anyInt(), Mockito.nullable(Locale.class), Mockito.nullable(List.class))).thenReturn("Mossatge mock");
 		String usuariCodi = "CODI_USER";
 		NotificacioMassivaTests.TestMassiusFiles test1Data = NotificacioMassivaTests.getTest1Files();
@@ -296,6 +309,14 @@ public class NotificacioMassivaServiceTest {
 		Mockito.when(conversioTipusHelper.convertir(
 				Mockito.any(NotificacioMassivaEntity.class), Mockito.any(Class.class)))
 				.thenReturn(new NotificacioMassivaInfoDto()); // ho ignorarem per a la prova
+		Mockito.doAnswer(invocation -> {
+			Object[] args = invocation.getArguments();
+			OutputStream out = ((OutputStream)args[2]);
+			byte[] contingut = Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getResource("/es/caib/notib/logic/massiu/resum.csv")).getFile()));
+			ByteArrayInputStream in = new ByteArrayInputStream(contingut);
+			IOUtils.copy(in, out);
+			return null;
+		}).when(pluginHelper).gestioDocumentalGet(Mockito.anyString(), Mockito.anyString(), Mockito.any(OutputStream.class));
 
 		// When
 		notificacioMassivaService.getNotificacioMassivaInfo(entitatId, notMassivaId);
