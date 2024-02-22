@@ -40,7 +40,7 @@ public class RegistreServiceImpl implements RegistreService {
 
     @Transactional
     @Override
-    public void enviarRegistre(EnviamentRegistreRequest enviamentRegistreRequest) {
+    public boolean enviarRegistre(EnviamentRegistreRequest enviamentRegistreRequest) {
 
         var enviamentUuid = enviamentRegistreRequest.getEnviamentUuid();
         try {
@@ -83,40 +83,28 @@ public class RegistreServiceImpl implements RegistreService {
     //                notificacioEnviamentRepository.save(enviament);
     //            }
             log.debug("[SM] Enviament de registre <" + enviamentUuid + "> is success " + registreSuccess);
-            if (registreSuccess) {
-                log.debug("[SM] Enviament de registre <" + enviamentUuid + "> success ");
-                enviamentSmService.registreSuccess(enviamentUuid);
-            } else {
-                log.debug("[SM] Enviament de registre <" + enviamentUuid + "> failed ");
-                enviamentSmService.registreFailed(enviamentUuid);
-            }
+            return registreSuccess;
         } catch (Exception ex) {
             if (enviamentUuid != null) {
                 log.debug("[SM] Enviament de registre <" + enviamentUuid + "> error ", ex);
                 enviamentSmService.registreFailed(enviamentUuid);
             }
+            return false;
         }
     }
 
     @Transactional
     @Override
-    public void consultaSir(ConsultaSirDto enviament) {
+    public boolean consultaSir(ConsultaSirDto enviament) {
 
         try {
             // Consultar enviament a SIR
             notificacioService.enviamentRefrescarEstatRegistre(enviament.getId());
             var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElseThrow();
-            boolean consultaSuccess = enviamentEntity.getSirConsultaIntent() == 0;
-    //            TEST
-    //            var consultaSuccess = new Random().nextBoolean();
-
-            if (consultaSuccess) {
-                enviamentSmService.sirSuccess(enviament.getUuid());
-            } else {
-                enviamentSmService.sirFailed(enviament.getUuid());
-            }
+            return enviamentEntity.getSirConsultaIntent() == 0;
         } catch (Exception ex) {
             enviamentSmService.sirFailed(enviament.getUuid());
+            return false;
         }
     }
 }

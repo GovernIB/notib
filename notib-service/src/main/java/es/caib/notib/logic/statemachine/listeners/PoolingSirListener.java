@@ -25,8 +25,7 @@ public class PoolingSirListener {
 
     @Transactional
     @JmsListener(destination = SmConstants.CUA_POOLING_SIR, containerFactory = SmConstants.JMS_FACTORY_ACK)
-    public void receiveConsultaSir(@Payload String enviamentUuid,
-                                   @Headers MessageHeaders headers,
+    public void receiveConsultaSir(@Payload String enviamentUuid, @Headers MessageHeaders headers,
                                    Message message) throws JMSException, InterruptedException {
         try {
             var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
