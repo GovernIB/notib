@@ -74,10 +74,7 @@ public class MassivaFile {
     private MessageHelper messageHelper;
     private PluginHelper pluginHelper;
 
-    public MassivaFile(
-            ConfigHelper configHelper,
-            MessageHelper messageHelper,
-            PluginHelper pluginHelper) {
+    public MassivaFile(ConfigHelper configHelper, MessageHelper messageHelper, PluginHelper pluginHelper) {
 
         this.configHelper = configHelper;
         this.messageHelper = messageHelper;
@@ -95,10 +92,8 @@ public class MassivaFile {
 //        }
     }
 
-    public void initCreate(
-            NotificacioMassivaDto notificacioMassiva,
-            EntitatEntity entitat,
-            String usuari) {
+    public void initCreate(NotificacioMassivaDto notificacioMassiva, EntitatEntity entitat, String usuari) throws Exception {
+
         // Obtenim les línies del fitxer CSV
         var csvLinies = CSVReader.readFile(notificacioMassiva.getFicheroCsvBytes());
         // Capçalera
@@ -115,10 +110,8 @@ public class MassivaFile {
         this.notificacions = getNotificacions(entitat, usuari, notificacioMassiva.getCaducitat());
     }
 
-    public void initInfo(
-            byte[] contingutCsv,
-            List<NotificacioEntity> notificacions,
-            NotificacioEventRepository notificacioEventRepository) {
+    public void initInfo(byte[] contingutCsv, List<NotificacioEntity> notificacions, NotificacioEventRepository notificacioEventRepository) {
+
         // Obtenim les línies del fitxer CSV
         var csvLinies = CSVReader.readFile(contingutCsv);
         // Capçalera
@@ -152,13 +145,14 @@ public class MassivaFile {
 
 
     public List<NotificacioInfo> generateEnviamentsInfo(List<NotificacioEntity> notificacions, NotificacioEventRepository notificacioEventRepository) {
+
         List<NotificacioInfo> enviamentsInfo = new ArrayList<>();
         if (enviamentsCsv == null) {
             return enviamentsInfo;
         }
 
         var numNotificacio = 0;
-        for (List<String> enviamentCsv: enviamentsCsv) {
+        for (var enviamentCsv: enviamentsCsv) {
             var errors = enviamentCsv.get(enviamentCsv.size() - 1);
             var cancelada = messageHelper.getMessage("notificacio.massiva.cancelada").equals(errors);
             String errorsExecucio = null;
@@ -232,6 +226,7 @@ public class MassivaFile {
     }
 
     public List<String> getEnviamentCsv(int index) {
+
         if (enviamentsCsv == null || enviamentsCsv.size() < index) {
             return null;
         }
@@ -239,28 +234,35 @@ public class MassivaFile {
     }
 
     private List<Notificacio> getNotificacions(EntitatEntity entitat, String usuari, Date caducitat) {
+
         var notis = new ArrayList<Notificacio>();
-        for (List<String> enviamentCsv: enviamentsCsv) {
-            InteressatTipus interessatTipus = getInteressatTipus(
-                    enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DEST_DOC)),
-                    enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DEST_EMAIL)),
-                    enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.UNITAT_DESTI)));
-            boolean perEmail = InteressatTipus.FISICA_SENSE_NIF.equals(interessatTipus);
-            EntregaPostal entregaPostal = null;
+        InteressatTipus interessatTipus;
+        boolean perEmail;
+        EntregaPostal entregaPostal;
+        Persona titular;
+        Enviament enviament;
+        Notificacio notificacio;
+        String numDocument;
+        String email;
+        String dir3Codi;
+        for (var enviamentCsv: enviamentsCsv) {
+
+            numDocument = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DEST_DOC));
+            email = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DEST_EMAIL));
+            dir3Codi = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.UNITAT_DESTI));
+            interessatTipus = getInteressatTipus(numDocument, email, dir3Codi);
+
+            perEmail = InteressatTipus.FISICA_SENSE_NIF.equals(interessatTipus);
+            entregaPostal = null;
             if (!perEmail) {
                 var linia1 = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.ADDR_LIN1));
                 var linia2 = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.ADDR_LIN2));
                 var cp = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.ADDR_CP));
                 if (entitat.getEntregaCie() != null && !Strings.isNullOrEmpty(linia1) && !Strings.isNullOrEmpty(cp)) {
-                    entregaPostal = EntregaPostal.builder()
-                            .tipus(NotificaDomiciliConcretTipus.SENSE_NORMALITZAR)
-                            .linea1(linia1)
-                            .linea2(linia2)
-                            .codiPostal(cp)
-                            .build();
+                    entregaPostal = EntregaPostal.builder().tipus(NotificaDomiciliConcretTipus.SENSE_NORMALITZAR).linea1(linia1).linea2(linia2).codiPostal(cp).build();
                 }
             }
-            Persona titular = Persona.builder()
+            titular = Persona.builder()
                     .interessatTipus(interessatTipus)
                     .nom(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DEST_NOM)))
                     .llinatge1(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DEST_LLINATGES)))
@@ -271,7 +273,7 @@ public class MassivaFile {
                     .email(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DEST_EMAIL)))
                     .incapacitat(false)
                     .build();
-            Enviament enviament = Enviament.builder()
+            enviament = Enviament.builder()
                     .serveiTipus(getServeiTipus(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PRIORITAT))))
                     .entregaDehActiva(false)
                     .entregaPostalActiva(entregaPostal != null)
@@ -279,7 +281,7 @@ public class MassivaFile {
                     .titular(titular)
                     .perEmail(perEmail)
                     .build();
-            Notificacio notificacio = Notificacio.builder()
+            notificacio = Notificacio.builder()
                     .emisorDir3Codi(entitat.getDir3Codi())
                     .organGestor(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.UNITAT_EMISORA)))
                     .procedimentCodi(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PROCEDIMENT)))
@@ -300,6 +302,7 @@ public class MassivaFile {
     }
 
     private DocumentTipus getDocumentTipus(String tipus) {
+
         if (Strings.isNullOrEmpty(tipus)) {
             return DocumentTipus.ALTRE;
         }
@@ -316,6 +319,7 @@ public class MassivaFile {
     }
 
     private ServeiTipus getServeiTipus(String tipus) {
+
         if (Strings.isNullOrEmpty(tipus)) {
             return null;
         }
@@ -329,6 +333,7 @@ public class MassivaFile {
     }
 
     private InteressatTipus getInteressatTipus(String numDocument, String email, String dir3Codi) {
+
         if (Strings.isNullOrEmpty(numDocument) && !Strings.isNullOrEmpty(email)) {
             return InteressatTipus.FISICA_SENSE_NIF;
         }
@@ -349,6 +354,7 @@ public class MassivaFile {
     }
 
     private EnviamentTipus getEnviamentTipus(String strTipus) {
+
         if (Strings.isNullOrEmpty(strTipus)) {
             return null;
         }
@@ -370,6 +376,7 @@ public class MassivaFile {
     }
 
     private Integer getRetard(String strRetard) {
+
         if (Strings.isNullOrEmpty(strRetard)) {
             return null;
         }
@@ -387,14 +394,18 @@ public class MassivaFile {
         return null;
     }
 
-    private Map<String, Document> getDocuments(byte[] contingutZip) {
+    private Map<String, Document> getDocuments(byte[] contingutZip) throws Exception {
+
         Map<String, Document> documentMap = new HashMap<>();
         boolean requereixMetadades = getRequereixMetadades();
         var fileNames = ZipFileUtils.readZipFileNames(contingutZip);
 
+        int linia = 0;
+        Document document = null;
         for (List<String> enviamentCsv: enviamentsCsv) {
-            Document document = null;
 
+            linia++;
+            document = null;
             var fitxerNomIndex = headerColumns.get(MassivaColumnsEnum.FITXER_NOM);
             var fitxerUuidIndex = headerColumns.get(MassivaColumnsEnum.FITXER_UUID);
             var fitxerCsvIndex = headerColumns.get(MassivaColumnsEnum.FITXER_CSV);
@@ -405,7 +416,9 @@ public class MassivaFile {
 
             // Document físic
             if (!Strings.isNullOrEmpty(documentNom)) {
-                var arxiuNom = fileNames.stream().filter(nom -> nom.equals(documentNom)).findFirst().orElse(null);
+                int liniaLamda = linia;
+                var arxiuNom = fileNames.stream().filter(nom -> nom.equals(documentNom)).findFirst()
+                        .orElseThrow(() -> new Exception(messageHelper.getMessage("notificacio.massiva.nom.fitxer.no.coincident", new Object[]{liniaLamda})));
                 if (arxiuNom != null && !documentMap.containsKey(arxiuNom)) {
                     var arxiuBytes = ZipFileUtils.readZipFile(contingutZip, arxiuNom);
                     var mime = MimeUtils.getMimeTypeFromContingut(arxiuNom, arxiuBytes);
@@ -458,6 +471,7 @@ public class MassivaFile {
     }
 
     private Boolean getBoolea(String valor) {
+
         if (Strings.isNullOrEmpty(valor)) {
             return false;
         }
@@ -474,6 +488,7 @@ public class MassivaFile {
     }
 
     private TipusDocumentalEnum getTipusDocumental(String tipus) {
+
         if (Strings.isNullOrEmpty(tipus)) {
             return null;
         }
@@ -546,6 +561,7 @@ public class MassivaFile {
                 .filter(this::columnExist)
                 .collect(Collectors.toMap(idx -> MassivaColumnsEnum.fromNom(headerCsv.get(idx)), Function.identity()));
     }
+
     private boolean columnExist(Integer index) {
         return MassivaColumnsEnum.fromNom(headerCsv.get(index)) != null;
     }
@@ -556,6 +572,7 @@ public class MassivaFile {
                 .filter(c -> isNeededAndNotPresent(c, requereixMetadades))
                 .collect(Collectors.toList());
     }
+
     private boolean isNeededAndNotPresent(MassivaColumnsEnum column, boolean requereixMetadades) {
         return !headerColumns.containsKey(column) && (requereixMetadades || !column.name().startsWith("META_"));
     }
@@ -591,8 +608,10 @@ public class MassivaFile {
     }
 
     private Long getMaximEnviaments() {
+
         return configHelper.getConfigAsLong("es.caib.notib.massives.maxim.files", MAX_ENVIAMENTS);
     }
+
     private boolean getRequereixMetadades() {
         return configHelper.getConfigAsBoolean("es.caib.notib.plugin.registre.documents.enviar", false);
     }

@@ -63,6 +63,6 @@ public enum MassivaColumnsEnum {
             }
 
     private static boolean isNomEqual(MassivaColumnsEnum column, String nom) {
-        return StringUtils.stripAccents(nom).equalsIgnoreCase(column.getNom());
+        return nom != null && StringUtils.stripAccents(nom).equalsIgnoreCase(column.getNom());
     }
 }
