@@ -17,8 +17,8 @@ public interface RegistreService {
 	void registrarSortida(RegistreAnotacioDto registreAnotacio);
 
 	@PreAuthorize("isAuthenticated()")
-	void enviarRegistre(EnviamentRegistreRequest enviamentRegistreRequest);
+	boolean enviarRegistre(EnviamentRegistreRequest enviamentRegistreRequest);
 
 	@PreAuthorize("isAuthenticated()")
-	void consultaSir(ConsultaSirDto enviament);
+	boolean consultaSir(ConsultaSirDto enviament);
 }

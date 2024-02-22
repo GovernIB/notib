@@ -32,6 +32,8 @@ import java.util.concurrent.Semaphore;
 public class EnviamentRegistreListener {
 
     private final RegistreService registreService;
+    private final EnviamentSmService enviamentSmService;
+
     private Semaphore semaphore = new Semaphore(5);
 
 
@@ -47,13 +49,19 @@ public class EnviamentRegistreListener {
 
         semaphore.acquire();
         try {
-            registreService.enviarRegistre(enviamentRegistreRequest);
+            var success = registreService.enviarRegistre(enviamentRegistreRequest);
+            if (success) {
+                log.debug("[SM] Enviament de registre <" + enviamentUuid + "> success ");
+                enviamentSmService.registreSuccess(enviamentUuid);
+            } else {
+                log.debug("[SM] Enviament de registre <" + enviamentUuid + "> failed ");
+                enviamentSmService.registreFailed(enviamentUuid);
+            }
         } finally {
             semaphore.release();
         }
         log.debug("[SM] Enviament de registre <" + enviamentUuid + "> completat");
         message.acknowledge();
-
     }
 
 }

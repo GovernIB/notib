@@ -26,13 +26,13 @@ public class RegistreService extends AbstractService<es.caib.notib.logic.intf.se
 
 	@Override
 	@RolesAllowed("**")
-	public void enviarRegistre(EnviamentRegistreRequest enviamentRegistreRequest) {
-		getDelegateService().enviarRegistre(enviamentRegistreRequest);
+	public boolean enviarRegistre(EnviamentRegistreRequest enviamentRegistreRequest) {
+		return getDelegateService().enviarRegistre(enviamentRegistreRequest);
 	}
 
 	@Override
-	public void consultaSir(ConsultaSirDto enviament) {
-		getDelegateService().consultaSir(enviament);
+	public boolean consultaSir(ConsultaSirDto enviament) {
+		return getDelegateService().consultaSir(enviament);
 	}
 
 }

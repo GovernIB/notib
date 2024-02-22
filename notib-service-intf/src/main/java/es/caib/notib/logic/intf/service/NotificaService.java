@@ -3,6 +3,7 @@ package es.caib.notib.logic.intf.service;
 import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentNotificaRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface NotificaService {
 
@@ -10,5 +11,8 @@ public interface NotificaService {
     void enviarNotifica(String enviamentUuid, EnviamentNotificaRequest enviamentNotificaRequest);
 
     @PreAuthorize("isAuthenticated()")
-    void consultaEstatEnviament(ConsultaNotificaDto enviament);
+    void enviarEvents(String enviamentUuid);
+
+    @PreAuthorize("isAuthenticated()")
+    boolean consultaEstatEnviament(ConsultaNotificaDto enviament);
 }

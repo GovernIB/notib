@@ -46,6 +46,7 @@ public class EnviamentNotificaListener {
         semaphore.acquire();
         try {
             notificaService.enviarNotifica(enviament.getUuid(), enviamentNotificaRequest);
+            notificaService.enviarEvents(enviament.getUuid());
         } finally {
             semaphore.release();
         }

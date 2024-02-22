@@ -6,8 +6,6 @@ import es.caib.notib.logic.intf.service.NotificaService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
-import es.caib.notib.logic.intf.statemachine.dto.ConsultaSirDto;
-import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentNotificaRequest;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
@@ -57,35 +55,13 @@ public class NotificaServiceImpl implements NotificaService {
 
             // Al notificar es processen tots els enviaments a l'hora. --> Notificacio
             // Per tant controlam que només s'executi el primer enviament de la notificació
-            if (haDeExecutar(notificacio.getId(), numIntent)) {
-                notificacioService.notificacioEnviar(notificacio.getId());
-
-                for (var env : notificacio.getEnviaments()) {
-                    var enviamentSuccess = env.getNotificaEstatData() != null;
-    //                    TEST
-    //                    var enviamentSuccess = new Random().nextBoolean();
-                    var event = enviamentSuccess ? EnviamentSmEvent.NT_SUCCESS : EnviamentSmEvent.NT_ERROR;
-                    switch (event) {
-                        case NT_SUCCESS:
-                            if (env.isPerEmail()) {
-                                enviamentSmService.notificaFi(env.getNotificaReferencia());
-                            } else {
-                                enviamentSmService.notificaSuccess(env.getNotificaReferencia());
-                            }
-                            break;
-                        case NT_ERROR:
-                            enviamentSmService.notificaFailed(env.getNotificaReferencia());
-                            break;
-                    }
-                }
-
-                if (NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()) ||
-                        NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat()) ||
-                        NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
-                    netejaExecucio(notificacio.getId());
-                }
-    //                notificacioTableHelper.actualitzarRegistre(notificacio);
+            if (!haDeExecutar(notificacio.getId(), numIntent)) {
+                return;
             }
+            notificacioService.notificacioEnviar(notificacio.getId());
+
+//                notificacioTableHelper.actualitzarRegistre(notificacio);
+
         } catch (Exception ex) {
             if (notificacio != null) {
                 notificacio.getEnviaments().forEach(e -> enviamentSmService.notificaFailed(e.getNotificaReferencia()));
@@ -95,25 +71,52 @@ public class NotificaServiceImpl implements NotificaService {
 
     @Transactional
     @Override
-    public void consultaEstatEnviament(ConsultaNotificaDto enviament) {
+    public void enviarEvents(String enviamentUuid) {
+
+        try {
+            var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
+            var notificacio = enviamentEntity.getNotificacio();
+            for (var env : notificacio.getEnviaments()) {
+                var enviamentSuccess = env.getNotificaEstatData() != null;
+                var event = enviamentSuccess ? EnviamentSmEvent.NT_SUCCESS : EnviamentSmEvent.NT_ERROR;
+                switch (event) {
+                    case NT_SUCCESS:
+                        if (env.isPerEmail()) {
+                            enviamentSmService.notificaFi(env.getNotificaReferencia());
+                        } else {
+                            enviamentSmService.notificaSuccess(env.getNotificaReferencia());
+                        }
+                        break;
+                    case NT_ERROR:
+                        enviamentSmService.notificaFailed(env.getNotificaReferencia());
+                        break;
+                }
+            }
+
+            if (NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()) ||
+                    NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat()) ||
+                    NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
+                netejaExecucio(notificacio.getId());
+            }
+        } catch (Exception ex) {
+            log.error("Error al enviar events un cop enviada la notificacio a Notifica");
+        }
+    }
+
+    @Transactional
+    @Override
+    public boolean consultaEstatEnviament(ConsultaNotificaDto enviament) {
 
         try {
         // Consultar enviament a notifica
             notificacioService.enviamentRefrescarEstat(enviament.getId());
             var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElseThrow();
-            var consultaSuccess = enviamentEntity.getNotificaIntentNum() == 0;
-    //            TEST
-    //            var consultaSuccess = new Random().nextBoolean();
-
-            if (consultaSuccess) {
-                enviamentSmService.consultaSuccess(enviament.getUuid());
-            } else {
-                enviamentSmService.consultaFailed(enviament.getUuid());
-            }
+            return enviamentEntity.getNotificaIntentNum() == 0;
         } catch (Exception ex) {
             if (enviament != null && enviament.getUuid() != null) {
                 enviamentSmService.consultaFailed(enviament.getUuid());
             }
+            return false;
         }
     }
 }

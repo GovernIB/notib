@@ -26,6 +26,7 @@ public class ConsultaNotificaListener {
 
 
     private final NotificaService notificaService;
+    private final EnviamentSmService enviamentSmService;
     private Semaphore semaphore = new Semaphore(5);
 
 
@@ -41,7 +42,12 @@ public class ConsultaNotificaListener {
 
         semaphore.acquire();
         try {
-            notificaService.consultaEstatEnviament(enviament);
+            var success = notificaService.consultaEstatEnviament(enviament);
+            if (success) {
+                enviamentSmService.consultaSuccess(enviament.getUuid());
+            } else {
+                enviamentSmService.consultaFailed(enviament.getUuid());
+            }
         } finally {
             semaphore.release();
         }

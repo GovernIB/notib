@@ -2,10 +2,7 @@ package es.caib.notib.ejb;
 
 
 import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
-import es.caib.notib.logic.intf.statemachine.dto.ConsultaSirDto;
-import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentNotificaRequest;
-import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
 import org.springframework.context.annotation.Primary;
 
 import javax.ejb.Stateless;
@@ -20,7 +17,12 @@ public class NotificaService extends AbstractService<es.caib.notib.logic.intf.se
     }
 
     @Override
-    public void consultaEstatEnviament(ConsultaNotificaDto enviament) {
-        getDelegateService().consultaEstatEnviament(enviament);
+    public void enviarEvents(String enviamentUuid) {
+        getDelegateService().enviarEvents(enviamentUuid);
+    }
+
+    @Override
+    public boolean consultaEstatEnviament(ConsultaNotificaDto enviament) {
+        return getDelegateService().consultaEstatEnviament(enviament);
     }
 }

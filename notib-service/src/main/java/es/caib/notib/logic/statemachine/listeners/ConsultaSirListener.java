@@ -26,6 +26,8 @@ public class ConsultaSirListener {
 
 
     private final RegistreService registreService;
+    private final EnviamentSmService enviamentSmService;;
+
     private Semaphore semaphore = new Semaphore(5);
 
     @JmsListener(destination = SmConstants.CUA_CONSULTA_SIR, containerFactory = SmConstants.JMS_FACTORY_ACK)
@@ -39,7 +41,12 @@ public class ConsultaSirListener {
         }
         semaphore.acquire();
         try {
-            registreService.consultaSir(enviament);
+            var success = registreService.consultaSir(enviament);
+            if (success) {
+                enviamentSmService.sirSuccess(enviament.getUuid());
+            } else {
+                enviamentSmService.sirFailed(enviament.getUuid());
+            }
         } finally {
             semaphore.release();
         }
