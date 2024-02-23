@@ -43,7 +43,8 @@ public abstract class NotificacioApiRestBaseController {
 
 		String errorDescripcio;
 		if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
-			errorDescripcio = "L'usuari " + aplicacioService.getUsuariActual().getCodi() + " no té els permisos necessaris: " + e.getMessage();
+			var usr = aplicacioService.getUsuariActual();
+			errorDescripcio = "L'usuari " + (usr != null ? usr.getCodi() : "") + " no té els permisos necessaris: " + e.getMessage();
 			return errorDescripcio;
 		}
 		errorDescripcio = UtilitatsNotib.getMessageExceptionOrCauseInstanceOf(e, EJBAccessException.class);

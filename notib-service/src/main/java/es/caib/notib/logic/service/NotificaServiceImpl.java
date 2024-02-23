@@ -59,12 +59,9 @@ public class NotificaServiceImpl implements NotificaService {
                 return;
             }
             notificacioService.notificacioEnviar(notificacio.getId());
-
-//                notificacioTableHelper.actualitzarRegistre(notificacio);
-
         } catch (Exception ex) {
             if (notificacio != null) {
-                notificacio.getEnviaments().forEach(e -> enviamentSmService.notificaFailed(e.getNotificaReferencia()));
+                log.error("Error enviant a notifica la notificacio " + notificacio.getId());
             }
         }
     }
@@ -113,9 +110,7 @@ public class NotificaServiceImpl implements NotificaService {
             var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElseThrow();
             return enviamentEntity.getNotificaIntentNum() == 0;
         } catch (Exception ex) {
-            if (enviament != null && enviament.getUuid() != null) {
-                enviamentSmService.consultaFailed(enviament.getUuid());
-            }
+            log.error("Error en la consulta de l'estat de l'enviament " + enviament.getUuid());
             return false;
         }
     }

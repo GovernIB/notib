@@ -1,5 +1,6 @@
 package es.caib.notib.logic.statemachine.listeners;
 
+import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentEmailRequest;
@@ -35,11 +36,12 @@ public class EnviamentEmailListener {
         // per tant no s'utilitza aquest listener
 
         var enviament = enviamentEmailRequest.getEnviamentEmailDto();
-        if (enviament != null && enviament.getUuid() != null) {
-            log.error("[SM] Rebut enviament per email <" + enviament.getUuid() + ">");
-        } else {
-            log.error("[SM] Rebut enviament per emial sense Enviament");
+        if (enviament == null || Strings.isNullOrEmpty(enviament.getUuid())) {
+            log.error("[SM] Rebut enviament per email sense Enviament");
+            message.acknowledge();
+            return;
         }
+        log.error("[SM] Rebut enviament per email <" + enviament.getUuid() + ">");
 
         semaphore.acquire();
         try {

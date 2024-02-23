@@ -31,7 +31,6 @@ public class PoolingNotificaListener {
         enviamentSmService.enviamentConsulta(enviamentUuid);
         log.debug("[SM] Iniciat pooling de consulta d'estat a Notifica de l'enviament amb UUID " + enviamentUuid);
         message.acknowledge();
-
     }
 
     public boolean isAdviserActiu() {

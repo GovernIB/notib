@@ -41,12 +41,12 @@ public class EnviamentRegistreListener {
     public void receiveEnviamentRegistre(@Payload EnviamentRegistreRequest enviamentRegistreRequest, @Headers MessageHeaders headers, Message message) throws JMSException, RegistreNotificaException, InterruptedException {
 
         var enviamentUuid = enviamentRegistreRequest.getEnviamentUuid();
-        if (enviamentUuid != null) {
-            log.debug("[SM] Rebut enviament de registre <" + enviamentUuid + ">");
-        } else {
+        if (enviamentUuid == null) {
             log.error("[SM] Rebut enviament de registre sense Enviament");
+            message.acknowledge();
+            return;
         }
-
+        log.debug("[SM] Rebut enviament de registre <" + enviamentUuid + ">");
         semaphore.acquire();
         try {
             var success = registreService.enviarRegistre(enviamentRegistreRequest);

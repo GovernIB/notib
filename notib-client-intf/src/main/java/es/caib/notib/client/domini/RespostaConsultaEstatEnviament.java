@@ -2,6 +2,7 @@
 package es.caib.notib.client.domini;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,6 +30,7 @@ import java.util.Date;
 public class RespostaConsultaEstatEnviament extends RespostaBase {
 
     private EnviamentEstat estat;
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Date estatData;
     private String estatDescripcio;
     private String estatOrigen;

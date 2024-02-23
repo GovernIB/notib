@@ -21,9 +21,9 @@ import static org.junit.Assert.*;
 public class ClientRestCarpetav2Test {
 
 	
-	private static final String URL = "http://localhost:8280/notibapi";
-	private static final String USERNAME = "admin";
-	private static final String PASSWORD = "admin";
+	private static final String URL = "http://localhost:8080/notibapi";
+	private static final String USERNAME = "u999000";
+	private static final String PASSWORD = "u999000";
 
 	private static final String DNI_TITULAR = "12345678z";
 	private static final String DATA_INICI = "07/02/2022";

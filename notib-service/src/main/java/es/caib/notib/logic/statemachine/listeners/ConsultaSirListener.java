@@ -34,11 +34,12 @@ public class ConsultaSirListener {
     public void receiveConsultaSir(@Payload ConsultaSirRequest consultaSirRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
         var enviament = consultaSirRequest.getConsultaSirDto();
-        if (enviament != null && enviament.getUuid() != null) {
-            log.debug("[SM] Rebut consulta d'estat a Sir <" + enviament.getUuid() + ">");
-        } else {
+        if (enviament == null || enviament.getUuid() == null) {
             log.error("[SM] Rebuda consulta d'estat a Sir sense Enviament");
+            message.acknowledge();
+            return;
         }
+        log.debug("[SM] Rebut consulta d'estat a Sir <" + enviament.getUuid() + ">");
         semaphore.acquire();
         try {
             var success = registreService.consultaSir(enviament);

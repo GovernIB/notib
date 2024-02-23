@@ -43,15 +43,15 @@ public class ClientBaseTest {
 	protected static final String LLIBRE = "L16";
 	protected static final String OFICINA = "O00009390";
 	protected static final String IDIOMA = "ca";
-	protected static final String USUARI_CODI = "e18225486x";
+	protected static final String USUARI_CODI = "u999000";
 	protected static final NotificaDomiciliConcretTipus TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipus.NACIONAL;
 
 	// LOCAL data
 //	Entitat: A04013511 (DGTIC) ò A04003003 (Govern)
 	protected static final String ENTITAT_DIR3CODI = "A04003003";
-	protected static final String ORGAN_CODI = "A04035948";
+	protected static final String ORGAN_CODI = "A04003749";
 	protected static final String ORGAN_CODI_CIE = "A04026958"; // LOCAL
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292"; // LOCAL
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "216076"; // LOCAL
 	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "215981"; // LOCAL
 
 
@@ -63,10 +63,7 @@ public class ClientBaseTest {
 //	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "896953"; // DEV
 
 
-	protected NotificacioV2 generarNotificacioV2(
-			String notificacioId,
-			int numDestinataris,
-			boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException {
+	protected NotificacioV2 generarNotificacioV2(String notificacioId, int numDestinataris, boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException {
 
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		NotificacioV2 notificacio = new NotificacioV2();
@@ -97,33 +94,32 @@ public class ClientBaseTest {
 		for (int i = 0; i < numDestinataris; i++) {
 			EnviamentV2 enviament = new EnviamentV2();
 			PersonaV2 titular = new PersonaV2();
-			titular.setNom("Siòn");
-			titular.setLlinatge1("Andreu");
-			titular.setLlinatge2("Nadal");
-			titular.setTelefon("666010101");
+			titular.setNom("Nom");
+			titular.setLlinatge1("Llinatge1");
+			titular.setLlinatge2("Llinatge2");
 			if (i == 0) {
-				titular.setNif("00000000T");
-				titular.setEmail("sandreu@limit.es");
+				titular.setNif("12345678z");
+				titular.setEmail("proves@limit.es");
 			}
 			titular.setInteressatTipus(i != 0 ? InteressatTipus.FISICA_SENSE_NIF : InteressatTipus.FISICA);
 			if (titular.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 				titular.setDir3Codi(ENTITAT_DIR3CODI);
 			}
 			enviament.setTitular(titular);
-			PersonaV2 destinatari = new PersonaV2();
-			destinatari.setNom("melcior");
-			destinatari.setLlinatge1("Andreu");
-			destinatari.setLlinatge2("Nadal");
-			destinatari.setNif("18225486x");
-			destinatari.setTelefon("666020202");
-			destinatari.setEmail("sandreu@limit.es");
-			destinatari.setInteressatTipus(InteressatTipus.ADMINISTRACIO);
-			if (destinatari.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
-				destinatari.setDir3Codi(ORGAN_SIR_CODI);
-			}
-			if (i == 0) {
-				enviament.getDestinataris().add(destinatari);
-			}
+//			PersonaV2 destinatari = new PersonaV2();
+//			destinatari.setNom("melcior");
+//			destinatari.setLlinatge1("Andreu");
+//			destinatari.setLlinatge2("Nadal");
+//			destinatari.setNif("18225486x");
+//			destinatari.setTelefon("666020202");
+//			destinatari.setEmail("sandreu@limit.es");
+//			destinatari.setInteressatTipus(InteressatTipus.ADMINISTRACIO);
+//			if (destinatari.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
+//				destinatari.setDir3Codi(ORGAN_SIR_CODI);
+//			}
+//			if (i == 0) {
+//				enviament.getDestinataris().add(destinatari);
+//			}
 			if (ambEnviamentPostal) {
 				EntregaPostalV2 entregaPostal = new EntregaPostalV2();
 				if (NotificaDomiciliConcretTipus.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {
@@ -164,37 +160,34 @@ public class ClientBaseTest {
 	}
 
 	private InputStream getContingutNotificacioAdjunt() {
-		return getClass().getResourceAsStream(
-				"/es/caib/notib/client/notificacio_adjunt.pdf");
+		return getClass().getResourceAsStream("/es/caib/notib/client/notificacio_adjunt.pdf");
 	}
 	
 	protected InputStream getContingutNotificacioAdjuntTxt() {
-		return getClass().getResourceAsStream(
-				"/es/caib/notib/client/notificacio_adjunt.txt");
+		return getClass().getResourceAsStream("/es/caib/notib/client/notificacio_adjunt.txt");
 	}
 	
 	protected InputStream getContingutNotificacioAdjuntGrande() {
-		return getClass().getResourceAsStream(
-				"/es/caib/notib/client/notificacio_adjunt_grande.pdf");
+		return getClass().getResourceAsStream("/es/caib/notib/client/notificacio_adjunt_grande.pdf");
 	}
 
 	protected InputStream getContingutNotificacioAdjuntFirmat() {
-		return getClass().getResourceAsStream(
-				"/es/caib/notib/client/notificacio_adjunt_firmat.pdf");
+		return getClass().getResourceAsStream("/es/caib/notib/client/notificacio_adjunt_firmat.pdf");
 	}
 
 	protected InputStream getContingutNotificacioAdjuntFirmatInvalid() {
-		return getClass().getResourceAsStream(
-				"/es/caib/notib/client/notificacio_adjunt_firmat_invalid.pdf");
+		return getClass().getResourceAsStream("/es/caib/notib/client/notificacio_adjunt_firmat_invalid.pdf");
 	}
 
 	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
+
 		GregorianCalendar c = new GregorianCalendar();
 		c.setTime(date);
 		return DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 	}
 	
 	protected List<DocumentV2> crearArxius(Integer numeroArxius, NotificacioV2 notificacioV2, String notificacioId, byte[] arxiuBytes) {
+
 		List<DocumentV2>  documents = new ArrayList<>();
 //		List<String> extensionsDisponibles = Arrays.asList(new String[] {"jpg", "jpeg", "odt", "odp", "ods", "odg", "docx", "xlsx", "pptx", "pdf", "png", "rtf", "svg", "tiff", "txt", "xml", "xsig", "csig", "html", "csv"});;
 		if(numeroArxius >= 0 && numeroArxius < 5) {
@@ -222,10 +215,7 @@ public class ClientBaseTest {
 	}
 	
 	
-	protected List<NotificacioV2> generarMultiplesNotificacioV2(
-			Integer numeroDeNotificacions,
-			int numDestinataris,
-			boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException {
+	protected List<NotificacioV2> generarMultiplesNotificacioV2(Integer numeroDeNotificacions, int numDestinataris, boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException {
 		
 		List<Integer> repetits = new ArrayList<>();
 		List<NotificacioV2> notificacions = new ArrayList<>();
@@ -370,9 +360,7 @@ public class ClientBaseTest {
 		return notificacions;
 	}
 
-	protected NotificacioV2 generarNotificacio(
-			int numDestinataris,
-			boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException {
+	protected NotificacioV2 generarNotificacio(int numDestinataris, boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException {
 
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 
@@ -512,6 +500,7 @@ public class ClientBaseTest {
 	}
 
 	private Integer generarRandomNoRepetit(List<Integer> repetits, Integer numeroDeNotificacions) {
+
 		 Integer index = new Random().nextInt(numeroDeNotificacions);
 	      while(repetits.contains(index)) {
 	    	  index = new Random().nextInt(numeroDeNotificacions);
@@ -542,9 +531,9 @@ public class ClientBaseTest {
 				ambEnviamentDEHObligat,
 				true);
 
-		if (!ambRetard)
+		if (!ambRetard) {
 			notificacioV2.setRetard(0);
-
+		}
 
 		return notificacioV2;
 

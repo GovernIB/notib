@@ -3,6 +3,7 @@
  */
 package es.caib.notib.client.domini.consulta;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,8 +32,10 @@ public class TransmissioV2 {
 	private String numExpedient;			// Número de l’expedient al que està associada la comunicació
 	private String concepte;				// Concepte de la comunicació
 	private String descripcio;				// Descripció de la comunicació
+	@JsonFormat(shape = JsonFormat.Shape.NUMBER)
 	private Date dataEnviament;				// Data d'enviament de la comunicació
 	private GenericInfo estat;				// Estat de l'enviament
+	@JsonFormat(shape = JsonFormat.Shape.NUMBER)
 	private Date dataEstat;					// Data en que s'ha realitzat l'enviament
 	private DocumentConsultaV2 document;				// Document comunicat
 	
@@ -40,8 +43,11 @@ public class TransmissioV2 {
 	private List<PersonaConsultaV2> destinataris;		// Persones representans, destinatàries de l'enviament
 
 	// Error
+	@JsonFormat(shape = JsonFormat.Shape.NUMBER)
 	private boolean error;					// Informa si s'ha produït algun error en la comunicació
+	@JsonFormat(shape = JsonFormat.Shape.NUMBER)
 	private Date errorData;					// Data de l'error
+	@JsonFormat(shape = JsonFormat.Shape.NUMBER)
 	private String errorDescripcio;			// Descripció de l'error
 	
 	private String justificant;				// Justificant de registre

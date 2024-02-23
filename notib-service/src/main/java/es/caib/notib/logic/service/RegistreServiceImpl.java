@@ -25,7 +25,6 @@ import java.util.Date;
 @Service
 public class RegistreServiceImpl implements RegistreService {
 
-    private final EnviamentSmService enviamentSmService;
     private final NotificacioService notificacioService;
     private final NotificacioEnviamentRepository notificacioEnviamentRepository;
     private final RegistreSmHelper registreSmHelper;
@@ -85,10 +84,7 @@ public class RegistreServiceImpl implements RegistreService {
             log.debug("[SM] Enviament de registre <" + enviamentUuid + "> is success " + registreSuccess);
             return registreSuccess;
         } catch (Exception ex) {
-            if (enviamentUuid != null) {
-                log.debug("[SM] Enviament de registre <" + enviamentUuid + "> error ", ex);
-                enviamentSmService.registreFailed(enviamentUuid);
-            }
+            log.debug("[SM] Enviament de registre <" + enviamentUuid + "> error ", ex);
             return false;
         }
     }
@@ -103,7 +99,7 @@ public class RegistreServiceImpl implements RegistreService {
             var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElseThrow();
             return enviamentEntity.getSirConsultaIntent() == 0;
         } catch (Exception ex) {
-            enviamentSmService.sirFailed(enviament.getUuid());
+            log.error("Error a la consulta SIR per l'enviament " + enviament.getUuid());
             return false;
         }
     }

@@ -28,12 +28,12 @@ import static org.junit.Assert.*;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ClientRestv2Test extends ClientBaseTest {
 
-//	private static final String URL = "http://localhost:8080/notibapi";
-//	private static final String USERNAME = "u999000";
-//	private static final String PASSWORD = "u999000";
-	private static final String URL = "https://dev.caib.es/notib2api";
-	private static final String USERNAME = "e18225486x";
-	private static final String PASSWORD = "limit";
+	private static final String URL = "http://localhost:8080/notibapi";
+	private static final String USERNAME = "u999000";
+	private static final String PASSWORD = "u999000";
+//	private static final String URL = "https://dev.caib.es/notib2api";
+//	private static final String USERNAME = "e18225486x";
+//	private static final String PASSWORD = "limit";
 
 
 	// Indicar si el servidor esta configurat en mode síncron
@@ -664,10 +664,10 @@ public class ClientRestv2Test extends ClientBaseTest {
 
 
 	@Test
-	public void consultaEstatNotificacioTest() throws DatatypeConfigurationException, IOException {
+	public void 	consultaEstatNotificacioTest() throws DatatypeConfigurationException, IOException {
 		// Given
 //		String referencia = "43573ddf-4f26-40d9-ae80-5bc9dcafbb96";
-		String referencia = "b64248ba-0a80-4d0f-a1cf-d7e28fa89f2e";
+		String referencia = "a88ad1c6-4e79-4287-b781-ffd689e4a6de";
 
 		// When
 		RespostaConsultaEstatNotificacioV2 respostaConsultaEstatNotificacio = client.consultaEstatNotificacio(referencia);
