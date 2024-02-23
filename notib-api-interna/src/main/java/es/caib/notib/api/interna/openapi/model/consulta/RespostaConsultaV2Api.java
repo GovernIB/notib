@@ -20,6 +20,6 @@ public class RespostaConsultaV2Api {
 	private boolean error;
 	@Schema(name = "errorDescripcio", implementation = String.class, example = "java.lang.NullPointerException", description = "Descripció de l'error")
 	private String errorDescripcio;
-	@Schema(name = "errorData", implementation = Date.class, example = "2023-05-29T07:32:03.526+0000", description = "Data de l'error")
+	@Schema(name = "errorData", implementation = Long.class, example = "1706168093962", description = "Data de l'error")
 	private Date errorData;
 }

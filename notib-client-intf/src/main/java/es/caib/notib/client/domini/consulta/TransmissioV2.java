@@ -43,11 +43,9 @@ public class TransmissioV2 {
 	private List<PersonaConsultaV2> destinataris;		// Persones representans, destinatàries de l'enviament
 
 	// Error
-	@JsonFormat(shape = JsonFormat.Shape.NUMBER)
 	private boolean error;					// Informa si s'ha produït algun error en la comunicació
 	@JsonFormat(shape = JsonFormat.Shape.NUMBER)
 	private Date errorData;					// Data de l'error
-	@JsonFormat(shape = JsonFormat.Shape.NUMBER)
 	private String errorDescripcio;			// Descripció de l'error
 	
 	private String justificant;				// Justificant de registre

@@ -16,7 +16,7 @@ import java.util.Date;
 @Schema(name = "Certificacio")
 public class CertificacioApi {
 
-    @Schema(name = "data", implementation = Date.class, example = "2023-05-29T07:32:03.526+0000", description = "Data de creació de la certificació de la notificació")
+    @Schema(name = "data", implementation = Long.class, example = "1706168093962", description = "Data de creació de la certificació de la notificació")
     private Date data;
     @Schema(name = "origen", implementation = String.class, example = "carpeta", description = "Origen de la certificació")
     private String origen;

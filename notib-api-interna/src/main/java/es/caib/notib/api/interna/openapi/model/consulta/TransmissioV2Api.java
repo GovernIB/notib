@@ -32,11 +32,11 @@ public class TransmissioV2Api {
 	private String concepte;				// Concepte de la notificació
 	@Schema(name = "descripcio", implementation = String.class, example = "Descripció de la notificació", description = "Descripció de la notificació")
 	private String descripcio;				// Descripció de la notificació
-	@Schema(name = "dataEnviament", implementation = Date.class, example = "2023-05-29T07:32:03.526+0000", description = "Data d'enviament de la notificació")
+	@Schema(name = "dataEnviament", implementation = Long.class, example = "1706168093962", description = "Data d'enviament de la notificació")
 	private Date dataEnviament;				// Data d'enviament de la notificació
 	@Schema(name = "estat", implementation = GenericInfoApi.class, description = "Estat de l'enviament")
 	private GenericInfoApi estat;			// Estat de l'enviament
-	@Schema(name = "dataEstat", implementation = Date.class, example = "2023-05-29T07:32:03.526+0000", description = "Data en que s'ha realitzat l'enviament")
+	@Schema(name = "dataEstat", implementation = Long.class, example = "1706168093962", description = "Data en que s'ha realitzat l'enviament")
 	private Date dataEstat;					// Data en que s'ha realitzat l'enviament
 	@Schema(name = "document", implementation = DocumentConsultaV2Api.class, example = "codi", description = "Document notificat")
 	private DocumentConsultaV2Api document;	// Document notificat
@@ -49,7 +49,7 @@ public class TransmissioV2Api {
 	// Error
 	@Schema(name = "error", implementation = Boolean.class, example = "false", description = "Informa si s'ha produït algun error en la notificació")
 	private boolean error;					// Informa si s'ha produït algun error en la notificació
-	@Schema(name = "errorData", implementation = Date.class, example = "2023-05-29T07:32:03.526+0000", description = "Data de l'error")
+	@Schema(name = "errorData", implementation = Long.class, example = "17061680939620", description = "Data de l'error")
 	private Date errorData;					// Data de l'error
 	@Schema(name = "errorDescripcio", implementation = String.class, example = "java.lang.NullPointerException", description = "Descripció de l'error")
 	private String errorDescripcio;			// Descripció de l'error
