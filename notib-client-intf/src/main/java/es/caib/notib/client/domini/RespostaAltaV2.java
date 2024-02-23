@@ -2,6 +2,7 @@
 package es.caib.notib.client.domini;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,6 +36,7 @@ public class RespostaAltaV2 extends RespostaBase {
     private NotificacioEstatEnum estat;
     @XmlElement(nillable = true)
     private List<EnviamentReferenciaV2> referencies;
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Date dataCreacio;
 
     public List<EnviamentReferenciaV2> getReferencies() {
