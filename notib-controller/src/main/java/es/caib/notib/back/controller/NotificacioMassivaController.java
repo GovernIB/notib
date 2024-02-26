@@ -1,5 +1,6 @@
 package es.caib.notib.back.controller;
 
+import es.caib.notib.back.command.ColumnesRemesesCommand;
 import es.caib.notib.back.command.NotificacioFiltreCommand;
 import es.caib.notib.back.command.NotificacioMassivaCommand;
 import es.caib.notib.back.command.NotificacioMassivaFiltreCommand;
@@ -21,6 +22,7 @@ import es.caib.notib.logic.intf.exception.InvalidCSVFileNotificacioMassivaExcept
 import es.caib.notib.logic.intf.exception.MaxLinesExceededException;
 import es.caib.notib.logic.intf.exception.NotificacioMassivaException;
 import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.ColumnesService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.GestioDocumentalService;
 import es.caib.notib.logic.intf.service.NotificacioMassivaService;
@@ -74,6 +76,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     private NotificacioBackHelper notificacioListHelper;
     @Autowired
     private GestioDocumentalService gestioDocumentalService;
+    @Autowired
+    private ColumnesService columnesService;
 
     private static final  String TABLE_FILTRE = "not_massiva_filtre";
     private static final String TABLE_NOTIFICACIONS_FILTRE = "not_massiva_nots_filtre";
@@ -238,6 +242,9 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         var data = new SimpleDateFormat("dd/MM/yyyy");
         var txt = new String[] {data.format(notMassivaData.getCreatedDate()), notMassivaData.getCsvFilename(), notMassivaData.getCreatedBy().getCodi()};
         model.addAttribute("subtitle", getMessage(request, "notificacio.massiva.notificacions.list.titol.sub", txt));
+        var codiUsuari = getCodiUsuariActual();
+        var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), codiUsuari);
+        model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
         return "notificacioMassivaNotificacionsList";
     }
 

@@ -175,9 +175,9 @@ $(document).ready(function() {
 							<c:when test="${not empty notInfo.cifNif}">
 								- ${notInfo.cifNif}</td>
 							</c:when>
-							<c:otherwise>
+							<c:when test="${empty notInfo.cifNif and not empty notInfo.email}">
 								- <spring:message code="notificacio.massiva.info.resum.interesat.sense.nif"/></td>
-							</c:otherwise>
+							</c:when>
 						</c:choose>
 <%--						<td>${notInfo.origen}</td>--%>
 						<td>${notInfo.errores}</td>

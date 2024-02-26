@@ -236,7 +236,7 @@ public class NotificacioTableHelper {
             tableViewItem.setEnviadaDate(getEnviadaDate(notificacio));
             tableViewItem.setTitular(titular.toString());
             tableViewItem.setNotificaIds(notificaIds.toString());
-            tableViewItem.setRegistreNums(registreNums.toString());
+            tableViewItem.setRegistreNums(registreNums.substring(0, registreNums.length()-2));
             tableViewItem.setEstatMask(estatMask);
             tableViewItem.setPerActualitzar(true);
             notificacioTableViewRepository.saveAndFlush(tableViewItem);

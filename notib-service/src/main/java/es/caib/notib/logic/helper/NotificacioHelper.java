@@ -317,12 +317,16 @@ public class NotificacioHelper {
 					document = doc;
 
 					// Recuperar csv
-					Map<String, Object> metadadesAddicionals = documentArxiu.getMetadades().getMetadadesAddicionals();
-					if (metadadesAddicionals != null) {
-						if (metadadesAddicionals.containsKey("csv"))
-							document.setCsv((String) metadadesAddicionals.get("csv"));
-						else if (metadadesAddicionals.containsKey("eni:csv"))
-							document.setCsv((String) metadadesAddicionals.get("eni:csv"));
+					if (documentArxiu.getMetadades() != null ) {
+						Map<String, Object> metadadesAddicionals = documentArxiu.getMetadades().getMetadadesAddicionals();
+						if (metadadesAddicionals != null) {
+							if (metadadesAddicionals.containsKey("csv"))
+								document.setCsv((String) metadadesAddicionals.get("csv"));
+							else if (metadadesAddicionals.containsKey("eni:csv"))
+								document.setCsv((String) metadadesAddicionals.get("eni:csv"));
+						}
+					} else {
+						log.info("Metadades null per el document amb uuid" + document.getUuid());
 					}
 
 				}

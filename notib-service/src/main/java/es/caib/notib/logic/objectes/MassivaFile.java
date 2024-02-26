@@ -21,6 +21,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto.Notifi
 import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.logic.intf.exception.InvalidCSVFileException;
 import es.caib.notib.logic.intf.exception.InvalidCSVFileNotificacioMassivaException;
+import es.caib.notib.logic.intf.exception.FilaDiferentSizeHeader;
 import es.caib.notib.logic.intf.exception.MaxLinesExceededException;
 import es.caib.notib.logic.intf.util.NifHelper;
 import es.caib.notib.logic.utils.CSVReader;
@@ -337,13 +338,13 @@ public class MassivaFile {
         if (Strings.isNullOrEmpty(numDocument) && !Strings.isNullOrEmpty(email)) {
             return InteressatTipus.FISICA_SENSE_NIF;
         }
-        if (Strings.isNullOrEmpty(numDocument) && Strings.isNullOrEmpty(email)) {
-            return null;
-        }
-        if (NifHelper.isValidCif(numDocument)) {
+//        if (Strings.isNullOrEmpty(numDocument) && Strings.isNullOrEmpty(email)) {
+//            return null;
+//        }
+        if (!Strings.isNullOrEmpty(numDocument) && NifHelper.isValidCif(numDocument)) {
             return InteressatTipus.JURIDICA;
         }
-        if (NifHelper.isValidNifNie(numDocument)) {
+        if (!Strings.isNullOrEmpty(numDocument) && NifHelper.isValidNifNie(numDocument)) {
             return InteressatTipus.FISICA;
         }
         var lista = pluginHelper.unitatsPerCodi(dir3Codi);
@@ -580,21 +581,29 @@ public class MassivaFile {
     private void checkCSVContent() {
 
         if (enviamentsCsv == null || headerCsv == null) {
-            throw new InvalidCSVFileException("S'ha produït un error processant el fitxer CSV indicat: sense contingut");
+            throw new InvalidCSVFileException(messageHelper.getMessage("notificacio.massiva.error.csv.sense.contingut"));
         }
         if (enviamentsCsv.isEmpty()) {
-            throw new InvalidCSVFileNotificacioMassivaException("El fitxer CSV està buid.");
+            throw new InvalidCSVFileNotificacioMassivaException(messageHelper.getMessage("notificacio.massiva.error.csv.buit"));
         }
         var maxEnviaments = getMaximEnviaments();
         if (enviamentsCsv.size() > maxEnviaments) {
             log.debug(String.format("[NOT-MASSIVA] El fitxer CSV conté més de les %d línies permeses.", maxEnviaments));
-            throw new MaxLinesExceededException(String.format("S'ha superat el màxim nombre de línies permès (%d) per al CSV de càrrega massiva.", maxEnviaments));
+            throw new MaxLinesExceededException(String.format(messageHelper.getMessage("notificacio.massiva.max.linies.permeses", new Object[]{maxEnviaments})));
         }
 
         if (!misingColumns.isEmpty() && !checkMissingColumnsFileColumns()) {
-            var msg = "El fitxer CSV no conté totes les columnes necessaries. Columnes que falten: " +
+            var msg = messageHelper.getMessage("notificacio.massiva.columnes.faltants") +
                     getMissingColumns().stream().map(MassivaColumnsEnum::getNom).collect(Collectors.joining(", "));
             throw new InvalidCSVFileNotificacioMassivaException(msg);
+        }
+
+        var fila = 1;
+        for (var enviament : enviamentsCsv) {
+            if (enviament.size() != headerCsv.size()) {
+                throw new FilaDiferentSizeHeader(messageHelper.getMessage("notificacio.massiva.fila.mida.diferent.header", new Object[]{fila}));
+            }
+            fila++;
         }
     }
 
