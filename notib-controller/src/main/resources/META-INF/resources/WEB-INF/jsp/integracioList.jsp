@@ -73,13 +73,20 @@
 					if (!data.parametres || data.parametres.length === 0) {
 						$('.integracio-parameters').hide();
 					} else {
+
 						$('.integracio-parameters').show();
 						let htmlList = "<ul>";
+						let clipBoard = ""
 						data.parametres.forEach(function (param) {
-							htmlList += '<li><strong>' + param.codi + ':</strong> ' + param.valor + '</li>'
+							htmlList += '<li><strong>' + param.codi + ':</strong> ' + param.valor + '</li>';
+							clipBoard += "\b" + param.codi + '\b: ' + param.valor + "\n";
 						});
 						htmlList += '</ul>';
 						$('#integracio-parameters-list').html(htmlList);
+						$("#cbcopy").click(e => {
+							e.stopPropagation();
+							navigator.clipboard.writeText(clipBoard);
+						});
 					}
 					let isError = data.estat === 'ERROR';
 					if (isError) {
@@ -228,7 +235,12 @@
 						<dd id="integracio-tipus"></dd>
 						<dt><spring:message code="integracio.detall.camp.estat"/></dt>
 						<dd id="integracio-estat"></dd>
-						<dt class="integracio-parameters"><spring:message code="integracio.detall.camp.params"/></dt>
+						<dt class="integracio-parameters">
+							<spring:message code="integracio.detall.camp.params"/>
+						</dt>
+						<dt>
+							<button id="cbcopy" class="btn btn-default" title="<spring:message code="comu.clipboard.copy"/>"><span class="fa fa-clipboard"></span></button>
+						</dt>
 						<dd id="integracio-parameters-list" class="integracio-parameters" style="max-height: 300px; overflow: auto; margin-bottom: 15px;">
 						</dd>
 						<dt class="integracio-error"><spring:message code="integracio.detall.camp.error.desc"/></dt>
