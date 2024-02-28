@@ -116,7 +116,7 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 
 		try {
 			var i = monitorRepository.findById(id).orElseThrow();
-			var a = paramRepository.findByMonitorIntegracio(i);
+			var a = paramRepository.findByMonitorIntegracioOrderByIdAsc(i);
 			if (a == null) {
 				return IntegracioDetall.builder().descripcio("Error obtinguent el detall de la integració " + id).build();
 			}
