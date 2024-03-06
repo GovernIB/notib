@@ -54,7 +54,7 @@ public class ConsultaSirPoolingAction implements Action<EnviamentSmEstat, Enviam
         log.debug("[SM] ConsultaSirPoolingAction enviament " + enviamentUuid);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
-
+        stateContext.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, reintents+1);
         jmsTemplate.convertAndSend(
                 SmConstants.CUA_CONSULTA_SIR,
                 ConsultaSirRequest.builder()

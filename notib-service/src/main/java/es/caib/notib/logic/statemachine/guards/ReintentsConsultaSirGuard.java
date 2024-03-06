@@ -22,6 +22,6 @@ public class ReintentsConsultaSirGuard implements Guard<EnviamentSmEstat, Enviam
         var numReintentsActuals = (Integer) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
         var maxReintents = configHelper.getConfigAsInteger("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.reintents.maxim", 3);
         log.debug("[SM] Reintent per error consulta SIR. Intent actual=" + numReintentsActuals + ", Max intents=" + maxReintents);
-        return numReintentsActuals < maxReintents;
+        return numReintentsActuals < maxReintents-1;
     }
 }

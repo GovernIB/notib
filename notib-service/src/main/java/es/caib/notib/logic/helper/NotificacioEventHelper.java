@@ -95,7 +95,7 @@ public class NotificacioEventHelper {
             event = NotificacioEventEntity.builder().notificacio(eventInfo.getEnviament().getNotificacio()).enviament(eventInfo.getEnviament())
                     .tipus(eventInfo.getTipus()).error(eventInfo.isError()).intents(1).fiReintents(eventInfo.isFiReintents()).errorDescripcio(eventInfo.getErrorDescripcio()).build();
         }
-        if (!eventInfo.isError() && event.getFiReintents()) {
+        if (!eventInfo.isError() && event.getFiReintents() && !NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(eventInfo.getTipus())) {
             event.setFiReintents(false);
         }
         eventRepository.saveAndFlush(event);

@@ -497,7 +497,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_ESTAT_FINAL,enviament.isRegistreEstatFinal());
-		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+//		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_SUCCESS);
 		return sm;
 	}
@@ -507,8 +507,8 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirFailed(String enviamentUuid) {
 
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
- 		var reintents = (int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
-		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, reintents + 1);
+// 		var reintents = (int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
+//		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, reintents + 1);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_ERROR);
 		stateMachineService.releaseStateMachine(enviamentUuid);
 		return sm;

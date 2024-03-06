@@ -38,6 +38,7 @@ public class EnviamentInfo extends NotificacioEnviamentDatatableDto{
 	private String registreNumeroFormatat;
 	private NotificacioRegistreEstatEnumDto registreEstat;
 	private boolean registreEstatFinal;
+	protected int sirConsultaIntent;
 	private Date sirRecepcioData;
 	private Date sirRegDestiData;
 	private int registreNumero;
