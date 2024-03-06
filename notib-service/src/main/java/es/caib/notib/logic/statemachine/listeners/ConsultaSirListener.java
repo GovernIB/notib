@@ -26,7 +26,7 @@ public class ConsultaSirListener {
 
 
     private final RegistreService registreService;
-    private final EnviamentSmService enviamentSmService;;
+    private final EnviamentSmService enviamentSmService;
 
     private Semaphore semaphore = new Semaphore(5);
 
