@@ -23,10 +23,8 @@ import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
 import es.caib.notib.logic.intf.dto.RespostaAccio;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
-import es.caib.notib.logic.intf.dto.Taula;
 import es.caib.notib.logic.intf.dto.missatges.Missatge;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
-import es.caib.notib.logic.intf.dto.notificacio.ColumnesRemeses;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
@@ -189,6 +187,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             MissatgesHelper.error(request, getErrorMsg(request, command.getErrors()));
         }
         var codiUsuari = getCodiUsuariActual();
+        var organGestorActual = getOrganGestorActual(request);
+        notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
         var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), codiUsuari);
         model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
         model.addAttribute("notificacioFiltreCommand", command);
@@ -244,7 +244,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         if (bindingResult.hasErrors()) {
             return "remesesColumns";
         }
+        var organGestorActual = getOrganGestorActual(request);
+
         model.addAttribute(new NotificacioFiltreCommand());
+        notificacioListHelper.fillModel(entitat, organGestorActual, request, model);
         columnesService.updateColumnesRemeses(entitat.getId(), ColumnesRemesesCommand.asDto(columnesCommand));
         return getModalControllerReturnValueSuccess(request, "redirect:notificacio", "enviament.controller.modificat.ok");
     }
