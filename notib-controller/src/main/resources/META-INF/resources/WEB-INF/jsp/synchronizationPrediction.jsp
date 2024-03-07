@@ -374,7 +374,7 @@
 							</c:choose>
 							<div class=horizontal-right>
 								<div id="wrapper">
-									<span class="label bg-success border-green right-postion-20 overflow-ellipsis" title="${key.codi} - ${denominacio}"> ${key.codi} -${denominacio} </span>
+									<span class="label bg-success border-green right-postion-20 overflow-ellipsis" title="${key.codi} - ${denominacio}"> ${key.codi} - ${denominacio} </span>
 									<div class="branch lv1">
 										<c:forEach var="value" items="${values}">
 											<c:choose>
