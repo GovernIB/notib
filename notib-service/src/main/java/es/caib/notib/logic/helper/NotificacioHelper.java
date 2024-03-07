@@ -251,17 +251,20 @@ public class NotificacioHelper {
 			return null;
 		}
 		String documentGesdocId = null;
+		log.info("Processant el document " + document.getArxiuNom());
 		if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
-			log.trace("Processam document gestió documental");
+			log.info("Processam document gestio documental");
 			if ( documentsProcessatsMassiu == null || //alta de notificacio web
 					!documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
 					( documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && // alta massiu web
 					documentsProcessatsMassiu.get(document.getArxiuNom()) == null) ) {
 
+				log.info("Creant document al gestor documental");
 				documentGesdocId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, Base64.decodeBase64(document.getContingutBase64()));
+				log.info("Document creat al gestor documental amb id " + documentGesdocId);
 			}
 		} else if (document.getUuid() != null) {
-			log.trace("Processam document desde UUID");
+			log.info("Processam document desde UUID");
 			if ( documentsProcessatsMassiu == null || //alta de notificacio web
 					!documentsProcessatsMassiu.containsKey(document.getUuid()) ||
 					( documentsProcessatsMassiu.containsKey(document.getUuid()) && // alta massiu web
@@ -315,11 +318,12 @@ public class NotificacioHelper {
 
 				}
 			} else {
+				log.info("Document UUID amb processat massiu");
 				documentEntity = documentRepository.findById(documentsProcessatsMassiu.get(document.getUuid())).get();
 				return documentEntity;
 			}
 		} else if (document.getCsv() != null) {
-			log.trace("Processam document desde CSV");
+			log.info("Processam document desde CSV");
 			if ( documentsProcessatsMassiu == null || //alta de notificacio web
 					!documentsProcessatsMassiu.containsKey(document.getCsv()) ||
 					( documentsProcessatsMassiu.containsKey(document.getCsv()) && // alta massiu web
@@ -361,24 +365,35 @@ public class NotificacioHelper {
 					document = doc;
 				}
 			} else {
+				log.info("Document CSV amb processat massiu");
 				return documentRepository.findById(documentsProcessatsMassiu.get(document.getCsv())).get();
 			}
 		} else if (documentsProcessatsMassiu != null && documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && documentsProcessatsMassiu.get(document.getArxiuNom()) != null ) {
+			log.info("Document amb processat massiu");
 			return documentRepository.findById(documentsProcessatsMassiu.get(document.getArxiuNom())).orElseThrow();
 		}
 
 		// Guardar document
 		if (document.getCsv() == null && document.getUuid() == null && document.getContingutBase64() == null && document.getArxiuId() != null) {
+			log.info("Document sense codi csv, uuId, contingutBase64 i am arxiuId " + document.getArxiuId());
 			return documentEntity;
 		}
 
-		log.trace("Enregistram el document llegit a la base de dades");
+		if (Strings.isNullOrEmpty(document.getCsv()) && Strings.isNullOrEmpty(document.getUuid()) && Strings.isNullOrEmpty(document.getContingutBase64()) && Strings.isNullOrEmpty(document.getArxiuId())) {
+			var error = "Document sense codi csv, uuId, contingutBase64, arxiuId ";
+			log.error(error);
+			return null;
+		}
+
+		log.info("Enregistram el document llegit a la base de dades " + document.getArxiuNom());
 		if (!Strings.isNullOrEmpty(document.getId())) {
+			log.info("Actualitzant el document " + document.getId() + " documentGesdocId " + documentGesdocId + " document.getArxiuId " + document.getArxiuId());
 			documentEntity = documentRepository.findById(Long.valueOf(document.getId())).orElseThrow();
 			documentEntity.update(documentGesdocId != null ? documentGesdocId : document.getArxiuId(), document.getArxiuNom(),
 					document.isNormalitzat(), document.getUuid(), document.getCsv(), document.getMediaType(), document.getMida(), document.getOrigen(),
 					document.getValidesa(), document.getTipoDocumental(), document.getModoFirma());
 		} else {
+			log.info("Creant el document " + document.getId() + " documentGesdocId " + documentGesdocId + " document.getArxiuId " + document.getArxiuId());
 			documentEntity = documentRepository.save(DocumentEntity.getBuilderV2(
 					documentGesdocId != null ? documentGesdocId : document.getArxiuId(),
 					document.getArxiuNom(),
