@@ -47,15 +47,15 @@ import java.util.Properties;
 		"file://${" + ConfigService.APP_SYSTEM_PROPERTIES + "}"})
 public class EjbContextConfig {
 
-	@Value("${spring.datasource.jndi-name:java:jboss/datasources/notibDS}")
+	@Value("${es.caib.notib.datasource.jndi:java:jboss/datasources/notibDS}")
 	private String dataSourceJndiName;
-	@Value("${spring.jpa.properties.hibernate.dialect:es.caib.notib.persist.dialect.OracleCaibDialect}")
+	@Value("${es.caib.notib.hibernate.dialect:es.caib.notib.persist.dialect.OracleCaibDialect}")
 	private String hibernateDialect;
-	@Value("${spring.jpa.hibernate.ddl-auto:none}")
+	@Value("${es.caib.notib.hibernate.ddl.auto:none}")
 	private String hibernateDdlAuto;
-	@Value("${spring.jpa.show-sql:false}")
+	@Value("${es.caib.notib.hibernate.show_sql:false}")
 	private String showSql;
-	@Value("${spring.jpa.properties.hibernate.format_sql:false}")
+	@Value("${es.caib.notib.hibernate.format_sql:false}")
 	private String formatSql;
 	@Value("${es.caib.notib.servidor.jboss:true}")
 	private String jboss;

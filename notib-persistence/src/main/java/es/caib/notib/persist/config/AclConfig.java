@@ -114,7 +114,7 @@ public class AclConfig {
 	private static final String UPDATE_OBJECT_IDENTITY = "update " + TABLE_OBJECT_IDENTITY + " set " +
 			"parent_object = ?, owner_sid = ?, entries_inheriting = ?" + " where id = ?";
 
-	@Value("${spring.jpa.properties.hibernate.dialect:es.caib.notib.persist.dialect.OracleCaibDialect}")
+	@Value("${es.caib.notib.hibernate.dialect:es.caib.notib.persist.dialect.OracleCaibDialect}")
 	private String hibernateDialect;
 
 	@Autowired
