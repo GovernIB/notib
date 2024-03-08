@@ -202,8 +202,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var notificacioEntity = notificacioHelper.saveNotificacio(notData);
 			notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
 			auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceImpl.create");
-			// SM
-			notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
+			notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.acquireStateMachine(e.getNotificaReferencia()));
 			return conversioTipusHelper.convertir(notificacioEntity, Notificacio.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

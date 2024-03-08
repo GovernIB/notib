@@ -178,11 +178,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	// Alta notificació
 	// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Transactional
+//	@Transactional
 	@Override
 	public RespostaAlta alta(Notificacio notificacio) throws NotificacioServiceWsException {
 
 		var resposta = altaV2(notificacio);
+		resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
 		return RespostaAlta.builder().identificador(resposta.getIdentificador()).estat(resposta.getEstat()).referencies(resposta.getReferenciesAsV1())
 				.error(resposta.isError()).errorDescripcio(resposta.getErrorDescripcio()).build();
 	}
@@ -332,9 +333,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			}
 			log.debug(">> [ALTA] enviaments creats");
 			notificacioGuardada = notificacioRepository.saveAndFlush(notificacioGuardada);
-
-			// SM
-			referencies.forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
 			return generaResposta(info, notificacioGuardada, referencies);
 		} catch (Exception ex) {
 			log.error("Error creant notificació", ex);
@@ -1084,6 +1082,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 						titular,
 						destinataris,
 						UUID.randomUUID().toString()).build());
+		enviamentSmService.acquireStateMachine(enviamentSaved.getUuid());
 		enviamentTableHelper.crearRegistre(enviamentSaved);
 		auditHelper.auditaEnviament(enviamentSaved, AuditService.TipusOperacio.CREATE, "NotificacioServiceWsImplV2.altaV2");
 		log.debug(">> [ALTA] enviament creat");
