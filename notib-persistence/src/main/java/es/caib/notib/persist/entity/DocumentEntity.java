@@ -86,7 +86,6 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			TipusDocumentalEnum tipoDocumental,
 			Boolean modoFirma) {
 
-		log.info("Actualitzant document " + this);
 		this.arxiuGestdocId = arxiuGestdocId;
 		this.arxiuNom = arxiuNom;
 		this.normalitzat = normalitzat;
@@ -98,8 +97,9 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 		this.validesa = validesa;
 		this.tipoDocumental = tipoDocumental;
 		this.modoFirma = modoFirma;
+		log.info("Actualitzant document arxiuGestdocId " + arxiuGestdocId + " csv " + csv + " uuid " + uuid + " ar");
 	}
-	
+
 	public static Builder getBuilder(
 			String arxiuGestdocId,
 			String arxiuNom,

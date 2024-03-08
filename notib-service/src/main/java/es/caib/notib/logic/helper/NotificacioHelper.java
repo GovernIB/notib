@@ -393,7 +393,7 @@ public class NotificacioHelper {
 					document.isNormalitzat(), document.getUuid(), document.getCsv(), document.getMediaType(), document.getMida(), document.getOrigen(),
 					document.getValidesa(), document.getTipoDocumental(), document.getModoFirma());
 		} else {
-			log.info("Creant el document " + document.getId() + " documentGesdocId " + documentGesdocId + " document.getArxiuId " + document.getArxiuId());
+			log.info("Creant el document - documentGesdocId " + documentGesdocId + " document.getArxiuId " + document.getArxiuId());
 			documentEntity = documentRepository.save(DocumentEntity.getBuilderV2(
 					documentGesdocId != null ? documentGesdocId : document.getArxiuId(),
 					document.getArxiuNom(),

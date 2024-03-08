@@ -433,10 +433,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			resultat.setDescripcionRespuesta(descripcioResposta);
 			log.error("Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacio.getId() + ")", descripcioResposta);
 			return resultat;
+		} catch (Exception ex) {
+			var resultat = new ResultadoAltaRemesaEnvios();
+			resultat.setCodigoRespuesta("Notib");
+			resultat.setDescripcionRespuesta("Error generant els enviaments " + ex.getMessage());
+			return resultat;
 		}
 	}
 
-	private AltaRemesaEnvios generarAltaRemesaEnvios(NotificacioEntity notificacio) throws GeneralSecurityException, DatatypeConfigurationException, DecoderException {
+	private AltaRemesaEnvios generarAltaRemesaEnvios(NotificacioEntity notificacio) throws Exception {
 
 		var envios = new AltaRemesaEnvios();
 		Integer retardPostal = null;
@@ -575,7 +580,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			}
 			envios.setOpcionesRemesa(opcionesRemesa);
 		} catch (Exception ex) {
-			log.error("Error generant la petició (notificacioId=" + notificacio.getId() + ")", ex);
+			var error = "Error generant la petició (notificacioId=" + notificacio.getId() + ")";
+			log.error(error, ex);
+			throw new Exception(ex);
 		}
 		return envios;
 	}
