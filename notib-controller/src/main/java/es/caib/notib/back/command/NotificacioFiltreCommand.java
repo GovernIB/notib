@@ -11,8 +11,10 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.back.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -20,7 +22,9 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter @Setter
+@Slf4j
+@Getter
+@Setter
 public class NotificacioFiltreCommand {
 	
 	private Long entitatId;
@@ -56,6 +60,26 @@ public class NotificacioFiltreCommand {
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
+	}
+
+	public void setDefaultFiltreData() {
+
+		try {
+			var avui = new Date();
+			if (dataFi == null) {
+				dataFi = avui;
+			}
+			if (dataInici != null) {
+				return;
+			}
+			var c = Calendar.getInstance();
+			c.setTime(avui);
+			c.add(Calendar.MONTH, -3);
+			var inici = c.getTime();
+			dataInici = inici;
+		} catch (Exception ex) {
+			log.error("Error parsejant la data", ex);
+		}
 	}
 
 }

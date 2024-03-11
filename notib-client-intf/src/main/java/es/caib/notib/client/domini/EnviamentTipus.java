@@ -8,7 +8,7 @@ import java.io.Serializable;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-public enum EnviamentTipus implements Serializable {
+public enum  EnviamentTipus implements Serializable {
     NOTIFICACIO,
     COMUNICACIO,
     SIR

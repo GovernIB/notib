@@ -130,7 +130,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 				organGestorCodi = organGestorActual.getCodi();
 			}
 
-			enviaments = enviamentService.	enviamentFindByEntityAndFiltre(entitatActual.getId(), RolEnumDto.valueOf(sessionScopedContext.getRolActual()), organGestorCodi,
+			enviaments = enviamentService.enviamentFindByEntityAndFiltre(entitatActual.getId(), RolEnumDto.valueOf(sessionScopedContext.getRolActual()), organGestorCodi,
 					getCodiUsuariActual(), NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments), DatatablesHelper.getPaginacioDtoFromRequest(request));
 
 		} catch(SecurityException e) {
