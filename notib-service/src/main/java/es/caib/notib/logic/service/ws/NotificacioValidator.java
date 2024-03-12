@@ -584,10 +584,8 @@ public class NotificacioValidator implements Validator {
         }
 
         // - Nom
-        if(Strings.isNullOrEmpty(persona.getNom())) {
-            if(isPersonaFisica || isPersonaSenseNif || isAdministracio) {
-                errors.rejectValue(envName + ".nom", error(PERSONA_NOM_NULL, l, prefix, tipus));
-            }
+        if(Strings.isNullOrEmpty(persona.getNom()) && (isPersonaFisica || isPersonaSenseNif)) {
+            errors.rejectValue(envName + ".nom", error(PERSONA_NOM_NULL, l, prefix, tipus));
         }
         if(!Strings.isNullOrEmpty(persona.getNom())) {
             if (!isAdministracio && persona.getNom().length() > 30) {
@@ -652,11 +650,11 @@ public class NotificacioValidator implements Validator {
             errors.rejectValue(envName + ".telefon", error(PERSONA_TELEFON_SIZE, l, prefix, 16));
         }
         // - Raó social
-        if (isPersonaJuridica && Strings.isNullOrEmpty(persona.getRaoSocial()) && Strings.isNullOrEmpty(persona.getNom()))  {
+        if ((isPersonaJuridica || isAdministracio) && Strings.isNullOrEmpty(persona.getRaoSocial()) && Strings.isNullOrEmpty(persona.getNom()))  {
             errors.rejectValue(envName + ".raoSocial", error(PERSONA_RAO_SOCIAL_NULL, l, prefix, tipus));
         }
-        if (!Strings.isNullOrEmpty(persona.getRaoSocial()) && persona.getRaoSocial().length() > 80) {
-            errors.rejectValue(envName + ".raoSocial", error(PERSONA_RAO_SOCIAL_SIZE, l, prefix, 80));
+        if (!Strings.isNullOrEmpty(persona.getRaoSocial()) && persona.getRaoSocial().length() > 255) {
+            errors.rejectValue(envName + ".raoSocial", error(PERSONA_RAO_SOCIAL_SIZE, l, prefix, 255));
         }
         // - Codi Dir3
         if (Strings.isNullOrEmpty(persona.getDir3Codi()) && isAdministracio) {
