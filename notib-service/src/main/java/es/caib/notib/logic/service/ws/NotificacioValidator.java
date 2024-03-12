@@ -649,14 +649,14 @@ public class NotificacioValidator implements Validator {
         }
         // - Telèfon
         if (!Strings.isNullOrEmpty(persona.getTelefon()) && persona.getTelefon().length() > 16) {
-            errors.rejectValue(envName + ".email", error(PERSONA_TELEFON_SIZE, l, prefix, 16));
+            errors.rejectValue(envName + ".telefon", error(PERSONA_TELEFON_SIZE, l, prefix, 16));
         }
         // - Raó social
         if (isPersonaJuridica && Strings.isNullOrEmpty(persona.getRaoSocial()) && Strings.isNullOrEmpty(persona.getNom()))  {
-            errors.rejectValue(envName + ".email", error(PERSONA_RAO_SOCIAL_NULL, l, prefix, tipus));
+            errors.rejectValue(envName + ".raoSocial", error(PERSONA_RAO_SOCIAL_NULL, l, prefix, tipus));
         }
         if (!Strings.isNullOrEmpty(persona.getRaoSocial()) && persona.getRaoSocial().length() > 80) {
-            errors.rejectValue(envName + ".email", error(PERSONA_RAO_SOCIAL_SIZE, l, prefix, 80));
+            errors.rejectValue(envName + ".raoSocial", error(PERSONA_RAO_SOCIAL_SIZE, l, prefix, 80));
         }
         // - Codi Dir3
         if (Strings.isNullOrEmpty(persona.getDir3Codi()) && isAdministracio) {
