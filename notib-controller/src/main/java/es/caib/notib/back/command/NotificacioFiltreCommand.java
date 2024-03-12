@@ -65,18 +65,25 @@ public class NotificacioFiltreCommand {
 	public void setDefaultFiltreData() {
 
 		try {
-			var avui = new Date();
+
 			if (dataFi == null) {
-				dataFi = avui;
+				var c = Calendar.getInstance();
+				c.setTime(new Date());
+				c.set(Calendar.SECOND, 59);
+				c.set(Calendar.MINUTE, 59);
+				c.set(Calendar.HOUR_OF_DAY, 23);
+				dataFi = c.getTime();
 			}
 			if (dataInici != null) {
 				return;
 			}
 			var c = Calendar.getInstance();
-			c.setTime(avui);
+			c.setTime(dataFi);
+			c.set(Calendar.SECOND, 0);
+			c.set(Calendar.MINUTE, 0);
+			c.set(Calendar.HOUR_OF_DAY, 0);
 			c.add(Calendar.MONTH, -3);
-			var inici = c.getTime();
-			dataInici = inici;
+            dataInici = c.getTime();
 		} catch (Exception ex) {
 			log.error("Error parsejant la data", ex);
 		}

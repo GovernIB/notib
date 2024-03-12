@@ -128,7 +128,7 @@ public class NotificacioListHelper {
         var organs = isAdminOrgan && organGestor != null ? organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestor.getCodi()) : null;
         var entitatsActives = isSuperAdmin ? entitatRepository.findByActiva(true) : null;
         var entitatFiltre = isUsuariEntitat || isUsuari ? entitatId : f.getEntitatId();
-        if (f.getDataInici().equals(f.getDataFi())) {
+        if (f.getDataInici() != null && f.getDataInici().equals(f.getDataFi())) {
             var c = Calendar.getInstance();
             c.setTime(f.getDataFi());
             c.add(Calendar.SECOND, 59);
