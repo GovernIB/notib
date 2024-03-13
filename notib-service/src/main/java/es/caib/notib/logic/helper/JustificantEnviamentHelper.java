@@ -599,9 +599,10 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 		switch (persona.getInteressatTipus()) {
 			case FISICA:
 			case FISICA_SENSE_NIF:
-			case ADMINISTRACIO:
-				return persona.getNom() != null ? persona.getNom() : "";
+//			case ADMINISTRACIO:
+//				return persona.getNom() != null ? persona.getNom() : "";
 			case JURIDICA:
+			case ADMINISTRACIO:
 				return persona.getRaoSocial() != null ? persona.getRaoSocial() : persona.getNom() != null ? persona.getNom() : "";
 			default:
 				return persona.getRaoSocial() != null ? persona.getRaoSocial() : "";
