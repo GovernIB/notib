@@ -53,10 +53,9 @@ public class GestioDocumentalServiceImpl implements GestioDocumentalService {
 
 		try {
 			var output = new ByteArrayOutputStream();
-			if (arxiuGestdocId == null) {
-				return output.toByteArray();
+			if (arxiuGestdocId != null) {
+				pluginHelper.gestioDocumentalGet(arxiuGestdocId, agrupacio, output);
 			}
-			pluginHelper.gestioDocumentalGet(arxiuGestdocId, agrupacio, output);
 			return output.toByteArray();
 		} catch (Exception ex) {
 			log.error("Error al recuperar l'arxiu de l'agrupació: " + agrupacio);
