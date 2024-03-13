@@ -53,7 +53,7 @@ public class GestioDocumentalServiceImpl implements GestioDocumentalService {
 
 		try {
 			var output = new ByteArrayOutputStream();
-			if (arxiuGestdocId != null) {
+			if (arxiuGestdocId == null) {
 				return output.toByteArray();
 			}
 			pluginHelper.gestioDocumentalGet(arxiuGestdocId, agrupacio, output);
