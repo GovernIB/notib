@@ -111,8 +111,13 @@ public class CallbackHelper {
 		}
 		var callback = callbackRepository.findByEnviamentId(env.getId());
 		if (callback == null) {
-			var usuari = env.getCreatedBy().orElseThrow();
-			callback = CallbackEntity.builder().usuariCodi(usuari.getCodi()).notificacioId(env.getNotificacio().getId()).enviamentId(env.getId()).build();
+			var usuari = env.getCreatedBy().orElse(env.getNotificacio().getCreatedBy().orElse(null));
+			var codi = "";
+			if (usuari == null) {
+				log.error("[CALLBACK] Error usuari null per enviament " + env.getId() + "  i null a la notificacio " + env.getNotificacio().getId());
+				return null;
+			}
+			callback = CallbackEntity.builder().usuariCodi(codi).notificacioId(env.getNotificacio().getId()).enviamentId(env.getId()).build();
 		}
 		callback.setData(new Date());
 		callback.setEstat(CallbackEstatEnumDto.PENDENT);
@@ -240,15 +245,20 @@ public class CallbackHelper {
 	private AplicacioEntity getAplicacio(CallbackEntity callback, @NonNull NotificacioEnviamentEntity enviament) throws Exception {
 
 		// Resol si hi ha una aplicació pel codi d'usuari que ha creat l'enviament
-		var usuari = enviament.getCreatedBy().orElseThrow();
-		var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuari.getCodi(), enviament.getNotificacio().getEntitat().getId());
+		var usuari = enviament.getCreatedBy().orElse(enviament.getNotificacio().getCreatedBy().orElse(null));
 		String errorMessage = null;
-		if (aplicacio == null) {
-			errorMessage = String.format("No s'ha trobat l'aplicació: codi usuari: %s, EntitatId: %d", usuari.getCodi(), enviament.getNotificacio().getEntitat().getId());
-		} else if (aplicacio.getCallbackUrl() == null) {
-			errorMessage = "La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada";
-		} else if (!aplicacio.isActiva()) {
-			errorMessage = "La aplicació " + aplicacio.getUsuariCodi() + " no està activa";
+		AplicacioEntity aplicacio = null;
+		if (usuari == null) {
+			errorMessage ="L'enviament i la notifacio no tenen assignat cap createdBy";
+		} else {
+			aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuari.getCodi(), enviament.getNotificacio().getEntitat().getId());
+			if (aplicacio == null) {
+				errorMessage = String.format("No s'ha trobat l'aplicació: codi usuari: %s, EntitatId: %d", usuari.getCodi(), enviament.getNotificacio().getEntitat().getId());
+			} else if (aplicacio.getCallbackUrl() == null) {
+				errorMessage = "La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada";
+			} else if (!aplicacio.isActiva()) {
+				errorMessage = "La aplicació " + aplicacio.getUsuariCodi() + " no està activa";
+			}
 		}
 		if (errorMessage != null) {
 			var info = new IntegracioInfo(IntegracioCodiEnum.CALLBACK, "Enviament d'avís de canvi d'estat", IntegracioAccioTipusEnumDto.ENVIAMENT,

@@ -127,12 +127,14 @@ public class ConversioTipusHelper {
 						if (d != null) {
 							b.setUsuariNom(d.getNomSencer());
 						}
-						var createdBy = convertir(a.getCreatedBy().orElseThrow(), UsuariDto.class);
-						b.setCreatedBy(createdBy);
+						var usuari = a.getCreatedBy().orElse(null);
+						if (usuari != null) {
+							var createdBy = convertir(usuari, UsuariDto.class);
+							b.setCreatedBy(createdBy);
+						}
+                        a.getCreatedDate().ifPresent(createdDate -> b.setCreatedDate(Date.from(createdDate.atZone(ZoneId.systemDefault()).toInstant())));
 
-						b.setCreatedDate(Date.from(a.getCreatedDate().orElseThrow().atZone(ZoneId.systemDefault()).toInstant()));
-
-					}
+                    }
 				}).byDefault().register();
 
 		mapperFactory.classMap(EntregaPostalEntity.class, EntregaPostalDto.class).
