@@ -515,7 +515,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 				fila[3] = enviament.getNotificacio().getProcedimentCodiNotib();
 				fila[4] = enviament.getNotificacio().getGrupCodi();
 				fila[5] = enviament.getNotificacio().getEmisorDir3Codi();
-				fila[6] = enviament.getCreatedBy().orElseThrow().getCodi();
+				var usuari = enviament.getCreatedBy().orElse(enviament.getNotificacio().getCreatedBy().orElse(null));
+				if (usuari != null) {
+					fila[6] = usuari.getCodi();
+				}
 				fila[7] = enviament.getNotificacio().getEnviamentTipus().name();
 				fila[8] = enviament.getNotificacio().getConcepte();
 				fila[9] = enviament.getNotificacio().getDescripcio();
