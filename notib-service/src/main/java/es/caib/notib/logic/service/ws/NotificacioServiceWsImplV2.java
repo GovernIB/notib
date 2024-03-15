@@ -178,7 +178,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	// Alta notificació
 	// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//	@Transactional
+	@Transactional
 	@Override
 	public RespostaAlta alta(Notificacio notificacio) throws NotificacioServiceWsException {
 
@@ -276,7 +276,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			notificacioValidator.setDocuments(docs);
 			notificacioValidator.setErrors(errors);
 			notificacioValidator.setLocale(new Locale("rest"));
-			notificacioValidator.validate();
+ 			notificacioValidator.validate();
 			if (errors.hasErrors()) {
 				String errorDescripcio = errors.getAllErrors().stream().map(e -> e.getCode()).collect(Collectors.joining(", "));
 				integracioHelper.addAccioError(info, resposta.getErrorDescripcio());
