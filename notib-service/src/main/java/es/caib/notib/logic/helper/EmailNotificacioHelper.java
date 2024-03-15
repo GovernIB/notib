@@ -79,9 +79,9 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 				continue;
 			}
 			var user = usuariRepository.findById(usuari).orElse(null);
-			if (user == null || (user.isRebreEmailsNotificacio() && (!user.isRebreEmailsNotificacioCreats()
-				|| user.isRebreEmailsNotificacioCreats() && usuari.equals(notificacio.getCreatedBy().orElseThrow().getCodi())))) {
-
+			var usr = notificacio.getCreatedBy().orElse(null);
+			var codi = usr != null ? usr.getCodi() : null;
+			if (user == null || (user.isRebreEmailsNotificacio() && (!user.isRebreEmailsNotificacioCreats() || user.isRebreEmailsNotificacioCreats() && usuari.equals(codi)))) {
 				var u = new UsuariDto();
 				u.setCodi(usuari);
 				u.setEmail((user != null && !Strings.isNullOrEmpty(user.getEmailAlt())) ? user.getEmailAlt() : dadesUsuari.getEmail());

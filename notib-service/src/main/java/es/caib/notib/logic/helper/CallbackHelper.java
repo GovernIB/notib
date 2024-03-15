@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Classe per englobar la tasca de notificar l'estat o la certificació a l'aplicació
@@ -79,7 +80,7 @@ public class CallbackHelper {
 			}
 			log.debug("[CALLBACK_CLIENT] Afegint callback per l'enviament " + env.getId());
 			var c = callbackRepository.findByEnviamentId(env.getId());
-			var usuari = env.getCreatedBy().orElseThrow();
+			var usuari = env.getCreatedBy().orElse(env.getNotificacio().getCreatedBy().orElseThrow());
 			if (c == null) {
 				c = CallbackEntity.builder().usuariCodi(usuari.getCodi()).notificacioId(not.getId()).enviamentId(env.getId()).build();
 			}
@@ -88,6 +89,8 @@ public class CallbackHelper {
 			c.setErrorDesc(errorDesc);
 			c.setEstat(CallbackEstatEnumDto.PENDENT);
 			callbackRepository.save(c);
+		} catch (NoSuchElementException ex) {
+			log.error("L'enviament " + env.getId() + " i la notificacio " + env.getNotificacio().getId() + " no tenen assignat el createdBy", ex);
 		} catch (Exception ex) {
 			log.error("Error creant el callback per l'enviamnet " + env.getId());
 		}
