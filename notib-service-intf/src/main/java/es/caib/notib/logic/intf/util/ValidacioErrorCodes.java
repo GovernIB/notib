@@ -16,6 +16,7 @@ public class ValidacioErrorCodes {
     public static final int PROCSER_NO_EXIST = 1022;
     public static final int PROCSER_INACTIU = 1023;
     public static final int SERVEI_EN_NOTIFICACIO = 1024;
+    public static final int ORGAN_NO_VIGENT = 1019;
     public static final int ORGAN_NULL = 1025;
     public static final int ORGAN_SIZE = 1026;
     public static final int ORGAN_ALTRE_ENTITAT = 1027;
