@@ -30,7 +30,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 
 	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws Exception {
 
-		var destinataris = obtenirCodiDestinatarisPerProcediment(notificacio);
+		var destinataris = obtenirCodiDestinataris(notificacio);
 		if (destinataris == null || destinataris.isEmpty()) {
 			log.info(String.format("La notificació (Id= %d) no té candidats per a enviar el correu electrònic", notificacio.getId()));
 			return "No s'han trobat destinataris";
@@ -68,10 +68,10 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 		return numEnviamentsErronis > 0 ? numEnviamentsErronis + " emails de " + destinataris.size() + " han produït error" : "Tots els emails enviats correctament";
 	}
 
-	private List<UsuariDto> obtenirCodiDestinatarisPerProcediment(NotificacioEntity notificacio) {
+	private List<UsuariDto> obtenirCodiDestinataris(NotificacioEntity notificacio) {
 
 		List<UsuariDto> destinataris = new ArrayList<>();
-		var usuaris = procSerHelper.findUsuaris(notificacio);
+		var usuaris = notificacio.getProcediment() != null ? procSerHelper.findUsuaris(notificacio) : procSerHelper.findUsuarisAmbPermisReadPerOrgan(notificacio);
 		DadesUsuari dadesUsuari;
 		for (var usuari: usuaris) {
 			dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);

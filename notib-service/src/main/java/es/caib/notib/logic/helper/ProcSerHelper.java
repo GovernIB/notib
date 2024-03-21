@@ -3,6 +3,7 @@ package es.caib.notib.logic.helper;
 import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto.TipusInfo;
@@ -144,6 +145,40 @@ public class ProcSerHelper {
 		}
 		usuarisAmbPermis.retainAll(usuarisDelGrup);
 		return usuarisAmbPermis;
+	}
+
+	public Set<String> findUsuarisAmbPermisReadPerOrgan(NotificacioEntity not) {
+
+		var organs = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(not.getEntitat().getDir3Codi(), not.getOrganGestor().getCodi());
+		List<PermisDto> permisos = new ArrayList<>();
+		for (var po: organs) {
+			permisos.addAll(permisosHelper.findPermisos(po.getId(), OrganGestorEntity.class));
+		}
+		return getUsuarisAmbPermis(permisos);
+	}
+
+	private Set<String> getUsuarisAmbPermis(List<PermisDto> permisos) {
+
+		Set<String> usuaris = new HashSet<>();
+		for (var permis: permisos) {
+			if (!permis.isRead()) {
+				continue;
+			}
+			switch (permis.getTipus()) {
+				case USUARI:
+					usuaris.add(permis.getPrincipal());
+					break;
+				case ROL:
+					var usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(permis.getPrincipal());
+					if (usuarisGrup != null) {
+						for (var usuariGrup : usuarisGrup) {
+							usuaris.add(usuariGrup.getCodi());
+						}
+					}
+					break;
+			}
+		}
+		return usuaris;
 	}
 
 	public Set<String> findUsuarisAmbPermisReadPerProcediment(NotificacioEntity not) {
