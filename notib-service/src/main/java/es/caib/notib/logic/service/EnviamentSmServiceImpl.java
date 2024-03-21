@@ -167,6 +167,11 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		}
 	}
 
+	@Override
+	public void acquireStateMachine(String uuid) {
+		stateMachineService.acquireStateMachine(uuid);
+	}
+
 	private boolean afegirEnviament(NotificacioEnviamentEntity env, EnviamentSmEvent eventSm, int intent) {
 
 		try {

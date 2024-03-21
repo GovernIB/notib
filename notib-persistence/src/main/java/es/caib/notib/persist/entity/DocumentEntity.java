@@ -5,6 +5,7 @@ import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.persist.audit.NotibAuditable;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Column;
@@ -20,6 +21,7 @@ import javax.persistence.Transient;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Getter
 @Entity
 @Table(name = "not_document")
@@ -83,6 +85,7 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			ValidesaEnum validesa,
 			TipusDocumentalEnum tipoDocumental,
 			Boolean modoFirma) {
+
 		this.arxiuGestdocId = arxiuGestdocId;
 		this.arxiuNom = arxiuNom;
 		this.normalitzat = normalitzat;
@@ -94,8 +97,9 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 		this.validesa = validesa;
 		this.tipoDocumental = tipoDocumental;
 		this.modoFirma = modoFirma;
+		log.info("Actualitzant document arxiuGestdocId " + arxiuGestdocId + " csv " + csv + " uuid " + uuid + " ar");
 	}
-	
+
 	public static Builder getBuilder(
 			String arxiuGestdocId,
 			String arxiuNom,

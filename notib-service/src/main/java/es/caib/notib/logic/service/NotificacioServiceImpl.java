@@ -38,6 +38,8 @@ import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.mapper.NotificacioMapper;
 import es.caib.notib.logic.mapper.NotificacioTableMapper;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -183,6 +185,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private NotificacioTableMapper notificacioTableMapper;
 	@Autowired
 	protected JmsTemplate jmsTemplate;
+	@Autowired
+	private NotibLogger logger;
 
 	private static final String DELETE = "NotificacioServiceImpl.delete";
 	private static final String UPDATE = "NotificacioServiceImpl.update";
@@ -203,8 +207,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var notificacioEntity = notificacioHelper.saveNotificacio(notData);
 			notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
 			auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceImpl.create");
-			// SM
-			notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
+			notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.acquireStateMachine(e.getNotificaReferencia()));
 			return conversioTipusHelper.convertir(notificacioEntity, Notificacio.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -583,7 +586,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 
-		log.info("Consulta taula de remeses ...");
+//		logger.info("Consulta taula de remeses ...", log, LoggingTipus.TAULA_REMESES);
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);

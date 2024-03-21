@@ -45,6 +45,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EntitatService;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.GestioDocumentalService;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.service.NotificacioService;
@@ -102,6 +103,8 @@ public class NotificacioFormController extends BaseUserController {
     private AplicacioService aplicacioService;
     @Autowired
     private NotificacioService notificacioService;
+    @Autowired
+    private EnviamentSmService enviamentSmService;
     @Autowired
     private EntitatService entitatService;
     @Autowired
@@ -306,7 +309,10 @@ public class NotificacioFormController extends BaseUserController {
             if (notificacioCommand.getId() != null) {
                 notificacioService.update(entitatActual.getId(), notificacioCommand.asNotificacioV2(), RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()));
             } else {
-                notificacioService.create(entitatActual.getId(), notificacioCommand.asNotificacioV2());
+                var not = notificacioService.create(entitatActual.getId(), notificacioCommand.asNotificacioV2());
+                // SM
+                not.getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
+
             }
         } catch (Exception ex) {
             log.error("[NOT-CONTROLLER] POST notificació desde interfície web. Excepció al processar les dades del formulari", ex);

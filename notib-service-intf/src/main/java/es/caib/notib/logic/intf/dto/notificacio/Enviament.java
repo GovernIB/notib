@@ -43,6 +43,7 @@ public class Enviament implements Serializable {
     private EntregaDeh entregaDeh;
     private ServeiTipus serveiTipus;
     private boolean perEmail;
+    private String notificaReferencia;
 
     public List<Persona> getDestinataris() {
 

@@ -49,14 +49,13 @@ public class NotificacioBackHelper {
 		NotificacioFiltreCommand notificacioFiltreCommand = (NotificacioFiltreCommand) request.getSession().getAttribute(keyAttr);
 		
 		if (notificacioFiltreCommand != null) {
+//			notificacioFiltreCommand.setDefaultFiltreData();
 			return notificacioFiltreCommand;
 		}
 		notificacioFiltreCommand = new NotificacioFiltreCommand();
+		notificacioFiltreCommand.setDefaultFiltreData();
 		if (getLast3months()) {
-			var cal = new GregorianCalendar();
-			cal.add(Calendar.MONTH, -3);
-			notificacioFiltreCommand.setDataInici(cal.getTime());
-			notificacioFiltreCommand.setDataFi(new Date());
+			notificacioFiltreCommand.setDefaultFiltreData();
 		}
 		RequestSessionHelper.actualitzarObjecteSessio(request, keyAttr, notificacioFiltreCommand);
 		return notificacioFiltreCommand;

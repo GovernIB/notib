@@ -425,6 +425,8 @@
         omplirProcediments();
         omplirServeis();
         loadOrgans($('#organGestor'), organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
+        $('#organGestor').val(${notificacioFiltreCommand.organGestor})
+        $('#organGestor').select2().trigger('change');
 
         let eventMessages = {
             'confirm-reintentar-notificacio': "<spring:message code="enviament.list.user.reintentar.notificacio.misatge.avis"/>",
@@ -486,6 +488,8 @@
                     selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
                 }
                 selProcediments.select2(select2Options);
+                selProcediments.val(${notificacioFiltreCommand.procedimentId})
+                selProcediments.select2().trigger('change');
             },
             error: function() {
                 console.error("error obtenint els procediments de l'òrgan gestor...");
@@ -540,6 +544,8 @@
                     selServeis.append("<option value=\"\"><spring:message code='notificacio.form.camp.servei.buit'/></option>");
                 }
                 selServeis.select2(select2Options);
+                selServeis.val(${notificacioFiltreCommand.serveiId})
+                selServeis.select2().trigger('change');
             },
             error: function() {
                 console.error("error obtenint els serveis de l'òrgan gestor...");

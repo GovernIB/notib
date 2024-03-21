@@ -11,8 +11,10 @@ import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,11 +41,16 @@ import java.util.Date;
 @RequestMapping("/api/services/notificacioV22")
 public class NotificacioApiRestLegacyV2Controller extends NotificacioApiRestBaseController {
 
+	@Autowired
+	private EnviamentSmService enviamentSmService;
+
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(value = "/alta", produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaAltaV2 alta(@RequestBody Notificacio notificacio) {
 		try {
-			return notificacioServiceWs.altaV2(notificacio);
+			var resposta = notificacioServiceWs.altaV2(notificacio);
+			resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
+			return resposta;
 		} catch (Exception e) {
 			var usr = SecurityContextHolder.getContext().getAuthentication().getName();
 			var rols = SecurityContextHolder.getContext().getAuthentication().getAuthorities();

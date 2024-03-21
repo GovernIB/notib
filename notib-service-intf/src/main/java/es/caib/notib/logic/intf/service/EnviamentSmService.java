@@ -33,6 +33,9 @@ public interface EnviamentSmService {
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	boolean afegirNotificacio(Long notificacioId);
 
+	@PreAuthorize("isAuthenticated()")
+	void acquireStateMachine(String uuid);
+
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	boolean canviarEstat(Long enviamentId, String estat);
 

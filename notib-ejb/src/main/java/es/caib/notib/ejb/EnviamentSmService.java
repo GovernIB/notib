@@ -53,6 +53,12 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
+	@RolesAllowed("**")
+	public void acquireStateMachine(String uuid) {
+		getDelegateService().acquireStateMachine(uuid);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public boolean canviarEstat(Long enviamentId, String estat) {
 		return getDelegateService().canviarEstat(enviamentId, estat);

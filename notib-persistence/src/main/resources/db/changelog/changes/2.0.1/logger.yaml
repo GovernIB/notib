@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1665140886758-1
+      author: limit
+      changes:
+        - insert:
+            tableName: NOT_CONFIG_TYPE
+            columns:
+              - column:
+                  name: CODE
+                  value: 'GENERAL'
+              - column:
+                  name: POSITION
+                  value: 0
+              - column:
+                  name:
+                  value:
+        - sql : "INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.TAULA_REMESES', 0, 'Mostrar logs de la taula de remeses', 'LOGS', 0, 0, 'BOOL ', 0);"

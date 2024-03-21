@@ -11,8 +11,10 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.back.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -20,8 +22,10 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter @Setter
-public class NotificacioFiltreCommand extends FiltreCommand {
+@Slf4j
+@Getter
+@Setter
+public class NotificacioFiltreCommand {
 	
 	private Long entitatId;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
@@ -70,6 +74,33 @@ public class NotificacioFiltreCommand extends FiltreCommand {
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
+	}
+
+	public void setDefaultFiltreData() {
+
+		try {
+
+			if (dataFi == null) {
+				var c = Calendar.getInstance();
+				c.setTime(new Date());
+				c.set(Calendar.SECOND, 59);
+				c.set(Calendar.MINUTE, 59);
+				c.set(Calendar.HOUR_OF_DAY, 23);
+				dataFi = c.getTime();
+			}
+			if (dataInici != null) {
+				return;
+			}
+			var c = Calendar.getInstance();
+			c.setTime(dataFi);
+			c.set(Calendar.SECOND, 0);
+			c.set(Calendar.MINUTE, 0);
+			c.set(Calendar.HOUR_OF_DAY, 0);
+			c.add(Calendar.MONTH, -3);
+            dataInici = c.getTime();
+		} catch (Exception ex) {
+			log.error("Error parsejant la data", ex);
+		}
 	}
 
 }

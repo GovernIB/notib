@@ -10,6 +10,7 @@ import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.dto.config.ConfigGroupDto;
 import es.caib.notib.logic.intf.service.ConfigService;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.config.ConfigEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.config.ConfigGroupRepository;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -48,7 +50,8 @@ public class ConfigServiceImpl implements ConfigService {
     private CacheHelper cacheHelper;
     @Autowired
     private ConfigHelper configHelper;
-
+    @Autowired
+    private NotibLogger logger;
 
     @Override
     @Transactional
@@ -67,6 +70,9 @@ public class ConfigServiceImpl implements ConfigService {
         cacheHelper.clearAllCaches();
         if ("es.caib.notib.state.machine.delay".equals(property.getKey())) {
             carregarDelaysReintentsRemeses();
+        }
+        if (property.getKey().contains(NotibLogger.PREFIX)) {
+            logger.setLogTipus(property.getKey());
         }
         return conversioTipusHelper.convertir(configEntity, ConfigDto.class);
     }

@@ -209,12 +209,13 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var filtre = filtreCommand.asDto();
         var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
         var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
-        String organGestorCodi = null;
+
         try {
             if (isUsuariEntitat && filtre != null) {
                 filtre.setEntitatId(entitatActual.getId());
             }
-            if (isAdminOrgan && entitatActual != null) {
+            var organGestorCodi = filtre.getOrganGestor();
+            if (isAdminOrgan && entitatActual != null && Strings.isNullOrEmpty(organGestorCodi)) {
                 OrganGestorDto organGestorActual = getOrganGestorActual(request);
                 organGestorCodi = organGestorActual.getCodi();
             }

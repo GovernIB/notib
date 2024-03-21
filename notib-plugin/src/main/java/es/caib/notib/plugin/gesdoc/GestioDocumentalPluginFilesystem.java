@@ -43,7 +43,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			var basedir = getBaseDir(agrupacio);
 			var subfolderId = getValidSubfolder(agrupacio);
 			var id = subfolderId + generateUniqueName(basedir);
-			log.debug("Creant fitxer al directori: " + basedir + AMB_ID + id);
+			log.info("Creant fitxer al directori: " + basedir + AMB_ID + id);
 			try (var outContent = new FileOutputStream(basedir + "/" + id)) {
 				IOUtils.copy(contingut, outContent);
 			}
@@ -58,7 +58,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 		try {
 			var fContent = getFile(agrupacio, id);
-			log.debug("Actalitzant fitxer, directori: " + getBaseDir(agrupacio) + AMB_ID + id);
+			log.info("Actalitzant fitxer, directori: " + getBaseDir(agrupacio) + AMB_ID + id);
 			if (fContent == null) {
 				throw new SistemaExternException(ARXIU_NO_TROBAT + id + ")");
 			}

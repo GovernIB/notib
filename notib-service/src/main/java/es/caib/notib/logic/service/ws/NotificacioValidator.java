@@ -14,6 +14,8 @@ import es.caib.notib.logic.intf.dto.notificacio.Enviament;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.util.NifHelper;
 import es.caib.notib.logic.utils.MimeUtils;
 import es.caib.notib.persist.entity.AplicacioEntity;
@@ -247,6 +249,11 @@ public class NotificacioValidator implements Validator {
             errors.rejectValue("organGestor", error(ORGAN_ALTRE_ENTITAT, locale));
             return;
         }
+
+        if (!OrganGestorEstatEnum.V.equals(organGestor.getEstat())) {
+            errors.rejectValue("organGestor", error(ORGAN_NO_VIGENT, locale));
+        }
+
         if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus()) && entitat != null && !entitat.isOficinaEntitat() && Strings.isNullOrEmpty(organGestor.getOficina())) {
             errors.rejectValue("organGestor", error(ORGAN_I_ENTITA_SENSE_OFICINA_EN_SIR, locale));
         }
@@ -608,10 +615,8 @@ public class NotificacioValidator implements Validator {
         }
 
         // - Nom
-        if(Strings.isNullOrEmpty(persona.getNom())) {
-            if(isPersonaFisica || isPersonaSenseNif || isAdministracio) {
-                errors.rejectValue(envName + ".nom", error(PERSONA_NOM_NULL, l, prefix, tipus));
-            }
+        if(Strings.isNullOrEmpty(persona.getNom()) && (isPersonaFisica || isPersonaSenseNif)) {
+            errors.rejectValue(envName + ".nom", error(PERSONA_NOM_NULL, l, prefix, tipus));
         }
         if(!Strings.isNullOrEmpty(persona.getNom())) {
             if (!isAdministracio && persona.getNom().length() > 30) {
@@ -673,14 +678,14 @@ public class NotificacioValidator implements Validator {
         }
         // - Telèfon
         if (!Strings.isNullOrEmpty(persona.getTelefon()) && persona.getTelefon().length() > 16) {
-            errors.rejectValue(envName + ".email", error(PERSONA_TELEFON_SIZE, l, prefix, 16));
+            errors.rejectValue(envName + ".telefon", error(PERSONA_TELEFON_SIZE, l, prefix, 16));
         }
         // - Raó social
-        if (isPersonaJuridica && Strings.isNullOrEmpty(persona.getRaoSocial()) && Strings.isNullOrEmpty(persona.getNom()))  {
-            errors.rejectValue(envName + ".email", error(PERSONA_RAO_SOCIAL_NULL, l, prefix, tipus));
+        if ((isPersonaJuridica || isAdministracio) && Strings.isNullOrEmpty(persona.getRaoSocial()) && Strings.isNullOrEmpty(persona.getNom()))  {
+            errors.rejectValue(envName + ".raoSocial", error(PERSONA_RAO_SOCIAL_NULL, l, prefix, tipus));
         }
-        if (!Strings.isNullOrEmpty(persona.getRaoSocial()) && persona.getRaoSocial().length() > 80) {
-            errors.rejectValue(envName + ".email", error(PERSONA_RAO_SOCIAL_SIZE, l, prefix, 80));
+        if (!Strings.isNullOrEmpty(persona.getRaoSocial()) && persona.getRaoSocial().length() > 255) {
+            errors.rejectValue(envName + ".raoSocial", error(PERSONA_RAO_SOCIAL_SIZE, l, prefix, 255));
         }
         // - Codi Dir3
         if (Strings.isNullOrEmpty(persona.getDir3Codi()) && isAdministracio) {

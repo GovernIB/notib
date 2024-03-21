@@ -667,12 +667,14 @@ public class PluginHelper {
 
 		info.setCodiEntitat(getCodiEntitatActual());
 		try {
+			log.info("Creant el document en el gestor documental amb agrupacio " + agrupacio);
 			var gestioDocumentalId = getGestioDocumentalPlugin().create(agrupacio, new ByteArrayInputStream(contingut));
 			info.getParams().add(new AccioParam("Id retornat", gestioDocumentalId));
 			integracioHelper.addAccioOk(info);
 			return gestioDocumentalId;
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al crear document a dins la gestió documental";
+			log.error("Error creant el document en el gestor documental amb agrupacio " + agrupacio);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), errorDescripcio, ex);
 		}
@@ -688,10 +690,12 @@ public class PluginHelper {
 
 		info.setCodiEntitat(getCodiEntitatActual());
 		try {
+			log.info("Actualitzant el document " + id);
 			getGestioDocumentalPlugin().update(id, agrupacio, new ByteArrayInputStream(contingut));
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al accedir al plugin de gestió documental";
+			log.error("Error actualitzant el document " + id);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), errorDescripcio, ex);
 		}

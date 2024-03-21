@@ -151,7 +151,7 @@ public class IntegracioHelper {
 //			var usuari = usuariRepository.findById(auth.getName()).orElse(null);
 			var usuari = cacheHelper.findUsuariByCodi(auth.getName());
 			if (usuari == null) {
-				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari " + auth.getName() + "no trobat a la bbdd");
+				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari " + auth.getName() + " no trobat a la bbdd");
 				return usuariNomCodi;
 			}
 			return usuari.getNomSencer() + " (" + usuari.getCodi() + ")";
