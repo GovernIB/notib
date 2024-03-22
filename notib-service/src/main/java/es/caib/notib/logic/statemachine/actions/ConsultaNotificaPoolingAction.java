@@ -6,9 +6,11 @@ import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.service.EnviamentSmServiceImpl;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.statemachine.mappers.ConsultaNotificaMapper;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +46,7 @@ public class ConsultaNotificaPoolingAction implements Action<EnviamentSmEstat, E
             return;
         }
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
-        log.debug("[SM] ConsultaNotificaPoolingAction enviament " + enviamentUuid);
+        NotibLogger.getInstance().info("[SM] ConsultaNotificaPoolingAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(consultaNotificaMapper.toDto(enviament)).numIntent(1).build();
         jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_ESTAT, consulta,
@@ -53,11 +55,12 @@ public class ConsultaNotificaPoolingAction implements Action<EnviamentSmEstat, E
                     return m;
                 });
 
-        log.debug("[SM] Enviada petició de consulta d'estat a notifica per pooling l'enviament amb UUID " + enviamentUuid);
+        NotibLogger.getInstance().info("[SM] Enviada petició de consulta d'estat a notifica per pooling l'enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
     }
 
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
+
         log.error("[SM] Recover ConsultaNotificaPoolingAction", t);
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         log.error("[SM] Recover ConsultaNotificaPoolingAction de enviament amb uuid=" + enviamentUuid);

@@ -8,8 +8,10 @@ import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.service.EnviamentSmServiceImpl;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,13 +52,13 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
-        log.debug("[SM] EnviamentRegistreAction enviament " + enviamentUuid);
+        NotibLogger.getInstance().info("[SM] EnviamentRegistreAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var variables = stateContext.getExtendedState().getVariables();
         var reintents = (int) variables.getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
         var env = EnviamentRegistreRequest.builder().enviamentUuid(enviamentUuid).numIntent(reintents + 1).build();//.enviamentRegistreDto(enviamentRegistreMapper.toDto(enviament))
         var retry = (boolean) variables.getOrDefault(SmConstants.RG_RETRY, false);
         var isRetry = EnviamentSmEvent.RG_RETRY.equals(stateContext.getMessage().getPayload()) || retry;
-        log.debug("[SM] Enviament registre acction enviament " + enviamentUuid);
+        NotibLogger.getInstance().info("[SM] Enviament registre acction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var delayMassiu = 0L;
         try {
             delayMassiu = (Long) variables.getOrDefault(SmConstants.ENVIAMENT_DELAY, 0L);
@@ -66,14 +68,14 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         var delay = !isRetry ? SmConstants.delay(reintents, delayMassiu) : 0L;
         variables.put(SmConstants.RG_RETRY, false);
         variables.put(SmConstants.ENVIAMENT_DELAY, 0L);
-        log.debug("[SM] Enviant peticio de registre per l'enviament amb UUID " + enviamentUuid + " delay " + delay + "ms");
+        NotibLogger.getInstance().info("[SM] Enviant peticio de registre per l'enviament amb UUID " + enviamentUuid + " delay " + delay + "ms", log, LoggingTipus.STATE_MACHINE);
         jmsTemplate.convertAndSend(SmConstants.CUA_REGISTRE, env,
                 m -> {
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
                     return m;
                 });
 
-        log.debug("[SM] Enviada peticio de registre per l'enviament amb UUID " + enviamentUuid);
+        NotibLogger.getInstance().info("[SM] Enviada peticio de registre per l'enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
     }
 
     @Transactional

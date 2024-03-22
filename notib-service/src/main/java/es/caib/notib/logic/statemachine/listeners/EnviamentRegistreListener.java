@@ -1,5 +1,6 @@
 package es.caib.notib.logic.statemachine.listeners;
 
+import com.google.common.base.Strings;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.helper.RegistreSmHelper;
@@ -10,7 +11,9 @@ import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.RegistreService;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +36,7 @@ public class EnviamentRegistreListener {
 
     private final RegistreService registreService;
     private final EnviamentSmService enviamentSmService;
+    private final NotificacioEnviamentRepository enviamentRepository;
 
     private Semaphore semaphore = new Semaphore(5);
 
@@ -49,18 +53,29 @@ public class EnviamentRegistreListener {
         log.debug("[SM] Rebut enviament de registre <" + enviamentUuid + ">");
         semaphore.acquire();
         try {
+            var enviament = enviamentRepository.findByUuid(enviamentUuid);
+            if (enviament.isEmpty()) {
+                log.error("[SM] Enviament inexistent " + enviamentUuid);
+                message.acknowledge();
+                return;
+            }
+            if (!Strings.isNullOrEmpty(enviament.get().getRegistreNumeroFormatat())) {
+                log.error("[SM] L'enviament ja te numero de registre " + enviamentUuid);
+                message.acknowledge();
+                return;
+            }
             var success = registreService.enviarRegistre(enviamentRegistreRequest);
             if (success) {
-                log.debug("[SM] Enviament de registre <" + enviamentUuid + "> success ");
+                NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> success ", log, LoggingTipus.STATE_MACHINE);
                 enviamentSmService.registreSuccess(enviamentUuid);
             } else {
-                log.debug("[SM] Enviament de registre <" + enviamentUuid + "> failed ");
+                NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> failed ", log, LoggingTipus.STATE_MACHINE);
                 enviamentSmService.registreFailed(enviamentUuid);
             }
         } finally {
             semaphore.release();
         }
-        log.debug("[SM] Enviament de registre <" + enviamentUuid + "> completat");
+        NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> completat", log, LoggingTipus.STATE_MACHINE);
         message.acknowledge();
     }
 

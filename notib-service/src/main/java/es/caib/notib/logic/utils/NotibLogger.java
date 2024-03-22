@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,19 +26,38 @@ public class NotibLogger {
     @Setter
     private static Map<LoggingTipus, Boolean> logs = new HashMap<>();
 
+    private static NotibLogger INSTANCE = null;
+
+    public static NotibLogger getInstance() {
+        return INSTANCE;
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        INSTANCE = this;
+    }
+
     public static final String PREFIX = "es.caib.notib.log.tipus.";
 
     public void info(String msg, Logger log, LoggingTipus tipus) {
 
-        if (!mostrarLog(tipus)) {
+        if (log == null || !mostrarLog(tipus)) {
             return;
         }
         log.info(msg);
     }
 
+    public void info(String msg, Exception ex, Logger log, LoggingTipus tipus) {
+
+        if (log == null ||!mostrarLog(tipus)) {
+            return;
+        }
+        log.info(msg, ex);
+    }
+
     public void error(String msg, Logger log, LoggingTipus tipus) {
 
-        if (!mostrarLog(tipus)) {
+        if (log == null ||!mostrarLog(tipus)) {
             return;
         }
         log.error(msg);
@@ -45,6 +65,9 @@ public class NotibLogger {
 
     private boolean mostrarLog(LoggingTipus tipus) {
 
+        if (tipus == null) {
+            return false;
+        }
         if (!logs.containsKey(tipus)) {
             getLogTipus(tipus);
         }
@@ -67,7 +90,7 @@ public class NotibLogger {
     private void getLogTipus(LoggingTipus tipus) {
 
         try {
-            logs.put(tipus, configHelper.getConfigAsBoolean("es.caib.notib.log.tipus." + tipus));
+            logs.put(tipus, configHelper.getConfigAsBoolean(PREFIX + tipus));
         } catch (Exception ex) {
             logs.put(tipus, false);
             log.error("Error obtenint la config key ", ex);

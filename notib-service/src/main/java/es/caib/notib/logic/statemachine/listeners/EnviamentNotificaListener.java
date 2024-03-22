@@ -3,7 +3,9 @@ package es.caib.notib.logic.statemachine.listeners;
 import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.service.NotificaService;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentNotificaRequest;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.NotibLogger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
@@ -35,7 +37,7 @@ public class EnviamentNotificaListener {
             message.acknowledge();
             return;
         }
-        log.debug("[SM] Rebut enviament a notifica <" + enviament.getUuid() + ">");
+        NotibLogger.getInstance().info("[SM] Rebut enviament a notifica <" + enviament.getUuid() + ">", log, LoggingTipus.STATE_MACHINE);
         semaphore.acquire();
         try {
             notificaService.enviarNotifica(enviament.getUuid(), enviamentNotificaRequest);

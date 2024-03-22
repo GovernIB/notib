@@ -9,9 +9,11 @@ import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentNotificaRequest;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.service.EnviamentSmServiceImpl;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.statemachine.mappers.EnviamentNotificaMapper;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,13 +53,13 @@ public class EnviamentNotificaAction implements Action<EnviamentSmEstat, Enviame
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
-        log.debug("[SM] EnviamentNotificaAction enviament " + enviamentUuid);
+        NotibLogger.getInstance().info("[SM] EnviamentNotificaAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var variables = stateContext.getExtendedState().getVariables();
         var reintents = (int) variables.getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
         var notificacioRegistrada = enviament.getNotificacio().getEnviaments().stream().allMatch(e -> e.getRegistreData() != null);
         if (!notificacioRegistrada) {
-            log.debug("[SM] Petició de notificació NO enviada degut a que no tots els enviaments estan registrats - enviament amb UUID " + enviamentUuid);
+            NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada degut a que no tots els enviaments estan registrats - enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
             return;
         }
         var env = EnviamentNotificaRequest.builder().enviamentNotificaDto(enviamentNotificaMapper.toDto(enviament)).numIntent(reintents + 1).build();
@@ -69,7 +71,7 @@ public class EnviamentNotificaAction implements Action<EnviamentSmEstat, Enviame
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0L);
                     return m;
                 });
-        log.debug("[SM] Enviada petició de notificació per l'enviament amb UUID " + enviamentUuid);
+        NotibLogger.getInstance().info("[SM] Enviada petició de notificació per l'enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
     }
 
     @Transactional

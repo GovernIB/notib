@@ -1,7 +1,9 @@
 package es.caib.notib.logic.statemachine.listeners;
 
 import es.caib.notib.logic.intf.service.EnviamentSmService;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +35,8 @@ public class PoolingSirListener {
             var notificacioRegistrada = enviament.getNotificacio().getEnviaments().stream().allMatch(e -> e.getRegistreData() != null);
             if (notificacioRegistrada) {
                 enviament.getNotificacio().getEnviaments().forEach(e -> enviamentSmService.sirConsulta(e.getNotificaReferencia()));
-                log.debug("[SM] Tots els enviaments de la notificació estan registrats. S'ha d'avançar la màquina d'estats - enviament amb UUID " + enviamentUuid);
+                var msg = "[SM] Tots els enviaments de la notificació estan registrats. S'ha d'avançar la màquina d'estats - enviament amb UUID " + enviamentUuid;
+                NotibLogger.getInstance().info(msg, log, LoggingTipus.STATE_MACHINE);
             }
         } catch (Exception ex) {
             log.error("[SM] Error en el pooling Sir de l'enviament <" + enviamentUuid + ">");
