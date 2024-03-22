@@ -4,8 +4,10 @@ import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.service.EnviamentSmServiceImpl;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.NotibLogger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
@@ -40,13 +42,13 @@ public class ConsultaNotificaIniciPoolingAction implements Action<EnviamentSmEst
             return;
         }
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
-        log.debug("[SM] ConsultaNotificaPoolingAction enviament " + enviamentUuid);
+        NotibLogger.getInstance().info("[SM] ConsultaNotificaPoolingAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var delay = configHelper.getConfigAsLong("es.caib.notib.pooling.delay", DELAY_DEFECTE);
         jmsTemplate.convertAndSend(SmConstants.CUA_POOLING_ESTAT, enviamentUuid, m -> {
             m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
             return m;
         });
-        log.debug("[SM] Inici pooling consulta a Notifica, si no està actiu l'adviser");
+        NotibLogger.getInstance().info("[SM] Inici pooling consulta a Notifica, si no està actiu l'adviser", log, LoggingTipus.STATE_MACHINE);
     }
 
     @Recover
@@ -62,7 +64,7 @@ public class ConsultaNotificaIniciPoolingAction implements Action<EnviamentSmEst
         }
         if (!isAdviserActiu()) {
             enviamentSmService.enviamentConsulta(enviamentUuid);
-            log.debug("[SM] Iniciat pooling de consulta d'estat a Notifica de l'enviament amb UUID " + enviamentUuid);
+            NotibLogger.getInstance().info("[SM] Iniciat pooling de consulta d'estat a Notifica de l'enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         }
 
     }

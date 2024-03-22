@@ -7,5 +7,6 @@ public enum LoggingTipus {
     CALLBACK,
     REGISTRE,
     NOTIFICA,
-    SIR;
+    SIR,
+    STATE_MACHINE;
 }

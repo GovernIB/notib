@@ -3,8 +3,10 @@ package es.caib.notib.logic.statemachine.actions;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.service.EnviamentSmServiceImpl;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,19 +31,20 @@ public class NotificaAction implements Action<EnviamentSmEstat, EnviamentSmEvent
 
 
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
-        log.debug("[SM] NotificaAction enviament " + enviamentUuid);
+        NotibLogger.getInstance().info("[SM] NotificaAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 
         var notificacioRegistrada = enviament.getNotificacio().getEnviaments().stream().allMatch(e -> e.getRegistreData() != null);
         if (notificacioRegistrada) {
 //            enviamentSmService.notificaEnviament(enviamentUuid);
             enviament.getNotificacio().getEnviaments().forEach(e -> enviamentSmService.notificaEnviament(e.getNotificaReferencia(), false));
-            log.debug("[SM] Tots els enviaments de la notificació estan registrats. S'ha d'avançar la màquina d'estats - enviament amb UUID " + enviamentUuid);
+            NotibLogger.getInstance().info("[SM] Tots els enviaments de la notificació estan registrats. S'ha d'avançar la màquina d'estats - enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         }
     }
 
 //    @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
+
         log.error("[SM] Recover NotificaAction", t);
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         log.error("[SM] Recover NotificaAction de enviament amb uuid=" + enviamentUuid);

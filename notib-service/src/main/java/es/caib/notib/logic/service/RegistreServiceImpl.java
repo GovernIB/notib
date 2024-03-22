@@ -12,6 +12,8 @@ import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.RegistreService;
 import es.caib.notib.logic.intf.statemachine.dto.ConsultaSirDto;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,14 +49,14 @@ public class RegistreServiceImpl implements RegistreService {
             var notificacio = enviament.getNotificacio();
             var numIntent = enviamentRegistreRequest.getNumIntent();
             notificacio.setRegistreEnviamentIntent(numIntent);
-            log.debug("[SM] Enviament de registre <" + enviamentUuid + "> registrant ");
+            NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> registrant ", log, LoggingTipus.REGISTRE);
             // Registrar enviament
             boolean registreSuccess = registreSmHelper.registrarEnviament(enviament, numIntent);
-            log.debug("[SM] Enviament de registre <" + enviamentUuid + "> registrat ");
+            NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> registrat ", log, LoggingTipus.REGISTRE);
 
             // Actualitzar notificació
             if (notificacioEnviamentRepository.areEnviamentsRegistrats(notificacio.getId()) == 1) {
-                log.debug("[SM] Enviament de registre <" + enviamentUuid + "> actualitzant notificacio");
+                NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> actualitzant notificacio", log, LoggingTipus.REGISTRE);
                 var isSir = notificacio.isComunicacioSir();
                 notificacio.updateEstat(isSir ? NotificacioEstatEnumDto.ENVIAT_SIR : NotificacioEstatEnumDto.REGISTRADA);
 
@@ -70,9 +72,9 @@ public class RegistreServiceImpl implements RegistreService {
                     notificacio.updateEstatDate(new Date());
                 }
             }
-            log.debug("[SM] Enviament de registre <" + enviamentUuid + "> actualitzant registre");
+            NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> actualitzant registre", log, LoggingTipus.REGISTRE);
             notificacioTableHelper.actualitzarRegistre(notificacio);
-            log.debug("[SM] Enviament de registre <" + enviamentUuid + "> audita notificacio");
+            NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> audita notificacio", log, LoggingTipus.REGISTRE);
             auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "RegistreSmHelper.registrarEnviament");
 
     //            TEST
@@ -81,10 +83,10 @@ public class RegistreServiceImpl implements RegistreService {
     //                enviament.setRegistreData(new Date());
     //                notificacioEnviamentRepository.save(enviament);
     //            }
-            log.debug("[SM] Enviament de registre <" + enviamentUuid + "> is success " + registreSuccess);
+            NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> is success " + registreSuccess, log, LoggingTipus.REGISTRE);
             return registreSuccess;
         } catch (Exception ex) {
-            log.debug("[SM] Enviament de registre <" + enviamentUuid + "> error ", ex);
+            NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> error ", ex, log, LoggingTipus.REGISTRE);
             return false;
         }
     }

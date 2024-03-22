@@ -13,8 +13,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Mètodes per a l'enviament de correus.
@@ -71,11 +73,23 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 	private List<UsuariDto> obtenirCodiDestinataris(NotificacioEntity notificacio) {
 
 		List<UsuariDto> destinataris = new ArrayList<>();
-		var usuaris = notificacio.getProcediment() != null ? procSerHelper.findUsuaris(notificacio) : procSerHelper.findUsuarisAmbPermisReadPerOrgan(notificacio);
+		Set<String> usuaris;
+		try {
+			usuaris = notificacio.getProcediment() != null ? procSerHelper.findUsuaris(notificacio) : procSerHelper.findUsuarisAmbPermisReadPerOrgan(notificacio);
+		} catch (Exception ex) {
+			log.error("[EMAIL] Error al buscar els usuaris amb permisos ", ex);
+			usuaris = new HashSet<>();
+			usuaris.add(notificacio.getUsuariCodi());
+		}
+		if (usuaris.isEmpty()) {
+			log.error("[EMAIL] No s'han trobat usuaris amb permisos, possible error de Keycloak. Afegit usuari de la notificacio. Usuari: " + notificacio.getUsuariCodi());
+			usuaris.add(notificacio.getUsuariCodi());
+		}
 		DadesUsuari dadesUsuari;
 		for (var usuari: usuaris) {
 			dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
 			if (dadesUsuari == null || Strings.isNullOrEmpty(dadesUsuari.getEmail())) {
+				log.error("[EMAIL] Usuari " + usuari + " sense dades per enviar email");
 				continue;
 			}
 			var user = usuariRepository.findById(usuari).orElse(null);

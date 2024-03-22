@@ -3,8 +3,10 @@ package es.caib.notib.logic.statemachine.actions;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.service.EnviamentSmServiceImpl;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,9 +38,9 @@ public class ConsultaSirIniciPoolingAction implements Action<EnviamentSmEstat, E
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
-        log.debug("[SM] ConsultaSirIniciPoolingAction enviament " + enviamentUuid);
+        NotibLogger.getInstance().info("[SM] ConsultaSirIniciPoolingAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         jmsTemplate.convertAndSend(SmConstants.CUA_POOLING_SIR, enviamentUuid);
-        log.debug("[SM] Inici pooling consulta a SIR");
+        NotibLogger.getInstance().info("[SM] Inici pooling consulta a SIR", log, LoggingTipus.STATE_MACHINE);
     }
 
     @Transactional
@@ -57,7 +59,7 @@ public class ConsultaSirIniciPoolingAction implements Action<EnviamentSmEstat, E
         var notificacioRegistrada = enviament.getNotificacio().getEnviaments().stream().allMatch(e -> e.getRegistreData() != null);
         if (notificacioRegistrada) {
             enviament.getNotificacio().getEnviaments().forEach(e -> enviamentSmService.sirConsulta(e.getNotificaReferencia()));
-            log.debug("[SM] Tots els enviaments de la notificació estan registrats. S'ha d'avançar la màquina d'estats - enviament amb UUID " + enviamentUuid);
+            NotibLogger.getInstance().info("[SM] Tots els enviaments de la notificació estan registrats. S'ha d'avançar la màquina d'estats - enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         }
     }
 }
