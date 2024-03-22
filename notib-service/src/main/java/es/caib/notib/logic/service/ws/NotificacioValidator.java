@@ -15,6 +15,7 @@ import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.util.NifHelper;
 import es.caib.notib.logic.utils.MimeUtils;
@@ -223,6 +224,11 @@ public class NotificacioValidator implements Validator {
             errors.rejectValue("organGestor", error(ORGAN_ALTRE_ENTITAT, locale));
             return;
         }
+
+        if (!OrganGestorEstatEnum.V.equals(organGestor.getEstat())) {
+            errors.rejectValue("organGestor", error(ORGAN_NO_VIGENT, locale));
+        }
+
         if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus()) && entitat != null && !entitat.isOficinaEntitat() && Strings.isNullOrEmpty(organGestor.getOficina())) {
             errors.rejectValue("organGestor", error(ORGAN_I_ENTITA_SENSE_OFICINA_EN_SIR, locale));
         }
