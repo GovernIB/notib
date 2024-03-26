@@ -3,6 +3,7 @@
  */
 package es.caib.notib.persist.config;
 
+import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.repository.UsuariRepository;
 import lombok.Setter;
@@ -30,15 +31,23 @@ public class AuditingConfig implements EnvironmentAware {
 	private Environment environment;
 	@Autowired
 	private UsuariRepository usuariRepository;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 	@Bean
 	public AuditorAware<UsuariEntity> auditorProvider() {
 		return () -> {
 			var authentication = SecurityContextHolder.getContext().getAuthentication();
-			if (authentication == null || !authentication.isAuthenticated())
+			if (authentication == null || !authentication.isAuthenticated()) {
 				return Optional.empty();
+			}
 
-			return usuariRepository.getByCodiReadOnlyNewTransaction(authentication.getName());
+			var usuari = usuariRepository.getByCodi(authentication.getName());
+			if (!usuari.isEmpty()) {
+				return usuari;
+			}
+			aplicacioService.crearUsuari(authentication.getName());
+			return usuariRepository.getByCodi(authentication.getName());
 		};
 	}
 
