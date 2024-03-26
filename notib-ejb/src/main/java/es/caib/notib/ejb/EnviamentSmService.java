@@ -47,7 +47,7 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN"})
 	public boolean afegirNotificacio(Long notificacioId) {
 		return getDelegateService().afegirNotificacio(notificacioId);
 	}
@@ -59,13 +59,13 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN"})
 	public boolean canviarEstat(Long enviamentId, String estat) {
 		return getDelegateService().canviarEstat(enviamentId, estat);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN"})
 	public boolean enviarEvent(Long enviamentId, String event) {
 		return getDelegateService().enviarEvent(enviamentId, event);
 	}

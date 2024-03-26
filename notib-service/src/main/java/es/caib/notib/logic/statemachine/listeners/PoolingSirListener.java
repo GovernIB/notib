@@ -35,7 +35,7 @@ public class PoolingSirListener {
             var notificacioRegistrada = enviament.getNotificacio().getEnviaments().stream().allMatch(e -> e.getRegistreData() != null);
             if (notificacioRegistrada) {
                 enviament.getNotificacio().getEnviaments().forEach(e -> enviamentSmService.sirConsulta(e.getNotificaReferencia()));
-                var msg = "[SM] Tots els enviaments de la notificació estan registrats. S'ha d'avançar la màquina d'estats - enviament amb UUID " + enviamentUuid;
+                var msg = "[SM] Tots els enviaments de la notificació estan registrats. S'ha d'avancar la maquina d'estats - enviament amb UU ID " + enviamentUuid;
                 NotibLogger.getInstance().info(msg, log, LoggingTipus.STATE_MACHINE);
             }
         } catch (Exception ex) {

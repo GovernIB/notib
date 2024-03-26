@@ -1,5 +1,6 @@
 package es.caib.notib.logic.statemachine.actions;
 
+import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
@@ -10,6 +11,7 @@ import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.activemq.ScheduledMessage;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.annotation.Backoff;
@@ -29,9 +31,12 @@ public class ConsultaSirIniciPoolingAction implements Action<EnviamentSmEstat, E
     private final NotificacioEnviamentRepository notificacioEnviamentRepository;
     private final JmsTemplate jmsTemplate;
     private final ApplicationContext applicationContext;
+    private final ConfigHelper configHelper;
 
     // No es pot injectar degut a error cíclic
     private EnviamentSmService enviamentSmService;
+
+    private static final Long DELAY_DEFECTE = 1800000L;
 
     @Override
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 30000, multiplier = 10, maxDelay = 3600000))
@@ -39,7 +44,11 @@ public class ConsultaSirIniciPoolingAction implements Action<EnviamentSmEstat, E
 
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         NotibLogger.getInstance().info("[SM] ConsultaSirIniciPoolingAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
-        jmsTemplate.convertAndSend(SmConstants.CUA_POOLING_SIR, enviamentUuid);
+        var delay = configHelper.getConfigAsLong("es.caib.notib.pooling.delay", DELAY_DEFECTE);
+        jmsTemplate.convertAndSend(SmConstants.CUA_POOLING_SIR, enviamentUuid, m -> {
+            m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
+            return m;
+        });
         NotibLogger.getInstance().info("[SM] Inici pooling consulta a SIR", log, LoggingTipus.STATE_MACHINE);
     }
 
