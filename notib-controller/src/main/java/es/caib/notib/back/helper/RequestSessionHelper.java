@@ -3,7 +3,14 @@
  */
 package es.caib.notib.back.helper;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utilitat per a gestionar els objectes de la sessió de l'usuari.
@@ -32,4 +39,16 @@ public class RequestSessionHelper {
 		return request.getAttribute("javax.servlet.error.request_uri") != null;
 	}
 
+	public static String getJsonSession(HttpServletRequest request) throws IOException {
+		Map<String, Object> sessionData = new HashMap<>();
+		Enumeration<String> attributeNames = request.getSession().getAttributeNames();
+		while (attributeNames.hasMoreElements()) {
+			String attributeName = attributeNames.nextElement();
+			sessionData.put(attributeName, request.getSession().getAttribute(attributeName));
+		}
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+		return objectMapper.writeValueAsString(sessionData);
+	}
 }

@@ -6,6 +6,7 @@ package es.caib.notib.back.controller;
 import es.caib.notib.back.command.UsuariCommand;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.EnumHelper;
+import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Locale;
 
 /**
@@ -78,6 +80,12 @@ public class UsuariController extends BaseController {
 	@ResponseBody
 	public String getIdioma() {
 		return new Locale(sessionScopedContext.getIdiomaUsuari(), Locale.getDefault().getCountry()).toLanguageTag();
+	}
+
+	@GetMapping(value = "/sessio")
+	@ResponseBody
+	public String getInfoSessio(HttpServletRequest request) throws IOException {
+		return RequestSessionHelper.getJsonSession(request);
 	}
 
 }
