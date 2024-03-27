@@ -32,42 +32,42 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 
 	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws Exception {
 
+		var info = new IntegracioInfo(IntegracioCodiEnum.EMAIL, "Enviament de emails per notificació " + notificacio.getId(), IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(notificacio.getEntitat().getCodi());
+		info.addParam("Identificador de la notificacio", String.valueOf(notificacio.getId()));
 		var destinataris = obtenirCodiDestinataris(notificacio);
 		if (destinataris == null || destinataris.isEmpty()) {
-			log.info(String.format("La notificació (Id= %d) no té candidats per a enviar el correu electrònic", notificacio.getId()));
-			return "No s'han trobat destinataris";
+			var msg = String.format("La notificació (Id= %d) no té candidats per a enviar el correu electrònic", notificacio.getId());
+			log.info(msg);
+			info.addParam("Resultat", msg);
+			integracioHelper.addAccioOk(info);
 		}
 		// TODO: Optimitzar per enviar un únic email
 		int numEnviamentsErronis = 0;
 		for (var usuariDto : destinataris) {
-			var info = new IntegracioInfo(
-					IntegracioCodiEnum.EMAIL,
-					"Enviament de email per notificació a un destinatari " + notificacio.getId(),
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					new AccioParam("Identificador de la notificacio", String.valueOf(notificacio.getId())),
-					new AccioParam("Destinatari", usuariDto.getNom()),
-					new AccioParam("Correu electrònic", usuariDto.getEmail()));
-			info.setCodiEntitat(notificacio.getEntitat().getCodi());
+			info.addParam("Destinatari", usuariDto.getNom());
+			info.addParam("Correu electrònic", usuariDto.getEmail());
 			if (usuariDto.getEmail() == null || usuariDto.getEmail().isEmpty()) {
 				log.error("usuari sense email. Codi: " + usuariDto.getCodi());
 				integracioHelper.addAccioError(info, "Destinatari " + usuariDto.getNom() + " no té email");
 				numEnviamentsErronis++;
 				continue;
 			}
-
 			try {
 				var email = !Strings.isNullOrEmpty(usuariDto.getEmailAlt()) ? usuariDto.getEmailAlt() : usuariDto.getEmail();
 				email = email.replaceAll("\\s+","");
 				log.info(String.format("Enviant correu notificació (Id= %d) a %s", notificacio.getId(), email));
 				sendEmailNotificacio(email, notificacio);
-				integracioHelper.addAccioOk(info);
 			} catch (Exception ex) {
 				log.error("No s'ha pogut avisar per correu electrònic a: " + usuariDto.getNom(), ex);
 				integracioHelper.addAccioError(info, "Error enviant email", ex);
 				numEnviamentsErronis++;
 			}
 		}
-		return numEnviamentsErronis > 0 ? numEnviamentsErronis + " emails de " + destinataris.size() + " han produït error" : "Tots els emails enviats correctament";
+		var resultat = numEnviamentsErronis > 0 ? numEnviamentsErronis + " emails de " + destinataris.size() + " han produït error" : "Tots els emails enviats correctament";
+		info.addParam("Resultat", resultat);
+		integracioHelper.addAccioOk(info);
+		return resultat;
 	}
 
 	private List<UsuariDto> obtenirCodiDestinataris(NotificacioEntity notificacio) {
