@@ -35,8 +35,6 @@ public class EmailListener {
                                @Headers MessageHeaders headers,
                                Message message) throws JMSException {
 
-
-
         try {
             var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
             emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);

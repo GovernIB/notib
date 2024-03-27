@@ -40,33 +40,49 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 			var msg = String.format("La notificació (Id= %d) no té candidats per a enviar el correu electrònic", notificacio.getId());
 			log.info(msg);
 			info.addParam("Resultat", msg);
-			integracioHelper.addAccioOk(info);
+			integracioHelper.addAccioError(info, msg);
 		}
 		// TODO: Optimitzar per enviar un únic email
 		int numEnviamentsErronis = 0;
+		StringBuilder error = new StringBuilder();
+		List<Exception> exceptions = new ArrayList<>();
 		for (var usuariDto : destinataris) {
-			info.addParam("Destinatari", usuariDto.getNom());
-			info.addParam("Correu electrònic", usuariDto.getEmail());
 			if (usuariDto.getEmail() == null || usuariDto.getEmail().isEmpty()) {
-				log.error("usuari sense email. Codi: " + usuariDto.getCodi());
-				integracioHelper.addAccioError(info, "Destinatari " + usuariDto.getNom() + " no té email");
+				var msg = "Usuari sense email. Codi: " + usuariDto.getCodi();
+				log.error(msg);
+				info.addParam("Error", msg);
+//				integracioHelper.addAccioError(info, "Destinatari " + usuariDto.getNom() + " no té email");
 				numEnviamentsErronis++;
 				continue;
 			}
+			var email = !Strings.isNullOrEmpty(usuariDto.getEmailAlt()) ? usuariDto.getEmailAlt() : usuariDto.getEmail();
+			email = email.replaceAll("\\s+","");
 			try {
-				var email = !Strings.isNullOrEmpty(usuariDto.getEmailAlt()) ? usuariDto.getEmailAlt() : usuariDto.getEmail();
-				email = email.replaceAll("\\s+","");
 				log.info(String.format("Enviant correu notificació (Id= %d) a %s", notificacio.getId(), email));
+				info.addParam("Destinatari", usuariDto.getNom());
+				info.addParam("Correu electrònic", usuariDto.getEmail());
 				sendEmailNotificacio(email, notificacio);
 			} catch (Exception ex) {
-				log.error("No s'ha pogut avisar per correu electrònic a: " + usuariDto.getNom(), ex);
-				integracioHelper.addAccioError(info, "Error enviant email", ex);
+				var msg = "Error enviant email. No s'ha pogut avisar per correu electrònic a: " + email;
+				log.error(msg, ex);
+				exceptions.add(ex);
+				error.append(msg).append("<br>");
 				numEnviamentsErronis++;
 			}
 		}
 		var resultat = numEnviamentsErronis > 0 ? numEnviamentsErronis + " emails de " + destinataris.size() + " han produït error" : "Tots els emails enviats correctament";
 		info.addParam("Resultat", resultat);
-		integracioHelper.addAccioOk(info);
+		if (Strings.isNullOrEmpty(error.toString())) {
+			integracioHelper.addAccioOk(info);
+//		} else if (!Strings.isNullOrEmpty(error.toString()) && numEnviamentsErronis == destinataris.size()) {
+//			integracioHelper.addAccioError(info, error.toString());
+		} else {
+			var msg = "";
+			for (var ex : exceptions) {
+				msg += ex.getMessage() + "&#13;&#10;&#13;&#10;";
+			}
+			integracioHelper.addAccioWarn(info, error.toString(), new Exception(msg));
+		}
 		return resultat;
 	}
 
@@ -99,12 +115,16 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 			var user = usuariRepository.findById(usuari).orElse(null);
 			var usr = notificacio.getCreatedBy().orElse(null);
 			var codi = usr != null ? usr.getCodi() : null;
-			if (user == null || (user.isRebreEmailsNotificacio() && (!user.isRebreEmailsNotificacioCreats() || user.isRebreEmailsNotificacioCreats() && usuari.equals(codi)))) {
+			if (user == null || !user.isRebreEmailsNotificacioCreats() && !user.isRebreEmailsNotificacio()) {
+				continue;
+			}
+//			if (user == null || (user.isRebreEmailsNotificacio() && (!user.isRebreEmailsNotificacioCreats() || user.isRebreEmailsNotificacioCreats() && usuari.equals(codi)))) {
 				var u = new UsuariDto();
 				u.setCodi(usuari);
+				u.setNom((user != null && !Strings.isNullOrEmpty(user.getNomSencer())) ? user.getNomSencer() : dadesUsuari.getNomSencer());
 				u.setEmail((user != null && !Strings.isNullOrEmpty(user.getEmailAlt())) ? user.getEmailAlt() : dadesUsuari.getEmail());
 				destinataris.add(u);
-			}
+//			}
 		}
 		return destinataris;
 	}

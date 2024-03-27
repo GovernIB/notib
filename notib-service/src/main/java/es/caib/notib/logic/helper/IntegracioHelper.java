@@ -99,6 +99,31 @@ public class IntegracioHelper {
 				+ "parametres=" + info.getParams() + ", tipus=" + info.getTipus() + ", tempsResposta=" + info.getTempsResposta() + ")", throwable);
 	}
 
+	public void addAccioWarn(IntegracioInfo info, String errorDescripcio, Throwable throwable) {
+
+		addAccioWarn(info, errorDescripcio, throwable,true);
+	}
+
+	public void addAccioWarn(IntegracioInfo info, String errorDescripcio) {
+
+		addAccioWarn(info, errorDescripcio, null,true);
+	}
+
+	public void addAccioWarn(IntegracioInfo info, String errorDescripcio, Throwable throwable, boolean obtenirUsuari) {
+
+		var accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio()).tipus(info.getTipus())
+				.codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.WARN).errorDescripcio(errorDescripcio)
+				.aplicacio(info.getAplicacio()).build();
+
+		assignarAccioAParams(info, accio);
+		if (throwable != null) {
+			accio.setExcepcioMessage(ExceptionUtils.getMessage(throwable));
+			accio.setExcepcioStacktrace(ExceptionUtils.getStackTrace(throwable));
+		}
+		addAccio(accio, obtenirUsuari);
+		log.debug("Error d'integracio " + info.getDescripcio() + ": " + errorDescripcio + "(integracioCodi=" + info.getCodi() + ", "
+				+ "parametres=" + info.getParams() + ", tipus=" + info.getTipus() + ", tempsResposta=" + info.getTempsResposta() + ")", throwable);
+	}
 
 	private void addAccio(MonitorIntegracioEntity accio, boolean obtenirUsuari) {
 
