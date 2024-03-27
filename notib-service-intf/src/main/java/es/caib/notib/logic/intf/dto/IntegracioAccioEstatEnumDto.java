@@ -11,5 +11,6 @@ package es.caib.notib.logic.intf.dto;
  */
 public enum IntegracioAccioEstatEnumDto {
 	OK,
-	ERROR
+	ERROR,
+	WARN;
 }

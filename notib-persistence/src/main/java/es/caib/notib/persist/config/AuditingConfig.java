@@ -42,7 +42,7 @@ public class AuditingConfig implements EnvironmentAware {
 				return Optional.empty();
 			}
 
-			var usuari = usuariRepository.getByCodi(authentication.getName());
+			var usuari = usuariRepository.getByCodiReadOnlyNewTransaction(authentication.getName());
 			if (!usuari.isEmpty()) {
 				return usuari;
 			}
