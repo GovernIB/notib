@@ -155,6 +155,8 @@ public class ConversioTipusHelper {
 				}).register();
 
 		mapperFactory.classMap(IntegracioFiltreCommand.class, IntegracioFiltreDto.class)
+				.exclude("dataInici")
+				.exclude("dataFi")
 				.byDefault()
 				.customize(new CustomMapper<IntegracioFiltreCommand, IntegracioFiltreDto>() {
 					@Override
