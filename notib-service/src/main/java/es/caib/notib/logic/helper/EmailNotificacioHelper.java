@@ -42,7 +42,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 		for (var usuariDto : destinataris) {
 			var info = new IntegracioInfo(
 					IntegracioCodiEnum.EMAIL,
-					"Enviament de email per notificació a un destinatari",
+					"Enviament de email per notificació a un destinatari " + notificacio.getId(),
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					new AccioParam("Identificador de la notificacio", String.valueOf(notificacio.getId())),
 					new AccioParam("Destinatari", usuariDto.getNom()),
@@ -81,8 +81,12 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 			usuaris = new HashSet<>();
 			usuaris.add(notificacio.getUsuariCodi());
 		}
+
 		if (usuaris.isEmpty()) {
 			log.error("[EMAIL] No s'han trobat usuaris amb permisos, possible error de Keycloak. Afegit usuari de la notificacio. Usuari: " + notificacio.getUsuariCodi());
+			usuaris.add(notificacio.getUsuariCodi());
+		}
+		if (!usuaris.contains(notificacio.getUsuariCodi())) {
 			usuaris.add(notificacio.getUsuariCodi());
 		}
 		DadesUsuari dadesUsuari;

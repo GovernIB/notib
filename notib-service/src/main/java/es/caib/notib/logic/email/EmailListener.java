@@ -37,7 +37,7 @@ public class EmailListener {
 
         var info = new IntegracioInfo(
                 IntegracioCodiEnum.EMAIL,
-                "Enviament de emails per notificació",
+                "Enviament de emails per notificació " + notificacioId ,
                 IntegracioAccioTipusEnumDto.ENVIAMENT,
                 new AccioParam("Identificador de la notificacio ", String.valueOf(notificacioId)));
 
