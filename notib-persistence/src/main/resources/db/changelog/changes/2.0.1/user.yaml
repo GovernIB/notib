@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - property:
+      dbms: oracle
+      name: varcharUnit
+      value: CHAR
+  - property:
+      dbms: postgresql
+      name: varcharUnit
+      value: ''
+  - changeSet:
+      id: 1665140886758-3
+      author: limit
+      changes:
+        - addColumn:
+            tableName: NOT_USUARI
+            columns:
+              - column:
+                  name: NIF
+                  type: varchar(40 ${varcharUnit})

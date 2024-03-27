@@ -38,6 +38,8 @@ public class UsuariEntity implements Serializable {
 	private String codi;
 	@Column(name = "nom", length = 100)
 	private String nom;
+	@Column(name = "nif", length = 40)
+	private String nif;
 	@Column(name = "llinatges", length = 100)
 	private String llinatges;
 	@Column(name = "nom_sencer", length = 200)
@@ -62,13 +64,15 @@ public class UsuariEntity implements Serializable {
 	@Version
 	private long version = 0;
 
-	public void update(String nom, String llinatges, String email) {
+	public void update(String nom, String llinatges, String nif, String email) {
 		this.nom = nom;
 		this.llinatges = llinatges;
+		this.nif = nif;
 		this.email = email;
 	}
-	public void update(String nomSencer, String email) {
+	public void update(String nomSencer, String nif, String email) {
 		this.nomSencer = nomSencer;
+		this.nif = nif;
 		this.email = email;
 	}
 	
