@@ -111,9 +111,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 				throw new NotFoundException(auth.getName(), DadesUsuari.class);
 			}
 			if (dadesUsuari.getNomSencer() != null) {
-				usuari.update(dadesUsuari.getNomSencer(), dadesUsuari.getEmail());
+				usuari.update(dadesUsuari.getNomSencer(), dadesUsuari.getNif(), dadesUsuari.getEmail());
 			} else {
-				usuari.update(dadesUsuari.getNom(), dadesUsuari.getLlinatges(), dadesUsuari.getEmail());
+				usuari.update(dadesUsuari.getNom(), dadesUsuari.getLlinatges(), dadesUsuari.getNif(), dadesUsuari.getEmail());
 			}
 			cacheHelper.evictUsuariByCodi(usuari.getCodi());
 			permisosCacheable.clearAuthenticationPermissionsCaches(auth);

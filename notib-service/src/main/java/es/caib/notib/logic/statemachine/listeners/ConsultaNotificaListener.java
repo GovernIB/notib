@@ -4,7 +4,9 @@ import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificaService;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.NotibLogger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
@@ -37,7 +39,7 @@ public class ConsultaNotificaListener {
             message.acknowledge();
             return;
         }
-        log.debug("[SM] Rebut consulta d'estat a notifica <" + enviament.getUuid() + ">");
+        NotibLogger.getInstance().info("[SM] Rebut consulta d'estat a notifica <" + enviament.getUuid() + ">", log, LoggingTipus.STATE_MACHINE);
         semaphore.acquire();
         try {
             var success = notificaService.consultaEstatEnviament(enviament);

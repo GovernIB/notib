@@ -98,6 +98,10 @@
 						} else {
 							$('#integracio-excepcioStacktrace').hide();
 						}
+					} else if(data.estat === 'WARN') {
+						$('.integracio-error').show();
+						$('#integracio-errorDescripcio').html(data.errorDescripcio);
+						$('#integracio-excepcioStacktrace').html(data.excepcioStacktrace);
 					} else {
 						$('.integracio-error').hide();
 					}
@@ -204,8 +208,12 @@
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{if estat == 'OK'}}
 							<span class="label label-success"><span class="fa fa-check"></span>&nbsp;{{:estat}}</span>
-						{{else}}
+						{{/if}}
+						{{if estat == 'ERROR'}}
 							<span class="label label-danger" title="{{:excepcioMessage}}"><span class="fa fa-warning"></span>&nbsp;{{:estat}}</span>
+						{{/if}}
+						{{if estat == 'WARN'}}
+							<span class="label label-warning" title="{{:excepcioMessage}}"><span class="fa fa-warning"></span>&nbsp;{{:estat}}</span>
 						{{/if}}
 					</script>
 				</th>

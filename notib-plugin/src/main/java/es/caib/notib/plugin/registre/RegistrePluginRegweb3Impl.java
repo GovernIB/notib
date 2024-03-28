@@ -281,8 +281,11 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			case 13:
 				resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_SIR);
 				break;
+			case 14:
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.ENVIAT_NOTIFICAR);
+				break;
 			default:
-				log.error("AsientoRegistralWs no té un estat conegut estat -> " +  ar.getEstado());
+				log.error("AsientoRegistralWs no te un estat conegut estat -> " +  ar.getEstado());
 				break;
 		}
 		resposta.setEntitatCodi(ar.getEntidadCodigo());

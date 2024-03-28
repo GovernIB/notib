@@ -1,11 +1,11 @@
 package es.caib.notib.logic.statemachine.listeners;
 
 import es.caib.notib.logic.intf.service.EnviamentSmService;
-import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.RegistreService;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
-import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
+import es.caib.notib.logic.utils.NotibLogger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
@@ -13,7 +13,6 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -39,7 +38,7 @@ public class ConsultaSirListener {
             message.acknowledge();
             return;
         }
-        log.debug("[SM] Rebut consulta d'estat a Sir <" + enviament.getUuid() + ">");
+        NotibLogger.getInstance().info("[SM] Rebut consulta d'estat a Sir <" + enviament.getUuid() + ">", log, LoggingTipus.STATE_MACHINE);
         semaphore.acquire();
         try {
             var success = registreService.consultaSir(enviament);

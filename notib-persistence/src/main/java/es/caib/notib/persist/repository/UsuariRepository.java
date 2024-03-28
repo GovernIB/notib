@@ -46,4 +46,5 @@ public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 			"UNION SELECT ng.CODI AS rol FROM NOT_GRUP ng)", nativeQuery = true)
 	Set<String> getNotibRolsDisponibles(@Param("codi") String codi);
 
+	Optional<UsuariEntity> getByCodi(String name);
 }

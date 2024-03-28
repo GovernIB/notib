@@ -9,9 +9,11 @@ import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.service.EnviamentSmServiceImpl;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.statemachine.mappers.ConsultaSirMapper;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +53,7 @@ public class ConsultaSirPoolingAction implements Action<EnviamentSmEstat, Enviam
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
-        log.debug("[SM] ConsultaSirPoolingAction enviament " + enviamentUuid);
+        NotibLogger.getInstance().info("[SM] ConsultaSirPoolingAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
         stateContext.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, reintents+1);
@@ -66,7 +68,7 @@ public class ConsultaSirPoolingAction implements Action<EnviamentSmEstat, Enviam
                     return m;
                 });
 
-        log.debug("[SM] Enviada consulta d'estat SIR per l'enviament amb UUID " + enviamentUuid);
+        NotibLogger.getInstance().info("[SM] Enviada consulta d'estat SIR per l'enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
     }
 
     @Transactional

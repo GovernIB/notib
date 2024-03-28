@@ -143,7 +143,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 	)
 	Page<EnviamentTableEntity> findAmbFiltre(FiltreEnviament filtre, Pageable pageable);
 
-	@Query( "select nenv from EnviamentTableEntity nenv " +
+	@Query( "select nenv.id from EnviamentTableEntity nenv " +
 			"where " +
 			"    (:#{#filtre.entitatIdNull} = true or :#{#filtre.entitatId} = nenv.entitat.id) " +
 			"and (:#{#filtre.isSuperAdmin} = true or " +

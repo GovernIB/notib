@@ -31,8 +31,9 @@ public enum NotificacioRegistreEstatEnumDto implements Serializable {
 	REBUTJAT(10, "RB", "#955959"),		// SIR
 	REENVIAT(11, "RE", "#c1bcbc"),		// SIR
 	DISTRIBUINT(12, "DT", "#c1bcbc"),
-	OFICI_SIR(13, "S", "#c1bcbc");		// SIR
-	
+	OFICI_SIR(13, "S", "#c1bcbc"),		// SIR
+	ENVIAT_NOTIFICAR(14, "EN", "#c1bcbc");
+
 	private Integer numVal;
 	private String budget;
 	private String color;

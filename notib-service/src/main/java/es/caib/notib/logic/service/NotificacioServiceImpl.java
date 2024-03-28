@@ -185,8 +185,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private NotificacioTableMapper notificacioTableMapper;
 	@Autowired
 	protected JmsTemplate jmsTemplate;
-	@Autowired
-	private NotibLogger logger;
 
 	private static final String DELETE = "NotificacioServiceImpl.delete";
 	private static final String UPDATE = "NotificacioServiceImpl.update";
@@ -586,7 +584,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 
-//		logger.info("Consulta taula de remeses ...", log, LoggingTipus.TAULA_REMESES);
+		NotibLogger.getInstance().info("Consulta taula de remeses ...", log, LoggingTipus.TAULA_REMESES);
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);

@@ -2,7 +2,9 @@ package es.caib.notib.logic.statemachine.listeners;
 
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.NotibLogger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
@@ -27,9 +29,9 @@ public class PoolingNotificaListener {
     @JmsListener(destination = SmConstants.CUA_POOLING_ESTAT, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveConsultaSir(@Payload String enviamentUuid, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
-        log.debug("[SM] PoolingNotificaListener enviament " + enviamentUuid);
+        NotibLogger.getInstance().info("[SM] PoolingNotificaListener enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         enviamentSmService.enviamentConsulta(enviamentUuid);
-        log.debug("[SM] Iniciat pooling de consulta d'estat a Notifica de l'enviament amb UUID " + enviamentUuid);
+        NotibLogger.getInstance().info("[SM] Iniciat pooling de consulta d'estat a Notifica de l'enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         message.acknowledge();
     }
 

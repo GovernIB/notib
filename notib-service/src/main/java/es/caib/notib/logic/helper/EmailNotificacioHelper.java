@@ -13,8 +13,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Mètodes per a l'enviament de correus.
@@ -30,63 +32,99 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 
 	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws Exception {
 
+		var info = new IntegracioInfo(IntegracioCodiEnum.EMAIL, "Enviament de emails per notificació " + notificacio.getId(), IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(notificacio.getEntitat().getCodi());
+		info.addParam("Identificador de la notificacio", String.valueOf(notificacio.getId()));
 		var destinataris = obtenirCodiDestinataris(notificacio);
 		if (destinataris == null || destinataris.isEmpty()) {
-			log.info(String.format("La notificació (Id= %d) no té candidats per a enviar el correu electrònic", notificacio.getId()));
-			return "No s'han trobat destinataris";
+			var msg = String.format("La notificació (Id= %d) no té candidats per a enviar el correu electrònic", notificacio.getId());
+			log.info(msg);
+			info.addParam("Resultat", msg);
+			integracioHelper.addAccioError(info, msg);
 		}
 		// TODO: Optimitzar per enviar un únic email
 		int numEnviamentsErronis = 0;
+		StringBuilder error = new StringBuilder();
+		List<Exception> exceptions = new ArrayList<>();
 		for (var usuariDto : destinataris) {
-			var info = new IntegracioInfo(
-					IntegracioCodiEnum.EMAIL,
-					"Enviament de email per notificació a un destinatari",
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					new AccioParam("Identificador de la notificacio", String.valueOf(notificacio.getId())),
-					new AccioParam("Destinatari", usuariDto.getNom()),
-					new AccioParam("Correu electrònic", usuariDto.getEmail()));
-			info.setCodiEntitat(notificacio.getEntitat().getCodi());
 			if (usuariDto.getEmail() == null || usuariDto.getEmail().isEmpty()) {
-				log.error("usuari sense email. Codi: " + usuariDto.getCodi());
-				integracioHelper.addAccioError(info, "Destinatari " + usuariDto.getNom() + " no té email");
+				var msg = "Usuari sense email. Codi: " + usuariDto.getCodi();
+				log.error(msg);
+				info.addParam("Error", msg);
+//				integracioHelper.addAccioError(info, "Destinatari " + usuariDto.getNom() + " no té email");
 				numEnviamentsErronis++;
 				continue;
 			}
-
+			var email = !Strings.isNullOrEmpty(usuariDto.getEmailAlt()) ? usuariDto.getEmailAlt() : usuariDto.getEmail();
+			email = email.replaceAll("\\s+","");
 			try {
-				var email = !Strings.isNullOrEmpty(usuariDto.getEmailAlt()) ? usuariDto.getEmailAlt() : usuariDto.getEmail();
-				email = email.replaceAll("\\s+","");
 				log.info(String.format("Enviant correu notificació (Id= %d) a %s", notificacio.getId(), email));
+				info.addParam("Destinatari", usuariDto.getNom());
+				info.addParam("Correu electrònic", usuariDto.getEmail());
 				sendEmailNotificacio(email, notificacio);
-				integracioHelper.addAccioOk(info);
 			} catch (Exception ex) {
-				log.error("No s'ha pogut avisar per correu electrònic a: " + usuariDto.getNom(), ex);
-				integracioHelper.addAccioError(info, "Error enviant email", ex);
+				var msg = "Error enviant email. No s'ha pogut avisar per correu electrònic a: " + email;
+				log.error(msg, ex);
+				exceptions.add(ex);
+				error.append(msg).append("<br>");
 				numEnviamentsErronis++;
 			}
 		}
-		return numEnviamentsErronis > 0 ? numEnviamentsErronis + " emails de " + destinataris.size() + " han produït error" : "Tots els emails enviats correctament";
+		var resultat = numEnviamentsErronis > 0 ? numEnviamentsErronis + " emails de " + destinataris.size() + " han produït error" : "Tots els emails enviats correctament";
+		info.addParam("Resultat", resultat);
+		if (Strings.isNullOrEmpty(error.toString())) {
+			integracioHelper.addAccioOk(info);
+//		} else if (!Strings.isNullOrEmpty(error.toString()) && numEnviamentsErronis == destinataris.size()) {
+//			integracioHelper.addAccioError(info, error.toString());
+		} else {
+			var msg = "";
+			for (var ex : exceptions) {
+				msg += ex.getMessage() + "&#13;&#10;&#13;&#10;";
+			}
+			integracioHelper.addAccioWarn(info, error.toString(), new Exception(msg));
+		}
+		return resultat;
 	}
 
 	private List<UsuariDto> obtenirCodiDestinataris(NotificacioEntity notificacio) {
 
 		List<UsuariDto> destinataris = new ArrayList<>();
-		var usuaris = notificacio.getProcediment() != null ? procSerHelper.findUsuaris(notificacio) : procSerHelper.findUsuarisAmbPermisReadPerOrgan(notificacio);
+		Set<String> usuaris;
+		try {
+			usuaris = notificacio.getProcediment() != null ? procSerHelper.findUsuaris(notificacio) : procSerHelper.findUsuarisAmbPermisReadPerOrgan(notificacio);
+		} catch (Exception ex) {
+			log.error("[EMAIL] Error al buscar els usuaris amb permisos ", ex);
+			usuaris = new HashSet<>();
+			usuaris.add(notificacio.getUsuariCodi());
+		}
+
+		if (usuaris.isEmpty()) {
+			log.error("[EMAIL] No s'han trobat usuaris amb permisos, possible error de Keycloak. Afegit usuari de la notificacio. Usuari: " + notificacio.getUsuariCodi());
+			usuaris.add(notificacio.getUsuariCodi());
+		}
+		if (!usuaris.contains(notificacio.getUsuariCodi())) {
+			usuaris.add(notificacio.getUsuariCodi());
+		}
 		DadesUsuari dadesUsuari;
 		for (var usuari: usuaris) {
 			dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
 			if (dadesUsuari == null || Strings.isNullOrEmpty(dadesUsuari.getEmail())) {
+				log.error("[EMAIL] Usuari " + usuari + " sense dades per enviar email");
 				continue;
 			}
 			var user = usuariRepository.findById(usuari).orElse(null);
 			var usr = notificacio.getCreatedBy().orElse(null);
 			var codi = usr != null ? usr.getCodi() : null;
-			if (user == null || (user.isRebreEmailsNotificacio() && (!user.isRebreEmailsNotificacioCreats() || user.isRebreEmailsNotificacioCreats() && usuari.equals(codi)))) {
+			if (user == null || !user.isRebreEmailsNotificacioCreats() && !user.isRebreEmailsNotificacio()) {
+				continue;
+			}
+//			if (user == null || (user.isRebreEmailsNotificacio() && (!user.isRebreEmailsNotificacioCreats() || user.isRebreEmailsNotificacioCreats() && usuari.equals(codi)))) {
 				var u = new UsuariDto();
 				u.setCodi(usuari);
+				u.setNom((user != null && !Strings.isNullOrEmpty(user.getNomSencer())) ? user.getNomSencer() : dadesUsuari.getNomSencer());
 				u.setEmail((user != null && !Strings.isNullOrEmpty(user.getEmailAlt())) ? user.getEmailAlt() : dadesUsuari.getEmail());
 				destinataris.add(u);
-			}
+//			}
 		}
 		return destinataris;
 	}

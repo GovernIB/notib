@@ -154,6 +154,15 @@
     </profiles>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -219,6 +228,31 @@
                                 <Implementation-SCM-Branch>${git.branch}</Implementation-SCM-Branch>
                                 <Implementation-SCM-Revision>${git.commit.id}</Implementation-SCM-Revision>
                             </additionalProperties>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resource-one</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/src/test/java/es/caib/notib/logic/statemachine</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>../notib-service/src/main/java/es/caib/notib/logic/statemachine</directory>
+                                    <includes>
+                                        <include>SmConstants.java</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>

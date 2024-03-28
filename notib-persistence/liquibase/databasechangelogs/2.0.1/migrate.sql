@@ -33,3 +33,6 @@ ALTER TABLE not_procediment ADD actiu NUMBER(1) DEFAULT '1';
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.massives.state.machine.inici.delay', '', 'Temps espera (ms) per iniciar cada fila de les notificacions massives.', 'GENERAL', 0, 0, 'INT', 1);
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.massives.maxim.files', '', 'Nombre màxim de files en les notificacions massives', 'GENERAL', 0, 0, 'INT', 1);
 
+-- Changeset db/changelog/changes/2.0.1/user.yaml::1665140886758-3::limit
+ALTER TABLE NOT_USUARI ADD NIF VARCHAR2(40 CHAR);
+

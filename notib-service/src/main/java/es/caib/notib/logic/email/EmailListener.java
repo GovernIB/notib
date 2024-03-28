@@ -35,21 +35,11 @@ public class EmailListener {
                                @Headers MessageHeaders headers,
                                Message message) throws JMSException {
 
-        var info = new IntegracioInfo(
-                IntegracioCodiEnum.EMAIL,
-                "Enviament de emails per notificació",
-                IntegracioAccioTipusEnumDto.ENVIAMENT,
-                new AccioParam("Identificador de la notificacio ", String.valueOf(notificacioId)));
-
         try {
             var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
-            info.setCodiEntitat(notificacio.getEntitat().getCodi());
-            var resultat = emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
-            info.addParam("Resultat", resultat);
-            integracioHelper.addAccioOk(info);
+            emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
         } catch (Exception ex) {
             log.error("Error enviant els emails per la notificacio " + notificacioId, ex);
-            integracioHelper.addAccioError(info, "Error enviant email", ex);
         }
         message.acknowledge();
     }

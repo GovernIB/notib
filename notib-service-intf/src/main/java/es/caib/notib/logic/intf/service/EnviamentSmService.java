@@ -30,16 +30,16 @@ public interface EnviamentSmService {
 
 	void afegirNotificacions();
 
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	boolean afegirNotificacio(Long notificacioId);
 
 	@PreAuthorize("isAuthenticated()")
 	void acquireStateMachine(String uuid);
 
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	boolean canviarEstat(Long enviamentId, String estat);
 
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	boolean enviarEvent(Long enviamentId, String event);
 
 	@PreAuthorize("isAuthenticated()")
