@@ -72,6 +72,12 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
+	public byte[] getJsonOrgansGestorDir3(Long entitatId) {
+		return getDelegateService().getJsonOrgansGestorDir3(entitatId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
 	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) throws Exception {
 		return getDelegateService().predictSyncDir3OrgansGestors(entitatId);
 	}

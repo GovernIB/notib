@@ -72,6 +72,9 @@ public class OrganGestorController extends BaseUserController{
 	private static final String ARBRE_REDIRECT = "redirect:../../../organgestorArbre";
 	private static final String LIST_REDIRECT = "redirect:../../../organgestor";
 
+	private static final String SET_COOKIE = "Set-cookie";
+	private static final String FILE_DOWNLOAD = "fileDownload=true; path=/";
+
 
 	@GetMapping
 	public String get(HttpServletRequest request, Model model) {
@@ -251,6 +254,20 @@ public class OrganGestorController extends BaseUserController{
 					: getModalControllerReturnValueErrorMessageText(request, redirect, ex.getMessage());
 		}
 		return "synchronizationPrediction";
+	}
+
+	@GetMapping(value = "/descarregar/json/organs/dir3")
+	@ResponseBody
+	public void descarregarDiagramaStateMachine(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+		response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
+		try {
+			var entitat = getEntitatActualComprovantPermisos(request);
+			var arxiu = organGestorService.getJsonOrgansGestorDir3(entitat.getId());
+			writeFileToResponse("organsDir3JSON.json", arxiu, response);
+		} catch (Exception ex) {
+			log.debug("Error al obtenir la plantilla de el model de dades CSV de càrrega massiva", ex);
+		}
 	}
 
 	@PostMapping(value = "/saveSynchronize")

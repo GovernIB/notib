@@ -144,6 +144,11 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 	}
 
 	@Override
+	public byte[] findAmbPareJson(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
+		return new byte[0];
+	}
+
+	@Override
 	public List<NodeDir3> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 
 		try {

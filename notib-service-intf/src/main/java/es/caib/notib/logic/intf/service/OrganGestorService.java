@@ -85,6 +85,9 @@ public interface OrganGestorService {
 	Object[] syncDir3OrgansGestors(EntitatDto entitat) throws Exception;
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
+	byte[] getJsonOrgansGestorDir3(Long entitatId);
+
+	@PreAuthorize("hasRole('NOT_ADMIN')")
 	PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) throws Exception;
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")

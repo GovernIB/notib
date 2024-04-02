@@ -984,6 +984,25 @@ public class PluginHelper {
 		return unitatsOrganitzativesFindByPare(entitat.getCodi(), entitat.getDir3Codi(), null, null);
 	}
 
+	public byte[] unitatsOrganitzativesFindByPareJSON(String entitatCodi, String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) {
+
+		var info = new IntegracioInfo(IntegracioCodiEnum.UNITATS, "Obtenier llista JSON d'unitats donat un pare", IntegracioAccioTipusEnumDto.ENVIAMENT,
+				new AccioParam("unitatPare", pareCodi));
+		try {
+			ConfigHelper.setEntitatCodi(entitatCodi);
+			info.setCodiEntitat(entitatCodi);
+			var unitatsOrganitzatives = getUnitatsOrganitzativesPlugin().findAmbPareJson(pareCodi, dataActualitzacio, dataSincronitzacio);
+			integracioHelper.addAccioOk(info);
+			return unitatsOrganitzatives;
+		} catch (SistemaExternException sex) {
+			throw sex;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'unitats organitzatives";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioCodiEnum.UNITATS.name(), errorDescripcio, ex);
+		}
+	}
+
 	public List<NodeDir3> unitatsOrganitzativesFindByPare(String entitatCodi, String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) {
 
 		var info = new IntegracioInfo(IntegracioCodiEnum.UNITATS, "Consulta llista d'unitats donat un pare", IntegracioAccioTipusEnumDto.ENVIAMENT,

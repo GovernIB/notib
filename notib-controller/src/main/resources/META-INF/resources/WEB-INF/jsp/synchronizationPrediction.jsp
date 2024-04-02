@@ -23,6 +23,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
 	<script src="<c:url value="/js/printThis.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<script src="<c:url value='/js/FileSaver.min.js'/>"></script>
 	<not:modalHead />
 	<script>
 		var itervalProgres;
@@ -162,6 +163,17 @@
 		}
 
 		let crearPdf = () => $('#divPredict').printThis();
+
+		let getOrgansJson = () => {
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value='/organgestor/descarregar/json/organs/dir3'/>",
+				success: function (data) {
+					var blob = new Blob([data], {type: "text/plain;charset=utf-8"});
+					saveAs(blob, "organsDir3.json");
+				}
+			});
+		}
 
 	</script>
 	<style type="text/css">
@@ -572,21 +584,23 @@
 	<div id="actualitzacioInfo" class="info">
 		<span id="bcursor" class="blinking-cursor">|</span>
 	</div>
-
-	<c:set var="formAction">
-		<not:modalUrl value="/organgestor/saveSynchronize" />
-	</c:set>
-	<form:form id="formSync" action="${formAction}" method="post" cssClass="form-horizontal" role="form">
-		<div id="modal-botons">
-			<a id="pdfBtn" class="btn btn-default" onclick="crearPdf()"><spring:message code="comu.boto.descarregar.pdf" /></a>
+	<div id="modal-botons">
+		<a onclick="getOrgansJson()" class="btn btn-info btn-sm fileDownloadSimpleRichExperience" title="<spring:message code="organgestor.list.boto.descarregar.json.dir3"/>">
+			<spring:message code="organgestor.list.boto.descarregar.json.dir3"/><span class="fa fa-download"></span>
+		</a>
+		<a id="pdfBtn" class="btn btn-default" onclick="crearPdf()"><spring:message code="comu.boto.descarregar.pdf" /></a>
+		<c:set var="formAction">
+			<not:modalUrl value="/organgestor/saveSynchronize" />
+		</c:set>
+		<form:form id="formSync" action="${formAction}" method="post" cssClass="form-horizontal" role="form">
 			<button id="autobtn" type="submit" class="btn btn-success" data-noloading="true"
 				<c:if test="${isAllEmpty and !isFirstSincronization}"><c:out value="disabled='disabled'"/></c:if>>
 				<span class="fa fa-save"></span>
 				<spring:message code="organgestor.list.boto.synchronize" />
 			</button>
 			<a id="cancelbtn" style="display: none !important;" class="btn btn-default" onclick="dismissFunction()" data-modal-cancel="false"><spring:message code="comu.boto.cancelar" /></a>
-		</div>
-	</form:form>
+		</form:form>
+	</div>
 
 </body>
-</html>
+</html	>

@@ -19,6 +19,7 @@ import es.caib.notib.logic.helper.ProcSerSyncHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.Arbre;
 import es.caib.notib.logic.intf.dto.ArbreNode;
+import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
@@ -632,6 +633,17 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			});
 		}
 		return unitats;
+	}
+
+	@Override
+	public byte[] getJsonOrgansGestorDir3(Long entitatId) {
+
+		var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+		try {
+			return pluginHelper.unitatsOrganitzativesFindByPareJSON(entitat.getCodi(), entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
+		} catch (Exception ex) {
+			throw new SistemaExternException(IntegracioCodiEnum.UNITATS.name(), "No ha estat possible el json dels organs gestors del DIR3", ex);
+		}
 	}
 
 	@SuppressWarnings({"deprecation", "unchecked"})

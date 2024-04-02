@@ -37,7 +37,9 @@ public interface UnitatsOrganitzativesPlugin {
 			Date fechaActualizacion,
 			Date fechaSincronizacion) throws SistemaExternException;
 
-	/**
+    byte[] findAmbPareJson(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException;
+
+    /**
 	 * Retorna la llista d'unitats organitzatives filles donada
 	 * una unitat pare.
 	 * If you put fechaActualizacion==null and fechaSincronizacion==null it returns all unitats that are now vigent (current tree)

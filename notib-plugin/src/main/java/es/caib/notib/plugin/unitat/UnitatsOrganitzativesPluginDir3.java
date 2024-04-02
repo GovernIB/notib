@@ -145,6 +145,22 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	}
 
 	@Override
+	public byte[] findAmbPareJson(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
+		try {
+			DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			List<NodeDir3> unitats = new ArrayList<>();
+			List<UnitatOrganitzativa> unidades = new ArrayList<>();
+			var url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerArbolUnidades?codigo=" + pareCodi + "&denominacionCooficial=false" +
+					(dataActualitzacio != null ? FECHA_ACT_PARAM + sdf.format(dataActualitzacio) : "") +
+					(dataSincronitzacio != null ? FECHA_SINC_PARAM + sdf.format(dataSincronitzacio) : ""));
+			byte[] response = getResponse(url);
+			return response;
+		} catch (Exception ex) {
+			throw new SistemaExternException("No s'han pogut consultar les unitats organitzatives via WS (pareCodi=" + pareCodi + ")", ex);
+		}
+	}
+
+	@Override
 	public List<NodeDir3> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 
 		try {
