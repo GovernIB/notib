@@ -191,8 +191,8 @@ public class IntegracioHelper {
 		var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
 		info.setAplicacio(usuariCodi);
 		if (entitatId == null) {
-			var msg = "No existeix una aplicació amb el codi '" + usuariCodi;
-			info.getParams().add(new AccioParam("Codi aplicació", msg));
+			log.error("La entitat no pot ser null. Afegit el codi d'usari loguejat com a codi d'aplicació");
+			info.getParams().add(new AccioParam("Codi aplicació", usuariCodi));
 			return;
 		}
 		var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuariCodi, entitatId);

@@ -799,7 +799,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			// Consutla justificant
 			if (dadesConsulta.isAmbJustificant()) {
 				RespostaJustificantRecepcio justificant = pluginHelper.obtenirJustificant(notificacio.getEmisorDir3Codi(), numeroRegistreFormatat);
-				integracioHelper.addAplicacioAccioParam(info, null);
+				var entitatId = notificacio.getEntitat() != null ? notificacio.getEntitat().getId() : null;
+				integracioHelper.addAplicacioAccioParam(info, entitatId);
 				if (justificant.getErrorCodi() == null || "OK".equals(justificant.getErrorCodi())) {
 					resposta.setJustificant(justificant.getJustificant());
 				} else {
