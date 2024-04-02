@@ -21,6 +21,7 @@ public class SmConstants {
 //    public static final String CALLBACK_SIR_ACTIU = "ex_callback_sir";
     public static final String CONSULTA_POOLING = "ex_pooling";
     public static final String ENVIAMENT_REINTENTS = "ex_reintents";
+    public static final String CONSULTA_SIR_POOLING_DATA_INICI = "ex_sir_pooling_data_inici";
     // Número màxim de reintents per acció
     public static final String RG_MAX_REINTENTS = "ex_rg_max_reintents";
     public static final String NT_MAX_REINTENTS = "ex_nt_max_reintents";

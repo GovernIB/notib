@@ -25,7 +25,7 @@ import java.util.Date;
 @Slf4j
 @Getter
 @Setter
-public class NotificacioFiltreCommand {
+public class NotificacioFiltreCommand extends FiltreCommand {
 	
 	private Long entitatId;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;

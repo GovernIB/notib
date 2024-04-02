@@ -101,10 +101,10 @@ public class RegistreHelper {
 			log.error(errorPrefix, ex);
 		}
 		var errorMaxReintents = false;
-//		if (error) {
+		if (error) {
 			enviament.updateSirNovaConsulta(pluginHelper.getConsultaSirReintentsPeriodeProperty());
 			errorMaxReintents = enviament.getSirConsultaIntent() >= pluginHelper.getConsultaSirReintentsMaxProperty();
-//		}
+		}
 		notificacioEventHelper.addSirConsultaEvent(enviament, error, errorDescripcio, errorMaxReintents);
 		if (canviEstat || error && !errorUltimaConsulta || !error && errorUltimaConsulta) {
 			callbackHelper.updateCallback(enviament, error, errorDescripcio);

@@ -128,6 +128,11 @@ public class NotificacioEventHelper {
                 .error(error).errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
     }
 
+    public void addSirConsultaEventFiPooling(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+
+        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.SIR_CONSULTA)
+                .error(error).errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
+    }
 
     // Events de Notifica
     // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

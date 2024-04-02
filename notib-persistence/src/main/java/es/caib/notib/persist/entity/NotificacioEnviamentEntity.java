@@ -226,6 +226,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "sir_con_intent")
 	protected int sirConsultaIntent;
+
+	@Column(name="sir_fi_pooling")
+	private boolean sirFiPooling;
 	
 	@Column(name = "sir_rec_data")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -454,6 +457,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	
 	public void refreshSirConsulta() {
 		this.sirConsultaIntent = 0;
+		this.sirFiPooling = false;
 		this.sirConsultaData = new Date();
 	}
 	

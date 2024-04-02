@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.Date;
 
 /**
  * Implementació del servei de gestió de enviaments.
@@ -525,6 +526,8 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		sm.getExtendedState().getVariables().put(SmConstants.CONSULTA_SIR_POOLING_DATA_INICI, new Date());
+		//actualitzar la data pk torni a entrar
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_RESET);
 		return sm;
 	}

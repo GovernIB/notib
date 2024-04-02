@@ -5,6 +5,7 @@ import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.EnviamentTableHelper;
 import es.caib.notib.logic.helper.NotificacioEventHelper;
 import es.caib.notib.logic.helper.PropertiesConstants;
+import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.annotation.Backoff;
@@ -30,6 +32,9 @@ import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Slf4j
 @Component
@@ -49,6 +54,7 @@ public class ConsultaSirPoolingAction implements Action<EnviamentSmEstat, Enviam
     private EnviamentSmService enviamentSmService;
 
     @Override
+    @Transactional
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 30000, multiplier = 10, maxDelay = 3600000))
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
@@ -56,13 +62,22 @@ public class ConsultaSirPoolingAction implements Action<EnviamentSmEstat, Enviam
         NotibLogger.getInstance().info("[SM] ConsultaSirPoolingAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
-        stateContext.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, reintents+1);
-        jmsTemplate.convertAndSend(
-                SmConstants.CUA_CONSULTA_SIR,
-                ConsultaSirRequest.builder()
-                        .consultaSirDto(consultaSirMapper.toDto(enviament))
-                        .numIntent(reintents + 1)
-                        .build(),
+        var poolingDataInici = (Date) stateContext.getExtendedState().getVariables().get(SmConstants.CONSULTA_SIR_POOLING_DATA_INICI);
+        var ara = new Date();
+        if (poolingDataInici == null) {
+            stateContext.getExtendedState().getVariables().put(SmConstants.CONSULTA_SIR_POOLING_DATA_INICI, ara);
+        } else {
+            var dies = configHelper.getConfigAsInteger("es.caib.notib.consulta.sir.dies.intents");
+            var diesPooling = DateUtils.addDays(poolingDataInici, dies);
+            if (ara.after(diesPooling)) {
+                NotibLogger.getInstance().info("[SM] Enviament " + enviamentUuid + " ha superat el maxim de dies de pooling. No es consultara mes.", log, LoggingTipus.STATE_MACHINE);
+                enviament.setSirFiPooling(true);
+                notificacioEventHelper.addSirConsultaEventFiPooling(enviament, false, "", true);
+                return;
+            }
+        }
+        var consulta = ConsultaSirRequest.builder().consultaSirDto(consultaSirMapper.toDto(enviament)).numIntent(reintents + 1).build();
+        jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_SIR, consulta,
                 m -> {
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, refrescarPeriode());
                     return m;
