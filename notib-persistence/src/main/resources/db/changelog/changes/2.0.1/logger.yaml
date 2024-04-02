@@ -3,19 +3,7 @@ databaseChangeLog:
       id: 1665140886758-2
       author: limit
       changes:
-        - insert:
-            tableName: NOT_CONFIG_TYPE
-            columns:
-              - column:
-                  name: CODE
-                  value: 'GENERAL'
-              - column:
-                  name: POSITION
-                  value: 0
-              - column:
-                  name:
-                  value:
-        - sql : "INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.TAULA_REMESES', 'false', 'Mostrar logs de la taula de remeses', 'LOGS', 0, 1, 'BOOL', 0);
+        - sql : "INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.TAULA_REMESES', 'false', 'Mostrar logs de la taula de remeses', 'LOGS', 0, 0, 'BOOL', 0);
         INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.GENERIC', 'false', 'Mostrar logs generics', 'LOGS', 0, 0, 'BOOL', 0);
         INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.CALLBACK', 'false', 'Mostrar logs dels callbacks', 'LOGS', 0, 2, 'BOOL', 0);
         INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.REGISTRE', 'false', 'Mostrar logs de registre', 'LOGS', 0, 3, 'BOOL', 0);
