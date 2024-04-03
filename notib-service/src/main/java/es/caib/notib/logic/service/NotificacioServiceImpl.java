@@ -473,6 +473,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 					dto.getNotificacionsMovilErrorDesc().add(eventNotMovil.getErrorDescripcio());
 					env.setNotificacioMovilErrorDesc(eventNotMovil.getErrorDescripcio());
 				}
+				if (env.isSirFiPooling()) {
+					env.setFiReintents(true);
+					env.setFiReintentsDesc(messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + NotificacioEventTipusEnumDto.SIR_FI_POOLING));
+				}
 				callback = callbackRepository.findByEnviamentIdAndEstat(env.getId(), CallbackEstatEnumDto.ERROR);
 				if (callback == null) {
 					continue;
@@ -507,7 +511,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				int env = 1;
 				for (var event : lastErrorEvent) {
 					msg = messageHelper.getMessage("notificacio.event.fi.reintents");
-					tipus = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + event.getTipus());
+					var et = NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(event.getTipus()) && event.getEnviament().isSirFiPooling() ? NotificacioEventTipusEnumDto.SIR_FI_POOLING : event.getTipus();
+					tipus = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + et);
 					m.append("Env ").append(env).append(": ").append(msg).append(" -> ").append(tipus).append("\n");
 					env++;
 				}

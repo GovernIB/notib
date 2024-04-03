@@ -723,12 +723,18 @@ public class EnviamentServiceImpl implements EnviamentService {
 			enviamentDto.setCallbackData(callback.getData() != null ? df.format(callback.getData()) : null);
 		}
 		var event = enviament.getNotificacioErrorEvent();
-		if (event != null && event.getFiReintents()) {
+		if (enviament.isSirFiPooling()) {
+			enviamentDto.setFiReintents(true);
+			var msg = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + NotificacioEventTipusEnumDto.SIR_FI_POOLING);
+			enviamentDto.setFiReintentsDesc(msg);
+
+		} else if (event != null && event.getFiReintents()) {
 			enviamentDto.setFiReintents(true);
 			var msg = messageHelper.getMessage("notificacio.event.fi.reintents");
 			var tipus = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + event.getTipus());
 			enviamentDto.setFiReintentsDesc(msg + " -> " + tipus);
 		}
+
 		var e = notificacioEventRepository.findLastApiCarpetaByEnviamentId(enviament.getId());
 		if (e != null && e.isError()) {
 			enviamentDto.setNotificacioMovilErrorDesc(e.getErrorDescripcio());

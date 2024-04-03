@@ -8,6 +8,7 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum NotificacioEventTipusEnumDto implements Serializable {
+
 	REGISTRE_ENVIAMENT,
 	SIR_ENVIAMENT,
 	SIR_CONSULTA,
@@ -17,7 +18,8 @@ public enum NotificacioEventTipusEnumDto implements Serializable {
 	ADVISER_DATAT,
 	EMAIL_ENVIAMENT,
 	CALLBACK_ENVIAMENT,
-	API_CARPETA
+	API_CARPETA,
+	SIR_FI_POOLING;
 //	NOTIFICA_ENVIAMENT,  // 0			// Enviar notificacions a Notifica
 //	NOTIFICA_CALLBACK_DATAT,			// Rebre adviser amb datat
 //	NOTIFICA_CALLBACK_CERTIFICACIO,		// Rebre adviser amb certificació

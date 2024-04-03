@@ -5,6 +5,7 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.NotificacioListHelper;
 import es.caib.notib.logic.helper.NotificacioTableHelper;
+import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -222,11 +223,13 @@ public abstract class NotificacioTableMapper {
     }
 
     private String getCallbackError(NotificacioTableItemDto dto) {
-            int callbackFiReintents = eventRepository.countEventCallbackAmbFiReintentsByNotificacioId(dto.getId());
+
+        int callbackFiReintents = eventRepository.countEventCallbackAmbFiReintentsByNotificacioId(dto.getId());
         return callbackFiReintents > 0 ? " <span class=\"fa fa-warning text-info\" title=\"" + getMessage + "callback.fi.reintents" + fiGetMessage + "\"></span>" : "";
     }
 
     private String getFiReintentsError(NotificacioTableItemDto dto) {
+
         List<NotificacioEventEntity> lastErrorEvent = eventRepository.findEventsAmbFiReintentsByNotificacioId(dto.getId());
         StringBuilder fiReintentsError = new StringBuilder();
         if (lastErrorEvent != null && !lastErrorEvent.isEmpty()) {
@@ -234,7 +237,8 @@ public abstract class NotificacioTableMapper {
             String tipus;
             int env = 1;
             for (var event : lastErrorEvent) {
-                tipus = getMessage + "es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + event.getTipus() + fiGetMessage;
+                var et = NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(event.getTipus()) && event.getEnviament().isSirFiPooling() ? NotificacioEventTipusEnumDto.SIR_FI_POOLING : event.getTipus();
+                tipus = getMessage + "es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + et + fiGetMessage;
                 fiReintentsError.append("Env ").append(env++).append(": ").append(msg).append(" -> ").append(tipus).append("\n");
             }
         }

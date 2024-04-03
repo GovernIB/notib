@@ -41,6 +41,7 @@ public class EnviamentInfo extends NotificacioEnviamentDatatableDto{
 	protected int sirConsultaIntent;
 	private Date sirRecepcioData;
 	private Date sirRegDestiData;
+	private boolean sirFiPooling;
 	private int registreNumero;
 	private Date registreData;
 

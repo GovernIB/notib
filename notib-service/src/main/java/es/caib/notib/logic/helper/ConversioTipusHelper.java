@@ -508,10 +508,18 @@ public class ConversioTipusHelper {
 				dto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
 				if (Boolean.TRUE.equals(event.getFiReintents())) {
 					var msg = messageHelper.getMessage("notificacio.event.fi.reintents");
-					var tipus = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + event.getTipus());
+					var et = NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(event.getTipus()) && entity.isSirFiPooling() ? NotificacioEventTipusEnumDto.SIR_FI_POOLING : event.getTipus();
+					var tipus = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + et);
 					dto.setFiReintents(event.getFiReintents());
 					dto.setFiReintentsDesc(msg + " -> " + tipus);
 				}
+			}
+
+			if (entity.isSirFiPooling()) {
+				dto.setFiReintents(true);
+				var msg = messageHelper.getMessage("notificacio.event.fi.reintents");
+				var tipus = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + NotificacioEventTipusEnumDto.SIR_FI_POOLING);
+				dto.setFiReintentsDesc(msg + " -> " + tipus);
 			}
 			var callback = callbackRepository.findByEnviamentIdAndEstat(dto.getId(), CallbackEstatEnumDto.ERROR);
 			if (callback == null) {
