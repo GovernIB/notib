@@ -286,27 +286,6 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.proCodi == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.proCodi == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="procedimentTipus" data-visible="false"></th>
-				<th data-col-name="procedimentCodiNom" data-template="#cellProcedimentTemplate" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codiprocediment"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="codiProcediment" value="${filtreEnviaments.codiProcediment}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codiprocediment"/>"/>
-						</div>
-					</script>
-					<script id="cellProcedimentTemplate" type="text/x-jsrender">
-						{{if procedimentTipus == 'PROCEDIMENT'}}<span class="label label-primary">P</span>{{/if}}
-						{{if procedimentTipus == 'SERVEI'}}<span class="label label-warning">S</span>{{/if}}
-						{{:procedimentCodiNom}}
-					</script>
-				</th>
-				<c:choose>
 					<c:when test = "${columnes.grupCodi == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
@@ -341,6 +320,27 @@ function getCookie(cname) {
 						{{if organEstat != 'V'}}
 							<span class="fa fa-warning text-danger" title="<spring:message code='enviament.list.organGestor.obsolet'/>"></span>{{/if}}
  					</script>
+				</th>
+				<c:choose>
+					<c:when test = "${columnes.proCodi == true}">
+						<c:set value="true" var="visible"></c:set>
+					</c:when>
+					<c:when test = "${columnes.proCodi == false}">
+						<c:set value="false" var="visible"></c:set>
+					</c:when>
+				</c:choose>
+				<th data-col-name="procedimentTipus" data-visible="false"></th>
+				<th data-col-name="procedimentCodiNom" data-template="#cellProcedimentTemplate" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codiprocediment"/>
+					<script type="text/x-jsrender">
+						<div class="from-group">
+							<input name="codiProcediment" value="${filtreEnviaments.codiProcediment}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codiprocediment"/>"/>
+						</div>
+					</script>
+					<script id="cellProcedimentTemplate" type="text/x-jsrender">
+						{{if procedimentTipus == 'PROCEDIMENT'}}<span class="label label-primary">P</span>{{/if}}
+						{{if procedimentTipus == 'SERVEI'}}<span class="label label-warning">S</span>{{/if}}
+						{{:procedimentCodiNom}}
+					</script>
 				</th>
 				<c:choose>
 					<c:when test = "${columnes.usuari == true}">
