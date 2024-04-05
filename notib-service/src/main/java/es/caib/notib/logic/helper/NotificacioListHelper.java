@@ -88,7 +88,12 @@ public class NotificacioListHelper {
 
         OrganGestorEntity organGestor = null;
         if (f.getOrganGestor() != null && !f.getOrganGestor().isEmpty()) {
-            organGestor = organGestorRepository.findById(Long.valueOf(f.getOrganGestor())).orElse(null);
+            try {
+                var id = Long.valueOf(f.getOrganGestor());
+                organGestor = organGestorRepository.findById(id).orElse(null);
+            } catch (NumberFormatException ex) {
+                organGestor = organGestorRepository.findByCodi(f.getOrganGestor());
+            }
         }
         ProcSerEntity procediment = null;
         if (f.getProcedimentId() != null) {
