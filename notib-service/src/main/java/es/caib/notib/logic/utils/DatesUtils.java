@@ -5,9 +5,9 @@ import java.util.Date;
 
 public class DatesUtils {
 
-    public static Date incrementarDataFiSiMateixDia(Date dataInici, Date dataFi) {
+    public static Date incrementarDataFi(Date dataFi) {
 
-        if (dataInici== null || !dataInici.equals(dataFi)) {
+        if (dataFi == null) {
             return dataFi;
         }
         Calendar cal = Calendar.getInstance();
