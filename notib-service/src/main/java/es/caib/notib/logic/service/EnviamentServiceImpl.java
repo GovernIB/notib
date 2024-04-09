@@ -217,9 +217,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 			log.info("Consulta ids d'enviament, accions massives");
 			entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
 			var f = getFiltre(entitatId, filtre, usuariCodi, rol, organGestorCodi);
-			f.setDataEnviamentFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataEnviamentInici(), f.getDataEnviamentFi()));
-			f.setDataProgramadaDisposicioFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataProgramadaDisposicioInici(), f.getDataProgramadaDisposicioFi()));
-			f.setDataCaducitatFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataCaducitatInici(), f.getDataCaducitatFi()));
+			f.setDataEnviamentFi(DatesUtils.incrementarDataFi(f.getDataEnviamentFi()));
+			f.setDataProgramadaDisposicioFi(DatesUtils.incrementarDataFi(f.getDataProgramadaDisposicioFi()));
+			f.setDataCaducitatFi(DatesUtils.incrementarDataFi(f.getDataCaducitatFi()));
 			return enviamentTableRepository.findIdsAmbFiltre(f);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -284,9 +284,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 			mapeigPropietatsOrdenacio.put("referenciaNotificacio", new String[] {"referenciaNotificacio"});
 
 			var f = getFiltre(entitatId, filtre, usuariCodi, rol, organGestorCodi);
-			f.setDataEnviamentFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataEnviamentInici(), f.getDataEnviamentFi()));
-			f.setDataCaducitatFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataCaducitatInici(), f.getDataCaducitatFi()));
-			f.setDataProgramadaDisposicioFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataProgramadaDisposicioInici(), f.getDataProgramadaDisposicioFi()));
+			f.setDataEnviamentFi(DatesUtils.incrementarDataFi(f.getDataEnviamentFi()));
+			f.setDataCaducitatFi(DatesUtils.incrementarDataFi(f.getDataCaducitatFi()));
+			f.setDataProgramadaDisposicioFi(DatesUtils.incrementarDataFi(f.getDataProgramadaDisposicioFi()));
 			setOrdresCampsCompostos(paginacioParams);
 			var pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
  			var pageEnviaments = enviamentTableRepository.findAmbFiltre(f, pageable);

@@ -596,7 +596,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var rols = aplicacioService.findRolsUsuariActual();
 			filtre.setOrganGestor(organGestorCodi);
 			var f = notificacioListHelper.getFiltre(filtre, entitatId, rol, usuariCodi, rols);
-			f.setDataFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataInici(), f.getDataFi()));
+			f.setDataFi(DatesUtils.incrementarDataFi(f.getDataFi()));
 			var notificacions = notificacioTableViewRepository.findAmbFiltre(f, pageable);
 			var dtos = notificacioTableMapper.toNotificacionsTableItemDto(
 					notificacions.getContent(),
@@ -616,7 +616,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var rols = aplicacioService.findRolsUsuariActual();
 			filtre.setOrganGestor(organGestorCodi);
 			var f = notificacioListHelper.getFiltre(filtre, entitatId, rol, usuariCodi, rols);
-			f.setDataFi(DatesUtils.incrementarDataFiSiMateixDia(f.getDataInici(), f.getDataFi()));
+			f.setDataFi(DatesUtils.incrementarDataFi(f.getDataFi()));
 			return notificacioTableViewRepository.findIdsAmbFiltre(f);
 		} finally {
 			log.error("Eror obtinguent els ids amb filtre de les remeses")
