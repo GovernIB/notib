@@ -289,7 +289,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 			f.setDataEnviamentFi(DatesUtils.incrementarDataFi(f.getDataEnviamentFi()));
 			f.setDataCaducitatFi(DatesUtils.incrementarDataFi(f.getDataCaducitatFi()));
 			f.setDataProgramadaDisposicioFi(DatesUtils.incrementarDataFi(f.getDataProgramadaDisposicioFi()));
-			setOrdresCampsCompostos(paginacioParams);
 			var pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
  			var pageEnviaments = enviamentTableRepository.findAmbFiltre(f, pageable);
 			if(pageEnviaments == null || !pageEnviaments.hasContent()) {
