@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Calendar;
 import java.util.Map;
 
 
@@ -61,7 +60,7 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 			var pageable = paginacioHelper.toSpringDataPageable(paginacio);
 			var entitatCodiNull = Strings.isNullOrEmpty(filtre.getEntitatCodi());
 			var appNull = Strings.isNullOrEmpty(filtre.getAplicacio());
-			filtre.setDataFi(DatesUtils.incrementarDataFiSiMateixDia(filtre.getDataInici(), filtre.getDataFi()));
+			filtre.setDataFi(DatesUtils.incrementarDataFi(filtre.getDataFi()));
 
 			var f = FiltreMonitorIntegracio.builder()
 					.codi(codi)

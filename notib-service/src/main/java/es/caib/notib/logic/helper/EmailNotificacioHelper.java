@@ -35,7 +35,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 		var info = new IntegracioInfo(IntegracioCodiEnum.EMAIL, "Enviament de emails per notificació " + notificacio.getId(), IntegracioAccioTipusEnumDto.ENVIAMENT);
 		info.setCodiEntitat(notificacio.getEntitat().getCodi());
 		info.addParam("Identificador de la notificacio", String.valueOf(notificacio.getId()));
-		var destinataris = obtenirCodiDestinataris(notificacio);
+		var destinataris = obtenirCodiDestinataris(notificacio, info);
 		if (destinataris == null || destinataris.isEmpty()) {
 			var msg = String.format("La notificació (Id= %d) no té candidats per a enviar el correu electrònic", notificacio.getId());
 			log.info(msg);
@@ -60,8 +60,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 			email = email.replaceAll("\\s+","");
 			try {
 				log.info(String.format("Enviant correu notificació (Id= %d) a %s", notificacio.getId(), email));
-				info.addParam("Destinatari", usuariDto.getNom());
-				info.addParam("Correu electrònic", usuariDto.getEmail());
+				info.addParam(usuariDto.getCodi(), "Enviant correu electrònic a " + usuariDto.getNom() + " - " + usuariDto.getEmail());
 				sendEmailNotificacio(email, notificacio);
 			} catch (Exception ex) {
 				var msg = "Error enviant email. No s'ha pogut avisar per correu electrònic a: " + email;
@@ -87,7 +86,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 		return resultat;
 	}
 
-	private List<UsuariDto> obtenirCodiDestinataris(NotificacioEntity notificacio) {
+	private List<UsuariDto> obtenirCodiDestinataris(NotificacioEntity notificacio, IntegracioInfo info) {
 
 		List<UsuariDto> destinataris = new ArrayList<>();
 		Set<String> usuaris;
@@ -106,26 +105,25 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 		if (!usuaris.contains(notificacio.getUsuariCodi())) {
 			usuaris.add(notificacio.getUsuariCodi());
 		}
-		DadesUsuari dadesUsuari;
+		DadesUsuari dadesUsuari = null;
 		for (var usuari: usuaris) {
-			dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
-			if (dadesUsuari == null || Strings.isNullOrEmpty(dadesUsuari.getEmail())) {
-				log.error("[EMAIL] Usuari " + usuari + " sense dades per enviar email");
-				continue;
+			try {
+				dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
+			} catch (Exception ex) {
+				log.error("[EMAIL] Error al consultar l'usuari", ex);
 			}
 			var user = usuariRepository.findById(usuari).orElse(null);
 			var usr = notificacio.getCreatedBy().orElse(null);
 			var codi = usr != null ? usr.getCodi() : null;
-			if (user == null || !user.isRebreEmailsNotificacioCreats() && !user.isRebreEmailsNotificacio()) {
-				continue;
-			}
-//			if (user == null || (user.isRebreEmailsNotificacio() && (!user.isRebreEmailsNotificacioCreats() || user.isRebreEmailsNotificacioCreats() && usuari.equals(codi)))) {
+			if (user == null || (user.isRebreEmailsNotificacio() && (!user.isRebreEmailsNotificacioCreats() || user.isRebreEmailsNotificacioCreats() && usuari.equals(codi)))) {
 				var u = new UsuariDto();
 				u.setCodi(usuari);
-				u.setNom((user != null && !Strings.isNullOrEmpty(user.getNomSencer())) ? user.getNomSencer() : dadesUsuari.getNomSencer());
-				u.setEmail((user != null && !Strings.isNullOrEmpty(user.getEmailAlt())) ? user.getEmailAlt() : dadesUsuari.getEmail());
+				u.setNom(dadesUsuari != null ? dadesUsuari.getNomSencer() : user != null && !Strings.isNullOrEmpty(user.getNomSencer()) ? user.getNomSencer() : "");
+				u.setEmail(dadesUsuari != null ? dadesUsuari.getEmail() : user != null && !Strings.isNullOrEmpty(user.getEmailAlt()) ? user.getEmailAlt() : usuari + "@caib.es");
 				destinataris.add(u);
-//			}
+			} else {
+				info.addParam(usuari, "No té activat l'enviament per correu electrònic");
+			}
 		}
 		return destinataris;
 	}
