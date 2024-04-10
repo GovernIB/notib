@@ -41,6 +41,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 			log.info(msg);
 			info.addParam("Resultat", msg);
 			integracioHelper.addAccioError(info, msg);
+			return msg;
 		}
 		// TODO: Optimitzar per enviar un únic email
 		int numEnviamentsErronis = 0;
