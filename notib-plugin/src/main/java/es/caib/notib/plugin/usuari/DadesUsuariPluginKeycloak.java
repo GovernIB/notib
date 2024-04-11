@@ -133,7 +133,6 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 	@Override
 	public String[] getUsernamesByRol(String rol) throws Exception {
 
-		logInfo("fooooooooooooooooo");
 		Set<String> usernamesClientApp = null;
 		Set<String> usernamesClientPersons = null;
 		Set<String> usersRealm = null;
@@ -142,7 +141,7 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 			usernamesClientApp = this.getUsernamesByRolOfClient(rol, appClient);
 			logInfo("[Keycloak] Usuaris pel rol " + rol + " amb el client d'aplicacio " + appClient + " : " + usernamesClientApp);
 		} catch (Exception ex) {
-			logError("No s'han obtingut usuaris per client d'aplicació", ex);
+			logError("No s'han obtingut usuaris per client d'aplicació amb el rol " + rol, ex);
 //			log.error("No s'han obtingut usuaris per client d'aplicació", ex);
 		}
 		try {
@@ -150,7 +149,7 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 			usernamesClientPersons = this.getUsernamesByRolOfClient(rol, personsClient);
 			logInfo("[Keycloak] Usuaris pel rol " + rol + " amb el client de persones " + personsClient + " : " + usernamesClientPersons);
 		} catch (Exception ex) {
-			logError("No s'han obtingut usuaris per client de persones", ex);
+			logError("No s'han obtingut usuaris per client de persones amb el rol " + rol, ex);
 //			log.error("No s'han obtingut usuaris per client de persones", ex);
 		}
 		try {
