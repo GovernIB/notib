@@ -2,10 +2,7 @@ package es.caib.notib.logic.utils;
 
 import com.google.common.base.Strings;
 import es.caib.notib.logic.helper.ConfigHelper;
-import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.objectes.LoggingTipus;
-import es.caib.notib.persist.repository.config.ConfigRepository;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;

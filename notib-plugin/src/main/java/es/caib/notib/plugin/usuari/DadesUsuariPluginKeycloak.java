@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.usuari;
 
+import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import es.caib.notib.plugin.SistemaExternException;
 import lombok.extern.slf4j.Slf4j;
 import org.fundaciobit.pluginsib.userinformation.IUserInformationPlugin;
@@ -31,10 +32,35 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin implements DadesUsuariPlugin, IUserInformationPlugin {
 
-
+	private boolean mostrarLogs = false;
 	public DadesUsuariPluginKeycloak(String propertyKeyBase, Properties properties) {
+
 		super(propertyKeyBase, properties);
+		mostrarLogs = Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.KEYCLOAK"));
 	}
+
+	public void logInfo(String msg) {
+
+		try {
+			if (mostrarLogs) {
+				log.info(msg);
+			}
+		} catch (Exception ex) {
+			log.error("Error creant el log ", ex);
+		}
+	}
+
+	public void logError(String msg, Exception exception) {
+
+		try {
+			if (mostrarLogs) {
+				log.error(msg, exception);
+			}
+		} catch (Exception ex) {
+			log.error("Error creant el log ", ex);
+		}
+	}
+
 
 	public DadesUsuariPluginKeycloak(String propertyKeyBase) {
 		super(propertyKeyBase);
@@ -107,23 +133,29 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 	@Override
 	public String[] getUsernamesByRol(String rol) throws Exception {
 
+		logInfo("fooooooooooooooooo");
 		Set<String> usernamesClientApp = null;
 		Set<String> usernamesClientPersons = null;
 		Set<String> usersRealm = null;
 		try {
 			String appClient = this.getPropertyRequired("pluginsib.userinformation.keycloak.client_id");
 			usernamesClientApp = this.getUsernamesByRolOfClient(rol, appClient);
+			logInfo("[Keycloak] Usuaris pel rol " + rol + " amb el client d'aplicacio " + appClient + " : " + usernamesClientApp);
 		} catch (Exception ex) {
-			log.error("No s'han obtingut usuaris per client d'aplicació", ex);
+			logError("No s'han obtingut usuaris per client d'aplicació", ex);
+//			log.error("No s'han obtingut usuaris per client d'aplicació", ex);
 		}
 		try {
 			String personsClient = this.getPropertyRequired("pluginsib.userinformation.keycloak.client_id_for_user_autentication");
 			usernamesClientPersons = this.getUsernamesByRolOfClient(rol, personsClient);
+			logInfo("[Keycloak] Usuaris pel rol " + rol + " amb el client de persones " + personsClient + " : " + usernamesClientPersons);
 		} catch (Exception ex) {
-			log.error("No s'han obtingut usuaris per client de persones", ex);
+			logError("No s'han obtingut usuaris per client de persones", ex);
+//			log.error("No s'han obtingut usuaris per client de persones", ex);
 		}
 		try {
 			usersRealm = this.getUsernamesByRolOfRealm(rol);
+			logInfo("[Keycloak] Usuaris del realm pel rol " + rol + " : " + usersRealm);
 		} catch (Exception ex) {
 			log.error("No s'han obtingut usuaris per realm", ex);
 		}

@@ -1,13 +1,8 @@
 package es.caib.notib.logic.statemachine.listeners;
 
 import com.google.common.base.Strings;
-import es.caib.notib.logic.helper.AuditHelper;
-import es.caib.notib.logic.helper.NotificacioTableHelper;
-import es.caib.notib.logic.helper.RegistreSmHelper;
-import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
-import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.RegistreService;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
@@ -22,11 +17,9 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import java.util.Date;
 import java.util.concurrent.Semaphore;
 
 @Slf4j
