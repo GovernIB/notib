@@ -68,10 +68,14 @@ public class AjaxUserController extends BaseUserController {
 			if (aplicacio == null) {
 				return new ArrayList<>(setUsuaris);
 			}
-			var usuariAplciacio = new UsuariDto();
-			usuariAplciacio.setCodi(aplicacio.getUsuariCodi());
-			usuariAplciacio.setNom(aplicacio.getUsuariCodi());
-			setUsuaris.add(usuariAplciacio);
+
+			UsuariDto usuariAplciacio;
+			for (var app : aplicacio) {
+				usuariAplciacio = new UsuariDto();
+				usuariAplciacio.setCodi(app.getUsuariCodi());
+				usuariAplciacio.setNom(app.getUsuariCodi());
+				setUsuaris.add(usuariAplciacio);
+			}
 			return new ArrayList<>(setUsuaris);
 		} catch (Exception ex) {
 			log.error("Error al consultar la informació dels usuaris amb el filtre \"" + text + "\"", ex);

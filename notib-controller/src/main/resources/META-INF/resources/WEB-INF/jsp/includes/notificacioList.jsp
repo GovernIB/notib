@@ -610,7 +610,6 @@
                     placeholderKey="notificacio.list.filtre.camp.creadaper"
                     suggestValue="codi"
                     suggestText="nom"
-                    suggestTextAddicional="nif"
                     inline="true"/>
         </div>
         <div class="col-md-2">

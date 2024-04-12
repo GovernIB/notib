@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Primary;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
+import java.util.List;
 
 /**
  * Implementació de UsuariAplicacioService com a EJB que empra una clase
@@ -79,7 +80,7 @@ public class UsuariAplicacioService extends AbstractService<es.caib.notib.logic.
 
 	@Override
 	@RolesAllowed("**")
-	public AplicacioDto findByEntitatAndText(Long entitatId, String text) {
+	public List<AplicacioDto> findByEntitatAndText(Long entitatId, String text) {
 		return getDelegateService().findByEntitatAndText(entitatId, text);
 	}
 
