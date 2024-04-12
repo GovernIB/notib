@@ -12,6 +12,8 @@ import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.persist.entity.AplicacioEntity;
 
+import java.util.List;
+
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
  * de dades del tipus entitat.
@@ -65,7 +67,7 @@ public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long
 			+ "WHERE a.entitat.id = :entitatId"
 			+ "		AND lower(a.usuariCodi) like concat('%', lower(:text), '%') "
 			+ "ORDER BY a.usuariCodi desc")
-	AplicacioEntity findByText(@Param("entitatId") Long entitatId, @Param("text") String text);
+	List<AplicacioEntity> findByText(@Param("entitatId") Long entitatId, @Param("text") String text);
 
 	int deleteAplicacioEntityByEntitat(EntitatEntity entitat);
 

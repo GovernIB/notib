@@ -194,12 +194,12 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public AplicacioDto findByEntitatAndText(Long entitatId, String text) {
+	public List<AplicacioDto> findByEntitatAndText(Long entitatId, String text) {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consultant usuaris aplicació amb text (text=" + text + ")");
-			return conversioTipusHelper.convertir(aplicacioRepository.findByText(entitatId, text), AplicacioDto.class);
+			return conversioTipusHelper.convertirList(aplicacioRepository.findByText(entitatId, text), AplicacioDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

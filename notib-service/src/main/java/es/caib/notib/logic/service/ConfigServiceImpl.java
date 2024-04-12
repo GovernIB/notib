@@ -9,6 +9,7 @@ import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.dto.config.ConfigGroupDto;
 import es.caib.notib.logic.intf.service.ConfigService;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.config.ConfigEntity;
@@ -72,7 +73,11 @@ public class ConfigServiceImpl implements ConfigService {
             carregarDelaysReintentsRemeses();
         }
         if (property.getKey().contains(NotibLogger.PREFIX)) {
-            logger.setLogTipus(property.getKey());
+            if (property.getKey().endsWith(LoggingTipus.KEYCLOAK.name())) {
+                pluginHelper.resetPlugins("USUARIS");
+            } else {
+                logger.setLogTipus(property.getKey());
+            }
         }
         return conversioTipusHelper.convertir(configEntity, ConfigDto.class);
     }

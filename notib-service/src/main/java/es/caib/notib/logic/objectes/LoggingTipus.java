@@ -8,5 +8,6 @@ public enum LoggingTipus {
     REGISTRE,
     NOTIFICA,
     SIR,
-    STATE_MACHINE;
+    STATE_MACHINE,
+    KEYCLOAK;
 }

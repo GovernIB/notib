@@ -1,6 +1,7 @@
 package es.caib.notib.plugin.usuari;
 
 import es.caib.notib.plugin.SistemaExternException;
+import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import lombok.extern.slf4j.Slf4j;
 import org.fundaciobit.pluginsib.userinformation.IUserInformationPlugin;
 import org.fundaciobit.pluginsib.userinformation.keycloak.KeyCloakUserInformationPlugin;
@@ -32,9 +33,14 @@ import java.util.stream.Collectors;
 public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin implements DadesUsuariPlugin, IUserInformationPlugin {
 
 
+	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
+
 	public DadesUsuariPluginKeycloak(String propertyKeyBase, Properties properties) {
+
 		super(propertyKeyBase, properties);
+		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.KEYCLOAK")));
 	}
+
 
 	public DadesUsuariPluginKeycloak(String propertyKeyBase) {
 		super(propertyKeyBase);
@@ -44,7 +50,7 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 	@Override
 	public List<String> consultarRolsAmbCodi(String usuariCodi) throws SistemaExternException {
 
-		log.debug("Consulta dels rols de l'usuari (usuariCodi=" + usuariCodi + ")");
+		logger.info("[Keycloak] Consulta dels rols de l'usuari (usuariCodi=" + usuariCodi + ")");
 		try {
 			var rolesInfo = getRolesByUsername(usuariCodi);
 			return rolesInfo != null && rolesInfo.getRoles() != null ? new ArrayList<>(Arrays.asList(rolesInfo.getRoles())) : new ArrayList<>();
@@ -56,7 +62,7 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 	@Override
 	public DadesUsuari consultarAmbCodi(String usuariCodi) throws SistemaExternException {
 
-		log.debug("Consulta de les dades de l'usuari (usuariCodi=" + usuariCodi + ")");
+		logger.info("[Keycloak] Consulta de les dades de l'usuari (usuariCodi=" + usuariCodi + ")");
 		try {
 			var userInfo = getUserInfoByUserName(usuariCodi);
 			if (userInfo == null) {
@@ -72,7 +78,7 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 	@Override
 	public List<DadesUsuari> consultarAmbGrup(String grupCodi) throws SistemaExternException {
 		
-		log.debug("Consulta dels usuaris del grup (grupCodi=" + grupCodi + ")");
+		logger.info("[Keycloak] Consulta dels usuaris del grup (grupCodi=" + grupCodi + ")");
 		try {
 			var usuariCodis = getUsernamesByRol(grupCodi);
 //			var usuariCodis = getUsuarisByRol(grupCodi);
@@ -81,11 +87,12 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 			}
 			return Arrays.stream(usuariCodis).map(u -> DadesUsuari.builder().codi(u).build()).collect(Collectors.toList());
 		} catch (Exception ex) {
-			throw new SistemaExternException("Error al consultar les dades dels usuaris amb grup (grup=" + grupCodi + ")", ex);
+			throw new SistemaExternException("[Keycloak] Error al consultar les dades dels usuaris amb grup (grup=" + grupCodi + ")", ex);
 		}
 	}
 
 	private String[] getUsuarisByRol(String rol) throws Exception {
+
 		Keycloak keycloak = this.getKeyCloakConnection();
 		var rrs = keycloak.realm(this.getPropertyRequired("pluginsib.userinformation.keycloak.realm")).roles();
 		try {
@@ -113,19 +120,24 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 		try {
 			String appClient = this.getPropertyRequired("pluginsib.userinformation.keycloak.client_id");
 			usernamesClientApp = this.getUsernamesByRolOfClient(rol, appClient);
+			logger.info("[Keycloak] Usuaris pel rol " + rol + " amb el client d'aplicacio " + appClient + " : " + usernamesClientApp);
 		} catch (Exception ex) {
-			log.error("No s'han obtingut usuaris per client d'aplicació", ex);
+			logger.error("[Keycloak] No s'han obtingut usuaris per client d'aplicació amb el rol " + rol, ex);
+//			log.error("No s'han obtingut usuaris per client d'aplicació", ex);
 		}
 		try {
 			String personsClient = this.getPropertyRequired("pluginsib.userinformation.keycloak.client_id_for_user_autentication");
 			usernamesClientPersons = this.getUsernamesByRolOfClient(rol, personsClient);
+			logger.info("[Keycloak] Usuaris pel rol " + rol + " amb el client de persones " + personsClient + " : " + usernamesClientPersons);
 		} catch (Exception ex) {
-			log.error("No s'han obtingut usuaris per client de persones", ex);
+			logger.error("No s'han obtingut usuaris per client de persones amb el rol " + rol, ex);
+//			log.error("No s'han obtingut usuaris per client de persones", ex);
 		}
 		try {
 			usersRealm = this.getUsernamesByRolOfRealm(rol);
+			logger.info("[Keycloak] Usuaris del realm pel rol " + rol + " : " + usersRealm);
 		} catch (Exception ex) {
-			log.error("No s'han obtingut usuaris per realm", ex);
+			log.error("[Keycloak] No s'han obtingut usuaris per realm", ex);
 		}
 		if (usernamesClientApp == null && usernamesClientPersons == null && usersRealm == null) {
 			return null;

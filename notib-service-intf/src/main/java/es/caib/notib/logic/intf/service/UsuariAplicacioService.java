@@ -10,6 +10,8 @@ import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 
+import java.util.List;
+
 /**
  * Declaració dels mètodes per a la gestió d'entitats.
  * 
@@ -103,7 +105,7 @@ public interface UsuariAplicacioService {
 	 * @return L'aplicació que coincideix  amb el text introduït.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	public AplicacioDto findByEntitatAndText(Long entitatId, String text);
+	List<AplicacioDto> findByEntitatAndText(Long entitatId, String text);
 	
 	/**
 	 * Llistat amb totes les aplicacions paginades.
