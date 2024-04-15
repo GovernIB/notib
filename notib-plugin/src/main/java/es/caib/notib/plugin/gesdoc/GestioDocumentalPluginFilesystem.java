@@ -2,6 +2,7 @@ package es.caib.notib.plugin.gesdoc;
 
 import es.caib.notib.logic.intf.util.FitxerUtils;
 import es.caib.notib.plugin.SistemaExternException;
+import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -31,8 +32,12 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	private static final String AMB_ID = " amb id: ";
 	private static final String ARXIU_NO_TROBAT = "No s'ha trobat l'arxiu (id=";
 
+	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
+
 	public GestioDocumentalPluginFilesystem(Properties properties) {
+
 		this.properties = properties;
+		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.GESDOC")));
 	}
 
 	@Override
@@ -43,7 +48,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			var basedir = getBaseDir(agrupacio);
 			var subfolderId = getValidSubfolder(agrupacio);
 			var id = subfolderId + generateUniqueName(basedir);
-			log.info("Creant fitxer al directori: " + basedir + AMB_ID + id);
+			log.info("[GESDOC] Creant fitxer al directori: " + basedir + AMB_ID + id);
 			try (var outContent = new FileOutputStream(basedir + "/" + id)) {
 				IOUtils.copy(contingut, outContent);
 			}
@@ -58,7 +63,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 		try {
 			var fContent = getFile(agrupacio, id);
-			log.info("Actalitzant fitxer, directori: " + getBaseDir(agrupacio) + AMB_ID + id);
+			log.info("[GESDOC] Actalitzant fitxer, directori: " + getBaseDir(agrupacio) + AMB_ID + id);
 			if (fContent == null) {
 				throw new SistemaExternException(ARXIU_NO_TROBAT + id + ")");
 			}
@@ -75,7 +80,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 		try {
 			var fContent = getFile(agrupacio, id);
-			log.debug("Eliminant fitxer, directori: " + getBaseDir(agrupacio) + AMB_ID + id);
+			logger.info("[GESDOC] Eliminant fitxer, directori: " + getBaseDir(agrupacio) + AMB_ID + id);
 			if (fContent == null) {
 				throw new SistemaExternException(ARXIU_NO_TROBAT + id + ")");
 			}
@@ -95,7 +100,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 				fContent = getFile("", id);
 				isAgrupacio = false;
 			}
-			log.debug("Consultant fitxer, directori: " + (isAgrupacio ? getBaseDir(agrupacio) : "") + AMB_ID + id);
+			logger.info("[GESDOC] Consultant fitxer, directori: " + (isAgrupacio ? getBaseDir(agrupacio) : "") + AMB_ID + id);
 			if (fContent == null) {
 				throw new SistemaExternException(ARXIU_NO_TROBAT + id + ")");
 			}

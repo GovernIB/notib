@@ -9,5 +9,11 @@ public enum LoggingTipus {
     NOTIFICA,
     SIR,
     STATE_MACHINE,
-    KEYCLOAK;
+    KEYCLOAK,
+    ROLSAC,
+    UNITATS,
+    GESDOC,
+    FIRMA_SERVIDOR,
+    CARPETA,
+    ARXIU;
 }

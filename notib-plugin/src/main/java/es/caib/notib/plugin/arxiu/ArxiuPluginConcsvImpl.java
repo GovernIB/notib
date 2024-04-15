@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import es.caib.plugins.arxiu.api.*;
 import es.caib.plugins.arxiu.caib.ArxiuCaibClient;
 import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
@@ -35,14 +36,19 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 	private static final String UUID = "uuid:";
 	private static final String ERROR_METADADES_CSV = "No ha estat possible obtenir les metadades del document amb CSV ";
 	private static final String ERROR_METADADES_UUID = "No ha estat possible obtenir les metadades del document amb UUID ";
+
 	private Client versioImprimibleClient;
+
+	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
 	public ArxiuPluginConcsvImpl(String propertyKeyBase) {
 		super(propertyKeyBase);
 	}
 
 	public ArxiuPluginConcsvImpl(String propertyKeyBase, Properties properties) {
+
 		super(propertyKeyBase, properties);
+		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.ARXIU")));
 	}
 
 	@Override
@@ -68,7 +74,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 				response.setMetadades(toDocumentMetadades(result));
 				response.setFirmes(result.containsKey("eni:tipoFirma") ? Collections.singletonList(new Firma()) : null);
 			} catch(Exception e) {
-				log.debug(ERROR_METADADES_CSV + identificador);
+				logger.info("[ARXIU]" + ERROR_METADADES_CSV + identificador);
 				response.setMetadades(null);
 			}
 			return response;
@@ -188,6 +194,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 				url += "/";
 			}
 			url += "metadata/uuid/";
+			logger.info("[ARXIU] Obtinguent metadades uuid del document " + identificador + " url " + url);
 			var webResource = getVersioImprimibleClientConcsv().resource(url + identificador);
 			var jsonData = webResource.accept(MediaType.APPLICATION_JSON).get(String.class);
 			return new ObjectMapper().readValue(jsonData, HashMap.class);
@@ -214,6 +221,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 				url += "/";
 			}
 			url += "metadata/";
+			logger.info("[ARXIU] Obtinguent metadades del document " + identificador + " url " + url);
 			WebResource webResource = getVersioImprimibleClientConcsv().resource(url + identificador);
 			String jsonData = webResource.accept(MediaType.APPLICATION_JSON).get(String.class);
 			return new ObjectMapper().readValue(jsonData, HashMap.class);
@@ -228,6 +236,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 
 		String url = getPropertyConversioImprimibleUrlCsvConcsv();
 		WebResource webResource;
+		logger.info("[ARXIU] Generant versio imprimible csv. identificador " + identificador + " metadada1 " + metadada1 + " metadada2 " + metadada2 + " marcaAigua " + marcaAigua);
 		if (url.endsWith("/")) {
 			webResource = getVersioImprimibleClientConcsv().resource(url + identificador);
 		} else {
@@ -249,6 +258,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 
 		String url = getPropertyConversioImprimibleUrlUuidConcsv();
 		WebResource webResource;
+		logger.info("[ARXIU] Generant versio imprimible uuid. identificador " + identificador + " metadada1 " + metadada1 + " metadada2 " + metadada2 + " marcaAigua " + marcaAigua);
 		if (url.endsWith("/")) {
 			webResource = getVersioImprimibleClientConcsv().resource(url + identificador);
 		} else {

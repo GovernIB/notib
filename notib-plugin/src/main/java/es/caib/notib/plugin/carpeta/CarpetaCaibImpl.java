@@ -7,6 +7,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.ws.rs.core.MediaType;
@@ -19,15 +20,18 @@ public class CarpetaCaibImpl implements CarpetaPlugin {
     private Client client;
     private final Properties properties;
 
-    public CarpetaCaibImpl(Properties properties) {
-        this.properties = properties;
+    private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
+    public CarpetaCaibImpl(Properties properties) {
+
+        this.properties = properties;
+        logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.CARPETA")));
     }
 
     @Override
     public RespostaSendNotificacioMovil enviarNotificacioMobil(MissatgeCarpetaParams params) throws Exception{
 
-        log.info("Enviant avís a CARPETA");
+        log.info("[CARPETA] Enviant avís a CARPETA");
         RespostaSendNotificacioMovil resposta = null;
         try {
             if (params.getTipus() == null) {
@@ -41,18 +45,20 @@ public class CarpetaCaibImpl implements CarpetaPlugin {
             MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
             queryParams.add("nif", params.getNifDestinatari());
             queryParams.add("notificationCode", notCode);
-            queryParams.add("notificationLang", "ca");
-            queryParams.add("langError", "ca");
+            var lang = "ca";
+            queryParams.add("notificationLang", lang);
+            queryParams.add("langError", lang);
             params.setQueryParams(queryParams);
+            logger.info("[CARPETA] Enviant notificacio movil nif " + params.getNifDestinatari() + " notificationCode " + notCode + " notificationLang " + lang + " langError " + lang + " url " + url);
             ClientResponse res = resource.queryParams(queryParams).type(MediaType.APPLICATION_JSON_TYPE).accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
             String jsonResposta = res.getEntity(String.class);
             ObjectMapper mapper = new ObjectMapper();
             mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             resposta = mapper.readValue(jsonResposta, RespostaSendNotificacioMovil.class);
-            log.info("Avís enviat a CARPETA");
+            log.info("[CARPETA] Avís enviat a CARPETA");
             return resposta;
         } catch (Exception ex) {
-            String msg =  "[API CARPETA] Error enviant la notificacio mòvil.";
+            String msg =  "[CARPETA] Error enviant la notificacio mòvil.";
             log.error(msg, ex);
             msg += ex;
             throw new Exception(msg);

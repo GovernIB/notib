@@ -17,6 +17,7 @@ import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWsService;
 import es.caib.dir3caib.ws.api.unidad.UnidadTF;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.plugin.SistemaExternException;
+import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -55,9 +56,12 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 
 	private final Properties properties;
 
+	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
 	public UnitatsOrganitzativesPluginDir3Ws(Properties properties) {
+
 		this.properties = properties;
+		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.UNITATS")));
 	}
 
 	@Override
@@ -66,7 +70,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 		Map<String, NodeDir3> organigrama = new HashMap<>();
 		try {
 			var url = new URL(getServiceUrl() + SERVEI_ORGANIGRAMA + "?codigo=" + codiEntitat);
-			log.debug(URL + url);
+			logger.info("[UNITATS] Consulta organigrama per entitat " + codiEntitat + " url" + url);
 			var httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -112,6 +116,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 			if (fechaSincronizacion != null) {
 				tpSincronizacion = new Timestamp(fechaSincronizacion.getTime());
 			}
+			logger.info("[UNITATS] Consulta organigrama per entitat. Codi pare " + pareCodi + " `data actualitzacio" + fechaActualizacion + " data sincronitzacio " + fechaSincronizacion);
 			var arbol = getObtenerUnidadesService().obtenerArbolUnidades(pareCodi, tpActualizacion, tpSincronizacion);
 			NodeDir3 node;
 			NodeDir3 pare;
@@ -154,6 +159,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 		try {
 			var dataAct = dataActualitzacio != null ? new Timestamp(dataActualitzacio.getTime()) : null;
 			var dataSinc = dataSincronitzacio != null ? new Timestamp(dataSincronitzacio.getTime()) : null;
+			logger.info("[UNITATS] Consulta organigrama per entitat. Codi pare " + pareCodi);
 			List<UnidadTF> unidades = getObtenerUnidadesService().obtenerArbolUnidades(pareCodi, dataAct, dataSinc);
 			if (unidades == null) {
 				return new ArrayList<>();
@@ -174,6 +180,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 		try {
 			var dataAct = dataActualitzacio != null ? new Timestamp(dataActualitzacio.getTime()) : null;
 			var dataSinc = dataSincronitzacio != null ? new Timestamp(dataSincronitzacio.getTime()) : null;
+			logger.info("[UNITATS] Consulta organigrama per entitat. Codi pare " + pareCodi + " `data actualitzacio" + dataActualitzacio + " data sincronitzacio " + dataSincronitzacio);
 			var unidad = getObtenerUnidadesService().obtenerUnidad(pareCodi, dataAct, dataSinc);
 			return unidad != null ? toNodeDir3(unidad) : null;
 		} catch (Exception ex) {
@@ -193,7 +200,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 
 		try {
 			var url = new URL(getServiceUrl() + SERVEI_UNITAT + "arbolUnidades?codigo=" + codiEntitat);
-			log.debug(URL + url);
+			logger.info("[UNITATS] Consulta les untiats per la entitat " + codiEntitat + " inclourePare " + inclourePare + " url " + url);
 			var httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -223,7 +230,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 
 		try {
 			var url = new URL(getServiceUrl() + SERVEI_UNITAT + "denominacion?codigo=" + codiDir3);
-			log.debug(URL + url);
+			logger.info("[UNITATS] Consulta la denominacio per la unitat " + codiDir3 + " url " + url);
 			var httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -250,7 +257,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 					+ "&provincia="+ (provincia != null ? provincia : "-1")
 					+ "&localidad=" + ((municipi != null && !municipi.isEmpty() )  ? municipi+"-01" : "-1")
 					+ "&vigentes=true");
-			log.debug(URL + url);
+			logger.info("[UNITATS] Consulta unitats " + url);
 			var httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -276,7 +283,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 		List<ObjetoDirectorio> unitats = new ArrayList<>();
 		try {
 			var url = new URL(getServiceUrl() + SERVEI_UNITAT + "unidadesDenominacion?denominacion=" + denominacio);
-			log.debug(URL + url);
+			logger.info("[UNITATS] Consulta unitats amb denominacio " + denominacio + " url " + url);
 			var httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -307,7 +314,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 					+ "&localidad=" + (municipi != null ? municipi : "-1")
 					+ "&oficinasSir=false"
 					+ "&vigentes=true");
-			log.debug(URL + url);
+			logger.info("[UNITATS] Consulta oficines url " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -329,7 +336,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 
 		try {
 			var url = new URL(getServiceUrl() + SERVEI_CATALEG + "nivelesAdministracion");
-			log.debug(URL + url);
+			logger.info("[UNITATS] Consulta nivells administracio url " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -347,6 +354,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 	public List<CodiValorPais> paisos() throws SistemaExternException {
 
 		try {
+			logger.info("[UNITATS] Consulta paisos");
 			var paisosWs = getCatalogosWsWithSecurityApi().obtenerCatPais();
 			List<CodiValorPais> paisos = new ArrayList<>();
 			CodiValorPais pais;
@@ -369,7 +377,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 
 		try {
 			var url = new URL(getServiceUrl() + SERVEI_CATALEG + "comunidadesAutonomas");
-			log.debug(URL + url);
+			logger.info("[UNITATS] Consulta comunitats autonomes url " + url);
 			var httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -389,7 +397,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 
 		try {
 			var url = new URL(getServiceUrl() + SERVEI_CATALEG + "provincias");
-			log.debug(URL + url);
+			logger.info("[UNITATS] Consulta provincies url " + url);
 			var httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -409,7 +417,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 
 		try {
 			var url = new URL(getServiceUrl() + SERVEI_CATALEG + "provincias/comunidadAutonoma?id=" + codiCA);
-			log.debug(URL + url);
+			logger.info("[UNITATS] Consulta provincies de la comunitat autonoma " + codiCA + " url " + url);
 			var httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -445,7 +453,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 					+ "localidades/provincia/entidadGeografica?"
 					+ "codigoProvincia=" + codiProvincia
 					+ "&codigoEntidadGeografica=01");
-			log.debug("URL: " + url);
+			logger.info("[UNITATS] Consulta localistats de la provincia " + codiProvincia + " url " + url);
 			var httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -495,6 +503,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 
 		try {
 			List<OficinaSir> oficinesSIR = new ArrayList<>();
+			logger.info("[UNITATS] Consulta oficines de la entitat " + entitat);
 			var oficinesWS = getObtenerOficinasSIRUnidad().obtenerArbolOficinas(entitat, null, null);
 			for (OficinaTF oficinaTF : oficinesWS) {
 				OficinaSir oficinaSIR = new OficinaSir();
@@ -513,6 +522,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 	private void getOficinesUnitatSuperior(String unitat, List<OficinaTF> oficinesWS, Map<String, OrganismeDto> arbreUnitats) throws MalformedURLException {
 
 		var arbre = arbreUnitats.get(unitat);
+		logger.info("[UNITATS] Consulta oficines de la unitat " + unitat);
 		var oficinesUnitatActual = getObtenerOficinasSIRUnidad().obtenerOficinasSIRUnidad(unitat);
 		if (arbre != null) {
 			var unitatSuperiorCurrentUnitat = arbre.getPare();

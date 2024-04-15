@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.logic.intf.dto.RegistreInteressatDocumentTipusDtoEnum;
 import es.caib.notib.logic.intf.dto.RegistreInteressatDto;
+import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import es.caib.regweb3.ws.api.v3.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,8 +34,12 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	private static final String OFICINA_VIRTUAL_DEFAULT = "Oficina Virtual";
 	private static final String ERROR_TO_RESPOSTA_CONSULTA = "Error no controlat toRespostaConsultaRegistre ";
 
+	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
+
 	public RegistrePluginRegweb3Impl(Properties properties) {
+
 		super(properties);
+		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.REGISTRE")));
 	}
 
 
@@ -44,7 +49,10 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		var rc = new RespostaConsultaRegistre();
 		try {
 			var asiento = toAsientoRegistralBean(arb);
-			return toRespostaConsultaRegistre(getAsientoRegistralApi().crearAsientoRegistral(null, codiDir3Entitat, asiento, tipusOperacio, generarJustificant, false));
+			logger.info("[REGISTRE] Creant assentament registral codiDir3Entitat " + codiDir3Entitat  + " tipusOperacio " + tipusOperacio + " generarJustificant " + generarJustificant);
+			var resposta = getAsientoRegistralApi().crearAsientoRegistral(null, codiDir3Entitat, asiento, tipusOperacio, generarJustificant, false);
+			logger.info("[REGISTRE] Resposta assentament registral " + resposta);
+			return toRespostaConsultaRegistre(resposta);
 		} catch (WsI18NException e) {
 			rc.setErrorCodi("0");
 			rc.setErrorDescripcio(e.getMessage());
@@ -66,7 +74,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 		var rc = new RespostaConsultaRegistre();
 		try {
+			logger.info("[REGISTRE] Creant assentament registral codiDir3Entitat " + codiDir3Entitat + " numeroRegistre " + numeroRegistre + " tipusOperacio " + tipusOperacio + " ambAnnexos " + ambAnnexos);
 			var asientoRegistralWs = getAsientoRegistralApi().obtenerAsientoRegistral(codiDir3Entitat, numeroRegistre, tipusOperacio, ambAnnexos);
+			logger.info("[REGISTRE] Assentament registral " + asientoRegistralWs);
 			return toRespostaConsultaRegistre(asientoRegistralWs);
 		} catch (WsI18NException e) {
 			rc.setErrorCodi("0");
@@ -89,7 +99,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 		var rj = new RespostaJustificantRecepcio();
 		try {
-			return toRespostaJustificantRecepcio(getAsientoRegistralApi().obtenerJustificante(codiDir3Entitat, numeroRegistreFormatat, tipusRegistre));
+			logger.info("[REGISTRE] Obtenint justificant " + codiDir3Entitat + " numeroRegistreFormatat " + numeroRegistreFormatat);
+			var justificant = getAsientoRegistralApi().obtenerJustificante(codiDir3Entitat, numeroRegistreFormatat, tipusRegistre);
+			return toRespostaJustificantRecepcio(justificant);
 		} catch (WsI18NException e) {
 			rj.setErrorCodi("0");
 			rj.setErrorDescripcio("No s'ha pogut obtenir el justificant");
@@ -111,6 +123,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 		var rj = new RespostaJustificantRecepcio();
 		try {
+			logger.info("[REGISTRE] Obtenint ofici extern codiDir3Entitat " + codiDir3Entitat + " numeroRegistreFormatat " + numeroRegistreFormatat);
 			return toRespostaJustificantRecepcio(getAsientoRegistralApi().obtenerOficioExterno(codiDir3Entitat, numeroRegistreFormatat));
 		} catch (WsI18NException e) {
 			rj.setErrorCodi("0");
@@ -395,10 +408,11 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	}
 
 	@Override
-	public List<TipusAssumpte> llistarTipusAssumpte(String entitatcodi) throws RegistrePluginException {
+	public List<TipusAssumpte> llistarTipusAssumpte(String entitatCodi) throws RegistrePluginException {
 
 		try {
-			return toTipusAssumpte(getInfoApi().listarTipoAsunto(entitatcodi));
+			logger.info("[REGISTRE] Llistant tipus assumpte entitatCodi " + entitatCodi);
+			return toTipusAssumpte(getInfoApi().listarTipoAsunto(entitatCodi));
 		} catch (Exception ex) {
 			throw new RegistrePluginException("Error recuperant tipus assumpte", ex);
 		}
@@ -408,6 +422,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	public List<CodiAssumpte> llistarCodisAssumpte(String entitatCodi, String tipusAssumpte) throws RegistrePluginException {
 
 		try {
+			logger.info("[REGISTRE] Llistant tipus assumpte entitatCodi " + entitatCodi + " tipusAssumpte " + tipusAssumpte);
 			return toCodisAssumpte(getInfoApi().listarCodigoAsunto(entitatCodi, tipusAssumpte));
 		} catch (Exception ex) {
 			throw new RegistrePluginException("Error recuperant codi assumpte", ex);
@@ -419,6 +434,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 		String nomOficinaVirtual = nomOficinaVirtualEntitat != null ? nomOficinaVirtualEntitat : OFICINA_VIRTUAL_DEFAULT;
 		try {
+			logger.info("[REGISTRE] Obtenir oficina virtual entitatCodi " + entitatCodi + " nomOficinaVirtualEntitat " + nomOficinaVirtualEntitat + " autoritzacioValor " + autoritzacioValor);
 			var oficines = toOficines(getInfoApi().listarOficinas(entitatCodi, autoritzacioValor));
 			if (oficines.isEmpty()) {
 				return new Oficina();
@@ -439,6 +455,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	public List<Oficina> llistarOficines(String entitatCodi, Long autoritzacioValor) throws RegistrePluginException {
 
 		try {
+			logger.info("[REGISTRE] Obtenir oficines virtual entitatCodi " + entitatCodi + " autoritzacioValor " + autoritzacioValor);
 			return toOficines(getInfoApi().listarOficinas(entitatCodi, autoritzacioValor));
 		} catch (Exception ex) {
 			throw new RegistrePluginException("Error obtenint les oficines", ex);
@@ -449,6 +466,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	public List<Llibre> llistarLlibres(String entitatCodi, String oficina, Long autoritzacioValor) throws RegistrePluginException {
 
 		try {
+			logger.info("[REGISTRE] Obtenir llibres entitatCodi " + entitatCodi + " oficina " + oficina + " autoritzacioValor " + autoritzacioValor);
 			return toLlibres(getInfoApi().listarLibros(entitatCodi, oficina, autoritzacioValor));
 		} catch (Exception ex) {
 			throw new RegistrePluginException("Error obtenint els llibres", ex);
@@ -459,6 +477,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	public List<Organisme> llistarOrganismes(String entitatCodi) throws RegistrePluginException {
 
 		try {
+			logger.info("[REGISTRE] Obtenir llibres entitatCodi " + entitatCodi);
 			return toOrganismes(getInfoApi().listarOrganismos(entitatCodi));
 		} catch (Exception ex) {
 			throw new RegistrePluginException("Error obtenint els organismes", ex);
@@ -470,6 +489,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 		List<LlibreOficina> llibreOficina = null;
 		try {
+			logger.info("[REGISTRE] Obtenir llibres oficines entitatCodi " + entitatCodi + " usuariCodi " + usuariCodi + " tipusRegistre " + tipusRegistre);
 			llibreOficina = toLlibreOficina(getInfoApi().obtenerLibrosOficinaUsuario(entitatCodi, usuariCodi, tipusRegistre));
 		} catch (RegistrePluginException rex) {
 			log.error("Error a plugin registre obtenció llibres i oficina", rex);
@@ -486,6 +506,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 		var llibreOrganisme = new Llibre();
 		try {
+			logger.info("[REGISTRE] Obtenir llibres oficines entitatCodi " + entitatCodi + " organismeCodi " + organismeCodi);
 			llibreOrganisme = toLlibreOrganisme(getInfoApi().listarLibroOrganismo(entitatCodi, organismeCodi));
 		} catch (RegistrePluginException rex) {
 			log.error("Error a plugin registre obtenció llibres d'organisme", rex);

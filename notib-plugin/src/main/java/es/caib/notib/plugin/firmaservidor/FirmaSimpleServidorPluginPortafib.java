@@ -4,6 +4,7 @@
 package es.caib.notib.plugin.firmaservidor;
 
 import es.caib.notib.plugin.SistemaExternException;
+import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import lombok.extern.slf4j.Slf4j;
 import org.fundaciobit.apisib.apifirmasimple.v1.ApiFirmaEnServidorSimple;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleAvailableProfile;
@@ -34,8 +35,12 @@ public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
 
 	private final Properties properties;
 
+	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
+
 	public FirmaSimpleServidorPluginPortafib(Properties properties) {
+
 		this.properties = properties;
+		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.FIRMA_SERVIDOR")));
 	}
 
 	@Override
@@ -48,6 +53,7 @@ public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
 		ApiFirmaEnServidorSimple api = new ApiFirmaEnServidorSimpleJersey(getPropertyEndpoint(), getPropertyUsername(), getPropertyPassword());
 		FirmaSimpleFile fileToSign = new FirmaSimpleFile(nom, "application/pdf", contingut);
 		FirmaSimpleSignatureResult result;
+		logger.info("[FIRMA_SERVIDOR] Firmant document amb nom " + nom + " motiu " + motiu + " tipusDocumental " + tipusDocumental);
 		try {
 			String perfil = getPropertyPerfil();
 			result = internalSignDocument(api, perfil, fileToSign, motiu, tipusDocumental);
@@ -73,7 +79,7 @@ public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
 		String administrationID = null;
 		var signerEmail = getPropertySignerEmail();
 		var commonInfo = new FirmaSimpleCommonInfo(perfil, languageUI, certificat, administrationID, signerEmail);
-		log.debug("languageUI = |" + languageUI + "|");
+		logger.info("[FIRMA_SERVIDOR] languageUI = |" + languageUI + "|");
 		var signature = new FirmaSimpleSignDocumentRequest(commonInfo, fileInfoSignature);
 		var fullResults = api.signDocument(signature);
 		var transactionStatus = fullResults.getStatus();
@@ -92,9 +98,9 @@ public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
 				throw new SistemaExternException("S'ha cancel·lat el procés de firmat.");
 
 			case FirmaSimpleStatus.STATUS_FINAL_OK: // 2
-				log.debug(" ===== RESULTAT  =========");
-				log.debug(" ---- Signature [ " + fullResults.getSignID() + " ]");
-				log.debug(FirmaSimpleSignedFileInfo.toString(fullResults.getSignedFileInfo()));
+				logger.info("[FIRMA_SERVIDOR] ===== RESULTAT  =========");
+				logger.info("[FIRMA_SERVIDOR] ---- Signature [ " + fullResults.getSignID() + " ]");
+				logger.info("[FIRMA_SERVIDOR] " + FirmaSimpleSignedFileInfo.toString(fullResults.getSignedFileInfo()));
 				return fullResults;
 			default:
 				throw new SistemaExternException("Status de firma desconegut");

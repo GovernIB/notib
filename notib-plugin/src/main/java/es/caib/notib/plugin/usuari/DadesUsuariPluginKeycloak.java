@@ -53,18 +53,20 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 		logger.info("[Keycloak] Consulta dels rols de l'usuari (usuariCodi=" + usuariCodi + ")");
 		try {
 			var rolesInfo = getRolesByUsername(usuariCodi);
+			logger.info("[Keycloak] Rols de l'usuari" + usuariCodi + " " + rolesInfo);
 			return rolesInfo != null && rolesInfo.getRoles() != null ? new ArrayList<>(Arrays.asList(rolesInfo.getRoles())) : new ArrayList<>();
 		} catch (Exception ex) {
 			throw new SistemaExternException("Error al consultar els rols de l'usuari (usuariCodi=" + usuariCodi + ")", ex);
 		}
 	}
-	
+
 	@Override
 	public DadesUsuari consultarAmbCodi(String usuariCodi) throws SistemaExternException {
 
 		logger.info("[Keycloak] Consulta de les dades de l'usuari (usuariCodi=" + usuariCodi + ")");
 		try {
 			var userInfo = getUserInfoByUserName(usuariCodi);
+			logger.info("[Keycloak] Dades de l'usuari" + usuariCodi + " " + userInfo);
 			if (userInfo == null) {
 				return null;
 			}
@@ -81,7 +83,7 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 		logger.info("[Keycloak] Consulta dels usuaris del grup (grupCodi=" + grupCodi + ")");
 		try {
 			var usuariCodis = getUsernamesByRol(grupCodi);
-//			var usuariCodis = getUsuarisByRol(grupCodi);
+			logger.info("[Keycloak] Usuaris del grup " + grupCodi + " " + Arrays.toString(usuariCodis));
 			if (usuariCodis == null || usuariCodis.length == 0) {
 				return new ArrayList<>();
 			}

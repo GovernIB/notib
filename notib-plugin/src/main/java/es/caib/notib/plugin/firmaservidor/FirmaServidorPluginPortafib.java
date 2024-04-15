@@ -3,6 +3,7 @@ package es.caib.notib.plugin.firmaservidor;
 import es.caib.notib.client.domini.Fitxer;
 import es.caib.notib.logic.intf.util.FitxerUtils;
 import es.caib.notib.plugin.SistemaExternException;
+import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.fundaciobit.plugins.signature.api.*;
@@ -30,6 +31,8 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 
 	private final Properties properties;
 
+	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
+
 	public FirmaServidorPluginPortafib(Properties properties) {
 
 		super();
@@ -39,6 +42,7 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 		final var base = new File(tempDir, FIRMASERVIDOR_TMPDIR);
 		base.mkdirs();
 		tempDirPath = base.getAbsolutePath();
+		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.FIRMA_SERVIDOR")));
 	}
 
 	@Override
@@ -47,6 +51,7 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 		File sourceFile = null;
 		File destFile = null;
 		var uuid = UUID.randomUUID().toString();
+		logger.info("[FIRMA_SERVIDOR] Firmant document amb nom " + nom + " motiu " + motiu + " tipusFirma " + tipusFirma + " idioma " + idioma);
 		try {
 			// Guarda el contingut en un arxiu temporal
 			sourceFile = getArxiuTemporal(uuid, contingut);
@@ -121,6 +126,7 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 		String timestampUrlBase = null;
 		var signaturesSetResponse = plugin.signDocuments(signaturesSetRequest, timestampUrlBase, null);
 		var signaturesSetStatus = signaturesSetResponse.getStatusSignaturesSet();
+		logger.info("[FIRMA_SERVIDOR] Resposta signatura " + signaturesSetStatus.getStatus());
 		if (signaturesSetStatus.getStatus() != StatusSignaturesSet.STATUS_FINAL_OK) {
 			// Error en el procés de firma
 			var exceptionMessage = "Error en la firma de servidor: [" + signaturesSetStatus.getStatus() + "] " + signaturesSetStatus.getErrorMsg();

@@ -49,14 +49,14 @@ public class RegistreServiceImpl implements RegistreService {
             var notificacio = enviament.getNotificacio();
             var numIntent = enviamentRegistreRequest.getNumIntent();
             notificacio.setRegistreEnviamentIntent(numIntent);
-            NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> registrant ", log, LoggingTipus.REGISTRE);
+            NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> registrant ", log, LoggingTipus.REGISTRE);
             // Registrar enviament
             boolean registreSuccess = registreSmHelper.registrarEnviament(enviament, numIntent);
-            NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> registrat ", log, LoggingTipus.REGISTRE);
+            NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> registrat ", log, LoggingTipus.REGISTRE);
 
             // Actualitzar notificació
             if (notificacioEnviamentRepository.areEnviamentsRegistrats(notificacio.getId()) == 1) {
-                NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> actualitzant notificacio", log, LoggingTipus.REGISTRE);
+                NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> actualitzant notificacio", log, LoggingTipus.REGISTRE);
                 var isSir = notificacio.isComunicacioSir();
                 notificacio.updateEstat(isSir ? NotificacioEstatEnumDto.ENVIAT_SIR : NotificacioEstatEnumDto.REGISTRADA);
 
@@ -72,9 +72,9 @@ public class RegistreServiceImpl implements RegistreService {
                     notificacio.updateEstatDate(new Date());
                 }
             }
-            NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> actualitzant registre", log, LoggingTipus.REGISTRE);
+            NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> actualitzant registre", log, LoggingTipus.REGISTRE);
             notificacioTableHelper.actualitzarRegistre(notificacio);
-            NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> audita notificacio", log, LoggingTipus.REGISTRE);
+            NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> audita notificacio", log, LoggingTipus.REGISTRE);
             auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "RegistreSmHelper.registrarEnviament");
 
     //            TEST
@@ -83,10 +83,10 @@ public class RegistreServiceImpl implements RegistreService {
     //                enviament.setRegistreData(new Date());
     //                notificacioEnviamentRepository.save(enviament);
     //            }
-            NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> is success " + registreSuccess, log, LoggingTipus.REGISTRE);
+            NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> is success " + registreSuccess, log, LoggingTipus.REGISTRE);
             return registreSuccess;
         } catch (Exception ex) {
-            NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> error ", ex, log, LoggingTipus.REGISTRE);
+            NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> error ", ex, log, LoggingTipus.REGISTRE);
             return false;
         }
     }

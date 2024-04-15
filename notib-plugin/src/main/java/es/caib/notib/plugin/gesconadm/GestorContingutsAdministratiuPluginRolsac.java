@@ -11,6 +11,7 @@ import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
 import es.caib.notib.plugin.SistemaExternException;
+import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.ejb.CreateException;
@@ -43,15 +44,20 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	private static final String CODIGO_UA_DIR3 = "{\"codigoUADir3\":\"";
 	private static final String CODIGO_UA_DIR3_PARAMS = "\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}";
 
+	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
+
 	public GestorContingutsAdministratiuPluginRolsac(Properties properties) {
 		this.properties = properties;
+		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.ROLSAC")));
 	}
 
 	@Override
 	public GesconAdm getProcSerByCodiSia(String codiSia, boolean isServei) throws SistemaExternException {
 
+		var procSer = isServei ? "servei" : "procediment";
 		try {
 			var url = getBaseUrl() + ROLSAC_SERVICE_PATH + (isServei ? SERVICIOS : PROCEDIMIENTOS);
+			logger.info("[ROLSAC] Obtinguent el " + procSer + " amb codi " + codiSia + " url " + url);
 			var jerseyClient = generarClient();
 			autenticarClient(jerseyClient, url);
 			var form = new Form();
@@ -62,7 +68,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			return isServei ? getServeiByCodiSia(mapper, json) :getProcedimentByCodiSia(mapper, json);
 		} catch (Exception ex) {
-			throw new SistemaExternException("No s'han pogut consultar el " + (isServei ? "servei" : "procediment") + " amb codi SIA " + codiSia + " via REST", ex);
+			throw new SistemaExternException("No s'han pogut consultar el " + procSer + " amb codi SIA " + codiSia + " via REST", ex);
 		}
 	}
 
@@ -94,6 +100,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		List<Procediment> procediments = new ArrayList<>();
 		try {
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + PROCEDIMIENTOS;
+			logger.info("[ROLSAC] Obtinguent tots els procediments de la url " + urlAmbMetode);
 			var jerseyClient = generarClient();
 			autenticarClient(jerseyClient, urlAmbMetode);
 			var form = new Form();
@@ -118,6 +125,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		List<Procediment> procediments = new ArrayList<>();
 		try {
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + PROCEDIMIENTOS;
+			logger.info("[ROLSAC] Obtinguent tots els procediments (pagina " + numPagina + ") per la unitat " + codi + " de la url " + urlAmbMetode);
 			var jerseyClient = generarClient();
 			autenticarClient(jerseyClient, urlAmbMetode);
 			var form = new Form();
@@ -143,6 +151,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		try {
 			var numElements = getTotalProcediments(codi);
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + PROCEDIMIENTOS;
+			logger.info("[ROLSAC] Obtinguent tots els procediments per la unitat " + codi + " de la url " + urlAmbMetode);
 			var jerseyClient = generarClient();
 			autenticarClient(jerseyClient, urlAmbMetode);
 			var form = new Form();
@@ -169,6 +178,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		}
 		try {
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "unidades_administrativas/" + codi;
+			logger.info("[ROLSAC] Obtinguent unitat administrativa " + codi + " de la url " + urlAmbMetode);
 			var jerseyClient = generarClient();
 			autenticarClient(jerseyClient, urlAmbMetode);
 			var json = jerseyClient.resource(urlAmbMetode).post(String.class);
@@ -197,6 +207,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		var numeroElements = 0;
 		try {
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + PROCEDIMIENTOS;
+			logger.info("[ROLSAC] Obtinguent el total de procediments de la unitat administrativa " + codi + " de la url " + urlAmbMetode);
 			var jerseyClient = generarClient();
 			autenticarClient(jerseyClient, urlAmbMetode);
 			var form = new Form();
@@ -221,6 +232,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		List<Servei> serveis = new ArrayList<>();
 		try {
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + SERVICIOS;
+			logger.info("[ROLSAC] Obtinguent tots els serveis de la url " + urlAmbMetode);
 			var jerseyClient = generarClient();
 			autenticarClient(jerseyClient, urlAmbMetode);
 			var form = new Form();
@@ -245,6 +257,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		List<Servei> serveis = new ArrayList<>();
 		try {
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + SERVICIOS;
+			logger.info("[ROLSAC] Obtinguent tots els serveis (pagina " + numPagina + ") per la unitat " + codi + " de la url " + urlAmbMetode);
 			Client jerseyClient = generarClient();
 			autenticarClient(jerseyClient, urlAmbMetode);
 			var form = new Form();
@@ -270,6 +283,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		try {
 			var numElements = getTotalServeis(codi);
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + SERVICIOS;
+			logger.info("[ROLSAC] Obtinguent tots els serveis de la unitat administrativa " + codi + " de la url " + urlAmbMetode);
 			var jerseyClient = generarClient();
 			autenticarClient(jerseyClient, urlAmbMetode);
 			var form = new Form();
@@ -294,6 +308,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		var numeroElements = 0;
 		try {
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + SERVICIOS;
+			logger.info("[ROLSAC] Obtinguent el total de serveis de la unitat administrativa " + codi + " de la url " + urlAmbMetode);
 			var jerseyClient = generarClient();
 			autenticarClient(jerseyClient, urlAmbMetode);
 			var form = new Form();
@@ -403,11 +418,11 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		var username = getUsernameServiceUrl();
 		var password = getPasswordServiceUrl();
 		if (isServiceBasicAuthentication()) {
-			log.debug("Autenticant REST amb autenticació de tipus HTTP basic (" + "urlAmbMetode=" + urlAmbMetode + ", " + "username=" + username + ")");
+			logger.info("[ROLSAC] Autenticant REST amb autenticació de tipus HTTP basic (" + "urlAmbMetode=" + urlAmbMetode + ", " + "username=" + username + ")");
 			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
 			return;
 		}
-		log.debug("Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (urlAmbMetode=" + urlAmbMetode + ", " + "username=" + username + ")");
+		logger.info("[ROLSAC] Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (urlAmbMetode=" + urlAmbMetode + ", " + "username=" + username + ")");
 		jerseyClient.resource(urlAmbMetode).get(String.class);
 		var form = new Form();
 		form.putSingle("j_username", username);
