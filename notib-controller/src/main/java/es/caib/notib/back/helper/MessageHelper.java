@@ -5,11 +5,17 @@ package es.caib.notib.back.helper;
 
 import java.util.Locale;
 
+import com.google.common.base.Strings;
+import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpSession;
 
 /**
  * Helper per a mostrar missatges multiidioma.
@@ -45,16 +51,40 @@ public class MessageHelper implements MessageSourceAware {
 	public String getMessage(String key, Object[] vars, Locale locale) {
 
 		try {
+			if (locale == null) {
+//				var context = (SessionScopedContext) getLocale().getAttribute("sessionScopedContext");
+//				locale = new Locale(context != null ? context.getIdiomaUsuari() : "ca");
+				locale = getLocale();
+			}
 			return messageSource.getMessage(key, vars, locale);
 		} catch (NoSuchMessageException ex) {
 			return key.startsWith("enum.") ? key.substring(key.lastIndexOf(".") + 1) :"???" + key + "???";
 		}
 	}
 
+	public static Locale getLocale() {
+
+		var ca = "ca";
+		var requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+		if (requestAttributes == null) {
+			return new Locale(ca);
+		}
+		var attr = (SessionScopedContext) requestAttributes.getRequest().getSession().getAttribute("scopedTarget.sessionScopedContext");
+		if (attr == null) {
+			return new Locale(ca);
+		}
+		var idioma = attr.getIdiomaUsuari();
+		return new Locale(Strings.isNullOrEmpty(idioma) ? idioma : ca);
+//		((SessionScopedContext)(((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getSession().getAttribute("scopedTarget.sessionScopedContext"))).getIdiomaUsuari();
+//		ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+//		return attr.getRequest().getSession(true); // true == allow create
+	}
+
 	public String getMessage(String key, Object[] vars) {
 		return getMessage(key, vars, null);
 	}
 	public String getMessage(String key) {
+
 		return getMessage(key, null, null);
 	}
 
