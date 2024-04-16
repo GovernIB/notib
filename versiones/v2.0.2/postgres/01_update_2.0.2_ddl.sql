@@ -1,0 +1,29 @@
+ALTER TABLE not_columnes ADD data_creacio_remesa BOOLEAN DEFAULT TRUE;
+
+ALTER TABLE not_columnes ADD data_enviament_remesa BOOLEAN DEFAULT TRUE;
+
+ALTER TABLE not_columnes ADD num_registre_remesa BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE not_columnes ADD organ_emisor_remesa BOOLEAN DEFAULT TRUE;
+
+ALTER TABLE not_columnes ADD proc_ser_codi_remesa BOOLEAN DEFAULT TRUE;
+
+ALTER TABLE not_columnes ADD num_expedient_remesa BOOLEAN DEFAULT TRUE;
+
+ALTER TABLE not_columnes ADD concepte_remesa BOOLEAN DEFAULT TRUE;
+
+ALTER TABLE not_columnes ADD creada_per_remesa BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE not_columnes ADD interessats_remesa BOOLEAN DEFAULT TRUE;
+
+ALTER TABLE not_columnes ADD estat_remesa BOOLEAN DEFAULT TRUE;
+
+ALTER TABLE NOT_COLUMNES DROP COLUMN TITULAR_NIF;
+
+ALTER TABLE NOT_COLUMNES ADD DATA_CREACIO BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE not_usuari ADD NUM_ELEMENTS_PAGINA_DEFECTE VARCHAR(30) DEFAULT 'DEU';
+
+ALTER TABLE not_notificacio_table ADD REGISTRE_NUMS VARCHAR(1024);
+
+ALTER TABLE not_notificacio_env ADD SIR_FI_POOLING BOOLEAN DEFAULT FALSE;
