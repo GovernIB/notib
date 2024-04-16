@@ -123,7 +123,11 @@ public class NotibController implements ErrorController {
 	@GetMapping(value = "/error")
 	public String error(HttpServletRequest request, Model model) {
 
-		model.addAttribute("errorObject", new ErrorObject(request));
+		var error = new ErrorObject(request);
+		if ("/notibback/usuari/logout".equals(error.getRequestUri())) {
+			return "redirect:/";
+		}
+		model.addAttribute("errorObject", error);
 		return "util/error";
 	}
 
