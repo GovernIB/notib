@@ -40,7 +40,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 			var msg = String.format("La notificació (Id= %d) no té candidats per a enviar el correu electrònic", notificacio.getId());
 			log.info(msg);
 			info.addParam("Resultat", msg);
-			integracioHelper.addAccioError(info, msg);
+			integracioHelper.addAccioOk(info);
 			return msg;
 		}
 		// TODO: Optimitzar per enviar un únic email
