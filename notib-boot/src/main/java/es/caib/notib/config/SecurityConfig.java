@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
-import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
@@ -60,7 +59,8 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 	public void configureGlobal(AuthenticationManagerBuilder auth)  {
 
 		var keycloakAuthenticationProvider = keycloakAuthenticationProvider();
-		var authorityMapper = new SimpleAuthorityMapper();
+//		var authorityMapper = new SimpleAuthorityMapper();
+		var authorityMapper = new NotibBootAuthorityMapper();
 		authorityMapper.setPrefix(ROLE_PREFIX);
 		keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(authorityMapper);
 		auth.authenticationProvider(keycloakAuthenticationProvider);

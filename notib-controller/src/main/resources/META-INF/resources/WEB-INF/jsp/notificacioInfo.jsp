@@ -707,7 +707,7 @@ $(document).ready(function() {
 															<c:if test="${not empty enviament.registreEstat}">
 																<tr>
 																	<td><strong><spring:message code="enviament.info.seu.registre.estat"/></strong></td>
-																	<td>${enviament.registreEstat}</td>
+																	<td><spring:message code="es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto.${enviament.registreEstat}"/></td>
 																</tr>
 															</c:if>
 															<c:if test="${not empty enviament.sirRecepcioData}">

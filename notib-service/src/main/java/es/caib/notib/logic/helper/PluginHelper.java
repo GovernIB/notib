@@ -3,31 +3,9 @@ package es.caib.notib.logic.helper;
 import com.google.common.base.Strings;
 import com.itextpdf.text.pdf.PdfReader;
 import es.caib.notib.client.domini.DocumentTipus;
-import es.caib.notib.client.domini.EnviamentTipus;
-import es.caib.notib.client.domini.Idioma;
-import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.client.domini.OrigenEnum;
-import es.caib.notib.client.domini.TipusDocumentalEnum;
-import es.caib.notib.client.domini.ValidesaEnum;
+import es.caib.notib.client.domini.*;
 import es.caib.notib.logic.exception.DocumentNotFoundException;
-import es.caib.notib.logic.intf.dto.AccioParam;
-import es.caib.notib.logic.intf.dto.AnexoWsDto;
-import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
-import es.caib.notib.logic.intf.dto.DatosInteresadoWsDto;
-import es.caib.notib.logic.intf.dto.FitxerDto;
-import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
-import es.caib.notib.logic.intf.dto.IntegracioInfo;
-import es.caib.notib.logic.intf.dto.InteresadoWsDto;
-import es.caib.notib.logic.intf.dto.LlibreDto;
-import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.logic.intf.dto.OficinaDto;
-import es.caib.notib.logic.intf.dto.RegistreAnnexDto;
-import es.caib.notib.logic.intf.dto.RegistreModeFirmaDtoEnum;
-import es.caib.notib.logic.intf.dto.RegistreOrigenDtoEnum;
-import es.caib.notib.logic.intf.dto.RegistreTipusDocumentDtoEnum;
-import es.caib.notib.logic.intf.dto.RegistreTipusDocumentalDtoEnum;
-import es.caib.notib.logic.intf.dto.SignatureInfoDto;
+import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.dto.notificacio.EnviamentSirTipusDocumentEnviarEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
@@ -36,11 +14,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
-import es.caib.notib.persist.entity.DocumentEntity;
-import es.caib.notib.persist.entity.EntitatEntity;
-import es.caib.notib.persist.entity.NotificacioEntity;
-import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
-import es.caib.notib.persist.entity.PersonaEntity;
+import es.caib.notib.persist.entity.*;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.carpeta.CarpetaPlugin;
 import es.caib.notib.plugin.carpeta.MissatgeCarpetaParams;
@@ -49,31 +23,11 @@ import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
-import es.caib.notib.plugin.registre.CodiAssumpte;
-import es.caib.notib.plugin.registre.DadesOficina;
-import es.caib.notib.plugin.registre.Llibre;
-import es.caib.notib.plugin.registre.LlibreOficina;
-import es.caib.notib.plugin.registre.Organisme;
-import es.caib.notib.plugin.registre.RegistrePlugin;
-import es.caib.notib.plugin.registre.RegistrePluginException;
-import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
-import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
-import es.caib.notib.plugin.registre.TipusAssumpte;
-import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
-import es.caib.notib.plugin.unitat.CodiValor;
-import es.caib.notib.plugin.unitat.CodiValorPais;
-import es.caib.notib.plugin.unitat.NodeDir3;
-import es.caib.notib.plugin.unitat.ObjetoDirectorio;
-import es.caib.notib.plugin.unitat.OficinaSir;
-import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
+import es.caib.notib.plugin.registre.*;
+import es.caib.notib.plugin.unitat.*;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
-import es.caib.plugins.arxiu.api.ArxiuException;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import es.caib.plugins.arxiu.api.*;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -82,10 +36,9 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformation;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -95,16 +48,7 @@ import java.io.File;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -137,23 +81,31 @@ public class PluginHelper {
 	private Map<String, IValidateSignaturePlugin> validaSignaturaPlugins = new HashMap<>();
 	private Map<String, CarpetaPlugin> carpetaPlugin = new HashMap<>();
 
-	@Autowired
-	private IntegracioHelper integracioHelper;
-	@Autowired
-	private NotificacioEventHelper eventHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Resource
-	private MessageHelper messageManager;
-	@Resource
-	private EntitatRepository entitatRepository;
+	private final IntegracioHelper integracioHelper;
+	private final NotificacioEventHelper eventHelper;
+	private final ConfigHelper configHelper;
+	private final CacheHelper cacheHelper;
+	private final MessageHelper messageManager;
+	private final EntitatRepository entitatRepository;
 
 	private static Set<String> blockedObtenirJustificant = null;
 
+    public PluginHelper(IntegracioHelper integracioHelper,
+						NotificacioEventHelper eventHelper,
+						ConfigHelper configHelper,
+						@Lazy CacheHelper cacheHelper,
+						MessageHelper messageManager,
+						EntitatRepository entitatRepository) {
+        this.integracioHelper = integracioHelper;
+        this.eventHelper = eventHelper;
+        this.configHelper = configHelper;
+        this.cacheHelper = cacheHelper;
+        this.messageManager = messageManager;
+        this.entitatRepository = entitatRepository;
+    }
 
-	// REGISTRE
+
+    // REGISTRE
 	// /////////////////////////////////////////////////////////////////////////////////////
 
 	public RespostaConsultaRegistre crearAsientoRegistral(String codiDir3Entitat, AsientoRegistralBeanDto arb, Long tipusOperacio,

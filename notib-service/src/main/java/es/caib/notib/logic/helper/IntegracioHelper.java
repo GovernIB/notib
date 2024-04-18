@@ -8,22 +8,17 @@ import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioEntity;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioParamEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
-import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.persist.repository.monitor.MonitorIntegracioParamRepository;
 import es.caib.notib.persist.repository.monitor.MonitorIntegracioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -35,19 +30,20 @@ import java.util.stream.Collectors;
 @Component
 public class IntegracioHelper {
 
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private AplicacioRepository aplicacioRepository;
-	@Autowired
-	private MonitorIntegracioRepository monitorRepository;
-	@Autowired
-	private MonitorIntegracioParamRepository monitorParamRepository;
-	@Autowired
-	private CacheHelper cacheHelper;
+	private final AplicacioRepository aplicacioRepository;
+	private final MonitorIntegracioRepository monitorRepository;
+	private final MonitorIntegracioParamRepository monitorParamRepository;
+	private final CacheHelper cacheHelper;
+
+    public IntegracioHelper(AplicacioRepository aplicacioRepository, MonitorIntegracioRepository monitorRepository, MonitorIntegracioParamRepository monitorParamRepository, @Lazy CacheHelper cacheHelper) {
+        this.aplicacioRepository = aplicacioRepository;
+        this.monitorRepository = monitorRepository;
+        this.monitorParamRepository = monitorParamRepository;
+        this.cacheHelper = cacheHelper;
+    }
 
 
-	public Map<IntegracioCodiEnum, Integer> countErrorsGroupByCodi() {
+    public Map<IntegracioCodiEnum, Integer> countErrorsGroupByCodi() {
 
 		Map<IntegracioCodiEnum ,Integer> errorsGroupByCodi = new HashMap<>();
 		IntegracioCodiEnum.stream().forEach(codi -> errorsGroupByCodi.put(codi, countErrors(codi)));

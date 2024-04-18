@@ -4,12 +4,11 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
-import es.caib.notib.persist.repository.UsuariRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.NoSuchMessageException;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -25,13 +24,15 @@ import java.util.Locale;
 public class MessageHelper implements MessageSourceAware {
 
 	private MessageSource messageSource;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private CacheHelper cacheHelper;
+
+	private final CacheHelper cacheHelper;
+
+    public MessageHelper(@Lazy CacheHelper cacheHelper) {
+        this.cacheHelper = cacheHelper;
+    }
 
 
-	public String getMessage(String[] keys, Object[] vars, Locale locale) {
+    public String getMessage(String[] keys, Object[] vars, Locale locale) {
 
 		var msg = "???" + (keys.length > 0 ? keys[keys.length-1] : "") + "???";
 		var found = false;
@@ -97,7 +98,4 @@ public class MessageHelper implements MessageSourceAware {
 		this.messageSource = messageSource;
 	}
 
-	public void setUsuariRepository(UsuariRepository usuariRepository) {
-		this.usuariRepository = usuariRepository;
-	}
 }
