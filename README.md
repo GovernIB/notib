@@ -1,36 +1,34 @@
 # ![Logo notib](https://github.com/GovernIB/notib/raw/master/assets/logo2.png) Notib
 
 **Versions**
-> - Versió Estable: __notib-1.1.23__ (tag [NOTIB 1.1.23](https://github.com/GovernIB/notib/releases/tag/v1.1.23))
-> - Versió Desenvolupament: __notib-2.0.0__ (branca [notib-dev](https://github.com/GovernIB/notib/tree/notib-wip))  
+> - Versió Estable: __notib-2.0.1__ (tag [NOTIB 2.0.1](https://github.com/GovernIB/notib/releases/tag/v2.0.1))
+> - Versió Desenvolupament: __notib-2.0.2__ (branca [notib2-dev](https://github.com/GovernIB/notib/tree/notib2-dev))  
 >  
-> - Versió actual del client REST: __1.1.23.3__
->   - Java7: ([notib-client-1.1.23.3.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client/1.1.23.3/notib-client-1.1.23.3.jar), [notib-client-intf-1.1.23.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.23/notib-client-intf-1.1.23.jar))  
+> - Versió actual del client REST: __2.0.1__
+>   - Java7: ([notib-client-2.0.1.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client/2.0.1/notib-client-2.0.1.jar), [notib-client-intf-2.0.1.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/2.0.1/notib-client-intf-2.0.1.jar))  
 >     ```
 >     <dependency>  
 >         <groupId>es.caib.notib</groupId>  
 >         <artifactId>notib-client</artifactId>  
->         <version>1.1.23.3</version>  
+>         <version>2.0.1</version>  
 >     </dependency>
 >     ```
->   - Java11: ([notib-client-2-1.1.23.3.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-2/1.1.23.3/notib-client-2-1.1.23.3.jar), [notib-client-intf-1.1.23.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.23/notib-client-intf-1.1.23.jar))  
+>   - Java11: ([notib-client-2-2.0.1.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-2/2.0.1/notib-client-2-2.0.1.jar), [notib-client-intf-2.0.1.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/2.0.1/notib-client-intf-2.0.1.jar))  
 >  
 >     ```
 >     <dependency>  
 >         <groupId>es.caib.notib</groupId>  
 >         <artifactId>notib-client-2</artifactId>  
->         <version>1.1.23.3</version>  
+>         <version>2.0.1</version>  
 >     </dependency>
 >     ```
 > - Configuració del client REST:
 >   - Adreça base del servei: https://SERVER/notibapi (substituïr SERVER per l'adreça que correspongui)
->   - Tipus d'autenticació: BASIC
 >    ```
 >    private NotificacioRestClientV2 client = NotificacioRestClientFactory.getRestClientV2(
 >                https://SERVER/notibapi, // Adreça base
 >                USERNAME,
->                PASSWORD,
->                true); // Tipus autenticació BASIC?
+>                PASSWORD);
 >    ```
 
 
@@ -41,9 +39,9 @@ NOTIB ofereix una plataforma  per a realitzar i gestionar totes les comunicacion
 
 **Documentació**
 
->- [Manual d'usuari](https://github.com/GovernIB/notib/raw/notib-1.1/doc/pdf/NOTIB_usuari.pdf)
->- [Manual d'instal·lació](https://github.com/GovernIB/notib/raw/notib-1.1/doc/pdf/NOTIB_instalacio.pdf)
->- [Manual d'administració](https://github.com/GovernIB/notib/raw/notib-1.1/doc/pdf/NOTIB_administracio.pdf)
->- [Manual d'integració](https://github.com/GovernIB/notib/raw/notib-1.1/doc/pdf/NOTIB_integracio.pdf)
->- [Manual de plugins](https://github.com/GovernIB/notib/raw/notib-1.1/doc/pdf/NOTIB_plugins.pdf)
->- [Model de dades](https://github.com/GovernIB/notib/raw/notib-1.1/doc/pdf/NOTIB_model_dades.pdf)
+>- [Manual d'usuari](https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_usuari.pdf)
+>- [Manual d'instal·lació](https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_instalacio.pdf)
+>- [Manual d'administració](https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_administracio.pdf)
+>- [Manual d'integració](https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_integracio.pdf)
+>- [Manual de plugins](https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_plugins.pdf)
+>- [Model de dades](https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_model_dades.pdf)
