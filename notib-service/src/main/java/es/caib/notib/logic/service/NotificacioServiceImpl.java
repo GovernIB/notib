@@ -917,7 +917,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			var input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/logic/stateMachine/diagramaStateMachine.png");
+			var input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/logic/statemachine/diagramaStateMachine.png");
 			assert input != null;
 			return IOUtils.toByteArray(input);
 		} catch (IOException ex) {

@@ -1,6 +1,6 @@
-package es.caib.notib.persist.repository.stateMachine;
+package es.caib.notib.persist.repository.statemachine;
 
-import es.caib.notib.persist.entity.stateMachine.StateMachineEntity;
+import es.caib.notib.persist.entity.statemachine.StateMachineEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
