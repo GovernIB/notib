@@ -126,8 +126,24 @@ public class PluginHelper {
 
 	private static Set<String> blockedObtenirJustificant = null;
 
+	public PluginHelper(IntegracioHelper integracioHelper,
+						NotificacioEventHelper eventHelper,
+						ConfigHelper configHelper,
+						@Lazy CacheHelper cacheHelper,
+						MessageHelper messageManager,
+						EntitatRepository entitatRepository) {
 
-    // REGISTRE
+		this.integracioHelper = integracioHelper;
+		this.eventHelper = eventHelper;
+		this.configHelper = configHelper;
+		this.cacheHelper = cacheHelper;
+		this.messageManager = messageManager;
+		this.entitatRepository = entitatRepository;
+	}
+
+
+
+	// REGISTRE
 	// /////////////////////////////////////////////////////////////////////////////////////
 
 	public RespostaConsultaRegistre crearAsientoRegistral(String codiDir3Entitat, AsientoRegistralBeanDto arb, Long tipusOperacio,
