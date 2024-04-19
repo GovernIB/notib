@@ -420,7 +420,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			tipusEnviament = NotificacioTipusEnviamentEnumDto.notificacio.equals(filtreDto.getEnviamentTipus()) ? EnviamentTipus.NOTIFICACIO :  EnviamentTipus.COMUNICACIO;
 		}
 		var creadaPer = filtreDto.getCreatedBy() != null ? filtreDto.getCreatedBy().getCodi() : null;
-		return FiltreEnviament.builder()
+		var f = FiltreEnviament.builder()
 				.entitatIdNull(isSuperAdmin)
 				.entitatId(entitatId)
 				.dataCreacioIniciNull(dataCreacioInici == null)
@@ -489,7 +489,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				.referenciaNotificacioNull(Strings.isNullOrEmpty(filtreDto.getReferenciaNotificacio()))
 				.referenciaNotificacio(filtreDto.getReferenciaNotificacio())
 				.procedimentsCodisNotibNull(esProcedimentsCodisNotibNull)
-				.procedimentsCodisNotib(!esProcedimentsCodisNotibNull ? codisProcedimentsOrgans : null)
+				.procedimentsCodisNotib(!esProcedimentsCodisNotibNull ? codisProcedimentsDisponibles : null)
 				.organsGestorsCodisNotibNull(esOrgansGestorsCodisNotibNull)
 				.organsGestorsCodisNotib(!esOrgansGestorsCodisNotibNull ? codisOrgansGestorsDisponibles : null)
 				.organsGestorsComunsCodisNotibNull(esOrgansGestorsComunsCodisNotibNull)
@@ -505,6 +505,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				.isSuperAdmin(isSuperAdmin)
 				.isAdminOrgan(isAdminOrgan)
 				.build();
+		f.crearProcedimentsCodisNotibSplit();
+		return f;
 	}
 
 	@Transactional(readOnly = true)

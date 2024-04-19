@@ -7,13 +7,17 @@ import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.ListUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Builder
 @Getter
 @Setter
+@Slf4j
 public class FiltreNotificacio {
 
     private boolean entitatIdNull;
@@ -51,7 +55,8 @@ public class FiltreNotificacio {
     private String referencia;
     private boolean isUsuari;
     private boolean procedimentsCodisNotibNull;
-    private List<? extends String> procedimentsCodisNotib;
+    private List<String> procedimentsCodisNotib;
+    private List<List<String>> procedimentsCodisNotibSplit;
     private List<? extends String> grupsProcedimentCodisNotib;
     private boolean organsGestorsCodisNotibNull;
     private List<? extends String> organsGestorsCodisNotib;
@@ -70,4 +75,24 @@ public class FiltreNotificacio {
 
     private boolean esOrgansGestorsComunsCodisNotibNull;
     private List<? extends String> organsGestorsComunsCodisNotib;
+
+    public void crearProcedimentsCodisNotibSplit() {
+
+        procedimentsCodisNotibSplit = new ArrayList<>(4);
+        if (procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty()) {
+            for (var foo = 0; foo<4; foo++) {
+                procedimentsCodisNotibSplit.add(new ArrayList<>());
+            }
+            return;
+        }
+        var temp = ListUtils.partition(procedimentsCodisNotib, 999);
+        if (temp.size() > 4) {
+            procedimentsCodisNotibSplit = new ArrayList<>(temp.size());
+        }
+        procedimentsCodisNotibSplit.addAll(temp);
+        while (procedimentsCodisNotibSplit.size() < 4) {
+            procedimentsCodisNotibSplit.add(new ArrayList<>());
+        }
+    }
+
 }
