@@ -7,6 +7,7 @@ import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections4.ListUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -50,6 +51,7 @@ public class FiltreNotificacio {
     private boolean isUsuari;
     private boolean procedimentsCodisNotibNull;
     private List<? extends String> procedimentsCodisNotib;
+    private List<? extends List<? extends String>> procedimentsCodisNotibSplit;
     private List<? extends String> grupsProcedimentCodisNotib;
     private boolean organsGestorsCodisNotibNull;
     private List<? extends String> organsGestorsCodisNotib;
@@ -68,4 +70,9 @@ public class FiltreNotificacio {
 
     private boolean esOrgansGestorsComunsCodisNotibNull;
     private List<? extends String> organsGestorsComunsCodisNotib;
+
+    public void crearProcedimentsCodisNotibSplit() {
+        procedimentsCodisNotibSplit = ListUtils.partition(procedimentsCodisNotib, 999);
+    }
+
 }
