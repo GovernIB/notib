@@ -36,6 +36,8 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -79,6 +81,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.fundaciobit.plugins.validatesignature.afirmacxf.AfirmaCxfValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformation;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
@@ -2123,15 +2126,28 @@ public class PluginHelper {
 
 	private IValidateSignaturePlugin getValidaSignaturaPlugin() {
 
+		NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Instanciant plugin de validacio de signatura", log, LoggingTipus.VALIDATE_SIGNATURE);
 		var entitatCodi = configHelper.getEntitatActualCodi();
+		NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Entitat codi " + entitatCodi, log, LoggingTipus.VALIDATE_SIGNATURE);
 		if (Strings.isNullOrEmpty(entitatCodi)) {
 			throw new RuntimeException("El codi d'entitat no pot ser nul");
 		}
 		var plugin = validaSignaturaPlugins.get(entitatCodi);
 		if (plugin != null) {
+			NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Plugin previament instanciat per la entitat " + entitatCodi, log, LoggingTipus.VALIDATE_SIGNATURE);
+			if (plugin instanceof AfirmaCxfValidateSignaturePlugin) {
+				var properties = ((AfirmaCxfValidateSignaturePlugin) plugin).getPluginProperties();
+				var endpoint = properties.get("es.caib.notib.plugins.validatesignature.afirmacxf.endpoint");
+				var username = properties.get("es.caib.notib.plugins.validatesignature.afirmacxf.authorization.username");
+				var transformersPath = properties.get("es.caib.notib.plugins.validatesignature.afirmacxf.TransformersTemplatesPath");
+				NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Endpoint " + endpoint, log, LoggingTipus.VALIDATE_SIGNATURE);
+				NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Username " + username, log, LoggingTipus.VALIDATE_SIGNATURE);
+				NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] TransformersTemplatesPath " + transformersPath, log, LoggingTipus.VALIDATE_SIGNATURE);
+			}
 			return plugin;
 		}
 		var pluginClass = getPropertyPluginValidaSignatura();
+		NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Plugin class " + pluginClass, log, LoggingTipus.VALIDATE_SIGNATURE);
 		if (Strings.isNullOrEmpty(pluginClass)) {
 			var error = "No està configurada la classe per al plugin de validació de firma";
 			log.error(error);
@@ -2139,8 +2155,15 @@ public class PluginHelper {
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (IValidateSignaturePlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-					.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+			NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Innstanciant plugin per la entitat " + entitatCodi, log, LoggingTipus.VALIDATE_SIGNATURE);
+			var properties = configHelper.getAllEntityProperties(entitatCodi);
+			var endpoint = properties.get("es.caib.notib.plugins.validatesignature.afirmacxf.endpoint");
+			var username = properties.get("es.caib.notib.plugins.validatesignature.afirmacxf.authorization.username");
+			var transformersPath = properties.get("es.caib.notib.plugins.validatesignature.afirmacxf.TransformersTemplatesPath");
+			NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Endpoint " + endpoint, log, LoggingTipus.VALIDATE_SIGNATURE);
+			NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Username " + username, log, LoggingTipus.VALIDATE_SIGNATURE);
+			NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] TransformersTemplatesPath " + transformersPath, log, LoggingTipus.VALIDATE_SIGNATURE);
+			plugin = (IValidateSignaturePlugin)clazz.getDeclaredConstructor(String.class, Properties.class).newInstance(ConfigDto.prefix + ".", properties);
 			validaSignaturaPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {

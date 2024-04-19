@@ -4,4 +4,35 @@ UPDATE NOT_NOTIFICACIO_TABLE SET PER_ACTUALITZAR = 1;
 UPDATE NOT_NOTIFICACIO_ENV_TABLE t SET REGISTRE_DATA = (SELECT nne.REGISTRE_DATA FROM NOT_NOTIFICACIO_ENV nne WHERE t.id = nne.id);
 
 UPDATE NOT_NOTIFICACIO_TABLE SET REGISTRE_NUMS = (select listagg(E.REGISTRE_NUMERO_FORMATAT , ', ') WITHIN GROUP (ORDER BY E.ID) FROM NOT_NOTIFICACIO_ENV E WHERE E.NOTIFICACIO_ID = NOT_NOTIFICACIO_TABLE.ID);
+
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.consulta.sir.dies.intents', '7', 'Dies que el pooling seguirà fent la consulta si aquesta no retorna un estat final', 'GENERAL', 0, 0, 'INT', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.TAULA_REMESES', 'false', 'Mostrar logs de la taula de remeses', 'LOGS', 0, 0, 'BOOL', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.GENERIC', 'false', 'Mostrar logs generics', 'LOGS', 0, 0, 'BOOL', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.CALLBACK', 'false', 'Mostrar logs dels callbacks', 'LOGS', 2, 0, 'BOOL', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.REGISTRE', 'false', 'Mostrar logs de registre', 'LOGS', 3, 0, 'BOOL', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.NOTIFICA', 'false', 'Mostrar logs de Notifica@', 'LOGS', 4, 0, 'BOOL', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.SIR', 'false', 'Mostrar logs de la taula de comunicacions SIR', 'LOGS', 5, 0, 'BOOL', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.STATE_MACHINE', 'false', 'Mostrar logs de la state machine', 'LOGS', 6, 0, 'BOOL', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.plugin.KEYCLOAK', 'false', 'Mostrar logs del plugin de Keycloak', 'LOGS', 7, 0, 'BOOL', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.plugin.ROLSAC', 'false', 'Mostrar logs del plugin de ROLSAC', 'LOGS', 9, 0, 'BOOL', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.plugin.UNITATS', 'false', 'Mostrar logs del plugin unitats administratives', 'LOGS', 10, 0, 'BOOL', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.plugin.GESDOC', 'false', 'Mostrar logs del plugin del gestor documental', 'LOGS', 11, 0, 'BOOL', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.plugin.FIRMA_SERVIDOR', 'false', 'Mostrar logs del plugin de firma en servidor', 'LOGS', 12, 0, 'BOOL', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.plugin.CARPETA', 'false', 'Mostrar logs del plugin de carpeta', 'LOGS', 13, 0, 'BOOL', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.plugin.ARXIU', 'false', 'Mostrar logs del plugin de carpeta', 'LOGS', 14, 0, 'BOOL', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.plugin.VALIDATE_SIGNATURE', 'false', 'Mostrar logs del plugin de validació de signatura', 'LOGS', 15, 0, 'BOOL', 0);
