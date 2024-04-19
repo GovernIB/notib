@@ -67,6 +67,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Autowired
 	private AccesUsuariInterceptor accesUsuariInterceptor;
 
+	private static final long MAX_UPLOAD_SIZE = 52428800l;
+
 	@Bean
 	public LocaleResolver localeResolver() {
 
@@ -105,7 +107,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Bean(name = "multipartResolver")
 	public CommonsMultipartResolver multipartResolver() {
 		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
-		multipartResolver.setMaxUploadSize(10485760);
+		multipartResolver.setMaxUploadSize(MAX_UPLOAD_SIZE);
+//		multipartResolver.setResolveLazily(true);
 		return multipartResolver;
 	}
 

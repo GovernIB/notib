@@ -142,7 +142,7 @@ public class NotificacioListHelper {
             f.setDataFi(c.getTime());
         }
 
-        return FiltreNotificacio.builder()
+        var filtreNotificacio = FiltreNotificacio.builder()
                 .entitatIdNull(entitatFiltre == null)
                 .entitatId(entitatFiltre)
                 .entitat(entitatActual)
@@ -194,6 +194,9 @@ public class NotificacioListHelper {
                 .organs(organs)
                 .notMassivaIdNull(f.getNotMassivaId() == null)
                 .notMassivaId(f.getNotMassivaId()).build();
+
+        filtreNotificacio.crearProcedimentsCodisNotibSplit();
+        return filtreNotificacio;
     }
 
 }

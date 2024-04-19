@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.NotificacioEventHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
@@ -54,6 +55,11 @@ public class ConfigServiceImpl implements ConfigService {
     @Autowired
     private NotibLogger logger;
 
+    private static final long MAX_UPLOAD_SIZE = 52428800l;
+
+    @Autowired
+    private MessageHelper messageHelper;
+
     @Override
     @Transactional
     public ConfigDto updateProperty(ConfigDto property) {
@@ -64,6 +70,9 @@ public class ConfigServiceImpl implements ConfigService {
             log.error("ATENCIÓ S'ESTÀ INTENTANT GUARDAR UNA PROPIETAT QUE NO ÉS CONFIGURABLE");
             return null;
         }
+        if (checkNotificacioDocumentSize(property))  {
+            return ConfigDto.builder().key("error").description(messageHelper.getMessage("config.controller.edit.max.document.size", new Object[]{MAX_UPLOAD_SIZE})).build();
+        }
         configEntity.update(!"null".equals(property.getValue()) ? property.getValue() : null);
         configHelper.reloadDbProperties();
         pluginHelper.resetPlugins(configEntity.getGroupCode());
@@ -72,6 +81,7 @@ public class ConfigServiceImpl implements ConfigService {
         if ("es.caib.notib.state.machine.delay".equals(property.getKey())) {
             carregarDelaysReintentsRemeses();
         }
+
         if (property.getKey().contains(NotibLogger.PREFIX)) {
             if (property.getKey().endsWith(LoggingTipus.KEYCLOAK.name())) {
                 pluginHelper.resetPlugins("USUARIS");
@@ -80,6 +90,19 @@ public class ConfigServiceImpl implements ConfigService {
             }
         }
         return conversioTipusHelper.convertir(configEntity, ConfigDto.class);
+    }
+
+    private boolean checkNotificacioDocumentSize(ConfigDto property) {
+
+        if (!"es.caib.notib.notificacio.document.size".equals(property.getKey()) || property.getValue() == null) {
+            return false;
+        }
+        try {
+            long mida = Long.parseLong(property.getValue());
+            return mida > MAX_UPLOAD_SIZE;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     @Override

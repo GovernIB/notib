@@ -80,15 +80,21 @@ public class ConfigController extends BaseUserController{
         }
         var msg = "config.controller.edit.ok";
         var status = 1;
+        var isErrorDesc = false;
         try {
             var c = configService.updateProperty(configCommand.asDto());
             msg = c == null ? errorMsg : msg;
             status = c == null ? 0 : status;
+            if (c != null && "error".equals(c.getKey())) {
+                isErrorDesc = true;
+                msg = c.getDescription();
+                status = 0;
+            }
         } catch (Exception ex) {
             status = 0;
             log.error(errorMsg, ex);
         }
-        return SimpleResponse.builder().status(status).message(getMessage(request, msg)).build();
+        return SimpleResponse.builder().status(status).message(isErrorDesc ? msg : getMessage(request, msg)).build();
     }
 
     @ResponseBody

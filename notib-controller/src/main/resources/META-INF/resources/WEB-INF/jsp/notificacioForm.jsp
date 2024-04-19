@@ -511,8 +511,15 @@
 				let id = metadadesId.charAt(metadadesId.length - 1);
 
 				$file.closest(".fileinput").next(".validating-block").remove();
-				$('<p class="validating-block text-info"><span class="fa fa-spin fa-circle-o-notch"></span>&nbsp;<spring:message code="notificacio.form.valid.document.validant"/></p>').insertAfter($file.closest(".fileinput"));
-
+				$('<p id="cercle-validacio" class="validating-block text-info"><span class="fa fa-spin fa-circle-o-notch"></span>&nbsp;<spring:message code="notificacio.form.valid.document.validant"/></p>').insertAfter($file.closest(".fileinput"));
+				if (fitxer.size + "" > ${docMaxSize}) {
+					$file.closest(".form-group").addClass("has-error");
+					$file.closest(".fileinput").next(".help-block").remove();
+					$('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span id="arxiu' + id + '.errors"><spring:message code="notificacio.form.valid.document.error"/> ' + ' ' + '<spring:message code="notificacio.for.camp.document.mida.maxima"/></span></p>').insertAfter($file.closest(".fileinput"));
+					$("#cercle-validacio").hide();
+					$file.prop("disabled", false);
+					return;
+				}
 				$("#saveForm").attr("disabled", true);
 				$.ajax({
 					type: "POST",
@@ -538,7 +545,7 @@
 							$('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span id="arxiu' + id + '.errors"><spring:message code="notificacio.form.valid.document.error"/> ' + data.errorMsg + '</span></p>').insertAfter($file.closest(".fileinput"));
 						} else {
 							$file.closest(".form-group").removeClass("has-error");
-							$file.closest(".fileinput").next(".help-block").remove();
+							$file.closest(".fileinput").next(".help-block").hide();
 
 							if (data.signed) {
 								$('<p class="validating-block text-success"><span class="fa fa-check"></span>&nbsp;<spring:message code="notificacio.form.valid.document.firma.ok"/></p>').insertAfter($file.closest(".fileinput"));

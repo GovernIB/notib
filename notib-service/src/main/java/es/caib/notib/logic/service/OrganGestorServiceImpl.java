@@ -1200,7 +1200,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				organsGestorsDisponibles = organGestorRepository.findByEntitat(entitat);
 			} else if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
 				List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organ);
-				organsGestorsDisponibles = organGestorRepository.findByCodiIn(organs);
+				int chunkSize = 999;
+				for (int foo = 0; foo < organs.size(); foo=foo+chunkSize) {
+					int indexFinal = foo + chunkSize;
+					indexFinal = indexFinal <= organs.size() ? indexFinal : organs.size();
+					List<OrganGestorEntity> organsChunk = organGestorRepository.findByCodiIn(organs.subList(foo, indexFinal));
+					organsGestorsDisponibles.addAll(organsChunk);
+				}
 			} else if (RolEnumDto.tothom.equals(rol)) {
 				organsGestorsDisponibles = recuperarOrgansPerProcedimentAmbPermis(usuari, entitat, PermisEnum.CONSULTA);
 			}
@@ -1496,7 +1502,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			procedimentsDisponiblesIds.add(pro.getId());
 		}
 		if (!procedimentsDisponiblesIds.isEmpty()) {
-			organsGestorsProcediments = organGestorRepository.findByProcedimentIds(procedimentsDisponiblesIds);
+			int chunkSize = 999;
+			for (int foo = 0; foo < procedimentsDisponiblesIds.size(); foo=foo+chunkSize) {
+				int indexFinal = foo + chunkSize;
+				indexFinal = indexFinal <= procedimentsDisponiblesIds.size() ? indexFinal : procedimentsDisponiblesIds.size();
+				List<OrganGestorEntity> organsChunk = organGestorRepository.findByProcedimentIds(procedimentsDisponiblesIds.subList(foo, indexFinal));
+				organsGestorsProcediments.addAll(organsChunk);
+			}
 		}
 		List<OrganGestorEntity> organsGestorsAmbPermis = new ArrayList<>();
 		List<String> organsCodis = new ArrayList<>();
@@ -1522,8 +1534,15 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		for (var org : organsAmbPermisComuns) {
 			organsCodis.add(org.getCodi());
 		}
-		if (!organsCodis.isEmpty()) {
-			organsGestorsAmbPermis = organGestorRepository.findByEntitatCodiAndCodiIn(entitat.getCodi(), organsCodis);
+		if (!organsCodis.isEmpty() && organsCodis.size() > 999) {
+			int chunkSize = 999;
+			for (int foo = 0; foo < organsCodis.size(); foo=foo+chunkSize) {
+				int indexFinal = foo + chunkSize;
+				indexFinal = indexFinal <= organsCodis.size() ? indexFinal : organsCodis.size();
+				List<OrganGestorEntity> organsChunk = organGestorRepository.findByEntitatCodiAndCodiIn(entitat.getCodi(), organsCodis.subList(foo, indexFinal));
+				organsGestorsAmbPermis.addAll(organsChunk);
+			}
+//			organsGestorsAmbPermis = organGestorRepository.findByEntitatCodiAndCodiIn(entitat.getCodi(), organsCodis);
 		}
 		// 3-juntam tots els òrgans i ordenam per nom
 		List<OrganGestorEntity> organsGestors;
