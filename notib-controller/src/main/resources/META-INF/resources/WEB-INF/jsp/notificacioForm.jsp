@@ -2027,22 +2027,22 @@
 					<input type="hidden" name="documents[0].mida" value="${notificacioCommand.documents[0].mida}">
 					<!-- CSV -->
 					<div id="input-origen-csv_0" class="col-md-6">
-						<not:inputText name="documentArxiuCsv[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+						<not:inputText name="documentArxiuCsv[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 					</div>
 					
 					<!-- UUID -->
 					<div id="input-origen-uuid_0" class="col-md-6 hidden">
-						<not:inputText name="documentArxiuUuid[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+						<not:inputText name="documentArxiuUuid[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 					</div>
 					
 					<!-- FITXER -->
 					<div id="input-origen-arxiu_0" class="col-md-6 hidden">
 						<c:choose>
 							<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
-								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="test"/>
+								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" messageArgs="${maxFileSize},${maxFilesSize}" fileName="test"/>
 							</c:when>
 							<c:otherwise>
-								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_0}"/>
+								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" messageArgs="${maxFileSize},${maxFilesSize}" fileName="${nomDocument_0}"/>
 							</c:otherwise>
 						</c:choose>
 					</div>
@@ -2090,22 +2090,22 @@
 						<input type="hidden" name="documents[1].mida" value="${notificacioCommand.documents[1].mida}">
 						<!-- CSV -->
 						<div id="input-origen-csv_1" class="col-md-6">
-							<not:inputText name="documentArxiuCsv[1]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+							<not:inputText name="documentArxiuCsv[1]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 						</div>
 	
 						<!-- UUID -->
 						<div id="input-origen-uuid_1" class="col-md-6 hidden">
-							<not:inputText name="documentArxiuUuid[1]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+							<not:inputText name="documentArxiuUuid[1]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 						</div>
 	
 						<!-- FITXER -->
 						<div id="input-origen-arxiu_1" class="col-md-6 hidden">
 							<c:choose>
 								<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
-									<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_1}"/>
+									<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" messageArgs="${maxFileSize},${maxFilesSize}" fileName="${nomDocument_1}"/>
 								</c:when>
 								<c:otherwise>
-									<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_1}"/>
+									<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" messageArgs="${maxFileSize},${maxFilesSize}" fileName="${nomDocument_1}"/>
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -2149,22 +2149,22 @@
 						<input type="hidden" name="documents[2].mida" value="${notificacioCommand.documents[2].mida}">
 						<!-- CSV -->
 						<div id="input-origen-csv_2" class="col-md-6">
-							<not:inputText name="documentArxiuCsv[2]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+							<not:inputText name="documentArxiuCsv[2]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 						</div>
 	
 						<!-- UUID -->
 						<div id="input-origen-uuid_2" class="col-md-6 hidden">
-							<not:inputText name="documentArxiuUuid[2]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+							<not:inputText name="documentArxiuUuid[2]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 						</div>
 	
 						<!-- FITXER -->
 						<div id="input-origen-arxiu_2" class="col-md-6 hidden">
 							<c:choose>
 								<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
-									<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_2}"/>
+									<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" messageArgs="${maxFileSize},${maxFilesSize}" fileName="${nomDocument_2}"/>
 								</c:when>
 								<c:otherwise>
-									<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_2}"/>
+									<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" messageArgs="${maxFileSize},${maxFilesSize}" fileName="${nomDocument_2}"/>
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -2210,22 +2210,22 @@
 						<input type="hidden" name="documents[3].mida" value="${notificacioCommand.documents[3].mida}">
 						<!-- CSV -->
 						<div id="input-origen-csv_3" class="col-md-6">
-							<not:inputText name="documentArxiuCsv[3]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+							<not:inputText name="documentArxiuCsv[3]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 						</div>
 	
 						<!-- UUID -->
 						<div id="input-origen-uuid_3" class="col-md-6 hidden">
-							<not:inputText name="documentArxiuUuid[3]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+							<not:inputText name="documentArxiuUuid[3]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 						</div>
 	
 						<!-- FITXER -->
 						<div id="input-origen-arxiu_3" class="col-md-6 hidden">
 							<c:choose>
 								<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
-									<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_3}"/>
+									<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" messageArgs="${maxFileSize},${maxFilesSize}" fileName="${nomDocument_3}"/>
 								</c:when>
 								<c:otherwise>
-									<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_3}"/>
+									<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" messageArgs="${maxFileSize},${maxFilesSize}" fileName="${nomDocument_3}"/>
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -2269,22 +2269,21 @@
 						<input type="hidden" name="documents[4].mida" value="${notificacioCommand.documents[4].mida}">
 						<!-- CSV -->
 						<div id="input-origen-csv_4" class="col-md-6">
-							<not:inputText name="documentArxiuCsv[4]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+							<not:inputText name="documentArxiuCsv[4]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}" />
 						</div>
 	
 						<!-- UUID -->
 						<div id="input-origen-uuid_4" class="col-md-6 hidden">
-							<not:inputText name="documentArxiuUuid[4]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 						</div>
 	
 						<!-- FITXER -->
 						<div id="input-origen-arxiu_4" class="col-md-6 hidden">
 							<c:choose>
 								<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
-									<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_4}"/>
+									<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" messageArgs="${maxFileSize},${maxFilesSize}" fileName="${nomDocument_4}"/>
 								</c:when>
 								<c:otherwise>
-									<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" fileName="${nomDocument_4}"/>
+									<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" messageArgs="${maxFileSize},${maxFilesSize}" fileName="${nomDocument_4}"/>
 								</c:otherwise>
 							</c:choose>
 						</div>

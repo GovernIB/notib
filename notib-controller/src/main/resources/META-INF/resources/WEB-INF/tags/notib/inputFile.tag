@@ -14,6 +14,7 @@
 <%@ attribute name="logoMenu" required="false" rtexprvalue="true"%>
 <%@ attribute name="fileEntitat" required="false" rtexprvalue="true"%>
 <%@ attribute name="messageKey" required="false" rtexprvalue="true"%>
+<%@ attribute name="messageArgs" required="false" rtexprvalue="true"%>
 <%@ attribute name="messageInfo" required="false" rtexprvalue="true"%>
 <%@ attribute name="info" required="false" rtexprvalue="true"%>
 <%@ attribute name="fileName" required="false" rtexprvalue="true"%>
@@ -21,7 +22,22 @@
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
 <c:set var="campLabelText"><c:choose><c:when test="${not empty textKey}"><spring:message code="${textKey}"/></c:when><c:when test="${not empty text}">${text}</c:when><c:otherwise>${campPath}</c:otherwise></c:choose><c:if test="${required}">*</c:if></c:set>
 <c:set var="campPlaceholder"><c:choose><c:when test="${not empty placeholderKey}"><spring:message code="${placeholderKey}"/></c:when><c:otherwise>${placeholder}</c:otherwise></c:choose></c:set>
-<c:set var="campInfoText"><c:choose><c:when test="${not empty messageKey}"><spring:message code="${messageKey}"/></c:when><c:when test="${not empty messageInfo}">${messageInfo}</c:when><c:otherwise>${campPath}</c:otherwise></c:choose></c:set>
+<c:set var="campInfoText">
+	<c:choose>
+		<c:when test="${not empty messageKey && not empty messageArgs}">
+			<spring:message code="${messageKey}" arguments="${messageArgs}" argumentSeparator=","/>
+		</c:when>
+		<c:when test="${not empty messageKey && empty messageArgs}">
+			<spring:message code="${messageKey}"/>
+		</c:when>
+		<c:when test="${not empty messageInfo}">
+			${messageInfo}
+		</c:when>
+		<c:otherwise>
+			${campPath}
+		</c:otherwise>
+	</c:choose>
+</c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
 <c:set var="campInputSize"><c:choose><c:when test="${not empty inputSize}">${inputSize}</c:when><c:otherwise>${12 - campLabelSize}</c:otherwise></c:choose></c:set>
 <c:set var="campInputSizeDiv">${campInputSize / 2}</c:set>

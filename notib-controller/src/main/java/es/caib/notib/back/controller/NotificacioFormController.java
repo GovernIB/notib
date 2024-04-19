@@ -192,7 +192,6 @@ public class NotificacioFormController extends BaseUserController {
         this.tipusEnviament = tipusEnviament;
         notificacioCommand.setEnviamentTipus(tipusEnviament);
         emplenarModelNotificacio(request, model, notificacioCommand);
-
     }
 
     @GetMapping(value = "/organ/{organId}/procediments")
@@ -604,6 +603,12 @@ public class NotificacioFormController extends BaseUserController {
         model.addAttribute("referer", referer);
         model.addAttribute("validaFirmaWebEnabled", isValidaFirmaWebEnabled());
         model.addAttribute("isPermesComunicacionsSirPropiaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.comunicacions.sir.internes", FALSE));
+
+        long maxFileSize = Long.parseLong(aplicacioService.propertyGet("es.caib.notib.notificacio.document.size"));
+        long maxFilesSize = Long.parseLong(aplicacioService.propertyGet("es.caib.notib.notificacio.document.total.size"));
+
+        model.addAttribute("maxFileSize", maxFileSize/(1024*1024));
+        model.addAttribute("maxFilesSize", maxFilesSize/(1024*1024));
     }
 
     private void ompliModelFormulari(HttpServletRequest request, ProcSerDto procedimentActual, EntitatDto entitatActual, NotificacioCommand notificacioCommand,
