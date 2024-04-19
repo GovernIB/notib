@@ -28,8 +28,8 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaEstatDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
-import es.caib.notib.logic.intf.service.NotificacioMassivaService;
 import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.logic.service.ws.NotificacioValidator;
 import es.caib.notib.logic.test.NotificacioMassivaTests;
@@ -128,12 +128,13 @@ public class NotificacioMassivaServiceTest {
 	private JmsTemplate jmsTemplate;
 
 	@InjectMocks
-	NotificacioMassivaService notificacioMassivaService = new NotificacioMassivaServiceImpl();
+	NotificacioMassivaServiceImpl notificacioMassivaService;
 
 	Long entitatId = 2L;
 	EntitatEntity entitatMock;
 	ProcSerEntity procSerMock;
 	OrganGestorEntity organMock;
+	NotificacioEntity notificacioMock;
 
 	Long notMassivaId = 2L;
 	NotificacioMassivaEntity notificacioMassivaMock;
@@ -168,6 +169,7 @@ public class NotificacioMassivaServiceTest {
 		entitatMock = Mockito.mock(EntitatEntity.class);
 		procSerMock = Mockito.mock(ProcSerEntity.class);
 		organMock = Mockito.mock(OrganGestorEntity.class);
+		notificacioMock = Mockito.mock(NotificacioEntity.class);
 		Mockito.when(entitatMock.getDir3Codi()).thenReturn(entitatCodiDir3);
 		Mockito.when(entitatMock.isActiva()).thenReturn(true);
 		Mockito.when(procSerMock.isActiu()).thenReturn(true);
@@ -219,6 +221,7 @@ public class NotificacioMassivaServiceTest {
 
 		// Given
 		Mockito.when(organMock.getCodi()).thenReturn("A04003746");
+		Mockito.when(organMock.getEstat()).thenReturn(OrganGestorEstatEnum.V);
 //		Mockito.when(notificacioValidator.validarNotificacioMassiu(
 //			Mockito.any(NotificacioDatabaseDto.class), Mockito.any(EntitatEntity.class), Mockito.<Map<String, Long>>any()))
 //			.thenReturn(new ArrayList<String>());
@@ -240,6 +243,7 @@ public class NotificacioMassivaServiceTest {
 	public void whenCreate_GivenNoErrors_ThenCallAltaNotificacioWeb() throws Exception {
 		// Given
 		Mockito.when(organMock.getCodi()).thenReturn("E04975701");
+		Mockito.when(organMock.getEstat()).thenReturn(OrganGestorEstatEnum.V);
 //		Mockito.when(notificacioValidatorHelper.validarNotificacioMassiu(
 //				Mockito.any(NotificacioDatabaseDto.class), Mockito.any(EntitatEntity.class), Mockito.<Map<String, Long>>any()))
 //				.thenReturn(new ArrayList<String>());
