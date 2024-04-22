@@ -336,6 +336,15 @@
         });
     }
 
+    const select2Format = {	theme: 'bootstrap',	width: 'auto', allowClear: true};
+    // const formatSelects = () => {
+    //     $("#organGestor").select2(select2Format);
+    //     $("#procedimentId").select2(select2Format);
+    //     $("#serveiId").select2(select2Format);
+    // }
+    function formatSelects (id) {
+        $(id).select2(select2Format);
+    }
     $(document).ready(function() {
 
         let $taula = $('#notificacio');
@@ -416,14 +425,24 @@
             nomesAmbErrors = !$(this).hasClass('active');
             $('#nomesAmbErrors').val(nomesAmbErrors);
         })
+
         $('#organGestor').on('change', function () {
-            //Procediments
+            formatSelects($(this));
             omplirProcediments();
             omplirServeis();
         });
 
+        $('#procedimentId').on('change', function () {
+            formatSelects($(this));
+        });
+
+        $('#serveiId').on('change', function () {
+            formatSelects($(this));
+        });
+
         omplirProcediments();
         omplirServeis();
+
         loadOrgans($('#organGestor'), organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
         $('#organGestor').val(${notificacioFiltreCommand.organGestor})
         $('#organGestor').select2().trigger('change');
@@ -438,7 +457,12 @@
             'confirm-enviar-callback': "<spring:message code="enviament.list.user.enviar.callback.misatge.avis"/>",
             'confirm-accio-massiva': "<spring:message code="enviament.list.user.confirm.accio.massiva"/>",
         };
-        initEvents($('#notificacio'), 'notificacio', eventMessages)
+        initEvents($('#notificacio'), 'notificacio', eventMessages);
+
+        // formatSelects($('#organGestor'));
+        // formatSelects($('#procedimentId'));
+        // formatSelects($('#serveiId'));
+
     });
 
     function omplirProcediments() {
@@ -448,10 +472,6 @@
             type: 'GET',
             url: "<c:url value="/notificacio/procedimentsOrgan/"/>" + organId,
             success: function(data) {
-                var select2Options = {
-                    theme: 'bootstrap',
-                    allowClear: true,
-                    width: 'auto'};
                 // Procediments
                 var procediments = data;
                 var selProcediments = $("#procedimentId");
@@ -487,9 +507,9 @@
                 } else {
                     selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
                 }
-                selProcediments.select2(select2Options);
                 selProcediments.val(${notificacioFiltreCommand.procedimentId})
                 selProcediments.select2().trigger('change');
+
             },
             error: function() {
                 console.error("error obtenint els procediments de l'òrgan gestor...");
@@ -504,10 +524,6 @@
             type: 'GET',
             url: "<c:url value="/notificacio/serveisOrgan/"/>" + organId,
             success: function(data) {
-                var select2Options = {
-                    theme: 'bootstrap',
-                    allowClear: true,
-                    width: 'auto'};
                 // Procediments
                 var serveis = data;
                 var selServeis = $("#serveiId");
@@ -543,7 +559,6 @@
                 } else {
                     selServeis.append("<option value=\"\"><spring:message code='notificacio.form.camp.servei.buit'/></option>");
                 }
-                selServeis.select2(select2Options);
                 selServeis.val(${notificacioFiltreCommand.serveiId})
                 selServeis.select2().trigger('change');
             },
@@ -612,7 +627,7 @@
     </div>
     <div class="row">
         <div class="col-md-2">
-            <not:inputSelect id="tipusUsuari" name="tipusUsuari" optionItems="${tipusUsuari}" optionValueAttribute="value" optionTextKeyAttribute="text"  emptyOption="true"  placeholderKey="notificacio.list.filtre.camp.tipususuari" inline="true" />
+            <not:inputSelect id="tipusUsuari" name="tipusUsuari"  optionValueAttribute="value" optionTextKeyAttribute="text"  emptyOption="true"  placeholderKey="notificacio.list.filtre.camp.tipususuari" inline="true" />
         </div>
         <div class="col-md-4">
             <c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
