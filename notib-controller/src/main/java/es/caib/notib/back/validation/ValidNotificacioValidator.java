@@ -157,8 +157,13 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			var fileTotalMaxSize = 15728640L; // 15MB
 			List<String> formatsDisponibles = Arrays.asList("application/pdf", "application/zip", "application/x-zip-compressed");
 			List<String> extensionsDisponibles = Arrays.asList("jpg", "jpeg", "odt", "odp", "ods", "odg", "docx", "xlsx", "pptx", "pdf", "png", "rtf", "svg", "tiff", "txt", "xml", "xsig");
-			if (aplicacioService.propertyGet("es.caib.notib.notificacio.document.size") != null) {
-				fileMaxSize = Long.parseLong(aplicacioService.propertyGet("es.caib.notib.notificacio.document.size"));
+			var docSize = aplicacioService.propertyGet("es.caib.notib.notificacio.document.size");
+			if (docSize != null) {
+				fileMaxSize = Long.parseLong(docSize);
+			}
+			var maxSize = aplicacioService.propertyGet("es.caib.notib.notificacio.document.total.size");
+			if (maxSize != null) {
+				fileTotalMaxSize = Long.parseLong(maxSize);
 			}
 			var fileTotalSize = 0L;
 			for (int i = 0; i < 5; i++) {

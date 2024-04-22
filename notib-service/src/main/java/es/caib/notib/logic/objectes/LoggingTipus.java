@@ -15,5 +15,6 @@ public enum LoggingTipus {
     GESDOC,
     FIRMA_SERVIDOR,
     CARPETA,
-    ARXIU;
+    ARXIU,
+    VALIDATE_SIGNATURE;
 }

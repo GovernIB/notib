@@ -68,7 +68,11 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"	nenv.usuariCodi = :#{#filtre.usuariCodi} " +
 			// Té permís consulta sobre el procediment
 			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and nenv.procedimentCodiNotib is not null " +
-			"			and nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}) and nenv.procedimentIsComu = false) " +
+			"			and (nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[0]}) " +
+			"				or nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[1]}) " +
+			"				or nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[2]}) " +
+			"				or nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[3]})) " +
+			"		and nenv.procedimentIsComu = false) " +
 			// Té permís consulta sobre l'òrgan
 			"	or (:#{#filtre.organsGestorsCodisNotibNull} = false and nenv.organCodi is not null " +
 			"			and (nenv.procedimentIsComu = false or nenv.procedimentRequirePermission = false) " +
@@ -154,7 +158,11 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"	nenv.usuariCodi = :#{#filtre.usuariCodi} " +
 			// Té permís consulta sobre el procediment
 			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and nenv.procedimentCodiNotib is not null " +
-			"			and nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}) and nenv.procedimentIsComu = false) " +
+			"			and (nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[0]}) " +
+			"			or nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[1]}) " +
+			"			or nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[2]}) " +
+			"			or nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[3]})) " +
+			"		and nenv.procedimentIsComu = false) " +
 			// Té permís consulta sobre l'òrgan
 			"	or (:#{#filtre.organsGestorsCodisNotibNull} = false and nenv.organCodi is not null " +
 			"			and (nenv.procedimentIsComu = false or nenv.procedimentRequirePermission = false) " +

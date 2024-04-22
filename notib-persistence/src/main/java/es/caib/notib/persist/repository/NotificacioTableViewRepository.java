@@ -79,7 +79,11 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			" ntf.usuariCodi = :#{#filtre.usuariCodi} " +
 			// Té permís consulta sobre el procediment
 			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null " +
-			"			and ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}) and ntf.procedimentIsComu = false) " +
+			"			and (ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[0]}) " +
+			"					or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[1]}) " +
+			"					or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[2]}) " +
+			"					or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[3]})) " +
+			"			and ntf.procedimentIsComu = false) " +
 			// Té permís consulta sobre l'òrgan
 			"	or (:#{#filtre.organsGestorsCodisNotibNull} = false and ntf.organCodi is not null " +
 			"			and (ntf.procedimentIsComu = false or ntf.procedimentRequirePermission = false) " +
@@ -105,7 +109,11 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:#{#filtre.isSuperAdmin} = false or ntf.entitat in (:#{#filtre.entitatsActives})) " +
 			"and (:#{#filtre.isAdminOrgan} = false or " +
 			"   (" +
-			"	(:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}))" +
+			"	(:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null " +
+			"		and (ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[0]}) " +
+			"				or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[1]}) " +
+			"				or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[2]}) " +
+			"				or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[3]})))" +
 //			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " +
 			"   or (ntf.organCodi is not null and ntf.organCodi in (:#{#filtre.organs}))" +
 			"	)) " +
@@ -139,8 +147,14 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			" :#{#filtre.isSuperAdmin} = true or " +
 			"   ntf.usuariCodi = :#{#filtre.usuariCodi} " +
 			// Té permís consulta sobre el procediment
+//			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null " +
+//			"			and ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}) and ntf.procedimentIsComu = false) " +
 			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null " +
-			"			and ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}) and ntf.procedimentIsComu = false) " +
+			"			and (ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[0]}) " +
+			"					or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[1]}) " +
+			"					or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[2]}) " +
+			"					or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[3]})) " +
+			"			and ntf.procedimentIsComu = false) " +
 			// Té permís consulta sobre l'òrgan
 			"	or (:#{#filtre.organsGestorsCodisNotibNull} = false and ntf.organCodi is not null " +
 			"			and (ntf.procedimentIsComu = false or ntf.procedimentRequirePermission = false) " +
@@ -166,7 +180,11 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:#{#filtre.isSuperAdmin} = false or ntf.entitat in (:#{#filtre.entitatsActives})) " +
 			"and (:#{#filtre.isAdminOrgan} = false or " +
 			"   (" +
-			"	(:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}))" +
+			"	(:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null and " +
+			"	(ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[0]}) " +
+			"		or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[1]}) " +
+			"		or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[2]}) " +
+			"		or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[3]})))" +
 //			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " +
 			"   or (ntf.organCodi is not null and ntf.organCodi in (:#{#filtre.organs}))" +
 			"	)) " +

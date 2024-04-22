@@ -7,13 +7,17 @@ import es.caib.notib.persist.entity.EntitatEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.ListUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Builder
 @Getter
 @Setter
+@Slf4j
 public class FiltreEnviament {
 
     private boolean entitatIdNull;
@@ -83,6 +87,7 @@ public class FiltreEnviament {
 
     private boolean procedimentsCodisNotibNull;
     private List<String> procedimentsCodisNotib;
+    private List<List<String>> procedimentsCodisNotibSplit;
     private boolean organsGestorsCodisNotibNull;
     private boolean organsGestorsComunsCodisNotibNull;
     private List<? extends String> organsGestorsComunsCodisNotib;
@@ -100,5 +105,25 @@ public class FiltreEnviament {
 
     public boolean isUsuari() {
         return isUsuari;
+    }
+
+    public void crearProcedimentsCodisNotibSplit() {
+
+        procedimentsCodisNotibSplit = new ArrayList<>(4);
+        if (procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty()) {
+            for (var foo = 0; foo<4; foo++) {
+                procedimentsCodisNotibSplit.add(new ArrayList<>());
+            }
+            return;
+        }
+        var temp = ListUtils.partition(procedimentsCodisNotib, 999);
+        if (temp.size() > 4) {
+            procedimentsCodisNotibSplit = new ArrayList<>(temp.size());
+            log.error("[CONSULTA ENVIAMENT] Error ");
+        }
+        procedimentsCodisNotibSplit.addAll(temp);
+        while (procedimentsCodisNotibSplit.size() < 4) {
+            procedimentsCodisNotibSplit.add(new ArrayList<>());
+        }
     }
 }
