@@ -236,7 +236,11 @@ public class NotificacioTableHelper {
             tableViewItem.setEnviadaDate(getEnviadaDate(notificacio));
             tableViewItem.setTitular(titular.toString());
             tableViewItem.setNotificaIds(notificaIds.toString());
-            tableViewItem.setRegistreNums(registreNums.substring(0, registreNums.length()-2));
+            var rNums = registreNums.substring(0, registreNums.length()-2);
+            if (rNums.length() > 2000) {
+                rNums = rNums.substring(0, 2000) + "...";
+            }
+            tableViewItem.setRegistreNums(rNums);
             tableViewItem.setEstatMask(estatMask);
             tableViewItem.setPerActualitzar(true);
             notificacioTableViewRepository.saveAndFlush(tableViewItem);
