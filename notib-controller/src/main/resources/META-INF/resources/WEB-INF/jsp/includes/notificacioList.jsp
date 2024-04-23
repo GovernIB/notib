@@ -427,17 +427,17 @@
         })
 
         $('#organGestor').on('change', function () {
-            formatSelects($(this));
             omplirProcediments();
             omplirServeis();
         });
-
-        $('#procedimentId').on('change', function () {
-            formatSelects($(this));
+        $('#organGestor').on('select2:unselect', function(e) {
+            $('#organGestor').select2('open');
         });
-
-        $('#serveiId').on('change', function () {
-            formatSelects($(this));
+        $('#procedimentId').on('select2:unselect', function(e) {
+            $('#procedimentId').select2('open');
+        });
+        $('#serveiId').on('select2:unselect', function(e) {
+            $('#serveiId').select2('open');
         });
 
         omplirProcediments();
@@ -458,11 +458,7 @@
             'confirm-accio-massiva': "<spring:message code="enviament.list.user.confirm.accio.massiva"/>",
         };
         initEvents($('#notificacio'), 'notificacio', eventMessages);
-
-        // formatSelects($('#organGestor'));
-        // formatSelects($('#procedimentId'));
-        // formatSelects($('#serveiId'));
-
+        formatSelects($('#organGestor'));
     });
 
     function omplirProcediments() {
@@ -508,8 +504,7 @@
                     selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
                 }
                 selProcediments.val(${notificacioFiltreCommand.procedimentId})
-                selProcediments.select2().trigger('change');
-
+                formatSelects($('#procedimentId'));
             },
             error: function() {
                 console.error("error obtenint els procediments de l'òrgan gestor...");
@@ -560,7 +555,7 @@
                     selServeis.append("<option value=\"\"><spring:message code='notificacio.form.camp.servei.buit'/></option>");
                 }
                 selServeis.val(${notificacioFiltreCommand.serveiId})
-                selServeis.select2().trigger('change');
+                formatSelects($('#serveiId'));
             },
             error: function() {
                 console.error("error obtenint els serveis de l'òrgan gestor...");
@@ -659,10 +654,10 @@
 
 <script id="botonsTemplate" type="text/x-jsrender">
 
-        </div>
-		<div class="text-right">
-			<div class="btn-group">
-                <a href="<c:url value="/notificacio/visualitzar"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default"><span class="fa fa-eye-slash"></span> <spring:message code="enviament.list.show"/></a>
+    </div>
+    <div class="text-right">
+        <div class="btn-group">
+            <a href="<c:url value="/notificacio/visualitzar"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default"><span class="fa fa-eye-slash"></span> <spring:message code="enviament.list.show"/></a>
                 <button id="btn-desplegar-envs" class="btn btn-default" style="display:none"><spring:message code="notificacio.list.boto.desplegar"/> <span class="fa fa-caret-down"></span></button>
                 <button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
 				<button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
@@ -676,24 +671,24 @@
 						<li><a id="reintentarErrors" style="cursor: pointer;" ><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
 						<li><a id="updateEstat" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.actualitzar.estat"/></a></li>
                         <li><a id="processarMassiu" href="<c:url value="/notificacio/processar/massiu"/>" data-toggle="modal" data-refresh-pagina="true"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>
-<%--                        <li><a id="processarMassiu" style="cursor: pointer;" data-toggle="modal" data-refresh-pagina="true"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>--%>
+    <%--                        <li><a id="processarMassiu" style="cursor: pointer;" data-toggle="modal" data-refresh-pagina="true"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>--%>
 <%--                        <li><a href="<c:url value="/notificacio/eliminar"/>"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>--%>
                         <li><a id="eliminar" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
                         <li><a id="descarregarJustificant" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.justificant"/></a></li>
 
-                        <c:if test="${isRolActualAdministradorEntitat}">
-                            <li><a style="cursor: pointer;" id="reactivarRegistre"><spring:message code="notificacio.list.accio.massiva.reactivar.registre"/></a></li>
-                            <li><a style="cursor: pointer;" id="reactivarConsulta"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica"/></a></li>
-                            <li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir"/></a></li>
-                            <li><a style="cursor: pointer;" id="reactivarCallback"><spring:message code="notificacio.list.accio.massiva.reactivar.callbacks"/></a></li>
-                            <li><a style="cursor: pointer;" id="enviarCallback"><spring:message code="notificacio.list.accio.massiva.enviar.callbacks"/></a></li>
-                            <li><a style="cursor: pointer;" id="enviarNotificacionsMovil"><spring:message code="notificacio.list.accio.massiva.enviar.notificacions.movil"/></a></li>
-                        </c:if>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</script>
+    <c:if test="${isRolActualAdministradorEntitat}">
+        <li><a style="cursor: pointer;" id="reactivarRegistre"><spring:message code="notificacio.list.accio.massiva.reactivar.registre"/></a></li>
+        <li><a style="cursor: pointer;" id="reactivarConsulta"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica"/></a></li>
+        <li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir"/></a></li>
+        <li><a style="cursor: pointer;" id="reactivarCallback"><spring:message code="notificacio.list.accio.massiva.reactivar.callbacks"/></a></li>
+        <li><a style="cursor: pointer;" id="enviarCallback"><spring:message code="notificacio.list.accio.massiva.enviar.callbacks"/></a></li>
+        <li><a style="cursor: pointer;" id="enviarNotificacionsMovil"><spring:message code="notificacio.list.accio.massiva.enviar.notificacions.movil"/></a></li>
+    </c:if>
+    </ul>
+</div>
+</div>
+</div>
+</script>
 
 <script id="rowhrefTemplate" type="text/x-jsrender"><c:url value="/notificacio/{{:id}}/info"/></script>
 <div id="cover-spin"></div>
@@ -720,8 +715,8 @@
     <tr>
         <th data-col-name="id" data-visible="false">#</th>
         <th data-col-name="tipusUsuari" data-visible="false">#</th>
-<%--        <th data-col-name="errorLastCallback" data-visible="false">#</th>--%>
-<%--        <th data-col-name="hasEnviamentsPendentsRegistre" data-visible="false">#</th>--%>
+        <%--        <th data-col-name="errorLastCallback" data-visible="false">#</th>--%>
+        <%--        <th data-col-name="hasEnviamentsPendentsRegistre" data-visible="false">#</th>--%>
         <th data-col-name="notificaError" data-visible="false"></th>
         <th data-col-name="notificaErrorDescripcio" data-visible="false"></th>
         <th data-col-name="enviant" data-visible="false"></th>
@@ -819,14 +814,14 @@
                     {{/if}}
                     {{if justificant}}
                         <li><a href="<c:url value="/notificacio/{{:id}}/justificant"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-download"></span>&nbsp; <spring:message code="comu.boto.justificant"/></a></li>
-<%--                        {^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan()) && hasEnviamentsPendentsRegistre }}--%>
+                <%--                        {^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan()) && hasEnviamentsPendentsRegistre }}--%>
 <%--                            <li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>--%>
 <%--                            <li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>--%>
 <%--                        {{/if}}--%>
-                    {{/if}}
-<%--                        MIRAR EL ^ QUE FA --%>
-                    {^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan())  && (enviant || estat == 'PENDENT')}}
-                        <li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
+                {{/if}}
+                <%--                        MIRAR EL ^ QUE FA --%>
+                {^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan())  && (enviant || estat == 'PENDENT')}}
+                    <li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
                         <li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
                     {{/if}}
                     </ul>
