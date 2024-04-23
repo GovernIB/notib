@@ -679,6 +679,7 @@
 <%--                        <li><a id="processarMassiu" style="cursor: pointer;" data-toggle="modal" data-refresh-pagina="true"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>--%>
 <%--                        <li><a href="<c:url value="/notificacio/eliminar"/>"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>--%>
                         <li><a id="eliminar" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
+                        <li><a id="descarregarJustificant" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.justificant"/></a></li>
 
                         <c:if test="${isRolActualAdministradorEntitat}">
                             <li><a style="cursor: pointer;" id="reactivarRegistre"><spring:message code="notificacio.list.accio.massiva.reactivar.registre"/></a></li>

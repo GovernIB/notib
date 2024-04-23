@@ -729,6 +729,28 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
     }
 
+    @GetMapping(value = {"/descarregar/justificant/massiu"})
+    public String descarregarJustificantMassiu(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
+
+        var entitatActual = sessionScopedContext.getEntitatActual();
+        var referer = request.getHeader("Referer");
+        var seleccio = getIdsSeleccionats(request);
+        if (seleccio == null || seleccio.isEmpty()) {
+            return getModalControllerReturnValueError(request,REDIRECT + referer,SELECCIO_BUIDA);
+        }
+
+        response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
+        for (var notificacioId : seleccio) {
+            var sequence = request.getParameter("sequence");
+            var justificant = justificantService.generarJustificantEnviament(notificacioId, entitatActual.getId(), sequence);
+            if (justificant == null) {
+                throw new ValidationException("Existeix un altre procés iniciat. Esperau que finalitzi la descàrrega del document.");
+            }
+            writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
+        }
+        return getModalControllerReturnValueSuccess(request,REDIRECT + referer,"notificacio.controller.esborrar.massiu.ok");
+    }
+
     @GetMapping(value = "/{notificacioId}/justificant/estat/{sequence}")
     @ResponseBody
     public ProgresDescarregaDto justificantEstat(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable String sequence) {
