@@ -515,7 +515,7 @@
 				if (fitxer.size + "" > ${docMaxSize}) {
 					$file.closest(".form-group").addClass("has-error");
 					$file.closest(".fileinput").next(".help-block").remove();
-					$('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span id="arxiu' + id + '.errors"><spring:message code="notificacio.form.valid.document.error"/> ' + ' ' + '<spring:message code="notificacio.for.camp.document.mida.maxima"/></span></p>').insertAfter($file.closest(".fileinput"));
+					$('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span id="arxiu' + id + '.errors"><spring:message code="notificacio.form.valid.document.error"/> ' + ' ' + '<spring:message code="notificacio.for.camp.document.mida.maxima"/> ${docMaxSize}Bytes</span></p>').insertAfter($file.closest(".fileinput"));
 					$("#cercle-validacio").hide();
 					$file.prop("disabled", false);
 					return;
