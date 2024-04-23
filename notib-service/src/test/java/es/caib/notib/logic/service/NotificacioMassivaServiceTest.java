@@ -316,7 +316,8 @@ public class NotificacioMassivaServiceTest {
 		Mockito.doAnswer(invocation -> {
 			Object[] args = invocation.getArguments();
 			OutputStream out = ((OutputStream)args[2]);
-			byte[] contingut = Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getResource("/es/caib/notib/logic/massiu/resum.csv")).getFile()));
+//			byte[] contingut = Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getResource("/es/caib/notib/logic/massiu/resum.csv")).getFile()));
+			byte[] contingut = Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getResource("/es/caib/notib/logic/massiu/resum.csv")).toURI()));
 			ByteArrayInputStream in = new ByteArrayInputStream(contingut);
 			IOUtils.copy(in, out);
 			return null;

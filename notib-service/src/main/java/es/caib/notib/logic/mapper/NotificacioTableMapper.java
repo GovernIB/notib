@@ -145,7 +145,11 @@ public abstract class NotificacioTableMapper {
             not.setDocumentId(dto.getDocumentId());
             not.setEnvCerData(dto.getEnvCerData());
             not.setEstatString(dto.getEstatString());
-            not.setRegistreNums(registreNums.substring(0, registreNums.length()-2));
+            var rNums = registreNums.substring(0, registreNums.length()-2);
+            if (rNums.length() > 2000) {
+                rNums = rNums.substring(0, 2000) + "...";
+            }
+            not.setRegistreNums(rNums);
             not.setPerActualitzar(false);
             notificacioTableHelper.actualitzarCampsLlistat(not);
         } catch (Exception ex) {
