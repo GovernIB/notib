@@ -757,7 +757,6 @@
             </th>
         </c:if>
         <th data-col-name="procedimentTipus" data-visible="false"></th>
-        <th data-col-name="estat" data-visible="false"></th>
         <c:if test = "${columnes.procSerCodi == true}">
             <th data-col-name="procedimentDesc" data-template="#cellProcedimentTemplate" width="200px"><spring:message code="notificacio.list.columna.procediment"/>
                 <script id="cellProcedimentTemplate" type="text/x-jsrender">
@@ -775,11 +774,15 @@
         <c:if test = "${columnes.concepte == true}">
             <th data-col-name="concepte" width="${ampladaConcepte}" ><spring:message code="notificacio.list.columna.concepte"/></th>
         </c:if>
+        <c:if test = "${columnes.creadaPer == true}">
+            <th data-col-name="createdByComplet" data-converter="String" width="150px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
+        </c:if>
         <c:if test = "${columnes.interessats == true}">
             <th data-col-name="titular"><spring:message code="notificacio.list.columna.interessats"/></th>
         </c:if>
         <th data-col-name="estatDate" data-converter="datetime" data-visible="false"></th>
         <th data-col-name="estatProcessatDate" data-converter="datetime" data-visible="false"></th>
+        <th data-col-name="estat" data-visible="false"></th>
         <c:if test = "${columnes.estat == true}">
             <th data-col-name="estatString" data-template="#cellEstatTemplate" <c:if test="${isRolActualAdministradorEntitat}"> data-disable-events="true" </c:if>width="120px"><spring:message code="notificacio.list.columna.estat"/>
                 <script id="cellEstatTemplate" type="text/x-jsrender">
@@ -791,9 +794,6 @@
                     </div>
                 </script>
             </th>
-        </c:if>
-        <c:if test = "${columnes.creadaPer == true}">
-            <th data-col-name="createdByComplet" data-converter="String" width="150px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
         </c:if>
         <th data-col-name="permisProcessar" data-visible="false">
         <th data-col-name="documentId" data-visible="false" style="visibility: hidden">
