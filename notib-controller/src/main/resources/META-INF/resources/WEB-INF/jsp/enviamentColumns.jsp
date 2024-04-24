@@ -26,8 +26,8 @@
 	<not:modalHead/>
 <style type="text/css">
 input[type='checkbox'] {
-    width:30px;
-    height:30px;
+    /*width:30px;*/
+    /*height:30px;*/
     background:white;
     border-radius:5px;
     border:2px solid #555;
@@ -48,31 +48,31 @@ input[type='checkbox']:checked{
 		<div class="row col-xs-12">
 			<div class="row col-xs-6">
 				<div class="col-md-3">
-					<not:inputCheckboxGros name="dataCreacio" textKey="enviament.list.datacreacio" labelSize="10"/>
+					<not:inputCheckbox name="dataCreacio" textKey="enviament.list.datacreacio" labelSize="10"/>
 				</div>
 				<div class="col-md-3">
-					<not:inputCheckboxGros name="dataEnviament" textKey="enviament.list.dataenviament" labelSize="10" />
+					<not:inputCheckbox name="dataEnviament" textKey="enviament.list.dataenviament" labelSize="10" />
 				</div>
 				<div class="col-md-3">
-					<not:inputCheckboxGros name="dataProgramada" textKey="enviament.list.dataprogramada" labelSize="10" />
+					<not:inputCheckbox name="dataProgramada" textKey="enviament.list.dataprogramada" labelSize="10" />
 				</div>
 				<div class="col-md-2">
-					<not:inputCheckboxGros name="notIdentificador" textKey="enviament.list.codinotifica" labelSize="10"/>
+					<not:inputCheckbox name="notIdentificador" textKey="enviament.list.codinotifica" labelSize="10"/>
 				</div>
 				<div class="col-md-3">
-					<not:inputCheckboxGros name="proCodi" textKey="enviament.list.codiprocediment" labelSize="10"/>
+					<not:inputCheckbox name="proCodi" textKey="enviament.list.codiprocediment" labelSize="10"/>
 				</div>
 				<div class="col-md-3">
-					<not:inputCheckboxGros name="grupCodi" textKey="enviament.list.codigrup" labelSize="10"/>
+					<not:inputCheckbox name="grupCodi" textKey="enviament.list.codigrup" labelSize="10"/>
 				</div>
 				<div class="col-md-3">
-					<not:inputCheckboxGros name="dir3Codi" textKey="enviament.list.dir3codi" labelSize="10"/>
+					<not:inputCheckbox name="dir3Codi" textKey="enviament.list.dir3codi" labelSize="10"/>
 				</div>
 				<div class="col-md-3">
-					<not:inputCheckboxGros name="usuari" textKey="enviament.list.usuari" labelSize="10"/>
+					<not:inputCheckbox name="usuari" textKey="enviament.list.usuari" labelSize="10"/>
 				</div>
 				<div class="col-md-2">
-					<not:inputCheckboxGros name="enviamentTipus" textKey="enviament.list.tipusenviament" labelSize="10"/>
+					<not:inputCheckbox name="enviamentTipus" textKey="enviament.list.tipusenviament" labelSize="10"/>
 				</div>
 				<div class="col-md-3">
 					<not:inputCheckbox name="concepte" textKey="enviament.list.concepte" labelSize="10"/>

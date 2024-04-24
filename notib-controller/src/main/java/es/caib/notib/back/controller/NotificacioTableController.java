@@ -13,9 +13,11 @@ import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.NotificacioBackHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
+import es.caib.notib.client.domini.Fitxer;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
@@ -40,6 +42,7 @@ import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.ServeiService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -71,6 +74,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -727,6 +731,48 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
         response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
         writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
+    }
+
+    @GetMapping(value = {"/descarregar/justificant/massiu"})
+    public String descarregarJustificantMassiu(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
+
+        var entitatActual = sessionScopedContext.getEntitatActual();
+        var referer = request.getHeader("Referer");
+        var seleccio = getIdsSeleccionats(request);
+        if (seleccio == null || seleccio.isEmpty()) {
+            return getModalControllerReturnValueError(request,REDIRECT + referer,SELECCIO_BUIDA);
+        }
+
+        response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
+        List<FitxerDto> justificants = new ArrayList<>();
+        var seqNum = 0;
+        for (var notificacioId : seleccio) {
+//            var sequence = request.getParameter("sequence" + seqNum);
+            var sequence = "sequence" + UUID.randomUUID();
+            seqNum++;
+            var justificant = justificantService.generarJustificantEnviament(notificacioId, entitatActual.getId(), sequence);
+            if (justificant == null) {
+                log.error("[MASSIVA DESCARREGAR JUSTIFICANT] Existeix un altre procés iniciat. Esperau que finalitzi la descàrrega del document. Notificacio id " + notificacioId);
+                continue;
+            }
+            justificants.add(justificant);
+        }
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(baos);
+
+        for (var justificant : justificants) {
+            ZipEntry entry = new ZipEntry(StringUtils.stripAccents(justificant.getNom()));
+            entry.setSize(justificant.getContingut().length);
+            zos.putNextEntry(entry);
+            zos.write(justificant.getContingut());
+            zos.closeEntry();
+        }
+        zos.close();
+        var sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        var date = sdf.format(new Date()).replace(":", "_");
+        writeFileToResponse("justificantsMassiu_" + date + ".zip", baos.toByteArray(), response);
+        return getModalControllerReturnValueSuccess(request,REDIRECT + referer,"notificacio.controller.descarregar.justificant.massiu.ok");
     }
 
     @GetMapping(value = "/{notificacioId}/justificant/estat/{sequence}")
