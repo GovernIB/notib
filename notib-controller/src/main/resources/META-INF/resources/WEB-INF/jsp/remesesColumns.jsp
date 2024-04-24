@@ -26,8 +26,8 @@
 	<not:modalHead/>
 <style type="text/css">
 input[type='checkbox'] {
-    width:30px;
-    height:30px;
+    /*width:30px;*/
+    /*height:30px;*/
     background:white;
     border-radius:5px;
     border:2px solid #555;
@@ -47,34 +47,34 @@ input[type='checkbox']:checked{
 		<form:hidden path="id"/>
 		<div class="row col-xs-12">
 			<div class="row col-xs-6">
-				<div class="col-md-3">
-					<not:inputCheckboxGros name="dataCreacio" textKey="enviament.list.datacreacio" labelSize="10"/>
+				<div class="col-md-4">
+					<not:inputCheckbox name="dataCreacio" textKey="enviament.list.datacreacio" labelSize="10"/>
 				</div>
-				<div class="col-md-3">
-					<not:inputCheckboxGros name="dataEnviament" textKey="enviament.list.dataenviament" labelSize="10" />
+				<div class="col-md-4">
+					<not:inputCheckbox name="dataEnviament" textKey="enviament.list.dataenviament" labelSize="10" />
 				</div>
-				<div class="col-md-3">
-					<not:inputCheckboxGros name="numRegistre" textKey="notificacio.list.columna.num.registre" labelSize="10" />
+				<div class="col-md-4">
+					<not:inputCheckbox name="numRegistre" textKey="notificacio.list.columna.num.registre" labelSize="10" />
 				</div>
-				<div class="col-md-2">
-					<not:inputCheckboxGros name="organEmisor" textKey="notificacio.form.camp.organEmisor" labelSize="10"/>
+				<div class="col-md-4">
+					<not:inputCheckbox name="organEmisor" textKey="notificacio.form.camp.organEmisor" labelSize="10"/>
 				</div>
-				<div class="col-md-3">
-					<not:inputCheckboxGros name="procSerCodi" textKey="notificacio.list.columna.procediment" labelSize="10"/>
+				<div class="col-md-4">
+					<not:inputCheckbox name="procSerCodi" textKey="notificacio.list.columna.procediment" labelSize="10"/>
 				</div>
-				<div class="col-md-3">
-					<not:inputCheckboxGros name="numExpedient" textKey="notificacio.list.columna.num.expedient" labelSize="10"/>
+				<div class="col-md-4">
+					<not:inputCheckbox name="numExpedient" textKey="notificacio.list.columna.num.expedient" labelSize="10"/>
 				</div>
-				<div class="col-md-3">
-					<not:inputCheckboxGros name="concepte" textKey="notificacio.list.columna.concepte" labelSize="10"/>
+				<div class="col-md-4">
+					<not:inputCheckbox name="concepte" textKey="notificacio.list.columna.concepte" labelSize="10"/>
 				</div>
-				<div class="col-md-3">
-					<not:inputCheckboxGros name="creadaPer" textKey="notificacio.list.columna.enviament.creada" labelSize="10"/>
+				<div class="col-md-4">
+					<not:inputCheckbox name="creadaPer" textKey="notificacio.list.columna.enviament.creada" labelSize="10"/>
 				</div>
-				<div class="col-md-2">
-					<not:inputCheckboxGros name="interessats" textKey="notificacio.list.columna.interessats" labelSize="10"/>
+				<div class="col-md-4">
+					<not:inputCheckbox name="interessats" textKey="notificacio.list.columna.interessats" labelSize="10"/>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-4">
 					<not:inputCheckbox name="estat" textKey="notificacio.list.columna.estat" labelSize="10"/>
 				</div>
 			</div>
