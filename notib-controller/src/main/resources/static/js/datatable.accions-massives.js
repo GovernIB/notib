@@ -241,7 +241,7 @@ function initEvents($table, url_prefix, eventMessages) {
             location.href = url_prefix + "/eliminar";
         });
 
-        $("#descarregarJustificant").on("click", () => {
+        $("#descarregarJustificantMassiu").on("click", () => {
 
             let count = Number($(".seleccioCount").html());
             if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
