@@ -250,6 +250,15 @@ function initEvents($table, url_prefix, eventMessages) {
             location.href = url_prefix + "/descarregar/justificant/massiu";
         });
 
+        $("#descarregarCertificacioMassiu").on("click", () => {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
+            location.href = url_prefix + "/descarregar/certificacio/massiu";
+        });
+
         $("#reactivarRegistre").on("click", () => {
 
             let count = Number($(".seleccioCount").html());
