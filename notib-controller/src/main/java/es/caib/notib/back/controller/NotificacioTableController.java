@@ -592,13 +592,12 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     }
 
     @GetMapping(value = {"/descarregar/certificacio/massiu"})
-    public String certificacioDescarregarMassiu(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
+    @ResponseBody
+    public void certificacioDescarregarMassiu(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
 
-        var entitatActual = sessionScopedContext.getEntitatActual();
-        var referer = request.getHeader("Referer");
         var seleccio = getIdsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
-            return getModalControllerReturnValueError(request,REDIRECT + referer,SELECCIO_BUIDA);
+            return;
         }
 
         response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
@@ -621,10 +620,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                     interessats.put(env.getTitular().getNif(), numInteressats);
                     certificacio.setNom(numInteressats + "_" + certificacio.getNom());
                 }
-//                var entry = new ZipEntry(arxiu.getNom());
-//                entry.setSize(arxiu.getTamany());
-//                zos.putNextEntry(entry);
-//                zos.write(arxiu.getContingut());
                 contingut = true;
                 notCertificacions.add(certificacio);
             }
@@ -651,7 +646,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         var date = sdf.format(new Date()).replace(":", "_");
         writeFileToResponse("certificacionsMassives_" + date + ".zip", baos.toByteArray(), response);
-        return getModalControllerReturnValueSuccess(request,REDIRECT + referer,"notificacio.controller.descarregar.justificant.massiu.ok");
     }
 
     @GetMapping(value = "/{notificacioId}/enviament/{enviamentId}/certificacioDescarregar")
@@ -797,13 +791,15 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     }
 
     @GetMapping(value = {"/descarregar/justificant/massiu"})
-    public String justificantDescarregarMassiu(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
+    @ResponseBody
+    public void justificantDescarregarMassiu(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
 
         var entitatActual = sessionScopedContext.getEntitatActual();
         var referer = request.getHeader("Referer");
         var seleccio = getIdsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
-            return getModalControllerReturnValueError(request,REDIRECT + referer,SELECCIO_BUIDA);
+            return;
+//            return getModalControllerReturnValueError(request,REDIRECT + referer,SELECCIO_BUIDA);
         }
 
         response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
@@ -834,7 +830,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         var date = sdf.format(new Date()).replace(":", "_");
         writeFileToResponse("justificantsMassiu_" + date + ".zip", baos.toByteArray(), response);
-        return getModalControllerReturnValueSuccess(request,REDIRECT + referer,"notificacio.controller.descarregar.justificant.massiu.ok");
+//        return getModalControllerReturnValueSuccess(request,REDIRECT + referer,"notificacio.controller.descarregar.justificant.massiu.ok");
     }
 
     @GetMapping(value = "/{notificacioId}/justificant/estat/{sequence}")
