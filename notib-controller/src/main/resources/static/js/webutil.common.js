@@ -385,13 +385,19 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 				}
 			});
 		}
-		var s2 = $(this).select2({
-		    placeholder: $(this).data('placeholder'),
-		    theme: "bootstrap",
-		    allowClear: $(this).data('placeholder') ? true : false,
-		    minimumResultsForSearch: $(this).data('minimumresults')
-		});
-		
+		let select2Options = {
+			placeholder: $(this).data('placeholder'),
+			theme: "bootstrap",
+			allowClear: $(this).data('placeholder') ? true : false,
+			minimumResultsForSearch: $(this).data('minimumresults')
+		};
+		var templateResultFunction = window[$(this).data('templateresultfunction')];
+		if (templateResultFunction != null) {
+			select2Options['templateResult'] = templateResultFunction;
+			select2Options['templateSelection'] = templateResultFunction;
+		}
+		$(this).select2(select2Options);
+
 		// Unicament per tipus de document de l'entitat!!!
 		if (selectValue !== undefined) {
 			addDefault(selectValue);
@@ -715,6 +721,7 @@ function resetSessionTimeout(){
 
 function loadOrgans($selector, organsGestors, missatgeObsolets){
 	function formatState(organ) {
+		debugger;
 		let msgObsolet = missatgeObsolets;
 		if (organ.estat == 'V' || organ.estat == null || organ.estat == '') {
 			return organ.text;

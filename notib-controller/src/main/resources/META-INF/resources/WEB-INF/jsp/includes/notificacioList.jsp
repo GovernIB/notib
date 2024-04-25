@@ -113,6 +113,62 @@
     }
 </style>
 <script type="text/javascript">
+
+    function showEstat(element) {
+        var bsIconCode = "";
+        var translate = element.text;
+        if (element.id == 'PENDENT') {
+            bsIconCode = "fa fa-clock-o";
+            translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PENDENT"/>";
+        }
+        if (element.id == 'ENVIADA') {
+            bsIconCode = "fa fa-send-o";
+            translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA"/>";
+        }
+        if (element.id == 'REGISTRADA') {
+            bsIconCode = "fa fa-file-o";
+            translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.REGISTRADA"/>";
+        }
+        if (element.id == 'FINALITZADA') {
+            bsIconCode = "fa fa-check";
+            translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA"/>";
+        }
+        if (element.id == 'PROCESSADA') {
+            bsIconCode = "fa fa-check-circle";
+            translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA"/>";
+        }
+        if (element.id == 'EXPIRADA') {
+            bsIconCode = "fa fa-check";
+            translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.EXPIRADA"/>";
+        }
+        if (element.id == 'NOTIFICADA') {
+            bsIconCode = "fa fa-check";
+            translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.NOTIFICADA"/>";
+        }
+        if (element.id == 'REBUTJADA') {
+            bsIconCode = "fa fa-check";
+            translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.REBUTJADA"/>";
+        }
+        if (element.id == 'ENVIAT_SIR') {
+            bsIconCode = "fa fa-send-o";
+            translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIAT_SIR"/>";
+        }
+        if (element.id == 'ENVIADA_AMB_ERRORS') {
+            bsIconCode = "fa fa-send-o";
+            translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS"/>";
+        }
+        if (element.id == 'FINALITZADA_AMB_ERRORS') {
+            bsIconCode = "fa fa-check";
+            translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS"/>";
+        }
+        if (element.id == 'ENVIANT') {
+            bsIconCode = "fa fa-clock-o";
+            translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIANT"/>";
+        }
+
+        return $('<span class="' + bsIconCode + '"></span><span>  ' + translate + '</span>');
+    }
+
     var myHelpers = {
         recuperarEstatEnviament: returnEnviamentsStatusDiv,
         hlpIsUsuari: isRolActualUsuari,
@@ -140,9 +196,16 @@
     </c:forEach>
 
     var notificacioEstats = [];
-    <c:forEach var="estat" items="${notificacioEstats}">
-    notificacioEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
+    notificacioEstats.push({value:"", text:""});
+    <c:forEach items="${notificacioEstats}" var="notificacioEstat">
+    notificacioEstats.push({value:"${notificacioEstat.value}", text:"${notificacioEstat.text}"});
     </c:forEach>
+
+    <%--var notificacioEstats = [];--%>
+    <%--<c:forEach var="estat" items="${notificacioEstats}">--%>
+    <%--notificacioEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";--%>
+    <%--</c:forEach>--%>
+
     var notificacioEnviamentEstats = [];
     <c:forEach var="estat" items="${notificacioEnviamentEstats}">
     notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
@@ -430,6 +493,9 @@
             omplirProcediments();
             omplirServeis();
         });
+        $('#estat').on('select2:unselect', function(e) {
+            $('#estat').select2('open');
+        });
         $('#organGestor').on('select2:unselect', function(e) {
             $('#organGestor').select2('open');
         });
@@ -444,8 +510,12 @@
         omplirServeis();
 
         loadOrgans($('#organGestor'), organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
+
         $('#organGestor').val(${notificacioFiltreCommand.organGestor})
-        $('#organGestor').select2().trigger('change');
+        // $('#organGestor').select2().trigger('change');
+        // $('#estat').select2().trigger('change');
+        $('#organGestor').trigger('change');
+        $('#estat').trigger('change');
 
         let eventMessages = {
             'confirm-reintentar-notificacio': "<spring:message code="enviament.list.user.reintentar.notificacio.misatge.avis"/>",
@@ -582,9 +652,15 @@
         <div class="col-md-4">
             <not:inputText name="concepte" inline="true"  placeholderKey="notificacio.list.filtre.camp.concepte"/>
         </div>
+<%--        <div class="col-md-2">--%>
+<%--            <not:inputSelect id="estat" name="estat" optionItems="${notificacioEstats}" optionValueAttribute="value"--%>
+<%--             optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>--%>
+<%--        </div>--%>
         <div class="col-md-2">
-            <not:inputSelect id="estat" name="estat" optionItems="${notificacioEstats}" optionValueAttribute="value"
-                             optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>
+            <not:inputSelect id="estat" name="estat" optionMinimumResultsForSearch="0"
+                 optionTextKeyAttribute="text"
+                 emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"
+                 templateResultFunction="showEstat" />
         </div>
         <div class="col-md-2">
             <not:inputDate name="dataInici" placeholderKey="notificacio.list.filtre.camp.datainici" inline="true" required="false" />
