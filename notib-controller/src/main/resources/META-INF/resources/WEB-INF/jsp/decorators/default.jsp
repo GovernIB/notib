@@ -259,7 +259,14 @@
 						<ul class="dropdown-menu">
 							<li>
 								<a id="mu_config" href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><spring:message code="decorator.menu.configuracio.user"/></a>
-								<a id="mu_manual" href="https://github.com/GovernIB/notib/raw/${manifestAtributes['Implementation-SCM-Branch']}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
+								<c:choose>
+									<c:when test="${isRolActualUsuari}">
+										<a id="mu_manual" href="https://github.com/GovernIB/notib/raw/${manifestAtributes['Implementation-SCM-Branch']}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
+									</c:when>
+									<c:when test="${isRolActualAdministrador || isRolActualAdministradorEntitat || isRolActualAdministradorOrgan}">
+										<a id="mu_manual" href="https://github.com/GovernIB/notib/raw/${manifestAtributes['Implementation-SCM-Branch']}/doc/pdf/NOTIB_administracio.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.administrador"/></a>
+									</c:when>
+								</c:choose>
 							</li>
 							<li>
 								<a id="mu_logout" href="<c:url value="/logout"/>">
