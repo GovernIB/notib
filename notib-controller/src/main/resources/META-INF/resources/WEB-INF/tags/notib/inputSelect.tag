@@ -30,6 +30,7 @@
 <%@ attribute name="value" required="false" rtexprvalue="true"%>
 <%@ attribute name="labelClass" required="false" rtexprvalue="true"%>
 <%@ attribute name="inputClass" required="false" rtexprvalue="true"%>
+<%@ attribute name="templateResultFunction" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campId" value="${campPath}"/><c:if test="${not empty id}"><c:set var="campId" value="${id}"/></c:if>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
@@ -49,7 +50,8 @@
 			<form:select path="${campPath}" cssClass="form-control ${generalClass}" id="${campId}"
 						 disabled="${disabled}" style="width:100%" data-toggle="select2"
 						 data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}"
-						 data-enum="${optionEnum}" data-enum-value="${campValue}">
+						 data-enum="${optionEnum}" data-enum-value="${campValue}"
+						 data-templateresultfunction="${templateResultFunction}">
 				<c:if test="${emptyOption == 'true'}">
 					<c:choose>
 						<c:when test="${not empty emptyOptionTextKey}"><option value=""><spring:message code="${emptyOptionTextKey}"/></option></c:when>
@@ -82,7 +84,7 @@
 	</c:when>
 	<c:otherwise>
    		<label class="sr-only" for="${campPath}">${campLabelText}</label>
-		<form:select path="${campPath}" cssClass="form-control ${generalClass}" id="${campId}" disabled="${disabled}" style="width:100%" data-toggle="select2" data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}" data-enum="${optionEnum}" data-enum-value="${campValue}">
+		<form:select path="${campPath}" cssClass="form-control ${generalClass}" id="${campId}" disabled="${disabled}" style="width:100%" data-toggle="select2" data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}" data-enum="${optionEnum}" data-enum-value="${campValue}" data-templateresultfunction="${templateResultFunction}">
 			<c:if test="${emptyOption == 'true'}">
 				<c:choose>
 					<c:when test="${not empty emptyOptionTextKey}"><option value=""><spring:message code="${emptyOptionTextKey}"/></option></c:when>
