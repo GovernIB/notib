@@ -5,6 +5,7 @@ package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.ServeiTipus;
@@ -1124,22 +1125,27 @@ public class NotificacioServiceImpl implements NotificacioService {
 		var timer = metricsHelper.iniciMetrica();
 		var resposta = new RespostaAccio<String>();
 		try {
+			log.debug("[MASSIVA] Reset enviamentS " + ids);
 			for (var id : ids) {
-				log.debug("Reset enviament " + id + ")");
-				var e = enviamentRepository.findById(id).orElseThrow();
-				var estatEnviament = enviamentSmService.getEstatEnviament(e.getUuid());
+				var enviament = enviamentRepository.findById(id).orElseThrow();
+				var estatEnviament = enviamentSmService.getEstatEnviament(enviament.getUuid());
 				try {
-					if (!EnviamentSmEstat.NOTIFICA_ERROR.equals(estatEnviament)) {
+					if (!EnviamentSmEstat.NOTIFICA_ERROR.equals(estatEnviament) && !EnviamentSmEstat.SIR_ERROR.equals(estatEnviament)) {
 						continue;
 					}
-					e.refreshNotificaConsulta();
-					var events = notificacioEventRepository.findByEnviamentAndTipusAndError(e, NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, true);
+					enviament.refreshNotificaConsulta();
+					var events = notificacioEventRepository.findByEnviamentAndTipusAndError(enviament, NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, true);
 					for (var event : events) {
 						event.setFiReintents(false);
 					}
-					enviamentSmService.consultaReset(e.getUuid());
+					auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "EnviamentServiceImpl.reactivaSir");
+					if (EnviamentTipus.SIR.equals(enviament.getNotificacio().getEnviamentTipus())) {
+						enviamentSmService.sirReset(enviament.getUuid());
+					} else{
+						enviamentSmService.consultaReset(enviament.getUuid());
+					}
 				} catch (Exception ex) {
-					resposta.getErrors().add(e.getUuid());
+					resposta.getErrors().add(enviament.getUuid());
 				}
 			}
 			return !resposta.getExecutades().isEmpty();
