@@ -8,7 +8,7 @@ server:
 spring:
   datasource:
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@localhost:49164:xe
+    url: jdbc:oracle:thin:@localhost:49161:xe
     username: notib
     password: notib
   jpa:
@@ -93,7 +93,7 @@ es:
                   realm: GOIB
                   client_id: goib-ws
                   client_id_for_user_autentication: goib-ws
-                  password_secret: 5d96d138-05a4-4087-9c91-52faa33b7b85
+                  password_secret: 72ce6860-ac1b-46da-816c-b1196ef2f3fc
       properties: /home/salloza/Documentos/Notib/notib.properties
 #      system:
 #        properties:
