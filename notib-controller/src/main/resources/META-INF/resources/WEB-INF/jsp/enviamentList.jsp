@@ -197,7 +197,7 @@ function getCookie(cname) {
 		id="enviament"
 		data-toggle="datatable"
 		data-url="<c:url value="/enviament/datatable"/>"
-		class="table table-striped table-bordered nowrap"
+		class="table table-striped table-bordered"
 		data-default-order="0"
 		data-default-dir="desc"
 		data-individual-filter="true"
@@ -309,7 +309,7 @@ function getCookie(cname) {
 					</c:when>
 				</c:choose>
 				<th data-col-name="organEstat" data-visible="false"></th>
-				<th data-col-name="organCodiNom" data-template="#cellOrganGestorTemplate" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dir3codi"/>
+				<th data-col-name="organCodiNom" width="360" data-template="#cellOrganGestorTemplate" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dir3codi"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="dir3Codi" value="${filtreEnviaments.dir3Codi}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.dir3codi"/>"/>
@@ -330,7 +330,7 @@ function getCookie(cname) {
 					</c:when>
 				</c:choose>
 				<th data-col-name="procedimentTipus" data-visible="false"></th>
-				<th data-col-name="procedimentCodiNom" data-template="#cellProcedimentTemplate" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codiprocediment"/>
+				<th data-col-name="procedimentCodiNom" width="300" data-template="#cellProcedimentTemplate" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codiprocediment"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="codiProcediment" value="${filtreEnviaments.codiProcediment}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codiprocediment"/>"/>
@@ -395,7 +395,7 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="titularNomLlinatge" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.nomLlinatgetitular"/>
+				<th data-col-name="titularNomLlinatge" width="160" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.nomLlinatgetitular"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="titularNomLlinatge" value="${filtreEnviaments.titularNomLlinatge}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.nomLlinatgetitular"/>"/>
@@ -529,7 +529,7 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="codiNotibEnviament" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.referencia.enviament"/>
+				<th data-col-name="codiNotibEnviament" width="240" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.referencia.enviament"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="codiNotibEnviament" value="${filtreEnviaments.codiNotibEnviament}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.referencia.enviament"/>"/>
@@ -602,7 +602,7 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<th data-col-name="notificacioId" data-visible="false"></th>
-				<th data-orderable="false" data-template="#cellAccionsTemplate" width="101">
+				<th data-orderable="false" data-template="#cellAccionsTemplate" width="190">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a>
 						<a href="<c:url value="/notificacio/{{:notificacioId}}/info"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detall.remesa"/></a>
