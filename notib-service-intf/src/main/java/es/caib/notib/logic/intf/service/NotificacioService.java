@@ -265,14 +265,13 @@ public interface NotificacioService {
 	boolean enviarNotificacioANotifica(Long notificacioId, boolean retry);
 
 	/**
-	 * Reseteja els intents de la notificacio.
-	 * Prova de fer l'enviament d'una notificació pendent.
+	 * Reseteja els intents de les consultes a Notifica@ o SIR.
 	 *
-	 * @param notificacioId Atribut id de la notificació.
+	 * @param ids Identificadors dels enviaments.
 	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	boolean resetNotificacioANotifica(Set<Long> ids);
+	boolean resetConsultaEstat(Set<Long> ids);
 	
 	/**
 	 * Registra i notifica una notificació
@@ -424,6 +423,9 @@ public interface NotificacioService {
 
 	@PreAuthorize("isAuthenticated()")
 	boolean reenviarNotificacioAmbErrors(Long notificacioId);
+
+	@PreAuthorize("isAuthenticated()")
+	boolean reactivarNotificacioAmbErrors(Set<Long> notificacioId);
 
 	@PreAuthorize("isAuthenticated()")
 	boolean reactivarNotificacioAmbErrors(Long notificacioId);

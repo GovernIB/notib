@@ -175,6 +175,7 @@ function initEvents($table, url_prefix, eventMessages) {
             }
             return false;
         });
+
         $('#updateEstat').on('click', function() {
 
             let count = Number($(".seleccioCount").html());
@@ -208,18 +209,18 @@ function initEvents($table, url_prefix, eventMessages) {
             return false;
         });
 
-        $('#enviarCallback').on('click', function() {
-
-            let count = Number($(".seleccioCount").html());
-            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
-                return;
-            }
-            if(confirm(eventMessages['confirm-enviar-callback'])){
-                location.href =  url_prefix + "/enviar/callback";
-                setTimeout(() => $table.DataTable().rows().deselect(), 100);
-            }
-            return false;
-        });
+        // $('#enviarCallback').on('click', function() {
+        //
+        //     let count = Number($(".seleccioCount").html());
+        //     if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+        //         return;
+        //     }
+        //     if(confirm(eventMessages['confirm-enviar-callback'])){
+        //         location.href =  url_prefix + "/enviar/callback";
+        //         setTimeout(() => $table.DataTable().rows().deselect(), 100);
+        //     }
+        //     return false;
+        // });
 
         $("#exportarODS").on("click", (e) => {
 
@@ -257,6 +258,15 @@ function initEvents($table, url_prefix, eventMessages) {
                 return;
             }
             location.href = url_prefix + "/descarregar/justificant/massiu";
+        });
+
+        $("#descarregarCertificacioMassiu").on("click", () => {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
+            location.href = url_prefix + "/descarregar/certificacio/massiu";
         });
 
         $("#reactivarRegistre").on("click", () => {

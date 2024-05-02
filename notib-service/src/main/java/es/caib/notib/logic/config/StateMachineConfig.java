@@ -115,7 +115,7 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<EnviamentS
                     .last(NOTIFICA_ERROR).and()
                 .withExternal().source(NOTIFICA_ERROR).target(NOTIFICA_PENDENT).event(NT_RESET).guard(uuidGuard()).action(enviamentNotificaAction).and()
                 .withExternal().source(NOTIFICA_ERROR).target(NOTIFICA_PENDENT).event(NT_RETRY).guard(uuidGuard()).action(enviamentNotificaAction).and()
-                .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_PENDENT).event(NT_RETRY).guard(uuidGuard()).action(enviamentRegistreAction).and()
+                .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_PENDENT).event(NT_RETRY).guard(uuidGuard()).action(enviamentNotificaAction).and()
                 .withExternal().source(NOTIFICA_PENDENT).target(NOTIFICA_SENT).event(NT_FORWARD).and()
                 .withExternal().source(NOTIFICA_ERROR).target(NOTIFICA_SENT).event(NT_FORWARD).and()
                 // Consulta estat

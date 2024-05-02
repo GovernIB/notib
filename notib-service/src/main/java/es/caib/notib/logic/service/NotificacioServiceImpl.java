@@ -5,6 +5,7 @@ package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.ServeiTipus;
@@ -1177,27 +1178,36 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public boolean resetNotificacioANotifica(Set<Long> ids) {
+	public boolean resetConsultaEstat(Set<Long> ids) {
 
 		var timer = metricsHelper.iniciMetrica();
 		var resposta = new RespostaAccio<String>();
 		try {
+			NotibLogger.getInstance().info("[MASSIVA] Reset enviamentS " + ids, log, LoggingTipus.MASSIVA);
+			var isSir = false;
+			NotificacioEnviamentEntity enviament;
+			var isAdviser = configHelper.getConfigAsBoolean("es.caib.notib.adviser.actiu");
 			for (var id : ids) {
-				log.debug("Reset enviament " + id + ")");
-				var e = enviamentRepository.findById(id).orElseThrow();
-				var estatEnviament = enviamentSmService.getEstatEnviament(e.getUuid());
+				enviament = enviamentRepository.findById(id).orElseThrow();
+				var estatEnviament = enviamentSmService.getEstatEnviament(enviament.getUuid());
 				try {
-					if (!EnviamentSmEstat.NOTIFICA_ERROR.equals(estatEnviament)) {
-						continue;
+					isSir = EnviamentTipus.SIR.equals(enviament.getNotificacio().getEnviamentTipus());
+					if (isSir && (EnviamentSmEstat.SIR_ERROR.equals(estatEnviament) || enviament.isSirFiPooling())) {
+						enviament.refreshSirConsulta();
+						enviamentSmService.sirReset(enviament.getUuid());
 					}
-					e.refreshNotificaConsulta();
-					var events = notificacioEventRepository.findByEnviamentAndTipusAndError(e, NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, true);
-					for (var event : events) {
-						event.setFiReintents(false);
+					// mirar si te adivser o no  si en té fer la consulta al momnent
+					if (!isAdviser && EnviamentSmEstat.NOTIFICA_SENT.equals(estatEnviament)) {
+						enviament.refreshNotificaConsulta();
+						enviamentSmService.consultaReset(enviament.getUuid());
 					}
-					enviamentSmService.consultaReset(e.getUuid());
+					if (isAdviser && (EnviamentSmEstat.CONSULTA_ERROR.equals(estatEnviament) || EnviamentSmEstat.NOTIFICA_SENT.equals(estatEnviament))) {
+						notificaHelper.enviamentRefrescarEstat(enviament.getId());
+					}
+
+					resposta.getExecutades().add(enviament.getUuid());
 				} catch (Exception ex) {
-					resposta.getErrors().add(e.getUuid());
+					resposta.getErrors().add(enviament.getUuid());
 				}
 			}
 			return !resposta.getExecutades().isEmpty();
@@ -1651,6 +1661,44 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 		return false;
+	}
+
+	@Transactional
+	@Override
+	public boolean reactivarNotificacioAmbErrors(Set<Long> enviaments) {
+
+		var timer = metricsHelper.iniciMetrica();
+		var resposta = new RespostaAccio<String>();
+		try {
+			NotibLogger.getInstance().info("[MASSIVA] Reactivar enviaments amb error a registre o notifica fi reintents" + enviaments, log, LoggingTipus.MASSIVA);
+			Set<NotificacioEntity> notificacions = new HashSet<>();
+			NotificacioEntity notificacio;
+			NotificacioEnviamentEntity enviament;
+			for (var id : enviaments) {
+				enviament = enviamentRepository.findById(id).orElseThrow();
+				notificacio = enviament.getNotificacio();
+				var estatEnviament = enviamentSmService.getEstatEnviament(enviament.getUuid());
+				try {
+					if (!EnviamentSmEstat.REGISTRE_ERROR.equals(estatEnviament) && !EnviamentSmEstat.NOTIFICA_ERROR.equals(estatEnviament)) {
+						continue;
+					}
+					if (EnviamentSmEstat.REGISTRE_ERROR.equals(estatEnviament)) {
+						notificacio.refreshRegistre();
+						enviamentSmService.registreReset(enviament.getUuid());
+					} else if (EnviamentSmEstat.NOTIFICA_ERROR.equals(estatEnviament)) {
+						notificacio.resetIntentsNotificacio();
+						enviamentSmService.notificaReset(enviament.getUuid());
+					}
+
+					resposta.getExecutades().add(enviament.getUuid());
+				} catch (Exception ex) {
+					resposta.getErrors().add(enviament.getUuid());
+				}
+			}
+			return !resposta.getExecutades().isEmpty();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Transactional
