@@ -16,5 +16,6 @@ public enum LoggingTipus {
     FIRMA_SERVIDOR,
     CARPETA,
     ARXIU,
-    VALIDATE_SIGNATURE;
+    VALIDATE_SIGNATURE,
+    MASSIVA;
 }

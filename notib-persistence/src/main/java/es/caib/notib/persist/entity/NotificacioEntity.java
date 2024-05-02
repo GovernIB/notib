@@ -325,7 +325,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	public void refreshRegistre() {
 
-		this.registreEnviamentIntent = 1;
+		this.registreEnviamentIntent = 0;
 		var cal = Calendar.getInstance();
 		this.registreData = cal.getTime();
 	}

@@ -129,8 +129,8 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed("**")
-	public boolean resetNotificacioANotifica(Set<Long> ids) {
-		return getDelegateService().resetNotificacioANotifica(ids);
+	public boolean resetConsultaEstat(Set<Long> ids) {
+		return getDelegateService().resetConsultaEstat(ids);
 	}
 
 
@@ -386,6 +386,11 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed("**")
+	public boolean reactivarNotificacioAmbErrors(Set<Long> notificacioId) {
+		return getDelegateService().reactivarNotificacioAmbErrors(notificacioId);
+	}
+
+	@Override
 	public boolean reactivarNotificacioAmbErrors(Long notificacioId) {
 		return getDelegateService().reactivarNotificacioAmbErrors(notificacioId);
 	}

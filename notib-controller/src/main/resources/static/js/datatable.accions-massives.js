@@ -155,26 +155,26 @@ function initEvents($table, url_prefix, eventMessages) {
             }
             return false;
         });
-        //
-        // $('#reactivarSir').on('click', function() {
-        //
-        //     let count = Number($(".seleccioCount").html());
-        //     if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
-        //         return;
-        //     }
-        //     if(confirm(eventMessages['confirm-reintentar-sir'])){
-        //         $.get(
-        //             url_prefix + "/reactivar/sir",
-        //             () => {
-        //                 $table.DataTable().ajax.reload(null, true);
-        //                 webutilRefreshMissatges();
-        //             }
-        //         );
-        //         // location.href =  url_prefix + "/reactivar/sir";
-        //         setTimeout(() => $table.DataTable().rows().deselect(), 100);
-        //     }
-        //     return false;
-        // });
+
+        $('#reactivarSir').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
+            if(confirm(eventMessages['confirm-reintentar-sir'])){
+                $.get(
+                    url_prefix + "/reactivar/sir",
+                    () => {
+                        $table.DataTable().ajax.reload(null, true);
+                        webutilRefreshMissatges();
+                    }
+                );
+                // location.href =  url_prefix + "/reactivar/sir";
+                setTimeout(() => $table.DataTable().rows().deselect(), 100);
+            }
+            return false;
+        });
 
         $('#updateEstat').on('click', function() {
 

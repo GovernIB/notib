@@ -197,47 +197,66 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
 
         var seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
-            MissatgesHelper.error(request, getMessage(request, "enviament.controller.notificacio.seleccio.buida"));
-            return ERROR;
+            MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.seleccio.buida"));
+            return REDIRECT + request.getHeader(REFERER);
         }
-        NotificacioEnviamentDtoV2 e;
-        Set<Long> notificacioIds = new HashSet<>();
-        for(var id: seleccio) {
-            e = enviamentService.getOne(id);
-            notificacioIds.add(e.getNotificacioId());
+        log.info("Reactivam els enviaments amb error: " + StringUtils.join(seleccio, ", "));
+        try {
+            notificacioService.reactivarNotificacioAmbErrors(seleccio);
+            MissatgesHelper.info(request, getMessage(request, "enviament.controller.reactivar.enviament.error.fi.reintents.OK"));
+        } catch (Exception e) {
+            MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.enviament.error.fi.reintents.KO"));
         }
-        log.info("Reactivam enviaments de notificacions amb error: " + StringUtils.join(notificacioIds, ", "));
-        var notificacionsNoFinalitzadesAmbError = 0;
-        var notificacionsError = 0;
-        for(var notificacioId: notificacioIds) {
-            var notificacio = notificacioService.findAmbId(notificacioId, isAdministrador(request));
-            if(!notificacio.getEstat().equals(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS) && !notificacio.isJustificantCreat()) {
-                notificacionsNoFinalitzadesAmbError++;
-                continue;
-            }
-            try {
-                notificacioService.reactivarNotificacioAmbErrors(notificacioId);
-            } catch (Exception ex) {
-                notificacionsError++;
-                mostraErrorReintentarNotificacio(request, notificacioId, notificacio, ex);
-            }
-        }
-        String msg;
-        if (notificacionsNoFinalitzadesAmbError == notificacioIds.size()) {
-            msg = getMessage(request, REINTENT_TEXT + (notificacionsNoFinalitzadesAmbError == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".errors.KO");
-            MissatgesHelper.error(request, msg);
-        } else if (notificacionsError == notificacioIds.size()) {
-            msg = getMessage(request, REINTENT_TEXT + (notificacionsError == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".errors.error");
-            MissatgesHelper.error(request, msg);
-        } else if (notificacionsError > 0) {
-            msg = getMessage(request, "enviament.controller.reintent.notificacions.errors.error.alguna");
-            MissatgesHelper.warning(request, notificacionsError + " " + msg);
-        } else {
-            msg = getMessage(request, REINTENT_TEXT + (notificacioIds.size() == 1 ? NOTIFICACIO : NOTIFICACIONS) + ".errors.OK");
-            MissatgesHelper.info(request, msg);
-        }
-        return "ok";
+        return REDIRECT + request.getHeader(REFERER);
     }
+
+//    @GetMapping(value = "/reactivar/notificacionsError")
+//    @ResponseBody
+//    public String reactivarErrors(HttpServletRequest request) throws IOException {
+//
+//        var seleccio = getIdsEnviamentsSeleccionats(request);
+//        if (seleccio == null || seleccio.isEmpty()) {
+//            MissatgesHelper.error(request, getMessage(request, "enviament.controller.notificacio.seleccio.buida"));
+//            return ERROR;
+//        }
+//        NotificacioEnviamentDtoV2 e;
+//        Set<Long> notificacioIds = new HashSet<>();
+//        for(var id: seleccio) {
+//            e = enviamentService.getOne(id);
+//            notificacioIds.add(e.getNotificacioId());
+//        }
+//        log.info("Reactivam enviaments de notificacions amb error: " + StringUtils.join(notificacioIds, ", "));
+//        var notificacionsNoFinalitzadesAmbError = 0;
+//        var notificacionsError = 0;
+//        for(var notificacioId: notificacioIds) {
+//            var notificacio = notificacioService.findAmbId(notificacioId, isAdministrador(request));
+//            if(!notificacio.getEstat().equals(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS) && !notificacio.isJustificantCreat()) {
+//                notificacionsNoFinalitzadesAmbError++;
+//                continue;
+//            }
+//            try {
+//                notificacioService.reactivarNotificacioAmbErrors(notificacioId);
+//            } catch (Exception ex) {
+//                notificacionsError++;
+//                mostraErrorReintentarNotificacio(request, notificacioId, notificacio, ex);
+//            }
+//        }
+//        String msg;
+//        if (notificacionsNoFinalitzadesAmbError == notificacioIds.size()) {
+//            msg = getMessage(request, REINTENT_TEXT + (notificacionsNoFinalitzadesAmbError == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".errors.KO");
+//            MissatgesHelper.error(request, msg);
+//        } else if (notificacionsError == notificacioIds.size()) {
+//            msg = getMessage(request, REINTENT_TEXT + (notificacionsError == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".errors.error");
+//            MissatgesHelper.error(request, msg);
+//        } else if (notificacionsError > 0) {
+//            msg = getMessage(request, "enviament.controller.reintent.notificacions.errors.error.alguna");
+//            MissatgesHelper.warning(request, notificacionsError + " " + msg);
+//        } else {
+//            msg = getMessage(request, REINTENT_TEXT + (notificacioIds.size() == 1 ? NOTIFICACIO : NOTIFICACIONS) + ".errors.OK");
+//            MissatgesHelper.info(request, msg);
+//        }
+//        return "ok";
+//    }
 
     @GetMapping(value = "/reactivar/consulta")
     public String reactivarConsulta(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -249,7 +268,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
         log.info("Reactivam consulta dels enviaments: " + StringUtils.join(seleccio, ", "));
         try {
-            notificacioService.resetNotificacioANotifica(seleccio);
+            notificacioService.resetConsultaEstat(seleccio);
             MissatgesHelper.info(request, getMessage(request, "enviament.controller.reactivar.consultes.OK"));
         } catch (Exception e) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.consultes.KO"));
