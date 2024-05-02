@@ -65,6 +65,18 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("isAuthenticated()")
 	void delete(Long entitatId, Long notificacioId) throws NotFoundException;
+
+	/**
+	 * Recupera la notificació indicada per paràmetre
+	 *
+	 * @param entitatId Id de l'entitat actual
+	 * @param notificacioId Id de la notificació a eliminar
+	 *
+	 * @return La llista de notificacions actualitzada
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("isAuthenticated()")
+	void restore(Long entitatId, Long notificacioId) throws NotFoundException;
 	
 	/**
 	 * Actualitza la informació de la notificacio que tengui el mateix

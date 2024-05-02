@@ -212,6 +212,50 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
+//	@Transactional
+//	@Override
+//	public void delete(Long entitatId, Long notificacioId) throws NotFoundException {
+//
+//		var timer = metricsHelper.iniciMetrica();
+//		try {
+//			entityComprovarHelper.comprovarEntitat(entitatId,false,true,true,false);
+//			log.debug("Esborrant la notificació (notificacioId=" + notificacioId + ")");
+//			var notificacio = notificacioRepository.findById(notificacioId).orElse(null);
+//			if (notificacio == null) {
+//				throw new NotFoundException(notificacioId, NotificacioEntity.class, "No s'ha trobat cap notificació amb l'id especificat");
+//			}
+//			var enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacioId);
+////			### Esborrar la notificació
+//			if (enviamentsPendents == null || enviamentsPendents.isEmpty()) {
+//				throw new ValidationException("Aquesta notificació està enviada i no es pot esborrar");
+//			}
+//			// esborram tots els seus events
+//			notificacioEventRepository.deleteByNotificacio(notificacio);
+//
+////				## El titular s'ha d'esborrar de forma individual
+//			for (var enviament : notificacio.getEnviaments()) {
+//				var titular = enviament.getTitular();
+//				if (HibernateHelper.isProxy(titular)) {
+//					titular = HibernateHelper.deproxy(titular);
+//				}
+//				enviamentTableRepository.deleteById(enviament.getId());
+//				notificacioEventRepository.deleteByEnviament(enviament);
+//				notificacioEnviamentRepository.delete(enviament);
+//				notificacioEnviamentRepository.flush();
+//				auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.DELETE, DELETE);
+//				personaRepository.delete(titular);
+//				enviamentSmService.remove(enviament.getNotificaReferencia());
+//			}
+//			notificacioTableHelper.eliminarRegistre(notificacio);
+//			notificacioRepository.delete(notificacio);
+//			notificacioRepository.flush();
+//			auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.DELETE, DELETE);
+//			log.debug("La notificació s'ha esborrat correctament (notificacioId=" + notificacioId + ")");
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
+//	}
+
 	@Transactional
 	@Override
 	public void delete(Long entitatId, Long notificacioId) throws NotFoundException {
@@ -220,37 +264,51 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			entityComprovarHelper.comprovarEntitat(entitatId,false,true,true,false);
 			log.debug("Esborrant la notificació (notificacioId=" + notificacioId + ")");
-			var notificacio = notificacioRepository.findById(notificacioId).orElse(null);
-			if (notificacio == null) {
+			var notificacioEntity = notificacioRepository.findById(notificacioId).orElse(null);
+			var notificacioTableEntity = notificacioTableViewRepository.findById(notificacioId).orElse(null);
+
+			if (notificacioEntity == null || notificacioTableEntity == null) {
 				throw new NotFoundException(notificacioId, NotificacioEntity.class, "No s'ha trobat cap notificació amb l'id especificat");
 			}
-			var enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacioId);
-//			### Esborrar la notificació
-			if (enviamentsPendents == null || enviamentsPendents.isEmpty()) {
-				throw new ValidationException("Aquesta notificació està enviada i no es pot esborrar");
-			}
-			// esborram tots els seus events
-			notificacioEventRepository.deleteByNotificacio(notificacio);
 
-//				## El titular s'ha d'esborrar de forma individual
-			for (var enviament : notificacio.getEnviaments()) {
-				var titular = enviament.getTitular();
-				if (HibernateHelper.isProxy(titular)) {
-					titular = HibernateHelper.deproxy(titular);
-				}
-				enviamentTableRepository.deleteById(enviament.getId());
-				notificacioEventRepository.deleteByEnviament(enviament);
-				notificacioEnviamentRepository.delete(enviament);
-				notificacioEnviamentRepository.flush();
-				auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.DELETE, DELETE);
-				personaRepository.delete(titular);
-				enviamentSmService.remove(enviament.getNotificaReferencia());
-			}
-			notificacioTableHelper.eliminarRegistre(notificacio);
-			notificacioRepository.delete(notificacio);
+			notificacioEntity.setDeleted(true);
+			notificacioTableEntity.setDeleted(true);
+			notificacioRepository.save(notificacioEntity);
+			notificacioTableViewRepository.save(notificacioTableEntity);
+
 			notificacioRepository.flush();
-			auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.DELETE, DELETE);
+			notificacioTableViewRepository.flush();
+
 			log.debug("La notificació s'ha esborrat correctament (notificacioId=" + notificacioId + ")");
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Transactional
+	@Override
+	public void restore(Long entitatId, Long notificacioId) throws NotFoundException {
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			entityComprovarHelper.comprovarEntitat(entitatId,false,true,true,false);
+			log.debug("Recuperant la notificació (notificacioId=" + notificacioId + ")");
+			var notificacioEntity = notificacioRepository.findById(notificacioId).orElse(null);
+			var notificacioTableEntity = notificacioTableViewRepository.findById(notificacioId).orElse(null);
+
+			if (notificacioEntity == null || notificacioTableEntity == null) {
+				throw new NotFoundException(notificacioId, NotificacioEntity.class, "No s'ha trobat cap notificació amb l'id especificat");
+			}
+
+			notificacioEntity.setDeleted(false);
+			notificacioTableEntity.setDeleted(false);
+			notificacioRepository.save(notificacioEntity);
+			notificacioTableViewRepository.save(notificacioTableEntity);
+
+			notificacioRepository.flush();
+			notificacioTableViewRepository.flush();
+
+			log.debug("La notificació s'ha recuperat correctament (notificacioId=" + notificacioId + ")");
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

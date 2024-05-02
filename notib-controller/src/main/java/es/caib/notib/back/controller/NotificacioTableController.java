@@ -1,46 +1,17 @@
 package es.caib.notib.back.controller;
 
 import com.google.common.base.Strings;
-import es.caib.notib.back.command.ColumnesCommand;
-import es.caib.notib.back.command.ColumnesRemesesCommand;
-import es.caib.notib.back.command.MarcarProcessatCommand;
-import es.caib.notib.back.command.NotificacioFiltreCommand;
-import es.caib.notib.back.helper.DatatablesHelper;
+import es.caib.notib.back.command.*;
+import es.caib.notib.back.helper.*;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.notib.back.helper.EnumHelper;
-import es.caib.notib.back.helper.MessageHelper;
-import es.caib.notib.back.helper.MissatgesHelper;
-import es.caib.notib.back.helper.NotificacioBackHelper;
-import es.caib.notib.back.helper.RequestSessionHelper;
-import es.caib.notib.back.helper.RolHelper;
-import es.caib.notib.client.domini.Fitxer;
-import es.caib.notib.logic.intf.dto.ArxiuDto;
-import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
-import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.FitxerDto;
-import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.logic.intf.dto.PaginaDto;
-import es.caib.notib.logic.intf.dto.PermisEnum;
-import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto;
-import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
-import es.caib.notib.logic.intf.dto.RespostaAccio;
-import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.missatges.Missatge;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
-import es.caib.notib.logic.intf.service.CallbackService;
-import es.caib.notib.logic.intf.service.ColumnesService;
-import es.caib.notib.logic.intf.service.EnviamentService;
-import es.caib.notib.logic.intf.service.EnviamentSmService;
-import es.caib.notib.logic.intf.service.GrupService;
-import es.caib.notib.logic.intf.service.JustificantService;
-import es.caib.notib.logic.intf.service.NotificacioService;
-import es.caib.notib.logic.intf.service.PermisosService;
-import es.caib.notib.logic.intf.service.ProcedimentService;
-import es.caib.notib.logic.intf.service.ServeiService;
+import es.caib.notib.logic.intf.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -66,15 +31,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -157,12 +114,27 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var organGestorActual = getOrganGestorActual(request);
         var filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
+        filtre.setDeleted(false);
         model.addAttribute(filtre);
         var codiUsuari = getCodiUsuariActual();
         var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), codiUsuari);
         model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
         notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
         return "notificacioList";
+    }
+
+    @GetMapping(value = "/notificacionsEsborrades")
+    public String getNotificacionsEsborrades(HttpServletRequest request, Model model) {
+        var entitatActual = getEntitatActualComprovantPermisos(request);
+        var organGestorActual = getOrganGestorActual(request);
+        var filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
+        filtre.setDeleted(true);
+        model.addAttribute(filtre);
+        var codiUsuari = getCodiUsuariActual();
+        var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), codiUsuari);
+        model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
+        notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
+        return "notificacioEsborradaList";
     }
 
     @GetMapping(value = "/filtrades/{referencia}")
@@ -223,6 +195,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 OrganGestorDto organGestorActual = getOrganGestorActual(request);
                 organGestorCodi = organGestorActual.getCodi();
             }
+//            filtre.setDeleted(false);
             notificacions = notificacioService.findAmbFiltrePaginat(entitatActual != null ? entitatActual.getId() : null,
                                                 RolEnumDto.valueOf(sessionScopedContext.getRolActual()), organGestorCodi, getCodiUsuariActual(), filtre,
                                                 DatatablesHelper.getPaginacioDtoFromRequest(request));
@@ -967,6 +940,32 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
         RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, notificacionsNoEsborrades);
         return notificacionsNoEsborrades.isEmpty() ?
+                getModalControllerReturnValueSuccess(request,REDIRECT + referer,"notificacio.controller.esborrar.massiu.ok")
+                : getModalControllerReturnValueError(request,REDIRECT + referer,"notificacio.controller.esborrar.massiu.ko");
+    }
+
+    @GetMapping(value = {"/recuperar", "{notificacioId}/notificacio/recuperar/"})
+    public String recuperarMassiu(HttpServletRequest request, Model model) {
+
+        var entitatActual = sessionScopedContext.getEntitatActual();
+        var referer = request.getHeader("Referer");
+        var seleccio = getIdsSeleccionats(request);
+        if (seleccio == null || seleccio.isEmpty()) {
+            return getModalControllerReturnValueError(request,REDIRECT + referer,SELECCIO_BUIDA);
+        }
+
+        Set<Long> notificacionsNoRecuperades = new HashSet<>();
+        for (var notificacioId : seleccio) {
+            try {
+                notificacioService.restore(entitatActual.getId(), notificacioId);
+            } catch (Exception ex) {
+                notificacionsNoRecuperades.add(notificacioId);
+                log.error("Hi ha hagut un error recuperant la notificació", ex);
+                MissatgesHelper.error(request, String.format("Hi ha hagut un error recuperant la notificació (Id: %s): %s", notificacioId, ex.getMessage()));
+            }
+        }
+        RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, notificacionsNoRecuperades);
+        return notificacionsNoRecuperades.isEmpty() ?
                 getModalControllerReturnValueSuccess(request,REDIRECT + referer,"notificacio.controller.esborrar.massiu.ok")
                 : getModalControllerReturnValueError(request,REDIRECT + referer,"notificacio.controller.esborrar.massiu.ko");
     }

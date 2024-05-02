@@ -164,6 +164,8 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private boolean hasEnviamentsPendentsRegistre;
 	@Column(name = "PER_ACTUALITZAR")
 	private boolean perActualitzar;
+	@Column(name = "DELETED")
+	private boolean deleted;
 
 	@Setter
 	@Transient

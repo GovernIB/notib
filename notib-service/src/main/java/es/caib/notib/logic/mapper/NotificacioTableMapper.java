@@ -139,6 +139,7 @@ public abstract class NotificacioTableMapper {
         }
         dto.setErrorLastCallback(not.getNotificacio().isErrorLastCallback());
         dto.setEstatString(getColumnaEstat(dto, enviaments));
+        dto.setDeleted(not.isDeleted());
         // TODO: Fer-ho amb un servei apart amb transaccionalitat independent
         // Actualitzam l'entitat
         try {

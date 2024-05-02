@@ -355,6 +355,7 @@
 									<ul class="dropdown-menu">
 										<li><a id="mg_nerror" href="<c:url value="/massiu/registre/notificacionsError"/>"><spring:message code="decorator.menu.massiu.registre"/></a></li>
 										<li><a id="mg_massiu" href="<c:url value="/notificacio/massiva/"/>"><spring:message code="decorator.menu.notificacio.massiva.consulta"/></a></li>
+										<li><a id="mg_esborrades" href="<c:url value="/notificacio/notificacionsEsborrades"/>"><spring:message code="decorator.menu.massiu.esborrades"/></a></li>
 									</ul>
 								</div>
 

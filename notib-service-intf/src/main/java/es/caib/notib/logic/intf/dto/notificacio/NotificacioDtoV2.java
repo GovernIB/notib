@@ -66,6 +66,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 
 	private boolean hasEnviamentsPendents;
 	private boolean justificantCreat;
+	private boolean deleted;
 
 	private String registreLlibreNom;
 	private String registreOficinaNom;

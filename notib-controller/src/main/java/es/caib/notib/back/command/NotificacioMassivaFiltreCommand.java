@@ -16,6 +16,7 @@ public class NotificacioMassivaFiltreCommand extends FiltreCommand {
     private NotificacioMassivaEstatDto estatProces;
     private String createdByCodi;
     private boolean nomesAmbErrors;
+    private boolean deleted;
 
     public void setDataInici(Date dataInici) {
 

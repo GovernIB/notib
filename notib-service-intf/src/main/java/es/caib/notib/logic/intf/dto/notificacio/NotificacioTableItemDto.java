@@ -72,6 +72,8 @@ public class NotificacioTableItemDto {
 
 	private String titular;
 	private String registreNums;
+
+	private boolean deleted;
 //
 //	private int nTramitacio;
 //	private int nCompareixenca;

@@ -39,6 +39,7 @@ public class NotificacioFiltreDto implements Serializable {
 	private String registreNum;
 	private String referencia;
 	private boolean nomesAmbErrors;
+	private boolean deleted;
 
 
 	public boolean isEmpty() {
@@ -89,6 +90,9 @@ public class NotificacioFiltreDto implements Serializable {
 			return false;
 		}
 		if (referencia != null && !referencia.isEmpty()) {
+			return false;
+		}
+		if (deleted) {
 			return false;
 		}
 		return true;

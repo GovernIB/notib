@@ -364,6 +364,7 @@ public class NotificacioMassivaServiceTest {
 						.creadaPer(null)
 						.identificador(null)
 						.nomesAmbErrors(false)
+						.deleted(false)
 						.nomesSenseErrors(false)
 						.build()); // ho ignorarem per a la prova
 //		Page<NotificacioTableEntity> page = Page.empty();

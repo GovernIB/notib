@@ -236,6 +236,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Transient
 	protected boolean hasEnviamentsPendents;
 
+	@Setter
+	@Column(name = "deleted")
+	private boolean deleted = false;
+
 	public void addEnviament(NotificacioEnviamentEntity enviament) {
 		this.enviaments.add(enviament);
 	}

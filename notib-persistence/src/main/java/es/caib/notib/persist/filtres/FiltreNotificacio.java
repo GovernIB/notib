@@ -76,6 +76,8 @@ public class FiltreNotificacio {
     private boolean esOrgansGestorsComunsCodisNotibNull;
     private List<? extends String> organsGestorsComunsCodisNotib;
 
+    private boolean deleted;
+
     public void crearProcedimentsCodisNotibSplit() {
 
         procedimentsCodisNotibSplit = new ArrayList<>(4);

@@ -46,6 +46,7 @@ public class NotificacioFiltreCommand extends FiltreCommand {
 	private String referencia;
 	private boolean nomesAmbErrors;
 	private boolean hasErrors;
+	private boolean deleted;
 
 	public void setDataInici(Date dataInici) {
 

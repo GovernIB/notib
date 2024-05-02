@@ -18,4 +18,5 @@ public class NotificacioMassivaFiltreDto implements Serializable {
     private NotificacioMassivaEstatDto estatProces;
     private String createdByCodi;
     private boolean nomesAmbErrors;
+    private boolean deleted;
 }

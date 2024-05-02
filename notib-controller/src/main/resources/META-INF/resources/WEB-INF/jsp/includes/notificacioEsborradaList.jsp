@@ -201,11 +201,6 @@
     notificacioEstats.push({value:"${notificacioEstat.value}", text:"${notificacioEstat.text}"});
     </c:forEach>
 
-    <%--var notificacioEstats = [];--%>
-    <%--<c:forEach var="estat" items="${notificacioEstats}">--%>
-    <%--notificacioEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";--%>
-    <%--</c:forEach>--%>
-
     var notificacioEnviamentEstats = [];
     <c:forEach var="estat" items="${notificacioEnviamentEstats}">
     notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
@@ -244,135 +239,6 @@
     function returnEnviamentsStatusDiv(notificacioId) {
         var content = "";
         var getUrl = "<c:url value="/notificacio/"/>" + notificacioId + "/enviament";
-
-        // $.getJSON({
-        //     url: getUrl,
-        //     success: (user) => {
-        //         for (i = 0; i < user.length; i++) {
-        //             content += (user[i].notificaEstat) ? notificacioEnviamentEstats[user[i].notificaEstat] + ',' : '';
-        //         }
-        //         if (content !== undefined && content != '') {
-        //             content = "("+content.replace(/,\s*$/, "")+")";
-        //         }
-        //         $('.estat_' + notificacioId).append(content);
-        //     },
-        //     error: console.log("No s'han pogut recuperar els enviaments de la notificació: " + notificacioId)
-        // })
-    }
-
-    function mostraEnviamentsNotificacio(td, rowData) {
-        var getUrl = "<c:url value="/notificacio/"/>" + rowData.id + "/enviament";
-        $.get(getUrl).done(function(data) {
-            $(td).empty();
-            $(td).append(
-                '<table class="table table-striped table-bordered table-enviaments">' +
-                '<caption><spring:message code="notificacio.list.enviament.list.titol"/></caption>' +
-                '<thead>' +
-                '<tr>' +
-                '<th><spring:message code="notificacio.list.enviament.list.titular"/></th>' +
-                '<th><spring:message code="notificacio.list.enviament.list.destinataris"/></th>' +
-                '<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
-                '<th></th>' +
-                '</tr>' +
-                '</thead><tbody></tbody></table>');
-            contingutTbody = '';
-            for (i = 0; i < data.length; i++) {
-                var nomTitular = '', llinatge1 = '', llinatge2 = '', destinataris = '', nif = '';
-
-                if (data[i].titular.nom != null) {
-                    nomTitular = data[i].titular.nom;
-                } else if (data[i].titular.raoSocial != null){
-                    nomTitular = data[i].titular.raoSocial;
-                }
-                if (data[i].titular.llinatge1 != null) {
-                    llinatge1 = data[i].titular.llinatge1;
-                }
-                if (data[i].titular.llinatge2 != null) {
-                    llinatge2 = data[i].titular.llinatge2;
-                }
-
-                $.each(data[i].destinataris, function (index, destinatari) {
-                    var nomDest = '', llinatge1Dest = '', llinatge2Dest = '';
-                    if (destinatari.nom != null) {
-                        nomDest = destinatari.nom;
-                    } else if (destinatari.raoSocial != null){
-                        nomDest = destinatari.raoSocial;
-                    }
-                    if (destinatari.llinatge1 != null) {
-                        llinatge1Dest = destinatari.llinatge1;
-                    }
-                    if (destinatari.llinatge2 != null) {
-                        llinatge2Dest = destinatari.llinatge2;
-                    }
-                    if (destinatari.nif != null) {
-                        nif = destinatari.nif;
-                    } else {
-                        nif = destinatari.dir3Codi;
-                    }
-                    nif = (nif == null) ? "" : "(" + nif + ")";
-                    destinataris += nomDest + ' ' + llinatge1Dest + ' ' + llinatge2Dest + ' ' + nif + ', ';
-                });
-                if (data[i].titular.nif != null) {
-                    nif = data[i].titular.nif;
-                } else {
-                    nif = data[i].titular.dir3Codi;
-                }
-                nif = (nif == null) ? "" : "(" + nif + ")";
-                if (data[i].perEmail) {
-                    nif += " - <span class='fa fa-envelope-o'></span> " + data[i].titular.email;
-                }
-                contingutTbody += '<tr data-toggle="modal" data-href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" style="cursor: pointer;">';
-                contingutTbody += '<td>' + nomTitular + ' ' + llinatge1 + ' ' + llinatge2 + ' '+ nif +'</td>';
-                if (destinataris != ''){
-                    //Remove last white space
-                    destinataris = destinataris.substr(0, destinataris.length-1);
-                    //Remove last comma
-                    destinataris = destinataris.substr(0, destinataris.length-1);
-                } else {
-                    destinataris = '<spring:message code="notificacio.list.enviament.list.sensedestinataris"/>';
-                }
-                contingutTbody += '<td>' + destinataris + '</td>';
-                contingutTbody +=  data[i].estatColor ? '<td style="box-shadow: inset 3px 0px 0px ' + data[i].estatColor + ';"> ' +
-                    '              <span class="' + data[i].estatIcona + '"></span><span>  </span>' : '<td>';
-                contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
-                if (data[i].notificaEstat == "FINALITZADA" && data[i].perEmail) {
-                    if (rowData.enviamentTipus == "NOTIFICACIO") {
-                        contingutTbody += " (<spring:message code="notificacio.list.enviament.list.finalitzat.avis.email"/>)"
-                    } else {
-                        contingutTbody += " (<spring:message code="notificacio.list.enviament.list.finalitzat.email"/>)"
-                    }
-                }
-                if (data[i].notificacioError && data[i].notificaEstat !== "FINALITZADA" && data[i].notificaEstat !== "PROCESSADA") {
-                    var errorTitle = '';
-                    if (data[i].notificacioErrorDescripcio) {
-                        errorTitle = data[i].notificacioErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-                    } else {
-                        errorTitle = "Descripció de l'error no registrada";
-                    }
-                    contingutTbody += ' <span class="fa fa-warning text-danger" title="' + errorTitle + '"></span>';
-                }
-                if (data[i].fiReintents) {
-                    contingutTbody += ' <span class="fa fa-warning text-warning" title="' + data[i].fiReintentsDesc + '"></span>';
-                }
-                if (data[i].callbackFiReintents) {
-                    contingutTbody += ' <span class="fa fa-warning text-info" title="' + data[i].callbackFiReintentsDesc + '"></span>';
-                }
-                if (data[i].notificacioMovilErrorDesc) {
-                    contingutTbody += ' <span style="color:#8a6d3b; cursor:pointer;" class="fa fa-mobile fa-lg" title="' + data[i].notificacioMovilErrorDesc + '"></span>';
-                }
-                contingutTbody += '</td>';
-                contingutTbody += '<td width="114px">';
-                if (data[i].notificaCertificacioData != null) {
-                    contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/certificacioDescarregar"/>" class="btn btn-default btn-sm fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.accio.descarregar.certificacio"/>"><span class="fa fa-download"></span></a>';
-                }
-
-                contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" data-toggle="modal" class="btn btn-default btn-sm"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>';
-                contingutTbody += '</td>';
-                contingutTbody += '</tr>';
-            }
-            $('table tbody', td).append(contingutTbody);
-            $('table tbody td').webutilModalEval();
-        });
     }
 
     $(function() {
@@ -410,57 +276,7 @@
     }
     $(document).ready(function() {
 
-        let $taula = $('#notificacio');
-        $taula.on('rowinfo.dataTable', function(e, td, rowData) {
-            mostraEnviamentsNotificacio(td, rowData)
-        });
-
-        $taula.on('init.dt', function () {
-
-            $("#notificacio_wrapper").prepend('<button id="closeAll" class="btn btn-default"><span class="fa fa-caret-square-o-up"></span> <spring:message code="organgestor.arbre.contrau"/></button>');
-            $("#notificacio_wrapper").prepend('<button id="expandAll" class="btn btn-default"><span class="fa fa-caret-square-o-down"></span> <spring:message code="organgestor.arbre.expandeix"/> </button>');
-
-            let $btnDesplegarEnvs = $('#btn-desplegar-envs');
-            $("#closeAll").on("click", function() {
-                var shown = $btnDesplegarEnvs.find("span").hasClass('fa-caret-up');
-                $taula.dataTable().api().rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-                    var rowData = this.data();
-                    let $parentTr = $("#" + this.id());
-                    let isCollapsed = $parentTr.find("td:last span").hasClass('fa-caret-up')
-                    if (shown) {
-                        // accedim d'aquesta manera als tr per no haver de modificar el codi de webutil.datatable
-                        $(".table-enviaments").closest("tr").remove();
-                    }
-                });
-                if (shown) {
-                    $btnDesplegarEnvs.find("span").removeClass('fa-caret-up');
-                    $btnDesplegarEnvs.find("span").addClass('fa-caret-down');
-                    $(".btn-rowInfo").find("span").removeClass('fa-caret-up');
-                    $(".btn-rowInfo").find("span").addClass('fa-caret-down');
-                }
-            });
-            $("#expandAll").on("click", () => {
-
-                var shown = $btnDesplegarEnvs.find("span").hasClass('fa-caret-up');
-                $taula.dataTable().api().rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-                    var rowData = this.data();
-                    let $parentTr = $("#" + this.id());
-                    let isCollapsed = $parentTr.find("td:last span").hasClass('fa-caret-up')
-                    if (!shown && !isCollapsed) {
-                        $('<tr data-row-info="true"><td colspan="' + $parentTr.children().length + '"></td></tr>').insertAfter($parentTr);
-                        mostraEnviamentsNotificacio($('td', $parentTr.next()), rowData)
-                    }
-                });
-                if (!shown) {
-                    $btnDesplegarEnvs.find("span").toggleClass('fa-caret-up');
-                    $(".btn-rowInfo").find("span").removeClass('fa-caret-down');
-                    $(".btn-rowInfo").find("span").addClass('fa-caret-up');
-                }
-            });
-        });
-
         $("#filtrar").click(() => {
-            // deseleccionar()
             deselecciona()
         });
 
@@ -652,15 +468,15 @@
         <div class="col-md-4">
             <not:inputText name="concepte" inline="true"  placeholderKey="notificacio.list.filtre.camp.concepte"/>
         </div>
-<%--        <div class="col-md-2">--%>
-<%--            <not:inputSelect id="estat" name="estat" optionItems="${notificacioEstats}" optionValueAttribute="value"--%>
-<%--             optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>--%>
-<%--        </div>--%>
+            <%--        <div class="col-md-2">--%>
+            <%--            <not:inputSelect id="estat" name="estat" optionItems="${notificacioEstats}" optionValueAttribute="value"--%>
+            <%--             optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>--%>
+            <%--        </div>--%>
         <div class="col-md-2">
             <not:inputSelect id="estat" name="estat" optionMinimumResultsForSearch="0"
-                 optionTextKeyAttribute="text"
-                 emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"
-                 templateResultFunction="showEstat" />
+                             optionTextKeyAttribute="text"
+                             emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"
+                             templateResultFunction="showEstat" />
         </div>
         <div class="col-md-2">
             <not:inputDate name="dataInici" placeholderKey="notificacio.list.filtre.camp.datainici" inline="true" required="false" />
@@ -728,47 +544,6 @@
     </div>
 </form:form>
 
-<script id="botonsTemplate" type="text/x-jsrender">
-
-    </div>
-    <div class="text-right">
-        <div class="btn-group">
-            <a href="<c:url value="/notificacio/visualitzar"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default"><span class="fa fa-eye-slash"></span> <spring:message code="enviament.list.show"/></a>
-                <button id="btn-desplegar-envs" class="btn btn-default" style="display:none"><spring:message code="notificacio.list.boto.desplegar"/> <span class="fa fa-caret-down"></span></button>
-                <button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
-				<button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
-				<div class="btn-group">
-					<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-  						<span class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
-					</button>
-					<ul class="dropdown-menu">
-						<li><a id="processarMassiu" href="<c:url value="/notificacio/processar/massiu"/>" data-toggle="modal" data-refresh-pagina="true" title='<spring:message code="notificacio.list.accio.massiva.processar.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>
-						<li><a id="updateEstat" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.actualitzar.estat.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.actualitzar.estat"/></a></li>
-						<li><a id="reintentarErrors" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.reintentar.errors.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
-						<li><a id="reintentarNotificacio" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.reintentar.notificacions.tooltip"/>' ><spring:message code="notificacio.list.accio.massiva.reintentar.notificacions"/></a></li>
-                        <li><a id="exportarODS" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.exportar.tooltip"/>' ><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
-                        <li><a id="eliminar" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.eliminar.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
-                        <li><a id="recuperar" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.recuperar.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.recuperar"/></a></li>
-                        <li><a id="descarregarJustificantMassiu" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.justificant"/></a></li>
-
-    <%--                        <li><a id="processarMassiu" style="cursor: pointer;" data-toggle="modal" data-refresh-pagina="true"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>--%>
-    <%--                        <li><a href="<c:url value="/notificacio/eliminar"/>"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>--%>
-
-
-    <c:if test="${isRolActualAdministradorEntitat}">
-        <hr/>
-        <li><a style="cursor: pointer;" id="reactivarConsulta" title='<spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica"/></a></li>
-        <li><a style="cursor: pointer;" id="reactivarSir" title='<spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir"/></a></li>
-        <li><a style="cursor: pointer;" id="reactivarCallback" title='<spring:message code="notificacio.list.accio.massiva.reactivar.callbacks.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.callbacks"/></a></li>
-        <li><a style="cursor: pointer;" id="enviarCallback" title='<spring:message code="notificacio.list.accio.massiva.enviar.callbacks.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.enviar.callbacks"/></a></li>
-        <li><a style="cursor: pointer;" id="enviarNotificacionsMovil" title='<spring:message code="notificacio.list.accio.massiva.enviar.notificacions.movil.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.enviar.notificacions.movil"/></a></li>
-        <li><a style="cursor: pointer;" id="reactivarRegistre" title='<spring:message code="notificacio.list.accio.massiva.reactivar.registre.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.registre"/></a></li>
-    </c:if>
-    </ul>
-</div>
-</div>
-</div>
-</script>
 
 <script id="rowhrefTemplate" type="text/x-jsrender"><c:url value="/notificacio/{{:id}}/info"/></script>
 <div id="cover-spin"></div>
@@ -782,21 +557,17 @@
         class="table table-striped table-bordered"
         style="width:100%"
         data-row-info="true"
-<%--        data-filter="#form-filtre"--%>
         data-save-state="true"
         data-mantenir-paginacio="true"
         data-paging-style-x="true"
         data-rowhref-template="#rowhrefTemplate"
-        data-botons-template="#botonsTemplate"
-        data-selection-enabled="true"
+        data-selection-enabled="false"
         data-rowhref-toggle="modal"
 >
     <thead>
     <tr>
         <th data-col-name="id" data-visible="false">#</th>
         <th data-col-name="tipusUsuari" data-visible="false">#</th>
-        <%--        <th data-col-name="errorLastCallback" data-visible="false">#</th>--%>
-        <%--        <th data-col-name="hasEnviamentsPendentsRegistre" data-visible="false">#</th>--%>
         <th data-col-name="notificaError" data-visible="false"></th>
         <th data-col-name="notificaErrorDescripcio" data-visible="false"></th>
         <th data-col-name="enviant" data-visible="false"></th>
@@ -813,7 +584,7 @@
                 {{/if}}
             </script>
         </th>
-        <%-- <th data-col-name="notificaEnviamentData" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>--%>
+
         <c:if test = "${columnes.dataCreacio == true}">
             <th data-col-name="createdDate" data-converter="datetime"   width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.creadael"/></th>
         </c:if>
@@ -878,7 +649,6 @@
         <th data-col-name="permisProcessar" data-visible="false">
         <th data-col-name="documentId" data-visible="false" style="visibility: hidden">
         <th data-col-name="deleted" data-visible="false" style="visibility: hidden">
-            <%--        <th data-col-name="enviamentId" data-visible="false" style="visibility: hidden">--%>
         <th data-col-name="envCerData" data-visible="false" style="visibility: hidden">
         <th data-col-name="id" data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px" style="z-index:99999;">
             <script id="cellAccionsTemplate" type="text/x-jsrender">
@@ -895,10 +665,6 @@
                     {{/if}}
                     {{if justificant}}
                         <li><a href="<c:url value="/notificacio/{{:id}}/justificant"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-download"></span>&nbsp; <spring:message code="comu.boto.justificant"/></a></li>
-                <%--                        {^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan()) && hasEnviamentsPendentsRegistre }}--%>
-<%--                            <li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>--%>
-<%--                            <li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>--%>
-<%--                        {{/if}}--%>
                 {{/if}}
                 <%--                        MIRAR EL ^ QUE FA --%>
                 {^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan())  && (enviant || estat == 'PENDENT')}}

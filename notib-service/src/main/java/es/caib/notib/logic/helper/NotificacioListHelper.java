@@ -108,6 +108,7 @@ public class NotificacioListHelper {
         var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat,false);
         var nomesSenseErrors = false;
         var nomesAmbErrors = f.isNomesAmbErrors();
+        var deleted = f.isDeleted();
         List<String> codisProcedimentsDisponibles = new ArrayList<>();
         List<String> codisOrgansGestorsDisponibles = new ArrayList<>();
         List<String> codisProcedimentsOrgans = new ArrayList<>();
@@ -173,6 +174,7 @@ public class NotificacioListHelper {
                 .registreNumNull(Strings.isNullOrEmpty(f.getRegistreNum()))
                 .registreNum(f.getRegistreNum())
                 .nomesAmbErrors(nomesAmbErrors)
+                .deleted(deleted)
                 .nomesSenseErrors(nomesSenseErrors)
                 .referenciaNull(Strings.isNullOrEmpty(f.getReferencia()))
                 .referencia(f.getReferencia())
