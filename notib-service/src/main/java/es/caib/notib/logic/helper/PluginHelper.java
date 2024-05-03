@@ -59,7 +59,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.fundaciobit.plugins.validatesignature.afirmacxf.AfirmaCxfValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformation;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
@@ -2122,15 +2121,15 @@ public class PluginHelper {
 		var plugin = validaSignaturaPlugins.get(entitatCodi);
 		if (plugin != null) {
 			NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Plugin previament instanciat per la entitat " + entitatCodi, log, LoggingTipus.VALIDATE_SIGNATURE);
-			if (plugin instanceof AfirmaCxfValidateSignaturePlugin) {
-				var properties = ((AfirmaCxfValidateSignaturePlugin) plugin).getPluginProperties();
-				var endpoint = properties.get("es.caib.notib.plugins.validatesignature.afirmacxf.endpoint");
-				var username = properties.get("es.caib.notib.plugins.validatesignature.afirmacxf.authorization.username");
-				var transformersPath = properties.get("es.caib.notib.plugins.validatesignature.afirmacxf.TransformersTemplatesPath");
-				NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Endpoint " + endpoint, log, LoggingTipus.VALIDATE_SIGNATURE);
-				NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Username " + username, log, LoggingTipus.VALIDATE_SIGNATURE);
-				NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] TransformersTemplatesPath " + transformersPath, log, LoggingTipus.VALIDATE_SIGNATURE);
-			}
+//			if (plugin instanceof AfirmaCxfValidateSignaturePlugin) {
+//				var properties = ((AfirmaCxfValidateSignaturePlugin) plugin).getPluginProperties();
+//				var endpoint = properties.get("es.caib.notib.plugins.validatesignature.afirmacxf.endpoint");
+//				var username = properties.get("es.caib.notib.plugins.validatesignature.afirmacxf.authorization.username");
+//				var transformersPath = properties.get("es.caib.notib.plugins.validatesignature.afirmacxf.TransformersTemplatesPath");
+//				NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Endpoint " + endpoint, log, LoggingTipus.VALIDATE_SIGNATURE);
+//				NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Username " + username, log, LoggingTipus.VALIDATE_SIGNATURE);
+//				NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] TransformersTemplatesPath " + transformersPath, log, LoggingTipus.VALIDATE_SIGNATURE);
+//			}
 			return plugin;
 		}
 		var pluginClass = getPropertyPluginValidaSignatura();
