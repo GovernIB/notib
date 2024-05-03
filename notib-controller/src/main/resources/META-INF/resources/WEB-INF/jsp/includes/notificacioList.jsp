@@ -752,7 +752,6 @@
 						<li><a id="reintentarErrors" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.reintentar.errors.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
 <%--						<li><a id="reintentarNotificacio" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.reintentar.notificacions.tooltip"/>' ><spring:message code="notificacio.list.accio.massiva.reintentar.notificacions"/></a></li>--%>
                         <li><a id="eliminar" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.eliminar.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
-                        <li><a id="recuperar" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.recuperar.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.recuperar"/></a></li>
                         <li><a id="exportarODS" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.exportar.tooltip"/>' ><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
                         <li><a id="descarregarJustificantMassiu" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.justificant"/></a></li>
                         <li><a id="descarregarCertificacioMassiu" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.certificacio"/></a></li>

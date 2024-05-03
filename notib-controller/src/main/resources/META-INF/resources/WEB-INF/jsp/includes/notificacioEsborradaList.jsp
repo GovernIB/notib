@@ -89,10 +89,6 @@
         vertical-align: middle;
     }
 
-    #nomesAmbErrorsBtn {
-        margin-right: 10%;
-    }
-
     .cellEstat {
         position: relative;
     }
@@ -266,11 +262,7 @@
     }
 
     const select2Format = {	theme: 'bootstrap',	width: 'auto', allowClear: true};
-    // const formatSelects = () => {
-    //     $("#organGestor").select2(select2Format);
-    //     $("#procedimentId").select2(select2Format);
-    //     $("#serveiId").select2(select2Format);
-    // }
+
     function formatSelects (id) {
         $(id).select2(select2Format);
     }
@@ -292,18 +284,11 @@
                 }
 
             });
-            $('#nomesAmbErrorsBtn').removeClass('active');
-            $('#nomesAmbErrors').val(false);
+
             omplirProcediments();
             omplirServeis();
-            // deseleccionar();
             deselecciona();
-            // $('#form-filtre').submit();
         });
-        $('#nomesAmbErrorsBtn').click(function() {
-            nomesAmbErrors = !$(this).hasClass('active');
-            $('#nomesAmbErrors').val(nomesAmbErrors);
-        })
 
         $('#organGestor').on('change', function () {
             omplirProcediments();
@@ -328,8 +313,6 @@
         loadOrgans($('#organGestor'), organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
 
         $('#organGestor').val(${notificacioFiltreCommand.organGestor})
-        // $('#organGestor').select2().trigger('change');
-        // $('#estat').select2().trigger('change');
         $('#organGestor').trigger('change');
         $('#estat').trigger('change');
 
@@ -370,8 +353,6 @@
                         }
                     });
 
-                    // console.debug(procedimentsComuns);
-                    // console.debug(procedimentsOrgan);
                     if (procedimentsComuns.length > 0) {
                         selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
                         $.each(procedimentsComuns, function(index, val) {
@@ -421,8 +402,6 @@
                         }
                     });
 
-                    // console.debug(serveisComuns);
-                    // console.debug(serveisOrgan);
                     if (serveisComuns.length > 0) {
                         selServeis.append("<optgroup label='<spring:message code='notificacio.form.camp.servei.comuns'/>'>");
                         $.each(serveisComuns, function(index, val) {
@@ -462,16 +441,22 @@
             <not:inputSelect id="enviamentTipus" name="enviamentTipus" optionItems="${notificacioEnviamentTipus}" optionValueAttribute="value"
                              optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.enviament.tipus" inline="true"/>
         </div>
-            <%--div class="col-md-2">
-                <not:inputSelect name="comunicacioTipus" optionItems="${notificacioComunicacioTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.comunicacio.tipus" inline="true"/>
-            </div--%>
-        <div class="col-md-4">
+        <div class="col-md-2">
             <not:inputText name="concepte" inline="true"  placeholderKey="notificacio.list.filtre.camp.concepte"/>
         </div>
-            <%--        <div class="col-md-2">--%>
-            <%--            <not:inputSelect id="estat" name="estat" optionItems="${notificacioEstats}" optionValueAttribute="value"--%>
-            <%--             optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>--%>
-            <%--        </div>--%>
+        <div class="col-md-2">
+            <c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
+            <c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+            <not:inputSuggest
+                    name="creadaPer"
+                    urlConsultaInicial="${urlConsultaInicial}"
+                    urlConsultaLlistat="${urlConsultaLlistat}"
+                    textKey="notificacio.list.filtre.camp.numexpedient"
+                    placeholderKey="notificacio.list.filtre.camp.creadaper"
+                    suggestValue="codi"
+                    suggestText="nom"
+                    inline="true"/>
+        </div>
         <div class="col-md-2">
             <not:inputSelect id="estat" name="estat" optionMinimumResultsForSearch="0"
                              optionTextKeyAttribute="text"
@@ -513,31 +498,9 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-2">
-            <not:inputSelect id="tipusUsuari" name="tipusUsuari"  optionValueAttribute="value" optionTextKeyAttribute="text"  emptyOption="true"  placeholderKey="notificacio.list.filtre.camp.tipususuari" inline="true" />
-        </div>
-        <div class="col-md-4">
-            <c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-            <c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
-            <not:inputSuggest
-                    name="creadaPer"
-                    urlConsultaInicial="${urlConsultaInicial}"
-                    urlConsultaLlistat="${urlConsultaLlistat}"
-                    textKey="notificacio.list.filtre.camp.numexpedient"
-                    placeholderKey="notificacio.list.filtre.camp.creadaper"
-                    suggestValue="codi"
-                    suggestText="nom"
-                    inline="true"/>
-        </div>
-        <div class="col-md-2">
-            <not:inputText name="referencia" inline="true" placeholderKey="notificacio.list.filtre.camp.referencia"/>
-        </div>
-        <div class="col-md-2">
-            <not:inputText name="registreNum" inline="true" placeholderKey="notificacio.list.filtre.camp.registre.num"/>
-        </div>
+
+
         <div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
-            <button id="nomesAmbErrorsBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbErrors"/>" class="btn btn-default pull-left <c:if test="${nomesAmbErrors}">active</c:if>" data-toggle="button"><span class="fa fa-warning"></span></button>
-            <not:inputHidden name="nomesAmbErrors"/>
             <button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default" style="padding: 6px 9px;" title="<spring:message code="comu.boto.netejar"/>"><span class="fa fa-eraser icona_ocultable" style="padding: 2px 0px;"></span><span class="text_ocultable"><spring:message code="comu.boto.netejar"/></span></button>
             <button id="filtrar" type="submit" name="accio" value="filtrar" class="btn btn-primary" title="<spring:message code="comu.boto.filtrar"/>"><span class="fa fa-filter" id="botoFiltrar"></span><span class="text_ocultable"><spring:message code="comu.boto.filtrar"/></span></button>
         </div>
@@ -556,7 +519,6 @@
         data-default-dir="desc"
         class="table table-striped table-bordered"
         style="width:100%"
-        data-row-info="true"
         data-save-state="true"
         data-mantenir-paginacio="true"
         data-paging-style-x="true"
@@ -590,9 +552,6 @@
         </c:if>
         <c:if test = "${columnes.dataEnviament == true}">
             <th data-col-name="enviadaDate" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>
-        </c:if>
-        <c:if test = "${columnes.numRegistre == true}">
-            <th data-col-name="registreNums"><spring:message code="notificacio.list.columna.num.registre"/></th>
         </c:if>
         <c:if test="${mostraEntitat}">
             <th data-col-name="entitatNom" width="170px"><spring:message code="notificacio.list.columna.entitat"/></th>
@@ -656,21 +615,7 @@
                     <button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
                     <ul class="dropdown-menu dropdown-menu-right">
                         <li><a href="<c:url value="/notificacio/{{:id}}/info"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a></li>
-                        <li><a href="<c:url value="/notificacio/{{:id}}/documentDescarregar/{{:documentId}}"/>" target="_blank" rel=”noopener noreferrer”><span class="fa fa-download"></span>&nbsp; <spring:message code="notificacio.info.document.descarregar"/></a></li>
-                        {^{if envCerData != null }}
-                            <li><a href="<c:url value="/notificacio/{{:id}}/enviament/certificacionsDescarregar"/>" download><span class="fa fa-download"></span>&nbsp; <spring:message code="enviament.info.notifica.certificacio.num.descarregar"/></a></li>
-                        {{/if}}
-                    {^{if (~hlpIsAdministradorEntitat() && estat == 'FINALITZADA') || permisProcessar }}
-                        <li><a href="<c:url value="/notificacio/{{:id}}/processar"/>" data-toggle="modal"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
-                    {{/if}}
-                    {{if justificant}}
-                        <li><a href="<c:url value="/notificacio/{{:id}}/justificant"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-download"></span>&nbsp; <spring:message code="comu.boto.justificant"/></a></li>
-                {{/if}}
-                <%--                        MIRAR EL ^ QUE FA --%>
-                {^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan())  && (enviant || estat == 'PENDENT')}}
-                    <li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
-                        <li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-                    {{/if}}
+                        <li><a href="<c:url value="/notificacio/{{:id}}/restore"/>"><span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.recuperar"/></a></li>
                     </ul>
                 </div>
             </script>

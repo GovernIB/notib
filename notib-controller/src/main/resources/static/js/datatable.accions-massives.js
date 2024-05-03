@@ -242,15 +242,6 @@ function initEvents($table, url_prefix, eventMessages) {
             location.href = url_prefix + "/eliminar";
         });
 
-        $("#recuperar").on("click", () => {
-
-            let count = Number($(".seleccioCount").html());
-            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
-                return;
-            }
-            location.href = url_prefix + "/recuperar";
-        });
-
         $("#descarregarJustificantMassiu").on("click", () => {
 
             let count = Number($(".seleccioCount").html());

@@ -327,6 +327,20 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
     }
 
+    @GetMapping(value = "/{notificacioId}/restore")
+    public String recuperar(HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
+
+        var entitatActual = sessionScopedContext.getEntitatActual();
+        var referer = request.getHeader("Referer");
+        try {
+            notificacioService.restore(entitatActual.getId(), notificacioId);
+            return getModalControllerReturnValueSuccess(request,REDIRECT + referer,"notificacio.controller.recuperar.ok");
+        } catch (Exception ex) {
+            log.error("Hi ha hagut un error recuperant la notificació", ex);
+            return getModalControllerReturnValueError(request, REDIRECT + referer, "notificacio.controller.recuperar.ko", new Object[]{ex.getMessage()});
+        }
+    }
+
     @GetMapping(value = "/{notificacioId}/processar")
     public String processarGet(HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
 
