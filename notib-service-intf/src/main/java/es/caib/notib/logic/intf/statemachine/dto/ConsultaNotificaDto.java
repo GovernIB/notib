@@ -26,5 +26,6 @@ public class ConsultaNotificaDto {
     private EnviamentEstat estat;
     private Date notificaCertificacioData;
     private String notificaCertificacioArxiuId;
+    private boolean deleted;
 
 }

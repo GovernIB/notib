@@ -34,5 +34,6 @@ public class ConsultaSirDto {
     private EnviamentEstat estat;
     private String registreNumeroFormatat;
     private String usuari;
+    private boolean deleted;
 
 }

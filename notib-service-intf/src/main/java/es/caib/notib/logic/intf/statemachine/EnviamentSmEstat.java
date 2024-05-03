@@ -21,7 +21,7 @@ public enum EnviamentSmEstat {
     CONSULTA_ERROR,         // Error al consultar l'estat de l'enviament a Notifica
     CONSULTA_ESTAT,         // Estat consultat correctament
     // SIR
-    SIR_PENDENT,                // Enviament per enviar a SIR
+    SIR_PENDENT,                    // Enviament per enviar a SIR
     SIR_RETRY,              // Reintent de consulta de l'estat de l'enviament a SIR
     SIR_ERROR,              // Error al consultar l'estat de l'enviament a SIR
     SIR_ESTAT,              // Estat consultat correctament

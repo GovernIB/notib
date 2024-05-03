@@ -76,7 +76,7 @@ public interface NotificacioService {
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	void restore(Long entitatId, Long notificacioId) throws NotFoundException;
+	void restore(Long entitatId, Long notificacioId) throws NotFoundException, Exception;
 	
 	/**
 	 * Actualitza la informació de la notificacio que tengui el mateix

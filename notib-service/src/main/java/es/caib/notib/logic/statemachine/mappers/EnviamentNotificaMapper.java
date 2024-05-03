@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public interface EnviamentNotificaMapper {
 
     @Mapping(source = "notificacio.entitat.codi", target = "entitatCodi")
+    @Mapping(source = "notificacio.deleted", target = "deleted")
     @Mapping(source = "notificacio.referencia", target = "notificacioUuid")
     @Mapping(source = "notificaReferencia", target = "uuid")
     @Mapping(source = "notificacio.enviaments", target = "enviamentsUuid", qualifiedByName = "uuids")

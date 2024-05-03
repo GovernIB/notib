@@ -15,14 +15,13 @@ public class EnviamentNotificaDto {
 
     // Entitat
     private String entitatCodi;
-
     // Notificacio
     private String notificacioUuid;
-
     // Enviament
     private String uuid;
-
     // Enviamenta
     private List<String> enviamentsUuid;
+    //Marcada com esborrada
+    private boolean deleted;
 
 }

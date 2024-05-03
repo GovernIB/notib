@@ -4,7 +4,9 @@ import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentEmailRequest;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.NotibLogger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
@@ -38,6 +40,11 @@ public class EnviamentEmailListener {
         var enviament = enviamentEmailRequest.getEnviamentEmailDto();
         if (enviament == null || Strings.isNullOrEmpty(enviament.getUuid())) {
             log.error("[SM] Rebut enviament per email sense Enviament");
+            message.acknowledge();
+            return;
+        }
+        if (enviament.isDeleted()) {
+            NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid(), log, LoggingTipus.STATE_MACHINE);
             message.acknowledge();
             return;
         }

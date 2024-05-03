@@ -15,6 +15,7 @@ public abstract class EnviamentEmailMapper {
 
     @Mapping(source = "notificaReferencia", target = "uuid")
     @Mapping(source = "notificacio.entitat.codi", target = "entitatCodi")
+    @Mapping(source = "notificacio.deleted", target = "deleted")
     @Mapping(source = "notificacio.entitat.nom", target = "entitatNom")
     @Mapping(source = "notificacio.id", target = "notificacioId")
     @Mapping(source = "notificacio.concepte", target = "concepte")

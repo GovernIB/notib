@@ -34,5 +34,6 @@ public class EnviamentEmailDto {
     // Enviament
     private Long id;
     private String uuid;
+    private boolean deleted;
 
 }

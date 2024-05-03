@@ -62,6 +62,7 @@ public abstract class EnviamentRegistreMapper {
     @Mapping(source = "notificacio.entitat.codi", target = "entitatCodi")
     @Mapping(source = "notificacio.entitat.nom", target = "entitatNom")
     @Mapping(source = "notificacio.entitat.dir3Codi", target = "entitatDir3Codi")
+    @Mapping(source = "notificacio.deleted", target = "deleted")
     @Mapping(source = "notificacio.id", target = "notificacioId")
     @Mapping(source = "notificacio.concepte", target = "concepte")
     @Mapping(source = "notificacio.enviamentTipus", target = "tipusEnviament")

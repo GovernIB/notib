@@ -52,7 +52,13 @@ public class EnviamentRegistreListener {
                 message.acknowledge();
                 return;
             }
-            if (!Strings.isNullOrEmpty(enviament.get().getRegistreNumeroFormatat())) {
+            var env = enviament.get();
+            if (env.getNotificacio().isDeleted()) {
+                NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
+                message.acknowledge();
+                return;
+            }
+            if (!Strings.isNullOrEmpty(env.getRegistreNumeroFormatat())) {
                 log.error("[SM] L'enviament ja te numero de registre " + enviamentUuid);
                 message.acknowledge();
                 return;

@@ -297,12 +297,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public void restore(Long entitatId, Long notificacioId) throws NotFoundException {
+	public void restore(Long entitatId, Long notificacioId) throws Exception {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			entityComprovarHelper.comprovarEntitat(entitatId,false,true,true,false);
-			log.debug("Recuperant la notificació (notificacioId=" + notificacioId + ")");
+			NotibLogger.getInstance().info("Recuperant la notificació (notificacioId=" + notificacioId + ")", log, LoggingTipus.TAULA_REMESES);
 			var notificacioEntity = notificacioRepository.findById(notificacioId).orElse(null);
 			var notificacioTableEntity = notificacioTableViewRepository.findById(notificacioId).orElse(null);
 
@@ -310,20 +310,47 @@ public class NotificacioServiceImpl implements NotificacioService {
 				throw new NotFoundException(notificacioId, NotificacioEntity.class, "No s'ha trobat cap notificació amb l'id especificat");
 			}
 
+
 			notificacioEntity.setDeleted(false);
 			notificacioTableEntity.setDeleted(false);
-			notificacioRepository.save(notificacioEntity);
-			notificacioTableViewRepository.save(notificacioTableEntity);
+			notificacioRepository.saveAndFlush(notificacioEntity);
+			notificacioTableViewRepository.saveAndFlush(notificacioTableEntity);
 
-			notificacioRepository.flush();
-			notificacioTableViewRepository.flush();
+			restuararEnviamentsStateMachine(notificacioEntity.getEnviaments());
 
-			log.debug("La notificació s'ha recuperat correctament (notificacioId=" + notificacioId + ")");
+			NotibLogger.getInstance().info("La notificació s'ha recuperat correctament (notificacioId=" + notificacioId + ")", log, LoggingTipus.TAULA_REMESES);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
+	private void restuararEnviamentsStateMachine(Set<NotificacioEnviamentEntity> enviaments) throws Exception {
+
+		EnviamentSmEstat estat;
+		for (var env : enviaments) {
+			estat = enviamentSmService.getEstatEnviament(env.getUuid());
+			switch (estat) {
+				case NOU:
+					enviamentSmService.registreEnviament(env.getUuid(), false);
+					break;
+				case REGISTRE_PENDENT:
+					enviamentSmService.registreEnviament(env.getUuid(), true);
+					break;
+				case REGISTRE_ERROR:
+					enviamentSmService.registreRetry(env.getUuid());
+					break;
+				case NOTIFICA_PENDENT:
+					enviamentSmService.notificaEnviament(env.getUuid(), true);
+					break;
+				case NOTIFICA_ERROR:
+					enviamentSmService.notificaRetry(env.getUuid());
+					break;
+				default:
+					throw new Exception("Enviament " + env.getUuid() + " te un estat que no es pot recuperar " + estat);
+			}
+		}
+	}
+
 	@Transactional
 	@Override
 	public Notificacio update(Long entitatId, Notificacio notificacio, boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {

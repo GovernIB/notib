@@ -31,7 +31,11 @@ public class PoolingSirListener {
 
         try {
             var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
-
+            if (enviament.getNotificacio().isDeleted()) {
+                NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid(), log, LoggingTipus.STATE_MACHINE);
+                message.acknowledge();
+                return;
+            }
             var notificacioRegistrada = enviament.getNotificacio().getEnviaments().stream().allMatch(e -> e.getRegistreData() != null);
             if (notificacioRegistrada) {
                 enviament.getNotificacio().getEnviaments().forEach(e -> enviamentSmService.sirConsulta(e.getNotificaReferencia()));

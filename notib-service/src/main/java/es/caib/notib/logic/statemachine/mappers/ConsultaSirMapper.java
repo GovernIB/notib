@@ -18,6 +18,7 @@ public abstract class ConsultaSirMapper {
     @Mapping(source = "notificaEstat", target = "estat")
     @Mapping(source = "createdBy", target = "usuari", qualifiedByName = "usuariCodi")
     @Mapping(source = "notificacio.entitat.nom", target = "entitatNom")
+    @Mapping(source = "notificacio.deleted", target = "deleted")
     @Mapping(source = "notificacio.entitat.dir3Codi", target = "entitatDir3Codi")
     @Mapping(source = "notificacio.id", target = "notificacioId")
     @Mapping(source = "notificacio.concepte", target = "concepte")

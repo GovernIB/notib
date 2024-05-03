@@ -1016,7 +1016,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 : getModalControllerReturnValueError(request,REDIRECT + referer,"notificacio.controller.esborrar.massiu.ko");
     }
 
-    @GetMapping(value = {"/recuperar", "{notificacioId}/notificacio/recuperar/"})
+    @GetMapping(value = {"/recuperar", "{notificacioId}/recuperar/"})
     public String recuperarMassiu(HttpServletRequest request, Model model) {
 
         var entitatActual = sessionScopedContext.getEntitatActual();

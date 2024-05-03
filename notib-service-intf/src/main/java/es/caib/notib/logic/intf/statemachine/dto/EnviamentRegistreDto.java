@@ -51,5 +51,6 @@ public class EnviamentRegistreDto {
     private String uuid;
     private Date registreData;
     private int registreIntent;
+    private boolean deleted;
 
 }

@@ -38,6 +38,11 @@ public class EnviamentNotificaListener {
             return;
         }
         NotibLogger.getInstance().info("[SM] Rebut enviament a notifica <" + enviament.getUuid() + ">", log, LoggingTipus.STATE_MACHINE);
+        if (enviament.isDeleted()) {
+            NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid(), log, LoggingTipus.STATE_MACHINE);
+            message.acknowledge();
+            return;
+        }
         semaphore.acquire();
         try {
             notificaService.enviarNotifica(enviament.getUuid(), enviamentNotificaRequest);

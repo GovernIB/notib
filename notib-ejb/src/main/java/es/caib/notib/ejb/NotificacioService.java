@@ -160,7 +160,7 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public void restore(Long entitatId, Long notificacioId) throws NotFoundException {
+	public void restore(Long entitatId, Long notificacioId) throws Exception {
 		getDelegateService().restore(entitatId, notificacioId);
 	}
 

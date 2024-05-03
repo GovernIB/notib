@@ -10,6 +10,7 @@ public interface ConsultaNotificaMapper {
 
     @Mapping(source = "notificacio.entitat.codi", target = "entitatCodi")
     @Mapping(source = "notificacio.entitat.apiKey", target = "entitatApiKey")
+    @Mapping(source = "notificacio.deleted", target = "deleted")
     @Mapping(source = "notificaReferencia", target = "uuid")
     @Mapping(source = "notificaEstat", target = "estat")
     public ConsultaNotificaDto toDto(NotificacioEnviamentEntity enviament);
