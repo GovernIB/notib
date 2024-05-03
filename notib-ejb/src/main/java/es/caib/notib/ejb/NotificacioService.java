@@ -159,6 +159,12 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public void restore(Long entitatId, Long notificacioId) throws NotFoundException {
+		getDelegateService().restore(entitatId, notificacioId);
+	}
+
+	@Override
 	@RolesAllowed("**")
 	public PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findAmbFiltrePaginat(entitatId, rol, organGestorCodi, usuariCodi, filtre, paginacioParams);

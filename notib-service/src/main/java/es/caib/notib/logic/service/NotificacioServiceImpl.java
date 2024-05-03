@@ -271,6 +271,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (notificacioEntity == null || notificacioTableEntity == null) {
 				throw new NotFoundException(notificacioId, NotificacioEntity.class, "No s'ha trobat cap notificació amb l'id especificat");
 			}
+			var enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacioId);
+
+			if (notificacioTableEntity.getEnviamentTipus().equals(EnviamentTipus.SIR) && (enviamentsPendents == null || enviamentsPendents.isEmpty())) {
+					throw new ValidationException("Aquesta notificació està enviada a SIR i no es pot esborrar");
+			}
+
+			if ((enviamentsPendents == null || enviamentsPendents.isEmpty()) && !(notificacioTableEntity.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA))) {
+				throw new ValidationException("Aquesta notificació està enviada i no està registrada, per tant, no es pot esborrar");
+			}
 
 			notificacioEntity.setDeleted(true);
 			notificacioTableEntity.setDeleted(true);
