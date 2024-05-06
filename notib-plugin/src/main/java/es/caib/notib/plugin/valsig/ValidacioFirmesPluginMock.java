@@ -2,11 +2,11 @@ package es.caib.notib.plugin.valsig;
 
 
 
-import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
-import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformation;
-import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
-import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
-import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
+import es.caib.notib.plugin.validatesignature.api.IValidateSignaturePlugin;
+import es.caib.notib.plugin.validatesignature.api.SignatureRequestedInformation;
+import es.caib.notib.plugin.validatesignature.api.ValidateSignatureRequest;
+import es.caib.notib.plugin.validatesignature.api.ValidateSignatureResponse;
+import es.caib.notib.plugin.validatesignature.api.ValidationStatus;
 
 import java.util.Properties;
 

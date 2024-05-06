@@ -59,12 +59,60 @@
 			<artifactId>xercesImpl</artifactId>
 			<version>2.12.2</version>
 		</dependency>
-
-<!--		<dependency>-->
-<!--			<groupId>org.fundaciobit.pluginsib.validatesignature</groupId>-->
-<!--			<artifactId>pluginsib-validatesignature-afirmacxf-jboss7</artifactId>-->
-<!--			<version>2.0.8</version>-->
-<!--		</dependency>-->
+		<!-- Dependències per a poder implementar el plugin de validació de firma v.2.0.8 -->
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.ws</groupId>
+			<artifactId>jaxws-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.jws</groupId>
+			<artifactId>jsr181-api</artifactId>
+			<version>1.0.0.MR1-redhat-8</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>integra</artifactId>
+			<version>1.3.1</version>
+			<!-- Eliminam tota la comunicació AXIS -->
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.axis</groupId>
+					<artifactId>axis</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.axis</groupId>
+					<artifactId>axis-jaxrpc</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.axis</groupId>
+					<artifactId>axis-saaj</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.santuario</groupId>
+					<artifactId>xmlsec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.xml.wss</groupId>
+					<artifactId>xws-security</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-impl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bctsp-jdk16</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>org.fundaciobit.apisib.apifirmasimple</groupId>
 			<artifactId>apifirmasimple-jersey</artifactId>
@@ -106,6 +154,36 @@
 	</profiles>
 	<build>
 		<plugins>
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-shade-plugin</artifactId>-->
+<!--				<version>3.5.3</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<phase>package</phase>-->
+<!--						<goals>-->
+<!--							<goal>shade</goal>-->
+<!--						</goals>-->
+<!--						<configuration>-->
+<!--							<artifactSet>-->
+<!--								<includes>-->
+<!--									<include>org.fundaciobit.pluginsib.validatesignature:pluginsib-validatesignature-afirmacxf-jboss7</include>-->
+<!--								</includes>-->
+<!--								<excludes>-->
+<!--									<exclude>/org/opensaml/xml/util/**</exclude>-->
+<!--									<exclude>META-INF/MANIFEST.MF</exclude>-->
+<!--								</excludes>-->
+<!--							</artifactSet>-->
+<!--							<relocations>-->
+<!--								<relocation>-->
+<!--									<pattern>org.fundaciobit.plugins.validatesignature.afirmacxf</pattern>-->
+<!--									<shadedPattern>es.caib.notib.validatesignature.afirmacxf</shadedPattern>-->
+<!--								</relocation>-->
+<!--							</relocations>-->
+<!--						</configuration>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -146,6 +224,18 @@
 			<id>jboss-thirdparty-releases</id>
 			<name>JBoss 3rd-party Repository</name>
 			<url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/</url>
+		</repository>
+		<repository>
+			<id>jboss-eap-repository-group</id>
+			<name>JBoss EAP Maven Repository</name>
+			<url>https://maven.repository.redhat.com/ga/</url>
+			<layout>default</layout>
+			<releases>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
 		</repository>
 	</repositories>
 </project>
