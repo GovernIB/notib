@@ -2010,7 +2010,7 @@
 					<label><spring:message code="notificacio.form.titol.document" /></label>
 					<hr/>
 				</div>
-				
+
 				<!-- TIPUS DE DOCUMENT -->
 				<div class="row">
 					<div class="col-md-6">
@@ -2036,12 +2036,12 @@
 					<div id="input-origen-csv_0" class="col-md-6">
 						<not:inputText name="documentArxiuCsv[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 					</div>
-					
+
 					<!-- UUID -->
 					<div id="input-origen-uuid_0" class="col-md-6 hidden">
 						<not:inputText name="documentArxiuUuid[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 					</div>
-					
+
 					<!-- FITXER -->
 					<div id="input-origen-arxiu_0" class="col-md-6 hidden">
 						<c:choose>
@@ -2071,7 +2071,7 @@
 					</div>
 					<hr/>
 				</div>
-	
+
 				<div id="docs-addicionals"<c:if test="${enviamentTipus != 'SIR'}"> class="hidden"</c:if>>
 					<!-- DOCUMENT 2 -->
 					<div id="document2" class="row hidden">
@@ -2099,12 +2099,12 @@
 						<div id="input-origen-csv_1" class="col-md-6">
 							<not:inputText name="documentArxiuCsv[1]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 						</div>
-	
+
 						<!-- UUID -->
 						<div id="input-origen-uuid_1" class="col-md-6 hidden">
 							<not:inputText name="documentArxiuUuid[1]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 						</div>
-	
+
 						<!-- FITXER -->
 						<div id="input-origen-arxiu_1" class="col-md-6 hidden">
 							<c:choose>
@@ -2158,12 +2158,12 @@
 						<div id="input-origen-csv_2" class="col-md-6">
 							<not:inputText name="documentArxiuCsv[2]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 						</div>
-	
+
 						<!-- UUID -->
 						<div id="input-origen-uuid_2" class="col-md-6 hidden">
 							<not:inputText name="documentArxiuUuid[2]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 						</div>
-	
+
 						<!-- FITXER -->
 						<div id="input-origen-arxiu_2" class="col-md-6 hidden">
 							<c:choose>
@@ -2219,12 +2219,12 @@
 						<div id="input-origen-csv_3" class="col-md-6">
 							<not:inputText name="documentArxiuCsv[3]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 						</div>
-	
+
 						<!-- UUID -->
 						<div id="input-origen-uuid_3" class="col-md-6 hidden">
 							<not:inputText name="documentArxiuUuid[3]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
 						</div>
-	
+
 						<!-- FITXER -->
 						<div id="input-origen-arxiu_3" class="col-md-6 hidden">
 							<c:choose>
@@ -2278,11 +2278,11 @@
 						<div id="input-origen-csv_4" class="col-md-6">
 							<not:inputText name="documentArxiuCsv[4]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}" />
 						</div>
-	
+
 						<!-- UUID -->
 						<div id="input-origen-uuid_4" class="col-md-6 hidden">
 						</div>
-	
+
 						<!-- FITXER -->
 						<div id="input-origen-arxiu_4" class="col-md-6 hidden">
 							<c:choose>
@@ -2318,7 +2318,7 @@
 					<input type="button" class="btn btn-danger hidden" id="removeDocument" value="<spring:message code="notificacio.form.boto.remove.document"/>" />
 				</div>
 				</c:if>
-	
+
 				<!--  DOCUMENT NOTMALITZAT -->
 				<c:if test="${enviamentTipus != 'SIR'}">
 				<div id="normalitzat" class="row">
