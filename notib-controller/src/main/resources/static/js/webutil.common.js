@@ -396,7 +396,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 			select2Options['templateResult'] = templateResultFunction;
 			select2Options['templateSelection'] = templateResultFunction;
 		}
-		$(this).select2(select2Options);
+		let s2 = $(this).select2(select2Options);
 
 		// Unicament per tipus de document de l'entitat!!!
 		if (selectValue !== undefined) {
