@@ -134,15 +134,15 @@
             translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA"/>";
         }
         if (element.id == 'EXPIRADA') {
-            bsIconCode = "fa fa-check";
+            bsIconCode = "fa fa-asterisk";
             translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.EXPIRADA"/>";
         }
         if (element.id == 'NOTIFICADA') {
-            bsIconCode = "fa fa-check";
+            bsIconCode = "fa fa-check-circle";
             translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.NOTIFICADA"/>";
         }
         if (element.id == 'REBUTJADA') {
-            bsIconCode = "fa fa-check";
+            bsIconCode = "fa fa-times";
             translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.REBUTJADA"/>";
         }
         if (element.id == 'ENVIAT_SIR') {
