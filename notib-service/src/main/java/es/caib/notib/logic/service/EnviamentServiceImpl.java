@@ -236,8 +236,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 			log.debug("Consulta de destinatari donat el seu id (destinatariId=" + enviamentId + ")");
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 			// #779: Obtenim la certificació de forma automàtica
-			if (enviament.getNotificaCertificacioArxiuId() == null &&
-					( EnviamentEstat.REBUTJADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat()) )) {
+			var isEstatFinal = EnviamentEstat.EXPIRADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.REBUTJADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat());
+			if (enviament.getNotificaCertificacioArxiuId() == null && isEstatFinal) {
 
 				try {
 					notificaHelper.enviamentRefrescarEstat(enviamentId);

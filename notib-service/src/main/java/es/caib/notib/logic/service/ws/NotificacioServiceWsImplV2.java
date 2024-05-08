@@ -79,6 +79,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 
 import javax.jws.WebService;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.ByteArrayOutputStream;
 import java.security.GeneralSecurityException;
 import java.time.ZoneId;
@@ -177,6 +179,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 	@Autowired
 	private EnviamentSmService enviamentSmService;
+
+	@PersistenceContext
+	private EntityManager entityManager;
 
 //	@Autowired
 //	private NotificacioValidator notificacioValidator;
@@ -620,10 +625,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				if (enviament.getNotificaCertificacioData() != null) {
 					log.debug("Guardant certificació enviament amb referencia: " + referencia);
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					pluginHelper.gestioDocumentalGet(
-							enviament.getNotificaCertificacioArxiuId(),
-							PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-							baos);
+					pluginHelper.gestioDocumentalGet(enviament.getNotificaCertificacioArxiuId(), PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, baos);
 					String certificacioBase64 = org.apache.commons.codec.binary.Base64.encodeBase64String(baos.toByteArray());
 
 					Certificacio certificacio = Certificacio.builder()
@@ -1038,11 +1040,21 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			resposta.setErrorDescripcio(errorDesc);
 			integracioHelper.addAplicacioAccioParam(info, null);
 			integracioHelper.addAccioError(info, errorDesc, t);
-		} else {
-			ConfigHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
-			integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
-			info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
+			return enviament;
 		}
+		var isEstatFinal = EnviamentEstat.EXPIRADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.REBUTJADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat());
+		if (enviament.getNotificaCertificacioArxiuId() == null && isEstatFinal) {
+			try {
+				notificaHelper.enviamentRefrescarEstat(enviament.getId());
+				entityManager.refresh(enviament);
+			} catch (Exception ex) {
+				log.error("No s'ha pogut actualitzar la certificació de l'enviament amb id: " + enviament.getId(), ex);
+			}
+		}
+		ConfigHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
+		integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
+		info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
+
 		return enviament;
 	}
 
