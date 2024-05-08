@@ -300,13 +300,14 @@ public class AdviserServiceImpl implements AdviserService {
     }
 
     private String guardarCertificacioAcuseRecibo(byte[] acuse) {
+
         try {
-            log.info("Guardant certificació acusament de rebut...");
+            log.info("Guardant certificacio acusament de rebut...");
             return pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, acuse);
         } catch (Exception ex) {
             log.error("No s'ha pogut guardar la certificació a la gestió documental", ex);
+            throw ex;
         }
-        return null;
     }
 
     private EnviamentEstat getNotificaEstat(String estado) {
