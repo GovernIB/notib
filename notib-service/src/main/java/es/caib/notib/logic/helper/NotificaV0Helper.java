@@ -214,9 +214,9 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 //					var decodificat = certificacio.getContenidoCertificacion();
 //					String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, decodificat);
 //					log.info("Actualitzant certificació enviament...");
-//					enviament.updateNotifivcaCertificacio(dataCertificacio, gestioDocumentalId, certificacio.getHash(), certificacio.getOrigen(), certificacio.getMetadatos(),
+//					enviament.updateNotificaCertificacio(dataCertificacio, gestioDocumentalId, certificacio.getHash(), certificacio.getOrigen(), certificacio.getMetadatos(),
 //							certificacio.getCsv(), certificacio.getMime(), Integer.parseInt(certificacio.getSize()), null, null, null);
-//
+					enviament.setNotificaCertificacioArxiuId("1619444211413/1702399811960");
 					log.info("Fi actualització certificació. Creant nou event per certificació...");
 					//Crea un nou event
 					notificacioEventHelper.addAdviserCertificacioEvent(enviament, false, null);
