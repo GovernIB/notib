@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - property:
+      name: tipus
+      value: NUMBER(1,0)
+      dbms: oracle
+  - property:
+      name: tipus
+      value: boolean
+      dbms: postgresql
+  - changeSet:
+      id: 1714736924374-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_notificacio_table
+            columns:
+              - column:
+                  name: DELETED
+                  type: ${tipus}
+                  defaultValue: 0
+        - addColumn:
+            tableName: not_notificacio
+            columns:
+              - column:
+                  name: DELETED
+                  type: ${tipus}
+                  defaultValue: 0
