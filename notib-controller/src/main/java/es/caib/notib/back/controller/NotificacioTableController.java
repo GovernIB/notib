@@ -664,12 +664,18 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             var zos = new ZipOutputStream(baos);
             var enviaments = enviamentService.enviamentFindAmbNotificacio(notificacioId);
             Map<String, Integer> interessats = new HashMap<>();
+            ArxiuDto arxiu;
             int numInteressats = 0;
             for (var env : enviaments) {
                 if (env.getNotificaCertificacioData() == null) {
                     continue;
                 }
-                var arxiu = notificacioService.enviamentGetCertificacioArxiu(env.getId());
+                try {
+                    arxiu = notificacioService.enviamentGetCertificacioArxiu(env.getId());
+                } catch (Exception ex) {
+                    log.error("Error descarregant la certificacio de l'enviament " + env.getId(), ex);
+                    continue;
+                }
                 arxiu.setNom(env.getTitular().getNif() + "_" + arxiu.getNom());
                 if (interessats.get(env.getTitular().getNif()) == null) {
                     numInteressats++;
