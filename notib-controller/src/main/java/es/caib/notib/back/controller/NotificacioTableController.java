@@ -596,11 +596,17 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             Map<String, Integer> interessats = new HashMap<>();
             int numInteressats = 0;
             notCertificacions = new ArrayList<>();
+            ArxiuDto certificacio;
             for (var env : enviaments) {
                 if (env.getNotificaCertificacioData() == null) {
                     continue;
                 }
-                var certificacio = notificacioService.enviamentGetCertificacioArxiu(env.getId());
+                try {
+                    certificacio = notificacioService.enviamentGetCertificacioArxiu(env.getId());
+                } catch (Exception ex) {
+                    log.error("Error descarregant la certificacio per l'enviament " + env.getId());
+                    continue;
+                }
                 certificacio.setNom(env.getTitular().getNif() + "_" + certificacio.getNom());
                 if (interessats.get(env.getTitular().getNif()) == null) {
                     numInteressats++;
