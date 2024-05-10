@@ -73,7 +73,7 @@
                         // console.log("Progres:", data);
                         writeInfo(data);
                         $('#cancelbtn', parent.document).toggle(true);
-                        if (data.progres == 100) {
+                        if (data.progres === 100) {
                             clearInterval(itervalProgres);
                             isUpdating = false;
                             $('#bar').css('width', '100%');
@@ -82,17 +82,19 @@
 // 							$('.modal-footer', parent.document).show();
                             $('.close', parent.document).prop('disabled', false);
                             $('.loading').hide();
-                        } else {
-                            if (data.progres > 0) {
-                                $('.loading').hide();
-                                $('.progress').show();
-                                $('#bar').css('width', data.progres + '%');
-                                $('#bar').attr('aria-valuenow', data.progres);
-                                $('#bar').html(data.progres + '%');
-                            }else if(data.progres == 0 && data.numProcedimentsActualitzats == 0 ){
-                                $('.close', parent.document).prop('disabled', false);
-                                $('.loading').hide();
-                            }
+                            return;
+                        }
+                        if (data.progres > 0) {
+                            $('.loading').hide();
+                            $('.progress').show();
+                            $('#bar').css('width', data.progres + '%');
+                            $('#bar').attr('aria-valuenow', data.progres);
+                            $('#bar').html(data.progres + '%');
+                            return;
+                        }
+                        if(data.progres == 0 && data.numProcedimentsActualitzats == 0 ){
+                            $('.close', parent.document).prop('disabled', false);
+                            $('.loading').hide();
                         }
                     }
                 },
