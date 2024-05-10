@@ -715,16 +715,18 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
     private void enviarCorreuElectronic(NotificacioMassivaEntity notificacioMassiva) {
 
-        if (!Strings.isNullOrEmpty(notificacioMassiva.getEmail())) {
-            try {
-                jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_MASSIVA, notificacioMassiva.getId(), m -> {
-                    // Esperam 5 segons a enviar el correu per asseguar que ja s'hagi desat la notificació massiva
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 5000L);
-                    return m;
-                });
-            } catch (JmsException ex) {
-                log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.", ex);
-            }
+        if (Strings.isNullOrEmpty(notificacioMassiva.getEmail())) {
+            return;
+        }
+        try {
+
+            jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_MASSIVA, notificacioMassiva.getId(), m -> {
+                // Esperam 5 segons a enviar el correu per asseguar que ja s'hagi desat la notificació massiva
+                m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 5000L);
+                return m;
+            });
+        } catch (JmsException ex) {
+            log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.", ex);
         }
     }
 
