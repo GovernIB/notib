@@ -120,8 +120,11 @@
 <script type="text/javascript">
 
     function showEstat(element) {
-        var bsIconCode = "";
-        var translate = element.text;
+
+        let bsIconCode = "";
+        let translate = element.text;
+        let text = ""
+        let style = ""
         if (element.id == 'PENDENT') {
             bsIconCode = "fa fa-clock-o";
             translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PENDENT"/>";
@@ -155,7 +158,9 @@
             translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.REBUTJADA"/>";
         }
         if (element.id == 'ENVIAT_SIR') {
-            bsIconCode = "fa fa-send-o";
+            bsIconCode ="label label-primary";
+            text = "S"
+            style = "display:inline-block; padding:3px";
             translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIAT_SIR"/>";
         }
         if (element.id == 'ENVIADA_AMB_ERRORS') {
@@ -171,7 +176,7 @@
             translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIANT"/>";
         }
 
-        return $('<span class="' + bsIconCode + '"></span><span>  ' + translate + '</span>');
+        return $('<span style= " ' + style + ' " class="' + bsIconCode + '">' + text + ' </span><span>  ' + translate + '</span>');
     }
 
     var myHelpers = {
