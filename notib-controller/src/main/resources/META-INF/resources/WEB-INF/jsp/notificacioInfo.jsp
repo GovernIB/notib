@@ -272,7 +272,7 @@ $(document).ready(function() {
 						</c:if>
 						<tr>
 							<td><strong><spring:message code="notificacio.info.dada.idioma" /></strong></td>
-							<td>${notificacio.idioma}</td>
+							<td><spring:message code="es.caib.notib.logic.intf.dto.Idioma.${notificacio.idioma}"/></td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="notificacio.info.dada.creacio.data" /></strong></td>
@@ -1122,8 +1122,7 @@ $(document).ready(function() {
 		</c:if>
 	</div>
 	<div id="modal-botons" class="text-right">
-		<a href="<c:url value="/notificacio"/>" class="btn btn-default"
-			data-modal-cancel="true"><spring:message code="comu.boto.tancar" /></a>
+		<a href="<c:url value="/notificacio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar" /></a>
 	</div>
 </body>
 </html>
