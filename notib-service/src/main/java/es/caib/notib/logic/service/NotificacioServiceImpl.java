@@ -627,7 +627,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				return dto;
 			}
 			dto.setNotificaErrorData(e.getData());
-			dto.setNotificaErrorDescripcio(notificacioTableEntity.getNotificaErrorDescripcio());
+			dto.setNotificaErrorDescripcio(e.getErrorDescripcio());
 			return dto;
 		} finally {
 			metricsHelper.fiMetrica(timer);

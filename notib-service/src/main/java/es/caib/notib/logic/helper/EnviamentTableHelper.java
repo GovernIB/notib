@@ -16,6 +16,8 @@ public class EnviamentTableHelper {
 
     @Autowired
     private EnviamentTableRepository enviamentTableRepository;
+    @Autowired
+    private NotificacioTableHelper notificacioTableHelper;
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEnviamentEntity enviament) {
@@ -126,6 +128,7 @@ public class EnviamentTableHelper {
         tableViewItem.setErrorLastCallback(enviament.isErrorLastCallback());
 
         enviamentTableRepository.saveAndFlush(tableViewItem);
+        notificacioTableHelper.actualitzarRegistre(notificacio);
     }
 
     /////
