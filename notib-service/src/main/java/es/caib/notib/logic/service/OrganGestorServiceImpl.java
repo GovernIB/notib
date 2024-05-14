@@ -1201,7 +1201,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			} else if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
 				List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organ);
 				int chunkSize = 999;
-				for (int foo = 0; foo < organs.size(); foo=foo+chunkSize) {
+				for (int foo = 0; foo < organs.size(); foo = foo + chunkSize) {
 					int indexFinal = foo + chunkSize;
 					indexFinal = indexFinal <= organs.size() ? indexFinal : organs.size();
 					List<OrganGestorEntity> organsChunk = organGestorRepository.findByCodiIn(organs.subList(foo, indexFinal));
@@ -1221,6 +1221,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				organsGestors.add(CodiValorEstatDto.builder().id(organGestor.getId()).codi(organGestor.getCodi()).valor(nom).estat(organGestor.getEstat()).build());
 			}
 			return organsGestors;
+		} catch (NoPermisosException ex) {
+			log.info("Usuari " + usuari + " sense permisos");
+			return new ArrayList<>();
 		} catch (Exception ex) {
 			log.error("Error obtinguent els òrgans disponibles -> ", ex);
 			return new ArrayList<>();
