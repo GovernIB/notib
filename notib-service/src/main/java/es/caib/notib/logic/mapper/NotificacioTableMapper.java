@@ -213,7 +213,7 @@ public abstract class NotificacioTableMapper {
         var error = "";
 //        boolean isFinal = NotificacioEstatEnumDto.PROCESSADA.equals(dto.getEstat()) || NotificacioEstatEnumDto.FINALITZADA.equals(dto.getEstat());
 //        var eventError = !isFinal ? eventRepository.findLastErrorEventByNotificacioId(dto.getId()) : null;
-        var eventError = eventRepository.findLastEventByNotificacioId(dto.getId());
+        var eventError = eventRepository.findLastErrorEventByNotificacioId(dto.getId());
         if (eventError != null && !Strings.isNullOrEmpty(eventError.getErrorDescripcio())) {
             var desc = eventError.getErrorDescripcio();
             if (desc.length() > 500) {

@@ -597,7 +597,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				dto.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEntity.getOperadorPostal(), OperadorPostalDataDto.class));
 				dto.setCie(conversioTipusHelper.convertir(entregaCieEntity.getCie(), CieDataDto.class));
 			}
-
 			var lastErrorEvent = notificacioEventRepository.findEventsAmbFiReintentsByNotificacioId(notificacio.getId());
 			if (lastErrorEvent != null && !lastErrorEvent.isEmpty()) {
 				String msg = "";
@@ -605,6 +604,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				StringBuilder m = new StringBuilder();
 				int env = 1;
 				for (var event : lastErrorEvent) {
+
 					msg = messageHelper.getMessage("notificacio.event.fi.reintents");
 					var et = NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(event.getTipus()) && event.getEnviament().isSirFiPooling() ? NotificacioEventTipusEnumDto.SIR_FI_POOLING : event.getTipus();
 					tipus = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + et);
