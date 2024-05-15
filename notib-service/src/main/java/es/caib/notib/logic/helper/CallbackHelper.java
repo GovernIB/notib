@@ -155,7 +155,7 @@ public class CallbackHelper {
 	}
 
 	@Transactional (rollbackFor = RuntimeException.class)
-	public NotificacioEntity notifica(@NonNull NotificacioEnviamentEntity env) throws Exception{
+	public NotificacioEntity notifica(@NonNull NotificacioEnviamentEntity env) throws Exception {
 
 		var callback = callbackRepository.findByEnviamentId(env.getId());
 		var notificacio = env.getNotificacio();
@@ -164,11 +164,14 @@ public class CallbackHelper {
 				new AccioParam("Identificador de la notificació", String.valueOf(notificacio.getId())));
 
 		if (callback == null) {
-			integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat. No existeix un callback per l'enviament " + env.getId());
+			integracioHelper.addAccioError(info, "Error enviant avis de canvi d'estat. No existeix un callback per l'enviament " + env.getId());
 			return notificacio;
 		}
-		log.trace("[Callback] Consultant aplicació de l'event. ");
+		log.trace("[Callback] Consultant aplicacio de l'event. ");
 		var aplicacio = getAplicacio(callback, env);
+		if (!aplicacio.isActiva()) {
+			return notificacio;
+		}
 		info.addParam("Codi aplicació", aplicacio.getUsuariCodi());
 		info.addParam("Callback id", callback.getId() + "");
 		info.addParam("Callback URL", aplicacio.getCallbackUrl());
@@ -187,11 +190,11 @@ public class CallbackHelper {
 
 			//Marcar com a processada si la notificació s'ha fet des de una aplicació
 			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.APLICACIO && isAllEnviamentsEstatFinal(notificacio)) {
-				log.info("[Callback] Marcant notificació com processada per ser usuari aplicació...");
+				log.info("[Callback] Marcant notificacio com processada per ser usuari aplicacio...");
 				start = System.nanoTime();
 				notificacio.updateEstat(NotificacioEstatEnumDto.PROCESSADA);
 				notificacio.updateEstatProcessatDate(new Date());
-				notificacio.updateMotiu("Notificació processada de forma automàtica. Estat final: " + env.getNotificaEstat());
+				notificacio.updateMotiu("Notificacio processada de forma automatica. Estat final: " + env.getNotificaEstat());
 				notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(notificacio.getId()).estat(NotificacioEstatEnumDto.PROCESSADA).estatProcessatDate(new Date()).build());
 				elapsedTime = System.nanoTime() - start;
 				log.info("marca processada: "  + elapsedTime);
@@ -202,13 +205,13 @@ public class CallbackHelper {
 			callback.update(CallbackEstatEnumDto.NOTIFICAT, intents, null, getIntentsPeriodeProperty());
 			notificacio.updateLastCallbackError(false);
 			integracioHelper.addAccioOk(info);
-			log.info(String.format("[Callback] Enviament del callback [Id: %d] de la notificacio [Id: %d] exitós", callback.getId(), notificacio.getId()));
+			log.info(String.format("[Callback] Enviament del callback [Id: %d] de la notificacio [Id: %d] exitos", callback.getId(), notificacio.getId()));
 			elapsedTime = System.nanoTime() - start;
 			log.info("marcar com a notificat: "  + elapsedTime);
 		} catch (Exception ex) {
 			var start = System.nanoTime();
 			isError = true;
-			log.info(String.format("[Callback] Excepció notificant el callback [Id: %d]: %s", callback.getId(), ex));
+			log.info(String.format("[Callback] Excepcio notificant el callback [Id: %d]: %s", callback.getId(), ex));
 			// Marca un error a l'event
 			var maxIntents = this.getEventsIntentsMaxProperty();
 			errorMaxReintents = intents >= maxIntents;
@@ -217,7 +220,7 @@ public class CallbackHelper {
 			errorDescripcio = "Error notificant canvis al client: " + ex.getMessage() + "\n" + ExceptionUtils.getStackTrace(ex);
 			callback.update(estatNou, intents, "Error notificant canvis al client: " + ex.getMessage(), getIntentsPeriodeProperty());
 			notificacio.updateLastCallbackError(true);
-			integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat", ex);
+			integracioHelper.addAccioError(info, "Error enviant l'avis de canvi d'estat", ex);
 			var elapsedTime = System.nanoTime() - start;
 			log.info("excepcio: "  + elapsedTime);
 		}
@@ -252,6 +255,7 @@ public class CallbackHelper {
 		var usuari = enviament.getCreatedBy().orElse(enviament.getNotificacio().getCreatedBy().orElse(null));
 		String errorMessage = null;
 		AplicacioEntity aplicacio = null;
+		var activa = true;
 		if (usuari == null) {
 			errorMessage ="L'enviament i la notifacio no tenen assignat cap createdBy";
 		} else {
@@ -262,6 +266,7 @@ public class CallbackHelper {
 				errorMessage = "La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada";
 			} else if (!aplicacio.isActiva()) {
 				errorMessage = "La aplicació " + aplicacio.getUsuariCodi() + " no està activa";
+				activa = false;
 			}
 		}
 		if (errorMessage != null) {
@@ -280,7 +285,9 @@ public class CallbackHelper {
 			callback.update(estatNou, intents, msg, getIntentsPeriodeProperty());
 			integracioHelper.addAccioError(info, msg);
 			notificacioEventHelper.addCallbackEnviamentEvent(enviament, true, msg, errorMaxReintents);
-			throw new Exception(errorMessage);
+			if (activa) {
+				throw new Exception(errorMessage);
+			}
 		}
 		return aplicacio;
 	}
