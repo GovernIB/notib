@@ -214,13 +214,18 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 		var timer = metricsHelper.iniciMetrica();
 		// Generar informació per al monitor d'integracions
-		var info = generateInfoAlta(notificacio);
+		EntitatEntity entitat = null;
+		try {
+			entitat = entitatRepository.findByDir3Codi(notificacio.getEmisorDir3Codi());
+		} catch (Exception ex) {
+			log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
+		}
+		var info = generateInfoAlta(notificacio, entitat != null ? entitat.getId() : null);
 		try {
 			log.debug("[ALTA] Alta de notificació: " + notificacio.toString());
 			var resposta = RespostaAltaV2.builder().build();
 
 			// Obtenir dades bàsiques per a la notificació
-			EntitatEntity entitat = null;
 			ProcSerEntity procediment = null;
 			OrganGestorEntity organGestor = null;
 			ProcSerOrganEntity procedimentOrgan = null;
@@ -232,7 +237,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 			// Entitat
 			var emisorDir3Codi = notificacio.getEmisorDir3Codi();
-			entitat = entitatRepository.findByDir3Codi(notificacio.getEmisorDir3Codi());
 			if (entitat != null) {
 				ConfigHelper.setEntitatCodi(entitat.getCodi());
 				info.setCodiEntitat(entitat.getCodi());
@@ -372,7 +376,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		}
 	}
 
-	private IntegracioInfo generateInfoAlta(Notificacio notificacio) {
+	private IntegracioInfo generateInfoAlta(Notificacio notificacio, Long entitatId) {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioCodiEnum.CALLBACK, "Alta de notificació", IntegracioAccioTipusEnumDto.RECEPCIO);
 
@@ -403,7 +407,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			notificaAtributMap.put("Error", "S'ha produït un error al intentar llegir la informació de la notificació");
 		}
 		notificaAtributMap.entrySet().stream().filter(e -> e.getValue() != null).forEach((e) -> info.addParam(e.getKey(), e.getValue().toString()));
-		integracioHelper.addAplicacioAccioParam(info, null);
+		integracioHelper.addAplicacioAccioParam(info, entitatId);
 		return info;
 	}
 
