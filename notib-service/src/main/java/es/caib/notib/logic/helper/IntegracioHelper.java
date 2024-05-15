@@ -165,11 +165,10 @@ public class IntegracioHelper {
 			return "Sistema";
 		}
 		var usuariNomCodi = auth.getName();
-		if (!obtenirUsuari) {
+		if (!obtenirUsuari || "SCHEDULLER".equals(auth.getName())) {
 			return usuariNomCodi;
 		}
 		try {
-//			var usuari = usuariRepository.findById(auth.getName()).orElse(null);
 			var usuari = cacheHelper.findUsuariByCodi(auth.getName());
 			if (usuari == null) {
 				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari " + auth.getName() + " no trobat a la bbdd");
