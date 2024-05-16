@@ -29,7 +29,7 @@ public class JustificantService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@RolesAllowed("**")
-	public FitxerDto generarJustificantEnviament(Long notificacioId, Long entitatId, String sequence) throws JustificantException {
+	public FitxerDto generarJustificantEnviament(Long notificacioId, Long entitatId, String sequence) throws Exception {
 		return getDelegateService().generarJustificantEnviament(notificacioId, entitatId, sequence);
 	}
 

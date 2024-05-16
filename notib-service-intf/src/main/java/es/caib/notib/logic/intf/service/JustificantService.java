@@ -50,7 +50,7 @@ public interface JustificantService {
      *      S'aixeca aquesta excepció quan hi ha un error durant la generació del document del justificant
      */
     @PreAuthorize("isAuthenticated()")
-    FitxerDto generarJustificantEnviament(Long notificacioId, Long entitatId, String sequence) throws JustificantException;
+    FitxerDto generarJustificantEnviament(Long notificacioId, Long entitatId, String sequence) throws JustificantException, Exception;
 
     /**
      * Executa el procés per a generar el justificant de recepció de comunicació SIR.

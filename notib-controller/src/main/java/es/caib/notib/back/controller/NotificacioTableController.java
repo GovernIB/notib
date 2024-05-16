@@ -9,6 +9,7 @@ import es.caib.notib.logic.intf.dto.missatges.Missatge;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.exception.JustificantException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.*;
@@ -781,9 +782,14 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var sequence = request.getParameter("sequence");
-        var justificant = justificantService.generarJustificantEnviament(notificacioId, entitatActual.getId(), sequence);
-        if (justificant == null) {
-            throw new ValidationException("Existeix un altre procés iniciat. Esperau que finalitzi la descàrrega del document.");
+        FitxerDto justificant;
+        try {
+            justificant = justificantService.generarJustificantEnviament(notificacioId, entitatActual.getId(), sequence);
+            if (justificant == null) {
+                throw new ValidationException("Existeix un altre procés iniciat. Esperau que finalitzi la descàrrega del document.");
+            }
+        } catch (Exception ex) {
+            throw new IOException("Error generant el justificant");
         }
         response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
         writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
@@ -804,12 +810,18 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
         List<FitxerDto> justificants = new ArrayList<>();
         var seqNum = 0;
+        FitxerDto justificant;
         for (var notificacioId : seleccio) {
             var sequence = "sequence" + UUID.randomUUID();
             seqNum++;
-            var justificant = justificantService.generarJustificantEnviament(notificacioId, entitatActual.getId(), sequence);
-            if (justificant == null) {
+            try {
+                justificant = justificantService.generarJustificantEnviament(notificacioId, entitatActual.getId(), sequence);
+                if (justificant == null) {
                 log.error("[MASSIVA DESCARREGAR JUSTIFICANT] Existeix un altre procés iniciat. Esperau que finalitzi la descàrrega del document. Notificacio id " + notificacioId);
+                continue;
+                }
+            } catch (Exception ex) {
+                log.error("Error descarregant el justificant per la notificacio " + notificacioId + " " + ex.getMessage());
                 continue;
             }
             justificants.add(justificant);
@@ -818,11 +830,11 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ZipOutputStream zos = new ZipOutputStream(baos);
 
-        for (var justificant : justificants) {
-            ZipEntry entry = new ZipEntry(StringUtils.stripAccents(justificant.getNom()));
-            entry.setSize(justificant.getContingut().length);
+        for (var just : justificants) {
+            ZipEntry entry = new ZipEntry(StringUtils.stripAccents(just.getNom()));
+            entry.setSize(just.getContingut().length);
             zos.putNextEntry(entry);
-            zos.write(justificant.getContingut());
+            zos.write(just.getContingut());
             zos.closeEntry();
         }
         zos.close();

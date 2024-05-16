@@ -82,14 +82,14 @@ public class JustificantServiceImpl implements JustificantService {
 
     @Transactional
     @Override
-    public FitxerDto generarJustificantEnviament(Long notificacioId, Long entitatId, String sequence) throws JustificantException {
+    public FitxerDto generarJustificantEnviament(Long notificacioId, Long entitatId, String sequence) throws Exception {
 
         var timer = metricsHelper.iniciMetrica();
         try {
             var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
             var enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
             if (enviamentsPendents != null && !enviamentsPendents.isEmpty() && !NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
-                throw new ValidationException("No es pot generar el justificant d'una notificació amb enviaments pendents.");
+                throw new Exception("No es pot generar el justificant d'una notificació amb enviaments pendents.");
             }
             entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false);
             if (isABackgroundProcessRunning(sequence)) {
