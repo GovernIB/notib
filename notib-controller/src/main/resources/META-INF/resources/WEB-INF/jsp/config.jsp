@@ -157,7 +157,7 @@
             });
         });
 
-        <c:url var="urlEdit" value="/config/update"/>
+<%--        <c:url var="urlEdit" value="/notibback/config/update"/>--%>
         $(".form-update-config").submit(function(e) {
 
             e.preventDefault();
@@ -166,7 +166,7 @@
             let spinner = addSpinner(id);
 
             $.ajax({
-                url: "${urlEdit}",
+                url: "/notibback/config/update",
                 type: "post",
                 processData: false,
                 contentType: false,

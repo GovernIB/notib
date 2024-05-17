@@ -157,7 +157,20 @@ public class ConfigServiceImpl implements ConfigService {
             log.error("Entitat config key no trobada. Key: " + key);
             return new ArrayList<>();
         }
-        return conversioTipusHelper.convertirList(configRepository.findLikeKeyEntitatNotNullAndConfigurable(split[1]), ConfigDto.class);
+        var configs = configRepository.findLikeKeyEntitatNotNullAndConfigurable(split[1]);
+        List<ConfigEntity> elements = new ArrayList<>();
+        for (var config: configs) {
+            var subSplit = config.getKey().split(ConfigDto.prefix + ".");
+            if (subSplit == null || subSplit.length != 2) {
+                continue;
+            }
+            var codiKey = subSplit[1];
+            var subkey = codiKey.substring(codiKey.indexOf("."));
+            if (split[1].equals(subkey)) {
+                elements.add(config);
+            }
+        }
+        return conversioTipusHelper.convertirList(elements, ConfigDto.class);
     }
 
     @Override

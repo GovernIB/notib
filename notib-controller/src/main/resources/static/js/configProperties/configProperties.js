@@ -73,7 +73,7 @@ let guardarPropietat = (configKey, netejar) => {
     formData.append("key", configKeyReplaced);
     formData.append("value", value);
     $.ajax({
-        url: "config/update",
+        url: "/notibback/config/update",
         type: "post",
         processData: false,
         contentType: false,

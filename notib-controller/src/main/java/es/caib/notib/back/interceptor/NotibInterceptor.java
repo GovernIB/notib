@@ -129,11 +129,23 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
         // Assignam l'idioma de l'usuari com a Locale
         RequestContextUtils.getLocaleResolver(request).setLocale(request, response, StringUtils.parseLocaleString(sessionScopedContext.getIdiomaUsuari()));
 
+        var entitat = getEntitatActual();
+        var capLogo = "";
+        var peuLogo = "";
+        var capBackColorLogo = "";
+        var capColor = "";
+        if (entitat != null) {
+            var codi = entitat.getCodi();
+            capLogo = aplicacioService.propertyGet("es.caib.notib." + codi + ".capsalera.logo");
+            peuLogo = aplicacioService.propertyGet("es.caib.notib." + codi + ".peu.logo");
+            capBackColorLogo = aplicacioService.propertyGet("es.caib.notib." + codi + ".capsalera.color.fons");
+            capColor = aplicacioService.propertyGet("es.caib.notib." + codi + ".capsalera.color.lletra");
+        }
         // Obtenim les propietats globals de capçalera i peu
-        sessionScopedContext.setCapLogo(aplicacioService.propertyGet("es.caib.notib.capsalera.logo"));
-        sessionScopedContext.setPeuLogo(aplicacioService.propertyGet("es.caib.notib.peu.logo"));
-        sessionScopedContext.setCapBackColor(aplicacioService.propertyGet("es.caib.notib.capsalera.color.fons"));
-        sessionScopedContext.setCapColor(aplicacioService.propertyGet("es.caib.notib.capsalera.color.lletra"));
+        sessionScopedContext.setCapLogo(!Strings.isNullOrEmpty(capLogo) ? capLogo : aplicacioService.propertyGet("es.caib.notib.capsalera.logo"));
+        sessionScopedContext.setPeuLogo(!Strings.isNullOrEmpty(peuLogo) ? peuLogo : aplicacioService.propertyGet("es.caib.notib.peu.logo"));
+        sessionScopedContext.setCapBackColor(!Strings.isNullOrEmpty(capBackColorLogo) ? capBackColorLogo : aplicacioService.propertyGet("es.caib.notib.capsalera.color.fons"));
+        sessionScopedContext.setCapColor(!Strings.isNullOrEmpty(capColor) ? capColor : aplicacioService.propertyGet("es.caib.notib.capsalera.color.lletra"));
     }
 
 

@@ -130,6 +130,12 @@
 		.list-inline.pull-right {
 			color: ${sessionScopedContext.capColor} !important;
 		}
+		#capcalera .colorConfig {
+			color: ${sessionScopedContext.capColor} !important;
+		}
+		#text-logo {
+			color: ${sessionScopedContext.capColor} !important;
+		}
 		</c:if>
 		</c:otherwise>
 		</c:choose>
@@ -144,7 +150,7 @@
 	</style>
 </head>
 <body>
-<div class="navbar navbar-default navbar-fixed-top navbar-app" role="navigation">
+<div id="capcalera" class="navbar navbar-default navbar-fixed-top navbar-app" role="navigation">
 	<div class="container container-custom">
 		<div class="navbar-header">
 			<%--button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -284,7 +290,7 @@
 						<c:choose>
 							<c:when test="${isRolActualAdministrador}">
 								<div class="btn-group">
-									<button id="m_monitor" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.monitoritzar"/>&nbsp;<span class="caret caret-white"></span></button>
+									<button id="m_monitor" data-toggle="dropdown" class="btn btn-primary dropdown-toggle colorConfig"><spring:message code="decorator.menu.monitoritzar"/>&nbsp;<span class="caret caret-white"></span></button>
 									<ul class="dropdown-menu">
 										<li><a id="mo_massiu" href="<c:url value="/massiu/notificacions"> <c:param name="mantenirPaginacio" value="true"/></c:url>"><spring:message code="decorator.menu.callback"/></a></li>
 										<li><a id="mo_integracions" href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
@@ -294,7 +300,7 @@
 									</ul>
 								</div>
 								<div class="btn-group">
-									<button id="m_conf" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
+									<button id="m_conf" data-toggle="dropdown" class="btn btn-primary dropdown-toggle colorConfig"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
 									<ul class="dropdown-menu">
 										<li><a id="mc_entitats" href="<c:url value="/entitat"/>"><spring:message code="decorator.menu.entitats"/></a></li>
 										<li><a id="mc_caches" href="<c:url value="/cache"/>"><spring:message code="decorator.menu.caches"/></a></li>
@@ -304,7 +310,7 @@
 										<li><a id="mc_broker" href="<c:url value="/api/sm/broker/restart"/>" title="<spring:message code="decorator.menu.reinici.state.machine.broker"/>"> <spring:message code="decorator.menu.reinici.state.machine.broker"/></a></li>
 									</ul>
 								</div>
-								<a id="ma_avisos" href="<c:url value="/avis"/>" class="btn btn-primary"><spring:message code="decorator.menu.avisos"/></a>
+								<a id="ma_avisos" href="<c:url value="/avis"/>" class="btn btn-primary colorConfig"><spring:message code="decorator.menu.avisos"/></a>
 							</c:when>
 
 							<c:when test="${isRolActualUsuari}">
