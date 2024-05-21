@@ -159,6 +159,9 @@ public class AdviserServiceImpl implements AdviserService {
                 var receptorNombre = receptor != null ? receptor.getNombreReceptor() : null;
                 var receptorNif = receptor != null ? receptor.getNifReceptor() : null;
                 var notificaEstat = getNotificaEstat(estado);
+                if (notificaEstat == null) {
+                    throw new Exception("Estat no trobat");
+                }
                 //Update enviament
                 notificaHelper.enviamentUpdateDatat(notificaEstat, dataEstat, estado, getModoNotificacion(modoNotificacion), receptorNif, receptorNombre, null, null, enviament);
                 log.debug("Registrant event callbackdatat de l'Adviser...");

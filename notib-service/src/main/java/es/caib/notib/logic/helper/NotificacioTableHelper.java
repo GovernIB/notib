@@ -128,7 +128,7 @@ public class NotificacioTableHelper {
                     var estatMask = item.getEstatMask();
                     NotificacioEstatEnumDto eventEstat;
                     for (var enviament : item.getEnviaments()) {
-                        if (!EnumUtils.isValidEnum(NotificacioEstatEnumDto.class, enviament.getNotificaEstat().name())) {
+                        if (enviament.getNotificaEstat() == null || !EnumUtils.isValidEnum(NotificacioEstatEnumDto.class, enviament.getNotificaEstat().name())) {
                             continue;
                         }
                         eventEstat = NotificacioEstatEnumDto.valueOf(enviament.getNotificaEstat().name());
@@ -143,7 +143,7 @@ public class NotificacioTableHelper {
             item.setPerActualitzar(true);
             notificacioTableViewRepository.saveAndFlush(item);
         } catch (Exception ex) {
-            log.error("Error acutalitzant la informació de la notificació " + not.getId(), ex);
+            log.error("Error actualitzant la informació de la notificació " + not.getId(), ex);
         }
     }
 
