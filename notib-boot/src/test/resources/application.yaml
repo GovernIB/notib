@@ -33,16 +33,23 @@ spring:
       datasource:
         concurrent-connection-validation:
   mail:
-    host: correu.limit.es
-    username: proves_limit@limit.es
-    password: R8lmu-98TRN
+    host:
+    username:
+    password:
     properties:
       mail:
         transport:
           protocol: smtp
         smtp:
           port: 25
-          auth: false
+          auth: true
+          ssl:
+            enable: true
+            trust: "*"
+          starttls:
+            enable: true
+            required: false
+
 #  mvc:
 #    view:
 #      prefix: /WEB_INF/jsp/
@@ -82,7 +89,7 @@ es:
                   realm: GOIB
                   client_id: goib-ws
                   client_id_for_user_autentication: goib-ws
-                  password_secret: 5d96d138-05a4-4087-9c91-52faa33b7b85
+                  password_secret:
         gesdoc:
           filesystem:
             base:

@@ -236,7 +236,7 @@ public class NotificacioTableHelper {
             tableViewItem.setEnviadaDate(getEnviadaDate(notificacio));
             tableViewItem.setTitular(titular.toString());
             tableViewItem.setNotificaIds(notificaIds.toString());
-            var rNums = registreNums.substring(0, registreNums.length()-2);
+            var rNums = !Strings.isNullOrEmpty(registreNums.toString()) ? registreNums.substring(0, registreNums.length()-2) : "";
             if (rNums.length() > 2000) {
                 rNums = rNums.substring(0, 2000) + "...";
             }

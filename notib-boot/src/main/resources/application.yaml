@@ -30,9 +30,9 @@ spring:
       datasource:
         concurrent-connection-validation:
   mail:
-    host: correu.limit.es
-    username: proves_limit@limit.es
-    password: R8lmu-98TRN
+    host:
+    username:
+    password:
     properties:
       mail:
         transport:
@@ -93,8 +93,8 @@ es:
                   realm: GOIB
                   client_id: goib-ws
                   client_id_for_user_autentication: goib-ws
-                  password_secret: 72ce6860-ac1b-46da-816c-b1196ef2f3fc
-      properties: /home/salloza/Documentos/Notib/notib.properties
+                  password_secret:
+      properties:
 #      system:
 #        properties:
 

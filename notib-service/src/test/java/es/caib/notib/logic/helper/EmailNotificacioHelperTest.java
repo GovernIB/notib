@@ -51,8 +51,8 @@ public class EmailNotificacioHelperTest {
 	// Dades per el Test
 //	private static final String EMAIL_USER = "xxxx@gmail.com";
 	private static final String EMAIL_PASS = "xxxxxx";
-	private static final String EMAIL_USER = "proves_limit@limit.es";
-	private static final String EMAIL_DEST = "test@limit.es";
+	private static final String EMAIL_USER = "";
+	private static final String EMAIL_DEST = "";
 	private static final String FILE_PATH = "";
 
 	@Mock
