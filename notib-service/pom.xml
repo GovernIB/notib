@@ -164,7 +164,13 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>notib-plugin</artifactId>
 			<version>${project.version}</version>
-<!--			<scope>test</scope>-->
+			<exclusions>
+				<exclusion>
+					<artifactId>javax.mail</artifactId>
+					<groupId>com.sun.mail</groupId>
+				</exclusion>
+			</exclusions>
+<!--						<scope>test</scope>-->
 		</dependency>
 		<dependency>
 			<groupId>io.dropwizard.metrics</groupId>
