@@ -21,9 +21,9 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorFiltreDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.organisme.PrediccioSincronitzacio;
 import es.caib.notib.logic.intf.exception.NotFoundException;
+import org.jboss.ejb3.annotation.TransactionTimeout;
 import org.springframework.context.annotation.Primary;
 
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.xml.bind.ValidationException;
@@ -66,6 +66,7 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
+	@TransactionTimeout(value = 3600)
 	public Object[] syncDir3OrgansGestors(EntitatDto entitat) throws Exception {
 		return getDelegateService().syncDir3OrgansGestors(entitat);
 	}
@@ -84,6 +85,7 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
+	@TransactionTimeout(value = 3600)
 	public void syncOficinesSIR(Long entitatId) throws Exception {
 		getDelegateService().syncOficinesSIR(entitatId);
 	}
