@@ -132,6 +132,7 @@ public class AdviserServiceImpl implements AdviserService {
             if (enviament.isNotificaEstatFinal()) {
                 var msg = "L'enviament amb identificador " + enviament.getNotificaIdentificador() + " ha rebut un callback de l'adviser de tipus " + tipoEntrega + " quan ja es troba en estat final." ;
                 log.debug(msg);
+                setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
                 // DATAT
                 switch (tipoEntrega) {
                     case DATAT:
@@ -140,11 +141,14 @@ public class AdviserServiceImpl implements AdviserService {
                         if (receptor != null && !isBlank(receptor.getNifReceptor())) {
                             enviament.updateReceptorDatat(receptor.getNifReceptor(), receptor.getNombreReceptor());
                         }
-                        setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
 //                        eventErrorDescripcio = msg;
                         integracioHelper.addAccioOk(info);
                         break;
                     case CERTIFICACIO:
+                    case DATAT_CERT:
+                        if (enviament.getNotificaCertificacioData() != null && !Strings.isNullOrEmpty(enviament.getNotificaCertificacioArxiuId())) {
+                            break;
+                        }
                         log.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
                         certificacionOrganismo(acusePDF, modoNotificacion, identificador, enviament, resultadoSincronizarEnvio);
                         log.debug("Certificació guardada correctament.");
@@ -152,6 +156,7 @@ public class AdviserServiceImpl implements AdviserService {
                         break;
                     default:
                         eventErrorDescripcio = msg;
+                        setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.ERROR_DESCONEGUT);
                         integracioHelper.addAccioError(info, "Tipus d'entrega " + tipoEntrega + " no reconeguda");
                         break;
                 }
