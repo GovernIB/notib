@@ -57,6 +57,7 @@ import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.utils.DatesUtils;
+import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
@@ -178,11 +179,17 @@ public class EnviamentServiceImpl implements EnviamentService {
 			var enviaments = notificacioEnviamentRepository.findByNotificacio(notificacio);
 			var envs = conversioTipusHelper.convertirList(enviaments, NotificacioEnviamentDatatableDto.class);
 			NotificacioEventEntity event;
+			CallbackEntity callback;
 			for (var env : envs) {
 				event = notificacioEventRepository.findLastApiCarpetaByEnviamentId(env.getId());
 				if (event != null && event.isError()) {
 					env.setNotificacioMovilErrorDesc(event.getErrorDescripcio());
 				}
+				callback = callbackRepository.findByEnviamentIdAndEstat(env.getId(), CallbackEstatEnumDto.ERROR);
+				if (callback == null) {
+					continue;
+				}
+				env.setErrorLastCallback(true);
 			}
 			return envs;
 		} finally {
@@ -744,6 +751,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		if (callback == null) {
 			return enviamentDto;
 		}
+		enviamentDto.setErrorLastCallback(true);
 		enviamentDto.setCallbackFiReintents(true);
 		enviamentDto.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
 		return enviamentDto;

@@ -168,8 +168,22 @@ public class CallbackHelper {
 			return notificacio;
 		}
 		log.trace("[Callback] Consultant aplicacio de l'event. ");
+		int intents = callback.getIntents() + 1;
 		var aplicacio = getAplicacio(callback, env);
 		if (!aplicacio.isActiva()) {
+			var start = System.nanoTime();
+			var errorDescripcio = "Error notificant canvis al client: No està activa la aplicació " + aplicacio.getCallbackUrl() ;
+			var maxIntents = this.getEventsIntentsMaxProperty();
+			var errorMaxReintents = intents >= maxIntents;
+			notificacio.updateLastCallbackError(true);
+			notificacioEventHelper.addCallbackEnviamentEvent(env, true, errorDescripcio, errorMaxReintents);
+			callback.update(CallbackEstatEnumDto.ERROR, intents, errorDescripcio, getIntentsPeriodeProperty());
+			log.info(String.format("[Callback] Fi intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]", intents, callback.getId(), notificacio.getId()));
+			long elapsedTime = System.nanoTime() - start;
+			log.info("addCallbackEvent: "  + elapsedTime);
+			auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "CallbackHelper.notifica");
+			// Marcar per actualitzar
+			notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(notificacio.getId()).build());
 			return notificacio;
 		}
 		info.addParam("Codi aplicació", aplicacio.getUsuariCodi());
@@ -177,7 +191,6 @@ public class CallbackHelper {
 		info.addParam("Callback URL", aplicacio.getCallbackUrl());
 		info.setAplicacio(aplicacio != null ? aplicacio.getUsuariCodi() : "Sense aplicació");
 		info.setCodiEntitat(notificacio.getEntitat() != null ? notificacio.getEntitat().getCodi() : null);
-		int intents = callback.getIntents() + 1;
 		log.info(String.format("[Callback] Intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]", intents, callback.getId(), notificacio.getId()));
 		var isError = false;
 		String errorDescripcio = null;

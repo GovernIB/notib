@@ -295,6 +295,9 @@ $(document).ready(function() {
 							<c:if test="${enviament.fiReintents}">
 								<span class="fa fa-warning text-warning" title="<c:out value='${enviament.fiReintentsDesc}' escapeXml='true'/>"></span>
 							</c:if>
+							<c:if test="${enviament.errorLastCallback}">
+								<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>
+							</c:if>
 							<c:if test="${enviament.callbackFiReintents}">
 								<span class="fa fa-warning text-info" title="<c:out value='${enviament.callbackFiReintentsDesc}' escapeXml='true'/>"></span>
 							</c:if>

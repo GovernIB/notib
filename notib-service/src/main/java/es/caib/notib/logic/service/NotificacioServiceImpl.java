@@ -576,6 +576,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (callback == null) {
 					continue;
 				}
+				dto.setErrorLastCallback(callback.isError());
 				env.setCallbackFiReintents(true);
 				env.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
 				callbackFiReintents++;

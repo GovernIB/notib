@@ -367,15 +367,15 @@ $(document).ready(function() {
 								<c:if test="${notificacio.fiReintents}">
 									<span class="fa fa-warning text-warning" title="<c:out value='${notificacio.fiReintentsDesc}' escapeXml='true'/>"></span>
 								</c:if>
+								<c:if test="${notificacio.tipusUsuari == 'APLICACIO' and notificacio.errorLastCallback}">
+									<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>
+								</c:if>
 								<c:if test="${notificacio.callbackFiReintents}">
 									<span class="fa fa-warning text-info" title="<c:out value='${notificacio.callbackFiReintentsDesc}' escapeXml='true'/>"></span>
 								</c:if>
 								<c:forEach var="error" items="${notificacio.notificacionsMovilErrorDesc}">
 									<span style="color:#8a6d3b;  cursor:pointer;" class="fa fa-mobile fa-lg" title="<c:out value='${error}' escapeXml="true"/>"></span>
 								</c:forEach>
-<%--								<c:if test="${notificacio.tipusUsuari == 'APLICACIO' and notificacio.errorLastEvent}">--%>
-<%--									<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>--%>
-<%--								</c:if>--%>
 <%--								<c:if test="${notificacio.estat == 'PROCESSADA' and not empty notificacio.estatDate}">--%>
 <%--									<br>--%>
 <%--									<span class="horaProcessat"><fmt:formatDate value="${notificacio.estatDate}" pattern="dd/MM/yyyy HH:mm:ss" /></span>--%>
@@ -680,6 +680,9 @@ $(document).ready(function() {
 												</c:if>
 												<c:if test="${enviament.fiReintents}">
 													<span class="fa fa-warning text-warning" title="${enviament.fiReintentsDesc}"></span>
+												</c:if>
+												<c:if test="${notificacio.tipusUsuari == 'APLICACIO' and notificacio.errorLastCallback}">
+													<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>
 												</c:if>
 												<c:if test="${enviament.callbackFiReintents}">
 													<span class="fa fa-warning text-info" title="${enviament.callbackFiReintentsDesc}"></span>

@@ -65,6 +65,7 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	private String fiReintentsDesc;
 	private boolean callbackFiReintents;
 	private String callbackFiReintentsDesc;
+	private boolean errorLastCallback;
 	private boolean perEmail;
 	private Date sirRecepcioData;
 	private Date sirRegDestiData;

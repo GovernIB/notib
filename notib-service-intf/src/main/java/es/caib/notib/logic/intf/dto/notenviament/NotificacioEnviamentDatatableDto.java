@@ -45,6 +45,7 @@ public class NotificacioEnviamentDatatableDto {
 	private boolean fiReintents;
 	private String fiReintentsDesc;
 
+	private boolean errorLastCallback;
 	private boolean callbackFiReintents;
 	private String callbackFiReintentsDesc;
 	private String  notificacioMovilErrorDesc;
