@@ -364,6 +364,9 @@
                 if (data[i].fiReintents) {
                     contingutTbody += ' <span class="fa fa-warning text-warning" title="' + data[i].fiReintentsDesc + '"></span>';
                 }
+                if (data[i].errorLastCallback) {
+                    contingutTbody += ' <span class="fa fa-exclamation-circle text-primary" title="' + data[i].errorLastCallback + '"></span>';
+                }
                 if (data[i].callbackFiReintents) {
                     contingutTbody += ' <span class="fa fa-warning text-info" title="' + data[i].callbackFiReintentsDesc + '"></span>';
                 }

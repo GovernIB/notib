@@ -56,7 +56,6 @@ public class NotificacioInfoDto extends AuditoriaDto {
 
 	private boolean eventsCallbackPendent;
 	private String dataCallbackPendent;
-	private boolean errorLastCallback;
 	private TipusUsuariEnumDto tipusUsuari;
 	private Idioma idioma;
 
@@ -89,6 +88,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private NotificacioEventTipusEnumDto noticaErrorEventTipus;
 	private boolean fiReintents;
 	private String fiReintentsDesc;
+	private boolean errorLastCallback;
 	private boolean callbackFiReintents;
 	private String callbackFiReintentsDesc;
 	private List<String> notificacionsMovilErrorDesc = new ArrayList<>();
