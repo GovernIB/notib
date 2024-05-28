@@ -74,7 +74,8 @@ public class AdviserServiceImpl implements AdviserService {
         OK ("000", "OK"),
         ERROR_ORGANISME("001", "Organismo Desconocido"),
         ERROR_IDENTIFICADOR("002", "Identificador no encontrado"),
-        ERROR_DESCONEGUT("666", "Error procesando peticion");
+        ERROR_DESCONEGUT("666", "Error procesando peticion"),
+        ESTAT_DESCONEGUT("003", "Estado inexistente");
 
         @Getter private String codi;
         @Getter private String desc;
@@ -119,6 +120,7 @@ public class AdviserServiceImpl implements AdviserService {
         resultadoSincronizarEnvio.setIdentificador(identificador);
         NotificacioEnviamentEntity enviament = null;
         String eventErrorDescripcio = null;
+        ResultatEnviamentEnum resultatEnum = null;
         try {
              enviament = notificacioEnviamentRepository.findByNotificaIdentificador(identificador);
             if (enviament == null) {
@@ -165,6 +167,7 @@ public class AdviserServiceImpl implements AdviserService {
                 var receptorNif = receptor != null ? receptor.getNifReceptor() : null;
                 var notificaEstat = getNotificaEstat(estado);
                 if (notificaEstat == null) {
+                    resultatEnum = ResultatEnviamentEnum.ESTAT_DESCONEGUT;
                     throw new Exception("Estat no trobat");
                 }
                 //Update enviament
@@ -179,7 +182,7 @@ public class AdviserServiceImpl implements AdviserService {
                 integracioHelper.addAccioOk(info);
             }
         } catch (Exception ex) {
-            setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.ERROR_DESCONEGUT);
+            setResultadoEnvio(resultadoSincronizarEnvio, resultatEnum != null ? resultatEnum : ResultatEnviamentEnum.ERROR_DESCONEGUT);
             eventErrorDescripcio = ExceptionUtils.getStackTrace(ex);
             log.error(ERROR_CALLBACK_NOTIFICA + identificador + ")", ex);
             integracioHelper.addAccioError(info, "Error processant la petició", ex);
