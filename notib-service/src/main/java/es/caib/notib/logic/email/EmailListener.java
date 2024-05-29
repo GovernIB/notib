@@ -1,11 +1,6 @@
 package es.caib.notib.logic.email;
 
 import es.caib.notib.logic.helper.EmailNotificacioHelper;
-import es.caib.notib.logic.helper.IntegracioHelper;
-import es.caib.notib.logic.intf.dto.AccioParam;
-import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
-import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +22,10 @@ public class EmailListener {
 
     private final EmailNotificacioHelper emailNotificacioHelper;
     private final NotificacioRepository notificacioRepository;
-    private final IntegracioHelper integracioHelper;
 
     @Transactional
     @JmsListener(destination = EmailConstants.CUA_EMAIL_NOTIFICACIO, containerFactory = SmConstants.JMS_FACTORY_ACK)
-    public void receiveMessage(@Payload Long notificacioId,
-                               @Headers MessageHeaders headers,
-                               Message message) throws JMSException {
+    public void receiveMessage(@Payload Long notificacioId, @Headers MessageHeaders headers, Message message) throws JMSException {
 
         try {
             var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
