@@ -74,8 +74,9 @@ public class AdviserServiceImpl implements AdviserService {
         OK ("000", "OK"),
         ERROR_ORGANISME("001", "Organismo Desconocido"),
         ERROR_IDENTIFICADOR("002", "Identificador no encontrado"),
-        ERROR_DESCONEGUT("666", "Error procesando peticion"),
-        ESTAT_DESCONEGUT("003", "Estado inexistente");
+        ESTAT_DESCONEGUT("003", "Estado inexistente"),
+        ERROR_ACUSE("004", "Acuse no trobat"),
+        ERROR_DESCONEGUT("666", "Error procesando peticion");
 
         @Getter private String codi;
         @Getter private String desc;
@@ -261,18 +262,21 @@ public class AdviserServiceImpl implements AdviserService {
     }
 
     private void certificatAmbError(String identificador, NotificacioEnviamentEntity enviament, ResultadoSincronizarEnvio resultadoSincronizarEnvio, ResultatExecucio resultat) {
+
         resultat.setError(ERROR_CALLBACK_NOTIFICA + identificador + "): No s'ha trobat el camp amb l'acús PDF a dins la petició rebuda.", null);
         notificacioEventHelper.addAdviserCertificacioEvent(enviament, resultat.isError(), resultat.getErrorDescripcio());
-        setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.ERROR_ORGANISME);
+        setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.ERROR_ACUSE, resultat.getErrorDescripcio());
     }
 
     private void certificacioAmbError(String identificador, NotificacioEnviamentEntity enviament, ResultadoSincronizarEnvio resultadoSincronizarEnvio, ResultatExecucio resultat, Exception ex) {
+
         resultat.setError(ERROR_CALLBACK_NOTIFICA + identificador + ")", ex);
         notificacioEventHelper.addAdviserCertificacioEvent(enviament, resultat.isError(), ExceptionUtils.getStackTrace(ex));
         setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.ERROR_DESCONEGUT);
     }
 
     private static void generateInfoLog(SincronizarEnvio sincronizarEnvio, String identificador, SimpleDateFormat sdf, Date dataEstat) {
+
         log.info("[ADV] Inici sincronització enviament Adviser [");
         log.info("        Id: " + (identificador != null ? identificador : ""));
         log.info("        OrganismoEmisor: " + sincronizarEnvio.getOrganismoEmisor());
@@ -306,8 +310,15 @@ public class AdviserServiceImpl implements AdviserService {
     }
 
     private static void setResultadoEnvio(ResultadoSincronizarEnvio resultadoSincronizarEnvio, ResultatEnviamentEnum resultat) {
+
         resultadoSincronizarEnvio.setCodigoRespuesta(resultat.getCodi());
         resultadoSincronizarEnvio.setDescripcionRespuesta(resultat.getDesc());
+    }
+
+    private static void setResultadoEnvio(ResultadoSincronizarEnvio resultadoSincronizarEnvio, ResultatEnviamentEnum resultat, String error) {
+
+        resultadoSincronizarEnvio.setCodigoRespuesta(resultat.getCodi());
+        resultadoSincronizarEnvio.setDescripcionRespuesta(error);
     }
 
     private String guardarCertificacioAcuseRecibo(byte[] acuse) {
