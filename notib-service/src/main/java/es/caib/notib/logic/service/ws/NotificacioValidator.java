@@ -474,7 +474,16 @@ public class NotificacioValidator implements Validator {
                 || procediment != null && procediment.getEntregaCie() != null;
         boolean entregaDehActiva = entitat != null && entitat.isAmbEntregaDeh();
         var enviamentTipus = notificacio.getEnviamentTipus();
-        IntStream.range(0, enviaments.size()).forEach(i -> validateEnviament(enviaments.get(i), enviamentTipus, emisor, entregaPostalActiva, entregaDehActiva, i, errors, locale));
+        var cieInactiu = true;
+        Enviament env;
+        for (var i=0; i<enviaments.size(); i++) {
+            env = enviaments.get(i);
+            validateEnviament(env, enviamentTipus, emisor, entregaPostalActiva, entregaDehActiva, i, errors, locale);
+            cieInactiu = cieInactiu && env.isEntregaPostalActiva();
+        }
+        if (notificacio.getRetard() != null && notificacio.getRetard() > 0 && !cieInactiu) {
+            errors.reject(error(RETARD_CIE_INACTIU, locale));
+        }
         // Nifs repetis
         // TODO: Eliminar la condició que no permet NIFs repetits?
         if (!EnviamentTipus.SIR.equals(enviamentTipus)) {
@@ -493,6 +502,7 @@ public class NotificacioValidator implements Validator {
                 break;
             }
         }
+
     }
 
     private void validateEnviament(Enviament enviament, EnviamentTipus enviamentTipus, String emisorDir3Codi, boolean entregaPostalActiva, boolean entregaDehActiva, int numEnviament, Errors errors, Locale l) {

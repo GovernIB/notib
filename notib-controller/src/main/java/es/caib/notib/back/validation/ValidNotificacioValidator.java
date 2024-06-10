@@ -25,6 +25,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.ENVIAMENT_DEH_INACTIU;
+
 /**
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -252,7 +255,10 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			if (notificacio.getEnviaments() != null) {
 				int envCount = 0;
 				List<String> nifs = new ArrayList<>();
-				for (var enviament: notificacio.getEnviaments()) {
+				var cieInactiu = true;
+				for (var enviament : notificacio.getEnviaments()) {
+
+					cieInactiu = cieInactiu && enviament.getEntregaPostal().isActiva();
 
 					// Incapacitat -> Destinataris no null
 					if (enviament.getTitular() != null && enviament.getTitular().isIncapacitat() && (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty())) {
@@ -351,6 +357,10 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 						}
 					}
 					envCount++;
+				}
+				if (notificacio.getRetard() > 0 && !cieInactiu) {
+					var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.retard.no.cie", null, locale);
+					context.buildConstraintViolationWithTemplate(msg).addNode("retard").addConstraintViolation();
 				}
 			}
 		} catch (final Exception ex) {

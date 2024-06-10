@@ -109,7 +109,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			log.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 			info.setCodiEntitat(notificacio.getEntitat() != null ? notificacio.getEntitat().getCodi() : null);
 			notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
-
 			// Validacions
 			if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 				log.error(" [NOT] la notificació no té l'estat REGISTRADA o ENVIADA AMB ERRORS.");
@@ -126,16 +125,22 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				log.info(" [TIMER-NOT] Notificació enviar (enviaNotificacio SOAP-QUERY)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
 				notificacio.updateNotificaEnviamentData();
-
+				var resultadoEnvios = resultadoAlta.getResultadoEnvios();
+//				if ("000".equals(resultadoAlta.getCodigoRespuesta()) && resultadoEnvios != null && !resultadoEnvios.getItem().isEmpty()) {
+//					if (!"OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
+//						// TODO FICAR MISSATGE DE WARNING (IMATGE APB)
+//
+//					}
 				if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
-					startTime = System.nanoTime();
+
+						startTime = System.nanoTime();
 					log.info(" >>> ... OK");
 					if (!ambEnviamentPerEmail) {
 						notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 					}
 					List<Long> enviamentsActualitzats = new ArrayList<>();
 					List<String> identificadorsNoUtilitzats = new ArrayList<>();
-					for (var resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
+					for (var resultadoEnvio: resultadoEnvios.getItem()) {
 						boolean assignat = false;
 						for (var enviament: notificacio.getEnviamentsPerNotifica()) {
 							var nif = enviament.getTitular().isIncapacitat() ? enviament.getDestinataris().get(0).getNif() : enviament.getTitular().getNif();
@@ -565,6 +570,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				var procSer = procSerRepository.findById(notificacio.getProcediment().getId()).orElse(null);
 				retardPostal = procSer != null ? procSer.getRetard() : null;
 			}
+
 			if (retardPostal != null) {
 				var opcionRetardo = new Opcion();
 				opcionRetardo.setTipo("retardo");
@@ -646,6 +652,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			if (!destinatarios.getDestinatario().isEmpty()) {
 				envio.setDestinatarios(destinatarios);
 			}
+
 			if (enviament.getEntregaPostal() != null) {
 				var entregaPostal = new EntregaPostal();
 				var procedimentNotificacio = notificacio.getProcediment();

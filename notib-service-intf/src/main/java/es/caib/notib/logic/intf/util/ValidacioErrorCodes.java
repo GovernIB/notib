@@ -61,6 +61,7 @@ public class ValidacioErrorCodes {
     public static final int SERVEI_TIPUS_NULL = 1101;
     public static final int ENVIAMENT_MINIM_UN_NIF = 1102;
     public static final int ENVIAMENT_POSTAL_INACTIU = 1103;
+    public static final int RETARD_CIE_INACTIU = 11033;
     public static final int ENVIAMENT_DEH_INACTIU = 1104;
     public static final int ENVIAMENT_NIFS_REPETITS = 1105;
     public static final int ENVIAMENT_SIR_TITULAR_NO_ADMINISTRACIO = 1106;
