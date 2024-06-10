@@ -726,7 +726,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					mergeMap.put(mergeOrSubstKey, value);
 				}
 			}
-
 			// Obtenir llistat d'unitats que ara estan vigents en BBDD, i després de la sincronització continuen vigents, però amb les propietats canviades
 			// ====================  CANVIS EN ATRIBUTS ===================
 			unitatsVigents = getVigentsFromWebService(entitat, unitatsWS, organsVigents);
@@ -734,6 +733,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			// Obtenir el llistat d'unitats que son totalment noves (no existeixen en BBDD): Creació
 			// ====================  NOUS ===================
 			List<UnitatOrganitzativaDto> unitatsNew = getNewFromWS(mapVersionsUnitats, splitMap, substMap, mergeMap);
+
+			afegirDenominacioSiNull(entitat.getCodi(), mergeMap.keySet());
+
 			return PrediccioSincronitzacio.builder()
 					.unitatsVigents(unitatsVigents)
 					.unitatsNew(unitatsNew)
@@ -746,6 +748,24 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			throw sex;
 		} catch (Exception ex) {
 			throw new SistemaExternException(IntegracioCodiEnum.UNITATS.name(), "No ha estat possible obtenir la predicció de canvis de unitats organitzatives", ex);
+		}
+	}
+
+	private void afegirDenominacioSiNull(String entitat, Set<UnitatOrganitzativaDto> organs) {
+
+		for (var key : organs) {
+			if (!Strings.isNullOrEmpty(key.getDenominacio()) || !Strings.isNullOrEmpty(key.getDenominacioCooficial())) {
+				continue;
+			}
+			var organ = organGestorRepository.findByCodi(key.getCodi());
+			if (organ != null) {
+				key.setDenominacio(organ.getNom());
+				key.setDenominacioCooficial(organ.getNomEs());
+				continue;
+			}
+			var unitat = pluginHelper.unitatOrganitzativaFindByCodi(entitat, key.getCodi(), null, null);
+			key.setDenominacio(unitat.getDenominacio());
+			key.setDenominacioCooficial(unitat.getDenominacionCooficial());
 		}
 	}
 
