@@ -1458,7 +1458,6 @@
 					}
 
 					viewModel.ambEntregaCIE = data.entregaCieActiva;
-					console.log(viewModel)
 					$("#metodeEntrega").css("display", data.entregaCieActiva || viewModel.ambEntregaDEH ? "block" : "none");
 					if (!data.entregaCieVigent) {
 						$("#entregaPostalCaducada").show();
@@ -1635,7 +1634,7 @@
 				</div>
 
 				<!-- RETARD -->
-				<div class="row" id="rowRetard">
+				<div class="row" id="rowRetard" style="display:none">
 					<div class="col-md-12">
 						<not:inputText name="retard" textKey="notificacio.form.camp.retard" info="true" messageInfo="notificacio.form.camp.retard.info" value="10" labelSize="2" inputSize="6"/>
 					</div>
