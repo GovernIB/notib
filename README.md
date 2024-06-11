@@ -1,8 +1,8 @@
 # ![Logo notib](https://github.com/GovernIB/notib/raw/master/assets/logo2.png) Notib
 
 **Versions**
-> - Versió Estable: __notib-2.0.2__ (tag [NOTIB 2.0.2](https://github.com/GovernIB/notib/releases/tag/v2.0.2))
-> - Versió Desenvolupament: __notib-2.0.3__ (branca [notib2-dev](https://github.com/GovernIB/notib/tree/notib2-dev))  
+> - Versió Estable: __notib-2.0.3__ (tag [NOTIB 2.0.3](https://github.com/GovernIB/notib/releases/tag/v2.0.3))
+> - Versió Desenvolupament: __notib-2.0.4__ (branca [notib2-dev](https://github.com/GovernIB/notib/tree/notib2-dev))  
 >  
 > - Versió actual del client REST: __2.0.1__
 >   - Java7: ([notib-client-2.0.1.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client/2.0.1/notib-client-2.0.1.jar), [notib-client-intf-2.0.1.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/2.0.1/notib-client-intf-2.0.1.jar))  
