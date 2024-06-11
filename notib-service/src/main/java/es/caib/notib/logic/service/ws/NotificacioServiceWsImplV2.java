@@ -302,6 +302,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 					cacheHelper,
 					organGestorCachable,
 					configHelper);
+			notificacioValidator.setWarns(new BindException(notificacio, "notificacio"));
 			notificacioValidator.setNotificacio(notificacio);
 			notificacioValidator.setEntitat(entitat);
 			notificacioValidator.setProcediment(procediment);
@@ -316,6 +317,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				log.debug(">> [ALTA] validacio: [errors=" + errorDescripcio + "]");
 				return setRespostaError(errorDescripcio);
 			}
+			String avisos = "";
+			if (notificacioValidator.getWarns().hasErrors()) {
+				avisos = notificacioValidator.getWarns().getAllErrors().stream().map(e -> e.getCode()).collect(Collectors.joining(", "));
+			}
+
 
 			// Desat
 			// DOCUMENTS
@@ -366,7 +372,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			}
 			log.debug(">> [ALTA] enviaments creats");
 			notificacioGuardada = notificacioRepository.saveAndFlush(notificacioGuardada);
-			return generaResposta(info, notificacioGuardada, referencies);
+			return generaResposta(info, notificacioGuardada, referencies, avisos);
 		} catch (Exception ex) {
 			log.error("Error creant notificació", ex);
 			integracioHelper.addAccioError(info, "Error creant la notificació", ex);
@@ -1063,9 +1069,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	}
 
 
-	private RespostaAltaV2 generaResposta(IntegracioInfo info, NotificacioEntity notificacioGuardada, List<EnviamentReferenciaV2> referencies) {
+	private RespostaAltaV2 generaResposta(IntegracioInfo info, NotificacioEntity notificacioGuardada, List<EnviamentReferenciaV2> referencies, String warns) {
 
 		RespostaAltaV2 resposta = new RespostaAltaV2();
+		resposta.setErrorDescripcio(warns);
 		resposta.setIdentificador(notificacioGuardada.getReferencia());
 		switch (notificacioGuardada.getEstat()) {
 			case PENDENT:

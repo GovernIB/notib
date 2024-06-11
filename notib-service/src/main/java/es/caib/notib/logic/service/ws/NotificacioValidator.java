@@ -27,6 +27,7 @@ import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.GrupProcSerRepository;
 import es.caib.notib.persist.repository.GrupRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.time.DateUtils;
@@ -78,6 +79,8 @@ public class NotificacioValidator implements Validator {
     private DocumentValidDto[] documents;
     @Setter
     private Errors errors;
+    @Setter @Getter
+    private Errors warns;
     @Setter
     private Locale locale;
     @Setter
@@ -482,7 +485,8 @@ public class NotificacioValidator implements Validator {
             cieInactiu = cieInactiu && env.isEntregaPostalActiva();
         }
         if (notificacio.getRetard() != null && notificacio.getRetard() > 0 && !cieInactiu) {
-            errors.reject(error(RETARD_CIE_INACTIU, locale));
+            notificacio.setRetard(0);
+            warns.reject(error(RETARD_CIE_INACTIU, locale));
         }
         // Nifs repetis
         // TODO: Eliminar la condició que no permet NIFs repetits?
