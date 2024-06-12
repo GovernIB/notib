@@ -42,8 +42,7 @@ public abstract class EmailHelper<T> {
 
         log.debug("Enviament correu notificació");
         var missatge = mailSender.createMimeMessage();
-//        missatge.setHeader("Content-Type", "text/html charset=ISO-8859-1");
-        var helper = new MimeMessageHelper(missatge, true);
+        var helper = new MimeMessageHelper(missatge, true, "UTF-8");
         helper.setTo(emailDestinatari);
         helper.setFrom(getRemitent());
         helper.setSubject(configHelper.getPrefix() + " " + getMailSubject());
@@ -54,7 +53,7 @@ public abstract class EmailHelper<T> {
                 helper.addAttachment(attach.filename, new ByteArrayResource(attach.content));
             }
         }
-        missatge.setContent(getMailHtmlBody(item), "text/html; charset=ISO-8859-1");
+
         mailSender.send(missatge);
     }
 
