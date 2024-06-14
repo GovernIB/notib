@@ -194,6 +194,20 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "notifica_error", nullable = false)
 	protected boolean notificaError;
 
+//	@Setter
+//	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
+//	@JoinColumn(name = "CALLBACK_ERROR_EVENT_ID")
+//	@ForeignKey(name = "NOT_NOTENV_NOTEVENT_ERROR_FK")
+//	@OnDelete(action = OnDeleteAction.CASCADE)
+//	protected NotificacioEventEntity callbackErrorEvent;
+//
+//	@Setter
+//	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
+//	@JoinColumn(name = "API_CARPETA_ERROR_EVENT_ID")
+//	@ForeignKey(name = "NOT_NOTENV_NOTEVENT_ERROR_FK")
+//	@OnDelete(action = OnDeleteAction.CASCADE)
+//	protected NotificacioEventEntity apiCarpetaErrorEvent;
+
 	@Setter
 	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
 	@JoinColumn(name = "notifica_error_event_id")
