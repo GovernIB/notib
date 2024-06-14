@@ -15,6 +15,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaTableItemDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
+import org.jboss.ejb3.annotation.TransactionTimeout;
 import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
@@ -110,8 +111,8 @@ public class NotificacioMassivaService extends AbstractService<es.caib.notib.log
 
 	@Override
 	@RolesAllowed("**")
-	public NotificacioMassivaDataDto create(Long entitatId, String usuariCodi,
-			NotificacioMassivaDto notificacioMassiu) throws RegistreNotificaException {
+	@TransactionTimeout(value = 3600)
+	public NotificacioMassivaDataDto create(Long entitatId, String usuariCodi, NotificacioMassivaDto notificacioMassiu) throws RegistreNotificaException {
 		return getDelegateService().create(entitatId, usuariCodi, notificacioMassiu);
 	}
 	@Override
@@ -119,6 +120,7 @@ public class NotificacioMassivaService extends AbstractService<es.caib.notib.log
 	public void delete(Long entitatId, Long notificacioMassivaId) {
 		getDelegateService().delete(entitatId, notificacioMassivaId);
 	}
+
 	@Override
 	@RolesAllowed("**")
 	public PaginaDto<NotificacioMassivaTableItemDto> findAmbFiltrePaginat(Long entitatId, NotificacioMassivaFiltreDto filtre, RolEnumDto rol, PaginacioParamsDto paginacioParams) {
