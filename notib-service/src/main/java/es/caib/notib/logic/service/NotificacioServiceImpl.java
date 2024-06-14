@@ -561,12 +561,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 			dto.setDataCallbackPendent(data);
 			int callbackFiReintents = 0;
 			CallbackEntity callback;
-			NotificacioEventEntity eventNotMovil;
+			List<NotificacioEventEntity> eventNotMovil;
 			for (var env : dto.getEnviaments()) {
 				eventNotMovil = notificacioEventRepository.findLastApiCarpetaByEnviamentId(env.getId());
-				if (eventNotMovil != null && eventNotMovil.isError()) {
-					dto.getNotificacionsMovilErrorDesc().add(eventNotMovil.getErrorDescripcio());
-					env.setNotificacioMovilErrorDesc(eventNotMovil.getErrorDescripcio());
+				if (eventNotMovil != null && !eventNotMovil.isEmpty() && eventNotMovil.get(0).isError()) {
+					dto.getNotificacionsMovilErrorDesc().add(eventNotMovil.get(0).getErrorDescripcio());
+					env.setNotificacioMovilErrorDesc(eventNotMovil.get(0).getErrorDescripcio());
 				}
 				if (env.isSirFiPooling()) {
 					env.setFiReintents(true);

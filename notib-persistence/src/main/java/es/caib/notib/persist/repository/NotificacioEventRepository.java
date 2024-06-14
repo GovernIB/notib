@@ -160,19 +160,27 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			"	   ) ")
 	NotificacioEventEntity findLastEventByNotificacioId(@Param("notificacioId") Long notificacioId);
 
-	@Query( "select ne " +
-			"from " +
-			"	NotificacioEventEntity ne " +
-			"where ne.id = ( " +
-			"		select " +
-			"			max(e.id) " +
-			"		from " +
-			"			NotificacioEventEntity e left outer join e.enviament n " +
-			"		where " +
-			"			n.id = :enviamentId " +
-			"			and e.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.API_CARPETA " +
-			"	   ) ")
-	NotificacioEventEntity findLastApiCarpetaByEnviamentId(@Param("enviamentId") Long enviamentId);
+//	@Query( "select ne " +
+//			"from " +
+//			"	NotificacioEventEntity ne " +
+//			"where ne.id = ( " +
+//			"		select " +
+//			"			max(e.id) " +
+//			"		from " +
+//			"			NotificacioEventEntity e left outer join e.enviament n " +
+//			"		where " +
+//			"			n.id = :enviamentId " +
+//			"			and e.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.API_CARPETA " +
+//			"	   ) ")
+	@Query( "SELECT ne " +
+			"FROM "
+//			+ " NotificacioEventEntity ne LEFT JOIN ne.enviament n "
+			+ " NotificacioEventEntity ne "
+			+ "WHERE "
+			+ " ne.enviament.id = :enviamentId "
+			+ " AND ne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.API_CARPETA "
+			+ " ORDER BY ne.id DESC")
+	List<NotificacioEventEntity> findLastApiCarpetaByEnviamentId(@Param("enviamentId") Long enviamentId);
 
 	@Query( "select ne from NotificacioEventEntity ne " +
 			" where ne.notificacio.id = :notificacioId " +

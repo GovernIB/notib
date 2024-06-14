@@ -178,12 +178,12 @@ public class EnviamentServiceImpl implements EnviamentService {
 			var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
 			var enviaments = notificacioEnviamentRepository.findByNotificacio(notificacio);
 			var envs = conversioTipusHelper.convertirList(enviaments, NotificacioEnviamentDatatableDto.class);
-			NotificacioEventEntity event;
+			List<NotificacioEventEntity> event;
 			CallbackEntity callback;
 			for (var env : envs) {
 				event = notificacioEventRepository.findLastApiCarpetaByEnviamentId(env.getId());
-				if (event != null && event.isError()) {
-					env.setNotificacioMovilErrorDesc(event.getErrorDescripcio());
+				if (event != null && !event.isEmpty() && event.get(0).isError()) {
+					env.setNotificacioMovilErrorDesc(event.get(0).getErrorDescripcio());
 				}
 				callback = callbackRepository.findByEnviamentIdAndEstat(env.getId(), CallbackEstatEnumDto.ERROR);
 				if (callback == null) {
@@ -744,8 +744,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 
 		var e = notificacioEventRepository.findLastApiCarpetaByEnviamentId(enviament.getId());
-		if (e != null && e.isError()) {
-			enviamentDto.setNotificacioMovilErrorDesc(e.getErrorDescripcio());
+		if (e != null && !e.isEmpty() && e.get(0).isError()) {
+			enviamentDto.setNotificacioMovilErrorDesc(e.get(0).getErrorDescripcio());
 		}
 		callback = callbackRepository.findByEnviamentIdAndEstat(enviament.getId(), CallbackEstatEnumDto.ERROR);
 		if (callback == null) {

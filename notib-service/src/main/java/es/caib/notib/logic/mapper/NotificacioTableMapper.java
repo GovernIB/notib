@@ -16,12 +16,12 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.NotificacioTableEntity;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
-import es.caib.notib.persist.repository.NotificacioRepository;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
@@ -38,6 +38,7 @@ import java.util.Set;
 
 import static org.springframework.web.util.HtmlUtils.htmlEscape;
 
+@Slf4j
 @Mapper(componentModel = "spring", uses = {CommonConversor.class}, builder = @org.mapstruct.Builder(disableBuilder = true))
 public abstract class NotificacioTableMapper {
 
@@ -62,8 +63,6 @@ public abstract class NotificacioTableMapper {
     private NotificacioEventRepository eventRepository;
     @Autowired
     private NotificacioTableHelper notificacioTableHelper;
-    @Autowired
-    private NotificacioRepository notificacioRepository;
 
 
     @Mapping(target = "registreEnviamentIntent", source = "not.registreEnviamentIntent", defaultValue = "0")
@@ -123,6 +122,7 @@ public abstract class NotificacioTableMapper {
 
     private void actualitzar(NotificacioTableEntity not, NotificacioTableItemDto dto) {
 
+//        var inici = System.currentTimeMillis();
         var enviaments = not.getEnviaments();
         if (dto.getDocumentId() == null) {
             dto.setDocumentId(not.getNotificacio().getDocument() != null ? not.getNotificacio().getDocument().getId() : null);
@@ -140,6 +140,8 @@ public abstract class NotificacioTableMapper {
                 }
             }
         }
+//        var fi = System.currentTimeMillis();
+//        log.info("actualitzar part1 -> " + (fi - inici));
         dto.setErrorLastCallback(not.getNotificacio().isErrorLastCallback());
         dto.setEstatString(getColumnaEstat(dto, enviaments));
         dto.setDeleted(not.isDeleted());
@@ -155,7 +157,10 @@ public abstract class NotificacioTableMapper {
             }
             not.setRegistreNums(rNums);
             not.setPerActualitzar(false);
+//            inici = System.currentTimeMillis();
             notificacioTableHelper.actualitzarCampsLlistat(not);
+//            fi = System.currentTimeMillis();
+//            log.info("actualitzarCampsLlistat -> " + (fi - inici));
         } catch (Exception ex) {
             // TODO: Si no es pot actualitzar, no es fa res. Es calcularà en cada consulta com fins ara!
         }
@@ -163,19 +168,57 @@ public abstract class NotificacioTableMapper {
 
     private String getColumnaEstat(NotificacioTableItemDto dto, Set<NotificacioEnviamentEntity> enviaments) {
 
+        log.info("Actualitzant la columna estat de la remesa " + dto.getId());
+        var columanEstatInici = System.currentTimeMillis();
         // Estat
+//        var inici = System.currentTimeMillis();
         String iconaEstat = getIconaEstat(dto);
+//        var fi = System.currentTimeMillis();
+//        long duracio = fi - inici;
+//        log.info("getIconaEstat -> " + duracio);
+//        inici = System.currentTimeMillis();
         String nomEstat = getNomEstat(dto);
+//        fi = System.currentTimeMillis();
+//        duracio = fi - inici;
+//        log.info("getNomEstat -> " + duracio);
         // Errors
-        String eventError = getEventError(dto, enviaments);
+//        inici = System.currentTimeMillis();
+        String eventError = getEventError(dto, enviaments.size());
+//        fi = System.currentTimeMillis();
+//        duracio = fi - inici;
+//        log.info("getEventError -> " + duracio);
+//        inici = System.currentTimeMillis();
         String callbackError = getCallbackError(dto);
-        String notificaMovilError = getNotificaMovilError(dto, enviaments);
+//        fi = System.currentTimeMillis();
+//        duracio = fi - inici;
+//        log.info("getCallbackError -> " + duracio);
+//        inici = System.currentTimeMillis();
         String fiReintentsError = getFiReintentsError(dto);
+//        fi = System.currentTimeMillis();
+//        duracio = fi - inici;
+//        log.info("getFiReintentsError -> " + duracio);
+//        inici = System.currentTimeMillis();
+        String notificaMovilError = getNotificaMovilError(dto, enviaments);
+//        fi = System.currentTimeMillis();
+//        duracio = fi - inici;
+//        log.info("getNotificaMovilError -> " + duracio);
         // Data
+//        inici = System.currentTimeMillis();
         String dataEstat = getDataEstat(dto);
+//        fi = System.currentTimeMillis();
+//        duracio = fi - inici;
+//        log.info("getDataEstat -> " + duracio);
         // Estats enviaments
+//        inici = System.currentTimeMillis();
         String registreEstat = getRegistreEstat(dto, enviaments);
+//        fi = System.currentTimeMillis();
+//        duracio = fi - inici;
+//        log.info("getRegistreEstat -> " + duracio);
+//        inici = System.currentTimeMillis();
         String notificaEstats = getNotificaEstats(dto, enviaments);
+//        fi = System.currentTimeMillis();
+//        duracio = fi - inici;
+//        log.info("getNotificaEstats -> " + duracio);
 
         var columnaEstat = new StringBuilder("<div class=\"flex-column\">")
                 .append("<div style=\"display:flex; justify-content:space-between\">")
@@ -193,6 +236,9 @@ public abstract class NotificacioTableMapper {
                 .append(dataEstat)
                 .append(notificaEstats);
 
+//        fi = System.currentTimeMillis();
+//        duracio = fi - columanEstatInici;
+//        log.info("getColumnaEstat -> " + duracio);
         return columnaEstat.toString();
     }
 
@@ -286,10 +332,11 @@ public abstract class NotificacioTableMapper {
             if (env.isPerEmail() || env.getNotificaEstat() == null) {
                 continue;
             }
+
             var eventCarpeta = eventRepository.findLastApiCarpetaByEnviamentId(env.getId());
-            if (eventCarpeta != null && eventCarpeta.isError()) {
+            if (eventCarpeta != null && !eventCarpeta.isEmpty() && eventCarpeta.get(0).isError()) {
                 multipleApiCarpetaError++;
-                notificacioMovilMsg.append(" <span style=\"color:#8a6d3b;\" class=\"fa fa-mobile fa-lg\" title=\"").append(eventCarpeta.getErrorDescripcio()).append("\"></span>\n");
+                notificacioMovilMsg.append(" <span style=\"color:#8a6d3b;\" class=\"fa fa-mobile fa-lg\" title=\"").append(eventCarpeta.get(0).getErrorDescripcio()).append("\"></span>\n");
             }
         }
         if (multipleApiCarpetaError > 1) {
