@@ -137,11 +137,11 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			"			and e.error = true " +
 			"			and e.tipus != es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT " +
 			"			and e.tipus != es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.API_CARPETA " +
-			" 			and 0 = (select count(e.id) from NotificacioEventEntity e " +
-	"								where e.notificacio.id = :notificacioId " +
-			"							and ne.tipus = e.tipus " +
-	"									and e.lastModifiedDate > ne.lastModifiedDate " +
-			"							and e.error = false) " +
+//			" 			and e.id = (select count(e.id) from NotificacioEventEntity e " +
+//	"								where e.notificacio.id = :notificacioId " +
+//			"							and ne.tipus = e.tipus " +
+//	"									and e.lastModifiedDate > ne.lastModifiedDate " +
+//			"							and e.error = false) " +
 			"	   ) ")
 	NotificacioEventEntity findLastErrorEventByNotificacioId(@Param("notificacioId") Long notificacioId);
 
@@ -178,11 +178,12 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			" where ne.notificacio.id = :notificacioId " +
 			" and ne.fiReintents = true " +
 			" and ne.tipus != es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT " +
-			" and 0 = (select count(e.id) from NotificacioEventEntity e " +
-			"			where e.notificacio.id = :notificacioId " +
-			"				and ne.tipus = e.tipus " +
-			"				and e.lastModifiedDate > ne.lastModifiedDate " +
-			"				and e.error = false)")
+//			" and 0 = (select count(e.id) from NotificacioEventEntity e " +
+//			"			where e.notificacio.id = :notificacioId " +
+//			"				and ne.tipus = e.tipus " +
+//			"				and e.lastModifiedDate > ne.lastModifiedDate " +
+//			"				and e.error = false)" +
+			"")
 	List<NotificacioEventEntity> findEventsAmbFiReintentsByNotificacioId(@Param("notificacioId") Long notificacioId);
 
 	@Query( "select count(ne.id) from NotificacioEventEntity ne " +
