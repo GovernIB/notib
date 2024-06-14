@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - sql: "CREATE INDEX EVENT_TIPUS_ENV_ID_IDX ON NOTIB.NOT_NOTIFICACIO_EVENT (TIPUS,NOTIFICACIO_ENV_ID);"
