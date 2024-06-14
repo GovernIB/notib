@@ -183,7 +183,7 @@ public abstract class NotificacioTableMapper {
 //        log.info("getNomEstat -> " + duracio);
         // Errors
 //        inici = System.currentTimeMillis();
-        String eventError = getEventError(dto, enviaments.size());
+        String eventError = getEventError(dto, enviaments);
 //        fi = System.currentTimeMillis();
 //        duracio = fi - inici;
 //        log.info("getEventError -> " + duracio);
