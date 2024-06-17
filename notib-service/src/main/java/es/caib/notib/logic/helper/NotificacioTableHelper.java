@@ -19,7 +19,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -167,29 +169,19 @@ public class NotificacioTableHelper {
             tableViewItem.setGrupCodi(notificacio.getGrupCodi());
             tableViewItem.setTipusUsuari(notificacio.getTipusUsuari());
             tableViewItem.setNotificacioMassiva(notificacio.getNotificacioMassivaEntity());
-            if (ignoreNotificaError(notificacio)) {
-                tableViewItem.setNotificaErrorData(null);
-                tableViewItem.setNotificaErrorDescripcio(null);
-            } else {
-
-                var lastEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
-                tableViewItem.setNotificaErrorData(lastEvent != null ? lastEvent.getData() : null);
-                String desc = null;
-                if (lastEvent != null && lastEvent.isError()) {
-                    desc = notificacio.hasEnviamentsPerEmail() ? "S'ha produït algun error en els enviaments. Els errors es poden consultar en cada un dels enviaments."
-                            :  lastEvent.getErrorDescripcio();
-                }
-                tableViewItem.setNotificaErrorDescripcio(desc);
-                tableViewItem.setErrorLastEvent(isErrorLastEvent(notificacio, lastEvent));
-            }
 
             // Camps calcaulats a partir de valors dels enviaments
             var titular = new StringBuilder();
             var notificaIds = new StringBuilder();
             var registreNums = new StringBuilder();
             Integer estatMask = 0;
+            List<NotificacioEventEntity> eventsError = new ArrayList<>();
             if (notificacio.getEnviaments() != null) {
                 for (var e : notificacio.getEnviaments()) {
+
+                    if (e.getNotificacioErrorEvent() != null && e.getNotificacioErrorEvent().isError()) {
+                        eventsError.add(e.getNotificacioErrorEvent());
+                    }
                     if (e.getTitular() != null) {
                         titular.append(e.getTitular().getNomFormatted()).append(", ");
                     }
@@ -217,6 +209,19 @@ public class NotificacioTableHelper {
                     notificaIds = new StringBuilder(notificaIds.substring(0, notificaIds.length() - 2));
                 }
             }
+            if (ignoreNotificaError(notificacio)) {
+                tableViewItem.setNotificaErrorData(null);
+                tableViewItem.setNotificaErrorDescripcio(null);
+            } else if (!eventsError.isEmpty()){
+
+                tableViewItem.setNotificaErrorData(eventsError.get(0).getData());
+                String desc = notificacio.hasEnviamentsPerEmail() || eventsError.size() > 1
+                            ? "S'ha produït algun error en els enviaments. Els errors es poden consultar en cada un dels enviaments."
+                            :  eventsError.get(0).getErrorDescripcio();
+                tableViewItem.setNotificaErrorDescripcio(desc);
+                tableViewItem.setErrorLastEvent(true);
+            }
+
             tableViewItem.setEnviamentTipus(notificacio.getEnviamentTipus());
             tableViewItem.setNumExpedient(notificacio.getNumExpedient());
             tableViewItem.setConcepte(notificacio.getConcepte());

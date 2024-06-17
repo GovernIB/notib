@@ -1099,13 +1099,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			default:
 				break;
 		}
-		NotificacioEventEntity errorEvent = notificacioHelper.getNotificaErrorEvent(notificacioGuardada);
-		if (errorEvent != null) {
-			info.setCodiEntitat(errorEvent.getNotificacio().getEntitat().getCodi());
-			resposta.setError(true);
-			resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
-			resposta.setErrorData(new Date());
-		}
+//		NotificacioEventEntity errorEvent = notificacioHelper.getNotificaErrorEvent(notificacioGuardada);
+//		if (errorEvent != null) {
+//			info.setCodiEntitat(errorEvent.getNotificacio().getEntitat().getCodi());
+//			resposta.setError(true);
+//			resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
+//			resposta.setErrorData(new Date());
+//		}
 		resposta.setReferencies(referencies);
 		resposta.setDataCreacio(notificacioGuardada.getCreatedDate().isPresent() ? Date.from(notificacioGuardada.getCreatedDate().orElseThrow().atZone(ZoneId.systemDefault()).toInstant()) : null);
 		log.debug(">> [ALTA] afegides referències");

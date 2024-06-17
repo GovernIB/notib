@@ -183,7 +183,7 @@ public abstract class NotificacioTableMapper {
 //        log.info("getNomEstat -> " + duracio);
         // Errors
 //        inici = System.currentTimeMillis();
-        String eventError = getEventError(dto, enviaments.size());
+        String eventError = getEventError(dto, enviaments);
 //        fi = System.currentTimeMillis();
 //        duracio = fi - inici;
 //        log.info("getEventError -> " + duracio);
@@ -193,7 +193,7 @@ public abstract class NotificacioTableMapper {
 //        duracio = fi - inici;
 //        log.info("getCallbackError -> " + duracio);
 //        inici = System.currentTimeMillis();
-        String fiReintentsError = getFiReintentsError(dto);
+//        String fiReintentsError = getFiReintentsError(dto);
 //        fi = System.currentTimeMillis();
 //        duracio = fi - inici;
 //        log.info("getFiReintentsError -> " + duracio);
@@ -227,7 +227,7 @@ public abstract class NotificacioTableMapper {
                 .append(iconaEstat)
                 .append(nomEstat)
                 .append(eventError)
-                .append(fiReintentsError)
+//                .append(fiReintentsError)
                 .append(callbackError)
                 .append(notificaMovilError)
                 .append("</span>")
@@ -257,22 +257,48 @@ public abstract class NotificacioTableMapper {
         return " " + getMessage + "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto." + (dto.isEnviant() ? NotificacioEstatEnumDto.ENVIANT.name() : dto.getEstat().name()) + fiGetMessage;
     }
 
-    private String getEventError(NotificacioTableItemDto dto, int enviamentsSize) {
+    private String getEventError(NotificacioTableItemDto dto, Set<NotificacioEnviamentEntity> enviaments) {
 
         var error = "";
 //        boolean isFinal = NotificacioEstatEnumDto.PROCESSADA.equals(dto.getEstat()) || NotificacioEstatEnumDto.FINALITZADA.equals(dto.getEstat());
 //        var eventError = !isFinal ? eventRepository.findLastErrorEventByNotificacioId(dto.getId()) : null;
-        var eventError = eventRepository.findLastErrorEventByNotificacioId(dto.getId());
-        if (eventError != null && !Strings.isNullOrEmpty(eventError.getErrorDescripcio())) {
-            var desc = eventError.getErrorDescripcio();
+//        var eventError = eventRepository.findLastErrorEventByNotificacioId(dto.getId());
+        NotificacioEventEntity event = null;
+        String msg = getMessage + "notificacio.event.fi.reintents" + fiGetMessage;
+        String tipus;
+        int numEnv = 1;
+        StringBuilder fiReintentsError = new StringBuilder();
+        for (var env : enviaments) {
+            event = env.getNotificacioErrorEvent();
+            if (event == null || Strings.isNullOrEmpty(event.getErrorDescripcio())) {
+                continue;
+            }
+            var desc = event.getErrorDescripcio();
             if (desc.length() > 500) {
                 desc = desc.substring(0, 500);
             }
-            error = " <span class=\"fa fa-warning text-danger\" title=\"" + (enviamentsSize == 1 ? htmlEscape(desc) : getMessage + "error.notificacio.enviaments" + fiGetMessage)+ " \"></span>";
+            if (error.isEmpty()) {
+                error = " <span class=\"fa fa-warning text-danger\" title=\"" + (enviaments.size() == 1 ? htmlEscape(desc) : getMessage + "error.notificacio.enviaments" + fiGetMessage) + " \"></span>";
+            }
+            if (Boolean.TRUE.equals(event.getFiReintents())) {
+                var et = NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(event.getTipus()) && event.getEnviament().isSirFiPooling() ? NotificacioEventTipusEnumDto.SIR_FI_POOLING : event.getTipus();
+                tipus = getMessage + "es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + et + fiGetMessage;
+                fiReintentsError.append("Env ").append(numEnv++).append(": ").append(msg).append(" -> ").append(tipus).append("\n");
+            }
         }
+
+//        if (eventError != null && !Strings.isNullOrEmpty(eventError.getErrorDescripcio())) {
+//            var desc = eventError.getErrorDescripcio();
+//            if (desc.length() > 500) {
+//                desc = desc.substring(0, 500);
+//            }
+//            error = " <span class=\"fa fa-warning text-danger\" title=\"" + (enviaments.size() == 1 ? htmlEscape(desc) : getMessage + "error.notificacio.enviaments" + fiGetMessage)+ " \"></span>";
+//        }
         if (TipusUsuariEnumDto.APLICACIO.equals(dto.getTipusUsuari()) && dto.isErrorLastCallback()) {
             error += " <span class=\"fa fa-exclamation-circle text-primary\" title=\"" +  getMessage + "notificacio.list.client.error" + fiGetMessage + "\"></span>";
         }
+
+        error += fiReintentsError.length() > 0 ? " <span class=\"fa fa-warning text-warning\" title=\"" + fiReintentsError + "\"></span>" : "";
         return error;
     }
 
@@ -282,22 +308,22 @@ public abstract class NotificacioTableMapper {
         return callbackFiReintents > 0 ? " <span class=\"fa fa-warning text-info\" title=\"" + getMessage + "callback.fi.reintents" + fiGetMessage + "\"></span>" : "";
     }
 
-    private String getFiReintentsError(NotificacioTableItemDto dto) {
-
-        List<NotificacioEventEntity> lastErrorEvent = eventRepository.findEventsAmbFiReintentsByNotificacioId(dto.getId());
-        StringBuilder fiReintentsError = new StringBuilder();
-        if (lastErrorEvent != null && !lastErrorEvent.isEmpty()) {
-            String msg = getMessage + "notificacio.event.fi.reintents" + fiGetMessage;
-            String tipus;
-            int env = 1;
-            for (var event : lastErrorEvent) {
-                var et = NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(event.getTipus()) && event.getEnviament().isSirFiPooling() ? NotificacioEventTipusEnumDto.SIR_FI_POOLING : event.getTipus();
-                tipus = getMessage + "es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + et + fiGetMessage;
-                fiReintentsError.append("Env ").append(env++).append(": ").append(msg).append(" -> ").append(tipus).append("\n");
-            }
-        }
-        return fiReintentsError.length() > 0 ? " <span class=\"fa fa-warning text-warning\" title=\"" + fiReintentsError + "\"></span>" : "";
-    }
+//    private String getFiReintentsError(NotificacioTableItemDto dto) {
+//
+//        List<NotificacioEventEntity> lastErrorEvent = eventRepository.findEventsAmbFiReintentsByNotificacioId(dto.getId());
+//        StringBuilder fiReintentsError = new StringBuilder();
+//        if (lastErrorEvent != null && !lastErrorEvent.isEmpty()) {
+//            String msg = getMessage + "notificacio.event.fi.reintents" + fiGetMessage;
+//            String tipus;
+//            int env = 1;
+//            for (var event : lastErrorEvent) {
+//                var et = NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(event.getTipus()) && event.getEnviament().isSirFiPooling() ? NotificacioEventTipusEnumDto.SIR_FI_POOLING : event.getTipus();
+//                tipus = getMessage + "es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + et + fiGetMessage;
+//                fiReintentsError.append("Env ").append(env++).append(": ").append(msg).append(" -> ").append(tipus).append("\n");
+//            }
+//        }
+//        return fiReintentsError.length() > 0 ? " <span class=\"fa fa-warning text-warning\" title=\"" + fiReintentsError + "\"></span>" : "";
+//    }
 
     private String getNotificaMovilError(NotificacioTableItemDto dto, Set<NotificacioEnviamentEntity> enviaments) {
         StringBuilder notificacioMovilMsg = new StringBuilder();

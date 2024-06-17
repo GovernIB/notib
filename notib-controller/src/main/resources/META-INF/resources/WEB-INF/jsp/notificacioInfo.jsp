@@ -167,18 +167,14 @@ $(document).ready(function() {
 			</button>
 			<div id="collapseError" class="collapse">
 				<br />
-				<table class="table table-bordered"
-					style="background-color: white; width: 100%">
+				<table class="table table-bordered" style="background-color: white; width: 100%">
 					<tbody>
 						<tr>
-							<td width="10%"><strong><spring:message
-										code="notificacio.info.error.data" /></strong></td>
-							<td><fmt:formatDate value="${notificacio.notificaErrorData}"
-									pattern="dd/MM/yyyy HH:mm:ss" /></td>
+							<td width="10%"><strong><spring:message code="notificacio.info.error.data" /></strong></td>
+							<td><fmt:formatDate value="${notificacio.notificaErrorData}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
 						</tr>
 						<tr>
-							<td><strong><spring:message
-										code="notificacio.info.error.error" /></strong></td>
+							<td><strong><spring:message code="notificacio.info.error.error" /></strong></td>
 							<td><textarea rows="10" style="width: 100%">${fn:escapeXml(notificacio.notificaErrorDescripcio)}</textarea></td>
 						</tr>
 					</tbody>
