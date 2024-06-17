@@ -112,7 +112,8 @@ public class NotificacioMassivaService extends AbstractService<es.caib.notib.log
 	@Override
 	@RolesAllowed("**")
 	@TransactionTimeout(value = 3600)
-	public NotificacioMassivaDataDto create(Long entitatId, String usuariCodi, NotificacioMassivaDto notificacioMassiu) throws RegistreNotificaException {
+	public NotificacioMassivaDataDto create(Long entitatId, String usuariCodi,
+			NotificacioMassivaDto notificacioMassiu) throws RegistreNotificaException {
 		return getDelegateService().create(entitatId, usuariCodi, notificacioMassiu);
 	}
 	@Override
