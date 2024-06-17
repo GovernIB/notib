@@ -120,6 +120,7 @@ public class NotificacioMassivaService extends AbstractService<es.caib.notib.log
 	public void delete(Long entitatId, Long notificacioMassivaId) {
 		getDelegateService().delete(entitatId, notificacioMassivaId);
 	}
+
 	@Override
 	@RolesAllowed("**")
 	public PaginaDto<NotificacioMassivaTableItemDto> findAmbFiltrePaginat(Long entitatId, NotificacioMassivaFiltreDto filtre, RolEnumDto rol, PaginacioParamsDto paginacioParams) {
