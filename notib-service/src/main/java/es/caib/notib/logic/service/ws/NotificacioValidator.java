@@ -477,14 +477,14 @@ public class NotificacioValidator implements Validator {
                 || procediment != null && procediment.getEntregaCie() != null;
         boolean entregaDehActiva = entitat != null && entitat.isAmbEntregaDeh();
         var enviamentTipus = notificacio.getEnviamentTipus();
-        var cieInactiu = true;
+        var cieActiu = false;
         Enviament env;
         for (var i=0; i<enviaments.size(); i++) {
             env = enviaments.get(i);
             validateEnviament(env, enviamentTipus, emisor, entregaPostalActiva, entregaDehActiva, i, errors, locale);
-            cieInactiu = cieInactiu && env.isEntregaPostalActiva();
+            cieActiu = cieActiu || env.isEntregaPostalActiva();
         }
-        if (notificacio.getRetard() != null && notificacio.getRetard() > 0 && !cieInactiu) {
+        if (notificacio.getRetard() != null && notificacio.getRetard() > 0 && procediment.getRetard() != null && procediment.getRetard() > 0 && !cieActiu) {
             notificacio.setRetard(0);
             warns.reject(error(RETARD_CIE_INACTIU, locale));
         }
