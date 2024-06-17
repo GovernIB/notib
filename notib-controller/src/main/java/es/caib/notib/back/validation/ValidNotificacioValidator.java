@@ -257,10 +257,10 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			if (notificacio.getEnviaments() != null) {
 				int envCount = 0;
 				List<String> nifs = new ArrayList<>();
-				var cieInactiu = false;
+				var cieActiu = false;
 				for (var enviament : notificacio.getEnviaments()) {
 
-					cieInactiu = cieInactiu || enviament.getEntregaPostal().isActiva();
+					cieActiu = cieActiu || enviament.getEntregaPostal().isActiva();
 
 					// Incapacitat -> Destinataris no null
 					if (enviament.getTitular() != null && enviament.getTitular().isIncapacitat() && (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty())) {
@@ -360,7 +360,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					}
 					envCount++;
 				}
-				if (notificacio.getRetard() > 0 && procediment != null && procediment.getRetard() > 0 && !cieInactiu) {
+				if (notificacio.getRetard() > 0 && procediment != null && procediment.getRetard() > 0 && !cieActiu) {
 					var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.retard.no.cie", null, locale);
 					context.buildConstraintViolationWithTemplate(msg).addNode("retard").addConstraintViolation();
 				}
