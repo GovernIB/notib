@@ -360,7 +360,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					}
 					envCount++;
 				}
-				if (notificacio.getRetard() > 0 && procediment != null && procediment.getRetard() > 0 && !cieActiu) {
+				if (notificacio.getRetard() > 0 && !cieActiu) {
 					var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.retard.no.cie", null, locale);
 					context.buildConstraintViolationWithTemplate(msg).addNode("retard").addConstraintViolation();
 				}
