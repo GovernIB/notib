@@ -15,9 +15,9 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaTableItemDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
+import org.jboss.ejb3.annotation.TransactionTimeout;
 import org.springframework.context.annotation.Primary;
 
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import java.io.IOException;
@@ -110,6 +110,7 @@ public class NotificacioMassivaService extends AbstractService<es.caib.notib.log
 
 	@Override
 	@RolesAllowed("**")
+	@TransactionTimeout(value = 3600)
 	public NotificacioMassivaDataDto create(Long entitatId, String usuariCodi,
 			NotificacioMassivaDto notificacioMassiu) throws RegistreNotificaException {
 		return getDelegateService().create(entitatId, usuariCodi, notificacioMassiu);
