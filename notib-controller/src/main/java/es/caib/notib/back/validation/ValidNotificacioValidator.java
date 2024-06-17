@@ -2,7 +2,6 @@ package es.caib.notib.back.validation;
 
 
 import com.google.common.base.Strings;
-import es.caib.notib.back.command.EnviamentCommand;
 import es.caib.notib.back.command.NotificacioCommand;
 import es.caib.notib.back.command.PersonaCommand;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
@@ -10,6 +9,7 @@ import es.caib.notib.back.helper.EmailValidHelper;
 import es.caib.notib.back.helper.MessageHelper;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
@@ -53,6 +53,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(final NotificacioCommand notificacio, final ConstraintValidatorContext context) {
+
 		boolean valid = true;
 		boolean comunicacioAmbAdministracio = false;
 		boolean comunicacioSenseAdministracio = false;
@@ -122,9 +123,11 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					context.buildConstraintViolationWithTemplate(msg).addNode("serveiId").addConstraintViolation();
 				}
 			}
+			ProcSerDto procediment = null;
 			if (procSer != null) {
-				boolean procedimentActiu = procedimentService.procedimentActiu(procSer);
-				if (!procedimentActiu) {
+
+				procediment = procedimentService.findById(null, false, procSer);
+				if (!procediment.isActiu()) {
 					valid = false;
 					if (useProcediment) {
 						var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.procediment.inactiu", null, locale);
@@ -135,8 +138,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					}
 				}
 
-				var procedimentAmbGrups = procedimentService.procedimentAmbGrups(procSer);
-				if (procedimentAmbGrups && notificacio.getGrupCodi() == null) {
+				if (procediment.isAgrupar() && notificacio.getGrupCodi() == null) {
 					valid = false;
 					var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.grup", null, locale);
 					context.buildConstraintViolationWithTemplate(msg).addNode("grupCodi").addConstraintViolation();
@@ -255,10 +257,10 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			if (notificacio.getEnviaments() != null) {
 				int envCount = 0;
 				List<String> nifs = new ArrayList<>();
-				var cieInactiu = true;
+				var cieInactiu = false;
 				for (var enviament : notificacio.getEnviaments()) {
 
-					cieInactiu = cieInactiu && enviament.getEntregaPostal().isActiva();
+					cieInactiu = cieInactiu || enviament.getEntregaPostal().isActiva();
 
 					// Incapacitat -> Destinataris no null
 					if (enviament.getTitular() != null && enviament.getTitular().isIncapacitat() && (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty())) {
@@ -358,7 +360,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					}
 					envCount++;
 				}
-				if (notificacio.getRetard() > 0 && !cieInactiu) {
+				if (notificacio.getRetard() > 0 && procediment != null && procediment.getRetard() > 0 && !cieInactiu) {
 					var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.retard.no.cie", null, locale);
 					context.buildConstraintViolationWithTemplate(msg).addNode("retard").addConstraintViolation();
 				}
