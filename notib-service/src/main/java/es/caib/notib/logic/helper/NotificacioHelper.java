@@ -462,7 +462,15 @@ public class NotificacioHelper {
 		if (notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIADA)) {
 			return null;
 		}
-		return notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
+		List<NotificacioEventEntity> eventsError = new ArrayList<>();
+		NotificacioEventEntity event;
+		for (var env : notificacio.getEnviaments()) {
+			event = env.getNotificacioErrorEvent();
+			if (event != null && event.isError()) {
+				eventsError.add(event);
+			}
+		}
+		return !eventsError.isEmpty() ? eventsError.get(0) : null;
 	}
 
 	@Getter

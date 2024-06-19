@@ -22,10 +22,12 @@ public class AuditHelper {
     private final NotificacioEventRepository notificacioEventRepository;
     private final NotificacioEnviamentAuditRepository notificacioEnviamentAuditRepository;
 
-
     public void auditaNotificacio(NotificacioEntity notificacio, AuditService.TipusOperacio tipusOperacio, String metode) {
 
-        var lastErrorEvent = NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()) ? null : notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
+//        var lastErrorEvent = NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()) ? null : notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
+        var enviaments = notificacio.getEnviaments();
+        var lastErrorEvent = NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()) ? null
+                : enviaments != null && !enviaments.isEmpty() ? enviaments.iterator().next().getNotificacioErrorEvent() : null;
         var audit = new NotificacioAudit(notificacio, lastErrorEvent, tipusOperacio, metode);
         var lastAudit = notificacioAuditRepository.findLastAudit(notificacio.getId());
         if (lastAudit == null || !tipusOperacio.equals(lastAudit.getTipusOperacio()) || !audit.equals(lastAudit)) {

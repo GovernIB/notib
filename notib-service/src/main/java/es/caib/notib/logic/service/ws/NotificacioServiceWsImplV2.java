@@ -1099,7 +1099,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			default:
 				break;
 		}
-		NotificacioEventEntity errorEvent = notificacioHelper.getNotificaErrorEvent(notificacioGuardada);
+		var errorEvent = notificacioHelper.getNotificaErrorEvent(notificacioGuardada);
 		if (errorEvent != null) {
 			info.setCodiEntitat(errorEvent.getNotificacio().getEntitat().getCodi());
 			resposta.setError(true);

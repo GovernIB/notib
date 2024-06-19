@@ -126,14 +126,14 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				log.info(" [TIMER-NOT] Notificació enviar (enviaNotificacio SOAP-QUERY)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
 				notificacio.updateNotificaEnviamentData();
 				var resultadoEnvios = resultadoAlta.getResultadoEnvios();
-//				if ("000".equals(resultadoAlta.getCodigoRespuesta()) && resultadoEnvios != null && !resultadoEnvios.getItem().isEmpty()) {
-//					if (!"OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
-//						// TODO FICAR MISSATGE DE WARNING (IMATGE APB)
-//
-//					}
-				if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
+//				if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
+				if ("000".equals(resultadoAlta.getCodigoRespuesta()) && resultadoEnvios != null && !resultadoEnvios.getItem().isEmpty()) {
+					if (!"OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
+						// TODO FICAR MISSATGE DE WARNING (IMATGE APB)
+						log.info("[Notificav2Helper] Enviament amb estat 000 pero desc no ok. Desc: " + resultadoAlta.getDescripcionRespuesta());
+					}
 
-						startTime = System.nanoTime();
+					startTime = System.nanoTime();
 					log.info(" >>> ... OK");
 					if (!ambEnviamentPerEmail) {
 						notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);

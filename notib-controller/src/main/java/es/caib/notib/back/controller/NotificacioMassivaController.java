@@ -108,6 +108,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         if (!command.getErrors().isEmpty()) {
             MissatgesHelper.error(request, getErrorMsg(request, command.getErrors()));
         }
+        model.addAttribute("notificacioMassivaEstats", EnumHelper.getOptionsForEnum(NotificacioMassivaEstatDto.class,
+                "es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaEstatDto."));
         return "notificacioMassivaList";
     }
 

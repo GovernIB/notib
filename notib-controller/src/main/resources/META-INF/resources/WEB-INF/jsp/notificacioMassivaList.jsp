@@ -47,13 +47,14 @@
 	$(document).ready(function() {
 		$('#btnNetejar').click(function () {
 			$(':input', $('#filtre')).each(function () {
-				var type = this.type, tag = this.tagName.toLowerCase();
+				let type = this.type;
+				let tag = this.tagName.toLowerCase();
 				if (type == 'text' || type == 'password' || tag == 'textarea') {
 					this.value = '';
 				} else if (type == 'checkbox' || type == 'radio') {
 					this.checked = false;
 				} else if (tag == 'select') {
-					this.selectedIndex = 0;
+					$(this).val(null).trigger('change');
 				}
 
 			});

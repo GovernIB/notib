@@ -562,7 +562,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 			int callbackFiReintents = 0;
 			CallbackEntity callback;
 			List<NotificacioEventEntity> eventNotMovil;
+			List<NotificacioEventEntity> lastErrorEvent = new ArrayList<>();
+			List<NotificacioEnviamentEntity> enviamentsEntity = new ArrayList<>();
+			enviamentsEntity.addAll(notificacio.getEnviaments());
+			NotificacioEventEntity eventError;
+			var numEnviament = 0;
 			for (var env : dto.getEnviaments()) {
+
+				eventError = enviamentsEntity.get(numEnviament).getNotificacioErrorEvent();
+				if (eventError != null && eventError.isError()) {
+					lastErrorEvent.add(eventError);
+				}
 				eventNotMovil = notificacioEventRepository.findLastApiCarpetaByEnviamentId(env.getId());
 				if (eventNotMovil != null && !eventNotMovil.isEmpty() && eventNotMovil.get(0).isError()) {
 					dto.getNotificacionsMovilErrorDesc().add(eventNotMovil.get(0).getErrorDescripcio());
@@ -580,12 +590,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 				env.setCallbackFiReintents(true);
 				env.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
 				callbackFiReintents++;
-
+				numEnviament++;
 			}
 			if (dto.getNotificacionsMovilErrorDesc().size() > 1) {
-				List<String> foo = new ArrayList<>();
-				foo.add(messageHelper.getMessage("api.carpeta.send.notificacio.movil.error"));
-				dto.setNotificacionsMovilErrorDesc(foo);
+				List<String> desc = new ArrayList<>();
+				desc.add(messageHelper.getMessage("api.carpeta.send.notificacio.movil.error"));
+				dto.setNotificacionsMovilErrorDesc(desc);
 			}
 			if (callbackFiReintents > 0) {
 				dto.setCallbackFiReintents(true);
@@ -598,12 +608,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 				dto.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEntity.getOperadorPostal(), OperadorPostalDataDto.class));
 				dto.setCie(conversioTipusHelper.convertir(entregaCieEntity.getCie(), CieDataDto.class));
 			}
-			var lastErrorEvent = notificacioEventRepository.findEventsAmbFiReintentsByNotificacioId(notificacio.getId());
-			if (lastErrorEvent != null && !lastErrorEvent.isEmpty()) {
+			if (!lastErrorEvent.isEmpty()) {
 				String msg = "";
 				String tipus = "";
 				StringBuilder m = new StringBuilder();
 				int env = 1;
+				var fiReintents = false;
 				for (var event : lastErrorEvent) {
 
 					msg = messageHelper.getMessage("notificacio.event.fi.reintents");
@@ -611,9 +621,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 					tipus = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + et);
 					m.append("Env ").append(env).append(": ").append(msg).append(" -> ").append(tipus).append("\n");
 					env++;
+					fiReintents = fiReintents || event.getFiReintents();
 				}
 				dto.setFiReintentsDesc(m.toString());
-				dto.setFiReintents(true);
+				dto.setFiReintents(fiReintents);
+
+				dto.setNotificaErrorDescripcio(lastErrorEvent.size() > 1 ? messageHelper.getMessage("error.notificacio.enviaments") : lastErrorEvent.get(0).getErrorDescripcio());
+
+				// TODO S'HA DE POSAR PER TOTS ELS EVENTS
+				dto.setNotificaErrorData(lastErrorEvent.get(0).getData());
 				dto.setNoticaErrorEventTipus(lastErrorEvent.get(0).getTipus());
 				// Obtenir error dels events
 				dto.setNotificaErrorTipus(getErrorTipus(lastErrorEvent.get(0)));
@@ -623,12 +639,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (notificacioTableEntity == null) {
 				return dto;
 			}
-			var e = notificacioEventRepository.findLastErrorEventByNotificacioId(id);
-			if (e == null) {
-				return dto;
-			}
-			dto.setNotificaErrorData(e.getData());
-			dto.setNotificaErrorDescripcio(e.getErrorDescripcio());
 			return dto;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1756,12 +1766,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (EnviamentSmEstat.NOTIFICA_ERROR.equals(enviamentSmService.getEstat(env.getUuid()))) {
 					enviamentSmService.consultaRetry(env.getUuid());
 				}
+				if (env.getNotificacioErrorEvent() != null && env.getNotificacioErrorEvent().getFiReintents()) {
+					env.getNotificacioErrorEvent().setFiReintents(false);
+				}
 			}
 			// TODO VEURE PERQUE EL MÈTODE UPDATE DEL REPOSITORY NO FUNCIONA
-			var events = notificacioEventRepository.findEventsAmbFiReintentsByNotificacioId(notificacioId);
-			for (var e : events) {
-				e.setFiReintents(false);
-			}
+//			var events = notificacioEventRepository.findEventsAmbFiReintentsByNotificacioId(notificacioId);
+//			for (var e : events) {
+//				e.setFiReintents(false);
+//			}
 			// D'ALGUNA FORMA NO ESTÀ QUADRAN ELS REINTENTS DE LA NOTIFICACIO AMB LA DELS EVENTS
 			var not = NotTableUpdate.builder().id(notificacioId).estat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS).build();
 			notificacioTableHelper.actualitzar(not);
