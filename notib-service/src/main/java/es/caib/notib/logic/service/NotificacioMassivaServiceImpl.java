@@ -244,7 +244,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         return dto;
     }
 
-    @Transactional(rollbackFor=Exception.class)
+    @Transactional(rollbackFor=Exception.class, timeout = 3600)
     @Override
     public NotificacioMassivaDataDto create(Long entitatId, @NonNull String usuariCodi, @NonNull NotificacioMassivaDto notificacioMassiva) throws RegistreNotificaException {
 
