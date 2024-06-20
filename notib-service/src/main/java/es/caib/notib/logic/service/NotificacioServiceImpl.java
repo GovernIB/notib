@@ -634,7 +634,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				// Obtenir error dels events
 				dto.setNotificaErrorTipus(getErrorTipus(lastErrorEvent.get(0)));
 			}
-			dto.setEnviadaDate(getEnviadaDate(notificacio));
+			dto.setEnviadaDate(notificacioTableHelper.getEnviadaDate(notificacio));
 			var notificacioTableEntity = notificacioTableViewRepository.findById(id).orElse(null);
 			if (notificacioTableEntity == null) {
 				return dto;
@@ -659,39 +659,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return null;
 	}
 
-	private Date getEnviadaDate(NotificacioEntity notificacio) {
-
-		try {
-			if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {
-				return null;
-			}
-
-			Date dataEnviament = null;
-			for (NotificacioEnviamentEntity env : notificacio.getEnviaments()) {
-				if (env.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)
-					&& (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT) || !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
-
-					dataEnviament = env.getRegistreData();
-				}
-
-				if (!env.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)
-					&& (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT) || !notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)
-						|| !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
-
-					dataEnviament = notificacio.getNotificaEnviamentNotificaData();
-				}
-				if (dataEnviament != null) {
-					break;
-				}
-			}
-			return dataEnviament;
-		} catch (Exception ex) {
-			log.error("Error actualitzant la data d'enviament a la taula del llistat", ex);
-		}
-		return null;
-	}
-
-	@Transactional(readOnly = true)
+//	@Transactional(readOnly = true)
+	@Transactional
 	@Override
 	public PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 

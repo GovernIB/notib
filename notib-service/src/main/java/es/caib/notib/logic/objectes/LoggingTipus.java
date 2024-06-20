@@ -17,5 +17,6 @@ public enum LoggingTipus {
     CARPETA,
     ARXIU,
     VALIDATE_SIGNATURE,
-    MASSIVA;
+    MASSIVA,
+    EFICIENCIA_TAULA_REMESES;
 }
