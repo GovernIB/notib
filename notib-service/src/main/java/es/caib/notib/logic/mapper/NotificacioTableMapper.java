@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.NotificacioListHelper;
-import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
@@ -12,10 +11,13 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.NotificacioTableEntity;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
+import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -58,11 +60,10 @@ public abstract class NotificacioTableMapper {
     NotificacioListHelper notificacioListHelper;
     @Autowired
     private MessageHelper messageHelper;
-
     @Autowired
     private NotificacioEventRepository eventRepository;
     @Autowired
-    private NotificacioTableHelper notificacioTableHelper;
+    private NotificacioTableViewRepository notificacioTableViewRepository;
 
 
     @Mapping(target = "registreEnviamentIntent", source = "not.registreEnviamentIntent", defaultValue = "0")
@@ -100,7 +101,6 @@ public abstract class NotificacioTableMapper {
         if (not == null) {
             return;
         }
-        // TODO: Modificar perActualitzar quan hi hagi un canvi
         if (not.isPerActualitzar()) {
             actualitzar(not, dto);
         }
@@ -122,7 +122,7 @@ public abstract class NotificacioTableMapper {
 
     private void actualitzar(NotificacioTableEntity not, NotificacioTableItemDto dto) {
 
-//        var inici = System.currentTimeMillis();
+        var iniciActualitzar = System.currentTimeMillis();
         var enviaments = not.getEnviaments();
         if (dto.getDocumentId() == null) {
             dto.setDocumentId(not.getNotificacio().getDocument() != null ? not.getNotificacio().getDocument().getId() : null);
@@ -157,10 +157,11 @@ public abstract class NotificacioTableMapper {
             }
             not.setRegistreNums(rNums);
             not.setPerActualitzar(false);
-//            inici = System.currentTimeMillis();
-            notificacioTableHelper.actualitzarCampsLlistat(not);
-//            fi = System.currentTimeMillis();
-//            log.info("actualitzarCampsLlistat -> " + (fi - inici));
+            var inici = System.currentTimeMillis();
+            notificacioTableViewRepository.saveAndFlush(not);
+            var fi = System.currentTimeMillis();
+            NotibLogger.getInstance().info("Guardar a not_table -> " + (fi - inici), log, LoggingTipus.EFICIENCIA_TAULA_REMESES);
+            NotibLogger.getInstance().info("Actualitzar notificacio -> " + (fi - iniciActualitzar), log, LoggingTipus.EFICIENCIA_TAULA_REMESES);
         } catch (Exception ex) {
             // TODO: Si no es pot actualitzar, no es fa res. Es calcularà en cada consulta com fins ara!
         }
@@ -168,57 +169,32 @@ public abstract class NotificacioTableMapper {
 
     private String getColumnaEstat(NotificacioTableItemDto dto, Set<NotificacioEnviamentEntity> enviaments) {
 
-        log.info("Actualitzant la columna estat de la remesa " + dto.getId());
+        NotibLogger.getInstance().info("Actualitzant la columna estat de la remesa " + dto.getId(), log, LoggingTipus.EFICIENCIA_TAULA_REMESES);
         var columanEstatInici = System.currentTimeMillis();
         // Estat
-//        var inici = System.currentTimeMillis();
         String iconaEstat = getIconaEstat(dto);
-//        var fi = System.currentTimeMillis();
-//        long duracio = fi - inici;
-//        log.info("getIconaEstat -> " + duracio);
-//        inici = System.currentTimeMillis();
         String nomEstat = getNomEstat(dto);
-//        fi = System.currentTimeMillis();
-//        duracio = fi - inici;
-//        log.info("getNomEstat -> " + duracio);
         // Errors
-//        inici = System.currentTimeMillis();
+        var inici = System.currentTimeMillis();
         String eventError = getEventError(dto, enviaments);
-//        fi = System.currentTimeMillis();
-//        duracio = fi - inici;
-//        log.info("getEventError -> " + duracio);
-//        inici = System.currentTimeMillis();
+        var fi = System.currentTimeMillis();
+        var  duracio = fi - inici;
+        NotibLogger.getInstance().info("getEventError -> " + duracio, log, LoggingTipus.EFICIENCIA_TAULA_REMESES);
+        inici = System.currentTimeMillis();
         String callbackError = getCallbackError(dto);
-//        fi = System.currentTimeMillis();
-//        duracio = fi - inici;
-//        log.info("getCallbackError -> " + duracio);
-//        inici = System.currentTimeMillis();
-//        String fiReintentsError = getFiReintentsError(dto);
-//        fi = System.currentTimeMillis();
-//        duracio = fi - inici;
-//        log.info("getFiReintentsError -> " + duracio);
-//        inici = System.currentTimeMillis();
+        fi = System.currentTimeMillis();
+        duracio = fi - inici;
+        NotibLogger.getInstance().info("getCallbackError -> " + duracio,  log, LoggingTipus.EFICIENCIA_TAULA_REMESES);
+        inici = System.currentTimeMillis();
         String notificaMovilError = getNotificaMovilError(dto, enviaments);
-//        fi = System.currentTimeMillis();
-//        duracio = fi - inici;
-//        log.info("getNotificaMovilError -> " + duracio);
+        fi = System.currentTimeMillis();
+        duracio = fi - inici;
+        NotibLogger.getInstance().info("getNotificaMovilError -> " + duracio,  log, LoggingTipus.EFICIENCIA_TAULA_REMESES);
         // Data
-//        inici = System.currentTimeMillis();
         String dataEstat = getDataEstat(dto);
-//        fi = System.currentTimeMillis();
-//        duracio = fi - inici;
-//        log.info("getDataEstat -> " + duracio);
         // Estats enviaments
-//        inici = System.currentTimeMillis();
         String registreEstat = getRegistreEstat(dto, enviaments);
-//        fi = System.currentTimeMillis();
-//        duracio = fi - inici;
-//        log.info("getRegistreEstat -> " + duracio);
-//        inici = System.currentTimeMillis();
         String notificaEstats = getNotificaEstats(dto, enviaments);
-//        fi = System.currentTimeMillis();
-//        duracio = fi - inici;
-//        log.info("getNotificaEstats -> " + duracio);
 
         var columnaEstat = new StringBuilder("<div class=\"flex-column\">")
                 .append("<div style=\"display:flex; justify-content:space-between\">")
@@ -227,7 +203,6 @@ public abstract class NotificacioTableMapper {
                 .append(iconaEstat)
                 .append(nomEstat)
                 .append(eventError)
-//                .append(fiReintentsError)
                 .append(callbackError)
                 .append(notificaMovilError)
                 .append("</span>")
@@ -236,9 +211,9 @@ public abstract class NotificacioTableMapper {
                 .append(dataEstat)
                 .append(notificaEstats);
 
-//        fi = System.currentTimeMillis();
-//        duracio = fi - columanEstatInici;
-//        log.info("getColumnaEstat -> " + duracio);
+        fi = System.currentTimeMillis();
+        duracio = fi - columanEstatInici;
+        NotibLogger.getInstance().info("getColumnaEstat -> " + duracio, log, LoggingTipus.EFICIENCIA_TAULA_REMESES);
         return columnaEstat.toString();
     }
 
