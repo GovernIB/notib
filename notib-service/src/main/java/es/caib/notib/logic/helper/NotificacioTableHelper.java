@@ -1,7 +1,6 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -179,8 +178,8 @@ public class NotificacioTableHelper {
             if (notificacio.getEnviaments() != null) {
                 for (var e : notificacio.getEnviaments()) {
 
-                    if (e.getNotificacioErrorEvent() != null && e.getNotificacioErrorEvent().isError()) {
-                        eventsError.add(e.getNotificacioErrorEvent());
+                    if (e.getUltimEvent() != null && e.getUltimEvent().isError()) {
+                        eventsError.add(e.getUltimEvent());
                     }
                     if (e.getTitular() != null) {
                         titular.append(e.getTitular().getNomFormatted()).append(", ");
@@ -333,20 +332,30 @@ public class NotificacioTableHelper {
             if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {
                 return null;
             }
-            NotificacioEnviamentEntity env = notificacio.getEnviaments().iterator().next();
+            Date data = null;
+            NotificacioEventEntity ultimEvent;
+            for (var env : notificacio.getEnviaments()) {
 
-            if (env.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)
-                && (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)
-                    || !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
-                return env.getRegistreData();
+                ultimEvent = env.getUltimEvent();
+                if (ultimEvent == null) {
+                    continue;
+                }
+                data = data == null ? ultimEvent.getData() : ultimEvent.getData().after(data) ? ultimEvent.getData() : data;
             }
 
-            if (!env.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)
-                    && (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)
-                        || !notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)
-                        || !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
-                return notificacio.getNotificaEnviamentData();
-            }
+            return data;
+//            var env = notificacio.getEnviaments().iterator().next();
+//            if (eventError != null && eventError.isError()) {
+//                return eventError.getData();
+//            }
+//            var estat = notificacio.getEstat();
+//            if (notificacio.isComunicacioSir() && !NotificacioEstatEnumDto.PENDENT.equals(estat) && !NotificacioEstatEnumDto.ENVIANT.equals(estat)) {
+//                return env.getRegistreData();
+//            }
+//
+//            if (!notificacio.isComunicacioSir() && !NotificacioEstatEnumDto.PENDENT.equals(estat) && !NotificacioEstatEnumDto.REGISTRADA.equals(estat) && !NotificacioEstatEnumDto.ENVIANT.equals(estat)) {
+//                return notificacio.getNotificaEnviamentNotificaData();
+//            }
         } catch (Exception ex) {
             log.error("Error actualitzant la data d'enviament a la taula del llistat", ex);
         }

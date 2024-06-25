@@ -197,7 +197,7 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 			built.sirConsultaData = notificacioEnviamentEntity.getSirConsultaData();
 			built.sirRecepcioData = notificacioEnviamentEntity.getSirRecepcioData();
 			built.sirRegDestiData = notificacioEnviamentEntity.getSirRegDestiData();
-			built.notificacioErrorEvent = notificacioEnviamentEntity.getNotificacioErrorEvent() != null ? notificacioEnviamentEntity.getNotificacioErrorEvent().getId() : null;
+			built.notificacioErrorEvent = notificacioEnviamentEntity.getUltimEvent() != null ? notificacioEnviamentEntity.getUltimEvent().getId() : null;
 			built.notificaError = notificacioEnviamentEntity.isNotificaError();
 			built.notificaDatatErrorDescripcio = notificacioEnviamentEntity.getNotificaDatatErrorDescripcio();
 		}

@@ -79,13 +79,13 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			log.error(" [NOT] la notificació no té l'estat REGISTRADA.");
 			throw new ValidationException(notificacioId, NotificacioEntity.class, "La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
 		}
-		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
+		notificacio.updateNotificaNouEnviament();
 		var error = false;
 		String errorDescripcio = null;
+		notificacio.updateNotificaEnviamentData();
 		try {
 			log.info(" >>> Enviant notificació...");
 			var resultadoAlta = enviaNotificacio(notificacio);
-			notificacio.updateNotificaEnviamentData();
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				log.info(" >>> ... OK");
 				if (!ambEnviamentPerEmail) {
@@ -124,7 +124,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())/* || NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())*/)) {
 			notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
 		}
-		notificacioEventHelper.addNotificaEnviamentEvent(notificacio, error, errorDescripcio, fiReintents);
+		var eventInfo = NotificacioEventHelper.EventInfo.builder().notificacio(notificacio).error(error).errorDescripcio(errorDescripcio).fiReintents(fiReintents).build();
+		notificacioEventHelper.addNotificaEnviamentEvent(eventInfo);
 		callbackHelper.updateCallbacks(notificacio, error, errorDescripcio);
 		log.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		notificacioTableHelper.actualitzarRegistre(notificacio);

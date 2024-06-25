@@ -210,10 +210,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
 	@Setter
 	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
-	@JoinColumn(name = "notifica_error_event_id")
-	@ForeignKey(name = "NOT_NOTENV_NOTEVENT_ERROR_FK")
+	@JoinColumn(name = "ultim_event")
+	@ForeignKey(name = "NOT_NOTEVENT_ULTIM_EVENT_FK")
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	protected NotificacioEventEntity notificacioErrorEvent;
+	protected NotificacioEventEntity ultimEvent;
 	
 	@Column(name = "notifica_intent_data")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -344,7 +344,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaEstatData = new Date();
 		this.notificaEstat = EnviamentEstat.NOTIB_ENVIADA;
 		this.notificaError = false;
-		this.notificacioErrorEvent = null;
+		this.ultimEvent = null;
 		this.notificaIntentData = new Date();
 		this.notificaEstatDataActualitzacio = new Date();
 	}
@@ -354,7 +354,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaEstat = EnviamentEstat.FINALITZADA;
 		this.notificaEstatFinal = true;
 		this.notificaError = false;
-		this.notificacioErrorEvent = null;
+		this.ultimEvent = null;
 		this.notificaIntentData = new Date();
 		this.notificaEstatDataActualitzacio = new Date();
 	}
@@ -443,7 +443,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public void updateNotificaError(boolean notificaError, NotificacioEventEntity notificaErrorEvent) {
 
 		this.notificaError = notificaError;
-		this.notificacioErrorEvent = notificaErrorEvent;
+		this.ultimEvent = notificaErrorEvent;
 	}
 
 	public void updateNotificaDataRefrescEstat() {
@@ -636,7 +636,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
 	@PreRemove
 	private void preRemove() {
-		this.notificacioErrorEvent = null;
+		this.ultimEvent = null;
 	}
 
 	private static final long serialVersionUID = 6993171107561077019L;

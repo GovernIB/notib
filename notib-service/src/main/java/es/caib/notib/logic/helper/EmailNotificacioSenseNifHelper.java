@@ -69,7 +69,7 @@ public class EmailNotificacioSenseNifHelper {
 		var notificacio = notificacioRepository.findById(enviamentsSenseNif.get(0).getNotificacio().getId()).orElseThrow();
 		log.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		if (totsEmail) {
-			notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
+			notificacio.updateNotificaNouEnviament();
 			notificacio.updateNotificaEnviamentData();
 			if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 				log.error(" [NOT] la notificació no té l'estat REGISTRADA o ENVIADA_AMB_ERRORS.");

@@ -5,6 +5,7 @@ import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.EntregaDehDto;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.NotificacioEventDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.cie.EntregaPostalDto;
 import lombok.Getter;
@@ -65,9 +66,16 @@ public class EnviamentInfo extends NotificacioEnviamentDatatableDto{
 	private String notificaIdentificador;
 	private boolean notificaError;
 
+	private NotificacioEventDto ultimEvent;
+	private boolean ultimEventError;
 	private boolean errorLastCallback;
 	private boolean callbackFiReintents;
 	private String callbackFiReintentsDesc;
 	private String notificacioMovilErrorDesc;
+
+
+	public boolean isUltimEventError() {
+		return ultimEvent != null && ultimEvent.isError();
+	}
 
 }

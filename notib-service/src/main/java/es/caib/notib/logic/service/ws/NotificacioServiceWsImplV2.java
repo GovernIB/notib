@@ -654,9 +654,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 					log.debug("Certificació de l'enviament amb referencia: " + referencia + " s'ha obtingut correctament.");
 				}
 
-				if (enviament.getNotificacioErrorEvent() != null) {
+				if (enviament.getUltimEvent() != null) {
 					NotificacioEstatEnumDto estat = enviament.getNotificacio().getEstat();
-					NotificacioEventEntity errorEvent = enviament.getNotificacioErrorEvent();
+					NotificacioEventEntity errorEvent = enviament.getUltimEvent();
 					var isError = !NotificacioEstatEnumDto.FINALITZADA.equals(estat) && !NotificacioEstatEnumDto.PROCESSADA.equals(estat) && !Strings.isNullOrEmpty(errorEvent.getErrorDescripcio());
 					resposta.setError(isError);
 					resposta.setErrorData(errorEvent.getData());

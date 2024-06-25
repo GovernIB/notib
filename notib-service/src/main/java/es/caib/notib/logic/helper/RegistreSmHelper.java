@@ -126,10 +126,13 @@ public class RegistreSmHelper {
 			finalitzaRegistre(arbResposta, enviament, request.isEnviamentSir());
 			success = true;
 		}
+		var data = arbResposta.getRegistreData() != null ? arbResposta.getRegistreData() : new Date();
+		var eventInfo = NotificacioEventHelper.EventInfo.builder().data(data).enviament(enviament).error(!success).errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build();
+
 		if (request.isEnviamentSir()) {
-			notificacioEventHelper.addSirEnviamentEvent(enviament, !success, errorDescripcio, errorMaxReintents);
+			notificacioEventHelper.addSirEnviamentEvent(eventInfo);
 		} else {
-			notificacioEventHelper.addRegistreEnviamentEvent(enviament, !success, errorDescripcio, errorMaxReintents);
+			notificacioEventHelper.addRegistreEnviamentEvent(eventInfo);
 		}
 		callbackHelper.crearCallback(notificacio, enviament, !success, errorDescripcio);
 		enviamentTableHelper.actualitzarRegistre(enviament);

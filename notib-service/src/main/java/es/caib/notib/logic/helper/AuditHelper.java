@@ -4,7 +4,6 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
-import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.auditoria.NotificacioAudit;
 import es.caib.notib.persist.entity.auditoria.NotificacioEnviamentAudit;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
@@ -27,7 +26,7 @@ public class AuditHelper {
 //        var lastErrorEvent = NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()) ? null : notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
         var enviaments = notificacio.getEnviaments();
         var lastErrorEvent = NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()) ? null
-                : enviaments != null && !enviaments.isEmpty() ? enviaments.iterator().next().getNotificacioErrorEvent() : null;
+                : enviaments != null && !enviaments.isEmpty() ? enviaments.iterator().next().getUltimEvent() : null;
         var audit = new NotificacioAudit(notificacio, lastErrorEvent, tipusOperacio, metode);
         var lastAudit = notificacioAuditRepository.findLastAudit(notificacio.getId());
         if (lastAudit == null || !tipusOperacio.equals(lastAudit.getTipusOperacio()) || !audit.equals(lastAudit)) {

@@ -244,7 +244,7 @@ public abstract class NotificacioTableMapper {
         int numEnv = 1;
         StringBuilder fiReintentsError = new StringBuilder();
         for (var env : enviaments) {
-            event = env.getNotificacioErrorEvent();
+            event = env.getUltimEvent();
             if (event == null || Strings.isNullOrEmpty(event.getErrorDescripcio())) {
                 continue;
             }

@@ -706,7 +706,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			for (Long enviamentId: enviaments) {
 				enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 				enviament.refreshSirConsulta();
-				event = enviament.getNotificacioErrorEvent();
+				event = enviament.getUltimEvent();
 				if (event != null) {
 					event.setFiReintents(false);
 				}
@@ -730,7 +730,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			var df = new SimpleDateFormat(FORMAT_DATA_HORA);
 			enviamentDto.setCallbackData(callback.getData() != null ? df.format(callback.getData()) : null);
 		}
-		var event = enviament.getNotificacioErrorEvent();
+		var event = enviament.getUltimEvent();
 		if (enviament.isSirFiPooling()) {
 			enviamentDto.setFiReintents(true);
 			var msg = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + NotificacioEventTipusEnumDto.SIR_FI_POOLING);
@@ -1101,7 +1101,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			Date errorData = null;
 			String errorDescripcio = null;
 			if (enviament.isNotificaError()) {
-				var event = enviament.getNotificacioErrorEvent();
+				var event = enviament.getUltimEvent();
 				if (event != null) {
 					errorData = event.getData();
 					errorDescripcio = event.getErrorDescripcio();

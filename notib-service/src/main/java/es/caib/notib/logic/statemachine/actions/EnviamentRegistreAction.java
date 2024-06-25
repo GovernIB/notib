@@ -29,6 +29,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -92,8 +94,9 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
             var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0) + 1;
             var fiReintents = reintents >= configHelper.getMaxReintentsRegistre();
             var errorDescripcio = StringUtils.truncate("Error al enviar l'event de creació de registre de sortida. " + t.getMessage() + "\n" + ExceptionUtils.getStackTrace(t), 2000);
+            var eventInfo = NotificacioEventHelper.EventInfo.builder().enviament(enviament).error(true).errorDescripcio(errorDescripcio).fiReintents(fiReintents).build();
 
-            notificacioEventHelper.addRegistreEnviamentEvent(enviament, true, errorDescripcio, fiReintents);
+            notificacioEventHelper.addRegistreEnviamentEvent(eventInfo);
             callbackHelper.crearCallback(enviament.getNotificacio(), enviament, true, errorDescripcio);
             enviamentTableHelper.actualitzarRegistre(enviament);
         } catch (Exception ex) {

@@ -6,7 +6,6 @@ package es.caib.notib.logic.service;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
-import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
@@ -569,7 +568,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var numEnviament = 0;
 			for (var env : dto.getEnviaments()) {
 
-				eventError = enviamentsEntity.get(numEnviament).getNotificacioErrorEvent();
+				eventError = enviamentsEntity.get(numEnviament).getUltimEvent();
 				if (eventError != null && eventError.isError()) {
 					lastErrorEvent.add(eventError);
 				}
@@ -635,10 +634,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 				dto.setNotificaErrorTipus(getErrorTipus(lastErrorEvent.get(0)));
 			}
 			dto.setEnviadaDate(notificacioTableHelper.getEnviadaDate(notificacio));
-			var notificacioTableEntity = notificacioTableViewRepository.findById(id).orElse(null);
-			if (notificacioTableEntity == null) {
-				return dto;
-			}
+//			var notificacioTableEntity = notificacioTableViewRepository.findById(id).orElse(null);
+//			if (notificacioTableEntity == null) {
+//				return dto;
+//			}
 			return dto;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1360,7 +1359,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioEventEntity event;
 			for(var enviament: notificacio.getEnviaments()) {
 				enviament.refreshSirConsulta();
-				event = enviament.getNotificacioErrorEvent();
+				event = enviament.getUltimEvent();
 				if (event != null) {
 					event.setFiReintents(false);
 				}
@@ -1735,8 +1734,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (EnviamentSmEstat.NOTIFICA_ERROR.equals(enviamentSmService.getEstat(env.getUuid()))) {
 					enviamentSmService.consultaRetry(env.getUuid());
 				}
-				if (env.getNotificacioErrorEvent() != null && env.getNotificacioErrorEvent().getFiReintents()) {
-					env.getNotificacioErrorEvent().setFiReintents(false);
+				if (env.getUltimEvent() != null && env.getUltimEvent().getFiReintents()) {
+					env.getUltimEvent().setFiReintents(false);
 				}
 			}
 			// TODO VEURE PERQUE EL MÈTODE UPDATE DEL REPOSITORY NO FUNCIONA
@@ -1890,8 +1889,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 		if (enviament.isNotificaError()) {
 			try {
 				NotificacioEventEntity event = null;
-				if (enviament.getNotificacioErrorEvent() != null && enviament.getNotificacioErrorEvent().getId() != null) {
-					event = notificacioEventRepository.getOne(enviament.getNotificacioErrorEvent().getId());
+				if (enviament.getUltimEvent() != null && enviament.getUltimEvent().getId() != null) {
+					event = notificacioEventRepository.getOne(enviament.getUltimEvent().getId());
 				}
 				if (event != null) {
 					estatDto.setNotificaErrorData(event.getData());

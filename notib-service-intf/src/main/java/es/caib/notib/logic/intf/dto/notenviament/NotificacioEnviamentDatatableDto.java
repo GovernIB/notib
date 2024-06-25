@@ -4,6 +4,7 @@
 package es.caib.notib.logic.intf.dto.notenviament;
 
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.logic.intf.dto.NotificacioEventDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -45,10 +46,16 @@ public class NotificacioEnviamentDatatableDto {
 	private boolean fiReintents;
 	private String fiReintentsDesc;
 
+	private NotificacioEventDto ultimEvent;
+	private boolean ultimEventError;
 	private boolean errorLastCallback;
 	private boolean callbackFiReintents;
 	private String callbackFiReintentsDesc;
 	private String  notificacioMovilErrorDesc;
+
+	public boolean isUltimEventError() {
+		return ultimEvent != null && ultimEvent.isError();
+	}
 
 
 	public boolean isNotificacioError() {

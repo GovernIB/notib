@@ -481,7 +481,7 @@ public class ConversioTipusHelper {
 				return;
 			}
 			try {
-				NotificacioEventEntity event = notificacioEnviamentEntity.getNotificacioErrorEvent();
+				NotificacioEventEntity event = notificacioEnviamentEntity.getUltimEvent();
 				if (event == null) {
 					return;
 				}
@@ -502,8 +502,8 @@ public class ConversioTipusHelper {
 
 			dto.setEstatColor(entity.getNotificaEstat().getColor());
 			dto.setEstatIcona(entity.getNotificaEstat().getIcona());
-			var event = entity.getNotificacioErrorEvent();
-			if (event != null) {
+			var event = entity.getUltimEvent();
+			if (event != null && event.isError()) {
 				dto.setNotificacioErrorData(event.getData());
 				dto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
 				if (Boolean.TRUE.equals(event.getFiReintents())) {
@@ -535,7 +535,7 @@ public class ConversioTipusHelper {
 		public void mapAtoB(NotificacioEnviamentEntity notificacioEnviamentEntity, EnviamentInfo notificacioEnviamentDto, MappingContext context) {
 
 			if (notificacioEnviamentEntity.isNotificaError()) {
-				var event = notificacioEnviamentEntity.getNotificacioErrorEvent();
+				var event = notificacioEnviamentEntity.getUltimEvent();
 				if (event != null) {
 					notificacioEnviamentDto.setNotificacioErrorData(event.getData());
 					notificacioEnviamentDto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
@@ -552,7 +552,7 @@ public class ConversioTipusHelper {
 		@Override
 		public void mapAtoB(NotificacioEnviamentEntity notificacioEnviamentEntity, NotificacioEnviamentDtoV2 notificacioEnviamentDto, MappingContext context) {
 
-			var errorEvent = notificacioEnviamentEntity.getNotificacioErrorEvent();
+			var errorEvent = notificacioEnviamentEntity.getUltimEvent();
 			var notificacio = notificacioEnviamentEntity.getNotificacio();
 			var enviant = errorEvent == null && notificacio.getRegistreEnviamentIntent() == 0 && notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT);
 			notificacioEnviamentDto.setEnviant(enviant);

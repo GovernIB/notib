@@ -465,7 +465,7 @@ public class NotificacioHelper {
 		List<NotificacioEventEntity> eventsError = new ArrayList<>();
 		NotificacioEventEntity event;
 		for (var env : notificacio.getEnviaments()) {
-			event = env.getNotificacioErrorEvent();
+			event = env.getUltimEvent();
 			if (event != null && event.isError()) {
 				eventsError.add(event);
 			}

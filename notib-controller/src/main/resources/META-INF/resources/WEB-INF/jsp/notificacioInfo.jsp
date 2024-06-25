@@ -660,7 +660,7 @@ $(document).ready(function() {
 														(<c:choose><c:when test="${notificacio.enviamentTipus == 'NOTIFICACIO'}"><spring:message code="notificacio.list.enviament.list.finalitzat.avis.email"/></c:when><c:otherwise><spring:message code="notificacio.list.enviament.list.finalitzat.email"/></c:otherwise></c:choose>)
 													</c:if>
 												</c:if>
-												<c:if test="${enviament.notificacioError and enviament.notificaEstat != 'FINALITZADA' and enviament.notificaEstat != 'PROCESSADA'
+												<c:if test="${enviament.ultimEventError and enviament.notificaEstat != 'FINALITZADA' and enviament.notificaEstat != 'PROCESSADA'
 															and enviament.notificaEstat != 'NOTIFICADA'}">
 													<c:set var="errorTitle">
 														<c:choose>

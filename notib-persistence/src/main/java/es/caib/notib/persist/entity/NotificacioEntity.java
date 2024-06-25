@@ -288,11 +288,11 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.notificaEnviamentIntent = 0;
 	}
 	
-	public void updateNotificaNouEnviament(int reintentsPeriodeNotifica) {
+	public void updateNotificaNouEnviament() {
 		this.notificaEnviamentIntent++;
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.SECOND, (int) (((double)reintentsPeriodeNotifica/1000)*Math.pow(2, notificaEnviamentIntent)));
-		this.notificaEnviamentData = cal.getTime();
+//		Calendar cal = Calendar.getInstance();
+//		cal.add(Calendar.SECOND, (int) (((double)reintentsPeriodeNotifica/1000)*Math.pow(2, notificaEnviamentIntent)));
+//		this.notificaEnviamentData = cal.getTime();
 	}
 	
 	public void updateNotificaEnviamentData() {

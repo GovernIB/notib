@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
+import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.exception.ValidationException;
@@ -108,7 +109,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
 			log.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 			info.setCodiEntitat(notificacio.getEntitat() != null ? notificacio.getEntitat().getCodi() : null);
-			notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
+			notificacio.updateNotificaNouEnviament();
 			// Validacions
 			if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 				log.error(" [NOT] la notificació no té l'estat REGISTRADA o ENVIADA AMB ERRORS.");
@@ -117,6 +118,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			}
 			var error = false;
 			String errorDescripcio = null;
+			notificacio.updateNotificaEnviamentData();
 			try {
 				log.info(" >>> Enviant notificació...");
 				var startTime = System.nanoTime();
@@ -124,7 +126,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				var resultadoAlta = enviaNotificacio(notificacio);
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				log.info(" [TIMER-NOT] Notificació enviar (enviaNotificacio SOAP-QUERY)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
-				notificacio.updateNotificaEnviamentData();
 				var resultadoEnvios = resultadoAlta.getResultadoEnvios();
 //				if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				if ("000".equals(resultadoAlta.getCodigoRespuesta()) && resultadoEnvios != null && !resultadoEnvios.getItem().isEmpty()) {
@@ -199,7 +200,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat()) /*|| NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())*/)) {
 				notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
 			}
-			notificacioEventHelper.addNotificaEnviamentEvent(notificacio, error, errorDescripcio, fiReintents);
+			var eventInfo = NotificacioEventHelper.EventInfo.builder().notificacio(notificacio).error(error).errorDescripcio(errorDescripcio).fiReintents(fiReintents).build();
+			notificacioEventHelper.addNotificaEnviamentEvent(eventInfo);
 			callbackHelper.updateCallbacks(notificacio, error, errorDescripcio);
 			log.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 			notificacioTableHelper.actualitzarRegistre(notificacio);

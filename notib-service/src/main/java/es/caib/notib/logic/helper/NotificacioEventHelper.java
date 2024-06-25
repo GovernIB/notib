@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -98,11 +99,14 @@ public class NotificacioEventHelper {
         if (!eventInfo.isError() && event.getFiReintents() && !NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(eventInfo.getTipus())) {
             event.setFiReintents(false);
         }
+        if (eventInfo.getData() != null) {
+            event.setData(eventInfo.getData());
+        }
         eventRepository.saveAndFlush(event);
         // Actualitzar l'error de la notificació i enviament
         eventInfo.getEnviament().getNotificacio().updateEventAfegir(event);
         if (!eventNoUnic) {
-            eventInfo.getEnviament().updateNotificaError(eventInfo.isError(), eventInfo.isError() ? event : null);
+            eventInfo.getEnviament().updateNotificaError(eventInfo.isError(), event);
         }
         return event;
     }
@@ -110,10 +114,22 @@ public class NotificacioEventHelper {
     // Events de Registre
     // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    public void addRegistreEnviamentEvent(EventInfo eventInfo) {
+
+        eventInfo.setTipus(NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT);
+        addEvent(eventInfo);
+    }
+
     public void addRegistreEnviamentEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
 
         addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT).error(error)
                 .errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
+    }
+
+    public void addSirEnviamentEvent(EventInfo eventInfo) {
+
+        eventInfo.setTipus(NotificacioEventTipusEnumDto.SIR_ENVIAMENT);
+        addEvent(eventInfo);
     }
 
     public void addSirEnviamentEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
@@ -136,6 +152,19 @@ public class NotificacioEventHelper {
 
     // Events de Notifica
     // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void addNotificaEnviamentEvent(EventInfo eventInfo) {
+
+        eventInfo.setTipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT);
+        eventInfo.setData(eventInfo.getNotificacio().getNotificaEnviamentNotificaData());
+        for (var enviament: eventInfo.notificacio.getEnviaments()) {
+            if (enviament.isPerEmail()) {
+                continue;
+            }
+            eventInfo.setEnviament(enviament);
+            addEvent(eventInfo);
+        }
+    }
 
     public void addNotificaEnviamentEvent(NotificacioEntity notificacio, boolean error, String errorDescripcio, boolean errorMaxReintents) {
 
@@ -191,6 +220,8 @@ public class NotificacioEventHelper {
     @Builder
     public static class EventInfo {
 
+        Date data;
+        NotificacioEntity notificacio;
         NotificacioEnviamentEntity enviament;
         NotificacioEventTipusEnumDto tipus;
         boolean error;

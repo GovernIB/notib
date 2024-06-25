@@ -10,6 +10,7 @@ import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
+import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.AuditService;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -178,10 +180,15 @@ public class RegistreNotificaHelper {
 		}
 		params.setArbResposta(arbResposta);
 		processarRespostaAsientoRegistral(params);
+		var data = arbResposta.getRegistreData() != null ? arbResposta.getRegistreData() : new Date();
+		var eventInfo = NotificacioEventHelper.EventInfo.builder().data(data).enviament(env).error(params.isError()).errorDescripcio(params.getErrorDescripcio()).fiReintents(params.isErrorMaxReintents()).build();
+
 		if (isComSir) {
-			notificacioEventHelper.addSirEnviamentEvent(env, params.isError(), params.getErrorDescripcio(), params.isErrorMaxReintents());
+//			notificacioEventHelper.addSirEnviamentEvent(env, params.isError(), params.getErrorDescripcio(), params.isErrorMaxReintents());
+			notificacioEventHelper.addSirEnviamentEvent(eventInfo);
 		} else {
-			notificacioEventHelper.addRegistreEnviamentEvent(env, params.isError(), params.getErrorDescripcio(), params.isErrorMaxReintents());
+//			notificacioEventHelper.addRegistreEnviamentEvent(env, params.isError(), params.getErrorDescripcio(), params.isErrorMaxReintents());
+			notificacioEventHelper.addRegistreEnviamentEvent(eventInfo);
 		}
 		callbackHelper.crearCallback(not, env, params.isError(), params.getErrorDescripcio());
 	}
