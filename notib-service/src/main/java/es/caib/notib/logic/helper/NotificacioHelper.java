@@ -270,13 +270,13 @@ public class NotificacioHelper {
 		}
 		String documentGesdocId = null;
 		log.info("Processant el document " + document.getArxiuNom());
-		if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
+		if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty() && isDocumentNotProcessat(document.getArxiuNom(), documentsProcessatsMassiu)) {
 
 			log.info("Processam document gestió documental");
-			if (isDocumentNotProcessat(document.getArxiuNom(), documentsProcessatsMassiu)) {
+//			if (isDocumentNotProcessat(document.getArxiuNom(), documentsProcessatsMassiu)) {
 				documentGesdocId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, Base64.decodeBase64(document.getContingutBase64()));
 				log.info("Document creat al gestor documental amb id " + documentGesdocId);
-			}
+//			}
 		} else if (document.getUuid() != null) {
 			log.info("Processam document desde UUID");
 			if (isDocumentNotProcessat(document.getUuid(), documentsProcessatsMassiu)) {
@@ -381,7 +381,7 @@ public class NotificacioHelper {
 				return documentRepository.findById(documentsProcessatsMassiu.get(document.getCsv())).get();
 			}
 		} else if (documentsProcessatsMassiu != null && documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && documentsProcessatsMassiu.get(document.getArxiuNom()) != null ) {
-			log.info("Document amb processat massiu");
+			log.info("Obtenint document amb processat massiu ja existent ");
 			return documentRepository.findById(documentsProcessatsMassiu.get(document.getArxiuNom())).orElseThrow();
 		}
 
