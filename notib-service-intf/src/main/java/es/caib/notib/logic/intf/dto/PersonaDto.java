@@ -32,6 +32,19 @@ public class PersonaDto implements Serializable{
 	private String email;
 	private String dir3Codi;
 
+	public void setNom(String nom) {
+
+		this.nom = nom;
+		nomInput = nom;
+	}
+
+	public void setRaoSocial(String raoSocial) {
+
+		this.raoSocial = raoSocial;
+		raoSocialInput = raoSocial;
+	}
+
+
 	public void setNomInput(String nomInput) {
 		this.nomInput = nomInput;
 		this.nom = nomInput;

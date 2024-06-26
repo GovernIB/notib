@@ -657,7 +657,7 @@ public class BaseServiceTest {
 		notificacio.setEnviamentDataProgramada(new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
 		notificacio.setRetard(5);
 		notificacio.setCaducitat(new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
-		DocumentDto document = new DocumentDto();
+		var document = new es.caib.notib.logic.intf.dto.notificacio.Document();
 		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 		document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
 		document.setHash(Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha1Hex(arxiuBytes).toCharArray())));

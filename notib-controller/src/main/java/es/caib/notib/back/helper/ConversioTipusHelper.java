@@ -5,6 +5,7 @@ package es.caib.notib.back.helper;
 
 import es.caib.notib.back.command.IntegracioFiltreCommand;
 import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.logic.intf.dto.PersonaDto;
@@ -16,6 +17,7 @@ import es.caib.notib.back.command.PersonaCommand;
 import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.logic.intf.dto.notificacio.Enviament;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
@@ -105,6 +107,52 @@ public class ConversioTipusHelper {
 						var epCommand = command.getEntregaPostal() == null ? new EntregapostalCommand() : command.getEntregaPostal();
 						epCommand.setActiva(dto.getEntregaPostal() != null);
 						command.setEntregaPostal(epCommand);
+					}
+				}).register();
+
+		mapperFactory.classMap(NotificacioDtoV2.class, NotificacioCommand.class)
+				.byDefault()
+				.customize(new CustomMapper<>() {
+					@Override
+					public void mapAtoB(NotificacioDtoV2 notificacioDto, NotificacioCommand notificacioCommand, MappingContext context) {
+						// Documents
+						var documents = new DocumentCommand[5];
+						documents[0] = DocumentCommand.asCommand(notificacioDto.getDocument());
+						documents[1] = DocumentCommand.asCommand(notificacioDto.getDocument2());
+						documents[2] = DocumentCommand.asCommand(notificacioDto.getDocument3());
+						documents[3] = DocumentCommand.asCommand(notificacioDto.getDocument4());
+						documents[4] = DocumentCommand.asCommand(notificacioDto.getDocument5());
+						notificacioCommand.setDocuments(documents);
+					}
+					@Override
+					public void mapBtoA(NotificacioCommand notificacioCommand, NotificacioDtoV2 notificacioDto, MappingContext context) {
+						// Documents
+						List<Document> documents = new ArrayList<>();
+						var document = DocumentCommand.asDto(notificacioCommand.getDocuments()[0]);
+						if (document != null) {
+							documents.add(document);
+						}
+						var document2 = DocumentCommand.asDto(notificacioCommand.getDocuments()[1]);
+						if (document2 != null) {
+							documents.add(document2);
+						}
+						var document3 = DocumentCommand.asDto(notificacioCommand.getDocuments()[2]);
+						if (document3 != null) {
+							documents.add(document3);
+						}
+						var document4 = DocumentCommand.asDto(notificacioCommand.getDocuments()[3]);
+						if (document4 != null) {
+							documents.add(document4);
+						}
+						var document5 = DocumentCommand.asDto(notificacioCommand.getDocuments()[4]);
+						if (document5 != null) {
+							documents.add(document5);
+						}
+						notificacioDto.setDocument(!documents.isEmpty() ? documents.get(0) : null);
+						notificacioDto.setDocument2(documents.size() > 1 ? documents.get(1) : null);
+						notificacioDto.setDocument3(documents.size() > 2 ? documents.get(2) : null);
+						notificacioDto.setDocument4(documents.size() > 3 ? documents.get(3) : null);
+						notificacioDto.setDocument5(documents.size() > 4 ? documents.get(4) : null);
 					}
 				}).register();
 

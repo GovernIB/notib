@@ -568,7 +568,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 		dadesAnnexoTable.addCell(contingutCell);
 	}
 	
-	private void getContingutAnnexos(DocumentDto document, PdfPTable dadesAnnexoTable) {
+	private void getContingutAnnexos(es.caib.notib.logic.intf.dto.notificacio.Document document, PdfPTable dadesAnnexoTable) {
 
 //		## [CONTINGUT COLUMNES]
 		var nomCsvOUuid = "";

@@ -58,11 +58,11 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private Date notificaEnviamentNotificaData;
 	private Idioma idioma;
 
-	private DocumentDto document;
-	private DocumentDto document2;
-	private DocumentDto document3;
-	private DocumentDto document4;
-	private DocumentDto document5;
+	private Document document;
+	private Document document2;
+	private Document document3;
+	private Document document4;
+	private Document document5;
 
 	private boolean hasEnviamentsPendents;
 	private boolean justificantCreat;

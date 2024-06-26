@@ -25,7 +25,7 @@ public class Document {
     private boolean generarCsv;
     private Long mida;
     private String hash;
-
+    private String arxiuGestdocId;
     @JsonDeserialize(using = TrimStringDeserializer.class)
     private String arxiuId;
     @JsonDeserialize(using = TrimStringDeserializer.class)

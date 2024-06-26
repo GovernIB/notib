@@ -7,6 +7,7 @@ import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.back.helper.ConversioTipusHelper;
+import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.notificacio.Document;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,6 +41,12 @@ public class DocumentCommand {
 
 		return dto != null ? ConversioTipusHelper.convertir(dto, DocumentCommand.class ) : new DocumentCommand();
 	}
+
+	public static DocumentCommand asCommand(DocumentDto dto) {
+
+		return dto != null ? ConversioTipusHelper.convertir(dto, DocumentCommand.class ) : new DocumentCommand();
+	}
+
 	public static Document asDto(DocumentCommand command) {
 
 		return command == null || (
