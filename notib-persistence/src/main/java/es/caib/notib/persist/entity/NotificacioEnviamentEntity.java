@@ -619,19 +619,14 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 
 	public boolean isPendentRefrescarEstatNotifica(){
-		if (!notificaEstatFinal)
-			return !Arrays.asList(EnviamentEstat.NOTIB_PENDENT,
-					EnviamentEstat.REGISTRADA,
-					EnviamentEstat.FINALITZADA,
-					EnviamentEstat.PROCESSADA).contains(notificaEstat);
-		else {
-			return notificaEstat.equals(EnviamentEstat.EXPIRADA) && notificaCertificacioData == null;
-		}
+
+		return notificaEstatFinal ? notificaEstat.equals(EnviamentEstat.EXPIRADA) && notificaCertificacioData == null
+				: !Arrays.asList(EnviamentEstat.NOTIB_PENDENT, EnviamentEstat.REGISTRADA, EnviamentEstat.FINALITZADA, EnviamentEstat.PROCESSADA).contains(notificaEstat);
 	}
+
 	public boolean isPendentRefrescarEstatRegistre(){
 		return !notificaEstatFinal && notificaEstat.equals(EnviamentEstat.ENVIAT_SIR)
-					&& !Arrays.asList(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT,
-							NotificacioRegistreEstatEnumDto.REBUTJAT).contains(registreEstat);
+				&& !Arrays.asList(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT, NotificacioRegistreEstatEnumDto.REBUTJAT).contains(registreEstat);
 	}
 
 	@PreRemove

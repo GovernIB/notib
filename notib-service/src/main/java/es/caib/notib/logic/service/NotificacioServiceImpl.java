@@ -1335,7 +1335,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			for(var enviament: notificacio.getEnviaments()) {
 				enviament.refreshNotificaConsulta();
-				enviamentSmService.consultaRetry(enviament.getUuid());
+				enviamentSmService.consultaReset(enviament.getUuid());
 			}
 			notificacioTableHelper.actualitzarRegistre(notificacio);
 			notificacioRepository.saveAndFlush(notificacio);
@@ -1732,7 +1732,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var enviaments = notificacio.getEnviaments();
 			for (var env : enviaments) {
 				if (EnviamentSmEstat.NOTIFICA_ERROR.equals(enviamentSmService.getEstat(env.getUuid()))) {
-					enviamentSmService.consultaRetry(env.getUuid());
+					enviamentSmService.consultaReset(env.getUuid());
 				}
 				if (env.getUltimEvent() != null && env.getUltimEvent().getFiReintents()) {
 					env.getUltimEvent().setFiReintents(false);

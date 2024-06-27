@@ -470,8 +470,9 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaRetry(String enviamentUuid) {
 
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
-		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
-		sendEvent(enviamentUuid, sm, EnviamentSmEvent.CN_RETRY);
+//		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		var event = EnviamentSmEstat.NOTIFICA_SENT.equals(sm.getState().getId()) ? EnviamentSmEvent.CN_CONSULTAR : EnviamentSmEvent.CN_RETRY;
+		sendEvent(enviamentUuid, sm, event);
 		return sm;
 	}
 

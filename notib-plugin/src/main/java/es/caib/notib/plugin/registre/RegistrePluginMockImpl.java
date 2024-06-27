@@ -62,8 +62,8 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		resposta.setRegistreData(data);
 		resposta.setRegistreNumero(String.valueOf(registre[1]));
 		resposta.setRegistreNumeroFormatat(registre[1] + "/" + registre[0]);
-		resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
-//		resposta.setEstat(NotificacioRegistreEstatEnumDto.PENDENT);
+//		resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
+		resposta.setEstat(NotificacioRegistreEstatEnumDto.PENDENT);
 
 		if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR)) {
 			resposta.setSirRecepecioData(data);
@@ -85,8 +85,8 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		respostaConsultaRegistre.setRegistreNumeroFormatat(registre[1] + "/" + registre[0]);
 		respostaConsultaRegistre.setRegistreNumero(String.valueOf(registre[1]));
 		respostaConsultaRegistre.setRegistreData(data);
-		respostaConsultaRegistre.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
-//		respostaConsultaRegistre.setEstat(NotificacioRegistreEstatEnumDto.PENDENT);
+//		respostaConsultaRegistre.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
+		respostaConsultaRegistre.setEstat(NotificacioRegistreEstatEnumDto.PENDENT);
 
 		 if (respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR))
 			 respostaConsultaRegistre.setSirRecepecioData(data);
@@ -108,13 +108,9 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	}
 	
 	@Override
-	public RespostaJustificantRecepcio obtenerJustificante(
-			String codiDir3Entitat, 
-			String numeroRegistreFormatat,
-			long tipusRegistre) {
+	public RespostaJustificantRecepcio obtenerJustificante(String codiDir3Entitat, String numeroRegistreFormatat, long tipusRegistre) {
 
 		RespostaJustificantRecepcio resposta = new RespostaJustificantRecepcio();
-		
 		resposta.setJustificant(getJustificant());
 		resposta.setErrorCodi("OK");
 		return resposta;
@@ -122,9 +118,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	}
 	
 	@Override
-	public RespostaJustificantRecepcio obtenerOficioExterno(
-			String codiDir3Entitat, 
-			String numeroRegistreFormatat) {
+	public RespostaJustificantRecepcio obtenerOficioExterno(String codiDir3Entitat, String numeroRegistreFormatat) {
 		return null;
 	}
 	
@@ -238,10 +232,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	}
 	
 	@Override
-	public List<Llibre> llistarLlibres(
-			String entitat,
-			String oficina,
-			Long autoritzacio) throws RegistrePluginException {
+	public List<Llibre> llistarLlibres(String entitat, String oficina, Long autoritzacio) throws RegistrePluginException {
 		
 		List<Llibre> llibres = new ArrayList<>();
 	
@@ -287,8 +278,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	}
 	
 	@Override
-	public List<Organisme> llistarOrganismes(
-			String entitat) throws RegistrePluginException {
+	public List<Organisme> llistarOrganismes(String entitat) throws RegistrePluginException {
 		
 		List<Organisme> organismes = new ArrayList<>();
 		
