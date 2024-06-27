@@ -118,8 +118,10 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 			if (user == null && usuari.equals(codi) || (user != null && user.isRebreEmailsNotificacio() && (!user.isRebreEmailsNotificacioCreats() || user.isRebreEmailsNotificacioCreats() && usuari.equals(codi)))) {
 				var u = new UsuariDto();
 				u.setCodi(usuari);
-				u.setNom(dadesUsuari != null ? dadesUsuari.getNomSencer() : user != null && !Strings.isNullOrEmpty(user.getNomSencer()) ? user.getNomSencer() : "");
-				u.setEmail(dadesUsuari != null ? dadesUsuari.getEmail() : user != null && !Strings.isNullOrEmpty(user.getEmailAlt()) ? user.getEmailAlt() : usuari + "@caib.es");
+				var nom = user != null && !Strings.isNullOrEmpty(user.getNomSencer()) ? user.getNomSencer() : dadesUsuari != null ? dadesUsuari.getNomSencer() : "";
+				var email = user != null && !Strings.isNullOrEmpty(user.getEmailAlt()) ? user.getEmailAlt() : dadesUsuari != null ? dadesUsuari.getEmail() : usuari + "@caib.es";
+				u.setNom(nom);
+				u.setEmail(email);
 				destinataris.add(u);
 			} else {
 				info.addParam(usuari, "No té activat l'enviament per correu electrònic");
