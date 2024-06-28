@@ -1239,6 +1239,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			log.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviamentId + ")");
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+			if (!enviament.isPendentRefrescarEstatNotifica()) {
+				return null;
+			}
 			// SM
 			if (enviament.isNotificaEstatFinal()) {
 				enviamentSmService.consultaForward(enviament.getUuid());
@@ -1486,12 +1489,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public boolean enviamentRefrescarEstatSir(Long enviamentId) {
+	public Boolean enviamentRefrescarEstatSir(Long enviamentId) {
 
 		var timer = metricsHelper.iniciMetrica();
 		var totBe = false;
 		try {
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+			if (!enviament.isPendentRefrescarEstatRegistre()) {
+				return null;
+			}
 			enviament = registreHelper.enviamentRefrescarEstatRegistre(enviamentId);
 			totBe = enviament.getSirConsultaIntent() == 0;
 			if (totBe) {

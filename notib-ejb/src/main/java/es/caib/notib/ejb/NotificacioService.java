@@ -257,7 +257,7 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@PermitAll
-	public boolean enviamentRefrescarEstatSir(Long enviamentId) {
+	public Boolean enviamentRefrescarEstatSir(Long enviamentId) {
 		return getDelegateService().enviamentRefrescarEstatSir(enviamentId);
 	}
 

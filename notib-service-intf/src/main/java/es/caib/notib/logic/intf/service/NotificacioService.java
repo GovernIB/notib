@@ -340,7 +340,7 @@ public interface NotificacioService {
 	void notificacioEnviar(Long notificacioId);
 	void enviamentRefrescarEstat(Long notificacioId);
 	void enviamentRefrescarEstatRegistre(Long enviamentId);
-	boolean enviamentRefrescarEstatSir(Long enviamentId);
+	Boolean enviamentRefrescarEstatSir(Long enviamentId);
 
 	List<Long> getNotificacionsPendentsRegistrar();
 	List<Long> getNotificacionsPendentsEnviar();
