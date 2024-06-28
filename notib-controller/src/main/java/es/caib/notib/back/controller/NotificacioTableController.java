@@ -9,7 +9,6 @@ import es.caib.notib.logic.intf.dto.missatges.Missatge;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
-import es.caib.notib.logic.intf.exception.JustificantException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.*;
@@ -18,6 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -306,6 +307,13 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return serveiService.getServeisOrgan(entitatId, organCodi, organGestor, rol, permis);
     }
 
+    @MessageMapping("/hello")
+    @SendTo("/topic/greetings")
+    public String greeting(String message) throws Exception {
+        log.info("[WEBSOCKET] missatge rebut");
+        return "foo";
+    }
+
     @GetMapping(value = "/{notificacioId}/info")
     public String info(HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
 
@@ -528,6 +536,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var enviamentEstat = notificacioService.enviamentRefrescarEstat(entitatActual.getId(), enviamentId);
+        if (enviamentEstat == null) {
+            return Missatge.builder().ok(true).msg(getMessage(request, "notificacio.controller.refrescar.estat.no.refrescar")).build();
+        }
         var totbe = !enviamentEstat.isNotificaError();
         String msg = null;
         if (totbe) {
@@ -546,6 +557,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
         getEntitatActualComprovantPermisos(request);
         var totbe = notificacioService.enviamentRefrescarEstatSir(enviamentId);
+        if (totbe == null) {
+            return Missatge.builder().ok(true).msg(getMessage(request, "notificacio.controller.refrescar.estat.no.refrescar")).build();
+        }
         String msg = null;
         if (totbe) {
             msg = getMessage(request, REFRESCAR_ESTAT_OK);
