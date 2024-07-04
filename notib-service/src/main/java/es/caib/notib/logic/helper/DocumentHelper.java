@@ -10,6 +10,7 @@ import es.caib.notib.logic.intf.dto.SignatureInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.logic.utils.MimeUtils;
 import es.caib.notib.persist.entity.DocumentEntity;
+import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class DocumentHelper {
 
     private final PluginHelper pluginHelper;
     private final ConfigHelper configHelper;
+    private final DocumentRepository documentRepository;
 
     private static final OrigenEnum ORIGEN = OrigenEnum.ADMINISTRACIO;
     private static final ValidesaEnum VALIDESA = ValidesaEnum.ORIGINAL;
@@ -73,6 +75,7 @@ public class DocumentHelper {
         }
         if (!Strings.isNullOrEmpty(document.getContingutBase64())) {
             dto = getDocumentByContingut(document, utilizarMetadadesPerDefecte);
+            document.setArxiuGestdocId(dto.getArxiuGestdocId());
         }
         return dto;
     }
@@ -174,9 +177,9 @@ public class DocumentHelper {
     private DocumentValidDto getDocumentByContingut(Document document, boolean utilizarMetadadesPerDefecte) {
         var dto = new DocumentValidDto();
 
-        byte[] contingut = Base64.decodeBase64(document.getContingutBase64());
-        String mediaType = MimeUtils.getMimeTypeFromContingut(document.getArxiuNom(), contingut);
-        boolean isPdf = MediaType.APPLICATION_PDF_VALUE.equals(mediaType);
+        var contingut = Base64.decodeBase64(document.getContingutBase64());
+        var mediaType = MimeUtils.getMimeTypeFromContingut(document.getArxiuNom(), contingut);
+        var isPdf = MediaType.APPLICATION_PDF_VALUE.equals(mediaType);
         if (isPdf && isValidaFirmaRestEnabled()) {
             SignatureInfoDto signatureInfo = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, document.getArxiuNom(), mediaType);
             if (signatureInfo.isError()) {
@@ -184,7 +187,12 @@ public class DocumentHelper {
                 dto.setErrorFirmaMsg(signatureInfo.getErrorMsg());
             }
         }
-        String documentGesdocId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, contingut);
+        DocumentEntity doc = null;
+        if (document.getArxiuGestdocId() != null) {
+            doc = documentRepository.getByArxiuGestdocId(document.getArxiuGestdocId());
+
+        }
+        var documentGesdocId = doc != null ? doc.getArxiuGestdocId() : pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, contingut);
 
         dto.setArxiuNom(document.getArxiuNom());
         dto.setMediaType(mediaType);

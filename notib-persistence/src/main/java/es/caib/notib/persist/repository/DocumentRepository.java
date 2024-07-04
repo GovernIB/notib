@@ -12,4 +12,5 @@ import es.caib.notib.persist.entity.DocumentEntity;
  */
 public interface DocumentRepository extends JpaRepository<DocumentEntity, Long>  {
 
+    DocumentEntity getByArxiuGestdocId(String arxiuGestdocId);
 }

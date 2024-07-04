@@ -274,7 +274,8 @@ public class NotificacioHelper {
 
 			log.info("Processam document gestió documental");
 //			if (isDocumentNotProcessat(document.getArxiuNom(), documentsProcessatsMassiu)) {
-				documentGesdocId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, Base64.decodeBase64(document.getContingutBase64()));
+				documentGesdocId = !Strings.isNullOrEmpty(document.getArxiuGestdocId()) ? document.getArxiuGestdocId() :
+						pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, Base64.decodeBase64(document.getContingutBase64()));
 				log.info("Document creat al gestor documental amb id " + documentGesdocId);
 //			}
 		} else if (document.getUuid() != null) {
