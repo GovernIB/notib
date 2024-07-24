@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
@@ -303,6 +304,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 		log.debug("[SM] Registre retry enviament " + enviamentUuid);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		sm.getExtendedState().getVariables().put(SmConstants.CODI_USUARI, SecurityContextHolder.getContext().getAuthentication().getName());
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_RETRY);
 		return sm;
 	}
@@ -370,6 +372,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaRetry(String enviamentUuid) {
 
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		sm.getExtendedState().getVariables().put(SmConstants.CODI_USUARI, SecurityContextHolder.getContext().getAuthentication().getName());
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_RETRY);
 		return sm;
 	}

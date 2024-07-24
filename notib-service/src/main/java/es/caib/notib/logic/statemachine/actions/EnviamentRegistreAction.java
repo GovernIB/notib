@@ -26,7 +26,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -37,7 +36,6 @@ import java.util.Date;
 public class EnviamentRegistreAction implements Action<EnviamentSmEstat, EnviamentSmEvent> {
 
     private final NotificacioEnviamentRepository notificacioEnviamentRepository;
-//    private final EnviamentRegistreMapper enviamentRegistreMapper;
     private final ConfigHelper configHelper;
     private final NotificacioEventHelper notificacioEventHelper;
     private final CallbackHelper callbackHelper;
@@ -57,7 +55,8 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         NotibLogger.getInstance().info("[SM] EnviamentRegistreAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var variables = stateContext.getExtendedState().getVariables();
         var reintents = (int) variables.getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
-        var env = EnviamentRegistreRequest.builder().enviamentUuid(enviamentUuid).numIntent(reintents + 1).build();//.enviamentRegistreDto(enviamentRegistreMapper.toDto(enviament))
+        var codiUsuari = (String) variables.get(SmConstants.CODI_USUARI);
+        var env = EnviamentRegistreRequest.builder().enviamentUuid(enviamentUuid).numIntent(reintents + 1).codiUsuari(codiUsuari).build();//.enviamentRegistreDto(enviamentRegistreMapper.toDto(enviament))
         var retry = (boolean) variables.getOrDefault(SmConstants.RG_RETRY, false);
         var isRetry = EnviamentSmEvent.RG_RETRY.equals(stateContext.getMessage().getPayload()) || retry;
         NotibLogger.getInstance().info("[SM] Enviament registre acction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
@@ -70,6 +69,7 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         var delay = !isRetry ? SmConstants.delay(reintents, delayMassiu) : 0L;
         variables.put(SmConstants.RG_RETRY, false);
         variables.put(SmConstants.ENVIAMENT_DELAY, 0L);
+
         NotibLogger.getInstance().info("[SM] Enviant peticio de registre per l'enviament amb UUID " + enviamentUuid + " delay " + delay + "ms", log, LoggingTipus.STATE_MACHINE);
         jmsTemplate.convertAndSend(SmConstants.CUA_REGISTRE, env,
                 m -> {

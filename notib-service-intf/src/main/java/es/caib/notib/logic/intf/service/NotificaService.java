@@ -11,7 +11,7 @@ public interface NotificaService {
     void enviarNotifica(String enviamentUuid, EnviamentNotificaRequest enviamentNotificaRequest);
 
     @PreAuthorize("isAuthenticated()")
-    void enviarEvents(String enviamentUuid);
+    void enviarEvents(String enviamentUuid, String codiUsuari);
 
     @PreAuthorize("isAuthenticated()")
     boolean consultaEstatEnviament(ConsultaNotificaDto enviament);

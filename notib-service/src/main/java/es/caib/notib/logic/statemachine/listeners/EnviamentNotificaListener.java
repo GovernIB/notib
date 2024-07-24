@@ -8,10 +8,12 @@ import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 
@@ -27,6 +29,15 @@ public class EnviamentNotificaListener {
     private final NotificaService notificaService;
     private Semaphore semaphore = new Semaphore(5);
 
+//    @Autowired
+//    private SimpMessagingTemplate template;
+
+
+//    @Autowired
+//    public EnviamentNotificaListener(SimpMessagingTemplate template, NotificaService notificaService) {
+//        this.template = template;
+//        this.notificaService = notificaService;
+//    }
 
     @JmsListener(destination = SmConstants.CUA_NOTIFICA, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveEnviamentNotifica(@Payload EnviamentNotificaRequest enviamentNotificaRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
@@ -46,7 +57,7 @@ public class EnviamentNotificaListener {
         semaphore.acquire();
         try {
             notificaService.enviarNotifica(enviament.getUuid(), enviamentNotificaRequest);
-            notificaService.enviarEvents(enviament.getUuid());
+            notificaService.enviarEvents(enviament.getUuid(), enviamentNotificaRequest.getCodiUsuari());
         } finally {
             semaphore.release();
         }

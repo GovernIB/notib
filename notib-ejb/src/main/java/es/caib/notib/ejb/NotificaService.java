@@ -17,8 +17,8 @@ public class NotificaService extends AbstractService<es.caib.notib.logic.intf.se
     }
 
     @Override
-    public void enviarEvents(String enviamentUuid) {
-        getDelegateService().enviarEvents(enviamentUuid);
+    public void enviarEvents(String enviamentUuid, String codiUsuari) {
+        getDelegateService().enviarEvents(enviamentUuid, codiUsuari);
     }
 
     @Override

@@ -35,12 +35,14 @@ z	<%@ page language="java" contentType="text/html; charset=UTF-8"
 <script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 <script src="<c:url value="/js/webutil.modal.js"/>"></script>
 <script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/js/NotibWebSocket.js"/>"></script>
 <script src="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.min.js"/>"></script>
 <link href="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.css"/>" rel="stylesheet"></link>
 <script src="<c:url value="/js/webutil.modal.js"/>"></script>
 <script src="<c:url value="/js/jquery.fileDownload.js"/>"></script>
 <not:modalHead />
 <script type="text/javascript">
+
 $(function() {
     $(document).on("click", "a.fileDownloadSimpleRichExperience", function() {
         $.fileDownload($(this).attr('href'), {
@@ -84,30 +86,6 @@ function afegirSm() {
 
 $(document).ready(function() {
 
-	const stompClient = new StompJs.Client({brokerURL: 'ws://localhost:8080/gs-guide-websocket'});
-
-	stompClient.onConnect = (frame) => {
-		setConnected(true);
-		console.log('Connected: ' + frame);
-		stompClient.subscribe('/topic/greetings', (greeting) => {
-			showGreeting(JSON.parse(greeting.body).content);
-		});
-	};
-
-	stompClient.onWebSocketError = (error) => {
-		console.error('Error with websocket', error);
-	};
-
-	stompClient.onStompError = (frame) => {
-		console.error('Broker reported error: ' + frame.headers['message']);
-		console.error('Additional details: ' + frame.body);
-	};
-
-	stompClient.publish({
-		destination: "/app/hello",
-		body: JSON.stringify({'name': "FOO"})
-	});
-
 	let $tableEvents = $('#table-events');
 	$tableEvents.on('rowinfo.dataTable', function(e, td, rowData) {
 
@@ -138,22 +116,44 @@ $(document).ready(function() {
 	});
 
 	$('#registrar-btn').click(function() {
+
 		$('#registrar-avis-user').css('display', 'inline-block');
 	    $('#registrar-btn').attr('disabled', true);
-        window.location.href = '<not:modalUrl value="/notificacio/${notificacio.id}/registrar"/>';
-	    return false;    
+		$.ajax({
+			type: 'GET',
+			url: '<c:url value="/notificacio/${notificacio.id}/registrar"/>',
+			async: true,
+			success: resposta =>  {
+				$('#registrar-btn').attr('disabled', false);
+				$("#registrar-avis-user").remove();
+				let webSocket = new NotibWebSocket();
+				webSocket.mostrarMissatge(resposta);
+			}
+		});
+		return false;
     });	
 	
 	$('#enviar-btn').click(function() {
 		$('#enviar-avis-user').css('display', 'inline-block');
 	    $('#enviar-btn').attr('disabled', true);
-        window.location.href = '<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>';
-	    return false;    
-    });
-	
+        <%--window.location.href = '<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>';--%>
+		$.ajax({
+			type: 'GET',
+			url: '<c:url value="/notificacio/${notificacio.id}/enviar"/>',
+			async: true,
+			success: resposta =>  {
+	    		$('#enviar-btn').attr('disabled', false);
+				$("#enviar-avis-user").remove();
+				let webSocket = new NotibWebSocket();
+				webSocket.mostrarMissatge(resposta);
+			}
+		});
+		return false;
+	});
+
 });
 </script>
-<style type="text/css">
+	<style type="text/css">
 .modal-backdrop {
     visibility: hidden !important;
 }
@@ -716,75 +716,75 @@ $(document).ready(function() {
 							    			<th><spring:message code="enviament.info.seccio.notifica.registre"/></th>
 							    			<c:choose>
 							    				<c:when test="${not empty enviament.registreNumeroFormatat}">
-													<td>
-													<table class="table table-striped" style="width:100%">
-														<tbody>
-															<tr>
-																<td><strong><spring:message code="enviament.info.seu.registre.num"/></strong></td>
-																<td>${enviament.registreNumeroFormatat}</td>
-															</tr>
-															<tr>
-																<td><strong><spring:message code="enviament.info.seu.registre.data"/></strong></td>
-																<td><fmt:formatDate value="${enviament.registreData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-															</tr>
-															<c:if test="${not empty enviament.registreEstat}">
+													<td id="${enviament.registreNumeroFormatat}">
+														<table class="table table-striped" style="width:100%">
+															<tbody>
 																<tr>
-																	<td><strong><spring:message code="enviament.info.seu.registre.estat"/></strong></td>
-																	<td><spring:message code="es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto.${enviament.registreEstat}"/></td>
+																	<td><strong><spring:message code="enviament.info.seu.registre.num"/></strong></td>
+																	<td>${enviament.registreNumeroFormatat}</td>
 																</tr>
-															</c:if>
-															<c:if test="${not empty enviament.sirRecepcioData}">
 																<tr>
-																	<td><strong><spring:message code="enviament.info.seu.registre.data.sir.recepcio"/></strong></td>
-																	<td><fmt:formatDate value="${enviament.sirRecepcioData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+																	<td><strong><spring:message code="enviament.info.seu.registre.data"/></strong></td>
+																	<td><fmt:formatDate value="${enviament.registreData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 																</tr>
-															</c:if>
-															<c:if test="${not empty enviament.sirRegDestiData}">
-																<tr>
-																	<td><strong><spring:message code="enviament.info.seu.registre.data.sir.desti"/></strong></td>
-																	<td><fmt:formatDate value="${enviament.sirRegDestiData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-																</tr>
-															</c:if>
-															<c:if test="${(isRolActualAdministradorEntitat || isRolActualAdministradorOrgan) && (not empty notificacio.registreOficinaNom || not empty notificacio.registreLlibreNom)}">
-																<c:if test="${not empty notificacio.registreOficinaNom}">
+																<c:if test="${not empty enviament.registreEstat}">
 																	<tr>
-																		<td width="30%">
-																			<strong><spring:message code="notificacio.info.seccio.llocregistre.camp.oficina" /></strong>
-																		</td>
-																		<td>${notificacio.registreOficinaNom}</td>
+																		<td><strong><spring:message code="enviament.info.seu.registre.estat"/></strong></td>
+																		<td><spring:message code="es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto.${enviament.registreEstat}"/></td>
 																	</tr>
 																</c:if>
-																<c:if test="${not empty notificacio.registreLlibreNom}">
+																<c:if test="${not empty enviament.sirRecepcioData}">
 																	<tr>
-																		<td width="30%">
-																			<strong><spring:message code="notificacio.info.seccio.llocregistre.camp.llibre" /></strong>
-																		</td>
-																		<td>${notificacio.registreLlibreNom}</td>
+																		<td><strong><spring:message code="enviament.info.seu.registre.data.sir.recepcio"/></strong></td>
+																		<td><fmt:formatDate value="${enviament.sirRecepcioData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 																	</tr>
 																</c:if>
-															</c:if>
-															<%-- Assentament registral o Registre normal (versió anterior) --%>
+																<c:if test="${not empty enviament.sirRegDestiData}">
+																	<tr>
+																		<td><strong><spring:message code="enviament.info.seu.registre.data.sir.desti"/></strong></td>
+																		<td><fmt:formatDate value="${enviament.sirRegDestiData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+																	</tr>
+																</c:if>
+																<c:if test="${(isRolActualAdministradorEntitat || isRolActualAdministradorOrgan) && (not empty notificacio.registreOficinaNom || not empty notificacio.registreLlibreNom)}">
+																	<c:if test="${not empty notificacio.registreOficinaNom}">
+																		<tr>
+																			<td width="30%">
+																				<strong><spring:message code="notificacio.info.seccio.llocregistre.camp.oficina" /></strong>
+																			</td>
+																			<td>${notificacio.registreOficinaNom}</td>
+																		</tr>
+																	</c:if>
+																	<c:if test="${not empty notificacio.registreLlibreNom}">
+																		<tr>
+																			<td width="30%">
+																				<strong><spring:message code="notificacio.info.seccio.llocregistre.camp.llibre" /></strong>
+																			</td>
+																			<td>${notificacio.registreLlibreNom}</td>
+																		</tr>
+																	</c:if>
+																</c:if>
+																<%-- Assentament registral o Registre normal (versió anterior) --%>
 
-															<c:if test="${(notificacio.enviamentTipus == 'COMUNICACIO' || notificacio.enviamentTipus == 'SIR') && enviament.titular.interessatTipus == 'ADMINISTRACIO'}">
-															<c:if test="${(not empty enviament.registreEstat && (enviament.registreEstat == 'DISTRIBUIT' || enviament.registreEstat == 'VALID' || enviament.registreEstat == 'OFICI_EXTERN'  || enviament.registreEstat == 'OFICI_SIR')) || (empty enviament.registreEstat && not empty enviament.registreNumeroFormatat)}">
-																<tr>
-																	<td><strong><spring:message code="enviament.info.seu.registre.justificant"/></strong></td>
-																	<td>
-																	<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/justificantDescarregar"/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience">
-																		<spring:message code="enviament.info.accio.descarregar.justificant"/>
-																		<span class="fa fa-download"></span>
-																	</a>
-																	</td>
-																<tr>
-															</c:if>
-															</c:if>
+																<c:if test="${(notificacio.enviamentTipus == 'COMUNICACIO' || notificacio.enviamentTipus == 'SIR') && enviament.titular.interessatTipus == 'ADMINISTRACIO'}">
+																<c:if test="${(not empty enviament.registreEstat && (enviament.registreEstat == 'DISTRIBUIT' || enviament.registreEstat == 'VALID' || enviament.registreEstat == 'OFICI_EXTERN'  || enviament.registreEstat == 'OFICI_SIR')) || (empty enviament.registreEstat && not empty enviament.registreNumeroFormatat)}">
+																	<tr>
+																		<td><strong><spring:message code="enviament.info.seu.registre.justificant"/></strong></td>
+																		<td>
+																		<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/justificantDescarregar"/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience">
+																			<spring:message code="enviament.info.accio.descarregar.justificant"/>
+																			<span class="fa fa-download"></span>
+																		</a>
+																		</td>
+																	<tr>
+																</c:if>
+																</c:if>
 
-														</tbody>
-													</table>
+															</tbody>
+														</table>
 													</td>
 							    				</c:when>
 							    				<c:otherwise>
-							    					<td><spring:message code="notificacio.list.enviament.list.noregistrat"/></td>
+							    					<td id="${enviament.id}-noregistrat" ><spring:message code="notificacio.list.enviament.list.noregistrat"/></td>
 							    				</c:otherwise>
 							    			</c:choose>
 							    		</tr>
@@ -998,10 +998,11 @@ $(document).ready(function() {
 								<strong><spring:message code="notificacio.info.accio.enviar" /></strong>
 							</div>
 							<div class="col-sm-6 text-right">
-								<a id="enviar-btn" href="<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>"
+								<button id="enviar-btn"
+<%--								   href="<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>"--%>
 									class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
 									<spring:message code="notificacio.info.accio.enviar.boto" />
-								</a>
+								</button>
 							</div>
 						</div>
 					</li>
@@ -1145,7 +1146,8 @@ $(document).ready(function() {
 		</c:if>
 	</div>
 	<div id="modal-botons" class="text-right">
-		<a href="<c:url value="/notificacio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar" /></a>
+<%--		<a href="<c:url value="/notificacio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar" /></a>--%>
+		<button class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar" /></button>
 	</div>
 </body>
 </html>

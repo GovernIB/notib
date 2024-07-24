@@ -11,8 +11,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Getter
 @Setter
-public class Missatge {
+public class MissatgeWs extends Missatge {
 
-    private boolean ok;
-    private String msg;
+    private String codiUsuari;
+    private boolean updateInfo;
+    private Long notificacioId;
 }

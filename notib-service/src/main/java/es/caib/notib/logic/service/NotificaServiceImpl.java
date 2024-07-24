@@ -1,5 +1,7 @@
 package es.caib.notib.logic.service;
 
+import es.caib.notib.logic.helper.MessageHelper;
+import es.caib.notib.logic.intf.dto.missatges.MissatgeWs;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificaService;
@@ -7,6 +9,7 @@ import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentNotificaRequest;
+import es.caib.notib.logic.websocket.WebSocketJms;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +29,8 @@ public class NotificaServiceImpl implements NotificaService {
     private final EnviamentSmService enviamentSmService;
     private final NotificacioEnviamentRepository notificacioEnviamentRepository;
     private final NotificacioService notificacioService;
-
+    private final WebSocketJms webSocketJms;
+    private final MessageHelper messageHelper;
 
     private static Map<Long, Integer> notificacionsExecutades = new HashMap<>();
     public static synchronized boolean haDeExecutar(Long notificacioId, Integer intent) {
@@ -68,14 +72,20 @@ public class NotificaServiceImpl implements NotificaService {
 
     @Transactional
     @Override
-    public void enviarEvents(String enviamentUuid) {
+    public void enviarEvents(String enviamentUuid, String codiUsuari) {
 
         try {
-            var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
-            var notificacio = enviamentEntity.getNotificacio();
-            for (var env : notificacio.getEnviaments()) {
+//            var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
+            var env = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
+//            var notificacio = enviamentEntity.getNotificacio();
+            var notificacio = env.getNotificacio();
+//            for (var env : notificacio.getEnviaments()) {
+//                var enviamentSuccess = enviamentEntity.getNotificaEstatData() != null;
                 var enviamentSuccess = env.getNotificaEstatData() != null;
                 var event = enviamentSuccess ? EnviamentSmEvent.NT_SUCCESS : EnviamentSmEvent.NT_ERROR;
+
+                var ok = true;
+                var msg = "";
                 switch (event) {
                     case NT_SUCCESS:
                         if (env.isPerEmail()) {
@@ -83,12 +93,17 @@ public class NotificaServiceImpl implements NotificaService {
                         } else {
                             enviamentSmService.notificaSuccess(env.getNotificaReferencia());
                         }
+                        msg = "enviament.notifica.ok";
                         break;
                     case NT_ERROR:
                         enviamentSmService.notificaFailed(env.getNotificaReferencia());
+                        msg = "enviament.notifica.error";
+                        ok = false;
                         break;
                 }
-            }
+                msg = messageHelper.getMessage(msg);
+                webSocketJms.enviarMissatge(MissatgeWs.builder().ok(ok).msg(msg).updateInfo(true).codiUsuari(codiUsuari).build());
+//            }
 
             if (NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()) ||
                     NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat()) ||

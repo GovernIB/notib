@@ -18,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -91,10 +93,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private static final String SELECCIO_BUIDA = "accio.massiva.seleccio.buida";
     private static final String PERMIS_DENGAT = "Permís denegat";
 
-
     public NotificacioTableController() {
         super.sessionAttributeSeleccio = SESSION_ATTRIBUTE_SELECCIO;
     }
+
 
     protected List<Long> getIdsElementsFiltrats(HttpServletRequest request) throws ParseException {
 
@@ -413,31 +415,27 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     }
 
     @GetMapping(value = "/{notificacioId}/enviar")
-    public String enviar(HttpServletRequest request, @PathVariable Long notificacioId, Model model) {
+    @ResponseBody
+    public Missatge enviar(HttpServletRequest request, @PathVariable Long notificacioId, Model model) {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
-        var enviada = notificacioService.enviarNotificacioANotifica(notificacioId, true);
+        var ok = notificacioService.enviarNotificacioANotifica(notificacioId, true);
         emplenarModelNotificacioInfo(entitatActual, notificacioId, request,ACCIONS, model);
         model.addAttribute(PESTANYA_ACTIVA, ACCIONS);
-        if (enviada) {
-            return getAjaxControllerReturnValueSuccess(request, NOT_INFO, "notificacio.controller.enviament.ok");
-        }
-        return getAjaxControllerReturnValueError(request, NOT_INFO, "notificacio.controller.enviament.error");
+        var msg = getMessage(request, ok ? "notificacio.controller.accio.enviada.ok" : "notificacio.controller.accio.enviada.error");
+        return Missatge.builder().ok(ok).msg(msg).build();
     }
 
     @GetMapping(value = "/{notificacioId}/registrar")
-    public String registrar(HttpServletRequest request, @PathVariable Long notificacioId, Model model) throws RegistreNotificaException {
+    @ResponseBody
+    public Missatge registrar(HttpServletRequest request, @PathVariable Long notificacioId, Model model) throws RegistreNotificaException {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         RespostaAccio<String> resposta = notificacioService.enviarNotificacioARegistre(notificacioId, true);
         emplenarModelNotificacioInfo(entitatActual, notificacioId, request,ACCIONS, model);
-        if (resposta.isEmpty() || !resposta.getErrors().isEmpty()) {
-            MissatgesHelper.error(request, getMessage(request, "notificacio.controller.registrar.error"));
-            return NOT_INFO;
-        }
-        resposta.getExecutades().forEach(e -> MissatgesHelper.success(request, "(" + e + ")" + getMessage(request,"notificacio.controller.registrar.ok")));
-        model.addAttribute(PESTANYA_ACTIVA, ACCIONS);
-        return NOT_INFO;
+        var ok = !resposta.isEmpty() && resposta.getErrors().isEmpty();
+        var msg = getMessage(request, ok ? "notificacio.controller.registrar.ok" : "notificacio.controller.registrar.error");
+        return Missatge.builder().ok(ok).msg(msg).build();
     }
 
     @GetMapping(value = "/{notificacioId}/reactivarconsulta")

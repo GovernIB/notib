@@ -62,7 +62,8 @@ public class EnviamentNotificaAction implements Action<EnviamentSmEstat, Enviame
             NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada degut a que no tots els enviaments estan registrats - enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
             return;
         }
-        var env = EnviamentNotificaRequest.builder().enviamentNotificaDto(enviamentNotificaMapper.toDto(enviament)).numIntent(reintents + 1).build();
+        var codiUsuari = (String) variables.get(SmConstants.CODI_USUARI);
+        var env = EnviamentNotificaRequest.builder().enviamentNotificaDto(enviamentNotificaMapper.toDto(enviament)).numIntent(reintents + 1).codiUsuari(codiUsuari).build();
         var retry = (boolean) variables.getOrDefault(SmConstants.NT_RETRY, false);
         var isRetry = EnviamentSmEvent.NT_RETRY.equals(stateContext.getMessage().getPayload()) || retry;
         variables.put(SmConstants.RG_RETRY, false);

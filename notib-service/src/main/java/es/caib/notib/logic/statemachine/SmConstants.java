@@ -8,6 +8,8 @@ public class SmConstants {
 
     public static final String JMS_FACTORY_ACK = "jmsFactory";
 
+    public static final String CODI_USUARI = "codiUsuari";
+
     // HEADER
     public static final String ENVIAMENT_UUID_HEADER = "h_enviament_uuid";
 
