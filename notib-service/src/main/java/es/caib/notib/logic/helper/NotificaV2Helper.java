@@ -97,8 +97,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Autowired
 	private EnviamentTableHelper enviamentTableHelper;
 
-	private final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
+	private static final String NOTIB = "Notib";
 
 	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
 
@@ -186,7 +185,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					integracioHelper.addAccioOk(info);
 				} else {
 					error = true;
-					errorDescripcio = "Error retornat per Notifica: [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
+					var errorNotib = NOTIB.equals(resultadoAlta.getDescripcionRespuesta());
+					var origenError = !errorNotib ? "Error retornat per Notifica: " : "Error retornat per Notib: ";
+					errorDescripcio = origenError + " [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
 					log.info(" >>> ... ERROR: " + errorDescripcio);
 					integracioHelper.addAccioError(info, errorDescripcio);
 				}
@@ -442,7 +443,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			return resultat;
 		} catch (Exception ex) {
 			var resultat = new ResultadoAltaRemesaEnvios();
-			resultat.setCodigoRespuesta("Notib");
+			resultat.setCodigoRespuesta(NOTIB);
 			resultat.setDescripcionRespuesta("Error generant els enviaments " + ex.getMessage());
 			return resultat;
 		}
