@@ -8,9 +8,7 @@ class NotibWebSocket {
     frameHandler(frame) {
 
         console.log('Connecting: ' + frame);
-        // this.stompClient.subscribe('/topic/messages', message => this.showMessage(message.body));
         this.stompClient.subscribe('/user/notibws/missatge', message => this.processarResposta(message.body));
-        // this.stompClient.subscribe("/notibws/notificacio/info", info => this.updateNotInfo(info.body));
     }
 
     onSocketClose = () => {
@@ -35,17 +33,6 @@ class NotibWebSocket {
             stompClient.deactivate();
         }
         console.log("Disconnected");
-    };
-
-    sendMessage(msg){
-        this.stompClient.publish({
-            destination:"/notibback/send",
-            body : msg
-            // body: JSON.stringify({
-            // 	'from': 'foo',
-            // 	'message': 'bar'
-            // })
-        });
     };
 
     processarResposta(resposta) {
@@ -80,8 +67,6 @@ class NotibWebSocket {
     }
 
     updateNotInfo(info) {
-
-        console.log(info);
         frames[frames.length-1].window.location.reload();
     }
 }
