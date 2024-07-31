@@ -797,7 +797,7 @@
         data-row-info="true"
 <%--        data-filter="#form-filtre"--%>
         data-save-state="true"
-        data-mantenir-paginacio="true"
+        data-mantenir-paginacio="false"
         data-paging-style-x="true"
         data-rowhref-template="#rowhrefTemplate"
         data-botons-template="#botonsTemplate"
