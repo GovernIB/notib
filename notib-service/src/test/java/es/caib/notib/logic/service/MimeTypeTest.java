@@ -1,7 +1,7 @@
 package es.caib.notib.logic.service;
 
 import es.caib.notib.logic.intf.dto.mime.MimeType;
-import es.caib.notib.logic.utils.MimeUtils;
+import es.caib.notib.logic.intf.util.MimeUtils;
 import joptsimple.internal.Strings;
 import org.apache.tika.Tika;
 import org.junit.Before;

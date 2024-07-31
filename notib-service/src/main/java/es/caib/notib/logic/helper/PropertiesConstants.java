@@ -50,4 +50,7 @@ public class PropertiesConstants {
     public static final String CODI_ENTORN = "es.caib.notib.codi.entorn";
 
     public static final String SCHEDULLED_MULTITHREAD = "es.caib.notib.multithread";
+
+    public static final String COMPRIMIR_DOCUMENTS_ANTICS = "es.caib.notib.comprimir.documents.antics.periode";
+    public static final String COMPRIMIR_DOCUMENTS_ANTICS_LLINDAR = "es.caib.notib.plugin.gesdoc.document.llindar.dies.comprimir";
 }

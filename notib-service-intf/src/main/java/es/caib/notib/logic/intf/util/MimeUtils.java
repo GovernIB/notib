@@ -1,10 +1,8 @@
-package es.caib.notib.logic.utils;
+package es.caib.notib.logic.intf.util;
 
-import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import es.caib.notib.logic.intf.dto.mime.Mimes;
 import es.caib.notib.logic.intf.dto.notificacio.Document;
-import es.caib.notib.logic.intf.util.FitxerUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.tika.Tika;

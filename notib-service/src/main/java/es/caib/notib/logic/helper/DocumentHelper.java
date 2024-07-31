@@ -8,7 +8,7 @@ import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.DocumentValidDto;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.Document;
-import es.caib.notib.logic.utils.MimeUtils;
+import es.caib.notib.logic.intf.util.MimeUtils;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.plugins.arxiu.api.DocumentContingut;

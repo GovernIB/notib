@@ -45,6 +45,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private static String ACTUAL_ESTAT_ORGANS_DEFCRON = "0 00 3 * * *";
     private static String REFRESCAR_NOT_EXPIR_DEFCRON = "0 30 3 * * *";
     private static String MONITOR_BUIDA_DADES_DEFCRON = "0 30 4 * * *";
+    private static String COMPRIMIR_DOCUMENTS_ANTICS_DEFCRON = "0 0 0 * * *";
 
     private static Integer CALLBACK_CLIENT = 0;
     private static Integer CERT_DEH = 1;
@@ -187,13 +188,19 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 PropertiesConstants.ACTUALITZAR_ESTAT_ORGANS,
                 ACTUAL_ESTAT_ORGANS_DEFCRON);
 
+        // 10. Comprimeix els documents antics del sistema de fitxers
+        ////////////////////////////////////////////////////////////////////////
+        registerCronTask(
+                "comprimirDocumentsAntics",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().comprimirDocumentsAntics(),
+                PropertiesConstants.COMPRIMIR_DOCUMENTS_ANTICS,
+                COMPRIMIR_DOCUMENTS_ANTICS_DEFCRON);
+
     }
 
-    private <T> void registerCronTask(String taskName,
-                                      Supplier<T> supplier,
-                                      Consumer<Supplier<T>> method,
-                                      String cronConfig,
-                                      String defualtCron) {
+    private <T> void registerCronTask(String taskName, Supplier<T> supplier, Consumer<Supplier<T>> method, String cronConfig, String defualtCron) {
+
         monitorTasquesService.addTasca(taskName);
         taskRegistrar.addTriggerTask(
                 () -> executeSchedulledMethod(supplier, method, taskName),
@@ -217,6 +224,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                                           Integer operation,
                                           String delayConfig,
                                           Long defaultDelay) {
+
         monitorTasquesService.addTasca(taskName);
         taskRegistrar.addTriggerTask(
                 () -> executeSchedulledMethod(supplier, method, taskName),

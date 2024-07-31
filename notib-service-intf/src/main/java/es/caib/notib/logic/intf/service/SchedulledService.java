@@ -48,4 +48,8 @@ public interface SchedulledService {
 
 	void actualitzarEstatOrgansEnviamentTable();
 
+	/**
+	 * Mètode d'execució periòdica per comprimir els documents guardats al sistema de fitxers
+	 */
+	void comprimirDocumentsAntics();
 }

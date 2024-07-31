@@ -1,19 +1,22 @@
 package es.caib.notib.plugin.gesdoc;
 
 import es.caib.notib.logic.intf.util.FitxerUtils;
+import es.caib.notib.logic.intf.util.MimeUtils;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+import java.util.zip.ZipFile;
 
 /**
  * Implementació del plugin de gestió documental que emmagatzema els arxius
@@ -105,12 +108,35 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 				throw new SistemaExternException(ARXIU_NO_TROBAT + id + ")");
 			}
 			try (var contingutIn = new FileInputStream(fContent)) {
-				IOUtils.copy(contingutIn, contingutOut);
+				var output = new ByteArrayOutputStream();
+				IOUtils.copy(contingutIn, output);
+				var mime = MimeUtils.getMimeTypeFromContingut(fContent.getName(), output.toByteArray());
+				output.close();
+				var contingut = "application/zip".equals(mime) ? getOutputStreamFromDocumentComprimit(fContent) : output;
+				InputStream is = new ByteArrayInputStream(contingut.toByteArray());
+				IOUtils.copy(is, contingutOut);
+				is.close();
 			}
 		} catch (Exception ex) {
 			throw new SistemaExternException("No s'ha pogut llegir l'arxiu (id=" + id + ")", ex);
 		}
 	}
+
+	private ByteArrayOutputStream getOutputStreamFromDocumentComprimit(File fitxer) {
+
+	try {
+		var zip = new ZipFile(fitxer);
+		var entry = zip.entries().nextElement();
+		var output = new ByteArrayOutputStream();
+		IOUtils.copy(zip.getInputStream(entry), output);
+		zip.close();
+		return output;
+	} catch (Exception e) {
+		log.debug("S'ha produït un error a l'llegir el fitxer ZIP.", e);
+		return new ByteArrayOutputStream();
+	}
+	}
+
 	private File getFile(String agrupacio, String id) {
 
 		agrupacio = checkAgrupacio(agrupacio);

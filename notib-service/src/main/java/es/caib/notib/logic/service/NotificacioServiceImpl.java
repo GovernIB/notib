@@ -672,6 +672,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var f = notificacioListHelper.getFiltre(filtre, entitatId, rol, usuariCodi, rols);
 			f.setDataFi(DatesUtils.incrementarDataFi(f.getDataFi()));
 			var notificacions = notificacioTableViewRepository.findAmbFiltre(f, pageable);
+			if (notificacions.getTotalPages() < paginacioParams.getPaginaNum()) {
+				paginacioParams.setPaginaNum(0);
+				pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
+				notificacions = notificacioTableViewRepository.findAmbFiltre(f, pageable);
+			}
 			var dtos = notificacioTableMapper.toNotificacionsTableItemDto(
 					notificacions.getContent(),
 					notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitatId, usuariCodi),

@@ -13,6 +13,7 @@ import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.monitor.MonitorIntegracioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +25,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Principal;
@@ -298,6 +301,51 @@ public class SchedulledServiceImpl implements SchedulledService {
 			}
 		}
 	}
+
+	@Override
+	public void comprimirDocumentsAntics() {
+
+		log.info("Inici tasca comprimir documents antics");
+		var llindar = -configHelper.getConfigAsInteger(PropertiesConstants.COMPRIMIR_DOCUMENTS_ANTICS_LLINDAR);
+		var ara = Calendar.getInstance().getTime();
+		var dataLlindar = DateUtils.addDays(ara, llindar);
+		var directori = getBaseDir("notificacions");
+		try (var filePathStream = Files.walk(Paths.get(directori), 2)) {
+			filePathStream.forEach(filePath -> {
+				var file = filePath.toFile();
+				if (file.isDirectory()) {
+					return;
+				}
+				try {
+					var lastModified = new Date(file.lastModified());
+					var proc = Runtime.getRuntime().exec("file " + filePath);
+					var stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+					String s = null;
+					String output = "";
+					while ((s = stdInput.readLine()) != null) {
+						output = s;
+					}
+					if (lastModified.after(dataLlindar) || output.contains("Zip")) {
+						return;
+					}
+					var comanda = "zip -j " + filePath + ".zip " + filePath;
+					proc = Runtime.getRuntime().exec(comanda);
+					proc.waitFor();
+					comanda = "rm " + filePath;
+					proc = Runtime.getRuntime().exec(comanda);
+					proc.waitFor();
+					comanda = "mv " + filePath + ".zip " + filePath;
+					proc = Runtime.getRuntime().exec(comanda);
+					proc.waitFor();
+				} catch (Exception e) {
+					System.out.println("Error executant la commanda" + e);
+				}
+			});
+		} catch (Exception ex) {
+			log.error("Error comprimint els documents antics", ex);
+		}
+		log.info("Els documents antics s'han comprimit correctament");
+    }
 
 	private void esborrarTemporals(String dir) throws Exception {
 
