@@ -10,4 +10,6 @@ databaseChangeLog:
           SELECT nne2.id FROM NOT_NOTIFICACIO_EVENT nne2 WHERE env.id = nne2.NOTIFICACIO_ENV_ID  AND nne2.\"DATA\" =
             (SELECT max(nne.\"DATA\") FROM NOT_NOTIFICACIO_EVENT nne WHERE nne.NOTIFICACIO_ENV_ID = env.id AND nne.TIPUS != 8 and nne.TIPUS != 9))
         WHERE env.CREATEDDATE > TO_DATE('25/03/2024', 'dd/MM/yyyy');
+        UPDATE NOT_NOTIFICACIO_TABLE n SET ENVIADA_DATE = (SELECT MAX(DATA) FROM NOT_NOTIFICACIO_EVENT nne WHERE nne.NOTIFICACIO_ID = n.id AND nne.TIPUS != 8 and nne.TIPUS != 9)
+        WHERE n.CREATEDDATE > TO_DATE('25/03/2024', 'dd/MM/yyyy');
   "
