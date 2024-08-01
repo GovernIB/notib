@@ -1,6 +1,7 @@
 package es.caib.notib.logic.service.ws;
 
 import com.google.common.base.Strings;
+import com.itextpdf.text.pdf.codec.Base64;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.CacheHelper;
@@ -17,6 +18,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.util.MimeUtils;
 import es.caib.notib.logic.intf.util.NifHelper;
+import es.caib.notib.logic.intf.util.PdfUtils;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.GrupEntity;
@@ -87,6 +89,7 @@ public class NotificacioValidator implements Validator {
     @Setter
     private boolean massiva;
 
+    private boolean cieActiu;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -113,8 +116,8 @@ public class NotificacioValidator implements Validator {
         validateOrgan();
         validateDadesBasiquesNotificacio();
         validateUsuari();
-        validateDocuments();
         validateEnviaments();
+        validateDocuments();
     }
 
     private void validateEntitat() {
@@ -414,9 +417,7 @@ public class NotificacioValidator implements Validator {
         } else if (document.getArxiuNom().length() > 200) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_NOM_SIZE, l, prefix));
         }
-        if (Strings.isNullOrEmpty(document.getContingutBase64()) &&
-                Strings.isNullOrEmpty(document.getCsv()) &&
-                Strings.isNullOrEmpty(document.getUuid())) {
+        if (Strings.isNullOrEmpty(document.getContingutBase64()) && Strings.isNullOrEmpty(document.getCsv()) && Strings.isNullOrEmpty(document.getUuid())) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_SOURCE_NULL, l, prefix));
         }
         // Limitar que només s'empleni un dels camps
@@ -429,11 +430,9 @@ public class NotificacioValidator implements Validator {
         }
         // Format (Mime)
         if (!Strings.isNullOrEmpty(dto.getMediaType()) && !documentMimeValid(enviamentTipus, dto.getMediaType())) {
-            if (EnviamentTipus.SIR.equals(enviamentTipus)) {
-                errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_FORMAT_SIR_INVALID, l, prefix));
-            } else {
-                errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_FORMAT_INVALID, l, prefix));
-            }
+            var errorTipus = cieActiu ? DOCUMENT_FORMAT_CIE_INVALID : EnviamentTipus.SIR.equals(enviamentTipus)
+                                ? DOCUMENT_FORMAT_SIR_INVALID : DOCUMENT_FORMAT_INVALID;
+            errors.rejectValue(doc + ".arxiuNom", error(errorTipus, l, prefix));
         }
         if (dto.isErrorFitxer()) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_ERROR_OBTENINT, l, prefix));
@@ -443,6 +442,10 @@ public class NotificacioValidator implements Validator {
         }
         if (dto.isErrorFirma()) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_ERROR_VALIDANT_FIRMA, l, prefix));
+        }
+
+        if (cieActiu) {
+            validarDocumentCIE(document, errors);
         }
         // Metadades
         if (Strings.isNullOrEmpty(document.getContingutBase64())) {
@@ -463,6 +466,13 @@ public class NotificacioValidator implements Validator {
         }
     }
 
+    public void validarDocumentCIE(Document document, Errors errors) {
+
+        var pdf = new PdfUtils(document);
+        var bytes = Base64.decode(document.getContingutBase64());
+
+    }
+
     private void validateEnviaments() {
 
         var enviaments = notificacio.getEnviaments();
@@ -476,7 +486,7 @@ public class NotificacioValidator implements Validator {
                 || procediment != null && procediment.getEntregaCie() != null;
         boolean entregaDehActiva = entitat != null && entitat.isAmbEntregaDeh();
         var enviamentTipus = notificacio.getEnviamentTipus();
-        var cieActiu = false;
+        cieActiu = false;
         Enviament env;
         for (var i=0; i<enviaments.size(); i++) {
             env = enviaments.get(i);
@@ -877,7 +887,8 @@ public class NotificacioValidator implements Validator {
     }
 
     private boolean documentMimeValid(EnviamentTipus enviamentTipus, String mime) {
-        return EnviamentTipus.SIR.equals(enviamentTipus) ? MimeUtils.isMimeValidSIR(mime) : MimeUtils.isMimeValidNoSIR(mime);
+        return EnviamentTipus.SIR.equals(enviamentTipus) ? MimeUtils.isMimeValidSIR(mime)
+                : cieActiu ? MimeUtils.isMimeValidCIE(mime) : MimeUtils.isMimeValidNoSIR(mime);
     }
 
     private Set<Character> validFormat(String value) {

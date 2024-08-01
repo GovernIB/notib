@@ -42,6 +42,7 @@ public class ValidacioErrorCodes {
     public static final int DOCUMENT_SOURCE_NULL = 1073;
     public static final int DOCUMENT_SOURCE_MULTIPLE = 1074;
     public static final int DOCUMENT_FORMAT_INVALID = 1075;
+    public static final int DOCUMENT_FORMAT_CIE_INVALID = 10755;
     public static final int DOCUMENT_FORMAT_SIR_INVALID = 1076;
     public static final int DOCUMENT_ERROR_OBTENINT = 1077;
     public static final int DOCUMENT_ERROR_OBTENINT_METADADES = 1078;

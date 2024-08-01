@@ -82,7 +82,12 @@ public class MimeUtils {
     public static boolean isMimeValidSIR(String mime) {
         return Mimes.getFormatsSIR().contains(mime);
     }
+
     public static boolean isMimeValidNoSIR(String mime) {
+        return Mimes.getFormatsNoSIR().contains(mime);
+    }
+
+    public static boolean isMimeValidCIE(String mime) {
         return Mimes.getFormatsNoSIR().contains(mime);
     }
 

@@ -33,12 +33,18 @@ public class Mimes {
             "application/zip"
     ));
 
+    private static final List<String> formatsCIE = new ArrayList<>(List.of("application/pdf"));
+
     public static List<String> getFormatsSIR() {
         return formatsSIR;
     }
 
     public static List<String> getFormatsNoSIR() {
         return formatsNoSIR;
+    }
+
+    public static List<String> getFormatsCIE() {
+        return formatsCIE;
     }
 
 }
