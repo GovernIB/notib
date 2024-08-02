@@ -43,17 +43,19 @@ public class EnviamentNotificaListener {
     public void receiveEnviamentNotifica(@Payload EnviamentNotificaRequest enviamentNotificaRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
         var enviament = enviamentNotificaRequest.getEnviamentNotificaDto();
+        message.acknowledge();
         if (enviament == null || Strings.isNullOrEmpty(enviament.getUuid())) {
             log.error("[SM] Rebut enviament notifica sense Enviament");
-            message.acknowledge();
+//            message.acknowledge();
             return;
         }
         NotibLogger.getInstance().info("[SM] Rebut enviament a notifica <" + enviament.getUuid() + ">", log, LoggingTipus.STATE_MACHINE);
         if (enviament.isDeleted()) {
             NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid(), log, LoggingTipus.STATE_MACHINE);
-            message.acknowledge();
+//            message.acknowledge();
             return;
         }
+
         semaphore.acquire();
         try {
             notificaService.enviarNotifica(enviament.getUuid(), enviamentNotificaRequest);
@@ -61,7 +63,7 @@ public class EnviamentNotificaListener {
         } finally {
             semaphore.release();
         }
-        message.acknowledge();
+//        message.acknowledge();
     }
 
 }

@@ -36,11 +36,11 @@ public class NotificaServiceImpl implements NotificaService {
     public static synchronized boolean haDeExecutar(Long notificacioId, Integer intent) {
 
         var ultimIntent = notificacionsExecutades.get(notificacioId);
-//        if (ultimIntent == null || ultimIntent < intent) {
-        notificacionsExecutades.put(notificacioId, intent);
-        return true;
-//        }
-//        return false;
+        if (ultimIntent == null || ultimIntent < intent) {
+            notificacionsExecutades.put(notificacioId, intent);
+            return true;
+        }
+        return false;
     }
 
     public static void netejaExecucio(Long notificacioId) {
