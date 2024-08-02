@@ -404,7 +404,7 @@
         $.ajax({
             type: 'GET',
             url: "<c:url value="/notificacio/deselect"/>",
-            // async: false,
+            async: false,
             success: function (data) {
                 $(".seleccioCount").html(data);
                 $('#notificacio').webutilDatatable('select-none');
@@ -473,7 +473,6 @@
         });
 
         $("#filtrar").click(() => {
-            // deseleccionar()
             deselecciona()
         });
 
@@ -491,9 +490,8 @@
             });
             $('#nomesAmbErrorsBtn').removeClass('active');
             $('#nomesAmbErrors').val(false);
-            omplirProcediments();
-            omplirServeis();
-            // deseleccionar();
+            // omplirProcediments();
+            // omplirServeis();
             deselecciona();
             // $('#form-filtre').submit();
         });
