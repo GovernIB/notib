@@ -146,7 +146,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			// Iniciada pel propi usuari
 			" :#{#filtre.isUsuariEntitat} = true or " +
 			" :#{#filtre.isSuperAdmin} = true or " +
-			"   ntf.usuariCodi = :#{#filtre.usuariCodi} " +0
+			"   ntf.usuariCodi = :#{#filtre.usuariCodi} " +
 			// Té permís consulta sobre el procediment
 //			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null " +
 //			"			and ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}) and ntf.procedimentIsComu = false) " +
