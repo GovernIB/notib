@@ -43,6 +43,9 @@ public class ValidacioErrorCodes {
     public static final int DOCUMENT_SOURCE_MULTIPLE = 1074;
     public static final int DOCUMENT_FORMAT_INVALID = 1075;
     public static final int DOCUMENT_FORMAT_CIE_INVALID = 10755;
+    public static final int DOCUMENT_CIE_PDF_VERSIO_INVALID = 107551;
+    public static final int DOCUMENT_CIE_PDF_DINA4_INVALID = 107552;
+    public static final int DOCUMENT_CIE_PDF_MAX_PAGES_INVALID = 107553;
     public static final int DOCUMENT_FORMAT_SIR_INVALID = 1076;
     public static final int DOCUMENT_ERROR_OBTENINT = 1077;
     public static final int DOCUMENT_ERROR_OBTENINT_METADADES = 1078;

@@ -1,6 +1,8 @@
 package es.caib.notib.logic.service.ws;
 
 import com.google.common.base.Strings;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.codec.Base64;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
@@ -28,6 +30,7 @@ import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.GrupProcSerRepository;
 import es.caib.notib.persist.repository.GrupRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
+import es.caib.notib.plugin.cie.TipusImpressio;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -36,6 +39,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -445,7 +449,11 @@ public class NotificacioValidator implements Validator {
         }
 
         if (cieActiu) {
-            validarDocumentCIE(document, errors);
+            try {
+                validarDocumentCIE(document, errors, doc, prefix);
+            } catch (Exception ex) {
+
+            }
         }
         // Metadades
         if (Strings.isNullOrEmpty(document.getContingutBase64())) {
@@ -466,10 +474,20 @@ public class NotificacioValidator implements Validator {
         }
     }
 
-    public void validarDocumentCIE(Document document, Errors errors) {
+    public void validarDocumentCIE(Document document, Errors errors, String doc, String prefix) throws IOException {
 
-        var pdf = new PdfUtils(document);
         var bytes = Base64.decode(document.getContingutBase64());
+        var pdf = new PdfUtils(bytes);
+        var versio = "7"; // 1.7
+        if (pdf.versionGreaterThan(versio)) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_VERSIO_INVALID, locale, prefix, "1.7"));
+        }
+        if (!pdf.isDinA4()) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_DINA4_INVALID, locale, prefix));
+        }
+        if (!pdf.maxPages(TipusImpressio.SIMPLEX.name())) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_MAX_PAGES_INVALID, locale, prefix));
+        }
 
     }
 
