@@ -1,8 +1,6 @@
 package es.caib.notib.logic.service.ws;
 
 import com.google.common.base.Strings;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.codec.Base64;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
@@ -63,7 +61,6 @@ public class NotificacioValidator implements Validator {
     public static final Pattern EMAIL_REGEX = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$", Pattern.CASE_INSENSITIVE);
 
     private final AplicacioRepository aplicacioRepository;
-//    private final GrupService grupService;
     private final GrupRepository grupRepository;
     private final ProcSerRepository procSerRepository;
     private final GrupProcSerRepository grupProcSerRepository;
@@ -477,6 +474,10 @@ public class NotificacioValidator implements Validator {
     public void validarDocumentCIE(Document document, Errors errors, String doc, String prefix) throws IOException {
 
         var bytes = Base64.decode(document.getContingutBase64());
+        if (bytes.length > 5000000) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_MIDA_MAX, locale, prefix));
+        }
+
         var pdf = new PdfUtils(bytes);
         var versio = "7"; // 1.7
         if (pdf.versionGreaterThan(versio)) {
@@ -487,6 +488,12 @@ public class NotificacioValidator implements Validator {
         }
         if (!pdf.maxPages(TipusImpressio.SIMPLEX.name())) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_MAX_PAGES_INVALID, locale, prefix));
+        }
+        if (pdf.isEditBlocked()) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_EDICIO_BLOQUEJADA, locale, prefix));
+        }
+        if (!pdf.checkFontsEmbeded()) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_FONTS_EMBEDED, locale, prefix));
         }
 
     }
@@ -847,7 +854,7 @@ public class NotificacioValidator implements Validator {
         }
         if(isNacional) {
             if (entregaPostal.getViaTipus() == null) {
-                errors.reject(messageHelper.getMessage("error.validacio.via.tipus.entrega.nacional.normalitzat"));
+//                errors.reject(messageHelper.getMessage("error.validacio.via.tipus.entrega.nacional.normalitzat"));
                 errors.rejectValue(envName + ".viaTipus", error(POSTAL_VIA_TIPUS_NULL, l, prefix, tipus));
             }
             if (Strings.isNullOrEmpty(entregaPostal.getViaNom())) {

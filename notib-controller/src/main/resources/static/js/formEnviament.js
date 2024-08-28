@@ -298,6 +298,7 @@ function reanumeraEnviament(enviament, index) {
 }
 
 function mostrarEntregaPostal(className) {
+
     var element = document.getElementById(className);
     var parent = $(element).closest(".enviamentsForm");
     var classParent = $(parent).attr('class');
@@ -316,7 +317,45 @@ function mostrarEntregaPostal(className) {
     } else {
         $('.entregaPostal_'+enviament_id_num).show();
         $("#rowRetard").show();
+        validarEntregaPostalCie();
     }
+}
+
+function validarEntregaPostalCie() {
+
+    let file= document.getElementById("arxiu[0]");
+    debugger;
+    if (!file || file.files.length === 0) {
+        return;
+    }
+
+    let fitxer = file.files[0];
+    let formData = new FormData();
+    formData.append('fitxer', fitxer, fitxer.name);
+    $.ajax({
+        type: "POST",
+        enctype: 'multipart/form-data',
+        url: "/notibback/notificacio/valida/entrega/postal",
+        data: formData,
+        processData: false,
+        contentType: false,
+        cache: false,
+        timeout: 600000,
+        success: function (validacioCie) {
+            if (validacioCie && validacioCie.errorCieMsg) {
+                mostrarErroDocCie(validacioCie);
+            }
+        }
+    });
+}
+
+let mostrarErroDocCie = cieValid => {
+
+    let msg = cieValid.errorCieMsg + "\n";
+    for (let e of cieValid.errorsCie) {
+        msg += "\n" + e;
+    }
+    alert(msg)
 }
 
 function mostrarDestinatari(enviament_id, isMultiplesDestinatarisActiu) {

@@ -43,8 +43,19 @@
 	</style>
 	<script type="text/javascript">
 		$(document).ready(function() {
-			let $selectOrgan = $('#organismePagadorCodi')
+
+			let $selectOrgan = $("#organismePagadorCodi");
 			loadOrgans($selectOrgan, organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
+			let cieAntic = $("#cieAntic");
+			debugger;
+			if (cieAntic) {
+				$("cieAnticForm").show();
+				$("cieNouForm").hide();
+			} else {
+				$("cieAnticForm").hide();
+				$("cieNouForm").show();
+			}
+
 		});
 
 		var organsGestors = [];
@@ -63,20 +74,37 @@
 	<c:set var="formAction"><not:modalUrl value="/cie/newOrModify"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="cieCommand" role="form">
 		<form:hidden path="id"/>
+		<not:inputCheckbox name="cieAntic" textKey="cie.form.camp.cie.antic"  labelSize="4" />
 		<div class="row">
-			<div class="col-md-2">
-				<not:inputSelect name="organismePagadorCodi" required="true" textKey="operadorpostal.form.camp.organismePagador" inline="false" emptyOption="true" optionMinimumResultsForSearch="0"/>
-			</div>
-			<div class="col-md-2">
-				<not:inputText name="nom" textKey="cie.form.camp.centreImpressio"/>
-			</div>
-			<div class="col-md-2">
-				<not:inputDate name="contracteDataVig" disabled="false" textKey="cie.form.camp.contracteDataVig" custom="true"/>
-			</div>
-			<div id="modal-botons">
-				<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-				<a href="<c:url value="/cie"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
-			</div>	
+				<div class="col-md-2">
+					<not:inputText name="nom" textKey="cie.form.camp.centreImpressio"/>
+				</div>
+<%--			<c:choose>--%>
+<%--				<c:when test="${cieAntic == false}">--%>
+					<div id="cieAnticForm">
+						<div class="col-md-2">
+							<not:inputSelect name="organismePagadorCodi" required="true" textKey="operadorpostal.form.camp.organismePagador" inline="false" emptyOption="true" optionMinimumResultsForSearch="0"/>
+						</div>
+						<div class="col-md-2">
+							<not:inputDate name="contracteDataVig" disabled="false" textKey="cie.form.camp.contracteDataVig" custom="true"/>
+						</div>
+					</div>
+<%--				</c:when>--%>
+<%--				<c:otherwise>--%>
+					<div id="cieNouForm">
+						<div class="col-md-2">
+							<not:inputText name="usuari" textKey="cie.form.camp.usuari"/>
+						</div>
+						<div class="col-md-2">
+							<not:inputText name="password" textKey="cie.form.camp.password"/>
+						</div>
+					</div>
+					<div id="modal-botons">
+						<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+						<a href="<c:url value="/cie"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+					</div>
+<%--				</c:otherwise>--%>
+<%--			</c:choose>--%>
 		</div>
 	</form:form>
 	

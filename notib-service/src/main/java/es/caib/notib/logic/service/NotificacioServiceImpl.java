@@ -36,9 +36,12 @@ import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
+import es.caib.notib.logic.intf.util.MimeUtils;
+import es.caib.notib.logic.intf.util.PdfUtils;
 import es.caib.notib.logic.mapper.NotificacioMapper;
 import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.CallbackEntity;
@@ -61,6 +64,7 @@ import es.caib.notib.persist.repository.ProcSerOrganRepository;
 import es.caib.notib.persist.repository.ProcedimentRepository;
 import es.caib.notib.persist.repository.auditoria.NotificacioAuditRepository;
 import es.caib.notib.persist.repository.auditoria.NotificacioEnviamentAuditRepository;
+import es.caib.notib.plugin.cie.TipusImpressio;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
@@ -91,6 +95,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.DOCUMENT_CIE_PDF_DINA4_INVALID;
+import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.DOCUMENT_CIE_PDF_EDICIO_BLOQUEJADA;
+import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.DOCUMENT_CIE_PDF_FONTS_EMBEDED;
+import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.DOCUMENT_CIE_PDF_MAX_PAGES_INVALID;
+import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.DOCUMENT_CIE_PDF_MIDA_MAX;
+import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.DOCUMENT_CIE_PDF_VERSIO_INVALID;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -173,6 +184,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private EmailNotificacioSenseNifHelper emailNotificacioSenseNifHelper;
 	@Autowired
 	private AuditHelper auditHelper;
+    @Autowired
+    private CiePluginHelper ciePluginHelper;
 	@Autowired
 	private CallbackRepository callbackRepository;
 
@@ -191,7 +204,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private static final String ERROR_DIR3 = "Error recuperant les provincies de DIR3CAIB: ";
 
 	protected static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
-	
+
 
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -1423,22 +1436,45 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			var enviamentsSenseNifNoEnviats = notificacio.getEnviamentsPerEmailNoEnviats();
 			// 3 possibles casuístiques
-			// 1. Tots els enviaments a Notifica
 			if (enviamentsSenseNifNoEnviats.isEmpty()) {
+				// 1. Tots els enviaments a Notifica
 				notificaHelper.notificacioEnviar(notificacio.getId());
-				return;
-			}
+			} else if (notificacio.getEnviamentsNoEnviats().size() <= enviamentsSenseNifNoEnviats.size()) {
 			// 2. Tots els enviaments per email
-			if (notificacio.getEnviamentsNoEnviats().size() <= enviamentsSenseNifNoEnviats.size()) {
 				emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, true);
 				return;
+			} else {
+				/* 3. Una part dels enviaments a Notifica i l'altre via email */
+				notificaHelper.notificacioEnviar(notificacio.getId(), true);
+				// Fa falta enviar els restants per email
+				emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, false);
 			}
-			/* 3. Una part dels enviaments a Notifica i l'altre via email */
-			notificaHelper.notificacioEnviar(notificacio.getId(), true);
-			// Fa falta enviar els restants per email
-			emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, false);
+			if (isEntregaCieActiva(notificacio)) {
+				enviarEntregaCie(notificacio);
+			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	private boolean isEntregaCieActiva(NotificacioEntity notificacio) {
+
+		var enviaments = notificacio.getEnviaments();
+		for (var e : enviaments) {
+			if (e.getEntregaPostal() != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void enviarEntregaCie(NotificacioEntity notificacio) {
+
+		try {
+			var resposta = ciePluginHelper.enviar(notificacio);
+			// TODO GUARDAR INFO A LA BDD
+		} catch (Exception ex) {
+			log.error("Error al enviar la entrega cie per la notificacio " + notificacio.getId(), ex);
 		}
 	}
 	
@@ -1781,6 +1817,41 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
     }
+
+	@Override
+	public DocCieValid validateDocCIE(byte[] bytes) throws IOException {
+
+		List<String> errors = new ArrayList<>();
+
+		if (!MimeUtils.isPDF(Base64.encodeBase64String(bytes))) {
+			errors.add(messageHelper.getMessage("error.validacio.10755"));
+		}
+		if (bytes.length > 5242880) {
+			errors.add(messageHelper.getMessage("error.validacio.107554"));
+		}
+
+		var pdf = new PdfUtils(bytes);
+		var versio = "7"; // 1.7
+		if (pdf.versionGreaterThan(versio)) {
+			errors.add(messageHelper.getMessage("error.validacio.107551", new Object[]{"1.7"}));
+		}
+		if (!pdf.isDinA4()) {
+			errors.add(messageHelper.getMessage("error.validacio.107552"));
+		}
+		if (!pdf.maxPages(TipusImpressio.SIMPLEX.name())) {
+			errors.add(messageHelper.getMessage("error.validacio.107553"));
+		}
+		if (pdf.isEditBlocked()) {
+			errors.add(messageHelper.getMessage("error.validacio.107555"));
+		}
+		if (!pdf.checkFontsEmbeded()) {
+			errors.add(messageHelper.getMessage("error.validacio.107556"));
+		}
+
+		var msg = !errors.isEmpty() ? messageHelper.getMessage("errors.validacio.cie") : "";
+
+		return DocCieValid.builder().errorsCie(errors).errorCieMsg(msg).build();
+	}
 
 	@Override
 	@Transactional

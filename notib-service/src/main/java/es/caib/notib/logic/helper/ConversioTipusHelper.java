@@ -66,6 +66,7 @@ import es.caib.notib.persist.entity.cie.PagadorCieFormatFullaEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieFormatSobreEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import es.caib.notib.persist.repository.CallbackRepository;
+import es.caib.notib.plugin.cie.EnviamentCie;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
@@ -163,6 +164,10 @@ public class ConversioTipusHelper {
 				field("formatSobre", "formatSobre").
 				field("formatFulla", "formatFulla").
 				field("domiciliCie", "cie").byDefault().register();
+
+		mapperFactory.classMap(NotificacioEntity.class, EnviamentCie.class).
+				field("organGestor.codi", "organGestor").
+				field("organGestor.nom", "organGestorNom").byDefault().register();
 
 		mapperFactory.classMap(NotificacioEntity.class, NotificacioDtoV2.class).
 				field("organGestor.codi", "organGestor").

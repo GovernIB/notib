@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.logic.intf.dto;
 
 import lombok.AllArgsConstructor;
@@ -12,15 +9,10 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter @Setter
-public class FirmaValidDto {
+@Getter
+@Setter
+public class DocumentValidacio {
 
-	String arxiuGestdocId;
-	String nom;
-	String mediaType;
-	Long mida;
-	private boolean signed;
-	private boolean error = false;
-	private String errorMsg = null;
-	
+    private FirmaValid validacioFirma;
+    private DocCieValid validacioCie;
 }

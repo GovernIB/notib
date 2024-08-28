@@ -149,11 +149,11 @@ public class ConfigHelper {
             }
         }
         propertyValue = environment.getProperty(globalKey);
-        if (propertyValue != null) {
-            return Optional.of(propertyValue);
+        if (propertyValue == null) {
+            log.warn("No s'ha trobat la propietat -> key global: " + globalKey + " key entitat: " + entitatKey);
+            return Optional.empty();
         }
-        log.warn("No s'ha trobat la propietat -> key global: " + globalKey + " key entitat: " + entitatKey);
-        return Optional.empty();
+        return Optional.of(propertyValue);
     }
 
     @Transactional(readOnly = true)

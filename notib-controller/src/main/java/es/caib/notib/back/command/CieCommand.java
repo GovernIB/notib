@@ -25,6 +25,9 @@ public class CieCommand {
 	private String organismePagadorCodi;
 	private String nom;
 	private Date contracteDataVig;
+	private String usuari;
+	private String password;
+	private boolean cieAntic;
 
 	public static CieCommand asCommand(CieDto dto) {
 		return dto != null ? ConversioTipusHelper.convertir(dto, CieCommand.class ) : null;

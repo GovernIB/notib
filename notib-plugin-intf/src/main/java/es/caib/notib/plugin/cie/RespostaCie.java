@@ -17,5 +17,5 @@ public class RespostaCie {
 
     private String identificador;
     private String codiError;
-    private Date descripcioError;
+    private String descripcioError;
 }

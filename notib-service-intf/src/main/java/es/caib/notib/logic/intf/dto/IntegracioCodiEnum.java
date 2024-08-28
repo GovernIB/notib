@@ -16,7 +16,8 @@ public enum IntegracioCodiEnum {
     FIRMASERV,
     VALIDASIG,
     CARPETA,
-    EMAIL;
+    EMAIL,
+    CIE;
 
 //    private final String descripcio;
 //

@@ -18,6 +18,9 @@ public class CieDataDto extends AuditoriaDto implements Serializable{
 	@EqualsAndHashCode.Include
 	private Date contracteDataVig;
 	private Long organGestorId;
+	private String usuari;
+	private String password;
+	private boolean cieAntic;
 
 	private static final long serialVersionUID = 1305599728317046741L;
 

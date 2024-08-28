@@ -5,6 +5,7 @@ package es.caib.notib.logic.intf.service;
 
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
+import es.caib.notib.logic.intf.dto.DocCieValid;
 import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.LocalitatsDto;
 import es.caib.notib.logic.intf.dto.NotificacioAuditDto;
@@ -434,5 +435,8 @@ public interface NotificacioService {
 	SignatureInfoDto checkIfSignedAttached(byte[] contingut, String nom, String contentType);
 
 	@PreAuthorize("isAuthenticated()")
+	DocCieValid validateDocCIE(byte[] bytes) throws IOException;
+
+    @PreAuthorize("isAuthenticated()")
 	void updateEstatList(Long notificacioId);
 }

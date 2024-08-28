@@ -5,6 +5,7 @@ package es.caib.notib.ejb;
 
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
+import es.caib.notib.logic.intf.dto.DocCieValid;
 import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.LocalitatsDto;
 import es.caib.notib.logic.intf.dto.NotificacioAuditDto;
@@ -407,7 +408,13 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 		return getDelegateService().checkIfSignedAttached(contingut, nom, contentType);
 	}
 
-    @Override
+	@Override
+	@RolesAllowed("**")
+	public DocCieValid validateDocCIE(byte[] bytes) throws IOException {
+		return getDelegateService().validateDocCIE(bytes);
+	}
+
+	@Override
 	@RolesAllowed("**")
     public void updateEstatList(Long notificacioId) {
         getDelegateService().updateEstatList(notificacioId);

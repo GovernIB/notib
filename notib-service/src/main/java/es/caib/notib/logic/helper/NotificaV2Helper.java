@@ -7,7 +7,6 @@ import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
-import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.exception.ValidationException;
@@ -34,9 +33,9 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
+import es.caib.notib.plugin.utils.WsClientHelper;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -63,8 +62,6 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
-import java.security.GeneralSecurityException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -656,26 +653,26 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				envio.setDestinatarios(destinatarios);
 			}
 
-			if (enviament.getEntregaPostal() != null) {
+			if (enviament.getEntregaPostal() != null && notificacio.getProcediment().getEntregaCieEfectiva() != null
+					&& !notificacio.getProcediment().getEntregaCieEfectiva().getCie().isCieExtern()) {
+
 				var entregaPostal = new EntregaPostal();
 				var procedimentNotificacio = notificacio.getProcediment();
 				if (procedimentNotificacio != null) {
 					var entregaCieEntity = procedimentNotificacio.getEntregaCieEfectiva();
-					if (entregaCieEntity != null) {
-						if (entregaCieEntity.getOperadorPostal() != null) {
-							var pagadorPostal = new OrganismoPagadorPostal();
-							pagadorPostal.setCodigoDIR3Postal(entregaCieEntity.getOperadorPostal().getOrganGestor().getCodi());
-							pagadorPostal.setCodClienteFacturacionPostal(entregaCieEntity.getOperadorPostal().getFacturacioClientCodi());
-							pagadorPostal.setNumContratoPostal(entregaCieEntity.getOperadorPostal().getContracteNum());
-							pagadorPostal.setFechaVigenciaPostal(toXmlGregorianCalendar(entregaCieEntity.getOperadorPostal().getContracteDataVig()));
-							entregaPostal.setOrganismoPagadorPostal(pagadorPostal);
-						}
-						if (entregaCieEntity.getCie() != null) {
-							var pagadorCie = new OrganismoPagadorCIE();
-							pagadorCie.setCodigoDIR3CIE(entregaCieEntity.getCie().getOrganGestor().getCodi());
-							pagadorCie.setFechaVigenciaCIE(toXmlGregorianCalendar(entregaCieEntity.getCie().getContracteDataVig()));
-							entregaPostal.setOrganismoPagadorCIE(pagadorCie);
-						}
+					if (entregaCieEntity.getOperadorPostal() != null) {
+						var pagadorPostal = new OrganismoPagadorPostal();
+						pagadorPostal.setCodigoDIR3Postal(entregaCieEntity.getOperadorPostal().getOrganGestor().getCodi());
+						pagadorPostal.setCodClienteFacturacionPostal(entregaCieEntity.getOperadorPostal().getFacturacioClientCodi());
+						pagadorPostal.setNumContratoPostal(entregaCieEntity.getOperadorPostal().getContracteNum());
+						pagadorPostal.setFechaVigenciaPostal(toXmlGregorianCalendar(entregaCieEntity.getOperadorPostal().getContracteDataVig()));
+						entregaPostal.setOrganismoPagadorPostal(pagadorPostal);
+					}
+					if (entregaCieEntity.getCie() != null) {
+						var pagadorCie = new OrganismoPagadorCIE();
+						pagadorCie.setCodigoDIR3CIE(entregaCieEntity.getCie().getOrganGestor().getCodi());
+						pagadorCie.setFechaVigenciaCIE(toXmlGregorianCalendar(entregaCieEntity.getCie().getContracteDataVig()));
+						entregaPostal.setOrganismoPagadorCIE(pagadorCie);
 					}
 				}
 				var entregaPostalEntity = enviament.getEntregaPostal();

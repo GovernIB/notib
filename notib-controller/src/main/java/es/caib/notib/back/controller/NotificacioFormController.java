@@ -25,9 +25,11 @@ import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.logic.intf.dto.DocCieValid;
 import es.caib.notib.logic.intf.dto.DocumentDto;
+import es.caib.notib.logic.intf.dto.DocumentValidacio;
 import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.FirmaValidDto;
+import es.caib.notib.logic.intf.dto.FirmaValid;
 import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.logic.intf.dto.LocalitatsDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
@@ -388,23 +390,34 @@ public class NotificacioFormController extends BaseUserController {
         }
     }
 
-    @PostMapping(value = "/valida/firma")
+    @PostMapping(value = "/valida/document/{entregaPostal}")
     @ResponseBody
-    public FirmaValidDto validaFirmaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer) throws IOException {
+    public DocumentValidacio validaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer, @PathVariable String entregaPostal) throws IOException {
 
         var nom = fitxer.getOriginalFilename();
         var content = fitxer.getBytes();
         var contentType = fitxer.getContentType();
         var contingutBase64 = Base64.encodeBase64String(content);
-        var firma = FirmaValidDto.builder().nom(nom).mida(fitxer.getSize()).mediaType(fitxer.getContentType()).build();
+        var firma = FirmaValid.builder().nom(nom).mida(fitxer.getSize()).mediaType(fitxer.getContentType()).build();
         if (!FileHelper.isPdf(contingutBase64)) {
-            return firma;
+            return DocumentValidacio.builder().validacioFirma(firma).build();
         }
         var signatureInfo = notificacioService.checkIfSignedAttached(content, nom, contentType);
         firma.setSigned(signatureInfo.isSigned());
         firma.setError(signatureInfo.isError());
         firma.setErrorMsg(signatureInfo.getErrorMsg());
-        return firma;
+
+        if (!Boolean.valueOf(entregaPostal)) {
+            return DocumentValidacio.builder().validacioFirma(firma).build();
+        }
+        var cieValid = notificacioService.validateDocCIE(content);
+        return DocumentValidacio.builder().validacioFirma(firma).validacioCie(cieValid).build();
+    }
+
+    @PostMapping(value = "/valida/entrega/postal")
+    @ResponseBody
+    public DocCieValid validaFirmaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer) throws IOException {
+        return notificacioService.validateDocCIE(fitxer.getBytes());
     }
 
     private void validaFirma(String nom, String mediaType, BindingResult bindingResult, int position, byte[] content) {

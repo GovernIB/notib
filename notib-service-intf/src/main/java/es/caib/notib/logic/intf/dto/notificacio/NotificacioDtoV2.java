@@ -3,7 +3,6 @@ package es.caib.notib.logic.intf.dto.notificacio;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.dto.AuditoriaDto;
-import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
@@ -22,54 +21,55 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+
 @Getter @Setter
 public class NotificacioDtoV2 extends AuditoriaDto {
 
-	private Long id;
-	private String emisorDir3Codi;
-	private EnviamentTipus enviamentTipus;
-	private String concepte;
-	private String descripcio;
-	private String organGestor;
-	private String organGestorNom;
-	private Date enviamentDataProgramada;
-	private Integer retard;
+	protected Long id;
+	protected String emisorDir3Codi;
+	protected EnviamentTipus enviamentTipus;
+	protected String concepte;
+	protected String descripcio;
+	protected String organGestor;
+	protected String organGestorNom;
+	protected Date enviamentDataProgramada;
+	protected Integer retard;
 	protected int notificaEnviamentIntent;
-	private Date caducitat;
-	private String csv_uuid;
-	private ProcSerDto procediment;
-	private String procedimentCodiNotib;
-	private GrupDto grup;
-	private String grupCodi;
-	private NotificacioEstatEnumDto estat;
-	private Date notificaErrorData;
-	private String notificaErrorDescripcio;
+	protected Date caducitat;
+	protected String csv_uuid;
+	protected ProcSerDto procediment;
+	protected String procedimentCodiNotib;
+	protected GrupDto grup;
+	protected String grupCodi;
+	protected NotificacioEstatEnumDto estat;
+	protected Date notificaErrorData;
+	protected String notificaErrorDescripcio;
 //	private NotificacioErrorTipusEnumDto notificaErrorTipus;
-	private String serveiTipus;
-	private List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<>();
-	private String usuariCodi;
-	private String motiu;
-	private String numExpedient;
-	private boolean permisProcessar;
-	private EntitatDto entitat;
-	private boolean errorLastCallback;
-	private TipusUsuariEnumDto tipusUsuari;
-	private Date notificaEnviamentData;
-	private Date notificaEnviamentNotificaData;
-	private Idioma idioma;
+	protected String serveiTipus;
+	protected List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<>();
+	protected String usuariCodi;
+	protected String motiu;
+	protected String numExpedient;
+	protected boolean permisProcessar;
+	protected EntitatDto entitat;
+	protected boolean errorLastCallback;
+	protected TipusUsuariEnumDto tipusUsuari;
+	protected Date notificaEnviamentData;
+	protected Date notificaEnviamentNotificaData;
+	protected Idioma idioma;
 
-	private Document document;
-	private Document document2;
-	private Document document3;
-	private Document document4;
-	private Document document5;
+	protected Document document;
+	protected Document document2;
+	protected Document document3;
+	protected Document document4;
+	protected Document document5;
 
-	private boolean hasEnviamentsPendents;
-	private boolean justificantCreat;
-	private boolean deleted;
+	protected boolean hasEnviamentsPendents;
+	protected boolean justificantCreat;
+	protected boolean deleted;
 
-	private String registreLlibreNom;
-	private String registreOficinaNom;
+	protected String registreLlibreNom;
+	protected String registreOficinaNom;
 
 	public boolean isNotificaError() {
 		return notificaErrorData != null;

@@ -19,6 +19,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.intf.service.PermisosService;
+import es.caib.notib.logic.utils.EncryptionUtil;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.persist.repository.OrganGestorRepository;
@@ -27,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -74,9 +76,21 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 			if (!Strings.isNullOrEmpty(cie.getOrganismePagadorCodi())) {
 				organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, cie.getOrganismePagadorCodi());
 			}
+			String password = cie.getPassword();
+			if (!Strings.isNullOrEmpty(password)) {
+				var encryptor = new EncryptionUtil();
+				password = encryptor.encrypt(password);
+			}
 			PagadorCieEntity p;
 			if (cie.getId() == null) {
-				p = PagadorCieEntity.builder().organGestor(organGestor).nom(cie.getNom()).contracteDataVig(cie.getContracteDataVig()).entitat(entitat).build();
+				p = PagadorCieEntity.builder()
+						.organGestor(organGestor)
+						.nom(cie.getNom())
+						.contracteDataVig(cie.getContracteDataVig())
+						.entitat(entitat)
+//						.usuari(!Strings.isNullOrEmpty(cie.getUsuari()) ? cie.getUsuari() : "")
+//						.password()
+						.build();
 			} else {
 				log.debug("Actualitzant pagador cie (pagador=" + cie + ")");
 				p = entityComprovarHelper.comprovarPagadorCie(cie.getId());

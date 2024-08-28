@@ -11,6 +11,7 @@ import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.dto.config.ConfigGroupDto;
 import es.caib.notib.logic.intf.service.ConfigService;
 import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.config.ConfigEntity;
@@ -49,6 +50,8 @@ public class ConfigServiceImpl implements ConfigService {
     @Autowired
     private PluginHelper pluginHelper;
     @Autowired
+    private CiePluginHelper ciePluginHelper;
+    @Autowired
     private CacheHelper cacheHelper;
     @Autowired
     private ConfigHelper configHelper;
@@ -76,6 +79,9 @@ public class ConfigServiceImpl implements ConfigService {
         configEntity.update(!"null".equals(property.getValue()) ? property.getValue() : null);
         configHelper.reloadDbProperties();
         pluginHelper.resetPlugins(configEntity.getGroupCode());
+        if ("CIE".equals(configEntity.getGroupCode())) {
+            ciePluginHelper.reset();
+        }
         NotificacioEventHelper.clearNotificaConsultaActiva();
         cacheHelper.clearAllCaches();
         if ("es.caib.notib.state.machine.delay".equals(property.getKey())) {
@@ -141,6 +147,7 @@ public class ConfigServiceImpl implements ConfigService {
         }
         configHelper.reloadDbProperties();
         pluginHelper.resetAllPlugins();
+        ciePluginHelper.reset();
         return editedProperties;
     }
 

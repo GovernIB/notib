@@ -472,7 +472,6 @@
 		</div> \
 	</div>';
 
-
 	$(document).ready(function() {
 
 		viewModel.ambEntregaCIE = false;
@@ -521,10 +520,11 @@
 					return;
 				}
 				$("#saveForm").attr("disabled", true);
+				let entregaPostal = viewModel.ambEntregaCIE && $('[id*="].entregaPostal.activa"]').toArray().some(x => {console.log(x); return x.checked});
 				$.ajax({
 					type: "POST",
 					enctype: 'multipart/form-data',
-					url: "<c:url value='/notificacio/valida/firma'/>",
+					url: "<c:url value='/notificacio/valida/document/'/>" + entregaPostal,
 					data: formData,
 					processData: false,
 					contentType: false,
@@ -534,30 +534,28 @@
 
 						$file.prop("disabled", false);
 						$file.closest(".fileinput").next(".validating-block").remove();
-
-						if (data.mediaType == 'application/pdf') {
-							$('#documents\\[' + id + '\\]\\.modoFirma').prop('checked', data.signed);
+						let validacioFirma = data.validacioFirma;
+						if (validacioFirma.mediaType === 'application/pdf') {
+							$('#documents\\[' + id + '\\]\\.modoFirma').prop('checked', validacioFirma.signed);
 						}
-						if (data.error) {
+						if (validacioFirma.error) {
 							$file.closest(".form-group").addClass("has-error");
 							$file.closest(".fileinput").next(".help-block").remove();
-							<%--$('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span id="arxiu' + id + '.errors"><spring:message code="notificacio.form.valid.document.firma"/></span></p>').insertAfter($file.closest(".fileinput"));--%>
-							$('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span id="arxiu' + id + '.errors"><spring:message code="notificacio.form.valid.document.error"/> ' + data.errorMsg + '</span></p>').insertAfter($file.closest(".fileinput"));
+							$('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span id="arxiu' + id + '.errors"><spring:message code="notificacio.form.valid.document.error"/> ' + validacioFirma.errorMsg + '</span></p>').insertAfter($file.closest(".fileinput"));
 						} else {
 							$file.closest(".form-group").removeClass("has-error");
 							$file.closest(".fileinput").next(".help-block").hide();
 
-							if (data.signed) {
+							if (validacioFirma.signed) {
 								$('<p class="validating-block text-success"><span class="fa fa-check"></span>&nbsp;<spring:message code="notificacio.form.valid.document.firma.ok"/></p>').insertAfter($file.closest(".fileinput"));
 							} else {
 								$('<p class="validating-block text-success"><span class="fa fa-check"></span>&nbsp;<spring:message code="notificacio.form.valid.document.sense.firma"/></p>').insertAfter($file.closest(".fileinput"));
 							}
 						}
-						// $('documents\\[' + id + '\\]\\.arxiuGestdocId').val(data.arxiuGestdocId);
-						// $('documents\\[' + id + '\\]\\.arxiuNom').val(data.nom);
-						// $('documents\\[' + id + '\\]\\.mediaType').val(data.mediaType);
-						// $('documents\\[' + id + '\\]\\.mida').val(data.mida);
-
+						let validacioCie = data.validacioCie;
+						if (validacioCie && validacioCie.errorCieMsg) {
+							mostrarErroDocCie(validacioCie);
+						}
 					},
 					error: function (e) {
 						console.error("ERROR : ", e);

@@ -25,7 +25,7 @@ import java.util.Scanner;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
-public class RegistrePluginMockImpl implements RegistrePlugin{
+public class RegistrePluginMockImpl implements RegistrePlugin {
 
 	private final Properties properties;
 	private final Random rand = new Random();
