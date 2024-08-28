@@ -19,6 +19,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.intf.service.PermisosService;
+import es.caib.notib.logic.objectes.StringEncriptat;
 import es.caib.notib.logic.utils.EncryptionUtil;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieEntity;
@@ -76,10 +77,11 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 			if (!Strings.isNullOrEmpty(cie.getOrganismePagadorCodi())) {
 				organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, cie.getOrganismePagadorCodi());
 			}
-			String password = cie.getPassword();
-			if (!Strings.isNullOrEmpty(password)) {
+			String apiKey = cie.getApiKey();
+			StringEncriptat encriptat = null;
+			if (!Strings.isNullOrEmpty(apiKey)) {
 				var encryptor = new EncryptionUtil();
-				password = encryptor.encrypt(password);
+				encriptat = encryptor.encrypt(apiKey);
 			}
 			PagadorCieEntity p;
 			if (cie.getId() == null) {
@@ -88,16 +90,18 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 						.nom(cie.getNom())
 						.contracteDataVig(cie.getContracteDataVig())
 						.entitat(entitat)
-//						.usuari(!Strings.isNullOrEmpty(cie.getUsuari()) ? cie.getUsuari() : "")
-//						.password()
+						.apiKey(encriptat != null ? encriptat.getString() : null)
+						.salt(encriptat != null ? encriptat.getSalt() : null)
 						.build();
 			} else {
 				log.debug("Actualitzant pagador cie (pagador=" + cie + ")");
 				p = entityComprovarHelper.comprovarPagadorCie(cie.getId());
-				if (organGestor != null) {
-					p.setOrganGestor(organGestor);
-				}
-				p.setContracteDataVig(cie.getContracteDataVig());
+				p.setNom(!Strings.isNullOrEmpty(cie.getNom()) ? cie.getNom() : p.getNom());
+				p.setOrganGestor(organGestor != null ? organGestor : p.getOrganGestor());
+				p.setApiKey(encriptat != null ? encriptat.getString() : p.getApiKey());
+				p.setSalt(encriptat != null ? encriptat.getSalt() : p.getSalt());
+				var contracteDataVig = cie.getContracteDataVig() != null ? cie.getContracteDataVig() : p.getContracteDataVig();
+				p.setContracteDataVig(contracteDataVig);
 			}
 			var pagadorCieEntity = pagadorCieReposity.save(p);
 			return conversioTipusHelper.convertir(pagadorCieEntity, CieDto.class);

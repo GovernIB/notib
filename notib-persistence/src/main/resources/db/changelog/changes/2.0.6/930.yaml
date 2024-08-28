@@ -1,4 +1,12 @@
 databaseChangeLog:
+  - property:
+      dbms: oracle
+      name: varcharUnit
+      value: CHAR
+  - property:
+      dbms: postgresql
+      name: varcharUnit
+      value: ''
   - changeSet:
       id: 1634114082437-1
       author: limit
@@ -12,6 +20,12 @@ databaseChangeLog:
                   defaultValue: 1
                   constraints:
                     nullable: false
+              - column:
+                  name: api_key
+                  type: varchar(36 ${varcharUnit})
+              - column:
+                  name: salt
+                  type: varchar(32 ${varcharUnit})
         - sql: "UPDATE NOT_PAGADOR_CIE SET CIE_EXTERN = 0;
                 INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.plugin.cie.class', 'es.caib.notib.plugin.cie.CieNexeaPluginImpl', 'Classe plugin CIE', 'CIE_CLASS', 'CIE' );
                 INSERT INTO NOT_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (11, 'PLUGINS', 'CIE', 'Plugin CIE' );

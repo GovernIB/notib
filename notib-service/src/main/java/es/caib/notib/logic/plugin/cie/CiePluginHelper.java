@@ -81,8 +81,8 @@ public class CiePluginHelper {
             enviamentCie.setContingutDocument(contingut);
             enviamentCie.setCodiDir3Entitat(configHelper.getConfigAsBoolean("es.caib.notib.plugin.codi.dir3.entitat"));
             var entregaCieEfectiva = notificacio.getProcediment().getEntregaCieEfectiva();
-            enviamentCie.setEntregaCie(conversioTipusHelper.convertir(entregaCieEfectiva, CieDto.class));
-            enviamentCie.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEfectiva, OperadorPostalDto.class));
+            enviamentCie.setEntregaCie(conversioTipusHelper.convertir(entregaCieEfectiva.getCie(), CieDto.class));
+            enviamentCie.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEfectiva.getOperadorPostal(), OperadorPostalDto.class));
             resposta = getCiePlugin(entitat.getCodi()).enviar(enviamentCie);
             if (Strings.isNullOrEmpty(resposta.getCodiError())) {
                 integracioHelper.addAccioOk(info);

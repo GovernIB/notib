@@ -42,8 +42,16 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "not_pagcie_organ_fk")
 	protected OrganGestorEntity organGestor;
 
+	@Column(name = "api_key")
+	private String apiKey;
+
+	@Column(name = "salt")
+	private String salt;
+
 	@Column(name = "cie_extern", nullable = false)
 	private boolean cieExtern;
+
+
 
 //	@Column(name = "USUARI", length = 256)
 //	private String usuari;

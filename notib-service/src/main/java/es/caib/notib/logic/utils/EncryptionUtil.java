@@ -1,5 +1,6 @@
 package es.caib.notib.logic.utils;
 
+import es.caib.notib.logic.objectes.StringEncriptat;
 import lombok.Getter;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
@@ -37,8 +38,8 @@ public class EncryptionUtil {
         return Base64.getEncoder().encodeToString(s);
     }
 
-    public String encrypt(String text) {
-        return encryptor.encrypt(text);
+    public StringEncriptat encrypt(String text) {
+        return StringEncriptat.builder().string(encryptor.encrypt(text)).salt(salt).build();
     }
 
     public String decrypt(String encryptedText) {
@@ -48,10 +49,10 @@ public class EncryptionUtil {
 
     public static void main(String[] args) {
 
-        var originalText = "Hello, Spring!";
+        var originalText = "42f88694-39b1-4a2d-8292-c845aedc1312";
         var encryptionUtil = new EncryptionUtil();
-        String encryptedText = encryptionUtil.encrypt(originalText);
-        String decryptedText = encryptionUtil.decrypt(encryptedText);
+        var encryptedText = encryptionUtil.encrypt(originalText);
+        var decryptedText = encryptionUtil.decrypt(encryptedText.getString());
 
         System.out.println("Original Text: " + originalText);
         System.out.println("Encrypted Text: " + encryptedText);

@@ -93,10 +93,7 @@
 <%--				<c:otherwise>--%>
 					<div id="cieNouForm">
 						<div class="col-md-2">
-							<not:inputText name="usuari" textKey="cie.form.camp.usuari"/>
-						</div>
-						<div class="col-md-2">
-							<not:inputText name="password" textKey="cie.form.camp.password"/>
+							<not:inputText name="apiKey" textKey="cie.form.camp.api.key"/>
 						</div>
 					</div>
 					<div id="modal-botons">

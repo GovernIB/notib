@@ -25,8 +25,7 @@ public class CieCommand {
 	private String organismePagadorCodi;
 	private String nom;
 	private Date contracteDataVig;
-	private String usuari;
-	private String password;
+	private String apiKey;
 	private boolean cieAntic;
 
 	public static CieCommand asCommand(CieDto dto) {
