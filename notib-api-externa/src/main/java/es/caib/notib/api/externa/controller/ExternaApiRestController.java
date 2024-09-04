@@ -37,7 +37,7 @@ import java.util.jar.Manifest;
 @RestController
 @RequestMapping("/api")
 @Tag(name = "Informació Notib", description = "API de informació de Notib")
-public class ExpernaApiRestController {
+public class ExternaApiRestController {
 
 	@Autowired
 	private ServletContext servletContext;

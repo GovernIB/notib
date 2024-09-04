@@ -1,2 +1,7 @@
+UPDATE NOT_NOTIFICACIO_ENV env SET env.ULTIM_EVENT = (
+    SELECT nne2.id FROM NOT_NOTIFICACIO_EVENT nne2 WHERE env.id = nne2.NOTIFICACIO_ENV_ID  AND nne2.DATA =
+                                                                                               (SELECT max(nne.DATA) FROM NOT_NOTIFICACIO_EVENT nne WHERE nne.NOTIFICACIO_ENV_ID = env.id AND nne.TIPUS != 8 and nne.TIPUS != 9))
+WHERE env.CREATEDDATE > TO_DATE('25/03/2024', 'dd/MM/yyyy');
+
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.gesdoc.document.llindar.dies.comprimir', '10', 'Comprimeix els documents anteriors al valor en dies', 'GES_DOC', 0, 0, 'INT', 0);
 UPDATE NOT_NOTIFICACIO_TABLE n SET ENVIADA_DATE = (SELECT MAX(DATA) FROM NOT_NOTIFICACIO_EVENT nne WHERE nne.NOTIFICACIO_ID = n.id AND nne.TIPUS != 8 and nne.TIPUS != 9) WHERE n.CREATEDDATE > TO_DATE('25/03/2024', 'dd/MM/yyyy');

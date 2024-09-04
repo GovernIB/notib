@@ -35,6 +35,7 @@
 			<resource-root path="spring-boot-starter-logging-*.jar"/>
 			<resource-root path="spring-boot-starter-security-*.jar"/>
 			<resource-root path="spring-boot-starter-web-*.jar"/>
+			<resource-root path="spring-boot-starter-websocket-*.jar"/>
 			<resource-root path="spring-boot-starter-mail-*.jar"/>
 			<resource-root path="spring-context-*.jar"/>
 			<resource-root path="spring-core-*.jar"/>
@@ -59,6 +60,7 @@
 			<module name="io.undertow.core"/>
 			<module name="io.undertow.servlet" export="true"/>
 			<module name="io.undertow.websocket" export="true"/>
+			<module name="jdk.management"/>
 		</dependencies>
 	</deployment>
 	<ear-subdeployments-isolated>false</ear-subdeployments-isolated>
@@ -80,6 +82,7 @@
 			<module name="notib-api-externa.ear"/>
 		</exclusions>
 		<dependencies>
+			<module name="jdk.management"/>
 			<module name="deployment.notib-service-intf"/>
 			<module name="deployment.notib-client-intf"/>
 			<module name="deployment.notib-api-libs"/>
@@ -100,4 +103,5 @@
 			<module name="deployment.notib-api-libs"/>
 		</dependencies>
 	</sub-deployment>
+	<ear-subdeployments-isolated>false</ear-subdeployments-isolated>
 </jboss-deployment-structure>

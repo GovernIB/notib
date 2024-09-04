@@ -51,6 +51,14 @@ public class EjbClientConfig {
 	public LocalStatelessSessionProxyFactoryBean enviamentSmServiceWs() {
 		return getLocalEjbFactoyBean(EnviamentSmService.class);
 	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean salutService() {
+		return getLocalEjbFactoyBean(SalutService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean activeMqService() {
+		return getLocalEjbFactoyBean(ActiveMqService.class);
+	}
 
 
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {
