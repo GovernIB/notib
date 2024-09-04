@@ -36,7 +36,7 @@ public class DadesUsuariPluginKeycloakTest {
 //    properties.put("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.realm", "webpre");
 //    properties.put("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.client_id", "goib-ws");
 //    properties.put("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.client_id_for_user_autentication", "goib-ws");
-//    properties.put("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.password_secret", "fac3667e-4601-4f61-9eef-5629eb5155ea");
+//    properties.put("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.password_secret", "********-****-****-****-************");
 //    properties.put("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.mapping.administrationID", "nif");
 //    properties.put("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.debug", "true");
 

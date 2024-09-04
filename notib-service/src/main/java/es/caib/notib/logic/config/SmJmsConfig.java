@@ -3,7 +3,6 @@ package es.caib.notib.logic.config;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.pool.PooledConnectionFactory;
-import org.apache.activemq.store.PersistenceAdapter;
 import org.apache.activemq.store.kahadb.KahaDBPersistenceAdapter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
@@ -73,14 +72,15 @@ public class SmJmsConfig {
     public BrokerService broker() throws Exception {
 
         final BrokerService broker = new BrokerService();
-//        broker.addConnector("vm://localhost");
         broker.addConnector(BROKER_URL);
-        PersistenceAdapter persistenceAdapter = new KahaDBPersistenceAdapter();
+        KahaDBPersistenceAdapter persistenceAdapter = new KahaDBPersistenceAdapter();
         File dir = new File(fileBaseDir + "/kaha");
         if (!dir.exists()) {
             dir.mkdirs();
         }
         persistenceAdapter.setDirectory(dir);
+        persistenceAdapter.setJournalMaxFileLength(1 * 1024 * 1024 * 1025); // 1Gb
+        persistenceAdapter.setCleanupInterval(1000 * 60 * 60);              // 1h
         broker.setPersistenceAdapter(persistenceAdapter);
         broker.setPersistent(true);
         broker.setSchedulerSupport(true);

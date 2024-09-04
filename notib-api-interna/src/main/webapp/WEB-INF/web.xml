@@ -34,6 +34,9 @@
             <url-pattern>/api-docs</url-pattern>
             <url-pattern>/api-docs/*</url-pattern>
             <url-pattern>/webjars/*</url-pattern>
+            <url-pattern>/appInfo</url-pattern>
+            <url-pattern>/salut</url-pattern>
+            <url-pattern>/salutPerformance</url-pattern>
         </web-resource-collection>
     </security-constraint>
     <security-constraint>

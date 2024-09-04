@@ -72,7 +72,10 @@ public class SecurityConfig {
 			"/api-docs/**",
 			"/webjars/**",
 			"/adviser",
-			"/adviser/**"
+			"/adviser/**",
+			"/appInfo",
+			"/salut",
+			"/salutPerformance"
 	};
 
 	@Bean
