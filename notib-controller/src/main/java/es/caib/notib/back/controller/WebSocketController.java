@@ -54,7 +54,7 @@ public class WebSocketController extends BaseController {
 //        return "hola websocket";
 //    }
 
-    @JmsListener(destination = WebSocketConstants.CUA_WEBSOCKET, containerFactory = WebSocketConstants.JMS_FACTORY_ACK)
+//    @JmsListener(destination = WebSocketConstants.CUA_WEBSOCKET, containerFactory = WebSocketConstants.JMS_FACTORY_ACK)
     public void enviarMissatge(@Payload MissatgeWs missatge, @Headers MessageHeaders headers, Message message) throws JMSException {
 
         if (Strings.isNullOrEmpty(missatge.getCodiUsuari()) || simpUserRegistry.getUser(missatge.getCodiUsuari()) == null) {
