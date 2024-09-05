@@ -1,6 +1,7 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
+import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.EntityComprovarHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
@@ -26,6 +27,7 @@ import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.PagadorCieRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -64,7 +66,9 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 	private MetricsHelper metricsHelper;
 	@Resource
 	private PermisosService permisosService;
-	
+    @Resource
+    private ConfigHelper configHelper;
+
 	@Override
 	@Transactional
 	public CieDto upsert(Long entitatId, CieDataDto cie) {
@@ -80,7 +84,7 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 			String apiKey = cie.getApiKey();
 			StringEncriptat encriptat = null;
 			if (!Strings.isNullOrEmpty(apiKey)) {
-				var encryptor = new EncryptionUtil();
+				var encryptor = new EncryptionUtil(configHelper.getConfig("es.caib.notib.plugin.cie.encriptor.key"));
 				encriptat = encryptor.encrypt(apiKey);
 			}
 			PagadorCieEntity p;
@@ -90,6 +94,7 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 						.nom(cie.getNom())
 						.contracteDataVig(cie.getContracteDataVig())
 						.entitat(entitat)
+						.cieExtern(cie.isCieExtern())
 						.apiKey(encriptat != null ? encriptat.getString() : null)
 						.salt(encriptat != null ? encriptat.getSalt() : null)
 						.build();
@@ -98,8 +103,15 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 				p = entityComprovarHelper.comprovarPagadorCie(cie.getId());
 				p.setNom(!Strings.isNullOrEmpty(cie.getNom()) ? cie.getNom() : p.getNom());
 				p.setOrganGestor(organGestor != null ? organGestor : p.getOrganGestor());
-				p.setApiKey(encriptat != null ? encriptat.getString() : p.getApiKey());
-				p.setSalt(encriptat != null ? encriptat.getSalt() : p.getSalt());
+				if (cie.isCieExtern()) {
+					p.setCieExtern(true);
+					p.setApiKey(encriptat != null ? encriptat.getString() : p.getApiKey());
+					p.setSalt(encriptat != null ? encriptat.getSalt() : p.getSalt());
+				} else {
+					p.setCieExtern(false);
+					p.setApiKey(null);
+					p.setSalt(null);
+				}
 				var contracteDataVig = cie.getContracteDataVig() != null ? cie.getContracteDataVig() : p.getContracteDataVig();
 				p.setContracteDataVig(contracteDataVig);
 			}
@@ -131,7 +143,12 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(id);
-			return conversioTipusHelper.convertir(pagadorCieEntity, CieDto.class);
+			var cie = conversioTipusHelper.convertir(pagadorCieEntity, CieDto.class);
+			if (!Strings.isNullOrEmpty(pagadorCieEntity.getApiKey())) {
+				var encript = new EncryptionUtil(configHelper.getConfig("es.caib.notib.plugin.cie.encriptor.key"), pagadorCieEntity.getSalt());
+				cie.setApiKey(encript.decrypt(pagadorCieEntity.getApiKey()));
+			}
+			return cie;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

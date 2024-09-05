@@ -160,6 +160,22 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			"	   ) ")
 	NotificacioEventEntity findLastEventByNotificacioId(@Param("notificacioId") Long notificacioId);
 
+	@Query( "SELECT ne " +
+			"FROM "
+			+ " NotificacioEventEntity ne "
+			+ "WHERE "
+			+ " ne.notificacio.id = :notificacioId "
+			+ " AND ne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.ENVIAMENT_CIE ")
+	List<NotificacioEventEntity> findEventsCieByNotificacioId(@Param("notificacioId") Long notificacioId);
+
+	@Query( "SELECT ne " +
+			"FROM "
+			+ " NotificacioEventEntity ne "
+			+ "WHERE "
+			+ " ne.enviament.id = :enviamentId "
+			+ " AND ne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.ENVIAMENT_CIE ")
+	NotificacioEventEntity findEventCieByEnviamentId(@Param("enviamentId") Long enviamentId);
+
 //	@Query( "select ne " +
 //			"from " +
 //			"	NotificacioEventEntity ne " +

@@ -67,6 +67,7 @@ public class NotificacioEventHelper {
         // Només generem un event d'enviament (si hi ha reintents es modifica l'actual)
         // i de consulta SIR per ara (fins que no implementin el callback)
         var eventUnic = NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT.equals(eventInfo.getTipus()) ||
+                NotificacioEventTipusEnumDto.ENVIAMENT_CIE.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.SIR_ENVIAMENT.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT.equals(eventInfo.getTipus()) ||
@@ -193,6 +194,18 @@ public class NotificacioEventHelper {
 
         addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.ADVISER_DATAT)
                 .error(error).errorDescripcio(errorDescripcio).build());
+    }
+
+    public void addCieEventEnviar(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+
+        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.ENVIAMENT_CIE)
+                .error(error).errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
+    }
+
+    public void addCieEventCancelar(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+
+        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.CANCELAR_CIE)
+                .error(error).errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
     }
 
 

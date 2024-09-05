@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Column;
@@ -122,6 +123,15 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 
 	@Column(name = "format_fulla", length = 10)
 	protected String formatFulla;
+
+	@Setter
+	@Column(name = "cie_id")
+	protected String cieId;
+
+	@Setter
+	@Column(name = "cie_cancelat")
+	protected boolean cieCancelat;
+
 
 	public void update(EntregaPostal entregaPostal) {
 

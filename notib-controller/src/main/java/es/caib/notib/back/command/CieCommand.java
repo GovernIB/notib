@@ -26,7 +26,15 @@ public class CieCommand {
 	private String nom;
 	private Date contracteDataVig;
 	private String apiKey;
-	private boolean cieAntic;
+	private boolean cieExtern = true;
+
+	public void setCieNotifica(boolean cieNotifica) {
+		cieExtern = !cieNotifica;
+	}
+
+	public boolean isCieNotifica() {
+		return !cieExtern;
+	}
 
 	public static CieCommand asCommand(CieDto dto) {
 		return dto != null ? ConversioTipusHelper.convertir(dto, CieCommand.class ) : null;

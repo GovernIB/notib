@@ -42,6 +42,7 @@ import es.caib.notib.logic.mapper.NotificacioMapper;
 import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.plugin.cie.CiePluginHelper;
+import es.caib.notib.logic.plugin.cie.CiePluginJms;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.CallbackEntity;
@@ -95,13 +96,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.DOCUMENT_CIE_PDF_DINA4_INVALID;
-import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.DOCUMENT_CIE_PDF_EDICIO_BLOQUEJADA;
-import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.DOCUMENT_CIE_PDF_FONTS_EMBEDED;
-import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.DOCUMENT_CIE_PDF_MAX_PAGES_INVALID;
-import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.DOCUMENT_CIE_PDF_MIDA_MAX;
-import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.DOCUMENT_CIE_PDF_VERSIO_INVALID;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -198,6 +192,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private NotificacioTableMapper notificacioTableMapper;
 	@Autowired
 	protected JmsTemplate jmsTemplate;
+	@Autowired
+	protected CiePluginJms ciePluginJms;
 
 	private static final String DELETE = "NotificacioServiceImpl.delete";
 	private static final String UPDATE = "NotificacioServiceImpl.update";
@@ -1450,7 +1446,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, false);
 			}
 			if (isEntregaCieActiva(notificacio)) {
-				enviarEntregaCie(notificacio);
+				enviarEntregaCie(notificacio.getReferencia());
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1461,23 +1457,21 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		var enviaments = notificacio.getEnviaments();
 		for (var e : enviaments) {
-			if (e.getEntregaPostal() != null) {
+			if (e.getEntregaPostal() == null) {
+				continue;
+			}
+			if (notificacio.getProcediment().getEntregaCieEfectiva().getCie().isCieExtern()) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private void enviarEntregaCie(NotificacioEntity notificacio) {
-
-		try {
-			var resposta = ciePluginHelper.enviar(notificacio);
-			// TODO GUARDAR INFO A LA BDD
-		} catch (Exception ex) {
-			log.error("Error al enviar la entrega cie per la notificacio " + notificacio.getId(), ex);
-		}
+	@Override
+	public void enviarEntregaCie(String uuid) {
+		ciePluginJms.enviarMissatge(uuid);
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<Long> getNotificacionsPendentsRefrescarEstat() {

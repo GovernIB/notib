@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 public class EnviamentCie extends NotificacioDtoV2 {
 //
-//    private String identificador;
+    private String identificador;
 //    private TipusRemesa tipus;
 //    private ProveidorCie proveidor;
 //    private DestinatariCie destinatari;

@@ -281,6 +281,11 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
+	public void enviarEntregaCie(String uuid) {
+		getDelegateService().enviarEntregaCie(uuid);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre, PaginacioParamsDto paginacioDtoFromRequest) {
 		return getDelegateService().findNotificacionsAmbErrorRegistre(entitatId, filtre, paginacioDtoFromRequest);

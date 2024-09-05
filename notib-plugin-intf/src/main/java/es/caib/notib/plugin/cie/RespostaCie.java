@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -15,7 +17,7 @@ import java.util.Date;
 @Setter
 public class RespostaCie {
 
-    private String identificador;
+    private List<IdentificadorCie> identificador = new ArrayList<>();
     private String codiError;
     private String descripcioError;
 }

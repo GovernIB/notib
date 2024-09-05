@@ -19,7 +19,7 @@ public class CieDataDto extends AuditoriaDto implements Serializable{
 	private Date contracteDataVig;
 	private Long organGestorId;
 	private String apiKey;
-	private boolean cieAntic;
+	private boolean cieExtern;
 
 	private static final long serialVersionUID = 1305599728317046741L;
 

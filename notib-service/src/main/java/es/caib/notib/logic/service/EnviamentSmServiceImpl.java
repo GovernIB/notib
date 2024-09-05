@@ -441,7 +441,8 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_ESTAT_FINAL,enviament.isNotificaEstatFinal());
-		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		var reintents = (int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
+		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, reintents + 1);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.CN_SUCCESS);
 		return sm;
 	}

@@ -721,7 +721,6 @@ function resetSessionTimeout(){
 
 function loadOrgans($selector, organsGestors, missatgeObsolets){
 	function formatState(organ) {
-		debugger;
 		let msgObsolet = missatgeObsolets;
 		if (organ.estat == 'V' || organ.estat == null || organ.estat == '') {
 			return organ.text;

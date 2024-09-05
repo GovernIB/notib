@@ -110,19 +110,19 @@ public class WsClientHelper<T> {
 		// Configura el log de les peticions
 		@SuppressWarnings("rawtypes")
 		List<Handler> handlerChain = new ArrayList<>();
-		if (logMissatgesActiu) {
+//		if (logMissatgesActiu) {
 			System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
 			System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
 			System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
 			System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
-		}
+//		}
 		// Configura handlers addicionals
 		for (var handler : handlers) {
 			if (handler != null) {
 				handlerChain.add(handler);
 			}
 //			if (logMissatgesActiu) {
-//				handlerChain.add(new SOAPLoggingHandler(WsClientHelper.class));
+				handlerChain.add(new SOAPLoggingHandler(WsClientHelper.class));
 //			}
 		}
 		bindingProvider.getBinding().setHandlerChain(handlerChain);

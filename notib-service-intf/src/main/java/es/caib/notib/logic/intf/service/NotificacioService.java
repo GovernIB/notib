@@ -32,6 +32,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -336,6 +337,7 @@ public interface NotificacioService {
 	boolean reactivarSir(Long notificacioId);
 	
 	
+	void enviarEntregaCie(String uuid);
 
 	// Mètodes per cridar des de l'schedulled
 	void notificacioEnviar(Long notificacioId);
@@ -345,6 +347,8 @@ public interface NotificacioService {
 
 	List<Long> getNotificacionsPendentsRegistrar();
 	List<Long> getNotificacionsPendentsEnviar();
+
+
 	List<Long> getNotificacionsPendentsRefrescarEstat();
 	List<Long> getNotificacionsDEHPendentsRefrescarCert();
 	List<Long> getNotificacionsCIEPendentsRefrescarCert();

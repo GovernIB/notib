@@ -35,6 +35,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	List<Long> findIdsSenseReferencia();
 
 //	NotificacioEntity findById(Long id);
+
+
 	
 	List<NotificacioEntity> findByTipusUsuari(TipusUsuariEnumDto tipusUsuari);
 	

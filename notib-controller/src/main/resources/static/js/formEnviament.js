@@ -324,7 +324,6 @@ function mostrarEntregaPostal(className) {
 function validarEntregaPostalCie() {
 
     let file= document.getElementById("arxiu[0]");
-    debugger;
     if (!file || file.files.length === 0) {
         return;
     }

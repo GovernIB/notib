@@ -31,7 +31,7 @@ public class ConsultaNotificaListener {
 
 
     @JmsListener(destination = SmConstants.CUA_CONSULTA_ESTAT, containerFactory = SmConstants.JMS_FACTORY_ACK)
-    public void receiveEnviamentRegistre(@Payload ConsultaNotificaRequest consultaNotificaRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
+    public void receiveEnviamentConsultaNotifica(@Payload ConsultaNotificaRequest consultaNotificaRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
         var enviament = consultaNotificaRequest.getConsultaNotificaDto();
         if (enviament != null && Strings.isNullOrEmpty(enviament.getUuid())) {

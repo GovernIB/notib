@@ -2,6 +2,7 @@ package es.caib.notib.logic.statemachine.listeners;
 
 import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.service.NotificaService;
+import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentNotificaRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
@@ -27,6 +28,7 @@ import java.util.concurrent.Semaphore;
 public class EnviamentNotificaListener {
 
     private final NotificaService notificaService;
+    private final NotificacioService notificacioService;
     private Semaphore semaphore = new Semaphore(5);
 
 //    @Autowired
@@ -59,6 +61,7 @@ public class EnviamentNotificaListener {
         semaphore.acquire();
         try {
             notificaService.enviarNotifica(enviament.getUuid(), enviamentNotificaRequest);
+//            notificacioService.enviarEntregaCie(enviament.getNotificacioUuid());
             notificaService.enviarEvents(enviament.getUuid(), enviamentNotificaRequest.getCodiUsuari());
         } finally {
             semaphore.release();

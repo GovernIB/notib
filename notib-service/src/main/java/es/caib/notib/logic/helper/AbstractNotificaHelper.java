@@ -12,11 +12,14 @@ import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.plugin.cie.CiePluginHelper;
+import es.caib.notib.logic.plugin.cie.CiePluginJms;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
@@ -68,6 +71,8 @@ public abstract class AbstractNotificaHelper {
 	protected  JmsTemplate jmsTemplate;
 
 	private boolean modeTest;
+    @Autowired
+    private CiePluginJms ciePluginJms;
 
 	public abstract NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail);
 
@@ -133,6 +138,13 @@ public abstract class AbstractNotificaHelper {
 		log.info("Estat final: " + estatsEnviamentsFinals);
 		NotificacioEstatEnumDto notificacioEstat = enviament.getNotificacio().getEstat();
 		NotificacioEntity notificacio = enviament.getNotificacio();
+		var dataEnviamentNotifica = notificacio.getNotificaEnviamentData();
+		var retard = notificacio.getRetard();
+		var dataRetard = DateUtils.addDays(dataEnviamentNotifica, retard);
+		var cancelar = dataRetard.before(dataEnviamentNotifica);
+		if (cancelar && enviament.getEntregaPostal() != null && estatFinal && enviament.getEntregaPostal().getCieId() == null) {
+			ciePluginJms.cancelarEnviament(enviament.getUuid());
+		}
 
 		if (estatsEnviamentsNotificaFinals && !NotificacioEstatEnumDto.PROCESSADA.equals(notificacioEstat)) {
 			NotificacioEstatEnumDto nouEstat = NotificacioEstatEnumDto.FINALITZADA;
