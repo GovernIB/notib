@@ -86,8 +86,8 @@ function afegirSm() {
 
 $(document).ready(function() {
 
-	const eventSource = new EventSource("<c:url value='/${notificacioId}/sse-endpoint'/>");
-
+	let eventSource = new EventSource("<c:url value='/${notificacioId}/sse-endpoint'/>");
+	console.log(eventSource);
 	eventSource.onmessage = function(resposta) {
 		let json = JSON.parse(resposta.data);
 		if (json.msg) {
@@ -110,12 +110,17 @@ $(document).ready(function() {
 		}
 		if (json.updateInfo) {
 			// window.frames[window.frames.length-1].window.location.reload();
+			eventSource.close();
 			window.location.reload();
 		}
 	};
 
 	eventSource.onerror = function(error) {
 		console.error("Error en SSE:", error);
+		eventSource.close();
+		setTimeout(() => {
+			eventSource = new EventSource("<c:url value='/${notificacioId}/sse-endpoint'/>");
+		}, 2000);
 	};
 
 

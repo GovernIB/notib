@@ -49,13 +49,15 @@ public class SseController extends BaseController {
     public SseEmitter streamEvents(@PathVariable Long notificacioId) {
 
         var em = emitters.getOrDefault(notificacioId, new HashMap<>());
-        var emitter = new SseEmitter(Long.MAX_VALUE);
-        em.put(sessionScopedContext.getUsuariActualCodi(), emitter);
+        var emitter = new SseEmitter(0L);
+        var usuariCodi = sessionScopedContext.getUsuariActualCodi();
+        em.remove(usuariCodi);
+        em.put(usuariCodi, emitter);
         emitters.put(notificacioId, em);
 
-        emitter.onCompletion(() -> emitters.remove(notificacioId));
-        emitter.onTimeout(() -> emitters.remove(notificacioId));
-        emitter.onError(e -> emitters.remove(notificacioId));
+//        emitter.onCompletion(() -> emitters.get(notificacioId).remove(usuariCodi));
+//        emitter.onTimeout(() -> emitters.get(notificacioId).remove(usuariCodi));
+//        emitter.onError(e -> emitters.get(notificacioId).remove(usuariCodi));
 
         return emitter;
     }
