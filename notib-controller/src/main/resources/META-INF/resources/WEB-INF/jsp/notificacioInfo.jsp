@@ -87,7 +87,6 @@ function afegirSm() {
 $(document).ready(function() {
 
 	let eventSource = new EventSource("<c:url value='/${notificacioId}/sse-endpoint'/>");
-	console.log(eventSource);
 	eventSource.onmessage = function(resposta) {
 		let json = JSON.parse(resposta.data);
 		if (json.msg) {
