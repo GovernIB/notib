@@ -63,8 +63,9 @@ public class SseController extends BaseController {
     }
 
 //    @JmsListener(destination = WebSocketConstants.CUA_WEBSOCKET, containerFactory = WebSocketConstants.JMS_FACTORY_ACK)
-    public void sendEventToClient(@Payload MissatgeWs missatge, @Headers MessageHeaders headers, Message message) {
+    public void sendEventToClient(@Payload MissatgeWs missatge, @Headers MessageHeaders headers, Message message) throws JMSException {
 
+        message.acknowledge();
         var emits = emitters.get(missatge.getNotificacioId());
         if (emits == null || emits.isEmpty()) {
             return;

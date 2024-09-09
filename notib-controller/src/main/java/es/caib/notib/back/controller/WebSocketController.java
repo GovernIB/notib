@@ -57,12 +57,11 @@ public class WebSocketController extends BaseController {
     @JmsListener(destination = WebSocketConstants.CUA_WEBSOCKET, containerFactory = WebSocketConstants.JMS_FACTORY_ACK)
     public void enviarMissatge(@Payload MissatgeWs missatge, @Headers MessageHeaders headers, Message message) throws JMSException {
 
+        message.acknowledge();
         if (Strings.isNullOrEmpty(missatge.getCodiUsuari()) || simpUserRegistry.getUser(missatge.getCodiUsuari()) == null) {
-            message.acknowledge();
             return;
         }
         template.convertAndSendToUser(missatge.getCodiUsuari(), "/notibws/missatge", missatge);
-        message.acknowledge();
     }
 //
 //    @JmsListener(destination = WebSocketConstants.CUA_WEBSOCKET, containerFactory = WebSocketConstants.JMS_FACTORY_ACK)
