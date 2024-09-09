@@ -24,7 +24,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //        registry.addEndpoint("/websocket").setAllowedOrigins("*").withSockJS(); //TODO VARIABLE PER ELS DIFERENTS ENTORNS
 //        registry.addEndpoint("/websocket").setAllowedOrigins("/notibback").withSockJS().setWebSocketEnabled(false);
         registry.addEndpoint("/websocket")
-                .setAllowedOrigins("/notibback")
+//                .setAllowedOrigins("/notibback")
+                .setAllowedOriginPatterns("/notibback")
 //                .setHandshakeHandler(new WebSocketHandshakeHandler())
                 .withSockJS();
     }

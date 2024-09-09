@@ -86,6 +86,43 @@ function afegirSm() {
 
 $(document).ready(function() {
 
+	<%--let eventSource = new EventSource("<c:url value='/${notificacioId}/sse-endpoint'/>");--%>
+	<%--eventSource.onmessage = function(resposta) {--%>
+	<%--	let json = JSON.parse(resposta.data);--%>
+	<%--	if (json.msg) {--%>
+	<%--		let classe = json.ok ? "alert-success" : "alert-danger";--%>
+	<%--		let content = '<button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +--%>
+	<%--				'<span class="fa fa-times"></span></button>' + json.msg + '</div>';--%>
+
+	<%--		let div = document.createElement("div");--%>
+	<%--		div.className = "alert " + classe;--%>
+	<%--		$(div).append(content);--%>
+	<%--		const frames = window.frames;--%>
+	<%--		if (frames.length > 0) {--%>
+	<%--			let cm = frames[frames.length-1].document.getElementById("contingut-missatges");--%>
+	<%--			$(cm).append(div);--%>
+	<%--		} else {--%>
+	<%--			$("#contingut-missatges").empty();--%>
+	<%--			$("#contingut-missatges").append(div);--%>
+	<%--		}--%>
+	<%--		window.setTimeout(() => div ? div.remove() : "", 4000);--%>
+	<%--	}--%>
+	<%--	if (json.updateInfo) {--%>
+	<%--		// window.frames[window.frames.length-1].window.location.reload();--%>
+	<%--		eventSource.close();--%>
+	<%--		window.location.reload();--%>
+	<%--	}--%>
+	<%--};--%>
+
+	<%--eventSource.onerror = function(error) {--%>
+	<%--	console.error("Error en SSE:", error);--%>
+	<%--	eventSource.close();--%>
+	<%--	setTimeout(() => {--%>
+	<%--		eventSource = new EventSource("<c:url value='/${notificacioId}/sse-endpoint'/>");--%>
+	<%--	}, 2000);--%>
+	<%--};--%>
+
+
 	let $tableEvents = $('#table-events');
 	$tableEvents.on('rowinfo.dataTable', function(e, td, rowData) {
 
