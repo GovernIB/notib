@@ -43,10 +43,10 @@ public class EnviamentRegistreListener {
     @JmsListener(destination = SmConstants.CUA_REGISTRE, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveEnviamentRegistre(@Payload EnviamentRegistreRequest enviamentRegistreRequest, @Headers MessageHeaders headers, Message message) throws JMSException, RegistreNotificaException, InterruptedException {
 
+        message.acknowledge();
         var enviamentUuid = enviamentRegistreRequest.getEnviamentUuid();
         if (enviamentUuid == null) {
             log.error("[SM] Rebut enviament de registre sense Enviament");
-            message.acknowledge();
             return;
         }
         log.debug("[SM] Rebut enviament de registre <" + enviamentUuid + ">");
@@ -55,13 +55,11 @@ public class EnviamentRegistreListener {
             var enviament = enviamentRepository.findByUuid(enviamentUuid);
             if (enviament.isEmpty()) {
                 log.error("[SM] Enviament inexistent " + enviamentUuid);
-                message.acknowledge();
                 return;
             }
             var env = enviament.get();
             if (env.getNotificacio().isDeleted()) {
                 NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
-                message.acknowledge();
                 return;
             }
             if (!Strings.isNullOrEmpty(env.getRegistreNumeroFormatat())) {
@@ -88,7 +86,6 @@ public class EnviamentRegistreListener {
             semaphore.release();
         }
         NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> completat", log, LoggingTipus.STATE_MACHINE);
-        message.acknowledge();
     }
 
 }
