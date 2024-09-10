@@ -24,7 +24,7 @@ public abstract class AbstractPluginHelper<T> {
 	protected final IntegracioHelper integracioHelper;
 	protected final ConfigHelper configHelper;
 
-	protected IntegracioPeticions peticionsPlugin = IntegracioPeticions.builder().build();
+	protected IntegracioPeticions peticionsPlugin = IntegracioPeticions.builder().organOk(new HashMap<>()).organError(new HashMap<>()).build();
 	protected Map<String, T> pluginMap = new HashMap<>();
 
 	public AbstractPluginHelper(IntegracioHelper integracioHelper,
