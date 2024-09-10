@@ -85,7 +85,7 @@ public class CieNexeaPluginImpl implements CiePlugin {
             var desc = sfe.getFault().getFaultString();
             return RespostaCie.builder().codiError(codi).descripcioError(desc).build();
         } catch (Exception ex) {
-            var desc = "Error al enviar l'enviament CIE " + notificacio.getId() + " - " + ex.getMessage();
+            var desc = "Error al enviar a CIE la notificacio " + notificacio.getId() + " - " + ex.getMessage();
             log.error(desc, ex);
             return RespostaCie.builder().codiError(NOTIB).descripcioError(desc).build();
         }

@@ -86,9 +86,10 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 				if (organGestor != null) {
 					pagador.setOrganGestor(organGestor);
 				}
+				pagador.setNom(postal.getNom());
 				pagador.setContracteNum(postal.getContracteNum());
 				pagador.setContracteDataVig(postal.getContracteDataVig());
-				pagador.setFacturacioClientCodi(pagador.getFacturacioClientCodi());
+				pagador.setFacturacioClientCodi(postal.getFacturacioClientCodi());
 			}
  			var pagadorPostalEntity = pagadorPostalReposity.save(pagador);
 			return conversioTipusHelper.convertir(pagadorPostalEntity, OperadorPostalDto.class);

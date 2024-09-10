@@ -474,7 +474,7 @@ public class NotificacioValidator implements Validator {
     public void validarDocumentCIE(Document document, Errors errors, String doc, String prefix) throws IOException {
 
         var bytes = Base64.decode(document.getContingutBase64());
-        if (bytes.length > 5000000) {
+        if (bytes.length > 5242880) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_MIDA_MAX, locale, prefix));
         }
 
@@ -495,7 +495,30 @@ public class NotificacioValidator implements Validator {
         if (!pdf.checkFontsEmbeded()) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_FONTS_EMBEDED, locale, prefix));
         }
-
+        if (!Strings.isNullOrEmpty(pdf.getJavaScript())) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_JAVA_SCRIPT, locale, prefix));
+        }
+        if (pdf.hasExternalLinks()) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_EXTERNAL_LINKS, locale, prefix));
+        }
+        if (pdf.hasTransparency()) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_TRANSPARENCY, locale, prefix));
+        }
+        if (pdf.hasAttachedFiles()) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_ATTACHED_FILES, locale, prefix));
+        }
+        if (pdf.hasMultimedia()) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_MULTIMEDIA, locale, prefix));
+        }
+        if (pdf.hasNonPrintableAnnotations()) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_NONE_PRINTABLE_ANNOTATIONS, locale, prefix));
+        }
+        if (pdf.hasForms()) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_INTERACTIVE_FORMS, locale, prefix));
+        }
+        if (pdf.hasNoneEmbeddedImages()) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_NONE_EMBEDDED_IMAGES, locale, prefix));
+        }
     }
 
     private void validateEnviaments() {

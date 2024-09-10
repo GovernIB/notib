@@ -49,6 +49,14 @@ public class ValidacioErrorCodes {
     public static final int DOCUMENT_CIE_PDF_MIDA_MAX = 107554;
     public static final int DOCUMENT_CIE_PDF_EDICIO_BLOQUEJADA = 107555;
     public static final int DOCUMENT_CIE_PDF_FONTS_EMBEDED = 107556;
+    public static final int DOCUMENT_CIE_PDF_JAVA_SCRIPT = 107557;
+    public static final int DOCUMENT_CIE_PDF_EXTERNAL_LINKS = 107558;
+    public static final int DOCUMENT_CIE_PDF_TRANSPARENCY = 107559;
+    public static final int DOCUMENT_CIE_PDF_ATTACHED_FILES = 107560;
+    public static final int DOCUMENT_CIE_PDF_MULTIMEDIA = 107561;
+    public static final int DOCUMENT_CIE_PDF_NONE_PRINTABLE_ANNOTATIONS = 107562;
+    public static final int DOCUMENT_CIE_PDF_INTERACTIVE_FORMS = 107563;
+    public static final int DOCUMENT_CIE_PDF_NONE_EMBEDDED_IMAGES = 107564;
     public static final int DOCUMENT_FORMAT_SIR_INVALID = 1076;
     public static final int DOCUMENT_ERROR_OBTENINT = 1077;
     public static final int DOCUMENT_ERROR_OBTENINT_METADADES = 1078;
