@@ -12,6 +12,8 @@ import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioRepository;
@@ -131,6 +133,7 @@ public abstract class AbstractNotificaHelper {
 			}
 		}
 		log.info("Estat final: " + estatsEnviamentsFinals);
+		NotibLogger.getInstance().printInfoSistema(log, LoggingTipus.METRIQUES_SISTEMA);
 		NotificacioEstatEnumDto notificacioEstat = enviament.getNotificacio().getEstat();
 		NotificacioEntity notificacio = enviament.getNotificacio();
 

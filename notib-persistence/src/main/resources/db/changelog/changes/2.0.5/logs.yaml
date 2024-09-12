@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - sql: "INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.EMAIL', 'false', 'Mostrar logs dels enviaments per email', 'LOGS', 16, 0, 'BOOL', 0);
+                INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.ADVISER', 'false', 'Mostrar logs de adviser', 'LOGS', 17, 0, 'BOOL', 0);
+                INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.METRIQUES_SISTEMA', 'false', 'Mostrar logs del gestor documental', 'LOGS', 19, 0, 'BOOL', 0);"

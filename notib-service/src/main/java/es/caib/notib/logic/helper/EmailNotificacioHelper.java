@@ -6,6 +6,8 @@ import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.UsuariDto;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +61,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 			var email = !Strings.isNullOrEmpty(usuariDto.getEmailAlt()) ? usuariDto.getEmailAlt() : usuariDto.getEmail();
 			email = email.replaceAll("\\s+","");
 			try {
+				NotibLogger.getInstance().printInfoSistema(log, LoggingTipus.METRIQUES_SISTEMA);
 				log.info(String.format("Enviant correu notificació (Id= %d) a %s", notificacio.getId(), email));
 				info.addParam(usuariDto.getCodi(), "Enviant correu electrònic a " + usuariDto.getNom() + " - " + usuariDto.getEmail());
 				sendEmailNotificacio(email, notificacio);

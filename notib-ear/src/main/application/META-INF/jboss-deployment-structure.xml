@@ -57,6 +57,7 @@
 			<module name="org.apache.ws.security"/>
 			<module name="org.bouncycastle"/>
 			<module name="io.undertow.core"/>
+			<module name="jdk.management"/>
 			<module name="io.undertow.servlet" export="true"/>
 			<module name="io.undertow.websocket" export="true"/>
 		</dependencies>

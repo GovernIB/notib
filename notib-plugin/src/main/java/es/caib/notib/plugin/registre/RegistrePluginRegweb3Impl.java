@@ -154,7 +154,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		return rj;
 	}
 
-	private AsientoRegistralWs toAsientoRegistralBean(AsientoRegistralBeanDto dto) {
+	private AsientoRegistralWs toAsientoRegistralBean(AsientoRegistralBeanDto dto) throws Exception{
 
 		var ar = new AsientoRegistralWs();
 		ar.setAplicacion(dto.getAplicacion());
@@ -201,6 +201,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		if(dto.getAnexos() != null) {
 			AnexoWs anexe;
 			for (var anexo: dto.getAnexos()) {
+				if (anexo == null) {
+					continue;
+				}
 				anexe = new AnexoWs();
 				anexe.setCsv(anexo.getCsv());
 				anexe.setFicheroAnexado(anexo.getFicheroAnexado());
@@ -218,6 +221,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 				anexe.setValidezDocumento(anexo.getValidezDocumento());				
 				ar.getAnexos().add(anexe);
 			}
+//			if (ar.getAnexos().isEmpty()) {
+//				throw new Exception("Error al toAsientoRegistralBean. AsientoRegistralBeanDto conte annexos pero aquests estan buits");
+//			}
 		}
 		//Interessat + representant
 		if (dto.getInteresados() != null) {
