@@ -57,6 +57,9 @@ public class ValidacioErrorCodes {
     public static final int DOCUMENT_CIE_PDF_NONE_PRINTABLE_ANNOTATIONS = 107562;
     public static final int DOCUMENT_CIE_PDF_INTERACTIVE_FORMS = 107563;
     public static final int DOCUMENT_CIE_PDF_NONE_EMBEDDED_IMAGES = 107564;
+    public static final int DOCUMENT_CIE_PDF_PRINTING_ALLOWED = 107565;
+    public static final int DOCUMENT_CIE_PDF_MODIFY_ALLOWED = 107566;
+    public static final int DOCUMENT_CIE_PDF_MAX_RIGHT_MARGIN = 107567;
     public static final int DOCUMENT_FORMAT_SIR_INVALID = 1076;
     public static final int DOCUMENT_ERROR_OBTENINT = 1077;
     public static final int DOCUMENT_ERROR_OBTENINT_METADADES = 1078;

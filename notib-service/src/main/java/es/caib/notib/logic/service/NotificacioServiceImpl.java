@@ -69,6 +69,7 @@ import es.caib.notib.plugin.cie.TipusImpressio;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
+import liquibase.pro.packaged.S;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -96,6 +97,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.DOCUMENT_CIE_PDF_MAX_RIGHT_MARGIN;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -1838,10 +1841,42 @@ public class NotificacioServiceImpl implements NotificacioService {
 		if (pdf.isEditBlocked()) {
 			errors.add(messageHelper.getMessage("error.validacio.107555"));
 		}
-		if (!pdf.checkFontsEmbeded()) {
+		if (pdf.hasNoneEmbeddedFonts()) {
 			errors.add(messageHelper.getMessage("error.validacio.107556"));
 		}
-
+		if (!Strings.isNullOrEmpty(pdf.getJavaScript())) {
+			errors.add(messageHelper.getMessage("error.validacio.107557"));
+		}
+		if (pdf.hasExternalLinks()) {
+			errors.add(messageHelper.getMessage("error.validacio.107558"));
+		}
+		if (pdf.hasTransparency()) {
+			errors.add(messageHelper.getMessage("error.validacio.107559"));
+		}
+		if (pdf.hasAttachedFiles()) {
+			errors.add(messageHelper.getMessage("error.validacio.107560"));
+		}
+		if (pdf.hasMultimedia()) {
+			errors.add(messageHelper.getMessage("error.validacio.107561"));
+		}
+		if (pdf.hasNonPrintableAnnotations()) {
+			errors.add(messageHelper.getMessage("error.validacio.107562"));
+		}
+		if (pdf.hasForms()) {
+			errors.add(messageHelper.getMessage("error.validacio.107563"));
+		}
+		if (pdf.hasNoneEmbeddedImages()) {
+			errors.add(messageHelper.getMessage("error.validacio.107564"));
+		}
+		if (pdf.isPrintingAllowed()) {
+			errors.add(messageHelper.getMessage("error.validacio.107565"));
+		}
+		if (pdf.isModifyAllowed()) {
+			errors.add(messageHelper.getMessage("error.validacio.107566"));
+		}
+		if (!pdf.isMaxRightMarginOk()) {
+			errors.add(messageHelper.getMessage("error.validacio.107567"));
+		}
 		var msg = !errors.isEmpty() ? messageHelper.getMessage("errors.validacio.cie") : "";
 
 		return DocCieValid.builder().errorsCie(errors).errorCieMsg(msg).build();

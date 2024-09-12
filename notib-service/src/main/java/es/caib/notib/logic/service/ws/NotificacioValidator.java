@@ -492,7 +492,7 @@ public class NotificacioValidator implements Validator {
         if (pdf.isEditBlocked()) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_EDICIO_BLOQUEJADA, locale, prefix));
         }
-        if (!pdf.checkFontsEmbeded()) {
+        if (pdf.hasNoneEmbeddedFonts()) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_FONTS_EMBEDED, locale, prefix));
         }
         if (!Strings.isNullOrEmpty(pdf.getJavaScript())) {
@@ -519,6 +519,16 @@ public class NotificacioValidator implements Validator {
         if (pdf.hasNoneEmbeddedImages()) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_NONE_EMBEDDED_IMAGES, locale, prefix));
         }
+        if (pdf.isPrintingAllowed()) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_PRINTING_ALLOWED, locale, prefix));
+        }
+        if (pdf.isModifyAllowed()) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_MODIFY_ALLOWED, locale, prefix));
+        }
+        if (!pdf.isMaxRightMarginOk()) {
+            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_MAX_RIGHT_MARGIN, locale, prefix));
+        }
+        pdf.close();
     }
 
     private void validateEnviaments() {
