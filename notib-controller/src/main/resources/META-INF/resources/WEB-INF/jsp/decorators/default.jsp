@@ -64,8 +64,8 @@
 	<script type="application/javascript" src="<c:url value="/js/NotibWebSocket.js"/>"></script>
 	<script type="text/javascript">
 
-		// let webSocket = new NotibWebSocket();
-		// webSocket.connectSockJs();
+		let webSocket = new NotibWebSocket();
+		webSocket.connectSockJs();
 
 		var userLanguage;
 		var setIdioma = function() {
