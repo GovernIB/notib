@@ -36,16 +36,14 @@ public class EnviamentEmailListener {
 
         // Actualment els enviaments de avisos de notificacions per Email es realitzen des de la funcionalitat de norificar
         // per tant no s'utilitza aquest listener
-
+        message.acknowledge();
         var enviament = enviamentEmailRequest.getEnviamentEmailDto();
         if (enviament == null || Strings.isNullOrEmpty(enviament.getUuid())) {
             log.error("[SM] Rebut enviament per email sense Enviament");
-            message.acknowledge();
             return;
         }
         if (enviament.isDeleted()) {
             NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid(), log, LoggingTipus.STATE_MACHINE);
-            message.acknowledge();
             return;
         }
         log.error("[SM] Rebut enviament per email <" + enviament.getUuid() + ">");
@@ -62,7 +60,6 @@ public class EnviamentEmailListener {
         } finally {
             semaphore.release();
         }
-        message.acknowledge();
 
     }
 

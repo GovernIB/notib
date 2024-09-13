@@ -32,16 +32,15 @@ public class ConsultaSirListener {
     @JmsListener(destination = SmConstants.CUA_CONSULTA_SIR, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveConsultaSir(@Payload ConsultaSirRequest consultaSirRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
+        message.acknowledge();
         var enviament = consultaSirRequest.getConsultaSirDto();
         if (enviament == null || enviament.getUuid() == null) {
             log.error("[SM] Rebuda consulta d'estat a Sir sense Enviament");
-            message.acknowledge();
             return;
         }
         NotibLogger.getInstance().info("[SM] Rebut consulta d'estat a Sir <" + enviament.getUuid() + ">", log, LoggingTipus.STATE_MACHINE);
         if (enviament.isDeleted()) {
             NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid(), log, LoggingTipus.STATE_MACHINE);
-            message.acknowledge();
             return;
         }
         semaphore.acquire();
@@ -55,7 +54,6 @@ public class ConsultaSirListener {
         } finally {
             semaphore.release();
         }
-        message.acknowledge();
 
     }
 

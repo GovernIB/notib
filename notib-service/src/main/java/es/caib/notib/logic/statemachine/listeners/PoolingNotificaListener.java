@@ -31,16 +31,15 @@ public class PoolingNotificaListener {
     @JmsListener(destination = SmConstants.CUA_POOLING_ESTAT, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveConsultaSir(@Payload String enviamentUuid, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
+        message.acknowledge();
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         if (enviament.getNotificacio().isDeleted()) {
             NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid(), log, LoggingTipus.STATE_MACHINE);
-            message.acknowledge();
             return;
         }
         NotibLogger.getInstance().info("[SM] PoolingNotificaListener enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         enviamentSmService.enviamentConsulta(enviamentUuid);
         NotibLogger.getInstance().info("[SM] Iniciat pooling de consulta d'estat a Notifica de l'enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
-        message.acknowledge();
     }
 
     public boolean isAdviserActiu() {

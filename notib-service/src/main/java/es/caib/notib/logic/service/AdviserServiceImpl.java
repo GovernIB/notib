@@ -23,6 +23,8 @@ import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.ResultadoSincronizarEnvio;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.SincronizarEnvio;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.Getter;
@@ -325,6 +327,7 @@ public class AdviserServiceImpl implements AdviserService {
 
         try {
             log.info("Guardant certificacio acusament de rebut...");
+            NotibLogger.getInstance().printInfoSistema(log, LoggingTipus.METRIQUES_SISTEMA);
             return pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, acuse);
         } catch (Exception ex) {
             log.error("No s'ha pogut guardar la certificació a la gestió documental", ex);

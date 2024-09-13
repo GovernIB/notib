@@ -29,11 +29,11 @@ public class PoolingSirListener {
     @JmsListener(destination = SmConstants.CUA_POOLING_SIR, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveConsultaSir(@Payload String enviamentUuid, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
+        message.acknowledge();
         try {
             var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
             if (enviament.getNotificacio().isDeleted()) {
                 NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid(), log, LoggingTipus.STATE_MACHINE);
-                message.acknowledge();
                 return;
             }
             var notificacioRegistrada = enviament.getNotificacio().getEnviaments().stream().allMatch(e -> e.getRegistreData() != null);
@@ -45,8 +45,6 @@ public class PoolingSirListener {
         } catch (Exception ex) {
             log.error("[SM] Error en el pooling Sir de l'enviament <" + enviamentUuid + ">");
         }
-        message.acknowledge();
-
     }
 
 }
