@@ -487,7 +487,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		if (recording == null) {
 			return;
 		}
-		var path = Paths.get(configHelper.getConfig("es.caib.notib.recorder.ruta.fitxer"));
+		var path = getRecordingPath();
 		recording.stop();
 		recording.dump(path);
 	}
@@ -495,8 +495,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public String analyzeRecording() throws IOException {
 
+		var path =getRecordingPath();
 		var analysis = new StringBuilder();
-		var path = Paths.get(configHelper.getConfig("es.caib.notib.recorder.ruta.fitxer"));
 		try (RecordingFile recordingFile = new RecordingFile(path)) {
 			while (recordingFile.hasMoreEvents()) {
 				var event = recordingFile.readEvent();
@@ -504,6 +504,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 			}
 		}
 		return analysis.toString();
+	}
+
+	private Path getRecordingPath() {
+
+		var baseDir = configHelper.getConfig("es.caib.notib.plugin.gesdoc.filesystem.base.dir");
+		baseDir = baseDir.endsWith("/") ? baseDir + "tmp/" : baseDir + "/tmp/";
+		return Paths.get(baseDir + "recording.jfr");
 	}
 
 	private String formatEvent(RecordedEvent event) {
