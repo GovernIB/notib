@@ -26,6 +26,9 @@ import es.caib.notib.persist.repository.ProcessosInicialsRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.persist.repository.acl.AclSidRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
+import jdk.jfr.Recording;
+import jdk.jfr.consumer.RecordedEvent;
+import jdk.jfr.consumer.RecordingFile;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.broker.BrokerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +39,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -456,6 +464,79 @@ public class AplicacioServiceImpl implements AplicacioService {
 			log.error("Error obtinguent el número d'elements per pàgina per defecte");
 			return 10;
 		}
+	}
+
+	private Recording recording;
+
+	@Override
+	public void startRecording() {
+
+		recording = new Recording();
+		Map<String, String> settings = new HashMap<>();
+		settings.put("jdk.ObjectAllocationInNewTLAB#enabled", "true");
+		settings.put("jdk.ObjectAllocationOutsideTLAB#enabled", "true");
+		settings.put("jdk.GarbageCollection#enabled", "true");
+		recording.setSettings(settings);
+		recording.setName("WebAppRecording");
+		recording.start();
+	}
+
+	@Override
+	public void stopRecording() throws Exception {
+
+		if (recording == null) {
+			return;
+		}
+		var path = Paths.get(configHelper.getConfig("es.caib.notib.recorder.ruta.fitxer"));
+		recording.stop();
+		recording.dump(path);
+	}
+
+	@Override
+	public String analyzeRecording() throws IOException {
+
+		var analysis = new StringBuilder();
+		var path = Paths.get(configHelper.getConfig("es.caib.notib.recorder.ruta.fitxer"));
+		try (RecordingFile recordingFile = new RecordingFile(path)) {
+			while (recordingFile.hasMoreEvents()) {
+				var event = recordingFile.readEvent();
+				analysis.append(formatEvent(event));
+			}
+		}
+		return analysis.toString();
+	}
+
+	private String formatEvent(RecordedEvent event) {
+
+		var sb = new StringBuilder();
+		var eventType = event.getEventType().getName();
+		sb.append("Event: ").append(eventType).append("\n");
+		sb.append("Start Time: ").append(event.getStartTime()).append("\n");
+		switch (eventType) {
+			case "jdk.ObjectAllocationInNewTLAB":
+			case "jdk.ObjectAllocationOutsideTLAB":
+				long allocationSize = event.getLong("allocationSize");
+				String objectClass = event.getClass("objectClass").getName();
+				sb.append("Allocation Size: ").append(allocationSize).append(" bytes").append("\n");
+				sb.append("Object Class: ").append(objectClass).append("\n");
+				break;
+			case "jdk.GarbageCollection":
+				long gcId = event.getLong("gcId");
+				String gcName = event.getString("name");
+				long duration = event.getDuration().toNanos();
+				sb.append("GC ID: ").append(gcId).append("\n");
+				sb.append("GC Name: ").append(gcName).append("\n");
+				sb.append("Duration: ").append(duration).append(" ns").append("\n");
+				break;
+			default:
+				event.getFields().forEach(field -> {
+					Object value = event.getValue(field.getName());
+					sb.append(field.getName()).append(": ").append(value).append("\n");
+				});
+				break;
+		}
+		sb.append("\n");
+		return sb.toString();
 	}
 
 }

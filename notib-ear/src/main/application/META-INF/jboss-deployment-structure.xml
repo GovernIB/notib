@@ -58,6 +58,7 @@
 			<module name="org.bouncycastle"/>
 			<module name="io.undertow.core"/>
 			<module name="jdk.management"/>
+			<module name="jdk.jfr"/>
 			<module name="io.undertow.servlet" export="true"/>
 			<module name="io.undertow.websocket" export="true"/>
 		</dependencies>

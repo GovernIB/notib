@@ -406,8 +406,11 @@ public interface NotificacioService {
 
 	@PreAuthorize("isAuthenticated()")
 	DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid);
-	
+
 	@PreAuthorize("isAuthenticated()")
+    int getMaxAccionesMassives();
+
+    @PreAuthorize("isAuthenticated()")
 	boolean validarIdCsv (String idCsv);
 
 	@PreAuthorize("isAuthenticated()")

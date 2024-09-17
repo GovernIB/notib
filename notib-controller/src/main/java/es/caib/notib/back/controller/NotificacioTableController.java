@@ -596,10 +596,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public void certificacioDescarregarMassiu(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
 
         var seleccio = getIdsSeleccionats(request);
-        if (seleccio == null || seleccio.isEmpty()) {
+        if (seleccio == null || seleccio.isEmpty() || (seleccio.size() == 1 && seleccio.contains(-1L))) {
             return;
         }
-
         response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
         List<List<ArxiuDto>> certificacions = new ArrayList<>();
         List<ArxiuDto> notCertificacions;
@@ -814,7 +813,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var entitatActual = sessionScopedContext.getEntitatActual();
         var referer = request.getHeader("Referer");
         var seleccio = getIdsSeleccionats(request);
-        if (seleccio == null || seleccio.isEmpty()) {
+        if (seleccio == null || seleccio.isEmpty() || (seleccio.size() == 1 && seleccio.contains(-1L))) {
             return;
 //            return getModalControllerReturnValueError(request,REDIRECT + referer,SELECCIO_BUIDA);
         }
@@ -930,6 +929,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         if (seleccio == null || seleccio.isEmpty()) {
             return getModalControllerReturnValueError(request,redirect,SELECCIO_BUIDA);
         }
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+            return getModalControllerReturnValueError(request, redirect,"accio.massiva.creat.ko");
+        }
         List<String> notificacionsError = new ArrayList<>();
         for (Long notificacioId : seleccio) {
             try {
@@ -958,6 +960,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var seleccio = getIdsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             return getModalControllerReturnValueError(request,REDIRECT_2_PARENTS,SELECCIO_BUIDA);
+        }
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+            return getModalControllerReturnValueError(request,REDIRECT_2_PARENTS,"accio.massiva.creat.ko");
         }
         List<String> notificacionsError = new ArrayList<>();
         for (var notificacioId : seleccio) {
@@ -998,6 +1003,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         if (seleccio == null || seleccio.isEmpty()) {
             return getModalControllerReturnValueError(request, REDIRECT_2_PARENTS, SELECCIO_BUIDA);
         }
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+           return MARCAR_PROCESSAT;
+        }
         if (bindingResult.hasErrors()) {
             RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, new HashSet<>());
             model.addAttribute(IS_MASSIU, true);
@@ -1035,7 +1043,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         if (seleccio == null || seleccio.isEmpty()) {
             return getModalControllerReturnValueError(request,REDIRECT + referer,SELECCIO_BUIDA);
         }
-
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+            return getModalControllerReturnValueError(request,REDIRECT + referer,"notificacio.controller.esborrar.massiu.ko");
+        }
         Set<Long> notificacionsNoEsborrades = new HashSet<>();
         for (var notificacioId : seleccio) {
             try {
@@ -1061,7 +1071,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         if (seleccio == null || seleccio.isEmpty()) {
             return getModalControllerReturnValueError(request,REDIRECT + referer,SELECCIO_BUIDA);
         }
-
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+            return getModalControllerReturnValueError(request,REDIRECT + referer,"notificacio.controller.esborrar.massiu.ko");
+        }
         Set<Long> notificacionsNoRecuperades = new HashSet<>();
         for (var notificacioId : seleccio) {
             try {

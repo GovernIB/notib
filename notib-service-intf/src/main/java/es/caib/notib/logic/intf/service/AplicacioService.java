@@ -190,4 +190,13 @@ public interface AplicacioService {
 
 	@PreAuthorize("isAuthenticated()")
     Integer getNumElementsPaginaDefecte();
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+    void startRecording();
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	void stopRecording() throws Exception;
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	String analyzeRecording() throws Exception;
 }

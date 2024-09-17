@@ -209,6 +209,24 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
+	public void startRecording() {
+		getDelegateService().startRecording();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public void stopRecording() throws Exception {
+		getDelegateService().stopRecording();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public String analyzeRecording() throws Exception {
+		return getDelegateService().analyzeRecording();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
 	public void restartSmBroker() throws Exception {
 		getDelegateService().restartSmBroker();
 	}

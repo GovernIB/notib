@@ -698,7 +698,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			f.setDataFi(DatesUtils.incrementarDataFi(f.getDataFi()));
 			return notificacioTableViewRepository.findIdsAmbFiltre(f);
 		} finally {
-			log.error("Eror obtinguent els ids amb filtre de les remeses")
+			log.error("Error obtinguent els ids amb filtre de les remeses")
 ;		}
 	}
 
@@ -1867,6 +1867,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	@Override
+	public int getMaxAccionesMassives() {
+
+		var max = configHelper.getConfigAsInteger("es.caib.notib.maxim.accions.massives");
+		return max != null ? max : 250;
 	}
 
 	private int getRegistreEnviamentsProcessarMaxProperty() {

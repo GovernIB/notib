@@ -105,7 +105,9 @@ public class NotificacioEventHelper {
         eventRepository.saveAndFlush(event);
         // Actualitzar l'error de la notificació i enviament
         eventInfo.getEnviament().getNotificacio().updateEventAfegir(event);
-        if (!eventNoUnic) {
+        if (!eventNoUnic && ( NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT.equals(event.getTipus()) ||
+                NotificacioEventTipusEnumDto.SIR_ENVIAMENT.equals(event.getTipus()) ||
+                NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT.equals(event.getTipus()))) {
             eventInfo.getEnviament().updateNotificaError(eventInfo.isError(), event);
         }
         return event;

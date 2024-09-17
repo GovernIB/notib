@@ -64,8 +64,8 @@
 	<script type="application/javascript" src="<c:url value="/js/NotibWebSocket.js"/>"></script>
 	<script type="text/javascript">
 
-		let webSocket = new NotibWebSocket();
-		webSocket.connectSockJs();
+		// let webSocket = new NotibWebSocket();
+		// webSocket.connectSockJs();
 
 		var userLanguage;
 		var setIdioma = function() {
@@ -304,6 +304,7 @@
 										<li><a id="mo_excepcions" href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
 										<li><a id="mo_metriques" href="<c:url value="/metrics/list"/>"><spring:message code="decorator.menu.metriques"/></a></li>
 										<li><a id="mo_monitor" data-toggle="modal" data-maximized="true" id="botoMonitor" href="<c:url value="/monitor"/>"><spring:message code='monitor.titol' /></a></li>
+										<li><a id="mo_recording" data-toggle="modal" data-maximized="true" id="botoRecording" href="<c:url value="/recording"/>"><spring:message code='decorator.menu.recording'/></a></li>
 									</ul>
 								</div>
 								<div class="btn-group">

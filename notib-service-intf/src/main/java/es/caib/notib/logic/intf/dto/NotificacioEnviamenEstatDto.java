@@ -6,8 +6,10 @@ package es.caib.notib.logic.intf.dto;
 import java.util.Date;
 
 import es.caib.notib.client.domini.EnviamentEstat;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -17,6 +19,8 @@ import lombok.ToString;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @ToString

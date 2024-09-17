@@ -368,6 +368,12 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed("**")
+	public int getMaxAccionesMassives() {
+		return getDelegateService().getMaxAccionesMassives();
+	}
+
+	@Override
+	@RolesAllowed("**")
 	public boolean validarIdCsv (String idCsv) {
 		return getDelegateService().validarIdCsv(idCsv);
 	}
