@@ -16,6 +16,8 @@ import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.ExcepcioLogHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
 import es.caib.notib.logic.intf.dto.ProcessosInicialsEnum;
 import es.caib.notib.logic.intf.dto.UsuariDto;
@@ -39,6 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -82,9 +85,15 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired
 	private MessageHelper messageHelper;
 	@Autowired
+	private PluginHelper pluginHelper;
+	@Autowired
 	private SchedulingConfig schedulingConfig;
 	@Autowired
 	private BrokerService brokerService;
+
+	private boolean isRecording;
+
+	private Recording recording;
 
 	public void restartSmBroker() throws Exception {
 
@@ -466,10 +475,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 	}
 
-	private Recording recording;
-
 	@Override
-	public void startRecording() {
+	public boolean startRecording() {
 
 		recording = new Recording();
 		Map<String, String> settings = new HashMap<>();
@@ -479,23 +486,27 @@ public class AplicacioServiceImpl implements AplicacioService {
 		recording.setSettings(settings);
 		recording.setName("WebAppRecording");
 		recording.start();
+		isRecording = true;
+		return isRecording;
 	}
 
 	@Override
-	public void stopRecording() throws Exception {
+	public boolean stopRecording() throws Exception {
 
 		if (recording == null) {
-			return;
+			return false;
 		}
 		var path = getRecordingPath();
 		recording.stop();
 		recording.dump(path);
+		isRecording = false;
+		return isRecording;
 	}
 
 	@Override
 	public String analyzeRecording() throws IOException {
 
-		var path =getRecordingPath();
+		var path = getRecordingPath();
 		var analysis = new StringBuilder();
 		try (RecordingFile recordingFile = new RecordingFile(path)) {
 			while (recordingFile.hasMoreEvents()) {
@@ -504,6 +515,19 @@ public class AplicacioServiceImpl implements AplicacioService {
 			}
 		}
 		return analysis.toString();
+	}
+
+	@Override
+	public ArxiuDto getRecordingFile() {
+
+		var output = new ByteArrayOutputStream();
+		pluginHelper.gestioDocumentalGet("recording.jfr", PluginHelper.GESDOC_AGRUPACIO_TEMPORALS, output);
+		return new ArxiuDto("recording.jfr", null, output.toByteArray(), output.size());
+	}
+
+	@Override
+	public boolean isRecording() {
+		return isRecording;
 	}
 
 	private Path getRecordingPath() {
