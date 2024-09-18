@@ -6,6 +6,8 @@ import es.caib.notib.logic.intf.dto.notificacio.Document;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.tika.Tika;
+import org.apache.tika.mime.MimeTypeException;
+import org.apache.tika.mime.MimeTypes;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,6 +78,11 @@ public class MimeUtils {
         String mimeType = tika.detect(tmp);
         FitxerUtils.esborrar(tmp);
         return mimeType;
+    }
+
+    public static String getExtension(String mimeType) throws MimeTypeException {
+
+        return MimeTypes.getDefaultMimeTypes().forName(mimeType).getExtension();
     }
 
 

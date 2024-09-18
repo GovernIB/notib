@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - sql: "INSERT INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE,CONFIGURABLE) VALUES (0, 'es.caib.notib.plugin.arxiu.caib.conversio.original.url.csv', 1, 'Url on generar imprimible per CSV', 'ARXIU',1 );
+INSERT INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE,CONFIGURABLE) VALUES (0, 'es.caib.notib.plugin.arxiu.caib.conversio.original.url.uuid', 1, 'Url on generar original per uuId', 'ARXIU',1 );"

@@ -21,6 +21,7 @@ import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
+import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.carpeta.CarpetaPlugin;
 import es.caib.notib.plugin.carpeta.MissatgeCarpetaParams;
@@ -122,15 +123,16 @@ public class PluginHelper {
 	private final CacheHelper cacheHelper;
 	private final MessageHelper messageManager;
 	private final EntitatRepository entitatRepository;
+	private final DocumentRepository documentRepository;
 
 	private static Set<String> blockedObtenirJustificant = null;
 
 	public PluginHelper(IntegracioHelper integracioHelper,
-						NotificacioEventHelper eventHelper,
-						ConfigHelper configHelper,
-						@Lazy CacheHelper cacheHelper,
-						MessageHelper messageManager,
-						EntitatRepository entitatRepository) {
+                        NotificacioEventHelper eventHelper,
+                        ConfigHelper configHelper,
+                        @Lazy CacheHelper cacheHelper,
+                        MessageHelper messageManager,
+                        EntitatRepository entitatRepository, DocumentRepository documentRepository) {
 
 		this.integracioHelper = integracioHelper;
 		this.eventHelper = eventHelper;
@@ -138,7 +140,8 @@ public class PluginHelper {
 		this.cacheHelper = cacheHelper;
 		this.messageManager = messageManager;
 		this.entitatRepository = entitatRepository;
-	}
+        this.documentRepository = documentRepository;
+    }
 
 
 
@@ -614,6 +617,7 @@ public class PluginHelper {
 		info.setCodiEntitat(getCodiEntitatActual());
 		try {
 			identificador = isUuid ? "uuid:" + identificador : "csv:" + identificador;
+//			identificador = isZip ? "original_" + identificador : identificador;
 			var documentDetalls = getArxiuPlugin().documentDetalls(identificador, versio, ambContingut);
 			integracioHelper.addAccioOk(info);
 			return documentDetalls;
@@ -633,6 +637,7 @@ public class PluginHelper {
 		info.setCodiEntitat(getCodiEntitatActual());
 		try {
 			id = isUuid ? "uuid:" + id : "csv:" + id;
+//			id = isZip ? "original_" + id : id;
 			var documentContingut = getArxiuPlugin().documentImprimible(id);
 			integracioHelper.addAccioOk(info);
 			return documentContingut;
@@ -713,7 +718,8 @@ public class PluginHelper {
 
 		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			getGestioDocumentalPlugin().get(id, agrupacio, contingutOut);
+			var document = documentRepository.getByArxiuGestdocId(id);
+			getGestioDocumentalPlugin().get(id, agrupacio, contingutOut, document.isMediaTypeZip());
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al accedir al plugin de gestió documental per a obtenir el document amb id: " + (agrupacio != null ? agrupacio + "/" : "") + id;

@@ -244,6 +244,11 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 
 		return this.getId().toString() + ".pdf";
 	}
+
+	public boolean isMediaTypeZip() {
+		return "application/zip".equals(mediaType);
+	}
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}

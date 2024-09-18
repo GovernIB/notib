@@ -94,7 +94,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	}
 
 	@Override
-	public void get(String id, String agrupacio, OutputStream contingutOut) throws SistemaExternException {
+	public void get(String id, String agrupacio, OutputStream contingutOut, boolean isZip) throws SistemaExternException {
 
 		try {
 			var fContent = getFile(agrupacio, id);
@@ -108,6 +108,10 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 				throw new SistemaExternException(ARXIU_NO_TROBAT + id + ")");
 			}
 			try (var contingutIn = new FileInputStream(fContent)) {
+				if (isZip) {
+					IOUtils.copy(contingutIn, contingutOut);
+					return;
+				}
 				var output = new ByteArrayOutputStream();
 				IOUtils.copy(contingutIn, output);
 				var mime = MimeUtils.getMimeTypeFromContingut(fContent.getName(), output.toByteArray());

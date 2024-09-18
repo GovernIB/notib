@@ -10,3 +10,6 @@ UPDATE NOT_NOTIFICACIO_ENV env SET env.ULTIM_EVENT = (
 WHERE env.CREATEDDATE > TO_DATE('25/03/2024', 'dd/MM/yyyy');
 UPDATE NOT_NOTIFICACIO_TABLE n SET ENVIADA_DATE = (SELECT MAX(DATA) FROM NOT_NOTIFICACIO_EVENT nne WHERE nne.NOTIFICACIO_ID = n.id AND nne.TIPUS != 8 and nne.TIPUS != 9)
 WHERE n.CREATEDDATE > TO_DATE('25/03/2024', 'dd/MM/yyyy');
+
+INSERT INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE,CONFIGURABLE) VALUES (0, 'es.caib.notib.plugin.arxiu.caib.conversio.original.url.csv', 1, 'Url on generar imprimible per CSV', 'ARXIU',1 );
+INSERT INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE,CONFIGURABLE) VALUES (0, 'es.caib.notib.plugin.arxiu.caib.conversio.original.url.uuid', 1, 'Url on generar original per uuId', 'ARXIU',1 );

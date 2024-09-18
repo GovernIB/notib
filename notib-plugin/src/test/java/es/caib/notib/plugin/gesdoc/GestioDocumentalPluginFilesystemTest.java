@@ -100,7 +100,7 @@ public class GestioDocumentalPluginFilesystemTest extends TestCase {
             for (String idFile : createdFiles.get(agr)){
                 ByteArrayOutputStream output = new ByteArrayOutputStream();
                 try {
-                    plugin.get(idFile, agr, output);
+                    plugin.get(idFile, agr, output, false);
                 } catch (SistemaExternException e) {
                     fail();
                 }
@@ -112,7 +112,7 @@ public class GestioDocumentalPluginFilesystemTest extends TestCase {
         for (String idFile : createdFiles.get("")){
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             try {
-                plugin.get(idFile, agr, output);
+                plugin.get(idFile, agr, output, false);
             } catch (SistemaExternException e) {
                 fail();
             }

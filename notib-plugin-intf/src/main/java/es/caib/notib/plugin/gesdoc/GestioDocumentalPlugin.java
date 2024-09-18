@@ -54,6 +54,6 @@ public interface GestioDocumentalPlugin {
 	 * @param contingutOut Stream de sortida a on escriure el contingut de l'arxiu.
 	 * @return La informació del document. @throws SistemaExternException Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
-	void get(String id, String agrupacio, OutputStream contingutOut) throws SistemaExternException;
+	void get(String id, String agrupacio, OutputStream contingutOut, boolean isZip) throws SistemaExternException;
 
 }

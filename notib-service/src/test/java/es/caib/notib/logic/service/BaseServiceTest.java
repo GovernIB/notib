@@ -423,7 +423,7 @@ public class BaseServiceTest {
 				IOUtils.copy(new ByteArrayInputStream(contingut), (OutputStream)args[2]);
 				return null;
 			}
-		}).when(gestioDocumentalPluginMock).get(Mockito.anyString(), Mockito.anyString(), Mockito.any(OutputStream.class));
+		}).when(gestioDocumentalPluginMock).get(Mockito.anyString(), Mockito.anyString(), Mockito.any(OutputStream.class), Mockito.eq(false));
 		pluginHelper.setGestioDocumentalPlugin(gestioDocumentalPluginMock);
 	}
 	
