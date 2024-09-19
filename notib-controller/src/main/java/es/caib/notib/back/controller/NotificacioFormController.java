@@ -55,6 +55,7 @@ import es.caib.notib.logic.intf.service.PagadorCieFormatSobreService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.ServeiService;
+import es.caib.notib.logic.intf.util.MimeUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -360,8 +361,9 @@ public class NotificacioFormController extends BaseUserController {
                         break;
                     }
                     if (notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId != null) {
-                        var result = notificacioCommand.getId() != null ? gestioDocumentalService.obtenirArxiuNotificacio(arxiuGestdocId)
-                                : gestioDocumentalService.obtenirArxiuTemporal(arxiuGestdocId);
+                        var result = notificacioCommand.getId() != null ?
+                                gestioDocumentalService.obtenirArxiuNotificacio(arxiuGestdocId) :
+                                gestioDocumentalService.obtenirArxiuTemporal(arxiuGestdocId, MimeUtils.isZipFileByMimeType(notificacioCommand.getDocuments()[i].getMediaType()));
 
                         var contingutBase64 = Base64.encodeBase64String(result);
                         notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);

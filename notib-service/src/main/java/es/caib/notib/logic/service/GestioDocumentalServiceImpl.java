@@ -39,8 +39,8 @@ public class GestioDocumentalServiceImpl implements GestioDocumentalService {
 	
 	@Override
 	@Transactional(rollbackFor=Exception.class)
-	public byte[] obtenirArxiuTemporal(String arxiuGestdocId) {
-		return consultaArxiuGestioDocumental(arxiuGestdocId, PluginHelper.GESDOC_AGRUPACIO_TEMPORALS);
+	public byte[] obtenirArxiuTemporal(String arxiuGestdocId, boolean isZip) {
+		return consultaArxiuGestioDocumental(arxiuGestdocId, PluginHelper.GESDOC_AGRUPACIO_TEMPORALS, isZip);
 	}
 
 	@Override
@@ -49,17 +49,25 @@ public class GestioDocumentalServiceImpl implements GestioDocumentalService {
 		return consultaArxiuGestioDocumental(arxiuGestdocId, PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS);
 	}
 
-	private byte[] consultaArxiuGestioDocumental(String arxiuGestdocId, String agrupacio) {
+	private byte[] consultaArxiuGestioDocumental(String arxiuGestdocId, String agrupacio, Boolean isZip) {
 
 		try {
 			var output = new ByteArrayOutputStream();
 			if (arxiuGestdocId != null) {
-				pluginHelper.gestioDocumentalGet(arxiuGestdocId, agrupacio, output);
+				if (isZip == null)
+					pluginHelper.gestioDocumentalGet(arxiuGestdocId, agrupacio, output);
+				else
+					pluginHelper.gestioDocumentalGet(arxiuGestdocId, agrupacio, output, isZip);
 			}
 			return output.toByteArray();
 		} catch (Exception ex) {
 			log.error("Error al recuperar l'arxiu de l'agrupació: " + agrupacio);
 			throw ex;
 		}
+	}
+
+	private byte[] consultaArxiuGestioDocumental(String arxiuGestdocId, String agrupacio) {
+
+		return consultaArxiuGestioDocumental(arxiuGestdocId, agrupacio, null);
 	}
 }

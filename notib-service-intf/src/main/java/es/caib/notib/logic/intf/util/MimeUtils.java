@@ -104,6 +104,19 @@ public class MimeUtils {
         return docBase64.startsWith(formatsValidsNotCom[0]) || docBase64.startsWith(formatsValidsNotCom[1]); //|| isZipSigned(mime, docBase64);
     }
 
+    public static boolean isZipFileByMimeType(String mimeType) {
+        if (mimeType == null) {
+            return false;
+        }
+
+        var mime = mimeType.trim().toLowerCase();
+        return "application/zip".equals(mime)
+                || "application/x-zip-compressed".equals(mime)
+                || "application/x-zip".equals(mime)
+                || "application/zip-compressed".equals(mime)
+                || "application/x-zip-compressed".equals(mime);
+    }
+
     public static boolean isZipSigned(String mime, String base64) {
 
         if (!ZIP_SIGNED.equals(mime)) {

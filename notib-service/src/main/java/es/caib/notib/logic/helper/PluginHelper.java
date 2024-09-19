@@ -727,6 +727,23 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), errorDescripcio, ex);
 		}
 	}
+
+	public void gestioDocumentalGet(String id, String agrupacio, OutputStream contingutOut, boolean isZip) {
+
+		var info = new IntegracioInfo(IntegracioCodiEnum.GESDOC, "Consultant arxiu de la gestió documental", IntegracioAccioTipusEnumDto.ENVIAMENT,
+				new AccioParam("Id del document", id),
+				new AccioParam("Agrupacio", agrupacio));
+
+		info.setCodiEntitat(getCodiEntitatActual());
+		try {
+			getGestioDocumentalPlugin().get(id, agrupacio, contingutOut, isZip);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			var errorDescripcio = "Error al accedir al plugin de gestió documental per a obtenir el document amb id: " + (agrupacio != null ? agrupacio + "/" : "") + id;
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), errorDescripcio, ex);
+		}
+	}
 	
 	// GESTOR CONTINGUTS ADMINISTRATIU (ROLSAC)
 	// /////////////////////////////////////////////////////////////////////////////////////

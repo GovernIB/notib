@@ -7,7 +7,6 @@ import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
-import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.exception.ValidationException;
@@ -36,7 +35,6 @@ import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -63,8 +61,6 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
-import java.security.GeneralSecurityException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -499,8 +495,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				opcionGenerarCsv.setValue("no");
 				opcionesDocumento.getOpcion().add(opcionGenerarCsv);
 				documento.setOpcionesDocumento(opcionesDocumento);
-				if(baos.toByteArray() != null) {
-					String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(baos.toByteArray()).toCharArray()));
+				if(documento.getContenido() != null) {
+					String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(documento.getContenido()).toCharArray()));
 					//Hash a enviar
 					documento.setHash(hash256);
 				}

@@ -273,11 +273,9 @@ public class NotificacioHelper {
 		if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty() && isDocumentNotProcessat(document.getArxiuNom(), documentsProcessatsMassiu)) {
 
 			log.info("Processam document gestió documental");
-//			if (isDocumentNotProcessat(document.getArxiuNom(), documentsProcessatsMassiu)) {
-				documentGesdocId = !Strings.isNullOrEmpty(document.getArxiuGestdocId()) ? document.getArxiuGestdocId() :
-						pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, Base64.decodeBase64(document.getContingutBase64()));
-				log.info("Document creat al gestor documental amb id " + documentGesdocId);
-//			}
+			documentGesdocId = // !Strings.isNullOrEmpty(document.getArxiuGestdocId()) ? document.getArxiuGestdocId() :
+					pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, Base64.decodeBase64(document.getContingutBase64()));
+			log.info("Document creat al gestor documental amb id " + documentGesdocId);
 		} else if (document.getUuid() != null) {
 			log.info("Processam document desde UUID");
 			if (isDocumentNotProcessat(document.getUuid(), documentsProcessatsMassiu)) {
