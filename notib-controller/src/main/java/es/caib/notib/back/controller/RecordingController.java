@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @Controller
 @RequestMapping("/recording")
@@ -28,7 +27,7 @@ public class RecordingController extends BaseController {
 
     @GetMapping("/download")
     @ResponseBody
-    public void downloadJFR(HttpServletResponse response) throws IOException {
+    public void downloadJFR(HttpServletResponse response) throws Exception {
 
         var arxiu = aplicacioService.getRecordingFile();
         response.setHeader("Set-cookie", "fileDownload=true; path=/");

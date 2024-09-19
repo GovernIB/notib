@@ -27,6 +27,7 @@ import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.repository.ProcessosInicialsRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.persist.repository.acl.AclSidRepository;
+import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import jdk.jfr.Recording;
 import jdk.jfr.consumer.RecordedEvent;
@@ -43,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -91,9 +93,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired
 	private BrokerService brokerService;
 
-	private boolean isRecording;
-
-	private Recording recording;
+	private static boolean isRecording;
+	private static Recording recording;
 
 	public void restartSmBroker() throws Exception {
 
@@ -499,6 +500,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		var path = getRecordingPath();
 		recording.stop();
 		recording.dump(path);
+		recording = null;
 		isRecording = false;
 		return isRecording;
 	}
@@ -518,10 +520,16 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	@Override
-	public ArxiuDto getRecordingFile() {
+	public ArxiuDto getRecordingFile() throws Exception {
 
 		var output = new ByteArrayOutputStream();
-		pluginHelper.gestioDocumentalGet("recording.jfr", PluginHelper.GESDOC_AGRUPACIO_TEMPORALS, output);
+		var recordingPath = getRecordingPath();
+
+		if (!Files.exists(recordingPath)) {
+			throw new SistemaExternException("No s'ha trobat l'arxiu de recording");
+		}
+
+		output.write(Files.readAllBytes(recordingPath));
 		return new ArxiuDto("recording.jfr", null, output.toByteArray(), output.size());
 	}
 

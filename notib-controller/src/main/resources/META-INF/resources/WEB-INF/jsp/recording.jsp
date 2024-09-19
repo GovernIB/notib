@@ -21,7 +21,7 @@
     $(document).ready(function() {
 
         console.log("recording" + recording);
-        if (recording === "Started") {
+        if (recording === "true") {
             $("#stopButton").toggle();
             $("#startButton").toggle();
         }

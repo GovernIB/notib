@@ -228,7 +228,7 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
-	public ArxiuDto getRecordingFile() {
+	public ArxiuDto getRecordingFile() throws Exception {
 		return getDelegateService().getRecordingFile();
 	}
 

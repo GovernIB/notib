@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.Instant;
 import java.util.Properties;
 import java.util.zip.ZipFile;
 
@@ -83,7 +84,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 		try {
 			var fContent = getFile(agrupacio, id);
-			logger.info("[GESDOC] Eliminant fitxer, directori: " + getBaseDir(agrupacio) + AMB_ID + id);
+			log.info("[GESDOC] Eliminant fitxer, directori: " + getBaseDir(agrupacio) + AMB_ID + id);
 			if (fContent == null) {
 				throw new SistemaExternException(ARXIU_NO_TROBAT + id + ")");
 			}
@@ -103,7 +104,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 				fContent = getFile("", id);
 				isAgrupacio = false;
 			}
-			logger.info("[GESDOC] Consultant fitxer, directori: " + (isAgrupacio ? getBaseDir(agrupacio) : "") + AMB_ID + id);
+			log.info("[GESDOC] Consultant fitxer, directori: " + (isAgrupacio ? getBaseDir(agrupacio) : "") + AMB_ID + id);
 			if (fContent == null) {
 				throw new SistemaExternException(ARXIU_NO_TROBAT + id + ")");
 			}
@@ -158,6 +159,9 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 		assert basedir != null;
 		var file = new File(basedir);
 		File[] directories = file.listFiles((current, name) -> {
+			if (!isValidTimestamp(name)) {
+				return false;
+			}
 			var f = new File(current, name);
 			if (!f.isDirectory()) {
 				return false;
@@ -173,6 +177,29 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 		var subfolder = generateUniqueName(basedir);
 		(new File(basedir + "/" + subfolder)).mkdir();
 		return subfolder + "/";
+	}
+
+	private static final Instant START_INSTANT = Instant.parse("2016-01-01T00:00:00Z");
+	public boolean isValidTimestamp(String timestamp) {
+		try {
+			// Intenta convertir la cadena de text a long
+			long ts = Long.parseLong(timestamp);
+
+			// Convertim el timestamp a un Instant
+			Instant tsInstant = Instant.ofEpochMilli(ts);
+
+			// Obtenim l'instant actual
+			Instant nowInstant = Instant.now();
+
+			// Comprovar si el timestamp està dins dels límits
+			if (!tsInstant.isBefore(START_INSTANT) && !tsInstant.isAfter(nowInstant)) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 
 	private String getBaseDir(String agrupacio) {

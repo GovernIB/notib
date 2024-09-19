@@ -202,7 +202,7 @@ public interface AplicacioService {
 	String analyzeRecording() throws Exception;
 
 	@PreAuthorize("hasRole('NOT_SUPER')")
-    ArxiuDto getRecordingFile();
+    ArxiuDto getRecordingFile() throws Exception;
 
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	boolean isRecording();
