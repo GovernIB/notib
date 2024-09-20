@@ -723,7 +723,8 @@ public class PluginHelper {
 
 		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			if (isZip == null) {
+			var agrupacioPotContenirZip = GESDOC_AGRUPACIO_NOTIFICACIONS.equals(agrupacio) || GESDOC_AGRUPACIO_TEMPORALS.equals(agrupacio) || GESDOC_AGRUPACIO_MASSIUS_ZIP.equals(agrupacio);
+			if (isZip == null && agrupacioPotContenirZip) {
 				var document = documentRepository.getByArxiuGestdocId(id);
 				if (document == null) {
 					throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), "El document a recuperar no existeix o és temporal i no s'ha indicat si es tracta d'un document zip");

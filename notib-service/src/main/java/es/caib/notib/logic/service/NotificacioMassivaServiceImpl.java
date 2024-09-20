@@ -183,7 +183,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         entityComprovarHelper.comprovarEntitat(entitatId);
         var notificacioMassiva = notificacioMassivaRepository.findById(notificacioMassivaId).orElseThrow();
         var baos = new ByteArrayOutputStream();
-        pluginHelper.gestioDocumentalGet(notificacioMassiva.getResumGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES, baos);
+        pluginHelper.gestioDocumentalGet(notificacioMassiva.getResumGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES, baos, false);
         var massivaFile = new MassivaFile(configHelper, messageHelper, pluginHelper);
         massivaFile.initInfo(baos.toByteArray(), notificacioMassiva.getNotificacions(), notificacioEventRepository);
         List<NotificacioMassivaInfoDto.NotificacioInfo> info = massivaFile.getEnviamentsInfo();
@@ -437,8 +437,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         var massiva = notificacioMassivaRepository.findById(notificacioMassivaId).orElseThrow();
         var baos = new ByteArrayOutputStream();
         var baosCsv = new ByteArrayOutputStream();
-        pluginHelper.gestioDocumentalGet(massiva.getResumGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES, baos);
-        pluginHelper.gestioDocumentalGet(massiva.getCsvGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_CSV, baosCsv);
+        pluginHelper.gestioDocumentalGet(massiva.getResumGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES, baos, false);
+        pluginHelper.gestioDocumentalGet(massiva.getCsvGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_CSV, baosCsv, false);
         var linies = CSVReader.readBody(baos.toByteArray());
         var liniesCsv = CSVReader.readBody(baos.toByteArray());
         if (linies == null || liniesCsv == null) {
@@ -566,7 +566,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         entityComprovarHelper.comprovarEntitat(entitatId);
         var notificacioMassiva = notificacioMassivaRepository.findById(notificacioMassivaId).orElseThrow();
         var baos = new ByteArrayOutputStream();
-        pluginHelper.gestioDocumentalGet(notificacioMassiva.getCsvGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_CSV, baos);
+        pluginHelper.gestioDocumentalGet(notificacioMassiva.getCsvGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_CSV, baos, false);
         return FitxerDto.builder().nom(notificacioMassiva.getCsvFilename()).contentType("text").contingut(baos.toByteArray()).tamany(baos.size()).build();
     }
 
@@ -587,7 +587,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         entityComprovarHelper.comprovarEntitat(entitatId);
         var notificacioMassiva = notificacioMassivaRepository.findById(notificacioMassivaId).orElseThrow();
         var baos = new ByteArrayOutputStream();
-        pluginHelper.gestioDocumentalGet(notificacioMassiva.getResumGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES, baos);
+        pluginHelper.gestioDocumentalGet(notificacioMassiva.getResumGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES, baos, false);
         var fitxer = FitxerDto.builder().nom("resum.csv").contentType("text").contingut(baos.toByteArray()).tamany(baos.size()).build();
         var errors = afegirErrorsProcessat(notificacioMassiva, fitxer.getContingut(), false);
         fitxer.setContingut(errors);
@@ -600,7 +600,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         entityComprovarHelper.comprovarEntitat(entitatId);
         var notificacioMassiva = notificacioMassivaRepository.findById(notificacioMassivaId).orElseThrow();
         var baos = new ByteArrayOutputStream();
-        pluginHelper.gestioDocumentalGet(notificacioMassiva.getErrorsGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_ERRORS, baos);
+        pluginHelper.gestioDocumentalGet(notificacioMassiva.getErrorsGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_ERRORS, baos, false);
         return FitxerDto.builder().nom("errors_validacio.csv").contentType("text").contingut(baos.toByteArray()).tamany(baos.size()).build();
     }
 

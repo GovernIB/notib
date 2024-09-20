@@ -321,7 +321,7 @@ public class NotificacioMassivaServiceTest {
 			ByteArrayInputStream in = new ByteArrayInputStream(contingut);
 			IOUtils.copy(in, out);
 			return null;
-		}).when(pluginHelper).gestioDocumentalGet(Mockito.anyString(), Mockito.anyString(), Mockito.any(OutputStream.class));
+		}).when(pluginHelper).gestioDocumentalGet(Mockito.anyString(), Mockito.anyString(), Mockito.any(OutputStream.class), Mockito.eq(false));
 
 		// When
 		notificacioMassivaService.getNotificacioMassivaInfo(entitatId, notMassivaId);
@@ -333,7 +333,7 @@ public class NotificacioMassivaServiceTest {
 		Mockito.verify(pluginHelper, Mockito.times(1)).gestioDocumentalGet(
 				Mockito.eq(notificacioMassivaMock.getResumGesdocId()),
 				Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES),
-				Mockito.<OutputStream>any());
+				Mockito.<OutputStream>any(), Mockito.eq(false));
 	}
 
 	@Test
@@ -478,7 +478,7 @@ public class NotificacioMassivaServiceTest {
 		Mockito.verify(pluginHelper, Mockito.times(1)).gestioDocumentalGet(
 				Mockito.eq(notificacioMassivaMock.getCsvGesdocId()),
 				Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_CSV),
-				Mockito.<OutputStream>any());
+				Mockito.<OutputStream>any(), Mockito.eq(false));
 	}
 
 	@Test
@@ -502,7 +502,7 @@ public class NotificacioMassivaServiceTest {
 		Mockito.verify(pluginHelper, Mockito.times(1)).gestioDocumentalGet(
 				Mockito.eq(notificacioMassivaMock.getResumGesdocId()),
 				Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES),
-				Mockito.<OutputStream>any());
+				Mockito.<OutputStream>any(), Mockito.eq(false));
 	}
 	@Test
 	public void whenGetErrorsFile_ThenCallGestioDocumentalGet() throws Exception {
@@ -513,7 +513,7 @@ public class NotificacioMassivaServiceTest {
 		Mockito.verify(pluginHelper, Mockito.times(1)).gestioDocumentalGet(
 				Mockito.eq(notificacioMassivaMock.getErrorsGesdocId()),
 				Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_ERRORS),
-				Mockito.<OutputStream>any());
+				Mockito.<OutputStream>any(), Mockito.eq(false));
 	}
 
 	@After

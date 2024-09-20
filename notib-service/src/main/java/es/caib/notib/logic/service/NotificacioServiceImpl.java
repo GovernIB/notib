@@ -1067,7 +1067,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				throw new RuntimeException("No s'ha trobat la certificació de l'enviament amb id: " + enviamentId);
 			}
 			var output = new ByteArrayOutputStream();
-			pluginHelper.gestioDocumentalGet(enviament.getNotificaCertificacioArxiuId(), PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, output);
+			pluginHelper.gestioDocumentalGet(enviament.getNotificaCertificacioArxiuId(), PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, output, false);
 			return new ArxiuDto(calcularNomArxiuCertificacio(enviament), enviament.getNotificaCertificacioMime(), output.toByteArray(), output.size());
 		} finally {
 			metricsHelper.fiMetrica(timer);
