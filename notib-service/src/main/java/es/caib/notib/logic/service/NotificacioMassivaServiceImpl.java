@@ -576,7 +576,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         entityComprovarHelper.comprovarEntitat(entitatId);
         var notificacioMassiva = notificacioMassivaRepository.findById(notificacioMassivaId).orElseThrow();
         var baos = new ByteArrayOutputStream();
-        pluginHelper.gestioDocumentalGet(notificacioMassiva.getZipGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_ZIP, baos);
+        pluginHelper.gestioDocumentalGet(notificacioMassiva.getZipGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_ZIP, baos, true);
         return FitxerDto.builder().nom(notificacioMassiva.getZipFilename()).contentType("text").contingut(baos.toByteArray()).tamany(baos.size()).build();
     }
 

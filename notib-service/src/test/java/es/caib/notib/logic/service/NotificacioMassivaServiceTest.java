@@ -491,7 +491,7 @@ public class NotificacioMassivaServiceTest {
 		Mockito.verify(pluginHelper, Mockito.times(1)).gestioDocumentalGet(
 				Mockito.eq(notificacioMassivaMock.getZipGesdocId()),
 				Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_ZIP),
-				Mockito.<OutputStream>any());
+				Mockito.<OutputStream>any(), Mockito.eq(true));
 	}
 	@Test
 	public void whenGetResumFile_ThenCallGestioDocumentalGet() throws Exception {
