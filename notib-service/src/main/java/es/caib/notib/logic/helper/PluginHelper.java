@@ -712,23 +712,10 @@ public class PluginHelper {
 	
 	public void gestioDocumentalGet(String id, String agrupacio, OutputStream contingutOut) {
 		
-		var info = new IntegracioInfo(IntegracioCodiEnum.GESDOC, "Consultant arxiu de la gestió documental", IntegracioAccioTipusEnumDto.ENVIAMENT,
-				new AccioParam("Id del document", id),
-				new AccioParam("Agrupacio", agrupacio));
-
-		info.setCodiEntitat(getCodiEntitatActual());
-		try {
-			var document = documentRepository.getByArxiuGestdocId(id);
-			getGestioDocumentalPlugin().get(id, agrupacio, contingutOut, document.isMediaTypeZip());
-			integracioHelper.addAccioOk(info);
-		} catch (Exception ex) {
-			var errorDescripcio = "Error al accedir al plugin de gestió documental per a obtenir el document amb id: " + (agrupacio != null ? agrupacio + "/" : "") + id;
-			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), errorDescripcio, ex);
-		}
+		gestioDocumentalGet(id, agrupacio, contingutOut, null);
 	}
 
-	public void gestioDocumentalGet(String id, String agrupacio, OutputStream contingutOut, boolean isZip) {
+	public void gestioDocumentalGet(String id, String agrupacio, OutputStream contingutOut, Boolean isZip) {
 
 		var info = new IntegracioInfo(IntegracioCodiEnum.GESDOC, "Consultant arxiu de la gestió documental", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Id del document", id),
@@ -736,6 +723,13 @@ public class PluginHelper {
 
 		info.setCodiEntitat(getCodiEntitatActual());
 		try {
+			if (isZip == null) {
+				var document = documentRepository.getByArxiuGestdocId(id);
+				if (document == null) {
+					throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), "El document a recuperar no existeix o és temporal i no s'ha indicat si es tracta d'un document zip");
+				}
+				isZip = document.isMediaTypeZip();
+			}
 			getGestioDocumentalPlugin().get(id, agrupacio, contingutOut, isZip);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
