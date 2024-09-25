@@ -9,9 +9,11 @@ import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
+import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -28,11 +30,20 @@ import java.util.Properties;
 @Component
 public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDocumentalPlugin> {
 
-	public GestioDocumentalPluginHelper(IntegracioHelper integracioHelper,
-                                        ConfigHelper configHelper) {
+	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
+	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
+	public static final String GESDOC_AGRUPACIO_TEMPORALS = "tmp";
+	public static final String GESDOC_AGRUPACIO_MASSIUS_CSV = "massius_csv";
+	public static final String GESDOC_AGRUPACIO_MASSIUS_ZIP = "massius_zip";
+	public static final String GESDOC_AGRUPACIO_MASSIUS_ERRORS = "massius_errors";
+	public static final String GESDOC_AGRUPACIO_MASSIUS_INFORMES = "massius_informes";
+
+	@Autowired
+	private DocumentRepository documentRepository;
+
+	public GestioDocumentalPluginHelper(IntegracioHelper integracioHelper, ConfigHelper configHelper) {
 		super(integracioHelper, configHelper);
 	}
-
 
 	@Synchronized
 	public String gestioDocumentalCreate(String agrupacio, byte[] contingut) {
@@ -102,7 +113,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 		}
 	}
 	
-	public void gestioDocumentalGet(String id, String agrupacio, OutputStream contingutOut) {
+	public void gestioDocumentalGet(String id, String agrupacio, OutputStream contingutOut, Boolean isZip) {
 		
 		var info = new IntegracioInfo(IntegracioCodiEnum.GESDOC, "Consultant arxiu de la gestió documental", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Id del document", id),
@@ -112,7 +123,15 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 
 		try {
 			peticionsPlugin.updatePeticioTotal(codiEntitat);
-			getPlugin().get(id, agrupacio, contingutOut);
+			var agrupacioPotContenirZip = GESDOC_AGRUPACIO_NOTIFICACIONS.equals(agrupacio) || GESDOC_AGRUPACIO_TEMPORALS.equals(agrupacio) || GESDOC_AGRUPACIO_MASSIUS_ZIP.equals(agrupacio);
+			if (isZip == null && agrupacioPotContenirZip) {
+				var document = documentRepository.getByArxiuGestdocId(id);
+				if (document == null) {
+					throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), "El document a recuperar no existeix o és temporal i no s'ha indicat si es tracta d'un document zip");
+				}
+				isZip = document.isMediaTypeZip();
+			}
+			getPlugin().get(id, agrupacio, contingutOut, isZip);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al accedir al plugin de gestió documental per a obtenir el document amb id: " + (agrupacio != null ? agrupacio + "/" : "") + id;
