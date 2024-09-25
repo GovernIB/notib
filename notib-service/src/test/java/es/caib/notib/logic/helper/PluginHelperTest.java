@@ -2,6 +2,15 @@ package es.caib.notib.logic.helper;
 
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.logic.helper.plugin.ArxiuPluginHelper;
+import es.caib.notib.logic.helper.plugin.CarpetaPluginHelper;
+import es.caib.notib.logic.helper.plugin.DadesUsuarisPluginHelper;
+import es.caib.notib.logic.helper.plugin.FirmaPluginHelper;
+import es.caib.notib.logic.helper.plugin.GestioDocumentalPluginHelper;
+import es.caib.notib.logic.helper.plugin.GestorDocumentalAdministratiuPluginHelper;
+import es.caib.notib.logic.helper.plugin.RegistrePluginHelper;
+import es.caib.notib.logic.helper.plugin.UnitatsOrganitzativesPluginHelper;
+import es.caib.notib.logic.helper.plugin.ValidaSignaturaPluginHelper;
 import es.caib.notib.logic.intf.dto.AnexoWsDto;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.DocumentDto;
@@ -61,6 +70,24 @@ public class PluginHelperTest {
 
     @Mock
     private ConfigHelper configHelper;
+    @Mock
+	private DadesUsuarisPluginHelper dadesUsuarisPluginHelper;
+    @Mock
+	private GestioDocumentalPluginHelper gestioDocumentalPluginHelper;
+    @Mock
+	private RegistrePluginHelper registrePluginHelper;
+    @Mock
+	private ArxiuPluginHelper arxiuPluginHelper;
+    @Mock
+	private UnitatsOrganitzativesPluginHelper unitatsOrganitzativesPluginHelper;
+    @Mock
+	private GestorDocumentalAdministratiuPluginHelper gestorDocumentalAdministratiuPluginHelper;
+    @Mock
+	private FirmaPluginHelper firmaPluginHelper;
+    @Mock
+	private ValidaSignaturaPluginHelper validaSignaturaPluginHelper;
+    @Mock
+	private CarpetaPluginHelper carpetaPluginHelper;
 	@Mock
 	private IntegracioHelper integracioHelper;
 	@Mock

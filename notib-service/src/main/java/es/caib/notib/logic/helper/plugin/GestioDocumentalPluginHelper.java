@@ -112,6 +112,11 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), errorDescripcio, ex);
 		}
 	}
+
+	public void gestioDocumentalGet(String id, String agrupacio, OutputStream contingutOut) {
+
+		gestioDocumentalGet(id, agrupacio, contingutOut, null);
+	}
 	
 	public void gestioDocumentalGet(String id, String agrupacio, OutputStream contingutOut, Boolean isZip) {
 		

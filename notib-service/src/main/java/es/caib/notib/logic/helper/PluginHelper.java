@@ -225,11 +225,15 @@ public class PluginHelper {
 	public void gestioDocumentalDelete(String id, String agrupacio) {
 		gestioDocumentalPluginHelper.gestioDocumentalDelete(id, agrupacio);
 	}
-	
+
+	public void gestioDocumentalGet(String id, String agrupacio, OutputStream contingutOut) {
+		gestioDocumentalGet(id, agrupacio, contingutOut, null);
+	}
+
 	public void gestioDocumentalGet(String id, String agrupacio, OutputStream contingutOut, Boolean isZip) {
 		gestioDocumentalPluginHelper.gestioDocumentalGet(id, agrupacio, contingutOut, isZip);
 	}
-	
+
 	// GESTOR CONTINGUTS ADMINISTRATIU (ROLSAC)
 	// /////////////////////////////////////////////////////////////////////////////////////
 	
