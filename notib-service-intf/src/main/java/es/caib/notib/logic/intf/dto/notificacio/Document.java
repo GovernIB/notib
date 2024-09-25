@@ -64,4 +64,8 @@ public class Document {
         if(csv != null && !csv.trim().isEmpty()) countSources++;
         return countSources;
     }
+
+    public boolean isMediaTypeZip() {
+        return "application/zip".equals(mediaType);
+    }
 }

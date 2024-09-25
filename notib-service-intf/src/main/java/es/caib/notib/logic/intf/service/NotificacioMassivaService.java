@@ -149,7 +149,7 @@ public interface NotificacioMassivaService {
 	 *
 	 * @return L'objecte amb la informació del fitxer consultat
 	 */
-	FitxerDto getErrorsValidacioFile(Long entitatId, Long notificacioMassivaId);
+	FitxerDto getErrorsValidacioFile(Long entitatId, Long notificacioMassivaId) throws IOException;
 
 
 	/**
@@ -161,7 +161,7 @@ public interface NotificacioMassivaService {
 	 *
 	 * @return L'objecte amb la informació del fitxer consultat
 	 */
-	FitxerDto getErrorsExecucioFile(Long entitatId, Long notificacioMassivaId);
+	FitxerDto getErrorsExecucioFile(Long entitatId, Long notificacioMassivaId) throws IOException;
 
 	/**
 	 * Obté un fitxer CSV d'exemple amb el format que ha de tenir per a carregar dades massives.

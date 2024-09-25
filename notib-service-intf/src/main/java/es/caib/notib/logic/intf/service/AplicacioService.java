@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.intf.service;
 
+import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
 import es.caib.notib.logic.intf.dto.ProcessosInicialsEnum;
 import es.caib.notib.logic.intf.dto.UsuariDto;
@@ -190,4 +191,19 @@ public interface AplicacioService {
 
 	@PreAuthorize("isAuthenticated()")
     Integer getNumElementsPaginaDefecte();
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+    boolean startRecording();
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	boolean stopRecording() throws Exception;
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	String analyzeRecording() throws Exception;
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+    ArxiuDto getRecordingFile() throws Exception;
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	boolean isRecording();
 }

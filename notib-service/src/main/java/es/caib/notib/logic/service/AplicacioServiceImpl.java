@@ -16,6 +16,8 @@ import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.ExcepcioLogHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
 import es.caib.notib.logic.intf.dto.ProcessosInicialsEnum;
 import es.caib.notib.logic.intf.dto.UsuariDto;
@@ -25,7 +27,11 @@ import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.repository.ProcessosInicialsRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.persist.repository.acl.AclSidRepository;
+import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.usuari.DadesUsuari;
+import jdk.jfr.Recording;
+import jdk.jfr.consumer.RecordedEvent;
+import jdk.jfr.consumer.RecordingFile;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.broker.BrokerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +42,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -50,7 +63,7 @@ import java.util.stream.Collectors;
 @Service
 public class AplicacioServiceImpl implements AplicacioService {
 
-	
+
 	@Autowired
 	private UsuariRepository usuariRepository;
 	@Autowired
@@ -74,9 +87,14 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired
 	private MessageHelper messageHelper;
 	@Autowired
+	private PluginHelper pluginHelper;
+	@Autowired
 	private SchedulingConfig schedulingConfig;
 	@Autowired
 	private BrokerService brokerService;
+
+	private static boolean isRecording;
+	private static Recording recording;
 
 	public void restartSmBroker() throws Exception {
 
@@ -144,7 +162,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			throw new NotFoundException(codi, DadesUsuari.class);
 		}
 		var u = UsuariEntity.builder().codi(dadesUsuari.getCodi()).email(dadesUsuari.getEmail()).idioma(idioma).nom(dadesUsuari.getNom())
-						.llinatges(dadesUsuari.getLlinatges()).nomSencer(dadesUsuari.getNomSencer()).build();
+				.llinatges(dadesUsuari.getLlinatges()).nomSencer(dadesUsuari.getNomSencer()).build();
 		usuariRepository.save(u);
 	}
 
@@ -162,13 +180,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats()).idioma(dto.getIdioma())
 					.numElementsPaginaDefecte(dto.getNumElementsPaginaDefecte().name()).build();
 			usuari.update(usr);
-            cacheHelper.evictUsuariByCodi(usuari.getCodi());
+			cacheHelper.evictUsuariByCodi(usuari.getCodi());
 			return toUsuariDtoAmbRols(usuari);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional
 	@Override
 	public void updateRolUsuariActual(String rol) {
@@ -183,7 +201,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional
 	@Override
 	public void updateEntitatUsuariActual(Long entitat) {
@@ -198,7 +216,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 
 	@Override
 	public UsuariDto getUsuariActual() {
@@ -240,7 +258,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<String> findRolsUsuariActual() {
@@ -254,7 +272,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public UsuariDto findUsuariAmbCodi(String codi) {
@@ -353,7 +371,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	public String propertyGet(String property, String defaultValue) {
 
@@ -374,7 +392,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			log.debug("Consultant les mètriques de l'aplicació");
 			var mapper = new ObjectMapper();
-			mapper.registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS,false));
+			mapper.registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, false));
 			return mapper.writeValueAsString(metricsHelper.getMetricRegistry());
 		} catch (Exception ex) {
 			log.error("Error al generar les mètriques de l'aplicació", ex);
@@ -428,17 +446,17 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 
 	// PROCESSOS INICIALS
-    @Override
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
-    public List<ProcessosInicialsEnum> getProcessosInicialsPendents() {
+	public List<ProcessosInicialsEnum> getProcessosInicialsPendents() {
 
 		List<ProcessosInicialsEnum> processosInicials = new ArrayList<>();
 		var processos = processosInicialsRepository.findProcesosInicialsEntityByInitTrue();
 		if (processos != null) {
 			processosInicials = processos.stream().map(p -> p.getCodi()).collect(Collectors.toList());
 		}
-        return processosInicials;
-    }
+		return processosInicials;
+	}
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -456,6 +474,108 @@ public class AplicacioServiceImpl implements AplicacioService {
 			log.error("Error obtinguent el número d'elements per pàgina per defecte");
 			return 10;
 		}
+	}
+
+	@Override
+	public boolean startRecording() {
+
+		recording = new Recording();
+		Map<String, String> settings = new HashMap<>();
+		settings.put("jdk.ObjectAllocationInNewTLAB#enabled", "true");
+		settings.put("jdk.ObjectAllocationOutsideTLAB#enabled", "true");
+		settings.put("jdk.GarbageCollection#enabled", "true");
+		recording.setSettings(settings);
+		recording.setName("WebAppRecording");
+		recording.start();
+		isRecording = true;
+		return isRecording;
+	}
+
+	@Override
+	public boolean stopRecording() throws Exception {
+
+		if (recording == null) {
+			return false;
+		}
+		var path = getRecordingPath();
+		recording.stop();
+		recording.dump(path);
+		recording = null;
+		isRecording = false;
+		return isRecording;
+	}
+
+	@Override
+	public String analyzeRecording() throws IOException {
+
+		var path = getRecordingPath();
+		var analysis = new StringBuilder();
+		try (RecordingFile recordingFile = new RecordingFile(path)) {
+			while (recordingFile.hasMoreEvents()) {
+				var event = recordingFile.readEvent();
+				analysis.append(formatEvent(event));
+			}
+		}
+		return analysis.toString();
+	}
+
+	@Override
+	public ArxiuDto getRecordingFile() throws Exception {
+
+		var recordingPath = getRecordingPath();
+		if (!Files.exists(recordingPath)) {
+			throw new SistemaExternException("No s'ha trobat l'arxiu de recording");
+		}
+
+		try (var output = new ByteArrayOutputStream()) {
+			output.write(Files.readAllBytes(recordingPath));
+			return new ArxiuDto("recording.jfr", null, output.toByteArray(), output.size());
+		}
+	}
+
+	@Override
+	public boolean isRecording() {
+		return isRecording;
+	}
+
+	private Path getRecordingPath() {
+
+		var baseDir = configHelper.getConfig("es.caib.notib.plugin.gesdoc.filesystem.base.dir");
+		baseDir = baseDir.endsWith("/") ? baseDir + "tmp/" : baseDir + "/tmp/";
+		return Paths.get(baseDir + "recording.jfr");
+	}
+
+	private String formatEvent(RecordedEvent event) {
+
+		var sb = new StringBuilder();
+		var eventType = event.getEventType().getName();
+		sb.append("Event: ").append(eventType).append("\n");
+		sb.append("Start Time: ").append(event.getStartTime()).append("\n");
+		switch (eventType) {
+			case "jdk.ObjectAllocationInNewTLAB":
+			case "jdk.ObjectAllocationOutsideTLAB":
+				long allocationSize = event.getLong("allocationSize");
+				String objectClass = event.getClass("objectClass").getName();
+				sb.append("Allocation Size: ").append(allocationSize).append(" bytes").append("\n");
+				sb.append("Object Class: ").append(objectClass).append("\n");
+				break;
+			case "jdk.GarbageCollection":
+				long gcId = event.getLong("gcId");
+				String gcName = event.getString("name");
+				long duration = event.getDuration().toNanos();
+				sb.append("GC ID: ").append(gcId).append("\n");
+				sb.append("GC Name: ").append(gcName).append("\n");
+				sb.append("Duration: ").append(duration).append(" ns").append("\n");
+				break;
+			default:
+				event.getFields().forEach(field -> {
+					Object value = event.getValue(field.getName());
+					sb.append(field.getName()).append(": ").append(value).append("\n");
+				});
+				break;
+		}
+		sb.append("\n");
+		return sb.toString();
 	}
 
 }

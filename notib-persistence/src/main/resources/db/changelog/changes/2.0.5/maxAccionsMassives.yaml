@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - sql: "INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.maxim.accions.massives', '250', 'Nombre máxim de files que es pot seleccionar com a usuari, per fer accions massives. Per defecte 250.', 'GENERAL', 0, 0, 'INT', 0);"

@@ -1,21 +1,18 @@
 package es.caib.notib.back.command;
 
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaDto;
-import es.caib.notib.logic.intf.service.GestioDocumentalService;
 import es.caib.notib.back.helper.ConversioTipusHelper;
 import es.caib.notib.back.validation.ValidNotificacioMassiu;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaDto;
+import es.caib.notib.logic.intf.service.GestioDocumentalService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.Date;
 
 /**
@@ -52,14 +49,14 @@ public class NotificacioMassivaCommand {
 			notificacioMassivaDto.setFicheroCsvBytes(this.getFicheroCsv().getBytes());
 			notificacioMassivaDto.setFicheroCsvNom(this.getFicheroCsv().getOriginalFilename());
 		} else {
-			notificacioMassivaDto.setFicheroCsvBytes(gestioDocumentalService.obtenirArxiuTemporal(fitxerCSVGestdocId));
+			notificacioMassivaDto.setFicheroCsvBytes(gestioDocumentalService.obtenirArxiuTemporal(fitxerCSVGestdocId, false));
 			notificacioMassivaDto.setFicheroCsvNom(fitxerCSVNom);
 		}
 		if (fitxerZIPGestdocId == null || fitxerZIPGestdocId.isEmpty() ) {
 			notificacioMassivaDto.setFicheroZipBytes(this.getFicheroZip().getBytes());
 			notificacioMassivaDto.setFicheroZipNom(this.getFicheroZip().getOriginalFilename());
 		} else {
-			notificacioMassivaDto.setFicheroZipBytes(gestioDocumentalService.obtenirArxiuTemporal(fitxerZIPGestdocId));
+			notificacioMassivaDto.setFicheroZipBytes(gestioDocumentalService.obtenirArxiuTemporal(fitxerZIPGestdocId, true));
 			notificacioMassivaDto.setFicheroZipNom(fitxerZIPNom);
 		}
 		return notificacioMassivaDto;

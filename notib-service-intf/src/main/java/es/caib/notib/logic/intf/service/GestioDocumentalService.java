@@ -21,7 +21,7 @@ public interface GestioDocumentalService {
 	String guardarArxiuTemporal(String string);
 
 	@PreAuthorize("isAuthenticated()")
-	byte[] obtenirArxiuTemporal(String arxiuGestdocId);
+	byte[] obtenirArxiuTemporal(String arxiuGestdocId, boolean isZip);
 
 	@PreAuthorize("isAuthenticated()")
 	byte[] obtenirArxiuNotificacio(String arxiuGestdocId);

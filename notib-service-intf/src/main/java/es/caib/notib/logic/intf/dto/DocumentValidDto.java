@@ -3,6 +3,7 @@ package es.caib.notib.logic.intf.dto;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
+import es.caib.notib.logic.intf.util.MimeUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,4 +33,12 @@ public class DocumentValidDto {
 	private boolean errorMetadades = false;
 	private boolean errorFirma = false;
 	private String errorFirmaMsg;
+
+	public void setMediaType(String mediaType) {
+		this.mediaType = mediaType;
+
+		if (MimeUtils.isZipFileByMimeType(mediaType)) {
+			this.mediaType = "application/zip";
+		}
+	}
 }

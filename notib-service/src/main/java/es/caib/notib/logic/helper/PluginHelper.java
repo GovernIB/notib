@@ -33,6 +33,12 @@ import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
+import es.caib.notib.persist.repository.DocumentRepository;
+import es.caib.notib.persist.repository.EntitatRepository;
+import es.caib.notib.plugin.carpeta.CarpetaPlugin;
+import es.caib.notib.plugin.carpeta.MissatgeCarpetaParams;
+import es.caib.notib.plugin.carpeta.VincleInteressat;
+import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
@@ -173,7 +179,7 @@ public class PluginHelper {
 	public void addOficinaAndLlibreRegistre(NotificacioEntity notificacio){
 		registrePluginHelper.addOficinaAndLlibreRegistre(notificacio);
 	}
-	
+
 	// USUARIS
 	// /////////////////////////////////////////////////////////////////////////////////////
 	

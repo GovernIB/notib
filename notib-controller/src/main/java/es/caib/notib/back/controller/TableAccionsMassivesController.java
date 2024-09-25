@@ -123,6 +123,9 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.exportacio.seleccio.buida"));
             return "redirect:../.." + (requestIsRemesesEnviamentMassiu(request) ? "/remeses" : "");
         }
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+            return "redirect:../.." + (requestIsRemesesEnviamentMassiu(request) ? "/remeses" : "");
+        }
         var entitatActual = getEntitatActualComprovantPermisos(request);
         try {
             var fitxer = enviamentService.exportacio(entitatActual.getId(), seleccio, format);
@@ -140,6 +143,9 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.notificacio.seleccio.buida"));
+            return ERROR;
+        }
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
             return ERROR;
         }
         MissatgesHelper.info( request, getMessage(request, "enviament.controller.reintent.notificacio.pendents.executant"));
@@ -198,6 +204,9 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.seleccio.buida"));
+            return REDIRECT + request.getHeader(REFERER);
+        }
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
             return REDIRECT + request.getHeader(REFERER);
         }
         log.info("Reactivam els enviaments amb error: " + StringUtils.join(seleccio, ", "));
@@ -266,6 +275,9 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.seleccio.buida"));
             return REDIRECT + request.getHeader(REFERER);
         }
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+            return REDIRECT + request.getHeader(REFERER);
+        }
         log.info("Reactivam consulta dels enviaments: " + StringUtils.join(seleccio, ", "));
         try {
             notificacioService.resetConsultaEstat(seleccio);
@@ -285,6 +297,9 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.seleccio.buida"));
             return REDIRECT + request.getHeader(REFERER);
         }
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+            return REDIRECT + request.getHeader(REFERER);
+        }
         log.info("Reactivam SIR dels enviaments: " + StringUtils.join(seleccio, ", "));
         try {
             enviamentService.reactivaSir(seleccio);
@@ -302,6 +317,9 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.actualitzarestat.buida"));
+            return ERROR;
+        }
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
             return ERROR;
         }
         MissatgesHelper.info( request, getMessage(request, "enviament.controller.actualitzarestat.executant"));
@@ -332,6 +350,9 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             MissatgesHelper.error(request, getMessage(request,"enviament.controller.enviar.callback.buida"));
             return REDIRECT + request.getHeader(REFERER);
         }
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+            return REDIRECT + request.getHeader(REFERER);
+        }
         var notificacioId =  seleccio != null && seleccio.isEmpty() ? Long.parseLong(path[2]) : null;
         seleccio = notificacioId != null ? new HashSet<>(List.of(notificacioId)) : seleccio;
         log.info("Reactivam callback dels enviaments: " + StringUtils.join(seleccio, ", "));
@@ -358,6 +379,9 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(request, getMessage(request,"enviament.controller.reactivar.callback.buida"));
+            return REDIRECT + request.getHeader(REFERER);
+        }
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
             return REDIRECT + request.getHeader(REFERER);
         }
         log.info("Reactivam callback dels enviaments: " + StringUtils.join(seleccio, ", "));
@@ -407,6 +431,9 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
     protected Set<Long> getIdsEnviamentsSeleccionats(HttpServletRequest request) {
 
         var ids = getIdsSeleccionats(request);
+        if (ids.contains(-1L)) {
+            return ids;
+        }
         return requestIsRemesesEnviamentMassiu(request) ? enviamentService.findIdsByNotificacioIds(ids) : ids;
     }
 
@@ -414,6 +441,13 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
 
         @SuppressWarnings("unchecked")
         var seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(request, sessionAttributeSeleccio);
+        var max = notificacioService.getMaxAccionesMassives();
+        if (seleccio != null && seleccio.size() > max) {
+            MissatgesHelper.error(request, getMessage(request,"enviament.list.user.accio.massiva.max.elements", new String[] {max+""}));
+            Set<Long> maxError = new HashSet<>();
+            maxError.add(-1L);
+            return maxError;
+        }
         return seleccio != null ? new HashSet<>(seleccio) : new HashSet<>();
     }
 

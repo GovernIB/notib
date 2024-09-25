@@ -3,6 +3,7 @@ package es.caib.notib.persist.entity;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
+import es.caib.notib.logic.intf.util.MimeUtils;
 import es.caib.notib.persist.audit.NotibAuditable;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -244,6 +245,11 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 
 		return this.getId().toString() + ".pdf";
 	}
+
+	public boolean isMediaTypeZip() {
+		return MimeUtils.isZipFileByMimeType(mediaType);
+	}
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}

@@ -51,8 +51,8 @@ public class EmailMassivaListener {
             if (!Strings.isNullOrEmpty(notificacioMassiva.getEmail())) {
                 ConfigHelper.setEntitatCodi(notificacioMassiva.getEntitat().getCodi());
                 info.addParam("Correu electrònic", notificacioMassiva.getEmail());
-                var fileResumContent = getFileContent(notificacioMassiva.getResumGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES);
-                var fileErrorsContent = getFileContent(notificacioMassiva.getErrorsGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_ERRORS);
+                var fileResumContent = getFileContent(notificacioMassiva.getResumGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES, false);
+                var fileErrorsContent = getFileContent(notificacioMassiva.getErrorsGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_ERRORS, false);
                 emailNotificacioMassivaHelper.sendMail(notificacioMassiva, notificacioMassiva.getEmail(), fileResumContent, fileErrorsContent);
             }
             integracioHelper.addAccioOk(info);
@@ -63,9 +63,9 @@ public class EmailMassivaListener {
         message.acknowledge();
     }
 
-    private byte[] getFileContent(String gesdocId, String agrupacio) {
+    private byte[] getFileContent(String gesdocId, String agrupacio, boolean isZip) {
         var baos = new ByteArrayOutputStream();
-        pluginHelper.gestioDocumentalGet(gesdocId, agrupacio, baos);
+        pluginHelper.gestioDocumentalGet(gesdocId, agrupacio, baos, isZip);
         return baos.toByteArray();
     }
 

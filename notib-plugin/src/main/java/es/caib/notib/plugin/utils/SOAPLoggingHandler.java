@@ -50,8 +50,8 @@ public class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
 		var outboundProperty = (Boolean)messageContext.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 		sb.append(outboundProperty.booleanValue() ? "Missarge sortint: " : "Missarge entrant: ");
 		var message = messageContext.getMessage();
-		var baos = new ByteArrayOutputStream();
-		try {
+
+		try (var baos = new ByteArrayOutputStream()) {
 			message.writeTo(baos);
 			sb.append(baos);
 		} catch (Exception ex) {

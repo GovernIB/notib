@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import es.caib.notib.logic.intf.util.MimeUtils;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import es.caib.plugins.arxiu.api.*;
 import es.caib.plugins.arxiu.caib.ArxiuCaibClient;
@@ -55,19 +56,27 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 	public Document documentDetalls(String identificador, String versio, boolean ambContingut) throws ArxiuException {
 
 		if (identificador.contains("csv:")) {
-			identificador = identificador.replace("csv:", "");
+//			identificador = identificador.replace("csv:", "");
 			return documentDetallsCsv(identificador, ambContingut);
 		}
-		identificador = identificador.replace(UUID, "");
+//		identificador = identificador.replace(UUID, "");
 		return documentDetallsUuid(identificador, ambContingut);
 	}
 
 	private Document documentDetallsCsv(String identificador, boolean ambContingut) {
 
 		try {
+			var id = identificador;
+			identificador = identificador.replace("csv:", "");
 			var response = new Document();
 			if (ambContingut) {
-				response.setContingut(documentImprimibleCsv(identificador));
+				try {
+
+					response.setContingut(documentImprimibleCsv(identificador));
+				} catch (Exception ex) {
+					log.info("No s'ha pogut obtenir la versio imprimible. Obtenint versio original del document csv " + id);
+					response.setContingut(documentOriginal(id));
+				}
 			}
 			try {
 				var result = documentMetadadesCsv(identificador);
@@ -86,9 +95,16 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 	private Document documentDetallsUuid(String identificador, boolean ambContingut) {
 
 		try {
+			var id = identificador;
+			identificador = identificador.replace(UUID, "");
 			Document response = new Document();
 			if (ambContingut) {
-				response.setContingut(documentImprimibleUuid(identificador));
+				try {
+					response.setContingut(documentImprimibleUuid(identificador));
+				} catch (Exception ex) {
+					log.info("No s'ha pogut obtenir la versio imprimible. Obtenint versio original del document uuid " + id);
+					response.setContingut(documentOriginal(id));
+				}
 			}
 			try {
 				var result = documentMetadadesUuid(identificador);
@@ -104,18 +120,44 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 		}
 	}
 
+	private DocumentContingut documentOriginal(String identificador) throws ArxiuException {
+
+		try {
+			logger.info("[ConCSV] Recuperant versio original uuid. identificador " + identificador);
+			String url = identificador.contains(UUID) ? getPropertyConversioOriginalUrlUuid() : getPropertyConversioOriginalUrlCsv();
+			var webResource = getVersioImprimibleClientConcsv().resource(url + (!url.endsWith("/") ? "/" : "") + identificador.split(":")[1]);
+			var is = webResource.get(InputStream.class);
+			var contingut = new DocumentContingut();
+			contingut.setContingut(IOUtils.toByteArray(is));
+			contingut.setTipusMime(MimeUtils.getMimeTypeFromContingut(null, contingut.getContingut()));
+			contingut.setArxiuNom("versio_original" + MimeUtils.getExtension(contingut.getTipusMime()));
+			contingut.setTamany(contingut.getContingut().length);
+			return contingut;
+		} catch (Exception ex) {
+			log.debug("S'ha produit un error generant el document " + identificador, ex);
+			throw new ArxiuException("S'ha produit un error recuperant el document original " + identificador, ex);
+		}
+	}
+
 	@Override
 	public DocumentContingut documentImprimible(String identificador) throws ArxiuException {
 
-		if(identificador.contains(UUID)) {
-			identificador = identificador.replace(UUID, "");
-			return documentImprimibleUuid(identificador);
+		var id = identificador;
+		try {
+			if (identificador.contains(UUID)) {
+				identificador = identificador.replace(UUID, "");
+				return documentImprimibleUuid(identificador);
+			}
+			identificador = identificador.replace("csv:", "");
+			return documentImprimibleCsv(identificador);
+		} catch (Exception ex) {
+			return documentOriginal(id);
 		}
-		identificador = identificador.replace("csv:", "");
-		return documentImprimibleCsv(identificador);
 	}
 
 	private DocumentContingut documentImprimibleCsv(final String identificador) throws ArxiuException {
+
+
 		/*
 		 * Les URLs de consulta son les següents:
 		 *   https://intranet.caib.es/concsv/rest/printable/uuid/IDENTIFICADOR?metadata1=METADADA_1&metadata2=METADADA_2&watermark=MARCA_AIGUA
@@ -129,6 +171,9 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 		 * Només es obligatori informa la HASH, la resta d'elements son opcionals. Si no s'informen metadades s'imprimeix l'hora i dia de la generació del document imprimible.
 		 */
 		try {
+//			if (identificador.contains("original_")) {
+//				return documentOriginal(identificador.split("original_")[1]);
+//			}
 			var is = generarVersioImprimibleCsv(identificador, null, /* metadada 1 */ null, /* metadada 2 */ null); // marca d'aigua
 			var contingut = new DocumentContingut();
 			contingut.setArxiuNom("versio_imprimible.pdf");
@@ -143,8 +188,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 	}
 	
 	
-	private DocumentContingut documentImprimibleUuid(
-			final String identificador) throws ArxiuException {
+	private DocumentContingut documentImprimibleUuid(final String identificador) throws ArxiuException {
 		/*
 		 * Les URLs de consulta son les següents:
 		 *   https://intranet.caib.es/concsv/rest/printable/uuid/IDENTIFICADOR?metadata1=METADADA_1&metadata2=METADADA_2&watermark=MARCA_AIGUA
@@ -158,11 +202,10 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 		 * Només es obligatori informa la HASH, la resta d'elements son opcionals. Si no s'informen metadades s'imprimeix l'hora i dia de la generació del document imprimible.
 		 */
 		try {
-			InputStream is = generarVersioImprimibleUuid(
-					identificador,
-					null, // metadada 1
-					null, // metadada 2
-					null); // marca d'aigua
+//			if (identificador.contains("original_")) {
+//				return documentOriginal(identificador.split("original_")[1]);
+//			}
+			InputStream is = generarVersioImprimibleUuid(identificador, null, null, null);
 			DocumentContingut contingut = new DocumentContingut();
 			contingut.setArxiuNom("versio_imprimible.pdf");
 			contingut.setTipusMime("application/pdf");
@@ -170,11 +213,8 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			contingut.setTamany(contingut.getContingut().length);
 			return contingut;
 		} catch (Exception ex) {
-			log.debug("S'ha produit un error generant la versió imprimible del document amb UUID " + identificador,
-					ex);
-			throw new ArxiuException(
-					"S'ha produit un error generant la versió imprimible del document amb UUID " + identificador,
-					ex);
+			log.debug("S'ha produit un error generant la versió imprimible del document amb UUID " + identificador, ex);
+			throw new ArxiuException("S'ha produit un error generant la versió imprimible del document amb UUID " + identificador, ex);
 		}
 	}
 
@@ -350,6 +390,14 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			versioImprimibleClient.addFilter(new HTTPBasicAuthFilter(usuari, contrasenya));
 		}
 		return versioImprimibleClient;
+	}
+
+	private String getPropertyConversioOriginalUrlCsv() {
+		return getPluginProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.original.url.csv");
+	}
+
+	private String getPropertyConversioOriginalUrlUuid() {
+		return getPluginProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.original.url.uuid");
 	}
 
 	private String getPropertyConversioImprimibleUrlCsvConcsv() {

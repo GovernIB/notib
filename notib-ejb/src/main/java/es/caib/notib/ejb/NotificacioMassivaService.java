@@ -81,13 +81,13 @@ public class NotificacioMassivaService extends AbstractService<es.caib.notib.log
 
 	@Override
 	@RolesAllowed("**")
-	public FitxerDto getErrorsValidacioFile(Long entitatId, Long notificacioMassivaId) {
+	public FitxerDto getErrorsValidacioFile(Long entitatId, Long notificacioMassivaId) throws IOException {
 		return getDelegateService().getErrorsValidacioFile(entitatId, notificacioMassivaId);
 	}
 
 	@Override
 	@RolesAllowed("**")
-	public FitxerDto getErrorsExecucioFile(Long entitatId, Long notificacioMassivaId) {
+	public FitxerDto getErrorsExecucioFile(Long entitatId, Long notificacioMassivaId) throws IOException {
 		return getDelegateService().getErrorsExecucioFile(entitatId, notificacioMassivaId);
 	}
 

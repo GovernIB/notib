@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Locale;
 
 /**
@@ -72,6 +73,14 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 			}
 			justificant.close();
 		} catch (DocumentException ex) {
+			var errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.generant.error", new Object[] {ex.getMessage()});
+			progres.setProgres(100);
+			progres.addInfo(ProgresDescarregaDto.TipusInfo.ERROR, errorMessage);
+			log.error(errorMessage, ex);
+		}
+		try {
+			out.close();
+		} catch (IOException ex) {
 			var errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.generant.error", new Object[] {ex.getMessage()});
 			progres.setProgres(100);
 			progres.addInfo(ProgresDescarregaDto.TipusInfo.ERROR, errorMessage);

@@ -26,8 +26,8 @@ public class GestioDocumentalService extends AbstractService<es.caib.notib.logic
 
 	@Override
 	@RolesAllowed("**")
-	public byte[] obtenirArxiuTemporal(String arxiuGestdocId) {
-		return getDelegateService().obtenirArxiuTemporal(arxiuGestdocId);
+	public byte[] obtenirArxiuTemporal(String arxiuGestdocId, boolean isZip) {
+		return getDelegateService().obtenirArxiuTemporal(arxiuGestdocId, isZip);
 	}
 	@Override
 	@RolesAllowed("**")

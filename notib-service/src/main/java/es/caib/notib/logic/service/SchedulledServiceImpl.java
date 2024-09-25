@@ -319,11 +319,12 @@ public class SchedulledServiceImpl implements SchedulledService {
 				try {
 					var lastModified = new Date(file.lastModified());
 					var proc = Runtime.getRuntime().exec("file " + filePath);
-					var stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 					String s = null;
 					String output = "";
-					while ((s = stdInput.readLine()) != null) {
-						output = s;
+					try (var isd = new InputStreamReader(proc.getInputStream()); var stdInput = new BufferedReader(isd)) {
+						while ((s = stdInput.readLine()) != null) {
+							output = s;
+						}
 					}
 					if (lastModified.after(dataLlindar) || output.contains("Zip")) {
 						return;

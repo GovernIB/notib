@@ -3,6 +3,7 @@
  */
 package es.caib.notib.ejb;
 
+import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
 import es.caib.notib.logic.intf.dto.ProcessosInicialsEnum;
 import es.caib.notib.logic.intf.dto.UsuariDto;
@@ -205,6 +206,36 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 	@PermitAll
 	public Integer getNumElementsPaginaDefecte() {
 		return getDelegateService().getNumElementsPaginaDefecte();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public boolean startRecording() {
+		return getDelegateService().startRecording();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public boolean stopRecording() throws Exception {
+		return getDelegateService().stopRecording();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public String analyzeRecording() throws Exception {
+		return getDelegateService().analyzeRecording();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public ArxiuDto getRecordingFile() throws Exception {
+		return getDelegateService().getRecordingFile();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public boolean isRecording() {
+		return getDelegateService().isRecording();
 	}
 
 	@Override

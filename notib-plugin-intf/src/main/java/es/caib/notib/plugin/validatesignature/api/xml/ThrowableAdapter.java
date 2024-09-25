@@ -13,20 +13,22 @@ public class ThrowableAdapter extends XmlAdapter<String, Throwable> {
 
     @Override
     public String marshal(Throwable v) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(v);
-        oos.close();
-        byte[] serializedBytes = baos.toByteArray();
-        return hexAdapter.marshal(serializedBytes);
+
+        try (var baos = new ByteArrayOutputStream(); var oos = new ObjectOutputStream(baos);) {
+            oos.writeObject(v);
+            oos.close();
+            var serializedBytes = baos.toByteArray();
+            return hexAdapter.marshal(serializedBytes);
+        }
     }
 
     @Override
     public Throwable unmarshal(String v) throws Exception {
-        byte[] serializedBytes = hexAdapter.unmarshal(v);
-        ByteArrayInputStream bais = new ByteArrayInputStream(serializedBytes);
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        Throwable result = (Throwable) ois.readObject();
-        return result;
+
+        var serializedBytes = hexAdapter.unmarshal(v);
+        try (var bais = new ByteArrayInputStream(serializedBytes); var ois = new ObjectInputStream(bais);) {
+            Throwable result = (Throwable) ois.readObject();
+            return result;
+        }
     }
 }

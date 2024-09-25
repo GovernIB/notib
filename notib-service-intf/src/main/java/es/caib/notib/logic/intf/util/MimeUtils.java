@@ -6,6 +6,8 @@ import es.caib.notib.logic.intf.dto.notificacio.Document;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.tika.Tika;
+import org.apache.tika.mime.MimeTypeException;
+import org.apache.tika.mime.MimeTypes;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,6 +80,11 @@ public class MimeUtils {
         return mimeType;
     }
 
+    public static String getExtension(String mimeType) throws MimeTypeException {
+
+        return MimeTypes.getDefaultMimeTypes().forName(mimeType).getExtension();
+    }
+
 
     public static boolean isMimeValidSIR(String mime) {
         return Mimes.getFormatsSIR().contains(mime);
@@ -100,6 +107,19 @@ public class MimeUtils {
     public static boolean isFormatValid(String mime, String docBase64) {
 
         return docBase64.startsWith(formatsValidsNotCom[0]) || docBase64.startsWith(formatsValidsNotCom[1]); //|| isZipSigned(mime, docBase64);
+    }
+
+    public static boolean isZipFileByMimeType(String mimeType) {
+        if (mimeType == null) {
+            return false;
+        }
+
+        var mime = mimeType.trim().toLowerCase();
+        return "application/zip".equals(mime)
+                || "application/x-zip-compressed".equals(mime)
+                || "application/x-zip".equals(mime)
+                || "application/zip-compressed".equals(mime)
+                || "application/x-zip-compressed".equals(mime);
     }
 
     public static boolean isZipSigned(String mime, String base64) {

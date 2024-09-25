@@ -635,7 +635,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				if (enviament.getNotificaCertificacioData() != null) {
 					log.debug("Guardant certificació enviament amb referencia: " + referencia);
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					pluginHelper.gestioDocumentalGet(enviament.getNotificaCertificacioArxiuId(), PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, baos);
+					pluginHelper.gestioDocumentalGet(enviament.getNotificaCertificacioArxiuId(), PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, baos, false);
 					String certificacioBase64 = org.apache.commons.codec.binary.Base64.encodeBase64String(baos.toByteArray());
 
 					Certificacio certificacio = Certificacio.builder()

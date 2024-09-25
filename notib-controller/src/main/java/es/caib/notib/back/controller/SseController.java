@@ -62,7 +62,7 @@ public class SseController extends BaseController {
         return emitter;
     }
 
-//    @JmsListener(destination = WebSocketConstants.CUA_WEBSOCKET, containerFactory = WebSocketConstants.JMS_FACTORY_ACK)
+    @JmsListener(destination = WebSocketConstants.CUA_WEBSOCKET, containerFactory = WebSocketConstants.JMS_FACTORY_ACK)
     public void sendEventToClient(@Payload MissatgeWs missatge, @Headers MessageHeaders headers, Message message) throws JMSException {
 
         message.acknowledge();

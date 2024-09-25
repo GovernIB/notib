@@ -496,8 +496,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				opcionGenerarCsv.setValue("no");
 				opcionesDocumento.getOpcion().add(opcionGenerarCsv);
 				documento.setOpcionesDocumento(opcionesDocumento);
-				if(baos.toByteArray() != null) {
-					String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(baos.toByteArray()).toCharArray()));
+				if(documento.getContenido() != null) {
+					String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(documento.getContenido()).toCharArray()));
 					//Hash a enviar
 					documento.setHash(hash256);
 				}
