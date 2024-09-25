@@ -1,6 +1,7 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.net.MediaType;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
@@ -173,7 +174,9 @@ public class JustificantServiceImpl implements JustificantService {
         progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant"));
         var contingut = justificantEnviamentHelper.generarJustificant(conversioTipusHelper.convertir(notificacio, NotificacioDtoV2.class), progres);
         var justificantOriginal = new FitxerDto();
-        justificantOriginal.setNom("justificant_notificació_" + notificacio.getId() + ".pdf");
+        var tipus = notificacio.getEnviamentTipus();
+        var tipusText = EnviamentTipus.NOTIFICACIO.equals(tipus) ? "notificació" : EnviamentTipus.COMUNICACIO.equals(tipus) ? "comunicació" : "comunicació:sir";
+        justificantOriginal.setNom("justificant_" + tipusText + "_" + notificacio.getId() + ".pdf");
         justificantOriginal.setContentType(MediaType.PDF.toString());
         justificantOriginal.setContingut(contingut);
 
