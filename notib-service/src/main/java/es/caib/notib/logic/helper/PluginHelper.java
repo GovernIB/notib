@@ -1470,8 +1470,7 @@ public class PluginHelper {
 
 	public byte[] getUrlDocumentContent(String urlPath) throws SistemaExternException {
 
-		var baos = new ByteArrayOutputStream();
-		try {
+		try (var baos = new ByteArrayOutputStream()) {
 			try (var is = new URL(urlPath).openStream()) {
 				var byteChunk = new byte[4096]; // Or whatever size you want to read in at a time.
 				int n;

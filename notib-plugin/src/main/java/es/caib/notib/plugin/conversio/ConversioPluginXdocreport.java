@@ -95,15 +95,16 @@ public class ConversioPluginXdocreport implements ConversioPlugin {
 			convertit.setArxiuContingut(baosConversio != null ? baosConversio.toByteArray() : arxiu.getArxiuContingut());
 		} else {
 			var pdfReader = baosConversio != null ? new PdfReader(baosConversio.toByteArray()) : new PdfReader(arxiu.getArxiuContingut());
-			var baosEstampacio = new ByteArrayOutputStream();
-			var pdfStamper = new PdfStamper(pdfReader, baosEstampacio);
-			PdfContentByte over;
-			for (var i = 0; i < pdfReader.getNumberOfPages(); i++) {
-				over = pdfStamper.getOverContent(i + 1);
-				estamparBarcodePdf417(over, url, BARCODE_POSITION_LEFT, 10);
+			try (var baosEstampacio = new ByteArrayOutputStream()) {
+				var pdfStamper = new PdfStamper(pdfReader, baosEstampacio);
+				PdfContentByte over;
+				for (var i = 0; i < pdfReader.getNumberOfPages(); i++) {
+					over = pdfStamper.getOverContent(i + 1);
+					estamparBarcodePdf417(over, url, BARCODE_POSITION_LEFT, 10);
+				}
+				pdfStamper.close();
+				convertit.setArxiuContingut(baosEstampacio.toByteArray());
 			}
-			pdfStamper.close();
-			convertit.setArxiuContingut(baosEstampacio.toByteArray());
 		}
 		convertit.setArxiuNom(getNomArxiuConvertitPdf(arxiu.getArxiuNom()));
 		return convertit;

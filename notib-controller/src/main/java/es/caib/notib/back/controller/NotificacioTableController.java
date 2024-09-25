@@ -648,6 +648,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             }
         }
         zos.close();
+        baos.close();
         var sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         var date = sdf.format(new Date()).replace(":", "_");
         writeFileToResponse("certificacionsMassives_" + date + ".zip", baos.toByteArray(), response);
@@ -673,13 +674,13 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @GetMapping(value = "/{notificacioId}/enviament/certificacionsDescarregar")
     @ResponseBody
-    public void certificacionsDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId) throws IOException {
+    public void certificacionsDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId) {
 
-        try {
+        try (var baos = new ByteArrayOutputStream(); var zos = new ZipOutputStream(baos);) {
             var locale = new Locale(sessionScopedContext.getIdiomaUsuari());
             boolean contingut = false;
-            var baos = new ByteArrayOutputStream();
-            var zos = new ZipOutputStream(baos);
+//            var baos = new ByteArrayOutputStream();
+//            var zos = new ZipOutputStream(baos);
             var enviaments = enviamentService.enviamentFindAmbNotificacio(notificacioId);
             Map<String, Integer> interessats = new HashMap<>();
             ArxiuDto arxiu;
@@ -712,7 +713,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 return;
             }
             zos.closeEntry();
-            zos.close();
             response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
             var nom = MessageHelper.getInstance().getMessage("notificacio.list.enviament.certificacio.zip.nom", null, locale);
             writeFileToResponse(nom + "_" + notificacioId + ".zip", baos.toByteArray(), response);
@@ -838,21 +838,20 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             justificants.add(justificant);
         }
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ZipOutputStream zos = new ZipOutputStream(baos);
-
-        for (var just : justificants) {
-            ZipEntry entry = new ZipEntry(StringUtils.stripAccents(just.getNom()));
-            entry.setSize(just.getContingut().length);
-            zos.putNextEntry(entry);
-            zos.write(just.getContingut());
-            zos.closeEntry();
+        try (var baos = new ByteArrayOutputStream(); var zos = new ZipOutputStream(baos)) {
+            for (var just : justificants) {
+                var entry = new ZipEntry(StringUtils.stripAccents(just.getNom()));
+                entry.setSize(just.getContingut().length);
+                zos.putNextEntry(entry);
+                zos.write(just.getContingut());
+                zos.closeEntry();
+            }
+            zos.close();
+            var sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            var date = sdf.format(new Date()).replace(":", "_");
+            writeFileToResponse("justificantsMassiu_" + date + ".zip", baos.toByteArray(), response);
+        //        return getModalControllerReturnValueSuccess(request,REDIRECT + referer,"notificacio.controller.descarregar.justificant.massiu.ok");
         }
-        zos.close();
-        var sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        var date = sdf.format(new Date()).replace(":", "_");
-        writeFileToResponse("justificantsMassiu_" + date + ".zip", baos.toByteArray(), response);
-//        return getModalControllerReturnValueSuccess(request,REDIRECT + referer,"notificacio.controller.descarregar.justificant.massiu.ok");
     }
 
     @GetMapping(value = "/{notificacioId}/justificant/estat/{sequence}")

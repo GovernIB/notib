@@ -63,7 +63,7 @@ import java.util.stream.Collectors;
 @Service
 public class AplicacioServiceImpl implements AplicacioService {
 
-	
+
 	@Autowired
 	private UsuariRepository usuariRepository;
 	@Autowired
@@ -162,7 +162,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			throw new NotFoundException(codi, DadesUsuari.class);
 		}
 		var u = UsuariEntity.builder().codi(dadesUsuari.getCodi()).email(dadesUsuari.getEmail()).idioma(idioma).nom(dadesUsuari.getNom())
-						.llinatges(dadesUsuari.getLlinatges()).nomSencer(dadesUsuari.getNomSencer()).build();
+				.llinatges(dadesUsuari.getLlinatges()).nomSencer(dadesUsuari.getNomSencer()).build();
 		usuariRepository.save(u);
 	}
 
@@ -180,13 +180,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats()).idioma(dto.getIdioma())
 					.numElementsPaginaDefecte(dto.getNumElementsPaginaDefecte().name()).build();
 			usuari.update(usr);
-            cacheHelper.evictUsuariByCodi(usuari.getCodi());
+			cacheHelper.evictUsuariByCodi(usuari.getCodi());
 			return toUsuariDtoAmbRols(usuari);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional
 	@Override
 	public void updateRolUsuariActual(String rol) {
@@ -201,7 +201,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional
 	@Override
 	public void updateEntitatUsuariActual(Long entitat) {
@@ -216,7 +216,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 
 	@Override
 	public UsuariDto getUsuariActual() {
@@ -258,7 +258,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<String> findRolsUsuariActual() {
@@ -272,7 +272,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public UsuariDto findUsuariAmbCodi(String codi) {
@@ -371,7 +371,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	public String propertyGet(String property, String defaultValue) {
 
@@ -392,7 +392,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			log.debug("Consultant les mètriques de l'aplicació");
 			var mapper = new ObjectMapper();
-			mapper.registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS,false));
+			mapper.registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, false));
 			return mapper.writeValueAsString(metricsHelper.getMetricRegistry());
 		} catch (Exception ex) {
 			log.error("Error al generar les mètriques de l'aplicació", ex);
@@ -446,17 +446,17 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 
 	// PROCESSOS INICIALS
-    @Override
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
-    public List<ProcessosInicialsEnum> getProcessosInicialsPendents() {
+	public List<ProcessosInicialsEnum> getProcessosInicialsPendents() {
 
 		List<ProcessosInicialsEnum> processosInicials = new ArrayList<>();
 		var processos = processosInicialsRepository.findProcesosInicialsEntityByInitTrue();
 		if (processos != null) {
 			processosInicials = processos.stream().map(p -> p.getCodi()).collect(Collectors.toList());
 		}
-        return processosInicials;
-    }
+		return processosInicials;
+	}
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -522,15 +522,15 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public ArxiuDto getRecordingFile() throws Exception {
 
-		var output = new ByteArrayOutputStream();
 		var recordingPath = getRecordingPath();
-
 		if (!Files.exists(recordingPath)) {
 			throw new SistemaExternException("No s'ha trobat l'arxiu de recording");
 		}
 
-		output.write(Files.readAllBytes(recordingPath));
-		return new ArxiuDto("recording.jfr", null, output.toByteArray(), output.size());
+		try (var output = new ByteArrayOutputStream()) {
+			output.write(Files.readAllBytes(recordingPath));
+			return new ArxiuDto("recording.jfr", null, output.toByteArray(), output.size());
+		}
 	}
 
 	@Override

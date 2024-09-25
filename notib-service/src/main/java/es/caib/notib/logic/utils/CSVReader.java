@@ -18,13 +18,20 @@ import java.util.function.Function;
 public class CSVReader {
 
     public static ICsvListReader setupCSVListReader(byte[] file) throws IOException {
+
         var bais = new ByteArrayInputStream(file);
         var detectedCharset = UniversalDetector.detectCharset(bais);
         if (detectedCharset == null) {
             detectedCharset = "UTF-8";
         }
-        var reader = new InputStreamReader(new ByteArrayInputStream(file), detectedCharset);
-        return new CsvListReader(reader, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
+        var fitxer = new ByteArrayInputStream(file);
+        var reader = new InputStreamReader(fitxer, detectedCharset);
+        var cvList = new CsvListReader(reader, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
+        bais.close();
+        fitxer.close();
+//        reader.close();
+//        cvList.close();
+        return cvList;
     }
 
     public static <T> T readLinesFromCSVFile(byte[] file, Function<ICsvListReader, T> fn) {

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -39,7 +40,7 @@ public abstract class JustificantHelper<T> {
     @Autowired
     protected ConfigHelper configHelper;
 
-    public abstract byte[] generarJustificant(T notificacio, ProgresDescarregaDto progres) throws JustificantException;
+    public abstract byte[] generarJustificant(T notificacio, ProgresDescarregaDto progres) throws JustificantException, IOException;
 
     @Builder
     protected static class JustificantTextKeys {

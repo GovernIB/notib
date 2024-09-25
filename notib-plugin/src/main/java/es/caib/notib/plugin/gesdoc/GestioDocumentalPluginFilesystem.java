@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.gesdoc;
 
+import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.util.FitxerUtils;
 import es.caib.notib.logic.intf.util.MimeUtils;
 import es.caib.notib.plugin.SistemaExternException;
@@ -13,9 +14,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.Comparator;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.zip.ZipFile;
 
@@ -47,7 +54,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	@Override
 	public String create(String agrupacio, InputStream contingut) throws SistemaExternException {
 
-		try {
+		try (contingut) {
 			agrupacio = checkAgrupacio(agrupacio);
 			var basedir = getBaseDir(agrupacio);
 			var subfolderId = getValidSubfolder(agrupacio);
@@ -65,7 +72,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	@Override
 	public void update(String id, String agrupacio, InputStream contingut) throws SistemaExternException {
 
-		try {
+		try (contingut) {
 			var fContent = getFile(agrupacio, id);
 			log.info("[GESDOC] Actalitzant fitxer, directori: " + getBaseDir(agrupacio) + AMB_ID + id);
 			if (fContent == null) {
@@ -97,7 +104,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	@Override
 	public void get(String id, String agrupacio, OutputStream contingutOut, boolean isZip) throws SistemaExternException {
 
-		try {
+		try (contingutOut) {
 			var fContent = getFile(agrupacio, id);
 			var isAgrupacio = true;
 			if (fContent == null && "notificacions".equals(agrupacio)) {
@@ -117,10 +124,10 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 				IOUtils.copy(contingutIn, output);
 				var mime = MimeUtils.getMimeTypeFromContingut(fContent.getName(), output.toByteArray());
 				output.close();
-				var contingut = "application/zip".equals(mime) ? getOutputStreamFromDocumentComprimit(fContent) : output;
-				InputStream is = new ByteArrayInputStream(contingut.toByteArray());
-				IOUtils.copy(is, contingutOut);
-				is.close();
+				try (var contingut = "application/zip".equals(mime) ? getOutputStreamFromDocumentComprimit(fContent) : output;
+					InputStream is = new ByteArrayInputStream(contingut.toByteArray())) {
+					IOUtils.copy(is, contingutOut);
+				}
 			}
 		} catch (Exception ex) {
 			throw new SistemaExternException("No s'ha pogut llegir l'arxiu (id=" + id + ")", ex);
@@ -157,27 +164,35 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 		var basedir = getBaseDir(agrupacio);
 		assert basedir != null;
-		var file = new File(basedir);
-		File[] directories = file.listFiles((current, name) -> {
-			if (!isValidTimestamp(name)) {
-				return false;
-			}
-			var f = new File(current, name);
-			if (!f.isDirectory()) {
-				return false;
-			}
-			var files = f.list();
-			return files == null || files.length < MAX_FILES_IN_FOLDER;
-		});
-		if (directories != null && directories.length > 0){
-			return directories[0].getName() + "/";
+		var ultimDirectori = ultimDirectoryModificat(basedir);
+		if (ultimDirectori != null) {
+			return ultimDirectori.getFileName() + "/";
 		}
-
 		// si no n'hi ha cap de valida en cream una de nova
 		var subfolder = generateUniqueName(basedir);
 		(new File(basedir + "/" + subfolder)).mkdir();
 		return subfolder + "/";
 	}
+
+	public Path ultimDirectoryModificat(String baseDir) {
+
+		try {
+			var dir = Paths.get(baseDir);
+			try (var list = Files.list(dir)) {
+				if (list.count() > MAX_FILES_IN_FOLDER) {
+					return null;
+				}
+			}
+			try (var list = Files.list(dir)) {
+				var lastModifiedDir = list.filter(Files::isDirectory).max(Comparator.comparingLong(p -> p.toFile().lastModified()));
+				return lastModifiedDir.orElse(null);
+			}
+		} catch (IOException ex) {
+			log.error("Error buscant ultimDirectoryModificat", ex);
+			return null;
+		}
+	}
+
 
 	private static final Instant START_INSTANT = Instant.parse("2016-01-01T00:00:00Z");
 	public boolean isValidTimestamp(String timestamp) {

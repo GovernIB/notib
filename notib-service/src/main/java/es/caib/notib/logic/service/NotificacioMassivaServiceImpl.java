@@ -595,26 +595,28 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     }
 
     @Override
-    public FitxerDto getErrorsValidacioFile(Long entitatId, Long notificacioMassivaId) {
+    public FitxerDto getErrorsValidacioFile(Long entitatId, Long notificacioMassivaId) throws IOException {
 
-        entityComprovarHelper.comprovarEntitat(entitatId);
-        var notificacioMassiva = notificacioMassivaRepository.findById(notificacioMassivaId).orElseThrow();
-        var baos = new ByteArrayOutputStream();
-        pluginHelper.gestioDocumentalGet(notificacioMassiva.getErrorsGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_ERRORS, baos, false);
-        return FitxerDto.builder().nom("errors_validacio.csv").contentType("text").contingut(baos.toByteArray()).tamany(baos.size()).build();
+        try (var baos = new ByteArrayOutputStream()) {
+            entityComprovarHelper.comprovarEntitat(entitatId);
+            var notificacioMassiva = notificacioMassivaRepository.findById(notificacioMassivaId).orElseThrow();
+            pluginHelper.gestioDocumentalGet(notificacioMassiva.getErrorsGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_ERRORS, baos, false);
+            return FitxerDto.builder().nom("errors_validacio.csv").contentType("text").contingut(baos.toByteArray()).tamany(baos.size()).build();
+        }
     }
 
     @Override
     @Transactional
-    public FitxerDto getErrorsExecucioFile(Long entitatId, Long notificacioMassivaId) {
+    public FitxerDto getErrorsExecucioFile(Long entitatId, Long notificacioMassivaId) throws IOException {
 
-        entityComprovarHelper.comprovarEntitat(entitatId);
-        var notificacioMassiva = notificacioMassivaRepository.findById(notificacioMassivaId).orElseThrow();
-        var baos = new ByteArrayOutputStream();
-        var fitxer = FitxerDto.builder().nom("errors_execucio.csv").contentType("text").contingut(baos.toByteArray()).tamany(baos.size()).build();
-        var errors = afegirErrorsProcessat(notificacioMassiva, fitxer.getContingut(), true);
-        fitxer.setContingut(errors);
-        return fitxer;
+        try (var baos = new ByteArrayOutputStream()) {
+            entityComprovarHelper.comprovarEntitat(entitatId);
+            var notificacioMassiva = notificacioMassivaRepository.findById(notificacioMassivaId).orElseThrow();
+            var fitxer = FitxerDto.builder().nom("errors_execucio.csv").contentType("text").contingut(baos.toByteArray()).tamany(baos.size()).build();
+            var errors = afegirErrorsProcessat(notificacioMassiva, fitxer.getContingut(), true);
+            fitxer.setContingut(errors);
+            return fitxer;
+        }
     }
 
     @Transactional
