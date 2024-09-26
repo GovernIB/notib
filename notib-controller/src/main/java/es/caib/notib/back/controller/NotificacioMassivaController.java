@@ -113,26 +113,26 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         return "notificacioMassivaList";
     }
 
-//    @GetMapping(value = "/datatable")
-//    @ResponseBody
-//    public DatatablesHelper.DatatablesResponse datatable(HttpServletRequest request) {
-//
-//        var entitatActual = getEntitatActualComprovantPermisos(request);
-//        var command = getFiltreCommand(request);
-//        var notificacions = new PaginaDto<NotificacioMassivaTableItemDto>();
-//        if (!command.getErrors().isEmpty()) {
-//            return DatatablesHelper.getDatatableResponse(request, notificacions);
-//        }
-//        var filtre = command.asDto();
-//        try {
-//            var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
-//            var paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-//            notificacions = notificacioMassivaService.findAmbFiltrePaginat(entitatActual != null ? entitatActual.getId() : null, filtre, rol, paginacio);
-//        } catch (SecurityException e) {
-//            MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
-//        }
-//        return DatatablesHelper.getDatatableResponse(request, notificacions);
-//    }
+    @GetMapping(value = "/datatable")
+    @ResponseBody
+    public DatatablesHelper.DatatablesResponse datatable(HttpServletRequest request) {
+
+        var entitatActual = getEntitatActualComprovantPermisos(request);
+        var command = getFiltreCommand(request);
+        var notificacions = new PaginaDto<NotificacioMassivaTableItemDto>();
+        if (!command.getErrors().isEmpty()) {
+            return DatatablesHelper.getDatatableResponse(request, notificacions);
+        }
+        var filtre = command.asDto();
+        try {
+            var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
+            var paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
+            notificacions = notificacioMassivaService.findAmbFiltrePaginat(entitatActual != null ? entitatActual.getId() : null, filtre, rol, paginacio);
+        } catch (SecurityException e) {
+            MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
+        }
+        return DatatablesHelper.getDatatableResponse(request, notificacions);
+    }
 
     @GetMapping(value = "/{id}/resum")
     public String summary(HttpServletRequest request, Model model, @PathVariable Long id) {
