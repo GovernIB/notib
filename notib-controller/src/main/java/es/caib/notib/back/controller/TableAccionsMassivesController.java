@@ -197,7 +197,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         return "ok";
     }
 
-    @GetMapping(value = "/reactivar/notificacionsError")
+    @GetMapping(value = {"/reactivar/notificacionsError", "{notificacioId}/notificacio/reactivar/notificacionsError"})
     @ResponseBody
     public String reactivarErrors(HttpServletRequest request) throws IOException {
 
@@ -206,8 +206,8 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.seleccio.buida"));
             return REDIRECT + request.getHeader(REFERER);
         }
-        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
-            return REDIRECT + request.getHeader(REFERER);
+            if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+                return REDIRECT + request.getHeader(REFERER);
         }
         log.info("Reactivam els enviaments amb error: " + StringUtils.join(seleccio, ", "));
         try {
@@ -267,7 +267,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
 //        return "ok";
 //    }
 
-    @GetMapping(value = "/reactivar/consulta")
+    @GetMapping(value = {"/reactivar/consulta", "{notificacioId}/notificacio/reactivar/consulta"})
     public String reactivarConsulta(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         var seleccio = getIdsEnviamentsSeleccionats(request);
@@ -288,7 +288,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         return REDIRECT + request.getHeader(REFERER);
     }
 
-    @GetMapping(value = "/reactivar/sir")
+    @GetMapping(value = {"/reactivar/sir", "{notificacioId}/notificacio/reactivar/sir"})
     @ResponseBody
     public String reactivarSir(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -341,7 +341,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         return "";
     }
 
-    @GetMapping(value = {"/enviar/callback", "{notifiacioId}/enviar/callback"})
+    @GetMapping(value = {"/enviar/callback", "{notifiacioId}/notificacio/enviar/callback"})
     public String enviarCallbacks(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         var path = request.getServletPath().split("/");
@@ -373,7 +373,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         return REDIRECT + request.getHeader(REFERER);
     }
 
-    @GetMapping(value = "/reactivar/callback")
+    @GetMapping(value = {"/reactivar/callback" , "{notificacioId}/notificacio/reactivar/callback"})
     public String reactivarCallbacks(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         var seleccio = getIdsEnviamentsSeleccionats(request);
