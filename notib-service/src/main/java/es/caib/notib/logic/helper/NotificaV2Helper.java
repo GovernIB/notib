@@ -165,8 +165,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 					// Amb el canvi de infoEnvioV2 cap a infoLigero, ara no es disposa dels camps de cada de caducitat i de disposició.
 					// Per això les emplenem aquí, amb les dades amb que hem realitzat la petició.
+					var dataCreacio = toDate(resultadoAlta.getFechaCreacion().getValue());
+					Date dataDisposicio = notificacio.getEnviamentDataProgramada() != null ? notificacio.getEnviamentDataProgramada() : dataCreacio;
+					incrementarDataCaducitat(notificacio, dataCreacio);
 					Date dataCaducitat = notificacio.getCaducitat();
-					Date dataDisposicio = notificacio.getEnviamentDataProgramada() != null ? notificacio.getEnviamentDataProgramada() : toDate(resultadoAlta.getFechaCreacion().getValue());
 					for (var enviament: notificacio.getEnviamentsPerNotifica()) {
 						enviament.setNotificaDataCaducitat(dataCaducitat);
 						enviament.setNotificaDataDisposicio(dataDisposicio);

@@ -12,6 +12,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoEnvios;
@@ -29,16 +30,20 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -91,6 +96,9 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				if (!ambEnviamentPerEmail) {
 					notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 				}
+				var dataEnviada = new Date();
+				incrementarDataCaducitat(notificacio, dataEnviada);
+
 				//Crea un nou event
 				for (var resultadoEnvio : resultadoAlta.getResultadoEnvios().getItem()) {
 					for (var enviament : notificacio.getEnviamentsPerNotifica()) {

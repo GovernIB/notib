@@ -9,10 +9,12 @@ import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.plugin.cie.CiePluginJms;
@@ -88,6 +90,18 @@ public abstract class AbstractNotificaHelper {
 
 	public void setModeTest(boolean modeTest) {
 		this.modeTest = modeTest;
+	}
+
+	public void incrementarDataCaducitat(NotificacioEntity notificacio, Date dataEnviament) {
+
+		var dataCreacio = DatesUtils.convertir(notificacio.getCreatedDate());
+		var mateixDia = DatesUtils.compareDatesWithoutTime(dataCreacio, dataEnviament);
+		if (mateixDia) {
+			return;
+		}
+		var diesDiferencia = DatesUtils.getDifferenceInDays(dataEnviament, dataCreacio);
+		var dataCaducitatNova = DateUtils.addDays(notificacio.getCaducitat(), diesDiferencia);
+		notificacio.setCaducitat(dataCaducitatNova);
 	}
 
 	public NotificacioEnviamentEntity enviamentUpdateDatat(
