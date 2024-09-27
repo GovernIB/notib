@@ -378,8 +378,14 @@ $(document).ready(function() {
 						<c:if test="${notificacio.caducitat != null}">
 							<tr>
 								<td><strong><spring:message code="notificacio.info.dada.caducitat"/></strong></td>
-								<td><fmt:formatDate value="${notificacio.caducitat}" pattern="dd/MM/yyyy" /></td>
+								<td><fmt:formatDate value="${notificacio.caducitat}" pattern="dd/MM/yyyy" />
 							</tr>
+							<c:if test="${notificacio.caducitatOriginal != null}">
+								<tr>
+									<td><strong><spring:message code="notificacio.info.dada.caducitat.original"/></strong></td>
+									<td><fmt:formatDate value="${notificacio.caducitatOriginal}" pattern="dd/MM/yyyy" /></td>
+								</tr>
+							</c:if>
 						</c:if>
 						<tr>
 							<td><strong><spring:message code="notificacio.info.dada.retard" /></strong></td>

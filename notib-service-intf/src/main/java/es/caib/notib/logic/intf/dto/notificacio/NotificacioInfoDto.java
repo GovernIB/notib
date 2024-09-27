@@ -40,6 +40,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private Integer retard;
 	protected int notificaEnviamentIntent;
 	private Date caducitat;
+	private Date caducitatOriginal;
 	private String csv_uuid;
 	private String procedimentCodiNotib;
 	private GrupDto grup;

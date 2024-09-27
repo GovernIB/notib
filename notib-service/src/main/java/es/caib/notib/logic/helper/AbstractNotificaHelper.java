@@ -101,6 +101,7 @@ public abstract class AbstractNotificaHelper {
 		}
 		var diesDiferencia = DatesUtils.getDifferenceInDays(dataEnviament, dataCreacio);
 		var dataCaducitatNova = DateUtils.addDays(notificacio.getCaducitat(), diesDiferencia);
+		notificacio.setCaducitatOriginal(notificacio.getCaducitat());
 		notificacio.setCaducitat(dataCaducitatNova);
 	}
 
