@@ -123,6 +123,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var codiUsuari = getCodiUsuariActual();
         var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), codiUsuari);
         model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
+        model.addAttribute("nomesFiReintents", filtre.isNomesFiReintents());
         notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
         return "notificacioList";
     }
@@ -173,6 +174,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
         model.addAttribute("notificacioFiltreCommand", command);
         model.addAttribute("nomesAmbErrors", command.isNomesAmbErrors());
+        model.addAttribute("nomesFiReintents", command.isNomesFiReintents());
         return "notificacioList";
     }
 

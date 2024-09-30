@@ -23,7 +23,6 @@ import es.caib.notib.logic.intf.exception.MaxLinesExceededException;
 import es.caib.notib.logic.intf.exception.NotificacioMassivaException;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.ColumnesService;
-import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.GestioDocumentalService;
 import es.caib.notib.logic.intf.service.NotificacioMassivaService;
 import es.caib.notib.logic.intf.service.NotificacioService;
@@ -236,8 +235,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var organGestorActual = getOrganGestorActual(request);
-        var notificacioFiltreCommand = notificacioListHelper.getFiltreCommand(request, TABLE_NOTIFICACIONS_FILTRE);
-        model.addAttribute(notificacioFiltreCommand);
+        var command = notificacioListHelper.getFiltreCommand(request, TABLE_NOTIFICACIONS_FILTRE);
+        model.addAttribute(command);
         notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
         model.addAttribute("notificacioMassivaId", id);
         var notMassivaData = notificacioMassivaService.findById(entitatActual.getId(), id);
@@ -247,6 +246,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         var codiUsuari = getCodiUsuariActual();
         var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), codiUsuari);
         model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
+        model.addAttribute("nomesFiReintents", command.asDto().isNomesFiReintents());
         return "notificacioMassivaNotificacionsList";
     }
 
@@ -261,6 +261,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), getCodiUsuariActual());
         model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
+        model.addAttribute("nomesFiReintents", command.asDto().isNomesFiReintents());
         return "notificacioMassivaNotificacionsList";
     }
 
@@ -271,12 +272,13 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var command = notificacioListHelper.getFiltreCommand(request, TABLE_NOTIFICACIONS_FILTRE);
         var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), getCodiUsuariActual());
+        var filtre = command.asDto();
         model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
+        model.addAttribute("nomesFiReintents", filtre.isNomesFiReintents());
         var notificacions = new PaginaDto<NotificacioTableItemDto>();
         if (!command.getErrors().isEmpty()) {
             return DatatablesHelper.getDatatableResponse(request, notificacions, "id", SESSION_ATTRIBUTE_SELECCIO);
         }
-        var filtre = command.asDto();
         try {
             notificacions = notificacioMassivaService.findNotificacions(entitatActual.getId(), id, filtre, DatatablesHelper.getPaginacioDtoFromRequest(request));
         } catch (SecurityException e) {

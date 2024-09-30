@@ -490,14 +490,22 @@
             });
             $('#nomesAmbErrorsBtn').removeClass('active');
             $('#nomesAmbErrors').val(false);
+            $('#nomesFiReintentsBtn').removeClass('active');
+            $('#nomesFiReintents').val(false);
             // omplirProcediments();
             // omplirServeis();
             deselecciona();
             // $('#form-filtre').submit();
         });
+
         $('#nomesAmbErrorsBtn').click(function() {
             nomesAmbErrors = !$(this).hasClass('active');
             $('#nomesAmbErrors').val(nomesAmbErrors);
+        })
+
+        $('#nomesFiReintentsBtn').click(function() {
+            nomesFiReintents = !$(this).hasClass('active');
+            $('#nomesFiReintents').val(nomesFiReintents);
         })
 
         $('#organGestor').on('change', function () {
@@ -733,6 +741,10 @@
         <div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
             <button id="nomesAmbErrorsBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbErrors"/>" class="btn btn-default pull-left <c:if test="${nomesAmbErrors}">active</c:if>" data-toggle="button"><span class="fa fa-warning"></span></button>
             <not:inputHidden name="nomesAmbErrors"/>
+            <c:if test="${isRolActualAdministradorEntitat}">
+                <button id="nomesFiReintentsBtn" title="<spring:message code="notificacio.list.filtre.camp.fiReintents"/>" class="btn btn-default pull-left <c:if test="${nomesFiReintents}">active</c:if>" data-toggle="button"><span class="fa fa-window-close"></span></button>
+                <not:inputHidden name="nomesFiReintents"/>
+            </c:if>
             <button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default" style="padding: 6px 9px;" title="<spring:message code="comu.boto.netejar"/>"><span class="fa fa-eraser icona_ocultable" style="padding: 2px 0px;"></span><span class="text_ocultable"><spring:message code="comu.boto.netejar"/></span></button>
             <button id="filtrar" type="submit" name="accio" value="filtrar" class="btn btn-primary" title="<spring:message code="comu.boto.filtrar"/>"><span class="fa fa-filter" id="botoFiltrar"></span><span class="text_ocultable"><spring:message code="comu.boto.filtrar"/></span></button>
         </div>

@@ -30,11 +30,14 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 	/**
 	 * Consulta de la taula de remeses d
 	 */
-	@Query(	"select ntf " +
+	@Query(	"select distinct ntf " +
 			"from " +
 			"     NotificacioTableEntity ntf " +
+			" join NotificacioEventEntity nne on ntf.id = nne.notificacio.id " +
 			"where " +
 			"    (ntf.notificacioMassiva = :#{#filtre.notificacioMassiva}) " +
+			" and  (:#{#filtre.nomesFiReintents} = false or nne.fiReintents = true " +
+			"		and (nne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT or nne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT )) " +
 			"and (:#{#filtre.entitatIdNull} = true or ntf.entitat.id = :#{#filtre.entitatId}) " +
 			"and (:#{#filtre.enviamentTipusNull} = true or ntf.enviamentTipus = :#{#filtre.enviamentTipus}) " +
 			"and (:#{#filtre.concepteNull} = true or lower(ntf.concepte) like concat('%', lower(:#{#filtre.concepte}), '%')) " +
@@ -68,9 +71,12 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 	@Query("update NotificacioTableEntity nt set nt.organEstat = :estat where nt.organCodi = :organCodi")
 	void updateOrganEstat(@Param("organCodi") String organCodi, @Param("estat") OrganGestorEstatEnum estat);
 
-	@Query("select ntf.id from NotificacioTableEntity ntf " +
+	@Query("select distinct ntf.id from NotificacioTableEntity ntf " +
+			" join NotificacioEventEntity nne on ntf.id = nne.notificacio.id " +
 			"where " +
 			"    (:#{#filtre.entitatIdNull} = true or ntf.entitat.id = :#{#filtre.entitatId}) " +
+			" and  (:#{#filtre.nomesFiReintents} = false or nne.fiReintents = true " +
+			"		and (nne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT or nne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT )) " +
 			" and  (" +
 			// PERMISOS
 			// Iniciada pel propi usuari
@@ -138,10 +144,13 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 	)
     List<Long> findIdsAmbFiltre(FiltreNotificacio filtre);
 
-	@Query("select ntf from NotificacioTableEntity ntf " +
+	@Query("select distinct ntf from NotificacioTableEntity ntf " +
+			" join NotificacioEventEntity nne on ntf.id = nne.notificacio.id " +
 			"where " +
 			"    (:#{#filtre.entitatIdNull} = true or ntf.entitat.id = :#{#filtre.entitatId}) " +
-			" and  (" +
+			" and  (:#{#filtre.nomesFiReintents} = false or nne.fiReintents = true " +
+			"		and (nne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT or nne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT )) " +
+			" and (" +
 			// PERMISOS
 			// Iniciada pel propi usuari
 			" :#{#filtre.isUsuariEntitat} = true or " +

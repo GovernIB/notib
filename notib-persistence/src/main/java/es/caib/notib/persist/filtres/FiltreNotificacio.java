@@ -51,6 +51,7 @@ public class FiltreNotificacio {
     private String registreNum;
     private boolean nomesAmbErrors;
     private boolean nomesSenseErrors;
+    private boolean nomesFiReintents;
     private boolean referenciaNull;
     private String referencia;
     private boolean isUsuari;
