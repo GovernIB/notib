@@ -674,10 +674,12 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @GetMapping(value = "/{notificacioId}/enviament/certificacionsDescarregar")
     @ResponseBody
-    public void certificacionsDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId) {
+    public void certificacionsDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId) throws IOException {
 
-        try (var baos = new ByteArrayOutputStream(); var zos = new ZipOutputStream(baos);) {
-            var locale = new Locale(sessionScopedContext.getIdiomaUsuari());
+        var baos = new ByteArrayOutputStream();
+        var locale = new Locale(sessionScopedContext.getIdiomaUsuari());
+        try (var zos = new ZipOutputStream(baos);) {
+
             boolean contingut = false;
 //            var baos = new ByteArrayOutputStream();
 //            var zos = new ZipOutputStream(baos);
@@ -714,14 +716,16 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             }
             zos.closeEntry();
             response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
-            var nom = MessageHelper.getInstance().getMessage("notificacio.list.enviament.certificacio.zip.nom", null, locale);
-            writeFileToResponse(nom + "_" + notificacioId + ".zip", baos.toByteArray(), response);
         } catch (Exception ex) {
             var msg = getMessage(request, "notificacio.list.enviament.descaregar.certificacio.error");
             log.error(msg, ex);
             MissatgesHelper.error(request, msg);
             throw new RuntimeException(msg);
+        } finally {
+            baos.close();
         }
+        var nom = MessageHelper.getInstance().getMessage("notificacio.list.enviament.certificacio.zip.nom", null, locale);
+        writeFileToResponse(nom + "_" + notificacioId + ".zip", baos.toByteArray(), response);
     }
 
 
