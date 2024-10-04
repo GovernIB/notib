@@ -1,6 +1,7 @@
 package es.caib.notib.logic.plugin.cie;
 
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -25,6 +26,7 @@ import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.plugin.cie.CiePlugin;
 import es.caib.notib.plugin.cie.EnviamentCie;
+import es.caib.notib.plugin.cie.InfoCie;
 import es.caib.notib.plugin.cie.RespostaCie;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -110,7 +112,7 @@ public class CiePluginHelper {
             enviamentCie.setEntregaCie(cie);
             enviamentCie.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEfectiva.getOperadorPostal(), OperadorPostalDto.class));
             resposta = getCiePlugin(entitat.getCodi()).enviar(enviamentCie);
-            if (Strings.isNullOrEmpty(resposta.getCodiError())) {
+            if ("000".equals(resposta.getCodiResposta())) {
                 integracioHelper.addAccioOk(info);
             } else {
                 integracioHelper.addAccioError(info, resposta.getDescripcioError());
@@ -121,15 +123,15 @@ public class CiePluginHelper {
             if (ex.getCause() != null) {
                 errorDescripcio += " :" + ex.getCause().getMessage();
             }
-            resposta.setCodiError(ERROR_INESPERAT);
+            resposta.setCodiResposta(ERROR_INESPERAT);
             resposta.setDescripcioError(errorDescripcio);
 //            throw new SistemaExternException(IntegracioCodiEnum.CIE.name(), errorDescripcio, ex);
         }
+        guardarRespostaCie(notificacioReferencia, resposta);
         return resposta;
     }
 
-    @Transactional
-    public void guardarRespostaCie(String notificacioReferencia, RespostaCie resposta) {
+    private void guardarRespostaCie(String notificacioReferencia, RespostaCie resposta) {
 
         try {
             var notificacio = notificacioRepository.findByReferencia(notificacioReferencia);
@@ -140,42 +142,44 @@ public class CiePluginHelper {
             }
             NotificacioEnviamentEntity env;
             EntregaPostalEntity entregaPostal;
-            for (var id : resposta.getIdentificador()) {
+            for (var id : resposta.getIdentificadors()) {
                 if (Strings.isNullOrEmpty(id.getNifTitular())) {
-                    log.error("Error al guardar l'enviament CIE. Resposta amb id " + id.getIdentificador() + " sense NIF");
+                    log.error("[ENTREGA_POSTAL] Error al guardar l'enviament CIE. Resposta amb id " + id.getIdentificador() + " sense NIF");
                     continue;
                 }
                 if (Strings.isNullOrEmpty(id.getIdentificador())) {
-                    log.error("Error al guardar l'enviament CIE. Resposta amb NIF " + id.getNifTitular() + " no te identificador");
+                    log.error("[ENTREGA_POSTAL] Error al guardar l'enviament CIE. Resposta amb NIF " + id.getNifTitular() + " no te identificador");
                     continue;
                 }
                 env = envs.get(id.getNifTitular());
                 entregaPostal = env.getEntregaPostal();
                 if (entregaPostal == null) {
-                    log.error("Error al guardar l'enviament CIE. El NIF " + id.getNifTitular() + " no pertany a cap dels enviamentsç ");
+                    log.error("[ENTREGA_POSTAL] Error al guardar l'enviament CIE. El NIF " + id.getNifTitular() + " no pertany a cap dels enviamentsç ");
                     continue;
                 }
                 entregaPostal.setCieId(id.getIdentificador());
+                entregaPostal.setCieEstat(CieEstat.ENVIADO_CI);
                 entregaPostalRepository.save(entregaPostal);
             }
+            afegirEventsEnviarCie(notificacioReferencia, resposta);
         } catch (Exception ex) {
             log.error("Error guardant l'enviament CIE a la BDD", ex);
         }
     }
 
-    @Transactional
-    public void afegirEventsEnviarCie(String notificacioReferencia, RespostaCie resposta) {
+    private void afegirEventsEnviarCie(String notificacioReferencia, RespostaCie resposta) {
 
         var notificacio = notificacioRepository.findByReferencia(notificacioReferencia);
         var events = notificacioEventRepository.findEventsCieByNotificacioId(notificacio.getId());
         var maxReintents = configHelper.getConfigAsInteger("es.caib.notib.plugin.cie.max.reintents");
-        var fiReintents = events != null && !events.isEmpty() && events.get(0).getIntents() > maxReintents;
+        var fiReintents = events != null && !events.isEmpty() && events.get(0).getIntents() >= maxReintents;
         for (var env : notificacio.getEnviaments()) {
             if (resposta == null) {
                 notificacioEventHelper.addCieEventEnviar(env, true, ERROR_INESPERAT, fiReintents);
                 continue;
             }
-            notificacioEventHelper.addCieEventEnviar(env, !Strings.isNullOrEmpty(resposta.getCodiError()), resposta.getDescripcioError(), fiReintents);
+            var error = !"000".equals(resposta.getCodiResposta());
+            notificacioEventHelper.addCieEventEnviar(env, error, error ? resposta.getDescripcioError() : "", fiReintents);
         }
     }
 
@@ -184,7 +188,7 @@ public class CiePluginHelper {
 
         var enviament = enviamentRepository.findByUuid(uuidEnviament).orElse(null);
         if (enviament == null) {
-            log.error("Error al cancelar l'enviament CIE. UUID " + uuidEnviament + " no trobat");
+            log.error("[ENTREGA_POSTAL] Error al cancelar l'enviament CIE. UUID " + uuidEnviament + " no trobat");
             return false;
         }
         var codiDir3Entitat = enviament.getNotificacio().getEntitat().getDir3Codi();
@@ -207,40 +211,89 @@ public class CiePluginHelper {
             enviamentCie.setIdentificador(enviament.getEntregaPostal().getCieId());
             enviamentCie.setEntregaCie(cie);
             resposta = getCiePlugin(entitat.getCodi()).cancelar(enviamentCie);
-            if (Strings.isNullOrEmpty(resposta.getCodiError())) {
+            if ("000".equals(resposta.getCodiResposta())) {
                 integracioHelper.addAccioOk(info);
                 enviament.getEntregaPostal().setCieCancelat(true);
+                enviament.getEntregaPostal().setCieEstat(CieEstat.CANCELADO);
+                cancelarUpdateEntregaPostal(uuidEnviament, true);
             } else {
                 integracioHelper.addAccioError(info, resposta.getDescripcioError());
+                cancelarUpdateEntregaPostal(uuidEnviament, false);
             }
+            return true;
         } catch (Exception ex) {
             var errorDescripcio = "Error al accedir al plugin CIE";
             integracioHelper.addAccioError(info, errorDescripcio, ex);
+            cancelarUpdateEntregaPostal(uuidEnviament, false);
             if (ex.getCause() != null) {
                 errorDescripcio += " :" + ex.getCause().getMessage();
             }
             resposta.setDescripcioError(errorDescripcio);
             throw new SistemaExternException(IntegracioCodiEnum.CIE.name(), errorDescripcio, ex);
         }
-
-        return true;
     }
 
-    @Transactional
-    public void cancelarEntregaPostal(String uuidEnviament, boolean ok) {
+    private void cancelarUpdateEntregaPostal(String uuidEnviament, boolean ok) {
 
         var enviament = enviamentRepository.findByUuid(uuidEnviament).orElse(null);
         if (enviament == null) {
-            log.error("Error al cancelar l'enviament CIE. UUID " + uuidEnviament + " no trobat");
+            log.error("[ENTREGA_POSTAL]  Error al guardar el resultat de cancelar l'enviament CIE. UUID " + uuidEnviament + " no trobat");
             return;
         }
-        if (!ok) {
-            var event = notificacioEventRepository.findEventCieByEnviamentId(enviament.getId());
-            var maxReintents = configHelper.getConfigAsInteger("es.caib.notib.plugin.cie.max.reintents");
-            var fiReintents = event != null && event.getIntents() > maxReintents;
-            notificacioEventHelper.addCieEventCancelar(enviament, true, "Error al cancelar l'enviament", fiReintents);
+        enviament.getEntregaPostal().setCieCancelat(ok);
+        var event = notificacioEventRepository.findEventCieByEnviamentId(enviament.getId());
+        var maxReintents = configHelper.getConfigAsInteger("es.caib.notib.plugin.cie.max.reintents");
+        var fiReintents = event != null && event.getIntents() > maxReintents;
+        notificacioEventHelper.addCieEventCancelar(enviament, !ok, !ok ? "Error al cancelar l'enviament" : "", fiReintents);
+    }
+
+    @Transactional
+    public InfoCie consultarEstatEntregaPostal(Long enviamentId) {
+
+        var enviament = enviamentRepository.findById(enviamentId).orElse(null);
+        if (enviament == null) {
+            log.error("[ENTREGA_POSTAL] Error al consultar l'estat de l'entrega postal l'enviament CIE. enviamentId " + enviamentId + " no trobat");
+            return null;
         }
-        enviament.getEntregaPostal().setCieCancelat(true);
+        var codiDir3Entitat = enviament.getNotificacio().getEntitat().getDir3Codi();
+        var info = new IntegracioInfo(IntegracioCodiEnum.CIE, "Consulta estat entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
+                new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
+                new AccioParam("Enviament", enviament.getId() + ""));
+
+        var infoCie = new InfoCie();
+        try {
+            EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+            if (entitat == null) {
+                throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
+            }
+            info.setCodiEntitat(entitat.getCodi());
+            var cieEntity = enviament.getNotificacio().getProcediment().getEntregaCieEfectiva();
+            var apiKey = getApiKey(cieEntity.getCie());
+            var cie = conversioTipusHelper.convertir(cieEntity, CieDto.class);
+            cie.setApiKey(apiKey);
+            var enviamentCie = new EnviamentCie();
+            enviamentCie.setIdentificador(enviament.getEntregaPostal().getCieId());
+            enviamentCie.setEntregaCie(cie);
+            infoCie = getCiePlugin(entitat.getCodi()).consultarEstat(enviamentCie);
+            if ("000".equals(infoCie.getCodiResposta())) {
+                integracioHelper.addAccioOk(info);
+                enviament.getEntregaPostal().setCieEstat(infoCie.getCodiEstat());
+                notificacioEventHelper.addCieEventConsultaEstat(enviament, false, "", false);
+            } else {
+                integracioHelper.addAccioError(info, infoCie.getDescripcioResposta());
+                notificacioEventHelper.addCieEventConsultaEstat(enviament, true, infoCie.getDescripcioResposta(), false);
+            }
+            return infoCie;
+        } catch (Exception ex) {
+            var errorDescripcio = "Error al accedir al plugin CIE";
+            integracioHelper.addAccioError(info, errorDescripcio, ex);
+            if (ex.getCause() != null) {
+                errorDescripcio += " :" + ex.getCause().getMessage();
+            }
+            infoCie.setDescripcioResposta(errorDescripcio);
+            notificacioEventHelper.addCieEventConsultaEstat(enviament, true, infoCie.getDescripcioResposta(), false);
+            throw new SistemaExternException(IntegracioCodiEnum.CIE.name(), errorDescripcio, ex);
+        }
     }
 
     private String getApiKey(PagadorCieEntity pagadorCieEntity) {

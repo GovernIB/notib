@@ -335,9 +335,15 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("isAuthenticated()")
 	boolean reactivarSir(Long notificacioId);
-	
-	
-	void enviarEntregaCie(String uuid);
+
+	@PreAuthorize("isAuthenticated()")
+	void enviarEntregaCie(String uuid, boolean retry);
+
+	@PreAuthorize("isAuthenticated()")
+	boolean cancelarEntregaCie(Long enviamentId);
+
+	@PreAuthorize("isAuthenticated()")
+	boolean consultarEstatEntregaPostal(Long enviamentId);
 
 	// Mètodes per cridar des de l'schedulled
 	void notificacioEnviar(Long notificacioId);
@@ -347,7 +353,6 @@ public interface NotificacioService {
 
 	List<Long> getNotificacionsPendentsRegistrar();
 	List<Long> getNotificacionsPendentsEnviar();
-
 
 	List<Long> getNotificacionsPendentsRefrescarEstat();
 	List<Long> getNotificacionsDEHPendentsRefrescarCert();

@@ -428,6 +428,23 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return Missatge.builder().ok(ok).msg(msg).build();
     }
 
+    @GetMapping(value = "/{notificacioId}/enviar/entrega/postal/{notificacioUuid}")
+    @ResponseBody
+    public Missatge enviarEntregaPostal(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable String notificacioUuid, Model model) {
+
+        var entitatActual = getEntitatActualComprovantPermisos(request);
+        var ok = true;
+        try {
+            notificacioService.enviarEntregaCie(notificacioUuid, false);
+        } catch (Exception ex) {
+            ok = false;
+        }
+        emplenarModelNotificacioInfo(entitatActual, notificacioId, request,ACCIONS, model);
+        model.addAttribute(PESTANYA_ACTIVA, ACCIONS);
+        var msg = getMessage(request, ok ? "notificacio.controller.accio.enviada.ok" : "notificacio.controller.accio.enviada.error");
+        return Missatge.builder().ok(ok).msg(msg).build();
+    }
+
     @GetMapping(value = "/{notificacioId}/registrar")
     @ResponseBody
     public Missatge registrar(HttpServletRequest request, @PathVariable Long notificacioId, Model model) throws RegistreNotificaException {
@@ -570,6 +587,24 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
 
         return Missatge.builder().ok(totbe).msg(msg).build();
+    }
+
+    @ResponseBody
+    @GetMapping(value = "/{notificacioId}/enviament/{enviamentId}/cancelar/entrega/postal")
+    public Missatge cancelarEntregaPostal(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId, Model model) {
+
+        getEntitatActualComprovantPermisos(request);
+        var ok = notificacioService.cancelarEntregaCie(enviamentId);
+        return Missatge.builder().ok(ok).msg(getMessage(request, ok ? "entrega.postal.cancelar.ok" : "entrega.postal.cancelar.error")).build();
+    }
+
+    @ResponseBody
+    @GetMapping(value = "/{notificacioId}/enviament/{enviamentId}/consultar/estat/entrega/postal")
+    public Missatge infoEntregaPostal(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId, Model model) {
+
+        getEntitatActualComprovantPermisos(request);
+        var ok = notificacioService.consultarEstatEntregaPostal(enviamentId);
+        return Missatge.builder().ok(ok).msg(getMessage(request, ok ? "entrega.postal.cancelar.ok" : "entrega.postal.cancelar.error")).build();
     }
 
     @GetMapping(value = "/descarregar/diagrama/state/machine")

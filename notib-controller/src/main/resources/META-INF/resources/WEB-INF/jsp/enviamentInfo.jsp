@@ -113,6 +113,7 @@ $(document).ready(function() {
 	});
 
 	$("#refrescarEstat").click(e => {
+
 		$("#refrescarEstat").prop("disabled", true);
 		e.preventDefault();
 		$.ajax({
@@ -124,6 +125,42 @@ $(document).ready(function() {
 						'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
 				$("#contingut-missatges").append(div);
 				window.location.href = '<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}?pipellaActiva=estatNotifica"/>';
+			},
+			error: err => console.error(err)
+		});
+	});
+
+	$("#cancelarEntregaPostal").click(e => {
+
+		$("#cancelarEntregaPostal").prop("disabled", true);
+		e.preventDefault();
+		$.ajax({
+			url: '<c:url value="/notificacio/${notificacioId}/enviament/${enviamentId}/cancelar/entrega/postal"/>',
+			success: data => {
+				$("#cancelarEntregaPostal").prop("disabled", false);
+				let classe = data.ok ? "alert-success" : "alert-danger";
+				let div = '<div class="alert ' + classe +'"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +
+						'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
+				$("#contingut-missatges").append(div);
+				window.location.href = '<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}?pipellaActiva=entregaPostal"/>';
+			},
+			error: err => console.error(err)
+		});
+	});
+
+	$("#consultaEstatEntregaPostal").click(e => {
+
+		$("#consultaEstatEntregaPostal").prop("disabled", true);
+		e.preventDefault();
+		$.ajax({
+			url: '<c:url value="/notificacio/${notificacioId}/enviament/${enviamentId}/consultar/estat/entrega/postal"/>',
+			success: data => {
+				$("#consultaEstatEntregaPostal").prop("disabled", false);
+				let classe = data.ok ? "alert-success" : "alert-danger";
+				let div = '<div class="alert ' + classe +'"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +
+						'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
+				$("#contingut-missatges").append(div);
+				window.location.href = '<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}?pipellaActiva=entregaPostal"/>';
 			},
 			error: err => console.error(err)
 		});
@@ -208,6 +245,11 @@ $(document).ready(function() {
 		<li role="presentation"<c:if test="${pipellaActiva == 'estatSeu'}"> class="active"</c:if>>
 			<a href="#estatRegistre" aria-controls="estatRegistre" role="tab" data-toggle="tab">
 				<spring:message code="enviament.info.tab.estat.registre"/>
+			</a>
+		</li>
+		<li role="presentation"<c:if test="${pipellaActiva == 'entregaPostal'}"> class="active"</c:if>>
+			<a href="#entregaPostal" aria-controls="entregaPostal" role="tab" data-toggle="tab">
+				<spring:message code="enviament.info.tab.entrega.postal"/>
 			</a>
 		</li>
 		<li role="presentation"<c:if test="${pipellaActiva == 'events'}"> class="active"</c:if>>
@@ -743,6 +785,42 @@ $(document).ready(function() {
 				</c:if>
 			</c:if>
 		</div>
+		<c:if test="${not empty enviament.entregaPostal.cieId}">
+			<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'entregaPostal'}"> active</c:if>" id="entregaPostal">
+				<br/>
+				<p class="text-right" style="margin-top: 1em">
+					<c:if test="${enviament.entregaPostal.cieEstat == 'ENVIADO_CI'}">
+						<button id="cancelarEntregaPostal" class="btn btn-default">
+							<spring:message code="notificacio.info.accio.cancelar.entrega.postal"/>
+						</button>
+					</c:if>
+					<button id="consultaEstatEntregaPostal" class="btn btn-default">
+						<span class="fa fa-refresh"></span>
+						<spring:message code="enviament.info.accio.refrescar.estat"/>
+					</button>
+				</p>
+				<br>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<strong><spring:message code="enviament.info.seccio.entrega.postal"/></strong>
+						</h3>
+					</div>
+					<table class="table table-bordered" style="width:100%">
+						<tbody>
+							<tr>
+								<td width="30%"><strong><spring:message code="enviament.info.dada.entrega.cie.id"/></strong></td>
+								<td>${enviament.entregaPostal.cieId}</td>
+							</tr>
+							<tr>
+								<td width="30%"><strong><spring:message code="enviament.info.dada.entrega.cie.estat"/></strong></td>
+								<td><spring:message code="es.caib.notib.client.domini.CieEstat.${enviament.entregaPostal.cieEstat}"/></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</c:if>
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>" id="events">
 			<table
 				id="events"

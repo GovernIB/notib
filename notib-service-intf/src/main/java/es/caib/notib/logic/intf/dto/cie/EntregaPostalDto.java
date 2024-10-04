@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import javax.persistence.Column;
 import java.io.Serializable;
 
 @Data
@@ -39,4 +41,7 @@ public class EntregaPostalDto implements Serializable{
 	private String formatSobre;
 	private String formatFulla;
 	private Integer cie;
+	private String cieId;
+	private boolean cieCancelat;
+	private String cieEstat;
 }

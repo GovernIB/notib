@@ -25,6 +25,10 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 public class PagadorCieEntity extends NotibAuditable<Long> {
 
+		@EqualsAndHashCode.Include
+	@Column(name = "dir3_codi", length = 9)
+	private String organismePagadorCodi;
+
 	@Column(name = "NOM", length = 256)
 	private String nom;
 
@@ -51,14 +55,10 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 	@Column(name = "cie_extern", nullable = false)
 	private boolean cieExtern;
 
-
-
-//	@Column(name = "USUARI", length = 256)
-//	private String usuari;
-//
-//	@Column(name = "PASSWORD", length = 256)
-//	private String password;
-
+	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@JoinColumn(name = "organ_emisor")
+	@ForeignKey(name = "not_emisorcie_organ_fk")
+	protected OrganGestorEntity organEmisor;
 
 
 	private static final long serialVersionUID = 8596990469127710436L;

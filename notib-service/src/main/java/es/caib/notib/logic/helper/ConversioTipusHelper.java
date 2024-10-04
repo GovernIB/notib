@@ -301,6 +301,7 @@ public class ConversioTipusHelper {
 				.field("entitat.id", "entitatId")
 				.field("organGestor.id", "organGestorId")
 				.field("organGestor.codi", "organismePagadorCodi")
+				.field("organEmisor.codi", "organismeEmisorCodi")
 				.byDefault().register();
 
 		mapperFactory.classMap(PagadorCieEntity.class, CieTableItemDto.class)
@@ -308,6 +309,7 @@ public class ConversioTipusHelper {
 					@Override
 					public void mapAtoB(PagadorCieEntity a, CieTableItemDto b, MappingContext context) {
 						b.setOrganismePagador(a.getOrganGestor() != null ? a.getOrganGestor().getCodi() + " - " + a.getOrganGestor().getNom() : "ORGAN GESTOR NO TROBAT");
+						b.setOrganismeEmisor(a.getOrganEmisor() != null ? a.getOrganEmisor().getCodi() + " - " + a.getOrganEmisor().getNom() : "ORGAN GESTOR NO TROBAT");
 					}
 				}).byDefault().register();
 

@@ -3,6 +3,7 @@
  */
 package es.caib.notib.plugin.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
@@ -44,6 +45,7 @@ import java.util.Set;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class WsClientHelper<T> {
 
 	public T generarClientWs(URL wsdlResourceUrl, String endpoint, QName qname, String username, String password, String soapAction, boolean logMissatgesActiu,
@@ -110,20 +112,20 @@ public class WsClientHelper<T> {
 		// Configura el log de les peticions
 		@SuppressWarnings("rawtypes")
 		List<Handler> handlerChain = new ArrayList<>();
-//		if (logMissatgesActiu) {
+		if (logMissatgesActiu) {
 			System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
 			System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
 			System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
 			System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
-//		}
+		}
 		// Configura handlers addicionals
 		for (var handler : handlers) {
 			if (handler != null) {
 				handlerChain.add(handler);
 			}
-//			if (logMissatgesActiu) {
-				handlerChain.add(new SOAPLoggingHandler(WsClientHelper.class));
-//			}
+			if (logMissatgesActiu) {
+				handlerChain.add(new SOAPLoggingHandler());
+			}
 		}
 		bindingProvider.getBinding().setHandlerChain(handlerChain);
 		if (soapAction != null) {
@@ -155,10 +157,8 @@ public class WsClientHelper<T> {
 
 	public static class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
 
-		private final Logger LOGGER;
-		public SOAPLoggingHandler(Class<?> loggerClass) {
+		public SOAPLoggingHandler() {
 			super();
-			LOGGER = LoggerFactory.getLogger(loggerClass);
 		}
 
 		public Set<QName> getHeaders() {
@@ -191,7 +191,7 @@ public class WsClientHelper<T> {
 			} catch (Exception ex) {
 				sb.append("Error al imprimir el missatge XML: ").append(ex.getMessage());
 			}
-			LOGGER.debug(sb.toString());
+			log.info(sb.toString());
 		}
 	}
 

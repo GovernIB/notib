@@ -1,5 +1,6 @@
 package es.caib.notib.persist.entity.cie;
 
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliNumeracioTipusEnumDto;
@@ -131,6 +132,11 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 	@Setter
 	@Column(name = "cie_cancelat")
 	protected boolean cieCancelat;
+
+	@Setter
+	@Column(name = "cie_estat")
+	protected CieEstat cieEstat;
+
 
 
 	public void update(EntregaPostal entregaPostal) {

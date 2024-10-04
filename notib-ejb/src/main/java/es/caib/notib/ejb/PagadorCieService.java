@@ -50,14 +50,8 @@ public class PagadorCieService extends AbstractService<es.caib.notib.logic.intf.
 
 	@Override
 	@RolesAllowed("**")
-	public PaginaDto<CieTableItemDto> findAmbFiltrePaginat(
-			Long entitatId,
-			CieFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return getDelegateService().findAmbFiltrePaginat(
-				entitatId,
-				filtre,
-				paginacioParams);
+	public PaginaDto<CieTableItemDto> findAmbFiltrePaginat(Long entitatId, CieFiltreDto filtre, PaginacioParamsDto paginacioParams) {
+		return getDelegateService().findAmbFiltrePaginat(entitatId, filtre, paginacioParams);
 	}
 
 	@Override

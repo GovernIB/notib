@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.cie;
 
+import es.caib.notib.client.domini.CieEstat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,11 +14,11 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-public class EstatCie {
+public class InfoCie {
 
     private String identificador;
-    private String codiFase;
-    private String descripcioFase;
-    private String codiEstat;
-    private String descripcioEstat;
+    private String codiResposta;
+    private String descripcioResposta;
+    private CieEstat codiEstat;
+    private Date data;
 }

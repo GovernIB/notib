@@ -81,6 +81,10 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 			if (!Strings.isNullOrEmpty(cie.getOrganismePagadorCodi())) {
 				organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, cie.getOrganismePagadorCodi());
 			}
+			OrganGestorEntity organEmisor = null;
+			if (!Strings.isNullOrEmpty(cie.getOrganismePagadorCodi())) {
+				organEmisor = entityComprovarHelper.comprovarOrganGestor(entitat, cie.getOrganismeEmisorCodi());
+			}
 			String apiKey = cie.getApiKey();
 			StringEncriptat encriptat = null;
 			if (!Strings.isNullOrEmpty(apiKey)) {
@@ -97,12 +101,14 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 						.cieExtern(cie.isCieExtern())
 						.apiKey(encriptat != null ? encriptat.getString() : null)
 						.salt(encriptat != null ? encriptat.getSalt() : null)
+						.organEmisor(organEmisor)
 						.build();
 			} else {
 				log.debug("Actualitzant pagador cie (pagador=" + cie + ")");
 				p = entityComprovarHelper.comprovarPagadorCie(cie.getId());
 				p.setNom(!Strings.isNullOrEmpty(cie.getNom()) ? cie.getNom() : p.getNom());
 				p.setOrganGestor(organGestor != null ? organGestor : p.getOrganGestor());
+				p.setOrganEmisor(organEmisor != null ? organEmisor : p.getOrganGestor());
 				if (cie.isCieExtern()) {
 					p.setCieExtern(true);
 					p.setApiKey(encriptat != null ? encriptat.getString() : p.getApiKey());

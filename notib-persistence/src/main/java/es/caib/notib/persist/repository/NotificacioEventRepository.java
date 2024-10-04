@@ -71,7 +71,12 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 	void deleteByNotificacio(NotificacioEntity notificacio);
 
 	List<NotificacioEventEntity> findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(NotificacioEntity notificacio, NotificacioEventTipusEnumDto tipus, boolean error);
+
 	List<NotificacioEventEntity> findByEnviamentAndTipusAndError(NotificacioEnviamentEntity enviament, NotificacioEventTipusEnumDto tipus, boolean error);
+
+	List<NotificacioEventEntity> findByNotificacioAndTipusAndError(NotificacioEntity notificacio, NotificacioEventTipusEnumDto tipus, boolean error);
+
+	List<NotificacioEventEntity> findByNotificacioAndTipusAndErrorAndFiReintents(NotificacioEntity notificacio, NotificacioEventTipusEnumDto tipus, boolean error, boolean fiReintents);
 
 	List<NotificacioEventEntity> findByNotificacioAndTipusAndErrorAndEnviamentIsNullOrderByDataDescIdDesc(NotificacioEntity notificacio, NotificacioEventTipusEnumDto tipus, boolean error);
 
@@ -165,7 +170,7 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			+ " NotificacioEventEntity ne "
 			+ "WHERE "
 			+ " ne.notificacio.id = :notificacioId "
-			+ " AND ne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.ENVIAMENT_CIE ")
+			+ " AND ne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.CIE_ENVIAMENT ")
 	List<NotificacioEventEntity> findEventsCieByNotificacioId(@Param("notificacioId") Long notificacioId);
 
 	@Query( "SELECT ne " +
@@ -173,7 +178,7 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			+ " NotificacioEventEntity ne "
 			+ "WHERE "
 			+ " ne.enviament.id = :enviamentId "
-			+ " AND ne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.ENVIAMENT_CIE ")
+			+ " AND ne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.CIE_ENVIAMENT ")
 	NotificacioEventEntity findEventCieByEnviamentId(@Param("enviamentId") Long enviamentId);
 
 //	@Query( "select ne " +

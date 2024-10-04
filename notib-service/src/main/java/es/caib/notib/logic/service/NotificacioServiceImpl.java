@@ -69,7 +69,6 @@ import es.caib.notib.plugin.cie.TipusImpressio;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
-import liquibase.pro.packaged.S;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -97,8 +96,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.DOCUMENT_CIE_PDF_MAX_RIGHT_MARGIN;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -574,12 +571,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 			CallbackEntity callback;
 			List<NotificacioEventEntity> eventNotMovil;
 			List<NotificacioEventEntity> lastErrorEvent = new ArrayList<>();
-			List<NotificacioEnviamentEntity> enviamentsEntity = new ArrayList<>();
-			enviamentsEntity.addAll(notificacio.getEnviaments());
+            List<NotificacioEnviamentEntity> enviamentsEntity = new ArrayList<>(notificacio.getEnviaments());
 			NotificacioEventEntity eventError;
 			var numEnviament = 0;
+			var entregaPostal = false;
 			for (var env : dto.getEnviaments()) {
 
+				if (!entregaPostal && env.getEntregaPostal() != null) {
+					entregaPostal = true;
+				}
 				eventError = enviamentsEntity.get(numEnviament).getUltimEvent();
 				if (eventError != null && eventError.isError()) {
 					lastErrorEvent.add(eventError);
@@ -633,6 +633,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 					m.append("Env ").append(env).append(": ").append(msg).append(" -> ").append(tipus).append("\n");
 					env++;
 					fiReintents = fiReintents || event.getFiReintents();
+					if (entregaPostal && NotificacioEventTipusEnumDto.CIE_ENVIAMENT.equals(event.getTipus())) {
+						dto.setErrorEntregaPostal(true);
+					}
 				}
 				dto.setFiReintentsDesc(m.toString());
 				dto.setFiReintents(fiReintents);
@@ -644,6 +647,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 				dto.setNoticaErrorEventTipus(lastErrorEvent.get(0).getTipus());
 				// Obtenir error dels events
 				dto.setNotificaErrorTipus(getErrorTipus(lastErrorEvent.get(0)));
+			}
+
+			if (entregaPostal) {
+				var eventsCie = notificacioEventRepository.findByNotificacioAndTipusAndError(notificacio, NotificacioEventTipusEnumDto.CIE_ENVIAMENT, false);
+				dto.setCancelarEntregaPostal(eventsCie != null && !eventsCie.isEmpty());
 			}
 			dto.setEnviadaDate(notificacioTableHelper.getEnviadaDate(notificacio));
 //			var notificacioTableEntity = notificacioTableViewRepository.findById(id).orElse(null);
@@ -1449,7 +1457,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, false);
 			}
 			if (isEntregaCieActiva(notificacio)) {
-				enviarEntregaCie(notificacio.getReferencia());
+				enviarEntregaCie(notificacio.getReferencia(), false);
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1471,9 +1479,35 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	@Override
-	public void enviarEntregaCie(String uuid) {
-		ciePluginJms.enviarMissatge(uuid);
+	public void enviarEntregaCie(String uuid, boolean retry) {
+		ciePluginJms.enviarMissatge(uuid, retry);
 	}
+
+	@Override
+	public boolean cancelarEntregaCie(Long enviamentId) {
+
+		try {
+			var env = enviamentRepository.findById(enviamentId).orElseThrow();
+			ciePluginJms.cancelarEnviament(env.getUuid());
+			return true;
+		} catch (Exception ex) {
+			log.error("Error cancelant l'entrega postal", ex);
+			return false;
+		}
+	}
+
+	@Override
+	public boolean consultarEstatEntregaPostal(Long enviamentId) {
+
+		try {
+			ciePluginHelper.consultarEstatEntregaPostal(enviamentId);
+			return true;
+		} catch (Exception ex) {
+			log.error("Error consultant l'estat de l'entrega postal", ex);
+			return false;
+		}
+	}
+
 
 	@Transactional(readOnly = true)
 	@Override
@@ -1729,30 +1763,46 @@ public class NotificacioServiceImpl implements NotificacioService {
 		var timer = metricsHelper.iniciMetrica();
 		var resposta = new RespostaAccio<String>();
 		try {
-			NotibLogger.getInstance().info("[MASSIVA] Reactivar enviaments amb error a registre o notifica fi reintents" + enviaments, log, LoggingTipus.MASSIVA);
-			Set<NotificacioEntity> notificacions = new HashSet<>();
-			NotificacioEntity notificacio;
+			Set<NotificacioEntity> notificacionsPostals = new HashSet<>();
+			NotibLogger.getInstance().info("[MASSIVA] Reactivar enviaments amb error a registre, notifica o entrega apostal amb fi reintents" + enviaments, log, LoggingTipus.MASSIVA);
+			NotificacioEntity notificacio = null;
 			NotificacioEnviamentEntity enviament;
+			var entregaPostal = false;
 			for (var id : enviaments) {
-				enviament = enviamentRepository.findById(id).orElseThrow();
+				enviament = enviamentRepository.findById(id).orElse(null);
+				if (enviament == null) {
+					log.error("MASSIVA] No existeix cap enviament amb id " + id);
+					resposta.getErrors().add(id + "");
+					continue;
+				}
 				notificacio = enviament.getNotificacio();
-				var estatEnviament = enviamentSmService.getEstatEnviament(enviament.getUuid());
 				try {
-					if (!EnviamentSmEstat.REGISTRE_ERROR.equals(estatEnviament) && !EnviamentSmEstat.NOTIFICA_ERROR.equals(estatEnviament)) {
-						continue;
-					}
+					var estatEnviament = enviamentSmService.getEstatEnviament(enviament.getUuid());
 					if (EnviamentSmEstat.REGISTRE_ERROR.equals(estatEnviament)) {
 						notificacio.refreshRegistre();
 						enviamentSmService.registreReset(enviament.getUuid());
-					} else if (EnviamentSmEstat.NOTIFICA_ERROR.equals(estatEnviament)) {
+						resposta.getExecutades().add(enviament.getUuid());
+						continue;
+					}
+					if (EnviamentSmEstat.NOTIFICA_ERROR.equals(estatEnviament)) {
 						notificacio.resetIntentsNotificacio();
 						enviamentSmService.notificaReset(enviament.getUuid());
+						resposta.getExecutades().add(enviament.getUuid());
+						continue;
 					}
-
-					resposta.getExecutades().add(enviament.getUuid());
+					if (!entregaPostal && enviament.getEntregaPostal() != null) {
+						var ultimEvent = enviament.getUltimEvent();
+						if (ultimEvent != null && NotificacioEventTipusEnumDto.CIE_ENVIAMENT.equals(ultimEvent.getTipus()) && ultimEvent.isError()) {
+							notificacionsPostals.add(notificacio);
+							resposta.getExecutades().add(enviament.getUuid());
+						}
+					}
 				} catch (Exception ex) {
 					resposta.getErrors().add(enviament.getUuid());
 				}
+			}
+			for (var not : notificacionsPostals) {
+				ciePluginJms.enviarMissatge(not.getReferencia(), false);
 			}
 			return !resposta.getExecutades().isEmpty();
 		} finally {

@@ -12,4 +12,5 @@ public class CieTableItemDto implements Serializable{
 	private String nom;
 	private String organismePagador;
 	private Date contracteDataVig;
+	private String organismeEmisor;
 }

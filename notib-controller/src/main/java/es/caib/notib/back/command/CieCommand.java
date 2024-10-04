@@ -23,6 +23,9 @@ public class CieCommand {
 	@NotEmpty
 	@Size(max=64)
 	private String organismePagadorCodi;
+	@NotEmpty
+	@Size(max=64)
+	private String organismeEmisorCodi;
 	private String nom;
 	private Date contracteDataVig;
 	private String apiKey;

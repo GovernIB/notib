@@ -46,6 +46,8 @@
 
 			let $selectOrgan = $("#organismePagadorCodi");
 			loadOrgans($selectOrgan, organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
+			let $selectOrganEmisor = $("#organismeEmisorCodi");
+			loadOrgans($selectOrganEmisor, organsEmisors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
 			let cieNotifica = ${cieCommand.cieNotifica};
 			if (cieNotifica) {
 				$("#cieExternForm").hide();
@@ -57,7 +59,7 @@
 
 		});
 
-		var organsGestors = [];
+		let organsGestors = [];
 		let organData;
 		organsGestors.push({id:"", text:"", estat:"V"});
 		<c:forEach items="${organsGestors}" var="organGestor">
@@ -67,6 +69,17 @@
 			</c:if>
 			organsGestors.push(organData);
 		</c:forEach>
+
+		let organsEmisors = [];
+		organsEmisors.push({id:"", text:"", estat:"V"});
+		<c:forEach items="${organsGestors}" var="organGestor">
+		organData = {id:"${organGestor.codi}", text:"${organGestor.valor}", estat:"${organGestor.estat}"}
+		<c:if test="${cieCommand.organismeEmisorCodi == organGestor.codi}">
+		organData['selected'] = true;
+		</c:if>
+		organsEmisors.push(organData);
+		</c:forEach>
+
 	</script>
 </head>
 <body>
@@ -88,6 +101,9 @@
 					<div class="col-md-2">
 						<not:inputText name="apiKey" textKey="cie.form.camp.api.key"/>
 					</div>
+				</div>
+				<div class="col-md-2">
+					<not:inputSelect name="organismeEmisorCodi" required="true" textKey="operadorpostal.form.camp.organismeEmisor" inline="false" emptyOption="true" optionMinimumResultsForSearch="0"/>
 				</div>
 				<div id="modal-botons">
 					<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

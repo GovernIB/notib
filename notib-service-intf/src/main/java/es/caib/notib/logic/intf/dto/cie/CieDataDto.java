@@ -20,6 +20,7 @@ public class CieDataDto extends AuditoriaDto implements Serializable{
 	private Long organGestorId;
 	private String apiKey;
 	private boolean cieExtern;
+	private String organismeEmisorCodi;
 
 	private static final long serialVersionUID = 1305599728317046741L;
 

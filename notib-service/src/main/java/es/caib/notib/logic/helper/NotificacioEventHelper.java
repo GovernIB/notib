@@ -1,6 +1,5 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.exception.EventException;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -67,7 +66,7 @@ public class NotificacioEventHelper {
         // Només generem un event d'enviament (si hi ha reintents es modifica l'actual)
         // i de consulta SIR per ara (fins que no implementin el callback)
         var eventUnic = NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT.equals(eventInfo.getTipus()) ||
-                NotificacioEventTipusEnumDto.ENVIAMENT_CIE.equals(eventInfo.getTipus()) ||
+                NotificacioEventTipusEnumDto.CIE_ENVIAMENT.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.SIR_ENVIAMENT.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT.equals(eventInfo.getTipus()) ||
@@ -108,6 +107,7 @@ public class NotificacioEventHelper {
         eventInfo.getEnviament().getNotificacio().updateEventAfegir(event);
         if (!eventNoUnic && ( NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT.equals(event.getTipus()) ||
                 NotificacioEventTipusEnumDto.SIR_ENVIAMENT.equals(event.getTipus()) ||
+                NotificacioEventTipusEnumDto.CIE_ENVIAMENT.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT.equals(event.getTipus()))) {
             eventInfo.getEnviament().updateNotificaError(eventInfo.isError(), event);
         }
@@ -200,13 +200,19 @@ public class NotificacioEventHelper {
 
     public void addCieEventEnviar(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
 
-        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.ENVIAMENT_CIE)
+        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.CIE_ENVIAMENT)
                 .error(error).errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
     }
 
     public void addCieEventCancelar(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
 
-        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.CANCELAR_CIE)
+        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.CIE_CANCELAR)
+                .error(error).errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
+    }
+
+    public void addCieEventConsultaEstat(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+
+        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.CIE_CONSULTA_ESTAT)
                 .error(error).errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
     }
 

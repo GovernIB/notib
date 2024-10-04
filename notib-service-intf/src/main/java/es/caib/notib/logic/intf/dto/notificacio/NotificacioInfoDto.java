@@ -29,6 +29,7 @@ import java.util.List;
 public class NotificacioInfoDto extends AuditoriaDto {
 
 	private Long id;
+	private String referencia;
 	private EnviamentTipus enviamentTipus;
 	private String concepte;
 	private String descripcio;
@@ -93,6 +94,9 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private boolean callbackFiReintents;
 	private String callbackFiReintentsDesc;
 	private List<String> notificacionsMovilErrorDesc = new ArrayList<>();
+	private boolean errorEntregaPostal;
+	private boolean entregaPostalFiReintents;
+	private boolean cancelarEntregaPostal;
 
 	private Date enviadaDate;
 

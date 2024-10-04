@@ -281,8 +281,21 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	public void enviarEntregaCie(String uuid) {
-		getDelegateService().enviarEntregaCie(uuid);
+	@RolesAllowed("**")
+	public void enviarEntregaCie(String uuid, boolean retry) {
+		getDelegateService().enviarEntregaCie(uuid, retry);
+	}
+
+	@Override
+	@RolesAllowed("**")
+	public boolean cancelarEntregaCie(Long enviamentId) {
+		return getDelegateService().cancelarEntregaCie(enviamentId);
+	}
+
+	@Override
+	@RolesAllowed("**")
+	public boolean consultarEstatEntregaPostal(Long enviamentId) {
+		return getDelegateService().consultarEstatEntregaPostal(enviamentId);
 	}
 
 	@Override
