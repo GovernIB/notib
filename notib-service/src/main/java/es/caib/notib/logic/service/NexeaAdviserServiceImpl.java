@@ -74,12 +74,13 @@ public class NexeaAdviserServiceImpl implements NexeaAdviserService  {
         var sinc = conversioTipusHelper.convertir(sincronizarEnvio, es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.SincronizarEnvio.class);
         sinc.setIdentificador(resposta.getIdentificador());
         var resultadoSincronizarEnvio = adviserService.sincronizarEnvio(sinc);
+        var codi = AdviserServiceImpl.ResultatEnviamentEnum.getByCodi(resultadoSincronizarEnvio.getCodigoRespuesta());
         if (NexeaAdviserWs.CODI_OK_DEC.equalsIgnoreCase(resposta.getDescripcionRespuesta())) {
             codigoRespuesta.value = NexeaAdviserWs.CODI_OK_DEC;
             descripcionRespuesta.value = NexeaAdviserWs.CODI_OK_DEC;
         } else {
-            codigoRespuesta.value = resultadoSincronizarEnvio.getCodigoRespuesta();
-            descripcionRespuesta.value = resultadoSincronizarEnvio.getDescripcionRespuesta();
+            codigoRespuesta.value = codi.getCodiNexea();
+            descripcionRespuesta.value = codi.getDesc();
         }
     }
 

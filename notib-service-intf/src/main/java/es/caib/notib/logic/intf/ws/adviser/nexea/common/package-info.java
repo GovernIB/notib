@@ -5,5 +5,5 @@
 // Generated on: 2023.06.01 at 01:39:07 PM CEST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://nexea.es/ws/adviserwsv2/1.0/sincronizarEnvio", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://nexea.es/ws/adviserwsv2/1.0/common", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package es.caib.notib.logic.intf.ws.adviser.nexea.common;
