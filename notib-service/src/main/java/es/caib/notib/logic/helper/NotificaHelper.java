@@ -5,6 +5,7 @@ package es.caib.notib.logic.helper;
 
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
+import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.RespuestaSincronizarEnvioOE;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,10 @@ public class NotificaHelper {
 
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseException) throws Exception {
 		return getNotificaHelper().enviamentRefrescarEstat(enviamentId, raiseException);
+	}
+
+	public RespuestaSincronizarEnvioOE enviamentEntregaPostalNotificada(NotificacioEnviamentEntity enviament) throws Exception {
+		return getNotificaHelper().enviamentEntregaPostalNotificada(enviament);
 	}
 
 	public String xifrarId(Long id) throws GeneralSecurityException {

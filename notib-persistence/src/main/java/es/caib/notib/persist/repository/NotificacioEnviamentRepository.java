@@ -46,17 +46,15 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	@Query(value = "FROM NotificacioEnviamentEntity n WHERE n.id = :notificacioId ORDER BY n.notificaEstatData DESC, n.notificaEstatDataActualitzacio DESC")
 	List<NotificacioEnviamentEntity> findByNotificacioIdOrderByNotificaEstatDataAndOrderByNotificaEstatDataActualitzacioDesc(@Param("notificacioId")  Long notificacioId);
 	
-//	NotificacioEnviamentEntity findById(Long id);
-	
 	@Query(value = "FROM NotificacioEnviamentEntity n WHERE n.notificacio = :notificacio")
 	List<NotificacioEnviamentEntity> findByNotificacio(@Param("notificacio") NotificacioEntity notificacio);
 
 	NotificacioEnviamentEntity findByNotificaReferencia(String notificaReferencia);
 
-	NotificacioEnviamentEntity findByNotificacioAndNotificaReferencia(
-			NotificacioEntity notificacio,
-			String notificaReferencia);
-	
+	@Query(value = "FROM NotificacioEnviamentEntity e WHERE e.entregaPostal.cieId = :cieId")
+	NotificacioEnviamentEntity findByCieId(@Param("cieId") String cieId);
+
+
 //	@Query(	" from NotificacioEnviamentEntity " +
 //			" where	notificacio = :notificacio " + 
 //			"	and (notificaEstatFinal = false " + 
@@ -343,5 +341,4 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 
 	@Query("select e.notificaReferencia from NotificacioEnviamentEntity e where e.id = :enviamentId")
 	String getUuidById(@Param("enviamentId") Long enviamentId);
-
 }

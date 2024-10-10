@@ -21,6 +21,7 @@ import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.Datado;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.Datados;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.InfoEnvioLigero;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.RespuestaInfoEnvioLigero;
+import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.RespuestaSincronizarEnvioOE;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
@@ -164,6 +165,14 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		Thread.sleep(1000);
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 		return enviamentRefrescarEstat(enviament, raiseExceptions);
+	}
+
+	@Override
+	public RespuestaSincronizarEnvioOE enviamentEntregaPostalNotificada(NotificacioEnviamentEntity enviament) throws Exception {
+
+		var resposta = new RespuestaSincronizarEnvioOE();
+		resposta.setCodigoRespuesta("000");
+		return resposta;
 	}
 
 

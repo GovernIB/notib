@@ -18,6 +18,7 @@ import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.plugin.cie.CiePluginJms;
+import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.RespuestaSincronizarEnvioOE;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioRepository;
@@ -83,6 +84,9 @@ public abstract class AbstractNotificaHelper {
 	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException;
 
 	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception;
+
+	public abstract RespuestaSincronizarEnvioOE enviamentEntregaPostalNotificada(NotificacioEnviamentEntity enviament) throws Exception;
+
 
 	public boolean isConnexioNotificaDisponible() {
 		return getNotificaUrlProperty() != null;

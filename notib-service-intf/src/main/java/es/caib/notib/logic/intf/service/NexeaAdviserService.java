@@ -1,15 +1,14 @@
 package es.caib.notib.logic.intf.service;
 
-
-import es.caib.notib.logic.intf.ws.adviser.common.Opciones;
-import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
-import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
+import es.caib.notib.logic.intf.ws.adviser.nexea.common.Opciones;
+import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.Acuse;
+import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.Receptor;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
 import java.math.BigInteger;
 
-public interface AdviserServiceWs {
+public interface NexeaAdviserService {
 
     void sincronizarEnvio(
             String organismoEmisor,
@@ -25,4 +24,5 @@ public interface AdviserServiceWs {
             Holder<String> codigoRespuesta,
             Holder<String> descripcionRespuesta,
             Holder<Opciones> opcionesResultadoSincronizarEnvio);
+
 }

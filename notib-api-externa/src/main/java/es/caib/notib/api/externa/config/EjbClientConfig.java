@@ -3,7 +3,10 @@
  */
 package es.caib.notib.api.externa.config;
 
+import es.caib.notib.logic.intf.service.AdviserService;
+import es.caib.notib.logic.intf.service.NexeaAdviserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
 
@@ -18,6 +21,17 @@ public class EjbClientConfig {
 
 	private static final String EJB_JNDI_PREFIX = "java:app/notib-ejb/";
 	private static final String EJB_JNDI_SUFFIX = "";
+
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean adviserService() {
+		return getLocalEjbFactoyBean(AdviserService.class);
+	}
+
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean nexeaAdviserService() {
+		return getLocalEjbFactoyBean(NexeaAdviserService.class);
+	}
+
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {
 
 		var jndiName = EJB_JNDI_PREFIX + serviceClass.getSimpleName() + EJB_JNDI_SUFFIX;

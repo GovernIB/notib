@@ -247,11 +247,13 @@ $(document).ready(function() {
 				<spring:message code="enviament.info.tab.estat.registre"/>
 			</a>
 		</li>
-		<li role="presentation"<c:if test="${pipellaActiva == 'entregaPostal'}"> class="active"</c:if>>
-			<a href="#entregaPostal" aria-controls="entregaPostal" role="tab" data-toggle="tab">
-				<spring:message code="enviament.info.tab.entrega.postal"/>
-			</a>
-		</li>
+		<c:if test="${not empty enviament.entregaPostal}">
+			<li role="presentation"<c:if test="${pipellaActiva == 'entregaPostal'}"> class="active"</c:if>>
+				<a href="#entregaPostal" aria-controls="entregaPostal" role="tab" data-toggle="tab">
+					<spring:message code="enviament.info.tab.entrega.postal"/>
+				</a>
+			</li>
+		</c:if>
 		<li role="presentation"<c:if test="${pipellaActiva == 'events'}"> class="active"</c:if>>
 			<a href="#events" aria-controls="events" role="tab" data-toggle="tab">
 				<spring:message code="enviament.info.tab.events"/>
@@ -785,7 +787,7 @@ $(document).ready(function() {
 				</c:if>
 			</c:if>
 		</div>
-		<c:if test="${not empty enviament.entregaPostal.cieId}">
+		<c:if test="${not empty enviament.entregaPostal}">
 			<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'entregaPostal'}"> active</c:if>" id="entregaPostal">
 				<br/>
 				<p class="text-right" style="margin-top: 1em">

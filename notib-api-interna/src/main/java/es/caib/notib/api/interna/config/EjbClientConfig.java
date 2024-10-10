@@ -60,7 +60,6 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(ActiveMqService.class);
 	}
 
-
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {
 
 		var jndiName = EJB_JNDI_PREFIX + serviceClass.getSimpleName() + EJB_JNDI_SUFFIX;

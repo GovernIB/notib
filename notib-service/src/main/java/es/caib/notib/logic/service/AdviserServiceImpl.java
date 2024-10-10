@@ -48,7 +48,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class AdviserServiceImpl implements AdviserService {
 
     @Autowired
-    private NotificacioEnviamentRepository notificacioEnviamentRepository;
+    private NotificacioEnviamentRepository enviamentRepository;
     @Autowired
     private PluginHelper pluginHelper;
     @Autowired
@@ -125,7 +125,7 @@ public class AdviserServiceImpl implements AdviserService {
         String eventErrorDescripcio = null;
         ResultatEnviamentEnum resultatEnum = null;
         try {
-             enviament = notificacioEnviamentRepository.findByNotificaIdentificador(identificador);
+             enviament = enviamentRepository.findByNotificaIdentificador(identificador);
             if (enviament == null) {
                 log.error(ERROR_CALLBACK_NOTIFICA + identificador + "): No s'ha trobat cap enviament amb l'identificador especificat (" + identificador + ").");
                 var forcarOk = configHelper.getConfigAsBoolean("es.caib.notib.adviser.forcar.resposta.ok");

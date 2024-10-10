@@ -43,6 +43,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.organisme.UnitatOrganitzativaDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
+import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.EnviamentTableEntity;
@@ -120,6 +121,8 @@ public class ConversioTipusHelper {
 				});
 
 		mapperFactory.classMap(EntitatEntity.class, EntitatDto.class).byDefault().customize(new EntitatEntitytoMapper()).register();
+
+		mapperFactory.classMap(SincronizarEnvio.class, es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.SincronizarEnvio.class).byDefault().register();
 
 		mapperFactory.classMap(NotificacioEntity.class, NotificacioInfoDto.class)
 				.field("organGestor.codi", "organGestorCodi")

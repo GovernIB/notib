@@ -1,6 +1,7 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.logic.intf.dto.AccioParam;
@@ -29,6 +30,7 @@ import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaE
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.Datado;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.InfoEnvioLigero;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.RespuestaInfoEnvioLigero;
+import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.RespuestaSincronizarEnvioOE;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
@@ -50,9 +52,12 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
+import javax.xml.ws.Holder;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
@@ -66,6 +71,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -320,6 +326,24 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 		}
 		return resultadoInfoEnvio;
+	}
+
+	public RespuestaSincronizarEnvioOE enviamentEntregaPostalNotificada(NotificacioEnviamentEntity enviament) throws Exception {
+
+		var apiKey = enviament.getNotificacio().getEntitat().getApiKey();
+		var organEmisor = enviament.getNotificacio().getEmisorDir3Codi();
+		var id = enviament.getNotificaIdentificador();
+		var tipoEntrega = BigInteger.valueOf(1);
+		var modoNotificacion = BigInteger.valueOf(2);
+		var estat = new Holder<>(CieEstat.NOTIFICADA.name());
+		var data = new Date();
+		var gregorianCalendar = new GregorianCalendar();
+		gregorianCalendar.setTime(data);
+		var xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
+		var dataHolder = new Holder<>(xmlGregorianCalendar);
+		return getSincronizarEnvioWs(apiKey).sincronizarEnvioOE(organEmisor, id, tipoEntrega, modoNotificacion, estat, dataHolder,
+				null, null, null, null, null, null, null, null);
+
 	}
 
 	private Datado getDarrerDatat(RespuestaInfoEnvioLigero resultadoInfoEnvio, NotificacioEnviamentEntity enviament, IntegracioInfo info) throws DatatypeConfigurationException, ParseException {
@@ -605,30 +629,36 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			var envio = new Envio();
 			var titular = new Persona();
 			var titularIncapacitat = false;
+
 			if (enviament.getTitular().isIncapacitat() && enviament.getDestinataris() != null) {
-				titular.setNif(enviament.getDestinataris().get(0).getNif());
-				titular.setApellidos(concatenarLlinatges(enviament.getDestinataris().get(0).getLlinatge1(), enviament.getDestinataris().get(0).getLlinatge2()));
-				titular.setTelefono(enviament.getDestinataris().get(0).getTelefon());
-				titular.setEmail(enviament.getDestinataris().get(0).getEmail());
-				if (enviament.getDestinataris().get(0).getInteressatTipus().equals(InteressatTipus.JURIDICA)) {
-					titular.setRazonSocial(enviament.getDestinataris().get(0).getRaoSocial());
+				var destinatari = enviament.getDestinataris().get(0);
+				titular.setNif(destinatari.getNif());
+				titular.setApellidos(concatenarLlinatges(destinatari.getLlinatge1(), destinatari.getLlinatge2()));
+				titular.setTelefono(destinatari.getTelefon());
+				titular.setEmail(destinatari.getEmail());
+				if (destinatari.getInteressatTipus().equals(InteressatTipus.JURIDICA)
+					|| destinatari.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
+					var raoSocial = !Strings.isNullOrEmpty(destinatari.getRaoSocial()) ? destinatari.getRaoSocial() : destinatari.getNom();
+					titular.setRazonSocial(raoSocial);
 				} else {
-					titular.setNombre(enviament.getDestinataris().get(0).getNom());
+					titular.setNombre(destinatari.getNom());
 				}
-				titular.setCodigoDestino(enviament.getDestinataris().get(0).getDir3Codi());
+				titular.setCodigoDestino(destinatari.getDir3Codi());
 				titularIncapacitat = true;
 			} else {
-				titular.setNif(InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) ? null : enviament.getTitular().getNif());
-				titular.setApellidos(concatenarLlinatges(enviament.getTitular().getLlinatge1(), enviament.getTitular().getLlinatge2()));
-				titular.setTelefono(enviament.getTitular().getTelefon());
-				titular.setEmail(InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) ? null : enviament.getTitular().getEmail());
+				var envTitular = enviament.getTitular();
+				titular.setNif(InteressatTipus.FISICA_SENSE_NIF.equals(envTitular.getInteressatTipus()) ? null : envTitular.getNif());
+				titular.setApellidos(concatenarLlinatges(envTitular.getLlinatge1(), envTitular.getLlinatge2()));
+				titular.setTelefono(envTitular.getTelefon());
+				titular.setEmail(InteressatTipus.FISICA_SENSE_NIF.equals(envTitular.getInteressatTipus()) ? null : envTitular.getEmail());
 				var interessatTipus = enviament.getTitular().getInteressatTipus();
 				if (InteressatTipus.JURIDICA.equals(interessatTipus) || InteressatTipus.ADMINISTRACIO.equals(interessatTipus) ) {
-					titular.setRazonSocial(enviament.getTitular().getRaoSocial());
+					var raoSocial = !Strings.isNullOrEmpty(envTitular.getRaoSocial()) ? envTitular.getRaoSocial() : envTitular.getNom();
+					titular.setRazonSocial(raoSocial);
 				} else {
-					titular.setNombre(enviament.getTitular().getNom());
+					titular.setNombre(envTitular.getNom());
 				}
-				titular.setCodigoDestino(enviament.getTitular().getDir3Codi());
+				titular.setCodigoDestino(envTitular.getDir3Codi());
 			}
 			envio.setTitular(titular);
 			var destinatarios = new Destinatarios();
@@ -781,8 +811,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				SincronizarEnvioWsPortType.class,
 				new Handler[0]);
 	}
-
-
 
 	private static class ApiKeySOAPHandlerV2 implements SOAPHandler<SOAPMessageContext> {
 		private final String apiKey;
