@@ -13,6 +13,7 @@ import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
+import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
@@ -169,11 +170,13 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	}
 
 	@Override
-	public RespuestaSincronizarEnvioOE enviamentEntregaPostalNotificada(NotificacioEnviamentEntity enviament) throws Exception {
+	public RespuestaSincronizarEnvioOE enviamentEntregaPostalNotificada(SincronizarEnvio sincronizarEnvio) throws Exception {
 
 		var resposta = new RespuestaSincronizarEnvioOE();
 		resposta.setCodigoRespuesta(NexeaAdviserWs.CODI_OK);
 		resposta.setDescripcionRespuesta(NexeaAdviserWs.CODI_OK_DEC);
+		var enviament = notificacioEnviamentRepository.findByCieId(sincronizarEnvio.getIdentificador());
+		notificacioEventHelper.addNotificaEnvioOE(enviament, false, "", false);
 		return resposta;
 	}
 

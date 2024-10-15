@@ -3,9 +3,15 @@ package es.caib.notib.logic.service;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.NotificaHelper;
+import es.caib.notib.logic.intf.dto.AccioParam;
+import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.service.AdviserService;
 import es.caib.notib.logic.intf.service.NexeaAdviserService;
+import es.caib.notib.logic.intf.websocket.WebSocketConstants;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.common.Opciones;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.Acuse;
@@ -14,7 +20,9 @@ import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnv
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.ResultadoSincronizarEnvio;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.activemq.ScheduledMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,9 +39,11 @@ public class NexeaAdviserServiceImpl implements NexeaAdviserService  {
     @Autowired
     private NotificacioEnviamentRepository enviamentRepository;
     @Autowired
-    private NotificaHelper notificaHelper;
+    private IntegracioHelper integracioHelper;
     @Autowired
     private ConversioTipusHelper conversioTipusHelper;
+    @Autowired
+    private JmsTemplate jmsTemplate;
 
     @Transactional
     @Override
@@ -51,6 +61,10 @@ public class NexeaAdviserServiceImpl implements NexeaAdviserService  {
                                  Holder<String> descripcionRespuesta,
                                  Holder<Opciones> opcionesResultadoSincronizarEnvio) {
 
+        var info = new IntegracioInfo(IntegracioCodiEnum.CIE, "Sincronitzar enviament", IntegracioAccioTipusEnumDto.RECEPCIO,
+                new AccioParam("Identificador Nexea", identificador.value),
+                new AccioParam("Estat", estado));
+
         var sincronizarEnvio = new SincronizarEnvio();
         sincronizarEnvio.setOrganismoEmisor(organismoEmisor);
         sincronizarEnvio.setIdentificador(identificador.value);
@@ -62,29 +76,29 @@ public class NexeaAdviserServiceImpl implements NexeaAdviserService  {
         sincronizarEnvio.setAcusePDF(acusePDF);
         sincronizarEnvio.setAcuseXML(acuseXML);
         sincronizarEnvio.setOpcionesSincronizarEnvio(opcionesSincronizarEnvio);
-        var resposta = sincronitzarEntregaPostal(sincronizarEnvio);
-        if (NexeaAdviserWs.CODI_ERROR.equals(resposta.getCodigoRespuesta())) {
-            codigoRespuesta.value = resposta.getCodigoRespuesta();
-            descripcionRespuesta.value = resposta.getDescripcionRespuesta();
-            return;
-        }
+        var resposta = sincronitzarEntregaPostal(sincronizarEnvio, info);
         codigoRespuesta.value = resposta.getCodigoRespuesta();
         descripcionRespuesta.value = resposta.getDescripcionRespuesta();
+        if (!NexeaAdviserWs.CODI_OK.equals(resposta.getCodigoRespuesta())) {
+            return;
+        }
 
         var sinc = conversioTipusHelper.convertir(sincronizarEnvio, es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.SincronizarEnvio.class);
         sinc.setIdentificador(resposta.getIdentificador());
         var resultadoSincronizarEnvio = adviserService.sincronizarEnvio(sinc);
         var codi = AdviserServiceImpl.ResultatEnviamentEnum.getByCodi(resultadoSincronizarEnvio.getCodigoRespuesta());
         if (NexeaAdviserWs.CODI_OK_DEC.equalsIgnoreCase(resposta.getDescripcionRespuesta())) {
-            codigoRespuesta.value = NexeaAdviserWs.CODI_OK_DEC;
+            codigoRespuesta.value = NexeaAdviserWs.CODI_OK;
             descripcionRespuesta.value = NexeaAdviserWs.CODI_OK_DEC;
+            integracioHelper.addAccioOk(info);
         } else {
             codigoRespuesta.value = codi.getCodiNexea();
             descripcionRespuesta.value = codi.getDesc();
+            integracioHelper.addAccioError(info, resposta.getDescripcionRespuesta());
         }
     }
 
-    private ResultadoSincronizarEnvio sincronitzarEntregaPostal(SincronizarEnvio sincronizarEnvio) {
+    private ResultadoSincronizarEnvio sincronitzarEntregaPostal(SincronizarEnvio sincronizarEnvio, IntegracioInfo info) {
 
         var identificador = sincronizarEnvio.getIdentificador();
         var resultado = new ResultadoSincronizarEnvio();
@@ -96,24 +110,24 @@ public class NexeaAdviserServiceImpl implements NexeaAdviserService  {
                 resultado.setDescripcionRespuesta("Identificador incorrecto");
                 return resultado;
             }
-            var estat = CieEstat.valueOf(sincronizarEnvio.getEstado().toUpperCase());
             var enviament = enviamentRepository.findByCieId(identificador);
             if (enviament == null) {
                 resultado.setCodigoRespuesta(NexeaAdviserWs.CODI_ERROR_IDENTIFICADOR_INEXISTENT);
                 resultado.setDescripcionRespuesta("Identificador no se corresponde con el CIE");
                 return resultado;
             }
-            resultado.setIdentificador(enviament.getNotificaIdentificador());
+            var estat = CieEstat.valueOf(sincronizarEnvio.getEstado().toUpperCase());
             enviament.getEntregaPostal().setCieEstat(estat);
-            if (!CieEstat.NOTIFICADA.equals(estat)) {
-                resultado.setCodigoRespuesta(NexeaAdviserWs.CODI_OK);
-                return resultado;
-            }
-            // Si l'estat retornat per nexea es notificada avisar a Notifica
-            var resposta = notificaHelper.enviamentEntregaPostalNotificada(enviament);
+            info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
+            resultado.setIdentificador(enviament.getNotificaIdentificador());
             resultado.setCodigoRespuesta(NexeaAdviserWs.CODI_OK);
-            if (!NexeaAdviserWs.CODI_OK_DEC.equalsIgnoreCase(resposta.getDescripcionRespuesta())) {
-                resultado.setCodigoRespuesta(NexeaAdviserWs.CODI_ERROR);
+            resultado.setDescripcionRespuesta(NexeaAdviserWs.CODI_OK_DEC);
+            if (CieEstat.NOTIFICADA.equals(estat)) {
+                jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvio,
+                        m -> {
+                            m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY,  0L);
+                            return m;
+                        });
             }
             return resultado;
         } catch (Exception e) {

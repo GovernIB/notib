@@ -142,6 +142,10 @@ public class CiePluginHelper {
             }
             NotificacioEnviamentEntity env;
             EntregaPostalEntity entregaPostal;
+            if (resposta.getIdentificadors() == null) {
+                afegirEventsEnviarCie(notificacioReferencia, resposta);
+                return;
+            }
             for (var id : resposta.getIdentificadors()) {
                 if (Strings.isNullOrEmpty(id.getNifTitular())) {
                     log.error("[ENTREGA_POSTAL] Error al guardar l'enviament CIE. Resposta amb id " + id.getIdentificador() + " sense NIF");

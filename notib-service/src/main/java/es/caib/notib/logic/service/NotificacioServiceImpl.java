@@ -561,6 +561,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			// Emplena els atributs registreLlibreNom i registreOficinaNom
 //			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
 			var dto = conversioTipusHelper.convertir(notificacio, NotificacioInfoDto.class);
+			var llindarDies = configHelper.getConfigAsInteger("es.caib.notib.llindar.dies.enviament.remeses");
+			dto.setNotificacioAntiga(DatesUtils.isNowAfterDate(notificacio.getCreatedDate().get(), llindarDies));
 			//CALLBACKS
 			var pendents = callbackRepository.findByNotificacioIdAndEstatOrderByDataDesc(notificacio.getId(), CallbackEstatEnumDto.PENDENT);
 			dto.setEventsCallbackPendent(notificacio.isTipusUsuariAplicacio() && pendents != null && !pendents.isEmpty());
@@ -1102,6 +1104,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 		var resposta = new RespostaAccio<String>();
 		try {
 			var notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			var llindarDies = configHelper.getConfigAsInteger("es.caib.notib.llindar.dies.enviament.remeses");
+			if (DatesUtils.isNowAfterDate(notificacioEntity.getCreatedDate().get(), llindarDies)) {
+				log.info("La notificacio amb id " + notificacioId + " no sera enviada ja que es massa antiga. S'ha de tornar a crear");
+				resposta.getNoExecutables().add(notificacioId + "");
+				return resposta;
+			}
 			notificacioEntity.getEnviaments().forEach(e -> {
 				EnviamentSmEstat estatEnviament = enviamentSmService.getEstatEnviament(e.getUuid());
 				try {
@@ -1186,9 +1194,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 		var resposta = new RespostaAccio<String>();
 		try {
 			log.debug("Intentant enviament de la notificació pendent (notificacioId=" + notificacioId + ")");
-			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			var notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			var llindarDies = configHelper.getConfigAsInteger("es.caib.notib.llindar.dies.enviament.remeses");
+			if (DatesUtils.isNowAfterDate(notificacioEntity.getCreatedDate().get(), llindarDies)) {
+				log.info("La notificacio amb id " + notificacioId + " no sera enviada ja que es massa antiga. S'ha de tornar a crear");
+				return false;
+			}
 			notificacioEntity.getEnviaments().forEach(e -> {
-				EnviamentSmEstat estatEnviament = enviamentSmService.getEstatEnviament(e.getUuid());
+				var estatEnviament = enviamentSmService.getEstatEnviament(e.getUuid());
 				try {
 					switch (estatEnviament) {
 						case NOTIFICA_RETRY:
@@ -1758,7 +1771,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public boolean reactivarNotificacioAmbErrors(Set<Long> enviaments) {
+	public RespostaAccio<String> reactivarNotificacioAmbErrors(Set<Long> enviaments) {
 
 		var timer = metricsHelper.iniciMetrica();
 		var resposta = new RespostaAccio<String>();
@@ -1768,6 +1781,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioEntity notificacio = null;
 			NotificacioEnviamentEntity enviament;
 			var entregaPostal = false;
+			var llindarDies = configHelper.getConfigAsInteger("es.caib.notib.llindar.dies.enviament.remeses");
 			for (var id : enviaments) {
 				enviament = enviamentRepository.findById(id).orElse(null);
 				if (enviament == null) {
@@ -1776,6 +1790,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 					continue;
 				}
 				notificacio = enviament.getNotificacio();
+				var saltar = DatesUtils.isNowAfterDate(notificacio.getCreatedDate().get(), llindarDies);
+				if (saltar) {
+					resposta.getNoExecutables().add(enviament.getUuid());
+					continue;
+				}
 				try {
 					var estatEnviament = enviamentSmService.getEstatEnviament(enviament.getUuid());
 					if (EnviamentSmEstat.REGISTRE_ERROR.equals(estatEnviament)) {
@@ -1804,7 +1823,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			for (var not : notificacionsPostals) {
 				ciePluginJms.enviarMissatge(not.getReferencia(), false);
 			}
-			return !resposta.getExecutades().isEmpty();
+			return resposta;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

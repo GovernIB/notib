@@ -12,6 +12,8 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
+import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
+import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.logic.wsdl.notificaV2.NotificaWsV2PortType;
 import es.caib.notib.logic.wsdl.notificaV2.SincronizarEnvioWsPortType;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.AltaRemesaEnvios;
@@ -30,6 +32,8 @@ import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaE
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.Datado;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.InfoEnvioLigero;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.RespuestaInfoEnvioLigero;
+import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.Acuse;
+import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.Receptor;
 import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.RespuestaSincronizarEnvioOE;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
@@ -53,7 +57,6 @@ import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
@@ -101,6 +104,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private EnviamentTableHelper enviamentTableHelper;
 
 	private static final String NOTIB = "Notib";
+    @Autowired
+    private ConversioTipusHelper conversioTipusHelper;
 
 	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
 
@@ -328,8 +333,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return resultadoInfoEnvio;
 	}
 
-	public RespuestaSincronizarEnvioOE enviamentEntregaPostalNotificada(NotificacioEnviamentEntity enviament) throws Exception {
+	@Transactional
+	public RespuestaSincronizarEnvioOE enviamentEntregaPostalNotificada(SincronizarEnvio sincronizarEnvio) throws Exception {
 
+		var enviament = notificacioEnviamentRepository.findByCieId(sincronizarEnvio.getIdentificador());
 		var apiKey = enviament.getNotificacio().getEntitat().getApiKey();
 		var organEmisor = enviament.getNotificacio().getEmisorDir3Codi();
 		var id = enviament.getNotificaIdentificador();
@@ -341,9 +348,20 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		gregorianCalendar.setTime(data);
 		var xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
 		var dataHolder = new Holder<>(xmlGregorianCalendar);
-		return getSincronizarEnvioWs(apiKey).sincronizarEnvioOE(organEmisor, id, tipoEntrega, modoNotificacion, estat, dataHolder,
-				null, null, null, null, null, null, null, null);
+		var receptor = conversioTipusHelper.convertir(sincronizarEnvio.getReceptor(), Receptor.class);
+		var acusePdf = conversioTipusHelper.convertir(sincronizarEnvio.getAcusePDF(), Acuse.class);
+		var acuseXml = conversioTipusHelper.convertir(sincronizarEnvio.getAcuseXML(), Acuse.class);
+		var opciones = conversioTipusHelper.convertir(sincronizarEnvio.getOpcionesSincronizarEnvio(), es.caib.notib.logic.wsdl.notificaV2.common.Opciones.class);
+		Holder<String> codigoRespuesta = new Holder<>();
+		Holder<String> descripcionRespuesta = new Holder<>();
+		Holder<es.caib.notib.logic.wsdl.notificaV2.common.Opciones> opcionesRespuestaSincronizarOE = new Holder<>();
+		var resposta = getSincronizarEnvioWs(apiKey).sincronizarEnvioOE(organEmisor, id, tipoEntrega, modoNotificacion, estat, dataHolder,
+				null, receptor, acusePdf, acuseXml, opciones, codigoRespuesta, descripcionRespuesta, opcionesRespuestaSincronizarOE);
 
+		var error = !NexeaAdviserWs.CODI_OK.equals(resposta.getCodigoRespuesta());
+		var errorDesc = error ? resposta.getDescripcionRespuesta() : "";
+		notificacioEventHelper.addNotificaEnvioOE(enviament, error, errorDesc, false);
+		return resposta;
 	}
 
 	private Datado getDarrerDatat(RespuestaInfoEnvioLigero resultadoInfoEnvio, NotificacioEnviamentEntity enviament, IntegracioInfo info) throws DatatypeConfigurationException, ParseException {

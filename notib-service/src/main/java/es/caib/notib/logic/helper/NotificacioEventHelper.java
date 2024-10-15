@@ -67,6 +67,7 @@ public class NotificacioEventHelper {
         // i de consulta SIR per ara (fins que no implementin el callback)
         var eventUnic = NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.CIE_ENVIAMENT.equals(eventInfo.getTipus()) ||
+                NotificacioEventTipusEnumDto.NOTIFICA_ENVIO_OE.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.SIR_ENVIAMENT.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT.equals(eventInfo.getTipus()) ||
@@ -108,6 +109,7 @@ public class NotificacioEventHelper {
         if (!eventNoUnic && ( NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT.equals(event.getTipus()) ||
                 NotificacioEventTipusEnumDto.SIR_ENVIAMENT.equals(event.getTipus()) ||
                 NotificacioEventTipusEnumDto.CIE_ENVIAMENT.equals(eventInfo.getTipus()) ||
+                NotificacioEventTipusEnumDto.NOTIFICA_ENVIO_OE.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT.equals(event.getTipus()))) {
             eventInfo.getEnviament().updateNotificaError(eventInfo.isError(), event);
         }
@@ -216,6 +218,11 @@ public class NotificacioEventHelper {
                 .error(error).errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
     }
 
+    public void addNotificaEnvioOE(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+
+        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIO_OE).error(error)
+                .errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
+    }
 
     // Events d'enviament via Email
     // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
