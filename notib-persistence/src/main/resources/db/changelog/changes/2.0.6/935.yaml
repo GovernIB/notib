@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - sql: "INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.llindar.dies.enviament.remeses', '5', 'Llindar en dies passats els quals la remesa no serà envaida i es té que tornar a crear', 'INT', 'GENERAL' );"

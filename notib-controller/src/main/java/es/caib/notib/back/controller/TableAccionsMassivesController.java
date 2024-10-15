@@ -136,66 +136,66 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         return null;
     }
 
-    @GetMapping(value = {"/reintentar/notificacio", "{notificacioId}/notificacio/reintentar/notificacio"})
-    @ResponseBody
-    public String reintentarNotificacio(HttpServletRequest request, HttpServletResponse response) throws RegistreNotificaException {
-
-        var seleccio = getIdsEnviamentsSeleccionats(request);
-        if (seleccio == null || seleccio.isEmpty()) {
-            MissatgesHelper.error(request, getMessage(request, "enviament.controller.notificacio.seleccio.buida"));
-            return ERROR;
-        }
-        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
-            return ERROR;
-        }
-        MissatgesHelper.info( request, getMessage(request, "enviament.controller.reintent.notificacio.pendents.executant"));
-        Set<Long> notificacioIds = new HashSet<>();
-        NotificacioEnviamentDtoV2 e;
-        for(var id: seleccio) {
-            e = enviamentService.getOne(id);
-            notificacioIds.add(e.getNotificacioId());
-        }
-        var notificacionsNoRegistrades = 0;
-        var notificacionsError = 0;
-        NotificacioDtoV2 notificacio;
-        for(var notificacioId: notificacioIds) {
-            notificacio = notificacioService.findAmbId(notificacioId, isAdministrador(request));
-            if(notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)) {
-                try {
-                    notificacioService.enviarNotificacioARegistre(notificacioId, true);
-                } catch (Exception ex) {
-                    notificacionsError++;
-                    mostraErrorReintentarNotificacio(request, notificacioId, notificacio, ex);
-                }
-                continue;
-            }
-            if (notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)) {
-                try {
-                    notificacioService.enviarNotificacioANotifica(notificacioId, true);
-                } catch (Exception ex) {
-                    notificacionsError++;
-                    mostraErrorReintentarNotificacio(request, notificacioId, notificacio, ex);
-                }
-                continue;
-            }
-            notificacionsNoRegistrades++;
-        }
-        String msg;
-        if(notificacionsNoRegistrades == notificacioIds.size()) {
-            msg = getMessage(request, REINTENT_TEXT + (notificacionsNoRegistrades == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".pendents.KO");
-            MissatgesHelper.error(request, msg);
-        } else if(notificacionsError == notificacioIds.size()) {
-            msg = getMessage(request, REINTENT_TEXT + (notificacionsError == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".pendents.error");
-            MissatgesHelper.error(request, msg);
-        } else if (notificacionsError > 0) {
-            msg = getMessage(request, "enviament.controller.reintent.notificacions.pendents.error.alguna");
-            MissatgesHelper.warning(request, notificacionsError + " " + msg);
-        } else {
-            msg = getMessage(request, REINTENT_TEXT + (notificacioIds.size() == 1 ? NOTIFICACIO : NOTIFICACIONS) + ".pendents.OK");
-            MissatgesHelper.info(request, msg);
-        }
-        return "ok";
-    }
+//    @GetMapping(value = {"/reintentar/notificacio", "{notificacioId}/notificacio/reintentar/notificacio"})
+//    @ResponseBody
+//    public String reintentarNotificacio(HttpServletRequest request, HttpServletResponse response) throws RegistreNotificaException {
+//
+//        var seleccio = getIdsEnviamentsSeleccionats(request);
+//        if (seleccio == null || seleccio.isEmpty()) {
+//            MissatgesHelper.error(request, getMessage(request, "enviament.controller.notificacio.seleccio.buida"));
+//            return ERROR;
+//        }
+//        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+//            return ERROR;
+//        }
+//        MissatgesHelper.info( request, getMessage(request, "enviament.controller.reintent.notificacio.pendents.executant"));
+//        Set<Long> notificacioIds = new HashSet<>();
+//        NotificacioEnviamentDtoV2 e;
+//        for(var id: seleccio) {
+//            e = enviamentService.getOne(id);
+//            notificacioIds.add(e.getNotificacioId());
+//        }
+//        var notificacionsNoRegistrades = 0;
+//        var notificacionsError = 0;
+//        NotificacioDtoV2 notificacio;
+//        for(var notificacioId: notificacioIds) {
+//            notificacio = notificacioService.findAmbId(notificacioId, isAdministrador(request));
+//            if(notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)) {
+//                try {
+//                    notificacioService.enviarNotificacioARegistre(notificacioId, true);
+//                } catch (Exception ex) {
+//                    notificacionsError++;
+//                    mostraErrorReintentarNotificacio(request, notificacioId, notificacio, ex);
+//                }
+//                continue;
+//            }
+//            if (notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)) {
+//                try {
+//                    notificacioService.enviarNotificacioANotifica(notificacioId, true);
+//                } catch (Exception ex) {
+//                    notificacionsError++;
+//                    mostraErrorReintentarNotificacio(request, notificacioId, notificacio, ex);
+//                }
+//                continue;
+//            }
+//            notificacionsNoRegistrades++;
+//        }
+//        String msg;
+//        if(notificacionsNoRegistrades == notificacioIds.size()) {
+//            msg = getMessage(request, REINTENT_TEXT + (notificacionsNoRegistrades == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".pendents.KO");
+//            MissatgesHelper.error(request, msg);
+//        } else if(notificacionsError == notificacioIds.size()) {
+//            msg = getMessage(request, REINTENT_TEXT + (notificacionsError == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".pendents.error");
+//            MissatgesHelper.error(request, msg);
+//        } else if (notificacionsError > 0) {
+//            msg = getMessage(request, "enviament.controller.reintent.notificacions.pendents.error.alguna");
+//            MissatgesHelper.warning(request, notificacionsError + " " + msg);
+//        } else {
+//            msg = getMessage(request, REINTENT_TEXT + (notificacioIds.size() == 1 ? NOTIFICACIO : NOTIFICACIONS) + ".pendents.OK");
+//            MissatgesHelper.info(request, msg);
+//        }
+//        return "ok";
+//    }
 
     @GetMapping(value = {"/reactivar/notificacionsError", "{notificacioId}/notificacio/reactivar/notificacionsError"})
     @ResponseBody
@@ -206,13 +206,14 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.seleccio.buida"));
             return REDIRECT + request.getHeader(REFERER);
         }
-            if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
                 return REDIRECT + request.getHeader(REFERER);
         }
         log.info("Reactivam els enviaments amb error: " + StringUtils.join(seleccio, ", "));
         try {
-            notificacioService.reactivarNotificacioAmbErrors(seleccio);
-            MissatgesHelper.info(request, getMessage(request, "enviament.controller.reactivar.enviament.error.fi.reintents.OK"));
+            var resposta = notificacioService.reactivarNotificacioAmbErrors(seleccio);
+            var msg = !resposta.getNoExecutables().isEmpty() ? "enviament.controller.reactivar.enviament.error.fi.reintents.notificacions.antigues" : "enviament.controller.reactivar.enviament.error.fi.reintents.OK";
+            MissatgesHelper.info(request, getMessage(request, msg));
         } catch (Exception e) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.enviament.error.fi.reintents.KO"));
         }

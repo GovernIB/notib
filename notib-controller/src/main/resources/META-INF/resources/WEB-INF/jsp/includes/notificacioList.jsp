@@ -757,40 +757,35 @@
     <div class="text-right">
         <div class="btn-group">
             <a href="<c:url value="/notificacio/visualitzar"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default"><span class="fa fa-eye-slash"></span> <spring:message code="enviament.list.show"/></a>
-                <button id="btn-desplegar-envs" class="btn btn-default" style="display:none"><spring:message code="notificacio.list.boto.desplegar"/> <span class="fa fa-caret-down"></span></button>
-                <button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
-				<button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
-				<div class="btn-group">
-					<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-  						<span class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
-					</button>
-					<ul class="dropdown-menu dropdown-left">
-						<li><a id="processarMassiu" href="<c:url value="/notificacio/processar/massiu"/>" data-toggle="modal" data-refresh-pagina="true" title='<spring:message code="notificacio.list.accio.massiva.processar.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>
-						<li><a id="updateEstat" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.actualitzar.estat.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.actualitzar.estat"/></a></li>
-						<li><a id="reintentarErrors" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.reintentar.errors.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
-<%--						<li><a id="reintentarNotificacio" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.reintentar.notificacions.tooltip"/>' ><spring:message code="notificacio.list.accio.massiva.reintentar.notificacions"/></a></li>--%>
-                        <li><a id="eliminar" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.eliminar.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
-                        <li><a id="exportarODS" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.exportar.tooltip"/>' ><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
-                        <li><a id="descarregarJustificantMassiu" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.justificant"/></a></li>
-                        <li><a id="descarregarCertificacioMassiu" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.certificacio"/></a></li>
+            <button id="btn-desplegar-envs" class="btn btn-default" style="display:none"><spring:message code="notificacio.list.boto.desplegar"/> <span class="fa fa-caret-down"></span></button>
+            <button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
+            <button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
+            <div class="btn-group">
+                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-left">
+                    <li><a id="processarMassiu" href="<c:url value="/notificacio/processar/massiu"/>" data-toggle="modal" data-refresh-pagina="true" title='<spring:message code="notificacio.list.accio.massiva.processar.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>
+                    <li><a id="updateEstat" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.actualitzar.estat.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.actualitzar.estat"/></a></li>
+                    <li><a id="reintentarErrors" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.reintentar.errors.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
+                    <li><a id="eliminar" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.eliminar.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
+                    <li><a id="exportarODS" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.exportar.tooltip"/>' ><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
+                    <li><a id="descarregarJustificantMassiu" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.justificant"/></a></li>
+                    <li><a id="descarregarCertificacioMassiu" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.certificacio"/></a></li>
 
-    <%--                        <li><a id="processarMassiu" style="cursor: pointer;" data-toggle="modal" data-refresh-pagina="true"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>--%>
-    <%--                        <li><a href="<c:url value="/notificacio/eliminar"/>"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>--%>
-
-
-    <c:if test="${isRolActualAdministradorEntitat}">
-        <hr/>
-        <li><a style="cursor: pointer;" id="reactivarConsulta" title='<spring:message code="notificacio.list.accio.massiva.reactivar.consultes.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica"/></a></li>
-<%--        <li><a style="cursor: pointer;" id="reactivarSir" title='<spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir"/></a></li>--%>
-        <li><a style="cursor: pointer;" id="reactivarCallback" title='<spring:message code="notificacio.list.accio.massiva.reactivar.callbacks.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.callbacks"/></a></li>
-<%--        <li><a style="cursor: pointer;" id="enviarCallback" title='<spring:message code="notificacio.list.accio.massiva.enviar.callbacks.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.enviar.callbacks"/></a></li>--%>
-        <li><a style="cursor: pointer;" id="enviarNotificacionsMovil" title='<spring:message code="notificacio.list.accio.massiva.enviar.notificacions.movil.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.enviar.notificacions.movil"/></a></li>
-<%--        <li><a style="cursor: pointer;" id="reactivarRegistre" title='<spring:message code="notificacio.list.accio.massiva.reactivar.registre.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.registre"/></a></li>--%>
-    </c:if>
-    </ul>
-</div>
-</div>
-</div>
+                    <c:if test="${isRolActualAdministradorEntitat}">
+                        <hr/>
+                        <li><a style="cursor: pointer;" id="reactivarConsulta" title='<spring:message code="notificacio.list.accio.massiva.reactivar.consultes.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica"/></a></li>
+                <%--        <li><a style="cursor: pointer;" id="reactivarSir" title='<spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir"/></a></li>--%>
+                        <li><a style="cursor: pointer;" id="reactivarCallback" title='<spring:message code="notificacio.list.accio.massiva.reactivar.callbacks.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.callbacks"/></a></li>
+                <%--        <li><a style="cursor: pointer;" id="enviarCallback" title='<spring:message code="notificacio.list.accio.massiva.enviar.callbacks.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.enviar.callbacks"/></a></li>--%>
+                        <li><a style="cursor: pointer;" id="enviarNotificacionsMovil" title='<spring:message code="notificacio.list.accio.massiva.enviar.notificacions.movil.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.enviar.notificacions.movil"/></a></li>
+                <%--        <li><a style="cursor: pointer;" id="reactivarRegistre" title='<spring:message code="notificacio.list.accio.massiva.reactivar.registre.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.registre"/></a></li>--%>
+                    </c:if>
+                </ul>
+            </div>
+        </div>
+    </div>
 </script>
 
 <script id="rowhrefTemplate" type="text/x-jsrender"><c:url value="/notificacio/{{:id}}/info"/></script>

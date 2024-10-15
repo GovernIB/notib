@@ -438,7 +438,7 @@ public interface NotificacioService {
 	boolean reenviarNotificacioAmbErrors(Long notificacioId);
 
 	@PreAuthorize("isAuthenticated()")
-	boolean reactivarNotificacioAmbErrors(Set<Long> notificacioId);
+	RespostaAccio<String> reactivarNotificacioAmbErrors(Set<Long> notificacioId);
 
 	@PreAuthorize("isAuthenticated()")
 	boolean reactivarNotificacioAmbErrors(Long notificacioId);

@@ -95,6 +95,7 @@ $(document).ready(function() {
 	});
 
 	let eventMessages = {
+		'confirm-reintentar-errors': "<spring:message code="enviament.list.user.reintentar.errors.misatge.avis"/>",
 		'confirm-reintentar-notificacio': "<spring:message code="enviament.list.user.reintentar.notificacio.misatge.avis"/>",
 		'confirm-reintentar-consulta': "<spring:message code="enviament.list.user.reactivar.consulta.misatge.avis"/>",
 		'confirm-reintentar-sir': "<spring:message code="enviament.list.user.reactivar.sir.misatge.avis"/>",
@@ -177,12 +178,7 @@ function getCookie(cname) {
 					<ul class="dropdown-menu dropdown-left">
 						<li><a style="cursor: pointer;" id="exportarODS"><spring:message code="enviament.list.user.exportar"/> a <spring:message code="enviament.list.user.exportar.EXCEL"/></a></li>
 						<li><a id="reintentarErrors" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.reintentar.errors.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
-	<%--						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="enviament.list.user.reintentar.notificacio"/></a></li>--%>
-<%--						<li><a style="cursor: pointer;" id="reintentarErrors"><spring:message code="enviament.list.user.reintentar.errors"/></a></li>--%>
-<%--						<li><a style="cursor: pointer;" id="reactivarConsulta"><spring:message code="enviament.list.user.reactivar.consulta"/></a></li>--%>
-<%--						<li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="enviament.list.user.reactivar.sir"/></a></li>--%>
 						<li><a style="cursor: pointer;" id="updateEstat"><spring:message code="enviament.list.user.actualitzar.estat"/></a></li>
-<%--						<li><a style="cursor: pointer;" id="reactivarCallback"><spring:message code="enviament.list.user.reactivar.callback"/></a></li>--%>
 
 						<c:if test="${isRolActualAdministradorEntitat}">
 							<hr/>

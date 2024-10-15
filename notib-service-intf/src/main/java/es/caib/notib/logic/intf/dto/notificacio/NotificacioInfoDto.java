@@ -98,6 +98,8 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private boolean entregaPostalFiReintents;
 	private boolean cancelarEntregaPostal;
 
+	private boolean notificacioAntiga;
+
 	private Date enviadaDate;
 
 	private boolean justificantCreat;

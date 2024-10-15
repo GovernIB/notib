@@ -417,7 +417,7 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed("**")
-	public boolean reactivarNotificacioAmbErrors(Set<Long> notificacioId) {
+	public RespostaAccio<String> reactivarNotificacioAmbErrors(Set<Long> notificacioId) {
 		return getDelegateService().reactivarNotificacioAmbErrors(notificacioId);
 	}
 

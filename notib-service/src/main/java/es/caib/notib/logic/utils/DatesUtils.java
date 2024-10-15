@@ -1,5 +1,6 @@
 package es.caib.notib.logic.utils;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Calendar;
@@ -14,7 +15,7 @@ public class DatesUtils {
         if (dataFi == null) {
             return dataFi;
         }
-        Calendar cal = Calendar.getInstance();
+        var cal = Calendar.getInstance();
         cal.setTime(dataFi);
         cal.add(Calendar.HOUR_OF_DAY, 23);
         cal.add(Calendar.MINUTE, 59);
@@ -55,5 +56,18 @@ public class DatesUtils {
         }
         var localDateTime = optionalLocalDateTime.get();
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static boolean isNowAfterDate(LocalDateTime data, int llindar) {
+        return isNowAfterDate(Timestamp.valueOf(data), llindar);
+    }
+
+    public static boolean isNowAfterDate(Date data, int llindar) {
+
+        var ara = new Date();
+        var cal = Calendar.getInstance();
+        cal.setTime(data);
+        cal.add(Calendar.DATE, llindar);
+        return ara.after(cal.getTime());
     }
 }

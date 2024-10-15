@@ -153,7 +153,10 @@ $(document).ready(function() {
 	});
 
 	$('#registrar-btn').click(function() {
-
+		if (${notificacio.notificacioAntiga}) {
+			alert("<spring:message code="notificacio.info.notificacio.antiga.avis" />");
+			return false;
+		}
 		$('#registrar-avis-user').css('display', 'inline-block');
 	    $('#registrar-btn').attr('disabled', true);
 		$.ajax({
@@ -171,9 +174,12 @@ $(document).ready(function() {
     });	
 	
 	$('#enviar-btn').click(function() {
+		if (${notificacio.notificacioAntiga}) {
+			alert("<spring:message code="notificacio.info.notificacio.antiga.avis" />");
+			return false;
+		}
 		$('#enviar-avis-user').css('display', 'inline-block');
 	    $('#enviar-btn').attr('disabled', true);
-        <%--window.location.href = '<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>';--%>
 		$.ajax({
 			type: 'GET',
 			url: '<c:url value="/notificacio/${notificacio.id}/enviar"/>',
@@ -186,6 +192,15 @@ $(document).ready(function() {
 			}
 		});
 		return false;
+	});
+
+	$('#enviar-entrega-postal-btn').click(function(e) {
+
+		if (${notificacio.notificacioAntiga}) {
+			e.preventDefault();
+			alert("<spring:message code="notificacio.info.notificacio.antiga.avis" />");
+			return false;
+		}
 	});
 
 });
@@ -1016,7 +1031,7 @@ $(document).ready(function() {
 						</div>
 					</li>
 				</c:if>
-				<c:if test="${notificacio.errorEntregaPostal == true}">
+				<c:if test="${notificacio.errorEntregaPostal == true and notificacio.notificacioAntiga == false}">
 					<c:set var="algunaAccioDisponible" value="${true}" />
 					<li class="list-group-item">
 						<div class="row">
@@ -1040,11 +1055,9 @@ $(document).ready(function() {
 								<strong><spring:message code="notificacio.info.accio.registrar" /></strong>
 							</div>
 							<div class="col-sm-6 text-right">
-								<a
-									id="registrar-btn" href="<not:modalUrl value="/notificacio/${notificacio.id}/registrar"/>"
-									class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
-									<spring:message code="notificacio.info.accio.registrar.boto" />
-								</a>
+								<button id="registrar-btn" class="btn btn-default btn-sm">
+									<span class="fa fa-send"></span><spring:message code="notificacio.info.accio.registrar.boto" />
+								</button>
 							</div>
 						</div>
 					</li>
@@ -1057,10 +1070,8 @@ $(document).ready(function() {
 								<strong><spring:message code="notificacio.info.accio.enviar" /></strong>
 							</div>
 							<div class="col-sm-6 text-right">
-								<button id="enviar-btn"
-<%--								   href="<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>"--%>
-									class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
-									<spring:message code="notificacio.info.accio.enviar.boto" />
+								<button id="enviar-btn" class="btn btn-default btn-sm">
+									<span class="fa fa-send"></span><spring:message code="notificacio.info.accio.enviar.boto" />
 								</button>
 							</div>
 						</div>
@@ -1125,8 +1136,7 @@ $(document).ready(function() {
 								<strong><spring:message code="notificacio.info.accio.reintent.errors" /></strong>
 							</div>
 							<div class="col-sm-6 text-right">
-								<a
-										href="<not:modalUrl value="/notificacio/${notificacio.id}/reenviarErrors"/>"
+								<a href="<not:modalUrl value="/notificacio/${notificacio.id}/reenviarErrors"/>"
 										class="btn btn-default btn-sm"> <span class="fa fa-undo"></span>
 									<spring:message code="notificacio.info.accio.reintent.errors.boto" />
 								</a>

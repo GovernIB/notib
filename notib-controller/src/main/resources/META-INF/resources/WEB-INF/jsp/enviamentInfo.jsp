@@ -790,37 +790,46 @@ $(document).ready(function() {
 		<c:if test="${not empty enviament.entregaPostal}">
 			<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'entregaPostal'}"> active</c:if>" id="entregaPostal">
 				<br/>
-				<p class="text-right" style="margin-top: 1em">
-					<c:if test="${enviament.entregaPostal.cieEstat == 'ENVIADO_CI'}">
-						<button id="cancelarEntregaPostal" class="btn btn-default">
-							<spring:message code="notificacio.info.accio.cancelar.entrega.postal"/>
-						</button>
-					</c:if>
-					<button id="consultaEstatEntregaPostal" class="btn btn-default">
-						<span class="fa fa-refresh"></span>
-						<spring:message code="enviament.info.accio.refrescar.estat"/>
-					</button>
-				</p>
-				<br>
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">
-							<strong><spring:message code="enviament.info.seccio.entrega.postal"/></strong>
-						</h3>
-					</div>
-					<table class="table table-bordered" style="width:100%">
-						<tbody>
-							<tr>
-								<td width="30%"><strong><spring:message code="enviament.info.dada.entrega.cie.id"/></strong></td>
-								<td>${enviament.entregaPostal.cieId}</td>
-							</tr>
-							<tr>
-								<td width="30%"><strong><spring:message code="enviament.info.dada.entrega.cie.estat"/></strong></td>
-								<td><spring:message code="es.caib.notib.client.domini.CieEstat.${enviament.entregaPostal.cieEstat}"/></td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+				<c:choose>
+					<c:when test="${empty enviament.entregaPostal.cieEstat}">
+						<div class="alert alert-info well-sm" role="alert">
+							<spring:message code="enviament.info.dada.entrega.cie.pendent" />
+						</div>
+					</c:when>
+					<c:otherwise>
+						<p class="text-right" style="margin-top: 1em">
+							<c:if test="${enviament.entregaPostal.cieEstat == 'ENVIADO_CI'}">
+								<button id="cancelarEntregaPostal" class="btn btn-default">
+									<spring:message code="notificacio.info.accio.cancelar.entrega.postal"/>
+								</button>
+							</c:if>
+							<button id="consultaEstatEntregaPostal" class="btn btn-default">
+								<span class="fa fa-refresh"></span>
+								<spring:message code="enviament.info.accio.refrescar.estat"/>
+							</button>
+						</p>
+						<br>
+						<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<strong><spring:message code="enviament.info.seccio.entrega.postal"/></strong>
+							</h3>
+						</div>
+							<table class="table table-bordered" style="width:100%">
+								<tbody>
+									<tr>
+										<td width="30%"><strong><spring:message code="enviament.info.dada.entrega.cie.id"/></strong></td>
+										<td>${enviament.entregaPostal.cieId}</td>
+									</tr>
+										<tr>
+											<td width="30%"><strong><spring:message code="enviament.info.dada.entrega.cie.estat"/></strong></td>
+											<td><spring:message code="es.caib.notib.client.domini.CieEstat.${enviament.entregaPostal.cieEstat}"/></td>
+										</tr>
+								</tbody>
+							</table>
+						</div>
+					</c:otherwise>
+				</c:choose>
 			</div>
 		</c:if>
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>" id="events">
