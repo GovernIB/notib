@@ -67,7 +67,7 @@ public class CieNexeaPluginImpl implements CiePlugin {
 
         try {
             var alta = generarAltaRemesaEnvios(notificacio);
-            var r = getNotificaWs(notificacio.getEntregaCie().getApiKey()+ "TEST").altaRemesaEnvios(alta);
+            var r = getNotificaWs(notificacio.getEntregaCie().getApiKey()).altaRemesaEnvios(alta);
             var resultadoEnvios = r.getResultadoEnvios();
             if (resultadoEnvios == null || resultadoEnvios.getItem() == null || resultadoEnvios.getItem().isEmpty()) {
                 return RespostaCie.builder().codiResposta(r.getCodigoRespuesta()).descripcioError(r.getDescripcionRespuesta()).build();

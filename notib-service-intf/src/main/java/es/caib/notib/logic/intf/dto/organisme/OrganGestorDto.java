@@ -48,6 +48,7 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 	private Boolean sir;
 	private String cif;
 	private boolean actiu;
+	private boolean permetreSir;
 
 	private String nomCodi;
 

@@ -42,6 +42,7 @@ public class OrganGestorCommand {
 	private boolean entregaCieActiva;
 	private Long operadorPostalId;
 	private Long cieId;
+	private boolean permetreSir;
 
 	private String estatTraduccio;
 

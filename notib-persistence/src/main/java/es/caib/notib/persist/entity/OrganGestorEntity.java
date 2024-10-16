@@ -85,6 +85,9 @@ public class OrganGestorEntity extends AbstractPersistable<Long> implements Seri
 	@Column(name = "sir")
 	private Boolean sir;
 
+	@Column(name = "permetre_sir")
+	private boolean permetreSir;
+
 	@JoinTable(name = "not_og_sinc_rel",
 			joinColumns = { @JoinColumn(name = "antic_og", referencedColumnName = "id", nullable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "nou_og", referencedColumnName = "id", nullable = false) })

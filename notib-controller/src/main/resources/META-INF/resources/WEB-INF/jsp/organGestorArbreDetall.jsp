@@ -204,6 +204,7 @@
                                  optionTextAttribute="nom" required="true" emptyOption="true"
                                  textKey="organgestor.form.camp.oficina" placeholderKey="organgestor.form.camp.oficina" optionMinimumResultsForSearch="0"/>
             </c:if>
+            <not:inputCheckbox name="permetreSir" generalClass="row" textKey="organgestor.form.camp.permetre.sir"/>
             <c:choose>
                 <c:when test="${not empty operadorPostalList && not empty cieList}">
                     <not:inputCheckbox name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie"/>

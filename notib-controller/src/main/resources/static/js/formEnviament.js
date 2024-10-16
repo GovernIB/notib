@@ -695,7 +695,7 @@ function loadOrgansGestors(urlCercaUnitats){
             } else {
                 $.each(data, (i, item) => {
                     let enviamentTipus = $('input#enviamentTipus').val();
-                    let local = ($('#organigrama').val().indexOf(item.codi) != -1) && !isPermesComunicacionsSirPropiaEntitat;
+                    let local = (($('#organigrama').val().indexOf(item.codi) != -1) && !isPermesComunicacionsSirPropiaEntitat);
                     let clase = (i % 2 == 0 ? 'even' : 'odd');
                     let socSir = (item.sir ? textMessages['comu.si'] : textMessages['comu.no']);
                     let comSir = enviamentTipus === 'SIR' && !local && item.sir;
@@ -707,7 +707,7 @@ function loadOrgansGestors(urlCercaUnitats){
                         '<td width="85%">' + item.codi + ' - ' + nom + '</td>' +
                         '<td>' + (socSir) + '</td>' +
                         '<td>';
-                    if (enviamentTipus === 'NOTIFICACIO' || enviamentTipus === 'COMUNICACIO' || comSir) {
+                    if (enviamentTipus === 'NOTIFICACIO' || enviamentTipus === 'COMUNICACIO' || comSir || item.permetreSir) {
                         list_html += '<button type="button" class="select btn btn-success">' + textMessages['comu.boto.seleccionar'] + '</button>';
                     } else if (item.sir) {
                         list_html += '<div style="cursor:pointer; color:#AAA;" title="' + textMessages["notificacio.sir.emprar.valib"] + '"><span  class="fa fa-warning text-danger" ></span> '

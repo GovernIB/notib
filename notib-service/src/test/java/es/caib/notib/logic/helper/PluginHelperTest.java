@@ -43,6 +43,7 @@ import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import es.caib.plugins.arxiu.api.DocumentTipus;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import javassist.bytecode.ByteArray;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -54,9 +55,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
@@ -117,13 +120,13 @@ public class PluginHelperTest {
 		Mockito.when(configHelper.getConfigAsInteger(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
 //		Mockito.when(configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.arxiu.class")).thenReturn("es.caib.notib.plugin.arxiu.ArxiuPluginConcsvImpl");
 //		Mockito.when(configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.registre.class")).thenReturn("es.caib.notib.plugin.registre.RegistrePluginMockImpl");
-		Mockito.when(configHelper.getConfigAsInteger("es.caib.notib.plugin.registre.segons.entre.peticions")).thenReturn(30);
+//		Mockito.when(configHelper.getConfigAsInteger("es.caib.notib.plugin.registre.segons.entre.peticions")).thenReturn(30);
 //		Mockito.when(configHelper.getAllEntityProperties(Mockito.anyString())).thenReturn(properties);
-		Mockito.when(entitatRepository.findByDir3Codi(Mockito.anyString())).thenReturn(entidad);
+//		Mockito.when(entitatRepository.findByDir3Codi(Mockito.anyString())).thenReturn(entidad);
 
 		// Plugin Arxiu
 		IArxiuPlugin pluginArxiu = Mockito.mock(ArxiuPluginConcsvImpl.class);
-		Mockito.when(pluginArxiu.documentDetalls(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true))).thenReturn(documentArxiuAmbContingut);
+//		Mockito.when(pluginArxiu.documentDetalls(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true))).thenReturn(documentArxiuAmbContingut);
 		arxiuPlugin.put("CAIB", pluginArxiu);
 		pluginHelper.setArxiuPlugin(arxiuPlugin);
 
@@ -137,7 +140,7 @@ public class PluginHelperTest {
 		var resposta = new RespostaJustificantRecepcio();
 		resposta.setErrorCodi(null);
 		resposta.setErrorDescripcio("respostaMock");
-		Mockito.when(pluginRegistre.obtenerJustificante(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong())).thenReturn(resposta);
+//		Mockito.when(pluginRegistre.obtenerJustificante(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong())).thenReturn(resposta);
 		registrePlugin.put("CAIB", pluginRegistre);
 		pluginHelper.setRegistrePlugin(registrePlugin);
 
@@ -150,7 +153,21 @@ public class PluginHelperTest {
 		var pluginRolsac = Mockito.mock(GestorContingutsAdministratiuPlugin.class);
 		gestorDocumentalAdministratiuPlugin.put("CAIB", pluginRolsac);
 		pluginHelper.setGestorDocumentalAdministratiuPlugin(gestorDocumentalAdministratiuPlugin);
+		AsientoRegistralBeanDto asiento = Mockito.mock(AsientoRegistralBeanDto.class);
+		List<AnexoWsDto> anexos = new ArrayList<>();
+		var anexo = new AnexoWsDto();
+		anexo.setCsv("test");
+		var fichero = new byte[0];
+		anexo.setFicheroAnexado(fichero);
+		anexo.setNombreFicheroAnexado("test");
+		anexos.add(anexo);
+		asiento.setAnexos(anexos);
+		Mockito.when(pluginHelper.notificacioToAsientoRegistralBean(Mockito.any(NotificacioEntity.class),
+																	Mockito.any(NotificacioEnviamentEntity.class),
+																	Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(asiento);
 
+
+		Mockito.when(pluginHelper.obtenirJustificant(Mockito.anyString(), Mockito.anyString())).thenReturn(resposta);
 	}
 
     static int secondsBetweenCalls = 2;
@@ -175,7 +192,7 @@ public class PluginHelperTest {
             resposta2 = pluginHelper.obtenirJustificant(codiDir3Entitat, numeroRegistreFormatat);
             lastTime = System.nanoTime();
             timeSpend = (lastTime - iniTime) / 1e9;
-        }while (resposta2.getErrorDescripcio() == null && timeSpend < secondsBetweenCalls + 2);
+        } while (resposta2.getErrorDescripcio() == null && timeSpend < secondsBetweenCalls + 2);
 
         Assert.assertTrue(timeSpend >= secondsBetweenCalls - 2);
     }
@@ -184,14 +201,12 @@ public class PluginHelperTest {
     public void whenNotificacioToAsientoRegistralBeanPerComunicSirAmbFicheroCsv_thenCsvNullIContingutInformat() throws IOException {
         
         // Given
-    	Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar"))).thenReturn("BINARI");
+//    	Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar"))).thenReturn("BINARI");
     	
 		Document documentArxiuAmbContingut = initDocument();
 
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
-		NotificacioEnviamentEntity enviament = initEnviament(
-				initPersonaAdministracio(InteressatTipus.ADMINISTRACIO)
-		);
+		NotificacioEnviamentEntity enviament = initEnviament(initPersonaAdministracio(InteressatTipus.ADMINISTRACIO));
 		enviaments.add(enviament);
     	var organGestor = initOrganGestor(entidad);
     	var procediment = initProcediment(entidad);
@@ -201,10 +216,7 @@ public class PluginHelperTest {
     	// When
     	AsientoRegistralBeanDto asientoRegistralBeanDto;
 		try {
-			asientoRegistralBeanDto = pluginHelper.notificacioToAsientoRegistralBean(notificacio,
-					enviament,
-					true, // inclou_documents
-					true); // isComunicacioSir
+			asientoRegistralBeanDto = pluginHelper.notificacioToAsientoRegistralBean(notificacio, enviament, true, true);
 	        // Then
 	    	for (AnexoWsDto anexo: asientoRegistralBeanDto.getAnexos()) {
 	    		assertNull(anexo.getCsv());
@@ -223,13 +235,11 @@ public class PluginHelperTest {
     public void whenNotificacioToAsientoRegistralBeanPerComunicSirAmbFicheroUuid_thenUuidNullIContingutInformat() throws IOException {
         
         // Given
-    	Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar"))).thenReturn("BINARI");
+//    	Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar"))).thenReturn("BINARI");
     	
-		Document documentArxiuAmbContingut = initDocument();
+		var documentArxiuAmbContingut = initDocument();
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
-		NotificacioEnviamentEntity enviament = initEnviament(
-				initPersonaAdministracio(InteressatTipus.ADMINISTRACIO)
-		);
+		var enviament = initEnviament(initPersonaAdministracio(InteressatTipus.ADMINISTRACIO));
 		enviaments.add(enviament);
     	var organGestor = initOrganGestor(entidad);
     	var procediment = initProcediment(entidad);
@@ -255,7 +265,7 @@ public class PluginHelperTest {
     public void whenNotificacioToAsientoRegistralBeanPerComunicSirAmbFicheroCsv_thenCsvInformatIContingutNull() throws IOException {
         
         // Given
-    	Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar"))).thenReturn("CSV");
+//    	Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar"))).thenReturn("CSV");
     	Document documentArxiuAmbContingut = initDocument();
     	
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
@@ -287,7 +297,7 @@ public class PluginHelperTest {
     public void whenNotificacioToAsientoRegistralBeanPerComunicSirAmbFicheroUuid_thenUuidInformatIContingutNull() throws IOException {
         
         // Given
-    	Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar"))).thenReturn("CSV");
+//    	Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar"))).thenReturn("CSV");
     	
     	Document documentArxiuAmbContingut = initDocument();
     	
@@ -319,8 +329,8 @@ public class PluginHelperTest {
     public void whenNotificacioToAsientoRegistralBeanPerComunicSirAmbFicheroCsv_thenCsvInformatIContingutInformat() throws IOException {
         
         // Given
-    	Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar"))).thenReturn("TOT");
-		Document documentArxiuAmbContingut = initDocument();
+//    	Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar"))).thenReturn("TOT");
+//		Document documentArxiuAmbContingut = initDocument();
 
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
 		var enviament = initEnviament(initPersonaAdministracio(InteressatTipus.ADMINISTRACIO));
@@ -349,7 +359,7 @@ public class PluginHelperTest {
     public void whenNotificacioToAsientoRegistralBeanPerComunicSirAmbFicheroUuid_thenUuidInformatIContingutInformat() throws IOException {
         
         // Given
-    	Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar"))).thenReturn("TOT");
+//    	Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar"))).thenReturn("TOT");
 		Document documentArxiuAmbContingut = initDocument();
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
 		NotificacioEnviamentEntity enviament = initEnviament(initPersonaAdministracio(InteressatTipus.ADMINISTRACIO));
@@ -408,7 +418,7 @@ public class PluginHelperTest {
 	private NotificacioEnviamentEntity initEnviament(PersonaEntity titular) {
 
 		var enviament = Mockito.mock(NotificacioEnviamentEntity.class);
-		Mockito.when(enviament.getTitular()).thenReturn(titular);
+//		Mockito.when(enviament.getTitular()).thenReturn(titular);
 		return enviament;
 	}
 	
@@ -459,7 +469,7 @@ public class PluginHelperTest {
 		for (var enviament: enviaments) {
 			enviament.setNotificacio(notificacioGuardada);
 		}
-		Mockito.when(configHelper.getEntitatActualCodi()).thenReturn("CAIB");
+//		Mockito.when(configHelper.getEntitatActualCodi()).thenReturn("CAIB");
 		return notificacioGuardada;
 	}
 

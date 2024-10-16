@@ -32,9 +32,11 @@ import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
+import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.plugin.carpeta.CarpetaPlugin;
 import es.caib.notib.plugin.carpeta.MissatgeCarpetaParams;
 import es.caib.notib.plugin.carpeta.VincleInteressat;
@@ -103,6 +105,7 @@ public class PluginHelper {
 	private final CarpetaPluginHelper carpetaPluginHelper;
 
 	private final ConfigHelper configHelper;
+	private final OrganGestorRepository organGestorRepository;
 
 
 	// REGISTRE
@@ -309,7 +312,16 @@ public class PluginHelper {
 	}
 	
 	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma, Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi) throws SistemaExternException {
-		return unitatsOrganitzativesPluginHelper.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
+		var organs = unitatsOrganitzativesPluginHelper.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
+		OrganGestorEntity organ;
+		for (var o : organs) {
+			organ = organGestorRepository.findByCodi(o.getCodi());
+			if (organ == null) {
+				continue;
+			}
+			o.setPermetreSir(organ.isPermetreSir());
+		}
+		return organs;
 	}
 
 	public List<OrganGestorDto> unitatsPerCodi(String codi) throws SistemaExternException {
