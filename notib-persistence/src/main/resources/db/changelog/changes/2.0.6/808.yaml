@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_organ_gestor
+            columns:
+              - column:
+                  name: permetre_sir
+                  type: boolean
+                  defaultValue: 0
+                  constraints:
+                    nullable: false
