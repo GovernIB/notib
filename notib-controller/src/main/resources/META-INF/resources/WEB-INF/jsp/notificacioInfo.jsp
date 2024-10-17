@@ -1066,7 +1066,7 @@ $(document).ready(function() {
 							</div>
 							<div class="col-sm-6 text-right">
 								<button id="registrar-btn" class="btn btn-default btn-sm">
-									<span><span class="fa fa-send"></span><spring:message code="notificacio.info.accio.registrar.boto" /></span>
+									<span><span class="fa fa-send"></span> <spring:message code="notificacio.info.accio.registrar.boto" /></span>
 								</button>
 							</div>
 						</div>
@@ -1081,7 +1081,7 @@ $(document).ready(function() {
 							</div>
 							<div class="col-sm-6 text-right">
 								<button id="enviar-btn" class="btn btn-default btn-sm">
-									<span class="fa fa-send"></span><spring:message code="notificacio.info.accio.enviar.boto" />
+									<span><span class="fa fa-send"> </span><spring:message code="notificacio.info.accio.enviar.boto" /></span>
 								</button>
 							</div>
 						</div>
