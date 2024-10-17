@@ -18,9 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -433,9 +431,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public Missatge enviarEntregaPostal(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable String notificacioUuid, Model model) {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
-        var ok = true;
+        boolean ok;
         try {
-            notificacioService.enviarEntregaCie(notificacioUuid, false);
+            ok = notificacioService.enviarEntregaPostal(notificacioUuid, false);
         } catch (Exception ex) {
             ok = false;
         }
@@ -594,7 +592,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public Missatge cancelarEntregaPostal(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId, Model model) {
 
         getEntitatActualComprovantPermisos(request);
-        var ok = notificacioService.cancelarEntregaCie(enviamentId);
+        var ok = notificacioService.cancelarEntregaPostal(enviamentId);
         return Missatge.builder().ok(ok).msg(getMessage(request, ok ? "entrega.postal.cancelar.ok" : "entrega.postal.cancelar.error")).build();
     }
 

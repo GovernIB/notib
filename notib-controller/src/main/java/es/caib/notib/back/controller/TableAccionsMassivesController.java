@@ -212,7 +212,8 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         log.info("Reactivam els enviaments amb error: " + StringUtils.join(seleccio, ", "));
         try {
             var resposta = notificacioService.reactivarNotificacioAmbErrors(seleccio);
-            var msg = !resposta.getNoExecutables().isEmpty() ? "enviament.controller.reactivar.enviament.error.fi.reintents.notificacions.antigues" : "enviament.controller.reactivar.enviament.error.fi.reintents.OK";
+            var msg = "enviament.controller.reactivar.enviament.error.fi.reintents.";
+            msg += !resposta.getNoExecutables().isEmpty() ? "notificacions.antigues" : !resposta.getErrors().isEmpty() ? "KO" : "OK";
             MissatgesHelper.info(request, getMessage(request, msg));
         } catch (Exception e) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.enviament.error.fi.reintents.KO"));

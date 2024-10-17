@@ -42,10 +42,9 @@ public class CiePluginListener {
     public void receiveCancelarEnviamentCie(@Payload String uuidEnviament, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
         message.acknowledge();
-        boolean resposta;
         try {
             // TODO AFEGIR EVENT A LA CUA i programar reintents segons max reintents
-            resposta = ciePluginHelper.cancelar(uuidEnviament);
+            ciePluginHelper.cancelar(uuidEnviament);
         } catch (Exception ex) {
             log.error("Error al enviar la entrega cie per la notificacio amb referencia" + uuidEnviament, ex);
         }

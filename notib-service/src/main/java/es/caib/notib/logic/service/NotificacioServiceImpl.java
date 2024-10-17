@@ -200,6 +200,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private static final String ERROR_DIR3 = "Error recuperant les provincies de DIR3CAIB: ";
 
 	protected static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
+    @Autowired
+    private NotificacioEventHelper notificacioEventHelper;
 
 
 	@Transactional(rollbackFor=Exception.class)
@@ -1464,13 +1466,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 				emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, true);
 				return;
 			} else {
-				/* 3. Una part dels enviaments a Notifica i l'altre via email */
+				// 3. Una part dels enviaments a Notifica i l'altre via email
 				notificaHelper.notificacioEnviar(notificacio.getId(), true);
 				// Fa falta enviar els restants per email
 				emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, false);
 			}
-			if (isEntregaCieActiva(notificacio)) {
-				enviarEntregaCie(notificacio.getReferencia(), false);
+			// 4. Enviar la entrega postal
+			if (isEntregaCieActiva(notificacio) && NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat())) {
+				enviarEntregaPostal(notificacio.getReferencia(), false);
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1492,17 +1495,27 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	@Override
-	public void enviarEntregaCie(String uuid, boolean retry) {
-		ciePluginJms.enviarMissatge(uuid, retry);
+	public boolean enviarEntregaPostal(String uuid, boolean retry) {
+
+		try {
+			if (ciePluginJms.enviarMissatge(uuid, retry)) {
+				return true;
+			}
+			var notificacio = notificacioRepository.findByReferencia(uuid);
+			notificacioEventHelper.addCieEventEnviar(notificacio, true, "Error inesperat al enviar la entrega postal", false);
+			return false;
+		} catch (Exception ex) {
+			log.error("Error al enviar la entrega postal", ex);
+			return false;
+		}
 	}
 
 	@Override
-	public boolean cancelarEntregaCie(Long enviamentId) {
+	public boolean cancelarEntregaPostal(Long enviamentId) {
 
 		try {
 			var env = enviamentRepository.findById(enviamentId).orElseThrow();
-			ciePluginJms.cancelarEnviament(env.getUuid());
-			return true;
+			return ciePluginJms.cancelarEnviament(env.getUuid());
 		} catch (Exception ex) {
 			log.error("Error cancelant l'entrega postal", ex);
 			return false;
@@ -1780,7 +1793,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotibLogger.getInstance().info("[MASSIVA] Reactivar enviaments amb error a registre, notifica o entrega apostal amb fi reintents" + enviaments, log, LoggingTipus.MASSIVA);
 			NotificacioEntity notificacio = null;
 			NotificacioEnviamentEntity enviament;
-			var entregaPostal = false;
 			var llindarDies = configHelper.getConfigAsInteger("es.caib.notib.llindar.dies.enviament.remeses");
 			for (var id : enviaments) {
 				enviament = enviamentRepository.findById(id).orElse(null);
@@ -1809,7 +1821,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						resposta.getExecutades().add(enviament.getUuid());
 						continue;
 					}
-					if (!entregaPostal && enviament.getEntregaPostal() != null) {
+					if (enviament.getEntregaPostal() != null) {
 						var ultimEvent = enviament.getUltimEvent();
 						if (ultimEvent != null && NotificacioEventTipusEnumDto.CIE_ENVIAMENT.equals(ultimEvent.getTipus()) && ultimEvent.isError()) {
 							notificacionsPostals.add(notificacio);
@@ -1820,8 +1832,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 					resposta.getErrors().add(enviament.getUuid());
 				}
 			}
+			var ok = true;
 			for (var not : notificacionsPostals) {
-				ciePluginJms.enviarMissatge(not.getReferencia(), false);
+				ok = ciePluginJms.enviarMissatge(not.getReferencia(), false);
+				if (!ok) {
+					for (var env : notificacio.getEnviaments()) {
+						resposta.getErrors().add(env.getUuid());
+					}
+				}
 			}
 			return resposta;
 		} finally {

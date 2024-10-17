@@ -67,6 +67,7 @@ public class NotificaServiceImpl implements NotificaService {
             if (notificacio != null) {
                 log.error("Error enviant a notifica la notificacio " + notificacio.getId());
             }
+
         }
     }
 

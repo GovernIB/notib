@@ -79,6 +79,8 @@ public abstract class AbstractNotificaHelper {
 	private boolean modeTest;
     @Autowired
     private CiePluginJms ciePluginJms;
+    @Autowired
+    private NotificacioEventHelper notificacioEventHelper;
 
 	public abstract NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail);
 
@@ -166,7 +168,10 @@ public abstract class AbstractNotificaHelper {
 		var dataRetard = DateUtils.addDays(dataEnviamentNotifica, retard);
 		var cancelar = dataRetard.before(dataEnviamentNotifica);
 		if (cancelar && enviament.getEntregaPostal() != null && estatFinal && enviament.getEntregaPostal().getCieId() == null) {
-			ciePluginJms.cancelarEnviament(enviament.getUuid());
+			var ok = ciePluginJms.cancelarEnviament(enviament.getUuid());
+			if (!ok) {
+				notificacioEventHelper.addCieEventCancelar(enviament, true, "Error inesperat al cancelar la entrega postal", false);
+			}
 		}
 
 		if (estatsEnviamentsNotificaFinals && !NotificacioEstatEnumDto.PROCESSADA.equals(notificacioEstat)) {

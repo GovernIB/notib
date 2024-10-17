@@ -201,6 +201,17 @@ $(document).ready(function() {
 			alert("<spring:message code="notificacio.info.notificacio.antiga.avis" />");
 			return false;
 		}
+		$('#enviar-entrega-postal-btn').attr('disabled', true);
+		$.ajax({
+			type: 'GET',
+			url: '<c:url value="/notificacio/${notificacio.id}/enviar/entrega/postal/${notificacio.referencia}"/>',
+			async: true,
+			success: resposta =>  {
+				$('#enviar-entrega-postal-btn').attr('disabled', false);
+				let webSocket = new NotibWebSocket();
+				webSocket.mostrarMissatge(resposta);
+			}
+		});
 	});
 
 });
@@ -1039,10 +1050,9 @@ $(document).ready(function() {
 								<strong><spring:message code="notificacio.info.accio.enviar.entrega.postal" /></strong>
 							</div>
 							<div class="col-sm-6 text-right">
-								<a id="enviar-entrega-postal-btn" href="<not:modalUrl value="/notificacio/${notificacio.id}/enviar/entrega/postal/${notificacio.referencia}"/>"
-										class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
-									<spring:message code="notificacio.info.accio.reintent.errors.boto" />
-								</a>
+								<button id="enviar-entrega-postal-btn" class="btn btn-default btn-sm">
+									<span><span class="fa fa-send"></span> <spring:message code="notificacio.info.accio.reintent.errors.boto" /></span>
+								</button>
 							</div>
 						</div>
 					</li>
@@ -1056,7 +1066,7 @@ $(document).ready(function() {
 							</div>
 							<div class="col-sm-6 text-right">
 								<button id="registrar-btn" class="btn btn-default btn-sm">
-									<span class="fa fa-send"></span><spring:message code="notificacio.info.accio.registrar.boto" />
+									<span><span class="fa fa-send"></span><spring:message code="notificacio.info.accio.registrar.boto" /></span>
 								</button>
 							</div>
 						</div>

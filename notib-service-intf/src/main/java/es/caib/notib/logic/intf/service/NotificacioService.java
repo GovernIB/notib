@@ -32,7 +32,6 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -337,10 +336,10 @@ public interface NotificacioService {
 	boolean reactivarSir(Long notificacioId);
 
 	@PreAuthorize("isAuthenticated()")
-	void enviarEntregaCie(String uuid, boolean retry);
+	boolean enviarEntregaPostal(String uuid, boolean retry);
 
 	@PreAuthorize("isAuthenticated()")
-	boolean cancelarEntregaCie(Long enviamentId);
+	boolean cancelarEntregaPostal(Long enviamentId);
 
 	@PreAuthorize("isAuthenticated()")
 	boolean consultarEstatEntregaPostal(Long enviamentId);

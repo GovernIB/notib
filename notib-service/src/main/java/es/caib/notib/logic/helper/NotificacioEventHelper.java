@@ -206,6 +206,13 @@ public class NotificacioEventHelper {
                 .error(error).errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
     }
 
+    public void addCieEventEnviar(NotificacioEntity notificacio, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+
+        for (var enviament: notificacio.getEnviaments()) {
+            addCieEventEnviar(enviament, error, errorDescripcio, errorMaxReintents);
+        }
+    }
+
     public void addCieEventCancelar(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
 
         addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.CIE_CANCELAR)
