@@ -33,7 +33,6 @@ public class CiePluginJms {
                 log.error("[CieJms] No s'ha pogut fer l'enviament CIE l'uuId de la notificacio es null");
                 return false;
             }
-            var foo = 1/0;
             var delay = 0L;
             if (retry) {
                 var not = notificacioRepository.findByReferencia(uuid);
