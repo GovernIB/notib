@@ -75,7 +75,8 @@ public class NotificaHelper {
 		var enviament = enviamentRepository.findByCieId(sincronizarEnvio.getIdentificador());
 		var events = eventRepository.findByEnviamentIdAndTipus(enviament.getId(), NotificacioEventTipusEnumDto.NOTIFICA_ENVIO_OE);
 		var reintents = !events.isEmpty() ? events.get(0).getIntents() : 0;
-		var maxIntents = configHelper.getConfigAsInteger("es.caib.notib.tasca.notifica.enviaments.reintents.maxim");
+		var maxIntents = configHelper.getConfigAsInteger("es.caib.notib.tasca.notifica.sincronizar.envioOE.reintents.maxim");
+		maxIntents = maxIntents != null ? maxIntents : 3;
 		if (reintents > maxIntents) {
 			for (var event : events) {
 				event.setFiReintents(true);

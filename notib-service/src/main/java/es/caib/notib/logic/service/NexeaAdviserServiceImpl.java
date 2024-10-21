@@ -11,6 +11,7 @@ import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.service.AdviserService;
 import es.caib.notib.logic.intf.service.NexeaAdviserService;
+import es.caib.notib.logic.intf.util.NifHelper;
 import es.caib.notib.logic.intf.websocket.WebSocketConstants;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.common.Opciones;
@@ -116,6 +117,11 @@ public class NexeaAdviserServiceImpl implements NexeaAdviserService  {
                 resultado.setDescripcionRespuesta("Identificador no se corresponde con el CIE");
                 return resultado;
             }
+            if (!receptorValid(sincronizarEnvio.getReceptor())) {
+                resultado.setCodigoRespuesta(NexeaAdviserWs.CODI_ERROR_VALIDACIO);
+                resultado.setDescripcionRespuesta("Receptor no tiene el formato correcto");
+                return resultado;
+            }
             var estat = CieEstat.valueOf(sincronizarEnvio.getEstado().toUpperCase());
             enviament.getEntregaPostal().setCieEstat(estat);
             info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
@@ -137,5 +143,10 @@ public class NexeaAdviserServiceImpl implements NexeaAdviserService  {
             resultado.setDescripcionRespuesta(error);
             return resultado;
         }
+    }
+
+    private boolean receptorValid(Receptor receptor) {
+        return receptor != null && !Strings.isNullOrEmpty(receptor.getNifReceptor())
+                && NifHelper.isvalid(receptor.getNifReceptor());
     }
 }
