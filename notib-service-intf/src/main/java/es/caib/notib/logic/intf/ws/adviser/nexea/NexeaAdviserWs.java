@@ -31,6 +31,7 @@ public interface NexeaAdviserWs {
     String CODI_ERROR = "3000";
     String CODI_ERROR_IDENTIFICADOR_INCORRECTE = "3001";
     String CODI_ERROR_IDENTIFICADOR_INEXISTENT = "3002";
+    String CODI_ERROR_VALIDACIO = "4000";
 
     /**
      *
