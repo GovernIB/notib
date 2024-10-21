@@ -4,9 +4,9 @@ package es.caib.notib.logic.wsdl.notificaV2;
 import es.caib.notib.logic.wsdl.notificaV2.common.Opciones;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.InfoEnvioLigero;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.RespuestaInfoEnvioLigero;
-import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.Acuse;
-import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.Receptor;
-import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.RespuestaSincronizarEnvioOE;
+import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOE.Acuse;
+import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOE.Receptor;
+import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOE.RespuestaSincronizarEnvioOE;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -30,7 +30,7 @@ import java.math.BigInteger;
 @XmlSeeAlso({
         es.caib.notib.logic.wsdl.notificaV2.common.ObjectFactory.class,
         es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.ObjectFactory.class,
-        es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.ObjectFactory.class
+        es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOE.ObjectFactory.class
 })
 public interface SincronizarEnvioWsPortType {
 

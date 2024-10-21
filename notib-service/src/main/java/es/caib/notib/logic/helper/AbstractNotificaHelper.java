@@ -9,7 +9,6 @@ import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
-import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.service.AuditService;
@@ -17,9 +16,8 @@ import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnv
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.logic.utils.NotibLogger;
-import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.plugin.cie.CiePluginJms;
-import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.RespuestaSincronizarEnvioOE;
+import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOE.RespuestaSincronizarEnvioOE;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioRepository;

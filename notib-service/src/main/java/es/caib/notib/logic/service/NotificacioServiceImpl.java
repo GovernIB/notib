@@ -4,6 +4,7 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.OrigenEnum;
@@ -43,6 +44,7 @@ import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.plugin.cie.CiePluginJms;
+import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.CallbackEntity;
@@ -70,6 +72,7 @@ import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
