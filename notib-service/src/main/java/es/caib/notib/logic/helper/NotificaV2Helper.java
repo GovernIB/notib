@@ -32,9 +32,9 @@ import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaE
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.Datado;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.InfoEnvioLigero;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.RespuestaInfoEnvioLigero;
-import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.Acuse;
-import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.Receptor;
-import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.RespuestaSincronizarEnvioOE;
+import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOE.Acuse;
+import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOE.Receptor;
+import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOE.RespuestaSincronizarEnvioOE;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
@@ -56,12 +56,13 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.ws.Holder;
-import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
@@ -72,6 +73,9 @@ import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -336,32 +340,43 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Transactional
 	public RespuestaSincronizarEnvioOE enviamentEntregaPostalNotificada(SincronizarEnvio sincronizarEnvio) throws Exception {
 
-		var enviament = notificacioEnviamentRepository.findByCieId(sincronizarEnvio.getIdentificador());
-		var apiKey = enviament.getNotificacio().getEntitat().getApiKey();
-		var organEmisor = enviament.getNotificacio().getEmisorDir3Codi();
-		var id = enviament.getNotificaIdentificador();
-		var tipoEntrega = BigInteger.valueOf(1);
-		var modoNotificacion = BigInteger.valueOf(2);
-		var estat = new Holder<>(CieEstat.NOTIFICADA.name());
-		var data = new Date();
-		var gregorianCalendar = new GregorianCalendar();
-		gregorianCalendar.setTime(data);
-		var xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
-		var dataHolder = new Holder<>(xmlGregorianCalendar);
-		var receptor = conversioTipusHelper.convertir(sincronizarEnvio.getReceptor(), Receptor.class);
-		var acusePdf = conversioTipusHelper.convertir(sincronizarEnvio.getAcusePDF(), Acuse.class);
-		var acuseXml = conversioTipusHelper.convertir(sincronizarEnvio.getAcuseXML(), Acuse.class);
-		var opciones = conversioTipusHelper.convertir(sincronizarEnvio.getOpcionesSincronizarEnvio(), es.caib.notib.logic.wsdl.notificaV2.common.Opciones.class);
-		Holder<String> codigoRespuesta = new Holder<>();
-		Holder<String> descripcionRespuesta = new Holder<>();
-		Holder<es.caib.notib.logic.wsdl.notificaV2.common.Opciones> opcionesRespuestaSincronizarOE = new Holder<>();
-		var resposta = getSincronizarEnvioWs(apiKey).sincronizarEnvioOE(organEmisor, id, tipoEntrega, modoNotificacion, estat, dataHolder,
-				null, receptor, acusePdf, acuseXml, opciones, codigoRespuesta, descripcionRespuesta, opcionesRespuestaSincronizarOE);
+		try {
+			var enviament = notificacioEnviamentRepository.findByCieId(sincronizarEnvio.getIdentificador());
+			var apiKey = enviament.getNotificacio().getEntitat().getApiKey();
+			var organEmisor = enviament.getNotificacio().getEmisorDir3Codi();
+			var id = enviament.getNotificaIdentificador();
+			var tipoEntrega = BigInteger.valueOf(1);
+			var modoNotificacion = BigInteger.valueOf(1);
+			var estat = new Holder<>(CieEstat.NOTIFICADA.name().toLowerCase());
+			var data = new Date();
+			var gregorianCalendar = new GregorianCalendar();
+			gregorianCalendar.setTime(data);
+			var xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
+			xmlGregorianCalendar.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
+			var dataHolder = new Holder<>(xmlGregorianCalendar);
+			var receptor = conversioTipusHelper.convertir(sincronizarEnvio.getReceptor(), Receptor.class);
+			var acusePdf = conversioTipusHelper.convertir(sincronizarEnvio.getAcusePDF(), Acuse.class);
+			var acuseXml = conversioTipusHelper.convertir(sincronizarEnvio.getAcuseXML(), Acuse.class);
+			var opciones = conversioTipusHelper.convertir(sincronizarEnvio.getOpcionesSincronizarEnvio(), es.caib.notib.logic.wsdl.notificaV2.common.Opciones.class);
+			Holder<String> codigoRespuesta = new Holder<>();
+			Holder<String> descripcionRespuesta = new Holder<>();
+			Holder<es.caib.notib.logic.wsdl.notificaV2.common.Opciones> opcionesRespuestaSincronizarOE = new Holder<>();
 
-		var error = !NexeaAdviserWs.CODI_OK.equals(resposta.getCodigoRespuesta());
-		var errorDesc = error ? resposta.getDescripcionRespuesta() : "";
-		notificacioEventHelper.addNotificaEnvioOE(enviament, error, errorDesc, false);
-		return resposta;
+			getSincronizarEnvioWs(apiKey).sincronizarEnvioOE(organEmisor, id, tipoEntrega, modoNotificacion, estat, dataHolder,
+					null, receptor, acusePdf, acuseXml, opciones, codigoRespuesta, descripcionRespuesta, opcionesRespuestaSincronizarOE);
+
+			var error = !NexeaAdviserWs.SYNC_ENVIO_OE_OK.equals(codigoRespuesta.value);
+			var errorDesc = error ? codigoRespuesta.value + " - " + descripcionRespuesta.value : "";
+			notificacioEventHelper.addNotificaEnvioOE(enviament, error, errorDesc, false);
+			var resposta = new RespuestaSincronizarEnvioOE();
+			resposta.setCodigoRespuesta(codigoRespuesta.value);
+			resposta.setDescripcionRespuesta(descripcionRespuesta.value);
+			return resposta;
+		} catch (Exception e) {
+			var resposta = new RespuestaSincronizarEnvioOE();
+			resposta.setCodigoRespuesta("error");
+			return resposta;
+		}
 	}
 
 	private Datado getDarrerDatat(RespuestaInfoEnvioLigero resultadoInfoEnvio, NotificacioEnviamentEntity enviament, IntegracioInfo info) throws DatatypeConfigurationException, ParseException {
@@ -827,7 +842,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				false,
 				true,
 				SincronizarEnvioWsPortType.class,
-				new Handler[0]);
+				new ApiKeySOAPHandlerV2(apiKey));
+//				new Handler[0]);
 	}
 
 	private static class ApiKeySOAPHandlerV2 implements SOAPHandler<SOAPMessageContext> {

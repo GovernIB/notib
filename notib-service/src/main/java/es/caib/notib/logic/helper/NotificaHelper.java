@@ -6,10 +6,9 @@ package es.caib.notib.logic.helper;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
-import es.caib.notib.logic.intf.websocket.WebSocketConstants;
+import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.logic.statemachine.SmConstants;
-import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe.RespuestaSincronizarEnvioOE;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
@@ -70,12 +69,19 @@ public class NotificaHelper {
 	public void enviamentEntregaPostalNotificada(SincronizarEnvio sincronizarEnvio) throws Exception {
 
 		var resposta = getNotificaHelper().enviamentEntregaPostalNotificada(sincronizarEnvio);
-		if ("000".equals(resposta.getCodigoRespuesta())) {
+		if (NexeaAdviserWs.SYNC_ENVIO_OE_OK.equals(resposta.getCodigoRespuesta())) {
 			return;
 		}
 		var enviament = enviamentRepository.findByCieId(sincronizarEnvio.getIdentificador());
 		var events = eventRepository.findByEnviamentIdAndTipus(enviament.getId(), NotificacioEventTipusEnumDto.NOTIFICA_ENVIO_OE);
 		var reintents = !events.isEmpty() ? events.get(0).getIntents() : 0;
+		var maxIntents = configHelper.getConfigAsInteger("es.caib.notib.tasca.notifica.enviaments.reintents.maxim");
+		if (reintents > maxIntents) {
+			for (var event : events) {
+				event.setFiReintents(true);
+			}
+			return;
+		}
 		jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvio,
 				m -> {
 					m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));

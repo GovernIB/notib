@@ -1,5 +1,5 @@
 
-package es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOe;
+package es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOE;
 
 import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
