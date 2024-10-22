@@ -65,8 +65,10 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -379,20 +381,27 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		}
 		var estat = filtre.getEstat();
 		var isEstatNull = estat == null;
-		return organGestorRepository.findByEntitatAndFiltre(
+		var page = organGestorRepository.findByEntitatAndFiltre(
 				entitat,
 				filtre.getCodi() == null || filtre.getCodi().isEmpty(),
 				filtre.getCodi() == null ? "" : filtre.getCodi(),
-				filtre.getNom() == null || filtre.getNom().isEmpty(),
-				filtre.getNom() == null ? "" : filtre.getNom(),
+//				filtre.getNom() == null || filtre.getNom().isEmpty(),
+//				filtre.getNom() == null ? "" : filtre.getNom(),
 				filtre.getOficina() == null || filtre.getOficina().isEmpty(),
 				filtre.getOficina() == null ? "" : filtre.getOficina(),
 				isEstatNull,
 				estat,
 				filtre.isEntregaCie(),
 				filtre.getCodiPare() == null || filtre.getCodiPare().isEmpty(),
-				filtre.getCodiPare() == null ? "" : filtre.getCodiPare(),
-				pageable);
+				filtre.getCodiPare() == null ? "" : filtre.getCodiPare());
+//				pageable);
+		if (Strings.isNullOrEmpty(filtre.getNom())) {
+			return new PageImpl<>(page);
+		}
+		filtre.setNom(StringUtils.stripAccents(filtre.getNom()).toLowerCase());
+		var contingut = page.stream().filter(organ -> Strings.isNullOrEmpty(filtre.getNom()) || StringUtils.stripAccents(organ.getNom().toLowerCase()).contains(filtre.getNom())).collect(Collectors.toList());
+		Page<OrganGestorEntity> organs = new PageImpl<>(contingut);
+		return organs;
 	}
 
 	private Page<OrganGestorEntity> findAmbFiltrePaginatByAdminOrgan(EntitatEntity entitat, String organActualCodiDir3, OrganGestorFiltreDto filtre, Pageable pageable) {

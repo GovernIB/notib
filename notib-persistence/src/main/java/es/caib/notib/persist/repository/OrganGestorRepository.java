@@ -83,24 +83,24 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"where (og.entitat = :entitat)" +
 			" and (:isCodiNull = true or lower(og.codi) like lower('%'||:codi||'%'))" +
 			" and (:isCodiPareNull = true or lower(og.codiPare) like lower('%'||:codiPare||'%'))" +
-			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))" +
+//			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))" +
 			" and (:isOficinaNull = true or lower(og.oficina) like lower('%'||:oficina||'%'))"+
 			" and (:isEstatNull = true or og.estat = :estat)" +
 			" and (:isEntregaCieActiva = false or og.entregaCie is not null)")
-	Page<OrganGestorEntity> findByEntitatAndFiltre(
+	List<OrganGestorEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("isCodiNull") boolean isCodiNull,
 			@Param("codi") String codi,
-			@Param("isNomNull") boolean isNomNull,
-			@Param("nom") String nom,
+//			@Param("isNomNull") boolean isNomNull,
+//			@Param("nom") String nom,
 			@Param("isOficinaNull") boolean isOficinaNull,
 			@Param("oficina") String oficina,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") OrganGestorEstatEnum estat,
 			@Param("isEntregaCieActiva") boolean isEntregaCieActiva,
 			@Param("isCodiPareNull") boolean isCodiPareNull,
-			@Param("codiPare") String codiPare,
-			Pageable paginacio);
+			@Param("codiPare") String codiPare);
+//			Pageable paginacio);
 	
 	@Query( "select distinct og " +
 			"from OrganGestorEntity og " +
