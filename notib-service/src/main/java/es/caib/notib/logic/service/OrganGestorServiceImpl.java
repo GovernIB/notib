@@ -61,6 +61,7 @@ import es.caib.notib.persist.repository.PagadorCieRepository;
 import es.caib.notib.persist.repository.PagadorPostalRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
+import liquibase.pro.packaged.T;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MultiValuedMap;
@@ -381,7 +382,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		}
 		var estat = filtre.getEstat();
 		var isEstatNull = estat == null;
-		var page = organGestorRepository.findByEntitatAndFiltre(
+		var organs = organGestorRepository.findByEntitatAndFiltre(
 				entitat,
 				filtre.getCodi() == null || filtre.getCodi().isEmpty(),
 				filtre.getCodi() == null ? "" : filtre.getCodi(),
@@ -395,13 +396,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				filtre.getCodiPare() == null || filtre.getCodiPare().isEmpty(),
 				filtre.getCodiPare() == null ? "" : filtre.getCodiPare());
 //				pageable);
-		if (Strings.isNullOrEmpty(filtre.getNom())) {
-			return new PageImpl<>(page);
-		}
-		filtre.setNom(StringUtils.stripAccents(filtre.getNom()).toLowerCase());
-		var contingut = page.stream().filter(organ -> Strings.isNullOrEmpty(filtre.getNom()) || StringUtils.stripAccents(organ.getNom().toLowerCase()).contains(filtre.getNom())).collect(Collectors.toList());
-		Page<OrganGestorEntity> organs = new PageImpl<>(contingut);
-		return organs;
+
+		return getPageFiltrada(organs, filtre.getNom());
 	}
 
 	private Page<OrganGestorEntity> findAmbFiltrePaginatByAdminOrgan(EntitatEntity entitat, String organActualCodiDir3, OrganGestorFiltreDto filtre, Pageable pageable) {
@@ -416,20 +412,32 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		}
 		OrganGestorEstatEnum estat = filtre.getEstat();
 		boolean isEstatNull = estat == null;
-		return organGestorRepository.findByEntitatAndOrganGestorAndFiltre(
+		var organs = organGestorRepository.findByEntitatAndOrganGestorAndFiltre(
 				entitat,
 				organGestorsListCodisDir3,
 				filtre.getCodi() == null || filtre.getCodi().isEmpty(),
 				filtre.getCodi() == null ? "" : filtre.getCodi(),
-				filtre.getNom() == null || filtre.getNom().isEmpty(),
-				filtre.getNom() == null ? "" : filtre.getNom(),
+//				filtre.getNom() == null || filtre.getNom().isEmpty(),
+//				filtre.getNom() == null ? "" : filtre.getNom(),
 				filtre.getOficina() == null || filtre.getOficina().isEmpty(),
 				filtre.getOficina() == null ? "" : filtre.getOficina(),
 				isEstatNull,
 				estat,
 				filtre.getCodiPare() == null || filtre.getCodiPare().isEmpty(),
-				filtre.getCodiPare() == null ? "" : filtre.getCodiPare(),
-				pageable);
+				filtre.getCodiPare() == null ? "" : filtre.getCodiPare());
+//				pageable);
+
+		return getPageFiltrada(organs, filtre.getNom());
+	}
+
+	private Page<OrganGestorEntity> getPageFiltrada(List<OrganGestorEntity> organs, String filtre) {
+
+		if (Strings.isNullOrEmpty(filtre)) {
+			return new PageImpl<>(organs);
+		}
+		var nom = StringUtils.stripAccents(filtre).toLowerCase();
+		var contingut = organs.stream().filter(organ -> Strings.isNullOrEmpty(nom) || StringUtils.stripAccents(organ.getNom().toLowerCase()).contains(nom)).collect(Collectors.toList());
+		return new PageImpl<>(contingut);
 	}
 	
 	public boolean isUpdatingOrgans(EntitatDto entitatDto) {
