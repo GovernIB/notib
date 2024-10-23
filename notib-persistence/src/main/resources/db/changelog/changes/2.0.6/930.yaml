@@ -29,6 +29,9 @@ databaseChangeLog:
               - column:
                   name: organ_emisor
                   type: number(19,0)
+              - column:
+                  name: dir3_codi
+                  type: varchar(9 ${varcharUnit})
         - addColumn:
             tableName: not_entrega_postal
             columns:
