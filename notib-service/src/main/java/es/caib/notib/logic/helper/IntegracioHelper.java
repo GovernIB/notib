@@ -35,6 +35,9 @@ public class IntegracioHelper {
 	private final MonitorIntegracioParamRepository monitorParamRepository;
 	private final CacheHelper cacheHelper;
 
+
+	private static final String APLICACIO_WEB = "Interficie web";
+
     public IntegracioHelper(AplicacioRepository aplicacioRepository, MonitorIntegracioRepository monitorRepository, MonitorIntegracioParamRepository monitorParamRepository, @Lazy CacheHelper cacheHelper) {
         this.aplicacioRepository = aplicacioRepository;
         this.monitorRepository = monitorRepository;
@@ -155,10 +158,11 @@ public class IntegracioHelper {
 		if (accio.getParametres() == null) {
 			accio.setParametres(new ArrayList<>());
 		}
-		accio.getParametres().add(MonitorIntegracioParamEntity.builder().monitorIntegracio(accio).codi("Usuari").valor(getUsuariNomCodi(obtenirUsuari)).build());
+
+		accio.getParametres().add(MonitorIntegracioParamEntity.builder().monitorIntegracio(accio).codi("Usuari").valor(getUsuariNomCodi(accio, obtenirUsuari)).build());
 	}
 
-	private String getUsuariNomCodi(boolean obtenirUsuari) {
+	private String getUsuariNomCodi(MonitorIntegracioEntity accio, boolean obtenirUsuari) {
 
 		var auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth == null || Strings.isNullOrEmpty(auth.getName())) {
@@ -173,6 +177,10 @@ public class IntegracioHelper {
 			if (usuari == null) {
 				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari " + auth.getName() + " no trobat a la bbdd");
 				return usuariNomCodi;
+			}
+			var aplicacio = aplicacioRepository.findByUsuariCodi(usuari.getCodi());
+			if (aplicacio == null) {
+				accio.setAplicacio(APLICACIO_WEB);
 			}
 			return usuari.getNomSencer() + " (" + usuari.getCodi() + ")";
 		} catch (Exception ex) {
