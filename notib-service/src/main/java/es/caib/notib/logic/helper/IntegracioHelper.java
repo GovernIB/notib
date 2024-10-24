@@ -178,6 +178,9 @@ public class IntegracioHelper {
 				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari " + auth.getName() + " no trobat a la bbdd");
 				return usuariNomCodi;
 			}
+			if (Strings.isNullOrEmpty(accio.getAplicacio())) {
+				return usuari.getNomSencer() + " (" + usuari.getCodi() + ")";
+			}
 			var aplicacio = aplicacioRepository.findByUsuariCodi(usuari.getCodi());
 			if (aplicacio == null) {
 				accio.setAplicacio(APLICACIO_WEB);
