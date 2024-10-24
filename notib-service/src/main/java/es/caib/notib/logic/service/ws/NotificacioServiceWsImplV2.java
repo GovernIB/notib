@@ -1049,7 +1049,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			resposta.setErrorData(new Date());
 			resposta.setErrorDescripcio(errorDesc);
 			integracioHelper.addAplicacioAccioParam(info, null);
-			integracioHelper.addAccioError(info, errorDesc, t);
+			integracioHelper.addAccioWarn(info, errorDesc, t);
 			return enviament;
 		}
 		var isEstatFinal = EnviamentEstat.EXPIRADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.REBUTJADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat());
