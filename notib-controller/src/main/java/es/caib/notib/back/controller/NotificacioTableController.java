@@ -58,8 +58,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @Autowired
     private GrupService grupService;
     @Autowired
-    private JustificantService justificantService;
-    @Autowired
     private NotificacioBackHelper notificacioListHelper;
     @Autowired
     private PermisosService permisosService;
@@ -86,8 +84,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private static final String ACCIONS = "accions";
     private static final String NOTIFICACIO_ID = "notificacioId";
     private static final String EVENT_TIPUS_ENUM = "es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.";
-    private static final String SET_COOKIE = "Set-cookie";
-    private static final String FILE_DOWNLOAD = "fileDownload=true; path=/";
     private static final String SELECCIO_BUIDA = "accio.massiva.seleccio.buida";
     private static final String PERMIS_DENGAT = "Permís denegat";
 
@@ -626,69 +622,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
     }
 
-    @GetMapping(value = {"/descarregar/certificacio/massiu"})
-    @ResponseBody
-    public void certificacioDescarregarMassiu(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
-
-        var seleccio = getIdsSeleccionats(request);
-        if (seleccio == null || seleccio.isEmpty() || (seleccio.size() == 1 && seleccio.contains(-1L))) {
-            return;
-        }
-        response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
-        List<List<ArxiuDto>> certificacions = new ArrayList<>();
-        List<ArxiuDto> notCertificacions;
-        var contingut = false;
-        for (var notificacioId : seleccio) {
-            var enviaments = enviamentService.enviamentFindAmbNotificacio(notificacioId);
-            Map<String, Integer> interessats = new HashMap<>();
-            int numInteressats = 0;
-            notCertificacions = new ArrayList<>();
-            ArxiuDto certificacio;
-            for (var env : enviaments) {
-                if (env.getNotificaCertificacioData() == null) {
-                    continue;
-                }
-                try {
-                    certificacio = notificacioService.enviamentGetCertificacioArxiu(env.getId());
-                } catch (Exception ex) {
-                    log.error("Error descarregant la certificacio per l'enviament " + env.getId());
-                    continue;
-                }
-                certificacio.setNom(env.getTitular().getNif() + "_" + certificacio.getNom());
-                if (interessats.get(env.getTitular().getNif()) == null) {
-                    numInteressats++;
-                    interessats.put(env.getTitular().getNif(), numInteressats);
-                    certificacio.setNom(numInteressats + "_" + certificacio.getNom());
-                }
-                contingut = true;
-                notCertificacions.add(certificacio);
-            }
-
-            if (!contingut) {
-                continue;
-            }
-            certificacions.add(notCertificacions);
-        }
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ZipOutputStream zos = new ZipOutputStream(baos);
-
-        for (var notCerts : certificacions) {
-            for (var certificacio : notCerts) {
-                ZipEntry entry = new ZipEntry(StringUtils.stripAccents(certificacio.getNom()));
-                entry.setSize(certificacio.getContingut().length);
-                zos.putNextEntry(entry);
-                zos.write(certificacio.getContingut());
-                zos.closeEntry();
-            }
-        }
-        zos.close();
-        baos.close();
-        var sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        var date = sdf.format(new Date()).replace(":", "_");
-        writeFileToResponse("certificacionsMassives_" + date + ".zip", baos.toByteArray(), response);
-    }
-
     @GetMapping(value = "/{notificacioId}/enviament/{enviamentId}/certificacioDescarregar")
     @ResponseBody
     public void certificacioDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long enviamentId) throws IOException {
@@ -843,54 +776,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
         response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
         writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
-    }
-
-    @GetMapping(value = {"/descarregar/justificant/massiu"})
-    @ResponseBody
-    public void justificantDescarregarMassiu(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
-
-        var entitatActual = sessionScopedContext.getEntitatActual();
-        var referer = request.getHeader("Referer");
-        var seleccio = getIdsSeleccionats(request);
-        if (seleccio == null || seleccio.isEmpty() || (seleccio.size() == 1 && seleccio.contains(-1L))) {
-            return;
-//            return getModalControllerReturnValueError(request,REDIRECT + referer,SELECCIO_BUIDA);
-        }
-
-        response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
-        List<FitxerDto> justificants = new ArrayList<>();
-        var seqNum = 0;
-        FitxerDto justificant;
-        for (var notificacioId : seleccio) {
-            var sequence = "sequence" + UUID.randomUUID();
-            seqNum++;
-            try {
-                justificant = justificantService.generarJustificantEnviament(notificacioId, entitatActual.getId(), sequence);
-                if (justificant == null) {
-                log.error("[MASSIVA DESCARREGAR JUSTIFICANT] Existeix un altre procés iniciat. Esperau que finalitzi la descàrrega del document. Notificacio id " + notificacioId);
-                continue;
-                }
-            } catch (Exception ex) {
-                log.error("Error descarregant el justificant per la notificacio " + notificacioId + " " + ex.getMessage());
-                continue;
-            }
-            justificants.add(justificant);
-        }
-
-        try (var baos = new ByteArrayOutputStream(); var zos = new ZipOutputStream(baos)) {
-            for (var just : justificants) {
-                var entry = new ZipEntry(StringUtils.stripAccents(just.getNom()));
-                entry.setSize(just.getContingut().length);
-                zos.putNextEntry(entry);
-                zos.write(just.getContingut());
-                zos.closeEntry();
-            }
-            zos.close();
-            var sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-            var date = sdf.format(new Date()).replace(":", "_");
-            writeFileToResponse("justificantsMassiu_" + date + ".zip", baos.toByteArray(), response);
-        //        return getModalControllerReturnValueSuccess(request,REDIRECT + referer,"notificacio.controller.descarregar.justificant.massiu.ok");
-        }
     }
 
     @GetMapping(value = "/{notificacioId}/justificant/estat/{sequence}")
