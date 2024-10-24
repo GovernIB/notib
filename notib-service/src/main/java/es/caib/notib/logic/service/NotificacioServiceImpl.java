@@ -697,7 +697,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var rols = aplicacioService.findRolsUsuariActual();
 			filtre.setOrganGestor(organGestorCodi);
 			var f = notificacioListHelper.getFiltre(filtre, entitatId, rol, usuariCodi, rols);
-			f.setDataFi(DatesUtils.incrementarDataFi(f.getDataFi()));
 			var notificacions = notificacioTableViewRepository.findAmbFiltre(f, pageable);
 			if (notificacions.getTotalPages() < paginacioParams.getPaginaNum()) {
 				paginacioParams.setPaginaNum(0);
@@ -722,7 +721,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var rols = aplicacioService.findRolsUsuariActual();
 			filtre.setOrganGestor(organGestorCodi);
 			var f = notificacioListHelper.getFiltre(filtre, entitatId, rol, usuariCodi, rols);
-			f.setDataFi(DatesUtils.incrementarDataFi(f.getDataFi()));
 			return notificacioTableViewRepository.findIdsAmbFiltre(f);
 		} finally {
 			log.error("Error obtinguent els ids amb filtre de les remeses")

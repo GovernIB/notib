@@ -6,6 +6,7 @@ import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.service.PermisosService;
+import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
 import es.caib.notib.persist.filtres.FiltreNotificacio;
@@ -135,14 +136,7 @@ public class NotificacioListHelper {
         var organs = isAdminOrgan && organGestor != null ? organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestor.getCodi()) : null;
         var entitatsActives = isSuperAdmin ? entitatRepository.findByActiva(true) : null;
         var entitatFiltre = isUsuariEntitat || isUsuari ? entitatId : f.getEntitatId();
-//        if (f.getDataInici() != null && f.getDataInici().equals(f.getDataFi())) {
-//            var c = Calendar.getInstance();
-//            c.setTime(f.getDataFi());
-//            c.add(Calendar.SECOND, 59);
-//            c.add(Calendar.MINUTE, 59);
-//            c.add(Calendar.HOUR, 23);
-//            f.setDataFi(c.getTime());
-//        }
+        f.setDataFi(DatesUtils.incrementarDataFi(f.getDataFi()));
 
         var filtreNotificacio = FiltreNotificacio.builder()
                 .entitatIdNull(entitatFiltre == null)
