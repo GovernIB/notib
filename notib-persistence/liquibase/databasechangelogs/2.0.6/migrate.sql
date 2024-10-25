@@ -26,7 +26,7 @@ INSERT INTO NOT_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (
 
 INSERT INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('CIE_CLASS', 'es.caib.notib.plugin.cie.CieNexeaPluginImpl');
 
-INSERT INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE) VALUES (1, 'es.caib.notib.plugin.cie.url', 0, 'Url del plugin CIE', 'CIE');
+INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE) VALUES (1, 'es.caib.notib.plugin.cie.url', 'https://nexea.es/serviciosweb_pre/NotificaWsV2Service', 0, 'Url del plugin CIE', 'CIE');
 
 INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (2, 'es.caib.notib.plugin.cie.max.reintents', '3', 'Número màxim de reintets dels enviaments CIE', 'INT', 'CIE' );
 
