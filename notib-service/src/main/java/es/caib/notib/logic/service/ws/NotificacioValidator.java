@@ -153,7 +153,7 @@ public class NotificacioValidator implements Validator {
             return;
         }
         if (!aplicacio.isActiva()) {
-            errors.reject(error(APLICACIO_INACTIVA, locale));
+            errors.reject(error(APLICACIO_INACTIVA, locale, usuariCodi));
         }
     }
 
