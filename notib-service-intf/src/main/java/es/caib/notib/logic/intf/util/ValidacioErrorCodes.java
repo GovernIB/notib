@@ -11,6 +11,7 @@ public class ValidacioErrorCodes {
     public static final int EMISOR_DIR3_NO_EXIST = 1010;
     public static final int ENTITAT_INACTIVA = 1011;
     public static final int APLICACIO_NO_EXIST = 1012;
+    public static final int APLICACIO_INACTIVA = 10122;
     public static final int PROCSER_NULL = 1020;
     public static final int PROCSER_SIZE = 1021;
     public static final int PROCSER_NO_EXIST = 1022;

@@ -150,6 +150,10 @@ public class NotificacioValidator implements Validator {
         }
         if (aplicacio == null) {
             errors.reject(error(APLICACIO_NO_EXIST, locale, usuariCodi, notificacio.getEmisorDir3Codi()));
+            return;
+        }
+        if (!aplicacio.isActiva()) {
+            errors.reject(error(APLICACIO_INACTIVA, locale));
         }
     }
 
