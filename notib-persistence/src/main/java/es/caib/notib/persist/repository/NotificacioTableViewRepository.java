@@ -128,7 +128,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:#{#filtre.notMassivaIdNull} = true or ntf.notificacioMassiva.id = :#{#filtre.notMassivaId}) " +
 			"and (:#{#filtre.enviamentTipusNull} = true or ntf.enviamentTipus = :#{#filtre.enviamentTipus}) " +
 			"and (:#{#filtre.concepteNull} = true or lower(ntf.concepte) like concat('%', lower(:#{#filtre.concepte}), '%')) " +
-			"and (:#{#filtre.estatNull} = true or bitand(ntf.estatMask, :#{#filtre.estatMask}) <> 0) " +
+//			"and (:#{#filtre.estatNull} = true or bitand(ntf.estatMask, :#{#filtre.estatMask}) <> 0) " +
+			"and (:#{#filtre.estatNull} = true or bitand(ntf.estatMask, :#{#filtre.estatMask}) = ntf.estatMask and bitand(ntf.estatMask, :#{#filtre.estatMask}) <> 0) " +
 			"and (:#{#filtre.dataIniciNull} = true or ntf.createdDate >= :#{#filtre.dataInici}) " +
 			"and (:#{#filtre.dataFiNull} = true or ntf.createdDate <= :#{#filtre.dataFi}) "+
 			"and (:#{#filtre.organCodiNull} = true or ntf.organCodi = :#{#filtre.organCodi}) " +
@@ -142,8 +143,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:#{#filtre.nomesSenseErrors} = false or ntf.notificaErrorData is null) " +
 			"and (:#{#filtre.adminOrgan} = true or :#{#filtre.nomesAmbErrors} = false or ntf.notificaErrorData is not null) " +
 			"and (:#{#filtre.deleted} = ntf.deleted) " +
-			"and (:#{#filtre.referenciaNull} = true or lower(ntf.referencia) like '%' || lower(:#{#filtre.referencia}) || '%')"
-	)
+			"and (:#{#filtre.referenciaNull} = true or lower(ntf.referencia) like '%' || lower(:#{#filtre.referencia}) || '%')")
     List<Long> findIdsAmbFiltre(FiltreNotificacio filtre);
 
 	@Query("select distinct ntf from NotificacioTableEntity ntf " +
