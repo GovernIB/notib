@@ -835,17 +835,17 @@ $(document).ready(function() {
 																<%-- Assentament registral o Registre normal (versió anterior) --%>
 
 																<c:if test="${(notificacio.enviamentTipus == 'COMUNICACIO' || notificacio.enviamentTipus == 'SIR') && enviament.titular.interessatTipus == 'ADMINISTRACIO'}">
-																<c:if test="${(not empty enviament.registreEstat && (enviament.registreEstat == 'DISTRIBUIT' || enviament.registreEstat == 'VALID' || enviament.registreEstat == 'OFICI_EXTERN'  || enviament.registreEstat == 'OFICI_SIR')) || (empty enviament.registreEstat && not empty enviament.registreNumeroFormatat)}">
-																	<tr>
-																		<td><strong><spring:message code="enviament.info.seu.registre.justificant"/></strong></td>
-																		<td>
-																		<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/justificantDescarregar"/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience">
-																			<spring:message code="enviament.info.accio.descarregar.justificant"/>
-																			<span class="fa fa-download"></span>
-																		</a>
-																		</td>
-																	<tr>
-																</c:if>
+																	<c:if test="${(not empty enviament.registreEstat && (enviament.registreEstat == 'DISTRIBUIT' || enviament.registreEstat == 'VALID' || enviament.registreEstat == 'OFICI_EXTERN'  || enviament.registreEstat == 'OFICI_SIR')) || (empty enviament.registreEstat && not empty enviament.registreNumeroFormatat)}">
+																		<tr>
+																			<td><strong><spring:message code="enviament.info.seu.registre.justificant"/></strong></td>
+																			<td>
+																			<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/justificantDescarregar"/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience">
+																				<spring:message code="enviament.info.accio.descarregar.justificant"/>
+																				<span class="fa fa-download"></span>
+																			</a>
+																			</td>
+																		<tr>
+																	</c:if>
 																</c:if>
 
 															</tbody>

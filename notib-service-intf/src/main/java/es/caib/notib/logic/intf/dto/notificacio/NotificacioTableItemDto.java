@@ -100,7 +100,8 @@ public class NotificacioTableItemDto {
 	}
 
 	public boolean isJustificant() {
-		return estat != null && !estat.equals(NotificacioEstatEnumDto.PENDENT) && !estat.equals(NotificacioEstatEnumDto.ENVIANT) && !estat.equals(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
+		return estat != null && !estat.equals(NotificacioEstatEnumDto.PENDENT) && !estat.equals(NotificacioEstatEnumDto.ENVIANT)
+				&& !estat.equals(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS) && !estat.equals(NotificacioEstatEnumDto.REGISTRADA);
 	}
 
 
