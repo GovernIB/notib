@@ -200,7 +200,7 @@ public class JustificantServiceImpl implements JustificantService {
         var justificantFirmat = new FitxerDto();
         justificantFirmat.setContentType(MediaType.PDF.toString());
         justificantFirmat.setContingut(contingutFirmat);
-        justificantFirmat.setNom("justificant_notificació_" + notificacio.getId() + "_firmat.pdf");
+        justificantFirmat.setNom("justificant_" + tipusText + "_" + notificacio.getId() + "_firmat.pdf");
         justificantFirmat.setTamany(contingutFirmat.length);
         notificacio.setJustificantCreat(true);
         return justificantFirmat;
