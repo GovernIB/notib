@@ -79,7 +79,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     private ColumnesService columnesService;
 
     private static final  String TABLE_FILTRE = "not_massiva_filtre";
-    private static final String TABLE_NOTIFICACIONS_FILTRE = "not_massiva_nots_filtre";
+    public static final String TABLE_NOTIFICACIONS_FILTRE = "not_massiva_nots_filtre";
     private static final String SESSION_ATTRIBUTE_SELECCIO = "NotificacioController.session.seleccio";
     private static final String SET_COOKIE = "Set-cookie";
     private static final String REDIRECT = "redirect:..";
@@ -233,6 +233,29 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @GetMapping(value = "/{id}/remeses")
     public String consultarRemeses(HttpServletRequest request, Model model, @PathVariable Long id) {
 
+        emplenarModelConsultaRemeses(request, model, id);
+        return "notificacioMassivaNotificacionsList";
+    }
+
+    @PostMapping(value = "/{id}/remeses")
+    public String consultarRemesesUpdateFiltre(HttpServletRequest request, NotificacioFiltreCommand command, Model model, @PathVariable Long id) {
+
+        RequestSessionHelper.actualitzarObjecteSessio(request, TABLE_NOTIFICACIONS_FILTRE, command);
+        if (!command.getErrors().isEmpty()) {
+            MissatgesHelper.error(request, getErrorMsg(request, command.getErrors()));
+        }
+        emplenarModelConsultaRemeses(request, model, id);
+//        model.addAttribute("notificacioMassivaId", id);
+//        var entitatActual = getEntitatActualComprovantPermisos(request);
+//        var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), getCodiUsuariActual());
+//        model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
+//        model.addAttribute("nomesFiReintents", command.asDto().isNomesFiReintents());
+        return "notificacioMassivaNotificacionsList";
+    }
+
+    private void emplenarModelConsultaRemeses(HttpServletRequest request, Model model, Long id) {
+
+
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var organGestorActual = getOrganGestorActual(request);
         var command = notificacioListHelper.getFiltreCommand(request, TABLE_NOTIFICACIONS_FILTRE);
@@ -247,22 +270,6 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), codiUsuari);
         model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
         model.addAttribute("nomesFiReintents", command.asDto().isNomesFiReintents());
-        return "notificacioMassivaNotificacionsList";
-    }
-
-    @PostMapping(value = "/{id}/remeses")
-    public String consultarRemesesUpdateFiltre(HttpServletRequest request, NotificacioFiltreCommand command, Model model, @PathVariable Long id) {
-
-        RequestSessionHelper.actualitzarObjecteSessio(request, TABLE_NOTIFICACIONS_FILTRE, command);
-        if (!command.getErrors().isEmpty()) {
-            MissatgesHelper.error(request, getErrorMsg(request, command.getErrors()));
-        }
-        model.addAttribute("notificacioMassivaId", id);
-        var entitatActual = getEntitatActualComprovantPermisos(request);
-        var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), getCodiUsuariActual());
-        model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
-        model.addAttribute("nomesFiReintents", command.asDto().isNomesFiReintents());
-        return "notificacioMassivaNotificacionsList";
     }
 
     @GetMapping(value = "/{id}/remeses/datatable")

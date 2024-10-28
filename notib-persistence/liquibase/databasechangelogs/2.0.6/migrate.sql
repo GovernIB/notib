@@ -42,3 +42,6 @@ ALTER TABLE not_notificacio ADD caducitat_original date;
 -- Changeset db/changelog/changes/2.0.6/935.yaml::1634114082437-1::limit
 INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.llindar.dies.enviament.remeses', '5', 'Llindar en dies passats els quals la remesa no serà envaida i es té que tornar a crear', 'INT', 'GENERAL' );
 
+
+-- Changeset db/changelog/changes/2.0.6/947.yaml::1634114082437-1::limit
+INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.filtre.remeses.last.3.month', 'true', 'Boolea indicant si es vol mostrar només es vol mostrar les remeses dels tres últims mesos', 'BOOL', 'TAULA_REMESES' );

@@ -4,6 +4,7 @@
 package es.caib.notib.back.helper;
 
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
+import es.caib.notib.back.controller.NotificacioMassivaController;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.*;
@@ -53,8 +54,8 @@ public class NotificacioBackHelper {
 			return notificacioFiltreCommand;
 		}
 		notificacioFiltreCommand = new NotificacioFiltreCommand();
-		notificacioFiltreCommand.setDefaultFiltreData();
-		if (getLast3months()) {
+//		notificacioFiltreCommand.setDefaultFiltreData();
+		if (getLast3months() && !NotificacioMassivaController.TABLE_NOTIFICACIONS_FILTRE.equals(keyAttr)) {
 			notificacioFiltreCommand.setDefaultFiltreData();
 		}
 		RequestSessionHelper.actualitzarObjecteSessio(request, keyAttr, notificacioFiltreCommand);
@@ -96,6 +97,8 @@ public class NotificacioBackHelper {
 
 	}
 	private boolean getLast3months() {
-		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.filtre.remeses.last.3.month");
+//		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.filtre.remeses.last.3.month");
+		var propietat = aplicacioService.propertyGet("es.caib.notib.filtre.remeses.last.3.month" , "false");
+		return "true".equals(propietat);
 	}
 }
