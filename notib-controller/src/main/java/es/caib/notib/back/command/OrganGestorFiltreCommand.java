@@ -22,6 +22,7 @@ public class OrganGestorFiltreCommand {
 	private String oficina;
 	private OrganGestorEstatEnum estat;
 	private boolean entregaCie;
+	private boolean permetreSir;
 
 	private String isFiltre;
 

@@ -86,8 +86,9 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 //			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))" +
 			" and (:isOficinaNull = true or lower(og.oficina) like lower('%'||:oficina||'%'))"+
 			" and (:isEstatNull = true or og.estat = :estat)" +
-			" and (:isEntregaCieActiva = false or og.entregaCie is not null)")
-	List<OrganGestorEntity> findByEntitatAndFiltre(
+			" and (:isEntregaCieActiva = false or og.entregaCie is not null)" +
+			" and (:isPermetreSir = false or og.permetreSir = true)")
+	Page<OrganGestorEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("isCodiNull") boolean isCodiNull,
 			@Param("codi") String codi,
@@ -98,6 +99,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") OrganGestorEstatEnum estat,
 			@Param("isEntregaCieActiva") boolean isEntregaCieActiva,
+			@Param("isPermetreSir") boolean isPermetreSir,
 			@Param("isCodiPareNull") boolean isCodiPareNull,
 			@Param("codiPare") String codiPare);
 //			Pageable paginacio);
@@ -126,8 +128,10 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			" and (:isCodiPareNull = true or lower(og.codiPare) like lower('%'||:codiPare||'%'))" +
 //			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))" +
 			" and (:isOficinaNull = true or lower(og.entitat.oficina) like lower('%'||:oficina||'%'))" +
-			" and (:isEstatNull = true or og.estat = :estat)")
-	List<OrganGestorEntity> findByEntitatAndOrganGestorAndFiltre(
+			" and (:isEstatNull = true or og.estat = :estat)" +
+			" and (:isEntregaCieActiva = false or og.entregaCie is not null)" +
+			" and (:isPermetreSir = false or og.permetreSir = true)")
+	Page<OrganGestorEntity> findByEntitatAndOrganGestorAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("organsIds") List<String> organs,
 			@Param("isCodiNull") boolean isCodiNull,
@@ -139,9 +143,11 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") OrganGestorEstatEnum estat,
 			@Param("isCodiPareNull") boolean isCodiPareNull,
-			@Param("codiPare") String codiPare);
+			@Param("codiPare") String codiPare,
+			@Param("isEntregaCieActiva") boolean isEntregaCieActiva,
+			@Param("isPermetreSir") boolean isPermetreSir);
 //			Pageable paginacio);
-	
+
 	@Query(	"select distinct og.codi " +
 			"from OrganGestorEntity og " +
 			"     left outer join og.entitat e " + 
