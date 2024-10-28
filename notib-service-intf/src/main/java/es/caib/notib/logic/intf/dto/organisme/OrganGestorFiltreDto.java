@@ -23,6 +23,7 @@ public class OrganGestorFiltreDto extends AuditoriaDto implements Serializable {
 	private String oficina;
 	private OrganGestorEstatEnum estat;
 	private boolean entregaCie;
+	private boolean permetreSir;
 
 	private boolean isFiltre;
 
@@ -38,6 +39,7 @@ public class OrganGestorFiltreDto extends AuditoriaDto implements Serializable {
 		boolean ok = organ != null && (codi == null || codi.isEmpty() || organ.getCodi() != null &&  organ.getCodi().contains(codi.toUpperCase()))
 				&& (nom == null || nom.isEmpty() || organ.getNom() != null && organ.getNom().toLowerCase().contains(nom.toLowerCase()))
 				&& (!entregaCie || organ.getCieId() != null)
+				&& (!permetreSir || organ.isPermetreSir())
 				&& (estat == null || estat.equals(organ.getEstat()))
 				&& (oficina == null || oficina.isEmpty() || organ.getOficina() != null && oficina.equals(organ.getOficina().getCodi()));
 		if (organ != null && entregaCie && organ.isEntregaCieActiva()) {

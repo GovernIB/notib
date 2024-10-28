@@ -40,11 +40,17 @@
 			$("#estat").change();
 			$('#btn-entregaCie').removeClass('active');
 			$('#entregaCieActiva').val(false);
+			$('#btn-permetreSir').removeClass('active');
+			$('#permetreSir').val(false);
 			$('#form-filtre').submit();
 		});
 		$('#btn-entregaCie').click(function() {
 			let entregaCie = !$(this).hasClass('active');
 			$('#entregaCie').val(entregaCie);
+		});
+		$('#btn-permetreSir').click(function() {
+			let permetreSir = !$(this).hasClass('active');
+			$('#permetreSir').val(permetreSir);
 		})
 		$(".panel-heading").css({"display": "flex", "justify-content": "space-between"})
 		$(".panel-heading").append("<div><button id='canviarVistaOrganGestor' class='btn btn-primary'><spring:message code='boto.canviar.vista'/></button></div>");
@@ -141,12 +147,17 @@
 
 		</div>
 		<div class="row">
-			<div class="col-md-2">
-					<%--				<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" inline="true" />--%>
+			<div class="btn-group" role="group">
 				<button id="btn-entregaCie" title="" class="btn btn-default <c:if test="${organGestorFiltreCommand.entregaCie}">active</c:if>" data-toggle="button">
 					<span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.cie"/>
 				</button>
 				<not:inputHidden name="entregaCie"/>
+			</div>
+			<div class="btn-group" role="group">
+				<button id="btn-permetreSir" title="" class="btn btn-default <c:if test="${organGestorFiltreCommand.permetreSir}">active</c:if>" data-toggle="button">
+					<span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.permetre.sir"/>
+				</button>
+				<not:inputHidden name="permetreSir"/>
 			</div>
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
@@ -213,6 +224,12 @@
 					<spring:message code="organgestor.list.columna.cie"/>
 					<script id="cellActivaTemplate" type="text/x-jsrender">
 						{{if entregaCieActiva}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="permetreSir" data-orderable="false" data-template="#cellPermetreSir">
+					<spring:message code="organgestor.list.columna.permetre.sir"/>
+					<script id="cellPermetreSir" type="text/x-jsrender">
+						{{if permetreSir}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
 				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="100px">

@@ -86,6 +86,8 @@
                     });
                     $('#btn-entregaCie').removeClass('active');
                     $('#entregaCie').val(false);
+                    $('#btn-permetreSir').removeClass('active');
+                    $('#permetreSir').removeClass('active');
                     $('#isFiltre').val(false);
                     $('#form-filtre').submit();
                 });
@@ -100,12 +102,17 @@
                 $("#btnFiltrar").click(() => {
                     $('#isFiltre').val(true);
                     $('#form-filtre').submit();
-                })
+                });
 
                 $('#btn-entregaCie').click(function() {
                     let entregaCieActiva = !$(this).hasClass('active');
                     $('#entregaCie').val(entregaCieActiva);
-                })
+                });
+
+                $('#btn-permetreSir').click(function() {
+                    let permetreSir = !$(this).hasClass('active');
+                    $('#permetreSir').val(permetreSir);
+                });
 
                 $(".panel-heading:first").css({"display": "flex", "justify-content": "space-between"})
                 $(".panel-heading:first").append("<div><button id='canviarVistaOrganGestor' class='btn btn-primary'><spring:message code='boto.canviar.vista'/></button></div>");
@@ -174,11 +181,17 @@
 
             </div>
             <div class="row">
-                <div class="col-md-2">
+                <div class="btn-group" role="group">
                     <button id="btn-entregaCie" title="" class="btn btn-default <c:if test="${organGestorFiltreCommand.entregaCie}">active</c:if>" data-toggle="button">
                         <span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.cie"/>
                     </button>
                     <not:inputHidden name="entregaCie"/>
+                </div>
+                <div class="btn-group" role="group">
+                    <button id="btn-permetreSir" title="" class="btn btn-default <c:if test="${organGestorFiltreCommand.permetreSir}">active</c:if>" data-toggle="button">
+                        <span class="fa fa-send"></span> <spring:message code="organgestor.list.columna.permetre.sir"/>
+                    </button>
+                    <not:inputHidden name="permetreSir"/>
                 </div>
                 <div class="col-md-2 pull-right">
                     <div class="pull-right">

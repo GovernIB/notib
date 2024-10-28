@@ -390,6 +390,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				isEstatNull,
 				estat,
 				filtre.isEntregaCie(),
+				filtre.isPermetreSir(),
 				filtre.getCodiPare() == null || filtre.getCodiPare().isEmpty(),
 				filtre.getCodiPare() == null ? "" : filtre.getCodiPare(),
 				pageable);
@@ -420,6 +421,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				estat,
 				filtre.getCodiPare() == null || filtre.getCodiPare().isEmpty(),
 				filtre.getCodiPare() == null ? "" : filtre.getCodiPare(),
+				filtre.isEntregaCie(),
+				filtre.isPermetreSir(),
 				pageable);
 	}
 	
