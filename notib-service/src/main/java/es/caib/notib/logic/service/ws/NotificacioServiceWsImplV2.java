@@ -313,7 +313,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
  			notificacioValidator.validate();
 			if (errors.hasErrors()) {
 				String errorDescripcio = errors.getAllErrors().stream().map(e -> e.getCode()).collect(Collectors.joining(", "));
-				integracioHelper.addAccioError(info, resposta.getErrorDescripcio());
+				integracioHelper.addAccioError(info, errorDescripcio);
 				log.debug(">> [ALTA] validacio: [errors=" + errorDescripcio + "]");
 				return setRespostaError(errorDescripcio);
 			}
