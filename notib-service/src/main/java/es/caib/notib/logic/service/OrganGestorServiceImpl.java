@@ -425,7 +425,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				isEstatNull,
 				estat,
 				filtre.getCodiPare() == null || filtre.getCodiPare().isEmpty(),
-				filtre.getCodiPare() == null ? "" : filtre.getCodiPare());
+				filtre.getCodiPare() == null ? "" : filtre.getCodiPare(),
                 filtre.isEntregaCie(),
                 filtre.isPermetreSir());
 //				pageable);

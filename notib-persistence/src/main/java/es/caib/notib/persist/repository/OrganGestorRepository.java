@@ -88,7 +88,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			" and (:isEstatNull = true or og.estat = :estat)" +
 			" and (:isEntregaCieActiva = false or og.entregaCie is not null)" +
 			" and (:isPermetreSir = false or og.permetreSir = true)")
-	Page<OrganGestorEntity> findByEntitatAndFiltre(
+	List<OrganGestorEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("isCodiNull") boolean isCodiNull,
 			@Param("codi") String codi,
@@ -131,7 +131,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			" and (:isEstatNull = true or og.estat = :estat)" +
 			" and (:isEntregaCieActiva = false or og.entregaCie is not null)" +
 			" and (:isPermetreSir = false or og.permetreSir = true)")
-	Page<OrganGestorEntity> findByEntitatAndOrganGestorAndFiltre(
+	List<OrganGestorEntity> findByEntitatAndOrganGestorAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("organsIds") List<String> organs,
 			@Param("isCodiNull") boolean isCodiNull,
