@@ -90,4 +90,10 @@ public class UsuariAplicacioService extends AbstractService<es.caib.notib.logic.
 		return getDelegateService().updateActiva(id, activa);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public boolean provarAplicacio(Long aplicacioId) {
+		return getDelegateService().provarAplicacio(aplicacioId);
+	}
+
 }

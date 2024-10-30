@@ -4,14 +4,18 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
+import com.sun.jersey.api.client.ClientResponse;
 import es.caib.notib.logic.aspect.Audita;
+import es.caib.notib.logic.helper.CallbackHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.EntityComprovarHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
+import es.caib.notib.logic.helper.RequestsHelper;
 import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.AuditService.TipusEntitat;
 import es.caib.notib.logic.intf.service.AuditService.TipusObjecte;
@@ -27,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
@@ -48,8 +53,10 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	private PaginacioHelper paginacioHelper;
 	@Resource
 	private MetricsHelper metricsHelper;
+	@Resource
+	private RequestsHelper requestsHelper;
 
-	
+
 	@Audita(entityType = TipusEntitat.APLICACIO, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
@@ -221,5 +228,21 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
+	@Override
+	public boolean provarAplicacio(Long aplicacioId) {
+
+		try {
+			log.info("Provant aplicacio " + aplicacioId);
+			var aplicacio = aplicacioRepository.findById(aplicacioId).orElseThrow();
+			var urlCallback = aplicacio.getCallbackUrl() + (aplicacio.getCallbackUrl().endsWith("/") ? "" : "/") +  CallbackHelper.NOTIFICACIO_CANVI;
+			var resposta = requestsHelper.callbackAplicacioNotificaCanvi(urlCallback, new NotificacioCanviClient());
+			return resposta != null && ClientResponse.Status.OK.getStatusCode() == resposta.getStatusInfo().getStatusCode();
+		} catch (Exception ex) {
+			log.error("Error inesperat provant la aplicacio", ex);
+			return false;
+		}
+	}
+
+
 }

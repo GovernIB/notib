@@ -86,6 +86,7 @@
 								{{else}}
 								<li><a href="aplicacio/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
 								{{/if}}
+								<li><a href="aplicacio/{{:id}}/provar" data-toggle="ajax"><span class="fa fa-cog"></span>&nbsp;&nbsp;<spring:message code="comu.boto.provar"/></a></li>
 								<li><a href="aplicacio/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="aplicacio.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>

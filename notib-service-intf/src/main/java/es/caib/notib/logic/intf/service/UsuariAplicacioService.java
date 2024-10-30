@@ -53,9 +53,7 @@ public interface UsuariAplicacioService {
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public AplicacioDto delete(
-			Long id,
-			Long entitatId) throws NotFoundException;
+	public AplicacioDto delete(Long id, Long entitatId) throws NotFoundException;
 	
 	/**
 	 * Consulta una aplicació a partir d'un l'identificador.
@@ -137,5 +135,8 @@ public interface UsuariAplicacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	public AplicacioDto updateActiva(Long id, boolean activa);
-	
+
+
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	boolean provarAplicacio(Long aplicacioId);
 }

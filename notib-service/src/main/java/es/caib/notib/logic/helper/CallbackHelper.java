@@ -47,7 +47,7 @@ import java.util.NoSuchElementException;
 @Component
 public class CallbackHelper {
 
-	private static final String NOTIFICACIO_CANVI = "notificaCanvi";
+	public static final String NOTIFICACIO_CANVI = "notificaCanvi";
 	@Autowired
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
