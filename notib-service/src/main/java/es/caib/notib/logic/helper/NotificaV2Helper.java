@@ -199,7 +199,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					integracioHelper.addAccioOk(info);
 				} else {
 					error = true;
-					var errorNotib = NOTIB.equals(resultadoAlta.getDescripcionRespuesta());
+					var errorNotib = NOTIB.equals(resultadoAlta.getCodigoRespuesta());
 					var origenError = !errorNotib ? "Error retornat per Notifica: " : "Error retornat per Notib: ";
 					errorDescripcio = origenError + " [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
 					log.info(" >>> ... ERROR: " + errorDescripcio);
