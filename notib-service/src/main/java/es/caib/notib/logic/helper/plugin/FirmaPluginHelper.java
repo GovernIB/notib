@@ -7,7 +7,7 @@ import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -34,7 +34,7 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 
 	public byte[] firmaServidorFirmar(NotificacioEntity notificacio, FitxerDto fitxer, TipusFirma tipusFirma, String motiu, String idioma) {
 
-		var info = new IntegracioInfo(IntegracioCodiEnum.FIRMASERV, "Firma en servidor d'un document", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.FIRMASERV, "Firma en servidor d'un document", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("notificacioId", notificacio.getId().toString()),
 				new AccioParam("títol", fitxer.getNom()));
 
@@ -49,7 +49,7 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 			log.error(errorDescripcio, ex);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			peticionsPlugin.updatePeticioError(getCodiEntitatActual());
-			throw new SistemaExternException(IntegracioCodiEnum.FIRMASERV.name(), errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioCodi.FIRMASERV.name(), errorDescripcio, ex);
 		}
 	}
 
@@ -68,7 +68,7 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 		if (pluginClass == null || pluginClass.length() == 0) {
 			var error = "No està configurada la classe per al plugin de firma en servidor";
 			log.error(error);
-			throw new SistemaExternException(IntegracioCodiEnum.FIRMASERV.name(), error);
+			throw new SistemaExternException(IntegracioCodi.FIRMASERV.name(), error);
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
@@ -78,7 +78,7 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 		} catch (Exception ex) {
 			var error = "Error al crear la instància del plugin de firma en servidor" ;
 			log.error(error + " (" + pluginClass + "): ", ex);
-			throw new SistemaExternException(IntegracioCodiEnum.FIRMASERV.name(), error, ex);
+			throw new SistemaExternException(IntegracioCodi.FIRMASERV.name(), error, ex);
 		}
 	}
 

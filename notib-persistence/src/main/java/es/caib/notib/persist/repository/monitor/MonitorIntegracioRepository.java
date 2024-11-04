@@ -1,7 +1,7 @@
 package es.caib.notib.persist.repository.monitor;
 
 import es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioEntity;
 import es.caib.notib.persist.filtres.FiltreMonitorIntegracio;
 import org.springframework.data.domain.Page;
@@ -31,7 +31,7 @@ public interface MonitorIntegracioRepository extends JpaRepository<MonitorIntegr
             "order by n.data desc ")
     Page<MonitorIntegracioEntity> getByFiltre(FiltreMonitorIntegracio filtre, Pageable pageable);
 
-    int countByCodiAndEstat(@Param("codi") IntegracioCodiEnum codi, @Param("estat")IntegracioAccioEstatEnumDto estat);
+    int countByCodiAndEstat(@Param("codi") IntegracioCodi codi, @Param("estat")IntegracioAccioEstatEnumDto estat);
 
     List<MonitorIntegracioEntity> findByDataLessThan(@Param("llindar") Date llindar);
 
@@ -46,7 +46,7 @@ public interface MonitorIntegracioRepository extends JpaRepository<MonitorIntegr
     void eliminarAntics(@Param("ids") List<Long> ids);
 
     @Modifying
-    void deleteByCodiAndCodiEntitat(@Param("codi") IntegracioCodiEnum codi, @Param("codiEntitat") String codiEntitat);
+    void deleteByCodiAndCodiEntitat(@Param("codi") IntegracioCodi codi, @Param("codiEntitat") String codiEntitat);
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     MonitorIntegracioEntity save(@Param("integracio") MonitorIntegracioEntity integracio);

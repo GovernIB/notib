@@ -8,7 +8,7 @@ import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.NotificacioEventHelper;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
@@ -50,7 +50,7 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 		if (e.isPerEmail() || InteressatTipus.ADMINISTRACIO.equals(e.getTitular().getInteressatTipus())) {
 			return;
 		}
-		var info = new IntegracioInfo(IntegracioCodiEnum.CARPETA, "Enviar notificació mòvil", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		var info = new IntegracioInfo(IntegracioCodi.CARPETA, "Enviar notificació mòvil", IntegracioAccioTipusEnumDto.ENVIAMENT);
 		var eventInfo = NotificacioEventHelper.EventInfo.builder().enviament(e).tipus(NotificacioEventTipusEnumDto.API_CARPETA).build();
 		var enviarCarpeta = enviarCarpeta();
 		try {
@@ -126,7 +126,7 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 		if (Strings.isNullOrEmpty(pluginClass)) {
 			var error = "No està configurada la classe per al plugin de CARPETA";
 			log.error(error);
-			throw new SistemaExternException(IntegracioCodiEnum.CARPETA.name(), error);
+			throw new SistemaExternException(IntegracioCodi.CARPETA.name(), error);
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
@@ -134,7 +134,7 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 			pluginMap.put(entitatCodi, plugin);
 			return (CarpetaPlugin) plugin;
 		} catch (Exception ex) {
-			throw new SistemaExternException(IntegracioCodiEnum.CARPETA.name(), "Error al crear la instància del plugin de CARPETA", ex);
+			throw new SistemaExternException(IntegracioCodi.CARPETA.name(), "Error al crear la instància del plugin de CARPETA", ex);
 		}
 	}
 

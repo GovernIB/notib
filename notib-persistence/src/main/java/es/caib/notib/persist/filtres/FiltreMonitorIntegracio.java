@@ -2,7 +2,7 @@ package es.caib.notib.persist.filtres;
 
 import es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +14,7 @@ import java.util.Date;
 @Setter
 public class FiltreMonitorIntegracio {
 
-    private IntegracioCodiEnum codi;
+    private IntegracioCodi codi;
     private boolean codiEntitatNull;
     private String codiEntitat;
     private boolean aplicacioNull;

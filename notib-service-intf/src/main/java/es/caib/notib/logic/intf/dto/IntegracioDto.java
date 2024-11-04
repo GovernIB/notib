@@ -22,7 +22,7 @@ import java.io.Serializable;
 @Getter @Setter
 public class IntegracioDto implements Serializable {
 
-	private IntegracioCodiEnum codi;
+	private IntegracioCodi codi;
 	private String nom;
 	private int numErrors;
 

@@ -7,7 +7,7 @@ import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.persist.repository.NotificacioMassivaRepository;
@@ -41,7 +41,7 @@ public class EmailMassivaListener {
                                Message message) throws JMSException {
 
         var info = new IntegracioInfo(
-                IntegracioCodiEnum.EMAIL,
+                IntegracioCodi.EMAIL,
                 "Enviament de email per notificació massiva",
                 IntegracioAccioTipusEnumDto.ENVIAMENT,
                 new AccioParam("Identificador de la notificacio massiva", String.valueOf(notificacioMassivaId)));

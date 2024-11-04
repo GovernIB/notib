@@ -4,7 +4,7 @@
 package es.caib.notib.logic.intf.service;
 
 import es.caib.notib.logic.intf.dto.IntegracioAccioDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioDetall;
 import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
@@ -32,11 +32,11 @@ public interface MonitorIntegracioService {
 	 *             Si no s'ha trobat la integració amb el codi especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(IntegracioCodiEnum codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) throws NotFoundException;
+	PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(IntegracioCodi codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) throws NotFoundException;
 
 	/** Consulta el número d'errors per integració. */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	Map<IntegracioCodiEnum, Integer> countErrors();
+	Map<IntegracioCodi, Integer> countErrors();
 
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	void netejarMonitor();

@@ -6,7 +6,7 @@ package es.caib.notib.logic.helper;
 import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.email.EmailConstants;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -412,7 +412,7 @@ public abstract class AbstractNotificaHelper {
 		cipher.init(Cipher.DECRYPT_MODE, rc4Key);
 
 		if (idXifrat.length() < 11) {
-			throw new SistemaExternException(IntegracioCodiEnum.CALLBACK.name(), "La longitud mínima del identificador xifrat ha de ser 11 caràcters.");
+			throw new SistemaExternException(IntegracioCodi.CALLBACK.name(), "La longitud mínima del identificador xifrat ha de ser 11 caràcters.");
 		}
 
 		byte[] desxifrat = cipher.doFinal(Base64.decodeBase64(idXifrat.getBytes()));

@@ -7,7 +7,7 @@ import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.plugins.arxiu.api.Document;
@@ -43,7 +43,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<IArxiuPlugin> {
 
 	public Document arxiuDocumentConsultar(String identificador, String versio, boolean ambContingut, boolean isUuid) throws DocumentNotFoundException {
 
-		var info = new IntegracioInfo(IntegracioCodiEnum.ARXIU, "Consulta d'un document", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.ARXIU, "Consulta d'un document", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("identificador del document", identificador),
 				new AccioParam("Versio", versio));
 
@@ -64,7 +64,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<IArxiuPlugin> {
 	
 	public DocumentContingut arxiuGetImprimible(String id, boolean isUuid) {
 		
-		var info = new IntegracioInfo(IntegracioCodiEnum.ARXIU, "Obtenir versió imprimible d'un document", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.ARXIU, "Obtenir versió imprimible d'un document", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador del document", id),
 				new AccioParam("Tipus d'identificador", isUuid ? "uuid" : "csv"));
 
@@ -80,7 +80,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<IArxiuPlugin> {
 		} catch (Exception ex) {
 			var errorDescripcio = "No s'ha pogut recuperar el document amb " + id;
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(IntegracioCodiEnum.ARXIU.name(), errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioCodi.ARXIU.name(), errorDescripcio, ex);
 		}
 	}
 	
@@ -113,7 +113,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<IArxiuPlugin> {
 		if (Strings.isNullOrEmpty(pluginClass)) {
 			String msg = "La classe del plugin d'arxiu digital no està definida";
 			log.error(msg);
-			throw new SistemaExternException(IntegracioCodiEnum.ARXIU.name(), msg);
+			throw new SistemaExternException(IntegracioCodi.ARXIU.name(), msg);
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
@@ -123,7 +123,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<IArxiuPlugin> {
 		} catch (Exception ex) {
 			var msg = "Error al crear la instància del plugin d'arxiu digital (" + pluginClass + ") ";
 			log.error(msg, ex);
-			throw new SistemaExternException(IntegracioCodiEnum.ARXIU.name(), msg, ex);
+			throw new SistemaExternException(IntegracioCodi.ARXIU.name(), msg, ex);
 		}
 	}
 

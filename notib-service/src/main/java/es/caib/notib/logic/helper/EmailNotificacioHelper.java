@@ -1,9 +1,8 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
-import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.objectes.LoggingTipus;
@@ -34,7 +33,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 
 	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws Exception {
 
-		var info = new IntegracioInfo(IntegracioCodiEnum.EMAIL, "Enviament de emails per notificació " + notificacio.getId(), IntegracioAccioTipusEnumDto.ENVIAMENT);
+		var info = new IntegracioInfo(IntegracioCodi.EMAIL, "Enviament de emails per notificació " + notificacio.getId(), IntegracioAccioTipusEnumDto.ENVIAMENT);
 		info.setCodiEntitat(notificacio.getEntitat().getCodi());
 		info.addParam("Identificador de la notificacio", String.valueOf(notificacio.getId()));
 		var destinataris = obtenirCodiDestinataris(notificacio, info);

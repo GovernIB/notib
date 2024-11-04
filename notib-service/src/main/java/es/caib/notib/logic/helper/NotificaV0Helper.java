@@ -5,7 +5,7 @@ import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificaRespostaDatatDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -74,7 +74,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
 
 		Thread.sleep(1000);
-		var info = new IntegracioInfo(IntegracioCodiEnum.NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
 
 		var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();

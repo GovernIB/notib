@@ -3,7 +3,7 @@ package es.caib.notib.logic.helper;
 import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioEntity;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioParamEntity;
@@ -46,10 +46,10 @@ public class IntegracioHelper {
     }
 
 
-    public Map<IntegracioCodiEnum, Integer> countErrorsGroupByCodi() {
+    public Map<IntegracioCodi, Integer> countErrorsGroupByCodi() {
 
-		Map<IntegracioCodiEnum ,Integer> errorsGroupByCodi = new HashMap<>();
-		IntegracioCodiEnum.stream().forEach(codi -> errorsGroupByCodi.put(codi, countErrors(codi)));
+		Map<IntegracioCodi,Integer> errorsGroupByCodi = new HashMap<>();
+		IntegracioCodi.stream().forEach(codi -> errorsGroupByCodi.put(codi, countErrors(codi)));
 		return errorsGroupByCodi;
 	}
 
@@ -138,7 +138,7 @@ public class IntegracioHelper {
 		}
 	}
 
-	private Integer countErrors(IntegracioCodiEnum codi) {
+	private Integer countErrors(IntegracioCodi codi) {
 		return monitorRepository.countByCodiAndEstat(codi, IntegracioAccioEstatEnumDto.ERROR);
 	}
 

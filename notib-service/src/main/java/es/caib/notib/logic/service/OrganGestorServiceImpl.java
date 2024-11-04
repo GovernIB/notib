@@ -19,12 +19,11 @@ import es.caib.notib.logic.helper.ProcSerSyncHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.Arbre;
 import es.caib.notib.logic.intf.dto.ArbreNode;
-import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
@@ -61,7 +60,6 @@ import es.caib.notib.persist.repository.PagadorCieRepository;
 import es.caib.notib.persist.repository.PagadorPostalRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
-import liquibase.pro.packaged.T;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MultiValuedMap;
@@ -617,7 +615,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		} finally {
 			progres.setProgres(100);
 			progres.setFinished(true);
-			var info = new IntegracioInfo(IntegracioCodiEnum.UNITATS, "Actualització d'òrgans gestors",
+			var info = new IntegracioInfo(IntegracioCodi.UNITATS, "Actualització d'òrgans gestors",
 					IntegracioAccioTipusEnumDto.PROCESSAR, new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
 			info.setCodiEntitat(entitatDto.getCodi());
 			for (var inf: progres.getInfo()) {
@@ -663,7 +661,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		try {
 			return pluginHelper.unitatsOrganitzativesFindByPareJSON(entitat.getCodi(), entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
 		} catch (Exception ex) {
-			throw new SistemaExternException(IntegracioCodiEnum.UNITATS.name(), "No ha estat possible el json dels organs gestors del DIR3", ex);
+			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), "No ha estat possible el json dels organs gestors del DIR3", ex);
 		}
 	}
 
@@ -768,7 +766,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		} catch (SistemaExternException sex) {
 			throw sex;
 		} catch (Exception ex) {
-			throw new SistemaExternException(IntegracioCodiEnum.UNITATS.name(), "No ha estat possible obtenir la predicció de canvis de unitats organitzatives", ex);
+			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), "No ha estat possible obtenir la predicció de canvis de unitats organitzatives", ex);
 		}
 	}
 
@@ -981,7 +979,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 							+ ") té l'estat (" + unitat.getEstat() + ") i l'històrica (" + historicCodi
 							+ ") però no s'ha retornat la unitat orgánica (" + historicCodi
 							+ ") en el resultat de la consulta del WS ni en la BBDD.";
-					throw new SistemaExternException(IntegracioCodiEnum.UNITATS.name(), errorMissatge);
+					throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorMissatge);
 				}
 			} else if (historicCodi.equals(unitat.getCodi())) {
 				// EXAMPLE:
@@ -1421,7 +1419,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private void syncOficines(String entitatDir3Codi, ProgresActualitzacioDto progres) {
 
 		var desc = "Actualització d'oficines SIR per l'entitat " + entitatDir3Codi;
-		var info = new IntegracioInfo(IntegracioCodiEnum.UNITATS, desc, IntegracioAccioTipusEnumDto.PROCESSAR);
+		var info = new IntegracioInfo(IntegracioCodi.UNITATS, desc, IntegracioAccioTipusEnumDto.PROCESSAR);
 		try {
 			// Obtenim l'entitat
 			var entitat = entitatRepository.findByDir3Codi(entitatDir3Codi);

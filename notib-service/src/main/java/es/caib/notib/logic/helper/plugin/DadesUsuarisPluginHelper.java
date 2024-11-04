@@ -6,7 +6,7 @@ import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.plugin.usuari.DadesUsuari;
@@ -35,7 +35,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 
 	public List<String> consultarRolsAmbCodi(String usuariCodi) {
 
-		var info = new IntegracioInfo(IntegracioCodiEnum.USUARIS,"Consulta rols usuari amb codi",
+		var info = new IntegracioInfo(IntegracioCodi.USUARIS,"Consulta rols usuari amb codi",
 				IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Codi d'usuari", usuariCodi));
 
 		try {
@@ -48,13 +48,13 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
 			peticionsPlugin.updatePeticioError(null);
-			throw new SistemaExternException(IntegracioCodiEnum.USUARIS.name(), errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioCodi.USUARIS.name(), errorDescripcio, ex);
 		}
 	}
 	
 	public DadesUsuari dadesUsuariConsultarAmbCodi(String usuariCodi) {
 		
-		var info = new IntegracioInfo(IntegracioCodiEnum.USUARIS,"Consulta d'usuari amb codi", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.USUARIS,"Consulta d'usuari amb codi", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi d'usuari", usuariCodi));
 
 		try {
@@ -66,13 +66,13 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 			var errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
 			peticionsPlugin.updatePeticioError(null);
-			throw new SistemaExternException(IntegracioCodiEnum.USUARIS.name(), errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioCodi.USUARIS.name(), errorDescripcio, ex);
 		}
 	}
 	
 	public List<DadesUsuari> dadesUsuariConsultarAmbGrup(String grupCodi) {
 		
-		var info = new IntegracioInfo(IntegracioCodiEnum.USUARIS,"Consulta d'usuaris d'un grup", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.USUARIS,"Consulta d'usuaris d'un grup", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi de grup", grupCodi));
 
 		try {
@@ -84,7 +84,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 			var errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
 			peticionsPlugin.updatePeticioError(null);
-			throw new SistemaExternException(IntegracioCodiEnum.USUARIS.name(), errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioCodi.USUARIS.name(), errorDescripcio, ex);
 		}
 	}
 
@@ -115,7 +115,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 		if (Strings.isNullOrEmpty(pluginClass)) {
 			var msg = "La classe del plugin d'usuari no està definida";
 			log.error(msg);
-			throw new SistemaExternException(IntegracioCodiEnum.USUARIS.name(), msg);
+			throw new SistemaExternException(IntegracioCodi.USUARIS.name(), msg);
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
@@ -127,7 +127,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 			return plugin;
 		} catch (Exception ex) {
 			log.error("Error al crear la instància del plugin de dades d'usuari (" + pluginClass + "): ", ex);
-			throw new SistemaExternException(IntegracioCodiEnum.USUARIS.name(), "Error al crear la instància del plugin de dades d'usuari", ex);
+			throw new SistemaExternException(IntegracioCodi.USUARIS.name(), "Error al crear la instància del plugin de dades d'usuari", ex);
 		}
 	}
 

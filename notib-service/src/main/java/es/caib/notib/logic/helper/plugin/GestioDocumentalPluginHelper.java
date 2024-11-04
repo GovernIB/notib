@@ -6,7 +6,7 @@ import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.persist.repository.DocumentRepository;
@@ -48,7 +48,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 	@Synchronized
 	public String gestioDocumentalCreate(String agrupacio, byte[] contingut) {
 		
-		var info = new IntegracioInfo(IntegracioCodiEnum.GESDOC, "Creació d'un arxiu", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.GESDOC, "Creació d'un arxiu", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Agrupacio", agrupacio),
 				new AccioParam("Núm bytes", (contingut != null) ? Integer.toString(contingut.length) : "0"));
 		var codiEntitat = getCodiEntitatActual();
@@ -66,14 +66,14 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			log.error("Error creant el document en el gestor documental amb agrupacio " + agrupacio);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			peticionsPlugin.updatePeticioError(codiEntitat);
-			throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), errorDescripcio, ex);
 		}
 	}
 
 	@Synchronized
 	public void gestioDocumentalUpdate(String id, String agrupacio, byte[] contingut) {
 		
-		var info = new IntegracioInfo(IntegracioCodiEnum.GESDOC, "Modificació d'un arxiu", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.GESDOC, "Modificació d'un arxiu", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Id del document", id),
 				new AccioParam("Agrupacio", agrupacio),
 				new AccioParam("Núm bytes", (contingut != null) ? Integer.toString(contingut.length) : "0"));
@@ -90,13 +90,13 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			log.error("Error actualitzant el document " + id);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			peticionsPlugin.updatePeticioError(codiEntitat);
-			throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), errorDescripcio, ex);
 		}
 	}
 	
 	public void gestioDocumentalDelete(String id, String agrupacio) {
 		
-		var info = new IntegracioInfo(IntegracioCodiEnum.GESDOC,"Eliminació d'un arxiu", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.GESDOC,"Eliminació d'un arxiu", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Id del document", id), new AccioParam("Agrupacio", agrupacio));
 		var codiEntitat = getCodiEntitatActual();
 		info.setCodiEntitat(codiEntitat);
@@ -109,7 +109,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			var errorDescripcio = "Error al accedir al plugin de gestió documental";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			peticionsPlugin.updatePeticioError(codiEntitat);
-			throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), errorDescripcio, ex);
 		}
 	}
 
@@ -120,7 +120,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 	
 	public void gestioDocumentalGet(String id, String agrupacio, OutputStream contingutOut, Boolean isZip) {
 		
-		var info = new IntegracioInfo(IntegracioCodiEnum.GESDOC, "Consultant arxiu de la gestió documental", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.GESDOC, "Consultant arxiu de la gestió documental", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Id del document", id),
 				new AccioParam("Agrupacio", agrupacio));
 		var codiEntitat = getCodiEntitatActual();
@@ -132,7 +132,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			if (isZip == null && agrupacioPotContenirZip) {
 				var document = documentRepository.getByArxiuGestdocId(id);
 				if (document == null) {
-					throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), "El document a recuperar no existeix o és temporal i no s'ha indicat si es tracta d'un document zip");
+					throw new SistemaExternException(IntegracioCodi.GESDOC.name(), "El document a recuperar no existeix o és temporal i no s'ha indicat si es tracta d'un document zip");
 				}
 				isZip = document.isMediaTypeZip();
 			}
@@ -142,7 +142,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			var errorDescripcio = "Error al accedir al plugin de gestió documental per a obtenir el document amb id: " + (agrupacio != null ? agrupacio + "/" : "") + id;
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			peticionsPlugin.updatePeticioError(codiEntitat);
-			throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), errorDescripcio, ex);
 		}
 	}
 	
@@ -175,7 +175,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 		if (Strings.isNullOrEmpty(pluginClass)) {
 			var msg = "La classe del plugin de gestió documental no està configurada";
 			log.error(msg);
-			throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), msg);
+			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), msg);
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
@@ -186,7 +186,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 		} catch (Exception ex) {
 			var msg = "Error al crear la instància del plugin de gestió documental (" + pluginClass + ") ";
 			log.error(msg, ex);
-			throw new SistemaExternException(IntegracioCodiEnum.GESDOC.name(), msg, ex);
+			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), msg, ex);
 		}
 	}
 
