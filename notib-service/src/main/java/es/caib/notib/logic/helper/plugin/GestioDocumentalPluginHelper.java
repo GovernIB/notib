@@ -4,9 +4,11 @@ import com.google.common.base.Strings;
 import es.caib.comanda.salut.model.EstatSalutEnum;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
+import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.persist.repository.DocumentRepository;
@@ -43,6 +45,14 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 
 	public GestioDocumentalPluginHelper(IntegracioHelper integracioHelper, ConfigHelper configHelper) {
 		super(integracioHelper, configHelper);
+	}
+
+	@Override
+	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception {
+
+		var id = gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, new byte[0]);
+		gestioDocumentalDelete(id, PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS);
+		return true;
 	}
 
 	@Synchronized

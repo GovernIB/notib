@@ -4,12 +4,17 @@ import com.google.common.base.Strings;
 import es.caib.comanda.salut.model.EstatSalutEnum;
 import es.caib.notib.logic.exception.DocumentNotFoundException;
 import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.ExcepcioLogHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
+import es.caib.notib.persist.repository.DocumentRepository;
+import es.caib.notib.persist.repository.EntitatRepository;
+import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
@@ -28,9 +33,56 @@ import java.util.Properties;
 @Component
 public class ArxiuPluginHelper extends AbstractPluginHelper<IArxiuPlugin> {
 
+	private final DocumentRepository documentRepository;
+	private final EntitatRepository entitatRepository;
+	private final NotificacioRepository notificacioRepository;
+
 	public ArxiuPluginHelper(IntegracioHelper integracioHelper,
-                             ConfigHelper configHelper) {
+							 ConfigHelper configHelper,
+							 DocumentRepository documentRepository,
+							 EntitatRepository entitatRepository, NotificacioRepository notificacioRepository) {
+
 		super(integracioHelper, configHelper);
+        this.documentRepository = documentRepository;
+        this.entitatRepository = entitatRepository;
+		this.notificacioRepository = notificacioRepository;
+	}
+
+	@Override
+	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception {
+
+		var entitats = entitatRepository.findAll();
+		IntegracioDiagnostic diagnostic;
+		var diagnosticOk = true;
+		String codi;
+		for (var entitat : entitats) {
+			codi = entitat.getCodi();
+			try {
+				var plugin = pluginMap.get(codi);
+				if (plugin == null)  {
+					continue;
+				}
+				var document = notificacioRepository.findTopByEntitatAndDocumentUuidNotNull(entitat).getDocument();
+				var arxiu = plugin.documentDetalls(document.getUuid(), null, true);
+				diagnostic = new IntegracioDiagnostic();
+				diagnostic.setCorrecte(arxiu != null);
+				diagnostics.put(codi, diagnostic);
+			} catch(Exception ex) {
+				diagnostic = new IntegracioDiagnostic();
+				diagnostic.setErrMsg(ex.getMessage());
+				diagnostics.put(codi, diagnostic);
+				diagnosticOk = false;
+			}
+		}
+		if (diagnostics.isEmpty() && !entitats.isEmpty()) {
+			var entitat = entitatRepository.findByCodi(getCodiEntitatActual());
+			var document = notificacioRepository.findTopByEntitatAndDocumentUuidNotNull(entitat).getDocument();
+			var arxiu = arxiuDocumentConsultar(document.getUuid(), null, true, true);
+			diagnostic = new IntegracioDiagnostic();
+			diagnostic.setCorrecte(arxiu != null);
+			diagnostics.put(entitat.getCodi(), diagnostic);
+		}
+		return diagnosticOk;
 	}
 
 

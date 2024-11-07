@@ -87,8 +87,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired
 	private MessageHelper messageHelper;
 	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
 	private SchedulingConfig schedulingConfig;
 	@Autowired
 	private BrokerService brokerService;

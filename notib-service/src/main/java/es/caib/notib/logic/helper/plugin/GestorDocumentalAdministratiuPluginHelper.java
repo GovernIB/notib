@@ -6,6 +6,7 @@ import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
@@ -271,6 +272,42 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 			peticionsPlugin.updatePeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.GESCONADM.name(), errorDescripcio, ex);
 		}
+	}
+
+	@Override
+	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception {
+
+
+		var entitats = entitatRepository.findAll();
+		IntegracioDiagnostic diagnostic;
+		var diagnosticOk = true;
+		String codi;
+		for (var entitat : entitats) {
+			codi = entitat.getCodi();
+			try {
+				var plugin = pluginMap.get(codi);
+				if (plugin == null)  {
+					continue;
+				}
+				var procediments = plugin.getProcedimentsByUnitat(entitat.getDir3Codi());
+				diagnostic = new IntegracioDiagnostic();
+				diagnostic.setCorrecte(procediments != null && !procediments.isEmpty());
+				diagnostics.put(codi, diagnostic);
+			} catch(Exception ex) {
+				diagnostic = new IntegracioDiagnostic();
+				diagnostic.setErrMsg(ex.getMessage());
+				diagnostics.put(codi, diagnostic);
+				diagnosticOk = false;
+			}
+		}
+		if (diagnostics.isEmpty() && !entitats.isEmpty()) {
+			var entitat = entitatRepository.findByCodi(getCodiEntitatActual());
+			var procediments = getProcedimentsGdaByEntitat(entitat.getDir3Codi());
+			diagnostic = new IntegracioDiagnostic();
+			diagnostic.setCorrecte(procediments != null && !procediments.isEmpty());
+			diagnostics.put(entitat.getCodi(), diagnostic);
+		}
+		return diagnosticOk;
 	}
 
 	@Override

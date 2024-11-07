@@ -7,6 +7,7 @@ import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
@@ -20,6 +21,7 @@ import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformati
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -39,6 +41,20 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<IValidateS
 		super(integracioHelper, configHelper);
 		this.integracioHelper = integracioHelper;
 		this.configHelper = configHelper;
+	}
+
+	@Override
+	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception {
+
+		try (var arxiuSignat = this.getClass().getResourceAsStream("/es/caib/notib/logic/diagnostic/test_firmat.pdf")){
+			if (arxiuSignat == null) {
+				log.error("L'Arxiu de proves per el diagnostic no existeix");
+				return false;
+			}
+			var bytes = arxiuSignat.readAllBytes();
+			var signatura = detectSignedAttachedUsingValidateSignaturePlugin(bytes, "test_firmat.pdf", "application/pdf");
+			return signatura != null && !signatura.isError();
+		}
 	}
 
 

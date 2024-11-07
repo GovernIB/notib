@@ -19,6 +19,7 @@ import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.DatosInteresadoWsDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.InteresadoWsDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
@@ -32,6 +33,7 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.DadesOficina;
@@ -82,6 +84,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 	private final EntitatRepository entitatRepository;
 	private final ArxiuPluginHelper arxiuPluginHelper;
 	private final GestioDocumentalPluginHelper gestioDocumentalPluginHelper;
+	private final NotificacioEnviamentRepository notificacioEnviamentRepository;
 
 	private static Set<String> blockedObtenirJustificant = null;
 
@@ -89,14 +92,16 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
                                 ConfigHelper configHelper,
                                 @Lazy CacheHelper cacheHelper,
                                 EntitatRepository entitatRepository,
-								ArxiuPluginHelper arxiuPluginHelper,
-								GestioDocumentalPluginHelper gestioDocumentalPluginHelper) {
+                                ArxiuPluginHelper arxiuPluginHelper,
+                                GestioDocumentalPluginHelper gestioDocumentalPluginHelper, NotificacioEnviamentRepository notificacioEnviamentRepository) {
+
 		super(integracioHelper, configHelper);
 		this.cacheHelper = cacheHelper;
 		this.entitatRepository = entitatRepository;
 		this.arxiuPluginHelper = arxiuPluginHelper;
 		this.gestioDocumentalPluginHelper = gestioDocumentalPluginHelper;
-	}
+        this.notificacioEnviamentRepository = notificacioEnviamentRepository;
+    }
 
 
 	// REGISTRE
@@ -941,6 +946,14 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 		}
 		// Associam el llibre amb l'entitat de la notificació
 		notificacio.setRegistreLlibreNom(dadesOficina.getLlibreNom());
+	}
+
+	@Override
+	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception {
+
+		var enviament = notificacioEnviamentRepository.findTopByRegistreNumeroFormatatNotNullOrderByIdDesc().orElseThrow();
+		var resposta = obtenerAsientoRegistral(enviament.getNotificacio().getEntitat().getDir3Codi(), enviament.getRegistreNumeroFormatat(), 2L,  /*registre sortida*/ false);
+		return !resposta.isError();
 	}
 
 	@Override

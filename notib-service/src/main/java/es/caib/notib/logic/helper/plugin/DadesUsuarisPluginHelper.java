@@ -7,8 +7,10 @@ import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
+import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -27,9 +30,18 @@ import java.util.Properties;
 @Component
 public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPlugin> {
 
+
 	public DadesUsuarisPluginHelper(IntegracioHelper integracioHelper,
                                     ConfigHelper configHelper) {
+
 		super(integracioHelper, configHelper);
+    }
+
+	@Override
+	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception {
+
+		var dades = dadesUsuariConsultarAmbCodi(diagnostics.keySet().stream().iterator().next());
+		return dades != null;
 	}
 
 

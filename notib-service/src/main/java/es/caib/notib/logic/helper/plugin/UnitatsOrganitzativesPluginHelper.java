@@ -8,12 +8,14 @@ import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
+import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.unitat.CodiValor;
@@ -49,10 +51,11 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
                                              ConfigHelper configHelper,
                                              MessageHelper messageManager,
                                              EntitatRepository entitatRepository) {
+
 		super(integracioHelper, configHelper);
 		this.messageManager = messageManager;
 		this.entitatRepository = entitatRepository;
-	}
+    }
 
 
 	// UNITATS ORGANITZATIVES
@@ -474,6 +477,41 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 
 	private OficinaDto toOficinaDto(OficinaSir oficinaSir) {
 		return OficinaDto.builder().codi(oficinaSir.getCodi()).nom(oficinaSir.getNom()).organCodi(oficinaSir.getOrganCodi()).sir(oficinaSir.isSir()).build();
+	}
+
+	@Override
+	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception {
+
+		var entitats = entitatRepository.findAll();
+		IntegracioDiagnostic diagnostic;
+		var diagnosticOk = true;
+		String codi;
+		for (var entitat : entitats) {
+			codi = entitat.getCodi();
+			try {
+				var plugin = pluginMap.get(codi);
+				if (plugin == null)  {
+					continue;
+				}
+				var unitats = plugin.cercaUnitats(entitat.getDir3Codi(), null, null, null, null, null, null, null);
+				diagnostic = new IntegracioDiagnostic();
+				diagnostic.setCorrecte(unitats != null && !unitats.isEmpty());
+				diagnostics.put(codi, diagnostic);
+			} catch(Exception ex) {
+				diagnostic = new IntegracioDiagnostic();
+				diagnostic.setErrMsg(ex.getMessage());
+				diagnostics.put(codi, diagnostic);
+				diagnosticOk = false;
+			}
+		}
+		if (diagnostics.isEmpty() && !entitats.isEmpty()) {
+			var entitat = entitatRepository.findByCodi(getCodiEntitatActual());
+			var unitats = cercaUnitats(entitat.getDir3Codi(), null, null, null, null, null, null, null);
+			diagnostic = new IntegracioDiagnostic();
+			diagnostic.setCorrecte(unitats != null && !unitats.isEmpty());
+			diagnostics.put(entitat.getCodi(), diagnostic);
+		}
+		return diagnosticOk;
 	}
 
 	@Override

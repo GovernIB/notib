@@ -9,16 +9,20 @@ import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.NotificacioEventHelper;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
+import es.caib.notib.logic.service.OrganGestorServiceImpl;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.carpeta.CarpetaPlugin;
 import es.caib.notib.plugin.carpeta.MissatgeCarpetaParams;
 import es.caib.notib.plugin.carpeta.VincleInteressat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -33,16 +37,19 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 	private final IntegracioHelper integracioHelper;
 	private final NotificacioEventHelper eventHelper;
 	private final ConfigHelper configHelper;
+	private final EntitatRepository entitatRepository;
 
 	public CarpetaPluginHelper(IntegracioHelper integracioHelper,
                                NotificacioEventHelper eventHelper,
-                               ConfigHelper configHelper) {
+                               ConfigHelper configHelper,
+							   EntitatRepository entitatRepository) {
 
 		super(integracioHelper, configHelper);
         this.integracioHelper = integracioHelper;
 		this.eventHelper = eventHelper;
 		this.configHelper = configHelper;
-	}
+        this.entitatRepository = entitatRepository;
+    }
 
 
 	public void enviarNotificacioMobil(NotificacioEnviamentEntity e) {
@@ -109,6 +116,44 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 				!Strings.isNullOrEmpty(configHelper.getConfig("es.caib.notib.plugin.carpeta.class")) &&
 				!Strings.isNullOrEmpty(configHelper.getConfig("es.caib.notib.plugin.carpeta.url")) &&
 				configHelper.getConfigAsBoolean("es.caib.notib.plugin.carpeta.msg.actiu");
+	}
+
+	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) {
+
+		var entitats = entitatRepository.findAll();
+		IntegracioDiagnostic diagnostic;
+		var diagnosticOk = true;
+		String codi;
+		for (var entitat : entitats) {
+			codi = entitat.getCodi();
+			try {
+				var plugin = pluginMap.get(codi);
+				if (plugin == null)  {
+					continue;
+				}
+				plugin.existeixNif("99999999R");
+				diagnostic = new IntegracioDiagnostic();
+				diagnostic.setCorrecte(true);
+				diagnostics.put(codi, diagnostic);
+			} catch(Exception ex) {
+				diagnostic = new IntegracioDiagnostic();
+				diagnostic.setErrMsg(ex.getMessage());
+				diagnostics.put(codi, diagnostic);
+				diagnosticOk = false;
+			}
+		}
+		if (diagnostics.isEmpty() && !entitats.isEmpty()) {
+			var entitat = entitatRepository.findByCodi(getCodiEntitatActual());
+			diagnostic = new IntegracioDiagnostic();
+			try {
+				getPlugin().existeixNif("99999999R");
+				diagnostic.setCorrecte(true);
+			} catch (Exception ex) {
+				diagnostic.setCorrecte(false);
+			}
+			diagnostics.put(entitat.getCodi(), diagnostic);
+		}
+		return diagnosticOk;
 	}
 
 	@Override

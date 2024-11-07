@@ -8,14 +8,18 @@ import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.persist.entity.NotificacioEntity;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -27,9 +31,24 @@ import java.util.Properties;
 @Component
 public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin> {
 
+	private final NotificacioEnviamentRepository enviamentRepository;
+
 	public FirmaPluginHelper(IntegracioHelper integracioHelper,
-                             ConfigHelper configHelper) {
+                             ConfigHelper configHelper, NotificacioEnviamentRepository enviamentRepository) {
 		super(integracioHelper, configHelper);
+        this.enviamentRepository = enviamentRepository;
+    }
+
+	@Override
+	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception {
+
+		var enviament = enviamentRepository.findTopByRegistreNumeroFormatatNotNullOrderByIdDesc().orElseThrow();
+		var justificantOriginal = new FitxerDto();
+		justificantOriginal.setNom("justificant_comunicacio_sir_" + enviament.getId() + ".pdf");
+		justificantOriginal.setContentType("application/pdf");
+		justificantOriginal.setContingut(String.valueOf( new Date().getTime()).getBytes());
+		var firmaContingut = firmaServidorFirmar(enviament.getNotificacio(), justificantOriginal, FirmaServidorPlugin.TipusFirma.PADES, "Test justificant enviament Notib", "ca");
+		return firmaContingut.length > 0;
 	}
 
 	public byte[] firmaServidorFirmar(NotificacioEntity notificacio, FitxerDto fitxer, TipusFirma tipusFirma, String motiu, String idioma) {

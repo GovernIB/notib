@@ -6,6 +6,7 @@ import es.caib.comanda.salut.model.EstatSalutEnum;
 import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
@@ -27,12 +28,14 @@ public abstract class AbstractPluginHelper<T> {
 	protected IntegracioPeticions peticionsPlugin = IntegracioPeticions.builder().organOk(new HashMap<>()).organError(new HashMap<>()).build();
 	protected Map<String, T> pluginMap = new HashMap<>();
 
-	public AbstractPluginHelper(IntegracioHelper integracioHelper,
-								ConfigHelper configHelper) {
+
+	public AbstractPluginHelper(IntegracioHelper integracioHelper, ConfigHelper configHelper) {
 
 		this.integracioHelper = integracioHelper;
 		this.configHelper = configHelper;
 	}
+
+	public abstract boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception;
 
 	protected String getCodiEntitatActual() {
 
@@ -44,6 +47,7 @@ public abstract class AbstractPluginHelper<T> {
 	}
 
 	public IntegracioPeticions getPeticionsPluginAndReset() {
+
 		IntegracioPeticions peticions = IntegracioPeticions.builder()
 				.totalOk(peticionsPlugin.getTotalOk())
 				.totalError(peticionsPlugin.getTotalError())
@@ -61,11 +65,7 @@ public abstract class AbstractPluginHelper<T> {
 			EstatSalutEnum estat = getEstat();
 			Instant end = Instant.now();
 			long latency = Duration.between(start, end).toMillis();
-
-			return EstatSalut.builder()
-					.latencia(latency)
-					.estat(estat)
-					.build();
+			return EstatSalut.builder().latencia(latency).estat(estat).build();
 		} catch (Exception ex) {
 			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
 		}
