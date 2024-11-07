@@ -65,6 +65,25 @@ public class CarpetaCaibImpl implements CarpetaPlugin {
         }
     }
 
+    @Override
+    public boolean existeixNif(String nif) {
+
+        try {
+            initClient();
+            String url = properties.getProperty("es.caib.notib.plugin.carpeta.url");
+            WebResource resource = client.resource(url);
+            MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
+            queryParams.add("nif", nif);
+            queryParams.add("lang", "ca");
+            ClientResponse res = resource.queryParams(queryParams).type(MediaType.APPLICATION_JSON_TYPE).accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
+            String jsonResposta = res.getEntity(String.class);
+            return true;
+        } catch (Exception ex) {
+            log.error("[CARPETA] Error consultant el nif ", ex);
+            throw ex;
+        }
+    }
+
     private void initClient() {
 
         if (client != null) {

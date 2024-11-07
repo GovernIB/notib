@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import es.caib.notib.persist.entity.AplicacioEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -21,10 +22,15 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long> {
-	
+
+	Optional<AplicacioEntity> findTopByCallbackUrlNotNullOrderByIdDesc();
+
 	AplicacioEntity findByUsuariCodi(String usuariCodi);
+
 	AplicacioEntity findByUsuariCodiAndEntitatId(String usuariCodi,Long entitatId);
+
 	AplicacioEntity findByEntitatIdAndId(Long entitatId, Long id);
+
 	AplicacioEntity findByEntitatIdAndUsuariCodi(Long entitatId, String usuariCodi);
 	
 	@Query(	  "FROM AplicacioEntity a "

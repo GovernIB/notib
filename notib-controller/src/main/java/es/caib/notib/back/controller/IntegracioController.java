@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioDetall;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.service.MonitorIntegracioService;
@@ -136,16 +137,19 @@ public class IntegracioController extends BaseUserController {
 	@GetMapping(value = "/diagnostic")
 	public String diagnostic(HttpServletRequest request, Model model) {
 
-		var integracions = monitorIntegracioService.findPerDiagnostic();
+		List<IntegracioDto> integracions = new ArrayList<>();
+		IntegracioCodi.stream().forEach(integracioCodi -> integracions.add(IntegracioDto.builder()
+				.codi(integracioCodi)
+				.nom(EnumHelper.getOneOptionForEnum(IntegracioCodi.class, "integracio.list.pipella." + integracioCodi).getText())
+				.build()));
 		model.addAttribute("integracions", integracions);
 		return "integracioDiagnostic";
 	}
 
 	@ResponseBody
-	@GetMapping(value = "/diagnosticAjax/{codiIntegracio}")
+	@GetMapping(value = "/diagnostic/{codiIntegracio}")
 	public IntegracioDiagnostic diagnosticAjax(HttpServletRequest request, @PathVariable String codiIntegracio, Model model) {
 
-		UsuariDto usuari = aplicacioService.getUsuariActual();
-		return monitorIntegracioService.diagnostic(codiIntegracio, usuari);
+		return monitorIntegracioService.diagnostic(codiIntegracio);
 	}
 }

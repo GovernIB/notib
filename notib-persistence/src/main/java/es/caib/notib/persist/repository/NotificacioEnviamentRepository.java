@@ -30,7 +30,14 @@ import java.util.Optional;
 public interface NotificacioEnviamentRepository extends JpaRepository<NotificacioEnviamentEntity, Long> {
 
 	List<NotificacioEnviamentEntity> findByNotificacioId(Long notificacioId);
+
 	List<NotificacioEnviamentEntity> findByIdIn(Collection<Long> ids);
+
+	Optional<NotificacioEnviamentEntity> findTopByRegistreNumeroFormatatNotNullOrderByIdDesc();
+
+	Optional<NotificacioEnviamentEntity> findTopByEntregaPostalNullOrderByIdDesc();
+
+	Optional<NotificacioEnviamentEntity> findTopByNotificaIdentificadorNullOrderByIdDesc();
 
 	@Query("select id from NotificacioEnviamentEntity where notificaReferencia is null")
 	List<Long> findIdsSenseReferencia();

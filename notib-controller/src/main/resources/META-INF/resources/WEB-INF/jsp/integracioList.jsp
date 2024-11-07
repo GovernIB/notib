@@ -125,6 +125,12 @@
 			});
 			$('#filtre').submit();
 		});
+
+		$("#netejarIntegracions").click(() => {
+			if (!confirm("Aquesta acció esborrarà totes les integracions. Vols continuar?")) {
+				return false;
+			}
+		});
 	});
 </script>
 
@@ -178,7 +184,12 @@
 	</ul>
 	<br/>
 	<script id="botonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a class="btn btn-default" href="<c:url value="/integracio/netejar"/>"><span class="fa fa-trash"></span>&nbsp;<spring:message code="integracio.netejar"/></a></p>
+		<div class="text-right">
+        	<div class="btn-group">
+				<a class="btn btn-default" href="<c:url value="/integracio/diagnostic"/>" data-toggle="modal"><span class="fa fa-cogs"></span>&nbsp;<spring:message code="integracio.diagnostic"/></a>
+				<button id="netejarIntegracions" class="btn btn-default" href="<c:url value="/integracio/netejar"/>"><span class="fa fa-trash"></span>&nbsp;<spring:message code="integracio.netejar"/></a>
+			</div>
+		</div>
 	</script>
 	<table id="missatges-integracions" data-toggle="datatable" data-url="<c:url value="/integracio/datatable"/>"
 <%--		   data-filter="#filtre"--%>

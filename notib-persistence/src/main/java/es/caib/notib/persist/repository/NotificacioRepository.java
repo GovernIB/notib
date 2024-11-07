@@ -36,7 +36,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 
 //	NotificacioEntity findById(Long id);
 
-
+	NotificacioEntity findTopByEntitatAndDocumentUuidNotNull(EntitatEntity entitat);
 	
 	List<NotificacioEntity> findByTipusUsuari(TipusUsuariEnumDto tipusUsuari);
 	

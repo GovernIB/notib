@@ -33,22 +33,44 @@
                 $("#span-refresh-" + integracio).removeClass("text-danger");
                 $.ajax({
                     method: "GET",
-                    url: "<c:url value='/integracio/diagnosticAjax'/>/" + integracio,
+                    url: "<c:url value='/integracio/diagnostic'/>/" + integracio,
                     async: true,
                     success: function(data){
                         $("#span-refresh-" + integracio).removeClass('fa-circle-o-notch');
                         $("#span-refresh-" + integracio).removeClass('fa-spin');
                         $("#span-refresh-" + integracio).removeClass('fa-refresh');
-                        if (data.correcte == true) {
-                            $("#span-refresh-" + integracio).addClass("fa-check text-success");
-                            let t = document.createTextNode("    " + data.prova);
-                            $('#integracio_' + integracio + '_info').append(t);
-                            debugger;
-                        }else {
-                            $("#span-refresh-" + integracio).addClass("fa-times text-danger");
-                            let t = document.createTextNode("    "+data.errMsg);
-                            $('#integracio_' + integracio + '_info').append(t);
-                            debugger;
+                        let clase;
+                        let textNode;
+                        if (!data.diagnosticsEntitat || Object.keys(data.diagnosticsEntitat).length === 0) {
+                            if (data.correcte) {
+                                clase = "fa-check text-succes";
+                                textNode = document.createTextNode("    " + data.prova);
+                            } else {
+                                clase = "fa-times text-danger";
+                                textNode = document.createTextNode("    " + data.errMsg);
+                            }
+                            $("#span-refresh-" + integracio).addClass(clase);
+                            $('#integracio_' + integracio + '_info').append(textNode);
+                        } else {
+                            const map = new Map(Object.entries(data.diagnosticsEntitat));
+                            $('#integracio_' + integracio + '_info').append(document.createTextNode(data.prova));
+                            map.forEach((diagnostic, codi) => {
+                                let div = document.createElement("div");
+                                let span = document.createElement("span");
+                                if (diagnostic && diagnostic.correcte) {
+                                    clase = "fa fa-check text-succes";
+                                    textNode = document.createTextNode("    " + codi);
+                                } else {
+                                    clase = "fa fa-times text-danger";
+                                    textNode = document.createTextNode("    " + codi + "    " + diagnostic.errMsg);
+                                }
+                                $(span).addClass(clase);
+                                let p = document.createElement("p");
+                                p.append(span);
+                                p.append(textNode);
+                                div.append(p);
+                                $('#integracio_' + integracio + '_info').append(div);
+                            });
                         }
                     }
                 });
@@ -58,24 +80,20 @@
 
 </head>
 <body>
-
-
-
-
-<ul class="nav nav-tabs" role="tablist">
-    <c:forEach var="integracio" items="${integracions}">
-        <c:if test="${not empty integracio}">
-            <dl class="dl-horizontal">
-                <dt class="integracio" id="integracio_${integracio.codi}" data-codi="${integracio.codi}">${integracio.nom}</dt>
-                <dd><span id="span-refresh-${integracio.codi}" class="ml-2 fa fa-refresh "></span>
-                    <p id="integracio_${integracio.codi}_info" style="display:inline;"></p></dd>
-            </dl>
-        </c:if>
-    </c:forEach>
-</ul>
-<div id="modal-botons">
-    <button name="btnRefrescarDiagnostic" type="button" id="btnRefrescarDiagnostic" class="btn btn-success"> <span class="fa fa-refresh"></span> <spring:message code="comu.boto.refrescar"/> </button>
-    <a href="<c:url value="/integracio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>
-</div>
+    <ul class="nav nav-tabs" role="tablist">
+        <c:forEach var="integracio" items="${integracions}">
+            <c:if test="${not empty integracio}">
+                <dl class="dl-horizontal">
+                    <dt class="integracio" id="integracio_${integracio.codi}" data-codi="${integracio.codi}"><spring:message code="${integracio.nom}"/></dt>
+                    <dd><span id="span-refresh-${integracio.codi}" class="ml-2 fa fa-refresh "></span>
+                        <p id="integracio_${integracio.codi}_info" style="display:inline;"></p></dd>
+                </dl>
+            </c:if>
+        </c:forEach>
+    </ul>
+    <div id="modal-botons">
+        <button name="btnRefrescarDiagnostic" type="button" id="btnRefrescarDiagnostic" class="btn btn-success"> <span class="fa fa-refresh"></span> <spring:message code="comu.boto.refrescar"/> </button>
+        <a href="<c:url value="/integracio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>
+    </div>
 
 </body>

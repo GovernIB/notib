@@ -6,6 +6,7 @@ package es.caib.notib.ejb;
 import es.caib.notib.logic.intf.dto.IntegracioAccioDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioDetall;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
@@ -47,5 +48,11 @@ public class MonitorIntegracioService extends AbstractService<es.caib.notib.logi
 	@RolesAllowed({"NOT_SUPER"})
 	public IntegracioDetall detallIntegracio(Long id) {
 		return getDelegateService().detallIntegracio(id);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public IntegracioDiagnostic diagnostic(String codi) {
+		return getDelegateService().diagnostic(codi);
 	}
 }

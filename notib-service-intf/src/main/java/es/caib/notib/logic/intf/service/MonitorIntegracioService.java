@@ -6,12 +6,15 @@ package es.caib.notib.logic.intf.service;
 import es.caib.notib.logic.intf.dto.IntegracioAccioDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioDetall;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
+import es.caib.notib.logic.intf.dto.IntegracioDto;
 import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -44,4 +47,6 @@ public interface MonitorIntegracioService {
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	IntegracioDetall detallIntegracio(Long id);
 
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	IntegracioDiagnostic diagnostic(String codi);
 }
