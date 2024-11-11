@@ -27,12 +27,12 @@ public class EmailListener {
     @JmsListener(destination = EmailConstants.CUA_EMAIL_NOTIFICACIO, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveMessage(@Payload Long notificacioId, @Headers MessageHeaders headers, Message message) throws JMSException {
 
+        message.acknowledge();
         try {
             var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
             emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
         } catch (Exception ex) {
             log.error("Error enviant els emails per la notificacio " + notificacioId, ex);
         }
-        message.acknowledge();
     }
 }

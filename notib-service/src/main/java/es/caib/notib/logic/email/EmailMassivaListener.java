@@ -40,6 +40,7 @@ public class EmailMassivaListener {
                                @Headers MessageHeaders headers,
                                Message message) throws JMSException {
 
+        message.acknowledge();
         var info = new IntegracioInfo(
                 IntegracioCodi.EMAIL,
                 "Enviament de email per notificació massiva",
@@ -60,7 +61,6 @@ public class EmailMassivaListener {
             log.error("Error enviant email per la notificacio massiva" + notificacioMassivaId, ex);
             integracioHelper.addAccioError(info, "Error enviant email", ex);
         }
-        message.acknowledge();
     }
 
     private byte[] getFileContent(String gesdocId, String agrupacio, boolean isZip) {

@@ -64,7 +64,6 @@ public class EnviamentRegistreListener {
             }
             if (!Strings.isNullOrEmpty(env.getRegistreNumeroFormatat())) {
                 log.error("[SM] L'enviament ja te numero de registre " + enviamentUuid);
-                message.acknowledge();
                 return;
             }
             var success = registreService.enviarRegistre(enviamentRegistreRequest);
