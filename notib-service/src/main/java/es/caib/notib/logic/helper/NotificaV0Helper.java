@@ -78,6 +78,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
 
 		var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
+		info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getUsuariCodi());
 		log.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 			log.error(" [NOT] la notificació no té l'estat REGISTRADA.");

@@ -10,6 +10,7 @@ import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
+import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.statemachine.mappers.EnviamentRegistreMapper;
@@ -68,7 +69,7 @@ public class RegistreSmHelper {
 		var codiDir3Registre = !Strings.isNullOrEmpty(entitat.getDir3CodiReg()) ? entitat.getDir3CodiReg() : entitat.getDir3Codi();
 		var accioInfo = new AccioParam("Procés descripció: ", " [REG] Realitzant nou assentament registral" + (enviamentSir ? " SIR " : " ") + "de l'enviament: " + enviament.getId());
 		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, descInfo, IntegracioAccioTipusEnumDto.ENVIAMENT, tipusEnvInfo, sirActivatInfo, accioInfo);
-
+		info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getUsuariCodi());
 		// Registre SIR
 		try {
 			var request = ReqAssentamentRegistral.builder()

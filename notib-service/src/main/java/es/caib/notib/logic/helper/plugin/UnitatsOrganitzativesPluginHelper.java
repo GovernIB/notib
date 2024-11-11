@@ -224,7 +224,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 	
 	public String getDenominacio(String codiDir3) {
 		
-		var info = new IntegracioInfo(IntegracioCodi.UNITATS,"Obtenir denominació d'organisme", IntegracioAccioTipusEnumDto.ENVIAMENT,
+            var info = new IntegracioInfo(IntegracioCodi.UNITATS,"Obtenir denominació d'organisme", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'organisme", codiDir3));
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);

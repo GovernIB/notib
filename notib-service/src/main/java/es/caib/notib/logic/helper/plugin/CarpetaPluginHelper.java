@@ -58,6 +58,7 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 			return;
 		}
 		var info = new IntegracioInfo(IntegracioCodi.CARPETA, "Enviar notificació mòvil", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setAplicacio(e.getNotificacio().getTipusUsuari(), e.getNotificacio().getUsuariCodi());
 		var eventInfo = NotificacioEventHelper.EventInfo.builder().enviament(e).tipus(NotificacioEventTipusEnumDto.API_CARPETA).build();
 		var enviarCarpeta = enviarCarpeta();
 		try {

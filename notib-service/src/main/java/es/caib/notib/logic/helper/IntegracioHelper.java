@@ -181,10 +181,6 @@ public class IntegracioHelper {
 			if (!Strings.isNullOrEmpty(accio.getAplicacio())) {
 				return usuari.getNomSencer() + " (" + usuari.getCodi() + ")";
 			}
-			var aplicacio = aplicacioRepository.findByUsuariCodi(usuari.getCodi());
-			if (aplicacio == null) {
-				accio.setAplicacio(APLICACIO_WEB);
-			}
 			return usuari.getNomSencer() + " (" + usuari.getCodi() + ")";
 		} catch (Exception ex) {
 			log.error("[Error Integració] Error al buscar l'usuari " + usuariNomCodi);

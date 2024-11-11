@@ -618,6 +618,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			var info = new IntegracioInfo(IntegracioCodi.UNITATS, "Actualització d'òrgans gestors",
 					IntegracioAccioTipusEnumDto.PROCESSAR, new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
 			info.setCodiEntitat(entitatDto.getCodi());
+			info.setAplicacio(IntegracioInfo.INTERFICIE_WEB);
 			for (var inf: progres.getInfo()) {
 				if (inf.getText() != null) {
 					info.getParams().add(new AccioParam("Msg. procés:", inf.getText()));
@@ -1420,6 +1421,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 		var desc = "Actualització d'oficines SIR per l'entitat " + entitatDir3Codi;
 		var info = new IntegracioInfo(IntegracioCodi.UNITATS, desc, IntegracioAccioTipusEnumDto.PROCESSAR);
+		info.setAplicacio(IntegracioInfo.INTERFICIE_WEB);
 		try {
 			// Obtenim l'entitat
 			var entitat = entitatRepository.findByDir3Codi(entitatDir3Codi);

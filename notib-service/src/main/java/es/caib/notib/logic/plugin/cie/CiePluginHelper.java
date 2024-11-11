@@ -81,7 +81,7 @@ public class CiePluginHelper {
         var info = new IntegracioInfo(IntegracioCodi.CIE, "Enviar entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
                 new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
                 new AccioParam("Notificacio", notificacio.getId() + ""));
-
+        info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getUsuariCodi());
         var resposta = new RespostaCie();
         try {
             EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
@@ -199,7 +199,7 @@ public class CiePluginHelper {
         var info = new IntegracioInfo(IntegracioCodi.CIE, "Cancelar entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
                 new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
                 new AccioParam("Enviament", enviament.getId() + ""));
-
+        info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getUsuariCodi());
         var resposta = new RespostaCie();
         try {
             EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
@@ -263,7 +263,7 @@ public class CiePluginHelper {
         var info = new IntegracioInfo(IntegracioCodi.CIE, "Consulta estat entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
                 new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
                 new AccioParam("Enviament", enviament.getId() + ""));
-
+        info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getUsuariCodi());
         var infoCie = new InfoCie();
         try {
             EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);

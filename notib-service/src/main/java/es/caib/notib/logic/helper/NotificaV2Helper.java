@@ -114,6 +114,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 		try {
 			var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
+			info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getUsuariCodi());
 			log.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 			info.setCodiEntitat(notificacio.getEntitat() != null ? notificacio.getEntitat().getCodi() : null);
 			notificacio.updateNotificaNouEnviament();
@@ -252,7 +253,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA,"Consultar estat d'un enviament", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de l'enviament", String.valueOf(enviament.getId())));
-
+		info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getUsuariCodi());
 		log.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		info.setCodiEntitat(enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null ?  enviament.getNotificacio().getEntitat().getCodi() : null);
 		long startTime;

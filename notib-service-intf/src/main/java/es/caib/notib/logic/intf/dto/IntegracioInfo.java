@@ -18,7 +18,9 @@ public class IntegracioInfo {
 	String aplicacio;
 	IntegracioAccioTipusEnumDto tipus;
 	Long tempsInici;
-	List<AccioParam> params = new ArrayList<AccioParam>();
+	List<AccioParam> params = new ArrayList<>();
+
+	public static final String INTERFICIE_WEB = "Interficie web";
 	
 	public IntegracioInfo(IntegracioCodi codi, String descripcio, IntegracioAccioTipusEnumDto tipus, AccioParam... params) {
 
@@ -41,5 +43,14 @@ public class IntegracioInfo {
 
 	public Long getTempsResposta() {
 		return System.currentTimeMillis() - tempsInici;
+	}
+
+	public void setAplicacio(String aplicacio) {
+		this.aplicacio = aplicacio;
+	}
+
+	public void setAplicacio(TipusUsuariEnumDto tipus, String usuariCodi) {
+
+		this.aplicacio = TipusUsuariEnumDto.APLICACIO.equals(tipus)  ? usuariCodi : INTERFICIE_WEB;
 	}
 }

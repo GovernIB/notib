@@ -34,6 +34,7 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
+import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.DadesOficina;
@@ -87,13 +88,14 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 	private final NotificacioEnviamentRepository notificacioEnviamentRepository;
 
 	private static Set<String> blockedObtenirJustificant = null;
+	private final NotificacioRepository notificacioRepository;
 
 	public RegistrePluginHelper(IntegracioHelper integracioHelper,
-                                ConfigHelper configHelper,
-                                @Lazy CacheHelper cacheHelper,
-                                EntitatRepository entitatRepository,
-                                ArxiuPluginHelper arxiuPluginHelper,
-                                GestioDocumentalPluginHelper gestioDocumentalPluginHelper, NotificacioEnviamentRepository notificacioEnviamentRepository) {
+								ConfigHelper configHelper,
+								@Lazy CacheHelper cacheHelper,
+								EntitatRepository entitatRepository,
+								ArxiuPluginHelper arxiuPluginHelper,
+								GestioDocumentalPluginHelper gestioDocumentalPluginHelper, NotificacioEnviamentRepository notificacioEnviamentRepository, NotificacioRepository notificacioRepository) {
 
 		super(integracioHelper, configHelper);
 		this.cacheHelper = cacheHelper;
@@ -101,7 +103,8 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 		this.arxiuPluginHelper = arxiuPluginHelper;
 		this.gestioDocumentalPluginHelper = gestioDocumentalPluginHelper;
         this.notificacioEnviamentRepository = notificacioEnviamentRepository;
-    }
+		this.notificacioRepository = notificacioRepository;
+	}
 
 
 	// REGISTRE
@@ -118,6 +121,8 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 
 		var resposta = new RespostaConsultaRegistre();
 		var entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+		var notificacio = notificacioRepository.findById(notificacioId).get();
+		info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getUsuariCodi());
 		try {
 			if (entitat == null) {
 				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
@@ -438,7 +443,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 		}
 	}
 	
-	public LlibreDto llistarLlibreOrganisme(String codiDir3Entitat, String organismeCodi) throws SistemaExternException{
+	public LlibreDto llistarLlibreOrganisme(String codiDir3Entitat, String organismeCodi) throws SistemaExternException {
 		
 		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "Obtenir la llista de llibres per organisme", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
