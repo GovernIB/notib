@@ -200,7 +200,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					var origenError = !errorNotib ? "Error retornat per Notifica: " : "Error retornat per Notib: ";
 					errorDescripcio = origenError + " [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
 					log.info(" >>> ... ERROR: " + errorDescripcio);
-					integracioHelper.addAccioError(info, errorDescripcio);
+					if (!Strings.isNullOrEmpty(resultadoAlta.getDescripcionRespuesta()) && resultadoAlta.getDescripcionRespuesta().equals("SistemaExternException")) {
+						integracioHelper.addAccioError(info, errorDescripcio);
+					}
 				}
 			} catch (Exception ex) {
 				log.error(ex.getMessage(), ex);
