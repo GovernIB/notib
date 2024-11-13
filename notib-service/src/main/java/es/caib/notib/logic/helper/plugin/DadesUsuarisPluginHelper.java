@@ -2,16 +2,12 @@ package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
 import es.caib.comanda.salut.model.EstatSalutEnum;
-import es.caib.notib.logic.aspect.Monitor;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
-import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
-import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import lombok.extern.slf4j.Slf4j;
