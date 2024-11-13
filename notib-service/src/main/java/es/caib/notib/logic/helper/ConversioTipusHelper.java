@@ -3,6 +3,8 @@
  */
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
+import es.caib.notib.client.domini.ampliarPlazo.Envios;
 import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
@@ -242,6 +244,10 @@ public class ConversioTipusHelper {
 				field("entitat.id", "entitatId").
 				byDefault().
 				register();
+
+		mapperFactory.classMap(Envios.class, es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.Envios.class).byDefault().register();
+		mapperFactory.classMap(es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.AmpliacionesPlazo.class, AmpliacionesPlazo.class).byDefault().register();
+		mapperFactory.classMap(AmpliacionesPlazo.class, es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.AmpliacionesPlazo.class).byDefault().register();
 
 		mapperFactory.classMap(UsuariEntity.class, UsuariDto.class).
 				customize(new UsuariEntitytoMapper()).byDefault().register();

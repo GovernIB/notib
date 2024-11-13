@@ -72,7 +72,6 @@ import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,8 +146,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private PersonaHelper personaHelper;
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
-	@Autowired
-	private EmailNotificacioHelper emailNotificacioHelper;
 	@Autowired
 	private UsuariHelper usuariHelper;
 	@Autowired

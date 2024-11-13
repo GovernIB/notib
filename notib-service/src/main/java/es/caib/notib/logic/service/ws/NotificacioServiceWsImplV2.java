@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.*;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.CacheHelper;
@@ -152,8 +154,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private EnviamentTableHelper enviamentTableHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
-//	@Autowired
-//	private RegistreNotificaHelper registreNotificaHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired
@@ -869,8 +869,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 	@Override
 	@Transactional(readOnly = true)
-	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(
-			String identificador) {
+	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(String identificador) {
+
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			IntegracioInfo info = new IntegracioInfo(
@@ -918,6 +918,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	@Override
+	public RespuestaAmpliarPlazoOE ampliarPlazo(AmpliarPlazoOE ampliarPlazo) {
+		return notificaHelper.ampliarPlazoOE(ampliarPlazo);
 	}
 
 

@@ -3,6 +3,8 @@ package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
@@ -44,6 +46,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * Helper MOCK de prova.
@@ -174,6 +177,18 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		resposta.setDescripcionRespuesta(NexeaAdviserWs.CODI_OK_DEC);
 		var enviament = notificacioEnviamentRepository.findByCieId(sincronizarEnvio.getIdentificador());
 		notificacioEventHelper.addNotificaEnvioOE(enviament, false, "", false);
+		return resposta;
+	}
+
+	@Override
+	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo, List<NotificacioEnviamentEntity> enviaments) {
+
+		var resposta = new RespuestaAmpliarPlazoOE();
+		resposta.setCodigoRespuesta("000");
+		resposta.setDescripcionRespuesta("Ok");
+		for (var enviament : enviaments) {
+			notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);
+		}
 		return resposta;
 	}
 

@@ -3,7 +3,10 @@
  */
 package es.caib.notib.logic.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
@@ -88,6 +91,51 @@ public class NotificaHelper {
 					m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));
 					return m;
 				});
+	}
+
+	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo) {
+
+		if (ampliarPlazo.getEnvios() == null) {
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("Envios no pot ser null").build();
+		}
+		if (ampliarPlazo.getEnvios().getIdentificador().size() > 100) {
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("Envios no pot tenir més de 100 elements").build();
+		}
+		if (Strings.isNullOrEmpty(ampliarPlazo.getMotivo())) {
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("El motiu no pot ser null").build();
+		}
+		if (ampliarPlazo.getPlazo() <= 0) {
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("El plaç ha de ser major que zero").build();
+		}
+		var ids = ampliarPlazo.getEnvios().getIdentificador();
+		var enviaments = enviamentRepository.findByNotificaIdentificadorIn(ids);
+		if (ids.size() != enviaments.size()) {
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("Alguns dels identificadors no son vàlids").build();
+		}
+//		boolean organsIguals = enviaments.stream().map(e -> e.getNotificacio().getOrganGestor().getCodi()).distinct().count() == 1;
+		var organsIguals = true;
+		var entregaPostal = false;
+		var estatPendent = true;
+		NotificacioEnviamentEntity enviament;;
+		for (var i = 0; i < enviaments.size(); i++) {
+			enviament = enviaments.get(i);
+			entregaPostal = entregaPostal || enviament.getEntregaPostal() != null;
+			estatPendent = estatPendent && EnviamentEstat.PENDENT.equals(enviament.getNotificaEstat());
+			if (i != 0) {
+				organsIguals = organsIguals && enviament.getNotificacio().getOrganGestor().getCodi().equals(enviaments.get(i-1).getNotificacio().getOrganGestor().getCodi());
+			}
+		}
+		if (entregaPostal) {
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("No es pot ampliar el plaç per enviaments amb entrega postal").build();
+		}
+		if (!estatPendent) {
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("Tots els enviaments han de tenir un estat pendent a Notific@").build();
+		}
+		if (!organsIguals) {
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("Els enviaments han de pertanyer tots al mateix Òrgan Gestor").build();
+		}
+
+		return getNotificaHelper().ampliarPlazoOE(ampliarPlazo, enviaments);
 	}
 
 	public String xifrarId(Long id) throws GeneralSecurityException {

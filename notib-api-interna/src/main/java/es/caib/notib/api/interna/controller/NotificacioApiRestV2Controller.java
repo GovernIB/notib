@@ -11,6 +11,8 @@ import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +24,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
@@ -108,4 +112,13 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 
 		return donarPermisConsulta(permisConsulta);
 	}
+
+	@PostMapping(value = {"/ampliarPlazo"}, produces="application/json")
+	@ResponseBody
+	public RespuestaAmpliarPlazoOE ampliarPlazo(@RequestBody AmpliarPlazoOE ampliarPlazo, HttpServletRequest request, HttpServletResponse response) {
+
+		var resposta = notificacioServiceWs.ampliarPlazo(ampliarPlazo);
+		return resposta;
+	}
+
 }

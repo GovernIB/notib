@@ -14,6 +14,8 @@ import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacio;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.ejb.AbstractService;
 import es.caib.notib.ejb.helper.UsuariAuthHelper;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
@@ -124,6 +126,12 @@ public class NotificacioServiceWsV2 extends AbstractService<es.caib.notib.logic.
 	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(@WebParam(name="identificador") @XmlElement(required = true) String identificador){
 		return getDelegateService().consultaJustificantEnviament(identificador);
 
+	}
+
+	@Override
+	@WebMethod
+	public RespuestaAmpliarPlazoOE ampliarPlazo(AmpliarPlazoOE ampliarPlazo) {
+		return getDelegateService().ampliarPlazo(ampliarPlazo);
 	}
 
 }

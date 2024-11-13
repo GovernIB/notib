@@ -4,6 +4,8 @@ import com.google.common.base.Strings;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
@@ -29,6 +31,7 @@ import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorCIE;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorPostal;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.Persona;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
+import es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.AmpliacionesPlazo;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.Datado;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.InfoEnvioLigero;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.RespuestaInfoEnvioLigero;
@@ -376,6 +379,33 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			resposta.setCodigoRespuesta("error");
 			return resposta;
 		}
+	}
+
+	@Override
+	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo, List<NotificacioEnviamentEntity> enviaments) {
+
+		RespuestaAmpliarPlazoOE resposta;
+		try {
+			var apiKey = enviaments.get(0).getNotificacio().getEntitat().getApiKey();
+			var organEmisor = enviaments.get(0).getNotificacio().getEmisorDir3Codi();
+			Holder<String> codigoRespuesta = new Holder<>();
+			Holder<String> descripcionRespuesta = new Holder<>();
+			Holder<AmpliacionesPlazo> ampliacionesPlazo = new Holder<>();
+			var envios = conversioTipusHelper.convertir(ampliarPlazo.getEnvios(),  es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.Envios.class);
+			getSincronizarEnvioWs(apiKey).ampliarPlazoOE(envios, organEmisor, ampliarPlazo.getPlazo()+"", ampliarPlazo.getMotivo(), codigoRespuesta, descripcionRespuesta, ampliacionesPlazo);
+			resposta = new RespuestaAmpliarPlazoOE();
+			resposta.setCodigoRespuesta(codigoRespuesta.value);
+			resposta.setDescripcionRespuesta(descripcionRespuesta.value);
+			resposta.setAmpliacionesPlazo(conversioTipusHelper.convertir(ampliacionesPlazo.value, es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo.class));
+		} catch (Exception ex) {
+			resposta = new RespuestaAmpliarPlazoOE();
+			resposta.setCodigoRespuesta("error");
+			resposta.setDescripcionRespuesta("Error inesperat al ampliarPlazosOE" + ex.getMessage());
+		}
+		for (var enviament : enviaments) {
+			notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);
+		}
+		return resposta;
 	}
 
 	private Datado getDarrerDatat(RespuestaInfoEnvioLigero resultadoInfoEnvio, NotificacioEnviamentEntity enviament, IntegracioInfo info) throws DatatypeConfigurationException, ParseException {

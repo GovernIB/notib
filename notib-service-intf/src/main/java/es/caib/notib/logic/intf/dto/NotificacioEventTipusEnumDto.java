@@ -23,7 +23,8 @@ public enum NotificacioEventTipusEnumDto implements Serializable {
 	CIE_ENVIAMENT,
 	CIE_CANCELAR,
 	CIE_CONSULTA_ESTAT,
-	NOTIFICA_ENVIO_OE;
+	NOTIFICA_ENVIO_OE,
+	AMPLIAR_PLAZO_OE;
 //	NOTIFICA_ENVIAMENT,  // 0			// Enviar notificacions a Notifica
 //	NOTIFICA_CALLBACK_DATAT,			// Rebre adviser amb datat
 //	NOTIFICA_CALLBACK_CERTIFICACIO,		// Rebre adviser amb certificació
