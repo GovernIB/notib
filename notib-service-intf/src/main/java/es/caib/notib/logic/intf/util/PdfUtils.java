@@ -44,7 +44,7 @@ public class PdfUtils extends PdfReader {
     }
 
     public boolean versionGreaterThan(String version) {
-        return version != null && version.compareTo(this.getPdfVersion() + "") > 0;
+        return version != null && version.compareTo(this.getPdfVersion() + "") < 0;
     }
 
     private boolean checkDinA4(int pageNumber) {
