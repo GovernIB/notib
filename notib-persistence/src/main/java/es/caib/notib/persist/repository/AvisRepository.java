@@ -34,4 +34,7 @@ public interface AvisRepository extends JpaRepository<AvisEntity, Long> {
 	List<AvisEntity> findActive(@Param("currentDate") Date currentDate);
 
 	List<AvisEntity> findByEntitatIdAndAssumpte(Long entitatId, String assumpte);
+
+	@Query("select a.id from AvisEntity a")
+    List<Long> findAllIds();
 }
