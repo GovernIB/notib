@@ -1,11 +1,17 @@
 package es.caib.notib.back.controller;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.google.common.primitives.Longs;
+import es.caib.notib.back.helper.RequestSessionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -33,10 +39,17 @@ import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
  */
 @Controller
 @RequestMapping("/avis")
-public class AvisController extends BaseUserController {
+public class AvisController extends TableAccionsMassivesController {
 	
 	@Autowired
 	private AvisService avisService;
+
+	private static final String SESSION_ATTRIBUTE_SELECCIO = "AvisController.session.seleccio";
+	private static final String REDIRECT = "redirect:../../avis";
+
+	public AvisController() {
+		super.sessionAttributeSeleccio = SESSION_ATTRIBUTE_SELECCIO;
+	}
 
 
 	@GetMapping
@@ -47,7 +60,9 @@ public class AvisController extends BaseUserController {
 	@ResponseBody
 	@GetMapping(value = "/datatable")
 	public DatatablesResponse datatable(HttpServletRequest request) {
-		return DatatablesHelper.getDatatableResponse(request, avisService.findPaginat(DatatablesHelper.getPaginacioDtoFromRequest(request)));
+
+		var avisos = avisService.findPaginat(DatatablesHelper.getPaginacioDtoFromRequest(request));
+		return DatatablesHelper.getDatatableResponse(request, avisos, "id", SESSION_ATTRIBUTE_SELECCIO);
 	}
 
 	@GetMapping(value = "/new")
@@ -96,21 +111,82 @@ public class AvisController extends BaseUserController {
 	@GetMapping(value = "/{avisId}/enable")
 	public String enable(HttpServletRequest request, @PathVariable Long avisId) {
 
-		avisService.updateActiva(avisId, true);
-		return getAjaxControllerReturnValueSuccess(request, "redirect:../../avis", "avis.controller.activat.ok");
+		var avis = avisService.updateActiva(avisId, true);
+		return avis != null ? getAjaxControllerReturnValueSuccess(request, "redirect:../../avis", "avis.controller.activat.ok")
+				: getAjaxControllerReturnValueError(request, "redirect:../../avis", "avis.controller.activat.ko");
+	}
+
+	@GetMapping(value = "/enable/massiu")
+	public String enableMassiu(HttpServletRequest request) {
+
+		var ids = getIdsSeleccionats(request);
+		AvisDto avis;
+		List<Long> idsError = new ArrayList<>();
+		for (var id : ids) {
+			avis = avisService.updateActiva(id, true);
+			if (avis == null) {
+				idsError.add(id);
+			}
+		}
+		return idsError.isEmpty() ? getAjaxControllerReturnValueSuccess(request, REDIRECT, "avis.controller.activat.massiu.ok")
+				: getAjaxControllerReturnValueError(request, REDIRECT, "avis.controller.activat.massiu.ko", new Object[]{idsError});
 	}
 
 	@GetMapping(value = "/{avisId}/disable")
 	public String disable(HttpServletRequest request, @PathVariable Long avisId) {
 
-		avisService.updateActiva(avisId, false);
-		return getAjaxControllerReturnValueSuccess(request, "redirect:../../avis", "avis.controller.desactivat.ok");
+		var avis = avisService.updateActiva(avisId, false);
+		return avis != null ? getAjaxControllerReturnValueSuccess(request, "redirect:../../avis", "avis.controller.desactivat.ok")
+				: getAjaxControllerReturnValueError(request, "redirect:../../avis", "avis.controller.desactivat.ko");
+	}
+
+	@GetMapping(value = "/disable/massiu")
+	public String disableMassiu(HttpServletRequest request) {
+
+		var ids = getIdsSeleccionats(request);
+		AvisDto avis;
+		List<Long> idsError = new ArrayList<>();
+		for (var id : ids) {
+			avis = avisService.updateActiva(id, false);
+			if (avis == null) {
+				idsError.add(id);
+			}
+		}
+		return idsError.isEmpty() ? getAjaxControllerReturnValueSuccess(request, REDIRECT, "avis.controller.desactivat.massiu.ok")
+				: getAjaxControllerReturnValueError(request, REDIRECT, "avis.controller.desactivat.massiu.ko", idsError.toArray());
 	}
 
 	@GetMapping(value = "/{avisId}/delete")
 	public String delete(HttpServletRequest request, @PathVariable Long avisId) {
 
-		avisService.delete(avisId);
-		return getAjaxControllerReturnValueSuccess(request, "redirect:../../avis", "avis.controller.esborrat.ok");
+		var avis = avisService.delete(avisId);
+		return avis != null ? getAjaxControllerReturnValueSuccess(request, REDIRECT, "avis.controller.esborrat.ok")
+				: getAjaxControllerReturnValueError(request, REDIRECT, "avis.controller.esborrat.ko");
+	}
+
+	@GetMapping(value = "/delete/massiu")
+	public String deleteMassiu(HttpServletRequest request) {
+
+		var ids = getIdsSeleccionats(request);
+		AvisDto avis;
+		List<Long> idsError = new ArrayList<>();
+		for (var id : ids) {
+			avis = avisService.delete(id);
+			if (avis == null) {
+				idsError.add(id);
+			}
+		}
+		RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, new HashSet<Long>());
+		if (idsError.isEmpty()) {
+			return getAjaxControllerReturnValueSuccess(request, REDIRECT, "avis.controller.esborrat.massiu.ok");
+		} else {
+			return getAjaxControllerReturnValueError(request, REDIRECT, "avis.controller.esborrat.massiu.ko", new Object[]{idsError});
+		}
+	}
+
+
+	@Override
+	protected List<Long> getIdsElementsFiltrats(HttpServletRequest request) throws ParseException {
+		return avisService.findAllIds();
 	}
 }
