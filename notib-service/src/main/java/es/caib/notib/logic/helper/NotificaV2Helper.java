@@ -398,9 +398,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			resposta.setDescripcionRespuesta(descripcionRespuesta.value);
 			resposta.setAmpliacionesPlazo(conversioTipusHelper.convertir(ampliacionesPlazo.value, es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo.class));
 		} catch (Exception ex) {
+			var msg = "Error inesperat al ampliarPlazosOE ";
+			log.error(msg, ex);
 			resposta = new RespuestaAmpliarPlazoOE();
 			resposta.setCodigoRespuesta("error");
-			resposta.setDescripcionRespuesta("Error inesperat al ampliarPlazosOE" + ex.getMessage());
+			resposta.setDescripcionRespuesta(msg + ex.getMessage());
 		}
 		for (var enviament : enviaments) {
 			notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);

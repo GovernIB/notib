@@ -128,9 +128,9 @@ public class NotificaHelper {
 		if (entregaPostal) {
 			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("No es pot ampliar el plaç per enviaments amb entrega postal").build();
 		}
-		if (!estatPendent) {
-			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("Tots els enviaments han de tenir un estat pendent a Notific@").build();
-		}
+//		if (!estatPendent) {
+//			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("Tots els enviaments han de tenir un estat pendent a Notific@").build();
+//		}
 		if (!organsIguals) {
 			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("Els enviaments han de pertanyer tots al mateix Òrgan Gestor").build();
 		}

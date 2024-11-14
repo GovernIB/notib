@@ -176,13 +176,13 @@
                     elementFormDefault="qualified">
             <element name="infoEnvioLigero" type="iel:InfoEnvioLigero"/>
             <complexType name="InfoEnvioLigero">
-                <sequence>
+                <all>
                     <element name="identificador" type="xsd:string" minOccurs="0"/>
                     <element name="referenciaEmisor" type="xsd:string" minOccurs="0"/>
                     <element name="codigoDir3" type="xsd:string" minOccurs="0"/>
                     <element name="nivelDetalle" type="iel:NivelDetalle"/>
                     <element name="opcionesInfoEnvioLigero" type="com:Opciones" minOccurs="0"/>
-                </sequence>
+                </all>
             </complexType>
             <element name="respuestaInfoEnvioLigero" type="iel:RespuestaInfoEnvioLigero"/>
             <complexType name="RespuestaInfoEnvioLigero">
@@ -262,12 +262,12 @@
                     elementFormDefault="qualified">
             <element name="ampliarPlazoOE" type="ap:AmpliarPlazoOE"/>
             <complexType name="AmpliarPlazoOE">
-                <sequence>
+                <all>
                     <element name="envios" type="ap:Envios"/>
                     <element name="organismoEmisor" type="xsd:string"/>
                     <element name="plazo" type="xsd:string"/>
                     <element name="motivo" type="xsd:string"/>
-                </sequence>
+                </all>
             </complexType>
             <complexType name="Envios">
                 <sequence>
@@ -366,7 +366,8 @@
 
     <wsdl:service name="SincronizarEnvioWsService">
         <wsdl:port name="SincronizarEnvioWsPort" binding="tns:SincronizarEnvioWsBinding">
-            <soap:address location="https://notificaws.redsara.es/ws/sincronizarEnvioWs"/>
+            <soap:address location="https://se-notificaws.redsara.es/ws/sincronizarEnvioWs"/>
+<!--            <soap:address location="https://notificaws.redsara.es/ws/sincronizarEnvioWs"/>-->
         </wsdl:port>
     </wsdl:service>
 
