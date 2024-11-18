@@ -1,6 +1,8 @@
 
 package es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE;
 
+import lombok.Setter;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -36,6 +38,7 @@ import javax.xml.bind.annotation.XmlType;
     "plazo",
     "motivo"
 })
+@Setter
 public class AmpliarPlazoOE {
 
     @XmlElement(required = true)

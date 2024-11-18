@@ -2,7 +2,9 @@
 package es.caib.notib.logic.wsdl.notificaV2;
 
 import es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.AmpliacionesPlazo;
+import es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.AmpliarPlazoOE;
 import es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.Envios;
+import es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.wsdl.notificaV2.common.Opciones;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.InfoEnvioLigero;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.RespuestaInfoEnvioLigero;
@@ -100,33 +102,24 @@ public interface SincronizarEnvioWsPortType {
         InfoEnvioLigero infoEnvioLigero);
 
 
-    /**
-     *
-     * @param descripcionRespuesta
-     * @param organismoEmisor
-     * @param motivo
-     * @param plazo
-     * @param ampliacionesPlazo
-     * @param envios
-     * @param codigoRespuesta
-     */
     @WebMethod(action = "ampliarPlazoOE")
     @RequestWrapper(localName = "ampliarPlazoOE", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE", className = "es.gob.administracionelectronica.notifica.ws.sincronizarenvio._1_0.ampliarplazooe.AmpliarPlazoOE")
     @ResponseWrapper(localName = "respuestaAmpliarPlazoOE", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE", className = "es.gob.administracionelectronica.notifica.ws.sincronizarenvio._1_0.ampliarplazooe.RespuestaAmpliarPlazoOE")
-    public void ampliarPlazoOE(
-            @WebParam(name = "envios", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE")
-            Envios envios,
-            @WebParam(name = "organismoEmisor", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE")
-            String organismoEmisor,
-            @WebParam(name = "plazo", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE")
-            String plazo,
-            @WebParam(name = "motivo", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE")
-            String motivo,
-            @WebParam(name = "codigoRespuesta", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE", mode = WebParam.Mode.OUT)
-            Holder<String> codigoRespuesta,
-            @WebParam(name = "descripcionRespuesta", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE", mode = WebParam.Mode.OUT)
-            Holder<String> descripcionRespuesta,
-            @WebParam(name = "ampliacionesPlazo", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE", mode = WebParam.Mode.OUT)
-            Holder<AmpliacionesPlazo> ampliacionesPlazo);
+    public RespuestaAmpliarPlazoOE ampliarPlazoOE(@WebParam(name = "ampliarPlazoOE", targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/ampliarPlazoOE", partName = "ampliarPlazoOE")
+                                AmpliarPlazoOE ampliarPlazoOE);
+//            @WebParam(name = "envios", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE")
+//            Envios envios,
+//            @WebParam(name = "organismoEmisor", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE")
+//            String organismoEmisor,
+//            @WebParam(name = "plazo", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE")
+//            String plazo,
+//            @WebParam(name = "motivo", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE")
+//            String motivo,
+//            @WebParam(name = "codigoRespuesta", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE", mode = WebParam.Mode.OUT)
+//            Holder<String> codigoRespuesta,
+//            @WebParam(name = "descripcionRespuesta", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE", mode = WebParam.Mode.OUT)
+//            Holder<String> descripcionRespuesta,
+//            @WebParam(name = "ampliacionesPlazo", targetNamespace = "http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE", mode = WebParam.Mode.OUT)
+//            Holder<AmpliacionesPlazo> ampliacionesPlazo);
 
 }

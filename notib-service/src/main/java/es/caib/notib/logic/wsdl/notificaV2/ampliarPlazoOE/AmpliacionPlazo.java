@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 
@@ -42,7 +43,8 @@ public class AmpliacionPlazo {
     protected String estado;
     @XmlElement(required = true)
     protected String identificador;
-    @XmlElement(required = true)
+    @XmlElement(required = true, nillable = true)
+    @XmlJavaTypeAdapter(XMLGregorianCalendarAdapter.class)
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar fechaCaducidad;
     @XmlElement(required = true)

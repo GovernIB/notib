@@ -189,6 +189,10 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		resposta.setCodigoRespuesta("000");
 		resposta.setDescripcionRespuesta("Ok");
 		for (var enviament : enviaments) {
+			var data = enviament.getNotificaDataCaducitat();
+			var dataAmpliada = DateUtils.addDays(data, ampliarPlazo.getPlazo());
+			enviament.setNotificaDataCaducitat(dataAmpliada);
+			notificacioEnviamentRepository.save(enviament);
 			notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);
 		}
 		return resposta;

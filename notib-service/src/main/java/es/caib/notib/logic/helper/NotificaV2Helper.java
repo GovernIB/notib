@@ -382,20 +382,21 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	}
 
 	@Override
+	@Transactional
 	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo, List<NotificacioEnviamentEntity> enviaments) {
 
 		RespuestaAmpliarPlazoOE resposta;
 		try {
 			var apiKey = enviaments.get(0).getNotificacio().getEntitat().getApiKey();
 			var organEmisor = enviaments.get(0).getNotificacio().getEmisorDir3Codi();
-			Holder<String> codigoRespuesta = new Holder<>();
-			Holder<String> descripcionRespuesta = new Holder<>();
 			Holder<AmpliacionesPlazo> ampliacionesPlazo = new Holder<>();
-			var envios = conversioTipusHelper.convertir(ampliarPlazo.getEnvios(),  es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.Envios.class);
-			getSincronizarEnvioWs(apiKey).ampliarPlazoOE(envios, organEmisor, ampliarPlazo.getPlazo()+"", ampliarPlazo.getMotivo(), codigoRespuesta, descripcionRespuesta, ampliacionesPlazo);
+			var ap = conversioTipusHelper.convertir(ampliarPlazo, es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.AmpliarPlazoOE.class);
+			ap.setOrganismoEmisor(organEmisor);
+			System.setProperty("jaxb.debug", "true");
+			var respuesta = getSincronizarEnvioWs(apiKey).ampliarPlazoOE(ap);
 			resposta = new RespuestaAmpliarPlazoOE();
-			resposta.setCodigoRespuesta(codigoRespuesta.value);
-			resposta.setDescripcionRespuesta(descripcionRespuesta.value);
+			resposta.setCodigoRespuesta(respuesta.getCodigoRespuesta());
+			resposta.setDescripcionRespuesta(respuesta.getDescripcionRespuesta());
 			resposta.setAmpliacionesPlazo(conversioTipusHelper.convertir(ampliacionesPlazo.value, es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo.class));
 		} catch (Exception ex) {
 			var msg = "Error inesperat al ampliarPlazosOE ";
@@ -404,12 +405,34 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			resposta.setCodigoRespuesta("error");
 			resposta.setDescripcionRespuesta(msg + ex.getMessage());
 		}
+		var ok = false;
+		var errorDesc = "";
 		for (var enviament : enviaments) {
-			notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);
+			ok = "000".equals(resposta.getCodigoRespuesta());
+			errorDesc = !ok ? resposta.getDescripcionRespuesta()  : "";
+			if (!ok) {
+				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, !ok, errorDesc, false);
+				return resposta;
+			}
+			var ampliaciones = resposta.getAmpliacionesPlazo();
+			if (ampliaciones == null || ampliaciones.getAmpliacionPlazo() == null || ampliaciones.getAmpliacionPlazo().isEmpty()) {
+				errorDesc = "[ampliarPlazoOE] No han arribat dades suficients per guardar la informacio a Notib";
+				log.error(errorDesc);
+				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, errorDesc, false);
+				return resposta;
+			}
+			for (var ampliacion : ampliaciones.getAmpliacionPlazo()) {
+				if (!enviament.getNotificaIdentificador().equals(ampliacion.getIdentificador())) {
+					continue;
+				}
+				var gregorianCalendar = ampliacion.getFechaCaducidad().toGregorianCalendar();
+				enviament.setNotificaDataCaducitat(gregorianCalendar.getTime());
+				notificacioEnviamentRepository.save(enviament);
+				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);
+			}
 		}
 		return resposta;
 	}
-
 	private Datado getDarrerDatat(RespuestaInfoEnvioLigero resultadoInfoEnvio, NotificacioEnviamentEntity enviament, IntegracioInfo info) throws DatatypeConfigurationException, ParseException {
 
 		info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
