@@ -34,6 +34,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -81,7 +82,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
 
 		var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
-		info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getUsuariCodi());
+		var usuari = notificacio.getCreatedBy().get().getCodi();
+		info.setAplicacio(notificacio.getTipusUsuari(), usuari);
 		log.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 			log.error(" [NOT] la notificació no té l'estat REGISTRADA.");
