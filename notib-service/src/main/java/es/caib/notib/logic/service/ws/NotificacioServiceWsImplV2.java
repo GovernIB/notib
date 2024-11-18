@@ -448,7 +448,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				if (notificacio == null) {
 					return resposta;
 				}
-				info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getUsuariCodi());
+				info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
 				resposta.setEstat(toNotificacioEstat(notificacio.getEstat()));
 				resposta.setTipus(notificacio.getEnviamentTipus().name());
 				resposta.setEmisorDir3(notificacio.getEmisorDir3Codi());

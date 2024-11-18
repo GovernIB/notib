@@ -35,7 +35,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 
 		var info = new IntegracioInfo(IntegracioCodi.EMAIL, "Enviament de emails per notificació " + notificacio.getId(), IntegracioAccioTipusEnumDto.ENVIAMENT);
 		info.setCodiEntitat(notificacio.getEntitat().getCodi());
-		info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getUsuariCodi());
+		info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
 		info.addParam("Identificador de la notificacio", String.valueOf(notificacio.getId()));
 		var destinataris = obtenirCodiDestinataris(notificacio, info);
 		if (destinataris == null || destinataris.isEmpty()) {

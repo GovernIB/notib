@@ -73,7 +73,7 @@ public class RegistreNotificaHelper {
 		var tipusEnv = new AccioParam("Tipus enviament: ", notificacioEntity.getEnviamentTipus().name());
 		var sirActivat = new AccioParam("Sir activat", String.valueOf(isSirActivat()));
 		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, desc, IntegracioAccioTipusEnumDto.ENVIAMENT, tipusEnv, sirActivat);
-		info.setAplicacio(notificacioEntity.getTipusUsuari(), notificacioEntity.getUsuariCodi());
+		info.setAplicacio(notificacioEntity.getTipusUsuari(), notificacioEntity.getCreatedBy().get().getCodi());
 		info.setCodiEntitat(notificacioEntity.getEntitat().getCodi());
 		var codiDir3 = notificacioEntity.getEntitat().getDir3CodiReg() != null  && !notificacioEntity.getEntitat().getDir3CodiReg().isEmpty() ? notificacioEntity.getEntitat().getDir3CodiReg() : notificacioEntity.getEntitat().getDir3Codi();
 		var totsAdministracio = isAllEnviamentsAAdministracio(notificacioEntity);

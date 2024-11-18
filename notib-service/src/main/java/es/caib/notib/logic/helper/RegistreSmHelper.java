@@ -69,7 +69,7 @@ public class RegistreSmHelper {
 		var codiDir3Registre = !Strings.isNullOrEmpty(entitat.getDir3CodiReg()) ? entitat.getDir3CodiReg() : entitat.getDir3Codi();
 		var accioInfo = new AccioParam("Procés descripció: ", " [REG] Realitzant nou assentament registral" + (enviamentSir ? " SIR " : " ") + "de l'enviament: " + enviament.getId());
 		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, descInfo, IntegracioAccioTipusEnumDto.ENVIAMENT, tipusEnvInfo, sirActivatInfo, accioInfo);
-		info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getUsuariCodi());
+		info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getCreatedBy().get().getCodi());
 		// Registre SIR
 		try {
 			var request = ReqAssentamentRegistral.builder()

@@ -116,7 +116,7 @@ public class NexeaAdviserServiceImpl implements NexeaAdviserService  {
                 resultado.setDescripcionRespuesta("Identificador no se corresponde con el CIE");
                 return resultado;
             }
-            info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getUsuariCodi());
+            info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getCreatedBy().get().getCodi());
             if (!receptorValid(sincronizarEnvio.getReceptor())) {
                 resultado.setCodigoRespuesta(NexeaAdviserWs.CODI_ERROR_VALIDACIO);
                 resultado.setDescripcionRespuesta("Receptor no tiene el formato correcto");

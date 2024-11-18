@@ -122,7 +122,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 		var resposta = new RespostaConsultaRegistre();
 		var entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
 		var notificacio = notificacioRepository.findById(notificacioId).get();
-		info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getUsuariCodi());
+		info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
 		try {
 			if (entitat == null) {
 				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
