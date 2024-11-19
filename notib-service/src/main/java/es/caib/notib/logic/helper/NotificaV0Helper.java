@@ -185,16 +185,27 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	@Override
 	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo, List<NotificacioEnviamentEntity> enviaments) {
 
+		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA, "Ampliació de plaç", IntegracioAccioTipusEnumDto.ENVIAMENT);
 		var resposta = new RespuestaAmpliarPlazoOE();
 		resposta.setCodigoRespuesta("000");
 		resposta.setDescripcionRespuesta("Ok");
+		StringBuilder codiEntitat = new StringBuilder();
+		Date data, dataAmpliada;
+		String entitat;
 		for (var enviament : enviaments) {
-			var data = enviament.getNotificaDataCaducitat();
-			var dataAmpliada = DateUtils.addDays(data, ampliarPlazo.getPlazo());
+			data = enviament.getNotificaDataCaducitat();
+			dataAmpliada = DateUtils.addDays(data, ampliarPlazo.getPlazo());
 			enviament.setNotificaDataCaducitat(dataAmpliada);
 			notificacioEnviamentRepository.save(enviament);
 			notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);
+			info.addParam("Enviament", enviament.getId() + "");
+			entitat = enviament.getNotificacio().getEntitat().getCodi();
+			if (!codiEntitat.toString().contains(entitat)) {
+				codiEntitat.append(entitat);
+			}
 		}
+		info.setCodiEntitat(codiEntitat.toString());
+		integracioHelper.addAccioOk(info);
 		return resposta;
 	}
 

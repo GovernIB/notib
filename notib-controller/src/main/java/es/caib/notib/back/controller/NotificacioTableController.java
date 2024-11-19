@@ -805,7 +805,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
     }
 
-    @GetMapping(value = "/{notificacioId}/refrescarEstatClient")
+    @GetMapping(value = "/{notificacioId}/ampliar/plazo")
     public String refrescarEstatClient(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
 
         var notificat = callbackService.reintentarCallback(notificacioId);
@@ -838,6 +838,16 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @ResponseBody
     public ProgresActualitzacioCertificacioDto enviamentsRefrescarEstatProgres() {
         return notificacioService.actualitzacioEnviamentsEstat();
+    }
+
+
+    @GetMapping(value = "/{notificacioId}/ampliacion/plazo")
+    public String ampliarPlazoOE(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
+
+//        notificacioService.ampliarPlazoOE(notificacioId);
+//        var msg = notificat ? "notificacio.controller.notificar.client.ok" : "notificacio.controller.notificar.client.error";
+//        MissatgesHelper.error(request, getMessage(request,msg));
+        return "ampliarPlazoForm";
     }
 
     // ACCIONS MASSIVES PER NOTIFICACIONS

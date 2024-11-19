@@ -179,6 +179,7 @@ function getCookie(cname) {
 						<li><a style="cursor: pointer;" id="exportarODS"><spring:message code="enviament.list.user.exportar"/> a <spring:message code="enviament.list.user.exportar.EXCEL"/></a></li>
 						<li><a id="reintentarErrors" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.reintentar.errors.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
 						<li><a style="cursor: pointer;" id="updateEstat"><spring:message code="enviament.list.user.actualitzar.estat"/></a></li>
+						<li><a style="cursor: pointer;" id="ampliarPlazoOe"><spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
 
 						<c:if test="${isRolActualAdministradorEntitat}">
 							<hr/>
@@ -616,8 +617,18 @@ function getCookie(cname) {
 				<th data-col-name="notificacioId" data-visible="false"></th>
 				<th data-orderable="false" data-template="#cellAccionsTemplate" width="190">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a>
-						<a href="<c:url value="/notificacio/{{:notificacioId}}/info"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detall.remesa"/></a>
+
+						<div class="dropdown">
+                   			<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+                    		<ul class="dropdown-menu dropdown-menu-right">
+								<a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+								<a href="<c:url value="/notificacio/{{:notificacioId}}/info"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detall.remesa"/></a></li>
+								<a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}/ampliar/plazo"/>"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
+							</ul>
+                		</div>
+<%--						<a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a>--%>
+<%--						<a href="<c:url value="/notificacio/{{:notificacioId}}/info"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detall.remesa"/></a>--%>
+<%--						<a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}/ampliar/plazo"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a>--%>
 					</script>
 				</th>
 			</tr>
