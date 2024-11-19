@@ -38,7 +38,7 @@ public class AuditingConfig implements EnvironmentAware {
 	public AuditorAware<UsuariEntity> auditorProvider() {
 		return () -> {
 			var authentication = SecurityContextHolder.getContext().getAuthentication();
-			if (authentication == null || !authentication.isAuthenticated() || "SCHEDULLER".equals(authentication.getName())) {
+			if (authentication == null || !authentication.isAuthenticated() || "SCHEDULLER".equals(authentication.getName()) || "anonymousUser".equals(authentication.getName())) {
 				return Optional.empty();
 			}
 

@@ -66,6 +66,8 @@ public class SecurityConfig {
 			"/swagger-ui/**",
 			"/rest",
 			"/api/rest",
+			"/adviser/entrega/postal",
+			"/adviser/entrega/postal/**",
 			"/api/rest/appinfo",
 			"/api-docs",
 			"/api-docs/**",
