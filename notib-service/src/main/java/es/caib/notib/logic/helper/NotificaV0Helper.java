@@ -198,7 +198,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			enviament.setNotificaDataCaducitat(dataAmpliada);
 			notificacioEnviamentRepository.save(enviament);
 			notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);
-			info.addParam("Enviament", enviament.getId() + "");
+			info.addParam("Notificacio/Enviament", enviament.getNotificacio().getId() + "/" + enviament.getId());
 			entitat = enviament.getNotificacio().getEntitat().getCodi();
 			if (!codiEntitat.toString().contains(entitat)) {
 				codiEntitat.append(entitat);

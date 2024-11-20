@@ -403,6 +403,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Transactional
 	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo, List<NotificacioEnviamentEntity> enviaments) {
 
+		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA, "Ampliació de plaç", IntegracioAccioTipusEnumDto.ENVIAMENT);
 		RespuestaAmpliarPlazoOE resposta;
 		try {
 			var apiKey = enviaments.get(0).getNotificacio().getEntitat().getApiKey();
@@ -425,29 +426,39 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 		var ok = false;
 		var errorDesc = "";
+		var codiEntitat = "";
+		ok = "000".equals(resposta.getCodigoRespuesta());
+		errorDesc = !ok ? resposta.getDescripcionRespuesta()  : "";
 		for (var enviament : enviaments) {
-			ok = "000".equals(resposta.getCodigoRespuesta());
-			errorDesc = !ok ? resposta.getDescripcionRespuesta()  : "";
+			info.addParam("Notificacio/Enviament", enviament.getNotificacio().getId() + "/" + enviament.getId());
+			codiEntitat +=  enviament.getNotificacio().getEntitat().getCodi();
 			if (!ok) {
 				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, !ok, errorDesc, false);
-				return resposta;
+				continue;
 			}
 			var ampliaciones = resposta.getAmpliacionesPlazo();
 			if (ampliaciones == null || ampliaciones.getAmpliacionPlazo() == null || ampliaciones.getAmpliacionPlazo().isEmpty()) {
 				errorDesc = "[ampliarPlazoOE] No han arribat dades suficients per guardar la informacio a Notib";
 				log.error(errorDesc);
 				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, errorDesc, false);
-				return resposta;
+				continue;
 			}
 			for (var ampliacion : ampliaciones.getAmpliacionPlazo()) {
 				if (!enviament.getNotificaIdentificador().equals(ampliacion.getIdentificador())) {
 					continue;
 				}
+
 				var gregorianCalendar = ampliacion.getFechaCaducidad().toGregorianCalendar();
 				enviament.setNotificaDataCaducitat(gregorianCalendar.getTime());
 				notificacioEnviamentRepository.save(enviament);
 				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);
 			}
+		}
+		info.setCodiEntitat(codiEntitat);
+		if (ok) {
+			integracioHelper.addAccioOk(info);
+		} else {
+			integracioHelper.addAccioError(info, errorDesc);
 		}
 		return resposta;
 	}
