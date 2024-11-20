@@ -22,7 +22,7 @@ public interface NexeaAdviserWs {
 
     String SERVICE_NAME = "NexeaAdviserWs";
     // TODO S'HA DE CANVIAR AQUESTA URL
-    String NAMESPACE_URI = "http://nexea.es/ws/adviserwsv2/1.0/";
+    String NAMESPACE_URI = "http://nexea.es/ws/adviserwsv2/1.0/sincronizarEnvio";
     String NAMESPACE_URI_PARAMETERS = "http://nexea.es/ws/adviserwsv2/1.0/sincronizarEnvio";
     String NAMESPACE_URI_PARAMETERS_COMMON = "http://nexea.es/ws/adviserwsv2/1.0/common";
     String SYNC_ENVIO_OE_OK = "200";

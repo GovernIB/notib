@@ -356,7 +356,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			var xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
 			xmlGregorianCalendar.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
 			var dataHolder = new Holder<>(xmlGregorianCalendar);
-			var receptor = conversioTipusHelper.convertir(sincronizarEnvio.getReceptor(), Receptor.class);
+			var receptor = sincronizarEnvio.getReceptor() == null ? getReceptor(enviament) : conversioTipusHelper.convertir(sincronizarEnvio.getReceptor(), Receptor.class);
 			var acusePdf = conversioTipusHelper.convertir(sincronizarEnvio.getAcusePDF(), Acuse.class);
 			var acuseXml = conversioTipusHelper.convertir(sincronizarEnvio.getAcuseXML(), Acuse.class);
 			var opciones = conversioTipusHelper.convertir(sincronizarEnvio.getOpcionesSincronizarEnvio(), es.caib.notib.logic.wsdl.notificaV2.common.Opciones.class);
@@ -381,7 +381,25 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 	}
 
-	@Override
+    private Receptor getReceptor(NotificacioEnviamentEntity enviament) {
+
+        var receptor = new Receptor();
+        var titular = enviament.getTitular();
+        receptor.setNifReceptor(titular.getNif());
+        receptor.setNombreReceptor(titular.getNomSencer());
+        receptor.setVinculoReceptor(BigInteger.ONE);
+        if (!titular.isIncapacitat()) {
+            return receptor;
+        }
+        receptor.setVinculoReceptor(BigInteger.TWO);
+        var destinatari = enviament.getDestinataris().get(0);
+        receptor.setNifRepresentante(destinatari.getNif());
+        receptor.setNombreRepresentante(destinatari.getNomSencer());
+        return receptor;
+    }
+
+
+    @Override
 	@Transactional
 	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo, List<NotificacioEnviamentEntity> enviaments) {
 
@@ -433,6 +451,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 		return resposta;
 	}
+
 	private Datado getDarrerDatat(RespuestaInfoEnvioLigero resultadoInfoEnvio, NotificacioEnviamentEntity enviament, IntegracioInfo info) throws DatatypeConfigurationException, ParseException {
 
 		info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());

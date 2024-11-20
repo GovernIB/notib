@@ -117,11 +117,11 @@ public class NexeaAdviserServiceImpl implements NexeaAdviserService  {
                 return resultado;
             }
             info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getCreatedBy().get().getCodi());
-            if (!receptorValid(sincronizarEnvio.getReceptor())) {
-                resultado.setCodigoRespuesta(NexeaAdviserWs.CODI_ERROR_VALIDACIO);
-                resultado.setDescripcionRespuesta("Receptor no tiene el formato correcto");
-                return resultado;
-            }
+//            if (!receptorValid(sincronizarEnvio.getReceptor())) {
+//                resultado.setCodigoRespuesta(NexeaAdviserWs.CODI_ERROR_VALIDACIO);
+//                resultado.setDescripcionRespuesta("Receptor no tiene el formato correcto");
+//                return resultado;
+//            }
             var estat = CieEstat.valueOf(sincronizarEnvio.getEstado().toUpperCase());
             enviament.getEntregaPostal().setCieEstat(estat);
             info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
