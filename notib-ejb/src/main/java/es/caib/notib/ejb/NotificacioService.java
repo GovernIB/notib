@@ -3,6 +3,8 @@
  */
 package es.caib.notib.ejb;
 
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
+import es.caib.notib.logic.intf.dto.AmpliacionPlazoDto;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.DocCieValid;
@@ -444,7 +446,13 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
         getDelegateService().updateEstatList(notificacioId);
     }
 
-    @SuppressWarnings("rawtypes")
+	@Override
+	@RolesAllowed("**")
+	public RespuestaAmpliarPlazoOE ampliacionPlazoOE(AmpliacionPlazoDto dto) {
+		return getDelegateService().ampliacionPlazoOE(dto);
+	}
+
+	@SuppressWarnings("rawtypes")
 	@Override
 	@PermitAll
 	public List<Long> getNotificacionsDEHPendentsRefrescarCert() {

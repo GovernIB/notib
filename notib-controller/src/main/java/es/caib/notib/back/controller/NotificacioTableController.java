@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import es.caib.notib.back.command.*;
 import es.caib.notib.back.helper.*;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.missatges.Missatge;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
@@ -62,8 +63,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @Autowired
     private PermisosService permisosService;
     @Autowired
-    private CallbackService callbackService;
-    @Autowired
     private EnviamentSmService envSmService;
     @Autowired
     private ColumnesService columnesService;
@@ -86,6 +85,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private static final String EVENT_TIPUS_ENUM = "es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.";
     private static final String SELECCIO_BUIDA = "accio.massiva.seleccio.buida";
     private static final String PERMIS_DENGAT = "Permís denegat";
+    @Autowired
+    private ConversioTipusHelper conversioTipusHelper;
 
     public NotificacioTableController() {
         super.sessionAttributeSeleccio = SESSION_ATTRIBUTE_SELECCIO;
@@ -805,15 +806,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
     }
 
-    @GetMapping(value = "/{notificacioId}/ampliar/plazo")
-    public String refrescarEstatClient(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
-
-        var notificat = callbackService.reintentarCallback(notificacioId);
-        var msg = notificat ? "notificacio.controller.notificar.client.ok" : "notificacio.controller.notificar.client.error";
-        MissatgesHelper.error(request, getMessage(request,msg));
-        return NOT_INFO;
-    }
-
     ////
     // Actualització enviaments expirats
     ////
@@ -842,12 +834,33 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
 
     @GetMapping(value = "/{notificacioId}/ampliacion/plazo")
-    public String ampliarPlazoOE(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
+    public String ampliarPlazoOEGet(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
 
-//        notificacioService.ampliarPlazoOE(notificacioId);
-//        var msg = notificat ? "notificacio.controller.notificar.client.ok" : "notificacio.controller.notificar.client.error";
-//        MissatgesHelper.error(request, getMessage(request,msg));
+        var ampliacion = new AmpliacionPlazoCommand();
+        ampliacion.setNotificacioId(notificacioId);
+        model.addAttribute(ampliacion);
         return "ampliarPlazoForm";
+    }
+
+    @GetMapping(value = "/{notificacioId}/enviament/{enviamentId}/ampliacion/plazo")
+    public String ampliarPlazoOEGetEnviament(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId, @PathVariable Long enviamentId) {
+
+        var ampliacion = new AmpliacionPlazoCommand();
+        ampliacion.setEnviamentId(enviamentId);
+        model.addAttribute(ampliacion);
+        return "ampliarPlazoForm";
+    }
+
+
+    @PostMapping(value = "/ampliacion/plazo")
+    public String ampliarPlazoOEPost(HttpServletResponse response, HttpServletRequest request, Model model, AmpliacionPlazoCommand ampliacionPlazo) {
+
+        var ampliarPlazoOE = new AmpliarPlazoOE();
+        ampliarPlazoOE.setPlazo(ampliacionPlazo.getDies());
+        ampliarPlazoOE.setMotivo(ampliacionPlazo.getMotiu());
+        var resposta = notificacioService.ampliacionPlazoOE(ConversioTipusHelper.convertir(ampliacionPlazo, AmpliacionPlazoDto.class));
+        return resposta != null && "000".equals(resposta.getCodigoRespuesta()) ? getModalControllerReturnValueSuccess(request, "redirect:/enviament", "ok")
+                : getModalControllerReturnValueError(request, "redirect:/enviament", resposta.getDescripcionRespuesta());
     }
 
     // ACCIONS MASSIVES PER NOTIFICACIONS

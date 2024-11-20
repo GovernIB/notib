@@ -4,13 +4,15 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.Envios;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.intf.dto.*;
@@ -44,7 +46,6 @@ import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.plugin.cie.CiePluginJms;
-import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.CallbackEntity;
@@ -1986,6 +1987,42 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 		item.setPerActualitzar(true);
 		notificacioTableViewRepository.save(item);
+	}
+
+	@Override
+	public RespuestaAmpliarPlazoOE ampliacionPlazoOE(AmpliacionPlazoDto dto) {
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			List<String> identificadors = new ArrayList<>();
+			var isNotificacio = dto.getNotificacioId() != null;
+			var isEnviament = dto.getEnviamentId() != null;
+			if (isNotificacio) {
+				var notificacio = notificacioRepository.findById(dto.getNotificacioId()).orElseThrow();
+				for (var enviament : notificacio.getEnviaments()) {
+					if (Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+						identificadors.add(enviament.getNotificaIdentificador());
+					}
+				}
+			}
+			if (isEnviament) {
+				var enviament = enviamentRepository.findById(dto.getEnviamentId()).orElseThrow();
+				if (!Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+					identificadors.add(enviament.getNotificaIdentificador());
+				}
+			}
+			var envios = new Envios();
+			var ampliarPlazoOE = new AmpliarPlazoOE(envios, dto.getDies(), dto.getMotiu());
+			return notificaHelper.ampliarPlazoOE(ampliarPlazoOE);
+		} catch (Exception ex) {
+			var msg = "Error inesperat al ampliarPlazoOE ";
+			log.error(msg, ex);
+			var resposta = new RespuestaAmpliarPlazoOE();
+			resposta.setDescripcionRespuesta(msg + ex.getMessage());
+			return resposta;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override

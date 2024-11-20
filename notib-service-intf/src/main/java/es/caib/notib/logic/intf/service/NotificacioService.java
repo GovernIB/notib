@@ -3,6 +3,9 @@
  */
 package es.caib.notib.logic.intf.service;
 
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
+import es.caib.notib.logic.intf.dto.AmpliacionPlazoDto;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.DocCieValid;
@@ -450,4 +453,7 @@ public interface NotificacioService {
 
     @PreAuthorize("isAuthenticated()")
 	void updateEstatList(Long notificacioId);
+
+	@PreAuthorize("isAuthenticated()")
+	RespuestaAmpliarPlazoOE ampliacionPlazoOE(AmpliacionPlazoDto notificacioId);
 }

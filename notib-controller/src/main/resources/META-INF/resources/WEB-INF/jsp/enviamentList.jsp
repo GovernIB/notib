@@ -623,7 +623,7 @@ function getCookie(cname) {
                     		<ul class="dropdown-menu dropdown-menu-right">
 								<a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 								<a href="<c:url value="/notificacio/{{:notificacioId}}/info"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detall.remesa"/></a></li>
-								<a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}/ampliar/plazo"/>"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
+								<a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}/ampliacion/plazo"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
 							</ul>
                 		</div>
 <%--						<a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a>--%>
