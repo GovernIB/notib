@@ -121,9 +121,9 @@ public class WsClientHelper<T> {
 			if (handler != null) {
 				handlerChain.add(handler);
 			}
-//			if (logMissatgesActiu) {
-//				handlerChain.add(new SOAPLoggingHandler(WsClientHelper.class));
-//			}
+			if (logMissatgesActiu) {
+				handlerChain.add(new SOAPLoggingHandler(WsClientHelper.class));
+			}
 		}
 		bindingProvider.getBinding().setHandlerChain(handlerChain);
 		if (soapAction != null) {
@@ -133,9 +133,9 @@ public class WsClientHelper<T> {
 		return servicePort;
 	}
 
-	public T generarClientWs(URL wsdlResourceUrl, String endpoint, QName qname, String userName, String password, boolean disableCxfChunking, Class<T> clazz, Handler<?>... handlers)
+	public T  generarClientWs(URL wsdlResourceUrl, String endpoint, QName qname, String userName, String password, boolean logMissatge, boolean disableCxfChunking, Class<T> clazz, Handler<?>... handlers)
 							throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
-		return this.generarClientWs(wsdlResourceUrl, endpoint, qname, userName, password, null, false, disableCxfChunking, clazz, handlers);
+		return this.generarClientWs(wsdlResourceUrl, endpoint, qname, userName, password, null, logMissatge, disableCxfChunking, clazz, handlers);
 	}
 
 	public T generarClientWs(URL wsdlResourceUrl, String endpoint, QName qname, String userName, String password, Class<T> clazz, Handler<?>... handlers)
@@ -190,7 +190,7 @@ public class WsClientHelper<T> {
 			} catch (Exception ex) {
 				sb.append("Error al imprimir el missatge XML: ").append(ex.getMessage());
 			}
-			LOGGER.debug(sb.toString());
+			LOGGER.info(sb.toString());
 		}
 	}
 
