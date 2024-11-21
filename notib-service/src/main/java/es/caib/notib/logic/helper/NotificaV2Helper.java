@@ -450,6 +450,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 				var gregorianCalendar = ampliacion.getFechaCaducidad().toGregorianCalendar();
 				enviament.setNotificaDataCaducitat(gregorianCalendar.getTime());
+				enviament.setPlazoAmpliado(true);
 				notificacioEnviamentRepository.save(enviament);
 				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);
 			}

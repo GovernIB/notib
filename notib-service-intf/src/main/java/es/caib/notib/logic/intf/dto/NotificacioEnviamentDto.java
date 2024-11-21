@@ -42,6 +42,8 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	private Date notificaEstatData;
 	private String notificaDatatErrorDescripcio;
 	private String notificaDatatOrigen;
+	private Date notificaDataCaducitat;
+	private boolean plazoAmpliado;
 	private String notificaDatatReceptorNif;
 	private String notificaDatatReceptorNom;
 	private String notificaDatatNumSeguiment;

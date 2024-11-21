@@ -96,21 +96,21 @@ public class NotificaHelper {
 	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo) {
 
 		if (ampliarPlazo.getEnvios() == null) {
-			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("Envios no pot ser null").build();
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("ampliar.plazo.enviaments.not.null").build();
 		}
 		if (ampliarPlazo.getEnvios().getIdentificador().size() > 100) {
-			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("Envios no pot tenir més de 100 elements").build();
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("ampliar.plazo.max.enviaments").build();
 		}
 		if (Strings.isNullOrEmpty(ampliarPlazo.getMotivo())) {
-			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("El motiu no pot ser null").build();
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("ampliar.plazo.motiu.null").build();
 		}
 		if (ampliarPlazo.getPlazo() <= 0) {
-			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("El plaç ha de ser major que zero").build();
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("ampliar.plazo.plazo.major.zero").build();
 		}
 		var ids = ampliarPlazo.getEnvios().getIdentificador();
 		var enviaments = enviamentRepository.findByNotificaIdentificadorIn(ids);
 		if (ids.size() != enviaments.size()) {
-			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("Alguns dels identificadors no son vàlids").build();
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("ampliar.plazo.identificadors.no.valids").build();
 		}
 //		boolean organsIguals = enviaments.stream().map(e -> e.getNotificacio().getOrganGestor().getCodi()).distinct().count() == 1;
 		var organsIguals = true;
@@ -126,13 +126,13 @@ public class NotificaHelper {
 			}
 		}
 		if (entregaPostal) {
-			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("No es pot ampliar el plaç per enviaments amb entrega postal").build();
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("ampliar.plazo.enviaments.entrega.postal").build();
 		}
 //		if (!estatPendent) {
 //			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("Tots els enviaments han de tenir un estat pendent a Notific@").build();
 //		}
 		if (!organsIguals) {
-			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("Els enviaments han de pertanyer tots al mateix Òrgan Gestor").build();
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("").build();
 		}
 
 		return getNotificaHelper().ampliarPlazoOE(ampliarPlazo, enviaments);
