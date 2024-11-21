@@ -599,7 +599,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
         getEntitatActualComprovantPermisos(request);
         var ok = notificacioService.consultarEstatEntregaPostal(enviamentId);
-        return Missatge.builder().ok(ok).msg(getMessage(request, ok ? "entrega.postal.cancelar.ok" : "entrega.postal.cancelar.error")).build();
+        return Missatge.builder().ok(ok).msg(getMessage(request, ok ? "entrega.postal.consultar.ok" : "entrega.postal.consultar.error")).build();
     }
 
     @GetMapping(value = "/descarregar/diagrama/state/machine")

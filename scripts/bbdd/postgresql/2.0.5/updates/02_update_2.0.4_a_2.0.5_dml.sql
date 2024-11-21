@@ -13,3 +13,4 @@ WHERE n.CREATEDDATE > TO_DATE('25/03/2024', 'dd/MM/yyyy');
 
 INSERT INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE,CONFIGURABLE) VALUES (0, 'es.caib.notib.plugin.arxiu.caib.conversio.original.url.csv', 1, 'Url on generar imprimible per CSV', 'ARXIU',1 );
 INSERT INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE,CONFIGURABLE) VALUES (0, 'es.caib.notib.plugin.arxiu.caib.conversio.original.url.uuid', 1, 'Url on generar original per uuId', 'ARXIU',1 );
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.NOTIFICA_SOAP', 'false', 'Mostrar logs de les crides SOAP a Notifc@', 'LOGS', 20, 0, 'BOOL', 0);

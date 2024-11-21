@@ -21,5 +21,6 @@ public enum LoggingTipus {
     EFICIENCIA_TAULA_REMESES,
     ADVISER,
     EMAIL,
-    METRIQUES_SISTEMA;
+    METRIQUES_SISTEMA,
+    NOTIFICA_SOAP;
 }
