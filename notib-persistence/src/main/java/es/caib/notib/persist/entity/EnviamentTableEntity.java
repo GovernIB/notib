@@ -180,4 +180,7 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 
 	@Column(name = "callback_error")
 	protected boolean errorLastCallback;
+
+	@Column(name = "entrega_postal")
+	protected boolean entregaPostal;
 }

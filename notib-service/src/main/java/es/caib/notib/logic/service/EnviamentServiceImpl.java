@@ -287,6 +287,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			mapeigPropietatsOrdenacio.put("notificaCertificacioNumSeguiment", new String[] {"notificaCertificacioNumSeguiment"});
 			mapeigPropietatsOrdenacio.put("csvUuid", new String[] {"csv_uuid"});
 			mapeigPropietatsOrdenacio.put("estat", new String[] {"estat"});
+			mapeigPropietatsOrdenacio.put("entergaPostal", new String[] {"entregaPostal"});
 			mapeigPropietatsOrdenacio.put("codiNotibEnviament", new String[] {"notificaReferencia"});
 			mapeigPropietatsOrdenacio.put("referenciaNotificacio", new String[] {"referenciaNotificacio"});
 
@@ -485,6 +486,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				.csvUuid(filtreDto.getCsvUuid())
 				.estatNull(estat == null)
 				.estat(estat)
+				.entregaPostal(filtreDto.getEntregaPostal())
 				.dir3CodiNull(Strings.isNullOrEmpty(filtreDto.getDir3Codi()))
 				.dir3Codi(filtreDto.getDir3Codi())
 				.creadaPerNull(Strings.isNullOrEmpty(creadaPer))

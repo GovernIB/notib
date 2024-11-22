@@ -9,3 +9,6 @@ ALTER TABLE not_entrega_postal ADD cie_cancelat NUMBER(1) DEFAULT '1' NOT NULL;
 ALTER TABLE not_entrega_postal ADD cie_estat VARCHAR2(50 CHAR);
 ALTER TABLE NOT_PAGADOR_CIE ADD CONSTRAINT NOT_EMISORCIE_ORGAN_FK FOREIGN KEY (ORGAN_EMISOR) REFERENCES NOT_ORGAN_GESTOR (ID);
 ALTER TABLE not_notificacio ADD caducitat_original date;
+ALTER TABLE not_notificacio_env_table ADD entrega_postal NUMBER(1) DEFAULT '0';
+ALTER TABLE not_notificacio_table ADD entrega_postal NUMBER(1) DEFAULT '0';
+ALTER TABLE not_columnes ADD entrega_postal NUMBER(1) DEFAULT '1';

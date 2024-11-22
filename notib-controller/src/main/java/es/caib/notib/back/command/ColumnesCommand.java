@@ -36,6 +36,7 @@ public class ColumnesCommand {
 	private boolean csvUuid; 
 	private boolean estat;
 	private boolean referenciaNotificacio;
+	private boolean entregaPostal;
 
 	public static ColumnesCommand asCommand(ColumnesDto dto) {
 		return ConversioTipusHelper.convertir(dto, ColumnesCommand.class);

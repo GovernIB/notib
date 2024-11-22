@@ -142,6 +142,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"	(:#{#filtre.hasZeronotificaEnviamentIntent} = false and nenv.registreEnviamentIntent > 0) " +
 			") " +
 			"and (:#{#filtre.nomesSenseErrors} = false or nenv.hasErrors = true) " +
+			"and (:#{#filtre.entregaPostal} is null or nenv.entregaPostal = :#{#filtre.entregaPostal}) " +
 			"and (:#{#filtre.referenciaNotificacioNull} = true or lower(nenv.notificacio.referencia) like '%'||lower(:#{#filtre.referenciaNotificacio})||'%') " +
 			"and (:#{#filtre.nomesAmbErrors} = false or nenv.hasErrors = false)"
 	)
@@ -232,6 +233,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"	(:#{#filtre.hasZeronotificaEnviamentIntent} = false and nenv.registreEnviamentIntent > 0) " +
 			") " +
 			"and (:#{#filtre.nomesSenseErrors} = false or nenv.hasErrors = true) " +
+			"and (:#{#filtre.entregaPostal} is null or nenv.entregaPostal = :#{#filtre.entregaPostal}) " +
 			"and (:#{#filtre.referenciaNotificacioNull} = true or lower(nenv.notificacio.referencia) like '%'||lower(:#{#filtre.referenciaNotificacio})||'%') " +
 			"and (:#{#filtre.nomesAmbErrors} = false or nenv.hasErrors = false)"
 	)

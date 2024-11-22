@@ -169,6 +169,7 @@ public class NotificacioListHelper {
                 .registreNumNull(Strings.isNullOrEmpty(f.getRegistreNum()))
                 .registreNum(f.getRegistreNum())
                 .nomesAmbErrors(nomesAmbErrors)
+                .nomesAmbEntregaPostal(f.isNomesAmbEntregaPostal())
                 .nomesFiReintents(nomesFiReintents)
                 .deleted(deleted)
                 .nomesSenseErrors(nomesSenseErrors)

@@ -73,6 +73,7 @@ public class FiltreEnviament {
     private boolean estatNull;
     private NotificacioEstatEnumDto estat;
     private EnviamentEstat notificaEstat;
+    private Boolean entregaPostal;
     private boolean dir3CodiNull;
     private String dir3Codi;
     private boolean creadaPerNull;

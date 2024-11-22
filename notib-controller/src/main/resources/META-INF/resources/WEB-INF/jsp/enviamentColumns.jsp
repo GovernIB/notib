@@ -118,6 +118,9 @@ input[type='checkbox']:checked{
 				<div class="col-md-2">
 					<not:inputCheckbox name="estat" textKey="enviament.list.estat" labelSize="10"/>
 				</div>
+				<div class="col-md-2">
+					<not:inputCheckbox name="entregaPostal" textKey="enviament.list.entrega.postal" labelSize="10"/>
+				</div>
 			</div>
 		</div>
 		<div id="modal-botons">

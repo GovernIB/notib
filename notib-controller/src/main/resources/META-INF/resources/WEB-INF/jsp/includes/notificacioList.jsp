@@ -89,8 +89,8 @@
         vertical-align: middle;
     }
 
-    #nomesAmbErrorsBtn {
-        margin-right: 10%;
+    #nomesAmbErrorsBtn, #nomesAmbEntregaPostalBtn {
+        margin-right: 2%;
     }
 
     .cellEstat {
@@ -490,6 +490,8 @@
             });
             $('#nomesAmbErrorsBtn').removeClass('active');
             $('#nomesAmbErrors').val(false);
+            $('#nomesAmbEntregaPostalBtn').removeClass('active');
+            $('#nomesAmbEntregaPostal').val(false);
             $('#nomesFiReintentsBtn').removeClass('active');
             $('#nomesFiReintents').val(false);
             // omplirProcediments();
@@ -501,6 +503,11 @@
         $('#nomesAmbErrorsBtn').click(function() {
             nomesAmbErrors = !$(this).hasClass('active');
             $('#nomesAmbErrors').val(nomesAmbErrors);
+        })
+
+        $('#nomesAmbEntregaPostalBtn').click(function() {
+            nomesAmbEntregaPostal = !$(this).hasClass('active');
+            $('#nomesAmbEntregaPostal').val(nomesAmbEntregaPostal);
         })
 
         $('#nomesFiReintentsBtn').click(function() {
@@ -739,6 +746,8 @@
             <not:inputText name="registreNum" inline="true" placeholderKey="notificacio.list.filtre.camp.registre.num"/>
         </div>
         <div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
+            <button id="nomesAmbEntregaPostalBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbEntregaPostal"/>" class="btn btn-default pull-left <c:if test="${nomesAmbEntregaPostal}">active</c:if>" data-toggle="button"><span class="fa fa-envelope"></span></button>
+            <not:inputHidden name="nomesAmbEntregaPostal"/>
             <button id="nomesAmbErrorsBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbErrors"/>" class="btn btn-default pull-left <c:if test="${nomesAmbErrors}">active</c:if>" data-toggle="button"><span class="fa fa-warning"></span></button>
             <not:inputHidden name="nomesAmbErrors"/>
             <c:if test="${isRolActualAdministradorEntitat}">

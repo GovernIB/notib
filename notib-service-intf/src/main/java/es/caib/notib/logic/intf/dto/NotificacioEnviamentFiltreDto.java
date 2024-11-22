@@ -48,6 +48,8 @@ public class NotificacioEnviamentFiltreDto extends AuditoriaDto {
 	private String titularNomLlinatge;
 	private String uuid;
 	private String referenciaNotificacio;
+	private Boolean entregaPostal;
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

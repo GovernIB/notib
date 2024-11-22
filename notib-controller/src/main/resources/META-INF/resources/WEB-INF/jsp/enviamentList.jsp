@@ -49,12 +49,18 @@
 $(document).ready(function() {
 
 	var $estatColumn = $('#estat');
+	var $entregaPostalColumn = $('#entregaPostal');
 	var $enviamentTipusColumn = $('#enviamentTipus');
 	$estatColumn.select2({
 		width: '100%',
         allowClear:true,
         placeholder: 'Selecciona una opció'//'${placeholderText}'
     });
+	$entregaPostalColumn.select2({
+		width: '100%',
+		allowClear:true,
+		placeholder: 'Selecciona una opció'//'${placeholderText}'
+	});
 	$enviamentTipusColumn.select2({
 		width: '100%',
 		allowClear:true,
@@ -76,11 +82,16 @@ $(document).ready(function() {
 	}
 
 	configureColumnSelectFilter($estatColumn);
+	configureColumnSelectFilter($entregaPostalColumn);
 	configureColumnSelectFilter($enviamentTipusColumn);
 
     if("${filtreEnviaments.estat}" != ""){
 		$estatColumn.val("${filtreEnviaments.estat}").trigger('change');
     }
+
+	if("${filtreEnviaments.entregaPostal}" != ""){
+		$entregaPostalColumn.val("${filtreEnviaments.entregaPostal}").trigger('change');
+	}
 
 	if("${filtreEnviaments.enviamentTipus}" != ""){
 		$enviamentTipusColumn.val("${filtreEnviaments.enviamentTipus}".toLowerCase()).trigger('change');
@@ -614,6 +625,27 @@ function getCookie(cname) {
 						</div>
 					</script>
 				</th>
+
+				<c:choose>
+					<c:when test = "${columnes.entregaPostal == true}">
+						<c:set value="true" var="visible"></c:set>
+					</c:when>
+					<c:when test = "${columnes.entregaPostal == false}">
+						<c:set value="false" var="visible"></c:set>
+					</c:when>
+				</c:choose>
+				<th data-col-name="entregaPostalText" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.entrega.postal"/>
+					<script type="text/x-jsrender">
+						<div class="from-group" style="padding: 0; font-weight: 100;">
+							<select class="form-control" id="entregaPostal" name="entregaPostal">
+								<option name="entregaPostal" class=""></option>
+								<option name="entregaPostal" value="true">Si</option>
+								<option name="entregaPostal" value="false">No</option>
+						</select>
+                    </div>
+					</script>
+				</th>
+
 				<th data-col-name="notificacioId" data-visible="false"></th>
 				<th data-orderable="false" data-template="#cellAccionsTemplate" width="190">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
