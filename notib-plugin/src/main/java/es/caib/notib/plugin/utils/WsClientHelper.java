@@ -135,9 +135,9 @@ public class WsClientHelper<T> {
 		return servicePort;
 	}
 
-	public T generarClientWs(URL wsdlResourceUrl, String endpoint, QName qname, String userName, String password, boolean disableCxfChunking, Class<T> clazz, Handler<?>... handlers)
+	public T generarClientWs(URL wsdlResourceUrl, String endpoint, QName qname, String userName, String password, boolean logMissatgeActiu, boolean disableCxfChunking, Class<T> clazz, Handler<?>... handlers)
 							throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
-		return this.generarClientWs(wsdlResourceUrl, endpoint, qname, userName, password, null, false, disableCxfChunking, clazz, handlers);
+		return this.generarClientWs(wsdlResourceUrl, endpoint, qname, userName, password, null, logMissatgeActiu, disableCxfChunking, clazz, handlers);
 	}
 
 	public T generarClientWs(URL wsdlResourceUrl, String endpoint, QName qname, String userName, String password, Class<T> clazz, Handler<?>... handlers)

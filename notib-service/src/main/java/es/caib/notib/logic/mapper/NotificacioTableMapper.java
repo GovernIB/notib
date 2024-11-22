@@ -171,6 +171,8 @@ public abstract class NotificacioTableMapper {
 
         NotibLogger.getInstance().info("Actualitzant la columna estat de la remesa " + dto.getId(), log, LoggingTipus.EFICIENCIA_TAULA_REMESES);
         var columanEstatInici = System.currentTimeMillis();
+        //Entrega postal
+        String entregaPostal = getEntregaPostal(enviaments);
         // Estat
         String iconaEstat = getIconaEstat(dto);
         String nomEstat = getNomEstat(dto);
@@ -196,7 +198,7 @@ public abstract class NotificacioTableMapper {
         String registreEstat = getRegistreEstat(dto, enviaments);
         String notificaEstats = getNotificaEstats(dto, enviaments);
 
-        var columnaEstat = new StringBuilder("<div class=\"flex-column\">")
+        var columnaEstat = new StringBuilder(entregaPostal + "<div class=\"flex-column\">")
                 .append("<div style=\"display:flex; justify-content:space-between\">")
                 .append("<span>")
                 .append(registreEstat)
@@ -215,6 +217,18 @@ public abstract class NotificacioTableMapper {
         duracio = fi - columanEstatInici;
         NotibLogger.getInstance().info("getColumnaEstat -> " + duracio, log, LoggingTipus.EFICIENCIA_TAULA_REMESES);
         return columnaEstat.toString();
+    }
+
+    private String getEntregaPostal(Set<NotificacioEnviamentEntity> enviaments) {
+
+        for (var enviament : enviaments) {
+
+            if (enviament.getEntregaPostal() != null) {
+                var title = messageHelper.getMessage("entrega.postal.icona.tooltip");
+                return "<span class=\"label label-success\" title=\"" + title +"\" style=\"float: right; position: relative; top: 0px;\"><span class=\"fa fa-envelope\"></span></span>";
+            }
+        }
+        return "";
     }
 
 

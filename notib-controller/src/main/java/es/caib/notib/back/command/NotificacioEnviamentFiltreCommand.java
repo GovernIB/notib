@@ -46,6 +46,7 @@ public class NotificacioEnviamentFiltreCommand extends FiltreCommand {
 	private String csvUuid;
 	private NotificacioEstatEnumDto estat;
 	private String referenciaNotificacio;
+	private Boolean entregaPostal;
 
 	public void setDataEnviamentInici(String dataEnviamentInici) {
 

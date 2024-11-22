@@ -36,6 +36,18 @@ ALTER TABLE NOT_PAGADOR_CIE ADD CONSTRAINT NOT_EMISORCIE_ORGAN_FK FOREIGN KEY (O
 
 INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.notifica.sincronizar.envioOE.reintents.maxim', '3', 'Màxim nombre de reintents del mètode sincronizarEnvioOE per entregues postals', 'INT', 'NOTIFICA' );
 
+ALTER TABLE not_notificacio_env_table ADD entrega_postal NUMBER(1) DEFAULT '0';
+
+ALTER TABLE not_notificacio_table ADD entrega_postal NUMBER(1) DEFAULT '0';
+
+ALTER TABLE not_columnes ADD entrega_postal NUMBER(1) DEFAULT '1';
+
+
+UPDATE NOT_NOTIFICACIO_TABLE t SET t.ENTREGA_POSTAL = 1 WHERE id in (SELECT n.id FROM not_notificacio n JOIN NOT_NOTIFICACIO_ENV e ON e.NOTIFICACIO_ID = n.id AND e.ENTREGA_POSTAL_ID IS NOT NULL);
+
+UPDATE NOT_NOTIFICACIO_ENV_TABLE t SET t.ENTREGA_POSTAL = 1 WHERE id in (SELECT e.id FROM NOT_NOTIFICACIO_ENV e WHERE e.ENTREGA_POSTAL_ID IS NOT NULL);
+
+
 -- Changeset db/changelog/changes/2.0.6/934.yaml::1634114082437-1::limit
 ALTER TABLE not_notificacio ADD caducitat_original date;
 

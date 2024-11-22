@@ -56,6 +56,8 @@ public class NotEnviamentTableItemDto implements Serializable {
 	private Long notificacioId;
 	private String csvUuid;
 	private String referenciaNotificacio;
+	private boolean entregaPostal;
+	private boolean entregaPostalText;
 
 	//Registre
 	private Integer registreNumero;
@@ -68,6 +70,11 @@ public class NotEnviamentTableItemDto implements Serializable {
 	private boolean isEnviant;
 
 	public NotEnviamentTableItemDto() {
+	}
+
+	public String getEntregaPostalText() {
+
+		return entregaPostal ? "Si" : "No";
 	}
 
 	public NotificacioEstatEnumDto getEstat() {

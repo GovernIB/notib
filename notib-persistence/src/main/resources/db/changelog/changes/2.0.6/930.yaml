@@ -47,6 +47,27 @@ databaseChangeLog:
               - column:
                   name: cie_estat
                   type: varchar(50 ${varcharUnit})
+        - addColumn:
+            tableName: not_notificacio_env_table
+            columns:
+              - column:
+                  name: entrega_postal
+                  type: boolean
+                  defaultValue: 0
+        - addColumn:
+            tableName: not_notificacio_table
+            columns:
+              - column:
+                  name: entrega_postal
+                  type: boolean
+                  defaultValue: 0
+        - addColumn:
+            tableName: not_columnes
+            columns:
+              - column:
+                  name: entrega_postal
+                  type: boolean
+                  defaultValue: 1
         - sql: "UPDATE NOT_PAGADOR_CIE SET CIE_EXTERN = 0;
                 INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.plugin.cie.class', 'es.caib.notib.plugin.cie.CieNexeaPluginImpl', 'Classe plugin CIE', 'CIE_CLASS', 'CIE' );
                 INSERT INTO NOT_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (11, 'PLUGINS', 'CIE', 'Plugin CIE' );
@@ -55,6 +76,8 @@ databaseChangeLog:
                 INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (2, 'es.caib.notib.plugin.cie.max.reintents', '3', 'Número màxim de reintets dels enviaments CIE', 'INT', 'CIE' );
                 INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (3, 'es.caib.notib.plugin.cie.reintents.delay', '10000', 'Temps en millisegons entre cada reintent', 'INT', 'CIE' );
                 ALTER TABLE NOT_PAGADOR_CIE ADD CONSTRAINT NOT_EMISORCIE_ORGAN_FK FOREIGN KEY (ORGAN_EMISOR) REFERENCES NOT_ORGAN_GESTOR (ID);
-                INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.notifica.sincronizar.envioOE.reintents.maxim', '3', 'Màxim nombre de reintents del mètode sincronizarEnvioOE per entregues postals', 'INT', 'NOTIFICA' );"
+                INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.notifica.sincronizar.envioOE.reintents.maxim', '3', 'Màxim nombre de reintents del mètode sincronizarEnvioOE per entregues postals', 'INT', 'NOTIFICA' );
+                UPDATE NOT_NOTIFICACIO_TABLE t SET t.ENTREGA_POSTAL = 1 WHERE id in (SELECT n.id FROM not_notificacio n JOIN NOT_NOTIFICACIO_ENV e ON e.NOTIFICACIO_ID = n.id AND e.ENTREGA_POSTAL_ID IS NOT NULL);
+                UPDATE NOT_NOTIFICACIO_ENV_TABLE t SET t.ENTREGA_POSTAL = 1 WHERE id in (SELECT e.id FROM NOT_NOTIFICACIO_ENV e WHERE e.ENTREGA_POSTAL_ID IS NOT NULL);"
 
 

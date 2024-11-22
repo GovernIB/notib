@@ -84,6 +84,8 @@ public class ColumnesEntity extends NotibAuditable<Long> {
 	private boolean estat;
 	@Column(name="referencia_notificacio")
 	private boolean referenciaNotificacio;
+	@Column(name="entrega_postal")
+	private boolean entregaPostal;
 
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat_id")
@@ -127,6 +129,7 @@ public class ColumnesEntity extends NotibAuditable<Long> {
 		csvUuid = col.isCsvUuid();
 		estat = col.isEstat();
 		referenciaNotificacio = col.isReferenciaNotificacio();
+		entregaPostal = col.isEntregaPostal();
 	}
 
 	private static final long serialVersionUID = -2299453443943600172L;

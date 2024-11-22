@@ -532,6 +532,7 @@ public class CieNexeaPluginImpl implements CiePlugin {
                 new QName("https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/","NotificaWsV2Service"),
                 null,
                 null,
+                false,
                 true,
                 NotificaWsV2PortType.class,
                 new ApiKeySOAPHandlerV2(apiKey));

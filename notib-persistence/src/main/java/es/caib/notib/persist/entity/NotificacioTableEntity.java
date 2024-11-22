@@ -166,6 +166,8 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private boolean perActualitzar;
 	@Column(name = "DELETED")
 	private boolean deleted;
+	@Column(name = "ENTREGA_POSTAL")
+	private boolean entregaPostal;
 
 	@Setter
 	@Transient
