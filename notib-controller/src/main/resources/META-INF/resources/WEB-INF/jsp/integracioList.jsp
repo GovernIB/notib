@@ -83,13 +83,13 @@
 						});
 						htmlList += '</ul>';
 						$('#integracio-parameters-list').html(htmlList);
-						$("#cbcopy").click(e => {
+						$("#copyParametres").click(e => {
 							e.stopPropagation();
 							navigator.clipboard.writeText(clipBoard);
 						});
 					}
-					let isError = data.estat === 'ERROR';
-					if (isError) {
+					let showError = data.estat === 'ERROR' || data.estat === 'WARN';
+					if (showError) {
 						$('.integracio-error').show();
 						$('#integracio-errorDescripcio').html(data.errorDescripcio);
 						$('#integracio-excepcioMessage').html(data.excepcioMessage);
@@ -98,10 +98,11 @@
 						} else {
 							$('#integracio-excepcioStacktrace').hide();
 						}
-					} else if(data.estat === 'WARN') {
-						$('.integracio-error').show();
-						$('#integracio-errorDescripcio').html(data.errorDescripcio);
-						$('#integracio-excepcioStacktrace').html(data.excepcioStacktrace);
+						let clipBoard = data.errorDescripcio + "\n" + data.excepcioStacktrace;
+						$("#copyError").click(e => {
+							e.stopPropagation();
+							navigator.clipboard.writeText(clipBoard);
+						});
 					} else {
 						$('.integracio-error').hide();
 					}
@@ -256,11 +257,15 @@
 							<spring:message code="integracio.detall.camp.params"/>
 						</dt>
 						<dt>
-							<button id="cbcopy" class="btn btn-default" title="<spring:message code="comu.clipboard.copy"/>"><span class="fa fa-clipboard"></span></button>
+							<button id="copyParametres" class="btn btn-default" title="<spring:message code="comu.clipboard.copy"/>"><span class="fa fa-clipboard"></span></button>
 						</dt>
 						<dd id="integracio-parameters-list" class="integracio-parameters" style="max-height: 300px; overflow: auto; margin-bottom: 15px;">
 						</dd>
-						<dt class="integracio-error"><spring:message code="integracio.detall.camp.error.desc"/></dt>
+						<dt class="integracio-error"><spring:message code="integracio.detall.camp.error.desc"/>
+						</dt>
+						<dt>
+							<button id="copyError" class="btn btn-default" title="<spring:message code="comu.clipboard.copy"/>"><span class="fa fa-clipboard"></span></button>
+						</dt>
 						<dd id="integracio-errorDescripcio" class="integracio-error"></dd>
 						<dt class="integracio-error"><spring:message code="integracio.detall.camp.excepcio.missatge"/></dt>
 						<dd id="integracio-excepcioMessage" class="integracio-error"></dd>
