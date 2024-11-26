@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -842,6 +843,24 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return "ampliarPlazoForm";
     }
 
+    @GetMapping(value = "/ampliacion/plazo/massiu")
+    public String ampliarPlazoOEMassiu(HttpServletResponse response, HttpServletRequest request, Model model) {
+
+        var seleccio = getIdsSeleccionats(request);
+        var redirect = "redirect:../../..";
+        if (seleccio == null || seleccio.isEmpty()) {
+            return getModalControllerReturnValueError(request,redirect,SELECCIO_BUIDA);
+        }
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+            return getModalControllerReturnValueError(request, redirect,"accio.massiva.creat.ko");
+        }
+        var ampliacion = new AmpliacionPlazoCommand();
+        ampliacion.setNotificacionsId(new ArrayList<>(seleccio));
+        model.addAttribute(ampliacion);
+        return "ampliarPlazoForm";
+    }
+
+
     @GetMapping(value = "/{notificacioId}/enviament/{enviamentId}/ampliacion/plazo")
     public String ampliarPlazoOEGetEnviament(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId, @PathVariable Long enviamentId) {
 
@@ -859,9 +878,11 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         ampliarPlazoOE.setPlazo(ampliacionPlazo.getDies());
         ampliarPlazoOE.setMotivo(ampliacionPlazo.getMotiu());
         var resposta = notificacioService.ampliacionPlazoOE(ConversioTipusHelper.convertir(ampliacionPlazo, AmpliacionPlazoDto.class));
-        return resposta != null && "000".equals(resposta.getCodigoRespuesta()) ? getModalControllerReturnValueSuccess(request, "redirect:/enviament", "ok")
-                : getModalControllerReturnValueError(request, "redirect:/enviament", resposta.getDescripcionRespuesta());
+        return resposta != null && resposta.isOk() ? getModalControllerReturnValueSuccess(request, "redirect:/enviament", "ampliar.plazo.ok")
+                : getModalControllerReturnValueError(request, "redirect:/enviament", "ampliar.plazo.error", new Object[] {resposta.getDescripcions() != null ?  resposta.getDescripcions() : resposta.getDescripcionRespuesta()});
     }
+
+
 
     // ACCIONS MASSIVES PER NOTIFICACIONS
     ////

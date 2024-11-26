@@ -131,6 +131,8 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         return seleccio.size();
     }
 
+
+
     @GetMapping(value = {"/export/{format}", "{notificacioId}/notificacio/export/{format}"})
     public String export(HttpServletRequest request, HttpServletResponse response, @PathVariable String format) throws IOException {
 
@@ -152,66 +154,6 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         return null;
     }
 
-//    @GetMapping(value = {"/reintentar/notificacio", "{notificacioId}/notificacio/reintentar/notificacio"})
-//    @ResponseBody
-//    public String reintentarNotificacio(HttpServletRequest request, HttpServletResponse response) throws RegistreNotificaException {
-//
-//        var seleccio = getIdsEnviamentsSeleccionats(request);
-//        if (seleccio == null || seleccio.isEmpty()) {
-//            MissatgesHelper.error(request, getMessage(request, "enviament.controller.notificacio.seleccio.buida"));
-//            return ERROR;
-//        }
-//        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
-//            return ERROR;
-//        }
-//        MissatgesHelper.info( request, getMessage(request, "enviament.controller.reintent.notificacio.pendents.executant"));
-//        Set<Long> notificacioIds = new HashSet<>();
-//        NotificacioEnviamentDtoV2 e;
-//        for(var id: seleccio) {
-//            e = enviamentService.getOne(id);
-//            notificacioIds.add(e.getNotificacioId());
-//        }
-//        var notificacionsNoRegistrades = 0;
-//        var notificacionsError = 0;
-//        NotificacioDtoV2 notificacio;
-//        for(var notificacioId: notificacioIds) {
-//            notificacio = notificacioService.findAmbId(notificacioId, isAdministrador(request));
-//            if(notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)) {
-//                try {
-//                    notificacioService.enviarNotificacioARegistre(notificacioId, true);
-//                } catch (Exception ex) {
-//                    notificacionsError++;
-//                    mostraErrorReintentarNotificacio(request, notificacioId, notificacio, ex);
-//                }
-//                continue;
-//            }
-//            if (notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)) {
-//                try {
-//                    notificacioService.enviarNotificacioANotifica(notificacioId, true);
-//                } catch (Exception ex) {
-//                    notificacionsError++;
-//                    mostraErrorReintentarNotificacio(request, notificacioId, notificacio, ex);
-//                }
-//                continue;
-//            }
-//            notificacionsNoRegistrades++;
-//        }
-//        String msg;
-//        if(notificacionsNoRegistrades == notificacioIds.size()) {
-//            msg = getMessage(request, REINTENT_TEXT + (notificacionsNoRegistrades == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".pendents.KO");
-//            MissatgesHelper.error(request, msg);
-//        } else if(notificacionsError == notificacioIds.size()) {
-//            msg = getMessage(request, REINTENT_TEXT + (notificacionsError == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".pendents.error");
-//            MissatgesHelper.error(request, msg);
-//        } else if (notificacionsError > 0) {
-//            msg = getMessage(request, "enviament.controller.reintent.notificacions.pendents.error.alguna");
-//            MissatgesHelper.warning(request, notificacionsError + " " + msg);
-//        } else {
-//            msg = getMessage(request, REINTENT_TEXT + (notificacioIds.size() == 1 ? NOTIFICACIO : NOTIFICACIONS) + ".pendents.OK");
-//            MissatgesHelper.info(request, msg);
-//        }
-//        return "ok";
-//    }
     @GetMapping(value = {"/descarregar/justificant/massiu", "{notificacioId}/notificacio/descarregar/justificant/massiu"})
     @ResponseBody
     public void justificantDescarregarMassiu(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
@@ -221,7 +163,6 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var seleccio = getIdsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty() || (seleccio.size() == 1 && seleccio.contains(-1L))) {
             return;
-//            return getModalControllerReturnValueError(request,REDIRECT + referer,SELECCIO_BUIDA);
         }
 
         response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
@@ -323,67 +264,6 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         writeFileToResponse("certificacionsMassives_" + date + ".zip", baos.toByteArray(), response);
     }
 
-//    @GetMapping(value = {"/reintentar/notificacio", "{notificacioId}/notificacio/reintentar/notificacio"})
-//    @ResponseBody
-//    public String reintentarNotificacio(HttpServletRequest request, HttpServletResponse response) throws RegistreNotificaException {
-//
-//        var seleccio = getIdsEnviamentsSeleccionats(request);
-//        if (seleccio == null || seleccio.isEmpty()) {
-//            MissatgesHelper.error(request, getMessage(request, "enviament.controller.notificacio.seleccio.buida"));
-//            return ERROR;
-//        }
-//        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
-//            return ERROR;
-//        }
-//        MissatgesHelper.info( request, getMessage(request, "enviament.controller.reintent.notificacio.pendents.executant"));
-//        Set<Long> notificacioIds = new HashSet<>();
-//        NotificacioEnviamentDtoV2 e;
-//        for(var id: seleccio) {
-//            e = enviamentService.getOne(id);
-//            notificacioIds.add(e.getNotificacioId());
-//        }
-//        var notificacionsNoRegistrades = 0;
-//        var notificacionsError = 0;
-//        NotificacioDtoV2 notificacio;
-//        for(var notificacioId: notificacioIds) {
-//            notificacio = notificacioService.findAmbId(notificacioId, isAdministrador(request));
-//            if(notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)) {
-//                try {
-//                    notificacioService.enviarNotificacioARegistre(notificacioId, true);
-//                } catch (Exception ex) {
-//                    notificacionsError++;
-//                    mostraErrorReintentarNotificacio(request, notificacioId, notificacio, ex);
-//                }
-//                continue;
-//            }
-//            if (notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)) {
-//                try {
-//                    notificacioService.enviarNotificacioANotifica(notificacioId, true);
-//                } catch (Exception ex) {
-//                    notificacionsError++;
-//                    mostraErrorReintentarNotificacio(request, notificacioId, notificacio, ex);
-//                }
-//                continue;
-//            }
-//            notificacionsNoRegistrades++;
-//        }
-//        String msg;
-//        if(notificacionsNoRegistrades == notificacioIds.size()) {
-//            msg = getMessage(request, REINTENT_TEXT + (notificacionsNoRegistrades == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".pendents.KO");
-//            MissatgesHelper.error(request, msg);
-//        } else if(notificacionsError == notificacioIds.size()) {
-//            msg = getMessage(request, REINTENT_TEXT + (notificacionsError == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".pendents.error");
-//            MissatgesHelper.error(request, msg);
-//        } else if (notificacionsError > 0) {
-//            msg = getMessage(request, "enviament.controller.reintent.notificacions.pendents.error.alguna");
-//            MissatgesHelper.warning(request, notificacionsError + " " + msg);
-//        } else {
-//            msg = getMessage(request, REINTENT_TEXT + (notificacioIds.size() == 1 ? NOTIFICACIO : NOTIFICACIONS) + ".pendents.OK");
-//            MissatgesHelper.info(request, msg);
-//        }
-//        return "ok";
-//    }
-
     @GetMapping(value = {"/reactivar/notificacionsError", "{notificacioId}/notificacio/reactivar/notificacionsError"})
     @ResponseBody
     public String reactivarErrors(HttpServletRequest request) throws IOException {
@@ -407,54 +287,6 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
         return REDIRECT + request.getHeader(REFERER);
     }
-
-//    @GetMapping(value = "/reactivar/notificacionsError")
-//    @ResponseBody
-//    public String reactivarErrors(HttpServletRequest request) throws IOException {
-//
-//        var seleccio = getIdsEnviamentsSeleccionats(request);
-//        if (seleccio == null || seleccio.isEmpty()) {
-//            MissatgesHelper.error(request, getMessage(request, "enviament.controller.notificacio.seleccio.buida"));
-//            return ERROR;
-//        }
-//        NotificacioEnviamentDtoV2 e;
-//        Set<Long> notificacioIds = new HashSet<>();
-//        for(var id: seleccio) {
-//            e = enviamentService.getOne(id);
-//            notificacioIds.add(e.getNotificacioId());
-//        }
-//        log.info("Reactivam enviaments de notificacions amb error: " + StringUtils.join(notificacioIds, ", "));
-//        var notificacionsNoFinalitzadesAmbError = 0;
-//        var notificacionsError = 0;
-//        for(var notificacioId: notificacioIds) {
-//            var notificacio = notificacioService.findAmbId(notificacioId, isAdministrador(request));
-//            if(!notificacio.getEstat().equals(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS) && !notificacio.isJustificantCreat()) {
-//                notificacionsNoFinalitzadesAmbError++;
-//                continue;
-//            }
-//            try {
-//                notificacioService.reactivarNotificacioAmbErrors(notificacioId);
-//            } catch (Exception ex) {
-//                notificacionsError++;
-//                mostraErrorReintentarNotificacio(request, notificacioId, notificacio, ex);
-//            }
-//        }
-//        String msg;
-//        if (notificacionsNoFinalitzadesAmbError == notificacioIds.size()) {
-//            msg = getMessage(request, REINTENT_TEXT + (notificacionsNoFinalitzadesAmbError == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".errors.KO");
-//            MissatgesHelper.error(request, msg);
-//        } else if (notificacionsError == notificacioIds.size()) {
-//            msg = getMessage(request, REINTENT_TEXT + (notificacionsError == 1 ? NOTIFICACIO : NOTIFICACIONS)+ ".errors.error");
-//            MissatgesHelper.error(request, msg);
-//        } else if (notificacionsError > 0) {
-//            msg = getMessage(request, "enviament.controller.reintent.notificacions.errors.error.alguna");
-//            MissatgesHelper.warning(request, notificacionsError + " " + msg);
-//        } else {
-//            msg = getMessage(request, REINTENT_TEXT + (notificacioIds.size() == 1 ? NOTIFICACIO : NOTIFICACIONS) + ".errors.OK");
-//            MissatgesHelper.info(request, msg);
-//        }
-//        return "ok";
-//    }
 
     @GetMapping(value = {"/reactivar/consulta", "{notificacioId}/notificacio/reactivar/consulta"})
     public String reactivarConsulta(HttpServletRequest request, HttpServletResponse response) throws IOException {

@@ -17,6 +17,8 @@ z	<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="
 <form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="ampliacionPlazoCommand" role="form">
     <form:hidden path="notificacioId"/>
     <form:hidden path="enviamentId"/>
+    <form:hidden path="notificacionsId"/>
+    <form:hidden path="enviamentsId"/>
     <div class="row">
         <div class="col-md-2">
             <not:inputText name="dies" textKey="ampliar.plazo.form.dies" required="true"/>

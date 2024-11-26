@@ -93,6 +93,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	
 	NotificacioEnviamentEntity findByNotificaIdentificador(String notificaIdentificador);
 	List<NotificacioEnviamentEntity> findByNotificaIdentificadorIn(List<String> notificaIdentificador);
+	List<NotificacioEnviamentEntity> findByNotificaReferenciaIn(List<String> notificaIdentificador);
 
 	@Query(	" select id from NotificacioEnviamentEntity " +
 			" where	notificaEstat = es.caib.notib.client.domini.EnviamentEstat.EXPIRADA " +

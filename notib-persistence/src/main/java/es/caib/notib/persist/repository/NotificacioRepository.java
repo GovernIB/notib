@@ -46,6 +46,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 
 	List<NotificacioEntity> findByNotificacioMassivaEntityId(Long NotificacioMassivaEntityId);
 
+	List<NotificacioEntity> findByIdIn(List<Long> ids);
+
 	@Modifying
 	@Query("update NotificacioEntity nt set nt.referencia = :referencia where nt.id = :id")
 	void updateReferencia(@Param("id") Long id, @Param("referencia") String referencia);

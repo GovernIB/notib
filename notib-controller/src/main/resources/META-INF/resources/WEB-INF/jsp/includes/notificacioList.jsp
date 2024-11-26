@@ -781,7 +781,7 @@
                     <li><a id="exportarODS" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.exportar.tooltip"/>' ><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
                     <li><a id="descarregarJustificantMassiu" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.justificant"/></a></li>
                     <li><a id="descarregarCertificacioMassiu" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.certificacio"/></a></li>
-                    <li><a id="ampliarPlazoOE" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
+                    <li><a id="ampliarPlazoOE" href="<c:url value="/notificacio/ampliacion/plazo/massiu"/>" data-toggle="modal" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
 
                     <c:if test="${isRolActualAdministradorEntitat}">
                         <hr/>
@@ -907,6 +907,7 @@
         <th data-col-name="documentId" data-visible="false" style="visibility: hidden">
             <%--        <th data-col-name="enviamentId" data-visible="false" style="visibility: hidden">--%>
         <th data-col-name="envCerData" data-visible="false" style="visibility: hidden">
+        <th data-col-name="plazoAmpliable" data-visible="false">
         <th data-col-name="id" data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px" style="z-index:99999;">
             <script id="cellAccionsTemplate" type="text/x-jsrender">
                 <div class="dropdown">
@@ -927,7 +928,9 @@
                         <li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
                         <li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
                     {{/if}}
+                    {{if plazoAmpliable}}
                         <li><a href="<c:url value="/notificacio/{{:id}}/ampliacion/plazo"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;<spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
+                    {{/if}}
                     </ul>
                 </div>
             </script>

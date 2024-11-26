@@ -1997,21 +1997,42 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<String> identificadors = new ArrayList<>();
 			var isNotificacio = dto.getNotificacioId() != null;
 			var isEnviament = dto.getEnviamentId() != null;
+			var isNotificacioMassiu = dto.getNotificacionsId() != null;
+			var isEnviamentMassiu = dto.getEnviamentsId() != null;
 			if (isNotificacio) {
 				var notificacio = notificacioRepository.findById(dto.getNotificacioId()).orElseThrow();
 				for (var enviament : notificacio.getEnviaments()) {
-					if (Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
-						identificadors.add(enviament.getNotificaIdentificador());
+					if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+						identificadors.add(enviament.getNotificaReferencia());
 					}
 				}
 			}
 			if (isEnviament) {
 				var enviament = enviamentRepository.findById(dto.getEnviamentId()).orElseThrow();
-				if (!Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
-					identificadors.add(enviament.getNotificaIdentificador());
+				if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+					identificadors.add(enviament.getNotificaReferencia());
+				}
+			}
+			if (isNotificacioMassiu) {
+				var notificacions = notificacioRepository.findByIdIn(dto.getNotificacionsId());
+				for (var not : notificacions) {
+					for (var enviament : not.getEnviaments()) {
+						if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+							identificadors.add(enviament.getNotificaReferencia());
+						}
+					}
+				}
+			}
+			if (isEnviamentMassiu) {
+				var enviaments = enviamentRepository.findByIdIn(dto.getEnviamentsId());
+				for (var enviament : enviaments) {
+					if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+						identificadors.add(enviament.getNotificaReferencia());
+					}
 				}
 			}
 			var envios = new Envios();
+			envios.setIdentificador(identificadors);
 			var ampliarPlazoOE = new AmpliarPlazoOE(envios, dto.getDies(), dto.getMotiu());
 			return notificaHelper.ampliarPlazoOE(ampliarPlazoOE);
 		} catch (Exception ex) {

@@ -194,6 +194,9 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		String entitat;
 		for (var enviament : enviaments) {
 			data = enviament.getNotificaDataCaducitat();
+			if (data == null) {
+				data = enviament.getNotificacio().getCaducitat();
+			}
 			dataAmpliada = DateUtils.addDays(data, ampliarPlazo.getPlazo());
 			enviament.setNotificaDataCaducitat(dataAmpliada);
 			enviament.setPlazoAmpliado(true);

@@ -3,6 +3,7 @@
  */
 package es.caib.notib.back.controller;
 
+import es.caib.notib.back.command.AmpliacionPlazoCommand;
 import es.caib.notib.back.command.ColumnesCommand;
 import es.caib.notib.back.command.NotificacioEnviamentCommand;
 import es.caib.notib.back.command.NotificacioEnviamentFiltreCommand;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Controlador per el mantinement d'enviaments.
  *
@@ -168,6 +172,23 @@ public class EnviamentController extends TableAccionsMassivesController {
 		model.addAttribute(new NotificacioFiltreCommand());
 		columnesService.columnesUpdate(entitat.getId(), ColumnesCommand.asDto(columnesCommand));
 		return getModalControllerReturnValueSuccess(request, "redirect:enviament", "enviament.controller.modificat.ok");
+	}
+
+	@GetMapping(value = "/ampliacion/plazo/massiu")
+	public String ampliarPlazoOEMassiu(HttpServletResponse response, HttpServletRequest request, Model model) {
+
+		var seleccio = getIdsSeleccionats(request);
+		var redirect = "redirect:../../..";
+		if (seleccio == null || seleccio.isEmpty()) {
+			return getModalControllerReturnValueError(request,redirect, "accio. massiva. seleccio. buida");
+		}
+		if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+			return getModalControllerReturnValueError(request, redirect,"accio.massiva.creat.ko");
+		}
+		var ampliacion = new AmpliacionPlazoCommand();
+		ampliacion.setEnviamentsId(new ArrayList<>(seleccio));
+		model.addAttribute(ampliacion);
+		return "ampliarPlazoForm";
 	}
 
 	private NotificacioEnviamentFiltreCommand getFiltreCommand(HttpServletRequest request) {

@@ -103,6 +103,10 @@ public class NotEnviamentTableItemDto implements Serializable {
 				.build().getNomFormatted();
 	}
 
+	public boolean isPlazoAmpliable() {
+		return !entregaPostal && NotificacioEstatEnumDto.ENVIADA.equals(estat);
+	}
+
 	private static final long serialVersionUID = -139254994389509932L;
 
 }
