@@ -15,7 +15,6 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
-import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.unitat.CodiValor;

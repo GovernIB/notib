@@ -78,6 +78,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private MonitorIntegracioRepository monitorRepository;
+    @Autowired
+    private CacheHelper cacheHelper;
 
 	// 1. Actualització dels procediments a partir de la informació de Rolsac
 	/////////////////////////////////////////////////////////////////////////
@@ -347,6 +349,15 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 		log.info("Els documents antics s'han comprimit correctament");
     }
+
+	@Override
+	public void evictCachePaisosProvincies() {
+
+		cacheHelper.evictLlistarPaisos();
+		cacheHelper.evictLlistarProvincies();
+		cacheHelper.evictLlistarProvinciesCodiCA();
+
+	}
 
 	private void esborrarTemporals(String dir) throws Exception {
 

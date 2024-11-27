@@ -52,6 +52,7 @@
 	<cache alias="findLlibreOrganisme" uses-template="default"/>
 	<cache alias="llistarNivellsAdministracions" uses-template="default"/>
 	<cache alias="llistarComunitatsAutonomes" uses-template="default"/>
+	<cache alias="llistarPaisos" uses-template="default"/>
 	<cache alias="llistarProvincies" uses-template="default"/>
 	<cache alias="llistarLocalitats" uses-template="default"/>
 	<cache alias="oficinesSIREntitat" uses-template="default"/>

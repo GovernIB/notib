@@ -52,4 +52,6 @@ public interface SchedulledService {
 	 * Mètode d'execució periòdica per comprimir els documents guardats al sistema de fitxers
 	 */
 	void comprimirDocumentsAntics();
+
+	void evictCachePaisosProvincies();
 }

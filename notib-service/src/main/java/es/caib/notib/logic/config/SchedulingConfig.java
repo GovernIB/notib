@@ -197,6 +197,18 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 PropertiesConstants.COMPRIMIR_DOCUMENTS_ANTICS,
                 COMPRIMIR_DOCUMENTS_ANTICS_DEFCRON);
 
+        // 11. Buidar cache paisos i provincies
+        /////////////////////////////////////////////////////////////////////////
+        registerPeriodicTask(
+                "evictCachePaisosProvincies",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().evictCachePaisosProvincies(),
+                PropertiesConstants.EVICT_CACHE_PAISOS_PROVINCIES,
+                300000L,
+                0,
+                PropertiesConstants.EVICT_CACHE_PAISOS_PROVINCIES,
+                420000L);
+
     }
 
     private <T> void registerCronTask(String taskName, Supplier<T> supplier, Consumer<Supplier<T>> method, String cronConfig, String defualtCron) {
@@ -274,6 +286,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 });
         monitorTasquesService.addTasca(taskName);
     }
+
 
     private <T> void executeSchedulledMethod(
             Supplier<T> supplier,

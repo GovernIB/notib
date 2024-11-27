@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * Informació d'un pais
  * 
@@ -11,7 +13,7 @@ import lombok.Data;
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CodiValorPais {
+public class CodiValorPais implements Serializable {
 
 	private String alfa2Pais;
 	private String alfa3Pais;

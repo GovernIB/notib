@@ -827,7 +827,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			List<CodiValorPais> codiValorPais = new ArrayList<>();
 			try {
-				codiValorPais = pluginHelper.llistarPaisos();
+				codiValorPais = cacheHelper.llistarPaisos();
 			} catch (Exception ex) {
 				log.error("Error recuperant els paisos de DIR3CAIB: " + ex);
 			}
@@ -845,7 +845,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			List<CodiValor> codiValor = new ArrayList<>();
 			try {
-				codiValor = pluginHelper.llistarProvincies();
+				codiValor = cacheHelper.llistarProvincies();
 			} catch (Exception ex) {
 				log.error(ERROR_DIR3 + ex);
 			}
