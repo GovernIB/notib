@@ -362,7 +362,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         return "";
     }
 
-    @GetMapping(value = {"/enviar/callback", "{notifiacioId}/notificacio/enviar/callback"})
+    @GetMapping(value = {"{notificacioId}/enviar/callback", "{notifiacioId}/notificacio/enviar/callback"})
     public String enviarCallbacks(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         var path = request.getServletPath().split("/");
