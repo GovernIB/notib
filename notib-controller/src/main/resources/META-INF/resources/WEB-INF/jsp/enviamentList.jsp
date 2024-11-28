@@ -1,4 +1,5 @@
 <%@ page import="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto" %>
+<%@ page import="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatOrdreFiltre" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -11,7 +12,7 @@
 	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(ssc.getRolActual()));
 	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()));
 	pageContext.setAttribute("notificacioComunicacioEnumOptions", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(es.caib.notib.logic.intf.dto.NotificacioTipusEnviamentEnumDto.class, "notificacio.tipus.enviament.enum."));
-	pageContext.setAttribute("notificacioEstatEnumOptions", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class, "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto."));
+	pageContext.setAttribute("notificacioEstatEnumOptions", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(NotificacioEstatOrdreFiltre.class, "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto."));
 %>
 <c:set var="ampladaConcepte">
 	<c:choose>

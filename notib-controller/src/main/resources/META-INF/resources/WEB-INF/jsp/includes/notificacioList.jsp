@@ -205,17 +205,6 @@
     organsGestors.push({id:"${organGestor.id}", text:"${organGestor.valor}", estat:"${organGestor.estat}"});
     </c:forEach>
 
-    var notificacioEstats = [];
-    notificacioEstats.push({value:"", text:""});
-    <c:forEach items="${notificacioEstats}" var="notificacioEstat">
-    notificacioEstats.push({value:"${notificacioEstat.value}", text:"${notificacioEstat.text}"});
-    </c:forEach>
-
-    <%--var notificacioEstats = [];--%>
-    <%--<c:forEach var="estat" items="${notificacioEstats}">--%>
-    <%--notificacioEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";--%>
-    <%--</c:forEach>--%>
-
     var notificacioEnviamentEstats = [];
     <c:forEach var="estat" items="${notificacioEnviamentEstats}">
     notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
