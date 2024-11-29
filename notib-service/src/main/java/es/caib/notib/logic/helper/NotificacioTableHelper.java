@@ -62,6 +62,7 @@ public class NotificacioTableHelper {
                     .usuariCodi(notificacio.getUsuariCodi())
                     .grupCodi(notificacio.getGrupCodi())
                     .tipusUsuari(notificacio.getTipusUsuari())
+                    .caducitat(notificacio.getCaducitat())
                     .notificaErrorData(null)
                     .notificaErrorDescripcio(null)
                     .enviamentTipus(notificacio.getEnviamentTipus())
@@ -223,6 +224,7 @@ public class NotificacioTableHelper {
 
             tableViewItem.setEnviamentTipus(notificacio.getEnviamentTipus());
             tableViewItem.setNumExpedient(notificacio.getNumExpedient());
+            tableViewItem.setCaducitat(notificacio.getCaducitat());
             tableViewItem.setConcepte(notificacio.getConcepte());
             tableViewItem.setEstat(notificacio.getEstat());
             tableViewItem.setEstatDate(notificacio.getEstatDate());

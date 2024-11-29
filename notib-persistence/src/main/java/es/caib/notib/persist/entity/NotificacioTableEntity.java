@@ -79,6 +79,9 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	@Column(name = "grup_codi", length = 64)
 	private String grupCodi;
 
+	@Column(name = "CADUCITAT")
+	private Date caducitat;
+
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,

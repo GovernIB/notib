@@ -33,6 +33,10 @@ public class FiltreNotificacio {
     private Date dataInici;
     private boolean dataFiNull;
     private Date dataFi;
+    private boolean dataCaducitatIniciNull;
+    private Date dataCaducitatInici;
+    private boolean dataCaducitatFiNull;
+    private Date dataCaducitatFi;
     private boolean titularNull;
     private String titular;
     private boolean organCodiNull;

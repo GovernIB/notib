@@ -28,6 +28,8 @@ public class NotificacioFiltreDto implements Serializable {
 	private String concepte;
 	private Date dataInici;
 	private Date dataFi;
+	private Date dataCaducitatInici;
+	private Date dataCaducitatFi;
 	private String titular;
 	private String organGestor;
 	private Long procedimentId;

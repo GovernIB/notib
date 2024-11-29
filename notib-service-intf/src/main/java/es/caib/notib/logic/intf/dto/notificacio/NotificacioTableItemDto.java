@@ -45,6 +45,7 @@ public class NotificacioTableItemDto {
 	private Date estatDate;
 	private NotificacioEstatEnumDto estat;
 	private String estatString;
+//	private String estatColor = "green";
 
 	private String createdByNom;
 	private String createdByCodi;

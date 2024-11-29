@@ -419,6 +419,11 @@
 
         $taula.on('init.dt', function () {
 
+           //  let rows = this.rows;
+           //  for (let row=1; row < rows.length; row++) {
+           //      this.rows[row].firstChild.style="border-left: 3px solid red";
+           //  }
+           // debugger;
             $("#notificacio_wrapper").prepend('<button id="closeAll" class="btn btn-default"><span class="fa fa-caret-square-o-up"></span> <spring:message code="organgestor.arbre.contrau"/></button>');
             $("#notificacio_wrapper").prepend('<button id="expandAll" class="btn btn-default"><span class="fa fa-caret-square-o-down"></span> <spring:message code="organgestor.arbre.expandeix"/> </button>');
 
@@ -685,6 +690,13 @@
         </div>
     </div>
     <div class="row">
+
+        <div class="col-md-2">
+            <not:inputDate name="dataCaducitatInici" placeholderKey="notificacio.list.filtre.camp.data.caducitat.inici" inline="true" required="false" />
+        </div>
+        <div class="col-md-2">
+            <not:inputDate name="dataCaducitatFi" placeholderKey="notificacio.list.filtre.camp.data.caducitat.fi" inline="true" required="false" />
+        </div>
         <div class="col-md-2">
             <not:inputText name="titular" inline="true" placeholderKey="notificacio.list.filtre.camp.titular"/>
         </div>
@@ -830,7 +842,6 @@
                 {{/if}}
             </script>
         </th>
-        <%-- <th data-col-name="notificaEnviamentData" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>--%>
         <c:if test = "${columnes.dataCreacio == true}">
             <th data-col-name="createdDate" data-converter="datetime"   width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.creadael"/></th>
         </c:if>
