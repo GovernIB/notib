@@ -53,6 +53,7 @@ public class NotEnviamentTableItemDto implements Serializable {
 	private String descripcio;
 	private String llibre;
 	private NotificacioEstatEnumDto estat;
+	private String estatColor;
 	private Long notificacioId;
 	private String csvUuid;
 	private String referenciaNotificacio;
@@ -70,6 +71,11 @@ public class NotEnviamentTableItemDto implements Serializable {
 	private boolean isEnviant;
 
 	public NotEnviamentTableItemDto() {
+	}
+
+	public String getEstatColor()  {
+
+		return estat.getColor();
 	}
 
 	public String getEntregaPostalText() {

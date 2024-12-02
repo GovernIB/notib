@@ -49,6 +49,16 @@
 <script>
 $(document).ready(function() {
 
+	let $taula = $('#enviament');
+	$taula.on('draw.dt', function () {
+
+		let rows = this.rows;
+		for (let row=1; row < rows.length; row++) {
+			let tag = $(this.rows[row]).find(".estatColor")[0];
+			let classes = tag.classList;
+			this.rows[row].firstChild.style="border-left: 3px solid " + classes[classes.length-1];
+		}
+	});
 	var $estatColumn = $('#estat');
 	var $entregaPostalColumn = $('#entregaPostal');
 	var $enviamentTipusColumn = $('#enviamentTipus');
@@ -614,9 +624,10 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="estat"  data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.estat"/>
+				<th data-col-name="estatColor" data-visible="false"></th>
+				<th data-col-name="estat" data-template="#cellEstatTemplate"   data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.estat"/>
 					<script type="text/x-jsrender">
-						<div class="from-group" style="padding: 0; font-weight: 100;">
+						<div class="from-group estatColor {{:estatColor}}" style="padding: 0; font-weight: 100;">
 							<select class="form-control" id="estat" name="estat">
 								<option name="estat" class=""></option>
     							<c:forEach items="${notificacioEstatEnumOptions}" var="opt">
@@ -624,6 +635,9 @@ function getCookie(cname) {
     							</c:forEach>
 							</select>
 						</div>
+					</script>
+					<script id="cellEstatTemplate" type="text/x-jsrender">
+						<div class="estatColor {{:estatColor}}">{{:estat}}</div>
 					</script>
 				</th>
 

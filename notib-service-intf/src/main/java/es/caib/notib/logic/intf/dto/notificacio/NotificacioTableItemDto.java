@@ -45,7 +45,7 @@ public class NotificacioTableItemDto {
 	private Date estatDate;
 	private NotificacioEstatEnumDto estat;
 	private String estatString;
-//	private String estatColor = "green";
+	private String estatColor = "green";
 
 	private String createdByNom;
 	private String createdByCodi;
@@ -80,6 +80,11 @@ public class NotificacioTableItemDto {
 
 
 	private Map<EnviamentEstat, Integer> contadorEstat = new HashMap<>();
+
+	public String getEstatColor()  {
+
+		return estat.getColor();
+	}
 
 	public void setEstat(NotificacioEstatEnumDto estat) {
 		this.estat = NotificacioEstatEnumDto.ENVIADA.equals(estat) && isComunicacioSir() ? NotificacioEstatEnumDto.ENVIAT_SIR : estat;

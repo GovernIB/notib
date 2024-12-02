@@ -417,13 +417,17 @@
             mostraEnviamentsNotificacio(td, rowData)
         });
 
-        $taula.on('init.dt', function () {
+        $taula.on('draw.dt', function () {
+            let rows = this.rows;
+            for (let row=1; row < rows.length; row++) {
+                let tag = $(this.rows[row]).find(".estatColor")[0];
+                let classes = tag.classList;
+                this.rows[row].firstChild.style="border-left: 3px solid " + classes[classes.length-1];
+            }
+        });
 
-           //  let rows = this.rows;
-           //  for (let row=1; row < rows.length; row++) {
-           //      this.rows[row].firstChild.style="border-left: 3px solid red";
-           //  }
-           // debugger;
+        $taula.on('init.dt', function () {
+            ç
             $("#notificacio_wrapper").prepend('<button id="closeAll" class="btn btn-default"><span class="fa fa-caret-square-o-up"></span> <spring:message code="organgestor.arbre.contrau"/></button>');
             $("#notificacio_wrapper").prepend('<button id="expandAll" class="btn btn-default"><span class="fa fa-caret-square-o-down"></span> <spring:message code="organgestor.arbre.expandeix"/> </button>');
 
@@ -890,11 +894,12 @@
         </c:if>
         <th data-col-name="estatDate" data-converter="datetime" data-visible="false"></th>
         <th data-col-name="estatProcessatDate" data-converter="datetime" data-visible="false"></th>
+        <th data-col-name="estatColor" data-visible="false"></th>
         <th data-col-name="estat" data-visible="false"></th>
         <c:if test = "${columnes.estat == true}">
             <th data-col-name="estatString" data-template="#cellEstatTemplate" <c:if test="${isRolActualAdministradorEntitat}"> data-disable-events="true" </c:if>width="120px"><spring:message code="notificacio.list.columna.estat"/>
                 <script id="cellEstatTemplate" type="text/x-jsrender">
-                    <div class="cellEstat">
+                    <div class="cellEstat estatColor {{:estatColor}}">
                         {{:estatString}}
                         {^{if ~hlpIsAdministradorEntitat() }}
                             <div class="hover-button"><a href="<c:url value="/notificacio/{{:id}}/updateEstatList"/>"><span class="fa fa-refresh"></span></a></div>
