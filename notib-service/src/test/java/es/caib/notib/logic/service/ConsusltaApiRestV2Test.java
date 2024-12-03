@@ -12,6 +12,7 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.logic.helper.DocumentHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.persist.filtres.FiltreConsultaEviament;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
@@ -77,14 +78,23 @@ public class ConsusltaApiRestV2Test {
         Integer pagina = 0;
         Integer mida = 10;
         String nif = "12345678z";
-        List<NotificacioEnviamentEntity> dades = new ArrayList<>();
-        Mockito.when(notificacioEnviamentRepository.countEnviaments(Mockito.anyString(), anyBoolean(), Mockito.any(Date.class), anyBoolean(), Mockito.any(Date.class),
-                Mockito.any(EnviamentTipus.class), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())).thenReturn(total);
+        var filtre = FiltreConsultaEviament.builder()
+                .dniTitular(Mockito.anyString())
+                .esDataInicialNull(anyBoolean())
+                .dataInicial(Mockito.any(Date.class))
+                .esDataFinalNull(anyBoolean())
+                .dataFinal(Mockito.any(Date.class))
+                .tipusNull(anyBoolean())
+                .tipus(Mockito.any(EnviamentTipus.class))
+                .esEstatFinalNull(anyBoolean())
+                .estatFinal(anyBoolean())
+                .esVisibleCarpetaNull(anyBoolean())
+                .visibleCarpeta(anyBoolean()).build();
+        Mockito.when(notificacioEnviamentRepository.countEnviaments(filtre)).thenReturn(total);
         var pageable = PageRequest.of(pagina, mida);
-        Mockito.when(notificacioEnviamentRepository.findEnviaments(nif, true, null, true, null, null,
-                true, null, true, null, Mockito.any(Pageable.class))).thenReturn(page);
-
-        RespostaConsultaV2 resposta = enviamentService.findEnviamentsV2(consulta);
+        filtre.setDniTitular(nif);
+        Mockito.when(notificacioEnviamentRepository.findEnviaments(filtre, pageable)).thenReturn(page);
+        var resposta = enviamentService.findEnviamentsV2(consulta);
         assertNotNull(resposta);
     }
 

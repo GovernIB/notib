@@ -61,6 +61,7 @@ import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
+import es.caib.notib.persist.filtres.FiltreConsultaEviament;
 import es.caib.notib.persist.filtres.FiltreEnviament;
 import es.caib.notib.persist.repository.CallbackRepository;
 import es.caib.notib.persist.repository.ColumnesRepository;
@@ -819,21 +820,23 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 		var dataInicial = consulta.getDataInicial() != null ? FiltreHelper.toIniciDia(consulta.getDataInicial()) : null;
 		var dataFinal = consulta.getDataFinal() != null ? FiltreHelper.toFiDia(consulta.getDataFinal()) : null;
-		var enviaments = notificacioEnviamentRepository.findEnviaments(
-				consulta.getDniTitular(),
-				dataInicial == null,
-				dataInicial,
-				dataFinal == null,
-				dataFinal,
-				consulta.getTipus(),
-				consulta.getEstatFinal() == null,
-				consulta.getEstatFinal(),
-				consulta.getVisibleCarpeta() == null,
-				consulta.getVisibleCarpeta(),
-				getPageable(consulta.getPagina(), consulta.getMida()));
-
+		var filtre = FiltreConsultaEviament.builder()
+						.dniTitular(consulta.getDniTitular())
+						.esDataInicialNull(dataInicial == null)
+						.dataInicial(dataInicial)
+						.esDataFinalNull(dataFinal == null)
+						.dataFinal(dataFinal)
+						.tipusNull(consulta.getTipus() == null)
+						.tipus(consulta.getTipus())
+						.esEstatFinalNull(consulta.getEstatFinal() == null)
+						.estatFinal(consulta.getEstatFinal())
+						.esVisibleCarpetaNull(consulta.getVisibleCarpeta() == null)
+						.visibleCarpeta(consulta.getVisibleCarpeta())
+						.build();
+		var enviaments = notificacioEnviamentRepository.findEnviaments(filtre, getPageable(consulta.getPagina(), consulta.getMida()));
 		var numEnviaments = (int) enviaments.getTotalElements();
-		return PaginaEnviaments.builder().messageHelper(messageHelper).numEnviaments(numEnviaments).enviaments(enviaments.getContent()).locale(new Locale(consulta.getIdioma().name())).build();
+		var locale = new Locale(consulta.getIdioma().name());
+		return PaginaEnviaments.builder().messageHelper(messageHelper).numEnviaments(numEnviaments).enviaments(enviaments.getContent()).locale(locale).build();
 	}
 
 	private Pageable getPageable(Integer pagina, Integer mida) {
@@ -844,8 +847,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 		return pageable;
 	}
-	
-	
+
 	private List<Transmissio> dtosToTransmissions(List<NotificacioEnviamentDto> enviaments, String basePath) {
 
 		if (enviaments == null) {
