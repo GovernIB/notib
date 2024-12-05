@@ -36,7 +36,8 @@
 		<!--		<apache.poi.version>4.1.2</apache.poi.version>-->
 		<guava.version>30.1.1-jre</guava.version>
 		<xdocreport.version>2.0.4</xdocreport.version>
-		<itext.pdf.version>5.5.13.3</itext.pdf.version>
+		<itext.pdf.version>5.5.13.1</itext.pdf.version>
+<!--		<itext.pdf.version>5.4.3</itext.pdf.version>-->
 		<docker.image.prefix>280421</docker.image.prefix>
 		<!--		<docker.image.name>notib</docker.image.name>-->
 		<junit.jupiter.version>5.9.3</junit.jupiter.version>
