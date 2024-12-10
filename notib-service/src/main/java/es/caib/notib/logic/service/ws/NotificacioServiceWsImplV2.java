@@ -1022,7 +1022,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			resposta.setErrorData(new Date());
 			resposta.setErrorDescripcio(errorDesc);
 			integracioHelper.addAplicacioAccioParam(info, null);
-			integracioHelper.addAccioError(info, errorDesc, t);
+			integracioHelper.addAccioWarn(info, errorDesc, t);
 		} else {
 			ConfigHelper.setEntitatCodi(notificacio.getEntitat().getCodi());
 			integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
