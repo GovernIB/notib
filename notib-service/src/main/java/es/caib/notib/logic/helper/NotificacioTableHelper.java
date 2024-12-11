@@ -195,7 +195,7 @@ public class NotificacioTableHelper {
                     if ((estatMask & e.getNotificacio().getEstat().getMask()) == 0) {
                         estatMask += e.getNotificacio().getEstat().getMask();
                     }
-                    if (EnumUtils.isValidEnum(NotificacioEstatEnumDto.class, e.getNotificaEstat().name())) {
+                    if (EnumUtils.isValidEnum(NotificacioEstatEnumDto.class, e.getNotificaEstat().name()) && estatMask != 8 && estatMask != 16) {
                         NotificacioEstatEnumDto eventEstat = NotificacioEstatEnumDto.valueOf(e.getNotificaEstat().name());
                         if ((estatMask & eventEstat.getMask()) == 0) {
                             estatMask += eventEstat.getMask();

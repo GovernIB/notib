@@ -128,8 +128,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:#{#filtre.notMassivaIdNull} = true or ntf.notificacioMassiva.id = :#{#filtre.notMassivaId}) " +
 			"and (:#{#filtre.enviamentTipusNull} = true or ntf.enviamentTipus = :#{#filtre.enviamentTipus}) " +
 			"and (:#{#filtre.concepteNull} = true or lower(ntf.concepte) like concat('%', lower(:#{#filtre.concepte}), '%')) " +
-//			"and (:#{#filtre.estatNull} = true or bitand(ntf.estatMask, :#{#filtre.estatMask}) <> 0) " +
-			"and (:#{#filtre.estatNull} = true or bitand(ntf.estatMask, :#{#filtre.estatMask}) = ntf.estatMask and bitand(ntf.estatMask, :#{#filtre.estatMask}) <> 0) " +
+			"and (:#{#filtre.estatNull} = true or bitand(ntf.estatMask, :#{#filtre.estatMask}) <> 0) " +
 			"and (:#{#filtre.dataIniciNull} = true or ntf.createdDate >= :#{#filtre.dataInici}) " +
 			"and (:#{#filtre.dataFiNull} = true or ntf.createdDate <= :#{#filtre.dataFi}) "+
 			"and (:#{#filtre.organCodiNull} = true or ntf.organCodi = :#{#filtre.organCodi}) " +
@@ -204,8 +203,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:#{#filtre.notMassivaIdNull} = true or ntf.notificacioMassiva.id = :#{#filtre.notMassivaId}) " +
 			"and (:#{#filtre.enviamentTipusNull} = true or ntf.enviamentTipus = :#{#filtre.enviamentTipus}) " +
 			"and (:#{#filtre.concepteNull} = true or lower(ntf.concepte) like concat('%', lower(:#{#filtre.concepte}), '%')) " +
-//			"and (:#{#filtre.estatNull} = true or bitand(ntf.estatMask, :#{#filtre.estatMask}) <> 0) " +
-			"and (:#{#filtre.estatNull} = true or bitand(ntf.estatMask, :#{#filtre.estatMask}) = ntf.estatMask and bitand(ntf.estatMask, :#{#filtre.estatMask}) <> 0) " +
+			"and (:#{#filtre.estatNull} = true or bitand(ntf.estatMask, :#{#filtre.estatMask}) <> 0) " +
 			"and (:#{#filtre.dataIniciNull} = true or ntf.createdDate >= :#{#filtre.dataInici}) " +
 			"and (:#{#filtre.dataFiNull} = true or ntf.createdDate <= :#{#filtre.dataFi}) "+
 			"and (:#{#filtre.dataCaducitatIniciNull} = true or ntf.caducitat >= :#{#filtre.dataCaducitatInici}) " +
