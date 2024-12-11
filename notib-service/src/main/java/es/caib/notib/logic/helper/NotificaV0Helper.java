@@ -200,6 +200,12 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			dataAmpliada = DateUtils.addDays(data, ampliarPlazo.getPlazo());
 			enviament.setNotificaDataCaducitat(dataAmpliada);
 			enviament.setPlazoAmpliado(true);
+			var caducitatOriginal = enviament.getNotificacio().getCaducitatOriginal();
+			if (caducitatOriginal == null) {
+				var caducitat = enviament.getNotificacio().getCaducitat();
+				enviament.getNotificacio().setCaducitatOriginal(caducitat);
+			}
+			enviament.getNotificacio().setCaducitat(dataAmpliada);
 			notificacioEnviamentRepository.save(enviament);
 			notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);
 			info.addParam("Notificacio/Enviament", enviament.getNotificacio().getId() + "/" + enviament.getId());

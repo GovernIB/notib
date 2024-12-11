@@ -448,9 +448,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					continue;
 				}
 
-				var gregorianCalendar = ampliacion.getFechaCaducidad().toGregorianCalendar();
-				enviament.setNotificaDataCaducitat(gregorianCalendar.getTime());
+				var dataCaducitat = ampliacion.getFechaCaducidad().toGregorianCalendar().getTime();
+				enviament.setNotificaDataCaducitat(dataCaducitat);
 				enviament.setPlazoAmpliado(true);
+				var caducitatOriginal = enviament.getNotificacio().getCaducitatOriginal();
+				if (caducitatOriginal == null) {
+					var caducitat = enviament.getNotificacio().getCaducitat();
+					enviament.getNotificacio().setCaducitatOriginal(caducitat);
+				}
+				enviament.getNotificacio().setCaducitat(dataCaducitat);
 				notificacioEnviamentRepository.save(enviament);
 				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);
 			}

@@ -580,12 +580,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioEventEntity eventError;
 			var numEnviament = 0;
 			var entregaPostal = false;
+			NotificacioEnviamentEntity enviament;
 			for (var env : dto.getEnviaments()) {
 
 				if (!entregaPostal && env.getEntregaPostal() != null) {
 					entregaPostal = true;
 				}
-				eventError = enviamentsEntity.get(numEnviament).getUltimEvent();
+				enviament = enviamentsEntity.get(numEnviament);
+				boolean plazoAmpliado = dto.isPlazoAmpliado();
+				dto.setPlazoAmpliado(plazoAmpliado || enviament.isPlazoAmpliado());
+				eventError = enviament.getUltimEvent();
 				if (eventError != null && eventError.isError()) {
 					lastErrorEvent.add(eventError);
 				}
