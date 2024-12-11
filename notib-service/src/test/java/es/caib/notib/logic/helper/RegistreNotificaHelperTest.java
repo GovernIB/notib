@@ -9,6 +9,7 @@ import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
+import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.plugin.registre.RegistrePluginException;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import org.junit.After;
@@ -21,6 +22,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.HashSet;
+import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RegistreNotificaHelperTest {
@@ -120,6 +122,10 @@ public class RegistreNotificaHelperTest {
 		Mockito.when(notificacio.getEntitat()).thenReturn(entitat);
 		Mockito.when(notificacio.getEnviaments()).thenReturn(enviaments);
 		Mockito.when(notificacio.isComunicacioSir()).thenReturn(EnviamentTipus.SIR.equals(enviamentTipus));
+		var usuari = Mockito.mock((UsuariEntity.class));
+		notificacio.setCreatedBy(usuari);
+		Mockito.when(notificacio.getCreatedBy()).thenReturn(Optional.of(usuari));
+		Mockito.when(usuari.getCodi()).thenReturn("1");
 		for (var enviament: enviaments) {
 			enviament.setNotificacio(notificacio);
 		}

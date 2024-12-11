@@ -9,6 +9,7 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcedimentEntity;
+import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Date;
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 
@@ -131,6 +133,10 @@ public class RegistreSmHelperTest {
         Mockito.when(notificacio.getUsuariCodi()).thenReturn("admin");
         Mockito.when(notificacio.getProcediment()).thenReturn(procediment);
         Mockito.when(notificacio.getConcepte()).thenReturn(concepte);
+        var usuari = Mockito.mock((UsuariEntity.class));
+        notificacio.setCreatedBy(usuari);
+        Mockito.when(notificacio.getCreatedBy()).thenReturn(Optional.of(usuari));
+        Mockito.when(usuari.getCodi()).thenReturn("1");
     }
 
     private void initEnviament() {
