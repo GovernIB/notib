@@ -486,20 +486,45 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private NotificacioEstatEnum toNotificacioEstat(NotificacioEstatEnumDto estat) {
 
 		switch (estat) {
+//			case PENDENT:
+//				return NotificacioEstatEnum.PENDENT;
+//			case ENVIADA:
+//				return NotificacioEstatEnum.ENVIADA;
+//			case ENVIADA_AMB_ERRORS:
+//				return NotificacioEstatEnum.ENVIADA_AMB_ERRORS;
+//			case REGISTRADA:
+//				return NotificacioEstatEnum.REGISTRADA;
+//			case FINALITZADA:
+//				return NotificacioEstatEnum.FINALITZADA;
+//			case FINALITZADA_AMB_ERRORS:
+//				return NotificacioEstatEnum.FINALITZADA_AMB_ERRORS;
+//			case PROCESSADA:
+//				return NotificacioEstatEnum.PROCESSADA;
+
 			case PENDENT:
 				return NotificacioEstatEnum.PENDENT;
 			case ENVIADA:
 				return NotificacioEstatEnum.ENVIADA;
-			case ENVIADA_AMB_ERRORS:
-				return NotificacioEstatEnum.ENVIADA_AMB_ERRORS;
 			case REGISTRADA:
 				return NotificacioEstatEnum.REGISTRADA;
 			case FINALITZADA:
 				return NotificacioEstatEnum.FINALITZADA;
-			case FINALITZADA_AMB_ERRORS:
-				return NotificacioEstatEnum.FINALITZADA_AMB_ERRORS;
 			case PROCESSADA:
 				return NotificacioEstatEnum.PROCESSADA;
+			case EXPIRADA:
+				return NotificacioEstatEnum.EXPIRADA;
+			case NOTIFICADA:
+				return NotificacioEstatEnum.NOTIFICADA;
+			case REBUTJADA:
+				return NotificacioEstatEnum.REBUTJADA;
+			case ENVIAT_SIR:
+				return NotificacioEstatEnum.ENVIAT_SIR;
+			case ENVIADA_AMB_ERRORS:
+				return NotificacioEstatEnum.ENVIADA_AMB_ERRORS;
+			case FINALITZADA_AMB_ERRORS:
+				return NotificacioEstatEnum.FINALITZADA_AMB_ERRORS;
+			case ENVIANT:
+				return NotificacioEstatEnum.ENVIANT;
 			default:
 				return null;
 		}
