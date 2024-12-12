@@ -47,6 +47,7 @@ public class ConsultaNotificaListener {
         semaphore.acquire();
         try {
             var success = notificaService.consultaEstatEnviament(enviament);
+            NotibLogger.getInstance().info("[SM] Consulta per l'enviament <" + enviament.getUuid() + "> ok -> " + success, log, LoggingTipus.STATE_MACHINE);
             if (success) {
                 enviamentSmService.consultaSuccess(enviament.getUuid());
             } else {
