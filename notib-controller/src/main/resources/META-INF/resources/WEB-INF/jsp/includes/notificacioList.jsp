@@ -694,13 +694,6 @@
         </div>
     </div>
     <div class="row">
-
-        <div class="col-md-2">
-            <not:inputDate name="dataCaducitatInici" placeholderKey="notificacio.list.filtre.camp.data.caducitat.inici" inline="true" required="false" />
-        </div>
-        <div class="col-md-2">
-            <not:inputDate name="dataCaducitatFi" placeholderKey="notificacio.list.filtre.camp.data.caducitat.fi" inline="true" required="false" />
-        </div>
         <div class="col-md-2">
             <not:inputText name="titular" inline="true" placeholderKey="notificacio.list.filtre.camp.titular"/>
         </div>
@@ -749,6 +742,14 @@
         </div>
         <div class="col-md-2">
             <not:inputText name="registreNum" inline="true" placeholderKey="notificacio.list.filtre.camp.registre.num"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <not:inputDate name="dataCaducitatInici" placeholderKey="notificacio.list.filtre.camp.data.caducitat.inici" inline="true" required="false" />
+        </div>
+        <div class="col-md-2">
+            <not:inputDate name="dataCaducitatFi" placeholderKey="notificacio.list.filtre.camp.data.caducitat.fi" inline="true" required="false" />
         </div>
         <div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
             <button id="nomesAmbEntregaPostalBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbEntregaPostal"/>" class="btn btn-default pull-left <c:if test="${nomesAmbEntregaPostal}">active</c:if>" data-toggle="button"><span class="fa fa-envelope"></span></button>
