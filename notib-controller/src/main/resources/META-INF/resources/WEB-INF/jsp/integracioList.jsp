@@ -187,7 +187,7 @@
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
         	<div class="btn-group">
-				<a class="btn btn-default" href="<c:url value="/integracio/diagnostic"/>" data-toggle="modal"><span class="fa fa-cogs"></span>&nbsp;<spring:message code="integracio.diagnostic"/></a>
+				<a class="btn btn-success" href="<c:url value="/integracio/diagnostic"/>" data-toggle="modal" style="margin-right:10px"><span class="fa fa-list"></span>&nbsp;<spring:message code="integracio.diagnostic"/></a>
 				<button id="netejarIntegracions" class="btn btn-default" href="<c:url value="/integracio/netejar"/>"><span class="fa fa-trash"></span>&nbsp;<spring:message code="integracio.netejar"/></a>
 			</div>
 		</div>
