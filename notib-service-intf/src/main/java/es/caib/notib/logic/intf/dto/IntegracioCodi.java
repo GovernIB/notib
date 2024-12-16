@@ -2,7 +2,7 @@ package es.caib.notib.logic.intf.dto;
 
 import java.util.stream.Stream;
 
-public enum IntegracioCodiEnum {
+public enum IntegracioCodi {
 
     USUARIS,
     REGISTRE,
@@ -29,8 +29,8 @@ public enum IntegracioCodiEnum {
 //        return descripcio;
 //    }
 
-    public static Stream<IntegracioCodiEnum> stream() {
-        return Stream.of(IntegracioCodiEnum.values());
+    public static Stream<IntegracioCodi> stream() {
+        return Stream.of(IntegracioCodi.values());
     }
 
 }

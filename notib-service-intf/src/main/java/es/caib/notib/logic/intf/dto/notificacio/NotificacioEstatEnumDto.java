@@ -14,25 +14,27 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum NotificacioEstatEnumDto implements Serializable {
-	PENDENT(0, 1<<0), 		// 15, M=1				00000000000001
-	ENVIADA(1, 1<<1),		// 23, M=2				00000000000010
-	REGISTRADA(2, 1<<2),	// 24, M=4				00000000000100
-	FINALITZADA(3, 1<<3),	// 22, M=8				00000000001000
-	PROCESSADA(4, 1<<4),	// 25, M=16
-	EXPIRADA(10, 1<<5),	// 10, M=32
-	NOTIFICADA(14, 1<<6),	// 14, M=64
-	REBUTJADA(20, 1<<7),	// 20, M=128
-	ENVIAT_SIR(27, 1<<8),	// 27, M=256
-	ENVIADA_AMB_ERRORS(28, 1<<9),	// 28, M=512
-	FINALITZADA_AMB_ERRORS(29, 1<<10),	// 29, M=1024
-	ENVIANT(40, 1<<11);	// M=2048
+	PENDENT(0, 1<<0, "#f0ad4e"), 		// 15, M=1				00000000000001
+	ENVIADA(1, 1<<1, "#5bc0de"),		// 23, M=2				00000000000010
+	REGISTRADA(2, 1<<2, "#007bff"),	// 24, M=4				00000000000100
+	FINALITZADA(3, 1<<3, "#00ff00"),	// 22, M=8				00000000001000
+	PROCESSADA(4, 1<<4, "#5cb85c"),	// 25, M=16
+	EXPIRADA(10, 1<<5, "#00ff00"),	// 10, M=32
+	NOTIFICADA(14, 1<<6, "#00ff00"),	// 14, M=64
+	REBUTJADA(20, 1<<7, "#00ff00"),	// 20, M=128
+	ENVIAT_SIR(27, 1<<8, "#5bc0de"),	// 27, M=256
+	ENVIADA_AMB_ERRORS(28, 1<<9, "#d9534f"),	// 28, M=512
+	FINALITZADA_AMB_ERRORS(29, 1<<10, "#d9534f"),	// 29, M=1024
+	ENVIANT(40, 1<<11, "#f0ad4e");	// M=2048
 
 	private Integer numVal;
 	private Integer mask;
-	
-	NotificacioEstatEnumDto(int numVal, int mask) {
+	private String color;
+
+	NotificacioEstatEnumDto(int numVal, int mask, String color) {
         this.numVal = numVal;
 		this.mask = mask;
+		this.color = color;
     }
 	
 	public int getNumVal() {
@@ -41,7 +43,10 @@ public enum NotificacioEstatEnumDto implements Serializable {
 	public int getMask() {
 		return mask;
 	}
-	
+	public String getColor() {
+		return color;
+	}
+
 	public Long getLongVal() {
 		return Long.parseLong(numVal.toString());
 	}

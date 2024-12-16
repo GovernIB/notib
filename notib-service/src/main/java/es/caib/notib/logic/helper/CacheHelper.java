@@ -14,6 +14,7 @@ import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.unitat.CodiValor;
+import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.Getter;
 import lombok.Setter;
@@ -195,6 +196,17 @@ public class CacheHelper {
 		return pluginHelper.llistarComunitatsAutonomes();
 	}
 
+	@Cacheable(value = "llistarPaisos")
+	public List<CodiValorPais> llistarPaisos() {
+		return pluginHelper.llistarPaisos();
+	}
+
+
+	@Cacheable(value = "llistarProvincies")
+	public List<CodiValor> llistarProvincies() {
+		return pluginHelper.llistarProvincies();
+	}
+
 	@Cacheable(value = "llistarProvincies", key="#codiCA")
 	public List<CodiValor> llistarProvincies(String codiCA) {
 		return pluginHelper.llistarProvincies(codiCA);
@@ -252,6 +264,21 @@ public class CacheHelper {
 	@CacheEvict(value = {"oficinesSIREntitat", "oficinesSIRUnitat"}, allEntries = true)
 	public void evictCercaOficines() {
 		//evictCercaOficines
+	}
+
+	@CacheEvict(value = "llistarPaisos", allEntries = true)
+	public void evictLlistarPaisos() {
+		// llistarPaisos
+	}
+
+	@CacheEvict(value = "llistarProvincies", allEntries = true)
+	public void evictLlistarProvincies() {
+		// evictLlistarProvincies
+	}
+
+	@CacheEvict(value = "llistarProvinciesCodiCA", allEntries = true)
+	public void evictLlistarProvinciesCodiCA() {
+		// evictLlistarProvinciesCodiCA
 	}
 
 	public void clearCache(String cacheName) {

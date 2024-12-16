@@ -587,6 +587,15 @@ $(document).ready(function() {
 									<td width="30%"><strong><spring:message code="enviament.info.notifica.estat"/></strong></td>
 									<td><spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/></td>
 								</tr>
+								<tr>
+									<td><strong><spring:message code="enviament.historic.list.columna.notificaDataCaducitat"/></strong></td>
+									<td>
+										<fmt:formatDate value="${enviament.notificaDataCaducitat}" pattern="dd/MM/yyyy HH:mm:ss"/>
+										<c:if test="${enviament.plazoAmpliado = true}">
+											<span class="label label-warning"><spring:message code="enviament.info.notifica.caducitat.plazo.ampliado"/></span>
+										</c:if>
+									</td>
+								</tr>
 								<c:if test="${not empty enviament.sirRecepcioData}">
 									<tr>
 										<td><strong><spring:message code="enviament.info.sir.recepcio.data"/></strong></td>

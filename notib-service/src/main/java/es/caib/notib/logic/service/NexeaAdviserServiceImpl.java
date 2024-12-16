@@ -7,12 +7,11 @@ import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.NotificaHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.service.AdviserService;
 import es.caib.notib.logic.intf.service.NexeaAdviserService;
 import es.caib.notib.logic.intf.util.NifHelper;
-import es.caib.notib.logic.intf.websocket.WebSocketConstants;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.common.Opciones;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.Acuse;
@@ -62,7 +61,7 @@ public class NexeaAdviserServiceImpl implements NexeaAdviserService  {
                                  Holder<String> descripcionRespuesta,
                                  Holder<Opciones> opcionesResultadoSincronizarEnvio) {
 
-        var info = new IntegracioInfo(IntegracioCodiEnum.CIE, "Sincronitzar enviament", IntegracioAccioTipusEnumDto.RECEPCIO,
+        var info = new IntegracioInfo(IntegracioCodi.CIE, "Sincronitzar enviament", IntegracioAccioTipusEnumDto.RECEPCIO,
                 new AccioParam("Identificador Nexea", identificador.value),
                 new AccioParam("Estat", estado));
 
@@ -117,6 +116,7 @@ public class NexeaAdviserServiceImpl implements NexeaAdviserService  {
                 resultado.setDescripcionRespuesta("Identificador no se corresponde con el CIE");
                 return resultado;
             }
+            info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getCreatedBy().get().getCodi());
 //            if (!receptorValid(sincronizarEnvio.getReceptor())) {
 //                resultado.setCodigoRespuesta(NexeaAdviserWs.CODI_ERROR_VALIDACIO);
 //                resultado.setDescripcionRespuesta("Receptor no tiene el formato correcto");

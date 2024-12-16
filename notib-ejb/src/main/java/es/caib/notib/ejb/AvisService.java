@@ -67,4 +67,10 @@ public class AvisService extends AbstractService<es.caib.notib.logic.intf.servic
 		return getDelegateService().findActiveAdmin(entitatId);
 	}
 
+	@Override
+	@RolesAllowed("NOT_SUPER")
+	public List<Long> findAllIds() {
+		return getDelegateService().findAllIds();
+	}
+
 }

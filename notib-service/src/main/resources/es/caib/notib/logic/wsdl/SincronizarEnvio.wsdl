@@ -5,6 +5,7 @@
                   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
                   xmlns:act="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/sincronizarEnvioOE"
                   xmlns:iel="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/infoEnvioLigero"
+                  xmlns:ap="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE"
                   name="SincronizarEnvioWs"
                   xmlns:tns="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/"
                   xmlns:com="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/common"
@@ -128,14 +129,14 @@
                     </enumeration>
                     <enumeration value="3">
                         <annotation><documentation>
-	                        Gestor organismo emisor
+                            Gestor organismo emisor
                         </documentation></annotation>
                     </enumeration>
-		                <enumeration value="4">
-			                <annotation><documentation>
-				                Sede
-			                </documentation></annotation>
-		                </enumeration>
+                    <enumeration value="4">
+                        <annotation><documentation>
+                            Sede
+                        </documentation></annotation>
+                    </enumeration>
                 </restriction>
             </simpleType>
             <simpleType name="TipoEntrega">
@@ -177,7 +178,7 @@
             <complexType name="InfoEnvioLigero">
                 <all>
                     <element name="identificador" type="xsd:string" minOccurs="0"/>
-                    <element name="referenciaEmisor" type="string" minOccurs="0"/>
+                    <element name="referenciaEmisor" type="xsd:string" minOccurs="0"/>
                     <element name="codigoDir3" type="xsd:string" minOccurs="0"/>
                     <element name="nivelDetalle" type="iel:NivelDetalle"/>
                     <element name="opcionesInfoEnvioLigero" type="com:Opciones" minOccurs="0"/>
@@ -254,6 +255,48 @@
                 </restriction>
             </simpleType>
         </xsd:schema>
+        <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    xmlns:ap="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE"
+                    xmlns:com="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/common"
+                    targetNamespace="http://administracionelectronica.gob.es/notifica/ws/sincronizarenvio/1.0/ampliarPlazoOE"
+                    elementFormDefault="qualified">
+            <element name="ampliarPlazoOE" type="ap:AmpliarPlazoOE"/>
+            <complexType name="AmpliarPlazoOE">
+                <all>
+                    <element name="envios" type="ap:Envios"/>
+                    <element name="organismoEmisor" type="xsd:string"/>
+                    <element name="plazo" type="xsd:string"/>
+                    <element name="motivo" type="xsd:string"/>
+                </all>
+            </complexType>
+            <complexType name="Envios">
+                <sequence>
+                    <element name="identificador" type="xsd:string" maxOccurs="100"/>
+                </sequence>
+            </complexType>
+            <element name="respuestaAmpliarPlazoOE" type="ap:RespuestaAmpliarPlazoOE"/>
+            <complexType name="RespuestaAmpliarPlazoOE">
+                <sequence>
+                    <element name="codigoRespuesta" type="xsd:string"/>
+                    <element name="descripcionRespuesta" type="xsd:string"/>
+                    <element name="ampliacionesPlazo"  minOccurs="0" type="ap:AmpliacionesPlazo"/>
+                </sequence>
+            </complexType>
+            <complexType name="AmpliacionesPlazo">
+                <sequence>
+                    <element name="ampliacionPlazo" type="ap:AmpliacionPlazo" minOccurs="0" maxOccurs="100"/>
+                </sequence>
+            </complexType>
+            <complexType name="AmpliacionPlazo">
+                <all>
+                    <element name="estado" type="xsd:string"/>
+                    <element name="identificador" type="xsd:string"/>
+                    <element name="fechaCaducidad" type="xsd:dateTime"/>
+                    <element name="mensajeError" type="xsd:string"/>
+                    <element name="codigo" type="xsd:string"/>
+                </all>
+            </complexType>
+        </xsd:schema>
     </wsdl:types>
 
     <wsdl:message name="sincronizarEnvioOERequest">
@@ -268,6 +311,12 @@
     <wsdl:message name="infoEnvioLigeroResponse">
         <wsdl:part name="respuestaInfoEnvioLigero" element="iel:respuestaInfoEnvioLigero"/>
     </wsdl:message>
+    <wsdl:message name="ampliarPlazoOERequest">
+        <wsdl:part name="ampliarPlazoOE" element="ap:ampliarPlazoOE"/>
+    </wsdl:message>
+    <wsdl:message name="ampliarPlazoOEResponse">
+        <wsdl:part name="respuestaAmpliarPlazoOE" element="ap:respuestaAmpliarPlazoOE"/>
+    </wsdl:message>
 
     <wsdl:portType name="SincronizarEnvioWsPortType">
         <wsdl:operation name="sincronizarEnvioOE">
@@ -277,6 +326,10 @@
         <wsdl:operation name="infoEnvioLigero">
             <wsdl:input message="tns:infoEnvioLigeroRequest"/>
             <wsdl:output message="tns:infoEnvioLigeroResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="ampliarPlazoOE">
+            <wsdl:input message="tns:ampliarPlazoOERequest"/>
+            <wsdl:output message="tns:ampliarPlazoOEResponse"/>
         </wsdl:operation>
     </wsdl:portType>
 
@@ -300,13 +353,22 @@
                 <soap:body use="literal" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="ampliarPlazoOE">
+            <soap:operation soapAction="ampliarPlazoOE"/>
+            <wsdl:input>
+                <soap:body use="literal" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </wsdl:output>
+        </wsdl:operation>
     </wsdl:binding>
 
     <wsdl:service name="SincronizarEnvioWsService">
         <wsdl:port name="SincronizarEnvioWsPort" binding="tns:SincronizarEnvioWsBinding">
             <soap:address location="https://se-notificaws.redsara.es/ws/sincronizarEnvioWs"/>
+<!--            <soap:address location="https://notificaws.redsara.es/ws/sincronizarEnvioWs"/>-->
         </wsdl:port>
     </wsdl:service>
 
 </wsdl:definitions>
-

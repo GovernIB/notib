@@ -9,6 +9,7 @@ import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.UsuariEntity;
+import es.caib.notib.persist.filtres.FiltreConsultaEviament;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,7 +31,14 @@ import java.util.Optional;
 public interface NotificacioEnviamentRepository extends JpaRepository<NotificacioEnviamentEntity, Long> {
 
 	List<NotificacioEnviamentEntity> findByNotificacioId(Long notificacioId);
+
 	List<NotificacioEnviamentEntity> findByIdIn(Collection<Long> ids);
+
+	Optional<NotificacioEnviamentEntity> findTopByRegistreNumeroFormatatNotNullOrderByIdDesc();
+
+	Optional<NotificacioEnviamentEntity> findTopByEntregaPostalNullOrderByIdDesc();
+
+	Optional<NotificacioEnviamentEntity> findTopByNotificaIdentificadorNullOrderByIdDesc();
 
 	@Query("select id from NotificacioEnviamentEntity where notificaReferencia is null")
 	List<Long> findIdsSenseReferencia();
@@ -85,6 +93,9 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	NotificacioEnviamentEntity findByNotificacioEntitatAndNotificaIdentificador(EntitatEntity entitat, String notificaIdentificador);
 	
 	NotificacioEnviamentEntity findByNotificaIdentificador(String notificaIdentificador);
+	List<NotificacioEnviamentEntity> findByNotificaIdentificadorIn(List<String> notificaIdentificador);
+	List<NotificacioEnviamentEntity> findByNotificaReferenciaIn(List<String> notificaIdentificador);
+
 	@Query(	" select id from NotificacioEnviamentEntity " +
 			" where	notificaEstat = es.caib.notib.client.domini.EnviamentEstat.EXPIRADA " +
 			"		and notificaCertificacioData is null" +
@@ -242,18 +253,18 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	@Query( " select count(distinct ne) " +
 			" from NotificacioEnviamentEntity ne " +
 			" left outer join ne.destinataris d " +
-		    " where ne.notificacio.enviamentTipus = :tipus " +
+		    " where (:#{#filtre.tipusNull} = true or ne.notificacio.enviamentTipus =  :#{#filtre.tipus}) " +
 			"   and (ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
-		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
+		    "   and (:#{#filtre.esEstatFinalNull} = true or ne.notificaEstatFinal = :#{#filtre.estatFinal}) " +
 		    "   and ne.notificaEstat <> es.caib.notib.client.domini.EnviamentEstat.REGISTRADA " +
-			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = upper(:dniTitular)) or (upper(d.nif) = upper(:dniTitular)))" +
-			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +
-			"	and (:esDataFinalNull = true or ne.notificacio.notificaEnviamentData <= :dataFinal) " +
-			"   and (:esVisibleCarpetaNull = true or :visibleCarpeta = false " +
+			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = upper(:#{#filtre.dniTitular})) or (upper(d.nif) = upper(:#{#filtre.dniTitular})))" +
+			"	and (:#{#filtre.esDataInicialNull} = true or ne.notificacio.notificaEnviamentData >= :#{#filtre.dataInicial}) " +
+			"	and (:#{#filtre.esDataFinalNull} = true or ne.notificacio.notificaEnviamentData <= :#{#filtre.dataFinal}) " +
+			"   and (:#{#filtre.esVisibleCarpetaNull} = true or :#{#filtre.visibleCarpeta} = false " +
 			"		or (ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_ENVIAMENT " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_SEU " +
@@ -273,33 +284,23 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.MORT " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.EXTRAVIADA " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.SENSE_INFORMACIO))")
-	Integer countEnviaments(
-			@Param("dniTitular") String dniTitular,
-			@Param("esDataInicialNull") boolean esDataInicialNull,
-			@Param("dataInicial") Date dataInicial,
-			@Param("esDataFinalNull") boolean esDataFinalNull,
-			@Param("dataFinal") Date dataFinal,
-			@Param("tipus") EnviamentTipus tipus,
-			@Param("esEstatFinalNull") boolean esEstatFinalNull,
-			@Param("estatFinal") Boolean estatFinal,
-			@Param("esVisibleCarpetaNull") boolean esVisibleCarpetaNull,
-			@Param("visibleCarpeta") Boolean visibleCarpeta);
+	Integer countEnviaments(FiltreConsultaEviament filtre);
 
 	@Query( " select distinct ne " +
 			" from NotificacioEnviamentEntity ne " +
 			" left outer join ne.destinataris d " +
-		    " where ne.notificacio.enviamentTipus =  :tipus " +
+			" where (:#{#filtre.tipusNull} = true or ne.notificacio.enviamentTipus =  :#{#filtre.tipus}) " +
 			"   and (ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS " +
 			"    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
-		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
+			"   and (:#{#filtre.esEstatFinalNull} = true or ne.notificaEstatFinal = :#{#filtre.estatFinal}) " +
 			"   and ne.notificaEstat <> es.caib.notib.client.domini.EnviamentEstat.REGISTRADA " +
-			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = upper(:dniTitular)) or (upper(d.nif) = upper(:dniTitular))) " +
-			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +
-			"	and (:esDataFinalNull = true or ne.notificacio.notificaEnviamentData <= :dataFinal) " +
-			"   and (:esVisibleCarpetaNull = true or :visibleCarpeta = false " +
+			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = upper(:#{#filtre.dniTitular})) or (upper(d.nif) = upper(:#{#filtre.dniTitular})))" +
+			"	and (:#{#filtre.esDataInicialNull} = true or ne.notificacio.notificaEnviamentData >= :#{#filtre.dataInicial}) " +
+			"	and (:#{#filtre.esDataFinalNull} = true or ne.notificacio.notificaEnviamentData <= :#{#filtre.dataFinal}) " +
+			"   and (:#{#filtre.esVisibleCarpetaNull} = true or :#{#filtre.visibleCarpeta} = false " +
 			"		or (ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_ENVIAMENT " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_SEU " +
@@ -319,18 +320,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.MORT " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.EXTRAVIADA " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.SENSE_INFORMACIO))")
-	Page<NotificacioEnviamentEntity> findEnviaments(
-			@Param("dniTitular") String dniTitular,
-			@Param("esDataInicialNull") boolean esDataInicialNull,
-			@Param("dataInicial") Date dataInicial,
-			@Param("esDataFinalNull") boolean esDataFinalNull,
-			@Param("dataFinal") Date dataFinal,
-			@Param("tipus") EnviamentTipus tipus,
-			@Param("esEstatFinalNull") boolean esEstatFinalNull,
-			@Param("estatFinal") Boolean estatFinal,
-			@Param("esVisibleCarpetaNull") boolean esVisibleCarpetaNull,
-			@Param("visibleCarpeta") Boolean visibleCarpeta,
-			Pageable pageable);
+	Page<NotificacioEnviamentEntity> findEnviaments(FiltreConsultaEviament filtre, Pageable pageable);
 
 	@Query(value = "from NotificacioEnviamentEntity where notificaReferencia = :enviamentUuid")
 	Optional<NotificacioEnviamentEntity> findByUuid(@Param("enviamentUuid") String enviamentUuid);

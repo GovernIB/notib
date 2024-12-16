@@ -30,8 +30,8 @@ public class EnviamentNotificaListener {
     @JmsListener(destination = SmConstants.CUA_NOTIFICA, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveEnviamentNotifica(@Payload EnviamentNotificaRequest enviamentNotificaRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
-        var enviament = enviamentNotificaRequest.getEnviamentNotificaDto();
         message.acknowledge();
+        var enviament = enviamentNotificaRequest.getEnviamentNotificaDto();
         if (enviament == null || Strings.isNullOrEmpty(enviament.getUuid())) {
             log.error("[SM] Rebut enviament notifica sense Enviament");
             return;

@@ -4,7 +4,7 @@ import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.AvisNivellEnumDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto.ActualitzacioInfo;
@@ -71,8 +71,9 @@ public class ProcSerSyncHelper {
 
 	public void actualitzaProcediments(EntitatDto entitatDto) {
 
-		var info = new IntegracioInfo(IntegracioCodiEnum.PROCEDIMENTS, "Actualització de procediments", IntegracioAccioTipusEnumDto.PROCESSAR,
+		var info = new IntegracioInfo(IntegracioCodi.PROCEDIMENTS, "Actualització de procediments", IntegracioAccioTipusEnumDto.PROCESSAR,
 				new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
+		info.setAplicacio(IntegracioInfo.INTERFICIE_WEB);
 		if (entitatDto == null) {
 			log.error("Error actualitzant els procediments. Entitat null");
 		}
@@ -390,8 +391,9 @@ public class ProcSerSyncHelper {
 	// ///////////////////////////////////////////////////////////////////////////
 	public void actualitzaServeis(EntitatDto entitatDto) {
 
-		var info = new IntegracioInfo(IntegracioCodiEnum.PROCEDIMENTS, "Actualització de serveis", IntegracioAccioTipusEnumDto.PROCESSAR, new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
+		var info = new IntegracioInfo(IntegracioCodi.PROCEDIMENTS, "Actualització de serveis", IntegracioAccioTipusEnumDto.PROCESSAR, new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
 		info.setCodiEntitat(entitatDto.getCodi());
+		info.setAplicacio(IntegracioInfo.INTERFICIE_WEB);
 		if (entitatDto == null) {
 			log.error("Error actualitzant els procediments. Entitat null");
 		}

@@ -15,7 +15,7 @@
 <c:set var="mostraEntitat" value="${isRolActualAdministrador && mostrarColumnaEntitat}" scope="request"/>
 <c:set var="entitat" value="${entitat}" scope="request"/>
 <c:set var="notificacioEnviamentTipus" value="${notificacioEnviamentTipus}" scope="request"/>
-<c:set var="notificacioEstats" value="${notificacioEstats}" scope="request"/>
+<%--<c:set var="notificacioEstats" value="${notificacioEstats}" scope="request"/>--%>
 <c:set var="tipusUsuari" value="${tipusUsuari}" scope="request"/>
 <c:set var="nomesAmbErrors" value="${nomesAmbErrors}" scope="request"/>
 <c:set var="mostrarColumnaNumExpedient" value="${mostrarColumnaNumExpedient}" scope="request"/>

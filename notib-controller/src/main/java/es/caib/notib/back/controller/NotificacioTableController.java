@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import es.caib.notib.back.command.*;
 import es.caib.notib.back.helper.*;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.missatges.Missatge;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -62,8 +64,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @Autowired
     private PermisosService permisosService;
     @Autowired
-    private CallbackService callbackService;
-    @Autowired
     private EnviamentSmService envSmService;
     @Autowired
     private ColumnesService columnesService;
@@ -86,6 +86,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private static final String EVENT_TIPUS_ENUM = "es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.";
     private static final String SELECCIO_BUIDA = "accio.massiva.seleccio.buida";
     private static final String PERMIS_DENGAT = "Permís denegat";
+    @Autowired
+    private ConversioTipusHelper conversioTipusHelper;
 
     public NotificacioTableController() {
         super.sessionAttributeSeleccio = SESSION_ATTRIBUTE_SELECCIO;
@@ -805,15 +807,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
     }
 
-    @GetMapping(value = "/{notificacioId}/refrescarEstatClient")
-    public String refrescarEstatClient(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
-
-        var notificat = callbackService.reintentarCallback(notificacioId);
-        var msg = notificat ? "notificacio.controller.notificar.client.ok" : "notificacio.controller.notificar.client.error";
-        MissatgesHelper.error(request, getMessage(request,msg));
-        return NOT_INFO;
-    }
-
     ////
     // Actualització enviaments expirats
     ////
@@ -839,6 +832,57 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public ProgresActualitzacioCertificacioDto enviamentsRefrescarEstatProgres() {
         return notificacioService.actualitzacioEnviamentsEstat();
     }
+
+
+    @GetMapping(value = "/{notificacioId}/ampliacion/plazo")
+    public String ampliarPlazoOEGet(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
+
+        var ampliacion = new AmpliacionPlazoCommand();
+        ampliacion.setNotificacioId(notificacioId);
+        model.addAttribute(ampliacion);
+        return "ampliarPlazoForm";
+    }
+
+    @GetMapping(value = "/ampliacion/plazo/massiu")
+    public String ampliarPlazoOEMassiu(HttpServletResponse response, HttpServletRequest request, Model model) {
+
+        var seleccio = getIdsSeleccionats(request);
+        var redirect = "redirect:../../..";
+        if (seleccio == null || seleccio.isEmpty()) {
+            return getModalControllerReturnValueError(request,redirect,SELECCIO_BUIDA);
+        }
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+            return getModalControllerReturnValueError(request, redirect,"accio.massiva.creat.ko");
+        }
+        var ampliacion = new AmpliacionPlazoCommand();
+        ampliacion.setNotificacionsId(new ArrayList<>(seleccio));
+        model.addAttribute(ampliacion);
+        return "ampliarPlazoForm";
+    }
+
+
+    @GetMapping(value = "/{notificacioId}/enviament/{enviamentId}/ampliacion/plazo")
+    public String ampliarPlazoOEGetEnviament(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId, @PathVariable Long enviamentId) {
+
+        var ampliacion = new AmpliacionPlazoCommand();
+        ampliacion.setEnviamentId(enviamentId);
+        model.addAttribute(ampliacion);
+        return "ampliarPlazoForm";
+    }
+
+
+    @PostMapping(value = "/ampliacion/plazo")
+    public String ampliarPlazoOEPost(HttpServletResponse response, HttpServletRequest request, Model model, AmpliacionPlazoCommand ampliacionPlazo) {
+
+        var ampliarPlazoOE = new AmpliarPlazoOE();
+        ampliarPlazoOE.setPlazo(ampliacionPlazo.getDies());
+        ampliarPlazoOE.setMotivo(ampliacionPlazo.getMotiu());
+        var resposta = notificacioService.ampliacionPlazoOE(ConversioTipusHelper.convertir(ampliacionPlazo, AmpliacionPlazoDto.class));
+        return resposta != null && resposta.isOk() ? getModalControllerReturnValueSuccess(request, "redirect:/enviament", "ampliar.plazo.ok")
+                : getModalControllerReturnValueError(request, "redirect:/enviament", "ampliar.plazo.error", new Object[] {resposta.getDescripcions() != null ?  resposta.getDescripcions() : resposta.getDescripcionRespuesta()});
+    }
+
+
 
     // ACCIONS MASSIVES PER NOTIFICACIONS
     ////

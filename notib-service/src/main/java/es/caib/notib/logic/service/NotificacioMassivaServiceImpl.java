@@ -365,7 +365,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         var pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
         var f = notificacioListHelper.getFiltre(filtre, entitatId, null, null, null);
         f.setNotificacioMassiva(notificacioMassivaRepository.findById(notificacioMassivaId).orElse(null));
-        f.setDataFi(DatesUtils.incrementarDataFi(f.getDataFi()));
         var notificacions = notificacioTableViewRepository.findAmbFiltreByNotificacioMassiva(f, pageable);
         var auth = SecurityContextHolder.getContext().getAuthentication();
         var dtos = notificacioTableMapper.toNotificacionsTableItemDto(

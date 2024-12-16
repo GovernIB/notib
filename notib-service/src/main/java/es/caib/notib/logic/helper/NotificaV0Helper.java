@@ -3,9 +3,11 @@ package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificaRespostaDatatDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -32,6 +34,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -44,6 +47,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * Helper MOCK de prova.
@@ -74,10 +78,12 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
 
 		Thread.sleep(1000);
-		var info = new IntegracioInfo(IntegracioCodiEnum.NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
 
 		var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
+		var usuari = notificacio.getCreatedBy().get().getCodi();
+		info.setAplicacio(notificacio.getTipusUsuari(), usuari);
 		log.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 			log.error(" [NOT] la notificació no té l'estat REGISTRADA.");
@@ -173,6 +179,43 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		resposta.setDescripcionRespuesta(NexeaAdviserWs.CODI_OK_DEC);
 		var enviament = notificacioEnviamentRepository.findByCieId(sincronizarEnvio.getIdentificador());
 		notificacioEventHelper.addNotificaEnvioOE(enviament, false, "", false);
+		return resposta;
+	}
+
+	@Override
+	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo, List<NotificacioEnviamentEntity> enviaments) {
+
+		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA, "Ampliació de plaç", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		var resposta = new RespuestaAmpliarPlazoOE();
+		resposta.setCodigoRespuesta("000");
+		resposta.setDescripcionRespuesta("Ok");
+		StringBuilder codiEntitat = new StringBuilder();
+		Date data, dataAmpliada;
+		String entitat;
+		for (var enviament : enviaments) {
+			data = enviament.getNotificaDataCaducitat();
+			if (data == null) {
+				data = enviament.getNotificacio().getCaducitat();
+			}
+			dataAmpliada = DateUtils.addDays(data, ampliarPlazo.getPlazo());
+			enviament.setNotificaDataCaducitat(dataAmpliada);
+			enviament.setPlazoAmpliado(true);
+			var caducitatOriginal = enviament.getNotificacio().getCaducitatOriginal();
+			if (caducitatOriginal == null) {
+				var caducitat = enviament.getNotificacio().getCaducitat();
+				enviament.getNotificacio().setCaducitatOriginal(caducitat);
+			}
+			enviament.getNotificacio().setCaducitat(dataAmpliada);
+			notificacioEnviamentRepository.save(enviament);
+			notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);
+			info.addParam("Notificacio/Enviament", enviament.getNotificacio().getId() + "/" + enviament.getId());
+			entitat = enviament.getNotificacio().getEntitat().getCodi();
+			if (!codiEntitat.toString().contains(entitat)) {
+				codiEntitat.append(entitat);
+			}
+		}
+		info.setCodiEntitat(codiEntitat.toString());
+		integracioHelper.addAccioOk(info);
 		return resposta;
 	}
 

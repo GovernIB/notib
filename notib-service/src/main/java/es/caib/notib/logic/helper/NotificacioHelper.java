@@ -71,8 +71,6 @@ public class NotificacioHelper {
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
-	private NotificacioEventRepository notificacioEventRepository;
-	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
@@ -84,8 +82,6 @@ public class NotificacioHelper {
 	private EnviamentTableHelper enviamentTableHelper;
 	@Autowired
 	private AuditHelper auditHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private MessageHelper messageHelper;
 

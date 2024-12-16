@@ -7,16 +7,41 @@
 <html>
 <head>
 	<title><spring:message code="avis.list.titol"/></title>
+
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
-    <script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
-    <link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
+	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<link href="<c:url value="/webjars/datatables.net-select-bs/1.1.2/css/select.bootstrap.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/datatables.net-select/1.1.2/js/dataTables.select.min.js"/>"></script>
+	<script src="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.min.js"/>"></script>
+	<link href="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.css"/>" rel="stylesheet"></link>
 	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
-    <script src="<c:url value="/js/webutil.common.js"/>"></script>
-    <script src="<c:url value="/js/webutil.datatable.js"/>"></script>
-    <script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
+	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<script src="<c:url value="/js/datatable.accions-massives.js"/>"></script>
+	<link href="<c:url value="/css/datatable-accions-massives.css"/>" rel="stylesheet"/>
+
 </head>
 <body>
-	<table id="avisos" data-toggle="datatable" data-url="<c:url value="/avis/datatable"/>" data-search-enabled="false" data-default-order="2" data-default-dir="asc" data-botons-template="#botonsTemplate" class="table table-striped table-bordered" style="width:100%">
+	<script type="text/javascript">
+		$(document).ready(function() {
+			let eventMessages = {
+				'confirm-accio-massiva': "<spring:message code="enviament.list.user.confirm.accio.massiva"/>",
+			};
+			initEvents($('#avisos'), 'avis', eventMessages);
+		});
+	</script>
+	<table id="avisos"
+		   data-toggle="datatable"
+		   data-url="<c:url value="/avis/datatable"/>"
+		   data-search-enabled="false"
+		   data-default-order="2"
+		   data-default-dir="asc"
+		   data-selection-enabled="true"
+		   data-botons-template="#botonsTemplate"
+		   class="table table-striped table-bordered"
+		   style="width:100%">
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false"></th>
@@ -62,6 +87,20 @@
 		</thead>
 	</table>
 	<script id="botonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a class="btn btn-default" href="avis/new" data-toggle="modal" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="avis.list.boto.nova.avis"/></a></p>
+		<div class="text-right">
+			<div class="btn-group">
+				<button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
+				<button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
+				<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu dropdown-left">
+					<li><a href="avis/enable/massiu"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
+					<li><a href="avis/disable/massiu"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
+					<li><a href="avis/delete/massiu"title='<spring:message code="comu.boto.esborrar"/>'><span class="fa fa-trash"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+				</ul>
+				<a class="btn btn-default" href="avis/new" data-toggle="modal" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="avis.list.boto.nova.avis"/></a>
+			</div>
+		</div>
 	</script>
 </body>

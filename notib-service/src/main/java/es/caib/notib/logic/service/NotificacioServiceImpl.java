@@ -4,13 +4,15 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.Envios;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.intf.dto.*;
@@ -44,7 +46,6 @@ import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.plugin.cie.CiePluginJms;
-import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.CallbackEntity;
@@ -72,7 +73,6 @@ import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,8 +147,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private PersonaHelper personaHelper;
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
-	@Autowired
-	private EmailNotificacioHelper emailNotificacioHelper;
 	@Autowired
 	private UsuariHelper usuariHelper;
 	@Autowired
@@ -582,12 +580,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioEventEntity eventError;
 			var numEnviament = 0;
 			var entregaPostal = false;
+			NotificacioEnviamentEntity enviament;
 			for (var env : dto.getEnviaments()) {
 
 				if (!entregaPostal && env.getEntregaPostal() != null) {
 					entregaPostal = true;
 				}
-				eventError = enviamentsEntity.get(numEnviament).getUltimEvent();
+				enviament = enviamentsEntity.get(numEnviament);
+				boolean plazoAmpliado = dto.isPlazoAmpliado();
+				dto.setPlazoAmpliado(plazoAmpliado || enviament.isPlazoAmpliado());
+				eventError = enviament.getUltimEvent();
 				if (eventError != null && eventError.isError()) {
 					lastErrorEvent.add(eventError);
 				}
@@ -697,7 +699,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var rols = aplicacioService.findRolsUsuariActual();
 			filtre.setOrganGestor(organGestorCodi);
 			var f = notificacioListHelper.getFiltre(filtre, entitatId, rol, usuariCodi, rols);
-			f.setDataFi(DatesUtils.incrementarDataFi(f.getDataFi()));
 			var notificacions = notificacioTableViewRepository.findAmbFiltre(f, pageable);
 			if (notificacions.getTotalPages() < paginacioParams.getPaginaNum()) {
 				paginacioParams.setPaginaNum(0);
@@ -722,7 +723,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var rols = aplicacioService.findRolsUsuariActual();
 			filtre.setOrganGestor(organGestorCodi);
 			var f = notificacioListHelper.getFiltre(filtre, entitatId, rol, usuariCodi, rols);
-			f.setDataFi(DatesUtils.incrementarDataFi(f.getDataFi()));
 			return notificacioTableViewRepository.findIdsAmbFiltre(f);
 		} finally {
 			log.error("Error obtinguent els ids amb filtre de les remeses")
@@ -831,7 +831,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			List<CodiValorPais> codiValorPais = new ArrayList<>();
 			try {
-				codiValorPais = pluginHelper.llistarPaisos();
+				codiValorPais = cacheHelper.llistarPaisos();
 			} catch (Exception ex) {
 				log.error("Error recuperant els paisos de DIR3CAIB: " + ex);
 			}
@@ -849,7 +849,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			List<CodiValor> codiValor = new ArrayList<>();
 			try {
-				codiValor = pluginHelper.llistarProvincies();
+				codiValor = cacheHelper.llistarProvincies();
 			} catch (Exception ex) {
 				log.error(ERROR_DIR3 + ex);
 			}
@@ -1991,6 +1991,63 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 		item.setPerActualitzar(true);
 		notificacioTableViewRepository.save(item);
+	}
+
+	@Override
+	public RespuestaAmpliarPlazoOE ampliacionPlazoOE(AmpliacionPlazoDto dto) {
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			List<String> identificadors = new ArrayList<>();
+			var isNotificacio = dto.getNotificacioId() != null;
+			var isEnviament = dto.getEnviamentId() != null;
+			var isNotificacioMassiu = dto.getNotificacionsId() != null;
+			var isEnviamentMassiu = dto.getEnviamentsId() != null;
+			if (isNotificacio) {
+				var notificacio = notificacioRepository.findById(dto.getNotificacioId()).orElseThrow();
+				for (var enviament : notificacio.getEnviaments()) {
+					if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+						identificadors.add(enviament.getNotificaReferencia());
+					}
+				}
+			}
+			if (isEnviament) {
+				var enviament = enviamentRepository.findById(dto.getEnviamentId()).orElseThrow();
+				if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+					identificadors.add(enviament.getNotificaReferencia());
+				}
+			}
+			if (isNotificacioMassiu) {
+				var notificacions = notificacioRepository.findByIdIn(dto.getNotificacionsId());
+				for (var not : notificacions) {
+					for (var enviament : not.getEnviaments()) {
+						if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+							identificadors.add(enviament.getNotificaReferencia());
+						}
+					}
+				}
+			}
+			if (isEnviamentMassiu) {
+				var enviaments = enviamentRepository.findByIdIn(dto.getEnviamentsId());
+				for (var enviament : enviaments) {
+					if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+						identificadors.add(enviament.getNotificaReferencia());
+					}
+				}
+			}
+			var envios = new Envios();
+			envios.setIdentificador(identificadors);
+			var ampliarPlazoOE = new AmpliarPlazoOE(envios, dto.getDies(), dto.getMotiu());
+			return notificaHelper.ampliarPlazoOE(ampliarPlazoOE);
+		} catch (Exception ex) {
+			var msg = "Error inesperat al ampliarPlazoOE ";
+			log.error(msg, ex);
+			var resposta = new RespuestaAmpliarPlazoOE();
+			resposta.setDescripcionRespuesta(msg + ex.getMessage());
+			return resposta;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override

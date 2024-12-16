@@ -53,4 +53,6 @@ public class PropertiesConstants {
 
     public static final String COMPRIMIR_DOCUMENTS_ANTICS = "es.caib.notib.comprimir.documents.antics.periode";
     public static final String COMPRIMIR_DOCUMENTS_ANTICS_LLINDAR = "es.caib.notib.plugin.gesdoc.document.llindar.dies.comprimir";
+
+    public static final String EVICT_CACHE_PAISOS_PROVINCIES = "es.caib.notib.cache.paisos.provincies";
 }

@@ -4,6 +4,8 @@
 package es.caib.notib.logic.intf.service;
 
 import es.caib.notib.client.domini.*;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 
@@ -66,4 +68,11 @@ public interface NotificacioServiceWs {
 	 */
 	RespostaConsultaJustificantEnviament consultaJustificantEnviament(String identificador);
 
+
+	/**
+	 * Amplia el plaç d'expiracio de Notific@ de les remeses
+	 * @param ampliarPlazo objecte amb les dades per ampliar el plaç d'una o més remeses
+	 * @Return la informació de l'ampliació
+	 */
+    RespuestaAmpliarPlazoOE ampliarPlazo(AmpliarPlazoOE ampliarPlazo);
 }

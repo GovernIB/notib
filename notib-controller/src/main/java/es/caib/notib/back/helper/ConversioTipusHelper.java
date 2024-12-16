@@ -3,8 +3,10 @@
  */
 package es.caib.notib.back.helper;
 
+import es.caib.notib.back.command.AmpliacionPlazoCommand;
 import es.caib.notib.back.command.IntegracioFiltreCommand;
 import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.logic.intf.dto.AmpliacionPlazoDto;
 import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
@@ -225,6 +227,9 @@ public class ConversioTipusHelper {
 						}
 					}
 				}).register();
+
+		mapperFactory.classMap(AmpliacionPlazoCommand.class, AmpliacionPlazoDto.class).byDefault().register();
+		mapperFactory.classMap(AmpliacionPlazoDto.class, AmpliacionPlazoCommand.class).byDefault().register();
 	}
 
 	

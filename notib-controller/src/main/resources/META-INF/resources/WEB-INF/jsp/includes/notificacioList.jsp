@@ -205,17 +205,6 @@
     organsGestors.push({id:"${organGestor.id}", text:"${organGestor.valor}", estat:"${organGestor.estat}"});
     </c:forEach>
 
-    var notificacioEstats = [];
-    notificacioEstats.push({value:"", text:""});
-    <c:forEach items="${notificacioEstats}" var="notificacioEstat">
-    notificacioEstats.push({value:"${notificacioEstat.value}", text:"${notificacioEstat.text}"});
-    </c:forEach>
-
-    <%--var notificacioEstats = [];--%>
-    <%--<c:forEach var="estat" items="${notificacioEstats}">--%>
-    <%--notificacioEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";--%>
-    <%--</c:forEach>--%>
-
     var notificacioEnviamentEstats = [];
     <c:forEach var="estat" items="${notificacioEnviamentEstats}">
     notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
@@ -426,6 +415,15 @@
         let $taula = $('#notificacio');
         $taula.on('rowinfo.dataTable', function(e, td, rowData) {
             mostraEnviamentsNotificacio(td, rowData)
+        });
+
+        $taula.on('draw.dt', function () {
+            let rows = this.rows;
+            for (let row=1; row < rows.length; row++) {
+                let tag = $(this.rows[row]).find(".estatColor")[0];
+                let classes = tag.classList;
+                this.rows[row].firstChild.style="border-left: 3px solid " + classes[classes.length-1];
+            }
         });
 
         $taula.on('init.dt', function () {
@@ -745,6 +743,14 @@
         <div class="col-md-2">
             <not:inputText name="registreNum" inline="true" placeholderKey="notificacio.list.filtre.camp.registre.num"/>
         </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <not:inputDate name="dataCaducitatInici" placeholderKey="notificacio.list.filtre.camp.data.caducitat.inici" inline="true" required="false" />
+        </div>
+        <div class="col-md-2">
+            <not:inputDate name="dataCaducitatFi" placeholderKey="notificacio.list.filtre.camp.data.caducitat.fi" inline="true" required="false" />
+        </div>
         <div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
             <button id="nomesAmbEntregaPostalBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbEntregaPostal"/>" class="btn btn-default pull-left <c:if test="${nomesAmbEntregaPostal}">active</c:if>" data-toggle="button"><span class="fa fa-envelope"></span></button>
             <not:inputHidden name="nomesAmbEntregaPostal"/>
@@ -781,6 +787,7 @@
                     <li><a id="exportarODS" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.exportar.tooltip"/>' ><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
                     <li><a id="descarregarJustificantMassiu" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.justificant"/></a></li>
                     <li><a id="descarregarCertificacioMassiu" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.certificacio"/></a></li>
+                    <li><a id="ampliarPlazoOE" href="<c:url value="/notificacio/ampliacion/plazo/massiu"/>" data-toggle="modal" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
 
                     <c:if test="${isRolActualAdministradorEntitat}">
                         <hr/>
@@ -840,7 +847,6 @@
                 {{/if}}
             </script>
         </th>
-        <%-- <th data-col-name="notificaEnviamentData" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>--%>
         <c:if test = "${columnes.dataCreacio == true}">
             <th data-col-name="createdDate" data-converter="datetime"   width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.creadael"/></th>
         </c:if>
@@ -889,11 +895,12 @@
         </c:if>
         <th data-col-name="estatDate" data-converter="datetime" data-visible="false"></th>
         <th data-col-name="estatProcessatDate" data-converter="datetime" data-visible="false"></th>
+        <th data-col-name="estatColor" data-visible="false"></th>
         <th data-col-name="estat" data-visible="false"></th>
         <c:if test = "${columnes.estat == true}">
             <th data-col-name="estatString" data-template="#cellEstatTemplate" <c:if test="${isRolActualAdministradorEntitat}"> data-disable-events="true" </c:if>width="120px"><spring:message code="notificacio.list.columna.estat"/>
                 <script id="cellEstatTemplate" type="text/x-jsrender">
-                    <div class="cellEstat">
+                    <div class="cellEstat estatColor {{:estatColor}}">
                         {{:estatString}}
                         {^{if ~hlpIsAdministradorEntitat() }}
                             <div class="hover-button"><a href="<c:url value="/notificacio/{{:id}}/updateEstatList"/>"><span class="fa fa-refresh"></span></a></div>
@@ -906,6 +913,7 @@
         <th data-col-name="documentId" data-visible="false" style="visibility: hidden">
             <%--        <th data-col-name="enviamentId" data-visible="false" style="visibility: hidden">--%>
         <th data-col-name="envCerData" data-visible="false" style="visibility: hidden">
+        <th data-col-name="plazoAmpliable" data-visible="false">
         <th data-col-name="id" data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px" style="z-index:99999;">
             <script id="cellAccionsTemplate" type="text/x-jsrender">
                 <div class="dropdown">
@@ -921,15 +929,13 @@
                     {{/if}}
                     {{if justificant}}
                         <li><a href="<c:url value="/notificacio/{{:id}}/justificant"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-download"></span>&nbsp; <spring:message code="comu.boto.justificant"/></a></li>
-                <%--                        {^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan()) && hasEnviamentsPendentsRegistre }}--%>
-<%--                            <li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>--%>
-<%--                            <li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>--%>
-<%--                        {{/if}}--%>
-                {{/if}}
-                <%--                        MIRAR EL ^ QUE FA --%>
-                {^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan())  && (enviant || estat == 'PENDENT' || estat == 'REGISTRADA')}}
-                    <li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
+                    {{/if}}
+                    {^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan())  && (enviant || estat == 'PENDENT' || estat == 'REGISTRADA')}}
+                        <li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
                         <li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+                    {{/if}}
+                    {{if plazoAmpliable}}
+                        <li><a href="<c:url value="/notificacio/{{:id}}/ampliacion/plazo"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;<spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
                     {{/if}}
                     </ul>
                 </div>

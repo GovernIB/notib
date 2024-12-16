@@ -13,6 +13,7 @@ import es.caib.notib.logic.helper.plugin.UnitatsOrganitzativesPluginHelper;
 import es.caib.notib.logic.helper.plugin.ValidaSignaturaPluginHelper;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.InteresadoWsDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
@@ -104,6 +105,14 @@ public class PluginHelper {
 	// REGISTRE
 	// /////////////////////////////////////////////////////////////////////////////////////
 
+	public boolean diagnosticarRegistre(Map<String, IntegracioDiagnostic> diagnostics) {
+		try {
+			return registrePluginHelper.diagnosticar(diagnostics);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public RespostaConsultaRegistre crearAsientoRegistral(String codiDir3Entitat, AsientoRegistralBeanDto arb, Long tipusOperacio, Long notificacioId, String enviamentIds, boolean generarJustificant) {
 		return registrePluginHelper.crearAsientoRegistral(codiDir3Entitat, arb, tipusOperacio, notificacioId, enviamentIds, generarJustificant);
 	}
@@ -178,7 +187,15 @@ public class PluginHelper {
 
 	// USUARIS
 	// /////////////////////////////////////////////////////////////////////////////////////
-	
+
+	public boolean diagnosticarDadesUsuaris(Map<String, IntegracioDiagnostic> diagnostics) {
+		try {
+			return dadesUsuarisPluginHelper.diagnosticar(diagnostics);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public List<String> consultarRolsAmbCodi(String usuariCodi) {
 		return dadesUsuarisPluginHelper.consultarRolsAmbCodi(usuariCodi);
 	}
@@ -193,7 +210,15 @@ public class PluginHelper {
 
 	// ARXIU 
 	// /////////////////////////////////////////////////////////////////////////////////////
-	
+
+	public boolean diagnosticarArxiu(Map<String, IntegracioDiagnostic> diagnostics) {
+		try {
+			return arxiuPluginHelper.diagnosticar(diagnostics);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public Document arxiuDocumentConsultar(String arxiuUuid, String versio, boolean isUuid) {
 		return arxiuDocumentConsultar(arxiuUuid, versio, false, isUuid);
 	}
@@ -210,6 +235,13 @@ public class PluginHelper {
 	// GESTOR DOCUMENTAL
 	// /////////////////////////////////////////////////////////////////////////////////////
 
+	public boolean diagnosticarGestorDocumental(Map<String, IntegracioDiagnostic> diagnostics) {
+		try {
+			return gestioDocumentalPluginHelper.diagnosticar(diagnostics);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 	public String gestioDocumentalCreate(String agrupacio, byte[] contingut) {
 		return gestioDocumentalPluginHelper.gestioDocumentalCreate(agrupacio, contingut);
 	}
@@ -232,7 +264,16 @@ public class PluginHelper {
 
 	// GESTOR CONTINGUTS ADMINISTRATIU (ROLSAC)
 	// /////////////////////////////////////////////////////////////////////////////////////
-	
+
+	public boolean diagnosticarGestorDocumentalAdministratiu(Map<String, IntegracioDiagnostic> diagnostics) {
+		try {
+
+			return gestorDocumentalAdministratiuPluginHelper.diagnosticar(diagnostics);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public List<ProcSerDto> getProcedimentsGda() {
 		return gestorDocumentalAdministratiuPluginHelper.getProcedimentsGda();
 	}
@@ -267,6 +308,14 @@ public class PluginHelper {
 	
 	// UNITATS ORGANITZATIVES
 	// /////////////////////////////////////////////////////////////////////////////////////
+
+	public boolean diagnosticarUnitats(Map<String, IntegracioDiagnostic> diagnostics) {
+		try {
+			return unitatsOrganitzativesPluginHelper.diagnosticar(diagnostics);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	public Map<String, NodeDir3> getOrganigramaPerEntitat(String codiDir3Entitat) throws SistemaExternException {
 		return unitatsOrganitzativesPluginHelper.getOrganigramaPerEntitat(codiDir3Entitat);
@@ -353,6 +402,14 @@ public class PluginHelper {
 	// FIRMA EN SERVIDOR
 	// /////////////////////////////////////////////////////////////////////////////////////
 
+	public boolean diagnosticarFirmaEnServidor(Map<String, IntegracioDiagnostic> diagnostics) {
+		try {
+			return firmaPluginHelper.diagnosticar(diagnostics);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public byte[] firmaServidorFirmar(NotificacioEntity notificacio, FitxerDto fitxer, TipusFirma tipusFirma, String motiu, String idioma) {
 		return firmaPluginHelper.firmaServidorFirmar(notificacio, fitxer, tipusFirma, motiu, idioma);
 	}
@@ -361,12 +418,24 @@ public class PluginHelper {
 	// VALIDACIÓ DE FIRMES
 	// /////////////////////////////////////////////////////////////////////////////////////
 
+	public boolean diagnosticarValidacioFirmes(Map<String, IntegracioDiagnostic> diagnostics) {
+		try {
+			return validaSignaturaPluginHelper.diagnosticar(diagnostics);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public SignatureInfoDto detectSignedAttachedUsingValidateSignaturePlugin(byte[] documentContingut, String nom, String firmaContentType) {
 		return validaSignaturaPluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(documentContingut, nom, firmaContentType);
 	}
 
 	// CARPETA
 	// /////////////////////////////////////////////////////////////////////////////////////
+
+	public boolean diagnosticarCarpeta(Map<String, IntegracioDiagnostic> diagnostics) {
+		return carpetaPluginHelper.diagnosticar(diagnostics);
+	}
 
 	public void enviarNotificacioMobil(NotificacioEnviamentEntity e) {
 		carpetaPluginHelper.enviarNotificacioMobil(e);

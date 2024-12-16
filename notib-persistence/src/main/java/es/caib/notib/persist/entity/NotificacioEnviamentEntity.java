@@ -101,6 +101,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "notifica_datcad")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaDataCaducitat;
+
+	@Column(name = "plazo_ampliado")
+	protected boolean plazoAmpliado;
 	
 	@Column(name = "notifica_emi_dir3codi", length = 9)
 	protected String notificaEmisorDir3;

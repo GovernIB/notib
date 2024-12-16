@@ -4,6 +4,8 @@
 package es.caib.notib.logic.intf.ws.notificacio;
 
 import es.caib.notib.client.domini.*;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 
 import javax.jws.WebParam;
@@ -88,4 +90,6 @@ public interface NotificacioServiceWsV2 {
 	 */
 	RespostaConsultaJustificantEnviament consultaJustificantEnviament(@WebParam(name="identificador") @XmlElement(required = true) String identificador);
 
+
+	RespuestaAmpliarPlazoOE ampliarPlazo(AmpliarPlazoOE ampliarPlazo);
 }

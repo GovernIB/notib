@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.*;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.CacheHelper;
@@ -30,7 +32,7 @@ import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.DocumentValidDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
@@ -152,8 +154,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private EnviamentTableHelper enviamentTableHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
-//	@Autowired
-//	private RegistreNotificaHelper registreNotificaHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired
@@ -313,7 +313,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
  			notificacioValidator.validate();
 			if (errors.hasErrors()) {
 				String errorDescripcio = errors.getAllErrors().stream().map(e -> e.getCode()).collect(Collectors.joining(", "));
-				integracioHelper.addAccioError(info, resposta.getErrorDescripcio());
+				integracioHelper.addAccioError(info, errorDescripcio);
 				log.debug(">> [ALTA] validacio: [errors=" + errorDescripcio + "]");
 				return setRespostaError(errorDescripcio);
 			}
@@ -384,7 +384,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 	private IntegracioInfo generateInfoAlta(Notificacio notificacio, Long entitatId) {
 
-		IntegracioInfo info = new IntegracioInfo(IntegracioCodiEnum.CALLBACK, "Alta de notificació", IntegracioAccioTipusEnumDto.RECEPCIO);
+		IntegracioInfo info = new IntegracioInfo(IntegracioCodi.CALLBACK, "Alta de notificació", IntegracioAccioTipusEnumDto.RECEPCIO);
 
 		ObjectMapper mapper  = new ObjectMapper();
 		Map<String, Object> notificaAtributMap = new HashMap<>();
@@ -441,13 +441,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consultant estat notificacio amb identificador: " + identificador);
-			var info = new IntegracioInfo(IntegracioCodiEnum.CALLBACK, "Consulta de l'estat d'una notificació", IntegracioAccioTipusEnumDto.RECEPCIO, new AccioParam("Identificador xifrat de la notificacio", identificador));
+			var info = new IntegracioInfo(IntegracioCodi.CALLBACK, "Consulta de l'estat d'una notificació", IntegracioAccioTipusEnumDto.RECEPCIO, new AccioParam("Identificador xifrat de la notificacio", identificador));
 			var resposta = RespostaConsultaEstatNotificacioV2.builder().identificador(identificador).build();
 			try {
 				var notificacio = getNotificacioByIdentificador(identificador, resposta, info);
 				if (notificacio == null) {
 					return resposta;
 				}
+				info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
 				resposta.setEstat(toNotificacioEstat(notificacio.getEstat()));
 				resposta.setTipus(notificacio.getEnviamentTipus().name());
 				resposta.setEmisorDir3(notificacio.getEmisorDir3Codi());
@@ -486,14 +487,19 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 		switch (estat) {
 			case PENDENT:
+			case ENVIANT:
 				return NotificacioEstatEnum.PENDENT;
 			case ENVIADA:
+			case ENVIAT_SIR:
 				return NotificacioEstatEnum.ENVIADA;
 			case ENVIADA_AMB_ERRORS:
 				return NotificacioEstatEnum.ENVIADA_AMB_ERRORS;
 			case REGISTRADA:
 				return NotificacioEstatEnum.REGISTRADA;
 			case FINALITZADA:
+			case EXPIRADA:
+			case NOTIFICADA:
+			case REBUTJADA:
 				return NotificacioEstatEnum.FINALITZADA;
 			case FINALITZADA_AMB_ERRORS:
 				return NotificacioEstatEnum.FINALITZADA_AMB_ERRORS;
@@ -501,6 +507,33 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				return NotificacioEstatEnum.PROCESSADA;
 			default:
 				return null;
+
+//			case PENDENT:
+//				return NotificacioEstatEnum.PENDENT;
+//			case ENVIADA:
+//				return NotificacioEstatEnum.ENVIADA;
+//			case REGISTRADA:
+//				return NotificacioEstatEnum.REGISTRADA;
+//			case FINALITZADA:
+//				return NotificacioEstatEnum.FINALITZADA;
+//			case PROCESSADA:
+//				return NotificacioEstatEnum.PROCESSADA;
+//			case EXPIRADA:
+//				return NotificacioEstatEnum.EXPIRADA;
+//			case NOTIFICADA:
+//				return NotificacioEstatEnum.NOTIFICADA;
+//			case REBUTJADA:
+//				return NotificacioEstatEnum.REBUTJADA;
+//			case ENVIAT_SIR:
+//				return NotificacioEstatEnum.ENVIAT_SIR;
+//			case ENVIADA_AMB_ERRORS:
+//				return NotificacioEstatEnum.ENVIADA_AMB_ERRORS;
+//			case FINALITZADA_AMB_ERRORS:
+//				return NotificacioEstatEnum.FINALITZADA_AMB_ERRORS;
+//			case ENVIANT:
+//				return NotificacioEstatEnum.ENVIANT;
+//			default:
+//				return null;
 		}
 	}
 
@@ -534,7 +567,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consultant estat enviament amb referencia: " + referencia);
-			IntegracioInfo info = new IntegracioInfo(IntegracioCodiEnum.CALLBACK,"Consulta de l'estat d'un enviament", IntegracioAccioTipusEnumDto.RECEPCIO);
+			IntegracioInfo info = new IntegracioInfo(IntegracioCodi.CALLBACK,"Consulta de l'estat d'un enviament", IntegracioAccioTipusEnumDto.RECEPCIO);
 			RespostaConsultaEstatEnviamentV2 resposta = RespostaConsultaEstatEnviamentV2.builder().referencia(referencia).build();
 
 			try {
@@ -774,7 +807,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			}
 
 			IntegracioInfo info = new IntegracioInfo(
-					IntegracioCodiEnum.CALLBACK,
+					IntegracioCodi.CALLBACK,
 					"Consulta de les dades de registre",
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					new AccioParam("Dades de la consulta", json));
@@ -868,12 +901,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 	@Override
 	@Transactional(readOnly = true)
-	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(
-			String identificador) {
+	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(String identificador) {
+
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			IntegracioInfo info = new IntegracioInfo(
-					IntegracioCodiEnum.CALLBACK,
+					IntegracioCodi.CALLBACK,
 					"Consulta de la justificació d'una notificació",
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					new AccioParam("Identificador xifrat de la notificacio", identificador));
@@ -919,6 +952,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		}
 	}
 
+	@Override
+	public RespuestaAmpliarPlazoOE ampliarPlazo(AmpliarPlazoOE ampliarPlazo) {
+		return notificaHelper.ampliarPlazoOE(ampliarPlazo);
+	}
+
 
 	// Donar permís de consulta sobre procediment
 	// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -937,7 +975,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			}
 
 			IntegracioInfo info = new IntegracioInfo(
-					IntegracioCodiEnum.CALLBACK,
+					IntegracioCodi.CALLBACK,
 					"Donar permis de consulta",
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					new AccioParam("Permís", json));
@@ -1016,7 +1054,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			resposta.setErrorData(new Date());
 			resposta.setErrorDescripcio(errorDesc);
 			integracioHelper.addAplicacioAccioParam(info, null);
-			integracioHelper.addAccioError(info, errorDesc, t);
+			integracioHelper.addAccioWarn(info, errorDesc, t);
 		} else {
 			ConfigHelper.setEntitatCodi(notificacio.getEntitat().getCodi());
 			integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
@@ -1049,7 +1087,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			resposta.setErrorData(new Date());
 			resposta.setErrorDescripcio(errorDesc);
 			integracioHelper.addAplicacioAccioParam(info, null);
-			integracioHelper.addAccioError(info, errorDesc, t);
+			integracioHelper.addAccioWarn(info, errorDesc, t);
 			return enviament;
 		}
 		var isEstatFinal = EnviamentEstat.EXPIRADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.REBUTJADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat());

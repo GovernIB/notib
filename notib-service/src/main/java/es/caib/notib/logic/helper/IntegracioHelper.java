@@ -3,7 +3,7 @@ package es.caib.notib.logic.helper;
 import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioEntity;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioParamEntity;
@@ -35,6 +35,9 @@ public class IntegracioHelper {
 	private final MonitorIntegracioParamRepository monitorParamRepository;
 	private final CacheHelper cacheHelper;
 
+
+	private static final String APLICACIO_WEB = "Interficie web";
+
     public IntegracioHelper(AplicacioRepository aplicacioRepository, MonitorIntegracioRepository monitorRepository, MonitorIntegracioParamRepository monitorParamRepository, @Lazy CacheHelper cacheHelper) {
         this.aplicacioRepository = aplicacioRepository;
         this.monitorRepository = monitorRepository;
@@ -43,10 +46,10 @@ public class IntegracioHelper {
     }
 
 
-    public Map<IntegracioCodiEnum, Integer> countErrorsGroupByCodi() {
+    public Map<IntegracioCodi, Integer> countErrorsGroupByCodi() {
 
-		Map<IntegracioCodiEnum ,Integer> errorsGroupByCodi = new HashMap<>();
-		IntegracioCodiEnum.stream().forEach(codi -> errorsGroupByCodi.put(codi, countErrors(codi)));
+		Map<IntegracioCodi,Integer> errorsGroupByCodi = new HashMap<>();
+		IntegracioCodi.stream().forEach(codi -> errorsGroupByCodi.put(codi, countErrors(codi)));
 		return errorsGroupByCodi;
 	}
 
@@ -135,7 +138,7 @@ public class IntegracioHelper {
 		}
 	}
 
-	private Integer countErrors(IntegracioCodiEnum codi) {
+	private Integer countErrors(IntegracioCodi codi) {
 		return monitorRepository.countByCodiAndEstat(codi, IntegracioAccioEstatEnumDto.ERROR);
 	}
 
@@ -155,10 +158,11 @@ public class IntegracioHelper {
 		if (accio.getParametres() == null) {
 			accio.setParametres(new ArrayList<>());
 		}
-		accio.getParametres().add(MonitorIntegracioParamEntity.builder().monitorIntegracio(accio).codi("Usuari").valor(getUsuariNomCodi(obtenirUsuari)).build());
+
+		accio.getParametres().add(MonitorIntegracioParamEntity.builder().monitorIntegracio(accio).codi("Usuari").valor(getUsuariNomCodi(accio, obtenirUsuari)).build());
 	}
 
-	private String getUsuariNomCodi(boolean obtenirUsuari) {
+	private String getUsuariNomCodi(MonitorIntegracioEntity accio, boolean obtenirUsuari) {
 
 		var auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth == null || Strings.isNullOrEmpty(auth.getName())) {
@@ -173,6 +177,9 @@ public class IntegracioHelper {
 			if (usuari == null) {
 				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari " + auth.getName() + " no trobat a la bbdd");
 				return usuariNomCodi;
+			}
+			if (!Strings.isNullOrEmpty(accio.getAplicacio())) {
+				return usuari.getNomSencer() + " (" + usuari.getCodi() + ")";
 			}
 			return usuari.getNomSencer() + " (" + usuari.getCodi() + ")";
 		} catch (Exception ex) {

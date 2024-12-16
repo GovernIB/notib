@@ -93,9 +93,14 @@
     <script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<script src="<c:url value="/js/formEnviament.js"/>"></script>
 	<script src="<c:url value="/js/bootbox.all.min.js"/>"></script>
+	<script type="application/javascript" src="<c:url value="/js/dragAndDrop.js"/>"></script>
 <style type="text/css">
 .help-block {
 	font-size: x-small;
+}
+
+.dropHighlight {
+	opacity: 0.5;
 }
 #entregaPostal .help-block {
 /* 	font-size: 8px; */
@@ -248,6 +253,23 @@
 	display: none;
 	margin-top:15px;
 }
+
+
+.drag_activated {
+
+	font-size:3em;
+	border: 4px dashed #ffd351;
+	height: 200px;
+	width: 100%;
+	background-color: #f5f5f5;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	mask-image: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+	-webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+}
+
 .highlight {background-color: #de7b7b; color: black; padding:1px 2px;}
 </style>
 </head>
@@ -505,8 +527,8 @@
 				let formData = new FormData();
 				formData.append('fitxer', fitxer, fitxer.name);
 				$file.prop("disabled", true);
-
 				let metadadesId = $file.closest(".row").next(".doc-metadades").prop("id");
+				metadadesId = !metadadesId ? $file.closest(".row")[0].querySelector(".doc-metadades").id : metadadesId;
 				let id = metadadesId.charAt(metadadesId.length - 1);
 
 				$file.closest(".fileinput").next(".validating-block").remove();
@@ -2002,76 +2024,82 @@
 
 			<!-- DOCUMENT -->
 			<div class="container-fluid">
-				<div class="title">
-					<span class="fa fa-file"></span>
-					<label><spring:message code="notificacio.form.titol.document" /></label>
-					<hr/>
-				</div>
+				<div id="document1" class="dropzone" ondrop="dropHandler(event, 'arxiu[0]');" ondragover="dragOverHandler(event);" ondragleave="removeHighlight(event)" ondragenter="highlight(event)">
+					<div class="title">
+						<span class="fa fa-file"></span>
+						<label><spring:message code="notificacio.form.titol.document" /></label>
+						<hr/>
+					</div>
 
-				<!-- TIPUS DE DOCUMENT -->
-				<div class="row">
-					<div class="col-md-6">
-						<div class="form-group">
-							<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
-							<form:hidden path="tipusDocumentSelected[0]" id="tipusDocumentSelected_0" value="${tipusDocument[0]}"/>
-							<div class="controls col-xs-8">
-								<form:hidden path="tipusDocumentDefault[0]"/>
-								<select id="tipusDocument_0" name="tipusDocument[0]" class="customSelect tipusDocument">
-								<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
-									<option value="${enumValue}" <c:if test="${not empty tipusDocument[0] && tipusDocument[0] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
-								</c:forEach>
-								</select>
+					<!-- TIPUS DE DOCUMENT -->
+					<div class="row">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
+								<form:hidden path="tipusDocumentSelected[0]" id="tipusDocumentSelected_0" value="${tipusDocument[0]}"/>
+								<div class="controls col-xs-8">
+									<form:hidden path="tipusDocumentDefault[0]"/>
+									<select id="tipusDocument_0" name="tipusDocument[0]" class="customSelect tipusDocument">
+									<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
+										<option value="${enumValue}" <c:if test="${not empty tipusDocument[0] && tipusDocument[0] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
+									</c:forEach>
+									</select>
+								</div>
 							</div>
 						</div>
-					</div>
-					<input type="hidden" name="documents[0].id" value="${notificacioCommand.documents[0].id}">
-					<input type="hidden" name="documents[0].arxiuGestdocId" value="${notificacioCommand.documents[0].arxiuGestdocId}">
-					<input type="hidden" name="documents[0].arxiuNom" value="${notificacioCommand.documents[0].arxiuNom}">
-					<input type="hidden" name="documents[0].mediaType" value="${notificacioCommand.documents[0].mediaType}">
-					<input type="hidden" name="documents[0].mida" value="${notificacioCommand.documents[0].mida}">
-					<!-- CSV -->
-					<div id="input-origen-csv_0" class="col-md-6">
-						<not:inputText name="documentArxiuCsv[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
-					</div>
+						<input type="hidden" name="documents[0].id" value="${notificacioCommand.documents[0].id}">
+						<input type="hidden" name="documents[0].arxiuGestdocId" value="${notificacioCommand.documents[0].arxiuGestdocId}">
+						<input type="hidden" name="documents[0].arxiuNom" value="${notificacioCommand.documents[0].arxiuNom}">
+						<input type="hidden" name="documents[0].mediaType" value="${notificacioCommand.documents[0].mediaType}">
+						<input type="hidden" name="documents[0].mida" value="${notificacioCommand.documents[0].mida}">
+						<!-- CSV -->
+						<div id="input-origen-csv_0" class="col-md-6">
+							<not:inputText name="documentArxiuCsv[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
+						</div>
 
-					<!-- UUID -->
-					<div id="input-origen-uuid_0" class="col-md-6 hidden">
-						<not:inputText name="documentArxiuUuid[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
-					</div>
+						<!-- UUID -->
+						<div id="input-origen-uuid_0" class="col-md-6 hidden">
+							<not:inputText name="documentArxiuUuid[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" messageInfoArgs="${maxFileSize},${maxFilesSize}"/>
+						</div>
 
-					<!-- FITXER -->
-					<div id="input-origen-arxiu_0" class="col-md-6 hidden">
-						<c:choose>
-							<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
-								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" messageArgs="${maxFileSize},${maxFilesSize}" fileName="test"/>
-							</c:when>
-							<c:otherwise>
-								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" messageArgs="${maxFileSize},${maxFilesSize}" fileName="${nomDocument_0}"/>
-							</c:otherwise>
-						</c:choose>
+						<!-- FITXER -->
+						<div id="input-origen-arxiu_0" class="col-md-6 hidden">
+							<c:choose>
+								<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
+									<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" messageArgs="${maxFileSize},${maxFilesSize}" fileName="test"/>
+								</c:when>
+								<c:otherwise>
+									<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageKey="${documentAvisKey}" messageArgs="${maxFileSize},${maxFilesSize}" fileName="${nomDocument_0}"/>
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</div>
+					<div id="metadades_0" class="row doc-metadades hidden">
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputSelect name="documents[0].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						</div>
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputSelect name="documents[0].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						</div>
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputSelect name="documents[0].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4"
+											 optionItems="${tipusDocumentals}" optionMinimumResultsForSearch="2"
+											 optionValueAttribute="value" optionTextKeyAttribute="text" />
+						</div>
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputCheckbox name="documents[0].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+						</div>
+						<div id="drag-area" class="drag_activated">
+							<span class="down fa fa-upload"></span>
+							<p><spring:message code="notificacio.form.drag.info" /></p>
+						</div>
+						<hr/>
 					</div>
 				</div>
-				<div id="metadades_0" class="row doc-metadades hidden">
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[0].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-					</div>
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[0].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-					</div>
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[0].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4"
-										 optionItems="${tipusDocumentals}" optionMinimumResultsForSearch="2"
-										 optionValueAttribute="value" optionTextKeyAttribute="text" />
-					</div>
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputCheckbox name="documents[0].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
-					</div>
-					<hr/>
-				</div>
-
 				<div id="docs-addicionals"<c:if test="${enviamentTipus != 'SIR'}"> class="hidden"</c:if>>
 					<!-- DOCUMENT 2 -->
-					<div id="document2" class="row hidden">
+<%--					<div id="document2" class="row hidden">--%>
+					<div id="document2" class="row hidden dropzone" ondrop="dropHandler(event, 'arxiu[1]');" ondragover="dragOverHandler(event);" ondragleave="removeHighlight(event)" ondragenter="highlight(event)">
 						<div class="col-md-6">
 							<div class="form-group">
 								<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
@@ -2113,24 +2141,24 @@
 								</c:otherwise>
 							</c:choose>
 						</div>
-					</div>
-					<div id="metadades_1" class="row doc-metadades hidden">
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputSelect name="documents[1].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						<div id="metadades_1" class="row doc-metadades hidden">
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputSelect name="documents[1].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+							</div>
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputSelect name="documents[1].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+							</div>
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputSelect name="documents[1].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+							</div>
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputCheckbox name="documents[1].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+							</div>
+							<hr/>
 						</div>
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputSelect name="documents[1].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-						</div>
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputSelect name="documents[1].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-						</div>
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputCheckbox name="documents[1].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
-						</div>
-						<hr/>
 					</div>
 					<!-- DOCUMENT 3 -->
-					<div id="document3" class="row hidden">
+					<div id="document3" class="row hidden" ondrop="dropHandler(event, 'arxiu[2]');" ondragover="dragOverHandler(event);" ondragleave="removeHighlight(event)" ondragenter="highlight(event)">
 						<div class="col-md-6">
 							<div class="form-group">
 								<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
@@ -2172,26 +2200,26 @@
 								</c:otherwise>
 							</c:choose>
 						</div>
-					</div>
-					<div id="metadades_2" class="row doc-metadades hidden">
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputSelect name="documents[2].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						<div id="metadades_2" class="row doc-metadades hidden">
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputSelect name="documents[2].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+							</div>
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputSelect name="documents[2].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+							</div>
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputSelect name="documents[2].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4"
+												 optionItems="${tipusDocumentals}" optionMinimumResultsForSearch="2"
+												 optionValueAttribute="value" optionTextKeyAttribute="text" />
+							</div>
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputCheckbox name="documents[2].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+							</div>
+							<hr/>
 						</div>
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputSelect name="documents[2].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-						</div>
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputSelect name="documents[2].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4"
-											 optionItems="${tipusDocumentals}" optionMinimumResultsForSearch="2"
-											 optionValueAttribute="value" optionTextKeyAttribute="text" />
-						</div>
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputCheckbox name="documents[2].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
-						</div>
-						<hr/>
 					</div>
 					<!-- DOCUMENT 4 -->
-					<div id="document4" class="row hidden">
+					<div id="document4" class="row hidden" ondrop="dropHandler(event, 'arxiu[3]');" ondragover="dragOverHandler(event);" ondragleave="removeHighlight(event)" ondragenter="highlight(event)">
 						<div class="col-md-6">
 							<div class="form-group">
 								<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
@@ -2233,24 +2261,24 @@
 								</c:otherwise>
 							</c:choose>
 						</div>
-					</div>
-					<div id="metadades_3" class="row doc-metadades hidden">
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputSelect name="documents[3].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						<div id="metadades_3" class="row doc-metadades hidden">
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputSelect name="documents[3].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+							</div>
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputSelect name="documents[3].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+							</div>
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputSelect name="documents[3].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+							</div>
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputCheckbox name="documents[3].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+							</div>
+							<hr/>
 						</div>
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputSelect name="documents[3].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-						</div>
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputSelect name="documents[3].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-						</div>
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputCheckbox name="documents[3].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
-						</div>
-						<hr/>
 					</div>
 					<!-- DOCUMENT 5 -->
-					<div id="document5" class="row hidden">
+					<div id="document5" class="row hidden" ondrop="dropHandler(event, 'arxiu[4]');" ondragover="dragOverHandler(event);" ondragleave="removeHighlight(event)" ondragenter="highlight(event)">
 						<div class="col-md-6">
 							<div class="form-group">
 								<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
@@ -2291,21 +2319,21 @@
 								</c:otherwise>
 							</c:choose>
 						</div>
-					</div>
-					<div id="metadades_4" class="row doc-metadades hidden">
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputSelect name="documents[4].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						<div id="metadades_4" class="row doc-metadades hidden">
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputSelect name="documents[4].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+							</div>
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputSelect name="documents[4].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+							</div>
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputSelect name="documents[4].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+							</div>
+							<div class="col-md-4 col-md-offset-2">
+								<not:inputCheckbox name="documents[4].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+							</div>
+							<hr/>
 						</div>
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputSelect name="documents[4].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-						</div>
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputSelect name="documents[4].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-						</div>
-						<div class="col-md-4 col-md-offset-2">
-							<not:inputCheckbox name="documents[4].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
-						</div>
-						<hr/>
 					</div>
 				</div>
 

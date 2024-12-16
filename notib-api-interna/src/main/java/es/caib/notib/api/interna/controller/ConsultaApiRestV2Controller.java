@@ -44,6 +44,26 @@ public class ConsultaApiRestV2Controller  extends NotificacioApiRestBaseControll
 
 	private static final String PATH = "/consulta/v2";
 
+	@GetMapping(value="/enviaments/{dniTitular}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public RespostaConsultaV2 enviamnetsByTitular(
+			HttpServletRequest request,
+			@PathVariable String dniTitular,
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
+			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
+			@RequestParam (value = "lang", required = false) Idioma lang,
+			@RequestParam(value = "pagina", required = false) Integer pagina,
+			@RequestParam(value = "mida", required = false) Integer mida) {
+
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
+		var basePath = location.toString();
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).estatFinal(null).basePath(basePath)
+				.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
+				.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
+		return enviamentService.findEnviamentsV2(consulta);
+	}
+
+
 	@GetMapping(value="/comunicacions/{dniTitular}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaV2 comunicacionsByTitular(
 			HttpServletRequest request,
@@ -79,6 +99,29 @@ public class ConsultaApiRestV2Controller  extends NotificacioApiRestBaseControll
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(null).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
+		try {
+			return enviamentService.findEnviamentsV2(consulta);
+		} catch (Exception e) {
+			return RespostaConsultaV2.builder().error(true).errorDescripcio(e.getMessage()).errorData(new Date()).build();
+		}
+	}
+
+	@GetMapping(value="/enviaments/{dniTitular}/pendents", produces = MediaType.APPLICATION_JSON_VALUE)
+	public RespostaConsultaV2 enviamentsPendentsByTitular(
+			HttpServletRequest request,
+			@PathVariable String dniTitular,
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
+			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
+			@RequestParam (value = "lang", required = false) Idioma lang,
+			@RequestParam(value = "pagina", required = false) Integer pagina,
+			@RequestParam(value = "mida", required = false) Integer mida) {
+
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
+		var basePath = location.toString();
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).estatFinal(false).basePath(basePath)
+				.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
+				.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
 		try {
 			return enviamentService.findEnviamentsV2(consulta);
 		} catch (Exception e) {
@@ -125,6 +168,29 @@ public class ConsultaApiRestV2Controller  extends NotificacioApiRestBaseControll
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(false).basePath(basePath)
 								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
+		try {
+			return enviamentService.findEnviamentsV2(consulta);
+		} catch (Exception e) {
+			return RespostaConsultaV2.builder().error(true).errorDescripcio(e.getMessage()).errorData(new Date()).build();
+		}
+	}
+
+	@GetMapping(value="/enviaments/{dniTitular}/llegides", produces = MediaType.APPLICATION_JSON_VALUE)
+	public RespostaConsultaV2 enviamentsLlegitsByTitular(
+			HttpServletRequest request,
+			@PathVariable String dniTitular,
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
+			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
+			@RequestParam (value = "lang", required = false) Idioma lang,
+			@RequestParam(value = "pagina", required = false) Integer pagina,
+			@RequestParam(value = "mida", required = false) Integer mida) {
+
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
+		var basePath = location.toString();
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(true).basePath(basePath)
+				.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
+				.visibleCarpeta(visibleCarpeta == null || visibleCarpeta).build();
 		try {
 			return enviamentService.findEnviamentsV2(consulta);
 		} catch (Exception e) {

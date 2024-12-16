@@ -62,6 +62,7 @@ public class NotificacioTableHelper {
                     .usuariCodi(notificacio.getUsuariCodi())
                     .grupCodi(notificacio.getGrupCodi())
                     .tipusUsuari(notificacio.getTipusUsuari())
+                    .caducitat(notificacio.getCaducitat())
                     .notificaErrorData(null)
                     .notificaErrorDescripcio(null)
                     .enviamentTipus(notificacio.getEnviamentTipus())
@@ -194,7 +195,7 @@ public class NotificacioTableHelper {
                     if ((estatMask & e.getNotificacio().getEstat().getMask()) == 0) {
                         estatMask += e.getNotificacio().getEstat().getMask();
                     }
-                    if (EnumUtils.isValidEnum(NotificacioEstatEnumDto.class, e.getNotificaEstat().name())) {
+                    if (EnumUtils.isValidEnum(NotificacioEstatEnumDto.class, e.getNotificaEstat().name()) && estatMask != 8 && estatMask != 16) {
                         NotificacioEstatEnumDto eventEstat = NotificacioEstatEnumDto.valueOf(e.getNotificaEstat().name());
                         if ((estatMask & eventEstat.getMask()) == 0) {
                             estatMask += eventEstat.getMask();
@@ -223,6 +224,7 @@ public class NotificacioTableHelper {
 
             tableViewItem.setEnviamentTipus(notificacio.getEnviamentTipus());
             tableViewItem.setNumExpedient(notificacio.getNumExpedient());
+            tableViewItem.setCaducitat(notificacio.getCaducitat());
             tableViewItem.setConcepte(notificacio.getConcepte());
             tableViewItem.setEstat(notificacio.getEstat());
             tableViewItem.setEstatDate(notificacio.getEstatDate());

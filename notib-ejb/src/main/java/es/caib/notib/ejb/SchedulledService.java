@@ -78,4 +78,9 @@ public class SchedulledService extends AbstractService<es.caib.notib.logic.intf.
 		getDelegateService().comprimirDocumentsAntics();
 	}
 
+	@Override
+	public void evictCachePaisosProvincies() {
+		getDelegateService().evictCachePaisosProvincies();
+	}
+
 }

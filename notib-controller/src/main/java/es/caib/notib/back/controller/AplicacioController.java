@@ -157,6 +157,21 @@ public class AplicacioController extends BaseController {
 		return getAjaxControllerReturnValueSuccess(request, REDIRECT, "aplicacio.controller.desactivada.ok");
 	}
 
+	@GetMapping(value = "/{aplicacioId}/provar")
+	public String provar(HttpServletRequest request, @PathVariable Long aplicacioId) {
+
+		return usuariAplicacioService.provarAplicacio(aplicacioId) ? getAjaxControllerReturnValueSuccess(request, REDIRECT, "aplicacio.controller.provar.ok")
+				: getAjaxControllerReturnValueError(request, REDIRECT, "aplicacio.controller.provar.ko");
+	}
+
+	@ResponseBody
+	@GetMapping(value = "/{aplicacioId}/provar/ajax")
+	public String provarAjax(HttpServletRequest request, @PathVariable Long aplicacioId) {
+
+		return usuariAplicacioService.provarAplicacio(aplicacioId) ? getMessage(request, "aplicacio.controller.provar.ok")
+				: getMessage(request, "aplicacio.controller.provar.ko");
+	}
+
 	private AplicacioFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
 		var command = (AplicacioFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, APLICACIO_FILTRE);

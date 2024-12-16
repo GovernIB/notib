@@ -3,7 +3,12 @@
  */
 package es.caib.notib.logic.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
@@ -21,7 +26,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Helper per a interactuar amb el servei web de Notific@.
@@ -46,6 +55,8 @@ public class NotificaHelper {
 
 	public static final String CUA_SINCRONIZAR_ENVIO_OE = "qu_sincronizar_envio_oe";
 	public static final String JMS_FACTORY_ACK = "jmsFactory";
+    @Autowired
+    private MessageHelper messageHelper;
 
 
 	public NotificacioEntity notificacioEnviar(Long notificacioId) {
@@ -88,6 +99,94 @@ public class NotificaHelper {
 					m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));
 					return m;
 				});
+	}
+
+	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo) {
+
+		if (ampliarPlazo.getEnvios() == null) {
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta(messageHelper.getMessage("ampliar.plazo.enviaments.not.null")).build();
+		}
+		if (ampliarPlazo.getEnvios().getIdentificador().size() > 100) {
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta(messageHelper.getMessage("ampliar.plazo.max.enviaments")).build();
+		}
+		if (Strings.isNullOrEmpty(ampliarPlazo.getMotivo())) {
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta(messageHelper.getMessage("ampliar.plazo.motiu.null")).build();
+		}
+		if (ampliarPlazo.getPlazo() <= 0) {
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta(messageHelper.getMessage("ampliar.plazo.plazo.major.zero")).build();
+		}
+		var ids = ampliarPlazo.getEnvios().getIdentificador();
+		var enviaments = enviamentRepository.findByNotificaReferenciaIn(ids);
+		if (ids.size() != enviaments.size()) {
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta(messageHelper.getMessage("ampliar.plazo.identificadors.no.valids")).build();
+		}
+		var organsIguals = true;
+		var entregaPostal = false;
+		var estatPendent = true;
+		NotificacioEnviamentEntity enviament;
+		Map<String, List<NotificacioEnviamentEntity>> enviamensNotifica = new HashMap<>();
+		Map<String, List<String>> organs = new HashMap<>();
+		String organ;
+		for (var i = 0; i < enviaments.size(); i++) {
+			enviament = enviaments.get(i);
+			entregaPostal = entregaPostal || enviament.getEntregaPostal() != null;
+			estatPendent = estatPendent && EnviamentEstat.PENDENT.equals(enviament.getNotificaEstat());
+//			if (i != 0) {
+//				organsIguals = organsIguals && enviament.getNotificacio().getOrganGestor().getCodi().equals(enviaments.get(i-1).getNotificacio().getOrganGestor().getCodi());
+//			}
+			organ = enviament.getNotificacio().getOrganGestor().getCodi();
+			if (!organs.containsKey(organ)) {
+				organs.put(organ, new ArrayList<>());
+				enviamensNotifica.put(organ, new ArrayList<>());
+			}
+			organs.get(organ).add(enviament.getNotificaIdentificador());
+			enviamensNotifica.get(organ).add(enviament);
+		}
+		if (entregaPostal) {
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta(messageHelper.getMessage("ampliar.plazo.enviaments.entrega.postal")).build();
+		}
+//		if (!estatPendent) {
+//			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("Tots els enviaments han de tenir un estat pendent a Notific@").build();
+//		}
+//		if (!organsIguals) {
+//			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta("").build();
+//		}
+		List<RespuestaAmpliarPlazoOE> respostes = new ArrayList<>();
+		for (var key : organs.keySet()) {
+			ampliarPlazo.getEnvios().setIdentificador(organs.get(key));
+			respostes.add(getNotificaHelper().ampliarPlazoOE(ampliarPlazo, enviamensNotifica.get(key)));
+		}
+		return unificarRespostes(respostes);
+	}
+
+	private RespuestaAmpliarPlazoOE unificarRespostes(List<RespuestaAmpliarPlazoOE> respostes) {
+
+		boolean ok = true;
+		List<String> codis = new ArrayList<>();
+		List<String> descripcio = new ArrayList<>();
+		List<AmpliacionPlazo> ampliaciones = new ArrayList<>();
+		for (var resposta : respostes) {
+
+			ok = ok && "000".equals(resposta.getCodigoRespuesta());
+			codis.add(resposta.getCodigoRespuesta());
+			if (!ok) {
+				descripcio.add(resposta.getDescripcionRespuesta());
+			}
+			var ampliacion = resposta.getAmpliacionesPlazo();
+			if (ampliacion == null) {
+				continue;
+			}
+			for (var ampli : ampliacion.getAmpliacionPlazo()) {
+				ampliaciones.add(ampli);
+			}
+		}
+		var resposta = new RespuestaAmpliarPlazoOE();
+		resposta.setCodis(codis);
+		resposta.setDescripcions(descripcio);
+		var ampliacion = new AmpliacionesPlazo();
+		ampliacion.setAmpliacionPlazo(ampliaciones);
+		resposta.setAmpliacionesPlazo(ampliacion);
+		return resposta;
 	}
 
 	public String xifrarId(Long id) throws GeneralSecurityException {

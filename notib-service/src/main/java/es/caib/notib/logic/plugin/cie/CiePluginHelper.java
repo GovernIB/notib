@@ -9,7 +9,7 @@ import es.caib.notib.logic.helper.NotificacioEventHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDto;
@@ -78,10 +78,10 @@ public class CiePluginHelper {
 
         var notificacio = notificacioRepository.findByReferencia(notificacioReferencia);
         var codiDir3Entitat = notificacio.getEntitat().getDir3Codi();
-        var info = new IntegracioInfo(IntegracioCodiEnum.CIE, "Enviar entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
+        var info = new IntegracioInfo(IntegracioCodi.CIE, "Enviar entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
                 new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
                 new AccioParam("Notificacio", notificacio.getId() + ""));
-
+        info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
         var resposta = new RespostaCie();
         try {
             EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
@@ -196,10 +196,10 @@ public class CiePluginHelper {
             return false;
         }
         var codiDir3Entitat = enviament.getNotificacio().getEntitat().getDir3Codi();
-        var info = new IntegracioInfo(IntegracioCodiEnum.CIE, "Cancelar entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
+        var info = new IntegracioInfo(IntegracioCodi.CIE, "Cancelar entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
                 new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
                 new AccioParam("Enviament", enviament.getId() + ""));
-
+        info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getCreatedBy().get().getCodi());
         var resposta = new RespostaCie();
         try {
             EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
@@ -233,7 +233,7 @@ public class CiePluginHelper {
                 errorDescripcio += " :" + ex.getCause().getMessage();
             }
             resposta.setDescripcioError(errorDescripcio);
-            throw new SistemaExternException(IntegracioCodiEnum.CIE.name(), errorDescripcio, ex);
+            throw new SistemaExternException(IntegracioCodi.CIE.name(), errorDescripcio, ex);
         }
     }
 
@@ -260,10 +260,10 @@ public class CiePluginHelper {
             return null;
         }
         var codiDir3Entitat = enviament.getNotificacio().getEntitat().getDir3Codi();
-        var info = new IntegracioInfo(IntegracioCodiEnum.CIE, "Consulta estat entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
+        var info = new IntegracioInfo(IntegracioCodi.CIE, "Consulta estat entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
                 new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
                 new AccioParam("Enviament", enviament.getId() + ""));
-
+        info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getCreatedBy().get().getCodi());
         var infoCie = new InfoCie();
         try {
             EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
@@ -296,7 +296,7 @@ public class CiePluginHelper {
             }
             infoCie.setDescripcioResposta(errorDescripcio);
             notificacioEventHelper.addCieEventConsultaEstat(enviament, true, infoCie.getDescripcioResposta(), false);
-            throw new SistemaExternException(IntegracioCodiEnum.CIE.name(), errorDescripcio, ex);
+            throw new SistemaExternException(IntegracioCodi.CIE.name(), errorDescripcio, ex);
         }
     }
 
@@ -320,7 +320,7 @@ public class CiePluginHelper {
         if (Strings.isNullOrEmpty(pluginClass)) {
             var msg = "\"La classe del plugin CIE no està definida\"";
             log.error(msg);
-            throw new SistemaExternException(IntegracioCodiEnum.REGISTRE.name(), msg);
+            throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), msg);
         }
         try {
             Class<?> clazz = Class.forName(pluginClass);
@@ -330,7 +330,7 @@ public class CiePluginHelper {
         } catch (Exception ex) {
             var msg = "\"Error al crear la instància del plugin CIE (\" + pluginClass + \") \"";
             log.error(msg, ex);
-            throw new SistemaExternException(IntegracioCodiEnum.REGISTRE.name(), msg, ex);
+            throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), msg, ex);
         }
     }
 

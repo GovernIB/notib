@@ -145,6 +145,21 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 								.addNode("dir3Codi")
 								.addConstraintViolation();
 					}
+
+					if (Strings.isNullOrEmpty(persona.getNif())) {
+						valid = false;
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.nif.obligatori", null, locale))
+								.addNode("nif")
+								.addConstraintViolation();
+					}
+					if (!Strings.isNullOrEmpty(persona.getNif()) && !NifHelper.isvalid(persona.getNif())) {
+						valid = false;
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.nif.error", null, locale))
+								.addNode("nif")
+								.addConstraintViolation();
+					}
 					break;
 			}
 

@@ -8,17 +8,21 @@ import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.NotificacioEventHelper;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
+import es.caib.notib.logic.service.OrganGestorServiceImpl;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.carpeta.CarpetaPlugin;
 import es.caib.notib.plugin.carpeta.MissatgeCarpetaParams;
 import es.caib.notib.plugin.carpeta.VincleInteressat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -33,16 +37,19 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 	private final IntegracioHelper integracioHelper;
 	private final NotificacioEventHelper eventHelper;
 	private final ConfigHelper configHelper;
+	private final EntitatRepository entitatRepository;
 
 	public CarpetaPluginHelper(IntegracioHelper integracioHelper,
                                NotificacioEventHelper eventHelper,
-                               ConfigHelper configHelper) {
+                               ConfigHelper configHelper,
+							   EntitatRepository entitatRepository) {
 
 		super(integracioHelper, configHelper);
         this.integracioHelper = integracioHelper;
 		this.eventHelper = eventHelper;
 		this.configHelper = configHelper;
-	}
+        this.entitatRepository = entitatRepository;
+    }
 
 
 	public void enviarNotificacioMobil(NotificacioEnviamentEntity e) {
@@ -50,7 +57,8 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 		if (e.isPerEmail() || InteressatTipus.ADMINISTRACIO.equals(e.getTitular().getInteressatTipus())) {
 			return;
 		}
-		var info = new IntegracioInfo(IntegracioCodiEnum.CARPETA, "Enviar notificació mòvil", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		var info = new IntegracioInfo(IntegracioCodi.CARPETA, "Enviar notificació mòvil", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setAplicacio(e.getNotificacio().getTipusUsuari(), e.getNotificacio().getCreatedBy().get().getCodi());
 		var eventInfo = NotificacioEventHelper.EventInfo.builder().enviament(e).tipus(NotificacioEventTipusEnumDto.API_CARPETA).build();
 		var enviarCarpeta = enviarCarpeta();
 		try {
@@ -111,6 +119,44 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 				configHelper.getConfigAsBoolean("es.caib.notib.plugin.carpeta.msg.actiu");
 	}
 
+	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) {
+
+		var entitats = entitatRepository.findAll();
+		IntegracioDiagnostic diagnostic;
+		var diagnosticOk = true;
+		String codi;
+		for (var entitat : entitats) {
+			codi = entitat.getCodi();
+			try {
+				var plugin = pluginMap.get(codi);
+				if (plugin == null)  {
+					continue;
+				}
+				plugin.existeixNif("99999999R");
+				diagnostic = new IntegracioDiagnostic();
+				diagnostic.setCorrecte(true);
+				diagnostics.put(codi, diagnostic);
+			} catch(Exception ex) {
+				diagnostic = new IntegracioDiagnostic();
+				diagnostic.setErrMsg(ex.getMessage());
+				diagnostics.put(codi, diagnostic);
+				diagnosticOk = false;
+			}
+		}
+		if (diagnostics.isEmpty() && !entitats.isEmpty()) {
+			var entitat = entitatRepository.findByCodi(getCodiEntitatActual());
+			diagnostic = new IntegracioDiagnostic();
+			try {
+				getPlugin().existeixNif("99999999R");
+				diagnostic.setCorrecte(true);
+			} catch (Exception ex) {
+				diagnostic.setCorrecte(false);
+			}
+			diagnostics.put(entitat.getCodi(), diagnostic);
+		}
+		return diagnosticOk;
+	}
+
 	@Override
 	protected CarpetaPlugin getPlugin() {
 
@@ -126,7 +172,7 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 		if (Strings.isNullOrEmpty(pluginClass)) {
 			var error = "No està configurada la classe per al plugin de CARPETA";
 			log.error(error);
-			throw new SistemaExternException(IntegracioCodiEnum.CARPETA.name(), error);
+			throw new SistemaExternException(IntegracioCodi.CARPETA.name(), error);
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
@@ -134,7 +180,7 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 			pluginMap.put(entitatCodi, plugin);
 			return (CarpetaPlugin) plugin;
 		} catch (Exception ex) {
-			throw new SistemaExternException(IntegracioCodiEnum.CARPETA.name(), "Error al crear la instància del plugin de CARPETA", ex);
+			throw new SistemaExternException(IntegracioCodi.CARPETA.name(), "Error al crear la instància del plugin de CARPETA", ex);
 		}
 	}
 

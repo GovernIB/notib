@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_notificacio_env
+            columns:
+              - column:
+                  name: plazo_ampliado
+                  type: number(1,0)

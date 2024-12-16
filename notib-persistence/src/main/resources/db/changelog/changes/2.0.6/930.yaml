@@ -22,7 +22,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: api_key
-                  type: varchar(128 ${varcharUnit})
+                  type: varchar(256 ${varcharUnit})
               - column:
                   name: salt
                   type: varchar(88 ${varcharUnit})

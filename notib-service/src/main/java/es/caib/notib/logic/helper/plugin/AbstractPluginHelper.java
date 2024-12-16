@@ -9,6 +9,7 @@ import es.caib.comanda.salut.model.IntegracioSalut;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.plugin.SalutPlugin;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,6 +41,8 @@ public abstract class AbstractPluginHelper<T extends SalutPlugin> {
 		this.integracioHelper = integracioHelper;
 		this.configHelper = configHelper;
 	}
+
+	public abstract boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception;
 
 	protected String getCodiEntitatActual() {
 

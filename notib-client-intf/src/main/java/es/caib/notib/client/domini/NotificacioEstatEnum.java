@@ -16,5 +16,18 @@ public enum NotificacioEstatEnum implements Serializable {
     FINALITZADA,
     PROCESSADA,
     ENVIADA_AMB_ERRORS,
-    FINALITZADA_AMB_ERRORS
+    FINALITZADA_AMB_ERRORS;
+
+//    PENDENT,
+//    ENVIADA,
+//    REGISTRADA,
+//    FINALITZADA,
+//    PROCESSADA,
+//    EXPIRADA,
+//    NOTIFICADA,
+//    REBUTJADA,
+//    ENVIAT_SIR,
+//    ENVIADA_AMB_ERRORS,
+//    FINALITZADA_AMB_ERRORS,
+//    ENVIANT;
 }

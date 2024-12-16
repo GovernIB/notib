@@ -2,7 +2,7 @@ package es.caib.notib.logic.helper;
 
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * Helper per notificacions
@@ -47,7 +46,7 @@ public class EnviamentHelper {
 		log.info("[EXPIRATS] Execució procés actualització enviaments expirats");
 		var auth = SecurityContextHolder.getContext().getAuthentication();
 		var username = auth == null ? "schedulled" : auth.getName();
-		var info = new IntegracioInfo(IntegracioCodiEnum.NOTIFICA, "Actualització d'enviaments expirats sense certificació",
+		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA, "Actualització d'enviaments expirats sense certificació",
 				IntegracioAccioTipusEnumDto.PROCESSAR, new AccioParam("Usuari encarregat: ", username));
 		var enviamentsIds = notificacioEnviamentRepository.findIdExpiradesAndNotificaCertificacioDataNull();
 		if (enviamentsIds == null || enviamentsIds.isEmpty()) {

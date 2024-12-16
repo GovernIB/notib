@@ -4,13 +4,18 @@ import com.google.common.base.Strings;
 import es.caib.comanda.salut.model.IntegracioApp;
 import es.caib.notib.logic.exception.DocumentNotFoundException;
 import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.ExcepcioLogHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.plugin.arxiu.ArxiuPlugin;
+import es.caib.notib.persist.repository.DocumentRepository;
+import es.caib.notib.persist.repository.EntitatRepository;
+import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +33,56 @@ import java.util.Properties;
 @Component
 public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 
+	private final DocumentRepository documentRepository;
+	private final EntitatRepository entitatRepository;
+	private final NotificacioRepository notificacioRepository;
+
 	public ArxiuPluginHelper(IntegracioHelper integracioHelper,
-                             ConfigHelper configHelper) {
+							 ConfigHelper configHelper,
+							 DocumentRepository documentRepository,
+							 EntitatRepository entitatRepository, NotificacioRepository notificacioRepository) {
+
 		super(integracioHelper, configHelper);
+        this.documentRepository = documentRepository;
+        this.entitatRepository = entitatRepository;
+		this.notificacioRepository = notificacioRepository;
+	}
+
+	@Override
+	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception {
+
+		var entitats = entitatRepository.findAll();
+		IntegracioDiagnostic diagnostic;
+		var diagnosticOk = true;
+		String codi;
+		for (var entitat : entitats) {
+			codi = entitat.getCodi();
+			try {
+				var plugin = pluginMap.get(codi);
+				if (plugin == null)  {
+					continue;
+				}
+				var document = notificacioRepository.findTopByEntitatAndDocumentUuidNotNull(entitat).getDocument();
+				var arxiu = plugin.documentDetalls(document.getUuid(), null, true);
+				diagnostic = new IntegracioDiagnostic();
+				diagnostic.setCorrecte(arxiu != null);
+				diagnostics.put(codi, diagnostic);
+			} catch(Exception ex) {
+				diagnostic = new IntegracioDiagnostic();
+				diagnostic.setErrMsg(ex.getMessage());
+				diagnostics.put(codi, diagnostic);
+				diagnosticOk = false;
+			}
+		}
+		if (diagnostics.isEmpty() && !entitats.isEmpty()) {
+			var entitat = entitatRepository.findByCodi(getCodiEntitatActual());
+			var document = notificacioRepository.findTopByEntitatAndDocumentUuidNotNull(entitat).getDocument();
+			var arxiu = arxiuDocumentConsultar(document.getUuid(), null, true, true);
+			diagnostic = new IntegracioDiagnostic();
+			diagnostic.setCorrecte(arxiu != null);
+			diagnostics.put(entitat.getCodi(), diagnostic);
+		}
+		return diagnosticOk;
 	}
 
 
@@ -43,7 +95,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 
 	public Document arxiuDocumentConsultar(String identificador, String versio, boolean ambContingut, boolean isUuid) throws DocumentNotFoundException {
 
-		var info = new IntegracioInfo(IntegracioCodiEnum.ARXIU, "Consulta d'un document", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.ARXIU, "Consulta d'un document", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("identificador del document", identificador),
 				new AccioParam("Versio", versio));
 
@@ -64,7 +116,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 	
 	public DocumentContingut arxiuGetImprimible(String id, boolean isUuid) {
 		
-		var info = new IntegracioInfo(IntegracioCodiEnum.ARXIU, "Obtenir versió imprimible d'un document", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.ARXIU, "Obtenir versió imprimible d'un document", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador del document", id),
 				new AccioParam("Tipus d'identificador", isUuid ? "uuid" : "csv"));
 
@@ -80,7 +132,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 		} catch (Exception ex) {
 			var errorDescripcio = "No s'ha pogut recuperar el document amb " + id;
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(IntegracioCodiEnum.ARXIU.name(), errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioCodi.ARXIU.name(), errorDescripcio, ex);
 		}
 	}
 	
@@ -113,7 +165,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 		if (Strings.isNullOrEmpty(pluginClass)) {
 			String msg = "La classe del plugin d'arxiu digital no està definida";
 			log.error(msg);
-			throw new SistemaExternException(IntegracioCodiEnum.ARXIU.name(), msg);
+			throw new SistemaExternException(IntegracioCodi.ARXIU.name(), msg);
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
@@ -123,7 +175,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 		} catch (Exception ex) {
 			var msg = "Error al crear la instància del plugin d'arxiu digital (" + pluginClass + ") ";
 			log.error(msg, ex);
-			throw new SistemaExternException(IntegracioCodiEnum.ARXIU.name(), msg, ex);
+			throw new SistemaExternException(IntegracioCodi.ARXIU.name(), msg, ex);
 		}
 	}
 

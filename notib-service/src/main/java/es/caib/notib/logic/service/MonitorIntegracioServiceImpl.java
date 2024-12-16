@@ -4,27 +4,44 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
+import com.sun.jersey.api.client.ClientResponse;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.EmailNotificacioHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
+import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.helper.NotificaHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
+import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.RequestsHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioDetall;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
+import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.MonitorIntegracioService;
+import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.utils.DatesUtils;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.filtres.FiltreMonitorIntegracio;
+import es.caib.notib.persist.repository.AplicacioRepository;
+import es.caib.notib.persist.repository.DocumentRepository;
+import es.caib.notib.persist.repository.EntitatRepository;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.monitor.MonitorIntegracioParamRepository;
 import es.caib.notib.persist.repository.monitor.MonitorIntegracioRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -49,10 +66,28 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	private MonitorIntegracioRepository monitorRepository;
 	@Resource
 	private MonitorIntegracioParamRepository paramRepository;
+	@Resource
+	private MessageHelper messageHelper;
+	@Resource
+	private PluginHelper pluginHelper;
+	@Resource
+	private AplicacioService aplicacioService;
+    @Autowired
+    private NotificacioEnviamentRepository enviamentRepository;
+    @Autowired
+    private CiePluginHelper ciePluginHelper;
+    @Autowired
+    private NotificaHelper notificaHelper;
+	@Autowired
+	private RequestsHelper requestsHelper;
+	@Autowired
+	private AplicacioRepository aplicacioRepository;
+    @Autowired
+    private EmailNotificacioHelper emailHelper;
 
 	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(IntegracioCodiEnum codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) {
+	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(IntegracioCodi codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
@@ -88,7 +123,7 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public Map<IntegracioCodiEnum, Integer> countErrors() {
+	public Map<IntegracioCodi, Integer> countErrors() {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
@@ -125,6 +160,78 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 					.excepcioStacktrace(i.getExcepcioStacktrace()).parametres(accions).build();
 		} catch (Exception ex) {
 			return IntegracioDetall.builder().descripcio("Error obtinguent el detall de la integració " + id).build();
+		}
+	}
+
+	@Override
+	public IntegracioDiagnostic diagnostic(String codi) {
+
+		var diagnostic = new IntegracioDiagnostic();
+		var usuari = aplicacioService.getUsuariActual();
+		try {
+			var integracioCodi = IntegracioCodi.valueOf(codi);
+			var prova = messageHelper.getMessage("integracio.list.pipella." + integracioCodi + ".descripcio");
+			diagnostic.setProva(prova);
+			NotificacioEnviamentEntity enviament;
+			Map<String, IntegracioDiagnostic> diagnostics = new HashMap<>();
+			switch (integracioCodi) {
+				case USUARIS:
+					diagnostics.put(usuari.getCodi(), null);
+					diagnostic.setCorrecte(pluginHelper.diagnosticarDadesUsuaris(diagnostics));
+					break;
+				case REGISTRE:
+					diagnostic.setCorrecte(pluginHelper.diagnosticarRegistre(diagnostics));
+					break;
+				case NOTIFICA:
+					enviament = enviamentRepository.findTopByNotificaIdentificadorNullOrderByIdDesc().orElseThrow();
+					notificaHelper.enviamentRefrescarEstat(enviament.getId());
+					diagnostic.setCorrecte(true);
+					break;
+				case ARXIU:
+					diagnostic.setCorrecte(pluginHelper.diagnosticarArxiu(diagnostics));
+					break;
+				case CALLBACK:
+					var aplicacio = aplicacioRepository.findTopByCallbackUrlNotNullOrderByIdDesc().orElseThrow();
+					var r = requestsHelper.callbackAplicacioNotificaCanvi(aplicacio.getCallbackUrl(), new NotificacioCanviClient());
+					diagnostic.setCorrecte(r != null && ClientResponse.Status.OK.getStatusCode() == r.getStatusInfo().getStatusCode());
+					break;
+				case GESDOC:
+					diagnostic.setCorrecte(pluginHelper.diagnosticarGestorDocumental(diagnostics));
+					break;
+				case UNITATS:
+					pluginHelper.diagnosticarUnitats(diagnostics);
+					break;
+				case GESCONADM:
+				case PROCEDIMENTS:
+					diagnostic.setCorrecte(pluginHelper.diagnosticarGestorDocumentalAdministratiu(diagnostics));
+					break;
+				case FIRMASERV:
+					diagnostic.setCorrecte(pluginHelper.diagnosticarFirmaEnServidor(diagnostics));
+					break;
+				case VALIDASIG:
+					diagnostic.setCorrecte(pluginHelper.diagnosticarValidacioFirmes(diagnostics));
+					break;
+				case CARPETA:
+					diagnostic.setCorrecte(pluginHelper.diagnosticarCarpeta(diagnostics));
+					break;
+//				case EMAIL:
+//					emailHelper.sendEmailTest(usuari.getEmail());
+//					diagnostic.setCorrecte(true);
+//					break;
+				case CIE:
+					enviament = enviamentRepository.findTopByEntregaPostalNullOrderByIdDesc().orElseThrow();
+					var resultat = ciePluginHelper.consultarEstatEntregaPostal(enviament.getId());
+					diagnostic.setCorrecte(resultat != null && "000".equals(resultat.getCodiResposta()));
+					break;
+			}
+			diagnostic.setDiagnosticsEntitat(diagnostics);
+			return diagnostic;
+		} catch (Exception ex) {
+			var error = "Error realitzant el diagnostic de la integracio: ";
+			log.error(error + codi);
+			diagnostic.setCorrecte(false);
+			diagnostic.setErrMsg(ex.getMessage());
+			return diagnostic;
 		}
 	}
 

@@ -83,13 +83,13 @@
 						});
 						htmlList += '</ul>';
 						$('#integracio-parameters-list').html(htmlList);
-						$("#cbcopy").click(e => {
+						$("#copyParametres").click(e => {
 							e.stopPropagation();
 							navigator.clipboard.writeText(clipBoard);
 						});
 					}
-					let isError = data.estat === 'ERROR';
-					if (isError) {
+					let showError = data.estat === 'ERROR' || data.estat === 'WARN';
+					if (showError) {
 						$('.integracio-error').show();
 						$('#integracio-errorDescripcio').html(data.errorDescripcio);
 						$('#integracio-excepcioMessage').html(data.excepcioMessage);
@@ -98,10 +98,11 @@
 						} else {
 							$('#integracio-excepcioStacktrace').hide();
 						}
-					} else if(data.estat === 'WARN') {
-						$('.integracio-error').show();
-						$('#integracio-errorDescripcio').html(data.errorDescripcio);
-						$('#integracio-excepcioStacktrace').html(data.excepcioStacktrace);
+						let clipBoard = data.errorDescripcio + "\n" + data.excepcioStacktrace;
+						$("#copyError").click(e => {
+							e.stopPropagation();
+							navigator.clipboard.writeText(clipBoard);
+						});
 					} else {
 						$('.integracio-error').hide();
 					}
@@ -124,6 +125,12 @@
 				}
 			});
 			$('#filtre').submit();
+		});
+
+		$("#netejarIntegracions").click(() => {
+			if (!confirm("Aquesta acció esborrarà totes les integracions. Vols continuar?")) {
+				return false;
+			}
 		});
 	});
 </script>
@@ -178,7 +185,12 @@
 	</ul>
 	<br/>
 	<script id="botonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a class="btn btn-default" href="<c:url value="/integracio/netejar"/>"><span class="fa fa-trash"></span>&nbsp;<spring:message code="integracio.netejar"/></a></p>
+		<div class="text-right">
+        	<div class="btn-group">
+				<a class="btn btn-success" href="<c:url value="/integracio/diagnostic"/>" data-toggle="modal" style="margin-right:10px"><span class="fa fa-list"></span>&nbsp;<spring:message code="integracio.diagnostic"/></a>
+				<button id="netejarIntegracions" class="btn btn-default" href="<c:url value="/integracio/netejar"/>"><span class="fa fa-trash"></span>&nbsp;<spring:message code="integracio.netejar"/></a>
+			</div>
+		</div>
 	</script>
 	<table id="missatges-integracions" data-toggle="datatable" data-url="<c:url value="/integracio/datatable"/>"
 <%--		   data-filter="#filtre"--%>
@@ -194,9 +206,7 @@
 <%--				<th data-col-name="excepcioStacktrace" data-visible="false"></th>--%>
 				<th data-col-name="data" data-orderable="false" data-converter="datetime"><spring:message code="integracio.list.columna.data"/></th>
 				<th data-col-name="descripcio" data-orderable="false"><spring:message code="integracio.list.columna.descripcio"/></th>
-				<c:if test="${codiActual == 'CALLBACK'}">
 					<th data-col-name="aplicacio" data-orderable="false"><spring:message code="integracio.list.columna.aplicacio"/></th>
-				</c:if>
 				<th data-col-name="tipus" data-orderable="false"><spring:message code="integracio.list.columna.tipus"/></th>
 				<th data-col-name="codiEntitat" data-orderable="false"><spring:message code="integracio.list.columna.entitat"/></th>
 				<th data-col-name="tempsResposta" data-template="#cellTempsTemplate" data-orderable="false">
@@ -247,11 +257,15 @@
 							<spring:message code="integracio.detall.camp.params"/>
 						</dt>
 						<dt>
-							<button id="cbcopy" class="btn btn-default" title="<spring:message code="comu.clipboard.copy"/>"><span class="fa fa-clipboard"></span></button>
+							<button id="copyParametres" class="btn btn-default" title="<spring:message code="comu.clipboard.copy"/>"><span class="fa fa-clipboard"></span></button>
 						</dt>
 						<dd id="integracio-parameters-list" class="integracio-parameters" style="max-height: 300px; overflow: auto; margin-bottom: 15px;">
 						</dd>
-						<dt class="integracio-error"><spring:message code="integracio.detall.camp.error.desc"/></dt>
+						<dt class="integracio-error"><spring:message code="integracio.detall.camp.error.desc"/>
+						</dt>
+						<dt>
+							<button id="copyError" class="btn btn-default" title="<spring:message code="comu.clipboard.copy"/>"><span class="fa fa-clipboard"></span></button>
+						</dt>
 						<dd id="integracio-errorDescripcio" class="integracio-error"></dd>
 						<dt class="integracio-error"><spring:message code="integracio.detall.camp.excepcio.missatge"/></dt>
 						<dd id="integracio-excepcioMessage" class="integracio-error"></dd>

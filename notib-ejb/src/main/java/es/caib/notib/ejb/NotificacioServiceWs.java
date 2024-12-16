@@ -14,10 +14,10 @@ import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacio;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
-import es.caib.notib.ejb.helper.UsuariAuthHelper;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.RolesAllowed;
@@ -105,6 +105,12 @@ public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.in
 	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(@WebParam(name="identificador") @XmlElement(required = true) String identificador){
 		return getDelegateService().consultaJustificantEnviament(identificador);
 
+	}
+
+	@Override
+	@RolesAllowed({"NOT_APL"})
+	public RespuestaAmpliarPlazoOE ampliarPlazo(AmpliarPlazoOE ampliarPlazo) {
+		return getDelegateService().ampliarPlazo(ampliarPlazo);
 	}
 
 }

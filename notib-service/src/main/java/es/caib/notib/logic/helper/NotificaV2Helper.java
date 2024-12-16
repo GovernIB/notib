@@ -4,9 +4,11 @@ import com.google.common.base.Strings;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
@@ -29,6 +31,7 @@ import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorCIE;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorPostal;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.Persona;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
+import es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.AmpliacionesPlazo;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.Datado;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.InfoEnvioLigero;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.RespuestaInfoEnvioLigero;
@@ -58,7 +61,6 @@ import javax.naming.NamingException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
@@ -73,9 +75,6 @@ import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -113,11 +112,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
 
- 		var info = new IntegracioInfo(IntegracioCodiEnum.NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
+ 		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
 
 		try {
 			var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
+			info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
 			log.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 			info.setCodiEntitat(notificacio.getEntitat() != null ? notificacio.getEntitat().getCodi() : null);
 			notificacio.updateNotificaNouEnviament();
@@ -199,11 +199,13 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					integracioHelper.addAccioOk(info);
 				} else {
 					error = true;
-					var errorNotib = NOTIB.equals(resultadoAlta.getDescripcionRespuesta());
+					var errorNotib = NOTIB.equals(resultadoAlta.getCodigoRespuesta());
 					var origenError = !errorNotib ? "Error retornat per Notifica: " : "Error retornat per Notib: ";
 					errorDescripcio = origenError + " [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
 					log.info(" >>> ... ERROR: " + errorDescripcio);
-					integracioHelper.addAccioError(info, errorDescripcio);
+					if (!Strings.isNullOrEmpty(resultadoAlta.getDescripcionRespuesta()) && resultadoAlta.getDescripcionRespuesta().equals("SistemaExternException")) {
+						integracioHelper.addAccioError(info, errorDescripcio);
+					}
 				}
 			} catch (Exception ex) {
 				log.error(ex.getMessage(), ex);
@@ -254,9 +256,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	private NotificacioEnviamentEntity enviamentRefrescarEstat(@NonNull NotificacioEnviamentEntity enviament, boolean raiseExceptions) throws Exception {
 
-		var info = new IntegracioInfo(IntegracioCodiEnum.NOTIFICA,"Consultar estat d'un enviament", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA,"Consultar estat d'un enviament", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de l'enviament", String.valueOf(enviament.getId())));
-
+		info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getCreatedBy().get().getCodi());
 		log.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		info.setCodiEntitat(enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null ?  enviament.getNotificacio().getEntitat().getCodi() : null);
 		long startTime;
@@ -379,21 +381,93 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 	}
 
-	private Receptor getReceptor(NotificacioEnviamentEntity enviament) {
+    private Receptor getReceptor(NotificacioEnviamentEntity enviament) {
 
-		var receptor = new Receptor();
-		var titular = enviament.getTitular();
-		receptor.setNifReceptor(titular.getNif());
-		receptor.setNombreReceptor(titular.getNomSencer());
-		receptor.setVinculoReceptor(BigInteger.ONE);
-		if (!titular.isIncapacitat()) {
-			return receptor;
+        var receptor = new Receptor();
+        var titular = enviament.getTitular();
+        receptor.setNifReceptor(titular.getNif());
+        receptor.setNombreReceptor(titular.getNomSencer());
+        receptor.setVinculoReceptor(BigInteger.ONE);
+        if (!titular.isIncapacitat()) {
+            return receptor;
+        }
+        receptor.setVinculoReceptor(BigInteger.TWO);
+        var destinatari = enviament.getDestinataris().get(0);
+        receptor.setNifRepresentante(destinatari.getNif());
+        receptor.setNombreRepresentante(destinatari.getNomSencer());
+        return receptor;
+    }
+
+
+    @Override
+	@Transactional
+	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo, List<NotificacioEnviamentEntity> enviaments) {
+
+		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA, "Ampliació de plaç", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		RespuestaAmpliarPlazoOE resposta;
+		try {
+			var apiKey = enviaments.get(0).getNotificacio().getEntitat().getApiKey();
+			var organEmisor = enviaments.get(0).getNotificacio().getEmisorDir3Codi();
+			Holder<AmpliacionesPlazo> ampliacionesPlazo = new Holder<>();
+			var ap = conversioTipusHelper.convertir(ampliarPlazo, es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.AmpliarPlazoOE.class);
+			ap.setOrganismoEmisor(organEmisor);
+			System.setProperty("jaxb.debug", "true");
+			var respuesta = getSincronizarEnvioWs(apiKey).ampliarPlazoOE(ap);
+			resposta = new RespuestaAmpliarPlazoOE();
+			resposta.setCodigoRespuesta(respuesta.getCodigoRespuesta());
+			resposta.setDescripcionRespuesta(respuesta.getDescripcionRespuesta());
+			resposta.setAmpliacionesPlazo(conversioTipusHelper.convertir(ampliacionesPlazo.value, es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo.class));
+		} catch (Exception ex) {
+			var msg = "Error inesperat al ampliarPlazosOE ";
+			log.error(msg, ex);
+			resposta = new RespuestaAmpliarPlazoOE();
+			resposta.setCodigoRespuesta("error");
+			resposta.setDescripcionRespuesta(msg + ex.getMessage());
 		}
-		receptor.setVinculoReceptor(BigInteger.TWO);
-		var destinatari = enviament.getDestinataris().get(0);
-		receptor.setNifRepresentante(destinatari.getNif());
-		receptor.setNombreRepresentante(destinatari.getNomSencer());
-		return receptor;
+		var ok = false;
+		var errorDesc = "";
+		var codiEntitat = "";
+		ok = "000".equals(resposta.getCodigoRespuesta());
+		errorDesc = !ok ? resposta.getDescripcionRespuesta()  : "";
+		for (var enviament : enviaments) {
+			info.addParam("Notificacio/Enviament", enviament.getNotificacio().getId() + "/" + enviament.getId());
+			codiEntitat +=  enviament.getNotificacio().getEntitat().getCodi();
+			if (!ok) {
+				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, !ok, errorDesc, false);
+				continue;
+			}
+			var ampliaciones = resposta.getAmpliacionesPlazo();
+			if (ampliaciones == null || ampliaciones.getAmpliacionPlazo() == null || ampliaciones.getAmpliacionPlazo().isEmpty()) {
+				errorDesc = "[ampliarPlazoOE] No han arribat dades suficients per guardar la informacio a Notib";
+				log.error(errorDesc);
+				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, errorDesc, false);
+				continue;
+			}
+			for (var ampliacion : ampliaciones.getAmpliacionPlazo()) {
+				if (!enviament.getNotificaIdentificador().equals(ampliacion.getIdentificador())) {
+					continue;
+				}
+
+				var dataCaducitat = ampliacion.getFechaCaducidad().toGregorianCalendar().getTime();
+				enviament.setNotificaDataCaducitat(dataCaducitat);
+				enviament.setPlazoAmpliado(true);
+				var caducitatOriginal = enviament.getNotificacio().getCaducitatOriginal();
+				if (caducitatOriginal == null) {
+					var caducitat = enviament.getNotificacio().getCaducitat();
+					enviament.getNotificacio().setCaducitatOriginal(caducitat);
+				}
+				enviament.getNotificacio().setCaducitat(dataCaducitat);
+				notificacioEnviamentRepository.save(enviament);
+				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);
+			}
+		}
+		info.setCodiEntitat(codiEntitat);
+		if (ok) {
+			integracioHelper.addAccioOk(info);
+		} else {
+			integracioHelper.addAccioError(info, errorDesc);
+		}
+		return resposta;
 	}
 
 	private Datado getDarrerDatat(RespuestaInfoEnvioLigero resultadoInfoEnvio, NotificacioEnviamentEntity enviament, IntegracioInfo info) throws DatatypeConfigurationException, ParseException {

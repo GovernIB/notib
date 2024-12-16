@@ -77,13 +77,15 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"    (:#{#filtre.entitatIdNull} = true or ntf.entitat.id = :#{#filtre.entitatId}) " +
 			" and  (:#{#filtre.nomesFiReintents} = false or nne.fiReintents = true " +
 			"		and (nne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.REGISTRE_ENVIAMENT or nne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT )) " +
-			" and  (" +
+			" and (" +
 			// PERMISOS
 			// Iniciada pel propi usuari
 			" :#{#filtre.isUsuariEntitat} = true or " +
 			" :#{#filtre.isSuperAdmin} = true or " +
-			" ntf.usuariCodi = :#{#filtre.usuariCodi} " +
+			"   ntf.usuariCodi = :#{#filtre.usuariCodi} " +
 			// Té permís consulta sobre el procediment
+//			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null " +
+//			"			and ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotib}) and ntf.procedimentIsComu = false) " +
 			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null " +
 			"			and (ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[0]}) " +
 			"					or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[1]}) " +
@@ -115,11 +117,11 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:#{#filtre.isSuperAdmin} = false or ntf.entitat in (:#{#filtre.entitatsActives})) " +
 			"and (:#{#filtre.isAdminOrgan} = false or " +
 			"   (" +
-			"	(:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null " +
-			"		and (ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[0]}) " +
-			"				or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[1]}) " +
-			"				or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[2]}) " +
-			"				or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[3]})))" +
+			"	(:#{#filtre.procedimentsCodisNotibNull} = false and ntf.procedimentCodiNotib is not null and " +
+			"	(ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[0]}) " +
+			"		or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[1]}) " +
+			"		or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[2]}) " +
+			"		or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[3]})))" +
 //			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " +
 			"   or (ntf.organCodi is not null and ntf.organCodi in (:#{#filtre.organs}))" +
 			"	)) " +
@@ -141,8 +143,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:#{#filtre.nomesAmbEntregaPostal} = false or ntf.entregaPostal = true) " +
 			"and (:#{#filtre.adminOrgan} = true or :#{#filtre.nomesAmbErrors} = false or ntf.notificaErrorData is not null) " +
 			"and (:#{#filtre.deleted} = ntf.deleted) " +
-			"and (:#{#filtre.referenciaNull} = true or lower(ntf.referencia) like '%' || lower(:#{#filtre.referencia}) || '%')"
-	)
+			"and (:#{#filtre.referenciaNull} = true or lower(ntf.referencia) like '%' || lower(:#{#filtre.referencia}) || '%')")
     List<Long> findIdsAmbFiltre(FiltreNotificacio filtre);
 
 	@Query("select distinct ntf from NotificacioTableEntity ntf " +
@@ -205,6 +206,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:#{#filtre.estatNull} = true or bitand(ntf.estatMask, :#{#filtre.estatMask}) <> 0) " +
 			"and (:#{#filtre.dataIniciNull} = true or ntf.createdDate >= :#{#filtre.dataInici}) " +
 			"and (:#{#filtre.dataFiNull} = true or ntf.createdDate <= :#{#filtre.dataFi}) "+
+			"and (:#{#filtre.dataCaducitatIniciNull} = true or ntf.caducitat >= :#{#filtre.dataCaducitatInici}) " +
+			"and (:#{#filtre.dataCaducitatFiNull} = true or ntf.caducitat <= :#{#filtre.dataCaducitatFi}) "+
 			"and (:#{#filtre.organCodiNull} = true or ntf.organCodi = :#{#filtre.organCodi}) " +
 			"and (:#{#filtre.procedimentNull} = true or ntf.procedimentCodi = :#{#filtre.procedimentCodi}) " +
 			"and (:#{#filtre.titularNull} = true or lower(ntf.titular) like concat('%', lower(:#{#filtre.titular}), '%'))" +

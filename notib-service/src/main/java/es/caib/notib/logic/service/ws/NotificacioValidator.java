@@ -30,6 +30,7 @@ import es.caib.notib.persist.repository.GrupRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
 import es.caib.notib.plugin.cie.TipusImpressio;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.time.DateUtils;
@@ -150,6 +151,10 @@ public class NotificacioValidator implements Validator {
         }
         if (aplicacio == null) {
             errors.reject(error(APLICACIO_NO_EXIST, locale, usuariCodi, notificacio.getEmisorDir3Codi()));
+            return;
+        }
+        if (!aplicacio.isActiva()) {
+            errors.reject(error(APLICACIO_INACTIVA, locale, usuariCodi));
         }
     }
 

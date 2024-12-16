@@ -45,6 +45,7 @@ public class NotificacioTableItemDto {
 	private Date estatDate;
 	private NotificacioEstatEnumDto estat;
 	private String estatString;
+	private String estatColor = "green";
 
 	private String createdByNom;
 	private String createdByCodi;
@@ -74,18 +75,16 @@ public class NotificacioTableItemDto {
 	private String registreNums;
 
 	private boolean deleted;
-//
-//	private int nTramitacio;
-//	private int nCompareixenca;
-//	private int nLlegida;
-//	private int nRebutjada;
-//	private int nExpirada;
-//	private int nAnulada;
-//	private int nError;
-//	private int nFinalitzada;
-//	private int nProcessada;
+
+	private boolean entregaPostal;
+
 
 	private Map<EnviamentEstat, Integer> contadorEstat = new HashMap<>();
+
+	public String getEstatColor()  {
+
+		return estat.getColor();
+	}
 
 	public void setEstat(NotificacioEstatEnumDto estat) {
 		this.estat = NotificacioEstatEnumDto.ENVIADA.equals(estat) && isComunicacioSir() ? NotificacioEstatEnumDto.ENVIAT_SIR : estat;
@@ -136,48 +135,10 @@ public class NotificacioTableItemDto {
 			return;
 		}
 		contadorEstat.put(estat, contadorEstat.get(estat) + 1);
-//
-//		switch (estat) {
-//
-//			case NOTIB_PENDENT:
-//			case REGISTRADA:
-//			case NOTIB_ENVIADA:
-//			case ENVIAMENT_PROGRAMAT:
-//				nTramitacio++;
-//				break;
-//			case ENVIADA:
-//			case ENVIADA_CI:
-//			case ENVIADA_DEH:
-//			case PENDENT:
-//			case ENTREGADA_OP:
-//			case PENDENT_ENVIAMENT:
-//			case PENDENT_SEU:
-//			case PENDENT_CIE:
-//			case PENDENT_DEH:
-//				nCompareixenca++;
-//				break;
-//			case LLEGIDA:
-//				nLlegida++;
-//				break;
-//			case REBUTJADA:
-//				nRebutjada++;
-//				break;
-//			case EXPIRADA:
-//				nExpirada++;
-//				break;
-//			case ANULADA:
-//				nAnulada++;
-//				break;
-//			case FINALITZADA:
-//				nFinalitzada++;
-//				break;
-//			case PROCESSADA:
-//			case ENVIAT_SIR:
-//				nProcessada++;
-//				break;
-//			default:
-//				nError++;
-//		}
+	}
+
+	public boolean isPlazoAmpliable() {
+		return !entregaPostal && NotificacioEstatEnumDto.ENVIADA.equals(estat);
 	}
 
 	@Override

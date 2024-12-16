@@ -36,7 +36,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 
 //	NotificacioEntity findById(Long id);
 
-
+	NotificacioEntity findTopByEntitatAndDocumentUuidNotNull(EntitatEntity entitat);
 	
 	List<NotificacioEntity> findByTipusUsuari(TipusUsuariEnumDto tipusUsuari);
 	
@@ -45,6 +45,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	List<NotificacioEntity> findByEntitatId(Long entitatId);
 
 	List<NotificacioEntity> findByNotificacioMassivaEntityId(Long NotificacioMassivaEntityId);
+
+	List<NotificacioEntity> findByIdIn(List<Long> ids);
 
 	@Modifying
 	@Query("update NotificacioEntity nt set nt.referencia = :referencia where nt.id = :id")

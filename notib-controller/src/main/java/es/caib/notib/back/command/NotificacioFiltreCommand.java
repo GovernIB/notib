@@ -4,10 +4,10 @@
 package es.caib.notib.back.command;
 
 import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatOrdreFiltre;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.back.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,10 +30,12 @@ public class NotificacioFiltreCommand extends FiltreCommand {
 	private Long entitatId;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private EnviamentTipus enviamentTipus;
-	private NotificacioEstatEnumDto estat;
+	private NotificacioEstatOrdreFiltre estat;
 	private String concepte;
 	private Date dataInici;
 	private Date dataFi;
+	private Date dataCaducitatInici;
+	private Date dataCaducitatFi;
 	private String titular;
 	private String organGestor;
 	private Long procedimentId;

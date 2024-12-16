@@ -8,7 +8,9 @@ import es.caib.notib.logic.intf.dto.stateMachine.StateMachineInfo;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioMassivaRepository;
@@ -79,7 +81,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta de la State Machine per l'enviament amb id" + enviamentId);
+			NotibLogger.getInstance().info("[SM] Consulta de la State Machine per l'enviament amb id" + enviamentId, log, LoggingTipus.STATE_MACHINE);
 			var env = enviamentRepository.findById(enviamentId).orElseThrow();
 			var info = new StateMachineInfo();
 			var estat = stateMachineService.acquireStateMachine(env.getUuid()).getState().getId();
@@ -100,7 +102,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional(readOnly=true, propagation = Propagation.REQUIRES_NEW)
 	public void afegirNotificacions() {
 
-		log.info("Afegint notificacions no existents a la màquina amb estat PENDENT, ENVIADA, REGISTRADA O ENVIADA_AMB_ERROR");
+		NotibLogger.getInstance().info("[SM] Afegint notificacions no existents a la màquina amb estat PENDENT, ENVIADA, REGISTRADA O ENVIADA_AMB_ERROR", log, LoggingTipus.STATE_MACHINE);
 		var notificacions = notificacioRepository.findNotificacionsEnProgres("20/08/2023");
 		var size = notificacions.size();
 		for (var foo=0;foo<size;foo++) {
@@ -126,7 +128,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	public boolean afegirNotificacio(Long notificacioId) {
 
 		try {
-			log.debug("Afegint a la màquina la notificacio amb id " + notificacioId);
+			NotibLogger.getInstance().info("[SM] Afegint a la màquina la notificacio amb id " + notificacioId, log, LoggingTipus.STATE_MACHINE);
 			var not = notificacioRepository.findById(notificacioId).orElseThrow();
 			var estat = not.getEstat();
 			not.getEnviaments().forEach(e -> {
@@ -177,7 +179,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	private boolean afegirEnviament(NotificacioEnviamentEntity env, EnviamentSmEvent eventSm, int intent) {
 
 		try {
-			log.debug("Afegint a la màquina l'enviament amb id " + env.getUuid());
+			NotibLogger.getInstance().info("[SM] Afegint a la màquina l'enviament amb id " + env.getUuid(), log, LoggingTipus.STATE_MACHINE);
 			var sm = stateMachineService.acquireStateMachine(env.getUuid());
 			sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, intent);
 			sendEvent(env.getUuid(), sm, eventSm);
@@ -193,7 +195,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	public boolean canviarEstat(Long enviamentId, String estat) {
 
 		try {
-			log.debug("Canviant a l'estat " + estat + " de la màquina per l'enviament amb id " + enviamentId);
+			NotibLogger.getInstance().info("[SM] Canviant a l'estat " + estat + " de la màquina per l'enviament amb id " + enviamentId, log, LoggingTipus.STATE_MACHINE);
 			var uuId = enviamentRepository.getUuidById(enviamentId);
 			var sm = stateMachineService.acquireStateMachine(uuId);
 			sm.getStateMachineAccessor().doWithAllRegions(access -> access
@@ -209,7 +211,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	public boolean enviarEvent(Long enviamentId, String event) {
 
 		try {
-			log.debug("Enviant l'event " + event + " a la màquina per l'enviament amb id " + enviamentId);
+			NotibLogger.getInstance().info("[SM] Enviant l'event " + event + " a la màquina per l'enviament amb id " + enviamentId, log, LoggingTipus.STATE_MACHINE);
 			var uuId = enviamentRepository.getUuidById(enviamentId);
 			var sm = stateMachineService.acquireStateMachine(uuId);
 			sendEvent(uuId, sm, EnviamentSmEvent.valueOf(event));
@@ -224,7 +226,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid, Long delay) {
 
-		log.debug("[SM] Alta enviament " + enviamentUuid + " delay " + delay);
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl altaEnviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 		var variables = sm.getExtendedState().getVariables();
@@ -240,7 +242,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid) {
 
-		log.debug("[SM] Alta enviament " + enviamentUuid);
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl altaEnviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 		var variables = sm.getExtendedState().getVariables();
@@ -255,7 +257,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreEnviament(String enviamentUuid, boolean retry) {
 
-		log.debug("[SM] Registre enviament " + enviamentUuid + " retry " + retry);
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl registreEnviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var variables = sm.getExtendedState().getVariables();
 		variables.put(SmConstants.RG_RETRY, retry);
@@ -267,7 +269,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreSuccess(String enviamentUuid) {
 
-		log.debug("[SM] Registre succes enviament " + enviamentUuid);
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl registreSuccess " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_SUCCESS);
@@ -278,7 +280,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreFailed(String enviamentUuid) {
 
-		log.debug("[SM] Registre failed enviament " + enviamentUuid);
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl registreFailed " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var reintents = (int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, reintents + 1);
@@ -291,7 +293,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreReset(String enviamentUuid) {
 
-		log.debug("[SM] Registre reset enviament " + enviamentUuid);
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl registreReset " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_RETRY);
@@ -302,7 +304,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreRetry(String enviamentUuid) {
 
-		log.debug("[SM] Registre retry enviament " + enviamentUuid);
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl registreRetry " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.CODI_USUARI, SecurityContextHolder.getContext().getAuthentication().getName());
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_RETRY);
@@ -313,7 +315,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreForward(String enviamentUuid) {
 
-		log.debug("[SM] Registre forward enviament " + enviamentUuid);
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl registreForward " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_FORWARD);
@@ -330,6 +332,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaEnviament(String enviamentUuid, boolean retry) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl notificaEnviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.NT_RETRY, retry);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_ENVIAR);
@@ -340,6 +343,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public void notificaFi(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl notificaFi " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_FI);
 		stateMachineService.releaseStateMachine(enviamentUuid);
@@ -349,6 +353,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaSuccess(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl notificaSuccess " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_SUCCESS);
@@ -359,6 +364,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaFailed(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl notificaFailed " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var reintents = (int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, reintents + 1);
@@ -371,6 +377,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaRetry(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl notificaRetry " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.CODI_USUARI, SecurityContextHolder.getContext().getAuthentication().getName());
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_RETRY);
@@ -381,6 +388,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaReset(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl notificaReset " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_RETRY);
@@ -391,6 +399,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaForward(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl notificaForward " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_FORWARD);
@@ -429,6 +438,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> enviamentConsulta(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl enviamentConsulta " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.CN_CONSULTAR);
 		return sm;
@@ -438,6 +448,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaSuccess(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl consultaSuccess " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_ESTAT_FINAL,enviament.isNotificaEstatFinal());
@@ -451,6 +462,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaFailed(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl consultaFailed " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var reintents = (int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, reintents + 1);
@@ -463,6 +475,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaReset(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl consultaReset " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.CN_RETRY);
@@ -473,6 +486,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaRetry(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl consultaRetry " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 //		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		var event = EnviamentSmEstat.NOTIFICA_SENT.equals(sm.getState().getId()) ? EnviamentSmEvent.CN_CONSULTAR : EnviamentSmEvent.CN_RETRY;
@@ -484,6 +498,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaForward(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl consultaForward " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.CN_FORWARD);
@@ -495,6 +510,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirConsulta(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl sirConsulta " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.CONSULTA_POOLING, true);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_CONSULTAR);
@@ -505,6 +521,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirSuccess(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl sirSuccess " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_ESTAT_FINAL,enviament.isRegistreEstatFinal());
@@ -517,6 +534,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirFailed(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl sirFailed " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
  		var reintents = (int)sm.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, reintents + 1);
@@ -529,6 +547,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirReset(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl sirReset " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sm.getExtendedState().getVariables().put(SmConstants.CONSULTA_SIR_POOLING_DATA_INICI, new Date());
@@ -541,6 +560,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirRetry(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl sirRetry " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_RETRY);
 		return sm;
@@ -550,6 +570,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
     public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirForward(String enviamentUuid) {
 
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl sirForward " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_FORWARD);

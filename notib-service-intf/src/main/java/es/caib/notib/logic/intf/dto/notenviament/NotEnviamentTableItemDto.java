@@ -53,6 +53,7 @@ public class NotEnviamentTableItemDto implements Serializable {
 	private String descripcio;
 	private String llibre;
 	private NotificacioEstatEnumDto estat;
+	private String estatColor;
 	private Long notificacioId;
 	private String csvUuid;
 	private String referenciaNotificacio;
@@ -70,6 +71,11 @@ public class NotEnviamentTableItemDto implements Serializable {
 	private boolean isEnviant;
 
 	public NotEnviamentTableItemDto() {
+	}
+
+	public String getEstatColor()  {
+
+		return estat.getColor();
 	}
 
 	public String getEntregaPostalText() {
@@ -101,6 +107,10 @@ public class NotEnviamentTableItemDto implements Serializable {
 				.raoSocial(titularRaoSocial)
 				.email(titularEmail)
 				.build().getNomFormatted();
+	}
+
+	public boolean isPlazoAmpliable() {
+		return !entregaPostal && NotificacioEstatEnumDto.ENVIADA.equals(estat);
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

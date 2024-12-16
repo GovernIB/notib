@@ -6,7 +6,8 @@ import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
@@ -20,6 +21,7 @@ import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformati
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -41,10 +43,24 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 		this.configHelper = configHelper;
 	}
 
+	@Override
+	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception {
+
+		try (var arxiuSignat = this.getClass().getResourceAsStream("/es/caib/notib/logic/diagnostic/test_firmat.pdf")){
+			if (arxiuSignat == null) {
+				log.error("L'Arxiu de proves per el diagnostic no existeix");
+				return false;
+			}
+			var bytes = arxiuSignat.readAllBytes();
+			var signatura = detectSignedAttachedUsingValidateSignaturePlugin(bytes, "test_firmat.pdf", "application/pdf");
+			return signatura != null && !signatura.isError();
+		}
+	}
+
 
 	public SignatureInfoDto detectSignedAttachedUsingValidateSignaturePlugin(byte[] documentContingut, String nom, String firmaContentType) {
 
-		var info = new IntegracioInfo(IntegracioCodiEnum.VALIDASIG, "Validació firmes de document", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.VALIDASIG, "Validació firmes de document", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Nom del document", nom), new AccioParam("ContentType", firmaContentType));
 		try {
 			var validationRequest = new ValidateSignatureRequest();
@@ -106,7 +122,7 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 		if (Strings.isNullOrEmpty(pluginClass)) {
 			var error = "No està configurada la classe per al plugin de validació de firma";
 			log.error(error);
-			throw new SistemaExternException(IntegracioCodiEnum.VALIDASIG.name(), error);
+			throw new SistemaExternException(IntegracioCodi.VALIDASIG.name(), error);
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
@@ -122,7 +138,7 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 			pluginMap.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
-			throw new SistemaExternException(IntegracioCodiEnum.VALIDASIG.name(), "Error al crear la instància del plugin de validació de signatures", ex);
+			throw new SistemaExternException(IntegracioCodi.VALIDASIG.name(), "Error al crear la instància del plugin de validació de signatures", ex);
 		}
 	}
 

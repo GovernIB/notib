@@ -5,8 +5,7 @@ import es.caib.comanda.salut.model.IntegracioApp;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
-import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.plugin.usuari.DadesUsuari;
@@ -16,7 +15,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+
+import static es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto.ENVIAMENT;
+import static es.caib.notib.logic.intf.dto.IntegracioCodi.USUARIS;
 
 /**
  * Helper per a interactuar amb els plugins.
@@ -27,17 +30,26 @@ import java.util.Properties;
 @Component
 public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPlugin> {
 
+
 	public DadesUsuarisPluginHelper(IntegracioHelper integracioHelper,
                                     ConfigHelper configHelper) {
+
 		super(integracioHelper, configHelper);
+    }
+
+	@Override
+	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception {
+
+		var dades = dadesUsuariConsultarAmbCodi(diagnostics.keySet().stream().iterator().next());
+		return dades != null;
 	}
 
 
+//	@Monitor(codi = USUARIS, descripcio = "Consulta rols usuari amb codi", tipus = ENVIAMENT)
 	public List<String> consultarRolsAmbCodi(String usuariCodi) {
 
-		var info = new IntegracioInfo(IntegracioCodiEnum.USUARIS,"Consulta rols usuari amb codi",
-				IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Codi d'usuari", usuariCodi));
-
+		var info = new IntegracioInfo(USUARIS,"Consulta rols usuari amb codi",
+				ENVIAMENT, new AccioParam("Codi d'usuari", usuariCodi));
 		try {
 			peticionsPlugin.updatePeticioTotal(null);
 			var rols = getPlugin().consultarRolsAmbCodi(usuariCodi);
@@ -48,13 +60,13 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
 			peticionsPlugin.updatePeticioError(null);
-			throw new SistemaExternException(IntegracioCodiEnum.USUARIS.name(), errorDescripcio, ex);
+			throw new SistemaExternException(USUARIS.name(), errorDescripcio, ex);
 		}
 	}
 	
 	public DadesUsuari dadesUsuariConsultarAmbCodi(String usuariCodi) {
 		
-		var info = new IntegracioInfo(IntegracioCodiEnum.USUARIS,"Consulta d'usuari amb codi", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(USUARIS,"Consulta d'usuari amb codi", ENVIAMENT,
 				new AccioParam("Codi d'usuari", usuariCodi));
 
 		try {
@@ -66,13 +78,13 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 			var errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
 			peticionsPlugin.updatePeticioError(null);
-			throw new SistemaExternException(IntegracioCodiEnum.USUARIS.name(), errorDescripcio, ex);
+			throw new SistemaExternException(USUARIS.name(), errorDescripcio, ex);
 		}
 	}
 	
 	public List<DadesUsuari> dadesUsuariConsultarAmbGrup(String grupCodi) {
 		
-		var info = new IntegracioInfo(IntegracioCodiEnum.USUARIS,"Consulta d'usuaris d'un grup", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(USUARIS,"Consulta d'usuaris d'un grup", ENVIAMENT,
 				new AccioParam("Codi de grup", grupCodi));
 
 		try {
@@ -84,7 +96,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 			var errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
 			peticionsPlugin.updatePeticioError(null);
-			throw new SistemaExternException(IntegracioCodiEnum.USUARIS.name(), errorDescripcio, ex);
+			throw new SistemaExternException(USUARIS.name(), errorDescripcio, ex);
 		}
 	}
 
@@ -113,7 +125,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 		if (Strings.isNullOrEmpty(pluginClass)) {
 			var msg = "La classe del plugin d'usuari no està definida";
 			log.error(msg);
-			throw new SistemaExternException(IntegracioCodiEnum.USUARIS.name(), msg);
+			throw new SistemaExternException(USUARIS.name(), msg);
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
@@ -125,7 +137,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 			return plugin;
 		} catch (Exception ex) {
 			log.error("Error al crear la instància del plugin de dades d'usuari (" + pluginClass + "): ", ex);
-			throw new SistemaExternException(IntegracioCodiEnum.USUARIS.name(), "Error al crear la instància del plugin de dades d'usuari", ex);
+			throw new SistemaExternException(USUARIS.name(), "Error al crear la instància del plugin de dades d'usuari", ex);
 		}
 	}
 

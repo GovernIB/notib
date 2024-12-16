@@ -59,20 +59,30 @@ public class AvisServiceImpl implements AvisService {
 	@Override
 	public AvisDto updateActiva(Long id, boolean activa) {
 
-		log.debug("Actualitzant propietat activa d'una avis existent (id=" + id + ", activa=" + activa + ")");
-		var avisEntity = avisRepository.findById(id).orElseThrow();
-		avisEntity.updateActiva(activa);
-		return conversioTipusHelper.convertir(avisEntity, AvisDto.class);
+		try {
+			log.debug("Actualitzant propietat activa d'una avis existent (id=" + id + ", activa=" + activa + ")");
+			var avisEntity = avisRepository.findById(id).orElseThrow();
+			avisEntity.updateActiva(activa);
+			return conversioTipusHelper.convertir(avisEntity, AvisDto.class);
+		} catch (Exception e) {
+			log.error("[Avis] Error arctualtizant la propietat activa per l'avis " + id, e);
+			return null;
+		}
 	}
 
 	@Transactional
 	@Override
 	public AvisDto delete(Long id) {
 
-		log.debug("Esborrant avis (id=" + id +  ")");
-		var avisEntity = avisRepository.findById(id).orElseThrow();
-		avisRepository.delete(avisEntity);
-		return conversioTipusHelper.convertir(avisEntity, AvisDto.class);
+		try {
+			log.debug("Esborrant avis (id=" + id +  ")");
+			var avisEntity = avisRepository.findById(id).orElseThrow();
+			avisRepository.delete(avisEntity);
+			return conversioTipusHelper.convertir(avisEntity, AvisDto.class);
+		} catch (Exception e) {
+			log.error("[Avis] Error esborrant l'avis " + id, e);
+			return null;
+		}
 	}
 
 	@Transactional(readOnly = true)
@@ -105,5 +115,10 @@ public class AvisServiceImpl implements AvisService {
 	@Override
 	public List<AvisDto> findActiveAdmin(Long entitatId) {
 		return conversioTipusHelper.convertirList(avisRepository.findActiveAdmin(DateUtils.truncate(new Date(), Calendar.DATE), entitatId), AvisDto.class);
+	}
+
+	@Override
+	public List<Long> findAllIds() {
+		return avisRepository.findAllIds();
 	}
 }

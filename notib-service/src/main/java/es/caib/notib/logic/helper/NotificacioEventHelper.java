@@ -231,6 +231,12 @@ public class NotificacioEventHelper {
                 .errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
     }
 
+    public void addNotificaAmpliarPlazo(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+
+        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.AMPLIAR_PLAZO_OE).error(error)
+                .errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
+    }
+
     // Events d'enviament via Email
     // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

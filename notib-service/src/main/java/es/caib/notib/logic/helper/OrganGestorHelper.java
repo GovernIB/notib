@@ -3,7 +3,7 @@ package es.caib.notib.logic.helper;
 import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.AvisNivellEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -223,7 +222,7 @@ public class OrganGestorHelper {
 		if (llibre != null) {
 			organ.updateLlibre(llibre.getCodi(), llibre.getNomLlarg());
 		}
-		var info = new IntegracioInfo(IntegracioCodiEnum.UNITATS, "Actualització d'oficines SIR per l'entitat " + entitatDir3Codi,
+		var info = new IntegracioInfo(IntegracioCodi.UNITATS, "Actualització d'oficines SIR per l'entitat " + entitatDir3Codi,
 				IntegracioAccioTipusEnumDto.PROCESSAR);
 		var arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitatDir3Codi);
 		processarOficinaOrgan(info, arbreUnitats, organ);

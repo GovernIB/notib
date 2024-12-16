@@ -35,6 +35,17 @@ public abstract class EmailHelper<T> {
     protected abstract String getMailPlainTextBody(T item);
     protected abstract String getMailSubject();
 
+    public void sendEmailTest(String destinatari) throws MessagingException {
+
+        var missatge = mailSender.createMimeMessage();
+        var helper = new MimeMessageHelper(missatge, true, "UTF-8");
+        helper.setTo(destinatari);
+        helper.setFrom(getRemitent());
+        helper.setSubject("[Notib] Test de diagnòstic");
+        helper.setText("Email de test", "Email creat durant el test de diagnòstic");
+        mailSender.send(missatge);
+    }
+
     protected void sendEmailNotificacio(String emailDestinatari, T item) throws MessagingException {
         sendEmailNotificacio(emailDestinatari, item ,null);
     }

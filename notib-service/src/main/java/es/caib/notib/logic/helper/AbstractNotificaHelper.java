@@ -5,8 +5,10 @@ package es.caib.notib.logic.helper;
 
 import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.email.EmailConstants;
-import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -49,6 +51,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -88,6 +91,7 @@ public abstract class AbstractNotificaHelper {
 
 	public abstract RespuestaSincronizarEnvioOE enviamentEntregaPostalNotificada(SincronizarEnvio sincronizarEnvio) throws Exception;
 
+	public abstract RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo, List<NotificacioEnviamentEntity> enviaments);
 
 	public boolean isConnexioNotificaDisponible() {
 		return getNotificaUrlProperty() != null;
@@ -412,7 +416,7 @@ public abstract class AbstractNotificaHelper {
 		cipher.init(Cipher.DECRYPT_MODE, rc4Key);
 
 		if (idXifrat.length() < 11) {
-			throw new SistemaExternException(IntegracioCodiEnum.CALLBACK.name(), "La longitud mínima del identificador xifrat ha de ser 11 caràcters.");
+			throw new SistemaExternException(IntegracioCodi.CALLBACK.name(), "La longitud mínima del identificador xifrat ha de ser 11 caràcters.");
 		}
 
 		byte[] desxifrat = cipher.doFinal(Base64.decodeBase64(idXifrat.getBytes()));
