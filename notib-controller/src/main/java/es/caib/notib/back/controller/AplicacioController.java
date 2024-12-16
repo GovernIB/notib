@@ -164,6 +164,14 @@ public class AplicacioController extends BaseController {
 				: getAjaxControllerReturnValueError(request, REDIRECT, "aplicacio.controller.provar.ko");
 	}
 
+	@ResponseBody
+	@GetMapping(value = "/{aplicacioId}/provar/ajax")
+	public String provarAjax(HttpServletRequest request, @PathVariable Long aplicacioId) {
+
+		return usuariAplicacioService.provarAplicacio(aplicacioId) ? getMessage(request, "aplicacio.controller.provar.ok")
+				: getMessage(request, "aplicacio.controller.provar.ko");
+	}
+
 	private AplicacioFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
 		var command = (AplicacioFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, APLICACIO_FILTRE);
