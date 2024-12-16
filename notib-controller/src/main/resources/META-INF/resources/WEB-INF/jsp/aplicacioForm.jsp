@@ -18,7 +18,24 @@
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
-	<script type="text/javascript"></script>
+	<script type="text/javascript">
+			$(document).ready(function() {
+				$("#btnProvar").click(e => {
+					e.preventDefault();
+					$.ajax({
+						method: "GET",
+						url: "<c:url value="/entitat/${entitat.id}/aplicacio/${aplicacioCommand.id}/provar/ajax"/>",
+						async: true,
+						success: function(data){
+							let classe = data && !data.includes("Error") ? "alert-success" : "alert-danger";
+							let div = '<div class="alert ' + classe +'">' + data + '</div>';
+							$("#contingut-missatges").append(div);
+						},
+						error: error => console.log(error)
+					});
+				});
+			});
+	</script>
 </head>
 <body>
 	<c:set var="createAplication"><not:modalUrl value="/entitat/${entitat.id}/aplicacio/newOrModify"/></c:set>
@@ -38,6 +55,9 @@
 
 		<not:inputText name="callbackUrl" textKey="aplicacio.form.camp.callback.url" required="true"/>
 		<div id="modal-botons">
+			<c:if test ="${!empty aplicacioCommand.id}">
+				<button id="btnProvar" class="btn btn-primary" href="<c:url value="/entitat/${entitat.id}/aplicacio/${aplicacioCommand.id}/provar"/>"><span class="fa fa-cog"></span>&nbsp;&nbsp;<spring:message code="comu.boto.provar"/></button>
+			</c:if>
 			<button id="btnSubmit" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/entitat/${entitat.id}/aplicacio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>

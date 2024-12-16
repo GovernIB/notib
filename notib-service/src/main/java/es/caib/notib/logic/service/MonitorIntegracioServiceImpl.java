@@ -178,6 +178,7 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 				case USUARIS:
 					diagnostics.put(usuari.getCodi(), null);
 					diagnostic.setCorrecte(pluginHelper.diagnosticarDadesUsuaris(diagnostics));
+					diagnostics = null;
 					break;
 				case REGISTRE:
 					diagnostic.setCorrecte(pluginHelper.diagnosticarRegistre(diagnostics));
@@ -214,10 +215,10 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 				case CARPETA:
 					diagnostic.setCorrecte(pluginHelper.diagnosticarCarpeta(diagnostics));
 					break;
-				case EMAIL:
-					emailHelper.sendEmailTest(usuari.getEmail());
-					diagnostic.setCorrecte(true);
-					break;
+//				case EMAIL:
+//					emailHelper.sendEmailTest(usuari.getEmail());
+//					diagnostic.setCorrecte(true);
+//					break;
 				case CIE:
 					enviament = enviamentRepository.findTopByEntregaPostalNullOrderByIdDesc().orElseThrow();
 					var resultat = ciePluginHelper.consultarEstatEntregaPostal(enviament.getId());

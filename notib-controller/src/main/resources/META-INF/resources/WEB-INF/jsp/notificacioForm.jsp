@@ -253,6 +253,23 @@
 	display: none;
 	margin-top:15px;
 }
+
+
+.drag_activated {
+
+	font-size:3em;
+	border: 4px dashed #ffd351;
+	height: 200px;
+	width: 100%;
+	background-color: #f5f5f5;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	mask-image: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+	-webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+}
+
 .highlight {background-color: #de7b7b; color: black; padding:1px 2px;}
 </style>
 </head>
@@ -2071,6 +2088,10 @@
 						</div>
 						<div class="col-md-4 col-md-offset-2">
 							<not:inputCheckbox name="documents[0].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+						</div>
+						<div id="drag-area" class="drag_activated">
+							<span class="down fa fa-upload"></span>
+							<p><spring:message code="notificacio.form.drag.info" /></p>
 						</div>
 						<hr/>
 					</div>

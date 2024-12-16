@@ -82,7 +82,7 @@
 <body>
     <ul class="nav nav-tabs" role="tablist">
         <c:forEach var="integracio" items="${integracions}">
-            <c:if test="${not empty integracio}">
+            <c:if test="${not empty integracio and integracio.codi != 'EMAIL'}">
                 <dl class="dl-horizontal">
                     <dt class="integracio" id="integracio_${integracio.codi}" data-codi="${integracio.codi}"><spring:message code="${integracio.nom}"/></dt>
                     <dd><span id="span-refresh-${integracio.codi}" class="ml-2 fa fa-refresh "></span>
