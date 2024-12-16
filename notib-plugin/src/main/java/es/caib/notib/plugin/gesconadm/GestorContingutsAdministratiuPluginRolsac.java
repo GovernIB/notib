@@ -10,8 +10,12 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
+import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.ejb.CreateException;
@@ -22,6 +26,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.rmi.RemoteException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,8 +52,14 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-	public GestorContingutsAdministratiuPluginRolsac(Properties properties) {
+//	public GestorContingutsAdministratiuPluginRolsac(Properties properties) {
+//		this.properties = properties;
+//		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.ROLSAC")));
+//	}
+
+	public GestorContingutsAdministratiuPluginRolsac(Properties properties, boolean configuracioEspecifica) {
 		this.properties = properties;
+		this.configuracioEspecifica = configuracioEspecifica;
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.ROLSAC")));
 	}
 
@@ -454,6 +466,59 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 		var isBasicAuth = properties.getProperty("es.caib.notib.plugin.gesconadm.basic.authentication");
 		return Strings.isNullOrEmpty(isBasicAuth) || Boolean.parseBoolean(isBasicAuth);
+	}
+
+
+	// Mètodes de SALUT
+	// /////////////////////////////////////////////////////////////////////////////////////////////
+
+	private boolean configuracioEspecifica = false;
+	private int operacionsOk = 0;
+	private int operacionsError = 0;
+
+	@Synchronized
+	private void incrementarOperacioOk() {
+		operacionsOk++;
+	}
+
+	@Synchronized
+	private void incrementarOperacioError() {
+		operacionsError++;
+	}
+
+	@Synchronized
+	private void resetComptadors() {
+		operacionsOk = 0;
+		operacionsError = 0;
+	}
+
+	@Override
+	public boolean teConfiguracioEspecifica() {
+		return this.configuracioEspecifica;
+	}
+
+	@Override
+	public EstatSalut getEstatPlugin() {
+		try {
+			Instant start = Instant.now();
+			consultaUsuaris(getLdapFiltreCodi(), "fakeUser");
+			return EstatSalut.builder()
+					.latencia((int) Duration.between(start, Instant.now()).toMillis())
+					.estat(EstatSalutEnum.UP)
+					.build();
+		} catch (Exception ex) {
+			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
+		}
+	}
+
+	@Override
+	public IntegracioPeticions getPeticionsPlugin() {
+		IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
+				.totalOk(operacionsOk)
+				.totalError(operacionsError)
+				.build();
+		resetComptadors();
+		return integracioPeticions;
 	}
 
 }

@@ -4,11 +4,11 @@ import es.caib.comanda.salut.model.AppInfo;
 import es.caib.comanda.salut.model.DetallSalut;
 import es.caib.comanda.salut.model.EstatSalut;
 import es.caib.comanda.salut.model.EstatSalutEnum;
-import es.caib.comanda.salut.model.IntegracioApp;
 import es.caib.comanda.salut.model.IntegracioInfo;
 import es.caib.comanda.salut.model.IntegracioSalut;
 import es.caib.comanda.salut.model.MissatgeSalut;
 import es.caib.comanda.salut.model.SalutInfo;
+import es.caib.comanda.salut.model.SubsistemaSalutInfo;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.service.SalutService;
 import es.caib.notib.logic.mapper.MissatgeSalutMapper;
@@ -44,6 +44,7 @@ import java.util.Date;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -58,18 +59,22 @@ public class SalutServiceImpl implements SalutService {
 
     @Override
     public List<IntegracioInfo> getIntegracions() {
-        return List.of(
-                IntegracioInfo.builder().integracioApp(IntegracioApp.CAR).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.AFI).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.PFI).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.RSC).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.DIR).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.ARX).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.REG).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.NTF).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.USR).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.EML).build()
-        );
+//        return List.of(
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.CAR).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.AFI).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.PFI).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.RSC).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.DIR).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.ARX).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.REG).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.NTF).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.USR).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.EML).build()
+//        );
+
+        return pluginHelper.getPluginHelpers().stream()
+                .flatMap(pluginHelper -> pluginHelper.getIntegracionsInfo().stream())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -82,7 +87,8 @@ public class SalutServiceImpl implements SalutService {
                 AppInfo.builder().codi("SIR").nom("SIR").build(),
                 AppInfo.builder().codi("NOT").nom("Notificació").build(),
                 AppInfo.builder().codi("CBK").nom("Callback de client").build(),
-                AppInfo.builder().codi("CIE").nom("CIE").build()
+                AppInfo.builder().codi("CIE").nom("CIE").build(),
+                AppInfo.builder().codi("GDO").nom("Gestió documental FileSystem").build()
         );
     }
 
@@ -128,7 +134,7 @@ public class SalutServiceImpl implements SalutService {
 
             return EstatSalut.builder()
                     .estat(EstatSalutEnum.UP)
-                    .latencia(Math.round(stats.getAverage()))
+                    .latencia((int) Math.round(stats.getAverage()))
                     .build();
         } catch (RunnerException e) {
             throw new RuntimeException(e);
@@ -142,7 +148,7 @@ public class SalutServiceImpl implements SalutService {
             Instant start = Instant.now();
             var response = restTemplate.getForObject(performanceUrl, String.class);
             Instant end = Instant.now();
-            long latency = Duration.between(start, end).toMillis();
+            Integer latency = (int) Duration.between(start, end).toMillis();
 
             return EstatSalut.builder()
                     .estat(EstatSalutEnum.UP)
@@ -162,7 +168,7 @@ public class SalutServiceImpl implements SalutService {
 
             return EstatSalut.builder()
                     .estat(EstatSalutEnum.UP)
-                    .latencia(Duration.between(start, end).toMillis())
+                    .latencia((int) Duration.between(start, end).toMillis())
                     .build();
         } catch (Exception e) {
             return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
@@ -172,13 +178,16 @@ public class SalutServiceImpl implements SalutService {
     private List<IntegracioSalut> checkIntegracions() {
 
         try {
-            return pluginHelper.getPeticionsPluginsAndReset();
+            return pluginHelper.getPluginHelpers().stream()
+                    .flatMap(pluginHelper -> pluginHelper.getIntegracionsSalut().stream())
+                    .collect(Collectors.toList());
+//            return pluginHelper.getPeticionsPluginsAndReset();
         } catch (Exception e) {
             return null;
         }
     }
 
-    public List<SalutInfo> checkSubsistemes() {
+    public List<SubsistemaSalutInfo> checkSubsistemes() {
 
         try {
 

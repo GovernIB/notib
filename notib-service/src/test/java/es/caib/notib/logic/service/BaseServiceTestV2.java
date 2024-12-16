@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
@@ -7,16 +8,25 @@ import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
-import es.caib.notib.persist.entity.config.ConfigEntity;
-import es.caib.notib.logic.helper.PluginHelper;
-import es.caib.notib.persist.repository.config.ConfigRepository;
 import es.caib.notib.logic.test.AuthenticationTest;
 import es.caib.notib.logic.test.data.ConfigTest;
 import es.caib.notib.logic.test.data.DatabaseItemTest;
 import es.caib.notib.logic.test.data.EntitatItemTest;
+import es.caib.notib.persist.entity.config.ConfigEntity;
+import es.caib.notib.persist.repository.config.ConfigRepository;
 import es.caib.notib.plugin.SistemaExternException;
+import es.caib.notib.plugin.arxiu.ArxiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.notib.plugin.registre.*;
+import es.caib.notib.plugin.registre.CodiAssumpte;
+import es.caib.notib.plugin.registre.Llibre;
+import es.caib.notib.plugin.registre.LlibreOficina;
+import es.caib.notib.plugin.registre.Oficina;
+import es.caib.notib.plugin.registre.Organisme;
+import es.caib.notib.plugin.registre.RegistrePlugin;
+import es.caib.notib.plugin.registre.RegistrePluginException;
+import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
+import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
+import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -27,7 +37,6 @@ import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -39,19 +48,23 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.MapPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.bind.ValidationException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
-import static es.caib.notib.logic.config.ReadDbPropertiesPostProcessor.DBAPP_PROPERTIES;
 import static org.junit.Assert.fail;
 
 /**
@@ -78,7 +91,7 @@ public class BaseServiceTestV2 {
 	protected GestioDocumentalPlugin gestioDocumentalPluginMock;
 
 	private RegistrePlugin registrePluginMock;
-	private IArxiuPlugin arxiuPluginMock;
+	private ArxiuPlugin arxiuPluginMock;
 	protected UnitatsOrganitzativesPlugin unitatsOrganitzativesPluginMock;
 
 	protected String currentTestDescription = "";
@@ -419,7 +432,7 @@ public class BaseServiceTestV2 {
 
 	//	IArxiuPlugin
 	protected void configureMockArxiuPlugin() throws IOException {
-		arxiuPluginMock = Mockito.mock(IArxiuPlugin.class);
+		arxiuPluginMock = Mockito.mock(ArxiuPlugin.class);
 		Expedient expedientArxiu = new Expedient();
 		expedientArxiu.setIdentificador(UUID.randomUUID().toString());
 		expedientArxiu.setNom("nom");

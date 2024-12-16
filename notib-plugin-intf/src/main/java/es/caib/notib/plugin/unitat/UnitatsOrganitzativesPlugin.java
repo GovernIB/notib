@@ -4,6 +4,7 @@
 package es.caib.notib.plugin.unitat;
 
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
+import es.caib.notib.plugin.SalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 
 import java.util.Date;
@@ -16,16 +17,14 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface UnitatsOrganitzativesPlugin {
+public interface UnitatsOrganitzativesPlugin extends SalutPlugin {
 	
 	/**
 	 * Retorna la llista d'unitats organitzatives filles donat un codi d'entitat.
 	 * 
-	 * @param codi
+	 * @param codiEntitat
 	 *            Codi dir3 de la unitat pare.
-	 * @param inclourePare
-	 * 			  Indica si el llistat ha d'incloure l'entitat pare
-	 *            
+	 *
 	 * @return La llista d'unitats organitzatives.
 	 * @throws SistemaExternException
 	 *            Si es produeix un error al consultar les unitats organitzatives.
@@ -81,7 +80,7 @@ public interface UnitatsOrganitzativesPlugin {
 	/**
 	 * Retorna la llista d'unitats organitzatives filles donat un codi d'entitat.
 	 * 
-	 * @param codi
+	 * @param codiEntitat
 	 *            Codi dir3 de la unitat pare.
 	 * @param inclourePare
 	 * 			  Indica si el llistat ha d'incloure l'entitat pare
@@ -95,7 +94,7 @@ public interface UnitatsOrganitzativesPlugin {
 	/**
 	 * Retorna la denominació  d'una unitats organitzativa.
 	 * 
-	 * @param codi
+	 * @param codiDir3
 	 *            Codi dir3 de la unitat organitzativa.
 	 *            
 	 * @return La denominació de la unitat organitzativa.
@@ -121,7 +120,7 @@ public interface UnitatsOrganitzativesPlugin {
 	 *            Indica si les unitats retornades són unitats arrel.
 	 * @param provincia
 	 *            Codi de la provincia de la unitat.
-	 * @param localitat
+	 * @param municipi
 	 *            Codi de la localitat de la unitat.
 	 *            
 	 * @return La llista d'unitats organitzatives.
@@ -165,7 +164,7 @@ public interface UnitatsOrganitzativesPlugin {
 	 *            Codi de la comunitat de la oficina.
 	 * @param provincia
 	 *            Codi de la provincia de la oficina.
-	 * @param localitat
+	 * @param municipi
 	 *            Codi de la localitat de la oficina.
 	 *            
 	 * @return La llista d'unitats organitzatives.

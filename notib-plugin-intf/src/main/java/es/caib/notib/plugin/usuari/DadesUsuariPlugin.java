@@ -3,6 +3,7 @@
  */
 package es.caib.notib.plugin.usuari;
 
+import es.caib.notib.plugin.SalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface DadesUsuariPlugin {
+public interface DadesUsuariPlugin extends SalutPlugin {
 
 	/**
 	 * Retorna la informació d'un usuari donat el codi d'usuari.

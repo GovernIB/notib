@@ -1,7 +1,7 @@
 package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
-import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioApp;
 import es.caib.notib.client.domini.DocumentTipus;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
@@ -973,12 +973,6 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 		}
 	}
 
-	@Override
-	protected EstatSalutEnum getEstat() {
-		// TODO: Petició per comprovar la salut
-		return EstatSalutEnum.UP;
-	}
-
 	private static boolean isDocumentEstranger(String nie) {
 
 		if (nie == null) {
@@ -1018,6 +1012,12 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 	protected String getPluginClassProperty() {
 		return configHelper.getConfig("es.caib.notib.plugin.registre.class");
 	}
+
+	@Override
+	protected IntegracioApp getCodiApp() {
+		return IntegracioApp.REG;
+	}
+
 	private int getSegonsEntreReintentRegistreProperty() {
 		return configHelper.getConfigAsInteger("es.caib.notib.plugin.registre.segons.entre.peticions");
 	}

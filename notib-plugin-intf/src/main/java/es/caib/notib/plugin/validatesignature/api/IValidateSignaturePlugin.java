@@ -1,6 +1,7 @@
 package es.caib.notib.plugin.validatesignature.api;
 
 import es.caib.notib.plugin.certificate.InformacioCertificat;
+import es.caib.notib.plugin.validatesignature.ValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
 
 import java.util.Arrays;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
  * @author anadal
  *
  */
-public interface IValidateSignaturePlugin extends org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin {
+public interface IValidateSignaturePlugin extends ValidateSignaturePlugin {
   
   
   public static final String VALIDATE_SIGNATURE_BASE_PROPERTY = IPLUGIN_BASE_PROPERTIES + "validatesignature.";

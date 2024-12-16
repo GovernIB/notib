@@ -1,6 +1,8 @@
 package es.caib.notib.plugin.gesdoc;
 
-import com.google.common.base.Strings;
+import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.notib.logic.intf.util.FitxerUtils;
 import es.caib.notib.logic.intf.util.MimeUtils;
 import es.caib.notib.plugin.SistemaExternException;
@@ -22,7 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Comparator;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.zip.ZipFile;
 
@@ -246,4 +247,18 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 		return agrupacio;
 	}
 
+	@Override
+	public boolean teConfiguracioEspecifica() {
+		return false;
+	}
+
+	@Override
+	public EstatSalut getEstatPlugin() {
+		return EstatSalut.builder().estat(EstatSalutEnum.UP).latencia(1).build();
+	}
+
+	@Override
+	public IntegracioPeticions getPeticionsPlugin() {
+		return null;
+	}
 }

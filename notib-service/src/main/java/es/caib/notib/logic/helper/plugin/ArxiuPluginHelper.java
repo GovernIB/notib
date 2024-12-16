@@ -1,7 +1,7 @@
 package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
-import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioApp;
 import es.caib.notib.logic.exception.DocumentNotFoundException;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -10,9 +10,9 @@ import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodiEnum;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
+import es.caib.notib.plugin.arxiu.ArxiuPlugin;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +26,7 @@ import java.util.Properties;
  */
 @Slf4j
 @Component
-public class ArxiuPluginHelper extends AbstractPluginHelper<IArxiuPlugin> {
+public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 
 	public ArxiuPluginHelper(IntegracioHelper integracioHelper,
                              ConfigHelper configHelper) {
@@ -99,7 +99,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<IArxiuPlugin> {
 	}
 
 	@Override
-	protected IArxiuPlugin getPlugin() {
+	protected ArxiuPlugin getPlugin() {
 
 		var codiEntitat = getCodiEntitatActual();
 		if (Strings.isNullOrEmpty(codiEntitat)) {
@@ -117,7 +117,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<IArxiuPlugin> {
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (IArxiuPlugin) clazz.getDeclaredConstructor(String.class, Properties.class).newInstance("es.caib.notib.", configHelper.getEnvironmentProperties());
+			plugin = (ArxiuPlugin) clazz.getDeclaredConstructor(String.class, Properties.class).newInstance("es.caib.notib.", configHelper.getEnvironmentProperties());
 			pluginMap.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -127,23 +127,22 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<IArxiuPlugin> {
 		}
 	}
 
-	@Override
-	protected EstatSalutEnum getEstat() {
-		// TODO: Petició per comprovar la salut
-		return EstatSalutEnum.UP;
-	}
-
 	// PROPIETATS PLUGIN
 	@Override
 	protected String getPluginClassProperty() {
 		return configHelper.getConfig("es.caib.notib.plugin.arxiu.class");
 	}
 
+	@Override
+	protected IntegracioApp getCodiApp() {
+		return IntegracioApp.ARX;
+	}
+
 	// Mètodes pels tests
-	public void setArxiuPlugin(IArxiuPlugin arxiuPlugin) {
+	public void setArxiuPlugin(ArxiuPlugin arxiuPlugin) {
 		this.pluginMap.put(getCodiEntitatActual(), arxiuPlugin);
 	}
-	public void setArxiuPlugin(Map<String, IArxiuPlugin> arxiuPlugin) {
+	public void setArxiuPlugin(Map<String, ArxiuPlugin> arxiuPlugin) {
 		pluginMap = arxiuPlugin;
 	}
 

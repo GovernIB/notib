@@ -1,7 +1,7 @@
 package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
-import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioApp;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.MessageHelper;
@@ -505,17 +505,16 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		}
 	}
 
-	@Override
-	protected EstatSalutEnum getEstat() {
-		// TODO: Petició per comprovar la salut
-		return EstatSalutEnum.UP;
-	}
-
 
 	// PROPIETATS PLUGIN
 	@Override
 	protected String getPluginClassProperty() {
 		return configHelper.getConfig("es.caib.notib.plugin.unitats.class");
+	}
+
+	@Override
+	protected IntegracioApp getCodiApp() {
+		return IntegracioApp.DIR;
 	}
 
 	public void setUnitatsOrganitzativesPlugin(UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin) {

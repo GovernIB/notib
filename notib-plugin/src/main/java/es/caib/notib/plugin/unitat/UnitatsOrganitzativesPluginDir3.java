@@ -8,11 +8,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.dir3caib.ws.api.catalogo.CatPais;
 import es.caib.dir3caib.ws.api.oficina.OficinaTF;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -25,6 +29,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -54,9 +60,15 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-	public UnitatsOrganitzativesPluginDir3(Properties properties) {
+//	public UnitatsOrganitzativesPluginDir3(Properties properties) {
+//
+//		this.properties = properties;
+//		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.UNITATS")));
+//	}
 
+	public UnitatsOrganitzativesPluginDir3(Properties properties, boolean configuracioEspecifica) {
 		this.properties = properties;
+		this.configuracioEspecifica = configuracioEspecifica;
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.UNITATS")));
 	}
 
@@ -646,5 +658,58 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 		reqContext.put(BindingProvider.USERNAME_PROPERTY, usr);
 		reqContext.put(BindingProvider.PASSWORD_PROPERTY, pwd);
 	}
-	
+
+
+	// Mètodes de SALUT
+	// /////////////////////////////////////////////////////////////////////////////////////////////
+
+	private boolean configuracioEspecifica = false;
+	private int operacionsOk = 0;
+	private int operacionsError = 0;
+
+	@Synchronized
+	private void incrementarOperacioOk() {
+		operacionsOk++;
+	}
+
+	@Synchronized
+	private void incrementarOperacioError() {
+		operacionsError++;
+	}
+
+	@Synchronized
+	private void resetComptadors() {
+		operacionsOk = 0;
+		operacionsError = 0;
+	}
+
+	@Override
+	public boolean teConfiguracioEspecifica() {
+		return this.configuracioEspecifica;
+	}
+
+	@Override
+	public EstatSalut getEstatPlugin() {
+		try {
+			Instant start = Instant.now();
+			consultaUsuaris(getLdapFiltreCodi(), "fakeUser");
+			return EstatSalut.builder()
+					.latencia((int) Duration.between(start, Instant.now()).toMillis())
+					.estat(EstatSalutEnum.UP)
+					.build();
+		} catch (Exception ex) {
+			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
+		}
+	}
+
+	@Override
+	public IntegracioPeticions getPeticionsPlugin() {
+		IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
+				.totalOk(operacionsOk)
+				.totalError(operacionsError)
+				.build();
+		resetComptadors();
+		return integracioPeticions;
+	}
+
 }

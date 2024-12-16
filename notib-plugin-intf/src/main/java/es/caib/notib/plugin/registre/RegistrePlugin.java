@@ -1,10 +1,11 @@
 package es.caib.notib.plugin.registre;
 
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
+import es.caib.notib.plugin.SalutPlugin;
 
 import java.util.List;
 
-public interface RegistrePlugin {
+public interface RegistrePlugin extends SalutPlugin {
 	
 //	/**
 //	 * Crea un registre de sortida

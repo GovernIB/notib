@@ -2,20 +2,34 @@ package es.caib.notib.plugin.arxiu;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.notib.logic.intf.util.MimeUtils;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
-import es.caib.plugins.arxiu.api.*;
-import es.caib.plugins.arxiu.caib.ArxiuCaibClient;
+import es.caib.plugins.arxiu.api.ArxiuException;
+import es.caib.plugins.arxiu.api.ContingutOrigen;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
+import es.caib.plugins.arxiu.api.DocumentExtensio;
+import es.caib.plugins.arxiu.api.DocumentFormat;
+import es.caib.plugins.arxiu.api.DocumentMetadades;
+import es.caib.plugins.arxiu.api.DocumentTipus;
+import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.DatatypeConverter;
-import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -26,7 +40,7 @@ import java.util.Map;
 import java.util.Properties;
 
 @Slf4j
-public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlugin {
+public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements ArxiuPlugin {
 
 	
 	public static final String ARXIU_BASE_PROPERTY = "es.caib.notib.plugin.arxiu.";
@@ -42,25 +56,57 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-	public ArxiuPluginConcsvImpl(String propertyKeyBase) {
-		super(propertyKeyBase);
-	}
+//	public ArxiuPluginConcsvImpl(String propertyKeyBase) {
+//		super(propertyKeyBase);
+//	}
+//
+//	public ArxiuPluginConcsvImpl(String propertyKeyBase, Properties properties) {
+//
+//		super(propertyKeyBase, properties);
+//		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.ARXIU")));
+//	}
 
-	public ArxiuPluginConcsvImpl(String propertyKeyBase, Properties properties) {
+	public ArxiuPluginConcsvImpl(String propertyKeyBase, Properties properties, boolean configuracioEspecifica) {
 
 		super(propertyKeyBase, properties);
+		this.configuracioEspecifica = configuracioEspecifica;
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.ARXIU")));
 	}
 
 	@Override
 	public Document documentDetalls(String identificador, String versio, boolean ambContingut) throws ArxiuException {
 
-		if (identificador.contains("csv:")) {
-//			identificador = identificador.replace("csv:", "");
-			return documentDetallsCsv(identificador, ambContingut);
+		try {
+			Document document = identificador.contains("csv:") ? 
+					documentDetallsCsv(identificador, ambContingut) : 
+					documentDetallsUuid(identificador, ambContingut);
+			incrementarOperacioOk();
+			return document;
+		} catch (Exception ex) {
+			incrementarOperacioError();
+			throw ex;
 		}
-//		identificador = identificador.replace(UUID, "");
-		return documentDetallsUuid(identificador, ambContingut);
+	}
+
+	@Override
+	public DocumentContingut documentImprimible(String identificador) throws ArxiuException {
+
+		DocumentContingut documentContingut;
+		var id = identificador;
+		try {
+			if (identificador.contains(UUID)) {
+				identificador = identificador.replace(UUID, "");
+				documentContingut = documentImprimibleUuid(identificador);
+			} else {
+				identificador = identificador.replace("csv:", "");
+				documentContingut = documentImprimibleCsv(identificador);
+			}
+			incrementarOperacioOk();
+			return documentContingut;
+		} catch (Exception ex) {
+			incrementarOperacioError();
+			return documentOriginal(id);
+		}
 	}
 
 	private Document documentDetallsCsv(String identificador, boolean ambContingut) {
@@ -136,22 +182,6 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 		} catch (Exception ex) {
 			log.debug("S'ha produit un error generant el document " + identificador, ex);
 			throw new ArxiuException("S'ha produit un error recuperant el document original " + identificador, ex);
-		}
-	}
-
-	@Override
-	public DocumentContingut documentImprimible(String identificador) throws ArxiuException {
-
-		var id = identificador;
-		try {
-			if (identificador.contains(UUID)) {
-				identificador = identificador.replace(UUID, "");
-				return documentImprimibleUuid(identificador);
-			}
-			identificador = identificador.replace("csv:", "");
-			return documentImprimibleCsv(identificador);
-		} catch (Exception ex) {
-			return documentOriginal(id);
 		}
 	}
 
@@ -392,6 +422,14 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 		return versioImprimibleClient;
 	}
 
+//	private static String ORIGINAL_URL_CSV = ARXIUCAIB_BASE_PROPERTY + "conversio.original.url.csv";
+//	private static String ORIGINAL_URL_UUID = ARXIUCAIB_BASE_PROPERTY + "conversio.original.url.uuid";
+//	private static String IMPRIMIBLE_URL_CSV = ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.url.csv";
+//	private static String IMPRIMIBLE_URL_UUID = ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.url.uuid";
+//	private static String IMPRIMIBLE_USAURI = ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.usuari";
+//	private static String IMPRIMIBLE_PASS = ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.contrasenya";
+
+
 	private String getPropertyConversioOriginalUrlCsv() {
 		return getPluginProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.original.url.csv");
 	}
@@ -432,4 +470,60 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 		return Integer.parseInt(timeout);
 	}
 
+
+	// Mètodes de SALUT
+	// /////////////////////////////////////////////////////////////////////////////////////////////
+
+	private boolean configuracioEspecifica = false;
+	private int operacionsOk = 0;
+	private int operacionsError = 0;
+
+	@Synchronized
+	private void incrementarOperacioOk() {
+		operacionsOk++;
+	}
+
+	@Synchronized
+	private void incrementarOperacioError() {
+		operacionsError++;
+	}
+
+	@Synchronized
+	private void resetComptadors() {
+		operacionsOk = 0;
+		operacionsError = 0;
+	}
+
+	@Override
+	public boolean teConfiguracioEspecifica() {
+		return this.configuracioEspecifica;
+	}
+
+	@Override
+	public EstatSalut getEstatPlugin() {
+		try {
+			Instant start = Instant.now();
+			String url = getPropertyConversioImprimibleUrlUuidConcsv();
+			String identificador = "00000000-0000-0000-0000-000000000000";
+			WebResource webResource = getVersioImprimibleClientConcsv().resource(url.endsWith("/") ? url + identificador : url + "/" + identificador);
+			ClientResponse response = webResource.get(ClientResponse.class);
+			if (response.getStatus() == 204) {
+				return EstatSalut.builder()
+						.latencia((int) Duration.between(start, Instant.now()).toMillis())
+						.estat(EstatSalutEnum.UP)
+						.build();
+			}
+		} catch (Exception ex) {}
+		return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
+	}
+
+	@Override
+	public IntegracioPeticions getPeticionsPlugin() {
+		IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
+				.totalOk(operacionsOk)
+				.totalError(operacionsError)
+				.build();
+		resetComptadors();
+		return integracioPeticions;
+	}
 }

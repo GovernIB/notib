@@ -2,6 +2,9 @@ package es.caib.notib.plugin.valsig;
 
 
 
+import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.notib.plugin.validatesignature.api.IValidateSignaturePlugin;
 import es.caib.notib.plugin.validatesignature.api.SignatureRequestedInformation;
 import es.caib.notib.plugin.validatesignature.api.ValidateSignatureRequest;
@@ -51,5 +54,20 @@ public class ValidacioFirmesPluginMock implements IValidateSignaturePlugin {
 //        validationStatus.setStatus(ValidationStatus.SIGNATURE_INVALID); // Validacio INVALID
         validateSignatureResponse.setValidationStatus(validationStatus);
         return validateSignatureResponse;
+    }
+
+    @Override
+    public boolean teConfiguracioEspecifica() {
+        return false;
+    }
+
+    @Override
+    public EstatSalut getEstatPlugin() {
+        return EstatSalut.builder().estat(EstatSalutEnum.UP).latencia(1).build();
+    }
+
+    @Override
+    public IntegracioPeticions getPeticionsPlugin() {
+        return IntegracioPeticions.builder().build();
     }
 }

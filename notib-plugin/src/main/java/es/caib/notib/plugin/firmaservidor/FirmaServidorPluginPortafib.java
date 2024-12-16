@@ -1,17 +1,29 @@
 package es.caib.notib.plugin.firmaservidor;
 
-import es.caib.notib.client.domini.Fitxer;
+import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.notib.logic.intf.util.FitxerUtils;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.fundaciobit.plugins.signature.api.*;
+import org.fundaciobit.plugins.signature.api.CommonInfoSignature;
+import org.fundaciobit.plugins.signature.api.FileInfoSignature;
+import org.fundaciobit.plugins.signature.api.ITimeStampGenerator;
+import org.fundaciobit.plugins.signature.api.PdfVisibleSignature;
+import org.fundaciobit.plugins.signature.api.SecureVerificationCodeStampInfo;
+import org.fundaciobit.plugins.signature.api.SignaturesSet;
+import org.fundaciobit.plugins.signature.api.SignaturesTableHeader;
+import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
 import org.fundaciobit.plugins.signatureserver.api.ISignatureServerPlugin;
 import org.fundaciobit.plugins.signatureserver.portafib.PortaFIBSignatureServerPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -33,7 +45,19 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-	public FirmaServidorPluginPortafib(Properties properties) {
+//	public FirmaServidorPluginPortafib(Properties properties) {
+//
+//		super();
+//		plugin = new PortaFIBSignatureServerPlugin(PROPERTIES_BASE, properties);
+//		this.properties = properties;
+//		var tempDir = System.getProperty("java.io.tmpdir");
+//		final var base = new File(tempDir, FIRMASERVIDOR_TMPDIR);
+//		base.mkdirs();
+//		tempDirPath = base.getAbsolutePath();
+//		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.FIRMA_SERVIDOR")));
+//	}
+
+	public FirmaServidorPluginPortafib(Properties properties, boolean configuracioEspecifica) {
 
 		super();
 		plugin = new PortaFIBSignatureServerPlugin(PROPERTIES_BASE, properties);
@@ -42,6 +66,7 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 		final var base = new File(tempDir, FIRMASERVIDOR_TMPDIR);
 		base.mkdirs();
 		tempDirPath = base.getAbsolutePath();
+		this.configuracioEspecifica = configuracioEspecifica;
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.FIRMA_SERVIDOR")));
 	}
 
@@ -151,4 +176,58 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 		}
 		throw new SistemaExternException(exceptionMessage);
 	}
+
+
+	// Mètodes de SALUT
+	// /////////////////////////////////////////////////////////////////////////////////////////////
+
+	private boolean configuracioEspecifica = false;
+	private int operacionsOk = 0;
+	private int operacionsError = 0;
+
+	@Synchronized
+	private void incrementarOperacioOk() {
+		operacionsOk++;
+	}
+
+	@Synchronized
+	private void incrementarOperacioError() {
+		operacionsError++;
+	}
+
+	@Synchronized
+	private void resetComptadors() {
+		operacionsOk = 0;
+		operacionsError = 0;
+	}
+
+	@Override
+	public boolean teConfiguracioEspecifica() {
+		return this.configuracioEspecifica;
+	}
+
+	@Override
+	public EstatSalut getEstatPlugin() {
+		try {
+			Instant start = Instant.now();
+			consultaUsuaris(getLdapFiltreCodi(), "fakeUser");
+			return EstatSalut.builder()
+					.latencia((int) Duration.between(start, Instant.now()).toMillis())
+					.estat(EstatSalutEnum.UP)
+					.build();
+		} catch (Exception ex) {
+			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
+		}
+	}
+
+	@Override
+	public IntegracioPeticions getPeticionsPlugin() {
+		IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
+				.totalOk(operacionsOk)
+				.totalError(operacionsError)
+				.build();
+		resetComptadors();
+		return integracioPeticions;
+	}
+
 }

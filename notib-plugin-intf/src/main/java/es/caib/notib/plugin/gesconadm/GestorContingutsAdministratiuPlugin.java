@@ -4,6 +4,7 @@
 package es.caib.notib.plugin.gesconadm;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.notib.plugin.SalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface GestorContingutsAdministratiuPlugin {
+public interface GestorContingutsAdministratiuPlugin extends SalutPlugin {
 
 	GesconAdm getProcSerByCodiSia(String codiSia, boolean isService) throws SistemaExternException;
 

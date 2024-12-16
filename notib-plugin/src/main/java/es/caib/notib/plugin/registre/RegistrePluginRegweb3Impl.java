@@ -1,6 +1,9 @@
 package es.caib.notib.plugin.registre;
 
 import com.google.common.base.Strings;
+import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.InteresadoWsDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
@@ -8,13 +11,27 @@ import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.logic.intf.dto.RegistreInteressatDocumentTipusDtoEnum;
 import es.caib.notib.logic.intf.dto.RegistreInteressatDto;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
-import es.caib.regweb3.ws.api.v3.*;
+import es.caib.regweb3.ws.api.v3.AnexoWs;
+import es.caib.regweb3.ws.api.v3.AsientoRegistralWs;
+import es.caib.regweb3.ws.api.v3.CodigoAsuntoWs;
+import es.caib.regweb3.ws.api.v3.DatosInteresadoWs;
+import es.caib.regweb3.ws.api.v3.IdentificadorWs;
+import es.caib.regweb3.ws.api.v3.InteresadoWs;
+import es.caib.regweb3.ws.api.v3.JustificanteWs;
+import es.caib.regweb3.ws.api.v3.LibroOficinaWs;
+import es.caib.regweb3.ws.api.v3.LibroWs;
+import es.caib.regweb3.ws.api.v3.OficinaWs;
+import es.caib.regweb3.ws.api.v3.OficioWs;
+import es.caib.regweb3.ws.api.v3.OrganismoWs;
+import es.caib.regweb3.ws.api.v3.TipoAsuntoWs;
+import es.caib.regweb3.ws.api.v3.WsI18NException;
+import es.caib.regweb3.ws.api.v3.WsValidationException;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,9 +53,15 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-	public RegistrePluginRegweb3Impl(Properties properties) {
+//	public RegistrePluginRegweb3Impl(Properties properties) {
+//
+//		super(properties);
+//		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.REGISTRE")));
+//	}
 
+	public RegistrePluginRegweb3Impl(Properties properties, boolean configuracioEspecifica) {
 		super(properties);
+		this.configuracioEspecifica = configuracioEspecifica;
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.REGISTRE")));
 	}
 
@@ -659,6 +682,59 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			throw new RegistrePluginException("Error conversió codis assumpte", ex);
 		}
 		return codisAssumpte;
+	}
+
+
+	// Mètodes de SALUT
+	// /////////////////////////////////////////////////////////////////////////////////////////////
+
+	private boolean configuracioEspecifica = false;
+	private int operacionsOk = 0;
+	private int operacionsError = 0;
+
+	@Synchronized
+	private void incrementarOperacioOk() {
+		operacionsOk++;
+	}
+
+	@Synchronized
+	private void incrementarOperacioError() {
+		operacionsError++;
+	}
+
+	@Synchronized
+	private void resetComptadors() {
+		operacionsOk = 0;
+		operacionsError = 0;
+	}
+
+	@Override
+	public boolean teConfiguracioEspecifica() {
+		return this.configuracioEspecifica;
+	}
+
+	@Override
+	public EstatSalut getEstatPlugin() {
+		try {
+			Instant start = Instant.now();
+			consultaUsuaris(getLdapFiltreCodi(), "fakeUser");
+			return EstatSalut.builder()
+					.latencia((int) Duration.between(start, Instant.now()).toMillis())
+					.estat(EstatSalutEnum.UP)
+					.build();
+		} catch (Exception ex) {
+			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
+		}
+	}
+
+	@Override
+	public IntegracioPeticions getPeticionsPlugin() {
+		IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
+				.totalOk(operacionsOk)
+				.totalError(operacionsError)
+				.build();
+		resetComptadors();
+		return integracioPeticions;
 	}
 
 }

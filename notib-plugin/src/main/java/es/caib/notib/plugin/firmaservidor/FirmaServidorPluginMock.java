@@ -3,6 +3,9 @@
  */
 package es.caib.notib.plugin.firmaservidor;
 
+import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.notib.plugin.SistemaExternException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -43,6 +46,24 @@ public class FirmaServidorPluginMock implements FirmaServidorPlugin {
 			log.error(errMsg, ex);
 		}
 		return firmaContingut;
+	}
+
+	// Mètodes de SALUT
+	// /////////////////////////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public boolean teConfiguracioEspecifica() {
+		return false;
+	}
+
+	@Override
+	public EstatSalut getEstatPlugin() {
+		return EstatSalut.builder().estat(EstatSalutEnum.UP).latencia(1).build();
+	}
+
+	@Override
+	public IntegracioPeticions getPeticionsPlugin() {
+		return IntegracioPeticions.builder().build();
 	}
 
 }

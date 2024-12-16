@@ -3,6 +3,9 @@ package es.caib.notib.plugin.validatesignature.afirmacxf;
 import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.security.PdfPKCS7;
+import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.notib.plugin.certificate.afirmacxf.InfoCertificatUtils;
 import es.caib.notib.plugin.validatesignature.afirmacxf.utils.XMLUtil;
 import es.caib.notib.plugin.validatesignature.afirmacxf.validarfirmaapi.DSSSignature;
@@ -33,6 +36,7 @@ import es.gob.afirma.utils.DSSConstants.ReportDetailLevel;
 import es.gob.afirma.utils.GeneralConstants;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
+import lombok.Synchronized;
 import net.java.xades.security.xml.XMLSignatureElement;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -66,6 +70,8 @@ import java.nio.charset.Charset;
 import java.security.Security;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -297,6 +303,12 @@ public class AfirmaCxfValidateSignaturePlugin extends AbstractValidateSignatureP
   public AfirmaCxfValidateSignaturePlugin(String propertyKeyBase, Properties properties) {
     super(propertyKeyBase, properties);
     init();
+  }
+
+  public AfirmaCxfValidateSignaturePlugin(String propertyKeyBase, Properties properties, boolean configuracioEspecifica) {
+    super(propertyKeyBase, properties);
+    init();
+    this.configuracioEspecifica = configuracioEspecifica;
   }
 
   public AfirmaCxfValidateSignaturePlugin(String propertyKeyBase) {
@@ -1305,6 +1317,59 @@ public class AfirmaCxfValidateSignaturePlugin extends AbstractValidateSignatureP
   @Override
   public String getResourceBundleName() {
   	return "validatesignature-afirmacxf";
+  }
+
+
+  // Mètodes de SALUT
+  // /////////////////////////////////////////////////////////////////////////////////////////////
+
+  private boolean configuracioEspecifica = false;
+  private int operacionsOk = 0;
+  private int operacionsError = 0;
+
+  @Synchronized
+  private void incrementarOperacioOk() {
+    operacionsOk++;
+  }
+
+  @Synchronized
+  private void incrementarOperacioError() {
+    operacionsError++;
+  }
+
+  @Synchronized
+  private void resetComptadors() {
+    operacionsOk = 0;
+    operacionsError = 0;
+  }
+
+  @Override
+  public boolean teConfiguracioEspecifica() {
+    return this.configuracioEspecifica;
+  }
+
+  @Override
+  public EstatSalut getEstatPlugin() {
+    try {
+      Instant start = Instant.now();
+      consultaUsuaris(getLdapFiltreCodi(), "fakeUser");
+      return EstatSalut.builder()
+              .latencia((int) Duration.between(start, Instant.now()).toMillis())
+              .estat(EstatSalutEnum.UP)
+              .build();
+    } catch (Exception ex) {
+      return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
+    }
+  }
+
+  @Override
+  public IntegracioPeticions getPeticionsPlugin() {
+    IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
+            .totalOk(operacionsOk)
+            .totalError(operacionsError)
+            .build();
+    resetComptadors();
+    return integracioPeticions;
   }
 
 }
