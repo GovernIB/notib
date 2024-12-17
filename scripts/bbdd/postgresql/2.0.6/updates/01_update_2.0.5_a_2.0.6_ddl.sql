@@ -12,3 +12,4 @@ ALTER TABLE not_notificacio ADD caducitat_original date;
 ALTER TABLE not_notificacio_env_table ADD entrega_postal NUMBER(1) DEFAULT '0';
 ALTER TABLE not_notificacio_table ADD entrega_postal NUMBER(1) DEFAULT '0';
 ALTER TABLE not_columnes ADD entrega_postal NUMBER(1) DEFAULT '1';
+ALTER TABLE not_notificacio_env ADD plazo_ampliado NUMBER(1, 0);
