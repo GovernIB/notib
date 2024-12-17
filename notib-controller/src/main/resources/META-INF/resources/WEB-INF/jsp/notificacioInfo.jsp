@@ -406,7 +406,7 @@ $(document).ready(function() {
 								<td><strong><spring:message code="notificacio.info.dada.caducitat"/></strong></td>
 								<td>
 									<fmt:formatDate value="${notificacio.caducitat}" pattern="dd/MM/yyyy" />
-									<c:if test="${notificacio.plazoAmpliado = true or notificacio.caducitatOriginal != null}">
+									<c:if test="${notificacio.plazoAmpliado == true or notificacio.caducitatOriginal != null}">
 										<span class="label label-warning"><spring:message code="enviament.info.notifica.caducitat.plazo.ampliado"/></span>
 									</c:if>
 								</td>

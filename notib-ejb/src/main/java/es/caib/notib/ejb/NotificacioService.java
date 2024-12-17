@@ -39,6 +39,7 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -450,6 +451,12 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	@RolesAllowed("**")
 	public RespuestaAmpliarPlazoOE ampliacionPlazoOE(AmpliacionPlazoDto dto) {
 		return getDelegateService().ampliacionPlazoOE(dto);
+	}
+
+	@Override
+	@RolesAllowed("**")
+	public Date getCaducitat(Long notificacioId) {
+		return getDelegateService().getCaducitat(notificacioId);
 	}
 
 	@SuppressWarnings("rawtypes")

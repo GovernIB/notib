@@ -2051,6 +2051,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	@Override
+	public Date getCaducitat(Long notificacioId) {
+
+		try {
+			return notificacioRepository.findById(notificacioId).orElseThrow().getCaducitat();
+		} catch (Exception ex) {
+			log.error("Error al obtenir la caducitat de la notificacio amb id " + notificacioId, ex);
+			return null;
+		}
+	}
+
+	@Override
 	public void refrescarEnviamentsExpirats() {
 
 		var timer = metricsHelper.iniciMetrica();
