@@ -15,6 +15,7 @@ import es.caib.notib.logic.helper.RequestsHelper;
 import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.RespostaTestAplicacio;
 import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.AuditService.TipusEntitat;
@@ -230,17 +231,20 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	}
 
 	@Override
-	public boolean provarAplicacio(Long aplicacioId) {
+	public RespostaTestAplicacio provarAplicacio(Long aplicacioId) {
 
 		try {
 			log.info("Provant aplicacio " + aplicacioId);
 			var aplicacio = aplicacioRepository.findById(aplicacioId).orElseThrow();
 			var urlCallback = aplicacio.getCallbackUrl() + (aplicacio.getCallbackUrl().endsWith("/") ? "" : "/") +  CallbackHelper.NOTIFICACIO_CANVI;
 			var resposta = requestsHelper.callbackAplicacioNotificaCanvi(urlCallback, new NotificacioCanviClient());
-			return resposta != null && ClientResponse.Status.OK.getStatusCode() == resposta.getStatusInfo().getStatusCode();
+			var ok = resposta != null && ClientResponse.Status.OK.getStatusCode() == resposta.getStatusInfo().getStatusCode();
+			var error = !ok && resposta != null ? resposta.getStatus() + " " + resposta.getStatusInfo() : null;
+			return RespostaTestAplicacio.builder().ok(ok).error(error).build();
 		} catch (Exception ex) {
-			log.error("Error inesperat provant la aplicacio", ex);
-			return false;
+			var msg = "Error inesperat provant la aplicacio";
+			log.error(msg, ex);
+			return RespostaTestAplicacio.builder().ok(false).error(msg + ex.getMessage()).build();
 		}
 	}
 

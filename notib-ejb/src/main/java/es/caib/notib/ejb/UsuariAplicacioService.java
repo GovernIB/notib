@@ -6,6 +6,7 @@ package es.caib.notib.ejb;
 import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.RespostaTestAplicacio;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import org.springframework.context.annotation.Primary;
 
@@ -92,7 +93,7 @@ public class UsuariAplicacioService extends AbstractService<es.caib.notib.logic.
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public boolean provarAplicacio(Long aplicacioId) {
+	public RespostaTestAplicacio provarAplicacio(Long aplicacioId) {
 		return getDelegateService().provarAplicacio(aplicacioId);
 	}
 
