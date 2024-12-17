@@ -50,6 +50,7 @@ public class CarpetaCaibImpl implements CarpetaPlugin {
                 throw new Exception("No es pot enviar la notificació mòvil. Tipus = null");
             }
             String url = properties.getProperty("es.caib.notib.plugin.carpeta.url");
+            url += (url.endsWith("/") ? "" : "/") + "secure/mobilenotification/sendnotificationtomobile";
             String key = "es.caib.notib.plugin.carpeta.missatge.codi." + params.getTipus().name().toLowerCase();
             String notCode = properties.getProperty(key);
             initClient();
@@ -84,14 +85,18 @@ public class CarpetaCaibImpl implements CarpetaPlugin {
 
         try {
             initClient();
-            String url = properties.getProperty("es.caib.notib.plugin.carpeta.url");
-            WebResource resource = client.resource(url);
+            var url = properties.getProperty("es.caib.notib.plugin.carpeta.url");
+            url += (url.endsWith("/") ? "" : "/") + "secure/mobilenotification/existcitizen";
+            var resource = client.resource(url);
             MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
             queryParams.add("nif", nif);
             queryParams.add("lang", "ca");
-            ClientResponse res = resource.queryParams(queryParams).type(MediaType.APPLICATION_JSON_TYPE).accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
-            String jsonResposta = res.getEntity(String.class);
-            return true;
+            var res = resource.queryParams(queryParams).type(MediaType.APPLICATION_JSON_TYPE).accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
+            if (res == null || res.getStatus() != 200) {
+                return false;
+            }
+            var jsonResposta = res.getEntity(String.class);
+            return "true".equalsIgnoreCase(jsonResposta);
         } catch (Exception ex) {
             log.error("[CARPETA] Error consultant el nif ", ex);
             throw ex;

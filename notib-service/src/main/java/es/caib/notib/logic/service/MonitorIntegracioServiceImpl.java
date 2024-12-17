@@ -178,6 +178,7 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 				case USUARIS:
 					diagnostics.put(usuari.getCodi(), null);
 					diagnostic.setCorrecte(pluginHelper.diagnosticarDadesUsuaris(diagnostics));
+					diagnostics = null;
 					break;
 				case REGISTRE:
 					diagnostic.setCorrecte(pluginHelper.diagnosticarRegistre(diagnostics));

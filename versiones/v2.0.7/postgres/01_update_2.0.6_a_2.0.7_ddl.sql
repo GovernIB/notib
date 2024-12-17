@@ -1,2 +1,2 @@
 ALTER TABLE not_notificacio_table ADD caducitat TIMESTAMP;
-UPDATE not_notificacio_table t SET CADUCITAT = (SELECT caducitat FROM not_notificacio n WHERE t.id = n.id);
+ALTER TABLE not_notificacio_env ADD plazo_ampliado NUMBER(1, 0) DEFAULT '0';
