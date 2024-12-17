@@ -9,3 +9,4 @@ databaseChangeLog:
               - column:
                   name: plazo_ampliado
                   type: number(1,0)
+                  defaultValue: 0
