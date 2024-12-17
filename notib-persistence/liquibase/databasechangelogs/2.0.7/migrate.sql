@@ -7,3 +7,7 @@ INSERT INTO NOT_CONFIG_GROUP (CODE,PARENT_CODE,POSITION,DESCRIPTION) VALUES ('SC
 ALTER TABLE not_notificacio_table ADD caducitat TIMESTAMP;
 
 UPDATE not_notificacio_table t SET CADUCITAT = (SELECT caducitat FROM not_notificacio n WHERE t.id = n.id);
+
+-- Changeset db/changelog/changes/2.0.7/859.yaml::1634114082437-1::limit
+ALTER TABLE not_notificacio_env ADD plazo_ampliado NUMBER(1, 0) DEFAULT '0';
+UPDATE NOT_NOTIFICACIO_ENV set plazo_ampliado = 0;
