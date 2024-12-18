@@ -14,7 +14,6 @@ import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -838,6 +837,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public String ampliarPlazoOEGet(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
 
         var ampliacion = new AmpliacionPlazoCommand();
+        ampliacion.setCaducitat(notificacioService.getCaducitat(notificacioId));
         ampliacion.setNotificacioId(notificacioId);
         model.addAttribute(ampliacion);
         return "ampliarPlazoForm";

@@ -160,16 +160,18 @@ public class AplicacioController extends BaseController {
 	@GetMapping(value = "/{aplicacioId}/provar")
 	public String provar(HttpServletRequest request, @PathVariable Long aplicacioId) {
 
-		return usuariAplicacioService.provarAplicacio(aplicacioId) ? getAjaxControllerReturnValueSuccess(request, REDIRECT, "aplicacio.controller.provar.ok")
-				: getAjaxControllerReturnValueError(request, REDIRECT, "aplicacio.controller.provar.ko");
+		var resposta = usuariAplicacioService.provarAplicacio(aplicacioId);
+		return resposta.isOk() ? getAjaxControllerReturnValueSuccess(request, REDIRECT, "aplicacio.controller.provar.ok")
+				: getAjaxControllerReturnValueError(request, REDIRECT, "aplicacio.controller.provar.ko", new Object[] { resposta.getError() });
 	}
 
 	@ResponseBody
 	@GetMapping(value = "/{aplicacioId}/provar/ajax")
 	public String provarAjax(HttpServletRequest request, @PathVariable Long aplicacioId) {
 
-		return usuariAplicacioService.provarAplicacio(aplicacioId) ? getMessage(request, "aplicacio.controller.provar.ok")
-				: getMessage(request, "aplicacio.controller.provar.ko");
+		var resposta = usuariAplicacioService.provarAplicacio(aplicacioId);
+		return resposta.isOk() ? getMessage(request, "aplicacio.controller.provar.ok")
+				: getMessage(request, "aplicacio.controller.provar.ko", new Object[] { resposta.getError() });
 	}
 
 	private AplicacioFiltreCommand getFiltreCommand(HttpServletRequest request) {

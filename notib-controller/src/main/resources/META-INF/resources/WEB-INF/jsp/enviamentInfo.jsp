@@ -591,7 +591,7 @@ $(document).ready(function() {
 									<td><strong><spring:message code="enviament.historic.list.columna.notificaDataCaducitat"/></strong></td>
 									<td>
 										<fmt:formatDate value="${enviament.notificaDataCaducitat}" pattern="dd/MM/yyyy HH:mm:ss"/>
-										<c:if test="${enviament.plazoAmpliado = true}">
+										<c:if test="${enviament.plazoAmpliado == true}">
 											<span class="label label-warning"><spring:message code="enviament.info.notifica.caducitat.plazo.ampliado"/></span>
 										</c:if>
 									</td>
