@@ -112,6 +112,9 @@ public class NotificaHelper {
 		if (Strings.isNullOrEmpty(ampliarPlazo.getMotivo())) {
 			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta(messageHelper.getMessage("ampliar.plazo.motiu.null")).build();
 		}
+		if (ampliarPlazo.getMotivo().length() > 250) {
+			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta(messageHelper.getMessage("ampliar.plazo.motiu.mida.max")).build();
+		}
 		if (ampliarPlazo.getPlazo() <= 0) {
 			return RespuestaAmpliarPlazoOE.builder().codigoRespuesta("error").descripcionRespuesta(messageHelper.getMessage("ampliar.plazo.plazo.major.zero")).build();
 		}

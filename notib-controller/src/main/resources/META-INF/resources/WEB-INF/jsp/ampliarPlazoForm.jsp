@@ -23,15 +23,15 @@
     <div class="row">
         <c:if test="${ampliacionPlazoCommand.caducitat != null}">
             <div class="col-md-2">
-                <not:inputDate name="caducitat" disabled="disabled" textKey="notificacio.form.camp.caducitat.actual" info="true" messageInfo="notificacio.form.camp.caducitat.info" />
+                <not:inputDate name="caducitat" disabled="true" textKey="notificacio.form.camp.caducitat.actual"/>
             </div>
         </c:if>
         <div class="col-md-2">
             <not:inputText name="dies" textKey="ampliar.plazo.form.dies" required="true"/>
         </div>
         <div class="col-md-2">
-<%--            <not:inputTextArea name="motiu" textKey="ampliar.plazo.form.motiu" inputMaxLength="250" required="true"/>--%>
-            <not:inputText name="motiu" textKey="ampliar.plazo.form.motiu" inputMaxLength="250" required="true"/>
+            <not:inputTextarea name="motiu" textKey="ampliar.plazo.form.motiu" inputMaxLength="250" required="true"/>
+<%--            <not:inputText name="motiu" textKey="ampliar.plazo.form.motiu" inputMaxLength="250" required="true"/>--%>
         </div>
         <div id="modal-botons">
             <button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
