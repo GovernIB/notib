@@ -165,7 +165,7 @@ public class IntegracioHelper {
 	private String getUsuariNomCodi(MonitorIntegracioEntity accio, boolean obtenirUsuari) {
 
 		var auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth == null || Strings.isNullOrEmpty(auth.getName())) {
+		if (auth == null || Strings.isNullOrEmpty(auth.getName()) || "anonymousUser".equals(auth.getName())) {
 			return "Sistema";
 		}
 		var usuariNomCodi = auth.getName();

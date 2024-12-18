@@ -4,6 +4,7 @@
 package es.caib.notib.ejb;
 
 import es.caib.notib.logic.intf.dto.AplicacioDto;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.RespostaTestAplicacio;
@@ -14,6 +15,7 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació de UsuariAplicacioService com a EJB que empra una clase
@@ -95,6 +97,12 @@ public class UsuariAplicacioService extends AbstractService<es.caib.notib.logic.
 	@RolesAllowed({"NOT_ADMIN"})
 	public RespostaTestAplicacio provarAplicacio(Long aplicacioId) {
 		return getDelegateService().provarAplicacio(aplicacioId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public boolean diagnosticarAplicacions(Map<String, IntegracioDiagnostic> diagnostics) {
+		return false;
 	}
 
 }
