@@ -403,7 +403,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Transactional
 	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo, List<NotificacioEnviamentEntity> enviaments) {
 
-		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA, "Ampliació de plaç", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA, "Ampliació de termini", IntegracioAccioTipusEnumDto.ENVIAMENT);
 		RespuestaAmpliarPlazoOE resposta;
 		try {
 			var apiKey = enviaments.get(0).getNotificacio().getEntitat().getApiKey();

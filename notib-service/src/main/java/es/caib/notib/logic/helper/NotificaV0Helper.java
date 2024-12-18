@@ -185,7 +185,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	@Override
 	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo, List<NotificacioEnviamentEntity> enviaments) {
 
-		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA, "Ampliació de plaç", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA, "Ampliació de termini", IntegracioAccioTipusEnumDto.ENVIAMENT);
 		var resposta = new RespuestaAmpliarPlazoOE();
 		resposta.setCodigoRespuesta("000");
 		resposta.setDescripcionRespuesta("Ok");
