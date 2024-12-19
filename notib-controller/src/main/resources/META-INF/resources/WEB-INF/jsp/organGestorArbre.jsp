@@ -30,18 +30,9 @@
                 hlpIsAdminOrgan: isAdminOrgan
             });
 
-            let organGestor = null;
-            function isAdminOrgan() {
-                return ${isRolActualAdministradorOrgan};
-            }
-            function changedCallback(e, data) {
-
-                $(".datatable-dades-carregant").css("display", "block");
-                $("#detall").css("display", "none");
-                let text = data.node.text.split('(');
-                text = text[text.length-1].split(')')[0];
+            function getDetall(codiOrgan) {
                 $.ajax({
-                    url: "<c:url value='/organgestorArbre/organgestor/'/>" + text,
+                    url: "<c:url value='/organgestorArbre/organgestor/'/>" + codiOrgan,
                     success: organ => {
                         if (organ) {
                             $("#detall").html(organ);
@@ -53,6 +44,19 @@
                         $(".datatable-dades-carregant").css("display", "none");
                     }
                 });
+            }
+
+            let organGestor = null;
+            function isAdminOrgan() {
+                return ${isRolActualAdministradorOrgan};
+            }
+            function changedCallback(e, data) {
+
+                $(".datatable-dades-carregant").css("display", "block");
+                $("#detall").css("display", "none");
+                let text = data.node.text.split('(');
+                text = text[text.length-1].split(')')[0];
+                getDetall(text);
             }
 
             $(document).on("click", "#expandAll", function() {
@@ -71,6 +75,20 @@
                     $('#isFiltre').val(true);
                 } else {
                     $('#arbreOrgans').jstree().open_all(null, 200);
+                    let arbre = $('#arbreOrgans').jstree();
+                    let model = arbre._model.data;
+                    let leaves = [];
+                    for (let id in model) {
+                        if (model.hasOwnProperty(id)) {
+                            let node = model[id];
+                            if (node.children.length === 0) {
+                                leaves.push(node);
+                            }
+                        }
+                    }
+                    if (leaves.length == 1) {
+                        getDetall(leaves[0].id);
+                    }
                 }
                 $('#btnNetejar').click(function() {
                     $(':input', $('#filtre')).each (function() {
