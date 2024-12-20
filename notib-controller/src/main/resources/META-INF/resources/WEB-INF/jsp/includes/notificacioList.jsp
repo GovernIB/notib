@@ -116,6 +116,19 @@
         right: 0;
         left: auto
     }
+
+    .filtreOcult {
+        display:none;
+    }
+
+    .botonsTipusFiltre {
+        float:right;
+        cursor:pointer;
+        text-decoration: underline;
+        text-decoration-style: dashed;
+    }
+
+
 </style>
 <script type="text/javascript">
 
@@ -553,23 +566,46 @@
         };
         initEvents($('#notificacio'), 'notificacio', eventMessages);
         formatSelects($('#organGestor'));
+
+        $("#filtreAvancat").on("click", e => {
+
+            e.preventDefault();
+            $(".filtreOcult").toggle();
+            $("#filtreAvancat").hide();
+            $("#filtreSimple").show();
+            $("#div-concepte").removeClass("col-md-2").addClass("col-md-4");
+            $('#btn-netejar-filtre').appendTo('#botons-filtre-avancat');
+            $('#filtrar').appendTo('#botons-filtre-avancat');
+        });
+
+        $("#filtreSimple").on("click", e => {
+
+            e.preventDefault();
+            $(".filtreOcult").toggle();
+            $("#filtreAvancat").show();
+            $("#filtreSimple").hide();
+            $("#div-concepte").removeClass("col-md-4").addClass("col-md-2");
+            $('#btn-netejar-filtre').appendTo('#botons-filtre-simple');
+            $('#filtrar').appendTo('#botons-filtre-simple');
+        });
     });
 
     function omplirProcediments() {
-        var organGestor = $("#organGestor");
+
+        let organGestor = $("#organGestor");
         let organId = $(organGestor).val() == undefined ? "" : $(organGestor).val();
         $.ajax({
             type: 'GET',
             url: "<c:url value="/notificacio/procedimentsOrgan/"/>" + organId,
             success: function(data) {
                 // Procediments
-                var procediments = data;
-                var selProcediments = $("#procedimentId");
+                let procediments = data;
+                let selProcediments = $("#procedimentId");
                 selProcediments.empty();
                 if (procediments && procediments.length > 0) {
                     selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.select'/></option>");
-                    var procedimentsComuns = [];
-                    var procedimentsOrgan = [];
+                    let procedimentsComuns = [];
+                    let procedimentsOrgan = [];
                     $.each(data, function(i, val) {
                         if(val.comu) {
                             procedimentsComuns.push(val);
@@ -660,7 +696,7 @@
 <form:form id="form-filtre" action="" method="post" cssClass="well" modelAttribute="notificacioFiltreCommand">
     <div class="row">
         <c:if test="${mostraEntitat}">
-            <div class="col-md-3">
+            <div class="col-md-3 filtreOcult">
                 <not:inputSelect name="entitatId" optionItems="${entitat}"
                                  optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true"
                                  placeholderKey="notificacio.list.filtre.camp.entitat" inline="true"/>
@@ -670,16 +706,9 @@
             <not:inputSelect id="enviamentTipus" name="enviamentTipus" optionItems="${notificacioEnviamentTipus}" optionValueAttribute="value"
                              optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.enviament.tipus" inline="true"/>
         </div>
-            <%--div class="col-md-2">
-                <not:inputSelect name="comunicacioTipus" optionItems="${notificacioComunicacioTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.comunicacio.tipus" inline="true"/>
-            </div--%>
-        <div class="col-md-4">
+        <div id="div-concepte" class="col-md-2">
             <not:inputText name="concepte" inline="true"  placeholderKey="notificacio.list.filtre.camp.concepte"/>
         </div>
-<%--        <div class="col-md-2">--%>
-<%--            <not:inputSelect id="estat" name="estat" optionItems="${notificacioEstats}" optionValueAttribute="value"--%>
-<%--             optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>--%>
-<%--        </div>--%>
         <div class="col-md-2">
             <not:inputSelect id="estat" name="estat" optionMinimumResultsForSearch="0"
                  optionTextKeyAttribute="text"
@@ -692,8 +721,12 @@
         <div class="col-md-2">
             <not:inputDate name="dataFi" placeholderKey="notificacio.list.filtre.camp.datafi" inline="true" required="false" />
         </div>
+        <div id="botons-filtre-simple" class="col-md-2 pull-right form-buttons"  style="text-align: right;">
+            <button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default" style="padding: 6px 9px; margin-right:5px;" title="<spring:message code="comu.boto.netejar"/>"><span class="fa fa-eraser icona_ocultable" style="padding: 2px 0px;"></span><span class="text_ocultable"><spring:message code="comu.boto.netejar"/></span></button>
+            <button id="filtrar" type="submit" name="accio" value="filtrar" class="btn btn-primary" title="<spring:message code="comu.boto.filtrar"/>"><span class="fa fa-filter" id="botoFiltrar"></span><span class="text_ocultable"><spring:message code="comu.boto.filtrar"/></span></button>
+        </div>
     </div>
-    <div class="row">
+    <div class="row filtreOcult">
         <div class="col-md-2">
             <not:inputText name="titular" inline="true" placeholderKey="notificacio.list.filtre.camp.titular"/>
         </div>
@@ -708,7 +741,7 @@
                              inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
         </div>
     </div>
-    <div class="row">
+    <div class="row filtreOcult">
         <div class="col-md-6">
             <not:inputSelect id="procedimentId" name="procedimentId" optionValueAttribute="id" optionTextAttribute="descripcio"
                              placeholderKey="notificacio.list.filtre.camp.procediment"
@@ -720,7 +753,7 @@
                              inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
         </div>
     </div>
-    <div class="row">
+    <div class="row filtreOcult">
         <div class="col-md-2">
             <not:inputSelect id="tipusUsuari" name="tipusUsuari"  optionValueAttribute="value" optionTextKeyAttribute="text"  emptyOption="true"  placeholderKey="notificacio.list.filtre.camp.tipususuari" inline="true" />
         </div>
@@ -744,14 +777,14 @@
             <not:inputText name="registreNum" inline="true" placeholderKey="notificacio.list.filtre.camp.registre.num"/>
         </div>
     </div>
-    <div class="row">
+    <div class="row filtreOcult">
         <div class="col-md-2">
             <not:inputDate name="dataCaducitatInici" placeholderKey="notificacio.list.filtre.camp.data.caducitat.inici" inline="true" required="false" />
         </div>
         <div class="col-md-2">
             <not:inputDate name="dataCaducitatFi" placeholderKey="notificacio.list.filtre.camp.data.caducitat.fi" inline="true" required="false" />
         </div>
-        <div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
+        <div id="botons-filtre-avancat" class="col-md-2 pull-right form-buttons"  style="text-align: right;">
             <button id="nomesAmbEntregaPostalBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbEntregaPostal"/>" class="btn btn-default pull-left <c:if test="${nomesAmbEntregaPostal}">active</c:if>" data-toggle="button"><span class="fa fa-envelope"></span></button>
             <not:inputHidden name="nomesAmbEntregaPostal"/>
             <button id="nomesAmbErrorsBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbErrors"/>" class="btn btn-default pull-left <c:if test="${nomesAmbErrors}">active</c:if>" data-toggle="button"><span class="fa fa-warning"></span></button>
@@ -760,9 +793,13 @@
                 <button id="nomesFiReintentsBtn" title="<spring:message code="notificacio.list.filtre.camp.fiReintents"/>" class="btn btn-default pull-left <c:if test="${nomesFiReintents}">active</c:if>" data-toggle="button"><span class="fa fa-window-close"></span></button>
                 <not:inputHidden name="nomesFiReintents"/>
             </c:if>
-            <button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default" style="padding: 6px 9px;" title="<spring:message code="comu.boto.netejar"/>"><span class="fa fa-eraser icona_ocultable" style="padding: 2px 0px;"></span><span class="text_ocultable"><spring:message code="comu.boto.netejar"/></span></button>
-            <button id="filtrar" type="submit" name="accio" value="filtrar" class="btn btn-primary" title="<spring:message code="comu.boto.filtrar"/>"><span class="fa fa-filter" id="botoFiltrar"></span><span class="text_ocultable"><spring:message code="comu.boto.filtrar"/></span></button>
         </div>
+    </div>
+    <div class ="row col-md-2 pull-right form-buttons">
+        <span id="filtreAvancat" class="botonsTipusFiltre" title="<spring:message code="notificacio.list.boto.filtre.avancat.tooltip"/>"><spring:message code="notificacio.list.boto.filtre.avancat"/></span>
+        <span id="filtreSimple" class="botonsTipusFiltre filtreOcult" title="<spring:message code="notificacio.list.boto.filtre.simple.tooltip"/>"><spring:message code="notificacio.list.boto.filtre.simple"/></span>
+<%--        <button id="filtreAvancat" title="<spring:message code="notificacio.list.boto.filtre.avancat.tooltip"/>" class="btn btn-default "><span class="fa fa-eraser"></span><spring:message code="notificacio.list.boto.filtre.avancat"/></button>--%>
+<%--        <button id="filtreSimple" title="<spring:message code="notificacio.list.boto.filtre.simple.tooltip"/>" class="btn btn-default filtreOcult"><span class="fa fa-eraser"></span><spring:message code="notificacio.list.boto.filtre.simple"/></button>--%>
     </div>
 </form:form>
 
@@ -771,6 +808,8 @@
     </div>
     <div class="text-right">
         <div class="btn-group">
+            <button id="closeAll" class="btn btn-default"><span class="fa fa-caret-square-o-up"></span> <spring:message code="organgestor.arbre.contrau"/></button>
+            <button id="expandAll" class="btn btn-default"><span class="fa fa-caret-square-o-down"></span> <spring:message code="organgestor.arbre.expandeix"/> </button>
             <a href="<c:url value="/notificacio/visualitzar"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default"><span class="fa fa-eye-slash"></span> <spring:message code="enviament.list.show"/></a>
             <button id="btn-desplegar-envs" class="btn btn-default" style="display:none"><spring:message code="notificacio.list.boto.desplegar"/> <span class="fa fa-caret-down"></span></button>
             <button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
