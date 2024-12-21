@@ -201,6 +201,54 @@ public class ConfigHelper {
         return properties;
     }
 
+    @Transactional(readOnly = true)
+    public boolean hasEntityGroupPropertiesModified(String entitatCodi, String grupCodi) {
+    
+        if (entitatCodi == null) {
+            return false;
+        }
+    
+//        var configGroup = configGroupRepository.findById(grupCodi).orElse(null);
+        var configuracions = configRepository.findByGrupCodi(grupCodi);
+
+        if (configuracions == null || configuracions.isEmpty()) {
+            return false;
+        }
+
+        Map<String, String> globalPproperties = new HashMap<>();
+        Map<String, String> entityProperties = new HashMap<>();
+
+        // Obtenir les propietats a nivell global
+        configuracions
+                .stream().filter(config -> config.getEntitatCodi() == null)
+                .forEach(config -> globalPproperties.put(getKeyName(config.getKey(), null), environment.getProperty(config.getKey())));
+    
+        // Obtenir les propietats a nivell d'entitat
+        configuracions
+                .stream().filter(config -> entitatCodi.equals(config.getEntitatCodi()))
+                .forEach(config -> entityProperties.put(getKeyName(config.getKey(), entitatCodi), getConfigGlobal(config.getKey())));
+    
+        // Compara les propietats i retorna el resultat
+        for (var entry : entityProperties.entrySet()) {
+            String globalValue = globalPproperties.get(entry.getKey());
+            String entityValue = entry.getValue();
+    
+            if (entityValue != null && !entityValue.equals(globalValue)) {
+                return true;
+            }
+        }
+    
+        return false;
+    }
+    
+    private String getKeyName(String key, String entitatCodi) {
+        if (entitatCodi == null) {
+            return key.substring(ConfigDto.prefix.length() + 1);
+        } else {
+            return key.substring(ConfigDto.prefix.length() + entitatCodi.length() + 2);
+        }
+    }
+
     public void crearConfigsEntitat(String codiEntitat) {
 
         var dto = new ConfigDto();

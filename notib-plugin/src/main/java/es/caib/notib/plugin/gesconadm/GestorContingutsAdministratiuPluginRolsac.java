@@ -78,14 +78,16 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			var json = jerseyClient.resource(url).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).accept(MediaType.APPLICATION_JSON_TYPE).post(String.class, form);
 			var mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			return isServei ? getServeiByCodiSia(mapper, json) :getProcedimentByCodiSia(mapper, json);
+			var result = isServei ? getServeiByCodiSia(mapper, json) :getProcedimentByCodiSia(mapper, json);
+			incrementarOperacioOk();
+			return result;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException("No s'han pogut consultar el " + procSer + " amb codi SIA " + codiSia + " via REST", ex);
 		}
 	}
 
-	@Override
-	public GcaServei getServeiByCodiSia(ObjectMapper mapper, String json) throws Exception {
+	private GcaServei getServeiByCodiSia(ObjectMapper mapper, String json) throws Exception {
 
 		var resposta = mapper.readValue(json, RespostaServeis.class);
 		if (resposta == null) {
@@ -95,8 +97,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		return !procs.isEmpty() ? procs.get(0) : null;
 	}
 
-	@Override
-	public GcaProcediment getProcedimentByCodiSia(ObjectMapper mapper, String json) throws Exception {
+	private GcaProcediment getProcedimentByCodiSia(ObjectMapper mapper, String json) throws Exception {
 
 		var resposta = mapper.readValue(json, RespostaProcediments.class);
 		if (resposta == null) {
@@ -125,8 +126,11 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				procediments = resposta.getResultado();
 			}
-			return toProcedimentDto(procediments);
+			var result = toProcedimentDto(procediments);
+			incrementarOperacioOk();
+			return result;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException(ERROR, ex);
 		}
 	}
@@ -150,8 +154,11 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				procediments = resposta.getResultado();
 			}
-			return toProcedimentDto(procediments);
+			var result = toProcedimentDto(procediments);
+			incrementarOperacioOk();
+			return result;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException(ERROR, ex);
 		}
 	}
@@ -176,14 +183,16 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				procediments = resposta.getResultado();
 			}
-			return toProcedimentDto(procediments);
+			var result = toProcedimentDto(procediments);
+			incrementarOperacioOk();
+			return result;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException(ERROR, ex);
 		}
 	}
 	
-	@Override
-	public String getUnitatAdministrativa(String codi) throws SistemaExternException {
+	private String getUnitatAdministrativa(String codi) throws SistemaExternException {
 
 		if (unitatsAdministratives.containsKey(codi)) {
 			return unitatsAdministratives.get(codi);
@@ -232,8 +241,10 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				numeroElements = resposta.getNumeroElementos();
 			}
+			incrementarOperacioOk();
 			return numeroElements;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException("No s'ha pogut consultar els total de procediments via REST", ex);
 		}
 	}
@@ -257,8 +268,11 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				serveis = resposta.getResultado();
 			}
-			return toServeiDto(serveis);
+			var result = toServeiDto(serveis);
+			incrementarOperacioOk();
+			return result;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException(ERROR, ex);
 		}
 	}
@@ -282,8 +296,11 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				serveis = resposta.getResultado();
 			}
-			return toServeiDto(serveis);
+			var result = toServeiDto(serveis);
+			incrementarOperacioOk();
+			return result;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException(ERROR, ex);
 		}
 	}
@@ -308,8 +325,11 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				serveis = resposta.getResultado();
 			}
-			return toServeiDto(serveis);
+			var result = toServeiDto(serveis);
+			incrementarOperacioOk();
+			return result;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException(ERROR, ex);
 		}
 	}
@@ -333,8 +353,10 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				numeroElements = resposta.getNumeroElementos();
 			}
+			incrementarOperacioOk();
 			return numeroElements;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException("No s'ha pogut consultar els total de procediments via REST", ex);
 		}
 	}
@@ -501,7 +523,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	public EstatSalut getEstatPlugin() {
 		try {
 			Instant start = Instant.now();
-			consultaUsuaris(getLdapFiltreCodi(), "fakeUser");
+			getProcedimentsByUnitat("000000000");
 			return EstatSalut.builder()
 					.latencia((int) Duration.between(start, Instant.now()).toMillis())
 					.estat(EstatSalutEnum.UP)

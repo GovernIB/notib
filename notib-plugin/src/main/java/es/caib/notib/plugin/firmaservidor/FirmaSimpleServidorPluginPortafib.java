@@ -68,8 +68,11 @@ public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
 		try {
 			String perfil = getPropertyPerfil();
 			result = internalSignDocument(api, perfil, fileToSign, motiu, tipusDocumental);
-			return result.getSignedFile().getData();
+			var resultat = result.getSignedFile().getData();
+			incrementarOperacioOk();
+			return resultat;
 		} catch (Exception e) {
+			incrementarOperacioError();
 			throw new RuntimeException(e);
 		}
 	}  
@@ -199,7 +202,8 @@ public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
 	public EstatSalut getEstatPlugin() {
 		try {
 			Instant start = Instant.now();
-			consultaUsuaris(getLdapFiltreCodi(), "fakeUser");
+			ApiFirmaEnServidorSimple api = new ApiFirmaEnServidorSimpleJersey(getPropertyEndpoint(), getPropertyUsername(), getPropertyPassword());
+			api.getAvailableProfiles("ca");
 			return EstatSalut.builder()
 					.latencia((int) Duration.between(start, Instant.now()).toMillis())
 					.estat(EstatSalutEnum.UP)

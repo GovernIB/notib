@@ -1,13 +1,17 @@
 package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
+import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
 import es.caib.comanda.salut.model.IntegracioApp;
+import es.caib.comanda.salut.model.IntegracioSalut;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
+import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +34,13 @@ import static es.caib.notib.logic.intf.dto.IntegracioCodi.USUARIS;
 @Component
 public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPlugin> {
 
+	public static final String GRUP = "USUARIS";
 
 	public DadesUsuarisPluginHelper(IntegracioHelper integracioHelper,
-                                    ConfigHelper configHelper) {
+                                    ConfigHelper configHelper,
+									EntitatRepository entitatRepository) {
 
-		super(integracioHelper, configHelper);
+		super(integracioHelper, configHelper, entitatRepository);
     }
 
 	@Override
@@ -51,7 +57,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 		var info = new IntegracioInfo(USUARIS,"Consulta rols usuari amb codi",
 				ENVIAMENT, new AccioParam("Codi d'usuari", usuariCodi));
 		try {
-			peticionsPlugin.updatePeticioTotal(null);
+			// peticionsPlugin.updatePeticioTotal(null);
 			var rols = getPlugin().consultarRolsAmbCodi(usuariCodi);
 			info.addParam("Rols Consultats: ", StringUtils.join(rols, ", "));
 			integracioHelper.addAccioOk(info, false);
@@ -59,7 +65,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
-			peticionsPlugin.updatePeticioError(null);
+			// peticionsPlugin.updatePeticioError(null);
 			throw new SistemaExternException(USUARIS.name(), errorDescripcio, ex);
 		}
 	}
@@ -70,14 +76,14 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 				new AccioParam("Codi d'usuari", usuariCodi));
 
 		try {
-			peticionsPlugin.updatePeticioTotal(null);
+			// peticionsPlugin.updatePeticioTotal(null);
 			var dadesUsuari = getPlugin().consultarAmbCodi(usuariCodi);
 			integracioHelper.addAccioOk(info, false);
 			return dadesUsuari;
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
-			peticionsPlugin.updatePeticioError(null);
+			// peticionsPlugin.updatePeticioError(null);
 			throw new SistemaExternException(USUARIS.name(), errorDescripcio, ex);
 		}
 	}
@@ -88,14 +94,14 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 				new AccioParam("Codi de grup", grupCodi));
 
 		try {
-			peticionsPlugin.updatePeticioTotal(null);
+			// peticionsPlugin.updatePeticioTotal(null);
 			var dadesUsuari = getPlugin().consultarAmbGrup(grupCodi);
 			integracioHelper.addAccioOk(info, false);
 			return dadesUsuari;
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
-			peticionsPlugin.updatePeticioError(null);
+			// peticionsPlugin.updatePeticioError(null);
 			throw new SistemaExternException(USUARIS.name(), errorDescripcio, ex);
 		}
 	}
@@ -128,11 +134,12 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 			throw new SistemaExternException(USUARIS.name(), msg);
 		}
 		try {
+			String propertyKeyBase = "es.caib.notib.plugin.dades.usuari.";
+			var properties = configHelper.getAllEntityProperties(null);
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = pluginClass.endsWith("DadesUsuariPluginKeycloak") ?
-							(DadesUsuariPlugin)clazz.getDeclaredConstructor(String.class, Properties.class).newInstance("es.caib.notib.plugin.dades.usuari.",
-									configHelper.getAllEntityProperties(null))
-							: (DadesUsuariPlugin) clazz.getDeclaredConstructor(Properties.class).newInstance(configHelper.getAllEntityProperties(null));
+							(DadesUsuariPlugin) clazz.getDeclaredConstructor(String.class, Properties.class, boolean.class).newInstance(propertyKeyBase, properties, false)
+							: (DadesUsuariPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(properties, false);
 			pluginMap.put(GLOBAL, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -152,9 +159,40 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 		return IntegracioApp.USR;
 	}
 
+	@Override
+	protected String getConfigGrup() {
+		return GRUP;
+	}
+
 	// Mètodes pels tests
 	public void setDadesUsuariPlugin(DadesUsuariPlugin dadesUsuariPlugin) {
 		this.pluginMap.put(GLOBAL, dadesUsuariPlugin);
 	}
 
+
+	// SALUT
+
+	@Override
+	public List<es.caib.comanda.salut.model.IntegracioInfo> getIntegracionsInfo() {
+		return List.of(es.caib.comanda.salut.model.IntegracioInfo.builder()
+				.codi(getCodiApp().name())
+				.nom(getCodiApp().getNom())
+				.build());
+	}
+
+	@Override
+	public List<IntegracioSalut> getIntegracionsSalut() {
+		var plugin = pluginMap.get(GLOBAL);
+		if (plugin == null) {
+			return List.of(IntegracioSalut.builder().codi(getCodiApp().name()).estat(EstatSalutEnum.UNKNOWN).build());
+		}
+
+		EstatSalut estatSalut = plugin.getEstatPlugin();
+		return List.of(IntegracioSalut.builder()
+				.codi(getCodiApp().name())
+				.estat(estatSalut.getEstat())
+				.latencia(estatSalut.getLatencia())
+				.peticions(plugin.getPeticionsPlugin())
+				.build());
+	}
 }

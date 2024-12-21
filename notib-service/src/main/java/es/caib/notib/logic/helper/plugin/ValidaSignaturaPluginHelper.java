@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.NotibLogger;
+import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.validatesignature.ValidateSignaturePlugin;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -33,14 +34,12 @@ import java.util.Properties;
 @Component
 public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSignaturePlugin> {
 
-	private final IntegracioHelper integracioHelper;
-	private final ConfigHelper configHelper;
+	public static final String GRUP = "VALIDATE_SIGNATURE";
 
 	public ValidaSignaturaPluginHelper(IntegracioHelper integracioHelper,
-                                       ConfigHelper configHelper) {
-		super(integracioHelper, configHelper);
-		this.integracioHelper = integracioHelper;
-		this.configHelper = configHelper;
+                                       ConfigHelper configHelper,
+									   EntitatRepository entitatRepository) {
+		super(integracioHelper, configHelper, entitatRepository);
 	}
 
 	@Override
@@ -73,7 +72,7 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 			sri.setReturnCertificates(false);
 			sri.setReturnTimeStampInfo(true);
 			validationRequest.setSignatureRequestedInformation(sri);
-			peticionsPlugin.updatePeticioTotal(getCodiEntitatActual());
+			// peticionsPlugin.updatePeticioTotal(getCodiEntitatActual());
 			var validateSignatureResponse = getPlugin().validateSignature(validationRequest);
 
 			var validationStatus = validateSignatureResponse.getValidationStatus();
@@ -101,7 +100,7 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 			}
 			log.error("Error al detectar firma de document", e);
 			integracioHelper.addAccioError(info, "Error al validar la firma", throwable);
-			peticionsPlugin.updatePeticioError(getCodiEntitatActual());
+			// peticionsPlugin.updatePeticioError(getCodiEntitatActual());
 			return SignatureInfoDto.builder().signed(false).error(true).errorMsg(e.getMessage()).build();
 		}
 	}
@@ -125,6 +124,7 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 			throw new SistemaExternException(IntegracioCodi.VALIDASIG.name(), error);
 		}
 		try {
+			var configuracioEspecifica = configHelper.hasEntityGroupPropertiesModified(entitatCodi, getConfigGrup());
 			Class<?> clazz = Class.forName(pluginClass);
 			NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Innstanciant plugin per la entitat " + entitatCodi, log, LoggingTipus.VALIDATE_SIGNATURE);
 			var properties = configHelper.getAllEntityProperties(entitatCodi);
@@ -134,7 +134,7 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 			NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Endpoint " + endpoint, log, LoggingTipus.VALIDATE_SIGNATURE);
 			NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Username " + username, log, LoggingTipus.VALIDATE_SIGNATURE);
 			NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] TransformersTemplatesPath " + transformersPath, log, LoggingTipus.VALIDATE_SIGNATURE);
-			plugin = (ValidateSignaturePlugin) clazz.getDeclaredConstructor(String.class, Properties.class).newInstance(ConfigDto.prefix + ".", properties);
+			plugin = (ValidateSignaturePlugin) clazz.getDeclaredConstructor(String.class, Properties.class, boolean.class).newInstance(ConfigDto.prefix + ".", properties, configuracioEspecifica);
 			pluginMap.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -142,6 +142,10 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 		}
 	}
 
+	@Override
+	protected String getConfigGrup() {
+		return GRUP;
+	}
 
 	// PROPIETATS PLUGIN
 	@Override

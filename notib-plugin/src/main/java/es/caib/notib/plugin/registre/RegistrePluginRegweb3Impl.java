@@ -59,8 +59,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 //		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.REGISTRE")));
 //	}
 
-	public RegistrePluginRegweb3Impl(Properties properties, boolean configuracioEspecifica) {
+	public RegistrePluginRegweb3Impl(Properties properties, String codiDir3Entitat, boolean configuracioEspecifica) {
 		super(properties);
+		this.codiDir3Entitat = codiDir3Entitat;
 		this.configuracioEspecifica = configuracioEspecifica;
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.REGISTRE")));
 	}
@@ -691,6 +692,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	private boolean configuracioEspecifica = false;
 	private int operacionsOk = 0;
 	private int operacionsError = 0;
+	private String codiDir3Entitat;
 
 	@Synchronized
 	private void incrementarOperacioOk() {
@@ -717,14 +719,20 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	public EstatSalut getEstatPlugin() {
 		try {
 			Instant start = Instant.now();
-			consultaUsuaris(getLdapFiltreCodi(), "fakeUser");
-			return EstatSalut.builder()
-					.latencia((int) Duration.between(start, Instant.now()).toMillis())
-					.estat(EstatSalutEnum.UP)
-					.build();
+			// TODO: Comprovar si és necessari indicar un número de registre vàlid
+//			var asientoRegistralWs = getAsientoRegistralApi().obtenerAsientoRegistral(codiDir3Entitat, "fakeReg", 2L, false);
+//			toRespostaConsultaRegistre(asientoRegistralWs);
+			var result = obtenerAsientoRegistral(codiDir3Entitat, "00/2000", 2L, false);
+			if (result.isOk() || result.isError() && Integer.valueOf(result.getErrorCodi()) < 2) {
+				return EstatSalut.builder()
+						.latencia((int) Duration.between(start, Instant.now()).toMillis())
+						.estat(EstatSalutEnum.UP)
+						.build();
+			}
 		} catch (Exception ex) {
-			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
+			ex.printStackTrace();
 		}
+		return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
 	}
 
 	@Override

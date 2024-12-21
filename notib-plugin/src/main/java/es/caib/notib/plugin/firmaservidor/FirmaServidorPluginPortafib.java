@@ -98,8 +98,11 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 			var userRequiresTimeStamp = false;
 			signFile(uuid, sourcePath, destPath, signType, signMode, motiu, idioma, userRequiresTimeStamp);
 			destFile = new File(destPath);
-			return FileUtils.readFileToByteArray(destFile);
+			var result = FileUtils.readFileToByteArray(destFile);
+			incrementarOperacioOk();
+			return result;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException(ex);
 		} finally {
 			// Esborra els arxius temporals
@@ -210,7 +213,7 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 	public EstatSalut getEstatPlugin() {
 		try {
 			Instant start = Instant.now();
-			consultaUsuaris(getLdapFiltreCodi(), "fakeUser");
+			((PortaFIBSignatureServerPlugin)plugin).getPassarelaDeFirmaEnServidorApi().getVersion();
 			return EstatSalut.builder()
 					.latencia((int) Duration.between(start, Instant.now()).toMillis())
 					.estat(EstatSalutEnum.UP)

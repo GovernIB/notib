@@ -2,17 +2,24 @@ package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
 import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
 import es.caib.comanda.salut.model.IntegracioApp;
 import es.caib.comanda.salut.model.IntegracioInfo;
-import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.comanda.salut.model.IntegracioSalut;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
-import es.caib.notib.plugin.SalutPlugin;
 import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
+import es.caib.notib.persist.repository.EntitatRepository;
+import es.caib.notib.plugin.SalutPlugin;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,18 +38,19 @@ public abstract class AbstractPluginHelper<T extends SalutPlugin> {
 
 	protected final IntegracioHelper integracioHelper;
 	protected final ConfigHelper configHelper;
+	protected final EntitatRepository entitatRepository;
 
-	protected IntegracioPeticions peticionsPlugin = IntegracioPeticions.builder().organOk(new HashMap<>()).organError(new HashMap<>()).build();
+//	protected IntegracioPeticions peticionsPlugin = IntegracioPeticions.builder().organOk(new HashMap<>()).organError(new HashMap<>()).build();
 	protected Map<String, T> pluginMap = new HashMap<>();
 
 	public AbstractPluginHelper(IntegracioHelper integracioHelper,
-								ConfigHelper configHelper) {
+								ConfigHelper configHelper,
+								EntitatRepository entitatRepository) {
 
 		this.integracioHelper = integracioHelper;
 		this.configHelper = configHelper;
+		this.entitatRepository = entitatRepository;
 	}
-
-	public abstract boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception;
 
 	protected String getCodiEntitatActual() {
 
@@ -57,63 +65,109 @@ public abstract class AbstractPluginHelper<T extends SalutPlugin> {
 		pluginMap = new HashMap<>();
 	}
 
-//	public IntegracioPeticions getPeticionsPluginAndReset() {
-//		IntegracioPeticions peticions = IntegracioPeticions.builder()
-//				.totalOk(peticionsPlugin.getTotalOk())
-//				.totalError(peticionsPlugin.getTotalError())
-//				.organOk(peticionsPlugin.getOrganOk())
-//				.organError(peticionsPlugin.getOrganError())
-//				.build();
-//		peticionsPlugin = IntegracioPeticions.builder().build();
-//		return peticions;
-//	}
-
-//	public EstatSalut getEstatPlugin() {
-//
-//		try {
-//			Instant start = Instant.now();
-//			EstatSalutEnum estat = getEstat();
-//			Instant end = Instant.now();
-//			int latency = (int) Duration.between(start, end).toMillis();
-//
-//			return EstatSalut.builder()
-//					.latencia(latency)
-//					.estat(estat)
-//					.build();
-//		} catch (NotImplementedException ex) {
-//
-//		} catch (Exception ex) {
-//			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
-//		}
-//	}
-
 	public List<IntegracioSalut> getIntegracionsSalut() {
 
-		List<String> codisFiltrats = getCodisFiltrats();
-		return codisFiltrats.stream()
-				.map(codiEntitat -> obtenirIntegracioSalut(codisFiltrats, codiEntitat))
-				.collect(Collectors.toList());
+//		List<String> codisFiltrats = getCodisFiltrats();
+//		return codisFiltrats.stream()
+//				.map(codiEntitat -> obtenirIntegracioSalut(codisFiltrats, codiEntitat))
+//				.collect(Collectors.toList());
+
+		Map<String, IntegracioSalut> integracionsMap = createIntegracionsFromPlugins();
+		addFilteredEntitiesToIntegracions(integracionsMap);
+		return new ArrayList<>(integracionsMap.values());
 	}
+
+	private Map<String, IntegracioSalut> createIntegracionsFromPlugins() {
+
+		Map<String, IntegracioSalut> integracioResult = new HashMap<>();
+		String codiIntegracio = getCodiApp().name();
+
+		pluginMap.forEach((codiEntitat, plugin) -> {
+			EstatSalut estatSalut = plugin.getEstatPlugin();
+
+			if (plugin.teConfiguracioEspecifica()) {
+				integracioResult.put(codiEntitat, createIntegracioForPlugin(codiIntegracio, codiEntitat, estatSalut, plugin));
+			} else {
+				mergeGlobalIntegracio(integracioResult, plugin, estatSalut, codiIntegracio);
+			}
+		});
+
+		return integracioResult;
+	}
+
+	private static <T extends SalutPlugin> void mergeGlobalIntegracio(Map<String, IntegracioSalut> integracioResult, T plugin, EstatSalut estatSalut, String codiIntegracio) {
+		integracioResult.merge(GLOBAL,
+				IntegracioSalut.builder()
+						.codi(codiIntegracio)
+						.estat(estatSalut.getEstat())
+						.latencia(estatSalut.getLatencia())
+						.peticions(plugin.getPeticionsPlugin())
+						.build(),
+				(existing, nou) -> {
+					existing.getPeticions().setTotalOk(existing.getPeticions().getTotalOk() + nou.getPeticions().getTotalOk());
+					existing.getPeticions().setTotalError(existing.getPeticions().getTotalError() + nou.getPeticions().getTotalError());
+					return existing;
+				});
+	}
+
+	private IntegracioSalut createIntegracioForPlugin(String codiIntegracio, String codiEntitat, EstatSalut estatSalut, T plugin) {
+		return IntegracioSalut.builder()
+				.codi(setFormatIntegracio(codiIntegracio, codiEntitat, 16))
+				.estat(estatSalut.getEstat())
+				.latencia(estatSalut.getLatencia())
+				.peticions(plugin.getPeticionsPlugin())
+				.build();
+	}
+
+	private void addFilteredEntitiesToIntegracions(Map<String, IntegracioSalut> integracionsMap) {
+		String codiIntegracio = getCodiApp().name();
+
+		getEntitatsFiltrades().stream()
+				.filter(entitat -> (entitat.isConfiguracioEspecifica() && !integracionsMap.containsKey(entitat.getCodi())) || (!entitat.isConfiguracioEspecifica() && !integracionsMap.containsKey(GLOBAL)))
+				.forEach(entitat -> integracionsMap.put(entitat.getCodi(),
+						IntegracioSalut.builder()
+								.codi(entitat.isConfiguracioEspecifica() ? setFormatIntegracio(codiIntegracio, entitat.getCodi(), 16) : codiIntegracio)
+								.estat(EstatSalutEnum.UNKNOWN)
+								.build()));
+	}
+
 
 	public List<IntegracioInfo> getIntegracionsInfo() {
 
-		List<String> codisFiltrats = getCodisFiltrats();
-		return codisFiltrats.stream()
-				.map(codiEntitat -> obtenirIntegracioInfo(codisFiltrats, codiEntitat))
+		List<CodiBool> entitatsFiltrades = getEntitatsFiltrades();
+		return entitatsFiltrades.stream()
+				.map(entitat -> obtenirIntegracioInfo(entitat))
 				.collect(Collectors.toList());
 	}
 
-	@NotNull
-	private List<String> getCodisFiltrats() {
+	private IntegracioInfo obtenirIntegracioInfo(CodiBool entitat) {
+		boolean showInfoEspecifica = entitat.isConfiguracioEspecifica();
+		String codiIntegracio = getCodiApp().name();
+		String nomIntegracio = getCodiApp().getNom();
+
+		return IntegracioInfo.builder()
+				.codi(showInfoEspecifica ? setFormatIntegracio(codiIntegracio, entitat.getCodi(), 16) : codiIntegracio)
+				.nom(showInfoEspecifica ? setFormatIntegracio(nomIntegracio, entitat.getCodi(), 255) : nomIntegracio)
+				.build();
+	}
+
+
+	private List<CodiBool> getEntitatsFiltrades() {
 		AtomicBoolean foundFirstWithConfig = new AtomicBoolean(false);
-		List<String> codisFiltrats = pluginMap.keySet().stream()
-				.filter(codiEntitat -> shouldInclude(codiEntitat, foundFirstWithConfig))
+		AtomicBoolean hasConfiguracioEspecifica = new AtomicBoolean(false);
+
+		List<CodiBool> codisFiltrats = entitatRepository.findCodiAllActives().stream()
+				.filter(codiEntitat -> shouldInclude(codiEntitat, foundFirstWithConfig, hasConfiguracioEspecifica))
+				.map(codiEntitat -> CodiBool.builder().codi(codiEntitat).configuracioEspecifica(hasConfiguracioEspecifica.get()).build())
 				.collect(Collectors.toList());
 		return codisFiltrats;
 	}
 
-	private boolean shouldInclude(String codiEntitat, AtomicBoolean foundFirstWithConfig) {
-		boolean hasConfigEspecifica = pluginMap.get(codiEntitat).teConfiguracioEspecifica();
+	private boolean shouldInclude(String codiEntitat, AtomicBoolean foundFirstWithConfig, AtomicBoolean hasConfiguracioEspecifica) {
+		boolean hasConfigEspecifica = pluginMap.get(codiEntitat) != null ?
+				pluginMap.get(codiEntitat).teConfiguracioEspecifica() :
+				configHelper.hasEntityGroupPropertiesModified(codiEntitat, getConfigGrup());
+		hasConfiguracioEspecifica.set(hasConfigEspecifica);
 
 		if (!hasConfigEspecifica && !foundFirstWithConfig.get()) {
 			foundFirstWithConfig.set(true);
@@ -121,31 +175,6 @@ public abstract class AbstractPluginHelper<T extends SalutPlugin> {
 		}
 
 		return hasConfigEspecifica; // Inclou només els elements que no compleixen teConfiguracioEspecifica o el primer que sí
-	}
-
-	private IntegracioInfo obtenirIntegracioInfo(List<String> codisFiltrats, String codiEntitat) {
-		boolean showInfoEspecifica = pluginMap.get(codiEntitat).teConfiguracioEspecifica() && codisFiltrats.size() > 1;
-		String codiIntegracio = getCodiApp().name();
-		String nomIntegracio = getCodiApp().getNom();
-
-		return IntegracioInfo.builder()
-				.codi(showInfoEspecifica ? setFormatIntegracio(codiIntegracio, codiEntitat, 16) : codiIntegracio)
-				.nom(showInfoEspecifica ? setFormatIntegracio(nomIntegracio, codiEntitat, 255) : nomIntegracio)
-				.build();
-	}
-
-	private IntegracioSalut obtenirIntegracioSalut(List<String> codisFiltrats, String codiEntitat) {
-		T plugin = pluginMap.get(codiEntitat);
-		boolean showInfoEspecifica = plugin.teConfiguracioEspecifica() && codisFiltrats.size() > 1;
-		String codiIntegracio = getCodiApp().name();
-		EstatSalut estatSalut = plugin.getEstatPlugin();
-
-		return IntegracioSalut.builder()
-				.codi(showInfoEspecifica ? setFormatIntegracio(codiIntegracio, codiEntitat, 16) : codiIntegracio)
-				.estat(estatSalut.getEstat())
-				.latencia(estatSalut.getLatencia())
-				.peticions(plugin.getPeticionsPlugin())
-				.build();
 	}
 
 	private String setFormatIntegracio(String text, String codiEntitat, int maxLength) {
@@ -157,5 +186,17 @@ public abstract class AbstractPluginHelper<T extends SalutPlugin> {
 	abstract protected T getPlugin();
 	abstract protected String getPluginClassProperty();
 	abstract protected IntegracioApp getCodiApp();
+	abstract protected String getConfigGrup();
 
+	public abstract boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception;
+
+
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Getter @Setter
+	public static class CodiBool implements Serializable {
+		private String codi;
+		private boolean configuracioEspecifica;
+	}
 }

@@ -12,6 +12,7 @@ import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.persist.entity.NotificacioEntity;
+import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
@@ -31,11 +32,15 @@ import java.util.Properties;
 @Component
 public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin> {
 
+	public static final String GRUP = "FIRMA";
+
 	private final NotificacioEnviamentRepository enviamentRepository;
 
 	public FirmaPluginHelper(IntegracioHelper integracioHelper,
-                             ConfigHelper configHelper, NotificacioEnviamentRepository enviamentRepository) {
-		super(integracioHelper, configHelper);
+                             ConfigHelper configHelper,
+							 EntitatRepository entitatRepository,
+							 NotificacioEnviamentRepository enviamentRepository) {
+		super(integracioHelper, configHelper, entitatRepository);
         this.enviamentRepository = enviamentRepository;
     }
 
@@ -59,7 +64,7 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 		info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
 		info.setCodiEntitat(notificacio.getEntitat().getCodi());
 		try {
-			peticionsPlugin.updatePeticioTotal(getCodiEntitatActual());
+			// peticionsPlugin.updatePeticioTotal(getCodiEntitatActual());
 			var firmaContingut = getPlugin().firmar(fitxer.getNom(), motiu, fitxer.getContingut(), tipusFirma, idioma);
 			integracioHelper.addAccioOk(info);
 			return firmaContingut;
@@ -67,7 +72,7 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 			var errorDescripcio = "Error al accedir al plugin de firma en servidor: " + ex.getMessage();
 			log.error(errorDescripcio, ex);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(getCodiEntitatActual());
+			// peticionsPlugin.updatePeticioError(getCodiEntitatActual());
 			throw new SistemaExternException(IntegracioCodi.FIRMASERV.name(), errorDescripcio, ex);
 		}
 	}
@@ -90,8 +95,10 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 			throw new SistemaExternException(IntegracioCodi.FIRMASERV.name(), error);
 		}
 		try {
+			var configuracioEspecifica = configHelper.hasEntityGroupPropertiesModified(codiEntitat, getConfigGrup());
+			var propietats = configHelper.getAllEntityProperties(codiEntitat);
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (FirmaServidorPlugin) clazz.getDeclaredConstructor(Properties.class).newInstance(configHelper.getAllEntityProperties(codiEntitat));
+			plugin = (FirmaServidorPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(propietats, configuracioEspecifica);
 			pluginMap.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -99,6 +106,11 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 			log.error(error + " (" + pluginClass + "): ", ex);
 			throw new SistemaExternException(IntegracioCodi.FIRMASERV.name(), error, ex);
 		}
+	}
+
+	@Override
+	protected String getConfigGrup() {
+		return GRUP;
 	}
 
 	// PROPIETATS PLUGIN

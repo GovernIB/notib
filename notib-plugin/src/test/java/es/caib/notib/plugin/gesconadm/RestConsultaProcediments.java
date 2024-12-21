@@ -30,7 +30,7 @@ public class RestConsultaProcediments {
 		properties.put("es.caib.notib.plugin.gesconadm.base.url", "https://dev.caib.es/rolsac");
 		properties.put("es.caib.notib.plugin.gesconadm.username", "$notib_rolsac");
 		properties.put("es.caib.notib.plugin.gesconadm.base.url", "https://dev.caib.es/rolsac");
-		pluginRolsac = new GestorContingutsAdministratiuPluginRolsac(properties);
+		pluginRolsac = new GestorContingutsAdministratiuPluginRolsac(properties, false);
 	}
 
 //	@Test

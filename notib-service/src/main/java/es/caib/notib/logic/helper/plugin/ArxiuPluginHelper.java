@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import es.caib.comanda.salut.model.IntegracioApp;
 import es.caib.notib.logic.exception.DocumentNotFoundException;
 import es.caib.notib.logic.helper.ConfigHelper;
-import es.caib.notib.logic.helper.ExcepcioLogHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
@@ -12,10 +11,10 @@ import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
-import es.caib.notib.plugin.arxiu.ArxiuPlugin;
 import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
+import es.caib.notib.plugin.arxiu.ArxiuPlugin;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import lombok.extern.slf4j.Slf4j;
@@ -33,18 +32,20 @@ import java.util.Properties;
 @Component
 public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 
+	public static final String GRUP = "ARXIU";
+
 	private final DocumentRepository documentRepository;
-	private final EntitatRepository entitatRepository;
 	private final NotificacioRepository notificacioRepository;
+
 
 	public ArxiuPluginHelper(IntegracioHelper integracioHelper,
 							 ConfigHelper configHelper,
+							 EntitatRepository entitatRepository,
 							 DocumentRepository documentRepository,
-							 EntitatRepository entitatRepository, NotificacioRepository notificacioRepository) {
+							 NotificacioRepository notificacioRepository) {
 
-		super(integracioHelper, configHelper);
+		super(integracioHelper, configHelper, entitatRepository);
         this.documentRepository = documentRepository;
-        this.entitatRepository = entitatRepository;
 		this.notificacioRepository = notificacioRepository;
 	}
 
@@ -103,7 +104,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 		info.setCodiEntitat(codiEntitat);
 		try {
 			identificador = isUuid ? "uuid:" + identificador : "csv:" + identificador;
-			peticionsPlugin.updatePeticioTotal(codiEntitat);
+			// peticionsPlugin.updatePeticioTotal(codiEntitat);
 			var documentDetalls = getPlugin().documentDetalls(identificador, versio, ambContingut);
 			integracioHelper.addAccioOk(info);
 			return documentDetalls;
@@ -125,7 +126,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 
 		try {
 			id = isUuid ? "uuid:" + id : "csv:" + id;
-			peticionsPlugin.updatePeticioTotal(codiEntitat);
+			// peticionsPlugin.updatePeticioTotal(codiEntitat);
 			var documentContingut = getPlugin().documentImprimible(id);
 			integracioHelper.addAccioOk(info);
 			return documentContingut;
@@ -168,8 +169,11 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 			throw new SistemaExternException(IntegracioCodi.ARXIU.name(), msg);
 		}
 		try {
+			var propertyKeyBase =  "es.caib.notib.";
+			var configuracioEspecifica = configHelper.hasEntityGroupPropertiesModified(codiEntitat, getConfigGrup());
+			var propietats = configHelper.getEnvironmentProperties();
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (ArxiuPlugin) clazz.getDeclaredConstructor(String.class, Properties.class).newInstance("es.caib.notib.", configHelper.getEnvironmentProperties());
+			plugin = (ArxiuPlugin) clazz.getDeclaredConstructor(String.class, Properties.class, boolean.class).newInstance(propertyKeyBase, propietats, configuracioEspecifica);
 			pluginMap.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -188,6 +192,11 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 	@Override
 	protected IntegracioApp getCodiApp() {
 		return IntegracioApp.ARX;
+	}
+
+	@Override
+	protected String getConfigGrup() {
+		return GRUP;
 	}
 
 	// Mètodes pels tests

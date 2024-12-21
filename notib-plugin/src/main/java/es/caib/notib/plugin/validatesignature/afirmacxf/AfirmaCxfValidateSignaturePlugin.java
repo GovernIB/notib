@@ -84,1292 +84,1407 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 
  * @author anadal
  * @author areus
  */
 public class AfirmaCxfValidateSignaturePlugin extends AbstractValidateSignaturePlugin {
 
-  private static final Map<String, String> localSignProfile2PluginSignProfile = new HashMap<String, String>();
-  private static final Map<String, String> localSignType2PluginSignType = new HashMap<String, String>();
-  private static final Map<String, String> localAlgorithm2PluginAlgorithm = new HashMap<String, String>();
-  private static final Map<String, String> localAlgorithmEnc2PluginAlgorithm = new HashMap<String, String>();
-  private static final SignatureRequestedInformation supportedSignatureRequestedInformation = new SignatureRequestedInformation();
+    private static final Map<String, String> localSignProfile2PluginSignProfile = new HashMap<String, String>();
+    private static final Map<String, String> localSignType2PluginSignType = new HashMap<String, String>();
+    private static final Map<String, String> localAlgorithm2PluginAlgorithm = new HashMap<String, String>();
+    private static final Map<String, String> localAlgorithmEnc2PluginAlgorithm = new HashMap<String, String>();
+    private static final SignatureRequestedInformation supportedSignatureRequestedInformation = new SignatureRequestedInformation();
 
-  private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
+    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
 
-  static {
-    DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
-    DOCUMENT_BUILDER_FACTORY.setNamespaceAware(true);
+    static {
+        DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+        DOCUMENT_BUILDER_FACTORY.setNamespaceAware(true);
 
-    if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-      Security.addProvider(new BouncyCastleProvider());
+        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+
+        supportedSignatureRequestedInformation.setReturnCertificateInfo(true);
+        supportedSignatureRequestedInformation.setReturnCertificates(true);
+        supportedSignatureRequestedInformation.setReturnSignatureTypeFormatProfile(true);
+        supportedSignatureRequestedInformation.setReturnTimeStampInfo(true);
+        supportedSignatureRequestedInformation.setReturnValidationChecks(true);
+        supportedSignatureRequestedInformation.setValidateCertificateRevocation(true);
+
+        localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.XADES_V_1_3_2,
+                ValidateSignatureConstants.SIGNTYPE_XAdES); // = "http://uri.etsi.org/01903/v1.3.2#";
+        localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.XADES_V_1_2_2,
+                ValidateSignatureConstants.SIGNTYPE_XAdES); // = "http://uri.etsi.org/01903/v1.2.2#";
+        localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.XADES_V_1_1_1,
+                ValidateSignatureConstants.SIGNTYPE_XAdES); // = "http://uri.etsi.org/01903/v1.1.1#";
+
+        localSignType2PluginSignType.put("http://uri.etsi.org/01903/v1.4.1#",
+                ValidateSignatureConstants.SIGNTYPE_XAdES); // = "http://uri.etsi.org/01903/v1.4.1#";
+
+        localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.CADES,
+                ValidateSignatureConstants.SIGNTYPE_CAdES); // = "http://uri.etsi.org/01733/v1.7.3#";
+        localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.CMS,
+                ValidateSignatureConstants.SIGNTYPE_CMS); // = "urn:ietf:rfc:3369";
+        localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.CMS_TST,
+                ValidateSignatureConstants.SIGNTYPE_CMS); // = "urn:afirma:dss:1.0:profile:XSS:forms:CMSWithTST";
+        localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.ODF,
+                ValidateSignatureConstants.SIGNTYPE_ODF); // = "urn:afirma:dss:1.0:profile:XSS:forms:ODF";
+        localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.PDF,
+                ValidateSignatureConstants.SIGNTYPE_PDF); // = "urn:afirma:dss:1.0:profile:XSS:forms:PDF";
+        localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.PADES,
+                ValidateSignatureConstants.SIGNTYPE_PAdES); // = "urn:afirma:dss:1.0:profile:XSS:forms:PAdES";
+        localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.XML_DSIG,
+                ValidateSignatureConstants.SIGNTYPE_XML_DSIG); // = "urn:ietf:rfc:3275";
+        localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.PKCS7,
+                ValidateSignatureConstants.SIGNTYPE_PKCS7); // = "urn:ietf:rfc:2315";
+        localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.XML_TST,
+                ValidateSignatureConstants.SIGNTYPE_XML_TST); // = "urn:oasis:names:tc:dss:1.0:core:schema:XMLTimeStampToken";
+
+        //  Attribute that represents identifier for CAdES Baseline.
+        // Definit a DSSConstants.SignTypesURIs.CADES_BASELINE_2_2_1,
+        localSignType2PluginSignType.put("http://uri.etsi.org/103173/v2.2.1#",
+                ValidateSignatureConstants.SIGNTYPE_CAdES);
+
+        // Attribute that represents identifier for PAdES Baseline.
+        // Definit a DSSConstants.SignTypesURIs.PADES_BASELINE_2_1_1,
+        localSignType2PluginSignType.put("http://uri.etsi.org/103172/v2.1.1#",
+                ValidateSignatureConstants.SIGNTYPE_PAdES);
+
+        // Attribute that represents identifier for XAdES Baseline.
+        // Definit a DSSConstants.SignTypesURIs.XADES_BASELINE_2_1_1,
+        localSignType2PluginSignType.put("http://uri.etsi.org/103171/v2.1.1#",
+                ValidateSignatureConstants.SIGNTYPE_XAdES);
+
+
+        localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.BES,
+                ValidateSignatureConstants.SIGNPROFILE_BES); //= "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:BES";
+        localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.EPES,
+                ValidateSignatureConstants.SIGNPROFILE_EPES); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:EPES";
+        localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.T,
+                ValidateSignatureConstants.SIGNPROFILE_T); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-T";
+        localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.C,
+                ValidateSignatureConstants.SIGNPROFILE_C); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-C";
+        localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.X,
+                ValidateSignatureConstants.SIGNPROFILE_X); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-X";
+        localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.X_1,
+                ValidateSignatureConstants.SIGNPROFILE_X1); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-X-1";
+        localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.X_2,
+                ValidateSignatureConstants.SIGNPROFILE_X2); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-X-2";
+        localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.X_L,
+                ValidateSignatureConstants.SIGNPROFILE_XL); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-X-L";
+        localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.X_L_1,
+                ValidateSignatureConstants.SIGNPROFILE_XL1); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-X-L-1";
+        localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.X_L_2,
+                ValidateSignatureConstants.SIGNPROFILE_XL2); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-X-L-2";
+        localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.A,
+                ValidateSignatureConstants.SIGNPROFILE_A); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-A";
+        localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.PADES_BASIC,
+                ValidateSignatureConstants.SIGNPROFILE_PADES_BASIC); // = "urn:afirma:dss:1.0:profile:XSS:PAdES:1.2.1:forms:Basico";
+        localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.PADES_BES,
+                ValidateSignatureConstants.SIGNPROFILE_BES); // = "urn:afirma:dss:1.0:profile:XSS:PAdES:1.1.2:forms:BES";
+        localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.PADES_EPES,
+                ValidateSignatureConstants.SIGNPROFILE_EPES); // = "urn:afirma:dss:1.0:profile:XSS:PAdES:1.1.2:forms:EPES";
+        localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.PADES_LTV,
+                ValidateSignatureConstants.SIGNPROFILE_PADES_LTV); // = "urn:afirma:dss:1.0:profile:XSS:PAdES:1.1.2:forms:LTV";
+
+        /*
+         * TODO Constant DSSConstants.SignatureForm.B_LEVEL
+         *  Attribute that represents B_LEVEL identifier form.
+         */
+        localSignProfile2PluginSignProfile.put("urn:afirma:dss:1.0:profile:XSS:AdES:forms:B-Level",
+                ValidateSignatureConstants.SIGNPROFILE_BES);
+
+        /*
+         * TODO Constant DSSConstants.SignatureForm.T_LEVEL
+         *  Attribute that represents T_LEVEL identifier form.
+         */
+        localSignProfile2PluginSignProfile.put("urn:afirma:dss:1.0:profile:XSS:AdES:forms:T-Level",
+                ValidateSignatureConstants.SIGNPROFILE_T);
+
+        /*
+         * TODO Constant DSSConstants.SignatureForm.LT_LEVEL
+         *  Attribute that represents LT_LEVEL identifier form..
+         */
+        localSignProfile2PluginSignProfile.put("urn:afirma:dss:1.0:profile:XSS:AdES:forms:LT-Level",
+                ValidateSignatureConstants.SIGNPROFILE_XL);
+
+        /*
+         * TODO Constant DSSConstants.SignatureForm.LTA_LEVEL
+         *  Attribute that represents LT_LEVEL identifier form.
+         */
+        localSignProfile2PluginSignProfile.put("urn:afirma:dss:1.0:profile:XSS:AdES:forms:LTA-Level",
+                ValidateSignatureConstants.SIGNPROFILE_A);
+
+
+        localAlgorithm2PluginAlgorithm.put("http://www.w3.org/2000/09/xmldsig#sha1",
+                SignatureDetailInfo.SIGN_ALGORITHM_SHA1);
+        localAlgorithm2PluginAlgorithm.put("http://www.w3.org/2000/09/xmldsig#sha256",
+                SignatureDetailInfo.SIGN_ALGORITHM_SHA256);
+        localAlgorithm2PluginAlgorithm.put("http://www.w3.org/2000/09/xmldsig#sha384",
+                SignatureDetailInfo.SIGN_ALGORITHM_SHA384);
+        localAlgorithm2PluginAlgorithm.put("http://www.w3.org/2000/09/xmldsig#sha512",
+                SignatureDetailInfo.SIGN_ALGORITHM_SHA512);
+
+        localAlgorithmEnc2PluginAlgorithm.put("http://www.w3.org/2001/04/xmlenc#sha1",
+                SignatureDetailInfo.SIGN_ALGORITHM_SHA1);
+        localAlgorithmEnc2PluginAlgorithm.put("http://www.w3.org/2001/04/xmlenc#sha256",
+                SignatureDetailInfo.SIGN_ALGORITHM_SHA256);
+        localAlgorithmEnc2PluginAlgorithm.put("http://www.w3.org/2001/04/xmlenc#sha384",
+                SignatureDetailInfo.SIGN_ALGORITHM_SHA384);
+        localAlgorithmEnc2PluginAlgorithm.put("http://www.w3.org/2001/04/xmlenc#sha512",
+                SignatureDetailInfo.SIGN_ALGORITHM_SHA512);
     }
 
-    supportedSignatureRequestedInformation.setReturnCertificateInfo(true);
-    supportedSignatureRequestedInformation.setReturnCertificates(true);
-    supportedSignatureRequestedInformation.setReturnSignatureTypeFormatProfile(true);
-    supportedSignatureRequestedInformation.setReturnTimeStampInfo(true);
-    supportedSignatureRequestedInformation.setReturnValidationChecks(true);
-    supportedSignatureRequestedInformation.setValidateCertificateRevocation(true);
+    private static final String AFIRMACXF_BASE_PROPERTIES = IValidateSignaturePlugin.VALIDATE_SIGNATURE_BASE_PROPERTY
+            + "afirmacxf.";
 
-    localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.XADES_V_1_3_2,
-        ValidateSignatureConstants.SIGNTYPE_XAdES); // = "http://uri.etsi.org/01903/v1.3.2#";
-    localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.XADES_V_1_2_2,
-        ValidateSignatureConstants.SIGNTYPE_XAdES); // = "http://uri.etsi.org/01903/v1.2.2#";
-    localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.XADES_V_1_1_1,
-        ValidateSignatureConstants.SIGNTYPE_XAdES); // = "http://uri.etsi.org/01903/v1.1.1#";
-    
-    localSignType2PluginSignType.put("http://uri.etsi.org/01903/v1.4.1#",
-        ValidateSignatureConstants.SIGNTYPE_XAdES); // = "http://uri.etsi.org/01903/v1.4.1#";
-    
-    localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.CADES,
-        ValidateSignatureConstants.SIGNTYPE_CAdES); // = "http://uri.etsi.org/01733/v1.7.3#";
-    localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.CMS,
-        ValidateSignatureConstants.SIGNTYPE_CMS); // = "urn:ietf:rfc:3369";
-    localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.CMS_TST,
-        ValidateSignatureConstants.SIGNTYPE_CMS); // = "urn:afirma:dss:1.0:profile:XSS:forms:CMSWithTST";
-    localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.ODF,
-        ValidateSignatureConstants.SIGNTYPE_ODF); // = "urn:afirma:dss:1.0:profile:XSS:forms:ODF";
-    localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.PDF,
-        ValidateSignatureConstants.SIGNTYPE_PDF); // = "urn:afirma:dss:1.0:profile:XSS:forms:PDF";
-    localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.PADES,
-        ValidateSignatureConstants.SIGNTYPE_PAdES); // = "urn:afirma:dss:1.0:profile:XSS:forms:PAdES";
-    localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.XML_DSIG,
-        ValidateSignatureConstants.SIGNTYPE_XML_DSIG); // = "urn:ietf:rfc:3275";
-    localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.PKCS7,
-        ValidateSignatureConstants.SIGNTYPE_PKCS7); // = "urn:ietf:rfc:2315";
-    localSignType2PluginSignType.put(DSSConstants.SignTypesURIs.XML_TST,
-        ValidateSignatureConstants.SIGNTYPE_XML_TST); // = "urn:oasis:names:tc:dss:1.0:core:schema:XMLTimeStampToken";
+    // TRANSFORMES XML
 
-    //  Attribute that represents identifier for CAdES Baseline.
-    // Definit a DSSConstants.SignTypesURIs.CADES_BASELINE_2_2_1,
-    localSignType2PluginSignType.put("http://uri.etsi.org/103173/v2.2.1#",
-        ValidateSignatureConstants.SIGNTYPE_CAdES);
+    private static final String APPLICATIONID_PROPERTY = AFIRMACXF_BASE_PROPERTIES
+            + "applicationID";
 
-    // Attribute that represents identifier for PAdES Baseline.
-    // Definit a DSSConstants.SignTypesURIs.PADES_BASELINE_2_1_1,
-    localSignType2PluginSignType.put("http://uri.etsi.org/103172/v2.1.1#",
-        ValidateSignatureConstants.SIGNTYPE_PAdES);
- 
-    // Attribute that represents identifier for XAdES Baseline.
-    // Definit a DSSConstants.SignTypesURIs.XADES_BASELINE_2_1_1,
-    localSignType2PluginSignType.put("http://uri.etsi.org/103171/v2.1.1#",
-        ValidateSignatureConstants.SIGNTYPE_XAdES);
+    private static final String TRANSFORMERSTEMPLATESPATH_PROPERTY = AFIRMACXF_BASE_PROPERTIES
+            + "TransformersTemplatesPath";
 
-    
-      localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.BES,
-          ValidateSignatureConstants.SIGNPROFILE_BES); //= "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:BES";
-      localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.EPES,
-          ValidateSignatureConstants.SIGNPROFILE_EPES); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:EPES";
-      localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.T,
-          ValidateSignatureConstants.SIGNPROFILE_T); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-T";
-      localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.C,
-          ValidateSignatureConstants.SIGNPROFILE_C); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-C";
-      localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.X,
-          ValidateSignatureConstants.SIGNPROFILE_X); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-X";
-      localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.X_1,
-          ValidateSignatureConstants.SIGNPROFILE_X1); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-X-1";
-      localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.X_2,
-          ValidateSignatureConstants.SIGNPROFILE_X2); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-X-2";
-      localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.X_L,
-          ValidateSignatureConstants.SIGNPROFILE_XL); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-X-L";
-      localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.X_L_1,
-          ValidateSignatureConstants.SIGNPROFILE_XL1); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-X-L-1";
-      localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.X_L_2,
-          ValidateSignatureConstants.SIGNPROFILE_XL2); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-X-L-2";
-      localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.A,
-          ValidateSignatureConstants.SIGNPROFILE_A); // = "urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-A";
-      localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.PADES_BASIC,
-          ValidateSignatureConstants.SIGNPROFILE_PADES_BASIC); // = "urn:afirma:dss:1.0:profile:XSS:PAdES:1.2.1:forms:Basico";
-      localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.PADES_BES,
-          ValidateSignatureConstants.SIGNPROFILE_BES); // = "urn:afirma:dss:1.0:profile:XSS:PAdES:1.1.2:forms:BES";
-      localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.PADES_EPES,
-          ValidateSignatureConstants.SIGNPROFILE_EPES); // = "urn:afirma:dss:1.0:profile:XSS:PAdES:1.1.2:forms:EPES";
-      localSignProfile2PluginSignProfile.put(DSSConstants.SignatureForm.PADES_LTV,
-          ValidateSignatureConstants.SIGNPROFILE_PADES_LTV); // = "urn:afirma:dss:1.0:profile:XSS:PAdES:1.1.2:forms:LTV";
+    // CRIDADA CXF
+    private static final String ENDPOINT = AFIRMACXF_BASE_PROPERTIES + "endpoint";
 
-      /*
-       * TODO Constant DSSConstants.SignatureForm.B_LEVEL
-       *  Attribute that represents B_LEVEL identifier form.
-       */
-      localSignProfile2PluginSignProfile.put("urn:afirma:dss:1.0:profile:XSS:AdES:forms:B-Level",
-          ValidateSignatureConstants.SIGNPROFILE_BES);
+    // UsernameToken
+    private static final String AUTH_UP_USERNAME = AFIRMACXF_BASE_PROPERTIES
+            + "authorization.username";
+    private static final String AUTH_UP_PASSWORD = AFIRMACXF_BASE_PROPERTIES
+            + "authorization.password";
 
-      /*
-       * TODO Constant DSSConstants.SignatureForm.T_LEVEL
-       *  Attribute that represents T_LEVEL identifier form.
-       */
-      localSignProfile2PluginSignProfile.put("urn:afirma:dss:1.0:profile:XSS:AdES:forms:T-Level",
-          ValidateSignatureConstants.SIGNPROFILE_T);
+    // CERTIFICATE Token
+    private static final String AUTH_KS_PATH = AFIRMACXF_BASE_PROPERTIES
+            + "authorization.ks.path";
+    private static final String AUTH_KS_TYPE = AFIRMACXF_BASE_PROPERTIES
+            + "authorization.ks.type";
+    private static final String AUTH_KS_PASSWORD = AFIRMACXF_BASE_PROPERTIES
+            + "authorization.ks.password";
+    private static final String AUTH_KS_ALIAS = AFIRMACXF_BASE_PROPERTIES
+            + "authorization.ks.cert.alias";
+    private static final String AUTH_KS_CERT_PASSWORD = AFIRMACXF_BASE_PROPERTIES
+            + "authorization.ks.cert.password";
 
-      /*
-       * TODO Constant DSSConstants.SignatureForm.LT_LEVEL
-       *  Attribute that represents LT_LEVEL identifier form..
-       */
-      localSignProfile2PluginSignProfile.put("urn:afirma:dss:1.0:profile:XSS:AdES:forms:LT-Level",
-          ValidateSignatureConstants.SIGNPROFILE_XL);
+    private static final String PRINT_XML = AFIRMACXF_BASE_PROPERTIES + "printxml";
 
-      /*
-       * TODO Constant DSSConstants.SignatureForm.LTA_LEVEL
-       *  Attribute that represents LT_LEVEL identifier form.
-       */
-      localSignProfile2PluginSignProfile.put("urn:afirma:dss:1.0:profile:XSS:AdES:forms:LTA-Level",
-          ValidateSignatureConstants.SIGNPROFILE_A);
-      
-    
-    localAlgorithm2PluginAlgorithm.put("http://www.w3.org/2000/09/xmldsig#sha1",
-        SignatureDetailInfo.SIGN_ALGORITHM_SHA1);
-    localAlgorithm2PluginAlgorithm.put("http://www.w3.org/2000/09/xmldsig#sha256",
-        SignatureDetailInfo.SIGN_ALGORITHM_SHA256);
-    localAlgorithm2PluginAlgorithm.put("http://www.w3.org/2000/09/xmldsig#sha384",
-        SignatureDetailInfo.SIGN_ALGORITHM_SHA384);
-    localAlgorithm2PluginAlgorithm.put("http://www.w3.org/2000/09/xmldsig#sha512",
-        SignatureDetailInfo.SIGN_ALGORITHM_SHA512);
+    private static final String CONNECT_TIMEOUT = AFIRMACXF_BASE_PROPERTIES + "connectTimeout";
 
-    localAlgorithmEnc2PluginAlgorithm.put("http://www.w3.org/2001/04/xmlenc#sha1",
-        SignatureDetailInfo.SIGN_ALGORITHM_SHA1);
-    localAlgorithmEnc2PluginAlgorithm.put("http://www.w3.org/2001/04/xmlenc#sha256",
-        SignatureDetailInfo.SIGN_ALGORITHM_SHA256);
-    localAlgorithmEnc2PluginAlgorithm.put("http://www.w3.org/2001/04/xmlenc#sha384",
-        SignatureDetailInfo.SIGN_ALGORITHM_SHA384);
-    localAlgorithmEnc2PluginAlgorithm.put("http://www.w3.org/2001/04/xmlenc#sha512",
-        SignatureDetailInfo.SIGN_ALGORITHM_SHA512);
-  }
+    private static final String READ_TIMEOUT = AFIRMACXF_BASE_PROPERTIES + "readTimeout";
 
-  private static final String AFIRMACXF_BASE_PROPERTIES = IValidateSignaturePlugin.VALIDATE_SIGNATURE_BASE_PROPERTY
-      + "afirmacxf.";
+    private static final ThreadLocal<SimpleDateFormat> dateFormatTimeStamp =
+            new ThreadLocal<SimpleDateFormat>() {
+                protected SimpleDateFormat initialValue() {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", new Locale("es"));
+                    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    return dateFormat;
+                }
+            };
 
-  // TRANSFORMES XML
-
-  private static final String APPLICATIONID_PROPERTY = AFIRMACXF_BASE_PROPERTIES
-      + "applicationID";
-
-  private static final String TRANSFORMERSTEMPLATESPATH_PROPERTY = AFIRMACXF_BASE_PROPERTIES
-      + "TransformersTemplatesPath";
-
-  // CRIDADA CXF
-  private static final String ENDPOINT = AFIRMACXF_BASE_PROPERTIES + "endpoint";
-
-  // UsernameToken
-  private static final String AUTH_UP_USERNAME = AFIRMACXF_BASE_PROPERTIES
-      + "authorization.username";
-  private static final String AUTH_UP_PASSWORD = AFIRMACXF_BASE_PROPERTIES
-      + "authorization.password";
-
-  // CERTIFICATE Token
-  private static final String AUTH_KS_PATH = AFIRMACXF_BASE_PROPERTIES
-      + "authorization.ks.path";
-  private static final String AUTH_KS_TYPE = AFIRMACXF_BASE_PROPERTIES
-      + "authorization.ks.type";
-  private static final String AUTH_KS_PASSWORD = AFIRMACXF_BASE_PROPERTIES
-      + "authorization.ks.password";
-  private static final String AUTH_KS_ALIAS = AFIRMACXF_BASE_PROPERTIES
-      + "authorization.ks.cert.alias";
-  private static final String AUTH_KS_CERT_PASSWORD = AFIRMACXF_BASE_PROPERTIES
-      + "authorization.ks.cert.password";
-
-  private static final String PRINT_XML = AFIRMACXF_BASE_PROPERTIES + "printxml";
-
-  private static final String CONNECT_TIMEOUT = AFIRMACXF_BASE_PROPERTIES + "connectTimeout";
-
-  private static final String READ_TIMEOUT = AFIRMACXF_BASE_PROPERTIES + "readTimeout";
-
-  private static final ThreadLocal<SimpleDateFormat> dateFormatTimeStamp =
-    new ThreadLocal<SimpleDateFormat>() {
-      protected SimpleDateFormat initialValue() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", new Locale("es"));
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return dateFormat;
-      }
-    };
-
-  private static final Pattern timeStampPattern = Pattern.compile(
+    private static final Pattern timeStampPattern = Pattern.compile(
             "<vr:Properties>.+<vr:CreationTime>(.+?)</vr:CreationTime>"
-            + ".*</vr:TimeStampContent><vr:MessageHashAlg Type=\"urn:afirma:dss:1.0:profile:XSS:detail:MessageHashAlg\"><dss:Code>(.+?)</dss:Code></vr:MessageHashAlg>"
-            + ".+<vr:CertificateValidity><vr:CertificateIdentifier><ds:X509IssuerName>(.+?)</ds:X509IssuerName>"
-            + ".+<vr:Subject>(.+?)</vr:Subject>.+</vr:Properties>");
+                    + ".*</vr:TimeStampContent><vr:MessageHashAlg Type=\"urn:afirma:dss:1.0:profile:XSS:detail:MessageHashAlg\"><dss:Code>(.+?)</dss:Code></vr:MessageHashAlg>"
+                    + ".+<vr:CertificateValidity><vr:CertificateIdentifier><ds:X509IssuerName>(.+?)</ds:X509IssuerName>"
+                    + ".+<vr:Subject>(.+?)</vr:Subject>.+</vr:Properties>");
 
-  private static final Pattern algorithmDigestPattern = Pattern.compile(
-          "<vr:DigestAlgAndValue><ds:DigestMethod Algorithm=\"(.+?)\"></ds:DigestMethod>" +
-                  "<ds:DigestValue><!\\[CDATA\\[(.+?)\\]\\]></ds:DigestValue>" +
-          "</vr:DigestAlgAndValue>");
+    private static final Pattern algorithmDigestPattern = Pattern.compile(
+            "<vr:DigestAlgAndValue><ds:DigestMethod Algorithm=\"(.+?)\"></ds:DigestMethod>" +
+                    "<ds:DigestValue><!\\[CDATA\\[(.+?)\\]\\]></ds:DigestValue>" +
+                    "</vr:DigestAlgAndValue>");
 
-  public AfirmaCxfValidateSignaturePlugin() {
-    super();
-    init();
-  }
-
-  public AfirmaCxfValidateSignaturePlugin(String propertyKeyBase, Properties properties) {
-    super(propertyKeyBase, properties);
-    init();
-  }
-
-  public AfirmaCxfValidateSignaturePlugin(String propertyKeyBase, Properties properties, boolean configuracioEspecifica) {
-    super(propertyKeyBase, properties);
-    init();
-    this.configuracioEspecifica = configuracioEspecifica;
-  }
-
-  public AfirmaCxfValidateSignaturePlugin(String propertyKeyBase) {
-    super(propertyKeyBase);
-    init();
-  }
-
-  /////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////
-
-  // Camps reutilitzables
-  private Configuration configuration;
-  private TransformersFacade transformersFacade;
-  private DSSSignature api;
-
-  /* inicialitzacions */
-  private void init() {
-    initConfiguration();
-    initTransformerFacade();
-    initApi();
-  }
-
-  private void initConfiguration() {
-      configuration = new Configuration(Configuration.VERSION_2_3_23);
-      configuration.setDefaultEncoding("UTF-8");
-      configuration.setTemplateLoader(
-              new ClassTemplateLoader(this.getClass(), "/template_afirma_validation"));
-  }
-
-  private void initTransformerFacade() {
-    try {
-      File path = new File(getPropertyRequired(TRANSFORMERSTEMPLATESPATH_PROPERTY));
-
-      Properties parserParamsProp = FileUtils.readPropertiesFromFile(new File(path, "parserParameters.properties"));
-      Properties transformersProperties = FileUtils.readPropertiesFromFile(new File(path, "transformers.properties"));
-
-      transformersProperties.setProperty("DSSAfirmaVerify.verify.1_0.request.transformerClass",
-              "es.caib.notib.plugin.validatesignature.afirmacxf.DSSXmlTransformer");
-      transformersProperties.setProperty("DSSAfirmaVerify.verify.1_0.parser.transformerClass",
-              "es.caib.notib.plugin.validatesignature.afirmacxf.DSSParseTransformer");
-      transformersProperties.setProperty("TransformersTemplatesPath", path.getAbsolutePath());
-
-      TransformersProperties.init(transformersProperties);
-      ParserParameterProperties.init(parserParamsProp);
-
-      transformersFacade = TransformersFacade.init(transformersProperties, parserParamsProp);
-    } catch (Exception e) {
-      throw new RuntimeException("Error inicialitzant TransformersFacade", e);
-    }
-  }
-
-  private void initApi()  {
-    try {
-      URL wsdlUrl = getClass().getResource("/wsdl/DSSAfirmaVerify.wsdl");
-      DSSSignatureService service = new DSSSignatureService(wsdlUrl);
-
-      api = service.getDSSAfirmaVerify();
-
-      Map<String, Object> reqContext = ((BindingProvider) api).getRequestContext();
-      reqContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, getEndpoint());
-
-      getClientHandler().addSecureHeader(api);
-
-      // Fixar timeout
-      HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-      httpClientPolicy.setConnectionTimeout(getConnectTimeout());
-      httpClientPolicy.setReceiveTimeout(getReadTimeout());
-      httpClientPolicy.setAllowChunking(false);
-
-      Client client = ClientProxy.getClient(api);
-      ((HTTPConduit) client.getConduit()).setClient(httpClientPolicy);
-
-    } catch (Exception e) {
-      throw new RuntimeException("Error inicialitzant API WS", e);
-    }
-  }
-
-  private ClientHandler getClientHandler() throws Exception {
-    final ClientHandler clientHandler;
-
-    String username = getProperty(AUTH_UP_USERNAME);
-    if (username != null && username.trim().length() != 0) {
-      String password = getProperty(AUTH_UP_PASSWORD);
-      clientHandler = new ClientHandlerUsernamePassword(username, password);
-    } else {
-      String keystoreLocation = getPropertyRequired(AUTH_KS_PATH);
-      String keystoreType = getPropertyRequired(AUTH_KS_TYPE);
-      String keystorePassword = getPropertyRequired(AUTH_KS_PASSWORD);
-      String keystoreCertAlias = getPropertyRequired(AUTH_KS_ALIAS);
-      String keystoreCertPassword = getPropertyRequired(AUTH_KS_CERT_PASSWORD);
-
-      clientHandler = new ClientHandlerCertificate(keystoreLocation, keystoreType,
-              keystorePassword, keystoreCertAlias, keystoreCertPassword);
-    }
-    return clientHandler;
-  }
-
-  private String getEndpoint() throws Exception {
-    return getPropertyRequired(ENDPOINT);
-  }
-
-  private long getConnectTimeout() {
-    String connectTimeoutProperty = getProperty(CONNECT_TIMEOUT, "20000");
-    return Long.parseLong(connectTimeoutProperty);
-
-  }
-
-  private long getReadTimeout() {
-    String readTimeoutProperty = getProperty(READ_TIMEOUT, "20000");
-    return Long.parseLong(readTimeoutProperty);
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////////////////////////////////
-
-  private TimeStampInfo[] parseTimeStamp(String xml) {
-
-    List<TimeStampInfo> list = new ArrayList<TimeStampInfo>();
-    SimpleDateFormat dateFormat = dateFormatTimeStamp.get();
-
-    Matcher m = timeStampPattern.matcher(xml);
-    while (m.find()) {
-
-      TimeStampInfo tsi = new TimeStampInfo();
-      try {
-        tsi.setCreationTime(dateFormat.parse(m.group(1)));
-      } catch (ParseException e) {
-        e.printStackTrace();
-      }
-      tsi.setAlgorithm(localAlgorithmEnc2PluginAlgorithm.get(m.group(2)));
-
-      tsi.setCertificateIssuer(m.group(3));
-      tsi.setCertificateSubject(m.group(4));
-
-      list.add(tsi);
+    public AfirmaCxfValidateSignaturePlugin() {
+        super();
+        init();
     }
 
-    if (list.size() == 0) {
-      return null;
+    public AfirmaCxfValidateSignaturePlugin(String propertyKeyBase, Properties properties) {
+        super(propertyKeyBase, properties);
+        init();
     }
 
-    return list.toArray(new TimeStampInfo[0]);
-  }
-
-  private String[][] parseAlgorithDigest(String xml) {
-
-    List<String> entriesAlg = new ArrayList<String>();
-    List<String> entriesDig = new ArrayList<String>();
-
-    Matcher m = algorithmDigestPattern.matcher(xml);
-    while (m.find()) {
-      entriesAlg.add(m.group(1));
-      entriesDig.add(m.group(2));
+    public AfirmaCxfValidateSignaturePlugin(String propertyKeyBase, Properties properties, boolean configuracioEspecifica) {
+        super(propertyKeyBase, properties);
+        init();
+        this.configuracioEspecifica = configuracioEspecifica;
     }
 
-    if (entriesAlg.size() == 0) {
-      return null;
+    public AfirmaCxfValidateSignaturePlugin(String propertyKeyBase) {
+        super(propertyKeyBase);
+        init();
     }
 
-    String[] entriesAlgStr = entriesAlg.toArray(new String[0]);
-    String[] entriesDigStr = entriesDig.toArray(new String[0]);
+    /// //////////////////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////////////////////
 
-    return new String[][] { entriesAlgStr, entriesDigStr };
-  }
+    // Camps reutilitzables
+    private Configuration configuration;
+    private TransformersFacade transformersFacade;
+    private DSSSignature api;
 
-  private String[][] parseXmlByIndexOfAndByGroup(String xml, String separator,
-      String pre, String post) {
-
-    String[] parts = xml.split(Pattern.quote(separator));
-
-    List<String[]> certs = new ArrayList<String[]>();
-
-    // hem de començar per 1, perquè el primer tros és el principi del document
-    for (int i = 1, partsLength = parts.length; i < partsLength; i++) {
-      String[] values = parseXmlByIndexOf(parts[i], pre, post);
-      certs.add(values);
+    /* inicialitzacions */
+    private void init() {
+        initConfiguration();
+        initTransformerFacade();
+        initApi();
     }
 
-    String[][] entriesStr;
-    if (certs.size() == 0) {
-      entriesStr = null;
-    } else {
-      entriesStr = certs.toArray(new String[certs.size()][]);
-    }
-    return entriesStr;
-  }
-
-  private String[] parseXmlByIndexOf(String xml, String pre, String post) {
-
-    int fromIndex = 0;
-
-    List<String> entries = new ArrayList<String>();
-    while (true) {
-
-      int preIndex = xml.indexOf(pre, fromIndex);
-      int postIndex = xml.indexOf(post, fromIndex);
-
-      if (preIndex == -1 || postIndex == -1) {
-        break;
-      }
-
-      String value = xml.substring(preIndex + pre.length(), postIndex);
-
-      entries.add(value);
-
-      fromIndex = postIndex + post.length();
+    private void initConfiguration() {
+        configuration = new Configuration(Configuration.VERSION_2_3_23);
+        configuration.setDefaultEncoding("UTF-8");
+        configuration.setTemplateLoader(
+                new ClassTemplateLoader(this.getClass(), "/template_afirma_validation"));
     }
 
-    String[] entriesStr;
-    if (entries.size() == 0) {
-      entriesStr = null;
-    } else {
-      entriesStr = entries.toArray(new String[0]);
-    }
-    return entriesStr;
-  }
+    private void initTransformerFacade() {
+        try {
+            File path = new File(getPropertyRequired(TRANSFORMERSTEMPLATESPATH_PROPERTY));
 
-  protected boolean isDebug() {
-    return "true".equals(getProperty(AFIRMACXF_BASE_PROPERTIES + "debug"));
-  }
+            Properties parserParamsProp = FileUtils.readPropertiesFromFile(new File(path, "parserParameters.properties"));
+            Properties transformersProperties = FileUtils.readPropertiesFromFile(new File(path, "transformers.properties"));
 
-  @Override
-  public SignatureRequestedInformation getSupportedSignatureRequestedInformation() {
-    return supportedSignatureRequestedInformation;
-  }
+            transformersProperties.setProperty("DSSAfirmaVerify.verify.1_0.request.transformerClass",
+                    "es.caib.notib.plugin.validatesignature.afirmacxf.DSSXmlTransformer");
+            transformersProperties.setProperty("DSSAfirmaVerify.verify.1_0.parser.transformerClass",
+                    "es.caib.notib.plugin.validatesignature.afirmacxf.DSSParseTransformer");
+            transformersProperties.setProperty("TransformersTemplatesPath", path.getAbsolutePath());
 
-  @Override
-  public SignatureRequestedInformation getSupportedSignatureRequestedInformationBySignatureType(String signType) {
-      return supportedSignatureRequestedInformation;
-  }
+            TransformersProperties.init(transformersProperties);
+            ParserParameterProperties.init(parserParamsProp);
 
-  @Override
-  public ValidateSignatureResponse validateSignature(ValidateSignatureRequest validationRequest)
-      throws Exception {
-    
-    SignatureRequestedInformation sri = validationRequest.getSignatureRequestedInformation();
-    
-    if (sri == null) {
-      sri = new SignatureRequestedInformation();
-    }
-    
-    final boolean debug = isDebug();
-
-    final String applicationID = getPropertyRequired(APPLICATIONID_PROPERTY);
-
-    if(debug) {
-      log.debug("applicationID = " + applicationID);
-    }
-
-    // Instanciamos un mapa con los paràmetros de entrada
-    Map<String, Object> inParams = new HashMap<String, Object>();
-
-    // OK
-    // VerifySignatureRequest verSigReq = new VerifySignatureRequest();
-    inParams.put(DSSTagsRequest.CLAIMED_IDENTITY, applicationID);
-
-    // OK VerificationReport verRep = new VerificationReport();
-    // OK verSigReq.setVerificationReport(verRep);
-    // OK verSigReq.getVerificationReport().getIncludeCertificateValues()
-    // Indicamos que queremos incluir la cadena de certificaci�n en la
-    // respuesta
-    // == Retorna els certificats de cada firma (requereix REPORT_DETAIL_LEVEL =
-    // ALL_DETAILS)
-    if (Boolean.TRUE.equals(sri.getReturnCertificates())) {
-      inParams.put(DSSTagsRequest.INCLUDE_CERTIFICATE, Boolean.TRUE.toString());
-    }
-
-    // OK verSigReq.getVerificationReport().getIncludeRevocationValues(
-    // Indicamos que queremos incluir informaci�n del estado de
-    // revocaci�n de la cadena de certificaci�n en la respuesta
-    // == NO FA RES
-    // inParams.put(DSSTagsRequest.INCLUDE_REVOCATION,
-    // Boolean.FALSE.toString());
-
-    // OK verSigReq.getVerificationReport().getReportDetailLevel()
-    // Indicamos que el nivel de detalle de la respuesta debe ser el
-    // máximo
-    // == ALL_DETAILS mostra més coses en l'XML però no en el Facades Pojos
-    if (Boolean.TRUE.equals(sri.getReturnCertificates())
-        || Boolean.TRUE.equals(sri.getReturnTimeStampInfo())) {
-      inParams.put(DSSTagsRequest.REPORT_DETAIL_LEVEL, ReportDetailLevel.ALL_DETAILS); // ALL_DETAILS);
-    } else {
-      inParams.put(DSSTagsRequest.REPORT_DETAIL_LEVEL, ReportDetailLevel.NO_DETAILS); // ALL_DETAILS);
-    }
-
-    // OK verSigReq.getVerificationReport().setCheckCertificateStatus(true);
-    // Indicamos que queremos validar el estado de revocaci�n del
-    // certificado
-    // == Vull suposar que ho fa.
-    if (Boolean.TRUE.equals(sri.getValidateCertificateRevocation())) {
-      inParams.put(DSSTagsRequest.CHECK_CERTIFICATE_STATUS, "true");
-    }
-
-    /*
-     * OK OptionalParameters optParam = new OptionalParameters();
-     * verSigReq.setOptionalParameters(optParam);
-     * optParam.setAdditionalReportOption(true);
-     */
-    // Indicamos que deseamos obtener en la respuesta informaci�n de los
-    // sellos de tiempo contenidos
-    // == retorna informacio del Segell de temp dins TimeStampInfo de DetailInfo
-    if (Boolean.TRUE.equals(sri.getReturnTimeStampInfo())) {
-      inParams.put(DSSTagsRequest.ADDICIONAL_REPORT_OPT_SIGNATURE_TIMESTAMP,
-          "urn:afirma:dss:1.0:profile:XSS:SignatureProperty:SignatureTimeStamp");
-    }
-
-    // OK optParam.setReturnProcessingDetails(true);
-    // Indicamos que queremos devolver informaci�n acerca de los
-    // procesos de validaci�n llevados a cabo
-    // == Retorna CODE/MESS/TYPE que es informacio especifica de les validacions
-    // que s'han passat i quines són vàlides i quines invalides
-    if (Boolean.TRUE.equals(sri.getReturnValidationChecks())) {
-      inParams.put(DSSTagsRequest.RETURN_PROCESSING_DETAILS, "");
-    }
-
-    // OK optParam.setReturnReadableCertificateInfo(true);
-    // Indicamos que queremos verificar el estado de cada uno de los
-    // certificados de la cadena de certificación
-    // == Controlat
-    if (Boolean.TRUE.equals(sri.getReturnCertificateInfo())) {
-      inParams.put(DSSTagsRequest.RETURN_READABLE_CERT_INFO, "");
-    }
-
-    // OK optParam.setReturnSignedDataInfo(true);
-    // Indicamos que queremos obtener informaci�n sobre los datos firmados
-    // == Això només retorna informació de DigestValue per cada firma
-    // inParams.put(DSSTagsRequest.RETURN_SIGNED_DATA_INFO, "true");
-
-    // OK verSigReq.setSignature(padesLtvSignature);
-    // Indicamos la firma a validar
-    // NOTA XYZ ZZZ Si es XML revisar mètode incorporateSignatureImplicit
-    final byte[] signData = validationRequest.getSignatureData();
-    if (signData == null) {
-      // 
-      throw new Exception("El valor de la signatura és null.");
-    }
-    
-    
-    String xadesFormat;
-    boolean isXAdES = XMLUtil.isXml(signData);
-    log.debug("\n\n ES XADES ?? " + isXAdES + " \n\n");
-    if (isXAdES) {
-
-      xadesFormat = getXAdESFormat(signData);
-      log.debug("  xadesFormat => " + xadesFormat);
-      
-      incorporateXMLSignature(inParams, signData, xadesFormat);
-
-    } else {
-      inParams.put(DSSTagsRequest.SIGNATURE_BASE64, new String(Base64.encode(signData)));
-    }
-
-    // Ok verSigReq.setDocument(txtSignedFile);
-    // Indicamos los datos firmados, codificados en Base64
-    // ES XML => inParams.put(DSSTagsRequest.BASE64XML, new
-    // String(Base64.encode(docXML)));
-    // NO ES XML => inParams.put(DSSTagsRequest.BASE64DATA, new
-    // String(Base64.encode(docNoXML)));
-    final byte[] docData = validationRequest.getSignedDocumentData();
-    if (docData != null) {
-      // GenerateMessageRequest.generateVerifySignRequest(verSigReq);
-
-      String encodedDoc = new String(Base64Coder.encodeBase64(docData));
-
-      if (XMLUtil.isXml(docData)) {
-        
-        //dss_InputDocuments_dss_Document_dss_Base64XML
-        inParams.put(DSSTagsRequest.BASE64XML, encodedDoc);
-        // "dss:InputDocuments/dss:Document@ID";
-        inParams.put(DSSTagsRequest.DOCUMENT_ATR_ID, System.nanoTime() + " " + System.currentTimeMillis());
-      } else {
-        //dss_InputDocuments_dss_Document_dss_Base64Data
-        inParams.put(DSSTagsRequest.BASE64DATA, encodedDoc);
-      }
-
-    }
-
-    if (debug) {
-      log.debug(" ========== IN PARAMS =========== ");
-
-      for (String b : inParams.keySet()) {
-        String str = (String)inParams.get(b);
-        if (str.length() > 80) {
-          log.debug(b + " => " + str.substring(1,80));
-        } else {
-          log.debug(b + " => " + str);
+            transformersFacade = TransformersFacade.init(transformersProperties, parserParamsProp);
+        } catch (Exception e) {
+            throw new RuntimeException("Error inicialitzant TransformersFacade", e);
         }
-      }
-      log.debug(" ================================= ");
     }
 
-    // Construimos el XML que constituye la petici�n
-    String xmlInput;
+    private void initApi() {
+        try {
+            URL wsdlUrl = getClass().getResource("/wsdl/DSSAfirmaVerify.wsdl");
+            DSSSignatureService service = new DSSSignatureService(wsdlUrl);
 
-    if (!isXAdES) {
-      xmlInput = transformersFacade.generateXml(inParams,
-          GeneralConstants.DSS_AFIRMA_VERIFY_REQUEST, GeneralConstants.DSS_AFIRMA_VERIFY_METHOD,
-          TransformersConstants.VERSION_10);
-    
-    } else  {
-       // Generar XML XADES MANUALMENT
-      /* EN JBOSS Es produeix un error al crear l'XML en XADES des de INTEGRA, 
-       * per la qual cosa, es que es fa es generar el XMl manualment a partir 
-       * d'una plantilla FreeMarker:
-       * 
-       * org.apache.cxf.binding.soap.SoapFault: java.lang.Exception: Error en los parßmetros de entrada.
-       * 
-       */
-      if (log.isDebugEnabled()) {
-        log.debug("Generant XML INput Manualment per XAdES.");
-      }
+            api = service.getDSSAfirmaVerify();
 
-      Map<String,Object> keys = new HashMap<String, Object>();
+            Map<String, Object> reqContext = ((BindingProvider) api).getRequestContext();
+            reqContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, getEndpoint());
 
-      for(String key : inParams.keySet()) {
+            getClientHandler().addSecureHeader(api);
 
-        String value = (String)inParams.get(key);
-        
-        if (key.equals("dss:SignatureObject")) {
-          
-          final String xmlUtf = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-          
-          if (value.trim().startsWith(xmlUtf)) {
-            value = "\t" + value.trim().substring(xmlUtf.length());
+            // Fixar timeout
+            HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+            httpClientPolicy.setConnectionTimeout(getConnectTimeout());
+            httpClientPolicy.setReceiveTimeout(getReadTimeout());
+            httpClientPolicy.setAllowChunking(false);
+
+            Client client = ClientProxy.getClient(api);
+            ((HTTPConduit) client.getConduit()).setClient(httpClientPolicy);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error inicialitzant API WS", e);
+        }
+    }
+
+    private ClientHandler getClientHandler() throws Exception {
+        final ClientHandler clientHandler;
+
+        String username = getProperty(AUTH_UP_USERNAME);
+        if (username != null && username.trim().length() != 0) {
+            String password = getProperty(AUTH_UP_PASSWORD);
+            clientHandler = new ClientHandlerUsernamePassword(username, password);
+        } else {
+            String keystoreLocation = getPropertyRequired(AUTH_KS_PATH);
+            String keystoreType = getPropertyRequired(AUTH_KS_TYPE);
+            String keystorePassword = getPropertyRequired(AUTH_KS_PASSWORD);
+            String keystoreCertAlias = getPropertyRequired(AUTH_KS_ALIAS);
+            String keystoreCertPassword = getPropertyRequired(AUTH_KS_CERT_PASSWORD);
+
+            clientHandler = new ClientHandlerCertificate(keystoreLocation, keystoreType,
+                    keystorePassword, keystoreCertAlias, keystoreCertPassword);
+        }
+        return clientHandler;
+    }
+
+    private String getEndpoint() throws Exception {
+        return getPropertyRequired(ENDPOINT);
+    }
+
+    private long getConnectTimeout() {
+        String connectTimeoutProperty = getProperty(CONNECT_TIMEOUT, "20000");
+        return Long.parseLong(connectTimeoutProperty);
+
+    }
+
+    private long getReadTimeout() {
+        String readTimeoutProperty = getProperty(READ_TIMEOUT, "20000");
+        return Long.parseLong(readTimeoutProperty);
+    }
+
+    /// ////////////////////////////////////////////////////////////////////////////////////////
+    /// ////////////////////////////////////////////////////////////////////////////////////////
+
+    private TimeStampInfo[] parseTimeStamp(String xml) {
+
+        List<TimeStampInfo> list = new ArrayList<TimeStampInfo>();
+        SimpleDateFormat dateFormat = dateFormatTimeStamp.get();
+
+        Matcher m = timeStampPattern.matcher(xml);
+        while (m.find()) {
+
+            TimeStampInfo tsi = new TimeStampInfo();
+            try {
+                tsi.setCreationTime(dateFormat.parse(m.group(1)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            tsi.setAlgorithm(localAlgorithmEnc2PluginAlgorithm.get(m.group(2)));
+
+            tsi.setCertificateIssuer(m.group(3));
+            tsi.setCertificateSubject(m.group(4));
+
+            list.add(tsi);
+        }
+
+        if (list.size() == 0) {
+            return null;
+        }
+
+        return list.toArray(new TimeStampInfo[0]);
+    }
+
+    private String[][] parseAlgorithDigest(String xml) {
+
+        List<String> entriesAlg = new ArrayList<String>();
+        List<String> entriesDig = new ArrayList<String>();
+
+        Matcher m = algorithmDigestPattern.matcher(xml);
+        while (m.find()) {
+            entriesAlg.add(m.group(1));
+            entriesDig.add(m.group(2));
+        }
+
+        if (entriesAlg.size() == 0) {
+            return null;
+        }
+
+        String[] entriesAlgStr = entriesAlg.toArray(new String[0]);
+        String[] entriesDigStr = entriesDig.toArray(new String[0]);
+
+        return new String[][]{entriesAlgStr, entriesDigStr};
+    }
+
+    private String[][] parseXmlByIndexOfAndByGroup(String xml, String separator,
+                                                   String pre, String post) {
+
+        String[] parts = xml.split(Pattern.quote(separator));
+
+        List<String[]> certs = new ArrayList<String[]>();
+
+        // hem de començar per 1, perquè el primer tros és el principi del document
+        for (int i = 1, partsLength = parts.length; i < partsLength; i++) {
+            String[] values = parseXmlByIndexOf(parts[i], pre, post);
+            certs.add(values);
+        }
+
+        String[][] entriesStr;
+        if (certs.size() == 0) {
+            entriesStr = null;
+        } else {
+            entriesStr = certs.toArray(new String[certs.size()][]);
+        }
+        return entriesStr;
+    }
+
+    private String[] parseXmlByIndexOf(String xml, String pre, String post) {
+
+        int fromIndex = 0;
+
+        List<String> entries = new ArrayList<String>();
+        while (true) {
+
+            int preIndex = xml.indexOf(pre, fromIndex);
+            int postIndex = xml.indexOf(post, fromIndex);
+
+            if (preIndex == -1 || postIndex == -1) {
+                break;
+            }
+
+            String value = xml.substring(preIndex + pre.length(), postIndex);
+
+            entries.add(value);
+
+            fromIndex = postIndex + post.length();
+        }
+
+        String[] entriesStr;
+        if (entries.size() == 0) {
+            entriesStr = null;
+        } else {
+            entriesStr = entries.toArray(new String[0]);
+        }
+        return entriesStr;
+    }
+
+    protected boolean isDebug() {
+        return "true".equals(getProperty(AFIRMACXF_BASE_PROPERTIES + "debug"));
+    }
+
+    @Override
+    public SignatureRequestedInformation getSupportedSignatureRequestedInformation() {
+        return supportedSignatureRequestedInformation;
+    }
+
+    @Override
+    public SignatureRequestedInformation getSupportedSignatureRequestedInformationBySignatureType(String signType) {
+        return supportedSignatureRequestedInformation;
+    }
+
+    @Override
+    public ValidateSignatureResponse validateSignature(ValidateSignatureRequest validationRequest) throws Exception {
+
+        ValidateSignatureResponse signatureInfo = null;
+
+        try {
+          SignatureRequestedInformation sri = validationRequest.getSignatureRequestedInformation();
+
+          if (sri == null) {
+            sri = new SignatureRequestedInformation();
           }
 
-          if (value.startsWith("\r") || value.startsWith("\n")) {
-             value = value.substring(1); 
+          final boolean debug = isDebug();
+
+          final String applicationID = getPropertyRequired(APPLICATIONID_PROPERTY);
+
+          if (debug) {
+            log.debug("applicationID = " + applicationID);
           }
-          
-          if (value.startsWith("\r") || value.startsWith("\n")) {
-            value = value.substring(1); 
-         }
-          
+
+          // Instanciamos un mapa con los paràmetros de entrada
+          Map<String, Object> inParams = new HashMap<String, Object>();
+
+          // OK
+          // VerifySignatureRequest verSigReq = new VerifySignatureRequest();
+          inParams.put(DSSTagsRequest.CLAIMED_IDENTITY, applicationID);
+
+          // OK VerificationReport verRep = new VerificationReport();
+          // OK verSigReq.setVerificationReport(verRep);
+          // OK verSigReq.getVerificationReport().getIncludeCertificateValues()
+          // Indicamos que queremos incluir la cadena de certificaci�n en la
+          // respuesta
+          // == Retorna els certificats de cada firma (requereix REPORT_DETAIL_LEVEL =
+          // ALL_DETAILS)
+          if (Boolean.TRUE.equals(sri.getReturnCertificates())) {
+            inParams.put(DSSTagsRequest.INCLUDE_CERTIFICATE, Boolean.TRUE.toString());
+          }
+
+          // OK verSigReq.getVerificationReport().getIncludeRevocationValues(
+          // Indicamos que queremos incluir informaci�n del estado de
+          // revocaci�n de la cadena de certificaci�n en la respuesta
+          // == NO FA RES
+          // inParams.put(DSSTagsRequest.INCLUDE_REVOCATION,
+          // Boolean.FALSE.toString());
+
+          // OK verSigReq.getVerificationReport().getReportDetailLevel()
+          // Indicamos que el nivel de detalle de la respuesta debe ser el
+          // máximo
+          // == ALL_DETAILS mostra més coses en l'XML però no en el Facades Pojos
+          if (Boolean.TRUE.equals(sri.getReturnCertificates())
+                  || Boolean.TRUE.equals(sri.getReturnTimeStampInfo())) {
+            inParams.put(DSSTagsRequest.REPORT_DETAIL_LEVEL, ReportDetailLevel.ALL_DETAILS); // ALL_DETAILS);
+          } else {
+            inParams.put(DSSTagsRequest.REPORT_DETAIL_LEVEL, ReportDetailLevel.NO_DETAILS); // ALL_DETAILS);
+          }
+
+          // OK verSigReq.getVerificationReport().setCheckCertificateStatus(true);
+          // Indicamos que queremos validar el estado de revocaci�n del
+          // certificado
+          // == Vull suposar que ho fa.
+          if (Boolean.TRUE.equals(sri.getValidateCertificateRevocation())) {
+            inParams.put(DSSTagsRequest.CHECK_CERTIFICATE_STATUS, "true");
+          }
+
+          /*
+           * OK OptionalParameters optParam = new OptionalParameters();
+           * verSigReq.setOptionalParameters(optParam);
+           * optParam.setAdditionalReportOption(true);
+           */
+          // Indicamos que deseamos obtener en la respuesta informaci�n de los
+          // sellos de tiempo contenidos
+          // == retorna informacio del Segell de temp dins TimeStampInfo de DetailInfo
+          if (Boolean.TRUE.equals(sri.getReturnTimeStampInfo())) {
+            inParams.put(DSSTagsRequest.ADDICIONAL_REPORT_OPT_SIGNATURE_TIMESTAMP,
+                    "urn:afirma:dss:1.0:profile:XSS:SignatureProperty:SignatureTimeStamp");
+          }
+
+          // OK optParam.setReturnProcessingDetails(true);
+          // Indicamos que queremos devolver informaci�n acerca de los
+          // procesos de validaci�n llevados a cabo
+          // == Retorna CODE/MESS/TYPE que es informacio especifica de les validacions
+          // que s'han passat i quines són vàlides i quines invalides
+          if (Boolean.TRUE.equals(sri.getReturnValidationChecks())) {
+            inParams.put(DSSTagsRequest.RETURN_PROCESSING_DETAILS, "");
+          }
+
+          // OK optParam.setReturnReadableCertificateInfo(true);
+          // Indicamos que queremos verificar el estado de cada uno de los
+          // certificados de la cadena de certificación
+          // == Controlat
+          if (Boolean.TRUE.equals(sri.getReturnCertificateInfo())) {
+            inParams.put(DSSTagsRequest.RETURN_READABLE_CERT_INFO, "");
+          }
+
+          // OK optParam.setReturnSignedDataInfo(true);
+          // Indicamos que queremos obtener informaci�n sobre los datos firmados
+          // == Això només retorna informació de DigestValue per cada firma
+          // inParams.put(DSSTagsRequest.RETURN_SIGNED_DATA_INFO, "true");
+
+          // OK verSigReq.setSignature(padesLtvSignature);
+          // Indicamos la firma a validar
+          // NOTA XYZ ZZZ Si es XML revisar mètode incorporateSignatureImplicit
+          final byte[] signData = validationRequest.getSignatureData();
+          if (signData == null) {
+            incrementarOperacioOk();
+            throw new Exception("El valor de la signatura és null.");
+          }
+
+
+          String xadesFormat;
+          boolean isXAdES = XMLUtil.isXml(signData);
+          log.debug("\n\n ES XADES ?? " + isXAdES + " \n\n");
+          if (isXAdES) {
+
+            xadesFormat = getXAdESFormat(signData);
+            log.debug("  xadesFormat => " + xadesFormat);
+
+            incorporateXMLSignature(inParams, signData, xadesFormat);
+
+          } else {
+            inParams.put(DSSTagsRequest.SIGNATURE_BASE64, new String(Base64.encode(signData)));
+          }
+
+          // Ok verSigReq.setDocument(txtSignedFile);
+          // Indicamos los datos firmados, codificados en Base64
+          // ES XML => inParams.put(DSSTagsRequest.BASE64XML, new
+          // String(Base64.encode(docXML)));
+          // NO ES XML => inParams.put(DSSTagsRequest.BASE64DATA, new
+          // String(Base64.encode(docNoXML)));
+          final byte[] docData = validationRequest.getSignedDocumentData();
+          if (docData != null) {
+            // GenerateMessageRequest.generateVerifySignRequest(verSigReq);
+
+            String encodedDoc = new String(Base64Coder.encodeBase64(docData));
+
+            if (XMLUtil.isXml(docData)) {
+
+              //dss_InputDocuments_dss_Document_dss_Base64XML
+              inParams.put(DSSTagsRequest.BASE64XML, encodedDoc);
+              // "dss:InputDocuments/dss:Document@ID";
+              inParams.put(DSSTagsRequest.DOCUMENT_ATR_ID, System.nanoTime() + " " + System.currentTimeMillis());
+            } else {
+              //dss_InputDocuments_dss_Document_dss_Base64Data
+              inParams.put(DSSTagsRequest.BASE64DATA, encodedDoc);
+            }
+
+          }
+
+          if (debug) {
+            log.debug(" ========== IN PARAMS =========== ");
+
+            for (String b : inParams.keySet()) {
+              String str = (String) inParams.get(b);
+              if (str.length() > 80) {
+                log.debug(b + " => " + str.substring(1, 80));
+              } else {
+                log.debug(b + " => " + str);
+              }
+            }
+            log.debug(" ================================= ");
+          }
+
+          // Construimos el XML que constituye la petici�n
+          String xmlInput;
+
+          if (!isXAdES) {
+            xmlInput = transformersFacade.generateXml(inParams,
+                    GeneralConstants.DSS_AFIRMA_VERIFY_REQUEST, GeneralConstants.DSS_AFIRMA_VERIFY_METHOD,
+                    TransformersConstants.VERSION_10);
+
+          } else {
+            // Generar XML XADES MANUALMENT
+            /* EN JBOSS Es produeix un error al crear l'XML en XADES des de INTEGRA,
+             * per la qual cosa, es que es fa es generar el XMl manualment a partir
+             * d'una plantilla FreeMarker:
+             *
+             * org.apache.cxf.binding.soap.SoapFault: java.lang.Exception: Error en los parßmetros de entrada.
+             *
+             */
+            if (log.isDebugEnabled()) {
+              log.debug("Generant XML INput Manualment per XAdES.");
+            }
+
+            Map<String, Object> keys = new HashMap<String, Object>();
+
+            for (String key : inParams.keySet()) {
+
+              String value = (String) inParams.get(key);
+
+              if (key.equals("dss:SignatureObject")) {
+
+                final String xmlUtf = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+
+                if (value.trim().startsWith(xmlUtf)) {
+                  value = "\t" + value.trim().substring(xmlUtf.length());
+                }
+
+                if (value.startsWith("\r") || value.startsWith("\n")) {
+                  value = value.substring(1);
+                }
+
+                if (value.startsWith("\r") || value.startsWith("\n")) {
+                  value = value.substring(1);
+                }
+
+              }
+
+              keys.put(key.replace(":", "_").replace("/", "_").replace("@", "_"), value);
+            }
+
+            keys.put("validationRequest", validationRequest);
+
+            xmlInput = processExpressionLanguage("xades_input_template.xml", keys);
+          }
+
+          // String xmlInput = new String(FileUtils.readFromFile(file2));
+
+          if ("true".equals(getProperty(PRINT_XML))) {
+            log.debug("IN_XML = \n" + xmlInput);
+          }
+
+          // Invocamos el servicio y obtenemos un XML de respuesta
+          String xmlOutput = cridadaWs(xmlInput);
+
+          // Parseamos la respuesta en un mapa
+          Map<String, Object> propertiesResult = transformersFacade.parseResponse(xmlOutput,
+                  GeneralConstants.DSS_AFIRMA_VERIFY_REQUEST, GeneralConstants.DSS_AFIRMA_VERIFY_METHOD,
+                  TransformersConstants.VERSION_10);
+
+
+          if ("true".equals(getProperty(PRINT_XML))) {
+            log.debug("OUT_XML = \n" + xmlOutput);
+          }
+
+          if (debug) {
+            log.debug(" ================================= ");
+
+            for (String b : propertiesResult.keySet()) {
+              String str = propertiesResult.get(b).toString();
+              if (str.length() > 80) {
+                log.debug(b + " => " + str.substring(1, 80));
+              } else {
+                log.debug(b + " => " + str);
+              }
+            }
+            log.debug(" ================================= ");
+          }
+
+          VerifySignatureResponse verSigRes = new VerifySignatureResponse();
+
+          if (propertiesResult != null) {
+            GenerateMessageResponse.generateVerifySignatureResponse(propertiesResult, verSigRes);
+          }
+
+          if (debug) {
+            internalPrint(verSigRes);
+          }
+
+          // ************* FINAL PRINT ********************
+
+          // SignatureFormatEnum sfe = new SignatureFormatEnum(type, form);
+
+          signatureInfo = new ValidateSignatureResponse();
+
+          if (verSigRes.getResult() == null) {
+            signatureInfo.getValidationStatus().setErrorMsg("No ha retornat informació de l'estat de la firma");
+            incrementarOperacioOk();
+            return signatureInfo;
+          }
+
+          String major = verSigRes.getResult().getResultMajor();
+
+          ValidationStatus status = signatureInfo.getValidationStatus();
+
+          if (DSSConstants.ResultProcessIds.VALID_SIGNATURE.equals(major)) {
+            status.setStatus(ValidationStatus.SIGNATURE_VALID);
+          } else {
+
+            String msg = verSigRes.getResult().getResultMessage();
+
+            if (msg == null) {
+              // XYZ ZZZ Traduir
+              msg = "Informació de l'error no disponible";
+            }
+
+            // Error de Comunicacio o de Servidor
+            if (DSSConstants.ResultProcessIds.REQUESTER_ERROR.equals(major)
+                    || DSSConstants.ResultProcessIds.RESPONDER_ERROR.equals(major)) {
+              throw new Exception(msg + "(" + major + ")");
+            }
+
+
+            if (DSSConstants.ResultProcessIds.INVALID_SIGNATURE.equals(major)) {
+
+              status.setStatus(ValidationStatus.SIGNATURE_INVALID);
+
+              String minor = verSigRes.getResult().getResultMinor();
+
+              if (minor != null) {
+                msg = msg + " (" + minor + ")";
+              }
+            } else {
+              status.setStatus(ValidationStatus.SIGNATURE_ERROR);
+
+              String minor = verSigRes.getResult().getResultMinor();
+
+              if (minor == null) {
+                msg = msg + " (" + major + ")";
+              } else {
+                msg = msg + " (" + major + " | " + minor + ")";
+              }
+
+            }
+
+            status.setErrorMsg(msg);
+
+          }
+
+          {
+            String[][] values = parseAlgorithDigest(xmlOutput);
+
+            if (values != null) {
+              initArray(signatureInfo, values[0].length);
+              SignatureDetailInfo[] detailInfo = signatureInfo.getSignatureDetailInfo();
+
+              for (int j = 0; j < detailInfo.length; j++) {
+                detailInfo[j].setAlgorithm(localAlgorithm2PluginAlgorithm.get(values[0][j]));
+                detailInfo[j].setDigestValue(values[1][j]);
+              }
+
+            }
+
+          }
+          // Certificate
+          extractCertificateChain(xmlOutput, signatureInfo);
+
+          // Informació TimeStamp
+          TimeStampInfo[] allTSI = parseTimeStamp(xmlOutput);
+          if (allTSI != null) {
+            SignatureDetailInfo[] detailInfo = signatureInfo.getSignatureDetailInfo();
+
+            for (int j = 0; j < allTSI.length; j++) {
+              // XYZ Pot ser no tengui informacio de Segell de temps alguna firma i
+              // l'array ja no correspon
+              detailInfo[j].setTimeStampInfo(allTSI[j]);
+            }
+          }
+
+          // DSSConstants.ResultProcessIds.INVALID_SIGNATURE
+          // DSSConstants.ResultProcessIds.REQUESTER_ERROR
+          // DSSConstants.ResultProcessIds.RESPONDER_ERROR
+
+          String type = (String) propertiesResult.get("dss:OptionalOutputs/dss:SignatureType"); // =>
+          // urn:afirma:dss:1.0:profile:XSS:forms:PAdES
+          String profile = (String) propertiesResult.get("dss:OptionalOutputs/ades:SignatureForm"); // =>
+          // urn:afirma:dss:1.0:profile:XSS:PAdES:1.2.1:forms:Basico
+          String pluginType = null;
+          if (type != null) {
+            pluginType = localSignType2PluginSignType.get(type);
+            signatureInfo.setSignType(pluginType);
+
+            if (pluginType != null) {
+              // Cercarem el format: implicit(attached), explicit (detached)
+              String signFormat = getSignFormat(pluginType, signData);
+              signatureInfo.setSignFormat(signFormat);
+            }
+          }
+
+
+          if (profile != null) {
+
+            String profilePlugin = localSignProfile2PluginSignProfile.get(profile);
+
+            if ((ValidateSignatureConstants.SIGNTYPE_PAdES.equals(pluginType) || ValidateSignatureConstants.SIGNTYPE_CAdES.equals(pluginType))) {
+
+              List<IndividualSignatureReport> reports = verSigRes.getVerificationReport();
+              if (reports != null && reports.size() != 0) {
+                // Get last Signature
+                IndividualSignatureReport report = reports.get(reports.size() - 1);
+                if (ValidateSignatureConstants.SIGNPROFILE_BES.equals(profilePlugin) && report.getSignaturePolicyIdentifier() != null) {
+                  profilePlugin = ValidateSignatureConstants.SIGNPROFILE_EPES;
+                }
+              }
+
+              if (ValidateSignatureConstants.SIGNTYPE_PAdES.equals(pluginType)) {
+
+                if (ValidateSignatureConstants.SIGNPROFILE_EPES.equals(profilePlugin) || ValidateSignatureConstants.SIGNPROFILE_BES.equals(profilePlugin)) {
+                  if (containsTimeStamp(signData)) {
+                    profilePlugin = ValidateSignatureConstants.SIGNPROFILE_T;
+                  }
+                } else if (ValidateSignatureConstants.SIGNPROFILE_XL.equals(profilePlugin)) {
+                  profilePlugin = ValidateSignatureConstants.SIGNPROFILE_PADES_LTV;
+                }
+              }
+
+            }
+            signatureInfo.setSignProfile(profilePlugin);
+          }
+
+          List<IndividualSignatureReport> reports = verSigRes.getVerificationReport();
+          initArray(signatureInfo, reports.size());
+          int c = 0;
+          for (IndividualSignatureReport report : reports) {
+
+            SignatureDetailInfo di = signatureInfo.getSignatureDetailInfo()[c++];
+
+            // Politica EPES
+            di.setPolicyIdentifier(report.getSignaturePolicyIdentifier());
+
+            // Detalls de Checks de Validacio
+            ProcessingDetail pd = report.getProcessingDetails();
+            if (pd != null) {
+              di.setValidChecks(convertDetail(pd.getListValidDetail()));
+              di.setInvalidChecks(convertDetail(pd.getListInvalidDetail()));
+              di.setIndeterminateChecks(convertDetail(pd.getListIndeterminateDetail()));
+            }
+
+            // Info de Certificat
+            Map<String, Object> certificateInfo = report.getReadableCertificateInfo();
+            if (certificateInfo != null && certificateInfo.size() != 0) {
+              di.setCertificateInfo(InfoCertificatUtils.processInfoCertificate(certificateInfo));
+            }
+          }
+        } catch (Exception e) {
+            // Document no firmat
+            if (e.getMessage().contains("El formato de la firma no es valido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)")
+                    || e.getMessage().contains("El formato de la firma no es válido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)")
+                    || e.getMessage().contains("El documento OOXML no está firmado(urn:oasis:names:tc:dss:1.0:resultmajor:ResponderError)")) {
+                incrementarOperacioOk();
+            } else if (!"El valor de la signatura és null.".equals(e.getMessage())) {
+              incrementarOperacioError();
+          }
+          throw e;
         }
-        
-        keys.put(key.replace(":", "_").replace("/", "_").replace("@", "_"), value);
-      }
 
-      keys.put("validationRequest",validationRequest);
+        incrementarOperacioOk();
+        return signatureInfo;
 
-      xmlInput = processExpressionLanguage("xades_input_template.xml", keys);
     }
 
-   // String xmlInput = new String(FileUtils.readFromFile(file2));
-    
-    if ("true".equals(getProperty(PRINT_XML))) {
-      log.debug("IN_XML = \n" + xmlInput);
-    }
+    protected void extractCertificateChain(String xmlOutput, ValidateSignatureResponse signatureInfo) {
+        // TODO Es pega amb la informació de Segell de Temps ???
+        final String splitBy = "<vr:IndividualSignatureReport>"; // <vr:CertificatePathValidity>";
 
-    // Invocamos el servicio y obtenemos un XML de respuesta
-    String xmlOutput = cridadaWs(xmlInput);
+        final String preA = "<vr:CertificateValue><![CDATA[";
+        final String postA = "]]></vr:CertificateValue>";
 
-    // Parseamos la respuesta en un mapa
-    Map<String, Object> propertiesResult = transformersFacade.parseResponse(xmlOutput,
-        GeneralConstants.DSS_AFIRMA_VERIFY_REQUEST, GeneralConstants.DSS_AFIRMA_VERIFY_METHOD,
-        TransformersConstants.VERSION_10);
+        String[][] certificatesB64 = parseXmlByIndexOfAndByGroup(xmlOutput, splitBy, preA, postA);
 
+        if (certificatesB64 != null) {
 
-    if ("true".equals(getProperty(PRINT_XML))) {
-      log.debug("OUT_XML = \n" + xmlOutput);
-    }
+            initArray(signatureInfo, certificatesB64.length);
+            SignatureDetailInfo[] detailInfo = signatureInfo.getSignatureDetailInfo();
 
-    if (debug) {
-      log.debug(" ================================= ");
+            for (int j = 0; j < detailInfo.length; j++) {
+                String[] certificatesBySign = certificatesB64[j];
+                if (certificatesBySign != null) {
+                    byte[][] chain = new byte[certificatesBySign.length][];
+                    for (int i = 0; i < chain.length; i++) {
+                        chain[i] = Base64.decode(certificatesBySign[i]);
+                    }
 
-      for (String b : propertiesResult.keySet()) {
-        String str = propertiesResult.get(b).toString();
-        if (str.length() > 80) {
-          log.debug(b + " => " + str.substring(1,80));
-        } else {
-          log.debug(b + " => " + str);
+                    detailInfo[j].setCertificateChain(chain);
+                }
+            }
+
         }
-      }
-      log.debug(" ================================= ");
     }
 
-    VerifySignatureResponse verSigRes = new VerifySignatureResponse();
+    protected boolean containsTimeStamp(byte[] signature) {
+        try {
+            PdfReader reader = new PdfReader(signature);
 
-    if (propertiesResult != null) {
-      GenerateMessageResponse.generateVerifySignatureResponse(propertiesResult, verSigRes);
-    }
+            AcroFields fields = reader.getAcroFields();
+            List<String> names = fields.getSignatureNames();
 
-    if (debug) {
-      internalPrint(verSigRes);
-    }
+            String signatureName = names.get(names.size() - 1);
 
-    // ************* FINAL PRINT ********************
+            PdfPKCS7 pkcs7 = fields.verifySignature(signatureName);
 
-    // SignatureFormatEnum sfe = new SignatureFormatEnum(type, form);
+            if (pkcs7.getTimeStampDate() != null && pkcs7.getTimeStampToken() != null) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
 
-    ValidateSignatureResponse signatureInfo = new ValidateSignatureResponse();
-
-    if (verSigRes.getResult() == null) {
-      signatureInfo.getValidationStatus().setErrorMsg(
-          "No ha retornat informació de l'estat de la firma");
-      return signatureInfo;
-    }
-
-    String major = verSigRes.getResult().getResultMajor();
-
-    ValidationStatus status = signatureInfo.getValidationStatus();
-
-    if (DSSConstants.ResultProcessIds.VALID_SIGNATURE.equals(major)) {
-      status.setStatus(ValidationStatus.SIGNATURE_VALID);
-    } else {
-
-      String msg = verSigRes.getResult().getResultMessage();
-
-      if (msg == null) {
-        // XYZ ZZZ Traduir
-        msg = "Informació de l'error no disponible";
-      }
-      
-      // Error de Comunicacio o de Servidor
-      if (DSSConstants.ResultProcessIds.REQUESTER_ERROR.equals(major)
-          || DSSConstants.ResultProcessIds.RESPONDER_ERROR.equals(major)) {
-        throw new Exception(msg + "(" + major + ")");
-      }
-      
-
-      if (DSSConstants.ResultProcessIds.INVALID_SIGNATURE.equals(major)) {
-
-        status.setStatus(ValidationStatus.SIGNATURE_INVALID);
-
-        String minor = verSigRes.getResult().getResultMinor();
-
-        if (minor != null) {
-          msg = msg + " (" + minor + ")";
         }
-      } else {
-        status.setStatus(ValidationStatus.SIGNATURE_ERROR);
-
-        String minor = verSigRes.getResult().getResultMinor();
-
-        if (minor == null) {
-          msg = msg + " (" + major + ")";
-        } else {
-          msg = msg + " (" + major + " | " + minor + ")";
-        }
-
-      }
-
-      status.setErrorMsg(msg);
-
+        return false;
     }
 
-    {
-      String[][] values = parseAlgorithDigest(xmlOutput);
+    protected void internalPrint(VerifySignatureResponse verSigRes) {
 
-      if (values != null) {
-        initArray(signatureInfo, values[0].length);
-        SignatureDetailInfo[] detailInfo = signatureInfo.getSignatureDetailInfo();
+        log.debug("RESULT MAJOR= " + verSigRes.getResult().getResultMajor());
+        log.debug("RESULT MINOR= " + verSigRes.getResult().getResultMinor());
+        log.debug("RESULT MESSAGE= " + verSigRes.getResult().getResultMessage());
 
-        for (int j = 0; j < detailInfo.length; j++) {
-          detailInfo[j].setAlgorithm(localAlgorithm2PluginAlgorithm.get(values[0][j]));
-          detailInfo[j].setDigestValue(values[1][j]);
-        }
-
-      }
-
-    }
-    // Certificate
-    extractCertificateChain(xmlOutput, signatureInfo);
-
-    // Informació TimeStamp
-    TimeStampInfo[] allTSI = parseTimeStamp(xmlOutput);
-    if (allTSI != null) {
-      SignatureDetailInfo[] detailInfo = signatureInfo.getSignatureDetailInfo();
-
-      for (int j = 0; j < allTSI.length; j++) {
-        // XYZ Pot ser no tengui informacio de Segell de temps alguna firma i
-        // l'array ja no correspon
-        detailInfo[j].setTimeStampInfo(allTSI[j]);
-      }
-    }
-
-    // DSSConstants.ResultProcessIds.INVALID_SIGNATURE
-    // DSSConstants.ResultProcessIds.REQUESTER_ERROR
-    // DSSConstants.ResultProcessIds.RESPONDER_ERROR
-
-    String type = (String) propertiesResult.get("dss:OptionalOutputs/dss:SignatureType"); // =>
-                                                                                          // urn:afirma:dss:1.0:profile:XSS:forms:PAdES
-    String profile = (String) propertiesResult.get("dss:OptionalOutputs/ades:SignatureForm"); // =>
-                                                                                             // urn:afirma:dss:1.0:profile:XSS:PAdES:1.2.1:forms:Basico
-    String pluginType = null;
-    if (type != null) {
-      pluginType = localSignType2PluginSignType.get(type); 
-      signatureInfo.setSignType(pluginType);
-      
-      if (pluginType != null) {
-        // Cercarem el format: implicit(attached), explicit (detached)
-        String signFormat = getSignFormat(pluginType, signData);
-        signatureInfo.setSignFormat(signFormat);
-      }
-    }
-    
-   
-    
-    if (profile != null) {
-
-      String profilePlugin = localSignProfile2PluginSignProfile.get(profile);
-      
-      if ((ValidateSignatureConstants.SIGNTYPE_PAdES.equals(pluginType) || ValidateSignatureConstants.SIGNTYPE_CAdES.equals(pluginType))) {
+        log.debug("FORMAT = " + verSigRes.getSignatureFormat());
 
         List<IndividualSignatureReport> reports = verSigRes.getVerificationReport();
-        if (reports != null && reports.size() !=0) {
-          // Get last Signature 
-          IndividualSignatureReport report =reports.get(reports.size() - 1);
-          if (ValidateSignatureConstants.SIGNPROFILE_BES.equals(profilePlugin) && report.getSignaturePolicyIdentifier() != null) {
-            profilePlugin = ValidateSignatureConstants.SIGNPROFILE_EPES;
-          }
+        int r = 0;
+        for (IndividualSignatureReport report : reports) {
+            log.debug(" ---- REPORT SIGNATURE[" + r++ + "] ---- ");
+
+            if (report.getDetailedReport() != null) {
+                log.debug("  report.getDetailedReport(): " + report.getDetailedReport());
+            }
+
+            ProcessingDetail pd = report.getProcessingDetails();
+            if (pd != null) {
+                log.debug(printDetail(pd.getListInvalidDetail(), "INVALIT"));
+                log.debug(printDetail(pd.getListIndeterminateDetail(), "INDETERMINATE"));
+                log.debug(printDetail(pd.getListValidDetail(), "VALIT"));
+            }
+
+            Map<String, Object> certificateInfo = report.getReadableCertificateInfo();
+            if (certificateInfo != null && certificateInfo.size() != 0) {
+
+                for (String k : certificateInfo.keySet()) {
+                    log.debug("  InfoCert[" + k + "] = " + certificateInfo.get(k));
+                }
+            }
+
+            log.debug("  SIGN report.getResult().getResultMajor(): "
+                    + report.getResult().getResultMajor());
+            log.debug("  SIGN report.getResult().getResultMinor(): "
+                    + report.getResult().getResultMinor());
+            log.debug("  SIGN report.getResult().getResultMessage(): "
+                    + report.getResult().getResultMessage());
+
+            log.debug("  SIGN report.getSignaturePolicyIdentifier(): "
+                    + report.getSignaturePolicyIdentifier());
+
+            if (report.getSigPolicyDocument() != null) {
+                log.debug("  SING report.getSigPolicyDocument()" + Arrays.toString(report.getSigPolicyDocument()));
+            }
+
         }
-        
-        if (ValidateSignatureConstants.SIGNTYPE_PAdES.equals(pluginType)) {
-          
-           if (ValidateSignatureConstants.SIGNPROFILE_EPES.equals(profilePlugin) || ValidateSignatureConstants.SIGNPROFILE_BES.equals(profilePlugin) ) {
-              if(containsTimeStamp(signData)) {
-                profilePlugin = ValidateSignatureConstants.SIGNPROFILE_T;
-              }
-           } else if (ValidateSignatureConstants.SIGNPROFILE_XL.equals(profilePlugin)) {
-             profilePlugin = ValidateSignatureConstants.SIGNPROFILE_PADES_LTV;
-           }
+
+        List<DataInfo> dataList = verSigRes.getSignedDataInfo();
+        int n = 0;
+        for (DataInfo dataInfo : dataList) {
+            log.debug(" ---- SIGN[" + n++ + "] ---- ");
+
+            if (dataInfo.getSignedDataRefs() != null) {
+                log.debug("    dataInfo.getSignedDataRefs() = "
+                        + Arrays.toString(dataInfo.getSignedDataRefs().toArray()));
+            }
+            if (dataInfo.getContentData() != null) {
+                log.debug("    dataInfo.getContentData().length = "
+                        + dataInfo.getContentData().length);
+            }
+
+            log.debug("    dataInfo.getDocumentHash().getDigestMethod() = "
+                    + dataInfo.getDocumentHash().getDigestMethod());
+
+            log.debug("    dataInfo.getDocumentHash().getDigestValue().length = "
+                    + dataInfo.getDocumentHash().getDigestValue().length);
+
         }
-        
-      }
-      signatureInfo.setSignProfile(profilePlugin);
     }
 
-    List<IndividualSignatureReport> reports = verSigRes.getVerificationReport();
-    initArray(signatureInfo, reports.size());
-    int c = 0;
-    for (IndividualSignatureReport report : reports) {
-
-      SignatureDetailInfo di = signatureInfo.getSignatureDetailInfo()[c++];
-
-      // Politica EPES
-      di.setPolicyIdentifier(report.getSignaturePolicyIdentifier());
-
-      // Detalls de Checks de Validacio
-      ProcessingDetail pd = report.getProcessingDetails();
-      if (pd != null) {
-        di.setValidChecks(convertDetail(pd.getListValidDetail()));
-        di.setInvalidChecks(convertDetail(pd.getListInvalidDetail()));
-        di.setIndeterminateChecks(convertDetail(pd.getListIndeterminateDetail()));
-      }
-
-      // Info de Certificat
-      Map<String, Object> certificateInfo = report.getReadableCertificateInfo();
-      if (certificateInfo != null && certificateInfo.size() != 0) {
-        di.setCertificateInfo(InfoCertificatUtils.processInfoCertificate(certificateInfo));
-      }
-    }
-
-    return signatureInfo;
-
-  }
-
-  protected void extractCertificateChain(String xmlOutput, ValidateSignatureResponse signatureInfo) {
-    // TODO Es pega amb la informació de Segell de Temps ???
-    final String splitBy = "<vr:IndividualSignatureReport>"; // <vr:CertificatePathValidity>";
-
-    final String preA = "<vr:CertificateValue><![CDATA[";
-    final String postA = "]]></vr:CertificateValue>";
-
-    String[][] certificatesB64 = parseXmlByIndexOfAndByGroup(xmlOutput, splitBy, preA, postA);
-
-    if (certificatesB64 != null) {
-
-      initArray(signatureInfo, certificatesB64.length);
-      SignatureDetailInfo[] detailInfo = signatureInfo.getSignatureDetailInfo();
-
-      for (int j = 0; j < detailInfo.length; j++) {
-        String[] certificatesBySign = certificatesB64[j];
-        if (certificatesBySign != null) {
-          byte[][] chain = new byte[certificatesBySign.length][];
-          for (int i = 0; i < chain.length; i++) {
-            chain[i] = Base64.decode(certificatesBySign[i]);
-          }
-
-          detailInfo[j].setCertificateChain(chain);
+    protected List<SignatureCheck> convertDetail(List<Detail> details) {
+        if (details == null || details.size() == 0) {
+            return null;
         }
-      }
 
-    }
-  }
-
-  protected boolean containsTimeStamp(byte[] signature) {
-    try {
-      PdfReader reader = new PdfReader(signature);
-
-      AcroFields fields = reader.getAcroFields();
-      List<String> names = fields.getSignatureNames();
-
-      String signatureName = names.get(names.size() - 1);
-
-      PdfPKCS7 pkcs7 = fields.verifySignature(signatureName);
-
-      if (pkcs7.getTimeStampDate() != null && pkcs7.getTimeStampToken() != null) {
-        return true;
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-
-    }
-    return false;
-  }
-
-  protected void internalPrint(VerifySignatureResponse verSigRes) {
-
-    log.debug("RESULT MAJOR= " + verSigRes.getResult().getResultMajor());
-    log.debug("RESULT MINOR= " + verSigRes.getResult().getResultMinor());
-    log.debug("RESULT MESSAGE= " + verSigRes.getResult().getResultMessage());
-
-    log.debug("FORMAT = " + verSigRes.getSignatureFormat());
-
-    List<IndividualSignatureReport> reports = verSigRes.getVerificationReport();
-    int r = 0;
-    for (IndividualSignatureReport report : reports) {
-      log.debug(" ---- REPORT SIGNATURE[" + r++ + "] ---- ");
-
-      if (report.getDetailedReport() != null) {
-        log.debug("  report.getDetailedReport(): " + report.getDetailedReport());
-      }
-
-      ProcessingDetail pd = report.getProcessingDetails();
-      if (pd != null) {
-        log.debug(printDetail(pd.getListInvalidDetail(), "INVALIT"));
-        log.debug(printDetail(pd.getListIndeterminateDetail(), "INDETERMINATE"));
-        log.debug(printDetail(pd.getListValidDetail(), "VALIT"));
-      }
-
-      Map<String, Object> certificateInfo = report.getReadableCertificateInfo();
-      if (certificateInfo != null && certificateInfo.size() != 0) {
-
-        for (String k : certificateInfo.keySet()) {
-          log.debug("  InfoCert[" + k + "] = " + certificateInfo.get(k));
+        List<SignatureCheck> checks = new ArrayList<SignatureCheck>();
+        for (Detail detail : details) {
+            checks.add(new SignatureCheck(detail.getCode(), detail.getType()));
         }
-      }
 
-      log.debug("  SIGN report.getResult().getResultMajor(): "
-              + report.getResult().getResultMajor());
-      log.debug("  SIGN report.getResult().getResultMinor(): "
-              + report.getResult().getResultMinor());
-      log.debug("  SIGN report.getResult().getResultMessage(): "
-              + report.getResult().getResultMessage());
+        return checks;
+    }
 
-      log.debug("  SIGN report.getSignaturePolicyIdentifier(): "
-              + report.getSignaturePolicyIdentifier());
-
-      if (report.getSigPolicyDocument() != null) {
-        log.debug("  SING report.getSigPolicyDocument()" + Arrays.toString(report.getSigPolicyDocument()));
-      }
+    protected void initArray(ValidateSignatureResponse si, int size) {
+        if (si.getSignatureDetailInfo() == null) {
+            SignatureDetailInfo[] array = new SignatureDetailInfo[size];
+            si.setSignatureDetailInfo(array);
+            for (int i = 0; i < array.length; i++) {
+                array[i] = new SignatureDetailInfo();
+            }
+        }
 
     }
 
-    List<DataInfo> dataList = verSigRes.getSignedDataInfo();
-    int n = 0;
-    for (DataInfo dataInfo : dataList) {
-      log.debug(" ---- SIGN[" + n++ + "] ---- ");
+    public String printDetail(List<Detail> details, String title) {
 
-      if (dataInfo.getSignedDataRefs() != null) {
-        log.debug("    dataInfo.getSignedDataRefs() = "
-                + Arrays.toString(dataInfo.getSignedDataRefs().toArray()));
-      }
-      if (dataInfo.getContentData() != null) {
-        log.debug("    dataInfo.getContentData().length = "
-                + dataInfo.getContentData().length);
-      }
+        if (details == null || details.size() == 0) {
+            return "";
+        }
 
-      log.debug("    dataInfo.getDocumentHash().getDigestMethod() = "
-              + dataInfo.getDocumentHash().getDigestMethod());
-
-      log.debug("    dataInfo.getDocumentHash().getDigestValue().length = "
-              + dataInfo.getDocumentHash().getDigestValue().length);
-
-    }
-  }
-
-  protected List<SignatureCheck> convertDetail(List<Detail> details) {
-    if (details == null || details.size() == 0) {
-      return null;
+        StringBuilder str = new StringBuilder(" +++++  DETAIL " + title + " +++++\n");
+        int d = 0;
+        for (Detail detail : details) {
+            str.append(d).append(".-CODE=").append(detail.getCode()).append("\n");
+            str.append(d).append(".-MESS=").append(detail.getMessage()).append("\n");
+            str.append(d).append(".-TYPE=").append(detail.getType()).append("\n");
+        }
+        str.append("\n");
+        return str.toString();
     }
 
-    List<SignatureCheck> checks = new ArrayList<SignatureCheck>();
-    for (Detail detail : details) {
-      checks.add(new SignatureCheck(detail.getCode(), detail.getType()));
+    public String cridadaWs(String inputXml) {
+        return api.verify(inputXml);
     }
 
-    return checks;
-  }
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // ------------- METODES COMUNICACIO AFIRMA FEDERAT
+    // ---------------------------
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
-  protected void initArray(ValidateSignatureResponse si, int size) {
-    if (si.getSignatureDetailInfo() == null) {
-      SignatureDetailInfo[] array = new SignatureDetailInfo[size];
-      si.setSignatureDetailInfo(array);
-      for (int i = 0; i < array.length; i++) {
-        array[i] = new SignatureDetailInfo();
-      }
+
+    private static final Charset UTF_8 = Charset.forName("UTF-8");
+
+    protected void incorporateXMLSignature(Map<String, Object> inputParameters, byte[] signature, String xadesFormat) {
+
+        if (ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPING_ATTACHED.equals(xadesFormat)) { // "XAdES Enveloping"
+            inputParameters.put("dss:SignatureObject", new String(signature, UTF_8));
+        } else if ((ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPED_ATTACHED.equals(xadesFormat)) // "XAdES Enveloped"
+                || (ValidateSignatureConstants.SIGNFORMAT_EXPLICIT_DETACHED.equals(xadesFormat))) { // "XAdES Detached"
+
+            String idSignaturePtr = String.valueOf(Math.random() * 9999.0D);
+            inputParameters
+                    .put("dss:SignatureObject/dss:SignaturePtr@WhichDocument", idSignaturePtr);
+            inputParameters.put("dss:InputDocuments/dss:Document@ID", idSignaturePtr);
+
+            inputParameters.put("dss:InputDocuments/dss:Document/dss:Base64XML",
+                    new String(Base64.encode(signature)));
+        }
+
     }
 
-  }
 
-  public String printDetail(List<Detail> details, String title) {
-
-    if (details == null || details.size() == 0) {
-      return "";
+    /**
+     * AQUEST MÈTODE ESTA DUPLICAT AL PLUGIN-INTEGR@
+     */
+    protected String getSignFormat(String signType, final byte[] signData) throws Exception {
+        String signFormat;
+        if (ValidateSignatureConstants.SIGNTYPE_CMS.equals(signType)) { // "CMS";
+            // TODO Això no se si es correcte !!!!!!!
+            try {
+                signFormat = getCAdESFormat(signData);
+            } catch (Throwable th) {
+                log.error("Error intentant obtenir el format d'una firma CMS emprant el mètode getCAdESFormat(): " + th.getMessage(), th);
+                signFormat = null;
+            }
+        } else if (ValidateSignatureConstants.SIGNTYPE_CAdES.equals(signType)) { // "CAdES";
+            signFormat = getCAdESFormat(signData);
+        } else if (ValidateSignatureConstants.SIGNTYPE_XAdES.equals(signType)) { // "XAdES";
+            signFormat = getXAdESFormat(signData);
+        } else if (ValidateSignatureConstants.SIGNTYPE_ODF.equals(signType)) { // "ODF";
+            signFormat = ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPED_ATTACHED;
+        } else if (ValidateSignatureConstants.SIGNTYPE_PDF.equals(signType)) { // "PDF"; // ?????
+            signFormat = ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPED_ATTACHED;
+        } else if (ValidateSignatureConstants.SIGNTYPE_PAdES.equals(signType)) { // "PAdES";
+            signFormat = ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPED_ATTACHED;
+        } else if (ValidateSignatureConstants.SIGNTYPE_OOXML.equals(signType)) { // "OOXML";
+            signFormat = ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPED_ATTACHED;
+        } else if (ValidateSignatureConstants.SIGNTYPE_XML_DSIG.equals(signType)) { // "XML_DSIG";
+            // TODO Això no se si es correcte !!!!!!!
+            try {
+                signFormat = getXAdESFormat(signData);
+            } catch (Throwable th) {
+                log.error("Error intentant obtenir el format d'una firma XML_DSIG emprant el"
+                        + " mètode getXAdESFormat(): " + th.getMessage(), th);
+                signFormat = null;
+            }
+        } else {
+            log.warn("Error intentant trobar el format de una firma amb tipus desconegut: "
+                    + signType, new Exception());
+            signFormat = null;
+        }
+        return signFormat;
     }
 
-    StringBuilder str = new StringBuilder(" +++++  DETAIL " + title + " +++++\n");
-    int d = 0;
-    for (Detail detail : details) {
-      str.append(d).append(".-CODE=").append(detail.getCode()).append("\n");
-      str.append(d).append(".-MESS=").append(detail.getMessage()).append("\n");
-      str.append(d).append(".-TYPE=").append(detail.getType()).append("\n");
-    }
-    str.append("\n");
-    return str.toString();
-  }
 
-  public String cridadaWs(String inputXml) {
-    return api.verify(inputXml);
-  }
+    /**
+     * AQUEST MÈTODE ESTA DUPLICAT AL PLUGIN-INTEGR@
+     */
+    private String getXAdESFormat(byte[] signature) throws Exception {
 
-  // ----------------------------------------------------------------------------
-  // ----------------------------------------------------------------------------
-  // ------------- METODES COMUNICACIO AFIRMA FEDERAT
-  // ---------------------------
-  // ----------------------------------------------------------------------------
-  // ----------------------------------------------------------------------------
+        Document eSignature = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(
+                new ByteArrayInputStream(signature));
 
-
-  private static final Charset UTF_8 = Charset.forName("UTF-8");
- 
-  protected void incorporateXMLSignature(Map<String, Object> inputParameters, byte[] signature, String xadesFormat) {
-
-    if (ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPING_ATTACHED.equals(xadesFormat)) { // "XAdES Enveloping"
-      inputParameters.put("dss:SignatureObject", new String(signature, UTF_8));
-    } else if ((ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPED_ATTACHED.equals(xadesFormat)) // "XAdES Enveloped"
-        || (ValidateSignatureConstants.SIGNFORMAT_EXPLICIT_DETACHED.equals(xadesFormat))) { // "XAdES Detached"
-
-      String idSignaturePtr = String.valueOf(Math.random() * 9999.0D);
-      inputParameters
-          .put("dss:SignatureObject/dss:SignaturePtr@WhichDocument", idSignaturePtr);
-      inputParameters.put("dss:InputDocuments/dss:Document@ID", idSignaturePtr);
-
-      inputParameters.put("dss:InputDocuments/dss:Document/dss:Base64XML",
-          new String(Base64.encode(signature)));
-    }
-
-  }
-
-  
-  /**
-   * AQUEST MÈTODE ESTA DUPLICAT AL PLUGIN-INTEGR@
-   */
-  protected String getSignFormat(String signType, final byte[] signData) throws Exception {
-    String signFormat;
-    if (ValidateSignatureConstants.SIGNTYPE_CMS.equals(signType)) { // "CMS";
-      // TODO Això no se si es correcte !!!!!!!
-      try {
-        signFormat = getCAdESFormat(signData);
-      } catch(Throwable th) {
-        log.error("Error intentant obtenir el format d'una firma CMS emprant el mètode getCAdESFormat(): " + th.getMessage(), th);
-        signFormat = null;
-      }
-    } else if (ValidateSignatureConstants.SIGNTYPE_CAdES.equals(signType)) { // "CAdES";
-      signFormat = getCAdESFormat(signData);
-    } else if (ValidateSignatureConstants.SIGNTYPE_XAdES.equals(signType)) { // "XAdES";
-      signFormat = getXAdESFormat(signData);
-    } else if (ValidateSignatureConstants.SIGNTYPE_ODF.equals(signType)) { // "ODF";
-      signFormat = ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPED_ATTACHED;
-    } else if (ValidateSignatureConstants.SIGNTYPE_PDF.equals(signType)) { // "PDF"; // ?????
-      signFormat = ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPED_ATTACHED;
-    } else if (ValidateSignatureConstants.SIGNTYPE_PAdES.equals(signType)) { // "PAdES";
-      signFormat = ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPED_ATTACHED;
-    } else if (ValidateSignatureConstants.SIGNTYPE_OOXML.equals(signType)) { // "OOXML";
-      signFormat = ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPED_ATTACHED;
-    } else if (ValidateSignatureConstants.SIGNTYPE_XML_DSIG.equals(signType)) { // "XML_DSIG";
-      // TODO Això no se si es correcte !!!!!!!
-      try {
-        signFormat = getXAdESFormat(signData);
-      } catch(Throwable th) {
-        log.error("Error intentant obtenir el format d'una firma XML_DSIG emprant el"
-            + " mètode getXAdESFormat(): " + th.getMessage(), th);
-        signFormat = null;
-      }
-    } else {
-      log.warn("Error intentant trobar el format de una firma amb tipus desconegut: "
-        + signType, new Exception());
-      signFormat = null;
-    }
-    return signFormat;
-  }
-  
-  
-  /**
-   * AQUEST MÈTODE ESTA DUPLICAT AL PLUGIN-INTEGR@
-   */
-  private String getXAdESFormat(byte[] signature) throws Exception {
-
-    Document eSignature = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(
-        new ByteArrayInputStream(signature));
-
-    XMLSignature xmlSignature;
-    String rootName = eSignature.getDocumentElement().getNodeName();
-    if (rootName.equalsIgnoreCase("ds:Signature") || rootName.equals("ROOT_COSIGNATURES")) {
-      //  "XAdES Enveloping"
-      return ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPING_ATTACHED;
-    }
-    NodeList signatureNodeLs = eSignature.getElementsByTagName("ds:Manifest");
-    if (signatureNodeLs.getLength() > 0) {
-      //  "XAdES Externally Detached
-      return ValidateSignatureConstants.SIGNFORMAT_EXPLICIT_EXTERNALLY_DETACHED;
-    }
-    NodeList signsList = eSignature.getElementsByTagNameNS(
-        "http://www.w3.org/2000/09/xmldsig#", "Signature");
-    if (signsList.getLength() == 0) {
-      throw new SigningException(Language.getResIntegra("XS003"));
-    }
-    Node signatureNode = signsList.item(0);
-    try {
-      xmlSignature = new XMLSignatureElement((Element) signatureNode).getXMLSignature();
-    } catch (MarshalException e) {
-      throw new SigningException(Language.getResIntegra("XS005"), e);
-    }
-    List<?> references = xmlSignature.getSignedInfo().getReferences();
-    for (Object reference : references) {
-      if (!"".equals(((Reference) reference).getURI()))
-        continue;
-      //  "XAdES Enveloped"
-      return ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPED_ATTACHED;
-    }
-    //  "XAdES Detached"
-    return ValidateSignatureConstants.SIGNFORMAT_EXPLICIT_DETACHED;
-  }
-
-
-  /**
-   * AQUEST MÈTODE ESTA DUPLICAT AL PLUGIN-INTEGR@
-   */
-  private String getCAdESFormat(byte[] signature) throws Exception {
-
-    CMSSignedData cmsSignedData = new CMSSignedData(signature);
-
-    ContentInfo contentInfo;
-    try {
-      java.lang.reflect.Method method;
-      method = cmsSignedData.getClass().getMethod("toASN1Structure");
-
-      contentInfo = (ContentInfo) method.invoke(cmsSignedData);
-
-    } catch (Exception e) {
-      java.lang.reflect.Method method;
-      method = cmsSignedData.getClass().getMethod("getContentInfo");
-      contentInfo = (ContentInfo) method.invoke(cmsSignedData);
+        XMLSignature xmlSignature;
+        String rootName = eSignature.getDocumentElement().getNodeName();
+        if (rootName.equalsIgnoreCase("ds:Signature") || rootName.equals("ROOT_COSIGNATURES")) {
+            //  "XAdES Enveloping"
+            return ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPING_ATTACHED;
+        }
+        NodeList signatureNodeLs = eSignature.getElementsByTagName("ds:Manifest");
+        if (signatureNodeLs.getLength() > 0) {
+            //  "XAdES Externally Detached
+            return ValidateSignatureConstants.SIGNFORMAT_EXPLICIT_EXTERNALLY_DETACHED;
+        }
+        NodeList signsList = eSignature.getElementsByTagNameNS(
+                "http://www.w3.org/2000/09/xmldsig#", "Signature");
+        if (signsList.getLength() == 0) {
+            throw new SigningException(Language.getResIntegra("XS003"));
+        }
+        Node signatureNode = signsList.item(0);
+        try {
+            xmlSignature = new XMLSignatureElement((Element) signatureNode).getXMLSignature();
+        } catch (MarshalException e) {
+            throw new SigningException(Language.getResIntegra("XS005"), e);
+        }
+        List<?> references = xmlSignature.getSignedInfo().getReferences();
+        for (Object reference : references) {
+            if (!"".equals(((Reference) reference).getURI()))
+                continue;
+            //  "XAdES Enveloped"
+            return ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPED_ATTACHED;
+        }
+        //  "XAdES Detached"
+        return ValidateSignatureConstants.SIGNFORMAT_EXPLICIT_DETACHED;
     }
 
-    java.lang.reflect.Method method;
-    method = contentInfo.getClass().getMethod("getContent");
 
-    Object encodable = method.invoke(contentInfo);
+    /**
+     * AQUEST MÈTODE ESTA DUPLICAT AL PLUGIN-INTEGR@
+     */
+    private String getCAdESFormat(byte[] signature) throws Exception {
 
-    SignedData signedData = SignedData.getInstance(encodable);
-    ContentInfo contentInfo2 = signedData.getEncapContentInfo();
-    boolean isImplicit = false;
-    if (contentInfo2 != null) {
+        CMSSignedData cmsSignedData = new CMSSignedData(signature);
 
-      // signedData.getEncapContentInfo().getContent() != null) {
-      java.lang.reflect.Method method2;
-      method2 = contentInfo2.getClass().getMethod("getContent");
+        ContentInfo contentInfo;
+        try {
+            java.lang.reflect.Method method;
+            method = cmsSignedData.getClass().getMethod("toASN1Structure");
 
-      Object obj = method2.invoke(contentInfo2);
+            contentInfo = (ContentInfo) method.invoke(cmsSignedData);
 
-      if (obj != null) {
-        isImplicit = true;
-      }
+        } catch (Exception e) {
+            java.lang.reflect.Method method;
+            method = cmsSignedData.getClass().getMethod("getContentInfo");
+            contentInfo = (ContentInfo) method.invoke(cmsSignedData);
+        }
+
+        java.lang.reflect.Method method;
+        method = contentInfo.getClass().getMethod("getContent");
+
+        Object encodable = method.invoke(contentInfo);
+
+        SignedData signedData = SignedData.getInstance(encodable);
+        ContentInfo contentInfo2 = signedData.getEncapContentInfo();
+        boolean isImplicit = false;
+        if (contentInfo2 != null) {
+
+            // signedData.getEncapContentInfo().getContent() != null) {
+            java.lang.reflect.Method method2;
+            method2 = contentInfo2.getClass().getMethod("getContent");
+
+            Object obj = method2.invoke(contentInfo2);
+
+            if (obj != null) {
+                isImplicit = true;
+            }
+        }
+
+        if (isImplicit) {
+            //  "CAdES attached/implicit signature";
+            return ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPING_ATTACHED;
+        } else {
+            //  "CAdES detached/explicit signature"
+            return ValidateSignatureConstants.SIGNFORMAT_EXPLICIT_DETACHED;
+        }
     }
 
-    if (isImplicit) {
-      //  "CAdES attached/implicit signature";
-      return ValidateSignatureConstants.SIGNFORMAT_IMPLICIT_ENVELOPING_ATTACHED;
-    } else {
-      //  "CAdES detached/explicit signature"
-      return ValidateSignatureConstants.SIGNFORMAT_EXPLICIT_DETACHED;
+    private String processExpressionLanguage(String plantilla, Map<String, Object> custodyParameters) throws Exception {
+        try {
+            if (custodyParameters == null) {
+                custodyParameters = new HashMap<String, Object>();
+            }
+
+            Writer out = new StringWriter();
+            configuration.getTemplate(plantilla).process(custodyParameters, out);
+
+            return out.toString();
+        } catch (Exception e) {
+            final String msg = "No s'ha pogut processar l'Expression Language " + plantilla
+                    + ":" + e.getMessage();
+            throw new Exception(msg, e);
+        }
     }
-  }
 
-  private String processExpressionLanguage(String plantilla, Map<String, Object> custodyParameters) throws Exception {
-    try {
-      if (custodyParameters == null) {
-        custodyParameters = new HashMap<String, Object>();
-      }
-
-      Writer out = new StringWriter();
-      configuration.getTemplate(plantilla).process(custodyParameters, out);
-
-      return out.toString();
-    } catch (Exception e) {
-      final String msg = "No s'ha pogut processar l'Expression Language " + plantilla
-              + ":" + e.getMessage();
-      throw new Exception(msg, e);
+    @Override
+    public String getResourceBundleName() {
+        return "validatesignature-afirmacxf";
     }
-  }
-
-  @Override
-  public String getResourceBundleName() {
-  	return "validatesignature-afirmacxf";
-  }
 
 
-  // Mètodes de SALUT
-  // /////////////////////////////////////////////////////////////////////////////////////////////
+    // Mètodes de SALUT
+    // /////////////////////////////////////////////////////////////////////////////////////////////
 
-  private boolean configuracioEspecifica = false;
-  private int operacionsOk = 0;
-  private int operacionsError = 0;
+    private boolean configuracioEspecifica = false;
+    private int operacionsOk = 0;
+    private int operacionsError = 0;
 
-  @Synchronized
-  private void incrementarOperacioOk() {
-    operacionsOk++;
-  }
-
-  @Synchronized
-  private void incrementarOperacioError() {
-    operacionsError++;
-  }
-
-  @Synchronized
-  private void resetComptadors() {
-    operacionsOk = 0;
-    operacionsError = 0;
-  }
-
-  @Override
-  public boolean teConfiguracioEspecifica() {
-    return this.configuracioEspecifica;
-  }
-
-  @Override
-  public EstatSalut getEstatPlugin() {
-    try {
-      Instant start = Instant.now();
-      consultaUsuaris(getLdapFiltreCodi(), "fakeUser");
-      return EstatSalut.builder()
-              .latencia((int) Duration.between(start, Instant.now()).toMillis())
-              .estat(EstatSalutEnum.UP)
-              .build();
-    } catch (Exception ex) {
-      return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
+    @Synchronized
+    private void incrementarOperacioOk() {
+        operacionsOk++;
     }
-  }
 
-  @Override
-  public IntegracioPeticions getPeticionsPlugin() {
-    IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
-            .totalOk(operacionsOk)
-            .totalError(operacionsError)
-            .build();
-    resetComptadors();
-    return integracioPeticions;
-  }
+    @Synchronized
+    private void incrementarOperacioError() {
+        operacionsError++;
+    }
+
+    @Synchronized
+    private void resetComptadors() {
+        operacionsOk = 0;
+        operacionsError = 0;
+    }
+
+    @Override
+    public boolean teConfiguracioEspecifica() {
+        return this.configuracioEspecifica;
+    }
+
+    @Override
+    public EstatSalut getEstatPlugin() {
+        try {
+            Instant start = Instant.now();
+            String inputXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><dss:VerifyRequest xmlns:dss=\"urn:oasis:names:tc:dss:1.0:core:schema\" xmlns:ades=\"urn:oasis:names:tc:dss:1.0:profiles:AdES:schema#\" xmlns:afxp=\"urn:afirma:dss:1.0:profile:XSS:schema\" xmlns:cmism=\"http://docs.oasis-open.org/ns/cmis/messaging/200908/\" xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:vr=\"urn:oasis:names:tc:dss:1.0:profiles:verificationreport:schema#\" Profile=\"urn:afirma:dss:1.0:profile:XSS\">\n" +
+                    "\t<dss:OptionalInputs>\n" +
+                    "\t\t<dss:ClaimedIdentity>\n" +
+                    "\t\t\t<dss:Name>CAIBDEV2.NOTIB</dss:Name>\n" +
+                    "\t\t</dss:ClaimedIdentity>\n" +
+                    "\t\t<afxp:ReturnReadableCertificateInfo/>\n" +
+                    "\t\t<vr:ReturnVerificationReport>\n" +
+                    "\t\t\t<vr:ReportOptions>\n" +
+                    "\t\t\t\t<vr:ReportDetailLevel>urn:oasis:names:tc:dss:1.0:reportdetail:allDetails</vr:ReportDetailLevel>\n" +
+                    "\t\t\t</vr:ReportOptions>\n" +
+                    "\t\t</vr:ReturnVerificationReport>\n" +
+                    "\t\t<afxp:AdditionalReportOption>\n" +
+                    "\t\t\t<afxp:IncludeProperties>\n" +
+                    "\t\t\t\t<afxp:IncludeProperty Type=\"urn:afirma:dss:1.0:profile:XSS:SignatureProperty:SignatureTimeStamp\"/>\n" +
+                    "\t\t\t</afxp:IncludeProperties>\n" +
+                    "\t\t</afxp:AdditionalReportOption>\n" +
+                    "\t</dss:OptionalInputs>\n" +
+                    "\t<dss:SignatureObject>\n" +
+                    "\t\t<dss:Base64Signature>" +
+                    "JVBERi0xLjYKJcOkw7zDtsOfCjIgMCBvYmoKPDwvTGVuZ3RoIDMgMCBSL0ZpbHRlci9GbGF0ZURlY29kZT4+CnN0cmVhbQp4nCWKuwoCMRRE+/sVUwsb52bzuIEQcEEL" +
+                    "u4WAhdj56AS38ffdRaY65wyd4isfEHT0hlii8znCgjpLiuUhlx3e/8e65SVTl5icIefRFSvod+xPCvXoz2ultljpOTatDG3IlbH5yrRxprVhzYUHBk6bt3brZzl2mWXG" +
+                    "D1qDHkIKZW5kc3RyZWFtCmVuZG9iagoKMyAwIG9iagoxMjYKZW5kb2JqCgo1IDAgb2JqCjw8L0xlbmd0aCA2IDAgUi9GaWx0ZXIvRmxhdGVEZWNvZGUvTGVuZ3RoMSA5" +
+                    "Nzk2Pj4Kc3RyZWFtCnic5Th7dFvlfb/vXsmSbTmSHFuWokS6inAelWXZURLivHxjW7KDHVt+BSkQLNmSLYEtCUl2CI9hVh6Z05Q0pbRQNtKNsqzNGdck3QKHFneFdl3X" +
+                    "Qrd25ZWRntLT09OkuJTSrhB5v++7V4qSBjjb2X+79nfv7/3+Pl0pl5mOgQ5mgQdxbCqSXl1lqgaAfwUg1WMzOWFHX+02hM8BcP82np6YevQfb3wXQHUaQHN6YvLg+Im3" +
+                    "PIcAdHGA8sV4LBJ9s/kzbgBTEG1sjiNhIH9Qg/hRxK+JT+Vue517kfJRH5omU2ORXr2wDPG3EF8xFbkt/QnVLg6gDlEQkpGp2B8e/VYUcQGgMptOZXNROLQEsPohyk9n" +
+                    "YumeR0dfRBzt8dQHwT966RAsozjHq9RlGm15RSX8v7zUR6AWutQ7QA9pdr/s4k+CBR4BWDpPsUv3fM/SH/8vo9DKjy/Ak3AajsCrsF9h+CEACZhGSun1TfghUukVgH3w" +
+                    "FZj7ELMn4QzyZbkwPEgzueoVgM/DKfjOZV4CMAV3YCxfg1dJM3wXRyUF7xAt3AMvotV3kLbnaqY4nFYYZ+B4CfV1+CJ3GK7j6Bw/QjmchzPAC/AYuQkt5zDPI8WMt/+J" +
+                    "0QfgLrwPQhxmEGaXescHr0H50m8xq7vgOvhz2AWTJRrPkcf5CuzfEDyONf0mo3kKTE0XfzP3Dxx38bOIfAYmcEUI5s4d4Xd9SIX+xxc/DFVkPV8P5VfjchtBn/8jt2Hp" +
+                    "Xf4aqIDhpcUCbal76bd8JJ9UjahWqneovvdRPso+o5pCbVj6ef6OfFTdq34Su3UCQOy8YV8oODw0ONAf6Ovd09N93e6uTr+vo71tl9i6c8f2bVtbtly7eVNzk6fR3bBu" +
+                    "7Zr6a5yrHXZzjdGgX1ZVWVGu1ZSpVTxHoEGQSNgn8fWC0R9x+pyRLneD4DPHO9wNPqc/LAkRQcKHao2zq4uRnBFJCAvSGnxESshhSUTJ8SskRVlSLEoSg7AdtlMXTkH6" +
+                    "fodTOEP29QcRPtLhDAnSBQbvYbBqDUOqEHE4UINFRaMVfJJ/Jj7nC2OMZL6yot3ZHqtwN8B8RSWClQhJ65zpebJuJ2EAt863dZ4DbRV1i5n6IlEp0B/0dVgdjpC7Ybe0" +
+                    "zNnBWNDOTEpl7ZKGmRQSNHQ4LMw3LMx96owBRsMuXdQZjdwYlPgI6s7xvrm5BySjS1rv7JDW3/6WGTOPSQ3ODp/kola7B4p+ui+5JJK63uAU5n4HmI7zwvnLKRGFUlZv" +
+                    "+B1QUOLaJTIQdNDL6sdaz835nYJ/LjwXObM0O+oUDM65eZ1uLu3DckMgiCbOLD172Cr5PxWSDOE42RpSUvcPdEvL+28ISly9X4hHkIL/rU7HFqvDWJQJfBgbsCxYHKyw" +
+                    "w0HLcPiMCKOISLP9QRkXYNT6NIgeV0jiwpSzUODUDlPObIFTVA87sbfdg8E5SVW/O+r0YcUPR6TZUZyum2ljnAZp2XtWh3Ou2ii0eEJMVsCodkcTgqReg0VCrVIFnBuq" +
+                    "MmdgyLL35McFKzpYY6wWWpxohtrxOX1h5X8mbkYDAha6yyUPwlBQEjsQECNKx3zzTR7UiISxYYkO1kzJ40xLNc62YndpWL7EYJCpKGpSTbsE4TFFS/L42L4SfHPhDjkE" +
+                    "asvZH3wGvEvn5jcK1lNe2AihDipsascpW+ObC0bHJXvYGsV9Ny4ErQ5JDGGHQ85gLETHDiu0/pyVDUeIzcpQsHvQ2d2/L7hFCURmUHOqet8VZpxBq2wGB1DS1muFIGfl" +
+                    "QyhoQILgR8DZth3vkqZei8uABWdUOrht24UgsUJBGsOQ1gu+WIciR/HLjKrpOLV3FayVURTttHdZHSGHfLkbOGQLimPU0NKidhVYeEwhQ4vz2d7FSLSWZjr0QtAZc4ac" +
+                    "cUESA0GaGy0Pq7JSDFZzpVdDl2ElxcIygQPZBYQWU/K7rKXFlToZXkS7rmDvLrCFOa2ze3COGncqBgEj3y0BHWFxi9HKzgK6oZ149goG3NJsQ8/NiyLdzPGt1Ihzd3TO" +
+                    "ORjczqTxPLnLejv1VQ3dpHuozd2AR1vbvJMc6p8XyaHBfcFnDPheeGgo+DRHuPZwW2j+GuQFnxHwQ4NROUqlRIoIFKGWBhDRMnnrMyLALOOqGIHhY2cIMJq2QCMwdoaT" +
+                    "aQbZ0RrmSAQOOSqZIxakVUjTyrRZRmPXPNCSiRVqUSuWizquirPOE0p6GinP4ntsOYFTOlJFrPOoNcDIZ8jsfLlolSVmUUKUIzw0fMn18L7gKR1+OlvZHR210QvHxRzH" +
+                    "ZuPHik+I0kG5MxSfC4foZgMTtgb/iUScO7FNzp0YSJlOqnDG2qRKZxult1J6q0wvo3QNjigxEVSfxd4HJEIn4IagA7eksOK71jnDBdqpEB4qc4afuzG4bUsfqKfxHbQc" +
+                    "X+97RI+6BqpqqsyWutqRUJ0qHKrjDTUjIYMmHDJUg4W0ihYiWMg5CzluIWkL2b9//62Zm/ZDq8sFZrwZq0lLi9Fr9DY3EQM4nEaTd0M1EcCISL1z07XGtZtUT+R/mP/F" +
+                    "6du+/N4vL/6BZMl4/m/zf5dfffLkSe4EsZDV79+hJav5F/Nfy5/OS/knVZusqr9asYm+vkDv0nn+af5FfPswwbPiPUZ1JaihzqxdFghpDVxNIMSZBDMBMzlnJgEzaTIT" +
+                    "g5ksMvRlM1kwE8lMjpvJUTOZNZO0mYTNRDQTWWXb44wUYKQmRjUwRqn+caYpq+F9/63KlVGum/aXXjIHa0NLc1llHKvXbNq42bvBpNm4xrm6rLYGy7SZfzrf9aNXXnnj" +
+                    "P147/Wf3f3L6wD33zpLX88b8b379we9/+8o/PXvuZ19/gb6AEVaHXqyDCcLidqyCSW3CKugDIZ3WYKrha/pDvAkj31maySLLQU4A6U+ZyQgmsL8YPmuiEbzmVm9prPXL" +
+                    "iFMw0ljrjM61axCmsV7L9zaf3Je/9pevPnD8WtdgLv/u33z12GTLNevJb3510Z7/45OefPxHX3PQWK0Y61n8RmOCz4kjUF2lUpVXl9eZ1ctNywMhjUmvwq06EKoymHTl" +
+                    "GH/tcVbthULxW86V9ANYA4t9kwrpyBSBpnOp7IVu3CrX31vMDbzF9FgzajAdHEuHsa7WsRazXW0hiJGW43dOfpp4D+R/re18tnXxNmIjupN27hcW9wePWtw9a1tIDTdu" +
+                    "cbN+uPCt2IL9aCZPi0tGXdnKlQ5Yt87tduh474bmxkCoWb/OsdKoc7vcgZBd76q1lJWVl9cMhMoNa/Glna8fCPGGGS/Z6yWbveQaLzF5SZmXvOclb3nJj7zk217yhJc8" +
+                    "7CWjXkICXtLhJU1MrsZLVF4SXywInvaSnJeIXrKRsZH3rpe87iULXiIxG/d6SdSrmJBlDAWxl73kBS/5qpccZWK3eMk2LxEKPrbIDo57SdhLhgo+apjmW0zzIS+ZRfei" +
+                    "q4RvZbpvsQA4iQmkmXv0qvcSrbJfRvYXd9KHbKZbb72KQOaSeomQPMZGr7n49LKu00veh3VK85UB2ElwI9bRu4XgDOAhtdG5ehmnMdUaFRT3qEaB6Wj4u0+IvulVe17q" +
+                    "WDyYH/7U8RU+X2ut8Ui+7fDwcPCTR/J7Dxwgy/mwa+vGFldb/lcXH7a43RYueFJbUaXavKuADoZWXbRQkBfYGOH5FsC94sc5qoWVcETcZyFEv0Jbq69dZbNAIKS32C2c" +
+                    "jrdYdNXVpkCo2qBT94d0pgUbkWzkuI0ctZFZG0nbSNhGAjYCNrITH6KNNNmIYCMGG1lkcih02Q5hV/GUghazZ+Sm/YUzoFCk2hobFmjztbV0h6yhB4JgrCV4dDk2riGq" +
+                    "HXdPbH6oqenLe1//3g+eJ4n85+MpcuxG8mr13COB6sot9sbzRP3eO/nxAfLYiSdOPUL3DH4v5n+Kua6EBfEuWL7cXKnTacyaVbaVlkBopX45IiZzIFRhqq2mW8RAt8gT" +
+                    "NvKWjbxgIxiMykZaEHnIRnI2ErWRIRvpsJGNNnKNjVgZG6vCldYEK/GyjRTLVaSXTs/IpeG6dHwUxkieotKzvHSCPmxaOvb8/dbb78zkb7mrf3jfJ+/O33zrrUTHhxta" +
+                    "Pv1AcRRGVl1cXhwFAjVL5zm36h48MzvFtRXLlmmW83ydWaWr1AVC5ZpKfQ2AsT8EpsfZIdhqJh529mWKJ3jxmKtu2bCBhqjGDxyjc1Mr8dZ6a53yGY6tJL3hkTvuirX+" +
+                    "5CfbmrYOOu+tyUxwn3Wv/fGPhy7evavNsMtsZ3MJ9HNXfQQqYRXMiv3VGs0qqFtVZ7OvwDN7hamsurqmhu8P1Rj0GKAeRDuZtROwk5ajdmKwk3N2smAnkp0cZYywnYiM" +
+                    "IsOCnZTscFb24mdmYR9fdmCzj0wNfbPYTE9qY42GfpLW1nA4mGu5/Oz923Irhqbn7rx4+C+Ipyz6hYXv//THe1/qJYtnTtfqLtYZXlE1mt15afPR3l+ev5j/rzVyjniG" +
+                    "c9XqHsyxFv5SHAedrsxorDPx5YMh4ImB52vF2upAqFavM+qNmGVtTR1R1ZGWd+vI0TrCpetIuI4E6ohYRxbqiFRHjjNUqCOGOgJ1ZJFRULRU8vLTjQ7dCCtAoZEuWGE2" +
+                    "/KCwHdlupJ9YZc7C+wN/ac7uEN0NotjgFiu+lLccv4+4VG/KuPj+1pLZwjQtj0wL1fUj+u2/A7v8G+A/d7z8g0u/8CydL7Oo6S9jWtp7kN85QOPI++D6ohC54mchXVkL" +
+                    "gPo7sE0F0MsfgV58WpHmQjiAsIdrgRpqTkVDaKH1xmsvvEaayF9z3+a38/+iqsa/e1V/UKzrYIPinwMDnhc3IvAt/tvAM66NJIsx7C3GQ1ByrwJzoIFxBebBClMKrEKZ" +
+                    "Qwqshir4ggKXgR6+rMAauB1OK7AWakijApfDMtKmwBUkSQIKXAkruW8Uf+Vu5F5T4CrYxGsVeBms4HfQ6FX017mT/PUKTEBQ8QrMwTKVU4F52KxqVmAVykwosBpWqB5Q" +
+                    "4DKwqb6kwBp4V/W8AmthnfqUApfDSvXrClzBvaH+vQJXwhbtvyuwDm4sr1TgKri5vOBrGWws/2FHYiKRS9weiwrRSC4ijKXSBzOJiXhOWDe2XtjQ1NwkdKZSE5MxoT2V" +
+                    "SacykVwilWysaL9SbIMwgCa6IrkGYXdyrLEnMRqTZYXBWCYxPhCbmJ6MZHZlx2LJaCwjuIUrJa7E98YyWYpsaGxu9F5iXimbyAoRIZeJRGNTkcwtQmr88jiETGwikc3F" +
+                    "MkhMJIXhxsFGIRDJxZI5IZKMCkNFxb7x8cRYjBHHYplcBIVTuThGevN0JpGNJsaot2xjMYGSagzmYjMxYU8kl4tlU8m2SBZ9YWRDiWQq2yAciCfG4sKBSFaIxrKJiSQy" +
+                    "Rw8Kl+sIyI1gLslkagZNzsQaMO7xTCwbTyQnhCxNWdEWcvFIjiY9FctlEmORycmD2LKpNGqNYo8OJHJxdDwVywq9sQPCQGoqkvxKoxwK1mYcayokptKZ1AyL0Z0dy8Ri" +
+                    "SXQWiUZGE5OJHFqLRzKRMawYli0xlmUVwUII6UjS7ZvOpNIxjPT6zp5LghigXM1sanIGPVPpZCwWpR4x7JnYJCqh48lU6haaz3gqg4FGc3F3SeTjqWQOVVNCJBrFxLFa" +
+                    "qbHpKdonLHOuEFxkLJNCXnoykkMrU9nGeC6X3urxHDhwoDGitGYMO9OIlj0fxcsdTMeUfmSolanJHmx/krZumvWXJjG4u0foS2N9/BicoAg0CIXJbG5sVlxgGRPpXLYx" +
+                    "m5hsTGUmPH3+HuiABEzgyuG6HWIQBQFXBPEIQmOQgjQchAyTiiNVgHVIXY/PDdAEzbgE6ESpFPInUV+AdoQzqEXvEWY3BUloxC/M7R9rbQNCA0oUXUy7AaHdqD+GFnpQ" +
+                    "bxS5pXYFGGSUBB6zVHMCpjGOCFJ2QRa1YigTZRICuHF9nI2P4+9lULbI2YBxNePyXlXz4+wm0JLAKp1jHBrpFIv+FqSlUO+j6iGgXIx1L4ucGMOizCq1PYwSg0wqwDRp" +
+                    "JXLMW5JJDV3FYx96HEf9MdbJguQYs00nQracQjiu1PRmrHeGRRBleoXcsuj5Tztw9dkYZNHNMJ97GJ3iWcZrQzyr5CXXbIhFkUIqrcUBjIT6jTM4wuoZZdp0xpKK5ihO" +
+                    "nfCRfgRFN6L0Jcl8zChRUp0Gpd7j7J5lfpPoQ2DxyV2+3LfA6hRhVZc7PYXcHJMdQ/ok/h1UdtkUVkX2NarsowNsV8aVjKeYXQF68XmATUWK9S3pWM16fKkq8tyMK3Mq" +
+                    "MN00wimWRaGObtYbmkmMRUqhCNv5o6gxyXzLscXZdERYb2NKr3Msg0K9okqmNOo0o7jBx+aC7veYUtPr8ZzouapFuYKls0l7MsnizZbYTrJoo8Uc5WpTqUnFk5zxJDuP" +
+                    "bin2Z5zNm1zRKLPm/pCaj7Pa5BSvKRZRFP/kjsuzlULdadYPeT/J05z7k8pFWH1Til6anUo5JZYptj/ibALTsBVfLD0YHf1rZHNYumvGlD3TqMTs+V/r0bjSrIKl+yNT" +
+                    "jGUKY+xRdn+yuOumS/ZvoRODeAb1sPMircyPX6mccIUFumuuPDOb2Zl5eRbyNCYQz7F4sqyWjSyHCeT3oYce+g4tfzu4D0O6yjVfHtg1SmJASJxMwHL8+heGXjICw2QX" +
+                    "7CAiPkXkteGzHXH6bCQ7YBbldiB9J+Lbkb4Nz0473ltx9eF6EJcKlyzRhBIefHoU3I14A2q8hHfCFqW2IpU+r0O8C5+dytOPdB8+fQq+G3F8Qpho8CW8ld2fJyrxFDl3" +
+                    "kbx0kQgXyd3vk8D7ZPado+9wv1lcb39q8flFru/tkbefeptvepvo3yZauGC4ELgQvpC+cPxCWYX+PNHBr4jxZ+e22N/ccXb4P3e8MQxnMbOzTWcDZ2fPSmfVZwk//AZv" +
+                    "shsWhIWmhfTC7MLLC+cWFhe0s984+g3u68957Prn7M9x9lN9p+4+xYdPEP0J+wku8MXwF7mjjxH9Y/bHPI/xjz7SaH+k02b//MNr7eceXnyYO7O0cOrhKqP/OdJHemAH" +
+                    "1rD3FL9kf2pXLdmDaenxbsflwdWHK4XrQVz4nQfF7bg8pEfcwo98jlQesx5zHbvj2OFj6vT9s/cfvZ+fve/ofdxTM8/PcNnAensq6bInOz9ht3jNwxovP1yGbtC7uHu0" +
+                    "fp0/PCLaR1Dohn1N9n2d6+3LvdXDakxYhYJ63s638n18in+Qf57XaAcCNns/rnOBxQAnBsp1fn2fvc/Tx59ZOifGuh1o7br0dbPX8bv96+1dnVvs+k57p6fzpc43O9/u" +
+                    "LBvpJI/jv/8p//N+XvSv9/hFv83hX9llHTZ5a4eNRD9s8OqHOYKN9sKwR7+k5/T6Ef3del4PrcDNmoianCFH54cGXa7uM5qlgW5JG7hBIoek+kF6F/v3SWWHJBjed0Nw" +
+                    "npBPh+47cgTaVnVLGwaDUnhVqFuKIiBSYBYBw6p5E7SFstmci13E5UJ4Gu/gmnYh8aasTIUiH1xZksUjKsuUiIsKyDjBu4vykED1CGrflAV6o0yXrES1s4o5pizfGGC+" +
+                    "6b8BvyiflgplbmRzdHJlYW0KZW5kb2JqCgo2IDAgb2JqCjU2NTgKZW5kb2JqCgo3IDAgb2JqCjw8L1R5cGUvRm9udERlc2NyaXB0b3IvRm9udE5hbWUvQkFBQUFBK0xp" +
+                    "YmVyYXRpb25TZXJpZgovRmxhZ3MgNAovRm9udEJCb3hbLTU0MyAtMzAzIDEyNzcgOTgxXS9JdGFsaWNBbmdsZSAwCi9Bc2NlbnQgMAovRGVzY2VudCAwCi9DYXBIZWln" +
+                    "aHQgOTgxCi9TdGVtViA4MAovRm9udEZpbGUyIDUgMCBSCj4+CmVuZG9iagoKOCAwIG9iago8PC9MZW5ndGggMjc0L0ZpbHRlci9GbGF0ZURlY29kZT4+CnN0cmVhbQp4" +
+                    "nF2Rz27DIAzG7zwFx+5QhaRpu0pRpK5dpBz2R8v2AAScDGkBRMghbz8w3SbtAPoZf59lm+zSXlutfPbqjOjA00Fp6WA2ixNAexiVJnlBpRL+FuEtJm5JFrzdOnuYWj2Y" +
+                    "qiLZW8jN3q10c5amhzuSvTgJTumRbj4uXYi7xdovmEB7ykhdUwlDqPPE7TOfIEPXtpUhrfy6DZY/wftqgRYY56kVYSTMlgtwXI9AKsZqWjVNTUDLf7n8ZukH8cldkOZB" +
+                    "ylhZ1oEL5EMTeZd4F7lEPu4j79P7NfIhMb4fEz9Gvk96rHlCLljkc9IUkR8Sn7DJWzex3bjPnzVQsTgXVoBLx9nj1ErD779YY6MLzzdIPYT8CmVuZHN0cmVhbQplbmRv" +
+                    "YmoKCjkgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHJ1ZVR5cGUvQmFzZUZvbnQvQkFBQUFBK0xpYmVyYXRpb25TZXJpZgovRmlyc3RDaGFyIDAKL0xhc3RDaGFy" +
+                    "IDExCi9XaWR0aHNbNzc3IDcyMiA1MDAgNDQzIDUwMCA3NzcgNDQzIDUwMCAyNzcgMjUwIDUwMCAyNzcgXQovRm9udERlc2NyaXB0b3IgNyAwIFIKL1RvVW5pY29kZSA4" +
+                    "IDAgUgo+PgplbmRvYmoKCjEwIDAgb2JqCjw8L0YxIDkgMCBSCj4+CmVuZG9iagoKMTEgMCBvYmoKPDwvRm9udCAxMCAwIFIKL1Byb2NTZXRbL1BERi9UZXh0XQo+Pgpl" +
+                    "bmRvYmoKCjEgMCBvYmoKPDwvVHlwZS9QYWdlL1BhcmVudCA0IDAgUi9SZXNvdXJjZXMgMTEgMCBSL01lZGlhQm94WzAgMCA1OTUuMzAzOTM3MDA3ODc0IDg0MS44ODk3" +
+                    "NjM3Nzk1MjhdL0dyb3VwPDwvUy9UcmFuc3BhcmVuY3kvQ1MvRGV2aWNlUkdCL0kgdHJ1ZT4+L0NvbnRlbnRzIDIgMCBSPj4KZW5kb2JqCgo0IDAgb2JqCjw8L1R5cGUv" +
+                    "UGFnZXMKL1Jlc291cmNlcyAxMSAwIFIKL01lZGlhQm94WyAwIDAgNTk1IDg0MSBdCi9LaWRzWyAxIDAgUiBdCi9Db3VudCAxPj4KZW5kb2JqCgoxMiAwIG9iago8PC9U" +
+                    "eXBlL0NhdGFsb2cvUGFnZXMgNCAwIFIKL09wZW5BY3Rpb25bMSAwIFIgL1hZWiBudWxsIG51bGwgMF0KL0xhbmcoY2EtRVMpCj4+CmVuZG9iagoKMTMgMCBvYmoKPDwv" +
+                    "Q3JlYXRvcjxGRUZGMDA1NzAwNzIwMDY5MDA3NDAwNjUwMDcyPgovUHJvZHVjZXI8RkVGRjAwNEMwMDY5MDA2MjAwNzIwMDY1MDA0RjAwNjYwMDY2MDA2OTAwNjMwMDY1" +
+                    "MDAyMDAwMzcwMDJFMDAzMj4KL0NyZWF0aW9uRGF0ZShEOjIwMjExMDE5MTUzNTQ5KzAyJzAwJyk+PgplbmRvYmoKCnhyZWYKMCAxNAowMDAwMDAwMDAwIDY1NTM1IGYg" +
+                    "CjAwMDAwMDY4MjMgMDAwMDAgbiAKMDAwMDAwMDAxOSAwMDAwMCBuIAowMDAwMDAwMjE2IDAwMDAwIG4gCjAwMDAwMDY5OTIgMDAwMDAgbiAKMDAwMDAwMDIzNiAwMDAw" +
+                    "MCBuIAowMDAwMDA1OTc4IDAwMDAwIG4gCjAwMDAwMDU5OTkgMDAwMDAgbiAKMDAwMDAwNjE4OSAwMDAwMCBuIAowMDAwMDA2NTMyIDAwMDAwIG4gCjAwMDAwMDY3MzYg" +
+                    "MDAwMDAgbiAKMDAwMDAwNjc2OCAwMDAwMCBuIAowMDAwMDA3MDkxIDAwMDAwIG4gCjAwMDAwMDcxODggMDAwMDAgbiAKdHJhaWxlcgo8PC9TaXplIDE0L1Jvb3QgMTIg" +
+                    "MCBSCi9JbmZvIDEzIDAgUgovSUQgWyA8Mjk1QjFGNDNFNDRDQzU0MEMyQzlFRjEzMDQ1M0NEMTk+CjwyOTVCMUY0M0U0NENDNTQwQzJDOUVGMTMwNDUzQ0QxOT4gXQov" +
+                    "RG9jQ2hlY2tzdW0gLzc4MTE1NzhCOTlFQjk4Q0NCRTdDNEVBNjlEMURFRTcyCj4+CnN0YXJ0eHJlZgo3MzYzCiUlRU9GCg==</dss:Base64Signature>\n" +
+                    "\t</dss:SignatureObject>\n" +
+                    "</dss:VerifyRequest>";
+            var result = cridadaWs(inputXml);
+            return EstatSalut.builder()
+                    .latencia((int) Duration.between(start, Instant.now()).toMillis())
+                    .estat(EstatSalutEnum.UP)
+                    .build();
+        } catch (Exception ex) {
+            return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
+        }
+    }
+
+    @Override
+    public IntegracioPeticions getPeticionsPlugin() {
+        IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
+                .totalOk(operacionsOk)
+                .totalError(operacionsError)
+                .build();
+        resetComptadors();
+        return integracioPeticions;
+    }
 
 }

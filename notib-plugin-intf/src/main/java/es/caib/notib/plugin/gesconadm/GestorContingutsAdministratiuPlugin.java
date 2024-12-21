@@ -3,7 +3,6 @@
  */
 package es.caib.notib.plugin.gesconadm;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.plugin.SalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 
@@ -19,9 +18,9 @@ public interface GestorContingutsAdministratiuPlugin extends SalutPlugin {
 
 	GesconAdm getProcSerByCodiSia(String codiSia, boolean isService) throws SistemaExternException;
 
-	GcaServei getServeiByCodiSia(ObjectMapper mapper, String json) throws Exception;
+//	GcaServei getServeiByCodiSia(ObjectMapper mapper, String json) throws Exception;
 
-	GcaProcediment getProcedimentByCodiSia(ObjectMapper mapper, String json) throws Exception;
+//	GcaProcediment getProcedimentByCodiSia(ObjectMapper mapper, String json) throws Exception;
 
 	// Procediments
 
@@ -50,15 +49,15 @@ public interface GestorContingutsAdministratiuPlugin extends SalutPlugin {
 	public List<GcaProcediment> getProcedimentsByUnitat(
 			String codi) throws SistemaExternException;
 	
-	/**
-	 * Retorna una unitat administrativa donat el seu codi.
-	 * 
-	 * @param codi CodiDir3 de la unitat administrativa
-	 * @return La unitat administrativa.
-	 * @throws SistemaExternException
-	 *            Si es produeix un error al consultar la unitat administrativa.
-	 */
-	public String getUnitatAdministrativa(String codi) throws SistemaExternException;
+//	/**
+//	 * Retorna una unitat administrativa donat el seu codi.
+//	 *
+//	 * @param codi CodiDir3 de la unitat administrativa
+//	 * @return La unitat administrativa.
+//	 * @throws SistemaExternException
+//	 *            Si es produeix un error al consultar la unitat administrativa.
+//	 */
+//	public String getUnitatAdministrativa(String codi) throws SistemaExternException;
 	
 	/**
 	 * Retorna el total de procediments per una entitat.

@@ -13,7 +13,6 @@ import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
-import es.caib.notib.logic.service.OrganGestorServiceImpl;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.carpeta.CarpetaPlugin;
@@ -34,21 +33,17 @@ import java.util.Properties;
 @Component
 public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 
-	private final IntegracioHelper integracioHelper;
+	public static final String GRUP = "CARPETA";
+
 	private final NotificacioEventHelper eventHelper;
-	private final ConfigHelper configHelper;
-	private final EntitatRepository entitatRepository;
 
 	public CarpetaPluginHelper(IntegracioHelper integracioHelper,
-                               NotificacioEventHelper eventHelper,
                                ConfigHelper configHelper,
-							   EntitatRepository entitatRepository) {
+							   EntitatRepository entitatRepository,
+                               NotificacioEventHelper eventHelper) {
 
-		super(integracioHelper, configHelper);
-        this.integracioHelper = integracioHelper;
+		super(integracioHelper, configHelper, entitatRepository);
 		this.eventHelper = eventHelper;
-		this.configHelper = configHelper;
-        this.entitatRepository = entitatRepository;
     }
 
 
@@ -65,7 +60,7 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 			if (!enviarCarpeta) {
 				throw new Exception("El plugin de CARPETA no està configurat");
 			}
-			peticionsPlugin.updatePeticioTotal(configHelper.getEntitatActualCodi());
+			// peticionsPlugin.updatePeticioTotal(configHelper.getEntitatActualCodi());
 			var res = getPlugin().enviarNotificacioMobil(crearMissatgeCarpetaParams(e));
 			if (!Strings.isNullOrEmpty(res.getCode()) && "OK".equalsIgnoreCase(res.getCode())) {
 				integracioHelper.addAccioOk(info);
@@ -81,7 +76,7 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 			eventInfo.setErrorDescripcio(ex.getMessage());
 			integracioHelper.addAccioError(info, msg, ex);
 			if (enviarCarpeta) {
-				peticionsPlugin.updatePeticioError(configHelper.getEntitatActualCodi());
+				// peticionsPlugin.updatePeticioError(configHelper.getEntitatActualCodi());
 			}
 		}
 		eventHelper.addEvent(eventInfo);
@@ -175,13 +170,20 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 			throw new SistemaExternException(IntegracioCodi.CARPETA.name(), error);
 		}
 		try {
+			var configuracioEspecifica = configHelper.hasEntityGroupPropertiesModified(entitatCodi, getConfigGrup());
+			var propietats = configHelper.getAllEntityProperties(entitatCodi);
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (CarpetaPlugin) clazz.getDeclaredConstructor(Properties.class).newInstance(configHelper.getAllEntityProperties(entitatCodi));
+			plugin = (CarpetaPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(propietats, configuracioEspecifica);
 			pluginMap.put(entitatCodi, plugin);
 			return (CarpetaPlugin) plugin;
 		} catch (Exception ex) {
 			throw new SistemaExternException(IntegracioCodi.CARPETA.name(), "Error al crear la instància del plugin de CARPETA", ex);
 		}
+	}
+
+	@Override
+	protected String getConfigGrup() {
+		return GRUP;
 	}
 
 	// PROPIETATS PLUGIN
