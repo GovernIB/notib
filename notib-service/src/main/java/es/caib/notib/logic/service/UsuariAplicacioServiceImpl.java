@@ -13,8 +13,10 @@ import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.helper.RequestsHelper;
 import es.caib.notib.logic.intf.dto.AplicacioDto;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.RespostaTestAplicacio;
 import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.AuditService.TipusEntitat;
@@ -24,6 +26,7 @@ import es.caib.notib.logic.intf.service.UsuariAplicacioService;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
+import es.caib.notib.persist.repository.EntitatRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +35,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació del servei de gestió d'usuaris.
@@ -55,6 +60,8 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	private MetricsHelper metricsHelper;
 	@Resource
 	private RequestsHelper requestsHelper;
+	@Resource
+	private EntitatRepository entitatRepository;
 
 
 	@Audita(entityType = TipusEntitat.APLICACIO, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
@@ -230,18 +237,49 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	}
 
 	@Override
-	public boolean provarAplicacio(Long aplicacioId) {
+	public RespostaTestAplicacio provarAplicacio(Long aplicacioId) {
 
 		try {
 			log.info("Provant aplicacio " + aplicacioId);
 			var aplicacio = aplicacioRepository.findById(aplicacioId).orElseThrow();
 			var urlCallback = aplicacio.getCallbackUrl() + (aplicacio.getCallbackUrl().endsWith("/") ? "" : "/") +  CallbackHelper.NOTIFICACIO_CANVI;
 			var resposta = requestsHelper.callbackAplicacioNotificaCanvi(urlCallback, new NotificacioCanviClient());
-			return resposta != null && ClientResponse.Status.OK.getStatusCode() == resposta.getStatusInfo().getStatusCode();
+			var ok = resposta != null && ClientResponse.Status.OK.getStatusCode() == resposta.getStatusInfo().getStatusCode();
+			var error = !ok && resposta != null ? resposta.getStatus() + " " + resposta.getStatusInfo() : null;
+			return RespostaTestAplicacio.builder().ok(ok).error(error).build();
 		} catch (Exception ex) {
-			log.error("Error inesperat provant la aplicacio", ex);
-			return false;
+			var msg = "Error inesperat provant la aplicacio";
+			log.error(msg, ex);
+			return RespostaTestAplicacio.builder().ok(false).error(msg + ex.getMessage()).build();
 		}
+	}
+
+	@Override
+	public boolean diagnosticarAplicacions(Map<String, IntegracioDiagnostic> diagnostics) {
+
+		var entitats = entitatRepository.findAll();
+		IntegracioDiagnostic diagnostic;
+		IntegracioDiagnostic diagnosticEntitat;
+		List<AplicacioEntity> aplicacions;
+		Map<String, IntegracioDiagnostic> diagnosticsEntitat;
+		RespostaTestAplicacio resposta;
+		String error;
+		for (var entitat : entitats) {
+			aplicacions = aplicacioRepository.findByEntitat(entitat);
+			if (aplicacions.isEmpty()) {
+				continue;
+			}
+			diagnosticsEntitat = new HashMap<>();
+			for (var aplicacio : aplicacions) {
+				resposta = provarAplicacio(aplicacio.getId());
+				error = !resposta.isOk()? resposta.getError() : null;
+				diagnostic = IntegracioDiagnostic.builder().correcte(resposta.isOk()).errMsg(error).build();
+				diagnosticsEntitat.put(aplicacio.getUsuariCodi(), diagnostic);
+			}
+			diagnosticEntitat = IntegracioDiagnostic.builder().diagnosticsEntitat(diagnosticsEntitat).build();
+			diagnostics.put(entitat.getCodi(), diagnosticEntitat);
+		}
+		return false;
 	}
 
 

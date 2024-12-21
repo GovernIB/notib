@@ -37,6 +37,7 @@ import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -456,4 +457,7 @@ public interface NotificacioService {
 
 	@PreAuthorize("isAuthenticated()")
 	RespuestaAmpliarPlazoOE ampliacionPlazoOE(AmpliacionPlazoDto notificacioId);
+
+	@PreAuthorize("isAuthenticated()")
+	Date getCaducitat(Long notificacioId);
 }

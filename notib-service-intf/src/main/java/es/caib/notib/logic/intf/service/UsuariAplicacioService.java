@@ -3,6 +3,8 @@
  */
 package es.caib.notib.logic.intf.service;
 
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
+import es.caib.notib.logic.intf.dto.RespostaTestAplicacio;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.logic.intf.dto.AplicacioDto;
@@ -11,6 +13,7 @@ import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Declaració dels mètodes per a la gestió d'entitats.
@@ -138,5 +141,8 @@ public interface UsuariAplicacioService {
 
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	boolean provarAplicacio(Long aplicacioId);
+	RespostaTestAplicacio provarAplicacio(Long aplicacioId);
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	boolean diagnosticarAplicacions(Map<String, IntegracioDiagnostic> diagnostics);
 }

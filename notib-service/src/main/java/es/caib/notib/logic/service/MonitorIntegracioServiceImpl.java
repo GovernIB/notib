@@ -25,6 +25,7 @@ import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.MonitorIntegracioService;
+import es.caib.notib.logic.intf.service.UsuariAplicacioService;
 import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
@@ -82,8 +83,8 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	private RequestsHelper requestsHelper;
 	@Autowired
 	private AplicacioRepository aplicacioRepository;
-    @Autowired
-    private EmailNotificacioHelper emailHelper;
+	@Autowired
+	private UsuariAplicacioService usuariAplicacioService;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -192,9 +193,13 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 					diagnostic.setCorrecte(pluginHelper.diagnosticarArxiu(diagnostics));
 					break;
 				case CALLBACK:
-					var aplicacio = aplicacioRepository.findTopByCallbackUrlNotNullOrderByIdDesc().orElseThrow();
-					var r = requestsHelper.callbackAplicacioNotificaCanvi(aplicacio.getCallbackUrl(), new NotificacioCanviClient());
-					diagnostic.setCorrecte(r != null && ClientResponse.Status.OK.getStatusCode() == r.getStatusInfo().getStatusCode());
+					diagnostic.setProva(messageHelper.getMessage("integracio.diagnostic.callback.descripcio"));
+					usuariAplicacioService.diagnosticarAplicacions(diagnostics);
+//					var aplicacio = aplicacioRepository.findTopByCallbackUrlNotNullOrderByIdDesc().orElseThrow();
+//					var r = requestsHelper.callbackAplicacioNotificaCanvi(aplicacio.getCallbackUrl(), new NotificacioCanviClient());
+//					var ok = r != null && ClientResponse.Status.OK.getStatusCode() == r.getStatusInfo().getStatusCode();
+//					diagnostic.setCorrecte(ok);
+//					diagnostic.setErrMsg(!ok ? r.getStatus() + " " + r.getStatusInfo() : null);
 					break;
 				case GESDOC:
 					diagnostic.setCorrecte(pluginHelper.diagnosticarGestorDocumental(diagnostics));

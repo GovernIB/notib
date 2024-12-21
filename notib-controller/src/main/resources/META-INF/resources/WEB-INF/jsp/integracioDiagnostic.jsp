@@ -21,8 +21,8 @@
         })
 
         function diagnostic() {
-            var integracions = $(".integracio");
-            for(var i=0; i<integracions.length; i++) {
+            let integracions = $(".integracio");
+            for(let i=0; i<integracions.length; i++) {
                 let integracio = integracions.eq(i).data('codi');
                 $("#span-refresh-" + integracio).empty().addClass('fa-circle-o-notch');
                 $("#span-refresh-" + integracio).addClass('fa-spin');
@@ -41,6 +41,8 @@
                         $("#span-refresh-" + integracio).removeClass('fa-refresh');
                         let clase;
                         let textNode;
+                        console.log("int " + integracio);
+                        console.log(data);
                         if (!data.diagnosticsEntitat || Object.keys(data.diagnosticsEntitat).length === 0) {
                             if (data.correcte) {
                                 clase = "fa-check text-succes";
@@ -55,26 +57,50 @@
                             const map = new Map(Object.entries(data.diagnosticsEntitat));
                             $('#integracio_' + integracio + '_info').append(document.createTextNode(data.prova));
                             map.forEach((diagnostic, codi) => {
-                                let div = document.createElement("div");
-                                let span = document.createElement("span");
-                                if (diagnostic && diagnostic.correcte) {
-                                    clase = "fa fa-check text-succes";
-                                    textNode = document.createTextNode("    " + codi);
-                                } else {
-                                    clase = "fa fa-times text-danger";
-                                    textNode = document.createTextNode("    " + codi + "    " + diagnostic.errMsg);
-                                }
-                                $(span).addClass(clase);
-                                let p = document.createElement("p");
-                                p.append(span);
-                                p.append(textNode);
-                                div.append(p);
+                                let div = crearDiagnosticInfo(diagnostic, codi)
                                 $('#integracio_' + integracio + '_info').append(div);
                             });
                         }
                     }
                 });
             }
+        }
+
+        function crearDiagnosticInfo(diagnostic, codi) {
+
+            let div = document.createElement("div");
+            let span = document.createElement("span");
+            let clase;
+            let textNode;
+            if (diagnostic && diagnostic.correcte) {
+                clase = "fa fa-check text-succes";
+                textNode = document.createTextNode("    " + codi);
+            } else if (diagnostic.errMsg) {
+                clase = "fa fa-times text-danger";
+                textNode = document.createTextNode("    " + codi + "    " + diagnostic.errMsg);
+            } else {
+                textNode = document.createTextNode("    " + codi);
+            }
+            let p = document.createElement("p");
+            $(span).addClass(clase);
+            p.append(span);
+            if (clase) {
+                p.append(textNode);
+            } else {
+                let b = document.createElement("b");
+                b.append(textNode)
+                p.append(b);
+            }
+            div.append(p);
+            if (!diagnostic.diagnosticsEntitat) {
+                return div;
+            }
+            const map = new Map(Object.entries(diagnostic.diagnosticsEntitat));
+            map.forEach((diagnostic, codi) => {
+                let divEntitat = crearDiagnosticInfo(diagnostic, codi)
+                div.append(divEntitat);
+            });
+            return div;
         }
     </script>
 
