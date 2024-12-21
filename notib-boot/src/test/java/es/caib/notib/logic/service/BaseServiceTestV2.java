@@ -17,6 +17,7 @@ import es.caib.notib.persist.entity.config.ConfigEntity;
 import es.caib.notib.persist.entity.config.ConfigTypeEntity;
 import es.caib.notib.persist.repository.config.ConfigRepository;
 import es.caib.notib.plugin.SistemaExternException;
+import es.caib.notib.plugin.arxiu.ArxiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.Llibre;
@@ -38,7 +39,6 @@ import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -96,7 +96,7 @@ public class BaseServiceTestV2 {
 	protected GestioDocumentalPlugin gestioDocumentalPluginMock;
 
 	private RegistrePlugin registrePluginMock;
-	private IArxiuPlugin arxiuPluginMock;
+	private ArxiuPlugin arxiuPluginMock;
 	protected UnitatsOrganitzativesPlugin unitatsOrganitzativesPluginMock;
 
 	protected String currentTestDescription = "";
@@ -438,7 +438,7 @@ public class BaseServiceTestV2 {
 
 	//	IArxiuPlugin
 	protected void configureMockArxiuPlugin() throws IOException {
-		arxiuPluginMock = Mockito.mock(IArxiuPlugin.class);
+		arxiuPluginMock = Mockito.mock(ArxiuPlugin.class);
 		Expedient expedientArxiu = new Expedient();
 		expedientArxiu.setIdentificador(UUID.randomUUID().toString());
 		expedientArxiu.setNom("nom");
