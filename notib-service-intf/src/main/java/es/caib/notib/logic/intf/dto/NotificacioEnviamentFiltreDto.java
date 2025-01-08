@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.intf.dto;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,7 +28,7 @@ public class NotificacioEnviamentFiltreDto extends AuditoriaDto {
 	private String codiProcediment;
 	private String grup;
 	private String usuari;
-	private NotificacioTipusEnviamentEnumDto enviamentTipus;
+	private EnviamentTipus enviamentTipus;
 	private String concepte;
 	private String descripcio;
 	private String nifTitular;

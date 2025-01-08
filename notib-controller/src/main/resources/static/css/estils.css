@@ -529,3 +529,14 @@ input.entitat-no-configurada[type="checkbox"]  {
 	-webkit-animation: spin .8s linear infinite;
 	animation: spin .8s linear infinite;
 }
+
+.filtreOcult {
+	display:none;
+}
+
+.botonsTipusFiltre {
+	float:right;
+	cursor:pointer;
+	text-decoration: underline;
+	text-decoration-style: dashed;
+}

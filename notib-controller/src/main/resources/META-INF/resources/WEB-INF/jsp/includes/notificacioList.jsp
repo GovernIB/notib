@@ -117,17 +117,6 @@
         left: auto
     }
 
-    .filtreOcult {
-        display:none;
-    }
-
-    .botonsTipusFiltre {
-        float:right;
-        cursor:pointer;
-        text-decoration: underline;
-        text-decoration-style: dashed;
-    }
-
 
 </style>
 <script type="text/javascript">

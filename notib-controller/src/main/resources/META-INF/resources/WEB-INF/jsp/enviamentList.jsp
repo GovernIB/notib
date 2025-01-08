@@ -1,5 +1,6 @@
-<%@ page import="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto" %>
 <%@ page import="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatOrdreFiltre" %>
+<%@ page import="es.caib.notib.client.domini.EnviamentTipus" %><%--<%@ page import="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto" %>--%>
+<%--<%@ page import="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatOrdreFiltre" %>--%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -11,8 +12,9 @@
 	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
 	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(ssc.getRolActual()));
 	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()));
-	pageContext.setAttribute("notificacioComunicacioEnumOptions", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(es.caib.notib.logic.intf.dto.NotificacioTipusEnviamentEnumDto.class, "notificacio.tipus.enviament.enum."));
-	pageContext.setAttribute("notificacioEstatEnumOptions", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(NotificacioEstatOrdreFiltre.class, "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto."));
+//	pageContext.setAttribute("notificacioComunicacioEnumOptions", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(es.caib.notib.logic.intf.dto.EnviamentTipus.class, "notificacio.tipus.enviament.enum."));
+//	pageContext.setAttribute("notificacioEstatEnumOptions", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(NotificacioEstatOrdreFiltre.class, "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto."));
+	pageContext.setAttribute("notificacioEnviamentTipus", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(EnviamentTipus.class, "es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto."));
 %>
 <c:set var="ampladaConcepte">
 	<c:choose>
@@ -22,6 +24,7 @@
 </c:set>
 <c:set var="refresh_state_succes"><spring:message code="notificacio.list.enviament.list.refresca.estat.exitos"/></c:set>
 <c:set var="refresh_state_error"><spring:message code="notificacio.list.enviament.list.refresca.estat.error"/></c:set>
+<c:set var="notificacioEnviamentTipus" value="${notificacioEnviamentTipus}" scope="request"/>
 <html>
 <head>
 	<title><spring:message code="enviament.list.titol"/></title>
@@ -47,128 +50,254 @@
 	<link href="<c:url value="/css/datatable-accions-massives.css"/>" rel="stylesheet"/>
 
 <script>
-$(document).ready(function() {
+	$(document).ready(function () {
 
-	let $taula = $('#enviament');
-	$taula.on('draw.dt', function () {
+		let $taula = $('#enviament');
+		$taula.on('draw.dt', function () {
 
-		let rows = this.rows;
-		for (let row=1; row < rows.length; row++) {
-			let tag = $(this.rows[row]).find(".estatColor")[0];
-			let classes = tag.classList;
-			this.rows[row].firstChild.style="border-left: 3px solid " + classes[classes.length-1];
+			let rows = this.rows;
+			for (let row = 1; row < rows.length; row++) {
+				let tag = $(this.rows[row]).find(".estatColor")[0];
+				if (!tag) {
+					console.error("No hi ha color d'estat per la fila " + row);
+					return;
+				}
+				let classes = tag.classList;
+				this.rows[row].firstChild.style = "border-left: 3px solid " + classes[classes.length - 1];
+			}
+		});
+		<%--var $estatColumn = $('#estat');--%>
+		<%--var $entregaPostalColumn = $('#entregaPostal');--%>
+		<%--var $enviamentTipusColumn = $('#enviamentTipus');--%>
+		<%--$estatColumn.select2({--%>
+		<%--	width: '100%',--%>
+		<%--	allowClear: true,--%>
+		<%--	placeholder: 'Selecciona una opció'//'${placeholderText}'--%>
+		<%--});--%>
+		<%--$entregaPostalColumn.select2({--%>
+		<%--	width: '100%',--%>
+		<%--	allowClear: true,--%>
+		<%--	placeholder: 'Selecciona una opció'//'${placeholderText}'--%>
+		<%--});--%>
+		<%--$enviamentTipusColumn.select2({--%>
+		<%--	width: '100%',--%>
+		<%--	allowClear: true,--%>
+		<%--	placeholder: '<spring:message code="notificacio.list.filtre.camp.enviament.tipus"/>'--%>
+		<%--});--%>
+
+		<%--function configureColumnSelectFilter($selector) {--%>
+		<%--	$selector.on('select2:select', function (e) {--%>
+		<%--		$("#enviament").dataTable().api().ajax.reload();--%>
+		<%--	});--%>
+		<%--	$selector.on('select2:unselect', function (e) {--%>
+		<%--		$("#enviament").dataTable().api().ajax.reload();--%>
+		<%--	});--%>
+		<%--	$selector.on('change', function () {--%>
+		<%--		$selector.val($selector.val());--%>
+		<%--		$("#btnFiltrar").first().click();--%>
+		<%--	});--%>
+		<%--}--%>
+
+		<%--configureColumnSelectFilter($estatColumn);--%>
+		<%--configureColumnSelectFilter($entregaPostalColumn);--%>
+		<%--configureColumnSelectFilter($enviamentTipusColumn);--%>
+
+		<%--if ("${filtreEnviaments.estat}" != "") {--%>
+		<%--	$estatColumn.val("${filtreEnviaments.estat}").trigger('change');--%>
+		<%--}--%>
+
+		<%--if ("${filtreEnviaments.entregaPostal}" != "") {--%>
+		<%--	$entregaPostalColumn.val("${filtreEnviaments.entregaPostal}").trigger('change');--%>
+		<%--}--%>
+
+		<%--if ("${filtreEnviaments.enviamentTipus}" != "") {--%>
+		<%--	$enviamentTipusColumn.val("${filtreEnviaments.enviamentTipus}".toLowerCase()).trigger('change');--%>
+		<%--}--%>
+
+		<%--$('.data').datepicker({--%>
+		<%--	orientation: "bottom",--%>
+		<%--	dateFormat: 'dd/mm/yy',--%>
+		<%--	weekStart: 1,--%>
+		<%--	todayHighlight: true,--%>
+		<%--	language: "${requestLocale}"--%>
+		<%--});--%>
+
+		let eventMessages = {
+			'confirm-reintentar-errors': "<spring:message code="enviament.list.user.reintentar.errors.misatge.avis"/>",
+			'confirm-reintentar-notificacio': "<spring:message code="enviament.list.user.reintentar.notificacio.misatge.avis"/>",
+			'confirm-reintentar-consulta': "<spring:message code="enviament.list.user.reactivar.consulta.misatge.avis"/>",
+			'confirm-reintentar-sir': "<spring:message code="enviament.list.user.reactivar.sir.misatge.avis"/>",
+			'confirm-update-estat': "<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>",
+			'confirm-reactivar-callback': "<spring:message code="enviament.list.user.reactivar.callback.misatge.avis"/>",
+			'confirm-accio-massiva': "<spring:message code="enviament.list.user.confirm.accio.massiva"/>",
+		};
+
+		initEvents($('#enviament'), 'enviament', eventMessages)
+
+		$("#enviament th").last().empty();
+		$("#enviament th").last().css("padding", 0);
+
+		$("#enviament th").keypress(function (event) {
+			if (event.which == 13) {
+				event.preventDefault();
+				$("#btnFiltrar").first().click();
+			}
+		});
+
+		$('#btn-netejar-filtre').click(function () {
+			$(':input', $('#form-filtre')).each(function () {
+				var type = this.type, tag = this.tagName.toLowerCase();
+				if (type == 'text' || type == 'password' || tag == 'textarea') {
+					this.value = '';
+				} else if (type == 'checkbox' || type == 'radio') {
+					this.checked = false;
+				} else if (tag == 'select') {
+					this.selectedIndex = 0;
+				}
+
+			});
+
+			$('#nomesAmbEntregaPostalBtn').removeClass('active');
+			$('#entregaPostal').val(false);
+			deselecciona();
+		});
+
+
+		$("#filtreAvancat").on("click", e => {
+
+			e.preventDefault();
+			$(".filtreOcult").toggle();
+			$("#div-concepte").removeClass("col-md-2").addClass("col-md-4");
+			$("#filtreAvancat").hide();
+			$("#filtreSimple").show();
+		});
+
+		$("#filtreSimple").on("click", e => {
+
+			e.preventDefault();
+			$(".filtreOcult").toggle();
+			$("#div-concepte").removeClass("col-md-4").addClass("col-md-2");
+			$("#filtreAvancat").show();
+			$("#filtreSimple").hide();
+		});
+
+		$('#nomesAmbEntregaPostalBtn').click(function() {
+			entregaPostal = !$(this).hasClass('active');
+			$('#entregaPostal').val(entregaPostal);
+		})
+	});
+
+	function deselecciona() {
+
+		$(".seleccioCount").html(0);
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/enviament/deselect"/>",
+			async: false,
+			success: function (data) {
+				$(".seleccioCount").html(data);
+				$('#enviament').webutilDatatable('select-none');
+			}
+		});
+	}
+
+	function setCookie(cname, cvalue) {
+		var exdays = 30;
+		var d = new Date();
+		d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+		var expires = "expires=" + d.toGMTString();
+		document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+	}
+
+	function getCookie(cname) {
+		var name = cname + "=";
+		var ca = document.cookie.split(';');
+		for (var i = 0; i < ca.length; i++) {
+			var c = ca[i];
+			while (c.charAt(0) == ' ') {
+				c = c.substring(1);
+			}
+			if (c.indexOf(name) == 0) {
+				return c.substring(name.length, c.length);
+			}
 		}
-	});
-	var $estatColumn = $('#estat');
-	var $entregaPostalColumn = $('#entregaPostal');
-	var $enviamentTipusColumn = $('#enviamentTipus');
-	$estatColumn.select2({
-		width: '100%',
-        allowClear:true,
-        placeholder: 'Selecciona una opció'//'${placeholderText}'
-    });
-	$entregaPostalColumn.select2({
-		width: '100%',
-		allowClear:true,
-		placeholder: 'Selecciona una opció'//'${placeholderText}'
-	});
-	$enviamentTipusColumn.select2({
-		width: '100%',
-		allowClear:true,
-		placeholder: '<spring:message code="notificacio.list.filtre.camp.enviament.tipus"/>'
-	});
-
-	function configureColumnSelectFilter($selector) {
-		$selector.on('select2:select', function (e) {
-			$("#enviament").dataTable().api().ajax.reload();
-		});
-		$selector.on('select2:unselect', function (e) {
-			$("#enviament").dataTable().api().ajax.reload();
-		});
-		$selector.on('change', function () {
-			// console.log($selector.val());
-			$selector.val($selector.val());
-			$("#btnFiltrar").first().click();
-		});
+		return "";
 	}
 
-	configureColumnSelectFilter($estatColumn);
-	configureColumnSelectFilter($entregaPostalColumn);
-	configureColumnSelectFilter($enviamentTipusColumn);
+	function showEstat(element) {
 
-    if("${filtreEnviaments.estat}" != ""){
-		$estatColumn.val("${filtreEnviaments.estat}").trigger('change');
-    }
+		let bsIconCode = "";
+		let translate = element.text;
+		let text = ""
+		let style = ""
+		if (element.id == 'PENDENT') {
+			bsIconCode = "fa fa-clock-o";
+			translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PENDENT"/>";
+		}
+		if (element.id == 'ENVIADA') {
+			bsIconCode = "fa fa-send-o";
+			translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA"/>";
+		}
+		if (element.id == 'REGISTRADA') {
+			bsIconCode = "fa fa-file-o";
+			translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.REGISTRADA"/>";
+		}
+		if (element.id == 'FINALITZADA') {
+			bsIconCode = "fa fa-check";
+			translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA"/>";
+		}
+		if (element.id == 'PROCESSADA') {
+			bsIconCode = "fa fa-check-circle";
+			translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA"/>";
+		}
+		if (element.id == 'EXPIRADA') {
+			bsIconCode = "fa fa-asterisk";
+			translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.EXPIRADA"/>";
+		}
+		if (element.id == 'NOTIFICADA') {
+			bsIconCode = "fa fa-check-circle";
+			translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.NOTIFICADA"/>";
+		}
+		if (element.id == 'REBUTJADA') {
+			bsIconCode = "fa fa-times";
+			translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.REBUTJADA"/>";
+		}
+		if (element.id == 'ENVIAT_SIR') {
+			bsIconCode = "label label-primary";
+			text = "S"
+			style = "display:inline-block; padding:3px";
+			translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIAT_SIR"/>";
+		}
+		if (element.id == 'ENVIADA_AMB_ERRORS') {
+			bsIconCode = "fa fa-send-o";
+			translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS"/>";
+		}
+		if (element.id == 'FINALITZADA_AMB_ERRORS') {
+			bsIconCode = "fa fa-check";
+			translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS"/>";
+		}
+		if (element.id == 'ENVIANT') {
+			bsIconCode = "fa fa-clock-o";
+			translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIANT"/>";
+		}
 
-	if("${filtreEnviaments.entregaPostal}" != ""){
-		$entregaPostalColumn.val("${filtreEnviaments.entregaPostal}").trigger('change');
+		return $('<span style= " ' + style + ' " class="' + bsIconCode + '">' + text + ' </span><span>  ' + translate + '</span>');
 	}
-
-	if("${filtreEnviaments.enviamentTipus}" != ""){
-		$enviamentTipusColumn.val("${filtreEnviaments.enviamentTipus}".toLowerCase()).trigger('change');
-	}
-
-    $('.data').datepicker({
-		orientation: "bottom",
-		dateFormat: 'dd/mm/yy',
-		weekStart: 1,
-		todayHighlight: true,
-		language: "${requestLocale}"
-	});
-
-	let eventMessages = {
-		'confirm-reintentar-errors': "<spring:message code="enviament.list.user.reintentar.errors.misatge.avis"/>",
-		'confirm-reintentar-notificacio': "<spring:message code="enviament.list.user.reintentar.notificacio.misatge.avis"/>",
-		'confirm-reintentar-consulta': "<spring:message code="enviament.list.user.reactivar.consulta.misatge.avis"/>",
-		'confirm-reintentar-sir': "<spring:message code="enviament.list.user.reactivar.sir.misatge.avis"/>",
-		'confirm-update-estat': "<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>",
-		'confirm-reactivar-callback': "<spring:message code="enviament.list.user.reactivar.callback.misatge.avis"/>",
-		'confirm-accio-massiva': "<spring:message code="enviament.list.user.confirm.accio.massiva"/>",
-	};
-
-	initEvents($('#enviament'), 'enviament', eventMessages)
-
-	$("#enviament th").last().empty();
-	$("#enviament th").last().css("padding", 0);
-
-	$("#enviament th").keypress(function(event) {
-	    if (event.which == 13) {
-	        event.preventDefault();
-	        $("#btnFiltrar").first().click();
-	    }
-	});
-});
+	var enviamentTipus = [];
+	<c:forEach var="tipus" items="${notificacioEnviamentTipus}">
+	enviamentTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
+	</c:forEach>
 
 
-function setCookie(cname,cvalue) {
-	var exdays = 30;
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires=" + d.toGMTString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}
-function getCookie(cname) {
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for(var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
-}
 </script>
-<style type="text/css">
-    .label-primary {
-        background-color: #999999;
-    }
-    .label-warning {
-        background-color: #dddddd;
-        color: #333333;
+	<style type="text/css">
+		.label-primary {
+			background-color: #999999;
+		}
+
+		.label-warning {
+			background-color: #dddddd;
+			color: #333333;
     }
     .div-filter-data-sep {
         padding: 0;
@@ -186,7 +315,6 @@ function getCookie(cname) {
 			<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: dimgray;margin-top: 10px;"></span>
 		</div>
 	</div>
-	<form:form id="enviamentFiltreForm" action="" method="post" cssClass="well hidden" modelAttribute="enviamentFiltreCommand"></form:form>
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
 			<div class="btn-group">
@@ -228,6 +356,111 @@ function getCookie(cname) {
 	</script>
 	<script id="rowhrefTemplate" type="text/x-jsrender">enviament/{{:id}}/detall</script>
 	<div id="cover-spin"></div>
+	<form:form id="form-filtre" action="" method="post" cssClass="well" modelAttribute="enviamentFiltreCommand">
+		<div class="row">
+			<div class="col-md-2">
+				<not:inputSelect id="enviamentTipus" name="enviamentTipus" optionItems="${notificacioEnviamentTipus}" optionValueAttribute="value"
+								 optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.enviament.tipus" inline="true"/>
+			</div>
+			<div id="div-concepte" class="col-md-2">
+				<not:inputText name="concepte" inline="true" placeholderKey="enviament.list.concepte"/>
+			</div>
+			<div class="col-md-2">
+				<not:inputSelect id="estat" name="estat" optionMinimumResultsForSearch="0" optionTextKeyAttribute="text" emptyOption="true"
+								 placeholderKey="notificacio.list.filtre.camp.estat" inline="true" templateResultFunction="showEstat" />
+			</div>
+			<div class="col-md-2">
+				<not:inputDate name="dataEnviamentInici" placeholderKey="enviament.list.dataenviament.inici" inline="true" required="false" />
+			</div>
+			<div class="col-md-2">
+				<not:inputDate name="dataEnviamentFi" placeholderKey="enviament.list.dataenviament.fi" inline="true" required="false" />
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputDate name="dataCreacioInici" placeholderKey="enviament.list.datacreacio.inici" inline="true" required="false" />
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputDate name="dataCreacioFi" placeholderKey="enviament.list.datacreacio.fi" inline="true" required="false" />
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputDate name="dataProgramadaDisposicioInici" placeholderKey="enviament.list.datadisposicio.inici" inline="true" required="false" />
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputDate name="dataProgramadaDisposicioFi" placeholderKey="enviament.list.datadisposicio.inici" inline="true" required="false" />
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputText name="codiNotifica" inline="true" placeholderKey="enviament.list.codinotifica"/>
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputText name="grup" inline="true" placeholderKey="enviament.list.codigrup"/>
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputText name="dir3Codi" inline="true" placeholderKey="enviament.list.dir3codi"/>
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputText name="codiProcediment" inline="true" placeholderKey="enviament.list.codiprocediment"/>
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputText name="usuari" inline="true" placeholderKey="enviament.list.usuari"/>
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputText name="descripcio" inline="true" placeholderKey="enviament.list.descripcio"/>
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputText name="titularNomLlinatge" inline="true" placeholderKey="enviament.list.nomLlinatgetitular"/>
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputText name="emailTitular" inline="true" placeholderKey="enviament.list.emailtitular"/>
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputText name="destinataris" inline="true" placeholderKey="enviament.list.destinataris"/>
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputText name="registreLlibre" inline="true" placeholderKey="enviament.list.llibreregistre"/>
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputText name="registreNumero" inline="true" placeholderKey="enviament.list.numeroregistre"/>
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputDate name="dataRegistreInici" placeholderKey="enviament.list.dataregistre.inici" inline="true" required="false" />
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputDate name="dataRegistreFi" placeholderKey="enviament.list.dataregistre.fi" inline="true" required="false" />
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputDate name="dataCaducitatInici" placeholderKey="enviament.list.datacaducitat.inici" inline="true" required="false" />
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputDate name="dataCaducitatFi" placeholderKey="enviament.list.datacaducitat.fi" inline="true" required="false" />
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputText name="codiNotibEnviament" inline="true" placeholderKey="enviament.list.referencia.enviament"/>
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputText name="referenciaNotificacio" inline="true" placeholderKey="enviament.list.identificador.notificacio"/>
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputText name="numeroCertCorreus" inline="true" placeholderKey="enviament.list.numerocertificatcorreus"/>
+			</div>
+			<div class="col-md-2 filtreOcult">
+				<not:inputText name="csvUuid" inline="true" placeholderKey="enviament.list.codicsvuuid"/>
+			</div>
+
+			<div class="col-md-2">
+				<div class="filtreOcult">
+					<button id="nomesAmbEntregaPostalBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbEntregaPostal"/>" class="btn btn-default pull-left <c:if test="${nomesAmbEntregaPostal}">active</c:if>" data-toggle="button"><span class="fa fa-envelope"></span></button>
+					<not:inputHidden name="entregaPostal"/>
+				</div>
+				<div id="botons-filtre-simple" class="col-md-2 pull-right form-buttons"  style="text-align: right;">
+					<button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default" style="padding: 6px 9px; margin-right:5px;" title="<spring:message code="comu.boto.netejar"/>"><span class="fa fa-eraser icona_ocultable" style="padding: 2px 0px;"></span><span class="text_ocultable"><spring:message code="comu.boto.netejar"/></span></button>
+					<button id="filtrar" type="submit" name="accio" value="filtrar" class="btn btn-primary" title="<spring:message code="comu.boto.filtrar"/>"><span class="fa fa-filter" id="botoFiltrar"></span><span class="text_ocultable"><spring:message code="comu.boto.filtrar"/></span></button>
+				</div>
+			</div>
+		</div>
+		<div class ="row col-md-2 pull-right form-buttons">
+			<span id="filtreAvancat" class="botonsTipusFiltre" title="<spring:message code="notificacio.list.boto.filtre.avancat.tooltip"/>"><spring:message code="notificacio.list.boto.filtre.avancat"/></span>
+			<span id="filtreSimple" class="botonsTipusFiltre filtreOcult" style="margin-top:5px" title="<spring:message code="notificacio.list.boto.filtre.simple.tooltip"/>"><spring:message code="notificacio.list.boto.filtre.simple"/></span>
+		</div>
+	</form:form>
 	<table
 		id="enviament"
 		data-toggle="datatable"
@@ -235,7 +468,7 @@ function getCookie(cname) {
 		class="table table-striped table-bordered"
 		data-default-order="0"
 		data-default-dir="desc"
-		data-individual-filter="true"
+<%--		data-individual-filter="true"--%>
 		data-botons-template="#botonsTemplate"
 		data-date-template="#dataTemplate"
 		data-cell-template="#cellFilterTemplate"
@@ -248,374 +481,43 @@ function getCookie(cname) {
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false"></th>
-				<c:choose>
-					<c:when test = "${columnes.dataCreacio == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.dataCreacio == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="createdDate" data-converter="date" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.datacreacio"/>
-					<script id="dataTemplate" type="text/x-jsrender">
-						<div class="from-group">
-							<div class="input-group vdivide">
-    							<input name="dataCreacioInici" value="${filtreEnviaments.dataCreacioInici}" type="text" class="form-control data" placeholder="Inici">
-    							<div class="input-group-addon div-filter-data-sep"></div>
-    							<input name="dataCreacioFi" value="${filtreEnviaments.dataCreacioFi}" type="text" class="form-control data" placeholder="Final">
-							</div>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.dataEnviament == true}">
-						<c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.dataEnviament == false}">
-						<c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="enviadaDate" data-converter="date" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataenviament"/>
-					<script id="dataTemplate" type="text/x-jsrender">
-						<div class="from-group">
-							<div class="input-group vdivide">
-    							<input name="dataEnviamentInici" value="${filtreEnviaments.dataEnviamentInici}" type="text" class="form-control data" placeholder="Inici">
-    							<div class="input-group-addon div-filter-data-sep"></div>
-    							<input name="dataEnviamentFi" value="${filtreEnviaments.dataEnviamentFi}" type="text" class="form-control data" placeholder="Final">
-							</div>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.dataProgramada == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.dataProgramada == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="enviamentDataProgramada" data-converter="datetime" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataprogramada"/>
-					<script id="dataTemplate" type="text/x-jsrender">
-						<div class="from-group input-daterange" data-provide="daterangepicker">
-							<div class="input-group vdivide">
-    							<input name="dataProgramadaDisposicioInici" value="${filtreEnviaments.dataProgramadaDisposicioInici}" type="text" class="form-control data" placeholder="Inici">
-    							<div class="input-group-addon div-filter-data-sep"></div>
-    							<input name="dataProgramadaDisposicioFi" value="${filtreEnviaments.dataProgramadaDisposicioFi}" type="text" class="form-control data" placeholder="Final">
-							</div>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.notIdentificador == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.notIdentificador == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="notificaIdentificador" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codinotifica"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="codiNotifica" value="${filtreEnviaments.codiNotifica}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codinotifica"/>"/>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.grupCodi == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.grupCodi == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="grupCodi" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codigrup"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="grup" value="${filtreEnviaments.grup}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codigrup"/>"/>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.dir3Codi == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.dir3Codi == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
+				<th data-col-name="createdDate" data-converter="date" data-visible="<c:out value = "${columnes.dataCreacio == true}"/>" ><spring:message code="enviament.list.datacreacio"/></th>
+				<th data-col-name="enviadaDate" data-converter="date" data-visible="<c:out value = "${columnes.dataEnviament == true}"/>" ><spring:message code="enviament.list.dataenviament"/></th>
+				<th data-col-name="enviamentDataProgramada" data-converter="datetime" data-visible="<c:out value = "${columnes.dataProgramada == true}"/>" ><spring:message code="enviament.list.dataprogramada"/></th>
+				<th data-col-name="notificaIdentificador" data-visible="<c:out value = "${columnes.notIdentificador == true}"/>" ><spring:message code="enviament.list.codinotifica"/></th>
+				<th data-col-name="grupCodi" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codigrup"/></th>
 				<th data-col-name="organEstat" data-visible="false"></th>
-				<th data-col-name="organCodiNom" width="360" data-template="#cellOrganGestorTemplate" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dir3codi"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="dir3Codi" value="${filtreEnviaments.dir3Codi}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.dir3codi"/>"/>
-						</div>
-					</script>
+				<th data-col-name="organCodiNom" width="360" data-template="#cellOrganGestorTemplate" data-visible="<c:out value = "${columnes.dir3Codi == true}"/>" ><spring:message code="enviament.list.dir3codi"/>
 					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
 						{{:organCodiNom}}
 						{{if organEstat != 'V'}}
-							<span class="fa fa-warning text-danger" title="<spring:message code='enviament.list.organGestor.obsolet'/>"></span>{{/if}}
+							<span class="fa fa-warning text-danger" title="<spring:message code='enviament.list.organGestor.obsolet'/>"></span>
+						{{/if}}
  					</script>
 				</th>
-				<c:choose>
-					<c:when test = "${columnes.proCodi == true}">
-						<c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.proCodi == false}">
-						<c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
 				<th data-col-name="procedimentTipus" data-visible="false"></th>
-				<th data-col-name="procedimentCodiNom" width="300" data-template="#cellProcedimentTemplate" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codiprocediment"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="codiProcediment" value="${filtreEnviaments.codiProcediment}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codiprocediment"/>"/>
-						</div>
-					</script>
+				<th data-col-name="procedimentCodiNom" width="300" data-template="#cellProcedimentTemplate" data-visible="<c:out value = "${columnes.proCodi == true}"/>" ><spring:message code="enviament.list.codiprocediment"/>
 					<script id="cellProcedimentTemplate" type="text/x-jsrender">
 						{{if procedimentTipus == 'PROCEDIMENT'}}<span class="label label-primary">P</span>{{/if}}
 						{{if procedimentTipus == 'SERVEI'}}<span class="label label-warning">S</span>{{/if}}
 						{{:procedimentCodiNom}}
 					</script>
 				</th>
-				<c:choose>
-					<c:when test = "${columnes.usuari == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.usuari == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="usuariCodi" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.usuari"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="usuari" value="${filtreEnviaments.usuari}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.usuari"/>"/>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.concepte == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.concepte == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="concepte" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.concepte"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="concepte" value="${filtreEnviaments.concepte}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.concepte"/>"/>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.descripcio == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.descripcio == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="descripcio"  data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.descripcio"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="descripcio" value="${filtreEnviaments.descripcio}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.descripcio"/>"/>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.titularNomLlinatge == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.titularNomLlinatge == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="titularNomLlinatge" width="160" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.nomLlinatgetitular"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="titularNomLlinatge" value="${filtreEnviaments.titularNomLlinatge}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.nomLlinatgetitular"/>"/>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.titularEmail == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.titularEmail == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="titularEmail" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.emailtitular"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="emailTitular" value="${filtreEnviaments.emailTitular}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.emailtitular"/>"/>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.destinataris == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.destinataris == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="destinataris" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.destinataris"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="destinataris" value="${filtreEnviaments.destinataris}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.destinataris"/>"/>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.llibreRegistre == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.llibreRegistre == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="llibre" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.llibreregistre"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="registreLlibre" value="${filtreEnviaments.registreLlibre}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.llibreregistre"/>"/>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.numeroRegistre == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.numeroRegistre == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="registreNumero" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.numeroregistre"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="registreNumero" value="${filtreEnviaments.registreNumero}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.numeroregistre"/>"/>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.dataRegistre == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.dataRegistre == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="registreData" width="230" data-converter="datetime" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataregistre"/>
-					<script type="text/x-jsrender">
-						<div class="from-group" data-provide="daterangepicker" style="width: 230px;">
-							<div class="input-group vdivide">
-    							<input name="dataRegistreInici" value="${filtreEnviaments.dataRegistreInici}" type="text" class="form-control data" placeholder="Inici">
-    							<div class="input-group-addon"></div>
-    							<input name="dataRegistreFi" value="${filtreEnviaments.dataRegistreFi}" type="text" class="form-control data" placeholder="Final">
-							</div>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.dataCaducitat == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.dataCaducitat == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="notificaDataCaducitat" width="230" data-converter="datetime" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.datacaducitat"/>
-					<script type="text/x-jsrender">
-						<div class="from-group" data-provide="daterangepicker" style="width: 230px;">
-							<div class="input-group vdivide">
-    							<input name="dataCaducitatInici" value="${filtreEnviaments.dataCaducitatInici}" type="text" class="form-control data" placeholder="Inici">
-    							<div class="input-group-addon"></div>
-    							<input name="dataCaducitatFi" value="${filtreEnviaments.dataCaducitatFi}" type="text" class="form-control data" placeholder="Final">
-							</div>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.enviamentTipus == true}">
-						<c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.enviamentTipus == false}">
-						<c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="tipusEnviament" class="enviamentTipusCol" width="5px" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.tipusenviament"/>
-					<script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
-					<div class="from-group" style="padding: 0; font-weight: 100;">
-						<select class="form-control" id="enviamentTipus" name="enviamentTipus"
-								style="width:100%" data-toggle="select2" data-minimumresults="-1" tabindex="-1" aria-hidden="true" data-select2-eval="true">
-							<option value=""></option>
-							<c:forEach items="${notificacioComunicacioEnumOptions}" var="opt">
-								<option name="enviamentTipus" value="${opt.value != 'buit' ? opt.value : ''}" class="${opt.value != 'buit' ? '' : 'buit'}"><span class="${opt.value != 'buit' ? '' : 'buit'}"><spring:message code="${opt.text}"/></span></option>
-							</c:forEach>
-						</select>
-					</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.codiNotibEnviament == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.codiNotibEnviament == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="codiNotibEnviament" width="240" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.referencia.enviament"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="codiNotibEnviament" value="${filtreEnviaments.codiNotibEnviament}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.referencia.enviament"/>"/>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.referenciaNotificacio == true}">
-						<c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.referenciaNotificacio == false}">
-						<c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="referenciaNotificacio" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.identificador.notificacio"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="referenciaNotificacio" value="${filtreEnviaments.referenciaNotificacio}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.identificador.notificacio"/>"/>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.numCertificacio == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.numCertificacio == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="notificaCertificacioNumSeguiment" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.numerocertificatcorreus"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="numeroCertCorreus" value="${filtreEnviaments.numeroCertCorreus}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.numerocertificatcorreus"/>"/>
-						</div>
-					</script>
-				</th>
-				<c:choose>
-					<c:when test = "${columnes.csvUuid == true}">
-					  <c:set value="true" var="visible"></c:set>
-					</c:when>
-					<c:when test = "${columnes.csvUuid == false}">
-					  <c:set value="false" var="visible"></c:set>
-					</c:when>
-				</c:choose>
-				<th data-col-name="csvUuid" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codicsvuuid"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="csvUuid" value="${filtreEnviaments.csvUuid}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codicsvuuid"/>"/>
-						</div>
-					</script>
-				</th>
+				<th data-col-name="usuariCodi" data-visible="<c:out value = "${columnes.usuari == true}"/>" ><spring:message code="enviament.list.usuari"/></th>
+				<th data-col-name="concepte" data-visible="<c:out value = "${columnes.concepte == true}"/>" ><spring:message code="enviament.list.concepte"/></th>
+				<th data-col-name="descripcio"  data-visible="<c:out value = "${columnes.descripcio == true}"/>" ><spring:message code="enviament.list.descripcio"/></th>
+				<th data-col-name="titularNomLlinatge" width="160" data-visible="<c:out value = "${columnes.titularNomLlinatge == true}"/>" ><spring:message code="enviament.list.nomLlinatgetitular"/></th>
+				<th data-col-name="titularEmail" data-visible="<c:out value = "${columnes.titularEmail == true}"/>" ><spring:message code="enviament.list.emailtitular"/></th>
+				<th data-col-name="destinataris" data-visible="<c:out value = "${columnes.destinataris == true}}"/>" ><spring:message code="enviament.list.destinataris"/></th>
+				<th data-col-name="llibre" data-visible="<c:out value = "${columnes.llibreRegistre == true}"/>" ><spring:message code="enviament.list.llibreregistre"/></th>
+				<th data-col-name="registreNumero" data-visible="<c:out value = "${columnes.numeroRegistre == true}"/>" ><spring:message code="enviament.list.numeroregistre"/></th>
+				<th data-col-name="registreData" width="230" data-converter="datetime" data-visible="<c:out value = "${columnes.dataRegistre == true}"/>" ><spring:message code="enviament.list.dataregistre"/></th>
+				<th data-col-name="notificaDataCaducitat" width="230" data-converter="datetime" data-visible="<c:out value = "${columnes.dataCaducitat == true}"/>" ><spring:message code="enviament.list.datacaducitat"/></th>
+				<th data-col-name="tipusEnviament" class="enviamentTipusCol" width="5px" data-visible="<c:out value = "${columnes.enviamentTipus == true}"/>" ><spring:message code="enviament.list.tipusenviament"/></th>
+				<th data-col-name="codiNotibEnviament" width="240" data-visible="<c:out value = "${columnes.codiNotibEnviament == true}"/>" ><spring:message code="enviament.list.referencia.enviament"/></th>
+				<th data-col-name="referenciaNotificacio" data-visible="<c:out value = "${columnes.referenciaNotificacio == true}"/>" ><spring:message code="enviament.list.identificador.notificacio"/></th>
+				<th data-col-name="notificaCertificacioNumSeguiment" data-visible="<c:out value = "${columnes.numCertificacio == true}"/>" ><spring:message code="enviament.list.numerocertificatcorreus"/></th>
+				<th data-col-name="csvUuid" data-visible="<c:out value = "${columnes.csvUuid == true}"/>" ><spring:message code="enviament.list.codicsvuuid"/></th>
 				<c:choose>
 					<c:when test = "${columnes.estat == true}">
 					  <c:set value="true" var="visible"></c:set>
@@ -626,16 +528,16 @@ function getCookie(cname) {
 				</c:choose>
 				<th data-col-name="estatColor" data-visible="false"></th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate"   data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.estat"/>
-					<script type="text/x-jsrender">
-						<div class="from-group estatColor {{:estatColor}}" style="padding: 0; font-weight: 100;">
-							<select class="form-control" id="estat" name="estat">
-								<option name="estat" class=""></option>
-    							<c:forEach items="${notificacioEstatEnumOptions}" var="opt">
-        							<option name="estat" value="${opt.value != 'buit' ? opt.value : ''}" class="${opt.value != 'buit' ? '' : 'buit'}"><span class="${opt.value != 'buit' ? '' : 'buit'}"><spring:message code="${opt.text}"/></span></option>
-    							</c:forEach>
-							</select>
-						</div>
-					</script>
+<%--					<script type="text/x-jsrender">--%>
+<%--						<div class="from-group estatColor {{:estatColor}}" style="padding: 0; font-weight: 100;">--%>
+<%--							<select class="form-control" id="estat" name="estat">--%>
+<%--								<option name="estat" class=""></option>--%>
+<%--    							<c:forEach items="${notificacioEstatEnumOptions}" var="opt">--%>
+<%--        							<option name="estat" value="${opt.value != 'buit' ? opt.value : ''}" class="${opt.value != 'buit' ? '' : 'buit'}"><span class="${opt.value != 'buit' ? '' : 'buit'}"><spring:message code="${opt.text}"/></span></option>--%>
+<%--    							</c:forEach>--%>
+<%--							</select>--%>
+<%--						</div>--%>
+<%--					</script>--%>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						<div class="estatColor {{:estatColor}}">{{:estat}}</div>
 					</script>
@@ -656,8 +558,8 @@ function getCookie(cname) {
 								<option name="entregaPostal" class=""></option>
 								<option name="entregaPostal" value="true">Si</option>
 								<option name="entregaPostal" value="false">No</option>
-						</select>
-                    </div>
+							</select>
+                    	</div>
 					</script>
 				</th>
 

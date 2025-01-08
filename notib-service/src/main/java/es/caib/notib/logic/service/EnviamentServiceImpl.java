@@ -33,7 +33,6 @@ import es.caib.notib.logic.intf.dto.NotificacioEnviamentFiltreDto;
 import es.caib.notib.logic.intf.dto.NotificacioEventDto;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.logic.intf.dto.NotificacioTipusEnviamentEnumDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
@@ -426,7 +425,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		//Filtres camps procediment
 		EnviamentTipus tipusEnviament = null;
 		if (filtreDto.getEnviamentTipus() != null) {
-			tipusEnviament = NotificacioTipusEnviamentEnumDto.notificacio.equals(filtreDto.getEnviamentTipus()) ? EnviamentTipus.NOTIFICACIO :  EnviamentTipus.COMUNICACIO;
+			tipusEnviament = filtreDto.getEnviamentTipus();
 		}
 		var creadaPer = filtreDto.getCreatedBy() != null ? filtreDto.getCreatedBy().getCodi() : null;
 		var f = FiltreEnviament.builder()

@@ -6,7 +6,7 @@ package es.caib.notib.back.controller;
 import es.caib.notib.back.command.AmpliacionPlazoCommand;
 import es.caib.notib.back.command.ColumnesCommand;
 import es.caib.notib.back.command.NotificacioEnviamentCommand;
-import es.caib.notib.back.command.NotificacioEnviamentFiltreCommand;
+import es.caib.notib.back.command.EnviamentFiltreCommand;
 import es.caib.notib.back.command.NotificacioFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
@@ -15,7 +15,6 @@ import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
-import es.caib.notib.logic.intf.dto.Taula;
 import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
@@ -40,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Controlador per el mantinement d'enviaments.
@@ -79,7 +77,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 			var organGestorActual = getOrganGestorActual(request);
 			organGestorCodi = organGestorActual.getCodi();
 		}
-		return enviamentService.findIdsAmbFiltre(entitatActual.getId(), RolEnumDto.valueOf(sessionScopedContext.getRolActual()), getCodiUsuariActual(), organGestorCodi, NotificacioEnviamentFiltreCommand.asDto(filtreCommand));
+		return enviamentService.findIdsAmbFiltre(entitatActual.getId(), RolEnumDto.valueOf(sessionScopedContext.getRolActual()), getCodiUsuariActual(), organGestorCodi, EnviamentFiltreCommand.asDto(filtreCommand));
 	}
 
 	@GetMapping
@@ -108,7 +106,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 	}
 
 	@PostMapping
-	public String post(HttpServletRequest request, @Valid NotificacioEnviamentFiltreCommand command, BindingResult bindingResult, Model model,
+	public String post(HttpServletRequest request, @Valid EnviamentFiltreCommand command, BindingResult bindingResult, Model model,
 					   @RequestParam(value = "accio", required = false) String accio) {
 
 		RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENTS_FILTRE, command);
@@ -145,7 +143,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 			}
 
 			enviaments = enviamentService.enviamentFindByEntityAndFiltre(entitatActual.getId(), RolEnumDto.valueOf(sessionScopedContext.getRolActual()), organGestorCodi,
-					getCodiUsuariActual(), NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments), DatatablesHelper.getPaginacioDtoFromRequest(request));
+					getCodiUsuariActual(), EnviamentFiltreCommand.asDto(filtreEnviaments), DatatablesHelper.getPaginacioDtoFromRequest(request));
 
 		} catch(SecurityException e) {
 			MissatgesHelper.error(request, getMessage(request, "enviament.controller.entitat.cap.assignada"));
@@ -191,20 +189,20 @@ public class EnviamentController extends TableAccionsMassivesController {
 		return "ampliarPlazoForm";
 	}
 
-	private NotificacioEnviamentFiltreCommand getFiltreCommand(HttpServletRequest request) {
+	private EnviamentFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
-		var filtreCommand = (NotificacioEnviamentFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENTS_FILTRE);
+		var filtreCommand = (EnviamentFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENTS_FILTRE);
 		if (filtreCommand != null) {
 			setDefaultFiltreData(filtreCommand);
 			return filtreCommand;
 		}
-		filtreCommand = new NotificacioEnviamentFiltreCommand();
+		filtreCommand = new EnviamentFiltreCommand();
 		setDefaultFiltreData(filtreCommand);
 		RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENTS_FILTRE, filtreCommand);
 		return filtreCommand;
 	}
 
-	private  void setDefaultFiltreData(NotificacioEnviamentFiltreCommand command) {
+	private  void setDefaultFiltreData(EnviamentFiltreCommand command) {
 
 		var df = new SimpleDateFormat("dd/MM/yyyy");
 		var avui = new Date();
