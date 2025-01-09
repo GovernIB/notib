@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - dropColumn:
+            tableName: not_columnes
+            columns:
+              - column:
+                  name: llibre_registre
+              - column:
+                  name: titular_email
+              - column:
+                  name: data_registre
+              - column:
+                  name: num_certificacio

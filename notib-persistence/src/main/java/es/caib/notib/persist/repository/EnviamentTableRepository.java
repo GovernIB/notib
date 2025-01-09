@@ -85,14 +85,6 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"   or (:#{#filtre.procedimentOrgansAmbPermisNull} = false and nenv.procedimentCodiNotib is not null " +
 			"			and CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:#{#filtre.procedimentOrgansAmbPermis})" +
 			"		) " +
-//			"(:esProcedimentsCodisNotibNull = false and nenv.procedimentCodiNotib is not null and nenv.procedimentCodiNotib in (:procedimentsCodisNotib))" +	// Té permís sobre el procediment
-//			"	or (:esOrgansGestorsCodisNotibNull = false and nenv.organCodi is not null and " +
-//			"			(nenv.procedimentCodiNotib is null or (nenv.procedimentIsComu = true and nenv.procedimentRequirePermission = false)) and nenv.organCodi in (:organsGestorsCodisNotib)" +
-//			"		) " + // Té permís sobre l'òrgan
-//			"   or ((nenv.procedimentCodiNotib is null or nenv.procedimentIsComu = true) and nenv.usuariCodi = :usuariCodi)" + // És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
-//			"   or 	(:esProcedimentOrgansIdsNotibNull = false and nenv.procedimentCodiNotib is not null and " +
-//			"			CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:procedimentOrgansIdsNotib)" +
-//			"		) " +	// Procediment comú amb permís de procediment-òrgan
 			") " +
 			"and (nenv.grupCodi = null or (nenv.grupCodi in (:#{#filtre.rols}))) " +
 			") " +
@@ -120,23 +112,17 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:#{#filtre.dataEnviamentFiNull} = true or nenv.createdDate <= :#{#filtre.dataEnviamentFi}) " +
 			"and (:#{#filtre.codiNotificaNull} = true or lower(CASE WHEN nenv.notificaIdentificador is null THEN '' ELSE nenv.notificaIdentificador END) like lower('%'||:#{#filtre.codiNotifica}||'%')) " +
 			"and (:#{#filtre.creadaPerNull} = true or lower(CASE WHEN nenv.createdBy.codi is null THEN '' ELSE nenv.createdBy.codi END) like lower('%'||:#{#filtre.creadaPerCodi}||'%')) " +
-//			"and (:#{#filtre.nifTitularNull} = true or lower(CASE WHEN nenv.titularNif is null THEN '' ELSE nenv.titularNif END) like lower('%'||:#{#filtre.nifTitular}||'%')) " +
 			"and (:#{#filtre.nomTitularNull} = true or (lower(concat(nenv.titularNom, ' ', nenv.titularLlinatge1, ' ', nenv.titularLlinatge2)) like '%'|| lower(:#{#filtre.nomTitular}) ||'%') " +
 			"or lower(CASE WHEN nenv.titularNif is null THEN '' ELSE nenv.titularNif END) like '%'|| lower(:#{#filtre.nomTitular}) ||'%') " +
 			"and (:#{#filtre.nomTitularNull} = true " +
 				"or lower(concat('[', nenv.titularLlinatge1, ' ', nenv.titularLlinatge2, ', ', nenv.titularNom,']')) like lower('%'||:#{#filtre.nomTitular}||'%') " +
 				"or lower(CASE WHEN nenv.titularNif is null THEN '' ELSE nenv.titularNif END) like '%'|| lower(:#{#filtre.nomTitular}) ||'%') " +
-			"and (:#{#filtre.emailTitularNull} = true or nenv.titularEmail = :#{#filtre.emailTitular}) " +
-//			"and (:#{#filtre.dir3CodiNull} = true or lower(CASE WHEN nenv.organCodi is null THEN '' ELSE nenv.organCodi END) like lower('%'||:#{#filtre.dir3Codi}||'%')) " +
 			"and (:#{#filtre.dir3CodiNull} = true " +
 				"or lower(CASE WHEN nenv.organCodi is null THEN '' ELSE nenv.organCodi END) like lower('%'||:#{#filtre.dir3Codi}||'%') " +
 				"or lower(nenv.notificacio.organGestor.nom) like '%' || lower(:#{#filtre.dir3Codi}) || '%') " +
-			"and (:#{#filtre.numeroCertCorreusNull} = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:#{#filtre.numeroCertCorreus}||'%')) " +
 			"and (:#{#filtre.usuariNull} = true or nenv.usuariCodi like lower('%'||:#{#filtre.usuari}||'%')) " +
 			"and (:#{#filtre.registreNumeroNull} = true or cast(nenv.registreNumero as string) like lower('%'||:#{#filtre.registreNumero}||'%')) " +
 			"and (:#{#filtre.codiNotibEnviamentNull} = true or nenv.notificaReferencia like '%'||:#{#filtre.codiNotibEnviament}||'%') " +
-			"and (:#{#filtre.dataRegistreIniciNull} = true or nenv.registreData >= :#{#filtre.dataRegistreInici}) " +
-			"and (:#{#filtre.dataRegistreFiNull} = true or nenv.registreData <= :#{#filtre.dataRegistreFi})" +
 			"and (:#{#filtre.hasZeronotificaEnviamentIntentNull} = true or " +
 			"	(:#{#filtre.hasZeronotificaEnviamentIntent} = true and nenv.registreEnviamentIntent = 0) or " +
 			"	(:#{#filtre.hasZeronotificaEnviamentIntent} = false and nenv.registreEnviamentIntent > 0) " +
@@ -160,9 +146,9 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			// Té permís consulta sobre el procediment
 			"	or (:#{#filtre.procedimentsCodisNotibNull} = false and nenv.procedimentCodiNotib is not null " +
 			"			and (nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[0]}) " +
-			"			or nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[1]}) " +
-			"			or nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[2]}) " +
-			"			or nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[3]})) " +
+			"				or nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[1]}) " +
+			"				or nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[2]}) " +
+			"				or nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[3]})) " +
 			"		and nenv.procedimentIsComu = false) " +
 			// Té permís consulta sobre l'òrgan
 			"	or (:#{#filtre.organsGestorsCodisNotibNull} = false and nenv.organCodi is not null " +
@@ -176,14 +162,6 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"   or (:#{#filtre.procedimentOrgansAmbPermisNull} = false and nenv.procedimentCodiNotib is not null " +
 			"			and CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:#{#filtre.procedimentOrgansAmbPermis})" +
 			"		) " +
-//			"(:esProcedimentsCodisNotibNull = false and nenv.procedimentCodiNotib is not null and nenv.procedimentCodiNotib in (:procedimentsCodisNotib))" +	// Té permís sobre el procediment
-//			"	or (:esOrgansGestorsCodisNotibNull = false and nenv.organCodi is not null and " +
-//			"			(nenv.procedimentCodiNotib is null or (nenv.procedimentIsComu = true and nenv.procedimentRequirePermission = false)) and nenv.organCodi in (:organsGestorsCodisNotib)" +
-//			"		) " + // Té permís sobre l'òrgan
-//			"   or ((nenv.procedimentCodiNotib is null or nenv.procedimentIsComu = true) and nenv.usuariCodi = :usuariCodi)" + // És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
-//			"   or 	(:esProcedimentOrgansIdsNotibNull = false and nenv.procedimentCodiNotib is not null and " +
-//			"			CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:procedimentOrgansIdsNotib)" +
-//			"		) " +	// Procediment comú amb permís de procediment-òrgan
 			") " +
 			"and (nenv.grupCodi = null or (nenv.grupCodi in (:#{#filtre.rols}))) " +
 			") " +
@@ -211,23 +189,17 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:#{#filtre.dataEnviamentFiNull} = true or nenv.createdDate <= :#{#filtre.dataEnviamentFi}) " +
 			"and (:#{#filtre.codiNotificaNull} = true or lower(CASE WHEN nenv.notificaIdentificador is null THEN '' ELSE nenv.notificaIdentificador END) like lower('%'||:#{#filtre.codiNotifica}||'%')) " +
 			"and (:#{#filtre.creadaPerNull} = true or lower(CASE WHEN nenv.createdBy.codi is null THEN '' ELSE nenv.createdBy.codi END) like lower('%'||:#{#filtre.creadaPerCodi}||'%')) " +
-//			"and (:#{#filtre.nifTitularNull} = true or lower(CASE WHEN nenv.titularNif is null THEN '' ELSE nenv.titularNif END) like lower('%'||:#{#filtre.nifTitular}||'%')) " +
 			"and (:#{#filtre.nomTitularNull} = true or (lower(concat(nenv.titularNom, ' ', nenv.titularLlinatge1, ' ', nenv.titularLlinatge2)) like '%'|| lower(:#{#filtre.nomTitular}) ||'%') " +
 			"or lower(CASE WHEN nenv.titularNif is null THEN '' ELSE nenv.titularNif END) like '%'|| lower(:#{#filtre.nomTitular}) ||'%') " +
 			"and (:#{#filtre.nomTitularNull} = true " +
 			"or lower(concat('[', nenv.titularLlinatge1, ' ', nenv.titularLlinatge2, ', ', nenv.titularNom,']')) like lower('%'||:#{#filtre.nomTitular}||'%') " +
 			"or lower(CASE WHEN nenv.titularNif is null THEN '' ELSE nenv.titularNif END) like '%'|| lower(:#{#filtre.nomTitular}) ||'%') " +
-			"and (:#{#filtre.emailTitularNull} = true or nenv.titularEmail = :#{#filtre.emailTitular}) " +
-//			"and (:#{#filtre.dir3CodiNull} = true or lower(CASE WHEN nenv.organCodi is null THEN '' ELSE nenv.organCodi END) like lower('%'||:#{#filtre.dir3Codi}||'%')) " +
 			"and (:#{#filtre.dir3CodiNull} = true " +
 			"or lower(CASE WHEN nenv.organCodi is null THEN '' ELSE nenv.organCodi END) like lower('%'||:#{#filtre.dir3Codi}||'%') " +
 			"or lower(nenv.notificacio.organGestor.nom) like '%' || lower(:#{#filtre.dir3Codi}) || '%') " +
-			"and (:#{#filtre.numeroCertCorreusNull} = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:#{#filtre.numeroCertCorreus}||'%')) " +
 			"and (:#{#filtre.usuariNull} = true or nenv.usuariCodi like lower('%'||:#{#filtre.usuari}||'%')) " +
 			"and (:#{#filtre.registreNumeroNull} = true or cast(nenv.registreNumero as string) like lower('%'||:#{#filtre.registreNumero}||'%')) " +
 			"and (:#{#filtre.codiNotibEnviamentNull} = true or nenv.notificaReferencia like '%'||:#{#filtre.codiNotibEnviament}||'%') " +
-			"and (:#{#filtre.dataRegistreIniciNull} = true or nenv.registreData >= :#{#filtre.dataRegistreInici}) " +
-			"and (:#{#filtre.dataRegistreFiNull} = true or nenv.registreData <= :#{#filtre.dataRegistreFi})" +
 			"and (:#{#filtre.hasZeronotificaEnviamentIntentNull} = true or " +
 			"	(:#{#filtre.hasZeronotificaEnviamentIntent} = true and nenv.registreEnviamentIntent = 0) or " +
 			"	(:#{#filtre.hasZeronotificaEnviamentIntent} = false and nenv.registreEnviamentIntent > 0) " +

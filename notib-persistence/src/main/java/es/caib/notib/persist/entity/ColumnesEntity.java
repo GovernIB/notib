@@ -62,22 +62,22 @@ public class ColumnesEntity extends NotibAuditable<Long> {
 	private boolean descripcio;
 	@Column(name="titular_nom_llinatge")
 	private boolean titularNomLlinatge; 
-	@Column(name="titular_email")
-	private boolean titularEmail;
+//	@Column(name="titular_email")
+//	private boolean titularEmail;
 	@Column(name="destinataris")
 	private boolean destinataris; 
-	@Column(name="llibre_registre")
-	private boolean llibreRegistre; 
+//	@Column(name="llibre_registre")
+//	private boolean llibreRegistre;
 	@Column(name="numero_registre")
 	private boolean numeroRegistre; 
-	@Column(name="data_registre")
-	private boolean dataRegistre; 
+//	@Column(name="data_registre")
+//	private boolean dataRegistre;
 	@Column(name="data_caducitat")
 	private boolean dataCaducitat; 
 	@Column(name="codi_notib_env")
 	private boolean codiNotibEnviament; 
-	@Column(name="num_certificacio")
-	private boolean numCertificacio; 
+//	@Column(name="num_certificacio")
+//	private boolean numCertificacio;
 	@Column(name="csv_uuid")
 	private boolean csvUuid; 
 	@Column(name="estat")
@@ -118,14 +118,14 @@ public class ColumnesEntity extends NotibAuditable<Long> {
 		concepte = col.isConcepte();
 		descripcio = col.isDescripcio();
 		titularNomLlinatge = col.isTitularNomLlinatge();
-		titularEmail = col.isTitularEmail();
+//		titularEmail = col.isTitularEmail();
 		destinataris = col.isDestinataris();
-		llibreRegistre = col.isLlibreRegistre();
+//		llibreRegistre = col.isLlibreRegistre();
 		numeroRegistre = col.isNumeroRegistre();
-		dataRegistre = col.isDataRegistre();
+//		dataRegistre = col.isDataRegistre();
 		dataCaducitat = col.isDataCaducitat();
 		codiNotibEnviament = col.isCodiNotibEnviament();
-		numCertificacio = col.isNumCertificacio();
+//		numCertificacio = col.isNumCertificacio();
 		csvUuid = col.isCsvUuid();
 		estat = col.isEstat();
 		referenciaNotificacio = col.isReferenciaNotificacio();

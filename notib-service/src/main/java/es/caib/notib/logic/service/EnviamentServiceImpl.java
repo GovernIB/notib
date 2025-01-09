@@ -280,11 +280,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 			mapeigPropietatsOrdenacio.put("descripcio", new String[] {"descripcio"});
 			mapeigPropietatsOrdenacio.put("titularNif", new String[] {"titularNif"});
 			mapeigPropietatsOrdenacio.put("titularNomLlinatge", new String[] {"titularNomLlinatge"});
-			mapeigPropietatsOrdenacio.put("titularEmail", new String[] {"titularEmail"});
-			mapeigPropietatsOrdenacio.put("llibre", new String[] {"registreLlibreNom"});
 			mapeigPropietatsOrdenacio.put("registreNumero", new String[] {"registreNumero"});
 			mapeigPropietatsOrdenacio.put("notificaDataCaducitat", new String[] {"notificaDataCaducitat"});
-			mapeigPropietatsOrdenacio.put("notificaCertificacioNumSeguiment", new String[] {"notificaCertificacioNumSeguiment"});
 			mapeigPropietatsOrdenacio.put("csvUuid", new String[] {"csv_uuid"});
 			mapeigPropietatsOrdenacio.put("estat", new String[] {"estat"});
 			mapeigPropietatsOrdenacio.put("entergaPostal", new String[] {"entregaPostal"});
@@ -375,8 +372,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 		Date dataEnviamentFi = null;
 		Date dataProgramadaDisposicioInici = null;
 		Date dataProgramadaDisposicioFi = null;
-		Date dataRegistreInici = null;
-		Date dataRegistreFi = null;
 		Date dataCaducitatInici = null;
 		Date dataCaducitatFi = null;
 
@@ -397,12 +392,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 		if (!Strings.isNullOrEmpty(filtreDto.getDataProgramadaDisposicioFi())) {
 			dataProgramadaDisposicioFi = FiltreHelper.toFiDia(new SimpleDateFormat(FORMAT_DATA).parse(filtreDto.getDataProgramadaDisposicioFi()));
-		}
-		if (!Strings.isNullOrEmpty(filtreDto.getDataRegistreInici())) {
-			dataRegistreInici = FiltreHelper.toIniciDia(new SimpleDateFormat(FORMAT_DATA).parse(filtreDto.getDataRegistreInici()));
-		}
-		if (!Strings.isNullOrEmpty(filtreDto.getDataRegistreFi())) {
-			dataRegistreFi = FiltreHelper.toFiDia(new SimpleDateFormat(FORMAT_DATA).parse(filtreDto.getDataRegistreFi()));
 		}
 		if (!Strings.isNullOrEmpty(filtreDto.getDataCaducitatInici())) {
 			dataCaducitatInici = FiltreHelper.toIniciDia(new SimpleDateFormat(FORMAT_DATA).parse(filtreDto.getDataCaducitatInici()));
@@ -461,27 +450,17 @@ public class EnviamentServiceImpl implements EnviamentService {
 				.nifTitular(filtreDto.getNifTitular())
 				.nomTitularNull(Strings.isNullOrEmpty(filtreDto.getTitularNomLlinatge()))
 				.nomTitular(filtreDto.getTitularNomLlinatge())
-				.emailTitularNull(Strings.isNullOrEmpty(filtreDto.getEmailTitular()))
-				.emailTitular(filtreDto.getEmailTitular())
-//				.destinataris(new FiltreField<>(dataProgramadaDisposicioFi))
-//				.registreLlibre(new FiltreField<>(dataProgramadaDisposicioFi))
 				.codiNotibEnviament(filtreDto.getCodiNotibEnviament())
 				.registreNumeroNull(Strings.isNullOrEmpty(filtreDto.getRegistreNumero()))
 				.registreNumero(filtreDto.getRegistreNumero())
 				.dataProgramadaDisposicioFiNull(dataProgramadaDisposicioFi == null)
 				.dataProgramadaDisposicioFi(dataProgramadaDisposicioFi)
-				.dataRegistreIniciNull(dataRegistreInici == null)
-				.dataRegistreInici(dataRegistreInici)
-				.dataRegistreFiNull(dataRegistreFi == null)
-				.dataRegistreFi(dataRegistreFi)
 				.dataCaducitatIniciNull(dataCaducitatInici == null)
 				.dataCaducitatInici(dataCaducitatInici)
 				.dataCaducitatFiNull(dataCaducitatFi == null)
 				.dataCaducitatFi(dataCaducitatFi)
 				.codiNotibEnviamentNull(Strings.isNullOrEmpty(filtreDto.getCodiNotibEnviament()))
 				.codiNotibEnviament(filtreDto.getCodiNotibEnviament())
-				.numeroCertCorreusNull(Strings.isNullOrEmpty(filtreDto.getNumeroCertCorreus()))
-				.numeroCertCorreus(filtreDto.getNumeroCertCorreus())
 				.csvUuidNull(Strings.isNullOrEmpty(filtreDto.getCsvUuid()))
 				.csvUuid(filtreDto.getCsvUuid())
 				.estatNull(estat == null)

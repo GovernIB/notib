@@ -409,22 +409,10 @@
 				<not:inputText name="titularNomLlinatge" inline="true" placeholderKey="enviament.list.nomLlinatgetitular"/>
 			</div>
 			<div class="col-md-2 filtreOcult">
-				<not:inputText name="emailTitular" inline="true" placeholderKey="enviament.list.emailtitular"/>
-			</div>
-			<div class="col-md-2 filtreOcult">
 				<not:inputText name="destinataris" inline="true" placeholderKey="enviament.list.destinataris"/>
 			</div>
 			<div class="col-md-2 filtreOcult">
-				<not:inputText name="registreLlibre" inline="true" placeholderKey="enviament.list.llibreregistre"/>
-			</div>
-			<div class="col-md-2 filtreOcult">
 				<not:inputText name="registreNumero" inline="true" placeholderKey="enviament.list.numeroregistre"/>
-			</div>
-			<div class="col-md-2 filtreOcult">
-				<not:inputDate name="dataRegistreInici" placeholderKey="enviament.list.dataregistre.inici" inline="true" required="false" />
-			</div>
-			<div class="col-md-2 filtreOcult">
-				<not:inputDate name="dataRegistreFi" placeholderKey="enviament.list.dataregistre.fi" inline="true" required="false" />
 			</div>
 			<div class="col-md-2 filtreOcult">
 				<not:inputDate name="dataCaducitatInici" placeholderKey="enviament.list.datacaducitat.inici" inline="true" required="false" />
@@ -439,24 +427,21 @@
 				<not:inputText name="referenciaNotificacio" inline="true" placeholderKey="enviament.list.identificador.notificacio"/>
 			</div>
 			<div class="col-md-2 filtreOcult">
-				<not:inputText name="numeroCertCorreus" inline="true" placeholderKey="enviament.list.numerocertificatcorreus"/>
-			</div>
-			<div class="col-md-2 filtreOcult">
 				<not:inputText name="csvUuid" inline="true" placeholderKey="enviament.list.codicsvuuid"/>
 			</div>
 
-			<div class="col-md-2">
-				<div class="filtreOcult">
+			<div class="col-md-2 pull-right flex-justify-end">
+				<div class="filtreOcult" style="margin-right:10px">
 					<button id="nomesAmbEntregaPostalBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbEntregaPostal"/>" class="btn btn-default pull-left <c:if test="${nomesAmbEntregaPostal}">active</c:if>" data-toggle="button"><span class="fa fa-envelope"></span></button>
 					<not:inputHidden name="entregaPostal"/>
 				</div>
-				<div id="botons-filtre-simple" class="col-md-2 pull-right form-buttons"  style="text-align: right;">
+				<div id="botons-filtre-simple" class="pull-right form-buttons"  style="text-align: right;">
 					<button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default" style="padding: 6px 9px; margin-right:5px;" title="<spring:message code="comu.boto.netejar"/>"><span class="fa fa-eraser icona_ocultable" style="padding: 2px 0px;"></span><span class="text_ocultable"><spring:message code="comu.boto.netejar"/></span></button>
 					<button id="filtrar" type="submit" name="accio" value="filtrar" class="btn btn-primary" title="<spring:message code="comu.boto.filtrar"/>"><span class="fa fa-filter" id="botoFiltrar"></span><span class="text_ocultable"><spring:message code="comu.boto.filtrar"/></span></button>
 				</div>
 			</div>
 		</div>
-		<div class ="row col-md-2 pull-right form-buttons">
+		<div class ="col-md-2 row pull-right form-buttons">
 			<span id="filtreAvancat" class="botonsTipusFiltre" title="<spring:message code="notificacio.list.boto.filtre.avancat.tooltip"/>"><spring:message code="notificacio.list.boto.filtre.avancat"/></span>
 			<span id="filtreSimple" class="botonsTipusFiltre filtreOcult" style="margin-top:5px" title="<spring:message code="notificacio.list.boto.filtre.simple.tooltip"/>"><spring:message code="notificacio.list.boto.filtre.simple"/></span>
 		</div>
@@ -507,16 +492,12 @@
 				<th data-col-name="concepte" data-visible="<c:out value = "${columnes.concepte == true}"/>" ><spring:message code="enviament.list.concepte"/></th>
 				<th data-col-name="descripcio"  data-visible="<c:out value = "${columnes.descripcio == true}"/>" ><spring:message code="enviament.list.descripcio"/></th>
 				<th data-col-name="titularNomLlinatge" width="160" data-visible="<c:out value = "${columnes.titularNomLlinatge == true}"/>" ><spring:message code="enviament.list.nomLlinatgetitular"/></th>
-				<th data-col-name="titularEmail" data-visible="<c:out value = "${columnes.titularEmail == true}"/>" ><spring:message code="enviament.list.emailtitular"/></th>
 				<th data-col-name="destinataris" data-visible="<c:out value = "${columnes.destinataris == true}}"/>" ><spring:message code="enviament.list.destinataris"/></th>
-				<th data-col-name="llibre" data-visible="<c:out value = "${columnes.llibreRegistre == true}"/>" ><spring:message code="enviament.list.llibreregistre"/></th>
 				<th data-col-name="registreNumero" data-visible="<c:out value = "${columnes.numeroRegistre == true}"/>" ><spring:message code="enviament.list.numeroregistre"/></th>
-				<th data-col-name="registreData" width="230" data-converter="datetime" data-visible="<c:out value = "${columnes.dataRegistre == true}"/>" ><spring:message code="enviament.list.dataregistre"/></th>
 				<th data-col-name="notificaDataCaducitat" width="230" data-converter="datetime" data-visible="<c:out value = "${columnes.dataCaducitat == true}"/>" ><spring:message code="enviament.list.datacaducitat"/></th>
 				<th data-col-name="tipusEnviament" class="enviamentTipusCol" width="5px" data-visible="<c:out value = "${columnes.enviamentTipus == true}"/>" ><spring:message code="enviament.list.tipusenviament"/></th>
 				<th data-col-name="codiNotibEnviament" width="240" data-visible="<c:out value = "${columnes.codiNotibEnviament == true}"/>" ><spring:message code="enviament.list.referencia.enviament"/></th>
 				<th data-col-name="referenciaNotificacio" data-visible="<c:out value = "${columnes.referenciaNotificacio == true}"/>" ><spring:message code="enviament.list.identificador.notificacio"/></th>
-				<th data-col-name="notificaCertificacioNumSeguiment" data-visible="<c:out value = "${columnes.numCertificacio == true}"/>" ><spring:message code="enviament.list.numerocertificatcorreus"/></th>
 				<th data-col-name="csvUuid" data-visible="<c:out value = "${columnes.csvUuid == true}"/>" ><spring:message code="enviament.list.codicsvuuid"/></th>
 				<c:choose>
 					<c:when test = "${columnes.estat == true}">
@@ -528,16 +509,6 @@
 				</c:choose>
 				<th data-col-name="estatColor" data-visible="false"></th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate"   data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.estat"/>
-<%--					<script type="text/x-jsrender">--%>
-<%--						<div class="from-group estatColor {{:estatColor}}" style="padding: 0; font-weight: 100;">--%>
-<%--							<select class="form-control" id="estat" name="estat">--%>
-<%--								<option name="estat" class=""></option>--%>
-<%--    							<c:forEach items="${notificacioEstatEnumOptions}" var="opt">--%>
-<%--        							<option name="estat" value="${opt.value != 'buit' ? opt.value : ''}" class="${opt.value != 'buit' ? '' : 'buit'}"><span class="${opt.value != 'buit' ? '' : 'buit'}"><spring:message code="${opt.text}"/></span></option>--%>
-<%--    							</c:forEach>--%>
-<%--							</select>--%>
-<%--						</div>--%>
-<%--					</script>--%>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						<div class="estatColor {{:estatColor}}">{{:estat}}</div>
 					</script>
@@ -578,9 +549,6 @@
 								{{/if}}
 							</ul>
                 		</div>
-<%--						<a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a>--%>
-<%--						<a href="<c:url value="/notificacio/{{:notificacioId}}/info"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detall.remesa"/></a>--%>
-<%--						<a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}/ampliar/plazo"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a>--%>
 					</script>
 				</th>
 			</tr>
