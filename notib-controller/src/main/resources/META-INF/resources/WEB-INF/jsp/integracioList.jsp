@@ -217,13 +217,13 @@
 					<spring:message code="integracio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{if estat == 'OK'}}
-							<span class="label label-success"><span class="fa fa-check"></span>&nbsp;{{:estat}}</span>
+							<span class="label label-success"><span class="fa fa-check"></span>&nbsp;<spring:message code="es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto.OK"/></span>
 						{{/if}}
 						{{if estat == 'ERROR'}}
-							<span class="label label-danger" title="{{:excepcioMessage}}"><span class="fa fa-warning"></span>&nbsp;{{:estat}}</span>
+							<span class="label label-danger" title="{{:excepcioMessage}}"><span class="fa fa-warning"></span>&nbsp;<spring:message code="es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto.ERROR"/></span>
 						{{/if}}
 						{{if estat == 'WARN'}}
-							<span class="label label-warning" title="{{:excepcioMessage}}"><span class="fa fa-warning"></span>&nbsp;{{:estat}}</span>
+							<span class="label label-warning" title="{{:excepcioMessage}}"><span class="fa fa-warning"></span>&nbsp;<spring:message code="es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto.WARN"/></span>
 						{{/if}}
 					</script>
 				</th>
