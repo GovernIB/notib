@@ -162,7 +162,7 @@ public class CallbackHelper {
 		var info = new IntegracioInfo(IntegracioCodi.CALLBACK, "Enviament d'avís de canvi d'estat", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de l'enviament", String.valueOf(env.getId())),
 				new AccioParam("Identificador de la notificació", String.valueOf(notificacio.getId())));
-
+		info.setNotificacioId(env.getNotificacio().getId());
 		if (callback == null) {
 			integracioHelper.addAccioError(info, "Error enviant avis de canvi d'estat. No existeix un callback per l'enviament " + env.getId());
 			return notificacio;
@@ -288,6 +288,7 @@ public class CallbackHelper {
 					new AccioParam("Codi aplicació", aplicacio != null ? aplicacio.getUsuariCodi() : ""),
 					new AccioParam("Identificador de la notificacio", String.valueOf(enviament.getNotificacio().getId()))
 			);
+			info.setNotificacioId(enviament.getNotificacio().getId());
 			var msg = "Error notificant el callback al client: " + errorMessage;
 			info.setAplicacio(aplicacio != null ? aplicacio.getUsuariCodi() : "Sense aplicació");
 

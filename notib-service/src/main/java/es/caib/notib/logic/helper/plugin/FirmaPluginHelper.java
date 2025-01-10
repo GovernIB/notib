@@ -56,6 +56,7 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 		var info = new IntegracioInfo(IntegracioCodi.FIRMASERV, "Firma en servidor d'un document", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("notificacioId", notificacio.getId().toString()),
 				new AccioParam("títol", fitxer.getNom()));
+		info.setNotificacioId(notificacio.getId());
 		info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
 		info.setCodiEntitat(notificacio.getEntitat().getCodi());
 		try {

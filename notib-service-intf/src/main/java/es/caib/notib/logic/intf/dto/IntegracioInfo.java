@@ -16,6 +16,7 @@ public class IntegracioInfo {
 	String codiEntitat;
 	String descripcio;
 	String aplicacio;
+	Long notificacioId;
 	IntegracioAccioTipusEnumDto tipus;
 	Long tempsInici;
 	List<AccioParam> params = new ArrayList<>();

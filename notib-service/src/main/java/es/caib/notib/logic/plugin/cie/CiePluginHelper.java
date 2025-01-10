@@ -81,6 +81,7 @@ public class CiePluginHelper {
         var info = new IntegracioInfo(IntegracioCodi.CIE, "Enviar entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
                 new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
                 new AccioParam("Notificacio", notificacio.getId() + ""));
+        info.setNotificacioId(notificacio.getId());
         info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
         var resposta = new RespostaCie();
         try {
@@ -195,11 +196,13 @@ public class CiePluginHelper {
             log.error("[ENTREGA_POSTAL] Error al cancelar l'enviament CIE. UUID " + uuidEnviament + " no trobat");
             return false;
         }
-        var codiDir3Entitat = enviament.getNotificacio().getEntitat().getDir3Codi();
+        var notificacio = enviament.getNotificacio();
+        var codiDir3Entitat = notificacio.getEntitat().getDir3Codi();
         var info = new IntegracioInfo(IntegracioCodi.CIE, "Cancelar entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
                 new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
                 new AccioParam("Enviament", enviament.getId() + ""));
-        info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getCreatedBy().get().getCodi());
+        info.setNotificacioId(notificacio.getId());
+        info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
         var resposta = new RespostaCie();
         try {
             EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
@@ -207,7 +210,7 @@ public class CiePluginHelper {
                 throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
             }
             info.setCodiEntitat(entitat.getCodi());
-            var cieEntity = enviament.getNotificacio().getProcediment().getEntregaCieEfectiva();
+            var cieEntity = notificacio.getProcediment().getEntregaCieEfectiva();
             var apiKey = getApiKey(cieEntity.getCie());
             var cie = conversioTipusHelper.convertir(cieEntity, CieDto.class);
             cie.setApiKey(apiKey);
@@ -263,15 +266,17 @@ public class CiePluginHelper {
         var info = new IntegracioInfo(IntegracioCodi.CIE, "Consulta estat entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
                 new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
                 new AccioParam("Enviament", enviament.getId() + ""));
-        info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getCreatedBy().get().getCodi());
+        var notificacio = enviament.getNotificacio();
+        info.setNotificacioId(notificacio.getId());
+        info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
         var infoCie = new InfoCie();
         try {
-            EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+            var entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
             if (entitat == null) {
                 throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
             }
             info.setCodiEntitat(entitat.getCodi());
-            var cieEntity = enviament.getNotificacio().getProcediment().getEntregaCieEfectiva();
+            var cieEntity = notificacio.getProcediment().getEntregaCieEfectiva();
             var apiKey = getApiKey(cieEntity.getCie());
             var cie = conversioTipusHelper.convertir(cieEntity, CieDto.class);
             cie.setApiKey(apiKey);

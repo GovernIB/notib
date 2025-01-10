@@ -61,7 +61,8 @@ public class IntegracioHelper {
 	public void addAccioOk(IntegracioInfo info, boolean obtenirUsuari) {
 
 		var accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio()).tipus(info.getTipus())
-				.codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.OK).aplicacio(info.getAplicacio()).build();
+				.codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.OK)
+				.aplicacio(info.getAplicacio()).notificacioId(info.getNotificacioId()).build();
 		assignarAccioAParams(info, accio);
 		addAccio(accio, obtenirUsuari);
 	}
@@ -86,7 +87,7 @@ public class IntegracioHelper {
 
 		var accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio()).tipus(info.getTipus())
 				.codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.ERROR).errorDescripcio(errorDescripcio)
-				.aplicacio(info.getAplicacio()).build();
+				.aplicacio(info.getAplicacio()).notificacioId(info.getNotificacioId()).build();
 
 		assignarAccioAParams(info, accio);
 		if (throwable != null) {
@@ -112,7 +113,7 @@ public class IntegracioHelper {
 
 		var accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio()).tipus(info.getTipus())
 				.codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.WARN).errorDescripcio(errorDescripcio)
-				.aplicacio(info.getAplicacio()).build();
+				.aplicacio(info.getAplicacio()).notificacioId(info.getNotificacioId()).build();
 
 		assignarAccioAParams(info, accio);
 		if (throwable != null) {

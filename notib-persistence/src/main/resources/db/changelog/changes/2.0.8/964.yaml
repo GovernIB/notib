@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_mon_int
+            columns:
+              - column:
+                  name: notificacio_id
+                  type: number(19,0)

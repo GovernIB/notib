@@ -122,6 +122,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 		var resposta = new RespostaConsultaRegistre();
 		var entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
 		var notificacio = notificacioRepository.findById(notificacioId).get();
+		info.setNotificacioId(notificacioId);
 		info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
 		try {
 			if (entitat == null) {

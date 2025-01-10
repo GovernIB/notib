@@ -114,7 +114,8 @@ public class AdviserServiceImpl implements AdviserService {
 
             generateInfoLog(sincronizarEnvio, identificador, sdf, dataEstat);
             IntegracioInfo info = generateInfoEnvio(sincronizarEnvio, identificador, sdf, dataEstat);
-
+            var enviament = enviamentRepository.findByNotificaIdentificador(identificador);
+            info.setNotificacioId(enviament.getNotificacio().getId());
             return updateEnviament(
                     sincronizarEnvio.getIdentificador(),
                     sincronizarEnvio.getTipoEntrega().intValue(),
@@ -308,6 +309,7 @@ public class AdviserServiceImpl implements AdviserService {
 
     @NotNull
     private static IntegracioInfo generateInfoEnvio(SincronizarEnvio sincronizarEnvio, String identificador, SimpleDateFormat sdf, Date dataEstat) {
+
         return new IntegracioInfo(IntegracioCodi.NOTIFICA, "Recepció de canvi de notificació via Adviser",
                 IntegracioAccioTipusEnumDto.RECEPCIO,
                 new AccioParam("Organisme emisor", sincronizarEnvio.getOrganismoEmisor()),

@@ -36,18 +36,14 @@ public class EmailMassivaListener {
 
     @Transactional
     @JmsListener(destination = EmailConstants.CUA_EMAIL_MASSIVA, containerFactory = SmConstants.JMS_FACTORY_ACK)
-    public void receiveMessage(@Payload Long notificacioMassivaId,
-                               @Headers MessageHeaders headers,
-                               Message message) throws JMSException {
+    public void receiveMessage(@Payload Long notificacioMassivaId, @Headers MessageHeaders headers, Message message) throws JMSException {
 
         message.acknowledge();
-        var info = new IntegracioInfo(
-                IntegracioCodi.EMAIL,
-                "Enviament de email per notificació massiva",
-                IntegracioAccioTipusEnumDto.ENVIAMENT,
+        var info = new IntegracioInfo(IntegracioCodi.EMAIL, "Enviament de email per notificació massiva", IntegracioAccioTipusEnumDto.ENVIAMENT,
                 new AccioParam("Identificador de la notificacio massiva", String.valueOf(notificacioMassivaId)));
         try {
             var notificacioMassiva = notificacioMassivaRepository.findById(notificacioMassivaId).orElseThrow();
+            info.setNotificacioId(notificacioMassivaId);
             info.setCodiEntitat(notificacioMassiva.getEntitat().getCodi());
             if (!Strings.isNullOrEmpty(notificacioMassiva.getEmail())) {
                 ConfigHelper.setEntitatCodi(notificacioMassiva.getEntitat().getCodi());

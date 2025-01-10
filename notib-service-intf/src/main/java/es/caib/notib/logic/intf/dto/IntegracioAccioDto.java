@@ -27,5 +27,6 @@ public class IntegracioAccioDto implements Serializable {
 	private String codiUsuari;
 	private String codiEntitat;
 	private String aplicacio;
+	private String notificacioId;
 
 }

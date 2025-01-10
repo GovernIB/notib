@@ -385,7 +385,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private IntegracioInfo generateInfoAlta(Notificacio notificacio, Long entitatId) {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioCodi.CALLBACK, "Alta de notificació", IntegracioAccioTipusEnumDto.RECEPCIO);
-
+        info.setNotificacioId(notificacio.getId());
 		ObjectMapper mapper  = new ObjectMapper();
 		Map<String, Object> notificaAtributMap = new HashMap<>();
 		mapper.registerModule(new SimpleModule() {
@@ -446,8 +446,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			try {
 				var notificacio = getNotificacioByIdentificador(identificador, resposta, info);
 				if (notificacio == null) {
+					log.error("No existeix la notificacio " + identificador);
 					return resposta;
 				}
+				info.setNotificacioId(notificacio.getId());
 				info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
 				resposta.setEstat(toNotificacioEstat(notificacio.getEstat()));
 				resposta.setTipus(notificacio.getEnviamentTipus().name());
@@ -573,8 +575,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			try {
 				NotificacioEnviamentEntity enviament = getEnviamentByReferencia(referencia, resposta, info);
 				if (enviament == null) {
+					log.error("No existeix l'enviament amb referencia " + referencia);
 					return resposta;
 				}
+				info.setNotificacioId(enviament.getNotificacio().getId());
 				// Si Notib no utilitza el servei Adviser de @Notifica, i ja ha estat enviat a @Notifica
 				// serà necessari consultar l'estat de la notificació a Notifica
 				if (!notificaHelper.isAdviserActiu() && !enviament.isNotificaEstatFinal()
@@ -838,6 +842,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				//Dades registre
 				numeroRegistreFormatat = obtenirDadesRegistre(resposta, enviament, notificacio, info, dadesConsulta.getIdentificador(), false);
 			}
+			if (notificacio != null) {
+				info.setNotificacioId(notificacio.getId());
+			}
 			if (resposta.isError())
 				return resposta;
 
@@ -913,9 +920,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			RespostaConsultaJustificantEnviament resposta = new RespostaConsultaJustificantEnviament();
 
 			NotificacioEntity notificacio = getNotificacioByIdentificador(identificador, resposta, info);
-			if (notificacio == null)
+			if (notificacio == null) {
+			    log.error("[CALLBACK] No s'ha trobat la notificacio amb identificador " + identificador);
 				return resposta;
-
+			}
+			info.setNotificacioId(notificacio.getId());
 			ProgresDescarregaDto progres = justificantService.consultaProgresGeneracioJustificant(identificador);
 			if (progres != null && progres.getProgres() != null &&  progres.getProgres() < 100) {
 				// Ja hi ha un altre procés generant el justificant
@@ -974,11 +983,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				log.error("Error convertint el permis a JSON", e);
 			}
 
-			IntegracioInfo info = new IntegracioInfo(
-					IntegracioCodi.CALLBACK,
-					"Donar permis de consulta",
-					IntegracioAccioTipusEnumDto.RECEPCIO,
-					new AccioParam("Permís", json));
+			var info = new IntegracioInfo(IntegracioCodi.CALLBACK, "Donar permis de consulta", IntegracioAccioTipusEnumDto.RECEPCIO, new AccioParam("Permís", json));
 
 			boolean totbe = false;
 			try {

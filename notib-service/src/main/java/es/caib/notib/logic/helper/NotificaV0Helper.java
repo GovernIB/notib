@@ -80,7 +80,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		Thread.sleep(1000);
 		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
-
+		info.setNotificacioId(notificacioId);
 		var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
 		var usuari = notificacio.getCreatedBy().get().getCodi();
 		info.setAplicacio(notificacio.getTipusUsuari(), usuari);

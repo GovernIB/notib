@@ -56,6 +56,9 @@ public class MonitorIntegracioEntity extends AbstractPersistable<Long> {
     @Column(name = "aplicacio", length = 64)
     private String aplicacio;
 
+    @Column(name = "notificacio_id")
+    private Long notificacioId;
+
     @Column(name = "temps_resposta")
     private Long tempsResposta;
 
