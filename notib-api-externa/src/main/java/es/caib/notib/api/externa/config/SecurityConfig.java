@@ -30,6 +30,7 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedG
 import org.springframework.security.web.authentication.preauth.j2ee.J2eeBasedPreAuthenticatedWebAuthenticationDetailsSource;
 import org.springframework.security.web.authentication.preauth.j2ee.J2eePreAuthenticatedProcessingFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.servlet.ServletException;
@@ -78,7 +79,8 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		return http
 				.cors(withDefaults())
-				.csrf(csrf -> csrf.disable())
+				.csrf((csrf) -> csrf.disable())
+//				.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 				.addFilterBefore(preAuthenticatedProcessingFilter(), BasicAuthenticationFilter.class)
 				.authenticationProvider(preauthAuthProvider())
 				.logout(lo -> lo.addLogoutHandler(getLogoutHandler())

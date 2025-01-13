@@ -51,7 +51,7 @@ public class CallbackHelperTest {
         Mockito.when(aplicacioRepository.findByUsuariCodiAndEntitatId(Mockito.anyString(), Mockito.anyLong())).thenReturn(aplicacio);
         var responseMock = Mockito.mock(ClientResponse.class);
         Mockito.when(responseMock.getStatusInfo()).thenReturn(Statuses.from(200, "OK"));
-        Mockito.when(requestsHelper.callbackAplicacioNotificaCanvi(Mockito.anyString(), Mockito.any(NotificacioCanviClient.class))).thenReturn(responseMock);
+        Mockito.when(requestsHelper.callbackAplicacioNotificaCanvi(Mockito.anyString(), Mockito.any(NotificacioCanviClient.class), Mockito.anyBoolean())).thenReturn(responseMock);
         System.setProperty("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max", MAX_INTENTS_CALLBACK);
     }
 

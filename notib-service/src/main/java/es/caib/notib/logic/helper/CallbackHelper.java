@@ -197,7 +197,7 @@ public class CallbackHelper {
 		var errorMaxReintents = false;
 		try {
 			var start = System.nanoTime();
-			notificaCanvi(env, aplicacio.getCallbackUrl());
+			notificaCanvi(env, aplicacio);
 			var elapsedTime = System.nanoTime() - start;
 			log.info("notificaCanvi "  + elapsedTime);
 
@@ -248,12 +248,14 @@ public class CallbackHelper {
 		return notificacio;
 	}
 
-	public String notificaCanvi(@NonNull NotificacioEnviamentEntity enviament, @NonNull String urlBase) throws Exception {
+	public String notificaCanvi(@NonNull NotificacioEnviamentEntity enviament, @NonNull AplicacioEntity aplicacio) throws Exception {
 
 		var notificacioCanvi = new NotificacioCanviClient(enviament.getNotificacio().getReferencia(), enviament.getNotificaReferencia());
 		// Completa la URL al mètode
+		var urlBase = aplicacio.getCallbackUrl();
+		var headerCsrf = aplicacio.isHeaderCsrf();
 		var urlCallback = urlBase + (urlBase.endsWith("/") ? "" : "/") +  NOTIFICACIO_CANVI;
-		var response = requestsHelper.callbackAplicacioNotificaCanvi(urlCallback, notificacioCanvi);
+		var response = requestsHelper.callbackAplicacioNotificaCanvi(urlCallback, notificacioCanvi, headerCsrf);
 		// Comprova que la resposta sigui 200 OK
 		if ( ClientResponse.Status.OK.getStatusCode() != response.getStatusInfo().getStatusCode()) {
 			log.error("Error al enviar callback per l'enviament " + enviament.getUuid() + " a la url " + urlBase);

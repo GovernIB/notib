@@ -54,6 +54,7 @@
 <%--		</c:choose>--%>
 
 		<not:inputText name="callbackUrl" textKey="aplicacio.form.camp.callback.url" required="true"/>
+		<not:inputCheckbox name="headerCsrf" generalClass="row" textKey="aplicacio.form.camp.callback.header.csrf"/>
 		<div id="modal-botons">
 			<c:if test ="${!empty aplicacioCommand.id}">
 				<button id="btnProvar" class="btn btn-primary" href="<c:url value="/entitat/${entitat.id}/aplicacio/${aplicacioCommand.id}/provar"/>"><span class="fa fa-cog"></span>&nbsp;&nbsp;<spring:message code="comu.boto.provar"/></button>

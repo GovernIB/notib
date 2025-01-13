@@ -8,13 +8,16 @@ import com.sun.jersey.api.client.filter.LoggingFilter;
 import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import org.springframework.stereotype.Component;
 
+import java.security.SecureRandom;
+import java.util.Base64;
+
 @Component
 public class RequestsHelper {
 
     private static Integer CONNECT_TIMEOUT = 5000;
     private static Integer READ_TIMEOUT = 20000;
 
-    public ClientResponse callbackAplicacioNotificaCanvi(String urlCallback, NotificacioCanviClient contingut) throws JsonProcessingException {
+    public ClientResponse callbackAplicacioNotificaCanvi(String urlCallback, NotificacioCanviClient contingut, boolean headerCsrf) throws JsonProcessingException {
 
         // Passa l'objecte a JSON
         var mapper  = new ObjectMapper();
@@ -22,7 +25,11 @@ public class RequestsHelper {
         // Prepara el client JSON per a la crida POST
         var jerseyClient = this.getClient();
         // Fa la crida POST passant les dades JSON
-        return jerseyClient.resource(urlCallback).type("application/json").post(ClientResponse.class, body);
+        var jersey = jerseyClient.resource(urlCallback).type("application/json");
+        if (headerCsrf) {
+            jersey.header("X-CSRF-Token", generateToken());
+        }
+        return jersey.post(ClientResponse.class, body);
     }
 
     private Client getClient() {
@@ -33,5 +40,14 @@ public class RequestsHelper {
         // Només per depurar la sortida, esborrar o comentar-ho:
         jerseyClient.addFilter(new LoggingFilter(System.out));
         return jerseyClient;
+    }
+
+    private String generateToken() {
+
+        var secureRandom = new SecureRandom();
+        var base64Encoder = Base64.getUrlEncoder();
+        var randomBytes = new byte[32];
+        secureRandom.nextBytes(randomBytes);
+        return base64Encoder.encodeToString(randomBytes);
     }
 }

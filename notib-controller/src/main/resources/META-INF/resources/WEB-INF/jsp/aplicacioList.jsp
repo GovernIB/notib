@@ -75,6 +75,12 @@
 						{{if activa}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="headerCsrf" data-template="#cellHeaderCsrfTemplate">
+					<spring:message code="aplicacio.list.columna.header.csrf"/>
+					<script id="cellHeaderCsrfTemplate" type="text/x-jsrender">
+						{{if headerCsrf}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">

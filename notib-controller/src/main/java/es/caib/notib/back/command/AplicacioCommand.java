@@ -29,6 +29,7 @@ public class AplicacioCommand {
 	@NotEmpty @Size(max=256) 
 	private String callbackUrl;
 	private Long entitatId;
+	private boolean headerCsrf;
 
 	public static AplicacioCommand asCommand(AplicacioDto dto) {
 		return ConversioTipusHelper.convertir(dto, AplicacioCommand.class);

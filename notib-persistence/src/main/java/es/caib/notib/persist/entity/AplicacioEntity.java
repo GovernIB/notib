@@ -34,16 +34,19 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 	private String callbackUrl;
 	@Column(name = "activa", nullable = false)
 	private boolean activa;
-	
+	@Column(name = "header_csrf", nullable = false)
+	private boolean headerCsrf;
+
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat_id", nullable = false)
 	@ForeignKey(name = "not_aplicacio_entitat_fk")
 	protected EntitatEntity entitat;
 
-	public void update(String usuariCodi, String callbackUrl) {
+	public void update(String usuariCodi, String callbackUrl, boolean headerCsrf) {
 
 		this.usuariCodi = usuariCodi;
 		this.callbackUrl = callbackUrl;
+		this.headerCsrf = headerCsrf;
 	}
 	
 	public void updateActiva(boolean activa) {

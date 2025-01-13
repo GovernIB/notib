@@ -30,6 +30,7 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedG
 import org.springframework.security.web.authentication.preauth.j2ee.J2eeBasedPreAuthenticatedWebAuthenticationDetailsSource;
 import org.springframework.security.web.authentication.preauth.j2ee.J2eePreAuthenticatedProcessingFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.servlet.ServletException;
@@ -83,16 +84,17 @@ public class SecurityConfig {
 		return http
 				.cors(withDefaults())
 				.csrf((csrf) -> csrf.disable())
+//				.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 				.addFilterBefore(preAuthenticatedProcessingFilter(), BasicAuthenticationFilter.class)
 				.authenticationProvider(preauthAuthProvider())
 				.logout((lo) -> lo.addLogoutHandler(getLogoutHandler())
 						.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 						.invalidateHttpSession(true).logoutSuccessUrl("/")
 						.permitAll(false))
-				.authorizeRequests((authz) -> authz.antMatchers(AUTH_WHITELIST)
+				.authorizeRequests(authz -> authz.antMatchers(AUTH_WHITELIST)
 						.permitAll()
 						.anyRequest().authenticated())
-				.headers((hd) -> hd.frameOptions().disable())
+				.headers(hd -> hd.frameOptions().disable())
 				.build();
 	}
 

@@ -90,7 +90,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 			log.debug("Actualitzant l'aplicació existent (aplicacio=" + aplicacio.toString() + ")");
 			entityComprovarHelper.comprovarEntitat(aplicacio.getEntitatId(), true, true, false, false);
 			var entity = aplicacioRepository.findById(aplicacio.getId()).orElseThrow();
-			entity.update(aplicacio.getUsuariCodi(), aplicacio.getCallbackUrl());
+			entity.update(aplicacio.getUsuariCodi(), aplicacio.getCallbackUrl(), aplicacio.isHeaderCsrf());
 			return conversioTipusHelper.convertir(entity, AplicacioDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -243,7 +243,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 			log.info("Provant aplicacio " + aplicacioId);
 			var aplicacio = aplicacioRepository.findById(aplicacioId).orElseThrow();
 			var urlCallback = aplicacio.getCallbackUrl() + (aplicacio.getCallbackUrl().endsWith("/") ? "" : "/") +  CallbackHelper.NOTIFICACIO_CANVI;
-			var resposta = requestsHelper.callbackAplicacioNotificaCanvi(urlCallback, new NotificacioCanviClient());
+			var resposta = requestsHelper.callbackAplicacioNotificaCanvi(urlCallback, new NotificacioCanviClient(), aplicacio.isHeaderCsrf());
 			var ok = resposta != null && ClientResponse.Status.OK.getStatusCode() == resposta.getStatusInfo().getStatusCode();
 			var error = !ok && resposta != null ? resposta.getStatus() + " " + resposta.getStatusInfo() : null;
 			return RespostaTestAplicacio.builder().ok(ok).error(error).build();
