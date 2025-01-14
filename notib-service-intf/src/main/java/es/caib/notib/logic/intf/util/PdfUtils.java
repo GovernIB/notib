@@ -234,14 +234,35 @@ public class PdfUtils extends PdfReader {
     }
 
     public boolean hasForms() {
-        return !getAcroFields().getFields().isEmpty();
+
+        var acroFields = getAcroFields();
+        if (acroFields == null) {
+            return false;
+        }
+        var fields = acroFields.getFields();
+        return fields != null && !fields.isEmpty();
     }
 
     public boolean hasNoneEmbeddedImages() {
         return noneEmbeddedImages;
     }
 
-    public boolean hasAttachedFiles() {
-        return !getCatalog().getAsDict(PdfName.NAMES).getAsDict(PdfName.EMBEDDEDFILES).getAsArray(PdfName.NAMES).isEmpty();
+    public boolean  hasAttachedFiles() {
+
+        var catalog = getCatalog();
+        if (catalog == null) {
+            return false;
+        }
+        var names = catalog.getAsDict(PdfName.NAMES);
+        if (names == null) {
+            return false;
+        }
+        var embeddedFiles = catalog.getAsDict(PdfName.EMBEDDEDFILES);
+        if (embeddedFiles == null) {
+            return false;
+        }
+        var files = embeddedFiles.getAsArray(PdfName.NAMES);
+        return files != null && !files.isEmpty();
+//        return !getCatalog().getAsDict(PdfName.NAMES).getAsDict(PdfName.EMBEDDEDFILES).getAsArray(PdfName.NAMES).isEmpty();
     }
 }
