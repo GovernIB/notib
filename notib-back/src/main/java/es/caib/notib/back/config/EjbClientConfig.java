@@ -141,6 +141,11 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(SalutService.class);
 	}
 
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean activeMqService() {
+		return getLocalEjbFactoyBean(ActiveMqService.class);
+	}
+
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {
 		String jndiName = EJB_JNDI_PREFIX + serviceClass.getSimpleName() + EJB_JNDI_SUFFIX;
 		log.info("Creating EJB proxy for serviceClass with JNDI name " + jndiName);
