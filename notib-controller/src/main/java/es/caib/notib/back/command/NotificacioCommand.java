@@ -7,6 +7,7 @@ import es.caib.notib.back.helper.CaducitatHelper;
 import es.caib.notib.back.helper.ConversioTipusHelper;
 import es.caib.notib.back.validation.ValidNotificacio;
 import es.caib.notib.back.validation.ValidPersonaValidator;
+import es.caib.notib.client.domini.DocumentTipus;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.InteressatTipus;
@@ -17,6 +18,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumD
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.Persona;
+import es.caib.notib.logic.intf.util.EidasValidator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -162,22 +164,31 @@ public class NotificacioCommand {
 	}
 	
 	private void establecerCamposPersona(Persona persona) {
-		if (persona != null) {
-			if (InteressatTipus.FISICA.equals(persona.getInteressatTipus())) {
-				persona.setDir3Codi(null);
-				persona.setDocumentTipus(null);
-			} else if (InteressatTipus.FISICA_SENSE_NIF.equals(persona.getInteressatTipus())) {
-				persona.setDir3Codi(null);
-			} else if (InteressatTipus.JURIDICA.equals(persona.getInteressatTipus())) {
-				persona.setDocumentTipus(null);
-				persona.setLlinatge1(null);
-				persona.setLlinatge2(null);
-			} else if (InteressatTipus.ADMINISTRACIO.equals(persona.getInteressatTipus())) {
-				persona.setDocumentTipus(null);
-				persona.setIncapacitat(Boolean.FALSE);
-				persona.setLlinatge1(null);
-				persona.setLlinatge2(null);	
-			}
+
+		if (persona == null) {
+			return;
+		}
+		var eidas = EidasValidator.isFormatEidas(persona.getNif());
+		if (InteressatTipus.FISICA.equals(persona.getInteressatTipus())) {
+			persona.setDir3Codi(null);
+			persona.setDocumentTipus(eidas ? DocumentTipus.ALTRE : null);
+			return;
+		}
+		if (InteressatTipus.FISICA_SENSE_NIF.equals(persona.getInteressatTipus())) {
+			persona.setDir3Codi(null);
+			return;
+		}
+		if (InteressatTipus.JURIDICA.equals(persona.getInteressatTipus())) {
+			persona.setDocumentTipus(eidas ? DocumentTipus.ALTRE : null);
+			persona.setLlinatge1(null);
+			persona.setLlinatge2(null);
+			return;
+		}
+		if (InteressatTipus.ADMINISTRACIO.equals(persona.getInteressatTipus())) {
+			persona.setDocumentTipus(null);
+			persona.setIncapacitat(Boolean.FALSE);
+			persona.setLlinatge1(null);
+			persona.setLlinatge2(null);
 		}
 	}
 	

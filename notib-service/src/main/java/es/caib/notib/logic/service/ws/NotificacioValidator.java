@@ -16,6 +16,7 @@ import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.logic.intf.util.EidasValidator;
 import es.caib.notib.logic.intf.util.MimeUtils;
 import es.caib.notib.logic.intf.util.NifHelper;
 import es.caib.notib.logic.intf.util.PdfUtils;
@@ -30,7 +31,6 @@ import es.caib.notib.persist.repository.GrupRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
 import es.caib.notib.plugin.cie.TipusImpressio;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.time.DateUtils;
@@ -209,8 +209,9 @@ public class NotificacioValidator implements Validator {
         if (procediment == null || !procediment.isAgrupar()) {
             return;
         }
-//        var grupNotificacio = grupService.findByCodi(notificacio.getGrupCodi(), entitat.getId());
-        var grupNotificacio = grupRepository.findByCodiAndEntitat(grupCodi, entitat);;
+        grupCodi = notificacio.getGrupCodi();
+        var grupNotificacio = grupRepository.findByCodiAndEntitat(notificacio.getGrupCodi(), entitat);
+//        var grupNotificacio = grupRepository.findByCodiAndEntitat(grupCodi, entitat);
         if (grupNotificacio == null) {
             errors.rejectValue(grupCodi, error(GRUP_INEXISTENT, locale, notificacio.getGrupCodi()));
             return;
@@ -733,9 +734,9 @@ public class NotificacioValidator implements Validator {
         }
 
         // - Nif
-        if(!Strings.isNullOrEmpty(persona.getNif()) && persona.getNif().length() > 9) {
-            errors.rejectValue(envName + ".nif", error(PERSONA_NIF_SIZE, l, prefix, tipus, 9));
-        }
+//        if(!Strings.isNullOrEmpty(persona.getNif()) && persona.getNif().length() > 9) {
+//            errors.rejectValue(envName + ".nif", error(PERSONA_NIF_SIZE, l, prefix, tipus, 9));
+//        }
         if (!isPersonaSenseNif) {
             if (Strings.isNullOrEmpty(persona.getNif())) {
                 if (isPersonaFisica || isPersonaJuridica) {
@@ -744,12 +745,12 @@ public class NotificacioValidator implements Validator {
             }
             if (!Strings.isNullOrEmpty(persona.getNif())) {
                 if(isPersonaFisica) {
-                    if (!NifHelper.isValidNifNie(persona.getNif())) {
-                        errors.rejectValue(envName + ".nif", error(PERSONA_NIF_INVALID, l, prefix, tipus, "Només s'admet NIF/NIE"));
+                    if (!NifHelper.isValidNifNie(persona.getNif()) && !EidasValidator.validateEidas(persona.getNif())) {
+                        errors.rejectValue(envName + ".nif", error(PERSONA_NIF_INVALID, l, prefix, tipus, "Només s'admet NIF/NIE/Identificador EIDAS"));
                     }
                 } else if (isPersonaJuridica) {
-                    if (!NifHelper.isValidCif(persona.getNif())) {
-                        errors.rejectValue(envName + ".nif", error(PERSONA_NIF_INVALID, l, prefix, tipus, "Només s'admet CIF"));
+                    if (!NifHelper.isValidCif(persona.getNif()) && !EidasValidator.validateEidas(persona.getNif())) {
+                        errors.rejectValue(envName + ".nif", error(PERSONA_NIF_INVALID, l, prefix, tipus, "Només s'admet CIF/Identificador EIDAS"));
                     }
                 } else {
                     if (!NifHelper.isvalid(persona.getNif())) {

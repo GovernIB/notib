@@ -27,6 +27,7 @@ import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.RegistreTipusDocumentDtoEnum;
 import es.caib.notib.logic.intf.dto.notificacio.EnviamentSirTipusDocumentEnviarEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
+import es.caib.notib.logic.intf.util.EidasValidator;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -50,6 +51,7 @@ import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
+import liquibase.pro.packaged.N;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -844,7 +846,8 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			interessatDades.setTipoDocumentoIdentificacion("O");
 		}  else if (persona.getInteressatTipus() == InteressatTipus.FISICA) {
 			interessatDades.setDocumento(persona.getNif() != null ? persona.getNif().trim() : null);
-			interessatDades.setTipoDocumentoIdentificacion(isDocumentEstranger(persona.getNif()) ? "E" : "N");
+			var tipo = EidasValidator.isFormatEidas(persona.getNif())? "X" : isDocumentEstranger(persona.getNif()) ? "E" : " N ";
+			interessatDades.setTipoDocumentoIdentificacion(tipo);
 		}  else if (persona.getInteressatTipus() == InteressatTipus.FISICA_SENSE_NIF) {
 			// Pot tenir un document (No NIF), que s'ha desat al camp NIF
 			if (persona.getNif() != null && !persona.getNif().isEmpty()) {
@@ -855,7 +858,8 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			}
 		} else if (persona.getInteressatTipus() == InteressatTipus.JURIDICA) {
 			interessatDades.setDocumento(persona.getNif() != null ? persona.getNif().trim() : null);
-			interessatDades.setTipoDocumentoIdentificacion("C");
+			var tipo = EidasValidator.isFormatEidas(persona.getNif()) ? "X" : "C";
+			interessatDades.setTipoDocumentoIdentificacion(tipo);
 		}
 		var raoSocial = persona.getRaoSocial() == null || persona.getRaoSocial().length() <= 80 ? persona.getRaoSocial() : persona.getRaoSocial().substring(0, 80);
 		var nom = persona.getNom() == null || persona.getNom().length() <= 30 ? persona.getNom() : persona.getNom().substring(0, 30);

@@ -47,6 +47,7 @@ import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioServiceWs;
+import es.caib.notib.logic.intf.util.EidasValidator;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.persist.entity.DocumentEntity;
@@ -1213,17 +1214,32 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	}
 
 	private PersonaEntity saveTitular(Enviament enviament) {
-		return personaRepository.save(PersonaEntity.getBuilderV2(
-				enviament.getTitular().getInteressatTipus(),
-				enviament.getTitular().getEmail(),
-				enviament.getTitular().getLlinatge1(),
-				enviament.getTitular().getLlinatge2(),
-				enviament.getTitular().getNif(),
-				enviament.getTitular().getNom(),
-				enviament.getTitular().getTelefon(),
-				enviament.getTitular().getRaoSocial(),
-				enviament.getTitular().getDir3Codi()
-		).incapacitat(enviament.getTitular().isIncapacitat()).build());
+
+		var titular = enviament.getTitular();
+		return personaRepository.save(
+//				PersonaEntity.getBuilderV2(
+//				enviament.getTitular().getInteressatTipus(),
+//				enviament.getTitular().getEmail(),
+//				enviament.getTitular().getLlinatge1(),
+//				enviament.getTitular().getLlinatge2(),
+//				enviament.getTitular().getNif(),
+//				enviament.getTitular().getNom(),
+//				enviament.getTitular().getTelefon(),
+//				enviament.getTitular().getRaoSocial(),
+//				enviament.getTitular().getDir3Codi()
+				PersonaEntity.builder()
+							.interessatTipus(titular.getInteressatTipus())
+							.email(titular.getEmail())
+							.llinatge1(titular.getLlinatge1())
+							.llinatge2(titular.getLlinatge2())
+							.nif(titular.getNif())
+							.nom(titular.getNom())
+							.telefon(titular.getTelefon())
+							.raoSocial(titular.getRaoSocial())
+							.dir3Codi(titular.getDir3Codi())
+							.incapacitat(titular.isIncapacitat())
+							.documentTipus(EidasValidator.isFormatEidas(titular.getNif())? DocumentTipus.ALTRE : null)
+							.build());
 	}
 
 	private ServeiTipus getServeiTipus(Enviament enviament) {

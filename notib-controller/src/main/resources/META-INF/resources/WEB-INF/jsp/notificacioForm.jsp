@@ -2089,12 +2089,21 @@
 						<div class="col-md-4 col-md-offset-2">
 							<not:inputCheckbox name="documents[0].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
 						</div>
-						<div id="drag-area" class="drag_activated">
-							<span class="down fa fa-upload"></span>
-							<p><spring:message code="notificacio.form.drag.info" /></p>
-						</div>
-						<hr/>
+
 					</div>
+					<!--  DOCUMENT NOTMALITZAT -->
+					<c:if test="${enviamentTipus != 'SIR'}">
+						<div id="normalitzat" class="row">
+							<div class="col-md-12">
+								<not:inputCheckbox name="documents[0].normalitzat" textKey="notificacio.form.camp.normalitzat" info="true" messageInfo="notificacio.form.camp.normalitzat.info" labelSize="2" />
+							</div>
+						</div>
+					</c:if>
+					<div id="drag-area" class="drag_activated">
+						<span class="down fa fa-upload"></span>
+						<p><spring:message code="notificacio.form.drag.info" /></p>
+					</div>
+					<hr/>
 				</div>
 				<div id="docs-addicionals"<c:if test="${enviamentTipus != 'SIR'}"> class="hidden"</c:if>>
 					<!-- DOCUMENT 2 -->
@@ -2154,8 +2163,12 @@
 							<div class="col-md-4 col-md-offset-2">
 								<not:inputCheckbox name="documents[1].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
 							</div>
-							<hr/>
 						</div>
+						<div id="drag-area" class="drag_activated">
+							<span class="down fa fa-upload"></span>
+							<p><spring:message code="notificacio.form.drag.info" /></p>
+						</div>
+						<hr/>
 					</div>
 					<!-- DOCUMENT 3 -->
 					<div id="document3" class="row hidden" ondrop="dropHandler(event, 'arxiu[2]');" ondragover="dragOverHandler(event);" ondragleave="removeHighlight(event)" ondragenter="highlight(event)">
@@ -2215,8 +2228,12 @@
 							<div class="col-md-4 col-md-offset-2">
 								<not:inputCheckbox name="documents[2].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
 							</div>
-							<hr/>
 						</div>
+						<div id="drag-area" class="drag_activated">
+							<span class="down fa fa-upload"></span>
+							<p><spring:message code="notificacio.form.drag.info" /></p>
+						</div>
+						<hr/>
 					</div>
 					<!-- DOCUMENT 4 -->
 					<div id="document4" class="row hidden" ondrop="dropHandler(event, 'arxiu[3]');" ondragover="dragOverHandler(event);" ondragleave="removeHighlight(event)" ondragenter="highlight(event)">
@@ -2274,8 +2291,12 @@
 							<div class="col-md-4 col-md-offset-2">
 								<not:inputCheckbox name="documents[3].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
 							</div>
-							<hr/>
 						</div>
+						<div id="drag-area" class="drag_activated">
+							<span class="down fa fa-upload"></span>
+							<p><spring:message code="notificacio.form.drag.info" /></p>
+						</div>
+						<hr/>
 					</div>
 					<!-- DOCUMENT 5 -->
 					<div id="document5" class="row hidden" ondrop="dropHandler(event, 'arxiu[4]');" ondragover="dragOverHandler(event);" ondragleave="removeHighlight(event)" ondragenter="highlight(event)">
@@ -2332,8 +2353,12 @@
 							<div class="col-md-4 col-md-offset-2">
 								<not:inputCheckbox name="documents[4].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
 							</div>
-							<hr/>
 						</div>
+						<div id="drag-area" class="drag_activated">
+							<span class="down fa fa-upload"></span>
+							<p><spring:message code="notificacio.form.drag.info" /></p>
+						</div>
+						<hr/>
 					</div>
 				</div>
 
@@ -2341,15 +2366,6 @@
 				<div id="btn-documents" class="text-left vt10">
 					<input type="button" class="btn btn-default" id="addDocument" value="<spring:message code="notificacio.form.boto.nou.document"/>" />
 					<input type="button" class="btn btn-danger hidden" id="removeDocument" value="<spring:message code="notificacio.form.boto.remove.document"/>" />
-				</div>
-				</c:if>
-
-				<!--  DOCUMENT NOTMALITZAT -->
-				<c:if test="${enviamentTipus != 'SIR'}">
-				<div id="normalitzat" class="row">
-					<div class="col-md-12">
-						<not:inputCheckbox name="documents[0].normalitzat" textKey="notificacio.form.camp.normalitzat" info="true" messageInfo="notificacio.form.camp.normalitzat.info" labelSize="2" />
-					</div>
 				</div>
 				</c:if>
 			</div>

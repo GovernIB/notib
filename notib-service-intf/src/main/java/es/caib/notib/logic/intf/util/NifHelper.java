@@ -16,20 +16,24 @@ public class NifHelper {
         if (nif == null || nif.length() < 9) {
             return false;
         }
-        nif = nif.toUpperCase();
-        String primerCaracter = nif.substring(0, 1);
-        var totNumeros = NumberUtils.isNumber(StringUtils.stripStart(nif.substring(1,nif.length()-1), "0"));
-        var valid = false;
-        if (LLETRES_CIF.contains(primerCaracter) && totNumeros) {
-            valid = isCifValid(nif);
-            if (valid) {
-                return true;
+        try {
+            nif = nif.toUpperCase();
+            String primerCaracter = nif.substring(0, 1);
+            var totNumeros = NumberUtils.isNumber(StringUtils.stripStart(nif.substring(1, nif.length() - 1), "0"));
+            var valid = false;
+            if (LLETRES_CIF.contains(primerCaracter) && totNumeros) {
+                valid = isCifValid(nif);
+                if (valid) {
+                    return true;
+                }
             }
+            if (LLETRES_NIE.contains(primerCaracter) && totNumeros) {
+                return isNieValid(nif);
+            }
+            return nif.substring(0, 8).matches("-?\\d+") && isDniValid(nif);
+        } catch (Exception e) {
+            return false;
         }
-        if (LLETRES_NIE.contains(primerCaracter) && totNumeros) {
-            return isNieValid(nif);
-        }
-        return nif.substring(0,8).matches("-?\\d+") && isDniValid(nif);
     }
 
     public static boolean isValidNifNie(String nif) {
@@ -37,12 +41,16 @@ public class NifHelper {
         if (nif == null || nif.length() < 9) {
             return false;
         }
-        nif = nif.toUpperCase();
-        var primerCaracter = nif.substring(0, 1);
-        if (LLETRES_NIE.contains(primerCaracter)) {
-            return isNieValid(nif);
+        try {
+            nif = nif.toUpperCase();
+            var primerCaracter = nif.substring(0, 1);
+            if (LLETRES_NIE.contains(primerCaracter)) {
+                return isNieValid(nif);
+            }
+            return nif.substring(0, 8).matches("-?\\d+") && isDniValid(nif);
+        } catch (Exception e) {
+            return false;
         }
-        return nif.substring(0,8).matches("-?\\d+") && isDniValid(nif);
     }
 
     public static boolean isValidCif(String nif) {
@@ -50,9 +58,13 @@ public class NifHelper {
         if (nif == null || nif.length() < 9) {
             return false;
         }
-        nif = nif.toUpperCase();
-        var primerCaracter = nif.substring(0, 1);
-        return LLETRES_CIF.contains(primerCaracter) && isCifValid(nif);
+        try {
+            nif = nif.toUpperCase();
+            var primerCaracter = nif.substring(0, 1);
+            return LLETRES_CIF.contains(primerCaracter) && isCifValid(nif);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private static boolean isCifValid(String cif) {

@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - sql : "ALTER TABLE NOT_PERSONA MODIFY NIF VARCHAR(50);
+        ALTER TABLE NOT_NOTIFICACIO_ENV_TABLE  MODIFY TITULAR_NIF  VARCHAR(50);"

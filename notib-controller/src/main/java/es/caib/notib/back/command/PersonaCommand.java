@@ -35,7 +35,7 @@ public class PersonaCommand {
 	@Size(max=30)
 	private String llinatge2;
 	private DocumentTipus documentTipus;
-	@Size(max=9)
+	@Size(max=50)
 	private String nif;
 	@Size(max=16)
 	private String telefon;

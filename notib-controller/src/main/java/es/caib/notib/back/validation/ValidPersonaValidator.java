@@ -6,6 +6,7 @@ import es.caib.notib.back.command.PersonaCommand;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.MessageHelper;
 import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.logic.intf.util.EidasValidator;
 import es.caib.notib.logic.intf.util.NifHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,12 +43,12 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 
 		try {
 			Locale locale = new Locale(sessionScopedContext.getIdiomaUsuari());
-			// Validació del NIF/NIE/CIF
-			if (persona.getNif() != null && !persona.getNif().isEmpty() && !InteressatTipus.FISICA_SENSE_NIF.equals(persona.getInteressatTipus()) && !NifHelper.isvalid(persona.getNif())) {
-				valid = false;
-				String msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.persona.nif", null, locale);
-				context.buildConstraintViolationWithTemplate(msg).addNode("nif").addConstraintViolation();
-			}
+//			// Validació del NIF/NIE/CIF
+//			if (!Strings.isNullOrEmpty(persona.getNif()) && !InteressatTipus.FISICA_SENSE_NIF.equals(persona.getInteressatTipus()) && !NifHelper.isvalid(persona.getNif())) {
+//				valid = false;
+//				String msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.persona.nif", null, locale);
+//				context.buildConstraintViolationWithTemplate(msg).addNode("nif").addConstraintViolation();
+//			}
 
 			// Validacions per tipus de persona
 			switch (persona.getInteressatTipus()) {
@@ -80,7 +81,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 								.addNode("nif")
 								.addConstraintViolation();
 					}
-					if (!Strings.isNullOrEmpty(persona.getNif()) && !NifHelper.isValidNifNie(persona.getNif())) {
+					if (!Strings.isNullOrEmpty(persona.getNif()) && !NifHelper.isValidNifNie(persona.getNif()) && !EidasValidator.validateEidas(persona.getNif())) {
 						valid = false;
 						context.buildConstraintViolationWithTemplate(
 										MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.tipoDocumentoIncorrecto", null, locale))
@@ -117,7 +118,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 								.addNode("nif")
 								.addConstraintViolation();
 					}
-					if (persona.getNif() != null && !persona.getNif().isEmpty() && !NifHelper.isValidCif(persona.getNif())) {
+					if (persona.getNif() != null && !persona.getNif().isEmpty() && !NifHelper.isValidCif(persona.getNif()) && !EidasValidator.validateEidas(persona.getNif())) {
 						valid = false;
 						context.buildConstraintViolationWithTemplate(
 										MessageHelper.getInstance().getMessage("notificacio.form.valid.juridica.tipoDocumentoIncorrecto", null, locale))
@@ -164,7 +165,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 			}
 
 		} catch (final Exception ex) {
-			log.error("S'ha produït un error inesperat al validar la notificació. "
+ 			log.error("S'ha produït un error inesperat al validar la notificació. "
 					+ "Si l'error es continua donant en properes intents, posis en contacte amb els administradors de l'aplicació.", ex);
 			valid = false;
 		}

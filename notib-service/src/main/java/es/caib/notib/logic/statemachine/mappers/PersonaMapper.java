@@ -5,6 +5,7 @@ import es.caib.notib.client.domini.DocumentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.DatosInteresadoWsDto;
 import es.caib.notib.logic.intf.dto.notificacio.Persona;
+import es.caib.notib.logic.intf.util.EidasValidator;
 import es.caib.notib.persist.entity.PersonaEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -67,12 +68,12 @@ public interface PersonaMapper {
             case ADMINISTRACIO:
                 return "O";
             case FISICA:
-                return isDocumentEstranger(persona.getNif()) ? "E" : "N";
+                return EidasValidator.isFormatEidas(persona.getNif()) ? "X" : isDocumentEstranger(persona.getNif()) ? "E" : " N ";
             case FISICA_SENSE_NIF:
                 return !Strings.isNullOrEmpty(persona.getNif()) && persona.getDocumentTipus() != null ?
                         (persona.getDocumentTipus() == DocumentTipus.PASSAPORT ? "P" : "X") : null;
             case JURIDICA:
-                return "C";
+                return EidasValidator.isFormatEidas(persona.getNif()) ? "X" : "C";
             default:
                 return null;
         }
