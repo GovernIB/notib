@@ -392,9 +392,9 @@ public class NotificacioFormController extends BaseUserController {
         }
     }
 
-    @PostMapping(value = "/valida/document/{entregaPostal}")
+    @PostMapping(value = "/valida/document/{entregaPostal}/{procedimentId}")
     @ResponseBody
-    public DocumentValidacio validaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer, @PathVariable String entregaPostal) throws IOException {
+    public DocumentValidacio validaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer, @PathVariable String entregaPostal, @PathVariable Long procedimentId) throws IOException {
 
         var nom = fitxer.getOriginalFilename();
         var content = fitxer.getBytes();
@@ -409,17 +409,19 @@ public class NotificacioFormController extends BaseUserController {
         firma.setError(signatureInfo.isError());
         firma.setErrorMsg(signatureInfo.getErrorMsg());
 
-        if (!Boolean.valueOf(entregaPostal)) {
+        if (!Boolean.valueOf(entregaPostal) && procedimentId != null && !procedimentService.procedimentAmbCieExtern(procedimentId)) {
             return DocumentValidacio.builder().validacioFirma(firma).build();
         }
         var cieValid = notificacioService.validateDocCIE(content);
         return DocumentValidacio.builder().validacioFirma(firma).validacioCie(cieValid).build();
     }
 
-    @PostMapping(value = "/valida/entrega/postal")
+    @PostMapping(value = "/valida/entrega/postal/{procedimentId}")
     @ResponseBody
-    public DocCieValid validaFirmaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer) throws IOException {
-        return notificacioService.validateDocCIE(fitxer.getBytes());
+    public DocCieValid validaFirmaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer, @PathVariable Long procedimentId) throws IOException {
+
+        return procedimentService.procedimentAmbCieExtern(procedimentId) ? notificacioService.validateDocCIE(fitxer.getBytes())
+                : DocCieValid.builder().errorsCie(new ArrayList<>()).build();
     }
 
     private void validaFirma(String nom, String mediaType, BindingResult bindingResult, int position, byte[] content) {

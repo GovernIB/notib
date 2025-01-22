@@ -1,6 +1,6 @@
 package es.caib.notib.api.externa.config;
 
-import es.caib.notib.logic.intf.service.NexeaAdviserService;
+import es.caib.notib.logic.intf.service.CieAdviserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,19 +10,19 @@ import javax.annotation.PostConstruct;
 public class ServiceInstancesConfig {
 
     @Autowired
-    private NexeaAdviserService nexeaAdviserService;
+    private CieAdviserService cieAdviserService;
 
 
-    private static NexeaAdviserService nexeaAdviserServiceInstance;
+    private static CieAdviserService cieAdviserServiceInstance;
 
-    public static NexeaAdviserService getNexeaAdviserServiceInstance() {
-        return nexeaAdviserServiceInstance;
+    public static CieAdviserService getCieAdviserServiceInstance() {
+        return cieAdviserServiceInstance;
     }
 
 
     @PostConstruct
     private void postConstruct() {
-        nexeaAdviserServiceInstance = nexeaAdviserService;
+        cieAdviserServiceInstance = cieAdviserService;
     }
 
 }

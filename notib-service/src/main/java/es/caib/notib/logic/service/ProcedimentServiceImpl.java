@@ -369,6 +369,20 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 		}
 	}
 
+	@Transactional(readOnly = true)
+	@Override
+	public boolean procedimentAmbCieExtern(Long procedimentId) {
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			//Compravar si agrupar
+			var procediment = procSerRepository.findById(procedimentId).orElseThrow();
+			return procediment.getEntregaCieEfectiva().getCie().isCieExtern();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
 	public boolean isUpdatingProcediments(EntitatDto entitatDto) {
 
 		var progres = progresActualitzacio.get(entitatDto.getDir3Codi());

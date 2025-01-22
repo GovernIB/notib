@@ -8,122 +8,34 @@
 				http://www.springframework.org/schema/jee
 				http://www.springframework.org/schema/jee/spring-jee-3.0.xsd">
 
-	<jee:local-slsb
-			id="enviamentService"
-			jndi-name="notib/EnviamentServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.EnviamentService"/>
-	<jee:local-slsb
-			id="grupService"
-			jndi-name="notib/GrupServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.GrupService"/>
-	<jee:local-slsb
-			id="pagadorCieService"
-			jndi-name="notib/PagadorCieServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.PagadorCieService"/>
-	<jee:local-slsb
-			id="pagadorCieFormatFullaService"
-			jndi-name="notib/PagadorCieFormatFullaServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.PagadorCieFormatFullaService"/>
-	<jee:local-slsb
-			id="pagadorCieFormatSobreService"
-			jndi-name="notib/PagadorCieFormatSobreServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.PagadorCieFormatSobreService"/>
-	<jee:local-slsb
-			id="pagadorPostalService"
-			jndi-name="notib/OperadorPostalServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.OperadorPostalService"/>
-	<jee:local-slsb
-			id="procedimentService"
-			jndi-name="notib/ProcedimentServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.ProcedimentService"/>
-	<jee:local-slsb
-			id="serveiService"
-			jndi-name="notib/ServeiServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.ServeiService"/>
-	<jee:local-slsb
-			id="organGestorService"
-			jndi-name="notib/OrganGestorServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.OrganGestorService"/>
-	<jee:local-slsb
-			id="aplicacioService"
-			jndi-name="notib/AplicacioServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.AplicacioService"/>
-	<jee:local-slsb
-			id="entitatService"
-			jndi-name="notib/EntitatServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.EntitatService"/>
-	<jee:local-slsb
-			id="notificacioService"
-			jndi-name="notib/NotificacioServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.NotificacioService"/>
-	<jee:local-slsb
-			id="schedulledService"
-			jndi-name="notib/SchedulledServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.SchedulledService"/>
-	<jee:local-slsb
-			id="callbackService"
-			jndi-name="notib/CallbackServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.CallbackService"/>
-	<jee:local-slsb
-			id="usuariAplicacioService"
-			jndi-name="notib/UsuariAplicacioServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.UsuariAplicacioService"/>
-	<jee:local-slsb
-			id="notificacioServiceWsV2"
-			jndi-name="notib/NotificacioServiceWsBeanV2/local"
-			business-interface="es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2"/>
-	<jee:local-slsb
-			id="adviserServiceWsV2"
-			jndi-name="notib/AdviserServiceWsV2Bean/local"
-			business-interface="es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2"/>
-	<jee:local-slsb
-			id="cacheService"
-			jndi-name="notib/CacheServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.CacheService"/>
-	<jee:local-slsb
-			id="auditService"
-			jndi-name="notib/AuditServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.AuditService"/>
-	<jee:local-slsb
-			id="avisService"
-			jndi-name="notib/AvisServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.AvisService"/>
-	<jee:local-slsb
-			id="justificantService"
-			jndi-name="notib/JustificantServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.JustificantService"/>
-	<jee:local-slsb
-			id="notificacioMassivaService"
-			jndi-name="notib/NotificacioMassivaServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.NotificacioMassivaService"/>
-	<jee:local-slsb
-			id="GestioDocumentalService"
-			jndi-name="notib/GestioDocumentalServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.GestioDocumentalService"/>
-	<jee:local-slsb
-			id="ConfigService"
-			jndi-name="notib/ConfigServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.ConfigService"/>
-	<jee:local-slsb
-			id="MonitorIntegracioService"
-			jndi-name="notib/MonitorIntegracioServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.MonitorIntegracioService"/>
-	<jee:local-slsb
-			id="PermisosService"
-			jndi-name="notib/PermisosServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.PermisosService"/>
-	<jee:local-slsb
-			id="AdviserService"
-			jndi-name="notib/AdviserServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.AdviserService"/>
-	<jee:local-slsb
-			id="MonitorTasquesService"
-			jndi-name="notib/MonitorTasquesServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.MonitorTasquesService"/>
-	<jee:local-slsb
-			id="nexeaAdviserService"
-			jndi-name="notib/NexeaAdviserServiceBean/local"
-			business-interface="es.caib.notib.logic.intf.service.NexeaAdviserService"/>
-
+	<jee:local-slsb id="enviamentService" jndi-name="notib/EnviamentServiceBean/local" business-interface="es.caib.notib.logic.intf.service.EnviamentService"/>
+	<jee:local-slsb id="grupService" jndi-name="notib/GrupServiceBean/local" business-interface="es.caib.notib.logic.intf.service.GrupService"/>
+	<jee:local-slsb id="pagadorCieService" jndi-name="notib/PagadorCieServiceBean/local" business-interface="es.caib.notib.logic.intf.service.PagadorCieService"/>
+	<jee:local-slsb id="pagadorCieFormatFullaService" jndi-name="notib/PagadorCieFormatFullaServiceBean/local" business-interface="es.caib.notib.logic.intf.service.PagadorCieFormatFullaService"/>
+	<jee:local-slsb id="pagadorCieFormatSobreService" jndi-name="notib/PagadorCieFormatSobreServiceBean/local" business-interface="es.caib.notib.logic.intf.service.PagadorCieFormatSobreService"/>
+	<jee:local-slsb id="pagadorPostalService" jndi-name="notib/OperadorPostalServiceBean/local" business-interface="es.caib.notib.logic.intf.service.OperadorPostalService"/>
+	<jee:local-slsb id="procedimentService" jndi-name="notib/ProcedimentServiceBean/local" business-interface="es.caib.notib.logic.intf.service.ProcedimentService"/>
+	<jee:local-slsb id="serveiService" jndi-name="notib/ServeiServiceBean/local" business-interface="es.caib.notib.logic.intf.service.ServeiService"/>
+	<jee:local-slsb id="organGestorService" jndi-name="notib/OrganGestorServiceBean/local" business-interface="es.caib.notib.logic.intf.service.OrganGestorService"/>
+	<jee:local-slsb id="aplicacioService" jndi-name="notib/AplicacioServiceBean/local" business-interface="es.caib.notib.logic.intf.service.AplicacioService"/>
+	<jee:local-slsb id="entitatService" jndi-name="notib/EntitatServiceBean/local" business-interface="es.caib.notib.logic.intf.service.EntitatService"/>
+	<jee:local-slsb id="notificacioService" jndi-name="notib/NotificacioServiceBean/local" business-interface="es.caib.notib.logic.intf.service.NotificacioService"/>
+	<jee:local-slsb id="schedulledService" jndi-name="notib/SchedulledServiceBean/local" business-interface="es.caib.notib.logic.intf.service.SchedulledService"/>
+	<jee:local-slsb id="callbackService" jndi-name="notib/CallbackServiceBean/local" business-interface="es.caib.notib.logic.intf.service.CallbackService"/>
+	<jee:local-slsb id="usuariAplicacioService" jndi-name="notib/UsuariAplicacioServiceBean/local" business-interface="es.caib.notib.logic.intf.service.UsuariAplicacioService"/>
+	<jee:local-slsb id="notificacioServiceWsV2" jndi-name="notib/NotificacioServiceWsBeanV2/local" business-interface="es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2"/>
+	<jee:local-slsb id="adviserServiceWsV2" jndi-name="notib/AdviserServiceWsV2Bean/local" business-interface="es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2"/>
+	<jee:local-slsb id="cacheService" jndi-name="notib/CacheServiceBean/local" business-interface="es.caib.notib.logic.intf.service.CacheService"/>
+	<jee:local-slsb id="auditService" jndi-name="notib/AuditServiceBean/local" business-interface="es.caib.notib.logic.intf.service.AuditService"/>
+	<jee:local-slsb id="avisService" jndi-name="notib/AvisServiceBean/local" business-interface="es.caib.notib.logic.intf.service.AvisService"/>
+	<jee:local-slsb id="justificantService" jndi-name="notib/JustificantServiceBean/local" business-interface="es.caib.notib.logic.intf.service.JustificantService"/>
+	<jee:local-slsb id="notificacioMassivaService" jndi-name="notib/NotificacioMassivaServiceBean/local" business-interface="es.caib.notib.logic.intf.service.NotificacioMassivaService"/>
+	<jee:local-slsb id="GestioDocumentalService" jndi-name="notib/GestioDocumentalServiceBean/local" business-interface="es.caib.notib.logic.intf.service.GestioDocumentalService"/>
+	<jee:local-slsb id="ConfigService" jndi-name="notib/ConfigServiceBean/local" business-interface="es.caib.notib.logic.intf.service.ConfigService"/>
+	<jee:local-slsb id="MonitorIntegracioService" jndi-name="notib/MonitorIntegracioServiceBean/local" business-interface="es.caib.notib.logic.intf.service.MonitorIntegracioService"/>
+	<jee:local-slsb id="PermisosService" jndi-name="notib/PermisosServiceBean/local" business-interface="es.caib.notib.logic.intf.service.PermisosService"/>
+	<jee:local-slsb id="AdviserService" jndi-name="notib/AdviserServiceBean/local" business-interface="es.caib.notib.logic.intf.service.AdviserService"/>
+	<jee:local-slsb id="MonitorTasquesService" jndi-name="notib/MonitorTasquesServiceBean/local" business-interface="es.caib.notib.logic.intf.service.MonitorTasquesService"/>
+	<jee:local-slsb id="cieAdviserService" jndi-name="notib/CieAdviserServiceBean/local" business-interface="es.caib.notib.logic.intf.service.CieAdviserService"/>
 	<jee:local-slsb id="ColumnesService" jndi-name="notib/ColumnesServiceBean/local" business-interface="es.caib.notib.logic.intf.service.ColumnesService"/>
 </beans>

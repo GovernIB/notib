@@ -4,7 +4,7 @@
 package es.caib.notib.api.externa.config;
 
 import es.caib.notib.logic.intf.service.AdviserService;
-import es.caib.notib.logic.intf.service.NexeaAdviserService;
+import es.caib.notib.logic.intf.service.CieAdviserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +28,8 @@ public class EjbClientConfig {
 	}
 
 	@Bean
-	public LocalStatelessSessionProxyFactoryBean nexeaAdviserService() {
-		return getLocalEjbFactoyBean(NexeaAdviserService.class);
+	public LocalStatelessSessionProxyFactoryBean cieAdviserService() {
+		return getLocalEjbFactoyBean(CieAdviserService.class);
 	}
 
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {

@@ -11,6 +11,7 @@ import es.caib.notib.logic.intf.dto.cie.CieTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -100,6 +101,9 @@ public interface PagadorCieService {
 
 	@PreAuthorize("isAuthenticated()")
 	Object findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor);
+
+	@PreAuthorize("isAuthenticated()")
+	boolean existeixCieByEntitatAndOrganGestor(String organGestor);
 
 	/**
 	 * Llistat amb tots els pagadros cie paginats.

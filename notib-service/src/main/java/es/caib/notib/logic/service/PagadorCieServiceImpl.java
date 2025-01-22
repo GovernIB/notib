@@ -27,7 +27,6 @@ import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.PagadorCieRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -320,6 +319,15 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public boolean existeixCieByEntitatAndOrganGestor(String organGestor) {
+
+		var organ = organGestorRepository.findByCodi(organGestor);
+		var cie = pagadorCieReposity.findByEntitatAndOrganGestor(organ.getEntitat(), organ);
+		return cie != null;
 	}
 
 	@Override

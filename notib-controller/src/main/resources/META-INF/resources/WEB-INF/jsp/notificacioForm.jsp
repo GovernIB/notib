@@ -546,7 +546,7 @@
 				$.ajax({
 					type: "POST",
 					enctype: 'multipart/form-data',
-					url: "<c:url value='/notificacio/valida/document/'/>" + entregaPostal,
+					url: "<c:url value='/notificacio/valida/document/'/>" + entregaPostal + "/" + document.getElementById("procedimentId").value,
 					data: formData,
 					processData: false,
 					contentType: false,

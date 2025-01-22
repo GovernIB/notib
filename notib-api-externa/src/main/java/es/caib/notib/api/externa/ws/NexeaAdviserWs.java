@@ -18,7 +18,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
 import java.math.BigInteger;
 
-import static es.caib.notib.api.externa.config.ServiceInstancesConfig.getNexeaAdviserServiceInstance;
+import static es.caib.notib.api.externa.config.ServiceInstancesConfig.getCieAdviserServiceInstance;
 
 
 /**
@@ -71,7 +71,7 @@ public class NexeaAdviserWs implements es.caib.notib.logic.intf.ws.adviser.nexea
             @WebParam(mode = WebParam.Mode.OUT, name = "opcionesResultadoSincronizarEnvio", targetNamespace = "")
             Holder<Opciones> opcionesResultadoSincronizarEnvio) {
 
-        getNexeaAdviserServiceInstance().sincronizarEnvio(
+        getCieAdviserServiceInstance().sincronizarEnvio(
                 organismoEmisor,
                 identificador,
                 tipoEntrega,

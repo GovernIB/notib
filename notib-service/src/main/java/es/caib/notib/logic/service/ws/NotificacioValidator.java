@@ -30,7 +30,6 @@ import es.caib.notib.persist.repository.GrupRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
 import es.caib.notib.plugin.cie.TipusImpressio;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.time.DateUtils;
@@ -478,6 +477,9 @@ public class NotificacioValidator implements Validator {
 
     public void validarDocumentCIE(Document document, Errors errors, String doc, String prefix) throws IOException {
 
+        if (!procediment.getEntregaCieEfectiva().getCie().isCieExtern()) {
+            return;
+        }
         var bytes = Base64.decode(document.getContingutBase64());
         if (bytes.length > 5242880) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_MIDA_MAX, locale, prefix));
