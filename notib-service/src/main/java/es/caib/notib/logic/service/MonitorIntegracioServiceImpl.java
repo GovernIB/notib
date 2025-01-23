@@ -33,6 +33,7 @@ import es.caib.notib.persist.filtres.FiltreMonitorIntegracio;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
+import es.caib.notib.persist.repository.EntregaPostalRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.monitor.MonitorIntegracioParamRepository;
 import es.caib.notib.persist.repository.monitor.MonitorIntegracioRepository;
@@ -85,6 +86,8 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
 	private UsuariAplicacioService usuariAplicacioService;
+    @Autowired
+    private EntregaPostalRepository entregaPostalRepository;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -225,9 +228,14 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 //					diagnostic.setCorrecte(true);
 //					break;
 				case CIE:
-					enviament = enviamentRepository.findTopByEntregaPostalNullOrderByIdDesc().orElseThrow();
+					var entrega = entregaPostalRepository.findTopByCieIdNotNullOrderByIdDesc().orElseThrow();
+					enviament = enviamentRepository.findByCieId(entrega.getCieId());
 					var resultat = ciePluginHelper.consultarEstatEntregaPostal(enviament.getId());
-					diagnostic.setCorrecte(resultat != null && "000".equals(resultat.getCodiResposta()));
+					var correcte = resultat != null && "000".equals(resultat.getCodiResposta());
+					diagnostic.setCorrecte(correcte);
+					if (!correcte) {
+						diagnostic.setErrMsg(resultat.getDescripcioResposta());
+					}
 					break;
 			}
 			diagnostic.setDiagnosticsEntitat(diagnostics);

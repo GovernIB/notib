@@ -1,6 +1,7 @@
 package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
+import com.google.common.net.MediaType;
 import es.caib.comanda.salut.model.EstatSalutEnum;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -18,6 +19,7 @@ import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
@@ -33,11 +35,11 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 
 	private final NotificacioEnviamentRepository enviamentRepository;
 
-	public FirmaPluginHelper(IntegracioHelper integracioHelper,
-                             ConfigHelper configHelper, NotificacioEnviamentRepository enviamentRepository) {
+	public FirmaPluginHelper(IntegracioHelper integracioHelper, ConfigHelper configHelper, NotificacioEnviamentRepository enviamentRepository) {
+
 		super(integracioHelper, configHelper);
         this.enviamentRepository = enviamentRepository;
-    }
+	}
 
 	@Override
 	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception {
@@ -45,8 +47,11 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 		var enviament = enviamentRepository.findTopByRegistreNumeroFormatatNotNullOrderByIdDesc().orElseThrow();
 		var justificantOriginal = new FitxerDto();
 		justificantOriginal.setNom("justificant_comunicacio_sir_" + enviament.getId() + ".pdf");
-		justificantOriginal.setContentType("application/pdf");
-		justificantOriginal.setContingut(String.valueOf( new Date().getTime()).getBytes());
+		var out = new ByteArrayOutputStream();
+		out.writeBytes(("Test diagnostic Notib " + String.valueOf( new Date().getTime())).getBytes());
+		out.close();
+		justificantOriginal.setContentType(MediaType.PDF.toString());
+		justificantOriginal.setContingut(out.toByteArray());
 		var firmaContingut = firmaServidorFirmar(enviament.getNotificacio(), justificantOriginal, FirmaServidorPlugin.TipusFirma.PADES, "Test justificant enviament Notib", "ca");
 		return firmaContingut.length > 0;
 	}
