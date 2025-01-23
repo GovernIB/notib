@@ -4,13 +4,17 @@ import com.google.common.base.Strings;
 import com.google.common.net.MediaType;
 import es.caib.comanda.salut.model.EstatSalutEnum;
 import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
+import es.caib.notib.logic.helper.JustificantEnviamentHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
+import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
@@ -34,24 +38,30 @@ import java.util.Properties;
 public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin> {
 
 	private final NotificacioEnviamentRepository enviamentRepository;
+	private final JustificantEnviamentHelper justificantEnviamentHelper;
+	private final ConversioTipusHelper conversioTipusHelper;
 
-	public FirmaPluginHelper(IntegracioHelper integracioHelper, ConfigHelper configHelper, NotificacioEnviamentRepository enviamentRepository) {
+	public FirmaPluginHelper(IntegracioHelper integracioHelper, ConfigHelper configHelper, NotificacioEnviamentRepository enviamentRepository, JustificantEnviamentHelper justificantEnviamentHelper, ConversioTipusHelper conversioTipusHelper) {
 
 		super(integracioHelper, configHelper);
         this.enviamentRepository = enviamentRepository;
+        this.justificantEnviamentHelper = justificantEnviamentHelper;
+		this.conversioTipusHelper = conversioTipusHelper;
 	}
 
 	@Override
 	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception {
 
 		var enviament = enviamentRepository.findTopByRegistreNumeroFormatatNotNullOrderByIdDesc().orElseThrow();
+		var contingut =justificantEnviamentHelper.generarJustificant(conversioTipusHelper.convertir(enviament.getNotificacio(), NotificacioDtoV2.class), new ProgresDescarregaDto());
 		var justificantOriginal = new FitxerDto();
 		justificantOriginal.setNom("justificant_comunicacio_sir_" + enviament.getId() + ".pdf");
-		var out = new ByteArrayOutputStream();
-		out.writeBytes(("Test diagnostic Notib " + String.valueOf( new Date().getTime())).getBytes());
-		out.close();
+//		var out = new ByteArrayOutputStream();
+//		out.writeBytes(("Test diagnostic Notib " + String.valueOf( new Date().getTime())).getBytes());
+//		out.close();
 		justificantOriginal.setContentType(MediaType.PDF.toString());
-		justificantOriginal.setContingut(out.toByteArray());
+//		justificantOriginal.setContingut(out.toByteArray());
+		justificantOriginal.setContingut(contingut);
 		var firmaContingut = firmaServidorFirmar(enviament.getNotificacio(), justificantOriginal, FirmaServidorPlugin.TipusFirma.PADES, "Test justificant enviament Notib", "ca");
 		return firmaContingut.length > 0;
 	}
