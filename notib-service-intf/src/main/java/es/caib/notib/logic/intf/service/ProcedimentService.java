@@ -378,6 +378,9 @@ public interface ProcedimentService {
     @PreAuthorize("hasRole('NOT_ADMIN')")
     ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi);
 
+    @PreAuthorize("isAuthenticated()")
+    boolean procedimentAmbCieExtern(Long procedimentId);
+
     /**
      * Consulta si existeix un procés en curs actualitzant els procediments de l'entitat indicada.
      *

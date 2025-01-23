@@ -59,6 +59,10 @@ public class EjbClientConfig {
 	public LocalStatelessSessionProxyFactoryBean activeMqService() {
 		return getLocalEjbFactoyBean(ActiveMqService.class);
 	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean cieAdviserService() {
+		return getLocalEjbFactoyBean(CieAdviserService.class);
+	}
 
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {
 

@@ -460,7 +460,7 @@ public class CieNexeaPluginImpl implements CiePlugin {
             var desc = sfe.getFault().getFaultString();
             return InfoCie.builder().identificador(enviament.getIdentificador()).codiResposta(codi).descripcioResposta(desc).build();
         } catch (Exception ex) {
-            var desc = "Error al consultar l'enviament CIE " + enviament.getIdentificador();
+            var desc = "Error al consultar l'enviament CIE " + enviament.getIdentificador() + ex.getMessage();
             log.error(desc, ex);
             return InfoCie.builder().identificador(enviament.getIdentificador()).codiResposta(NOTIB).descripcioResposta(desc).build();
         }

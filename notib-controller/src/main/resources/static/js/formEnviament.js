@@ -330,11 +330,12 @@ function validarEntregaPostalCie() {
 
     let fitxer = file.files[0];
     let formData = new FormData();
+    let procedimentId = document.getElementById("procedimentId").value;
     formData.append('fitxer', fitxer, fitxer.name);
     $.ajax({
         type: "POST",
         enctype: 'multipart/form-data',
-        url: "/notibback/notificacio/valida/entrega/postal",
+        url: "/notibback/notificacio/valida/entrega/postal/" + procedimentId,
         data: formData,
         processData: false,
         contentType: false,

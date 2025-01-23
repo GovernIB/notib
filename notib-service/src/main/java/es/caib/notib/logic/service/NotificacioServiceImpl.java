@@ -63,6 +63,7 @@ import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
+import es.caib.notib.persist.repository.PagadorCieRepository;
 import es.caib.notib.persist.repository.PersonaRepository;
 import es.caib.notib.persist.repository.ProcSerOrganRepository;
 import es.caib.notib.persist.repository.ProcedimentRepository;
@@ -127,6 +128,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEnviamentRepository enviamentRepository;
+	@Autowired
+	private PagadorCieRepository cieRepository;
 	@Autowired
 	private NotificacioAuditRepository notificacioAuditRepository;
 	@Autowired
@@ -1910,6 +1913,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		List<String> errors = new ArrayList<>();
 
+//		var cieOrgan = cieRepository.findByEntitatAndOrganGestor(entitat, organGestor);
+//		if (!cieOrgan.isCieExtern()) {
+//			return DocCieValid.builder().errorsCie(errors).build();
+//		}
+
 		if (!MimeUtils.isPDF(Base64.encodeBase64String(bytes))) {
 			errors.add(messageHelper.getMessage("error.validacio.10755"));
 		}
@@ -1931,9 +1939,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 		if (pdf.isEditBlocked()) {
 			errors.add(messageHelper.getMessage("error.validacio.107555"));
 		}
-		if (pdf.hasNoneEmbeddedFonts()) {
-			errors.add(messageHelper.getMessage("error.validacio.107556"));
-		}
+//		if (pdf.hasNoneEmbeddedFonts()) {
+//			errors.add(messageHelper.getMessage("error.validacio.107556"));
+//		}
 		if (!Strings.isNullOrEmpty(pdf.getJavaScript())) {
 			errors.add(messageHelper.getMessage("error.validacio.107557"));
 		}

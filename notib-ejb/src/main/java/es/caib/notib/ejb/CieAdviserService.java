@@ -3,6 +3,8 @@ package es.caib.notib.ejb;
 import es.caib.notib.logic.intf.ws.adviser.nexea.common.Opciones;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.Acuse;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.Receptor;
+import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.ResultadoSincronizarEnvio;
+import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.SincronizarEnvio;
 import org.springframework.context.annotation.Primary;
 
 import javax.ejb.Stateless;
@@ -12,7 +14,13 @@ import java.math.BigInteger;
 
 @Primary
 @Stateless
-public class NexeaAdviserService extends AbstractService<es.caib.notib.logic.intf.service.NexeaAdviserService> implements es.caib.notib.logic.intf.service.NexeaAdviserService  {
+public class CieAdviserService extends AbstractService<es.caib.notib.logic.intf.service.CieAdviserService> implements es.caib.notib.logic.intf.service.CieAdviserService {
+
+
+    @Override
+    public ResultadoSincronizarEnvio sincronizarEnvio(SincronizarEnvio sincronizarEnvio) {
+        return getDelegateService().sincronizarEnvio(sincronizarEnvio);
+    }
 
     @Override
     public void sincronizarEnvio(String organismoEmisor,

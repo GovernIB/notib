@@ -104,6 +104,7 @@ import java.util.stream.Stream;
 @Slf4j
 @Service
 public class NotificacioMassivaServiceImpl implements NotificacioMassivaService {
+
     @Autowired
     private GrupProcSerRepository grupProcSerRepository;
     @Autowired

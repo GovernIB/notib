@@ -10,7 +10,7 @@ import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.service.AdviserService;
-import es.caib.notib.logic.intf.service.NexeaAdviserService;
+import es.caib.notib.logic.intf.service.CieAdviserService;
 import es.caib.notib.logic.intf.util.NifHelper;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.common.Opciones;
@@ -32,7 +32,7 @@ import java.math.BigInteger;
 
 @Slf4j
 @Service
-public class NexeaAdviserServiceImpl implements NexeaAdviserService  {
+public class CieAdviserServiceImpl implements CieAdviserService {
 
     @Autowired
     private AdviserService adviserService;
@@ -44,6 +44,24 @@ public class NexeaAdviserServiceImpl implements NexeaAdviserService  {
     private ConversioTipusHelper conversioTipusHelper;
     @Autowired
     private JmsTemplate jmsTemplate;
+
+    @Override
+    public  es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.ResultadoSincronizarEnvio sincronizarEnvio(es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.SincronizarEnvio sincronizarEnvio) {
+
+        var info = new IntegracioInfo(IntegracioCodi.CIE, "Sincronitzar enviament", IntegracioAccioTipusEnumDto.RECEPCIO,
+                new AccioParam("Identificador Nexea", sincronizarEnvio.getIdentificador()),
+                new AccioParam("Estat", sincronizarEnvio.getEstado()));
+
+        var sinc = conversioTipusHelper.convertir(sincronizarEnvio, SincronizarEnvio.class);
+        var resposta = sincronitzarEntregaPostal(sinc, info);
+
+        if (NexeaAdviserWs.CODI_OK_DEC.equalsIgnoreCase(resposta.getDescripcionRespuesta())) {
+            integracioHelper.addAccioOk(info);
+        } else {
+            integracioHelper.addAccioError(info, resposta.getDescripcionRespuesta());
+        }
+        return conversioTipusHelper.convertir(sincronizarEnvio, es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.ResultadoSincronizarEnvio.class);
+    }
 
     @Transactional
     @Override
@@ -104,7 +122,7 @@ public class NexeaAdviserServiceImpl implements NexeaAdviserService  {
         var resultado = new ResultadoSincronizarEnvio();
         try {
             if (Strings.isNullOrEmpty(identificador)) {
-                var error = "[Nexea Adviser] Error l'identificador no pot ser null";
+                var error = "[CIE Adviser] Error l'identificador no pot ser null";
                 log.error(error);
                 resultado.setCodigoRespuesta(NexeaAdviserWs.CODI_ERROR_IDENTIFICADOR_INCORRECTE);
                 resultado.setDescripcionRespuesta("Identificador incorrecto");
@@ -138,7 +156,7 @@ public class NexeaAdviserServiceImpl implements NexeaAdviserService  {
             }
             return resultado;
         } catch (Exception e) {
-            var error = "[Nexea Adviser] Error al sincronitzar l'enviament amb id " + identificador;
+            var error = "[CIE Adviser] Error al sincronitzar l'enviament amb id " + identificador;
             log.error(error, e);
             resultado.setCodigoRespuesta(NexeaAdviserWs.CODI_ERROR);
             resultado.setDescripcionRespuesta(error);

@@ -288,6 +288,12 @@ public class ProcedimentService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
+	@PermitAll
+	public boolean procedimentAmbCieExtern(Long procedimentId) {
+		return getDelegateService().procedimentAmbCieExtern(procedimentId);
+	}
+
+	@Override
 	@RolesAllowed("**")
 	public List<ProcSerOrganDto> findProcedimentsOrganWithPermisByOrgan(String organId, String entitatCodi, List<ProcSerOrganDto> procedimentsOrgans) {
 		return getDelegateService().findProcedimentsOrganWithPermisByOrgan(organId, entitatCodi, procedimentsOrgans);

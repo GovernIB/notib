@@ -49,10 +49,17 @@ public class PdfUtils extends PdfReader {
 
     private boolean checkDinA4(int pageNumber) {
 
+        double a4Width = 595.28;
+        double a4Height = 841.89;
+        double tolerance = 5; // Tolerància
         var rect = this.getPageSizeWithRotation(pageNumber);
         var width = rect.getWidth();
         var height = rect.getHeight();
-        return (int) width == 595 && (int) height == 841;
+
+        return (Math.abs(width - a4Width) <= tolerance && Math.abs(height - a4Height) <= tolerance) ||
+                (Math.abs(height - a4Width) <= tolerance && Math.abs(width - a4Height) <= tolerance); // Per a pàgines
+
+//        return (int) width == 595 && (int) height == 841;
     }
 
     private boolean checkRightMargin(int pageNumber, float maxMargin) {

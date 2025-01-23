@@ -140,6 +140,10 @@ public class EjbClientConfig {
 	public LocalStatelessSessionProxyFactoryBean salutService() {
 		return getLocalEjbFactoyBean(SalutService.class);
 	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean cieAdviserService() {
+		return getLocalEjbFactoyBean(CieAdviserService.class);
+	}
 
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean activeMqService() {

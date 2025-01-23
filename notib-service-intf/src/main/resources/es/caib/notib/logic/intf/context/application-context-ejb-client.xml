@@ -36,7 +36,7 @@
 	<jee:local-slsb id="PermisosService" jndi-name="notib/PermisosServiceBean/local" business-interface="es.caib.notib.logic.intf.service.PermisosService"/>
 	<jee:local-slsb id="AdviserService" jndi-name="notib/AdviserServiceBean/local" business-interface="es.caib.notib.logic.intf.service.AdviserService"/>
 	<jee:local-slsb id="MonitorTasquesService" jndi-name="notib/MonitorTasquesServiceBean/local" business-interface="es.caib.notib.logic.intf.service.MonitorTasquesService"/>
-	<jee:local-slsb id="nexeaAdviserService" jndi-name="notib/NexeaAdviserServiceBean/local" business-interface="es.caib.notib.logic.intf.service.NexeaAdviserService"/>
+	<jee:local-slsb id="cieAdviserService" jndi-name="notib/CieAdviserServiceBean/local" business-interface="es.caib.notib.logic.intf.service.CieAdviserService"/>
 	<jee:local-slsb id="ColumnesService" jndi-name="notib/ColumnesServiceBean/local" business-interface="es.caib.notib.logic.intf.service.ColumnesService"/>
 	<jee:local-slsb id="ActiveMqService" jndi-name="notib/ActiveMqServiceBean/local" business-interface="es.caib.notib.logic.intf.service.ActiveMqService"/>
 </beans>

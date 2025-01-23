@@ -1,5 +1,7 @@
 package es.caib.notib.back.command;
 
+import es.caib.notib.back.validation.ValidCie;
+import es.caib.notib.back.validation.ValidNotificacio;
 import es.caib.notib.logic.intf.dto.cie.CieDataDto;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
 import es.caib.notib.back.helper.ConversioTipusHelper;
@@ -16,6 +18,7 @@ import java.util.Date;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Data
+@ValidCie
 public class CieCommand {
 	
 	private Long id;
