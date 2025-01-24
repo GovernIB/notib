@@ -3,6 +3,9 @@
  */
 package es.caib.notib.plugin.unitat;
 
+import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.plugin.SistemaExternException;
 import org.slf4j.Logger;
@@ -151,4 +154,23 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(UnitatsOrganitzativesMock.class);
+
+
+	// Mètodes de SALUT
+	// /////////////////////////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public boolean teConfiguracioEspecifica() {
+		return false;
+	}
+
+	@Override
+	public EstatSalut getEstatPlugin() {
+		return EstatSalut.builder().estat(EstatSalutEnum.UP).latencia(1).build();
+	}
+
+	@Override
+	public IntegracioPeticions getPeticionsPlugin() {
+		return IntegracioPeticions.builder().build();
+	}
 }

@@ -1,7 +1,7 @@
 package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
-import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioApp;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.PluginHelper;
@@ -12,10 +12,10 @@ import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.persist.repository.DocumentRepository;
+import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -40,11 +40,16 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 	public static final String GESDOC_AGRUPACIO_MASSIUS_ERRORS = "massius_errors";
 	public static final String GESDOC_AGRUPACIO_MASSIUS_INFORMES = "massius_informes";
 
-	@Autowired
-	private DocumentRepository documentRepository;
+	public static final String GRUP = "GES_DOC";
 
-	public GestioDocumentalPluginHelper(IntegracioHelper integracioHelper, ConfigHelper configHelper) {
-		super(integracioHelper, configHelper);
+	private final DocumentRepository documentRepository;
+
+	public GestioDocumentalPluginHelper(IntegracioHelper integracioHelper,
+										ConfigHelper configHelper,
+										EntitatRepository entitatRepository,
+										DocumentRepository documentRepository) {
+		super(integracioHelper, configHelper, entitatRepository);
+		this.documentRepository = documentRepository;
 	}
 
 	@Override
@@ -66,7 +71,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 
 		try {
 			log.info("Creant el document en el gestor documental amb agrupacio " + agrupacio);
-			peticionsPlugin.updatePeticioTotal(codiEntitat);
+			// peticionsPlugin.updatePeticioTotal(codiEntitat);
 			var gestioDocumentalId = getPlugin().create(agrupacio, new ByteArrayInputStream(contingut));
 			info.getParams().add(new AccioParam("Id retornat", gestioDocumentalId));
 			integracioHelper.addAccioOk(info);
@@ -75,7 +80,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			var errorDescripcio = "Error al crear document a dins la gestió documental";
 			log.error("Error creant el document en el gestor documental amb agrupacio " + agrupacio);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(codiEntitat);
+			// peticionsPlugin.updatePeticioError(codiEntitat);
 			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), errorDescripcio, ex);
 		}
 	}
@@ -92,14 +97,14 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 
 		try {
 			log.info("Actualitzant el document " + id);
-			peticionsPlugin.updatePeticioTotal(codiEntitat);
+			// peticionsPlugin.updatePeticioTotal(codiEntitat);
 			getPlugin().update(id, agrupacio, new ByteArrayInputStream(contingut));
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al accedir al plugin de gestió documental";
 			log.error("Error actualitzant el document " + id);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(codiEntitat);
+			// peticionsPlugin.updatePeticioError(codiEntitat);
 			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), errorDescripcio, ex);
 		}
 	}
@@ -112,13 +117,13 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 		info.setCodiEntitat(codiEntitat);
 
 		try {
-			peticionsPlugin.updatePeticioTotal(codiEntitat);
+			// peticionsPlugin.updatePeticioTotal(codiEntitat);
 			getPlugin().delete(id, agrupacio);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al accedir al plugin de gestió documental";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(codiEntitat);
+			// peticionsPlugin.updatePeticioError(codiEntitat);
 			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), errorDescripcio, ex);
 		}
 	}
@@ -137,7 +142,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 		info.setCodiEntitat(codiEntitat);
 
 		try {
-			peticionsPlugin.updatePeticioTotal(codiEntitat);
+			// peticionsPlugin.updatePeticioTotal(codiEntitat);
 			var agrupacioPotContenirZip = GESDOC_AGRUPACIO_NOTIFICACIONS.equals(agrupacio) || GESDOC_AGRUPACIO_TEMPORALS.equals(agrupacio) || GESDOC_AGRUPACIO_MASSIUS_ZIP.equals(agrupacio);
 			if (isZip == null && agrupacioPotContenirZip) {
 				var document = documentRepository.getByArxiuGestdocId(id);
@@ -151,7 +156,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al accedir al plugin de gestió documental per a obtenir el document amb id: " + (agrupacio != null ? agrupacio + "/" : "") + id;
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(codiEntitat);
+			// peticionsPlugin.updatePeticioError(codiEntitat);
 			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), errorDescripcio, ex);
 		}
 	}
@@ -188,9 +193,10 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), msg);
 		}
 		try {
+			var configuracioEspecifica = configHelper.hasEntityGroupPropertiesModified(codiEntitat, getConfigGrup());
+			var propietats = configHelper.getAllEntityProperties(codiEntitat);
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (GestioDocumentalPlugin) clazz.getDeclaredConstructor(Properties.class)
-					.newInstance(configHelper.getAllEntityProperties(codiEntitat));
+			plugin = (GestioDocumentalPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(propietats, configuracioEspecifica);
 			pluginMap.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -200,16 +206,20 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 		}
 	}
 
-	@Override
-	protected EstatSalutEnum getEstat() {
-		// TODO: Petició per comprovar la salut
-		return EstatSalutEnum.UP;
-	}
-
 	// PROPIETATS PLUGIN
 	@Override
 	protected String getPluginClassProperty() {
 		return configHelper.getConfig("es.caib.notib.plugin.gesdoc.class");
+	}
+
+	@Override
+	protected IntegracioApp getCodiApp() {
+		return IntegracioApp.GDC;
+	}
+
+	@Override
+	protected String getConfigGrup() {
+		return GRUP;
 	}
 
 	// Mètodes pels tests

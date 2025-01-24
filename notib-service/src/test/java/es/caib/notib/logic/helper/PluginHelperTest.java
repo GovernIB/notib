@@ -25,6 +25,7 @@ import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.entity.ProcSerOrganEntity;
 import es.caib.notib.persist.entity.ProcedimentEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
+import es.caib.notib.plugin.arxiu.ArxiuPlugin;
 import es.caib.notib.plugin.arxiu.ArxiuPluginConcsvImpl;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
@@ -39,8 +40,6 @@ import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import es.caib.plugins.arxiu.api.DocumentTipus;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
-import javassist.bytecode.ByteArray;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -97,7 +96,7 @@ public class PluginHelperTest {
 
 	EntitatEntity entidad;
 	Properties properties;
-	private Map<String, IArxiuPlugin> arxiuPlugin = new HashMap<>();
+	private Map<String, ArxiuPlugin> arxiuPlugin = new HashMap<>();
 	private Map<String, GestioDocumentalPlugin> gestioDocumentalPlugin = new HashMap<>();
 	private Map<String, RegistrePlugin> registrePlugin = new HashMap<>();
 	private Map<String, UnitatsOrganitzativesPlugin> unitatsOrganitzativesPlugin = new HashMap<>();
@@ -122,7 +121,7 @@ public class PluginHelperTest {
 //		Mockito.when(entitatRepository.findByDir3Codi(Mockito.anyString())).thenReturn(entidad);
 
 		// Plugin Arxiu
-		IArxiuPlugin pluginArxiu = Mockito.mock(ArxiuPluginConcsvImpl.class);
+		ArxiuPlugin pluginArxiu = Mockito.mock(ArxiuPluginConcsvImpl.class);
 //		Mockito.when(pluginArxiu.documentDetalls(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true))).thenReturn(documentArxiuAmbContingut);
 		arxiuPlugin.put("CAIB", pluginArxiu);
 		pluginHelper.setArxiuPlugin(arxiuPlugin);

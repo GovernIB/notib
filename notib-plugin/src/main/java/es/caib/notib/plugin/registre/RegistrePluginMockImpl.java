@@ -1,5 +1,8 @@
 package es.caib.notib.plugin.registre;
 
+import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.DatosInteresadoWsDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
@@ -356,6 +359,23 @@ public class RegistrePluginMockImpl implements RegistrePlugin {
 	public String toString() {
 	    return getClass().getName() + "@" + Integer.toHexString(hashCode());
 	}
-	
+
+	// Mètodes de SALUT
+	// /////////////////////////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public boolean teConfiguracioEspecifica() {
+		return false;
+	}
+
+	@Override
+	public EstatSalut getEstatPlugin() {
+		return EstatSalut.builder().estat(EstatSalutEnum.UP).latencia(1).build();
+	}
+
+	@Override
+	public IntegracioPeticions getPeticionsPlugin() {
+		return IntegracioPeticions.builder().build();
+	}
 	
 }

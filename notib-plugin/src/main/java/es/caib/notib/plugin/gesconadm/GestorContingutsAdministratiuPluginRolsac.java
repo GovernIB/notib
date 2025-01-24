@@ -10,8 +10,12 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
+import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.ejb.CreateException;
@@ -22,6 +26,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.rmi.RemoteException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,8 +52,14 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-	public GestorContingutsAdministratiuPluginRolsac(Properties properties) {
+//	public GestorContingutsAdministratiuPluginRolsac(Properties properties) {
+//		this.properties = properties;
+//		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.ROLSAC")));
+//	}
+
+	public GestorContingutsAdministratiuPluginRolsac(Properties properties, boolean configuracioEspecifica) {
 		this.properties = properties;
+		this.configuracioEspecifica = configuracioEspecifica;
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.ROLSAC")));
 	}
 
@@ -66,14 +78,16 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			var json = jerseyClient.resource(url).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).accept(MediaType.APPLICATION_JSON_TYPE).post(String.class, form);
 			var mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			return isServei ? getServeiByCodiSia(mapper, json) :getProcedimentByCodiSia(mapper, json);
+			var result = isServei ? getServeiByCodiSia(mapper, json) :getProcedimentByCodiSia(mapper, json);
+			incrementarOperacioOk();
+			return result;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException("No s'han pogut consultar el " + procSer + " amb codi SIA " + codiSia + " via REST", ex);
 		}
 	}
 
-	@Override
-	public GcaServei getServeiByCodiSia(ObjectMapper mapper, String json) throws Exception {
+	private GcaServei getServeiByCodiSia(ObjectMapper mapper, String json) throws Exception {
 
 		var resposta = mapper.readValue(json, RespostaServeis.class);
 		if (resposta == null) {
@@ -83,8 +97,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		return !procs.isEmpty() ? procs.get(0) : null;
 	}
 
-	@Override
-	public GcaProcediment getProcedimentByCodiSia(ObjectMapper mapper, String json) throws Exception {
+	private GcaProcediment getProcedimentByCodiSia(ObjectMapper mapper, String json) throws Exception {
 
 		var resposta = mapper.readValue(json, RespostaProcediments.class);
 		if (resposta == null) {
@@ -113,8 +126,11 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				procediments = resposta.getResultado();
 			}
-			return toProcedimentDto(procediments);
+			var result = toProcedimentDto(procediments);
+			incrementarOperacioOk();
+			return result;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException(ERROR, ex);
 		}
 	}
@@ -138,8 +154,11 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				procediments = resposta.getResultado();
 			}
-			return toProcedimentDto(procediments);
+			var result = toProcedimentDto(procediments);
+			incrementarOperacioOk();
+			return result;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException(ERROR, ex);
 		}
 	}
@@ -164,14 +183,16 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				procediments = resposta.getResultado();
 			}
-			return toProcedimentDto(procediments);
+			var result = toProcedimentDto(procediments);
+			incrementarOperacioOk();
+			return result;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException(ERROR, ex);
 		}
 	}
 	
-	@Override
-	public String getUnitatAdministrativa(String codi) throws SistemaExternException {
+	private String getUnitatAdministrativa(String codi) throws SistemaExternException {
 
 		if (unitatsAdministratives.containsKey(codi)) {
 			return unitatsAdministratives.get(codi);
@@ -220,8 +241,10 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				numeroElements = resposta.getNumeroElementos();
 			}
+			incrementarOperacioOk();
 			return numeroElements;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException("No s'ha pogut consultar els total de procediments via REST", ex);
 		}
 	}
@@ -245,8 +268,11 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				serveis = resposta.getResultado();
 			}
-			return toServeiDto(serveis);
+			var result = toServeiDto(serveis);
+			incrementarOperacioOk();
+			return result;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException(ERROR, ex);
 		}
 	}
@@ -270,8 +296,11 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				serveis = resposta.getResultado();
 			}
-			return toServeiDto(serveis);
+			var result = toServeiDto(serveis);
+			incrementarOperacioOk();
+			return result;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException(ERROR, ex);
 		}
 	}
@@ -296,8 +325,11 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				serveis = resposta.getResultado();
 			}
-			return toServeiDto(serveis);
+			var result = toServeiDto(serveis);
+			incrementarOperacioOk();
+			return result;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException(ERROR, ex);
 		}
 	}
@@ -321,8 +353,10 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				numeroElements = resposta.getNumeroElementos();
 			}
+			incrementarOperacioOk();
 			return numeroElements;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException("No s'ha pogut consultar els total de procediments via REST", ex);
 		}
 	}
@@ -454,6 +488,59 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 		var isBasicAuth = properties.getProperty("es.caib.notib.plugin.gesconadm.basic.authentication");
 		return Strings.isNullOrEmpty(isBasicAuth) || Boolean.parseBoolean(isBasicAuth);
+	}
+
+
+	// Mètodes de SALUT
+	// /////////////////////////////////////////////////////////////////////////////////////////////
+
+	private boolean configuracioEspecifica = false;
+	private int operacionsOk = 0;
+	private int operacionsError = 0;
+
+	@Synchronized
+	private void incrementarOperacioOk() {
+		operacionsOk++;
+	}
+
+	@Synchronized
+	private void incrementarOperacioError() {
+		operacionsError++;
+	}
+
+	@Synchronized
+	private void resetComptadors() {
+		operacionsOk = 0;
+		operacionsError = 0;
+	}
+
+	@Override
+	public boolean teConfiguracioEspecifica() {
+		return this.configuracioEspecifica;
+	}
+
+	@Override
+	public EstatSalut getEstatPlugin() {
+		try {
+			Instant start = Instant.now();
+			getProcedimentsByUnitat("000000000");
+			return EstatSalut.builder()
+					.latencia((int) Duration.between(start, Instant.now()).toMillis())
+					.estat(EstatSalutEnum.UP)
+					.build();
+		} catch (Exception ex) {
+			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
+		}
+	}
+
+	@Override
+	public IntegracioPeticions getPeticionsPlugin() {
+		IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
+				.totalOk(operacionsOk)
+				.totalError(operacionsError)
+				.build();
+		resetComptadors();
+		return integracioPeticions;
 	}
 
 }

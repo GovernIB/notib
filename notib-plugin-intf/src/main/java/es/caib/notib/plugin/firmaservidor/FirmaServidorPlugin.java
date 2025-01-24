@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.firmaservidor;
 
+import es.caib.notib.plugin.SalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 
 /**
@@ -7,7 +8,7 @@ import es.caib.notib.plugin.SistemaExternException;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface FirmaServidorPlugin {
+public interface FirmaServidorPlugin extends SalutPlugin {
 
 	public byte[] firmar(String nom, String motiu, byte[] contingut, TipusFirma tipusFirma, String idioma) throws SistemaExternException;
 

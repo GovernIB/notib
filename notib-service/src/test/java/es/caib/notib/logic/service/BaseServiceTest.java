@@ -12,7 +12,6 @@ import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
-import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.EntitatDataDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
@@ -27,8 +26,8 @@ import es.caib.notib.logic.intf.dto.cie.CieDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatFullaDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatSobreDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
@@ -53,6 +52,7 @@ import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.persist.repository.config.ConfigRepository;
 import es.caib.notib.plugin.SistemaExternException;
+import es.caib.notib.plugin.arxiu.ArxiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.Llibre;
@@ -73,7 +73,6 @@ import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -168,7 +167,7 @@ public class BaseServiceTest {
 	private DadesUsuariPlugin dadesUsuariPluginMock;
 	private GestioDocumentalPlugin gestioDocumentalPluginMock;
 	private RegistrePlugin registrePluginMock;
-	private IArxiuPlugin arxiuPluginMock;
+	private ArxiuPlugin arxiuPluginMock;
 	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPluginMock;
 
 
@@ -550,7 +549,7 @@ public class BaseServiceTest {
 
 	//	IArxiuPlugin
 	protected void configureMockArxiuPlugin() throws IOException {
-		arxiuPluginMock = Mockito.mock(IArxiuPlugin.class);
+		arxiuPluginMock = Mockito.mock(ArxiuPlugin.class);
 		Expedient expedientArxiu = new Expedient();
 		expedientArxiu.setIdentificador(UUID.randomUUID().toString());
 		expedientArxiu.setNom("nom");

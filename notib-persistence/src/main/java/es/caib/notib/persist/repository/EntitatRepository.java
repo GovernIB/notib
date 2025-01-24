@@ -64,4 +64,8 @@ public interface EntitatRepository extends JpaRepository<EntitatEntity, Long> {
 	List<EntitatEntity> findByIdsAndActiva(@Param("ids") List<Long> ids,
 										   @Param("activa") boolean activa);
 
+	@Query(	"select distinct e.codi " +
+			"  from EntitatEntity e " +
+			" where e.activa = true ")
+    List<String> findCodiAllActives();
 }

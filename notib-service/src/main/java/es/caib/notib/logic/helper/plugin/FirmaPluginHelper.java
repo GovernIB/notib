@@ -3,6 +3,7 @@ package es.caib.notib.logic.helper.plugin;
 import com.google.common.base.Strings;
 import com.google.common.net.MediaType;
 import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioApp;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -17,6 +18,7 @@ import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.persist.entity.NotificacioEntity;
+import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
@@ -37,13 +39,20 @@ import java.util.Properties;
 @Component
 public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin> {
 
+	public static final String GRUP = "FIRMA";
+
 	private final NotificacioEnviamentRepository enviamentRepository;
 	private final JustificantEnviamentHelper justificantEnviamentHelper;
 	private final ConversioTipusHelper conversioTipusHelper;
 
-	public FirmaPluginHelper(IntegracioHelper integracioHelper, ConfigHelper configHelper, NotificacioEnviamentRepository enviamentRepository, JustificantEnviamentHelper justificantEnviamentHelper, ConversioTipusHelper conversioTipusHelper) {
+	public FirmaPluginHelper(IntegracioHelper integracioHelper,
+                             ConfigHelper configHelper,
+                             NotificacioEnviamentRepository enviamentRepository,
+                             JustificantEnviamentHelper justificantEnviamentHelper,
+                             ConversioTipusHelper conversioTipusHelper,
+                             EntitatRepository entitatRepository,) {
 
-		super(integracioHelper, configHelper);
+		super(integracioHelper, configHelper, entitatRepository);
         this.enviamentRepository = enviamentRepository;
         this.justificantEnviamentHelper = justificantEnviamentHelper;
 		this.conversioTipusHelper = conversioTipusHelper;
@@ -56,11 +65,7 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 		var contingut =justificantEnviamentHelper.generarJustificant(conversioTipusHelper.convertir(enviament.getNotificacio(), NotificacioDtoV2.class), new ProgresDescarregaDto());
 		var justificantOriginal = new FitxerDto();
 		justificantOriginal.setNom("justificant_comunicacio_sir_" + enviament.getId() + ".pdf");
-//		var out = new ByteArrayOutputStream();
-//		out.writeBytes(("Test diagnostic Notib " + String.valueOf( new Date().getTime())).getBytes());
-//		out.close();
 		justificantOriginal.setContentType(MediaType.PDF.toString());
-//		justificantOriginal.setContingut(out.toByteArray());
 		justificantOriginal.setContingut(contingut);
 		var firmaContingut = firmaServidorFirmar(enviament.getNotificacio(), justificantOriginal, FirmaServidorPlugin.TipusFirma.PADES, "Test justificant enviament Notib", "ca");
 		return firmaContingut.length > 0;
@@ -75,7 +80,7 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 		info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
 		info.setCodiEntitat(notificacio.getEntitat().getCodi());
 		try {
-			peticionsPlugin.updatePeticioTotal(getCodiEntitatActual());
+			// peticionsPlugin.updatePeticioTotal(getCodiEntitatActual());
 			var firmaContingut = getPlugin().firmar(fitxer.getNom(), motiu, fitxer.getContingut(), tipusFirma, idioma);
 			integracioHelper.addAccioOk(info);
 			return firmaContingut;
@@ -83,7 +88,7 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 			var errorDescripcio = "Error al accedir al plugin de firma en servidor: " + ex.getMessage();
 			log.error(errorDescripcio, ex);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(getCodiEntitatActual());
+			// peticionsPlugin.updatePeticioError(getCodiEntitatActual());
 			throw new SistemaExternException(IntegracioCodi.FIRMASERV.name(), errorDescripcio, ex);
 		}
 	}
@@ -106,8 +111,10 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 			throw new SistemaExternException(IntegracioCodi.FIRMASERV.name(), error);
 		}
 		try {
+			var configuracioEspecifica = configHelper.hasEntityGroupPropertiesModified(codiEntitat, getConfigGrup());
+			var propietats = configHelper.getAllEntityProperties(codiEntitat);
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (FirmaServidorPlugin) clazz.getDeclaredConstructor(Properties.class).newInstance(configHelper.getAllEntityProperties(codiEntitat));
+			plugin = (FirmaServidorPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(propietats, configuracioEspecifica);
 			pluginMap.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -118,15 +125,19 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 	}
 
 	@Override
-	protected EstatSalutEnum getEstat() {
-		// TODO: Petició per comprovar la salut
-		return EstatSalutEnum.UP;
+	protected String getConfigGrup() {
+		return GRUP;
 	}
 
 	// PROPIETATS PLUGIN
 	@Override
 	protected String getPluginClassProperty() {
 		return configHelper.getConfig("es.caib.notib.plugin.firmaservidor.class");
+	}
+
+	@Override
+	protected IntegracioApp getCodiApp() {
+		return IntegracioApp.PFI;
 	}
 
 }

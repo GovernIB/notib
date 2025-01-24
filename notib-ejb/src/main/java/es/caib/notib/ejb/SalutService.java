@@ -1,7 +1,6 @@
 package es.caib.notib.ejb;
 
 import es.caib.comanda.salut.model.AppInfo;
-import es.caib.comanda.salut.model.EstatSalut;
 import es.caib.comanda.salut.model.IntegracioInfo;
 import es.caib.comanda.salut.model.SalutInfo;
 import org.springframework.context.annotation.Primary;
@@ -28,8 +27,4 @@ public class SalutService extends AbstractService<es.caib.notib.logic.intf.servi
         return getDelegateService().checkSalut(versio, performanceUrl);
     }
 
-    @Override
-    public EstatSalut executePerformanceTest() {
-        return getDelegateService().executePerformanceTest();
-    }
 }

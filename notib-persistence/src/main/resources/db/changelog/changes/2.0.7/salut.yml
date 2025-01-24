@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: update-salut
+      author: autor_del_canvi
+      changes:
+        - update:
+            tableName: NOT_CONFIG_TYPE
+            columns:
+              - column:
+                  name: VALUE
+                  value: "es.caib.notib.plugin.validatesignature.afirmacxf.AfirmaCxfValidateSignaturePlugin,es.caib.notib.plugin.valsig.AfirmaCxfValidateSignaturePlugin,es.caib.notib.plugin.valsig.ValidacioFirmesPluginMock"
+            where: "CODE = 'VALSIG_CLASS'"
+
+  - changeSet:
+      id: update-not-config
+      author: autor_del_canvi
+      changes:
+        - update:
+            tableName: NOT_CONFIG
+            columns:
+              - column:
+                  name: VALUE
+                  value: "es.caib.notib.plugin.valsig.AfirmaCxfValidateSignaturePlugin"
+            where: "VALUE = 'org.fundaciobit.plugins.validatesignature.afirmacxf.AfirmaCxfValidateSignaturePlugin'"

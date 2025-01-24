@@ -56,7 +56,6 @@ public class SalutController {
 
     @GetMapping("/salutPerformance")
     public String healthCheck() {
-        salutService.executePerformanceTest();
         return "OK";
     }
 

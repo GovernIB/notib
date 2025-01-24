@@ -42,6 +42,9 @@ public interface ConfigRepository extends JpaRepository<ConfigEntity, String> {
     @Query("FROM ConfigEntity c WHERE c.key like concat('%', :key, '%') AND c.entitatCodi IS NOT NULL AND c.configurable = true")
     List<ConfigEntity> findLikeKeyEntitatNotNullAndConfigurable(@Param("key") String key);
 
+    @Query("FROM ConfigEntity c WHERE c.groupCode = :grup")
+    List<ConfigEntity> findByGrupCodi(@Param("grup") String grup);
+
     @Transactional
     @Modifying
     @Query("DELETE FROM ConfigEntity c WHERE c.entitatCodi = :entitatCodi")

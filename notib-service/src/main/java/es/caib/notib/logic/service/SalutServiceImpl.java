@@ -4,12 +4,13 @@ import es.caib.comanda.salut.model.AppInfo;
 import es.caib.comanda.salut.model.DetallSalut;
 import es.caib.comanda.salut.model.EstatSalut;
 import es.caib.comanda.salut.model.EstatSalutEnum;
-import es.caib.comanda.salut.model.IntegracioApp;
 import es.caib.comanda.salut.model.IntegracioInfo;
 import es.caib.comanda.salut.model.IntegracioSalut;
 import es.caib.comanda.salut.model.MissatgeSalut;
 import es.caib.comanda.salut.model.SalutInfo;
+import es.caib.comanda.salut.model.SubsistemaSalutInfo;
 import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.plugin.AbstractPluginHelper;
 import es.caib.notib.logic.intf.service.SalutService;
 import es.caib.notib.logic.mapper.MissatgeSalutMapper;
 import es.caib.notib.logic.utils.NotibBenchmark;
@@ -40,10 +41,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -56,20 +59,26 @@ public class SalutServiceImpl implements SalutService {
     private final MissatgeSalutMapper missatgeSalutMapper;
     private final AvisRepository avisRepository;
 
+    private static final int MAX_CONNECTION_RETRY = 3;
+
     @Override
     public List<IntegracioInfo> getIntegracions() {
-        return List.of(
-                IntegracioInfo.builder().integracioApp(IntegracioApp.CAR).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.AFI).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.PFI).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.RSC).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.DIR).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.ARX).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.REG).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.NTF).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.USR).build(),
-                IntegracioInfo.builder().integracioApp(IntegracioApp.EML).build()
-        );
+//        return List.of(
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.CAR).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.AFI).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.PFI).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.RSC).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.DIR).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.ARX).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.REG).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.NTF).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.USR).build(),
+//                IntegracioInfo.builder().integracioApp(IntegracioApp.EML).build()
+//        );
+
+        return pluginHelper.getPluginHelpers().stream()
+                .flatMap(pluginHelper -> pluginHelper.getIntegracionsInfo().stream())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -82,7 +91,8 @@ public class SalutServiceImpl implements SalutService {
                 AppInfo.builder().codi("SIR").nom("SIR").build(),
                 AppInfo.builder().codi("NOT").nom("Notificació").build(),
                 AppInfo.builder().codi("CBK").nom("Callback de client").build(),
-                AppInfo.builder().codi("CIE").nom("CIE").build()
+                AppInfo.builder().codi("CIE").nom("CIE").build(),
+                AppInfo.builder().codi("GDO").nom("Gestió documental FileSystem").build()
         );
     }
 
@@ -109,8 +119,7 @@ public class SalutServiceImpl implements SalutService {
                 .build();
     }
 
-    @Override
-    public EstatSalut executePerformanceTest() {
+    private EstatSalut executePerformanceTest() {
 
         Options opt = new OptionsBuilder()
                 .include(NotibBenchmark.class.getSimpleName())
@@ -128,7 +137,7 @@ public class SalutServiceImpl implements SalutService {
 
             return EstatSalut.builder()
                     .estat(EstatSalutEnum.UP)
-                    .latencia(Math.round(stats.getAverage()))
+                    .latencia((int) Math.round(stats.getAverage()))
                     .build();
         } catch (RunnerException e) {
             throw new RuntimeException(e);
@@ -138,19 +147,29 @@ public class SalutServiceImpl implements SalutService {
 
     private EstatSalut checkEstatSalut(String performanceUrl) {
 
+        Instant start = Instant.now();
+        EstatSalutEnum estat = EstatSalutEnum.UP;
         try {
-            Instant start = Instant.now();
-            var response = restTemplate.getForObject(performanceUrl, String.class);
-            Instant end = Instant.now();
-            long latency = Duration.between(start, end).toMillis();
-
-            return EstatSalut.builder()
-                    .estat(EstatSalutEnum.UP)
-                    .latencia(latency)
-                    .build();
-        } catch (Exception e) {
-            return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
+            executePerformanceTest();
+        } catch (Exception e) {}
+        String response = null;
+        for (int i = 1; i <= MAX_CONNECTION_RETRY; i++) {
+            try {
+                restTemplate.getForObject(performanceUrl, String.class);
+                break;
+            } catch (Exception e) {
+                if (i == MAX_CONNECTION_RETRY) {
+                    estat = EstatSalutEnum.UNKNOWN; // After 3 connection failed attempts
+                }
+            }
         }
+        Instant end = Instant.now();
+        Integer latency = (int) Duration.between(start, end).toMillis();
+
+        return EstatSalut.builder()
+                .estat(estat)
+                .latencia(latency)
+                .build();
     }
 
     private EstatSalut checkDatabase() {
@@ -162,7 +181,7 @@ public class SalutServiceImpl implements SalutService {
 
             return EstatSalut.builder()
                     .estat(EstatSalutEnum.UP)
-                    .latencia(Duration.between(start, end).toMillis())
+                    .latencia((int) Duration.between(start, end).toMillis())
                     .build();
         } catch (Exception e) {
             return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
@@ -171,14 +190,19 @@ public class SalutServiceImpl implements SalutService {
 
     private List<IntegracioSalut> checkIntegracions() {
 
+        List<IntegracioSalut> integracionsSalut = new ArrayList<>();
         try {
-            return pluginHelper.getPeticionsPluginsAndReset();
+            List<AbstractPluginHelper<?>> helpers = pluginHelper.getPluginHelpers();
+            for (AbstractPluginHelper helper : helpers) {
+                integracionsSalut.addAll(helper.getIntegracionsSalut());
+            }
         } catch (Exception e) {
-            return null;
+            return Collections.emptyList();
         }
+        return integracionsSalut;
     }
 
-    public List<SalutInfo> checkSubsistemes() {
+    public List<SubsistemaSalutInfo> checkSubsistemes() {
 
         try {
 
@@ -229,8 +253,8 @@ public class SalutServiceImpl implements SalutService {
 
             return List.of(
                     DetallSalut.builder().codi("PRC").nom("Processadors").valor(String.valueOf(Runtime.getRuntime().availableProcessors())).build(),
-                    DetallSalut.builder().codi("CPU").nom("Càrrega del sistema").valor(systemCpuLoad).build(),
-                    DetallSalut.builder().codi("CPU").nom("Càrrega del procés").valor(processCpuLoad).build(),
+                    DetallSalut.builder().codi("SCPU").nom("Càrrega del sistema").valor(systemCpuLoad).build(),
+                    DetallSalut.builder().codi("PCPU").nom("Càrrega del procés").valor(processCpuLoad).build(),
                     DetallSalut.builder().codi("MED").nom("Memòria disponible").valor(humanReadableByteCount(memory.getFree())).build(),
                     DetallSalut.builder().codi("MET").nom("Memòria total").valor(humanReadableByteCount(memory.getTotal())).build(),
                     DetallSalut.builder().codi("EDT").nom("Espai de disc total").valor(humanReadableByteCount(totalSpace)).build(),

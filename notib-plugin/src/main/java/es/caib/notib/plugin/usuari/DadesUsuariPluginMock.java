@@ -3,6 +3,9 @@
  */
 package es.caib.notib.plugin.usuari;
 
+import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.notib.plugin.SistemaExternException;
 
 import java.util.Arrays;
@@ -42,4 +45,24 @@ public class DadesUsuariPluginMock implements DadesUsuariPlugin {
 		return Arrays.asList("NOT_SUPER", "NOT_ADMIN", "NOT_CARPETA", "NOT_APL", "tothom");
 	}
 
+	// Mètodes de SALUT
+	// /////////////////////////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public boolean teConfiguracioEspecifica() {
+		return false;
+	}
+
+	@Override
+	public EstatSalut getEstatPlugin() {
+		return EstatSalut.builder()
+				.estat(EstatSalutEnum.UP)
+				.latencia(1)
+				.build();
+	}
+
+	@Override
+	public IntegracioPeticions getPeticionsPlugin() {
+		return IntegracioPeticions.builder().build();
+	}
 }

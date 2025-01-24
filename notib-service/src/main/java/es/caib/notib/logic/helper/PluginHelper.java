@@ -1,8 +1,7 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.comanda.salut.model.IntegracioApp;
-import es.caib.comanda.salut.model.IntegracioSalut;
 import es.caib.notib.logic.exception.DocumentNotFoundException;
+import es.caib.notib.logic.helper.plugin.AbstractPluginHelper;
 import es.caib.notib.logic.helper.plugin.ArxiuPluginHelper;
 import es.caib.notib.logic.helper.plugin.CarpetaPluginHelper;
 import es.caib.notib.logic.helper.plugin.DadesUsuarisPluginHelper;
@@ -36,6 +35,7 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.repository.OrganGestorRepository;
+import es.caib.notib.plugin.arxiu.ArxiuPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
@@ -60,7 +60,6 @@ import es.caib.plugins.arxiu.api.ArxiuException;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -498,65 +497,67 @@ public class PluginHelper {
 
 	public void resetAllPlugins() {
 
-		dadesUsuarisPluginHelper.resetPlugin();
-		registrePluginHelper.resetPlugin();
-		gestorDocumentalAdministratiuPluginHelper.resetPlugin();
-		unitatsOrganitzativesPluginHelper.resetPlugin();
 		arxiuPluginHelper.resetPlugin();
-		gestioDocumentalPluginHelper.resetPlugin();
+		dadesUsuarisPluginHelper.resetPlugin();
 		firmaPluginHelper.resetPlugin();
+		validaSignaturaPluginHelper.resetPlugin();
+		gestorDocumentalAdministratiuPluginHelper.resetPlugin();
+		gestioDocumentalPluginHelper.resetPlugin();
+		registrePluginHelper.resetPlugin();
+		unitatsOrganitzativesPluginHelper.resetPlugin();
+		carpetaPluginHelper.resetPlugin();
 	}
 
-	public List<IntegracioSalut> getPeticionsPluginsAndReset() {
-
-		var estatPluginUsr = dadesUsuarisPluginHelper.getEstatPlugin();
-//		var estatPluginGdo = gestioDocumentalPluginHelper.getEstatPlugin();
-		var estatPluginReg = registrePluginHelper.getEstatPlugin();
-		var estatPluginArx = arxiuPluginHelper.getEstatPlugin();
-		var estatPluginDir = unitatsOrganitzativesPluginHelper.getEstatPlugin();
-		var estatPluginRsc = gestorDocumentalAdministratiuPluginHelper.getEstatPlugin();
-		var estatPluginPfi = firmaPluginHelper.getEstatPlugin();
-		var estatPluginAfi = validaSignaturaPluginHelper.getEstatPlugin();
-		var estatPluginCar = carpetaPluginHelper.getEstatPlugin();
-
-		var peticionsPluginUsr = dadesUsuarisPluginHelper.getPeticionsPluginAndReset();
-//		var peticionsPluginGdo = gestioDocumentalPluginHelper.getPeticionsPluginAndReset();
-		var peticionsPluginReg = registrePluginHelper.getPeticionsPluginAndReset();
-		var peticionsPluginArx = arxiuPluginHelper.getPeticionsPluginAndReset();
-		var peticionsPluginDir = unitatsOrganitzativesPluginHelper.getPeticionsPluginAndReset();
-		var peticionsPluginRsc = gestorDocumentalAdministratiuPluginHelper.getPeticionsPluginAndReset();
-		var peticionsPluginPfi = firmaPluginHelper.getPeticionsPluginAndReset();
-		var peticionsPluginAfi = validaSignaturaPluginHelper.getPeticionsPluginAndReset();
-		var peticionsPluginCar = carpetaPluginHelper.getPeticionsPluginAndReset();
-
-
-		var salutPluginUsr = IntegracioSalut.builder().codi(IntegracioApp.USR.name()).estat(estatPluginUsr.getEstat()).latencia(estatPluginUsr.getLatencia()).peticions(peticionsPluginUsr).build();
-//		var salutPluginGdo = IntegracioSalut.builder().codi("GDO").estat(estatPluginGdo.getEstat()).latencia(estatPluginGdo.getLatencia()).peticions(peticionsPluginGdo).build();
-		var salutPluginReg = IntegracioSalut.builder().codi(IntegracioApp.REG.name()).estat(estatPluginReg.getEstat()).latencia(estatPluginReg.getLatencia()).peticions(peticionsPluginReg).build();
-		var salutPluginArx = IntegracioSalut.builder().codi(IntegracioApp.ARX.name()).estat(estatPluginArx.getEstat()).latencia(estatPluginArx.getLatencia()).peticions(peticionsPluginArx).build();
-		var salutPluginDir = IntegracioSalut.builder().codi(IntegracioApp.DIR.name()).estat(estatPluginDir.getEstat()).latencia(estatPluginDir.getLatencia()).peticions(peticionsPluginDir).build();
-		var salutPluginRsc = IntegracioSalut.builder().codi(IntegracioApp.RSC.name()).estat(estatPluginRsc.getEstat()).latencia(estatPluginRsc.getLatencia()).peticions(peticionsPluginRsc).build();
-		var salutPluginPfi = IntegracioSalut.builder().codi(IntegracioApp.PFI.name()).estat(estatPluginPfi.getEstat()).latencia(estatPluginPfi.getLatencia()).peticions(peticionsPluginPfi).build();
-		var salutPluginAfi = IntegracioSalut.builder().codi(IntegracioApp.AFI.name()).estat(estatPluginAfi.getEstat()).latencia(estatPluginAfi.getLatencia()).peticions(peticionsPluginAfi).build();
-		var salutPluginCar = IntegracioSalut.builder().codi(IntegracioApp.CAR.name()).estat(estatPluginCar.getEstat()).latencia(estatPluginCar.getLatencia()).peticions(peticionsPluginCar).build();
-		// TODO: Afegir Notifica i Email
-//		var salutPluginNtf = IntegracioSalut.builder().codi(IntegracioApp.NTF.name()).estat(estatPluginNtf.getEstat()).latencia(estatPluginNtf.getLatencia()).peticions(peticionsPluginNtf).build();
-//		var salutPluginEml = IntegracioSalut.builder().codi(IntegracioApp.EML.name()).estat(estatPluginEml.getEstat()).latencia(estatPluginEml.getLatencia()).peticions(peticionsPluginEml).build();
-
-
-		return List.of(
-				salutPluginUsr,
-				salutPluginReg,
-				salutPluginArx,
-				salutPluginDir,
-				salutPluginRsc,
-				salutPluginPfi,
-				salutPluginAfi,
-				salutPluginCar
-//				salutPluginNtf,
-//				salutPluginEml
-		);
-	}
+//	public List<IntegracioSalut> getPeticionsPluginsAndReset() {
+//
+//		var estatPluginArx = arxiuPluginHelper.getIntegracionsSalut();
+//		var estatPluginUsr = dadesUsuarisPluginHelper.getIntegracionsSalut();
+//		var estatPluginPfi = firmaPluginHelper.getIntegracionsSalut();
+//		var estatPluginAfi = validaSignaturaPluginHelper.getIntegracionsSalut();
+//		var estatPluginRsc = gestorDocumentalAdministratiuPluginHelper.getIntegracionsSalut();
+////		var estatPluginGdo = gestioDocumentalPluginHelper.getIntegracionsSalut()();
+//		var estatPluginReg = registrePluginHelper.getIntegracionsSalut();
+//		var estatPluginDir = unitatsOrganitzativesPluginHelper.getIntegracionsSalut();
+//		var estatPluginCar = carpetaPluginHelper.getIntegracionsSalut();
+//
+//		var peticionsPluginArx = arxiuPluginHelper.getPeticionsPluginAndReset();
+//		var peticionsPluginUsr = dadesUsuarisPluginHelper.getPeticionsPluginAndReset();
+//		var peticionsPluginPfi = firmaPluginHelper.getPeticionsPluginAndReset();
+//		var peticionsPluginAfi = validaSignaturaPluginHelper.getPeticionsPluginAndReset();
+//		var peticionsPluginRsc = gestorDocumentalAdministratiuPluginHelper.getPeticionsPluginAndReset();
+////		var peticionsPluginGdo = gestioDocumentalPluginHelper.getPeticionsPluginAndReset();
+//		var peticionsPluginReg = registrePluginHelper.getPeticionsPluginAndReset();
+//		var peticionsPluginDir = unitatsOrganitzativesPluginHelper.getPeticionsPluginAndReset();
+//		var peticionsPluginCar = carpetaPluginHelper.getPeticionsPluginAndReset();
+//
+//
+//		var salutPluginArx = IntegracioSalut.builder().codi(IntegracioApp.ARX.name()).estat(estatPluginArx.getEstat()).latencia(estatPluginArx.getLatencia()).peticions(peticionsPluginArx).build();
+//		var salutPluginUsr = IntegracioSalut.builder().codi(IntegracioApp.USR.name()).estat(estatPluginUsr.getEstat()).latencia(estatPluginUsr.getLatencia()).peticions(peticionsPluginUsr).build();
+//		var salutPluginPfi = IntegracioSalut.builder().codi(IntegracioApp.PFI.name()).estat(estatPluginPfi.getEstat()).latencia(estatPluginPfi.getLatencia()).peticions(peticionsPluginPfi).build();
+//		var salutPluginAfi = IntegracioSalut.builder().codi(IntegracioApp.AFI.name()).estat(estatPluginAfi.getEstat()).latencia(estatPluginAfi.getLatencia()).peticions(peticionsPluginAfi).build();
+//		var salutPluginRsc = IntegracioSalut.builder().codi(IntegracioApp.RSC.name()).estat(estatPluginRsc.getEstat()).latencia(estatPluginRsc.getLatencia()).peticions(peticionsPluginRsc).build();
+////		var salutPluginGdo = IntegracioSalut.builder().codi("GDO").estat(estatPluginGdo.getEstat()).latencia(estatPluginGdo.getLatencia()).peticions(peticionsPluginGdo).build();
+//		var salutPluginReg = IntegracioSalut.builder().codi(IntegracioApp.REG.name()).estat(estatPluginReg.getEstat()).latencia(estatPluginReg.getLatencia()).peticions(peticionsPluginReg).build();
+//		var salutPluginDir = IntegracioSalut.builder().codi(IntegracioApp.DIR.name()).estat(estatPluginDir.getEstat()).latencia(estatPluginDir.getLatencia()).peticions(peticionsPluginDir).build();
+//		var salutPluginCar = IntegracioSalut.builder().codi(IntegracioApp.CAR.name()).estat(estatPluginCar.getEstat()).latencia(estatPluginCar.getLatencia()).peticions(peticionsPluginCar).build();
+//		// TODO: Afegir Notifica i Email
+////		var salutPluginNtf = IntegracioSalut.builder().codi(IntegracioApp.NTF.name()).estat(estatPluginNtf.getEstat()).latencia(estatPluginNtf.getLatencia()).peticions(peticionsPluginNtf).build();
+////		var salutPluginEml = IntegracioSalut.builder().codi(IntegracioApp.EML.name()).estat(estatPluginEml.getEstat()).latencia(estatPluginEml.getLatencia()).peticions(peticionsPluginEml).build();
+//
+//
+//		return List.of(
+//				salutPluginUsr,
+//				salutPluginReg,
+//				salutPluginArx,
+//				salutPluginDir,
+//				salutPluginRsc,
+//				salutPluginPfi,
+//				salutPluginAfi,
+//				salutPluginCar
+////				salutPluginNtf,
+////				salutPluginEml
+//		);
+//	}
 
 
 	// PROPIETATS TASQUES EN SEGON PLA
@@ -625,10 +626,10 @@ public class PluginHelper {
 		registrePluginHelper.setRegistrePlugin(registrePlugin);
 	}
 
-	public void setArxiuPlugin(IArxiuPlugin arxiuPlugin) {
+	public void setArxiuPlugin(ArxiuPlugin arxiuPlugin) {
 		arxiuPluginHelper.setArxiuPlugin(arxiuPlugin);
 	}
-	public void setArxiuPlugin(Map<String, IArxiuPlugin> arxiuPlugin) {
+	public void setArxiuPlugin(Map<String, ArxiuPlugin> arxiuPlugin) {
 		arxiuPluginHelper.setArxiuPlugin(arxiuPlugin);
 	}
 	
@@ -687,6 +688,19 @@ public class PluginHelper {
 			annex.setModeFirma(RegistreModeFirmaDtoEnum.SENSE_FIRMA);
 		}
 		return annex;
+	}
+
+	public List<AbstractPluginHelper<?>> getPluginHelpers() {
+		return List.of(
+				arxiuPluginHelper,
+				dadesUsuarisPluginHelper,
+				firmaPluginHelper,
+				validaSignaturaPluginHelper,
+				gestorDocumentalAdministratiuPluginHelper,
+				registrePluginHelper,
+				unitatsOrganitzativesPluginHelper,
+				carpetaPluginHelper
+		);
 	}
 
 //	private boolean isFitxerSigned(byte[] contingut, String contentType) {

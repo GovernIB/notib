@@ -3,6 +3,7 @@
  */
 package es.caib.notib.plugin.gesdoc;
 
+import es.caib.notib.plugin.SalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 
 import java.io.InputStream;
@@ -14,7 +15,7 @@ import java.io.OutputStream;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface GestioDocumentalPlugin {
+public interface GestioDocumentalPlugin extends SalutPlugin {
 
 	/**
 	 * Puja un document a la gestió documental.
