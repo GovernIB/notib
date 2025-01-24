@@ -50,7 +50,7 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
                              NotificacioEnviamentRepository enviamentRepository,
                              JustificantEnviamentHelper justificantEnviamentHelper,
                              ConversioTipusHelper conversioTipusHelper,
-                             EntitatRepository entitatRepository,) {
+                             EntitatRepository entitatRepository) {
 
 		super(integracioHelper, configHelper, entitatRepository);
         this.enviamentRepository = enviamentRepository;

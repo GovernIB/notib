@@ -8,7 +8,7 @@ import es.caib.comanda.salut.model.IntegracioInfo;
 import es.caib.comanda.salut.model.IntegracioSalut;
 import es.caib.comanda.salut.model.MissatgeSalut;
 import es.caib.comanda.salut.model.SalutInfo;
-import es.caib.comanda.salut.model.SubsistemaSalutInfo;
+import es.caib.comanda.salut.model.SubsistemaSalut;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.plugin.AbstractPluginHelper;
 import es.caib.notib.logic.intf.service.SalutService;
@@ -202,7 +202,7 @@ public class SalutServiceImpl implements SalutService {
         return integracionsSalut;
     }
 
-    public List<SubsistemaSalutInfo> checkSubsistemes() {
+    public List<SubsistemaSalut> checkSubsistemes() {
 
         try {
 
