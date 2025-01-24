@@ -46,7 +46,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
     private JmsTemplate jmsTemplate;
 
     @Override
-    public  es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.ResultadoSincronizarEnvio sincronizarEnvio(es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.SincronizarEnvio sincronizarEnvio) {
+    public  ResultadoSincronizarEnvio sincronizarEnvio(es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.SincronizarEnvio sincronizarEnvio) {
 
         var info = new IntegracioInfo(IntegracioCodi.CIE, "Sincronitzar enviament", IntegracioAccioTipusEnumDto.RECEPCIO,
                 new AccioParam("Identificador Nexea", sincronizarEnvio.getIdentificador()),
@@ -60,7 +60,8 @@ public class CieAdviserServiceImpl implements CieAdviserService {
         } else {
             integracioHelper.addAccioError(info, resposta.getDescripcionRespuesta());
         }
-        return conversioTipusHelper.convertir(sincronizarEnvio, es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.ResultadoSincronizarEnvio.class);
+        return resposta;
+//        return conversioTipusHelper.convertir(sincronizarEnvio, es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.ResultadoSincronizarEnvio.class);
     }
 
     @Transactional

@@ -26,6 +26,19 @@ import java.util.Date;
 @Tag(name = "Consulta v2", description = "API de consulta v2")
 public interface ConsultaApiRestV2Intf {
 
+	@GetMapping(value="/enviaments/{dniTitular}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "Consulta totes notificacions i comunicacions del titular donat el seu dni", description = "Retorna informació de totes les notificacions i comunicacions d'un titular, i el seu estat")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions i comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = RespostaConsultaV2Api.class, description = "Informació de notificacions i comunicacions"))})})
+	RespostaConsultaV2 enviamnetsByTitular(
+			HttpServletRequest request,
+			@PathVariable String dniTitular,
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
+			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
+			@RequestParam (value = "lang", required = false) Idioma lang,
+			@RequestParam(value = "pagina", required = false) Integer pagina,
+			@RequestParam(value = "mida", required = false) Integer mida);
+
 	@GetMapping(value="/comunicacions/{dniTitular}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "Consulta totes les comunicacions d'un titular donat el seu dni", description = "Retorna informació de totes les comunicacions d'un titular, i el seu estat")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions/Comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = RespostaConsultaV2Api.class, description = "Informació de comunicacions/notificacions"))})})
@@ -43,6 +56,19 @@ public interface ConsultaApiRestV2Intf {
 	@Operation(summary = "Consulta totes les notificacions d'un titular donat el seu dni", description = "Retorna informació de totes les notificacions d'un titular, i el seu estat")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions/Comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = RespostaConsultaV2Api.class, description = "Informació de comunicacions/notificacions"))})})
 	RespostaConsultaV2 notificacionsByTitular(
+			HttpServletRequest request,
+			@PathVariable String dniTitular,
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
+			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
+			@RequestParam (value = "lang", required = false) Idioma lang,
+			@RequestParam(value = "pagina", required = false) Integer pagina,
+			@RequestParam(value = "mida", required = false) Integer mida);
+
+	@GetMapping(value="/enviaments/{dniTitular}/pendents", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "Consulta totes les notificacions i comunicacions pendents (no llegides) d'un titular donat el seu dni", description = "Retorna informació sobre les notificacions i comunicacions pendents d'un titular, i el seu estat")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions i comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = RespostaConsultaV2Api.class, description = "Informació deles notificacions i omunicacions"))})})
+	RespostaConsultaV2 enviamentsPendentsByTitular(
 			HttpServletRequest request,
 			@PathVariable String dniTitular,
 			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
@@ -77,6 +103,20 @@ public interface ConsultaApiRestV2Intf {
 			@RequestParam (value = "lang", required = false) Idioma lang,
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida);
+
+	@GetMapping(value="/enviaments/{dniTitular}/llegides", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "Consulta totes les notificacions i comunicacions llegides d'un titular donat el seu dni", description = "Retorna informació sobre les notificacions i comunicacions ja llegides d'un titular, i el seu estat")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions i comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = RespostaConsultaV2Api.class, description = "Informació de les notificacions i comunicacions"))})})
+	RespostaConsultaV2 enviamentsLlegitsByTitular(
+			HttpServletRequest request,
+			@PathVariable String dniTitular,
+			@RequestParam (value = "dataInicial", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataInicial,
+			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy", fallbackPatterns = {"yyyy-MM-dd"}) Date dataFinal,
+			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
+			@RequestParam (value = "lang", required = false) Idioma lang,
+			@RequestParam(value = "pagina", required = false) Integer pagina,
+			@RequestParam(value = "mida", required = false) Integer mida);
+
 
 	@GetMapping(value="/comunicacions/{dniTitular}/llegides", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "Consulta totes les comunicacions llegides d'un titular donat el seu dni", description = "Retorna informació sobre les comunicacions ja llegides d'un titular, i el seu estat")

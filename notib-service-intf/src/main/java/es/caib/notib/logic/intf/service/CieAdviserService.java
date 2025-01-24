@@ -3,7 +3,7 @@ package es.caib.notib.logic.intf.service;
 import es.caib.notib.logic.intf.ws.adviser.nexea.common.Opciones;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.Acuse;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.Receptor;
-import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.ResultadoSincronizarEnvio;
+import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.ResultadoSincronizarEnvio;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.SincronizarEnvio;
 
 import javax.xml.datatype.XMLGregorianCalendar;
