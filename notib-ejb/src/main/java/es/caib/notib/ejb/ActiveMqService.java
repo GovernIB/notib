@@ -1,6 +1,7 @@
 package es.caib.notib.ejb;
 
 import es.caib.notib.logic.intf.dto.ActiveMqInfo;
+import es.caib.notib.logic.intf.dto.ActiveMqMissatgeInfo;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import org.springframework.context.annotation.Primary;
@@ -23,8 +24,8 @@ public class ActiveMqService extends AbstractService<es.caib.notib.logic.intf.se
 
     @Override
     @RolesAllowed({"NOT_SUPER"})
-    public void getMessages(String queueNom) {
-        getDelegateService().getMessages(queueNom);
+    public List<ActiveMqMissatgeInfo> getMessages(String queueNom) {
+        return getDelegateService().getMessages(queueNom);
     }
 
     @Override

@@ -3,6 +3,7 @@ package es.caib.notib.logic.service;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.intf.dto.ActiveMqInfo;
+import es.caib.notib.logic.intf.dto.ActiveMqMissatgeInfo;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.service.ActiveMqService;
@@ -12,6 +13,7 @@ import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.jmx.BrokerViewMBean;
 import org.apache.activemq.broker.jmx.QueueViewMBean;
 import org.apache.activemq.store.kahadb.KahaDBPersistenceAdapter;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import javax.management.JMX;
@@ -21,6 +23,7 @@ import javax.management.ObjectName;
 import javax.management.openmbean.OpenDataException;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
@@ -94,27 +97,37 @@ public class ActiveMqServiceImpl implements ActiveMqService {
     }
 
     @Override
-    public void getMessages(String queueNom) {
+    public List<ActiveMqMissatgeInfo> getMessages(String queueNom) {
 
+        List<ActiveMqMissatgeInfo> missatges = new ArrayList<>();
         try {
-        var connection = ManagementFactory.getPlatformMBeanServer();
-        var activeMQ = new ObjectName("org.apache.activemq:type=Broker,brokerName=localhost");
-        var mBean = JMX.newMBeanProxy(connection, activeMQ, BrokerViewMBean.class);
-        QueueViewMBean queueMBean;
-        for (var name : mBean.getQueues()) {
-            queueMBean = JMX.newMBeanProxy(connection, name, QueueViewMBean.class);
-            if (!queueMBean.getName().equals(queueNom)) {
-                continue;
+            var connection = ManagementFactory.getPlatformMBeanServer();
+            var activeMQ = new ObjectName("org.apache.activemq:type=Broker,brokerName=localhost");
+            var mBean = JMX.newMBeanProxy(connection, activeMQ, BrokerViewMBean.class);
+            QueueViewMBean queueMBean;
+            for (var name : mBean.getQueues()) {
+                queueMBean = JMX.newMBeanProxy(connection, name, QueueViewMBean.class);
+                if (!queueMBean.getName().equals(queueNom)) {
+                    continue;
+                }
+                var messages = queueMBean.browse();
+                for (var message : messages) {
+                    JSONObject json = new JSONObject(message.get("Text").toString());
+                    Iterator<String> keys = json.keys();
+                    if (keys.hasNext()) {
+                        String nomObjecte = keys.next();
+                        var jsonInfo = json.get(nomObjecte).toString();
+                        json = new JSONObject(jsonInfo);
+                        String uuid = json.getString("uuid");
+                        System.out.println("Message: " + uuid);
+                        missatges.add(new ActiveMqMissatgeInfo(uuid));
+                    }
+                }
             }
-            var messages = queueMBean.browse();
-            for (var message : messages) {
-
-                System.out.println("Message: " + message);
-            }
-        }
         } catch (Exception ex) {
             log.error("Error al obtenir la informacio dels missatges per la cua " + queueNom, ex);
         }
+        return missatges;
     }
 
     private List<String> getQueuesNames() throws Exception {

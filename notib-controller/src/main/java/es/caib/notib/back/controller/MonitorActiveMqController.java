@@ -5,6 +5,7 @@ package es.caib.notib.back.controller;
 
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.logic.intf.dto.ActiveMqInfo;
+import es.caib.notib.logic.intf.dto.ActiveMqMissatgeInfo;
 import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.service.ActiveMqService;
@@ -54,10 +55,8 @@ public class MonitorActiveMqController extends BaseController {
 	@ResponseBody
 	public DatatablesHelper.DatatablesResponse missatgesDatatable(HttpServletRequest request, @PathVariable String queueNom) {
 
-		var params = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		PaginaDto<ActiveMqInfo> apps = activeMqService.getInfoQueues(params);
-		activeMqService.getMessages(queueNom);
-		return DatatablesHelper.getDatatableResponse(request, apps);
+		var missatges = activeMqService.getMessages(queueNom);
+		return DatatablesHelper.getDatatableResponse(request, missatges);
 	}
 
 	@GetMapping("/queues")

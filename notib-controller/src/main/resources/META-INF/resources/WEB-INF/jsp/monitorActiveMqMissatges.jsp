@@ -41,21 +41,21 @@
 		style="width:100%">
 	<thead>
 	<tr>
-		<th data-col-name="nom"><spring:message code="monitor.activemq.columna.nom.cua"/></th>
-		<th data-col-name="descripcio"><spring:message code="monitor.activemq.columna.descripcio.cua"/></th>
-		<th data-col-name="mida"><spring:message code="monitor.activemq.columna.mida.cua"/></th>
-		<%--				<th data-col-name="consumersCount"><spring:message code="monitor.activemq.columna.counsumers.count"/></th>--%>
-		<th data-col-name="enqueueCount"><spring:message code="monitor.activemq.columna.enqueue.count"/></th>
-		<th data-col-name="dequeueCount"><spring:message code="monitor.activemq.columna.dequeue.count"/></th>
-		<th data-col-name="forwardCount"><spring:message code="monitor.activemq.columna.forward.count"/></th>
-		<th data-col-name="inFlightCount"><spring:message code="monitor.activemq.columna.in.flight.count"/></th>
-		<th data-col-name="expiredCount"><spring:message code="monitor.activemq.columna.expired.count"/></th>
-		<th data-col-name="storeMessageSize"><spring:message code="monitor.activemq.columna.store.message.size.count"/></th>
-		<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
-			<script id="cellAccionsTemplate" type="text/x-jsrender">
-				<a class="btn btn-primary" href="<c:url value="/monitor/activemq/missatges/{{:nom}}"/>" data-toggle="modal" data-processar="true"><span class="fa fa-send"></span>&nbsp;<spring:message code="comu.boto.accions"/></span>
-			</script>
-		</th>
+		<th data-col-name="uuid"><spring:message code="monitor.activemq.columna.nom.cua"/></th>
+<%--		<th data-col-name="descripcio"><spring:message code="monitor.activemq.columna.descripcio.cua"/></th>--%>
+<%--		<th data-col-name="mida"><spring:message code="monitor.activemq.columna.mida.cua"/></th>--%>
+<%--		&lt;%&ndash;				<th data-col-name="consumersCount"><spring:message code="monitor.activemq.columna.counsumers.count"/></th>&ndash;%&gt;--%>
+<%--		<th data-col-name="enqueueCount"><spring:message code="monitor.activemq.columna.enqueue.count"/></th>--%>
+<%--		<th data-col-name="dequeueCount"><spring:message code="monitor.activemq.columna.dequeue.count"/></th>--%>
+<%--		<th data-col-name="forwardCount"><spring:message code="monitor.activemq.columna.forward.count"/></th>--%>
+<%--		<th data-col-name="inFlightCount"><spring:message code="monitor.activemq.columna.in.flight.count"/></th>--%>
+<%--		<th data-col-name="expiredCount"><spring:message code="monitor.activemq.columna.expired.count"/></th>--%>
+<%--		<th data-col-name="storeMessageSize"><spring:message code="monitor.activemq.columna.store.message.size.count"/></th>--%>
+<%--		<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">--%>
+<%--			<script id="cellAccionsTemplate" type="text/x-jsrender">--%>
+<%--				<a class="btn btn-primary" href="<c:url value="/monitor/activemq/missatges/{{:nom}}"/>" data-toggle="modal" data-processar="true"><span class="fa fa-send"></span>&nbsp;<spring:message code="comu.boto.accions"/></span>--%>
+<%--			</script>--%>
+<%--		</th>--%>
 	</tr>
 
 	</thead>
