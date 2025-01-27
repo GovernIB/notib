@@ -40,15 +40,25 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	private static final long MAX_FILES_IN_FOLDER = 5000;
 
 	private final Properties properties;
+	private boolean configuracioEspecifica;
 
 	private static final String AMB_ID = " amb id: ";
 	private static final String ARXIU_NO_TROBAT = "No s'ha trobat l'arxiu (id=";
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
+
+
 	public GestioDocumentalPluginFilesystem(Properties properties) {
 
 		this.properties = properties;
+		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.GESDOC")));
+	}
+
+	public GestioDocumentalPluginFilesystem(Properties properties, boolean configuracioEspecifica) {
+
+		this.properties = properties;
+		this.configuracioEspecifica = configuracioEspecifica;
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.GESDOC")));
 	}
 
@@ -249,7 +259,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 	@Override
 	public boolean teConfiguracioEspecifica() {
-		return false;
+		return configuracioEspecifica;
 	}
 
 	@Override

@@ -17,13 +17,25 @@ public class ValidacioFirmesPluginMock implements IValidateSignaturePlugin {
 
     private Properties properties;
     private String propertyKeyBase;
+    private boolean configuracioEspcifica;
 
     public ValidacioFirmesPluginMock(String propertyKeyBase, Properties properties) {
+
         super();
         this.propertyKeyBase = propertyKeyBase;
         this.properties = properties;
     }
+
+    public ValidacioFirmesPluginMock(String propertyKeyBase, Properties properties, boolean configuracioEspcifica) {
+
+        super();
+        this.propertyKeyBase = propertyKeyBase;
+        this.properties = properties;
+        this.configuracioEspcifica = configuracioEspcifica;
+    }
+
     public ValidacioFirmesPluginMock(Properties properties) {
+
         super();
         this.properties = properties;
     }
