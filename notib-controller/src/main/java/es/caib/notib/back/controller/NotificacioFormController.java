@@ -54,6 +54,7 @@ import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PagadorCieFormatFullaService;
 import es.caib.notib.logic.intf.service.PagadorCieFormatSobreService;
+import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.ServeiService;
@@ -139,6 +140,8 @@ public class NotificacioFormController extends BaseUserController {
     private static final String ENVIAMENT_TIPUS = "enviament_tipus";
     private static final String NOM_DOCUMENT = "nomDocument_";
     private static final String FALSE = "false";
+    @Autowired
+    private PagadorCieService pagadorCieService;
 
 
     @GetMapping(value = "/new/notificacio")
@@ -482,9 +485,9 @@ public class NotificacioFormController extends BaseUserController {
         return notificacioService.llistarProvincies(codiCA);
     }
 
-    @GetMapping(value = "/procediment/{procedimentId}/dades")
+    @GetMapping(value = "/procediment/{procedimentId}/organ/{organCodi}/dades")
     @ResponseBody
-    public DadesProcediment getDadesProcSer(HttpServletRequest request, @PathVariable Long procedimentId) {
+    public DadesProcediment getDadesProcSer(HttpServletRequest request, @PathVariable Long procedimentId, @PathVariable String organCodi) {
 
         var entitatActual = sessionScopedContext.getEntitatActual();
         var procedimentActual = procedimentService.findById(entitatActual.getId(),false, procedimentId);
@@ -511,7 +514,14 @@ public class NotificacioFormController extends BaseUserController {
             // Obtenim òrgans seleccionables
         var permis = EnviamentTipus.SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
                 EnviamentTipus.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
-        dadesProcediment.setOrgansDisponibles(permisosService.getOrgansCodisAmbPermisPerProcedimentComu(entitatActual.getId(), getCodiUsuariActual(), permis, procedimentActual));
+        var organsDisponibles = permisosService.getOrgansCodisAmbPermisPerProcedimentComu(entitatActual.getId(), getCodiUsuariActual(), permis, procedimentActual);
+        dadesProcediment.setOrgansDisponibles(organsDisponibles);
+        if (!organsDisponibles.contains(organCodi)) {
+            return dadesProcediment;
+        }
+        // Mirar si organ seleccionat te entrega postal actvia
+        var organ = organGestorService.findByCodi(entitatActual.getId(), organCodi);
+        dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva());
         return dadesProcediment;
     }
 

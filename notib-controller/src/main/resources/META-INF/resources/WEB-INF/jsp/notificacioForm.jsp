@@ -1442,9 +1442,10 @@
 			$("#organGestor").prop("disabled", false);
 			$("#metodeEntrega").css("display", "none");
 		} else {
+			let organ = $("#organGestor").val();
 			$.ajax({
 				type: 'GET',
-				url: "<c:url value="/notificacio/procediment/"/>" + procediment + "/dades",
+				url: "<c:url value="/notificacio/procediment/"/>" + procediment + "/organ/" + organ + "/dades",
 				success: function(data) {
 					var select2Options = {
 						theme: 'bootstrap',

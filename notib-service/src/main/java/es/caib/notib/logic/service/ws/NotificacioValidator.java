@@ -185,7 +185,8 @@ public class NotificacioValidator implements Validator {
             if (ProcSerTipusEnum.SERVEI.equals(procediment.getTipus()) && EnviamentTipus.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
                 errors.reject(error(SERVEI_EN_NOTIFICACIO, locale));
             }
-            if (!procediment.isEntregaCieActivaAlgunNivell()) {
+            var cieActiuPerProcComuOrgan = procediment.isComu() && organGestor.getEntregaCie() != null;
+            if (!procediment.isEntregaCieActivaAlgunNivell() && !cieActiuPerProcComuOrgan) {
                 int i = 0;
                 for (var enviament : notificacio.getEnviaments()) {
                     if (enviament.isEntregaPostalActiva()) {
