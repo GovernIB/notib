@@ -76,7 +76,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 				configHelper.setEntitatCodi(entitat.getCodi());
 			}
 			info.setCodiEntitat(entitat.getCodi());
-			peticionsPlugin.updatePeticioTotal(entitat.getCodi());
+			peticionsPlugin.addPeticioTotal(entitat.getCodi());
 			Map<String, NodeDir3> organigrama;
 			if ("SOAP".equalsIgnoreCase(protocol)) {
 				log.info("Obtenir l'organigrama per entitat SOAP");
@@ -92,7 +92,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			String errorDescripcio = "Error al obtenir l'organigrama per entitat";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			if (entitat != null) {
-				peticionsPlugin.updatePeticioError(entitat.getCodi());
+				peticionsPlugin.addPeticioError(entitat.getCodi());
 			}
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
@@ -109,7 +109,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		try {
 			ConfigHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var unitatsOrganitzatives = getPlugin().findAmbPareJson(pareCodi, dataActualitzacio, dataSincronitzacio);
 			integracioHelper.addAccioOk(info);
 			return unitatsOrganitzatives;
@@ -118,7 +118,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'unitats organitzatives";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
@@ -132,7 +132,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		try {
 			ConfigHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var unitatsOrganitzatives = getPlugin().findAmbPare(pareCodi, dataActualitzacio, dataSincronitzacio);
 			removeUnitatsSubstitutedByItself(unitatsOrganitzatives);
 			if (unitatsOrganitzatives == null || unitatsOrganitzatives.isEmpty()) {
@@ -144,12 +144,12 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			integracioHelper.addAccioOk(info);
 			return unitatsOrganitzatives;
 		} catch (SistemaExternException sex) {
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw sex;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'unitats organitzatives";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
@@ -163,17 +163,17 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		try {
 			ConfigHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var unitatOrganitzativa = getPlugin().findAmbCodi(codi, dataActualitzacio, dataSincronitzacio);
 			integracioHelper.addAccioOk(info);
 			return unitatOrganitzativa;
 		} catch (SistemaExternException sex) {
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw sex;
 		} catch (Exception ex) {
 			var error = "Error al accedir al plugin d'unitats organitzatives";
 			integracioHelper.addAccioError(info, error, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), error, ex);
 		}
 	}
@@ -209,14 +209,14 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);
 		try {
-			peticionsPlugin.updatePeticioTotal(getCodiEntitatActual());
+			peticionsPlugin.addPeticioTotal(getCodiEntitatActual());
 			var organismes = getPlugin().unitatsPerEntitat(entitatcodi, true);
 			integracioHelper.addAccioOk(info);
 			return organismes;
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al llistar organismes per entitat";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
@@ -228,14 +228,14 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);
 		try {
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var denominacio = getPlugin().unitatDenominacio(codiDir3);
 			integracioHelper.addAccioOk(info);
 			return denominacio;
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al obtenir denominació de organisme";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
@@ -255,7 +255,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			if (denominacio != null) {
 				denominacio = denominacio.replaceAll(" ", "%20");
 			}
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var organismesNodeDir3 = getPlugin().cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
 			var organismes = organismesNodeDir3.stream().map(this::toOrganGestorDto).collect(Collectors.toList());
 			integracioHelper.addAccioOk(info);
@@ -263,7 +263,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al llistar organismes  a partir d'un text";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
@@ -280,7 +280,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);
 		try {
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var organismesDir3 = getPlugin().unitatsPerDenominacio(denominacio);
 			var organismes = organismesDir3.stream().map(this::toOrganGestorDto).collect(Collectors.toList());
 			integracioHelper.addAccioOk(info);
@@ -288,7 +288,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al llistar organismes  a partir d'un text";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
@@ -317,7 +317,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);
 		try {
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var nivellsAdministracio = getPlugin().nivellsAdministracio();
 			integracioHelper.addAccioOk(info);
 			return nivellsAdministracio;
@@ -325,7 +325,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			var errorDescripcio = "Error al llistar els nivells de les administracions";
 			log.error(errorDescripcio, ex);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
@@ -336,7 +336,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);
 		try {
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var comunitatsAutonomes = getPlugin().comunitatsAutonomes();
 			integracioHelper.addAccioOk(info);
 			return comunitatsAutonomes;
@@ -344,7 +344,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			var errorDescripcio = "Error al llistar les comunitats autònomes";
 			log.error(errorDescripcio, ex);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
@@ -355,7 +355,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);
 		try {
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var paisos = getPlugin().paisos();
 			integracioHelper.addAccioOk(info);
 			return paisos;
@@ -363,7 +363,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			var errorDescripcio = "Error al llistar països";
 			log.error(errorDescripcio, ex);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
@@ -374,7 +374,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);
 		try {
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var provincies = getPlugin().provincies();
 			integracioHelper.addAccioOk(info);
 			return provincies;
@@ -382,7 +382,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			var errorDescripcio = "Error al llistat províncies";
 			log.error(errorDescripcio, ex);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
@@ -393,7 +393,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);
 		try {
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var provincies = getPlugin().provincies(codiCA);
 			integracioHelper.addAccioOk(info);
 			return provincies;
@@ -401,7 +401,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			var errorDescripcio = "Error al llistat províncies";
 			log.error(errorDescripcio, ex);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
@@ -414,7 +414,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);
 		try {
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var localitats = getPlugin().localitats(codiProvincia);
 			integracioHelper.addAccioOk(info);
 			return localitats;
@@ -422,7 +422,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			var errorDescripcio = "Error al llistat els municipis d'una província";
 			log.error(errorDescripcio, ex);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
@@ -435,7 +435,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);
 		try {
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var oficinesTF = getPlugin().oficinesSIRUnitat(unitatCodi, arbreUnitats);
 			var oficinesSIR = oficinesTF.stream().map(o -> toOficinaDto(o)).collect(Collectors.toList());
 			integracioHelper.addAccioOk(info);
@@ -443,7 +443,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al llistar les oficines d'una unitat organitzativa";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
@@ -459,7 +459,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			}
 			var entitatCodi = entitat.getCodi();
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var oficinesTF = getPlugin().getOficinesEntitat(codiDir3Entitat);
 			var oficinesSIR = oficinesTF.stream().map(this::toOficinaDto).collect(Collectors.toList());
 			integracioHelper.addAccioOk(info);
@@ -468,7 +468,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			var errorDescripcio = "Error al llistar les oficines SIR d'una entitat";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			if (entitat != null) {
-				peticionsPlugin.updatePeticioError(entitat.getCodi());
+				peticionsPlugin.addPeticioError(entitat.getCodi());
 			}
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}

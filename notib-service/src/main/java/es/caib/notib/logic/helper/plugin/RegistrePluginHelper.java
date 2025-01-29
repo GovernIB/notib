@@ -130,7 +130,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var entitatCodi = entitat.getCodi();
 			configHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			resposta = getPlugin().salidaAsientoRegistral(codiDir3Entitat, arb, tipusOperacio, generarJustificant);
 			if (resposta.getErrorCodi() == null) {
 				integracioHelper.addAccioOk(info);
@@ -146,7 +146,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			resposta.setErrorDescripcio(errorDescripcio);
 			resposta.setErrorCodi("3");
 			if (entitat != null) {
-				peticionsPlugin.updatePeticioError(entitat.getCodi());
+				peticionsPlugin.addPeticioError(entitat.getCodi());
 			}
 		}
 		return resposta;
@@ -168,7 +168,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var entitatCodi = entitat.getCodi();
 			configHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			resposta = getPlugin().obtenerAsientoRegistral(codiDir3Entitat, numeroRegistreFormatat, tipusRegistre, ambAnnexos);
 			if (resposta.getErrorCodi() == null) {
 				integracioHelper.addAccioOk(info);
@@ -183,7 +183,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			}
 			resposta.setErrorDescripcio(errorDescripcio);
 			if (entitat != null) {
-				peticionsPlugin.updatePeticioError(entitat.getCodi());
+				peticionsPlugin.addPeticioError(entitat.getCodi());
 			}
 		}
 		return resposta;
@@ -232,7 +232,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var entitatCodi = entitat.getCodi();
 			configHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			resposta = getPlugin().obtenerJustificante(codiDir3Entitat, numeroRegistreFormatat,2);
 			if (resposta.getErrorCodi() == null) {
 				integracioHelper.addAccioOk(info);
@@ -247,7 +247,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			}
 			resposta.setErrorDescripcio(errorDescripcio);
 			if (entitat != null) {
-				peticionsPlugin.updatePeticioError(entitat.getCodi());
+				peticionsPlugin.addPeticioError(entitat.getCodi());
 			}
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}
@@ -269,7 +269,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var entitatCodi = entitat.getCodi();
 			configHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			resposta = getPlugin().obtenerOficioExterno(codiDir3Entitat, numeroRegistreFormatat);
 			if (resposta.getErrorCodi() == null) {
 				integracioHelper.addAccioOk(info);
@@ -284,7 +284,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			}
 			resposta.setErrorDescripcio(errorDescripcio);
 			if (entitat != null) {
-				peticionsPlugin.updatePeticioError(entitat.getCodi());
+				peticionsPlugin.addPeticioError(entitat.getCodi());
 			}
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}
@@ -303,7 +303,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var entitatCodi = entitat.getCodi();
 			configHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var tipusAssumptes = getPlugin().llistarTipusAssumpte(codiDir3Entitat);
 			integracioHelper.addAccioOk(info);
 			return tipusAssumptes;
@@ -311,7 +311,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var errorDescripcio = "Error al llistar els tipus d'assumpte";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			if (entitat != null) {
-				peticionsPlugin.updatePeticioError(entitat.getCodi());
+				peticionsPlugin.addPeticioError(entitat.getCodi());
 			}
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}
@@ -330,7 +330,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var entitatCodi = entitat.getCodi();
 			configHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var assumptes = getPlugin().llistarCodisAssumpte(codiDir3Entitat, tipusAssumpte);
 			integracioHelper.addAccioOk(info);
 			return assumptes;
@@ -338,7 +338,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var errorDescripcio = "Error al llistar els codis d'assumpte";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			if (entitat != null) {
-				peticionsPlugin.updatePeticioError(entitat.getCodi());
+				peticionsPlugin.addPeticioError(entitat.getCodi());
 			}
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}
@@ -359,7 +359,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var entitatCodi = entitat.getCodi();
 			configHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var oficina = getPlugin().llistarOficinaVirtual(codiDir3Entitat, nomOficinaVirtual, autoritzacio.getValor());
 			if (oficina != null) {
 				oficinaDto.setCodi(oficina.getCodi());
@@ -371,7 +371,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var errorDescripcio = "Error al obtenir la oficina virtual";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			if (entitat != null) {
-				peticionsPlugin.updatePeticioError(entitat.getCodi());
+				peticionsPlugin.addPeticioError(entitat.getCodi());
 			}
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}
@@ -392,7 +392,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var entitatCodi = entitat.getCodi();
 			configHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var oficines = getPlugin().llistarOficines(codiDir3Entitat, autoritzacio.getValor());
 			if (oficines != null) {
 				OficinaDto oficinaDto;
@@ -409,7 +409,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var errorDescripcio = "Error al llistar les oficines";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			if (entitat != null) {
-				peticionsPlugin.updatePeticioError(entitat.getCodi());
+				peticionsPlugin.addPeticioError(entitat.getCodi());
 			}
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}
@@ -429,7 +429,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var entitatCodi = entitat.getCodi();
 			configHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var llibresOficines = getPlugin().llistarLlibresOficines(codiDir3Entitat, usuariCodi, tipusRegistre.getValor());
 			integracioHelper.addAccioOk(info);
 			return llibresOficines;
@@ -437,7 +437,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			String errorDescripcio = "Error al llistar els llibres amb oficina";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			if (entitat != null) {
-				peticionsPlugin.updatePeticioError(entitat.getCodi());
+				peticionsPlugin.addPeticioError(entitat.getCodi());
 			}
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}
@@ -458,7 +458,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var entitatCodi = entitat.getCodi();
 			configHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var llibre = getPlugin().llistarLlibreOrganisme(codiDir3Entitat, organismeCodi);
 			if (llibre != null) {
 				llibreDto.setCodi(llibre.getCodi());
@@ -472,7 +472,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var errorDescripcio = "Error al llistar els llibres d'un organisme";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			if (entitat != null) {
-				peticionsPlugin.updatePeticioError(entitat.getCodi());
+				peticionsPlugin.addPeticioError(entitat.getCodi());
 			}
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}
@@ -493,7 +493,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var entitatCodi = entitat.getCodi();
 			configHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var llibres = getPlugin().llistarLlibres(codiDir3Entitat, oficina, autoritzacio.getValor());
 			if (llibres != null) {
 				for (Llibre llibre : llibres) {
@@ -511,7 +511,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var errorDescripcio = "Error al llistar els llibres d'una oficina";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			if (entitat != null) {
-				peticionsPlugin.updatePeticioError(entitat.getCodi());
+				peticionsPlugin.addPeticioError(entitat.getCodi());
 			}
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}
@@ -529,7 +529,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var entitatCodi = entitat.getCodi();
 			configHelper.setEntitatCodi(entitatCodi);
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var organismes = getPlugin().llistarOrganismes(codiDir3Entitat);
 			integracioHelper.addAccioOk(info);
 			return organismes;
@@ -537,7 +537,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			String errorDescripcio = "Error al llistar organismes";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			if (entitat != null) {
-				peticionsPlugin.updatePeticioError(entitat.getCodi());
+				peticionsPlugin.addPeticioError(entitat.getCodi());
 			}
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}

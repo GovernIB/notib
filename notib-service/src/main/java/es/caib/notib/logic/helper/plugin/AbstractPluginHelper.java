@@ -65,7 +65,7 @@ public abstract class AbstractPluginHelper<T> {
 			EstatSalutEnum estat = getEstat();
 			Instant end = Instant.now();
 			long latency = Duration.between(start, end).toMillis();
-			return EstatSalut.builder().latencia(latency).estat(estat).build();
+			return EstatSalut.builder().latencia((int) latency).estat(estat).build();
 		} catch (Exception ex) {
 			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
 		}

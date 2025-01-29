@@ -51,7 +51,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 		var info = new IntegracioInfo(USUARIS,"Consulta rols usuari amb codi",
 				ENVIAMENT, new AccioParam("Codi d'usuari", usuariCodi));
 		try {
-			peticionsPlugin.updatePeticioTotal(null);
+			peticionsPlugin.addPeticioTotal(null);
 			var rols = getPlugin().consultarRolsAmbCodi(usuariCodi);
 			info.addParam("Rols Consultats: ", StringUtils.join(rols, ", "));
 			integracioHelper.addAccioOk(info, false);
@@ -59,7 +59,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
-			peticionsPlugin.updatePeticioError(null);
+			peticionsPlugin.addPeticioError(null);
 			throw new SistemaExternException(USUARIS.name(), errorDescripcio, ex);
 		}
 	}
@@ -70,14 +70,14 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 				new AccioParam("Codi d'usuari", usuariCodi));
 
 		try {
-			peticionsPlugin.updatePeticioTotal(null);
+			peticionsPlugin.addPeticioTotal(null);
 			var dadesUsuari = getPlugin().consultarAmbCodi(usuariCodi);
 			integracioHelper.addAccioOk(info, false);
 			return dadesUsuari;
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
-			peticionsPlugin.updatePeticioError(null);
+			peticionsPlugin.addPeticioError(null);
 			throw new SistemaExternException(USUARIS.name(), errorDescripcio, ex);
 		}
 	}
@@ -88,14 +88,14 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 				new AccioParam("Codi de grup", grupCodi));
 
 		try {
-			peticionsPlugin.updatePeticioTotal(null);
+			peticionsPlugin.addPeticioTotal(null);
 			var dadesUsuari = getPlugin().consultarAmbGrup(grupCodi);
 			integracioHelper.addAccioOk(info, false);
 			return dadesUsuari;
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
-			peticionsPlugin.updatePeticioError(null);
+			peticionsPlugin.addPeticioError(null);
 			throw new SistemaExternException(USUARIS.name(), errorDescripcio, ex);
 		}
 	}

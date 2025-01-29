@@ -103,7 +103,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<IArxiuPlugin> {
 		info.setCodiEntitat(codiEntitat);
 		try {
 			identificador = isUuid ? "uuid:" + identificador : "csv:" + identificador;
-			peticionsPlugin.updatePeticioTotal(codiEntitat);
+			peticionsPlugin.addPeticioTotal(codiEntitat);
 			var documentDetalls = getPlugin().documentDetalls(identificador, versio, ambContingut);
 			integracioHelper.addAccioOk(info);
 			return documentDetalls;
@@ -125,7 +125,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<IArxiuPlugin> {
 
 		try {
 			id = isUuid ? "uuid:" + id : "csv:" + id;
-			peticionsPlugin.updatePeticioTotal(codiEntitat);
+			peticionsPlugin.addPeticioTotal(codiEntitat);
 			var documentContingut = getPlugin().documentImprimible(id);
 			integracioHelper.addAccioOk(info);
 			return documentContingut;

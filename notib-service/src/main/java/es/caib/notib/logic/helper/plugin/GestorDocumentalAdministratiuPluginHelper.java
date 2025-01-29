@@ -49,7 +49,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 		info.setCodiEntitat(entitatCodi);
 		try {
 			List<ProcSerDto> procediments = new ArrayList<>();
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var procs = getPlugin().getAllProcediments();
 			if (procs != null) {
 				ProcSerDto dto;
@@ -83,7 +83,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 			}
 			var entitatCodi = entitat.getCodi();
 			info.setCodiEntitat(entitatCodi);
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var totalElements = getPlugin().getTotalProcediments(codiDir3Entitat);
 			integracioHelper.addAccioOk(info);
 			return totalElements;
@@ -91,7 +91,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 			String errorDescripcio = "Error al obtenir el número total d'elements";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			if (entitat != null) {
-				peticionsPlugin.updatePeticioError(entitat.getCodi());
+				peticionsPlugin.addPeticioError(entitat.getCodi());
 			}
 			throw new SistemaExternException(IntegracioCodi.GESCONADM.name(), errorDescripcio, ex);
 		}
@@ -104,7 +104,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 		info.setCodiEntitat(entitatCodi);
 		List<ProcSerDto> procediments = new ArrayList<>();
 		try {
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var procs = getPlugin().getProcedimentsByUnitat(codiDir3);
 			if (procs != null) {
 				ProcSerDto dto;
@@ -124,7 +124,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al obtenir els procediments del gestor documental administratiu";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.GESCONADM.name(), errorDescripcio, ex);
 		}
 		return procediments;
@@ -137,7 +137,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);
 		try {
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var proc = getPlugin().getProcSerByCodiSia(codiSia, isServei);
 			if (proc == null) {
 				return null;
@@ -152,7 +152,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 		} catch (Exception ex) {
 			var errorDescripcio = "Error " + msg.toLowerCase();
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.GESCONADM.name(), errorDescripcio, ex);
 		}
 	}
@@ -164,7 +164,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 		info.setCodiEntitat(entitatCodi);
 		List<ProcSerDto> procediments = new ArrayList<>();
 		try {
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var procs = getPlugin().getProcedimentsByUnitat(codiDir3, numPagina);
 			if (procs != null) {
 				ProcSerDto dto;
@@ -185,7 +185,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al obtenir els procediments del gestor documental administratiu";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.GESCONADM.name(), errorDescripcio, ex);
 		}
 	}
@@ -196,14 +196,14 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);
 		try {
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var totalElements = getPlugin().getTotalServeis(codiDir3);
 			integracioHelper.addAccioOk(info);
 			return totalElements;
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al obtenir el número total d'elements";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.GESCONADM.name(), errorDescripcio, ex);
 		}
 	}
@@ -215,7 +215,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 		info.setCodiEntitat(entitatCodi);
 		try {
 			List<ProcSerDto> serveis = new ArrayList<>();
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var servs = getPlugin().getServeisByUnitat(codiDir3);
 			if (servs != null) {
 				ProcSerDto dto;
@@ -236,7 +236,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al obtenir els procediments del gestor documental administratiu";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.GESCONADM.name(), errorDescripcio, ex);
 		}
 	}
@@ -248,7 +248,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 		info.setCodiEntitat(entitatCodi);
 		try {
 			List<ProcSerDto> serveis = new ArrayList<>();
-			peticionsPlugin.updatePeticioTotal(entitatCodi);
+			peticionsPlugin.addPeticioTotal(entitatCodi);
 			var servs = getPlugin().getServeisByUnitat(codiDir3, numPagina);
 			if (servs != null) {
 				ProcSerDto dto;
@@ -269,7 +269,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al obtenir els procediments del gestor documental administratiu";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(entitatCodi);
+			peticionsPlugin.addPeticioError(entitatCodi);
 			throw new SistemaExternException(IntegracioCodi.GESCONADM.name(), errorDescripcio, ex);
 		}
 	}

@@ -74,7 +74,7 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 		info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
 		info.setCodiEntitat(notificacio.getEntitat().getCodi());
 		try {
-			peticionsPlugin.updatePeticioTotal(getCodiEntitatActual());
+			peticionsPlugin.addPeticioTotal(getCodiEntitatActual());
 			var firmaContingut = getPlugin().firmar(fitxer.getNom(), motiu, fitxer.getContingut(), tipusFirma, idioma);
 			integracioHelper.addAccioOk(info);
 			return firmaContingut;
@@ -82,7 +82,7 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 			var errorDescripcio = "Error al accedir al plugin de firma en servidor: " + ex.getMessage();
 			log.error(errorDescripcio, ex);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			peticionsPlugin.updatePeticioError(getCodiEntitatActual());
+			peticionsPlugin.addPeticioError(getCodiEntitatActual());
 			throw new SistemaExternException(IntegracioCodi.FIRMASERV.name(), errorDescripcio, ex);
 		}
 	}

@@ -73,7 +73,7 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<IValidateS
 			sri.setReturnCertificates(false);
 			sri.setReturnTimeStampInfo(true);
 			validationRequest.setSignatureRequestedInformation(sri);
-			peticionsPlugin.updatePeticioTotal(getCodiEntitatActual());
+			peticionsPlugin.addPeticioTotal(getCodiEntitatActual());
 			var validateSignatureResponse = getPlugin().validateSignature(validationRequest);
 
 			var validationStatus = validateSignatureResponse.getValidationStatus();
@@ -101,7 +101,7 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<IValidateS
 			}
 			log.error("Error al detectar firma de document", e);
 			integracioHelper.addAccioError(info, "Error al validar la firma", throwable);
-			peticionsPlugin.updatePeticioError(getCodiEntitatActual());
+			peticionsPlugin.addPeticioError(getCodiEntitatActual());
 			return SignatureInfoDto.builder().signed(false).error(true).errorMsg(e.getMessage()).build();
 		}
 	}

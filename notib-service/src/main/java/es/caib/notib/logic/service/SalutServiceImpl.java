@@ -9,6 +9,7 @@ import es.caib.comanda.salut.model.IntegracioInfo;
 import es.caib.comanda.salut.model.IntegracioSalut;
 import es.caib.comanda.salut.model.MissatgeSalut;
 import es.caib.comanda.salut.model.SalutInfo;
+import es.caib.comanda.salut.model.SubsistemaSalut;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.service.SalutService;
 import es.caib.notib.logic.mapper.MissatgeSalutMapper;
@@ -55,6 +56,8 @@ public class SalutServiceImpl implements SalutService {
     private final PluginHelper pluginHelper;
     private final MissatgeSalutMapper missatgeSalutMapper;
     private final AvisRepository avisRepository;
+
+    private static final int MAX_CONNECTION_RETRY = 3;
 
     @Override
     public List<IntegracioInfo> getIntegracions() {
@@ -128,7 +131,7 @@ public class SalutServiceImpl implements SalutService {
 
             return EstatSalut.builder()
                     .estat(EstatSalutEnum.UP)
-                    .latencia(Math.round(stats.getAverage()))
+                    .latencia((int)Math.round(stats.getAverage()))
                     .build();
         } catch (RunnerException e) {
             throw new RuntimeException(e);
@@ -138,19 +141,25 @@ public class SalutServiceImpl implements SalutService {
 
     private EstatSalut checkEstatSalut(String performanceUrl) {
 
-        try {
-            Instant start = Instant.now();
-            var response = restTemplate.getForObject(performanceUrl, String.class);
-            Instant end = Instant.now();
-            long latency = Duration.between(start, end).toMillis();
-
-            return EstatSalut.builder()
-                    .estat(EstatSalutEnum.UP)
-                    .latencia(latency)
-                    .build();
-        } catch (Exception e) {
-            return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
+        Instant start = Instant.now();
+        EstatSalutEnum estat = EstatSalutEnum.UP;
+        for (int i = 1; i <= MAX_CONNECTION_RETRY; i++) {
+            try {
+                restTemplate.getForObject(performanceUrl, String.class);
+                break;
+            } catch (Exception e) {
+                if (i == MAX_CONNECTION_RETRY) {
+                    estat = EstatSalutEnum.UNKNOWN; // After 3 connection failed attempts
+                }
+            }
         }
+        Instant end = Instant.now();
+        Integer latency = (int) Duration.between(start, end).toMillis();
+
+        return EstatSalut.builder()
+                .estat(estat)
+                .latencia(latency)
+                .build();
     }
 
     private EstatSalut checkDatabase() {
@@ -162,7 +171,7 @@ public class SalutServiceImpl implements SalutService {
 
             return EstatSalut.builder()
                     .estat(EstatSalutEnum.UP)
-                    .latencia(Duration.between(start, end).toMillis())
+                    .latencia((int)Duration.between(start, end).toMillis())
                     .build();
         } catch (Exception e) {
             return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
@@ -178,7 +187,7 @@ public class SalutServiceImpl implements SalutService {
         }
     }
 
-    public List<SalutInfo> checkSubsistemes() {
+    public List<SubsistemaSalut> checkSubsistemes() {
 
         try {
 
