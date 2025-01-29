@@ -499,9 +499,9 @@ public class NotificacioValidator implements Validator {
         if (pdf.isEditBlocked()) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_EDICIO_BLOQUEJADA, locale, prefix));
         }
-        if (pdf.hasNoneEmbeddedFonts()) {
-            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_FONTS_EMBEDED, locale, prefix));
-        }
+//        if (pdf.hasNoneEmbeddedFonts()) {
+//            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_FONTS_EMBEDED, locale, prefix));
+//        }
         if (!Strings.isNullOrEmpty(pdf.getJavaScript())) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_JAVA_SCRIPT, locale, prefix));
         }
