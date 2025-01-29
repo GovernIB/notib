@@ -25,40 +25,35 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+<not:modalHead />
 </head>
 <body>
-<table
-		id="taulaMissatges"
-		data-toggle="datatable"
-		data-url="<c:url value="/monitor/activemq/missatges/${queueNom}/datatable"/>"
-		data-search-enabled="false"
-		data-selection-enabled="false"
-		data-default-order="0"
-		data-default-dir="asc"
-		data-paging="false"
-		class="table table-bordered table-striped"
-		data-info-type="search"
-		style="width:100%">
-	<thead>
-	<tr>
-		<th data-col-name="uuid"><spring:message code="monitor.activemq.columna.nom.cua"/></th>
-<%--		<th data-col-name="descripcio"><spring:message code="monitor.activemq.columna.descripcio.cua"/></th>--%>
-<%--		<th data-col-name="mida"><spring:message code="monitor.activemq.columna.mida.cua"/></th>--%>
-<%--		&lt;%&ndash;				<th data-col-name="consumersCount"><spring:message code="monitor.activemq.columna.counsumers.count"/></th>&ndash;%&gt;--%>
-<%--		<th data-col-name="enqueueCount"><spring:message code="monitor.activemq.columna.enqueue.count"/></th>--%>
-<%--		<th data-col-name="dequeueCount"><spring:message code="monitor.activemq.columna.dequeue.count"/></th>--%>
-<%--		<th data-col-name="forwardCount"><spring:message code="monitor.activemq.columna.forward.count"/></th>--%>
-<%--		<th data-col-name="inFlightCount"><spring:message code="monitor.activemq.columna.in.flight.count"/></th>--%>
-<%--		<th data-col-name="expiredCount"><spring:message code="monitor.activemq.columna.expired.count"/></th>--%>
-<%--		<th data-col-name="storeMessageSize"><spring:message code="monitor.activemq.columna.store.message.size.count"/></th>--%>
-<%--		<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">--%>
-<%--			<script id="cellAccionsTemplate" type="text/x-jsrender">--%>
-<%--				<a class="btn btn-primary" href="<c:url value="/monitor/activemq/missatges/{{:nom}}"/>" data-toggle="modal" data-processar="true"><span class="fa fa-send"></span>&nbsp;<spring:message code="comu.boto.accions"/></span>--%>
-<%--			</script>--%>
-<%--		</th>--%>
-	</tr>
-
-	</thead>
-</table>
+	<table 	id="taulaMissatges"
+		 	data-toggle="datatable"
+			data-url="<c:url value="/monitor/activemq/missatges/${queueNom}/datatable"/>"
+			data-search-enabled="false"
+			data-selection-enabled="false"
+			data-default-order="0"
+			data-default-dir="asc"
+			data-paging="false"
+			class="table table-bordered table-striped"
+			data-info-type="search"
+			style="width:100%">
+		<thead>
+		<tr>
+			<th data-col-name="id"><spring:message code="monitor.activemq.columna.id.missatge"/>
+			<th data-col-name="data" data-converter="datetime"><spring:message code="monitor.activemq.columna.data"/>
+			<th data-col-name="uuid" data-template="#cellAccionsTemplateUuId"><spring:message code="monitor.activemq.columna.uuid"/>
+				<script id="cellAccionsTemplateUuId" type="text/x-jsrender">
+					<a href="<c:url value="/enviament/filtrades/{{:uuid}}"/>" target="_blank">{{:uuid}}</a>
+				</script>
+			</th>
+			<th data-col-name="notificacioUuId" data-template="#cellAccionsTemplateNotificiacio"><spring:message code="monitor.activemq.columna.id.notificacio"/>
+			<script id="cellAccionsTemplateNotificiacio" type="text/x-jsrender">
+				<a href="<c:url value="/notificacio/filtrades/{{:notificacioUuId}}"/>" target="_blank">{{:notificacioUuId}}</a>
+			</script>
+		</tr>
+		</thead>
+	</table>
 </body>
 </html>

@@ -25,6 +25,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -103,6 +104,18 @@ public class EnviamentController extends TableAccionsMassivesController {
 		model.addAttribute("columnes", ColumnesCommand.asCommand(columnes));
 		model.addAttribute("filtreEnviaments", filtreEnviaments);
 		return "enviamentList";
+	}
+
+	@GetMapping(value = "/filtrades/{uuid}")
+	public String getFiltrades(HttpServletRequest request, @PathVariable String uuid, Model model) {
+
+		var entitatActual = getEntitatActualComprovantPermisos(request);
+		var organGestorActual = getOrganGestorActual(request);
+		var filtre = getFiltreCommand(request);
+		filtre.setCodiNotibEnviament(uuid);
+		model.addAttribute(filtre);
+//		notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
+		return "redirect:/enviament";
 	}
 
 	@PostMapping

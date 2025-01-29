@@ -49,7 +49,7 @@
 				<th data-col-name="storeMessageSize"><spring:message code="monitor.activemq.columna.store.message.size.count"/></th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<a class="btn btn-primary" href="<c:url value="/monitor/activemq/missatges/{{:nom}}"/>" data-toggle="modal" data-processar="true"><span class="fa fa-send"></span>&nbsp;<spring:message code="monitor.activemq.boto.missatges"/></span>
+						<a class="btn btn-primary" href="<c:url value="/monitor/activemq/missatges/{{:nom}}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-send"></span>&nbsp;<spring:message code="monitor.activemq.boto.missatges"/></span>
 					</script>
 				</th>
 			</tr>

@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.dto.ActiveMqMissatgeInfo;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.service.ActiveMqService;
+import es.caib.notib.persist.repository.NotificacioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.broker.BrokerService;
@@ -23,6 +24,7 @@ import javax.management.ObjectName;
 import javax.management.openmbean.OpenDataException;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,6 +36,7 @@ public class ActiveMqServiceImpl implements ActiveMqService {
     private final BrokerService brokerService;
     private final PaginacioHelper paginacioHelper;
     private final MessageHelper messageHelper;
+    private final NotificacioRepository notificacioRepository;
 
     @Override
     public PaginaDto<ActiveMqInfo> getInfoQueues(PaginacioParamsDto paginacioParams) {
@@ -111,23 +114,61 @@ public class ActiveMqServiceImpl implements ActiveMqService {
                     continue;
                 }
                 var messages = queueMBean.browse();
+                String uuId;
+                ActiveMqMissatgeInfo info;
                 for (var message : messages) {
-                    JSONObject json = new JSONObject(message.get("Text").toString());
-                    Iterator<String> keys = json.keys();
-                    if (keys.hasNext()) {
-                        String nomObjecte = keys.next();
-                        var jsonInfo = json.get(nomObjecte).toString();
-                        json = new JSONObject(jsonInfo);
-                        String uuid = json.getString("uuid");
-                        System.out.println("Message: " + uuid);
-                        missatges.add(new ActiveMqMissatgeInfo(uuid));
-                    }
+                    info = ActiveMqMissatgeInfo.builder().id(message.get("JMSMessageID").toString()).data((Date)message.get("JMSTimestamp")).build();
+                    tractarMissatge(message.get("Text").toString(), info);
+                    missatges.add(info);
                 }
             }
         } catch (Exception ex) {
             log.error("Error al obtenir la informacio dels missatges per la cua " + queueNom, ex);
         }
         return missatges;
+    }
+
+    private void tractarMissatge(String msg, ActiveMqMissatgeInfo missatge) {
+
+//        JSONObject json;
+        try {
+            var uuId = msg.split("uuid")[1].split(",")[0].split("\"")[2];
+            missatge.setUuid(uuId);
+            return;
+//            json = new JSONObject(msg);
+//            String uuId;
+//            Iterator<String> keys = json.keys();
+//            if (keys.hasNext()) {
+//                String nomObjecte = keys.next();
+//                if ("enviamentUuid".equals(nomObjecte)) {
+//                    uuId = json.getString("enviamentUuid");
+//                    missatges.add(new ActiveMqMissatgeInfo(uuId));
+//                    return;
+//                }
+//                try {
+//                    var jsonInfo = json.get(nomObjecte).toString();
+//                    json = new JSONObject(jsonInfo);
+//                    uuId = json.getString("uuid");
+//                    missatges.add(new ActiveMqMissatgeInfo(uuId));
+//                } catch (Exception e) {
+//                    log.info("Descartat missatge " + json);
+//                }
+//            }
+        } catch(Exception ex) {
+        }
+        try {
+            var uuId = msg.split("enviamentUuid")[1].split(",")[0].split("\"")[2];
+            missatge.setUuid(uuId);
+        } catch (Exception ex) {
+
+        }
+        try {
+            var notificacioId = msg.split("notificacioId")[1].split(":")[1].split("}")[0];
+            var notificacio = notificacioRepository.findById(Long.parseLong(notificacioId)).orElseThrow();
+            missatge.setNotificacioUuId(notificacio.getReferencia());
+        } catch (Exception ex) {
+
+        }
     }
 
     private List<String> getQueuesNames() throws Exception {
