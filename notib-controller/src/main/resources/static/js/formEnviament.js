@@ -331,11 +331,12 @@ function validarEntregaPostalCie() {
     let fitxer = file.files[0];
     let formData = new FormData();
     let procedimentId = document.getElementById("procedimentId").value;
+    let organCodi = document.getElementById("organGestor").value;
     formData.append('fitxer', fitxer, fitxer.name);
     $.ajax({
         type: "POST",
         enctype: 'multipart/form-data',
-        url: "/notibback/notificacio/valida/entrega/postal/" + procedimentId,
+        url: "/notibback/notificacio/valida/entrega/postal/" + procedimentId + "/" + organCodi,
         data: formData,
         processData: false,
         contentType: false,

@@ -1489,11 +1489,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private boolean isEntregaCieActiva(NotificacioEntity notificacio) {
 
 		var enviaments = notificacio.getEnviaments();
+		EntregaCieEntity cieProcediment, cieOrgan;
 		for (var e : enviaments) {
 			if (e.getEntregaPostal() == null) {
 				continue;
 			}
-			if (notificacio.getProcediment().getEntregaCieEfectiva().getCie().isCieExtern()) {
+			cieProcediment = notificacio.getProcediment().getEntregaCieEfectiva();
+			if (cieProcediment != null && cieProcediment.getCie().isCieExtern()) {
+				return true;
+			}
+			cieOrgan = notificacio.getOrganGestor().getEntregaCie();
+			if (notificacio.getProcediment().isComu() && cieOrgan != null && cieOrgan.getCie().isCieExtern()) {
 				return true;
 			}
 		}

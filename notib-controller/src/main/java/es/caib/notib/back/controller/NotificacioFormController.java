@@ -54,6 +54,7 @@ import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PagadorCieFormatFullaService;
 import es.caib.notib.logic.intf.service.PagadorCieFormatSobreService;
+import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.ServeiService;
@@ -91,6 +92,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.
@@ -139,6 +141,8 @@ public class NotificacioFormController extends BaseUserController {
     private static final String ENVIAMENT_TIPUS = "enviament_tipus";
     private static final String NOM_DOCUMENT = "nomDocument_";
     private static final String FALSE = "false";
+    @Autowired
+    private PagadorCieService pagadorCieService;
 
 
     @GetMapping(value = "/new/notificacio")
@@ -392,9 +396,10 @@ public class NotificacioFormController extends BaseUserController {
         }
     }
 
-    @PostMapping(value = "/valida/document/{entregaPostal}/{procedimentId}")
+    @PostMapping(value = "/valida/document/{entregaPostal}")
     @ResponseBody
-    public DocumentValidacio validaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer, @PathVariable String entregaPostal, @PathVariable Long procedimentId) throws IOException {
+    public DocumentValidacio validaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer, @PathVariable String entregaPostal,
+                                            @RequestParam(required = false) Long procedimentId, @RequestParam(required = false) String organCodi) throws IOException {
 
         var nom = fitxer.getOriginalFilename();
         var content = fitxer.getBytes();
@@ -409,18 +414,18 @@ public class NotificacioFormController extends BaseUserController {
         firma.setError(signatureInfo.isError());
         firma.setErrorMsg(signatureInfo.getErrorMsg());
 
-        if (!Boolean.valueOf(entregaPostal) && procedimentId != null && !procedimentService.procedimentAmbCieExtern(procedimentId)) {
+        if (!Boolean.valueOf(entregaPostal) && procedimentId != null && !procedimentService .procedimentAmbCieExtern(procedimentId, organCodi)) {
             return DocumentValidacio.builder().validacioFirma(firma).build();
         }
         var cieValid = notificacioService.validateDocCIE(content);
         return DocumentValidacio.builder().validacioFirma(firma).validacioCie(cieValid).build();
     }
 
-    @PostMapping(value = "/valida/entrega/postal/{procedimentId}")
+    @PostMapping(value = "/valida/entrega/postal/{procedimentId}/{organCodi}")
     @ResponseBody
-    public DocCieValid validaFirmaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer, @PathVariable Long procedimentId) throws IOException {
+    public DocCieValid validaFirmaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer, @PathVariable Long procedimentId, @PathVariable String organCodi) throws IOException {
 
-        return procedimentService.procedimentAmbCieExtern(procedimentId) ? notificacioService.validateDocCIE(fitxer.getBytes())
+        return procedimentService.procedimentAmbCieExtern(procedimentId, organCodi) ? notificacioService.validateDocCIE(fitxer.getBytes())
                 : DocCieValid.builder().errorsCie(new ArrayList<>()).build();
     }
 
@@ -484,7 +489,7 @@ public class NotificacioFormController extends BaseUserController {
 
     @GetMapping(value = "/procediment/{procedimentId}/dades")
     @ResponseBody
-    public DadesProcediment getDadesProcSer(HttpServletRequest request, @PathVariable Long procedimentId) {
+    public DadesProcediment getDadesProcSer(HttpServletRequest request, @PathVariable Long procedimentId, @RequestParam(required = false) String organCodi) {
 
         var entitatActual = sessionScopedContext.getEntitatActual();
         var procedimentActual = procedimentService.findById(entitatActual.getId(),false, procedimentId);
@@ -511,7 +516,14 @@ public class NotificacioFormController extends BaseUserController {
             // Obtenim òrgans seleccionables
         var permis = EnviamentTipus.SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
                 EnviamentTipus.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
-        dadesProcediment.setOrgansDisponibles(permisosService.getOrgansCodisAmbPermisPerProcedimentComu(entitatActual.getId(), getCodiUsuariActual(), permis, procedimentActual));
+        var organsDisponibles = permisosService.getOrgansCodisAmbPermisPerProcedimentComu(entitatActual.getId(), getCodiUsuariActual(), permis, procedimentActual);
+        dadesProcediment.setOrgansDisponibles(organsDisponibles);
+        if (!organsDisponibles.contains(organCodi)) {
+            return dadesProcediment;
+        }
+        // Mirar si organ seleccionat te entrega postal actvia
+        var organ = organGestorService.findByCodi(entitatActual.getId(), organCodi);
+        dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva());
         return dadesProcediment;
     }
 

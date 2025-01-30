@@ -106,6 +106,7 @@ public class CiePluginHelper {
             enviamentCie.setContingutDocument(contingut);
             enviamentCie.setCodiDir3Entitat(configHelper.getConfigAsBoolean("es.caib.notib.plugin.codi.dir3.entitat"));
             var entregaCieEfectiva = notificacio.getProcediment().getEntregaCieEfectiva();
+            entregaCieEfectiva = entregaCieEfectiva == null ? notificacio.getOrganGestor().getEntregaCie() : entregaCieEfectiva;
             var pagadorCieEntity = entregaCieEfectiva.getCie();
             var apiKey = getApiKey(pagadorCieEntity);
             var cie = conversioTipusHelper.convertir(pagadorCieEntity, CieDto.class);

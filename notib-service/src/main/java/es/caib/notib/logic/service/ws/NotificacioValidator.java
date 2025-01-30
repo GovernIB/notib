@@ -186,7 +186,8 @@ public class NotificacioValidator implements Validator {
             if (ProcSerTipusEnum.SERVEI.equals(procediment.getTipus()) && EnviamentTipus.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
                 errors.reject(error(SERVEI_EN_NOTIFICACIO, locale));
             }
-            if (!procediment.isEntregaCieActivaAlgunNivell()) {
+            var cieActiuPerProcComuOrgan = procediment.isComu() && organGestor.getEntregaCie() != null;
+            if (!procediment.isEntregaCieActivaAlgunNivell() && !cieActiuPerProcComuOrgan) {
                 int i = 0;
                 for (var enviament : notificacio.getEnviaments()) {
                     if (enviament.isEntregaPostalActiva()) {
@@ -501,9 +502,9 @@ public class NotificacioValidator implements Validator {
         if (pdf.isEditBlocked()) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_EDICIO_BLOQUEJADA, locale, prefix));
         }
-        if (pdf.hasNoneEmbeddedFonts()) {
-            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_FONTS_EMBEDED, locale, prefix));
-        }
+//        if (pdf.hasNoneEmbeddedFonts()) {
+//            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_FONTS_EMBEDED, locale, prefix));
+//        }
         if (!Strings.isNullOrEmpty(pdf.getJavaScript())) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_JAVA_SCRIPT, locale, prefix));
         }
