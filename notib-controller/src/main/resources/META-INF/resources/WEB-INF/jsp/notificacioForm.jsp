@@ -543,10 +543,12 @@
 				}
 				$("#saveForm").attr("disabled", true);
 				let entregaPostal = viewModel.ambEntregaCIE && $('[id*="].entregaPostal.activa"]').toArray().some(x => {console.log(x); return x.checked});
+				let procId = document.getElementById("procedimentId").value;
+				let organCodi = document.getElementById("organGestor").value;
 				$.ajax({
 					type: "POST",
 					enctype: 'multipart/form-data',
-					url: "<c:url value='/notificacio/valida/document/'/>" + entregaPostal + "/" + document.getElementById("procedimentId").value,
+					url: "<c:url value='/notificacio/valida/document/'/>" + entregaPostal + "?procedimentId=" + procId + "&organCodi=" + organCodi,
 					data: formData,
 					processData: false,
 					contentType: false,
@@ -1445,7 +1447,7 @@
 			let organ = $("#organGestor").val();
 			$.ajax({
 				type: 'GET',
-				url: "<c:url value="/notificacio/procediment/"/>" + procediment + "/organ/" + organ + "/dades",
+				url: "<c:url value="/notificacio/procediment/"/>" + procediment + "/dades" + (organ ? "?organCodi=" + organ : ""),
 				success: function(data) {
 					var select2Options = {
 						theme: 'bootstrap',

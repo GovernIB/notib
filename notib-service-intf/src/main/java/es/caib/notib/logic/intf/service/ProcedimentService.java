@@ -379,7 +379,7 @@ public interface ProcedimentService {
     ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi);
 
     @PreAuthorize("isAuthenticated()")
-    boolean procedimentAmbCieExtern(Long procedimentId);
+    boolean procedimentAmbCieExtern(Long procedimentId, String organCodi);
 
     /**
      * Consulta si existeix un procés en curs actualitzant els procediments de l'entitat indicada.

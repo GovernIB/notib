@@ -371,13 +371,21 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public boolean procedimentAmbCieExtern(Long procedimentId) {
+	public boolean procedimentAmbCieExtern(Long procedimentId, String organCodi) {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			//Compravar si agrupar
 			var procediment = procSerRepository.findById(procedimentId).orElseThrow();
-			return procediment.getEntregaCieEfectiva().getCie().isCieExtern();
+			var entregaCie = procediment.getEntregaCieEfectiva();
+			if (entregaCie != null) {
+				return entregaCie.getCie().isCieExtern();
+			}
+			if (!procediment.isComu() || Strings.isNullOrEmpty(organCodi)) {
+				return false;
+			}
+			var organ = organGestorRepository.findByCodi(organCodi);
+			return organ.getEntregaCie().getCie().isCieExtern();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

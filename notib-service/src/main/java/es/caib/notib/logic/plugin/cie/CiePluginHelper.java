@@ -273,6 +273,7 @@ public class CiePluginHelper {
             }
             info.setCodiEntitat(entitat.getCodi());
             var cieEntity = enviament.getNotificacio().getProcediment().getEntregaCieEfectiva();
+            cieEntity = cieEntity == null ? enviament.getNotificacio().getOrganGestor().getEntregaCie() : cieEntity;
             var apiKey = getApiKey(cieEntity.getCie());
             var cie = conversioTipusHelper.convertir(cieEntity, CieDto.class);
             cie.setApiKey(apiKey);

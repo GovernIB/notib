@@ -92,6 +92,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.
@@ -395,9 +396,10 @@ public class NotificacioFormController extends BaseUserController {
         }
     }
 
-    @PostMapping(value = "/valida/document/{entregaPostal}/{procedimentId}")
+    @PostMapping(value = "/valida/document/{entregaPostal}")
     @ResponseBody
-    public DocumentValidacio validaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer, @PathVariable String entregaPostal, @PathVariable Long procedimentId) throws IOException {
+    public DocumentValidacio validaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer, @PathVariable String entregaPostal,
+                                            @RequestParam(required = false) Long procedimentId, @RequestParam(required = false) String organCodi) throws IOException {
 
         var nom = fitxer.getOriginalFilename();
         var content = fitxer.getBytes();
@@ -412,18 +414,18 @@ public class NotificacioFormController extends BaseUserController {
         firma.setError(signatureInfo.isError());
         firma.setErrorMsg(signatureInfo.getErrorMsg());
 
-        if (!Boolean.valueOf(entregaPostal) && procedimentId != null && !procedimentService.procedimentAmbCieExtern(procedimentId)) {
+        if (!Boolean.valueOf(entregaPostal) && procedimentId != null && !procedimentService .procedimentAmbCieExtern(procedimentId, organCodi)) {
             return DocumentValidacio.builder().validacioFirma(firma).build();
         }
         var cieValid = notificacioService.validateDocCIE(content);
         return DocumentValidacio.builder().validacioFirma(firma).validacioCie(cieValid).build();
     }
 
-    @PostMapping(value = "/valida/entrega/postal/{procedimentId}")
+    @PostMapping(value = "/valida/entrega/postal/{procedimentId}/{organCodi}")
     @ResponseBody
-    public DocCieValid validaFirmaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer, @PathVariable Long procedimentId) throws IOException {
+    public DocCieValid validaFirmaDocument(@RequestParam(value = "fitxer") MultipartFile fitxer, @PathVariable Long procedimentId, @PathVariable String organCodi) throws IOException {
 
-        return procedimentService.procedimentAmbCieExtern(procedimentId) ? notificacioService.validateDocCIE(fitxer.getBytes())
+        return procedimentService.procedimentAmbCieExtern(procedimentId, organCodi) ? notificacioService.validateDocCIE(fitxer.getBytes())
                 : DocCieValid.builder().errorsCie(new ArrayList<>()).build();
     }
 
@@ -485,9 +487,9 @@ public class NotificacioFormController extends BaseUserController {
         return notificacioService.llistarProvincies(codiCA);
     }
 
-    @GetMapping(value = "/procediment/{procedimentId}/organ/{organCodi}/dades")
+    @GetMapping(value = "/procediment/{procedimentId}/dades")
     @ResponseBody
-    public DadesProcediment getDadesProcSer(HttpServletRequest request, @PathVariable Long procedimentId, @PathVariable String organCodi) {
+    public DadesProcediment getDadesProcSer(HttpServletRequest request, @PathVariable Long procedimentId, @RequestParam(required = false) String organCodi) {
 
         var entitatActual = sessionScopedContext.getEntitatActual();
         var procedimentActual = procedimentService.findById(entitatActual.getId(),false, procedimentId);

@@ -289,8 +289,8 @@ public class ProcedimentService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@PermitAll
-	public boolean procedimentAmbCieExtern(Long procedimentId) {
-		return getDelegateService().procedimentAmbCieExtern(procedimentId);
+	public boolean procedimentAmbCieExtern(Long procedimentId, String organCodi) {
+		return getDelegateService().procedimentAmbCieExtern(procedimentId, organCodi);
 	}
 
 	@Override
