@@ -46,6 +46,7 @@ import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.plugin.cie.CiePluginJms;
+import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.CallbackEntity;
@@ -100,6 +101,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -1158,7 +1160,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					if (!EnviamentSmEstat.REGISTRE_ERROR.equals(estatEnviament)) {
 						return;
 					}
-					enviamentSmService.registreReset(e.getUuid());
+					enviamentSmService.registreReset(e.getUuid(), 0);
 					resposta.getExecutades().add(e.getUuid());
 				} catch (Exception ex) {
 					resposta.getErrors().add(e.getUuid());
@@ -1806,6 +1808,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioEntity notificacio = null;
 			NotificacioEnviamentEntity enviament;
 			var llindarDies = configHelper.getConfigAsInteger("es.caib.notib.llindar.dies.enviament.remeses");
+			AtomicInteger enviamentCounter = new AtomicInteger(1);
+			var globalDelay = configHelper.getConfigAsLong("es.caib.notib.massives.state.machine.inici.delay", SmConstants.MASSIU_DELAY);
 			for (var id : enviaments) {
 				enviament = enviamentRepository.findById(id).orElse(null);
 				if (enviament == null) {
@@ -1821,15 +1825,19 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 				try {
 					var estatEnviament = enviamentSmService.getEstatEnviament(enviament.getUuid());
+					var delay = enviamentCounter.getAndIncrement() * globalDelay;
+					var e = enviament;
 					if (EnviamentSmEstat.REGISTRE_ERROR.equals(estatEnviament) || EnviamentSmEstat.REGISTRE_PENDENT.equals(estatEnviament)) {
 						notificacio.refreshRegistre();
-						enviamentSmService.registreReset(enviament.getUuid());
+						new Thread(() -> enviamentSmService.registreReset(e.getUuid(), delay)).start();
+//						enviamentSmService.registreReset(enviament.getUuid());
 						resposta.getExecutades().add(enviament.getUuid());
 						continue;
 					}
 					if (EnviamentSmEstat.NOTIFICA_ERROR.equals(estatEnviament) || EnviamentSmEstat.NOTIFICA_PENDENT.equals(estatEnviament)) {
 						notificacio.resetIntentsNotificacio();
-						enviamentSmService.notificaReset(enviament.getUuid());
+						new Thread(() -> enviamentSmService.notificaReset(e.getUuid(), delay)).start();
+//						enviamentSmService.notificaReset(enviament.getUuid(), delay);
 						resposta.getExecutades().add(enviament.getUuid());
 						continue;
 					}

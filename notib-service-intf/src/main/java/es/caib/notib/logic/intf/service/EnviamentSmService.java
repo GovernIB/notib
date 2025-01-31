@@ -58,7 +58,7 @@ public interface EnviamentSmService {
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreFailed(String enviamentUuid);
 
 	@PreAuthorize("isAuthenticated()")
-	StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreReset(String enviamentUuid);
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreReset(String enviamentUuid, long delay);
 
 	@PreAuthorize("isAuthenticated()")
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreRetry(String enviamentUuid);
@@ -85,7 +85,7 @@ public interface EnviamentSmService {
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaRetry(String enviamentUuid);
 
 	@PreAuthorize("isAuthenticated()")
-	StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaReset(String enviamentUuid);
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaReset(String enviamentUuid, long delay);
 
 	@PreAuthorize("isAuthenticated()")
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaForward(String enviamentUuid);

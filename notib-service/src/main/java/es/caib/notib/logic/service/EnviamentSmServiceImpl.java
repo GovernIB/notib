@@ -13,7 +13,6 @@ import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
-import es.caib.notib.persist.repository.NotificacioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.statemachine.StateMachineRepository;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +51,6 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	private final NotificacioEnviamentRepository enviamentRepository;
 	private final NotificacioRepository notificacioRepository;
-	private final NotificacioMassivaRepository notificacioMassivaRepository;
 	private final StateMachineRepository smRepository;
 	private final StateMachineService<EnviamentSmEstat, EnviamentSmEvent> stateMachineService;
 
@@ -291,11 +289,13 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	@Override
 	@Transactional
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreReset(String enviamentUuid) {
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreReset(String enviamentUuid, long delay) {
 
 		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl registreReset " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
-		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		var variables = sm.getExtendedState().getVariables();
+		variables.put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		variables.put(SmConstants.ENVIAMENT_DELAY, delay);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_RETRY);
 		return sm;
 	}
@@ -386,11 +386,13 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	@Override
 	@Transactional
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaReset(String enviamentUuid) {
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> notificaReset(String enviamentUuid, long delay) {
 
 		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl notificaReset " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
-		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		var variables = sm.getExtendedState().getVariables();
+		variables.put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		variables.put(SmConstants.ENVIAMENT_DELAY, delay);
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_RETRY);
 		return sm;
 	}
