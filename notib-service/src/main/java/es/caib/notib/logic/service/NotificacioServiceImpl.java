@@ -1821,13 +1821,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 				try {
 					var estatEnviament = enviamentSmService.getEstatEnviament(enviament.getUuid());
-					if (EnviamentSmEstat.REGISTRE_ERROR.equals(estatEnviament)) {
+					if (EnviamentSmEstat.REGISTRE_ERROR.equals(estatEnviament) || EnviamentSmEstat.REGISTRE_PENDENT.equals(estatEnviament)) {
 						notificacio.refreshRegistre();
 						enviamentSmService.registreReset(enviament.getUuid());
 						resposta.getExecutades().add(enviament.getUuid());
 						continue;
 					}
-					if (EnviamentSmEstat.NOTIFICA_ERROR.equals(estatEnviament)) {
+					if (EnviamentSmEstat.NOTIFICA_ERROR.equals(estatEnviament) || EnviamentSmEstat.NOTIFICA_PENDENT.equals(estatEnviament)) {
 						notificacio.resetIntentsNotificacio();
 						enviamentSmService.notificaReset(enviament.getUuid());
 						resposta.getExecutades().add(enviament.getUuid());

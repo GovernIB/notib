@@ -29,11 +29,11 @@ public class ValidCieValidator implements ConstraintValidator<ValidCie, CieComma
 
         Locale locale = new Locale(sessionScopedContext.getIdiomaUsuari());
         var valid = true;
-        if (cieService.existeixCieByEntitatAndOrganGestor(cieCommand.getOrganismePagadorCodi())) {
-            var msg = MessageHelper.getInstance().getMessage("cie.form.organ.pagador.entitat.existent", null, locale);
-            context.buildConstraintViolationWithTemplate(msg).addNode("organismePagadorCodi").addConstraintViolation();
-            valid = false;
-        }
+//        if (cieService.existeixCieByEntitatAndOrganGestor(cieCommand.getOrganismePagadorCodi())) {
+//            var msg = MessageHelper.getInstance().getMessage("cie.form.organ.pagador.entitat.existent", null, locale);
+//            context.buildConstraintViolationWithTemplate(msg).addNode("organismePagadorCodi").addConstraintViolation();
+//            valid = false;
+//        }
         return valid;
     }
 }
