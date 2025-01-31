@@ -239,12 +239,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findAll() {
+
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			List<OrganGestorEntity> organs = organGestorRepository.findAll();
-			return conversioTipusHelper.convertirList(
-					organs,
-					OrganGestorDto.class);
+			var organs = organGestorRepository.findAll();
+			return conversioTipusHelper.convertirList(organs, OrganGestorDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -253,13 +252,12 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findByEntitat(Long entitatId) {
+
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			List<OrganGestorEntity> organs = organGestorRepository.findByEntitat(entitat);
-			return conversioTipusHelper.convertirList(
-					organs,
-					OrganGestorDto.class);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			var organs = organGestorRepository.findByEntitat(entitat);
+			return conversioTipusHelper.convertirList(organs, OrganGestorDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -270,10 +268,10 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	public List<CodiValorEstatDto> findOrgansGestorsCodiByEntitat(Long entitatId) {
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			List<CodiValorEstatDto> organsGestors = new ArrayList<>();
-			List<OrganGestorEntity> organs = organGestorRepository.findByEntitat(entitat);
-			for (OrganGestorEntity organ: organs) {
+			var organs = organGestorRepository.findByEntitat(entitat);
+			for (var organ: organs) {
 				organsGestors.add(CodiValorEstatDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
 			}
 			return organsGestors;
@@ -287,9 +285,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	public List<OrganGestorDto> findByProcedimentIds(List<Long> procedimentIds) {
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			return conversioTipusHelper.convertirList(
-					organGestorRepository.findByProcedimentIds(procedimentIds),
-					OrganGestorDto.class);
+			return conversioTipusHelper.convertirList(organGestorRepository.findByProcedimentIds(procedimentIds), OrganGestorDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1131,11 +1127,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				throw new ValidationException("Un administrador d'òrgan no pot gestionar el permís d'admministrador d'òrgans gestors");
 			}
 			permisosHelper.updatePermis(id, OrganGestorEntity.class, permisDto);
+
+			permisosService.evictGetOrgansAmbPermis();
 			permisosCacheable.evictAllFindOrgansGestorsAccessiblesUsuari();
 			permisosCacheable.evictAllFindEntitatsAccessiblesUsuari();
 			cacheHelper.evictFindProcedimentServeisWithPermis();
 			cacheHelper.evictFindOrgansGestorWithPermis();
 			permisosCacheable.evictAllPermisosEntitatsUsuariActual();
+
 			updateOrgansSessio();
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1156,11 +1155,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			}
 			entityComprovarHelper.comprovarOrganGestor(entitat, id);
 			permisosHelper.deletePermis(id, OrganGestorEntity.class, permisId);
+
+			permisosService.evictGetOrgansAmbPermis();
 			permisosCacheable.evictAllFindOrgansGestorsAccessiblesUsuari();
 			permisosCacheable.evictAllFindEntitatsAccessiblesUsuari();
 			cacheHelper.evictFindProcedimentServeisWithPermis();
 			cacheHelper.evictFindOrgansGestorWithPermis();
 			permisosCacheable.evictAllPermisosEntitatsUsuariActual();
+
 			updateOrgansSessio();
 		} finally {
 			metricsHelper.fiMetrica(timer);

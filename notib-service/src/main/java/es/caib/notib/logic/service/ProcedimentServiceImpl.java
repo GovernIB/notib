@@ -385,6 +385,9 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 				return false;
 			}
 			var organ = organGestorRepository.findByCodi(organCodi);
+			if (organ == null || organ.getEntregaCie() == null) {
+				return false;
+			}
 			return organ.getEntregaCie().getCie().isCieExtern();
 		} finally {
 			metricsHelper.fiMetrica(timer);

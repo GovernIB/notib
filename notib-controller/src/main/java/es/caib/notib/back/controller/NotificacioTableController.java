@@ -522,7 +522,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @ResponseBody
     public Missatge enviamentStateMachineSetEstat(HttpServletRequest request, @PathVariable Long enviamentId, @PathVariable String estat) {
 
-        if (!RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
+        var rolActual = sessionScopedContext.getRolActual();
+        if (!RolHelper.isUsuariActualAdministrador(rolActual) && !RolHelper.isUsuariActualAdministradorEntitat(rolActual)) {
             throw new SecurityException(PERMIS_DENGAT);
         }
         var ok = envSmService.canviarEstat(enviamentId, estat);
@@ -534,7 +535,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @ResponseBody
     public Missatge enviamentStateMachineSetEvent(HttpServletRequest request, @PathVariable Long enviamentId, @PathVariable String event) {
 
-        if (!RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
+        var rolActual = sessionScopedContext.getRolActual();
+        if (!RolHelper.isUsuariActualAdministrador(rolActual) && !RolHelper.isUsuariActualAdministradorEntitat(rolActual)) {
             throw new SecurityException(PERMIS_DENGAT);
         }
         var ok = envSmService.enviarEvent(enviamentId, event);
