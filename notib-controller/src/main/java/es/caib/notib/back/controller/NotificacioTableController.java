@@ -169,6 +169,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
         model.addAttribute("notificacioFiltreCommand", command);
         model.addAttribute("nomesAmbErrors", command.isNomesAmbErrors());
+        model.addAttribute("nomesAmbEntregaPostal", command.isNomesAmbEntregaPostal());
         model.addAttribute("nomesFiReintents", command.isNomesFiReintents());
         return "notificacioList";
     }

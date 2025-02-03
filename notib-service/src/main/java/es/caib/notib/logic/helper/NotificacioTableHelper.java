@@ -43,11 +43,13 @@ public class NotificacioTableHelper {
             StringBuilder titular = new StringBuilder();
             var notificaIds = "";
             Integer estatMask;
+            var entregaPostal = true;
             if (notificacio.getEnviaments() != null) {
                 for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
                     if (e.getTitular() != null) {
                         titular.append(e.getTitular().getNomFormatted()).append(", ");
                     }
+                    entregaPostal = entregaPostal && e.getEntregaPostal() != null;
                 }
                 if (titular.length() > 2)
                     titular = new StringBuilder(titular.substring(0, titular.length() - 2));
@@ -88,6 +90,7 @@ public class NotificacioTableHelper {
                     .notificaIds(notificaIds)
                     .registreNums("")
                     .estatMask(estatMask)
+                    .entregaPostal(entregaPostal)
                     .perActualitzar(true)
                     .build();
             notificacioTableViewRepository.save(tableViewItem);
@@ -176,6 +179,7 @@ public class NotificacioTableHelper {
             var registreNums = new StringBuilder();
             Integer estatMask = 0;
             List<NotificacioEventEntity> eventsError = new ArrayList<>();
+            var entregaPostal = true;
             if (notificacio.getEnviaments() != null) {
                 for (var e : notificacio.getEnviaments()) {
 
@@ -201,6 +205,8 @@ public class NotificacioTableHelper {
                             estatMask += eventEstat.getMask();
                         }
                     }
+
+                    entregaPostal = entregaPostal && e.getEntregaPostal() != null;
                 }
                 if (titular.length() > 2) {
                     titular = new StringBuilder(titular.substring(0, titular.length() - 2));
@@ -242,6 +248,7 @@ public class NotificacioTableHelper {
             tableViewItem.setEnviadaDate(getEnviadaDate(notificacio));
             tableViewItem.setTitular(titular.toString());
             tableViewItem.setNotificaIds(notificaIds.toString());
+            tableViewItem.setEntregaPostal(entregaPostal);
             var rNums = !Strings.isNullOrEmpty(registreNums.toString()) ? registreNums.substring(0, registreNums.length()-2) : "";
             if (rNums.length() > 2000) {
                 rNums = rNums.substring(0, 2000) + "...";

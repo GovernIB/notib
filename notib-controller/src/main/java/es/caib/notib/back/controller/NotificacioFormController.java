@@ -414,7 +414,11 @@ public class NotificacioFormController extends BaseUserController {
         firma.setError(signatureInfo.isError());
         firma.setErrorMsg(signatureInfo.getErrorMsg());
 
-        if (!Boolean.valueOf(entregaPostal) && procedimentId != null && !procedimentService .procedimentAmbCieExtern(procedimentId, organCodi)) {
+        if (!Boolean.valueOf(entregaPostal)) {
+            return DocumentValidacio.builder().validacioFirma(firma).build();
+        }
+        // si es entrega postal
+        if (procedimentId != null && !procedimentService.procedimentAmbCieExtern(procedimentId, organCodi)) {
             return DocumentValidacio.builder().validacioFirma(firma).build();
         }
         var cieValid = notificacioService.validateDocCIE(content);
