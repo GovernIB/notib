@@ -135,27 +135,29 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 			entityComprovarHelper.comprovarPermisos(null, true, true, true);
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<>();
-			mapeigPropietatsOrdenacio.put("organismePagador", new String[] {"organismePagadorCodi"});
+			mapeigPropietatsOrdenacio.put("organismePagador", new String[] {"organGestor"});
 			var pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			Page<PagadorPostalEntity> pageOpearadorsPostals;
 			List<String> organsFills = null;
+			var organismePagadorNull = Strings.isNullOrEmpty(filtre.getOrganismePagador());
+			var contracteNull = Strings.isNullOrEmpty(filtre.getContracteNum());
 			if (filtre.getOrganGestorId() != null) {
 				var organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, filtre.getOrganGestorId());
 				organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
 				pageOpearadorsPostals = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitatWithOrgan(
-						filtre.getOrganismePagador() == null || filtre.getOrganismePagador().isEmpty(),
+						organismePagadorNull,
 						filtre.getOrganismePagador(),
-						filtre.getContracteNum() == null || filtre.getContracteNum().isEmpty(),
+						contracteNull,
 						filtre.getContracteNum(),
 						organsFills,
 						entitat,
 						pageable);
 			} else {
 				pageOpearadorsPostals = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitat(
-						filtre.getOrganismePagador() == null || filtre.getOrganismePagador().isEmpty(),
-						filtre.getOrganismePagador() != null ? filtre.getOrganismePagador() : "",
-						filtre.getContracteNum() == null || filtre.getContracteNum().isEmpty(),
-						filtre.getContracteNum() != null ? filtre.getContracteNum() : "",
+						organismePagadorNull,
+						filtre.getOrganismePagador(),
+						contracteNull,
+						filtre.getContracteNum(),
 						entitat,
 						pageable);
 			}
