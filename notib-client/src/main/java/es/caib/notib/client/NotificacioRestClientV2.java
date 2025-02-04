@@ -3,6 +3,7 @@
  */
 package es.caib.notib.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import es.caib.notib.client.domini.AppInfo;
@@ -15,10 +16,13 @@ import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.client.domini.consulta.Arxiu;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.ws.rs.core.MediaType;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -145,6 +149,16 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 				return respostaAlta;
 			}
 			throw new RuntimeException(ue);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo) {
+
+		try {
+			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/ampliarPlazo";
+			return clientPost(urlAmbMetode, ampliarPlazo, RespuestaAmpliarPlazoOE.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}

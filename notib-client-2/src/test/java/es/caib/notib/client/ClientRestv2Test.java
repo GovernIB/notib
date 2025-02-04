@@ -1,6 +1,8 @@
 package es.caib.notib.client;
 
 import es.caib.notib.client.domini.*;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.Envios;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -79,6 +81,20 @@ public class ClientRestv2Test extends ClientBaseTest {
 		System.out.println(">>> Identificador: " + respostaAlta.getIdentificador());
 		System.out.println(">>> Referencia: " + referencies.get(0).getReferencia());
 		System.out.println(">>> Informació resposta: " + respostaAlta.toString());
+	}
+
+	@Test
+	public void ampliarPlazo() throws DatatypeConfigurationException, IOException {
+
+		var envios = new Envios();
+		envios.getIdentificador().add("5894cf6f-aa62-461a-b59e-3858796f3f3f");
+		var ampliacio = new AmpliarPlazoOE();
+		ampliacio.setEnvios(envios);
+		ampliacio.setMotivo("Test");
+		ampliacio.setPlazo(2);
+		var resposta = client.ampliarPlazoOE(ampliacio);
+		assertNotNull(resposta);
+		assertTrue(resposta.isOk());
 	}
 
 	@Test
