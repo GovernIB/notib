@@ -1822,7 +1822,7 @@
 										
 										<!-- CODI DIR3 -->
 										<div class="col-md-6 dir3Codi hidden">
-											<not:inputTextSearch  funcio="obrirModalOrganismes('Tit-${j}', '${urlOrganigrama}', '${urlComunitatsAutonomes}','${urlNivellAdministracions}', '${urlCercaUnitats}')" searchButton="searchOrganTit${j}" textKey="notificacio.form.camp.titular.dir3codi" required="true" readonly="true" value=""/>
+											<not:inputTextSearch  name="enviaments[${j}].titular.dir3CodiInput" funcio="obrirModalOrganismes('Tit-${j}', '${urlOrganigrama}', '${urlComunitatsAutonomes}','${urlNivellAdministracions}', '${urlCercaUnitats}')" searchButton="searchOrganTit${j}" textKey="notificacio.form.camp.titular.dir3codi" required="true" readonly="true" value=""/>
 <%-- 											value="${fn:join(enviaments[j].titular.dir3Codi, enviaments[j].titular.nom)} "/> --%>
 										</div>
 										

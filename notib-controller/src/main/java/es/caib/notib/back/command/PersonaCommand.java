@@ -43,6 +43,7 @@ public class PersonaCommand {
 	private String email;
 	@Size(max=9)	
 	private String dir3Codi;
+	private String dir3CodiInput;
 
 	
 	public static PersonaCommand asCommand(PersonaDto dto) {
