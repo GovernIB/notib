@@ -68,30 +68,20 @@
 		<form:hidden path="id"/>
 		<div class="row">
 			<div class="col-md-2">
-				<not:inputSelect name="organismePagadorCodi"
-								 required="true"
-								 textKey="operadorpostal.form.camp.organismePagador"
-								 inline="false"
-								 emptyOption="true"
-								 optionMinimumResultsForSearch="0"/>
+				<not:inputText name="nom" required="true" textKey="operadorpostal.list.columna.nom"/>
 			</div>
 			<div class="col-md-2">
-				<not:inputText name="nom"
-							   required="true"
-							   textKey="operadorpostal.form.camp.nom"/>
+				<not:inputSelect name="organismePagadorCodi" required="true" textKey="operadorpostal.form.camp.organismePagador"
+								 inline="false" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 			<div class="col-md-2">
-				<not:inputText name="contracteNum"
-							   required="true"
-							   textKey="operadorpostal.form.camp.contracteNum"/>
+				<not:inputText name="contracteNum" required="true" textKey="operadorpostal.form.camp.contracteNum"/>
 			</div>
 			<div class="col-md-2">
 				<not:inputDate name="contracteDataVig" textKey="operadorpostal.form.camp.contracteDataVig"/>
 			</div>
 			<div class="col-md-2">
-				<not:inputText name="facturacioClientCodi"
-							   required="true"
-							   textKey="operadorpostal.form.camp.facturacioClientCodi"/>
+				<not:inputText name="facturacioClientCodi" required="true" textKey="operadorpostal.form.camp.facturacioClientCodi"/>
 			</div>
 			<div id="modal-botons">
 				<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

@@ -72,8 +72,8 @@
 		data-filter="#filtre">
 		<thead>
 			<tr>
-				<th data-col-name="organismePagador"><spring:message code="operadorpostal.list.columna.organismePagador"/></th>
 				<th data-col-name="nom"><spring:message code="operadorpostal.list.columna.nom"/></th>
+				<th data-col-name="organismePagador"><spring:message code="operadorpostal.list.columna.organismePagador"/></th>
 				<th data-col-name="contracteNum"><spring:message code="operadorpostal.list.columna.contracteNum"/></th>
 				<th data-col-name="contracteDataVig" data-type="date" data-converter="date"><spring:message code="operadorpostal.list.columna.contracteDataVig"/></th>
 				<th data-col-name="facturacioClientCodi"><spring:message code="operadorpostal.list.columna.facturacioClientCodi"/></th>
