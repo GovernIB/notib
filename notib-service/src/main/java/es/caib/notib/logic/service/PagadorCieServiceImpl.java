@@ -169,7 +169,8 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			Page<PagadorCieEntity> pagadorCie = null;
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<>();
-			mapeigPropietatsOrdenacio.put("organismePagador", new String[] {"organismePagadorCodi"});
+			mapeigPropietatsOrdenacio.put("organismePagador", new String[] {"organGestor"});
+			mapeigPropietatsOrdenacio.put("organismeEmisor", new String[] {"organEmisor"});
 			var pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			List<String> organsFills;
 			if (filtre.getOrganGestorId() != null) {
