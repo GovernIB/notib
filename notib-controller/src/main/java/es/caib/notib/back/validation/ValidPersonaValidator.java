@@ -145,6 +145,10 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 										MessageHelper.getInstance().getMessage("notificacio.form.valid.administracio.dir3", null, locale))
 								.addNode("dir3Codi")
 								.addConstraintViolation();
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.administracio.dir3", null, locale))
+								.addNode("dir3CodiInput")
+								.addConstraintViolation();
 					}
 
 					if (Strings.isNullOrEmpty(persona.getNif())) {
@@ -161,6 +165,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 								.addNode("nif")
 								.addConstraintViolation();
 					}
+
 					break;
 			}
 
