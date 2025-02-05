@@ -144,19 +144,23 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 										MessageHelper.getInstance().getMessage("notificacio.form.valid.administracio.dir3", null, locale))
 								.addNode("dir3Codi")
 								.addConstraintViolation();
-						context.buildConstraintViolationWithTemplate(
-										MessageHelper.getInstance().getMessage("notificacio.form.valid.administracio.dir3", null, locale))
-								.addNode("dir3CodiInput")
-								.addConstraintViolation();
+//						context.buildConstraintViolationWithTemplate(
+//										MessageHelper.getInstance().getMessage("notificacio.form.valid.administracio.dir3", null, locale))
+//								.addNode("dir3CodiInput")
+//								.addConstraintViolation();
 					}
 
-					if (Strings.isNullOrEmpty(persona.getNif())) {
-						valid = false;
-						context.buildConstraintViolationWithTemplate(
-										MessageHelper.getInstance().getMessage("notificacio.form.valid.nif.obligatori", null, locale))
-								.addNode("nif")
-								.addConstraintViolation();
-					}
+//					if (Strings.isNullOrEmpty(persona.getNif())) {
+//						valid = false;
+//						context.buildConstraintViolationWithTemplate(
+//										MessageHelper.getInstance().getMessage("notificacio.form.valid.nif.obligatori", null, locale))
+//								.addNode("nif")
+//								.addConstraintViolation();
+//						context.buildConstraintViolationWithTemplate(
+//										MessageHelper.getInstance().getMessage("notificacio.form.valid.nif.obligatori", null, locale))
+//								.addNode("dir3CodiInput")
+//								.addConstraintViolation();
+//					}
 					if (!Strings.isNullOrEmpty(persona.getNif()) && !NifHelper.isvalid(persona.getNif())) {
 						valid = false;
 						context.buildConstraintViolationWithTemplate(

@@ -608,7 +608,7 @@ public class NotificacioValidator implements Validator {
                     senseNif = senseNif && Strings.isNullOrEmpty(destinatari.getNif());
                 }
             }
-            if (senseNif) {
+            if (senseNif && !notificacio.isSir()) {
                 errors.rejectValue(envName, error(ENVIAMENT_MINIM_UN_NIF, l, prefix));
             }
         }
@@ -638,6 +638,7 @@ public class NotificacioValidator implements Validator {
     }
 
     private void validateTitular(Enviament enviament, EnviamentTipus enviamentTipus, String emisorDir3Codi, String envName, String prefix, Errors errors, Locale l) {
+
         if (enviament.getTitular() == null) {
             errors.rejectValue(envName + ".titular", error(TITULAR_NULL, l, prefix));
             return;

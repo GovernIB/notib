@@ -210,4 +210,8 @@ public class Notificacio implements Serializable {
         return nifs;
     }
 
+    public boolean isSir() {
+        return EnviamentTipus.SIR.equals(getEnviamentTipus());
+    }
+
 }
