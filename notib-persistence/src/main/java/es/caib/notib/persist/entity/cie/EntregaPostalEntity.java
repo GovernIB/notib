@@ -6,6 +6,7 @@ import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.EntregaPostal;
+import es.caib.notib.logic.intf.rest.consulta.Estat;
 import es.caib.notib.persist.audit.NotibAuditable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -282,6 +283,10 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 			adressa += "c. " + domiciliComplement + " ";
 		}
 		return adressa;
+	}
+
+	public boolean errorEntregaPostal() {
+		return CieEstat.ERROR.equals(cieEstat);
 	}
 
 }

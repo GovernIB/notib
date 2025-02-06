@@ -221,14 +221,22 @@ public abstract class NotificacioTableMapper {
 
     private String getEntregaPostal(Set<NotificacioEnviamentEntity> enviaments) {
 
+        var entregaPostal = false;
+        var errorEntregaPostal = false;
         for (var enviament : enviaments) {
 
             if (enviament.getEntregaPostal() != null) {
-                var title = messageHelper.getMessage("entrega.postal.icona.tooltip");
-                return "<span class=\"label label-success\" title=\"" + title +"\" style=\"float: right; position: relative; top: 0px;\"><span class=\"fa fa-envelope\"></span></span>";
+                entregaPostal = true;
+                errorEntregaPostal = errorEntregaPostal || enviament.getEntregaPostal().errorEntregaPostal();
             }
+
         }
-        return "";
+
+        if (!entregaPostal) {
+            return "";
+        }
+        var title = messageHelper.getMessage(errorEntregaPostal ? "entrega.postal.erronia.icona.tooltip" : "entrega.postal.icona.tooltip");
+        return "<span class=\"label " + (errorEntregaPostal ? "label-danger"  : "label-success") + "\" title=\"" + title +"\" style=\"float: right; position: relative; top: 0px;\"><span class=\"fa fa-envelope\"></span></span>";
     }
 
 

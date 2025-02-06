@@ -20,6 +20,7 @@ import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnv
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.ResultadoSincronizarEnvio;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
+import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,8 @@ public class CieAdviserServiceImpl implements CieAdviserService {
     private AdviserService adviserService;
     @Autowired
     private NotificacioEnviamentRepository enviamentRepository;
+    @Autowired
+    private NotificacioTableViewRepository notificacioTableRepository;
     @Autowired
     private IntegracioHelper integracioHelper;
     @Autowired
@@ -172,6 +175,9 @@ public class CieAdviserServiceImpl implements CieAdviserService {
         if (entregaPostal == null) {
             return null;
         }
+        var notTable = notificacioTableRepository.findById(enviament.getNotificacio().getId()).get();
+        notTable.setPerActualitzar(true);
+        notificacioTableRepository.save(notTable);
         var estat = CieEstat.valueOf(sincronizarEnvio.getEstado().toUpperCase());
         enviament.getEntregaPostal().setCieEstat(estat);
         var opciones = sincronizarEnvio.getOpcionesSincronizarEnvio();
