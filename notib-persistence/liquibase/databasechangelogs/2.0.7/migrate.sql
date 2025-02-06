@@ -13,4 +13,4 @@ ALTER TABLE not_notificacio_env ADD plazo_ampliado NUMBER(1, 0) DEFAULT '0';
 UPDATE NOT_NOTIFICACIO_ENV set plazo_ampliado = 0;
 
 -- Changeset db/changelog/changes/2.0.7/930.yaml::1634114082437-1::limit
-ALTER TABLE not_pagador_cie ADD CONSTRAINT entitat_organ_constraint UNIQUE (entitat, organ_gestor);
+ALTER TABLE not_entrega_postal ADD cie_error_desc VARCHAR2(250 CHAR);

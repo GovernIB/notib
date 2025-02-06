@@ -1,9 +1,19 @@
 databaseChangeLog:
+  - property:
+      dbms: oracle
+      name: varcharUnit
+      value: CHAR
+  - property:
+      dbms: postgresql
+      name: varcharUnit
+      value: ''
   - changeSet:
       id: 1634114082437-1
       author: limit
       changes:
-        - addUniqueConstraint:
-            tableName: not_pagador_cie
-            columnNames: entitat, organ_gestor
-            constraintName: entitat_organ_constraint
+        - addColumn:
+            tableName: not_entrega_postal
+            columns:
+              - column:
+                  name: cie_error_desc
+                  type: varchar(250 ${varcharUnit})

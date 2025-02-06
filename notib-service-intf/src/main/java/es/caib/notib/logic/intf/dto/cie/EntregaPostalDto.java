@@ -44,4 +44,5 @@ public class EntregaPostalDto implements Serializable{
 	private String cieId;
 	private boolean cieCancelat;
 	private String cieEstat;
+	private String cieErrorDesc;
 }

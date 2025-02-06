@@ -19,6 +19,7 @@ import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.service.AdviserService;
 import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.intf.ws.adviser.common.Opciones;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.ResultadoSincronizarEnvio;
@@ -123,6 +124,7 @@ public class AdviserServiceImpl implements AdviserService {
                     dataEstat,
                     sincronizarEnvio.getReceptor(),
                     sincronizarEnvio.getAcusePDF(),
+                    sincronizarEnvio.getOpcionesSincronizarEnvio(),
                     info);
         } finally {
             metricsHelper.fiMetrica(timer);
@@ -130,7 +132,7 @@ public class AdviserServiceImpl implements AdviserService {
     }
 
     private ResultadoSincronizarEnvio updateEnviament(String identificador, int tipoEntrega, BigInteger modoNotificacion, String estado,
-                                                      Date dataEstat, Receptor receptor, Acuse acusePDF, IntegracioInfo info) {
+                                                      Date dataEstat, Receptor receptor, Acuse acusePDF, Opciones opciones, IntegracioInfo info) {
 
         var resultadoSincronizarEnvio = new ResultadoSincronizarEnvio();
         resultadoSincronizarEnvio.setIdentificador(identificador);
