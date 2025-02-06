@@ -270,6 +270,7 @@
                 '<tr>' +
                 '<th><spring:message code="notificacio.list.enviament.list.titular"/></th>' +
                 '<th><spring:message code="notificacio.list.enviament.list.destinataris"/></th>' +
+                '<th><spring:message code="notificacio.list.enviament.list.estat.entrega.postal"/></th>' +
                 '<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
                 '<th></th>' +
                 '</tr>' +
@@ -331,6 +332,7 @@
                     destinataris = '<spring:message code="notificacio.list.enviament.list.sensedestinataris"/>';
                 }
                 contingutTbody += '<td>' + destinataris + '</td>';
+                contingutTbody += '<td>' + data[i].estatEntregaPostal + '</td>';
                 contingutTbody +=  data[i].estatColor ? '<td style="box-shadow: inset 3px 0px 0px ' + data[i].estatColor + ';"> ' +
                     '              <span class="' + data[i].estatIcona + '"></span><span>  </span>' : '<td>';
                 contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
@@ -363,6 +365,7 @@
                     contingutTbody += ' <span style="color:#8a6d3b; cursor:pointer;" class="fa fa-mobile fa-lg" title="' + data[i].notificacioMovilErrorDesc + '"></span>';
                 }
                 contingutTbody += '</td>';
+
                 contingutTbody += '<td width="114px">';
                 if (data[i].notificaCertificacioData != null) {
                     contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/certificacioDescarregar"/>" class="btn btn-default btn-sm fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.accio.descarregar.certificacio"/>"><span class="fa fa-download"></span></a>';

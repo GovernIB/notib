@@ -33,6 +33,8 @@ public class NotificacioEnviamentDatatableDto {
 	private String estatIcona;
 	private Date notificaEstatData;
 
+	private String estatEntregaPostal;
+
 	private NotificacioEstatEnumDto notificacioEstat;
 	private Date notificacioErrorData;
 	private String notificacioErrorDescripcio;
