@@ -1953,9 +1953,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 		if (pdf.isEditBlocked()) {
 			errors.add(messageHelper.getMessage("error.validacio.107555"));
 		}
-//		if (pdf.hasNoneEmbeddedFonts()) {
-//			errors.add(messageHelper.getMessage("error.validacio.107556"));
-//		}
+		if (pdf.hasNoneEmbeddedFonts() && !pdf.hasBaseFonts()) {
+			errors.add(messageHelper.getMessage("error.validacio.107556"));
+		}
 		if (!Strings.isNullOrEmpty(pdf.getJavaScript())) {
 			errors.add(messageHelper.getMessage("error.validacio.107557"));
 		}

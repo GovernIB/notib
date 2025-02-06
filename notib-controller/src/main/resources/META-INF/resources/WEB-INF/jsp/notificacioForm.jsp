@@ -355,6 +355,8 @@
 		"notificacio.sir.emprar.valib.text": "<spring:message code="notificacio.sir.emprar.valib.text"/>",
 		"notificacio.form.dir3.cercar.noMinimCodiFiltre": "<spring:message code='notificacio.form.dir3.cercar.noMinimCodiFiltre'/>",
 		"notificacio.form.dir3.cercar.noMinimDenominacioFiltre": "<spring:message code='notificacio.form.dir3.cercar.noMinimDenominacioFiltre'/>",
+		"notificacio.sir.sense.cif": "<spring:message code="notificacio.sir.sense.cif"/>",
+		"notificacio.sir.sense.cif.text": "<spring:message code="notificacio.sir.sense.cif.text"/>",
 	};
 
 	var destinatariHTMLTemplate =' \

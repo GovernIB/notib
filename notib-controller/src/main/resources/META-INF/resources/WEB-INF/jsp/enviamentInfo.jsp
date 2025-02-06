@@ -830,10 +830,16 @@ $(document).ready(function() {
 										<td width="30%"><strong><spring:message code="enviament.info.dada.entrega.cie.id"/></strong></td>
 										<td>${enviament.entregaPostal.cieId}</td>
 									</tr>
+									<tr>
+										<td width="30%"><strong><spring:message code="enviament.info.dada.entrega.cie.estat"/></strong></td>
+										<td><spring:message code="es.caib.notib.client.domini.CieEstat.${enviament.entregaPostal.cieEstat}"/></td>
+									</tr>
+									<c:if test="${enviament.entregaPostal.cieErrorDesc != null}">
 										<tr>
-											<td width="30%"><strong><spring:message code="enviament.info.dada.entrega.cie.estat"/></strong></td>
-											<td><spring:message code="es.caib.notib.client.domini.CieEstat.${enviament.entregaPostal.cieEstat}"/></td>
+											<td width="30%"><strong><spring:message code="enviament.info.error.error"/></strong></td>
+											<td>${enviament.entregaPostal.cieErrorDesc}</td>
 										</tr>
+									</c:if>
 								</tbody>
 							</table>
 						</div>

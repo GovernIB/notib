@@ -1,20 +1,31 @@
 
 package es.caib.notib.client.domini.ampliarPlazo;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import es.caib.notib.client.domini.RespostaBase;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
-@Getter
-@Setter
-@Builder
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RespuestaAmpliarPlazoOE {
+@JsonAutoDetect
+@JsonIgnoreProperties(ignoreUnknown = true)
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class RespuestaAmpliarPlazoOE extends RespostaBase {
 
     protected String codigoRespuesta;
     protected String descripcionRespuesta;

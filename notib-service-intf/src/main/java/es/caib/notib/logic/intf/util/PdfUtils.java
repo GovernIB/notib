@@ -1,6 +1,7 @@
 package es.caib.notib.logic.intf.util;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfArray;
 import com.itextpdf.text.pdf.PdfDictionary;
@@ -17,6 +18,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 public class PdfUtils extends PdfReader {
@@ -29,8 +31,11 @@ public class PdfUtils extends PdfReader {
     private boolean nonePrintableAnnotations;
     private boolean noneEmbeddedImages;
     private boolean noneEmbeddedFonts;
+    private boolean baseFonts;
     @Getter
     private boolean maxRightMarginOk;
+
+    private final List<String> fontsNexea = Lists.newArrayList("arial", "courier", "helvetica", "timesnewroman", "timesroman");
 
     public PdfUtils(byte [] bytes) throws IOException {
 
@@ -49,9 +54,10 @@ public class PdfUtils extends PdfReader {
 
     private boolean checkDinA4(int pageNumber) {
 
-        double a4Width = 595.28;
-        double a4Height = 841.89;
-        double tolerance = 5; // Tolerància
+        // dinA4 = 210x297mm
+        double a4Width = 595.276;
+        double a4Height = 841.890;
+        double tolerance = 1; // Tolerància
         var rect = this.getPageSizeWithRotation(pageNumber);
         var width = rect.getWidth();
         var height = rect.getHeight();
@@ -84,7 +90,7 @@ public class PdfUtils extends PdfReader {
         var parser = new PdfReaderContentParser(this);
         checkNoneEmbeddedImages(parser, pageNumber);
         noneEmbeddedFonts = noneEmbeddedFonts || checkNoneEmbeddedFonts(pageNumber);
-
+        baseFonts = baseFonts || checkBaseFonts(pageNumber);
         var annots = getPageN(pageNumber).getAsArray(PdfName.ANNOTS);
         if (annots == null) {
             return;
@@ -98,7 +104,7 @@ public class PdfUtils extends PdfReader {
         }
     }
 
-    private boolean checkNoneEmbeddedFonts(int pageNumber) {
+    public boolean checkBaseFonts(int pageNumber) {
 
         var pageDict = getPageN(pageNumber);
         var resources = pageDict.getAsDict(PdfName.RESOURCES);
@@ -107,19 +113,46 @@ public class PdfUtils extends PdfReader {
             return false;
         }
         for (PdfName fontName : fonts.getKeys()) {
-            PdfDictionary fontDict = fonts.getAsDict(fontName);
-            PdfDictionary fontDescriptor = fontDict.getAsDict(PdfName.FONTDESCRIPTOR);
-            if (fontDescriptor == null) {
-                return true;
+            PdfDictionary fontDetails = fonts.getAsDict(fontName);
+            if (!fontDetails.contains(PdfName.BASEFONT)) {
+                continue;
             }
-            PdfObject fontFile = fontDescriptor.getDirectObject(PdfName.FONTFILE);
-            PdfObject fontFile2 = fontDescriptor.getDirectObject(PdfName.FONTFILE2);
-            PdfObject fontFile3 = fontDescriptor.getDirectObject(PdfName.FONTFILE3);
-            if (fontFile == null && fontFile2 == null && fontFile3 == null) {
+            String name = fontDetails.getAsName(PdfName.BASEFONT).toString().replace("/", "");
+            if (fontsNexea.contains(name.toLowerCase())) {
                 return true;
             }
         }
         return false;
+    }
+
+    private boolean checkNoneEmbeddedFonts(int pageNumber) {
+
+        var pageDict = getPageN(pageNumber);
+        var resources = pageDict.getAsDict(PdfName.RESOURCES);
+        var fonts = resources.getAsDict(PdfName.FONT);
+
+        if (fonts == null) {
+            return false;
+        }
+
+        for (PdfName fontName : fonts.getKeys()) {
+
+            PdfDictionary fontDict = fonts.getAsDict(fontName);
+            PdfDictionary fontDescriptor = fontDict.getAsDict(PdfName.FONTDESCRIPTOR);
+            // Check if font is embedded
+            if (fontDescriptor == null) {
+                return true; // Font is not embedded
+            }
+
+            PdfObject fontFile = fontDescriptor.getDirectObject(PdfName.FONTFILE);
+            PdfObject fontFile2 = fontDescriptor.getDirectObject(PdfName.FONTFILE2);
+            PdfObject fontFile3 = fontDescriptor.getDirectObject(PdfName.FONTFILE3);
+
+            if (fontFile == null && fontFile2 == null && fontFile3 == null) {
+                return true; // Font is not embedded
+            }
+        }
+        return false; // All fonts are embedded
     }
 
     private void checkNoneEmbeddedImages(PdfReaderContentParser parser, int pageNumber) {
@@ -222,6 +255,10 @@ public class PdfUtils extends PdfReader {
 
     public boolean hasNoneEmbeddedFonts() {
         return noneEmbeddedFonts;
+    }
+
+    public boolean hasBaseFonts() {
+        return baseFonts;
     }
 
     public boolean hasTransparency() {

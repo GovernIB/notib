@@ -18,6 +18,7 @@ import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.Acuse;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.Receptor;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.ResultadoSincronizarEnvio;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
@@ -60,8 +61,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
         } else {
             integracioHelper.addAccioError(info, resposta.getDescripcionRespuesta());
         }
-        return resposta;
-//        return conversioTipusHelper.convertir(sincronizarEnvio, es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.ResultadoSincronizarEnvio.class);
+        return conversioTipusHelper.convertir(resposta, es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.ResultadoSincronizarEnvio.class);
     }
 
     @Transactional
@@ -142,8 +142,8 @@ public class CieAdviserServiceImpl implements CieAdviserService {
 //                resultado.setDescripcionRespuesta("Receptor no tiene el formato correcto");
 //                return resultado;
 //            }
-            var estat = CieEstat.valueOf(sincronizarEnvio.getEstado().toUpperCase());
-            enviament.getEntregaPostal().setCieEstat(estat);
+
+            var estat = updateEntregaPostal(enviament, sincronizarEnvio);
             info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
             resultado.setIdentificador(enviament.getNotificaIdentificador());
             resultado.setCodigoRespuesta(NexeaAdviserWs.CODI_OK);
@@ -163,6 +163,29 @@ public class CieAdviserServiceImpl implements CieAdviserService {
             resultado.setDescripcionRespuesta(error);
             return resultado;
         }
+    }
+
+
+    private CieEstat updateEntregaPostal(NotificacioEnviamentEntity enviament, SincronizarEnvio sincronizarEnvio) {
+
+        var entregaPostal = enviament.getEntregaPostal();
+        if (entregaPostal == null) {
+            return null;
+        }
+        var estat = CieEstat.valueOf(sincronizarEnvio.getEstado().toUpperCase());
+        enviament.getEntregaPostal().setCieEstat(estat);
+        var opciones = sincronizarEnvio.getOpcionesSincronizarEnvio();
+        if (opciones == null) {
+            return estat;
+        }
+        for(var opcion : opciones.getOpcion()) {
+            if (!"motivoError".equals(opcion.getTipo())) {
+                continue;
+            }
+            var error = !Strings.isNullOrEmpty(opcion.getValue()) ? opcion.getValue().length() > 250 ? opcion.getValue().substring(0, 250) : opcion.getValue() : null;
+            entregaPostal.setCieErrorDesc(error);
+        }
+        return estat;
     }
 
     private boolean receptorValid(Receptor receptor) {

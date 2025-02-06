@@ -137,6 +137,10 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 	@Column(name = "cie_estat")
 	protected CieEstat cieEstat;
 
+	@Setter
+	@Column(name = "cie_error_desc", length = 250)
+	protected String cieErrorDesc;
+
 
 
 	public void update(EntregaPostal entregaPostal) {

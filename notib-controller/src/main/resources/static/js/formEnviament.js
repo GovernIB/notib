@@ -709,7 +709,10 @@ function loadOrgansGestors(urlCercaUnitats){
                         '<td width="85%">' + item.codi + ' - ' + nom + '</td>' +
                         '<td>' + (socSir) + '</td>' +
                         '<td>';
-                    if (enviamentTipus === 'NOTIFICACIO' || enviamentTipus === 'COMUNICACIO' || comSir || item.permetreSir) {
+                    if (!item.cif && !comSir){
+                       list_html += '<div style="cursor:pointer; color:#AAA;" title="' + textMessages["notificacio.sir.sense.cif"] + '"><span  class="fa fa-warning text-danger" ></span> '
+                           + textMessages["notificacio.sir.sense.cif.text"] + '</div>';
+                    } else if (enviamentTipus === 'NOTIFICACIO' || enviamentTipus === 'COMUNICACIO' || comSir || item.permetreSir) {
                         list_html += '<button type="button" class="select btn btn-success">' + textMessages['comu.boto.seleccionar'] + '</button>';
                     } else if (item.sir) {
                         list_html += '<div style="cursor:pointer; color:#AAA;" title="' + textMessages["notificacio.sir.emprar.valib"] + '"><span  class="fa fa-warning text-danger" ></span> '

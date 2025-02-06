@@ -294,8 +294,10 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 	}
 
 	private OrganGestorDto toOrganGestorDto(NodeDir3 organ) {
+
+		var cif = !Strings.isNullOrEmpty(organ.getCif()) && !"null".equals(organ.getCif()) ? organ.getCif() : null;
 		return OrganGestorDto.builder().codi(organ.getCodi()).nom(organ.getDenominacionCooficial()).nomEs(organ.getDenominacio())
-				.estat(organGestorEstatForName(organ.getEstat())).sir(organ.getTieneOficinaSir()).cif(organ.getCif()).build();
+				.estat(organGestorEstatForName(organ.getEstat())).sir(organ.getTieneOficinaSir()).cif(cif).build();
 	}
 	private OrganGestorEstatEnum organGestorEstatForName(String estatNom) {
 

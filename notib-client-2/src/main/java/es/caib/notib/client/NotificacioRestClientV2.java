@@ -13,6 +13,8 @@ import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.client.domini.consulta.Arxiu;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import lombok.extern.slf4j.Slf4j;
@@ -144,6 +146,24 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 			log.debug("Missatge REST enviat: " + body);
 			var wt = jerseyClient.target(urlAmbMetode);
 			var r = wt.request(MediaType.APPLICATION_JSON).post(Entity.json(body)).readEntity(RespostaAltaV2.class);
+			log.debug("Missatge REST rebut: " + r);
+			return r;
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+
+	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo) {
+
+		try {
+			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/ampliarPlazo";
+			ObjectMapper mapper  = getMapper();
+			String body = mapper.writeValueAsString(ampliarPlazo);
+			jerseyClient = generarClient();
+			log.debug("Missatge REST enviat: " + body);
+			var wt = jerseyClient.target(urlAmbMetode);
+			var r = wt.request(MediaType.APPLICATION_JSON).post(Entity.json(body)).readEntity(RespuestaAmpliarPlazoOE.class);
 			log.debug("Missatge REST rebut: " + r);
 			return r;
 		} catch (Exception ex) {
