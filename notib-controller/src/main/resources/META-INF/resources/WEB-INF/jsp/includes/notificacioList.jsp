@@ -334,7 +334,12 @@
                     destinataris = '<spring:message code="notificacio.list.enviament.list.sensedestinataris"/>';
                 }
                 contingutTbody += '<td>' + destinataris + '</td>';
-                contingutTbody += '<td>' + data[i].estatEntregaPostal + '</td>';
+                let estatPostal = data[i].estatEntregaPostal;
+                let mostrarIconaError = estatPostal.toString().toLowerCase().includes("error") && data[i].errorEntregaPostal;
+                let iconaError = mostrarIconaError ? '<span class="fa fa-warning text-danger" title="' + data[i].errorEntregaPostal + '"></span>' : "";
+                contingutTbody += '<td>' + data[i].estatEntregaPostal + "<span> </span>" + iconaError + '</td>';
+
+
                 contingutTbody +=  data[i].estatColor ? '<td style="box-shadow: inset 3px 0px 0px ' + data[i].estatColor + ';"> ' +
                     '              <span class="' + data[i].estatIcona + '"></span><span>  </span>' : '<td>';
                 contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';

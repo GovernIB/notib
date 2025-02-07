@@ -534,8 +534,8 @@ public class ConversioTipusHelper {
 			}
 
 			var entregaPostal = entity.getEntregaPostal();
-			dto.setEstatEntregaPostal(messageHelper.getMessage(entregaPostal != null ? "es.caib.notib.client.domini.CieEstat." +entregaPostal.getCieEstat() : "entrega.postal.null"));
-
+			dto.setEstatEntregaPostal(messageHelper.getMessage(entregaPostal != null ? "es.caib.notib.client.domini.CieEstat." + entregaPostal.getCieEstat() : "entrega.postal.null"));
+			dto.setErrorEntregaPostal(entregaPostal.getCieErrorDesc());
 			if (entity.isSirFiPooling()) {
 				dto.setFiReintents(true);
 				var msg = messageHelper.getMessage("notificacio.event.fi.reintents");

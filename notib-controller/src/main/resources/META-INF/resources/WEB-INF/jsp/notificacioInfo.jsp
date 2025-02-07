@@ -750,7 +750,7 @@ $(document).ready(function() {
 							    			</td>
 							    		</tr>
 										<tr>
-											<th><spring:message code="notificacio.list.enviament.list.estat"/></th>
+											<th><spring:message code="enviament.list.estat"/></th>
 											<td>
 												<c:if test="${not empty enviament.notificaEstat}">
 													<spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/>
