@@ -100,7 +100,7 @@ public class EnviamentAdviser implements Serializable {
             for (es.caib.notib.api.interna.model.adviser.Opcion op : opciones.getOpcion()) {
                 o = new es.caib.notib.logic.intf.ws.adviser.common.Opcion();
                 o.setTipo(op.getTipo());
-                o.setValue(o.getValue());
+                o.setValue(op.getValue());
                 os.getOpcion().add(o);
             }
         }
