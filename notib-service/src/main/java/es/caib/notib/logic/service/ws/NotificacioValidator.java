@@ -521,9 +521,9 @@ public class NotificacioValidator implements Validator {
         if (pdf.hasNonPrintableAnnotations()) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_NONE_PRINTABLE_ANNOTATIONS, locale, prefix));
         }
-        if (pdf.hasForms()) {
-            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_INTERACTIVE_FORMS, locale, prefix));
-        }
+//        if (pdf.hasForms()) {
+//            errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_INTERACTIVE_FORMS, locale, prefix));
+//        }
         if (pdf.hasNoneEmbeddedImages()) {
             errors.rejectValue(doc + ".arxiuNom", error(DOCUMENT_CIE_PDF_NONE_EMBEDDED_IMAGES, locale, prefix));
         }

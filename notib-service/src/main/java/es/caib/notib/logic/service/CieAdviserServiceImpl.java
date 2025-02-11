@@ -35,6 +35,7 @@ import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.repository.EntregaPostalRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -86,6 +87,8 @@ public class CieAdviserServiceImpl implements CieAdviserService {
     private static final int DATAT = 1;
     private static final int DATAT_CERT = 2;
     private static final int CERTIFICACIO = 3;
+    @Autowired
+    private EntregaPostalRepository entregaPostalRepository;
 
 
     @Override
@@ -223,11 +226,12 @@ public class CieAdviserServiceImpl implements CieAdviserService {
         notTable.setPerActualitzar(true);
         notificacioTableRepository.save(notTable);
         var estat = CieEstat.valueOf(sincronizarEnvio.getEstado().toUpperCase());
-        enviament.getEntregaPostal().setCieEstat(estat);
+        entregaPostal.setCieEstat(estat);
         var error = CieEstat.ERROR.equals(estat);
+        entregaPostal.setCieErrorDesc("");
         var opciones = sincronizarEnvio.getOpcionesSincronizarEnvio();
         if (opciones == null) {
-            notificacioEventHelper.addCieAdviserEvent(enviament, error, "Error ", false);
+//            notificacioEventHelper.addCieAdviserEvent(enviament, error, "Error ", false);
             return estat;
         }
         for(var opcion : opciones.getOpcion()) {
@@ -237,6 +241,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
             var errorMsg = !Strings.isNullOrEmpty(opcion.getValue()) ? opcion.getValue().length() > 250 ? opcion.getValue().substring(0, 250) : opcion.getValue() : null;
             entregaPostal.setCieErrorDesc(errorMsg);
         }
+        entregaPostalRepository.save(entregaPostal);
         notificacioEventHelper.addCieAdviserEvent(enviament, error,  entregaPostal.getCieErrorDesc(), false);
         return estat;
     }
