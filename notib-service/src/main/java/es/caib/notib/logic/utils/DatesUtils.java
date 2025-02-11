@@ -1,5 +1,6 @@
 package es.caib.notib.logic.utils;
 
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -69,5 +70,9 @@ public class DatesUtils {
         cal.setTime(data);
         cal.add(Calendar.DATE, llindar);
         return ara.after(cal.getTime());
+    }
+
+    public static Date toDate(XMLGregorianCalendar calendar) {
+        return calendar != null ? calendar.toGregorianCalendar().getTime() : null;
     }
 }

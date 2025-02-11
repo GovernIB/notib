@@ -289,4 +289,15 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 		return CieEstat.ERROR.equals(cieEstat);
 	}
 
+	public boolean isCieEstatFinal() {
+
+		return cieEstat != null && (CieEstat.NOTIFICADA.equals(cieEstat)
+				|| CieEstat.CANCELADO.equals(cieEstat)
+				|| CieEstat.EXTRAVIADA.equals(cieEstat)
+				|| CieEstat.SIN_INFORMACION.equals(cieEstat)
+				|| CieEstat.REHUSADA.equals(cieEstat)
+				|| CieEstat.ERROR.equals(cieEstat)
+				|| CieEstat.DEVUELTO.equals(cieEstat));
+	}
+
 }

@@ -17,6 +17,8 @@ import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.logic.intf.dto.adviser.ResultatEnviamentEnum;
+import es.caib.notib.logic.intf.dto.adviser.ResultatExecucio;
 import es.caib.notib.logic.intf.service.AdviserService;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.ws.adviser.common.Opciones;
@@ -25,6 +27,7 @@ import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.ResultadoSincronizarEnvio;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
@@ -72,37 +75,6 @@ public class AdviserServiceImpl implements AdviserService {
     private static final int DATAT_CERT = 2;
     private static final int CERTIFICACIO = 3;
 
-
-    public enum ResultatEnviamentEnum {
-        OK ("000", "000", "OK"),
-        ERROR_ORGANISME("001", "001", "Organismo Desconocido"),
-        ERROR_IDENTIFICADOR("002", "3002", "Identificador no encontrado"),
-        ESTAT_DESCONEGUT("003", "003", "Estado inexistente"),
-        ERROR_ACUSE("004", "3004", "Acuse no trobat"),
-        ERROR_DESCONEGUT("666",  "666", "Error procesando peticion");
-
-        @Getter private String codi;
-        @Getter private String codiNexea;
-        @Getter private String desc;
-
-        ResultatEnviamentEnum(final String codi, final String codiNexea, final String desc) {
-
-            this.codi = codi;
-            this.codiNexea = codiNexea;
-            this.desc = desc;
-        }
-
-        public static ResultatEnviamentEnum getByCodi(String codi) {
-
-            for (var val : ResultatEnviamentEnum.values()) {
-                if (val.getCodi().equals(codi)) {
-                    return val;
-                }
-            }
-            throw new IllegalArgumentException("ResultatEnviamentEnum no conte el codi " + codi);
-        }
-    }
-
     @Override
     @Transactional
     public ResultadoSincronizarEnvio sincronizarEnvio(SincronizarEnvio sincronizarEnvio) {
@@ -111,7 +83,7 @@ public class AdviserServiceImpl implements AdviserService {
         try {
             var identificador = sincronizarEnvio.getIdentificador();
             var sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-            var dataEstat = toDate(sincronizarEnvio.getFechaEstado());
+            var dataEstat = DatesUtils.toDate(sincronizarEnvio.getFechaEstado());
 
             generateInfoLog(sincronizarEnvio, identificador, sdf, dataEstat);
             IntegracioInfo info = generateInfoEnvio(sincronizarEnvio, identificador, sdf, dataEstat);
@@ -267,6 +239,7 @@ public class AdviserServiceImpl implements AdviserService {
     }
 
     private void certificacioOk(NotificacioEnviamentEntity enviament, ResultadoSincronizarEnvio resultadoSincronizarEnvio, String certificacioAntiga) {
+
         log.debug("Registrant event callbackcertificacio de l'Adviser...");
         notificacioEventHelper.addAdviserCertificacioEvent(enviament, false, null);
         //si hi havia una certificació antiga
@@ -416,25 +389,4 @@ public class AdviserServiceImpl implements AdviserService {
         }
     }
 
-    private Date toDate(XMLGregorianCalendar calendar) {
-        return calendar != null ? calendar.toGregorianCalendar().getTime() : null;
-    }
-
-    @Getter @Setter
-    private static class ResultatExecucio {
-        private String codi;
-        private String descripcio;
-        private boolean error = false;
-        private String errorDescripcio = "";
-
-        public void setError(String errorDescripcio, Exception ex) {
-            if (!Strings.isNullOrEmpty(errorDescripcio))
-                this.error = true;
-            this.errorDescripcio = errorDescripcio;
-            if (ex == null)
-                log.error(errorDescripcio);
-            else
-                log.error(errorDescripcio, ex);
-        }
-    }
 }

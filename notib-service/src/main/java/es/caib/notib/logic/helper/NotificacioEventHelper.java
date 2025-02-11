@@ -225,6 +225,24 @@ public class NotificacioEventHelper {
                 .error(error).errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
     }
 
+    public void addCieAdviserEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+
+        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.CIE_ADVISER)
+                .error(error).errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
+    }
+
+    public void addCieAdviserCertificacioEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio) {
+
+        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.CIE_ADVISER_CERTIFICACIO)
+                .error(error).errorDescripcio(errorDescripcio).build());
+    }
+
+    public void addCieAdviserDatatEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio) {
+
+        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.CIE_ADVISER_DATAT)
+                .error(error).errorDescripcio(errorDescripcio).build());
+    }
+
     public void addNotificaEnvioOE(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
 
         addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIO_OE).error(error)
