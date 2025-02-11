@@ -1,6 +1,7 @@
 package es.caib.notib.api.interna.controller;
 
 import es.caib.notib.api.interna.model.adviser.CieAdviser;
+import es.caib.notib.api.interna.openapi.interficies.EnviamentAdivserApiRestIntf;
 import es.caib.notib.logic.intf.dto.AdviserResponseDto;
 import es.caib.notib.logic.intf.service.CieAdviserService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -26,7 +27,7 @@ public class CieAdviserController implements EnviamentAdivserApiRestIntf {
     private CieAdviserService cieAdviserService;
 
     @PostMapping(value = "/sincronitzar", headers="Content-Type=application/json")
-    public AdviserResponseDto sincronitzarEnviamentCie(HttpServletRequest request, @RequestBody EnviamentCieAdviser adviser, Model model) {
+    public AdviserResponseDto sincronitzarEnviamentCie(HttpServletRequest request, @RequestBody CieAdviser adviser, Model model) {
 
         try {
             var factory = Validation.buildDefaultValidatorFactory();

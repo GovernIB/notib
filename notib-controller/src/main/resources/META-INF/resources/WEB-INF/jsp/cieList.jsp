@@ -70,9 +70,9 @@
 		data-filter="#filtre">
 		<thead>
 			<tr>
+				<th data-col-name="nom"><spring:message code="cie.list.columna.nom"/></th>
 				<th data-col-name="organismeEmisor"><spring:message code="operadorpostal.form.camp.organismeEmisor"/></th>
 				<th data-col-name="organismePagador"><spring:message code="cie.list.columna.organismePagador"/></th>
-				<th data-col-name="nom"><spring:message code="cie.list.columna.nom"/></th>
 				<th data-col-name="contracteDataVig" data-converter="date"><spring:message code="cie.list.columna.contracteDataVig"/></th>
 <%--				<th data-col-name="organGestorEstat" data-visible="false"></th>--%>
 <%--				<th data-col-name="organGestorCodi" data-template="#cellOrganGestorTemplate"><spring:message code="cie.list.columna.organgestor"/>--%>

@@ -1,5 +1,6 @@
 package es.caib.notib.api.interna.openapi.interficies;
 
+import es.caib.notib.api.interna.model.adviser.CieAdviser;
 import es.caib.notib.api.interna.model.adviser.EnviamentCieAdviser;
 import es.caib.notib.api.interna.openapi.model.consulta.RespostaConsultaV2Api;
 import es.caib.notib.logic.intf.dto.AdviserResponseDto;
@@ -24,6 +25,6 @@ public interface EnviamentAdivserApiRestIntf {
     @PostMapping(value = "/sincronitzar", headers="Content-Type=application/json")
     @Operation(summary = "Actualitza la informació de l'enviament postal rebut des del CIE", description = "Actualitza la informació de l'enviament postal rebut des del CIE")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Sincronitzar enviament CIE", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = RespostaConsultaV2Api.class, description = "Sincronitza enviament CIE"))})})
-    AdviserResponseDto sincronitzarEnviamentCie(HttpServletRequest request, @RequestBody EnviamentCieAdviser adviser, Model model);
+    AdviserResponseDto sincronitzarEnviamentCie(HttpServletRequest request, @RequestBody CieAdviser adviser, Model model);
 
 }
