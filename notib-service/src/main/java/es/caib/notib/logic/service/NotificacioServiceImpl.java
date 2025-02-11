@@ -626,8 +626,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 			// Emplena dades del procediment
 			var procedimentEntity = notificacio.getProcediment();
-			if (procedimentEntity != null && procedimentEntity.isEntregaCieActivaAlgunNivell()) {
-				EntregaCieEntity entregaCieEntity = procedimentEntity.getEntregaCieEfectiva();
+			var procComuOrganCie = procedimentEntity.isComu() && notificacio.getOrganGestor().getEntregaCie() != null;
+			if (entregaPostal && (procedimentEntity != null && procedimentEntity.isEntregaCieActivaAlgunNivell() || procComuOrganCie)) {
+				var entregaCieEntity = procedimentEntity.getEntregaCieEfectiva();
+				entregaCieEntity = entregaCieEntity == null ? notificacio.getOrganGestor().getEntregaCie() : entregaCieEntity;
 				dto.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEntity.getOperadorPostal(), OperadorPostalDataDto.class));
 				dto.setCie(conversioTipusHelper.convertir(entregaCieEntity.getCie(), CieDataDto.class));
 			}
