@@ -1931,12 +1931,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 //		if (!cieOrgan.isCieExtern()) {
 //			return DocCieValid.builder().errorsCie(errors).build();
 //		}
-
+		var prefix = new Object[]{""};
 		if (!MimeUtils.isPDF(Base64.encodeBase64String(bytes))) {
-			errors.add(messageHelper.getMessage("error.validacio.10755"));
+			errors.add(messageHelper.getMessage("error.validacio.10755", prefix));
 		}
 		if (bytes.length > 5242880) {
-			errors.add(messageHelper.getMessage("error.validacio.107554"));
+			errors.add(messageHelper.getMessage("error.validacio.107554", prefix));
 		}
 
 		var pdf = new PdfUtils(bytes);
@@ -1945,49 +1945,49 @@ public class NotificacioServiceImpl implements NotificacioService {
 			errors.add(messageHelper.getMessage("error.validacio.107551", new Object[]{"1.7"}));
 		}
 		if (!pdf.isDinA4()) {
-			errors.add(messageHelper.getMessage("error.validacio.107552"));
+			errors.add(messageHelper.getMessage("error.validacio.107552", prefix));
 		}
 		if (!pdf.maxPages(TipusImpressio.SIMPLEX.name())) {
-			errors.add(messageHelper.getMessage("error.validacio.107553"));
+			errors.add(messageHelper.getMessage("error.validacio.107553", prefix));
 		}
 		if (pdf.isEditBlocked()) {
-			errors.add(messageHelper.getMessage("error.validacio.107555"));
+			errors.add(messageHelper.getMessage("error.validacio.107555", prefix));
 		}
 		if (pdf.hasNoneEmbeddedFonts() && !pdf.hasBaseFonts()) {
-			errors.add(messageHelper.getMessage("error.validacio.107556"));
+			errors.add(messageHelper.getMessage("error.validacio.107556", prefix));
 		}
 		if (!Strings.isNullOrEmpty(pdf.getJavaScript())) {
-			errors.add(messageHelper.getMessage("error.validacio.107557"));
+			errors.add(messageHelper.getMessage("error.validacio.107557", prefix));
 		}
 		if (pdf.hasExternalLinks()) {
-			errors.add(messageHelper.getMessage("error.validacio.107558"));
+			errors.add(messageHelper.getMessage("error.validacio.107558", prefix));
 		}
 		if (pdf.hasTransparency()) {
-			errors.add(messageHelper.getMessage("error.validacio.107559"));
+			errors.add(messageHelper.getMessage("error.validacio.107559", prefix));
 		}
 		if (pdf.hasAttachedFiles()) {
-			errors.add(messageHelper.getMessage("error.validacio.107560"));
+			errors.add(messageHelper.getMessage("error.validacio.107560", prefix));
 		}
 		if (pdf.hasMultimedia()) {
-			errors.add(messageHelper.getMessage("error.validacio.107561"));
+			errors.add(messageHelper.getMessage("error.validacio.107561", prefix));
 		}
 		if (pdf.hasNonPrintableAnnotations()) {
-			errors.add(messageHelper.getMessage("error.validacio.107562"));
+			errors.add(messageHelper.getMessage("error.validacio.107562", prefix));
 		}
-		if (pdf.hasForms()) {
-			errors.add(messageHelper.getMessage("error.validacio.107563"));
-		}
+//		if (pdf.hasForms()) {
+//			errors.add(messageHelper.getMessage("error.validacio.107563", prefix));
+//		}
 		if (pdf.hasNoneEmbeddedImages()) {
-			errors.add(messageHelper.getMessage("error.validacio.107564"));
+			errors.add(messageHelper.getMessage("error.validacio.107564", prefix));
 		}
 		if (pdf.isPrintingAllowed()) {
-			errors.add(messageHelper.getMessage("error.validacio.107565"));
+			errors.add(messageHelper.getMessage("error.validacio.107565", prefix));
 		}
 		if (pdf.isModifyAllowed()) {
-			errors.add(messageHelper.getMessage("error.validacio.107566"));
+			errors.add(messageHelper.getMessage("error.validacio.107566", prefix));
 		}
 		if (!pdf.isMaxRightMarginOk()) {
-			errors.add(messageHelper.getMessage("error.validacio.107567"));
+			errors.add(messageHelper.getMessage("error.validacio.107567", prefix));
 		}
 		var msg = !errors.isEmpty() ? messageHelper.getMessage("errors.validacio.cie") : "";
 

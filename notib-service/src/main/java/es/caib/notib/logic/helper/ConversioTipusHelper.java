@@ -534,11 +534,13 @@ public class ConversioTipusHelper {
 			}
 
 			var entregaPostal = entity.getEntregaPostal();
-			var missatgeEstatPostal = messageHelper.getMessage(entregaPostal != null ?
-										entregaPostal.getCieEstat() != null ? "es.caib.notib.client.domini.CieEstat." + entregaPostal.getCieEstat() : "entrega.postal.pendent.enviar"
-										: "entrega.postal.null");
-			dto.setEstatEntregaPostal(missatgeEstatPostal);
-			dto.setErrorEntregaPostal(entregaPostal.getCieErrorDesc());
+			if (entregaPostal != null) {
+				var missatgeEstatPostal = messageHelper.getMessage(entregaPostal != null ?
+						entregaPostal.getCieEstat() != null ? "es.caib.notib.client.domini.CieEstat." + entregaPostal.getCieEstat() : "entrega.postal.pendent.enviar"
+						: "entrega.postal.null");
+				dto.setEstatEntregaPostal(missatgeEstatPostal);
+				dto.setErrorEntregaPostal(entregaPostal.getCieErrorDesc());
+			}
 			if (entity.isSirFiPooling()) {
 				dto.setFiReintents(true);
 				var msg = messageHelper.getMessage("notificacio.event.fi.reintents");

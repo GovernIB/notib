@@ -1,7 +1,6 @@
 package es.caib.notib.api.interna.controller;
 
-import es.caib.notib.api.interna.model.adviser.EnviamentCieAdviser;
-import es.caib.notib.api.interna.openapi.interficies.EnviamentAdivserApiRestIntf;
+import es.caib.notib.api.interna.model.adviser.CieAdviser;
 import es.caib.notib.logic.intf.dto.AdviserResponseDto;
 import es.caib.notib.logic.intf.service.CieAdviserService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -36,7 +35,7 @@ public class CieAdviserController implements EnviamentAdivserApiRestIntf {
 
             if (!violations.isEmpty()) {
                 var errorDescripcio = new StringBuilder("Error validant enviament: ");
-                for (ConstraintViolation<EnviamentCieAdviser> violation: violations) {
+                for (ConstraintViolation<CieAdviser> violation: violations) {
                     errorDescripcio.append("[" + violation.getPropertyPath() + ": " + violation.getMessage() + "] ");
                 }
                 return AdviserResponseDto.builder().identificador(adviser.getIdentificador()).codigoRespuesta("998").descripcionRespuesta(errorDescripcio.toString()).build();
