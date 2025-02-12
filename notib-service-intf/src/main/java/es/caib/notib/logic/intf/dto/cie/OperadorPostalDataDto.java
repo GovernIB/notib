@@ -15,6 +15,7 @@ public class OperadorPostalDataDto extends AuditoriaDto implements Serializable 
 	@EqualsAndHashCode.Include
 	private String nom;
 	private String organismePagadorCodi;
+	private String organismePagadorNom;
 	@EqualsAndHashCode.Include
 	private String contracteNum;
 	private Date contracteDataVig;

@@ -312,6 +312,7 @@ public class ConversioTipusHelper {
 				.field("entitat.id", "entitatId")
 				.field("organGestor.id", "organGestorId")
 				.field("organGestor.codi", "organismePagadorCodi")
+				.field("organGestor.nom", "organismePagadorNom")
 				.field("organEmisor.codi", "organismeEmisorCodi")
 				.byDefault().register();
 
@@ -327,6 +328,7 @@ public class ConversioTipusHelper {
 		mapperFactory.classMap(PagadorPostalEntity.class, OperadorPostalDto.class)
 				.field("entitat.id", "entitatId")
 				.field("organGestor.codi", "organismePagadorCodi")
+				.field("organGestor.nom", "organismePagadorNom")
 				.byDefault().register();
 
 		mapperFactory.classMap(PagadorPostalEntity.class, OperadorPostalTableItemDto.class)

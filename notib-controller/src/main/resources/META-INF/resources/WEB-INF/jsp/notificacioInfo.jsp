@@ -652,26 +652,20 @@ $(document).ready(function() {
 							<c:if
 								test="${not empty notificacio.operadorPostal.organismePagadorCodi}">
 								<tr>
-									<td width="30%"><strong><spring:message
-												code="notificacio.info.pagador.correus.codi.dir3" /></strong></td>
-									<td>${notificacio.operadorPostal.organismePagadorCodi}</td>
+									<td width="30%"><strong><spring:message code="notificacio.info.pagador.correus.codi.dir3" /></strong></td>
+									<td>${notificacio.operadorPostal.organismePagadorCodi} - ${notificacio.operadorPostal.organismePagadorNom}</td>
 								</tr>
 								<tr>
-									<td><strong><spring:message
-												code="notificacio.info.pagador.correus.contracte" /></strong></td>
+									<td><strong><spring:message code="notificacio.info.pagador.correus.contracte" /></strong></td>
 									<td>${notificacio.operadorPostal.contracteNum}</td>
 								</tr>
 								<tr>
-									<td><strong><spring:message
-												code="notificacio.info.pagador.correus.client" /></strong></td>
+									<td><strong><spring:message code="notificacio.info.pagador.correus.client" /></strong></td>
 									<td>${notificacio.operadorPostal.facturacioClientCodi}</td>
 								</tr>
 								<tr>
-									<td><strong><spring:message
-												code="notificacio.info.pagador.correus.vigencia" /></strong></td>
-									<td>
-									<fmt:formatDate pattern="dd/MM/yyyy" value="${notificacio.operadorPostal.contracteDataVig}" />
-									</td>
+									<td><strong><spring:message code="notificacio.info.pagador.correus.vigencia" /></strong></td>
+									<td><fmt:formatDate pattern="dd/MM/yyyy" value="${notificacio.operadorPostal.contracteDataVig}" /></td>
 								</tr>
 							</c:if>
 						</tbody>
@@ -689,13 +683,11 @@ $(document).ready(function() {
 						<tbody>
 							<c:if test="${not empty notificacio.cie.organismePagadorCodi}">
 								<tr>
-									<td width="30%"><strong><spring:message
-												code="notificacio.info.pagador.cie.codi.dir3" /></strong></td>
-									<td>${notificacio.cie.organismePagadorCodi}</td>
+									<td width="30%"><strong><spring:message code="notificacio.info.pagador.cie.codi.dir3" /></strong></td>
+									<td>${notificacio.cie.organismePagadorCodi} - ${notificacio.cie.organismePagadorNom}</td>
 								</tr>
 								<tr>
-									<td><strong><spring:message
-												code="notificacio.info.pagador.cie.vigencia" /></strong></td>
+									<td><strong><spring:message code="notificacio.info.pagador.cie.vigencia" /></strong></td>
 									<td>
 									<fmt:formatDate pattern="dd/MM/yyyy" value="${notificacio.cie.contracteDataVig}" />
 									</td>

@@ -15,6 +15,7 @@ public class CieDataDto extends AuditoriaDto implements Serializable{
 	private String nom;
 	@EqualsAndHashCode.Include
 	private String organismePagadorCodi;
+	private String organismePagadorNom;
 	@EqualsAndHashCode.Include
 	private Date contracteDataVig;
 	private Long organGestorId;
