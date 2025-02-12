@@ -179,6 +179,7 @@ public class NotificacioFormController extends BaseUserController {
         var enviament = new EnviamentCommand();
         var entregaPostal = new EntregapostalCommand();
         entregaPostal.setPaisCodi("ES");
+        entregaPostal.setProvincia("07");
         enviament.setEntregaPostal(entregaPostal);
         enviaments.add(enviament);
         notificacioCommand.setEnviaments(enviaments);

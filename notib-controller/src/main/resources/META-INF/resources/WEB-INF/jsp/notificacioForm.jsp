@@ -1868,7 +1868,7 @@
 										<p class="comentari"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
 									</div>
 									<div class="entrega-cie-activa">
-										<not:inputCheckbox name="enviaments[${j}].entregaPostal.activa" textKey="notificacio.form.camp.entregapostal.activa" labelSize="4" funcio="mostrarEntregaPostal(this.id)" />
+										<not:inputCheckbox  name="enviaments[${j}].entregaPostal.activa" textKey="notificacio.form.camp.entregapostal.activa" labelSize="1" funcio="mostrarEntregaPostal(this.id)" />
 									</div>
 								</div>
 								<!-- ENTREGA POSTAL -->
@@ -1876,9 +1876,29 @@
 									<div class="col-md-12">
 										<div id="entregaPostalCaducada" class="alert alert-warning"><spring:message code="notificacio.form.camp.entregapostal.caducada"/></div>
 										<div class="col-md-12">
-											<not:inputSelect name="enviaments[${j}].entregaPostal.domiciliConcretTipus" generalClass="enviamentTipus" textKey="notificacio.form.camp.entregapostal.tipus" required="true"
-															 optionItems="${entregaPostalTipus}" optionValueAttribute="value" optionTextKeyAttribute="text"  labelClass="labelcss" inputClass="inputcss"/>
-										</div>	
+											<div class="form-group">
+												<label class="control-label col-xs-2" style="width:9.667%; padding-right:0px;" for="enviaments[${j}].domiciliConcretTipus.viaTipus"><spring:message code="notificacio.form.camp.entregapostal.tipus" /></label>
+												<div class="controls col-xs-10" style="padding-left:0px;">
+													<div class="col-xs-1">
+														<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="NACIONAL" checked="checked"/>
+														<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.NACIONAL" />
+													</div>
+													<div class="col-xs-1">
+														<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="ESTRANGER" />
+														<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.ESTRANGER" />
+													</div>
+													<div class="col-xs-2" style="width:11.667%">
+														<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="APARTAT_CORREUS" />
+														<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.APARTAT_CORREUS" />
+													</div>
+													<div class="col-xs-2">
+														<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="SENSE_NORMALITZAR" />
+														<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.SENSE_NORMALITZAR" />
+													</div>
+												</div>
+											</div>
+
+										</div>
 										<div class="normalitzat">
 											<div class="col-md-4">
 												<not:inputSelect name="enviaments[${j}].entregaPostal.viaTipus" generalClass="tipusVia" textKey="notificacio.form.camp.entregapostal.tipusvia" labelClass="labelcss" inputClass="inputcss" required="true" />
@@ -1898,8 +1918,7 @@
 											<div class="col-md-4">
 												<not:inputText name="enviaments[${j}].entregaPostal.puntKm"
 															   textKey="notificacio.form.camp.entregapostal.puntkm"
-															   labelClass="labelcss" inputClass="inputcss"
-															   required="true"/>
+															   labelClass="labelcss" inputClass="inputcss"/>
 											</div>
 											<div class="col-md-4">
 												<not:inputText name="enviaments[${j}].entregaPostal.portal" textKey="notificacio.form.camp.entregapostal.portal" labelClass="labelcss" inputClass="inputcss" />
@@ -1917,10 +1936,7 @@
 												<not:inputText name="enviaments[${j}].entregaPostal.bloc" textKey="notificacio.form.camp.entregapostal.bloc" labelClass="labelcss" inputClass="inputcss" />
 											</div>
 											<div class="col-md-4">
-												<not:inputText name="enviaments[${j}].entregaPostal.codiPostal"
-															   textKey="notificacio.form.camp.entregapostal.codipostal"
-															   labelClass="labelcss" inputClass="inputcss"
-															   required="true"/>
+												<not:inputText name="enviaments[${j}].entregaPostal.codiPostal" textKey="notificacio.form.camp.entregapostal.codipostal" labelClass="labelcss" inputClass="inputcss" required="true"/>
 											</div>
 											<div class="col-md-6">
 												<not:inputSelect name="enviaments[${j}].entregaPostal.paisCodi" generalClass="paisos" emptyOption="true" textKey="notificacio.form.camp.entregapostal.paiscodi" labelClass="labelcss" inputClass="inputcss"/>
@@ -1989,7 +2005,7 @@
 								<c:if test="${ambEntregaDeh}">
 									<c:set var="entregaDehActiva" value="${enviament.entregaDeh.activa}"></c:set>
 									<div class="col-md-12">
-										<not:inputCheckbox name="enviaments[${j}].entregaDeh.activa" textKey="notificacio.form.camp.entregadeh.activa" labelSize="4" funcio="mostrarEntregaDeh(this.id)" />
+										<not:inputCheckbox name="enviaments[${j}].entregaDeh.activa" textKey="notificacio.form.camp.entregadeh.activa" labelSize="3" funcio="mostrarEntregaDeh(this.id)" />
 									</div>
 									<!-- ENTREGA DEH -->
 									<div id="entregaDeh" class="entregaDeh_${j}" <c:if test="${!entregaDehActiva}">style="display:none"</c:if>>
