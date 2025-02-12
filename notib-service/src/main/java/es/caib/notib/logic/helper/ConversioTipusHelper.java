@@ -540,6 +540,8 @@ public class ConversioTipusHelper {
 						: "entrega.postal.null");
 				dto.setEstatEntregaPostal(missatgeEstatPostal);
 				dto.setErrorEntregaPostal(entregaPostal.getCieErrorDesc());
+			} else {
+				dto.setEstatEntregaPostal(messageHelper.getMessage("entrega.postal.null"));
 			}
 			if (entity.isSirFiPooling()) {
 				dto.setFiReintents(true);
