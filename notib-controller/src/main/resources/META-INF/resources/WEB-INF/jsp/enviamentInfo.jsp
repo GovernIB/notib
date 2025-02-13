@@ -806,6 +806,11 @@ $(document).ready(function() {
 						</div>
 					</c:when>
 					<c:otherwise>
+						<c:if test="${not enviament.entregaPostal.cieEstat and empty enviament.entregaPostal.cieId}">
+							<div class="alert alert-info well-sm" role="alert">
+								<spring:message code="enviament.info.dada.entrega.cie.erronia" />
+							</div>
+						</c:if>
 						<p class="text-right" style="margin-top: 1em">
 							<c:if test="${enviament.entregaPostal.cieEstat == 'ENVIADO_CI'}">
 								<button id="cancelarEntregaPostal" class="btn btn-default">

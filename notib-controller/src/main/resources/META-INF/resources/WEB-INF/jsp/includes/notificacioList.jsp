@@ -335,7 +335,22 @@
                 let estatPostal = data[i].estatEntregaPostal;
                 let mostrarIconaError = estatPostal && estatPostal.toString().toLowerCase().includes("error") && data[i].errorEntregaPostal;
                 let iconaError = mostrarIconaError ? '<span class="fa fa-warning text-danger" title="' + data[i].errorEntregaPostal + '"></span>' : "";
-                contingutTbody += '<td>' + data[i].estatEntregaPostal + "<span> </span>" + iconaError + '</td>';
+                let isUltimEventCie = data[i].ultimEvent.eventCie;
+                let cieEventError = "";
+                if (isUltimEventCie && data[i].ultimEventError && !iconaError) {
+                    var errorTitle = '';
+                    if (data[i].notificacioErrorDescripcio) {
+                        errorTitle = data[i].notificacioErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                    } else {
+                        errorTitle = "Descripció de l'error no registrada";
+                    }
+                    cieEventError += ' <span class="fa fa-warning text-danger" title="' + errorTitle + '"></span>';
+                }
+                if (isUltimEventCie && data[i].fiReintents) {
+                    cieEventError += ' <span class="fa fa-warning text-warning" title="' + data[i].fiReintentsDesc + '"></span>';
+                }
+
+                contingutTbody += '<td>' + data[i].estatEntregaPostal + "<span> </span>" + iconaError + cieEventError + '</td>';
 
 
                 contingutTbody +=  data[i].estatColor ? '<td style="box-shadow: inset 3px 0px 0px ' + data[i].estatColor + ';"> ' +
@@ -348,7 +363,8 @@
                         contingutTbody += " (<spring:message code="notificacio.list.enviament.list.finalitzat.email"/>)"
                     }
                 }
-                if (data[i].ultimEventError && data[i].notificaEstat !== "FINALITZADA" && data[i].notificaEstat !== "PROCESSADA") {
+
+                if (!isUltimEventCie && data[i].ultimEventError && data[i].notificaEstat !== "FINALITZADA" && data[i].notificaEstat !== "PROCESSADA") {
                     var errorTitle = '';
                     if (data[i].notificacioErrorDescripcio) {
                         errorTitle = data[i].notificacioErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -357,7 +373,7 @@
                     }
                     contingutTbody += ' <span class="fa fa-warning text-danger" title="' + errorTitle + '"></span>';
                 }
-                if (data[i].fiReintents) {
+                if (!isUltimEventCie && data[i].fiReintents) {
                     contingutTbody += ' <span class="fa fa-warning text-warning" title="' + data[i].fiReintentsDesc + '"></span>';
                 }
                 if (data[i].errorLastCallback) {
