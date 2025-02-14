@@ -1,6 +1,7 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -179,7 +180,8 @@ public class NotificacioTableHelper {
             var registreNums = new StringBuilder();
             Integer estatMask = 0;
             List<NotificacioEventEntity> eventsError = new ArrayList<>();
-            var entregaPostal = true;
+            var entregaPostal = false;
+            var entregaPostalError = false;
             if (notificacio.getEnviaments() != null) {
                 for (var e : notificacio.getEnviaments()) {
 
@@ -206,7 +208,8 @@ public class NotificacioTableHelper {
                         }
                     }
 
-                    entregaPostal = entregaPostal && e.getEntregaPostal() != null;
+                    entregaPostal = entregaPostal || e.getEntregaPostal() != null;
+                    entregaPostalError = entregaPostalError || CieEstat.ERROR.equals(e.getEntregaPostal().getCieEstat());
                 }
                 if (titular.length() > 2) {
                     titular = new StringBuilder(titular.substring(0, titular.length() - 2));
@@ -249,6 +252,7 @@ public class NotificacioTableHelper {
             tableViewItem.setTitular(titular.toString());
             tableViewItem.setNotificaIds(notificaIds.toString());
             tableViewItem.setEntregaPostal(entregaPostal);
+            tableViewItem.setEntregaPostalError(entregaPostalError);
             var rNums = !Strings.isNullOrEmpty(registreNums.toString()) ? registreNums.substring(0, registreNums.length()-2) : "";
             if (rNums.length() > 2000) {
                 rNums = rNums.substring(0, 2000) + "...";

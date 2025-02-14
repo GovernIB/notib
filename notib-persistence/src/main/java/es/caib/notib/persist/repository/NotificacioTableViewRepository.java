@@ -141,7 +141,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:#{#filtre.registreNumNull} = true or ntf.registreNums like concat('%', :#{#filtre.registreNum}, '%')) " +
 			"and (:#{#filtre.nomesSenseErrors} = false or ntf.notificaErrorData is null) " +
 			"and (:#{#filtre.nomesAmbEntregaPostal} = false or ntf.entregaPostal = true) " +
-			"and (:#{#filtre.adminOrgan} = true or :#{#filtre.nomesAmbErrors} = false or ntf.notificaErrorData is not null or ntf.isErrorLastEvent = true) " +
+			"and (:#{#filtre.adminOrgan} = true or :#{#filtre.nomesAmbErrors} = false or ntf.notificaErrorData is not null or ntf.entregaPostalError = true) " +
 			"and (:#{#filtre.deleted} = ntf.deleted) " +
 			"and (:#{#filtre.referenciaNull} = true or lower(ntf.referencia) like '%' || lower(:#{#filtre.referencia}) || '%')")
     List<Long> findIdsAmbFiltre(FiltreNotificacio filtre);
@@ -218,7 +218,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:#{#filtre.registreNumNull} = true or ntf.registreNums like concat('%', :#{#filtre.registreNum}, '%')) " +
 			"and (:#{#filtre.nomesSenseErrors} = false or ntf.notificaErrorData is null) " +
 			"and (:#{#filtre.nomesAmbEntregaPostal} = false or ntf.entregaPostal = true) " +
-			"and (:#{#filtre.adminOrgan} = true or :#{#filtre.nomesAmbErrors} = false or ntf.notificaErrorData is not null or ntf.isErrorLastEvent = true) " +
+			"and (:#{#filtre.adminOrgan} = true or :#{#filtre.nomesAmbErrors} = false or ntf.notificaErrorData is not null or ntf.entregaPostalError = true) " +
 			"and (:#{#filtre.deleted} = ntf.deleted) " +
 			"and (:#{#filtre.referenciaNull} = true or lower(ntf.referencia) like '%' || lower(:#{#filtre.referencia}) || '%')")
 	Page<NotificacioTableEntity> findAmbFiltre(FiltreNotificacio filtre, Pageable paginacio);

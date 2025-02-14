@@ -7,6 +7,7 @@ import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.NotificacioEventHelper;
+import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
@@ -45,6 +46,7 @@ public class CiePluginHelper {
 
     private final NotificacioTableViewRepository notificacioTableViewRepository;
     private final MessageHelper messageHelper;
+    private final NotificacioTableHelper notificacioTableHelper;
     private Map<String, CiePlugin> ciePlugin = new HashMap<>();
     private final ConversioTipusHelper conversioTipusHelper;
     private final NotificacioEventHelper notificacioEventHelper;
@@ -59,7 +61,7 @@ public class CiePluginHelper {
 
     private static final String ERROR_INESPERAT = "Error inesperat";
 
-    public CiePluginHelper(ConfigHelper configHelper, EntitatRepository entitatRepository, IntegracioHelper integracioHelper, ConversioTipusHelper conversioTipusHelper, NotificacioEventHelper notificacioEventHelper, NotificacioRepository notificacioRepository, NotificacioEventRepository notificacioEventRepository, PluginHelper pluginHelper, EntregaPostalRepository entregaPostalRepository, NotificacioEnviamentRepository enviamentRepository, NotificacioTableViewRepository notificacioTableViewRepository, MessageHelper messageHelper) {
+    public CiePluginHelper(ConfigHelper configHelper, EntitatRepository entitatRepository, IntegracioHelper integracioHelper, ConversioTipusHelper conversioTipusHelper, NotificacioEventHelper notificacioEventHelper, NotificacioRepository notificacioRepository, NotificacioEventRepository notificacioEventRepository, PluginHelper pluginHelper, EntregaPostalRepository entregaPostalRepository, NotificacioEnviamentRepository enviamentRepository, NotificacioTableViewRepository notificacioTableViewRepository, MessageHelper messageHelper, NotificacioTableHelper notificacioTableHelper) {
 
         this.configHelper = configHelper;
         this.entitatRepository = entitatRepository;
@@ -73,6 +75,7 @@ public class CiePluginHelper {
         this.enviamentRepository = enviamentRepository;
         this.notificacioTableViewRepository = notificacioTableViewRepository;
         this.messageHelper = messageHelper;
+        this.notificacioTableHelper = notificacioTableHelper;
     }
 
     public void reset() {
@@ -135,6 +138,7 @@ public class CiePluginHelper {
 //            throw new SistemaExternException(IntegracioCodiEnum.CIE.name(), errorDescripcio, ex);
         }
         guardarRespostaCie(notificacioReferencia, resposta);
+        notificacioTableHelper.actualitzarRegistre(notificacio);
         return resposta;
     }
 
@@ -196,8 +200,8 @@ public class CiePluginHelper {
                 entregaPostal.setCieEstat(CieEstat.ERROR);
                 entregaPostal.setCieErrorDesc(resposta.getDescripcioError());
                 entregaPostalRepository.save(entregaPostal);
-                var notTable = notificacioTableViewRepository.findById(notificacio.getId()).get();
-                notTable.setErrorLastEvent(true);
+//                var notTable = notificacioTableViewRepository.findById(notificacio.getId()).get();
+//                notTable.setErrorLastEvent(true);
             }
         }
     }
