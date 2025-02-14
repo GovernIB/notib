@@ -6,6 +6,7 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
+import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,8 @@ public class NotificacioEventHelper {
     private NotificacioEventRepository eventRepository;
     @Autowired
     private ConfigHelper configHelper;
+    @Autowired
+    private NotificacioTableViewRepository notificacioTableViewRepository;
 
     private static Boolean notificaConsultaActiva = null;
 
@@ -112,6 +115,10 @@ public class NotificacioEventHelper {
                 NotificacioEventTipusEnumDto.NOTIFICA_ENVIO_OE.equals(eventInfo.getTipus()) ||
                 NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT.equals(event.getTipus()))) {
             eventInfo.getEnviament().updateNotificaError(eventInfo.isError(), event);
+
+            var notTable = notificacioTableViewRepository.findById(eventInfo.getEnviament().getNotificacio().getId()).get();
+            notTable.setErrorLastEvent(event.isError());
+            notificacioTableViewRepository.saveAndFlush(notTable);
         }
         return event;
     }

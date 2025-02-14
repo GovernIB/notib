@@ -12,6 +12,7 @@ import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotificaHelper;
 import es.caib.notib.logic.helper.NotificacioEventHelper;
+import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
@@ -89,6 +90,8 @@ public class CieAdviserServiceImpl implements CieAdviserService {
     private static final int CERTIFICACIO = 3;
     @Autowired
     private EntregaPostalRepository entregaPostalRepository;
+    @Autowired
+    private NotificacioTableHelper notificacioTableHelper;
 
 
     @Override
@@ -243,6 +246,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
             entregaPostal.setCieErrorDesc(errorMsg);
         }
         entregaPostalRepository.save(entregaPostal);
+        notificacioTableHelper.actualitzarRegistre(enviament.getNotificacio());
         notificacioEventHelper.addCieAdviserEvent(enviament, error,  entregaPostal.getCieErrorDesc(), false);
         return estat;
     }

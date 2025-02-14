@@ -57,6 +57,7 @@ public class CieNexeaPluginImpl implements CiePlugin {
 
     private final Properties properties;
     private static final String NOTIB = "Notib";
+    private static final String CIE = "CIE";
 
     public CieNexeaPluginImpl(Properties properties) {
         this.properties = properties;
@@ -85,9 +86,9 @@ public class CieNexeaPluginImpl implements CiePlugin {
             var desc = sfe.getFault().getFaultString();
             return RespostaCie.builder().codiResposta(codi).descripcioError(desc).build();
         } catch (Exception ex) {
-            var desc = "Error al enviar a CIE la notificacio " + notificacio.getId() + " - " + ex.getMessage();
+            var desc = "Error inesperat al enviar a CIE la notificacio " + notificacio.getId() + " - " + ex.getMessage();
             log.error(desc, ex);
-            return RespostaCie.builder().codiResposta(NOTIB).descripcioError(desc).build();
+            return RespostaCie.builder().codiResposta(CIE).descripcioError(desc).build();
         }
     }
 

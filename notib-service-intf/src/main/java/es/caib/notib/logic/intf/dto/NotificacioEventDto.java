@@ -46,6 +46,16 @@ public class NotificacioEventDto extends AuditoriaDto {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
+	public boolean isEventCie() {
+
+		return NotificacioEventTipusEnumDto.CIE_ENVIAMENT.equals(tipus)
+				|| NotificacioEventTipusEnumDto.CIE_CANCELAR.equals(tipus)
+				|| NotificacioEventTipusEnumDto.CIE_CONSULTA_ESTAT.equals(tipus)
+				|| NotificacioEventTipusEnumDto.CIE_ADVISER.equals(tipus)
+				|| NotificacioEventTipusEnumDto.CIE_ADVISER_CERTIFICACIO.equals(tipus)
+				|| NotificacioEventTipusEnumDto.CIE_ADVISER_DATAT.equals(tipus);
+	}
+
 	private static final long serialVersionUID = -139254994389509932L;
 
 }

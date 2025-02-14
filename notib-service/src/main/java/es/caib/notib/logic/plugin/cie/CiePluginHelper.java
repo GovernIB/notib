@@ -5,7 +5,9 @@ import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
+import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.NotificacioEventHelper;
+import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
@@ -24,6 +26,7 @@ import es.caib.notib.persist.repository.EntregaPostalRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
+import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import es.caib.notib.plugin.cie.CiePlugin;
 import es.caib.notib.plugin.cie.EnviamentCie;
 import es.caib.notib.plugin.cie.InfoCie;
@@ -41,6 +44,9 @@ import java.util.Properties;
 @Component
 public class CiePluginHelper {
 
+    private final NotificacioTableViewRepository notificacioTableViewRepository;
+    private final MessageHelper messageHelper;
+    private final NotificacioTableHelper notificacioTableHelper;
     private Map<String, CiePlugin> ciePlugin = new HashMap<>();
     private final ConversioTipusHelper conversioTipusHelper;
     private final NotificacioEventHelper notificacioEventHelper;
@@ -55,7 +61,7 @@ public class CiePluginHelper {
 
     private static final String ERROR_INESPERAT = "Error inesperat";
 
-    public CiePluginHelper(ConfigHelper configHelper, EntitatRepository entitatRepository, IntegracioHelper integracioHelper, ConversioTipusHelper conversioTipusHelper, NotificacioEventHelper notificacioEventHelper, NotificacioRepository notificacioRepository, NotificacioEventRepository notificacioEventRepository, PluginHelper pluginHelper, EntregaPostalRepository entregaPostalRepository, NotificacioEnviamentRepository enviamentRepository) {
+    public CiePluginHelper(ConfigHelper configHelper, EntitatRepository entitatRepository, IntegracioHelper integracioHelper, ConversioTipusHelper conversioTipusHelper, NotificacioEventHelper notificacioEventHelper, NotificacioRepository notificacioRepository, NotificacioEventRepository notificacioEventRepository, PluginHelper pluginHelper, EntregaPostalRepository entregaPostalRepository, NotificacioEnviamentRepository enviamentRepository, NotificacioTableViewRepository notificacioTableViewRepository, MessageHelper messageHelper, NotificacioTableHelper notificacioTableHelper) {
 
         this.configHelper = configHelper;
         this.entitatRepository = entitatRepository;
@@ -67,6 +73,9 @@ public class CiePluginHelper {
         this.pluginHelper = pluginHelper;
         this.entregaPostalRepository = entregaPostalRepository;
         this.enviamentRepository = enviamentRepository;
+        this.notificacioTableViewRepository = notificacioTableViewRepository;
+        this.messageHelper = messageHelper;
+        this.notificacioTableHelper = notificacioTableHelper;
     }
 
     public void reset() {
@@ -130,6 +139,7 @@ public class CiePluginHelper {
 //            throw new SistemaExternException(IntegracioCodiEnum.CIE.name(), errorDescripcio, ex);
         }
         guardarRespostaCie(notificacioReferencia, resposta);
+        notificacioTableHelper.actualitzarRegistre(notificacio);
         return resposta;
     }
 
@@ -186,6 +196,14 @@ public class CiePluginHelper {
             }
             var error = !"000".equals(resposta.getCodiResposta());
             notificacioEventHelper.addCieEventEnviar(env, error, error ? resposta.getDescripcioError() : "", fiReintents);
+            if (error) {
+                var entregaPostal = env.getEntregaPostal();
+                entregaPostal.setCieEstat(CieEstat.ERROR);
+                entregaPostal.setCieErrorDesc(resposta.getDescripcioError());
+                entregaPostalRepository.save(entregaPostal);
+//                var notTable = notificacioTableViewRepository.findById(notificacio.getId()).get();
+//                notTable.setErrorLastEvent(true);
+            }
         }
     }
 
@@ -288,6 +306,9 @@ public class CiePluginHelper {
             if ("000".equals(infoCie.getCodiResposta())) {
                 integracioHelper.addAccioOk(info);
                 enviament.getEntregaPostal().setCieEstat(infoCie.getCodiEstat());
+                if (CieEstat.ERROR.equals(infoCie.getCodiEstat()) && Strings.isNullOrEmpty(enviament.getEntregaPostal().getCieErrorDesc())) {
+                    enviament.getEntregaPostal().setCieErrorDesc(messageHelper.getMessage("entrega.postal.error.pendent.adviser"));
+                }
                 notificacioEventHelper.addCieEventConsultaEstat(enviament, false, "", false);
             } else {
                 integracioHelper.addAccioError(info, infoCie.getDescripcioResposta());

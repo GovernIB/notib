@@ -17,3 +17,14 @@ databaseChangeLog:
               - column:
                   name: cie_error_desc
                   type: varchar(250 ${varcharUnit})
+        - addColumn:
+            tableName: not_notificacio_table
+            columns:
+              - column:
+                  name: ENTREGA_POSTAL_ERROR
+                  type: number(1,0)
+                  defaultValue: 0
+        - sql: "UPDATE not_notificacio_table t SET t.ENTREGA_POSTAL_ERROR = 1 WHERE id IN (SELECT DISTINCT nne.NOTIFICACIO_ID 
+                FROM NOT_ENTREGA_POSTAL nep 
+                LEFT JOIN NOT_NOTIFICACIO_ENV nne ON nne.ENTREGA_POSTAL_ID = nep.id 
+                WHERE nep.CIE_ESTAT = 3 OR nep.CIE_ERROR_DESC IS NOT NULL);"
