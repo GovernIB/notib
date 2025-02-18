@@ -177,42 +177,42 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 	}
 
 	private String getLdapServerUrl() {
-		return properties.getProperty("es.caib.notib.plugin.dades.usuari.ldap.server.url");
+		return properties.getProperty("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.server.url");
 	}
 	
 	private String getLdapPrincipal() {
-		return properties.getProperty("es.caib.notib.plugin.dades.usuari.ldap.principal");
+		return properties.getProperty("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.principal");
 	}
 	
 	private String getLdapCredentials() {
-		return properties.getProperty("es.caib.notib.plugin.dades.usuari.ldap.credentials");
+		return properties.getProperty("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.credentials");
 	}
 	
 	private String getLdapSearchBase() {
-		return properties.getProperty("es.caib.notib.plugin.dades.usuari.ldap.search.base");
+		return properties.getProperty("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.search.base");
 	}
 	
 	private String getLdapAtributs() {
 		// Exemple: cn,givenName,sn,mail,departmentNumber,memberOf
-		return properties.getProperty("es.caib.notib.plugin.dades.usuari.ldap.atributs");
+		return properties.getProperty("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.atributs");
 	}
 	
 	private String getLdapFiltreCodi() {
 		// Exemple: (&(objectClass=inetOrgPersonCAIB)(cn=XXX))
-		return properties.getProperty("es.caib.notib.plugin.dades.usuari.ldap.filtre.codi");
+		return properties.getProperty("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.filtre.codi");
 	}
 	
 	private String getLdapFiltreGrup() {
 		// Exemple: (&(objectClass=inetOrgPersonCAIB)(memberOf=cn=XXX,dc=caib,dc=es))
-		return properties.getProperty("es.caib.notib.plugin.dades.usuari.ldap.filtre.grup");
+		return properties.getProperty("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.filtre.grup");
 	}
 	
 	private String getLdapExcloureGrup() {
-		return properties.getProperty("es.caib.notib.plugin.dades.usuari.ldap.excloure.grup");
+		return properties.getProperty("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.excloure.grup");
 	}
 	
 	private String getLdapExcloureMembre() {
-		return properties.getProperty("es.caib.notib.plugin.dades.usuari.ldap.excloure.membre");
+		return properties.getProperty("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.excloure.membre");
 	}
 
 }
