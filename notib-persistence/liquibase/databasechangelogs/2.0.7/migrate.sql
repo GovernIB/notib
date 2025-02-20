@@ -8,6 +8,8 @@ ALTER TABLE not_notificacio_table ADD caducitat TIMESTAMP;
 
 UPDATE not_notificacio_table t SET CADUCITAT = (SELECT caducitat FROM not_notificacio n WHERE t.id = n.id);
 
+ALTER TABLE not_notificacio_env ADD plazo_ampliado NUMBER(1, 0) DEFAULT '0';
+
 -- Changeset db/changelog/changes/2.0.7/859.yaml::1634114082437-1::limit
 ALTER TABLE not_notificacio_env ADD plazo_ampliado NUMBER(1, 0) DEFAULT '0';
 UPDATE NOT_NOTIFICACIO_ENV set plazo_ampliado = 0;
@@ -16,3 +18,50 @@ UPDATE NOT_NOTIFICACIO_ENV set plazo_ampliado = 0;
 ALTER TABLE not_entrega_postal ADD cie_error_desc VARCHAR2(250 CHAR);
 ALTER TABLE not_notificacio_table ADD ENTREGA_POSTAL_ERROR NUMBER(1, 0) DEFAULT '0';
 UPDATE not_notificacio_table t SET t.ENTREGA_POSTAL_ERROR = 1 WHERE id IN (SELECT DISTINCT nne.NOTIFICACIO_ID FROM NOT_ENTREGA_POSTAL nep LEFT JOIN NOT_NOTIFICACIO_ENV nne ON nne.ENTREGA_POSTAL_ID = nep.id WHERE nep.CIE_ESTAT = 3 OR nep.CIE_ERROR_DESC IS NOT NULL);
+
+ALTER TABLE not_entrega_postal ADD cie_datat_recnif VARCHAR2(9 CHAR);
+ALTER TABLE not_entrega_postal ADD cie_datat_recnom VARCHAR2(400 CHAR);
+ALTER TABLE not_entrega_postal ADD cie_cer_data TIMESTAMP(6);
+ALTER TABLE not_entrega_postal ADD cie_cer_arxiuid VARCHAR2(50 CHAR);
+ALTER TABLE not_entrega_postal ADD cie_cer_hash VARCHAR2(50 CHAR);
+ALTER TABLE not_entrega_postal ADD cie_cer_origen VARCHAR2(20 CHAR);
+ALTER TABLE not_entrega_postal ADD cie_cer_metas VARCHAR2(255 CHAR);
+ALTER TABLE not_entrega_postal ADD cie_cer_csv VARCHAR2(50 CHAR);
+ALTER TABLE not_entrega_postal ADD cie_cer_mime VARCHAR2(20 CHAR);
+ALTER TABLE not_entrega_postal ADD cie_cer_tamany INTEGER;
+ALTER TABLE not_entrega_postal ADD cie_cer_tipus VARCHAR2(20 CHAR);
+ALTER TABLE not_entrega_postal ADD cie_cer_arxtip VARCHAR2(20 CHAR);
+ALTER TABLE not_entrega_postal ADD cie_cer_numseg VARCHAR2(50 CHAR);
+ALTER TABLE not_entrega_postal ADD cie_estat_data TIMESTAMP(6);
+ALTER TABLE not_entrega_postal ADD cie_estat_desc VARCHAR2(255 CHAR);
+ALTER TABLE not_entrega_postal ADD cie_datat_origen VARCHAR2(20 CHAR);
+ALTER TABLE not_entrega_postal ADD cie_datat_numseg VARCHAR2(50 CHAR);
+ALTER TABLE not_entrega_postal ADD cie_datat_errdes VARCHAR2(255 CHAR);
+ALTER TABLE not_entrega_postal ADD cie_estat_dataact TIMESTAMP(6);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.ENTREGA_CIE', 'false', 'Mostrar logs relacionats amb la entrega postal', 'LOGS', 21, 0, 'BOOL', 0);
+
+-- Changeset db/changelog/changes/2.0.7/ldap.yaml::1634114082437-1::limit
+
+DELETE FROM not_config WHERE key like '%ldap%';
+
+UPDATE NOT_CONFIG_TYPE SET VALUE = VALUE || 'es.caib.notib.plugin.usuari.DadesUsuariPluginJdbc,es.caib.notib.plugin.usuari.DadesUsuariPluginLdapCaib' WHERE CODE = 'USUARIS_CLASS';
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.host_url', '', 'Security principal pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.security_principal', '', 'URL del servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.security_authentication', '', 'Security authentication pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.security_credentials', '', 'Security credentials pel servidor LDAP CAIB', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.users_context_dn', '', 'User context DN pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.search_scope', '', 'Search scope pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.username', '', 'Attribute username pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.mail', '', 'Attribute mail pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.administration_id', '', 'Attribute administration id pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.name', '', 'Attribute name pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.surname', '', 'Attribute surname pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.surname1', '', 'Attribute surname 1 pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.surname2', '', 'Attribute surname 2 pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.telephone', '', 'Attribute telephone pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.department', '', 'Attribute department pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.memberof', '', 'Attribute suffix role match member of pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.prefix_role_match_memberof', '', 'Attribute prefix role match member of pel servidor LDAP ', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.suffix_role_match_memberof', '', 'Attribute suffix role match member of pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
