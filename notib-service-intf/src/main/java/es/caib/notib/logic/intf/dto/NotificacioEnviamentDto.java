@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.intf.dto;
 
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.cie.EntregaPostalDto;
@@ -93,6 +94,11 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 		return sb.toString();
 	}
 
+	public boolean isNotificat() {
+
+		return EnviamentEstat.NOTIFICADA.equals(notificaEstat) || entregaPostal != null && CieEstat.NOTIFICADA.name().equals(entregaPostal.getCieEstat());
+	}
+
 	public boolean isEnviamentEnviat() {
 		return !EnviamentEstat.NOTIB_PENDENT.equals(notificaEstat) && !EnviamentEstat.REGISTRADA.equals(notificaEstat);
 	}
@@ -107,6 +113,7 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
+
 
 	private static final long serialVersionUID = -139254994389509932L;
 

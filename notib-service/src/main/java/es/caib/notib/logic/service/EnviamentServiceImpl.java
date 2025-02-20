@@ -25,6 +25,7 @@ import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.ProcSerHelper;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
+import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDto;
@@ -86,6 +87,7 @@ import org.supercsv.io.CsvListWriter;
 import org.supercsv.io.ICsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -1031,6 +1033,35 @@ public class EnviamentServiceImpl implements EnviamentService {
 			log.info(String.format("[Callback] Enviament del callback [Id: %d] de l''enviament [Id: %d] exitós", callback.getId(), callback.getEnviamentId()));
 		}
 		return enviamentsAmbError;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public ArxiuDto getCertificacioPostalArxiu(Long enviamentId) {
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+			try {
+				ConfigHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
+			} catch (Exception ex) {
+				log.error("No s'ha pogut definir l'entitat actual.", ex);
+			}
+//			// #779: Obtenim la certificació de forma automàtica
+//			if (enviament.getNotificaCertificacioArxiuId() == null) {
+//				enviament = notificaHelper.enviamentRefrescarEstat(enviamentId);
+//			}
+			var entregaPostal = enviament.getEntregaPostal();
+			if (entregaPostal == null || entregaPostal.getCieCertificacioArxiuId() == null) {
+				throw new RuntimeException("No s'ha trobat la certificació de l'entrega postal per l'enviament id: " + enviamentId);
+			}
+			var output = new ByteArrayOutputStream();
+			pluginHelper.gestioDocumentalGet(entregaPostal.getCieCertificacioArxiuId(), PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, output, false);
+			var nom = entregaPostal.getCieCertificacioArxiuNom();
+			return new ArxiuDto(nom, entregaPostal.getCieCertificacioMime(), output.toByteArray(), output.size());
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Builder @Getter

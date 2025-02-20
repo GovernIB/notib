@@ -3,7 +3,7 @@ package es.caib.notib.logic.service;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.logic.helper.AbstractNotificaHelper;
+import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.CallbackHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
@@ -21,8 +21,13 @@ import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.adviser.ResultatEnviamentEnum;
 import es.caib.notib.logic.intf.dto.adviser.ResultatExecucio;
+import es.caib.notib.logic.intf.dto.cie.CieCertificacioArxiuTipus;
+import es.caib.notib.logic.intf.dto.cie.CieCertificacioTipus;
+import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.CieAdviserService;
 import es.caib.notib.logic.intf.util.NifHelper;
@@ -35,6 +40,8 @@ import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnv
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.logic.utils.NotibLogger;
+import es.caib.notib.logic.wsdl.notificaV2.getcies.Cie;
+import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.EntregaPostalRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
@@ -42,7 +49,9 @@ import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +61,7 @@ import javax.xml.ws.Holder;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -81,8 +91,6 @@ public class CieAdviserServiceImpl implements CieAdviserService {
     private CallbackHelper callbackHelper;
     @Autowired
     private AuditHelper auditHelper;
-    @Autowired
-    private NotificaHelper notificaHelper;
 
     private static final String ERROR_CALLBACK_NOTIFICA = "[CIE ADVISER] Error al processar la informació de l'adviser ";
     private static final int DATAT = 1;
@@ -97,7 +105,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
     @Override
     public ResultadoSincronizarEnvio sincronizarEnvio(SincronizarEnvio sincronizarEnvio) {
 
-        var info = new IntegracioInfo(IntegracioCodi.CIE, "Sincronitzar enviament", IntegracioAccioTipusEnumDto.RECEPCIO,
+        var info = new IntegracioInfo(IntegracioCodi.CIE, "Sincronitzar enviament REST", IntegracioAccioTipusEnumDto.RECEPCIO,
                 new AccioParam("Identificador Nexea", sincronizarEnvio.getIdentificador()),
                 new AccioParam("Estat", sincronizarEnvio.getEstado()));
 
@@ -133,7 +141,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
                                  Holder<String> descripcionRespuesta,
                                  Holder<Opciones> opcionesResultadoSincronizarEnvio) {
 
-        var info = new IntegracioInfo(IntegracioCodi.CIE, "Sincronitzar enviament", IntegracioAccioTipusEnumDto.RECEPCIO,
+        var info = new IntegracioInfo(IntegracioCodi.CIE, "Sincronitzar enviament SOAP", IntegracioAccioTipusEnumDto.RECEPCIO,
                 new AccioParam("Identificador Nexea", identificador.value),
                 new AccioParam("Estat", estado));
 
@@ -171,6 +179,19 @@ public class CieAdviserServiceImpl implements CieAdviserService {
         }
     }
 
+    private void sincronitzarEnviamentAmbNotifica(NotificacioEnviamentEntity enviament, SincronizarEnvio sincronizarEnvio) {
+
+        if (!CieEstat.NOTIFICADA.equals(enviament.getEntregaPostal().getCieEstat()) || enviament.isNotificaEstatFinal()) {
+            return;
+        }
+        NotibLogger.getInstance().info("[CIE ADVISER] Enviant a la cua " + NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, log, LoggingTipus.ENTREGA_CIE);
+        jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvio,
+                m -> {
+                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY,  0L);
+                    return m;
+                });
+    }
+
     private ResultadoSincronizarEnvio sincronitzarEntregaPostal(SincronizarEnvio sincronizarEnvio, IntegracioInfo info) {
 
         var identificador = sincronizarEnvio.getIdentificador();
@@ -178,14 +199,16 @@ public class CieAdviserServiceImpl implements CieAdviserService {
         try {
             if (Strings.isNullOrEmpty(identificador)) {
                 var error = "[CIE Adviser] Error l'identificador no pot ser null";
-                log.error(error);
+                NotibLogger.getInstance().error(error, log, LoggingTipus.ENTREGA_CIE);
                 resultado.setCodigoRespuesta(NexeaAdviserWs.CODI_ERROR_IDENTIFICADOR_INCORRECTE);
                 resultado.setDescripcionRespuesta("Identificador incorrecto");
                 return resultado;
             }
             var enviament = enviamentRepository.findByCieId(identificador);
             if (enviament == null) {
+                var error = "[CIE Adviser] No existeix cap enviament per l'identificador " + identificador;
                 resultado.setCodigoRespuesta(NexeaAdviserWs.CODI_ERROR_IDENTIFICADOR_INEXISTENT);
+                NotibLogger.getInstance().error(error, log, LoggingTipus.ENTREGA_CIE);
                 resultado.setDescripcionRespuesta("Identificador no se corresponde con el CIE");
                 return resultado;
             }
@@ -196,18 +219,19 @@ public class CieAdviserServiceImpl implements CieAdviserService {
 //                return resultado;
 //            }
 
-            var estat = updateEntregaPostal(enviament, sincronizarEnvio);
+//            var estat = updateEntregaPostal(enviament, sincronizarEnvio);
             info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
             resultado.setIdentificador(enviament.getEntregaPostal().getCieId());
             resultado.setCodigoRespuesta(NexeaAdviserWs.CODI_OK);
             resultado.setDescripcionRespuesta(NexeaAdviserWs.CODI_OK_DEC);
-            if (CieEstat.NOTIFICADA.equals(estat)) {
-                jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvio,
-                        m -> {
-                            m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY,  0L);
-                            return m;
-                        });
-            }
+//            if (CieEstat.NOTIFICADA.equals(estat) && !enviament.isNotificaEstatFinal()) {
+//                NotibLogger.getInstance().info("Enviant a la cua " + NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, log, LoggingTipus.ENTREGA_CIE);
+//                jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvio,
+//                        m -> {
+//                            m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY,  0L);
+//                            return m;
+//                        });
+//            }
             return resultado;
         } catch (Exception e) {
             var error = "[CIE Adviser] Error al sincronitzar l'enviament amb id " + identificador;
@@ -219,36 +243,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
     }
 
 
-    private CieEstat updateEntregaPostal(NotificacioEnviamentEntity enviament, SincronizarEnvio sincronizarEnvio) {
 
-        var entregaPostal = enviament.getEntregaPostal();
-        if (entregaPostal == null) {
-            return null;
-        }
-        var notTable = notificacioTableRepository.findById(enviament.getNotificacio().getId()).get();
-        notTable.setPerActualitzar(true);
-        notificacioTableRepository.save(notTable);
-        var estat = CieEstat.valueOf(sincronizarEnvio.getEstado().toUpperCase());
-        entregaPostal.setCieEstat(estat);
-        var error = CieEstat.ERROR.equals(estat);
-        entregaPostal.setCieErrorDesc("");
-        var opciones = sincronizarEnvio.getOpcionesSincronizarEnvio();
-        if (opciones == null) {
-//            notificacioEventHelper.addCieAdviserEvent(enviament, error, "Error ", false);
-            return estat;
-        }
-        for(var opcion : opciones.getOpcion()) {
-            if (!"motivoError".equals(opcion.getTipo())) {
-                continue;
-            }
-            var errorMsg = !Strings.isNullOrEmpty(opcion.getValue()) ? opcion.getValue().length() > 250 ? opcion.getValue().substring(0, 250) : opcion.getValue() : null;
-            entregaPostal.setCieErrorDesc(errorMsg);
-        }
-        entregaPostalRepository.save(entregaPostal);
-        notificacioTableHelper.actualitzarRegistre(enviament.getNotificacio());
-        notificacioEventHelper.addCieAdviserEvent(enviament, error,  entregaPostal.getCieErrorDesc(), false);
-        return estat;
-    }
 
     private boolean receptorValid(Receptor receptor) {
         return receptor != null && !Strings.isNullOrEmpty(receptor.getNifReceptor())
@@ -265,23 +260,21 @@ public class CieAdviserServiceImpl implements CieAdviserService {
 
             generateInfoLog(sincronizarEnvio, identificador, sdf, dataEstat);
             var info = generateInfoEnvio(sincronizarEnvio, identificador, sdf, dataEstat);
+            return updateEnviament(sincronizarEnvio, dataEstat,  info);
 
-            return updateEnviament(
-                    sincronizarEnvio.getIdentificador(),
-                    sincronizarEnvio.getTipoEntrega().intValue(),
-                    sincronizarEnvio.getModoNotificacion(),
-                    sincronizarEnvio.getEstado(),
-                    dataEstat,
-                    sincronizarEnvio.getReceptor(),
-                    sincronizarEnvio.getAcusePDF(),
-                    info);
         } finally {
             metricsHelper.fiMetrica(timer);
         }
     }
 
-    private ResultadoSincronizarEnvio updateEnviament(String identificador, int tipoEntrega, BigInteger modoNotificacion, String estado,
-                                                      Date dataEstat, Receptor receptor, Acuse acusePDF, IntegracioInfo info) {
+    private ResultadoSincronizarEnvio updateEnviament(SincronizarEnvio sincronizarEnvio, Date dataEstat, IntegracioInfo info) {
+
+        var identificador = sincronizarEnvio.getIdentificador();
+        var tipoEntrega = sincronizarEnvio.getTipoEntrega().intValue();
+        var receptor = sincronizarEnvio.getReceptor();
+        var acusePDF = sincronizarEnvio.getAcusePDF();
+        var modoNotificacion = sincronizarEnvio.getModoNotificacion();
+        var estado = sincronizarEnvio.getEstado();
 
         var resultadoSincronizarEnvio = new ResultadoSincronizarEnvio();
         resultadoSincronizarEnvio.setIdentificador(identificador);
@@ -300,52 +293,60 @@ public class CieAdviserServiceImpl implements CieAdviserService {
             var entregaPostal = enviament.getEntregaPostal();
             updateCodiEntitatPerInfoAndConfig(info, enviament);
             if (entregaPostal.isCieEstatFinal()) {
-                var msg = "L'enviament amb identificador " + identificador + " ha rebut un callback de l'adviser de tipus " + tipoEntrega + " quan ja es troba en estat final." ;
-                log.debug(msg);
+                var msg = "[CIE ADVISER] L'enviament amb identificador " + identificador + " ha rebut un callback de l'adviser de tipus " + tipoEntrega + " quan ja es troba en estat final." ;
+                NotibLogger.getInstance().info(msg, log, LoggingTipus.ENTREGA_CIE);
                 setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
                 // DATAT
                 switch (tipoEntrega) {
                     case DATAT:
-//                        log.warn("Error al processar petició datadoOrganismo dins el callback de Notifica (L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
                         info.addParam("Nota", "L'enviament ja es troba en un estat final");
+                        NotibLogger.getInstance().info("[CIE ADVISER] tipoEntrega DATAT", log, LoggingTipus.ENTREGA_CIE);
                         if (receptor != null && !isBlank(receptor.getNifReceptor())) {
-                            enviament.updateReceptorDatat(receptor.getNifReceptor(), receptor.getNombreReceptor());
+                            entregaPostal.updateReceptorDatat(receptor.getNifReceptor(), receptor.getNombreReceptor());
                         }
 //                        eventErrorDescripcio = msg;
                         integracioHelper.addAccioOk(info);
                         break;
                     case CERTIFICACIO:
                     case DATAT_CERT:
-                        if (enviament.getNotificaCertificacioData() != null && !Strings.isNullOrEmpty(enviament.getNotificaCertificacioArxiuId())) {
+                        NotibLogger.getInstance().info("[CIE ADVISER] tipoEntrega DATAT + Certificacio", log, LoggingTipus.ENTREGA_CIE);
+                        if (entregaPostal.getCieCertificacioData() != null && !Strings.isNullOrEmpty(entregaPostal.getCieCertificacioArxiuId())) {
                             break;
                         }
-                        log.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
+                        NotibLogger.getInstance().info("[CIE ADVISER] Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + identificador + "]",  log, LoggingTipus.ENTREGA_CIE);
                         certificacionOrganismo(acusePDF, modoNotificacion, identificador, enviament, resultadoSincronizarEnvio);
-                        log.debug("Certificació guardada correctament.");
+                        NotibLogger.getInstance().info("Certificació guardada correctament.", log, LoggingTipus.ENTREGA_CIE);
                         integracioHelper.addAccioOk(info);
                         break;
                     default:
+                        NotibLogger.getInstance().info("[CIE ADVISER] Tipo de entrega desconegut: " + tipoEntrega, log, LoggingTipus.ENTREGA_CIE);
                         eventErrorDescripcio = msg;
                         setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.ERROR_DESCONEGUT);
                         integracioHelper.addAccioError(info, "Tipus d'entrega " + tipoEntrega + " no reconeguda");
                         break;
                 }
             } else {
+                NotibLogger.getInstance().info("[CIE ADVISER] Entrega postal " + identificador + " no esta en estat final. Estat: "  + entregaPostal.getCieEstat() , log, LoggingTipus.ENTREGA_CIE);
                 var receptorNombre = receptor != null ? receptor.getNombreReceptor() : null;
                 var receptorNif = receptor != null ? receptor.getNifReceptor() : null;
-                var notificaEstat = getCieEstat(estado);
-                if (notificaEstat == null) {
+//                var cieEstat = getCieEstat(estado);
+                CieEstat cieEstat;
+                try {
+                    cieEstat = CieEstat.valueOf(estado.toUpperCase());
+                 } catch (Exception ex) {
                     resultatEnum = ResultatEnviamentEnum.ESTAT_DESCONEGUT;
-                    throw new Exception("Estat no trobat");
+                    throw new Exception("[CIE ADVISER] Estat no trobat " + estado);
                 }
                 //Update enviament
-                notificaHelper.enviamentUpdateDatat(notificaEstat, dataEstat, estado, getModoNotificacion(modoNotificacion), receptorNif, receptorNombre, null, null, enviament);
-                log.debug("Registrant event callback datat de l'Adviser...");
+                updateDatat(cieEstat, dataEstat, estado, getModoNotificacion(modoNotificacion), receptorNif, receptorNombre,
+                        null, null, enviament, sincronizarEnvio.getOpcionesSincronizarEnvio());
+
+                NotibLogger.getInstance().info("Registrant event callback datat de l'Adviser...", log, LoggingTipus.ENTREGA_CIE);
                 setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
                 if (tipoEntrega == DATAT_CERT || tipoEntrega == CERTIFICACIO) {
-                    log.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
+                    NotibLogger.getInstance().info("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]", log, LoggingTipus.ENTREGA_CIE);
                     certificacionOrganismo(acusePDF, modoNotificacion, identificador, enviament, resultadoSincronizarEnvio);
-                    log.debug("Certificació guardada correctament.");
+                    NotibLogger.getInstance().info("Certificació guardada correctament.", log, LoggingTipus.ENTREGA_CIE);
                 }
                 integracioHelper.addAccioOk(info);
             }
@@ -355,7 +356,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
             log.error(ERROR_CALLBACK_NOTIFICA + identificador + ")", ex);
             integracioHelper.addAccioError(info, "Error processant la petició", ex);
         }
-        log.debug("Peticició processada correctament.");
+        NotibLogger.getInstance().info("Peticició processada correctament.", log, LoggingTipus.ENTREGA_CIE);
         if (enviament == null || enviament.getNotificacio() == null) {
             log.error("Error greu enviament o notificació son nulls ");
             return resultadoSincronizarEnvio;
@@ -364,10 +365,148 @@ public class CieAdviserServiceImpl implements CieAdviserService {
         if (tipoEntrega == DATAT || tipoEntrega == DATAT_CERT) {
             notificacioEventHelper.addCieAdviserDatatEvent(enviament, isError, eventErrorDescripcio);
         }
+        updateEntregaPostal(enviament, sincronizarEnvio);
+        sincronitzarEnviamentAmbNotifica(enviament, sincronizarEnvio);
         callbackHelper.updateCallback(enviament, isError, eventErrorDescripcio);
         auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaAdviserWsV2Impl.sincronizarEnvio");
         log.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");
         return resultadoSincronizarEnvio;
+    }
+
+    private void updateEntregaPostal(NotificacioEnviamentEntity enviament, SincronizarEnvio sincronizarEnvio) {
+
+        var entregaPostal = enviament.getEntregaPostal();
+        if (entregaPostal == null) {
+            return;
+        }
+        var notTable = notificacioTableRepository.findById(enviament.getNotificacio().getId()).get();
+        notTable.setPerActualitzar(true);
+        notificacioTableRepository.save(notTable);
+        var estat = CieEstat.valueOf(sincronizarEnvio.getEstado().toUpperCase());
+//        entregaPostal.setCieEstat(estat);
+        var error = CieEstat.ERROR.equals(estat);
+        entregaPostal.setCieErrorDesc("");
+        var opciones = sincronizarEnvio.getOpcionesSincronizarEnvio();
+        if (opciones == null) {
+            return;
+        }
+        for(var opcion : opciones.getOpcion()) {
+            if (!"motivoError".equals(opcion.getTipo())) {
+                continue;
+            }
+            var errorMsg = !Strings.isNullOrEmpty(opcion.getValue()) ? opcion.getValue().length() > 250 ? opcion.getValue().substring(0, 250) : opcion.getValue() : null;
+            entregaPostal.setCieErrorDesc(errorMsg);
+        }
+        entregaPostalRepository.save(entregaPostal);
+        notificacioTableHelper.actualitzarRegistre(enviament.getNotificacio());
+        notificacioEventHelper.addCieAdviserEvent(enviament, error,  entregaPostal.getCieErrorDesc(), false);
+    }
+
+    public NotificacioEnviamentEntity updateDatat(
+            CieEstat cieEstat,
+            Date cieEstatData,
+            String cieEstatDescripcio,
+            String cieDatatOrigen,
+            String cieDatatReceptorNif,
+            String cieDatatReceptorNom,
+            String cieDatatNumSeguiment,
+            String cieDatatErrorDescripcio,
+            NotificacioEnviamentEntity enviament,
+            Opciones opciones) throws Exception {
+
+        boolean estatFinal = CieEstat.NOTIFICADA.equals(cieEstat)
+                || CieEstat.CANCELADO.equals(cieEstat)
+                || CieEstat.EXTRAVIADA.equals(cieEstat)
+                || CieEstat.SIN_INFORMACION.equals(cieEstat)
+                || CieEstat.REHUSADA.equals(cieEstat)
+                || CieEstat.ERROR.equals(cieEstat)
+                || CieEstat.DEVUELTO.equals(cieEstat);
+
+        var entregaPostal = enviament.getEntregaPostal();
+        entregaPostal.updateCieDatat(
+                cieEstat,
+                cieEstatData,
+                estatFinal,
+                cieEstatDescripcio,
+                cieDatatOrigen,
+                cieDatatReceptorNif,
+                cieDatatReceptorNom,
+                cieDatatNumSeguiment,
+                cieDatatErrorDescripcio);
+
+        if (opciones != null) {
+            for(var opcion : opciones.getOpcion()) {
+                if (!"motivoError".equals(opcion.getTipo())) {
+                    continue;
+                }
+                var errorMsg = !Strings.isNullOrEmpty(opcion.getValue()) ? opcion.getValue().length() > 250 ? opcion.getValue().substring(0, 250) : opcion.getValue() : null;
+                entregaPostal.setCieErrorDesc(errorMsg);
+            }
+        }
+
+        var estatsEnviamentsFinals = true;
+        var estatsEnviamentsNotificaFinals = true;
+        var enviaments = enviament.getNotificacio().getEnviaments();
+        for (var env: enviaments) {
+            if (env.getId().equals(enviament.getId())) {
+                env = enviament;
+            }
+            if (env.isNotificaEstatFinal() && env.isCieEstatFinal()) {
+                continue;
+            }
+            if (!env.isNotificat()) {
+                estatsEnviamentsFinals = false;
+                if (!env.isPerEmail()) {
+                    estatsEnviamentsNotificaFinals = false;
+                }
+                break;
+            }
+
+//            if (!env.isNotificaEstatFinal() && !env.isCieEstatFinal() || !env.isNotificat()) {
+//                estatsEnviamentsFinals = false;
+//                if (!env.isPerEmail()) {
+//                    estatsEnviamentsNotificaFinals = false;
+//                }
+//                break;
+//            }
+        }
+        log.info("Estat final: " + estatsEnviamentsFinals);
+        NotibLogger.getInstance().printInfoSistema(log, LoggingTipus.METRIQUES_SISTEMA);
+        var notificacioEstat = enviament.getNotificacio().getEstat();
+        var notificacio = enviament.getNotificacio();
+        var dataEnviamentNotifica = notificacio.getNotificaEnviamentData();
+//        var retard = notificacio.getRetard();
+//        var dataRetard = DateUtils.addDays(dataEnviamentNotifica, retard);
+//        var cancelar = dataRetard.before(dataEnviamentNotifica);
+//        if (cancelar && enviament.getEntregaPostal() != null && estatFinal && enviament.getEntregaPostal().getCieId() == null) {
+//            var ok = ciePluginJms.cancelarEnviament(enviament.getUuid());
+//            if (!ok) {
+//                notificacioEventHelper.addCieEventCancelar(enviament, true, "Error inesperat al cancelar la entrega postal", false);
+//            }
+//        }
+
+        if (estatsEnviamentsNotificaFinals && !NotificacioEstatEnumDto.PROCESSADA.equals(notificacioEstat)) {
+            NotificacioEstatEnumDto nouEstat = NotificacioEstatEnumDto.FINALITZADA;
+            if (!estatsEnviamentsFinals) {
+                nouEstat = NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS;
+            }
+            notificacio.updateEstat(nouEstat);
+            notificacio.updateMotiu(cieEstat.name());
+            notificacio.updateEstatDate(new Date());
+            auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "AbstractNotificaHelper.enviamentUpdateDatat");
+
+            if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
+                try {
+                    log.info("Enviar email en cas d'usuaris INTERFICIE WEB");
+                    jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_NOTIFICACIO, notificacio.getId());
+                } catch (JmsException ex) {
+                    log.error("Hi ha hagut un error al intentar enviar el correu electrònic de la notificació amb id: ." + notificacio.getId(), ex);
+                }
+            }
+        }
+//        // Actualitzar màscara d'estats
+        notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(notificacio.getId()).estat(notificacio.getEstat()).build());
+        return enviament;
     }
 
     private void generateInfoLog(SincronizarEnvio sincronizarEnvio, String identificador, SimpleDateFormat sdf, Date dataEstat) {
@@ -386,10 +525,11 @@ public class CieAdviserServiceImpl implements CieAdviserService {
     }
 
     private static IntegracioInfo generateInfoEnvio(SincronizarEnvio sincronizarEnvio, String identificador, SimpleDateFormat sdf, Date dataEstat) {
+
         return new IntegracioInfo(IntegracioCodi.CIE, "Recepció de canvi d'estat al CIE via Adviser",
                 IntegracioAccioTipusEnumDto.RECEPCIO,
                 new AccioParam("Organisme emisor", sincronizarEnvio.getOrganismoEmisor()),
-                new AccioParam("Identificador Notifica", (identificador != null ? identificador : "")),
+                new AccioParam("Identificador CIE", (identificador != null ? identificador : "")),
                 new AccioParam("Tipus d'entrega", String.valueOf(sincronizarEnvio.getTipoEntrega())),
                 new AccioParam("Mode de notificació", String.valueOf(sincronizarEnvio.getModoNotificacion())),
                 new AccioParam("Estat", sincronizarEnvio.getEstado()),
@@ -427,19 +567,21 @@ public class CieAdviserServiceImpl implements CieAdviserService {
 
     private void certificacionOrganismo(Acuse acusePDF, BigInteger modoNotificacion, String identificador, NotificacioEnviamentEntity enviament, ResultadoSincronizarEnvio resultadoSincronizarEnvio) throws Exception {
 
-        if (enviament == null) {
-            throw new Exception("Enviament should not be null");
+
+        if (enviament == null || enviament.getEntregaPostal() == null) {
+            throw new Exception("[CIE ADVISER] Entrega postal no pot ser null");
         }
+        var entregaPostal = enviament.getEntregaPostal();
         var ambAcuse = acusePDF != null && acusePDF.getContenido() != null && acusePDF.getContenido().length > 0;
         var resultat = new ResultatExecucio();
         try {
             if (ambAcuse) {
-                log.debug("Nou estat enviament: " + enviament.getNotificaEstatDescripcio());
-                log.debug("Nou estat notificació: " + enviament.getNotificacio().getEstat().name());
-                var certificacioAntiga = enviament.getNotificaCertificacioArxiuId();
+                NotibLogger.getInstance().info("Nou estat entrega postal: " + entregaPostal.getCieEstat(), log, LoggingTipus.ENTREGA_CIE);
+//                NotibLogger.getInstance().info("Nou estat notificació: " + entregaPostal.getNotificacio().getEstat().name(), log, LoggingTipus.ENTREGA_CIE);
+                var certificacioAntiga = entregaPostal.getCieCertificacioArxiuId();
                 var gestioDocumentalId = guardarCertificacioAcuseRecibo(acusePDF.getContenido());
-                log.debug("Actualitzant enviament amb la certificació. ID gestió documental: " + gestioDocumentalId);
-                enviament.updateNotificaCertificacio(
+                NotibLogger.getInstance().info("Actualitzant enviament amb la certificació. ID gestió documental: " + gestioDocumentalId, log, LoggingTipus.ENTREGA_CIE);
+                entregaPostal.updateCieCertificacio(
                         new Date(),
                         gestioDocumentalId,
                         acusePDF.getHash(), // hash
@@ -448,8 +590,8 @@ public class CieAdviserServiceImpl implements CieAdviserService {
                         acusePDF.getCsvResguardo(), // csv
                         null, // tipus mime
                         null, // tamany
-                        NotificaCertificacioTipusEnumDto.ACUSE,
-                        NotificaCertificacioArxiuTipusEnumDto.PDF,
+                        CieCertificacioTipus.ACUSE,
+                        CieCertificacioArxiuTipus.PDF,
                         null); // núm. seguiment
                 certificacioOk(enviament, resultadoSincronizarEnvio, certificacioAntiga);
             } else {
@@ -459,31 +601,35 @@ public class CieAdviserServiceImpl implements CieAdviserService {
             certificacioAmbError(identificador, enviament, resultadoSincronizarEnvio, resultat, ex);
         }
         callbackHelper.updateCallback(enviament, resultat.isError(), resultat.getErrorDescripcio());
-        log.debug("Sortint de la certificació...");
+        NotibLogger.getInstance().info("Sortint de la certificació...", log, LoggingTipus.ENTREGA_CIE);
     }
 
     private void certificacioOk(NotificacioEnviamentEntity enviament, ResultadoSincronizarEnvio resultadoSincronizarEnvio, String certificacioAntiga) {
 
-        log.debug("Registrant event callbackcertificacio de l'Adviser...");
+        NotibLogger.getInstance().info("Registrant event callbackcertificacio de l'Adviser...", log, LoggingTipus.ENTREGA_CIE);
         notificacioEventHelper.addCieAdviserCertificacioEvent(enviament, false, null);
         //si hi havia una certificació antiga
         if (certificacioAntiga != null) {
-            log.debug("Esborrant certificació antiga...");
+            NotibLogger.getInstance().info("Esborrant certificació antiga...", log, LoggingTipus.ENTREGA_CIE);
             pluginHelper.gestioDocumentalDelete(certificacioAntiga, PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
         }
         setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
-        log.debug("Event callbackcertificacio registrat correctament: " + NotificacioEventTipusEnumDto.ADVISER_CERTIFICACIO.name());
+        NotibLogger.getInstance().info("Event callbackcertificacio registrat correctament: " + NotificacioEventTipusEnumDto.ADVISER_CERTIFICACIO.name(), log, LoggingTipus.ENTREGA_CIE);
     }
 
     private void certificatAmbError(String identificador, NotificacioEnviamentEntity enviament, ResultadoSincronizarEnvio resultadoSincronizarEnvio, ResultatExecucio resultat) {
 
-        resultat.setError(ERROR_CALLBACK_NOTIFICA + "(" + identificador + "): No s'ha trobat el camp amb l'acús PDF a dins la petició rebuda.", null);
+        var msg = ERROR_CALLBACK_NOTIFICA + "(" + identificador + "): No s'ha trobat el camp amb l'acús PDF a dins la petició rebuda.";
+        NotibLogger.getInstance().info(msg, log, LoggingTipus.ENTREGA_CIE);
+        resultat.setError(msg, null);
         notificacioEventHelper.addCieAdviserCertificacioEvent(enviament, resultat.isError(), resultat.getErrorDescripcio());
         setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.ERROR_ACUSE, resultat.getErrorDescripcio());
     }
 
     private void certificacioAmbError(String identificador, NotificacioEnviamentEntity enviament, ResultadoSincronizarEnvio resultadoSincronizarEnvio, ResultatExecucio resultat, Exception ex) {
 
+        var msg = ERROR_CALLBACK_NOTIFICA + "(" + identificador + ")";
+        NotibLogger.getInstance().info(msg, log, LoggingTipus.ENTREGA_CIE);
         resultat.setError(ERROR_CALLBACK_NOTIFICA + "(" + identificador + ")", ex);
         notificacioEventHelper.addCieAdviserCertificacioEvent(enviament, resultat.isError(), ExceptionUtils.getStackTrace(ex));
         setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.ERROR_DESCONEGUT);

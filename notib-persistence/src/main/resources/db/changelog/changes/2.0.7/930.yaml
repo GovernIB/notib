@@ -17,6 +17,66 @@ databaseChangeLog:
               - column:
                   name: cie_error_desc
                   type: varchar(250 ${varcharUnit})
+              - column:
+                  name: cie_datat_recnif
+                  type: varchar(9 ${varcharUnit})
+              - column:
+                  name: cie_datat_recnom
+                  type: varchar(400 ${varcharUnit})
+              - column:
+                  name: cie_cer_data
+                  type: TIMESTAMP(6)
+              - column:
+                  name: cie_cer_arxiuid
+                  type: varchar(50 ${varcharUnit})
+              - column:
+                  name: cie_cer_hash
+                  type: varchar(50 ${varcharUnit})
+              - column:
+                  name: cie_cer_origen
+                  type: varchar(20 ${varcharUnit})
+              - column:
+                  name: cie_cer_metas
+                  type: varchar(255 ${varcharUnit})
+              - column:
+                  name: cie_cer_csv
+                  type: varchar(50 ${varcharUnit})
+              - column:
+                  name: cie_cer_mime
+                  type: varchar(20 ${varcharUnit})
+              - column:
+                  name: cie_cer_tamany
+                  type: INTEGER
+              - column:
+                  name: cie_cer_tipus
+                  type: varchar(20 ${varcharUnit})
+              - column:
+                  name: cie_cer_arxtip
+                  type: varchar(20 ${varcharUnit})
+              - column:
+                  name: cie_cer_numseg
+                  type: varchar(50 ${varcharUnit})
+              - column:
+                  name: cie_estat_data
+                  type: TIMESTAMP(6)
+              - column:
+                  name: cie_estat_desc
+                  type: varchar(255 ${varcharUnit})
+              - column:
+                  name: cie_datat_origen
+                  type: varchar(20 ${varcharUnit})
+              - column:
+                  name: cie_datat_numseg
+                  type: varchar(50 ${varcharUnit})
+              - column:
+                  name: cie_datat_errdes
+                  type: varchar(255 ${varcharUnit})
+              - column:
+                  name: cie_estat_dataact
+                  type: TIMESTAMP(6)
+
+
+
         - addColumn:
             tableName: not_notificacio_table
             columns:
@@ -27,4 +87,5 @@ databaseChangeLog:
         - sql: "UPDATE not_notificacio_table t SET t.ENTREGA_POSTAL_ERROR = 1 WHERE id IN (SELECT DISTINCT nne.NOTIFICACIO_ID 
                 FROM NOT_ENTREGA_POSTAL nep 
                 LEFT JOIN NOT_NOTIFICACIO_ENV nne ON nne.ENTREGA_POSTAL_ID = nep.id 
-                WHERE nep.CIE_ESTAT = 3 OR nep.CIE_ERROR_DESC IS NOT NULL);"
+                WHERE nep.CIE_ESTAT = 3 OR nep.CIE_ERROR_DESC IS NOT NULL);
+                INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.ENTREGA_CIE', 'false', 'Mostrar logs relacionats amb la entrega postal', 'LOGS', 21, 0, 'BOOL', 0);"

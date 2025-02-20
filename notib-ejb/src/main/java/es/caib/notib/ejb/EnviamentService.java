@@ -5,6 +5,7 @@ package es.caib.notib.ejb;
 
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
+import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
@@ -134,5 +135,11 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 	@RolesAllowed("**")
 	public List<Long> enviarCallback(Set<Long> notificacions) throws Exception {
 		return getDelegateService().enviarCallback(notificacions);
+	}
+
+	@Override
+	@RolesAllowed("**")
+	public ArxiuDto getCertificacioPostalArxiu(Long enviamentId) {
+		return getDelegateService().getCertificacioPostalArxiu(enviamentId);
 	}
 }

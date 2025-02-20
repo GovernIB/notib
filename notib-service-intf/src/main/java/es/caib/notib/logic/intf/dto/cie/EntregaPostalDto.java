@@ -9,7 +9,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @Builder
@@ -45,4 +50,24 @@ public class EntregaPostalDto implements Serializable{
 	private boolean cieCancelat;
 	private String cieEstat;
 	private String cieErrorDesc;
+	private String cieDatatReceptorNif;
+	private String cieDatatReceptorNom;
+	private Date cieCertificacioData;
+	private String cieCertificacioArxiuId;
+	private String cieCertificacioArxiuNom;
+	private String cieCertificacioHash;
+	private String cieCertificacioOrigen;
+	private String cieCertificacioMetadades;
+	private String cieCertificacioCsv;
+	private String cieCertificacioMime;
+	private Integer cieCertificacioTamany;
+	private CieCertificacioTipus cieCertificacioTipus;
+	private CieCertificacioArxiuTipus cieCertificacioArxiuTipus;
+	private String cieCertificacioNumSeguiment;
+	private Date cieEstatData;
+	private String cieEstatDescripcio;
+	private String cieDatatOrigen;
+	private String cieDatatNumSeguiment;
+	private String cieDatatErrorDescripcio;
+	private Date cieEstatDataActualitzacio;
 }

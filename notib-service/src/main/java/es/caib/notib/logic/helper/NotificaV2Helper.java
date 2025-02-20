@@ -16,6 +16,8 @@ import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.logic.wsdl.notificaV2.NotificaWsV2PortType;
 import es.caib.notib.logic.wsdl.notificaV2.SincronizarEnvioWsPortType;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.AltaRemesaEnvios;
@@ -475,16 +477,19 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 		if (resultadoInfoEnvio.getDatados() == null) {
 			var errorDescripcio = "La resposta rebuda de Notifica no conté informació de datat";
+			NotibLogger.getInstance().error(errorDescripcio, log, LoggingTipus.ENTREGA_CIE);
 			integracioHelper.addAccioError(info, errorDescripcio);
 			throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 		}
 		Datado datatDarrer = null;
+		NotibLogger.getInstance().info("Recorrente els datats ", log, LoggingTipus.ENTREGA_CIE);
 		for (var datado: resultadoInfoEnvio.getDatados().getDatado()) {
 			var datatData = toDate(datado.getFecha());
 			if (datatDarrer == null) {
 				datatDarrer = datado;
 				continue;
 			}
+			NotibLogger.getInstance().info("Datat " + datado, log, LoggingTipus.ENTREGA_CIE);
 			if (datado.getFecha() != null) {
 				var datatDarrerData = toDate(datatDarrer.getFecha());
 				if (datatData.after(datatDarrerData)) {
@@ -494,6 +499,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 		if (datatDarrer == null) {
 			var errorDescripcio = "No s'ha pogut trobar el darrer datat dins la resposta rebuda de Notifica";
+			NotibLogger.getInstance().error(errorDescripcio, log, LoggingTipus.ENTREGA_CIE);
 			integracioHelper.addAccioError(info, errorDescripcio);
 			throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 		}
@@ -809,13 +815,16 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				envio.setDestinatarios(destinatarios);
 			}
 
-			if (enviament.getEntregaPostal() != null && notificacio.getProcediment().getEntregaCieEfectiva() != null
-					&& !notificacio.getProcediment().getEntregaCieEfectiva().getCie().isCieExtern()) {
+			if (enviament.getEntregaPostal() != null
+					&&  (notificacio.getProcediment().getEntregaCieEfectiva() != null && !notificacio.getProcediment().getEntregaCieEfectiva().getCie().isCieExtern()
+						|| notificacio.getOrganGestor().getEntregaCie() != null && notificacio.getOrganGestor().getEntregaCie().getCie().isCieExtern())) {
 
+				NotibLogger.getInstance().error("[NOTIFICA] Enviament " + enviament.getNotificaReferencia() + " amb entrega postal amb cie Notifica " , log, LoggingTipus.ENTREGA_CIE);
 				var entregaPostal = new EntregaPostal();
 				var procedimentNotificacio = notificacio.getProcediment();
 				if (procedimentNotificacio != null) {
 					var entregaCieEntity = procedimentNotificacio.getEntregaCieEfectiva();
+					entregaCieEntity = entregaCieEntity == null ? notificacio.getOrganGestor().getEntregaCie() : entregaCieEntity;
 					if (entregaCieEntity.getOperadorPostal() != null) {
 						var pagadorPostal = new OrganismoPagadorPostal();
 						pagadorPostal.setCodigoDIR3Postal(entregaCieEntity.getOperadorPostal().getOrganGestor().getCodi());

@@ -209,7 +209,8 @@ public class NotificacioTableHelper {
                     }
 
                     entregaPostal = entregaPostal || e.getEntregaPostal() != null;
-                    entregaPostalError = entregaPostalError || CieEstat.ERROR.equals(e.getEntregaPostal().getCieEstat());
+
+                    entregaPostalError = entregaPostalError || e.getEntregaPostal() != null && CieEstat.ERROR.equals(e.getEntregaPostal().getCieEstat());
                 }
                 if (titular.length() > 2) {
                     titular = new StringBuilder(titular.substring(0, titular.length() - 2));

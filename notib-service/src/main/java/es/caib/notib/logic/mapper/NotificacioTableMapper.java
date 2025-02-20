@@ -1,6 +1,7 @@
 package es.caib.notib.logic.mapper;
 
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.NotificacioListHelper;
@@ -372,7 +373,9 @@ public abstract class NotificacioTableMapper {
 
         StringBuilder notificacioEstat = new StringBuilder();
         for (NotificacioEnviamentEntity env : enviaments) {
-            dto.updateEstatTipusCount(env.getNotificaEstat());
+            var estat = env.getEntregaPostal() != null && CieEstat.NOTIFICADA.equals(env.getEntregaPostal().getCieEstat()) ? EnviamentEstat.NOTIFICADA : env.getNotificaEstat();
+//            dto.updateEstatTipusCount(env.getNotificaEstat());
+            dto.updateEstatTipusCount(estat);
         }
         if (NotificacioEstatEnumDto.FINALITZADA.equals(dto.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(dto.getEstat())
                 || NotificacioEstatEnumDto.PROCESSADA.equals(dto.getEstat()) || dto.getContadorEstat().size() > 1) {
@@ -383,7 +386,15 @@ public abstract class NotificacioTableMapper {
                         .append("</div>");
             }
         }
-
+//        var prefixNotifica = "es.caib.notib.client.domini.EnviamentEstat.";
+//        var prefixCie = "es.caib.notib.client.domini.CieEstat.";
+//        if (!NotificacioEstatEnumDto.FINALITZADA.equals(dto.getEstat()) && !NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(dto.getEstat())) {
+//            return "";
+//        }
+//        for (var enviament : enviaments) {
+//
+//
+//        }
         return notificacioEstat.length() > 0 ? notificacioEstat.toString() : "";
     }
 

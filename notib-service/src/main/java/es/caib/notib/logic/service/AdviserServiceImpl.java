@@ -31,8 +31,6 @@ import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -123,7 +120,7 @@ public class AdviserServiceImpl implements AdviserService {
             updateCodiEntitatPerInfoAndConfig(info, enviament);
             if (enviament.isNotificaEstatFinal()) {
                 var msg = "L'enviament amb identificador " + enviament.getNotificaIdentificador() + " ha rebut un callback de l'adviser de tipus " + tipoEntrega + " quan ja es troba en estat final." ;
-                log.debug(msg);
+                NotibLogger.getInstance().info(msg, log, LoggingTipus.ADVISER);
                 setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
                 // DATAT
                 switch (tipoEntrega) {
@@ -141,9 +138,9 @@ public class AdviserServiceImpl implements AdviserService {
                         if (enviament.getNotificaCertificacioData() != null && !Strings.isNullOrEmpty(enviament.getNotificaCertificacioArxiuId())) {
                             break;
                         }
-                        log.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
+                        NotibLogger.getInstance().info("[ADV] Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]", log, LoggingTipus.ADVISER);
                         certificacionOrganismo(acusePDF, modoNotificacion, identificador, enviament, resultadoSincronizarEnvio);
-                        log.debug("Certificació guardada correctament.");
+                        NotibLogger.getInstance().info("[ADV] Certificació guardada correctament.", log, LoggingTipus.ADVISER);
                         integracioHelper.addAccioOk(info);
                         break;
                     default:
@@ -162,12 +159,12 @@ public class AdviserServiceImpl implements AdviserService {
                 }
                 //Update enviament
                 notificaHelper.enviamentUpdateDatat(notificaEstat, dataEstat, estado, getModoNotificacion(modoNotificacion), receptorNif, receptorNombre, null, null, enviament);
-                log.debug("Registrant event callbackdatat de l'Adviser...");
+                NotibLogger.getInstance().info("[ADV] Registrant event callbackdatat de l'Adviser...", log, LoggingTipus.ADVISER);
                 setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
                 if (tipoEntrega == DATAT_CERT || tipoEntrega == CERTIFICACIO) {
-                    log.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
+                    NotibLogger.getInstance().info(" [ADV] Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]", log, LoggingTipus.ADVISER);
                     certificacionOrganismo(acusePDF, modoNotificacion, identificador, enviament, resultadoSincronizarEnvio);
-                    log.debug("Certificació guardada correctament.");
+                    NotibLogger.getInstance().info("[ADV] Certificació guardada correctament.", log, LoggingTipus.ADVISER);
                 }
                 integracioHelper.addAccioOk(info);
             }
@@ -177,7 +174,7 @@ public class AdviserServiceImpl implements AdviserService {
             log.error(ERROR_CALLBACK_NOTIFICA + identificador + ")", ex);
             integracioHelper.addAccioError(info, "Error processant la petició", ex);
         }
-        log.debug("Peticició processada correctament.");
+        NotibLogger.getInstance().info("Peticició processada correctament.", log, LoggingTipus.ADVISER);
         if (enviament == null || enviament.getNotificacio() == null) {
             log.error("Error greu enviament o notificació son nulls ");
             return resultadoSincronizarEnvio;
@@ -210,11 +207,11 @@ public class AdviserServiceImpl implements AdviserService {
         var resultat = new ResultatExecucio();
         try {
             if (ambAcuse) {
-                log.debug("Nou estat enviament: " + enviament.getNotificaEstatDescripcio());
-                log.debug("Nou estat notificació: " + enviament.getNotificacio().getEstat().name());
+                NotibLogger.getInstance().info("Nou estat enviament: " + enviament.getNotificaEstatDescripcio(), log, LoggingTipus.ADVISER);
+                NotibLogger.getInstance().info("Nou estat notificació: " + enviament.getNotificacio().getEstat().name(), log, LoggingTipus.ADVISER);
                 var certificacioAntiga = enviament.getNotificaCertificacioArxiuId();
                 var gestioDocumentalId = guardarCertificacioAcuseRecibo(acusePDF.getContenido());
-                log.debug("Actualitzant enviament amb la certificació. ID gestió documental: " + gestioDocumentalId);
+                NotibLogger.getInstance().info("Actualitzant enviament amb la certificació. ID gestió documental: " + gestioDocumentalId, log, LoggingTipus.ADVISER);
                 enviament.updateNotificaCertificacio(
                         new Date(),
                         gestioDocumentalId,
@@ -235,12 +232,12 @@ public class AdviserServiceImpl implements AdviserService {
             certificacioAmbError(identificador, enviament, resultadoSincronizarEnvio, resultat, ex);
         }
         callbackHelper.updateCallback(enviament, resultat.isError(), resultat.getErrorDescripcio());
-        log.debug("Sortint de la certificació...");
+        NotibLogger.getInstance().info("Sortint de la certificació...", log, LoggingTipus.ENTREGA_CIE);
     }
 
     private void certificacioOk(NotificacioEnviamentEntity enviament, ResultadoSincronizarEnvio resultadoSincronizarEnvio, String certificacioAntiga) {
 
-        log.debug("Registrant event callbackcertificacio de l'Adviser...");
+        NotibLogger.getInstance().info("Registrant event callbackcertificacio de l'Adviser...", log, LoggingTipus.ADVISER);
         notificacioEventHelper.addAdviserCertificacioEvent(enviament, false, null);
         //si hi havia una certificació antiga
         if (certificacioAntiga != null) {
@@ -248,7 +245,7 @@ public class AdviserServiceImpl implements AdviserService {
             pluginHelper.gestioDocumentalDelete(certificacioAntiga, PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
         }
         setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
-        log.debug("Event callbackcertificacio registrat correctament: " + NotificacioEventTipusEnumDto.ADVISER_CERTIFICACIO.name());
+        NotibLogger.getInstance().info("Event callbackcertificacio registrat correctament: " + NotificacioEventTipusEnumDto.ADVISER_CERTIFICACIO.name(), log, LoggingTipus.ADVISER);
     }
 
     private void certificatAmbError(String identificador, NotificacioEnviamentEntity enviament, ResultadoSincronizarEnvio resultadoSincronizarEnvio, ResultatExecucio resultat) {

@@ -39,6 +39,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -111,6 +112,7 @@ public class CiePluginHelper {
                 throw new Exception("El document no te contingut " + notificacio.getDocument().getId());
             }
             var enviamentCie = conversioTipusHelper.convertir(notificacio, EnviamentCie.class);
+            enviamentCie.setEnviaments(enviamentCie.getEnviaments().stream().filter(e -> e.getEntregaPostal() != null).collect(Collectors.toList()));
             enviamentCie.setContingutDocument(contingut);
             enviamentCie.setCodiDir3Entitat(configHelper.getConfigAsBoolean("es.caib.notib.plugin.codi.dir3.entitat"));
             var entregaCieEfectiva = notificacio.getProcediment().getEntregaCieEfectiva();

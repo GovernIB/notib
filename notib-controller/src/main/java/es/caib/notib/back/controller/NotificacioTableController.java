@@ -644,6 +644,24 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
     }
 
+    @GetMapping(value = "/{notificacioId}/enviament/{enviamentId}/certificacioPostalDescarregar")
+    @ResponseBody
+    public void certificacioPostalDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long enviamentId) throws IOException {
+
+        try {
+            var arxiu = enviamentService.getCertificacioPostalArxiu(enviamentId);
+            response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
+            writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+        } catch (Exception ex) {
+            log.error("Error descarregant la certificacio", ex);
+            var entitatActual = getEntitatActualComprovantPermisos(request);
+            notificacioService.enviamentRefrescarEstat(entitatActual.getId(), enviamentId);
+            var arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
+            response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
+            writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+        }
+    }
+
     @GetMapping(value = "/{notificacioId}/enviament/certificacionsDescarregar")
     @ResponseBody
     public void certificacionsDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId) throws IOException {
