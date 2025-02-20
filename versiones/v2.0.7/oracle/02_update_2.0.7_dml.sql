@@ -4,6 +4,7 @@ UPDATE not_notificacio_table t SET CADUCITAT = (SELECT caducitat FROM not_notifi
 UPDATE NOT_NOTIFICACIO_ENV set plazo_ampliado = 0;
 UPDATE not_notificacio_table t SET t.ENTREGA_POSTAL_ERROR = 1 WHERE id IN (SELECT DISTINCT nne.NOTIFICACIO_ID FROM NOT_ENTREGA_POSTAL nep LEFT JOIN NOT_NOTIFICACIO_ENV nne ON nne.ENTREGA_POSTAL_ID = nep.id WHERE nep.CIE_ESTAT = 3 OR nep.CIE_ERROR_DESC IS NOT NULL);
 
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.plugin.LDAP', 'false', 'Mostrar logs del plugin de LDAP', 'LOGS', 17, 0, 'BOOL', 0);
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.ENTREGA_CIE', 'false', 'Mostrar logs relacionats amb la entrega postal', 'LOGS', 21, 0, 'BOOL', 0);
 
 DELETE FROM not_config WHERE key like '%ldap%';

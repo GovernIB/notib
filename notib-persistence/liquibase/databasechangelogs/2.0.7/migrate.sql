@@ -39,6 +39,8 @@ ALTER TABLE not_entrega_postal ADD cie_datat_numseg VARCHAR2(50 CHAR);
 ALTER TABLE not_entrega_postal ADD cie_datat_errdes VARCHAR2(255 CHAR);
 ALTER TABLE not_entrega_postal ADD cie_estat_dataact TIMESTAMP(6);
 
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.plugin.LDAP', 'false', 'Mostrar logs del plugin de LDAP', 'LOGS', 17, 0, 'BOOL', 0);
+
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.ENTREGA_CIE', 'false', 'Mostrar logs relacionats amb la entrega postal', 'LOGS', 21, 0, 'BOOL', 0);
 
 -- Changeset db/changelog/changes/2.0.7/ldap.yaml::1634114082437-1::limit
