@@ -10,7 +10,7 @@ INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PRO
 
 DELETE FROM not_config WHERE key like '%ldap%';
 
-UPDATE NOT_CONFIG_TYPE SET VALUE = VALUE || 'es.caib.notib.plugin.usuari.DadesUsuariPluginJdbc,es.caib.notib.plugin.usuari.DadesUsuariPluginLdapCaib' WHERE CODE = 'USUARIS_CLASS';
+UPDATE NOT_CONFIG_TYPE SET VALUE = 'es.caib.notib.plugin.usuari.DadesUsuariPluginJdbc,es.caib.notib.plugin.usuari.DadesUsuariPluginLdap,es.caib.notib.plugin.usuari.DadesUsuariPluginMock,es.caib.notib.plugin.usuari.DadesUsuariPluginKeycloak,es.caib.notib.plugin.usuari.DadesUsuariPluginLdapCaib' WHERE CODE = 'USUARIS_CLASS';
 
 INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.host_url', '', 'Security principal pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
 
@@ -18,7 +18,7 @@ INSERT INTO not_config (key, value, description, group_code, position, jboss_pro
 
 INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.security_authentication', '', 'Security authentication pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
 
-INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.security_credentials', '', 'Security credentials pel servidor LDAP CAIB', 'USUARIS', '0', '1', 'TEXT', '0');
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.security_credentials', '', 'Security credentials pel servidor LDAP CAIB', 'USUARIS', '0', '1', 'PASSWORD', '0');
 
 INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.users_context_dn', '', 'User context DN pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
 
