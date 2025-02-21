@@ -816,8 +816,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			}
 
 			if (enviament.getEntregaPostal() != null
-					&&  (notificacio.getProcediment().getEntregaCieEfectiva() != null && !notificacio.getProcediment().getEntregaCieEfectiva().getCie().isCieExtern()
-						|| notificacio.getOrganGestor().getEntregaCie() != null && notificacio.getOrganGestor().getEntregaCie().getCie().isCieExtern())) {
+					&&  (notificacio.getProcediment() != null && notificacio.getProcediment().getEntregaCieEfectiva() != null && !notificacio.getProcediment().getEntregaCieEfectiva().getCie().isCieExtern()
+						|| notificacio.getOrganGestor().getEntregaCie() != null && !notificacio.getOrganGestor().getEntregaCie().getCie().isCieExtern())) {
 
 				NotibLogger.getInstance().error("[NOTIFICA] Enviament " + enviament.getNotificaReferencia() + " amb entrega postal amb cie Notifica " , log, LoggingTipus.ENTREGA_CIE);
 				var entregaPostal = new EntregaPostal();
