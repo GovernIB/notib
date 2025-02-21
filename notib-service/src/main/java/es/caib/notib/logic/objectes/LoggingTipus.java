@@ -22,5 +22,6 @@ public enum LoggingTipus {
     ADVISER,
     EMAIL,
     METRIQUES_SISTEMA,
-    NOTIFICA_SOAP;
+    NOTIFICA_SOAP,
+    ENTREGA_CIE;
 }

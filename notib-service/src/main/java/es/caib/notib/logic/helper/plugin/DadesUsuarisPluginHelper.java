@@ -137,7 +137,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 			String propertyKeyBase = "es.caib.notib.plugin.dades.usuari.";
 			var properties = configHelper.getAllEntityProperties(null);
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = pluginClass.endsWith("DadesUsuariPluginKeycloak") ?
+			plugin = pluginClass.endsWith("DadesUsuariPluginKeycloak") || pluginClass.endsWith("DadesUsuariPluginLdapCaib") ?
 							(DadesUsuariPlugin) clazz.getDeclaredConstructor(String.class, Properties.class, boolean.class).newInstance(propertyKeyBase, properties, false)
 							: (DadesUsuariPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(properties, false);
 			pluginMap.put(GLOBAL, plugin);

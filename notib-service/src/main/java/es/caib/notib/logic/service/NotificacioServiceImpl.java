@@ -561,7 +561,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			log.debug("Consulta de la notificacio amb id (id=" + id + ")");
 			var notificacio = notificacioRepository.findById(id).orElse(null);
-			if(notificacio == null) {
+			if (notificacio == null) {
 				return null;
 			}
 			var enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
@@ -581,7 +581,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			CallbackEntity callback;
 			List<NotificacioEventEntity> eventNotMovil;
 			List<NotificacioEventEntity> lastErrorEvent = new ArrayList<>();
-            List<NotificacioEnviamentEntity> enviamentsEntity = new ArrayList<>(notificacio.getEnviaments());
+			List<NotificacioEnviamentEntity> enviamentsEntity = new ArrayList<>(notificacio.getEnviaments());
 			NotificacioEventEntity eventError;
 			var numEnviament = 0;
 			var entregaPostal = false;
@@ -628,7 +628,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 			// Emplena dades del procediment
 			var procedimentEntity = notificacio.getProcediment();
-			var procComuOrganCie = procedimentEntity.isComu() && notificacio.getOrganGestor().getEntregaCie() != null;
+			var procComuOrganCie = procedimentEntity != null && procedimentEntity.isComu() && notificacio.getOrganGestor().getEntregaCie() != null;
 			if (entregaPostal && (procedimentEntity != null && procedimentEntity.isEntregaCieActivaAlgunNivell() || procComuOrganCie)) {
 				var entregaCieEntity = procedimentEntity.getEntregaCieEfectiva();
 				entregaCieEntity = entregaCieEntity == null ? notificacio.getOrganGestor().getEntregaCie() : entregaCieEntity;
@@ -675,6 +675,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 //				return dto;
 //			}
 			return dto;
+		} catch (Exception ex) {
+			log.error("[findNotificacioError] Error al consultar la informacio per la notificacio " + id, ex);
+			throw ex;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

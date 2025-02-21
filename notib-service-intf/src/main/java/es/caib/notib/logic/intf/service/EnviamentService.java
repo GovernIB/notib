@@ -5,6 +5,7 @@ package es.caib.notib.logic.intf.service;
 
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
+import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
@@ -38,13 +39,10 @@ public interface EnviamentService {
 	/**
 	 * Consulta la llista d'ids dels enviaments segons el filtre.
 	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat.
-	 * @param filtre
-	 *            Filtre per a la consulta.
+	 * @param entitatId Atribut id de l'entitat.
+	 * @param filtre Filtre per a la consulta.
 	 * @return La llista amb els ids dels expedients.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("isAuthenticated()")
 	List<Long> findIdsAmbFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException;
@@ -52,29 +50,20 @@ public interface EnviamentService {
 	/**
 	 * Consulta dels enviaments d'una entitat realitzats d'una notificació.
 	 * 
-	 * @param entitatId
-	 * 			Identificador de l'entitat de la que es vol consultar els enviaments
-	 * @param filtre
-	 * 			Filtre per a la consulta
+	 * @param entitatId Identificador de l'entitat de la que es vol consultar els enviaments
+	 * @param filtre Filtre per a la consulta
 	 * @param paginacio
 	 * @return Pàgina d'enviaments
 	 * 
 	 * @throws ParseException
 	 */
 	@PreAuthorize("isAuthenticated()")
-	PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(
-			Long entitatId,
-			RolEnumDto rol,
-			String organGestorCodi,
-			String usuariCodi,
-			NotificacioEnviamentFiltreDto filtre,
-			PaginacioParamsDto paginacio) throws ParseException;
+	PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioEnviamentFiltreDto filtre, PaginacioParamsDto paginacio) throws ParseException;
 	
 	/**
 	 * Consulta dels enviaments d'una notificació.
 	 * 
-	 * @param notificacioId
-	 *            Atribut id de la notificació.
+	 * @param notificacioId Atribut id de la notificació.
 	 * @return els destinataris trobats.
 	 */
 	@PreAuthorize("isAuthenticated()")
@@ -92,8 +81,7 @@ public interface EnviamentService {
 	/**
 	 * Consulta d'un enviament donat el seu id.
 	 * 
-	 * @param enviamentId
-	 *            Atribut id de l'enviament.
+	 * @param enviamentId Atribut id de l'enviament.
 	 * @return el destinatari trobat.
 	 */
 	@PreAuthorize("isAuthenticated()")
@@ -102,8 +90,7 @@ public interface EnviamentService {
 	/**
 	 * Consulta dels events d'una notificació.
 	 * 
-	 * @param notificacioId
-	 *            Atribut id de la notificació.
+	 * @param notificacioId Atribut id de la notificació.
 	 * @return els events trobats.
 	 */
 	@PreAuthorize("isAuthenticated()")
@@ -113,15 +100,11 @@ public interface EnviamentService {
 	/**
 	 * Genera un fitxer d'exportació amb la informació dels expedients.
 	 * 
-	 * @param entitatId 
-	 *            Atribut id de l'entitat.
-	 * @param format
-	 *            Format pel fitxer d'exportació ("ODS" o "CSV").
+	 * @param entitatId Atribut id de l'entitat.
+	 * @param format Format pel fitxer d'exportació ("ODS" o "CSV").
 	 * @return El fitxer resultant de l'exportació.
-	 * @throws IOException
-	 *             Si ha sorgit algun problema exportant les dades.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws IOException Si ha sorgit algun problema exportant les dades.
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("isAuthenticated()")
 	FitxerDto exportacio(Long entitatId, Collection<Long> enviamentIds, String format) throws IOException, NotFoundException, ParseException;
@@ -132,8 +115,7 @@ public interface EnviamentService {
 	/**
 	 * Obté les el justificant del registre.
 	 * 
-	 * @param enviamentId
-	 *            id de l'enviament registrat.
+	 * @param enviamentId id de l'enviament registrat.
 	 * @return document justificant descarregat.
 	 */
 	@PreAuthorize("isAuthenticated()")
@@ -142,8 +124,7 @@ public interface EnviamentService {
 	/**
 	 * Reactiva les consultes d'estat a Notific@
 	 * 
-	 * @param enviaments
-	 *            Llistat de atributs id dels enviaments
+	 * @param enviaments Llistat de atributs id dels enviaments
 	 */
 	@PreAuthorize("isAuthenticated()")
 	void reactivaConsultes(Set<Long> enviaments);
@@ -151,8 +132,7 @@ public interface EnviamentService {
 	/**
 	 * Reactiva les consultes d'estat a SIR
 	 * 
-	 * @param enviaments
-	 *            Llistat de atributs id dels enviaments
+	 * @param enviaments Llistat de atributs id dels enviaments
 	 */
 	@PreAuthorize("isAuthenticated()")
 	void reactivaSir(Set<Long> enviaments);
@@ -165,8 +145,7 @@ public interface EnviamentService {
 	/**
 	 * Actualitza l'estat de l'enviament indicat i reinicia el comptador de reintents.
 	 *
-	 * @param enviamentId
-	 *            id de l'enviament.
+	 * @param enviamentId id de l'enviament.
 	 */
 	@PreAuthorize("isAuthenticated()")
 	void actualitzarEstat(Long enviamentId);
@@ -174,8 +153,7 @@ public interface EnviamentService {
 	/**
 	 * Activa un event de callback de l'enviament indicat
 	 *
-	 * @param enviamentId
-	 *            id de l'enviament.
+	 * @param enviamentId id de l'enviament.
 	 */
 	@PreAuthorize("isAuthenticated()")
 	void activarCallback(Long enviamentId);
@@ -183,10 +161,12 @@ public interface EnviamentService {
 	/**
 	 * Envia un event de callback de als enviament indicat
 	 *
-	 * @param notificacions
-	 *            id de l'enviament.
+	 * @param notificacions id de l'enviament.
 	 */
 	@PreAuthorize("isAuthenticated()")
 	List<Long> enviarCallback(Set<Long> notificacions) throws Exception;
+
+	@PreAuthorize("isAuthenticated()")
+	ArxiuDto getCertificacioPostalArxiu(Long enviamentId);
 
 }

@@ -18,6 +18,7 @@ import es.caib.notib.plugin.cie.nexea.altaremesaenvios.OrganismoPagadorPostal;
 import es.caib.notib.plugin.cie.nexea.altaremesaenvios.Persona;
 import es.caib.notib.plugin.cie.nexea.cancelarenvio.CancelarEnvio;
 import es.caib.notib.plugin.cie.nexea.infoenvioligero.InfoEnvioLigero;
+import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import es.caib.notib.plugin.utils.WsClientHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -69,6 +70,7 @@ public class CieNexeaPluginImpl implements CiePlugin {
         try {
             var alta = generarAltaRemesaEnvios(notificacio);
             var r = getNotificaWs(notificacio.getEntregaCie().getApiKey()).altaRemesaEnvios(alta);
+//            NotibLogger.getInstance
             var resultadoEnvios = r.getResultadoEnvios();
             if (resultadoEnvios == null || resultadoEnvios.getItem() == null || resultadoEnvios.getItem().isEmpty()) {
                 return RespostaCie.builder().codiResposta(r.getCodigoRespuesta()).descripcioError(r.getDescripcionRespuesta()).build();

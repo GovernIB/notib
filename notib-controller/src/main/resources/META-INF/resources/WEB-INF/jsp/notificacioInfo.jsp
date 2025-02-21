@@ -477,10 +477,17 @@ $(document).ready(function() {
 <%--								</c:if>--%>
 								<c:if test="${notificacio.estat == 'FINALITZADA' or notificacio.estat == 'PROCESSADA'}">
 									(<c:forEach items="${notificacio.enviaments}" var="enviament" varStatus="status">
-										<c:if test="${not empty enviament.notificaEstat}">
-											<spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/>
-											${!status.last ? ', ' : ''}
-										</c:if>
+										<c:choose>
+											<c:when test="${enviament.notificat == true}">
+												<spring:message code="es.caib.notib.client.domini.EnviamentEstat.NOTIFICADA"/>
+											</c:when>
+											<c:otherwise>
+												<c:if test="${not empty enviament.notificaEstat}">
+													<spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/>
+													${!status.last ? ', ' : ''}
+												</c:if>
+											</c:otherwise>
+										</c:choose>
 									</c:forEach>)
 								</c:if>
 							</td>

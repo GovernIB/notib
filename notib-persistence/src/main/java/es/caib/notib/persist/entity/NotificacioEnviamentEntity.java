@@ -1,5 +1,6 @@
 package es.caib.notib.persist.entity;
 
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.ServeiTipus;
@@ -393,29 +394,36 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			String notificaDatatReceptorNom,
 			String notificaDatatNumSeguiment,
 			String notificaDatatErrorDescripcio) {
+
 		this.notificaEstat = notificaEstat;
 		this.notificaEstatData = notificaEstatData;
 		this.notificaEstatFinal = notificaEstatFinal;
 		this.notificaEstatDescripcio = notificaEstatDescripcio;
-		if (!isBlank(notificaDatatOrigen))
+
+		if (!isBlank(notificaDatatOrigen)) {
 			this.notificaDatatOrigen = notificaDatatOrigen;
-		if (!isBlank(notificaDatatReceptorNif))
+		}
+		if (!isBlank(notificaDatatReceptorNif)) {
 			this.notificaDatatReceptorNif = notificaDatatReceptorNif;
-		if (!isBlank(notificaDatatReceptorNom))
+		}
+		if (!isBlank(notificaDatatReceptorNom)) {
 			this.notificaDatatReceptorNom = notificaDatatReceptorNom;
-		if (!isBlank(notificaDatatNumSeguiment))
+		}
+		if (!isBlank(notificaDatatNumSeguiment)) {
 			this.notificaDatatNumSeguiment = notificaDatatNumSeguiment;
+		}
 		this.notificaDatatErrorDescripcio = notificaDatatErrorDescripcio;
 		this.notificaEstatDataActualitzacio = new Date();
 	}
 
-	public void updateReceptorDatat(
-			String notificaDatatReceptorNif,
-			String notificaDatatReceptorNom) {
-		if (!isBlank(notificaDatatReceptorNif))
+	public void updateReceptorDatat(String notificaDatatReceptorNif, String notificaDatatReceptorNom) {
+
+		if (!isBlank(notificaDatatReceptorNif)) {
 			this.notificaDatatReceptorNif = notificaDatatReceptorNif;
-		if (!isBlank(notificaDatatReceptorNom))
+		}
+		if (!isBlank(notificaDatatReceptorNom)) {
 			this.notificaDatatReceptorNom = notificaDatatReceptorNom;
+		}
 	}
 	
 	public void updateNotificaCertificacio(
@@ -430,6 +438,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			NotificaCertificacioTipusEnumDto notificaCertificacioTipus, // acuse o sobre
 			NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus,
 			String notificaCertificacioNumSeguiment) {
+
 		this.notificaCertificacioData = notificaCertificacioData;
 		this.notificaCertificacioArxiuId = notificaCertificacioArxiuId;
 		this.notificaCertificacioHash = notificaCertificacioHash;
@@ -638,4 +647,13 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 
 	private static final long serialVersionUID = 6993171107561077019L;
+
+	public boolean isCieEstatFinal() {
+		return entregaPostal != null && entregaPostal.isCieEstatFinal();
+	}
+
+	public boolean isNotificat() {
+
+		return EnviamentEstat.NOTIFICADA.equals(notificaEstat) || entregaPostal != null && CieEstat.NOTIFICADA.equals(entregaPostal.getCieEstat());
+	}
 }

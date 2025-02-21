@@ -124,6 +124,7 @@ public abstract class AbstractNotificaHelper {
 			String notificaDatatNumSeguiment,
 			String notificaDatatErrorDescripcio,
 			NotificacioEnviamentEntity enviament) throws Exception {
+
 		boolean estatFinal =
 				EnviamentEstat.ABSENT.equals(notificaEstat) ||
 						EnviamentEstat.ADRESA_INCORRECTA.equals(notificaEstat) ||
@@ -136,6 +137,7 @@ public abstract class AbstractNotificaHelper {
 						EnviamentEstat.REBUTJADA.equals(notificaEstat) ||
 						EnviamentEstat.DESCONEGUT.equals(notificaEstat) ||
 						EnviamentEstat.SENSE_INFORMACIO.equals(notificaEstat);
+
 		enviament.updateNotificaDatat(
 				notificaEstat,
 				notificaEstatData,
@@ -153,7 +155,7 @@ public abstract class AbstractNotificaHelper {
 			if (env.getId().equals(enviament.getId())) {
 				env = enviament;
 			}
-			if (!env.isNotificaEstatFinal()) {
+			if (!env.isNotificaEstatFinal() && !env.isCieEstatFinal()) {
 				estatsEnviamentsFinals = false;
 				if (!env.isPerEmail()) {
 					estatsEnviamentsNotificaFinals = false;

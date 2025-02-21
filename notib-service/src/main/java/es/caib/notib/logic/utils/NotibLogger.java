@@ -65,6 +65,14 @@ public class NotibLogger {
         log.info(msg, ex);
     }
 
+    public void error(String msg, Exception ex, Logger log, LoggingTipus tipus) {
+
+        if (log == null ||!mostrarLog(tipus)) {
+            return;
+        }
+        log.error(msg, ex);
+    }
+
     public void error(String msg, Logger log, LoggingTipus tipus) {
 
         if (log == null ||!mostrarLog(tipus)) {

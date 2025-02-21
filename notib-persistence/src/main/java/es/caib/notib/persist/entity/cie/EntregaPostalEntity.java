@@ -2,9 +2,14 @@ package es.caib.notib.persist.entity.cie;
 
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EntregaPostalVia;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
+import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
+import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliTipusEnumDto;
+import es.caib.notib.logic.intf.dto.cie.CieCertificacioArxiuTipus;
+import es.caib.notib.logic.intf.dto.cie.CieCertificacioTipus;
 import es.caib.notib.logic.intf.dto.notificacio.EntregaPostal;
 import es.caib.notib.logic.intf.rest.consulta.Estat;
 import es.caib.notib.persist.audit.NotibAuditable;
@@ -21,6 +26,12 @@ import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import java.util.Date;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Classe del model de dades que representa els enviaments d'una
@@ -141,7 +152,72 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 	@Setter
 	@Column(name = "cie_error_desc", length = 250)
 	protected String cieErrorDesc;
+	// TODO crear tots els camps seguents a 930.yaml
+	@Column(name = "cie_datat_recnif", length = 9)
+	protected String cieDatatReceptorNif;
 
+	@Column(name = "cie_datat_recnom", length = 400)
+	protected String cieDatatReceptorNom;
+
+	@Column(name = "cie_cer_data")
+	@Temporal(TemporalType.TIMESTAMP)
+	protected Date cieCertificacioData;
+
+	@Column(name = "cie_cer_arxiuid", length = 50)
+	protected String cieCertificacioArxiuId;
+
+	@Column(name = "cie_cer_hash", length = 50)
+	protected String cieCertificacioHash;
+
+	@Column(name = "cie_cer_origen", length = 20)
+	protected String cieCertificacioOrigen;
+
+	@Column(name = "cie_cer_metas", length = 255)
+	protected String cieCertificacioMetadades;
+
+	@Column(name = "cie_cer_csv", length = 50)
+	protected String cieCertificacioCsv;
+
+	@Column(name = "cie_cer_mime", length = 20)
+	protected String cieCertificacioMime;
+
+	@Column(name = "cie_cer_tamany", length = 20)
+	protected Integer cieCertificacioTamany;
+
+	@Column(name = "cie_cer_tipus")
+	@Enumerated(EnumType.ORDINAL)
+	protected CieCertificacioTipus cieCertificacioTipus;
+
+	@Column(name = "cie_cer_arxtip")
+	@Enumerated(EnumType.ORDINAL)
+	protected CieCertificacioArxiuTipus cieCertificacioArxiuTipus;
+
+	@Column(name = "cie_cer_numseg", length = 50)
+	protected String cieCertificacioNumSeguiment;
+
+	@Column(name = "cie_estat_data")
+	@Temporal(TemporalType.TIMESTAMP)
+	protected Date cieEstatData;
+
+	@Column(name = "cie_estat_desc", length = 255)
+	protected String cieEstatDescripcio;
+
+	@Column(name = "cie_datat_origen", length = 20)
+	protected String cieDatatOrigen;
+
+	@Column(name = "cie_datat_numseg", length = 50)
+	protected String cieDatatNumSeguiment;
+
+	@Column(name = "cie_datat_errdes", length = 255)
+	protected String cieDatatErrorDescripcio;
+
+	@Column(name = "cie_estat_dataact")
+	@Temporal(TemporalType.TIMESTAMP)
+	protected Date cieEstatDataActualitzacio;
+
+	public String getCieCertificacioArxiuNom() {
+		return "certificacio_postal_" + cieId + ".pdf";
+	}
 
 
 	public void update(EntregaPostal entregaPostal) {
@@ -298,6 +374,74 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 				|| CieEstat.REHUSADA.equals(cieEstat)
 				|| CieEstat.ERROR.equals(cieEstat)
 				|| CieEstat.DEVUELTO.equals(cieEstat));
+	}
+
+	public void updateReceptorDatat(String cieDatatReceptorNif, String cieDatatReceptorNom) {
+
+		if (!isBlank(cieDatatReceptorNif)) {
+			this.cieDatatReceptorNif = cieDatatReceptorNif;
+		}
+		if (!isBlank(cieDatatReceptorNom)) {
+			this.cieDatatReceptorNom = cieDatatReceptorNom;
+		}
+	}
+
+	public void updateCieCertificacio(
+			Date cieCertificacioData,
+			String cieCertificacioArxiuId,
+			String cieCertificacioHash,
+			String cieCertificacioOrigen,
+			String cieCertificacioMetadades,
+			String cieCertificacioCsv,
+			String cieCertificacioMime,
+			Integer cieCertificacioTamany,
+			CieCertificacioTipus cieCertificacioTipus, // acuse o sobre
+			CieCertificacioArxiuTipus cieCertificacioArxiuTipus,
+			String cieCertificacioNumSeguiment) {
+
+		this.cieCertificacioData = cieCertificacioData;
+		this.cieCertificacioArxiuId = cieCertificacioArxiuId;
+		this.cieCertificacioHash = cieCertificacioHash;
+		this.cieCertificacioOrigen = cieCertificacioOrigen;
+		this.cieCertificacioMetadades = cieCertificacioMetadades;
+		this.cieCertificacioCsv = cieCertificacioCsv;
+		this.cieCertificacioMime = cieCertificacioMime;
+		this.cieCertificacioTamany = cieCertificacioTamany;
+		this.cieCertificacioTipus = cieCertificacioTipus;
+		this.cieCertificacioArxiuTipus = cieCertificacioArxiuTipus;
+		this.cieCertificacioNumSeguiment = cieCertificacioNumSeguiment;
+	}
+
+	public void updateCieDatat(
+			CieEstat cieEstat,
+			Date cieEstatData,
+			boolean cieEstatFinal,
+			String cieEstatDescripcio,
+			String cieDatatOrigen,
+			String cieDatatReceptorNif,
+			String cieDatatReceptorNom,
+			String cieDatatNumSeguiment,
+			String cieDatatErrorDescripcio) {
+
+		this.cieEstat = cieEstat;
+		this.cieEstatData = cieEstatData;
+//		this.cieEstatFinal = cieEstatFinal;
+		this.cieEstatDescripcio = cieEstatDescripcio;
+
+		if (!isBlank(cieDatatOrigen)) {
+			this.cieDatatOrigen = cieDatatOrigen;
+		}
+		if (!isBlank(cieDatatReceptorNif)) {
+			this.cieDatatReceptorNif = cieDatatReceptorNif;
+		}
+		if (!isBlank(cieDatatReceptorNom)) {
+			this.cieDatatReceptorNom = cieDatatReceptorNom;
+		}
+		if (!isBlank(cieDatatNumSeguiment)) {
+			this.cieDatatNumSeguiment = cieDatatNumSeguiment;
+		}
+		this.cieDatatErrorDescripcio = cieDatatErrorDescripcio;
+		this.cieEstatDataActualitzacio = new Date();
 	}
 
 }

@@ -1,5 +1,6 @@
 package es.caib.notib.logic.intf.dto.notenviament;
 
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.EntregaDehDto;
@@ -73,6 +74,11 @@ public class EnviamentInfo extends NotificacioEnviamentDatatableDto{
 	private String callbackFiReintentsDesc;
 	private String notificacioMovilErrorDesc;
 
+
+	public boolean isNotificat() {
+
+		return EnviamentEstat.NOTIFICADA.equals(notificaEstat) || entregaPostal != null && CieEstat.NOTIFICADA.name().equals(entregaPostal.getCieEstat());
+	}
 
 	public boolean isUltimEventError() {
 		return ultimEvent != null && ultimEvent.isError();

@@ -3,3 +3,48 @@ INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE
 UPDATE not_notificacio_table t SET CADUCITAT = (SELECT caducitat FROM not_notificacio n WHERE t.id = n.id);
 UPDATE NOT_NOTIFICACIO_ENV set plazo_ampliado = 0;
 UPDATE not_notificacio_table t SET t.ENTREGA_POSTAL_ERROR = 1 WHERE id IN (SELECT DISTINCT nne.NOTIFICACIO_ID FROM NOT_ENTREGA_POSTAL nep LEFT JOIN NOT_NOTIFICACIO_ENV nne ON nne.ENTREGA_POSTAL_ID = nep.id WHERE nep.CIE_ESTAT = 3 OR nep.CIE_ERROR_DESC IS NOT NULL);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.plugin.LDAP', 'false', 'Mostrar logs del plugin de LDAP', 'LOGS', 17, 0, 'BOOL', 0);
+
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.ENTREGA_CIE', 'false', 'Mostrar logs relacionats amb la entrega postal', 'LOGS', 21, 0, 'BOOL', 0);
+
+DELETE FROM not_config WHERE key like '%ldap%';
+
+UPDATE NOT_CONFIG_TYPE SET VALUE = VALUE || 'es.caib.notib.plugin.usuari.DadesUsuariPluginJdbc,es.caib.notib.plugin.usuari.DadesUsuariPluginLdapCaib' WHERE CODE = 'USUARIS_CLASS';
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.host_url', '', 'Security principal pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.security_principal', '', 'URL del servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.security_authentication', '', 'Security authentication pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.security_credentials', '', 'Security credentials pel servidor LDAP CAIB', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.users_context_dn', '', 'User context DN pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.search_scope', '', 'Search scope pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.username', '', 'Attribute username pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.mail', '', 'Attribute mail pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.administration_id', '', 'Attribute administration id pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.name', '', 'Attribute name pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.surname', '', 'Attribute surname pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.surname1', '', 'Attribute surname 1 pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.surname2', '', 'Attribute surname 2 pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.telephone', '', 'Attribute telephone pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.department', '', 'Attribute department pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.memberof', '', 'Attribute suffix role match member of pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.prefix_role_match_memberof', '', 'Attribute prefix role match member of pel servidor LDAP ', 'USUARIS', '0', '1', 'TEXT', '0');
+
+INSERT INTO not_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.attribute.suffix_role_match_memberof', '', 'Attribute suffix role match member of pel servidor LDAP', 'USUARIS', '0', '1', 'TEXT', '0');
+
