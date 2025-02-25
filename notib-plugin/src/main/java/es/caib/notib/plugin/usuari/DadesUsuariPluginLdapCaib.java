@@ -3,11 +3,18 @@
  */
 package es.caib.notib.plugin.usuari;
 
+import es.caib.comanda.salut.model.EstatSalut;
+import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.fundaciobit.pluginsib.userinformation.UserInfo;
 import org.fundaciobit.pluginsib.userinformation.ldap.LdapUserInformationPlugin;
+
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -41,14 +48,22 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 		super(propertyKeyBase);
 	}
 
+	public DadesUsuariPluginLdapCaib(String propertyKeyBase, Properties properties, boolean configuracioEspecifica) {
+		super(propertyKeyBase, properties);
+		this.configuracioEspecifica = configuracioEspecifica;
+		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.LDAP")));
+	}
+
 	@Override
 	public List<String> consultarRolsAmbCodi(String usuariCodi) throws SistemaExternException {
 
 		logger.info("Consulta dels rols de l'usuari (usuariCodi=" + usuariCodi + ")");
 		try {
 			var info = getRolesByUsername(usuariCodi);
+			incrementarOperacioOk();
 			return info != null && info.getRoles() != null ? List.of(info.getRoles()) : new ArrayList<>();
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException("Error al consultar els rols de l'usuari (usuariCodi=" + usuariCodi + ")", ex);
 		}
 	}
@@ -59,8 +74,10 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 		logger.info("Consulta de les dades de l'usuari LDAP CAIB (usuariCodi=" + usuariCodi + ")");
 		try {
 			UserInfo userInfo = getUserInfoByUserName(usuariCodi);
+			incrementarOperacioOk();
 			return toDadesUsuari(userInfo);
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException("Error al consultar l'usuari amb codi " + usuariCodi, ex);
 		}
 	}
@@ -72,6 +89,7 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 		try {
 			List<DadesUsuari> dadesUsuaris = new ArrayList<>();
 			String [] codisUsuaris = this.getUsernamesByRol(grupCodi);
+			incrementarOperacioOk();
 			if (codisUsuaris == null) {
 				return dadesUsuaris;
 			}
@@ -90,6 +108,7 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 			}
 			return dadesUsuaris;
 		} catch (Exception ex) {
+			incrementarOperacioError();
 			throw new SistemaExternException("Error al consultar els usuaris del grup LDAP CAIB " + grupCodi, ex);
 		}
 	}
@@ -111,4 +130,55 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 		return dadesUsuari;
 	}
 
+	// Mètodes de SALUT
+	// /////////////////////////////////////////////////////////////////////////////////////////////
+
+	private boolean configuracioEspecifica = false;
+	private int operacionsOk = 0;
+	private int operacionsError = 0;
+
+	@Synchronized
+	private void incrementarOperacioOk() {
+		operacionsOk++;
+	}
+
+	@Synchronized
+	private void incrementarOperacioError() {
+		operacionsError++;
+	}
+
+	@Synchronized
+	private void resetComptadors() {
+		operacionsOk = 0;
+		operacionsError = 0;
+	}
+
+	@Override
+	public boolean teConfiguracioEspecifica() {
+		return this.configuracioEspecifica;
+	}
+
+	@Override
+	public EstatSalut getEstatPlugin() {
+		try {
+			Instant start = Instant.now();
+			consultarAmbCodi("fakeUser");
+			return EstatSalut.builder()
+					.latencia((int) Duration.between(start, Instant.now()).toMillis())
+					.estat(EstatSalutEnum.UP)
+					.build();
+		} catch (Exception ex) {
+			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
+		}
+	}
+
+	@Override
+	public IntegracioPeticions getPeticionsPlugin() {
+		IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
+				.totalOk(operacionsOk)
+				.totalError(operacionsError)
+				.build();
+		resetComptadors();
+		return integracioPeticions;
+	}
 }
