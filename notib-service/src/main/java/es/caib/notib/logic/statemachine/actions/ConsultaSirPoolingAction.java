@@ -76,7 +76,7 @@ public class ConsultaSirPoolingAction implements Action<EnviamentSmEstat, Enviam
                 return;
             }
         }
-        var consulta = ConsultaSirRequest.builder().consultaSirDto(consultaSirMapper.toDto(enviament)).numIntent(reintents + 1).build();
+        var consulta = ConsultaSirRequest.builder().enviamentUuid(enviamentUuid).consultaSirDto(consultaSirMapper.toDto(enviament)).numIntent(reintents + 1).build();
         jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_SIR, consulta,
                 m -> {
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, refrescarPeriode());

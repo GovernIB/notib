@@ -58,4 +58,16 @@ public class ActiveMqService extends AbstractService<es.caib.notib.logic.intf.se
         getDelegateService().compactKahaDB();
     }
 
+    @Override
+    @RolesAllowed({"NOT_SUPER"})
+    public boolean deleteMessage(String queueName, String messageId) {
+        return getDelegateService().deleteMessage(queueName, messageId);
+    }
+
+    @Override
+    @RolesAllowed({"NOT_SUPER"})
+    public boolean buidarCua(String queueName) {
+        return getDelegateService().buidarCua(queueName);
+    }
+
 }

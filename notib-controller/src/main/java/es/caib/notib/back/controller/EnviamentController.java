@@ -112,6 +112,8 @@ public class EnviamentController extends TableAccionsMassivesController {
 		var entitatActual = getEntitatActualComprovantPermisos(request);
 		var organGestorActual = getOrganGestorActual(request);
 		var filtre = getFiltreCommand(request);
+		filtre.setDataEnviamentInici(null);
+		filtre.setDataEnviamentFi(null);
 		filtre.setCodiNotibEnviament(uuid);
 		model.addAttribute(filtre);
 //		notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);

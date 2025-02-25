@@ -53,7 +53,7 @@ public class ConsultaNotificaAction implements Action<EnviamentSmEstat, Enviamen
         NotibLogger.getInstance().info("[SM] ConsultaNotificaAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
-        var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(consultaNotificaMapper.toDto(enviament)).numIntent(reintents + 1).build();
+        var consulta = ConsultaNotificaRequest.builder().enviamentUuid(enviamentUuid).consultaNotificaDto(consultaNotificaMapper.toDto(enviament)).numIntent(reintents + 1).build();
         jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_ESTAT, consulta,
                 m -> {
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));

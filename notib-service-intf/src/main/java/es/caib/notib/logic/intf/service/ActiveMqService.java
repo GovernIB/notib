@@ -27,5 +27,9 @@ public interface ActiveMqService {
     String getQueueDetails(String queueName) throws Exception;
     @PreAuthorize("hasRole('NOT_SUPER')")
     void compactKahaDB() throws Exception;
+    @PreAuthorize("hasRole('NOT_SUPER')")
+    boolean deleteMessage(String queueName, String messageId);
+    @PreAuthorize("hasRole('NOT_SUPER')")
+    boolean buidarCua(String queueName);
 
 }

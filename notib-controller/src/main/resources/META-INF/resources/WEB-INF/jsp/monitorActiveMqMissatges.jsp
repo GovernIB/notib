@@ -25,6 +25,13 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			setInterval(() => window.location.reload(), 10000);
+
+		});
+	</script>
 <not:modalHead />
 </head>
 <body>
@@ -49,9 +56,15 @@
 				</script>
 			</th>
 			<th data-col-name="notificacioUuId" data-template="#cellAccionsTemplateNotificiacio"><spring:message code="monitor.activemq.columna.id.notificacio"/>
-			<script id="cellAccionsTemplateNotificiacio" type="text/x-jsrender">
-				<a href="<c:url value="/notificacio/filtrades/{{:notificacioUuId}}"/>" target="_blank">{{:notificacioUuId}}</a>
-			</script>
+				<script id="cellAccionsTemplateNotificiacio" type="text/x-jsrender">
+					<a href="<c:url value="/notificacio/filtrades/{{:notificacioUuId}}"/>" target="_blank">{{:notificacioUuId}}</a>
+				</script>
+			</th>
+			<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
+				<script id="cellAccionsTemplate" type="text/x-jsrender">
+					<a class="btn btn-primary" data-toggle="ajax" href="<c:url value="/monitor/activemq/missatges/${queueNom}/{{:id}}/delete"/>"><span class="fa fa-trash"></span>&nbsp;<spring:message code="monitor.activemq.boto.esborrar"/></span>
+				</script>
+			</th>
 		</tr>
 		</thead>
 	</table>

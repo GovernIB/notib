@@ -63,7 +63,7 @@ public class EnviamentNotificaAction implements Action<EnviamentSmEstat, Enviame
             return;
         }
         var codiUsuari = (String) variables.get(SmConstants.CODI_USUARI);
-        var env = EnviamentNotificaRequest.builder().enviamentNotificaDto(enviamentNotificaMapper.toDto(enviament)).numIntent(reintents + 1).codiUsuari(codiUsuari).build();
+        var env = EnviamentNotificaRequest.builder().enviamentUuid(enviamentUuid).enviamentNotificaDto(enviamentNotificaMapper.toDto(enviament)).numIntent(reintents + 1).codiUsuari(codiUsuari).build();
         var retry = (boolean) variables.getOrDefault(SmConstants.NT_RETRY, false);
         var isRetry = EnviamentSmEvent.NT_RETRY.equals(stateContext.getMessage().getPayload()) || retry;
         variables.put(SmConstants.RG_RETRY, false);

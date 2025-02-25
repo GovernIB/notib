@@ -143,11 +143,15 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var organGestorActual = getOrganGestorActual(request);
         var filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
+        filtre.setDataInici(null);
+        filtre.setDataFi(null);
         filtre.setReferencia(referencia);
         model.addAttribute(filtre);
-        notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
+//        notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
         return "redirect:/notificacio";
     }
+
+
 
     @PostMapping(params = "netejar")
     public String postNeteja(HttpServletRequest request, Model model) {

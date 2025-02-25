@@ -20,9 +20,22 @@
 	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#refrescar").on("click", () => window.location.reload());
+
+		});
+	</script>
 </head>
 <body>
-
+	<script id="botonsTemplate" type="text/x-jsrender">
+		<div class="text-right">
+			<div class="btn-group">
+				<button id="refrescar" class="btn btn-default"><span class="fa fa-reload"></span>Refrescar</a>
+			</div>
+		</div>
+	</script>
 	<table
 		id="taulaInfoQueues"
 		data-toggle="datatable"
@@ -34,6 +47,7 @@
 		data-paging="false"
 		class="table table-bordered table-striped"
 		data-info-type="search"
+		data-botons-template="#botonsTemplate"
 		style="width:100%">
 		<thead>
 			<tr>
@@ -49,7 +63,13 @@
 				<th data-col-name="storeMessageSize"><spring:message code="monitor.activemq.columna.store.message.size.count"/></th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<a class="btn btn-primary" href="<c:url value="/monitor/activemq/missatges/{{:nom}}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-send"></span>&nbsp;<spring:message code="monitor.activemq.boto.missatges"/></span>
+						<div class="dropdown">
+							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+							<ul class="dropdown-menu dropdown-menu-right">
+								<li><a href="<c:url value="/monitor/activemq/missatges/{{:nom}}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-send"></span>&nbsp;<spring:message code="monitor.activemq.boto.missatges"/></span></li>
+								<li><a href="<c:url value="/monitor/activemq/missatges/{{:nom}}/buidar"/>" data-toggle="ajax"><span class="fa fa-trash"></span>&nbsp;<spring:message code="monitor.activemq.boto.buidar"/></span></li>
+							</ul>
+						</div>
 					</script>
 				</th>
 			</tr>

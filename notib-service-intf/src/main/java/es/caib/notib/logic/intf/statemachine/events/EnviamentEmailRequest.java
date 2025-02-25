@@ -5,15 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class EnviamentEmailRequest implements Serializable {
+@SuperBuilder
+public class EnviamentEmailRequest extends EnviamentSm implements Serializable {
 
     private EnviamentEmailDto enviamentEmailDto;
-    private Integer numIntent;
 }

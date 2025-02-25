@@ -54,6 +54,7 @@ public class EnviamentEmailAction implements Action<EnviamentSmEstat, EnviamentS
         jmsTemplate.convertAndSend(
                 SmConstants.CUA_NOTIFICA,
                 EnviamentNotificaRequest.builder()
+                        .enviamentUuid(enviamentUuid)
                         .enviamentNotificaDto(enviamentNotificaMapper.toDto(enviament))
                         .numIntent(reintents + 1)
                         .build(),

@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.dto.ActiveMqMissatgeInfo;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.service.ActiveMqService;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class ActiveMqServiceImpl implements ActiveMqService {
     private final PaginacioHelper paginacioHelper;
     private final MessageHelper messageHelper;
     private final NotificacioRepository notificacioRepository;
+    private final NotificacioEnviamentRepository notificacioEnviamentRepository;
 
     @Override
     public PaginaDto<ActiveMqInfo> getInfoQueues(PaginacioParamsDto paginacioParams) {
@@ -55,7 +57,7 @@ public class ActiveMqServiceImpl implements ActiveMqService {
                 }
             }
         } catch (Exception ex) {
-            log.error("Error al obtenir la informacio de les queues ", ex);
+            log.error("[Monitor MQ] Error al obtenir la informacio de les queues ", ex);
         }
         return paginacioHelper.toPaginaDto(infoQueues, ActiveMqInfo.class);
     }
@@ -123,37 +125,19 @@ public class ActiveMqServiceImpl implements ActiveMqService {
                 }
             }
         } catch (Exception ex) {
-            log.error("Error al obtenir la informacio dels missatges per la cua " + queueNom, ex);
+            log.error("[Monitor MQ] Error al obtenir la informacio dels missatges per la cua " + queueNom, ex);
         }
         return missatges;
     }
 
     private void tractarMissatge(String msg, ActiveMqMissatgeInfo missatge) {
 
-//        JSONObject json;
         try {
-            var uuId = msg.split("uuid")[1].split(",")[0].split("\"")[2];
+            var uuId = msg.split("enviamentUuid")[1].split(",")[0].split("\"")[2];
+            var enviament = notificacioEnviamentRepository.findByUuid(uuId).orElseThrow();
             missatge.setUuid(uuId);
+            missatge.setNotificacioUuId(enviament.getNotificacio().getReferencia());
             return;
-//            json = new JSONObject(msg);
-//            String uuId;
-//            Iterator<String> keys = json.keys();
-//            if (keys.hasNext()) {
-//                String nomObjecte = keys.next();
-//                if ("enviamentUuid".equals(nomObjecte)) {
-//                    uuId = json.getString("enviamentUuid");
-//                    missatges.add(new ActiveMqMissatgeInfo(uuId));
-//                    return;
-//                }
-//                try {
-//                    var jsonInfo = json.get(nomObjecte).toString();
-//                    json = new JSONObject(jsonInfo);
-//                    uuId = json.getString("uuid");
-//                    missatges.add(new ActiveMqMissatgeInfo(uuId));
-//                } catch (Exception e) {
-//                    log.info("Descartat missatge " + json);
-//                }
-//            }
         } catch(Exception ex) {
         }
         try {
@@ -206,21 +190,21 @@ public class ActiveMqServiceImpl implements ActiveMqService {
         MBeanServerConnection connection = ManagementFactory.getPlatformMBeanServer();
         ObjectName activeMQ = new ObjectName("org.apache.activemq:type=Broker,brokerName=localhost");
         BrokerViewMBean mBean = JMX.newMBeanProxy(connection, activeMQ, BrokerViewMBean.class);
-
         mBean.addQueue(queueName);
     }
 
     @Override
     public void deleteQueue(String queueName) throws Exception {
+
         MBeanServerConnection connection = ManagementFactory.getPlatformMBeanServer();
         ObjectName activeMQ = new ObjectName("org.apache.activemq:type=Broker,brokerName=localhost");
         BrokerViewMBean mBean = JMX.newMBeanProxy(connection, activeMQ, BrokerViewMBean.class);
-
         mBean.removeQueue(queueName);
     }
 
     @Override
     public String getQueueDetails(String queueName) throws Exception {
+
         MBeanServerConnection connection = ManagementFactory.getPlatformMBeanServer();
         ObjectName activeMQ = new ObjectName("org.apache.activemq:type=Broker,brokerName=localhost");
         BrokerViewMBean mBean = JMX.newMBeanProxy(connection, activeMQ, BrokerViewMBean.class);
@@ -238,6 +222,7 @@ public class ActiveMqServiceImpl implements ActiveMqService {
 
     @Override
     public void compactKahaDB() throws Exception {
+
         if (brokerService.getPersistenceAdapter() instanceof KahaDBPersistenceAdapter) {
             KahaDBPersistenceAdapter kahaDBStore = (KahaDBPersistenceAdapter) brokerService.getPersistenceAdapter();
             long originalCleanupInterval = kahaDBStore.getCleanupInterval();
@@ -254,6 +239,49 @@ public class ActiveMqServiceImpl implements ActiveMqService {
             }).start();
         } else {
             throw new IllegalStateException("Persistence adapter is not KahaDBStore");
+        }
+    }
+
+    @Override
+    public boolean deleteMessage(String queueName, String messageId) {
+
+        try {
+            var connection = ManagementFactory.getPlatformMBeanServer();
+            var activeMQ = new ObjectName("org.apache.activemq:type=Broker,brokerName=localhost");
+            var mBean = JMX.newMBeanProxy(connection, activeMQ, BrokerViewMBean.class);
+            for (var name : mBean.getQueues()) {
+                var queueMBean = JMX.newMBeanProxy(connection, name, QueueViewMBean.class);
+                if (!queueMBean.getName().equals(queueName)) {
+                    continue;
+                }
+                queueMBean.removeMessage(messageId);
+            }
+
+            return true;
+        } catch (Exception ex) {
+            log.error("[Monitor MQ] Error al esborrar el missatge " + messageId, ex);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean buidarCua(String queueName) {
+
+        try {
+            var connection = ManagementFactory.getPlatformMBeanServer();
+            var activeMQ = new ObjectName("org.apache.activemq:type=Broker,brokerName=localhost");
+            var mBean = JMX.newMBeanProxy(connection, activeMQ, BrokerViewMBean.class);
+            for (var name : mBean.getQueues()) {
+                var queueMBean = JMX.newMBeanProxy(connection, name, QueueViewMBean.class);
+                if (!queueMBean.getName().equals(queueName)) {
+                    continue;
+                }
+                queueMBean.purge();
+            }
+            return true;
+        } catch (Exception ex) {
+            log.error("[Monitor MQ] Error al buidar la cua " + queueName, ex);
+            return false;
         }
     }
 }

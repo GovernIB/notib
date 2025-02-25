@@ -59,6 +59,24 @@ public class MonitorActiveMqController extends BaseController {
 		return DatatablesHelper.getDatatableResponse(request, missatges);
 	}
 
+	@GetMapping(value = "/missatges/{queueName}/{messageId}/delete")
+	@ResponseBody
+	public String missatgesDelete(HttpServletRequest request, @PathVariable String queueName, @PathVariable String messageId) {
+
+		var ok = activeMqService.deleteMessage(queueName, messageId);
+		return ok ? getAjaxControllerReturnValueSuccess(request, "./", "monitor.activemq.missatge.delete.ok")
+				: getAjaxControllerReturnValueError(request, "./", "monitor.activemq.missatge.delete.ko");
+	}
+
+	@GetMapping(value = "/missatges/{queueName}/buidar")
+	@ResponseBody
+	public String buidarCua(HttpServletRequest request, @PathVariable String queueName) {
+
+		var ok = activeMqService.buidarCua(queueName);
+		return ok ? getAjaxControllerReturnValueSuccess(request, "./", "monitor.activemq.missatge.buidar.cua.ok")
+				: getAjaxControllerReturnValueError(request, "./", "monitor.activemq.missatge.buidar.cua.ko");
+	}
+
 	@GetMapping("/queues")
 	public List<String> getQueues() {
 		try {

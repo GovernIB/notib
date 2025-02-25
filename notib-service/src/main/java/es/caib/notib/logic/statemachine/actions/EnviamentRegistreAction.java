@@ -56,7 +56,7 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         var variables = stateContext.getExtendedState().getVariables();
         var reintents = (int) variables.getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
         var codiUsuari = (String) variables.get(SmConstants.CODI_USUARI);
-        var env = EnviamentRegistreRequest.builder().enviamentUuid(enviamentUuid).numIntent(reintents + 1).codiUsuari(codiUsuari).build();//.enviamentRegistreDto(enviamentRegistreMapper.toDto(enviament))
+        var env = EnviamentRegistreRequest.builder().enviamentUuid(enviamentUuid).numIntent(reintents + 1).codiUsuari(codiUsuari).build();
         var retry = (boolean) variables.getOrDefault(SmConstants.RG_RETRY, false);
         var isRetry = EnviamentSmEvent.RG_RETRY.equals(stateContext.getMessage().getPayload()) || retry;
         NotibLogger.getInstance().info("[SM] Enviament registre acction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
