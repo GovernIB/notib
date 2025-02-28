@@ -234,4 +234,8 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	FitxerDto exportacio(Long entitatId) throws IOException;
 
+	@PreAuthorize("isAuthenticated()")
+	boolean entregaCieActiva(EntitatDto entitat, String organCodi);
+
+
 }

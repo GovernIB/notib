@@ -19,6 +19,7 @@ import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.intf.util.MimeUtils;
 import es.caib.notib.logic.intf.util.NifHelper;
@@ -72,8 +73,7 @@ public class NotificacioValidator implements Validator {
     private final CacheHelper cacheHelper;
     private final OrganGestorCachable organGestorCachable;
     private final ConfigHelper configHelper;
-    private final PagadorCieService pagadorCieService;
-    private final OperadorPostalService operadorPostalService;
+    private final OrganGestorService organGestorService;
     private final ConversioTipusHelper conversioTipusHelper;
 
     @Setter
@@ -194,10 +194,8 @@ public class NotificacioValidator implements Validator {
             }
             var cieActiuPerProcComuOrgan = procediment.isComu() && organGestor.getEntregaCie() != null;
             var entitatDto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
-            var pagadorsCie = pagadorCieService.findNoCaducatsByEntitatAndOrgan(entitatDto, organGestor.getCodi(), false);
-            var pagadorsPostal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitatDto, organGestor.getCodi(), false);
-            var cieActiuPerPare = (pagadorsCie == null || !pagadorsCie.isEmpty()) && (pagadorsPostal == null || !pagadorsPostal.isEmpty());
-            if (!procediment.isEntregaCieActivaAlgunNivell() && !cieActiuPerProcComuOrgan && !cieActiuPerPare) {
+            var cieActiuOrgan = organGestorService.entregaCieActiva(entitatDto, organGestor.getCodi());
+            if (!procediment.isEntregaCieActivaAlgunNivell() && !cieActiuPerProcComuOrgan && !cieActiuOrgan) {
                 int i = 0;
                 for (var enviament : notificacio.getEnviaments()) {
                     if (enviament.isEntregaPostalActiva()) {
@@ -565,10 +563,7 @@ public class NotificacioValidator implements Validator {
 
         if (!entregaPostalActiva) {
             var entitatDto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
-            var pagadorsCie = pagadorCieService.findNoCaducatsByEntitatAndOrgan(entitatDto, organGestor.getCodi(), false);
-            var pagadorsPostal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitatDto, organGestor.getCodi(), false);
-            var cieActiuPerPare = (pagadorsCie == null || !pagadorsCie.isEmpty()) && (pagadorsPostal == null || !pagadorsPostal.isEmpty());
-            entregaPostalActiva = entregaPostalActiva || cieActiuPerPare;
+            entregaPostalActiva = organGestorService.entregaCieActiva(entitatDto, organGestor.getCodi());;
         }
 
         boolean entregaDehActiva = entitat != null && entitat.isAmbEntregaDeh();

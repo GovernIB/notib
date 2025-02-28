@@ -31,6 +31,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.logic.service.ws.NotificacioValidator;
@@ -129,9 +130,8 @@ public class NotificacioMassivaServiceTest {
 	@Mock
 	private JmsTemplate jmsTemplate;
 	@Mock
-	private PagadorCieService pagadorCieService;
-	@Mock
-	private OperadorPostalService operadorPostalService;
+	private OrganGestorService organGestorService;
+
 
 	@InjectMocks
 	NotificacioMassivaServiceImpl notificacioMassivaService;

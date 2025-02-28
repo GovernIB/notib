@@ -44,6 +44,7 @@ import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificacioMassivaService;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.logic.objectes.MassivaColumnsEnum;
@@ -165,15 +166,12 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     private OrganGestorCachable organGestorCachable;
     @Autowired
     private NotificacioTableMapper notificacioTableMapper;
-
     @Autowired
     private EnviamentSmService enviamentSmService;
     @Autowired
     protected JmsTemplate jmsTemplate;
     @Autowired
-    private PagadorCieService pagadorCieService;
-    @Autowired
-    private OperadorPostalService operadorPostalService;
+    private OrganGestorService organGestorService;
 
     @Override
     public NotificacioMassivaDataDto findById(Long entitatId, Long id) {
@@ -286,8 +284,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         cacheHelper,
                         organGestorCachable,
                         configHelper,
-                        pagadorCieService,
-                        operadorPostalService,
+                        organGestorService,
                         conversioTipusHelper);
                 notificacioValidator.setMassiva(true);
 

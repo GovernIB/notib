@@ -264,7 +264,13 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 		return getDelegateService().exportacio(entitatId);
 	}
 
-    @Override
+	@Override
+	@RolesAllowed("**")
+	public boolean entregaCieActiva(EntitatDto entitat, String organCodi) {
+		return getDelegateService().entregaCieActiva(entitat, organCodi);
+	}
+
+	@Override
 	@RolesAllowed("**")
 	public OrganGestorDto update(OrganGestorDto dto) {
 		return getDelegateService().update(dto);

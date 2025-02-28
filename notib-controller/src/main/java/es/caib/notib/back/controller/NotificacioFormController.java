@@ -531,10 +531,12 @@ public class NotificacioFormController extends BaseUserController {
         }
         // Mirar si organ seleccionat te entrega postal actvia
         var organ = organGestorService.findByCodi(entitatActual.getId(), organCodi);
-        var pagadorsCie = pagadorCieService.findNoCaducatsByEntitatAndOrgan(entitatActual, organCodi, false);
-        var pagadorsPostal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitatActual, organCodi, false);
-        var cieActiuPerPare = (pagadorsCie == null || !pagadorsCie.isEmpty()) && (pagadorsPostal == null || !pagadorsPostal.isEmpty());
-        dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva() || cieActiuPerPare);
+//        var pagadorsCie = pagadorCieService.findNoCaducatsByEntitatAndOrgan(entitatActual, organCodi, false);
+//        var pagadorsPostal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitatActual, organCodi, false);
+//        var cieActiuPerPare = (pagadorsCie == null || !pagadorsCie.isEmpty()) && (pagadorsPostal == null || !pagadorsPostal.isEmpty());
+        var cieActiuPerPare = organGestorService.entregaCieActiva(entitatActual, organCodi);
+//        dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva() || cieActiuPerPare);
+        dadesProcediment.setEntregaCieActiva(cieActiuPerPare);
         return dadesProcediment;
     }
 

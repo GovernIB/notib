@@ -49,6 +49,7 @@ import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioServiceWs;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
@@ -184,9 +185,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
-	private PagadorCieService pagadorCieService;
-	@Autowired
-	private OperadorPostalService operadorPostalService;
+	private OrganGestorService organGestorService;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -310,8 +309,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 					cacheHelper,
 					organGestorCachable,
 					configHelper,
-					pagadorCieService,
-					operadorPostalService,
+					organGestorService,
 					conversioTipusHelper);
 			notificacioValidator.setWarns(new BindException(notificacio, "notificacio"));
 			notificacioValidator.setNotificacio(notificacio);
