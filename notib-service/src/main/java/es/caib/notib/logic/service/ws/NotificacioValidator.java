@@ -6,8 +6,10 @@ import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.intf.dto.DocumentValidDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.logic.intf.dto.notificacio.EntregaPostal;
@@ -16,6 +18,8 @@ import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.logic.intf.service.OperadorPostalService;
+import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.intf.util.MimeUtils;
 import es.caib.notib.logic.intf.util.NifHelper;
 import es.caib.notib.logic.intf.util.PdfUtils;
@@ -68,6 +72,9 @@ public class NotificacioValidator implements Validator {
     private final CacheHelper cacheHelper;
     private final OrganGestorCachable organGestorCachable;
     private final ConfigHelper configHelper;
+    private final PagadorCieService pagadorCieService;
+    private final OperadorPostalService operadorPostalService;
+    private final ConversioTipusHelper conversioTipusHelper;
 
     @Setter
     private Notificacio notificacio;
@@ -186,7 +193,11 @@ public class NotificacioValidator implements Validator {
                 errors.reject(error(SERVEI_EN_NOTIFICACIO, locale));
             }
             var cieActiuPerProcComuOrgan = procediment.isComu() && organGestor.getEntregaCie() != null;
-            if (!procediment.isEntregaCieActivaAlgunNivell() && !cieActiuPerProcComuOrgan) {
+            var entitatDto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
+            var pagadorsCie = pagadorCieService.findNoCaducatsByEntitatAndOrgan(entitatDto, organGestor.getCodi(), false);
+            var pagadorsPostal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitatDto, organGestor.getCodi(), false);
+            var cieActiuPerPare = (pagadorsCie == null || !pagadorsCie.isEmpty()) && (pagadorsPostal == null || !pagadorsPostal.isEmpty());
+            if (!procediment.isEntregaCieActivaAlgunNivell() && !cieActiuPerProcComuOrgan && !cieActiuPerPare) {
                 int i = 0;
                 for (var enviament : notificacio.getEnviaments()) {
                     if (enviament.isEntregaPostalActiva()) {
@@ -547,9 +558,19 @@ public class NotificacioValidator implements Validator {
             errors.reject(error(ENVIAMENTS_NULL, locale));
             return;
         }
+
         boolean entregaPostalActiva = entitat != null && entitat.getEntregaCie() != null
                 || organGestor != null && organGestor.getEntregaCie() != null
                 || procediment != null && procediment.getEntregaCie() != null;
+
+        if (!entregaPostalActiva) {
+            var entitatDto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
+            var pagadorsCie = pagadorCieService.findNoCaducatsByEntitatAndOrgan(entitatDto, organGestor.getCodi(), false);
+            var pagadorsPostal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitatDto, organGestor.getCodi(), false);
+            var cieActiuPerPare = (pagadorsCie == null || !pagadorsCie.isEmpty()) && (pagadorsPostal == null || !pagadorsPostal.isEmpty());
+            entregaPostalActiva = entregaPostalActiva || cieActiuPerPare;
+        }
+
         boolean entregaDehActiva = entitat != null && entitat.isAmbEntregaDeh();
         var enviamentTipus = notificacio.getEnviamentTipus();
         cieActiu = false;

@@ -18,6 +18,7 @@ import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.CaducitatHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.DocumentHelper;
 import es.caib.notib.logic.helper.EnviamentTableHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -47,6 +48,8 @@ import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioServiceWs;
+import es.caib.notib.logic.intf.service.OperadorPostalService;
+import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.persist.entity.DocumentEntity;
@@ -176,9 +179,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private OrganGestorCachable organGestorCachable;
 	@Autowired
 	private ConfigHelper configHelper;
-
 	@Autowired
 	private EnviamentSmService enviamentSmService;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
+	@Autowired
+	private PagadorCieService pagadorCieService;
+	@Autowired
+	private OperadorPostalService operadorPostalService;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -301,7 +309,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 					messageHelper,
 					cacheHelper,
 					organGestorCachable,
-					configHelper);
+					configHelper,
+					pagadorCieService,
+					operadorPostalService,
+					conversioTipusHelper);
 			notificacioValidator.setWarns(new BindException(notificacio, "notificacio"));
 			notificacioValidator.setNotificacio(notificacio);
 			notificacioValidator.setEntitat(entitat);
