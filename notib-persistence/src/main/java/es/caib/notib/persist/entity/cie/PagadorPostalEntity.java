@@ -50,6 +50,10 @@ public class PagadorPostalEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "not_pagpostal_organ_fk")
 	protected OrganGestorEntity organGestor;
 
+	public boolean isCaducat() {
+		return new Date().getTime() > contracteDataVig.getTime();
+	}
+
 	private static final long serialVersionUID = 4863376704844981591L;
 
 

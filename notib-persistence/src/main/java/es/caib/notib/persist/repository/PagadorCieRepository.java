@@ -20,7 +20,7 @@ import java.util.List;
  */
 public interface PagadorCieRepository extends JpaRepository<PagadorCieEntity, Long> {
 
-	PagadorCieEntity findByEntitatAndOrganGestor(EntitatEntity entitat, OrganGestorEntity organGestor);
+	List<PagadorCieEntity> findByEntitatAndOrganGestor(EntitatEntity entitat, OrganGestorEntity organGestor);
 
 	List<PagadorCieEntity> findByContracteDataVigGreaterThanEqual(Date llindar);
 

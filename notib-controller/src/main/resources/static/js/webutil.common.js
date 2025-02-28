@@ -741,6 +741,7 @@ function loadOrgans($selector, organsGestors, missatgeObsolets){
 
 function loadPagadorPostal($selector, pagadors, missatgeObsolets){
 
+	console.log(pagadors);
 	let formatState = organ => !organ.icona ? organ.text
 		: $("<span title='" + missatgeObsolets + "'>" + organ.text + " <span class='fa fa-warning text-danger'></span></span>");
 	$selector.empty();

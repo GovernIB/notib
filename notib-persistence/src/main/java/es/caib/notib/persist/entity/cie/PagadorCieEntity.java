@@ -60,6 +60,11 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "not_emisorcie_organ_fk")
 	protected OrganGestorEntity organEmisor;
 
+	public boolean isCaducat() {
+		return new Date().getTime() > contracteDataVig.getTime();
+	}
+
+
 
 	private static final long serialVersionUID = 8596990469127710436L;
 

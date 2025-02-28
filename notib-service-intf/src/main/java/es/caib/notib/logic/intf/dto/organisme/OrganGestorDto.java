@@ -52,6 +52,7 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 
 	private String nomCodi;
 
+	private boolean entregaCieDesactivada;
 	private boolean entregaCieActiva;
 	private Long operadorPostalId;
 	private Long cieId;

@@ -105,6 +105,9 @@ public class OrganGestorEntity extends AbstractPersistable<Long> implements Seri
 	@Column(name = "no_vigent")
 	private Boolean noVigent;
 
+	@Column(name = "entrega_cie_desactivada")
+	private Boolean entregaCieDesactivada;
+
 //	public void update(
 //			String codi,
 //			String nom,

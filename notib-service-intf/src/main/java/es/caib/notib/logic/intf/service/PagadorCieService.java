@@ -58,19 +58,13 @@ public interface PagadorCieService {
 	/**
 	 * Consulta de pagadors cie segons els paràmetres del filtre.
 	 * 
-	 * @param entitatId
-	 * 				Informació de l'entitat actual.
-	 * @param filtre
-	 *            	Paràmetres per a filtrar els resultats.
-	 * @param paginacioParams
-	 *            	Paràmetres per a dur a terme la paginació del resultats.
+	 * @param entitatId Informació de l'entitat actual.
+	 * @param filtre Paràmetres per a filtrar els resultats.
+	 * @param paginacioParams Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb els pagadors cie.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	PaginaDto<CieTableItemDto> findAmbFiltrePaginat(
-			Long entitatId,
-			CieFiltreDto filtre,
-			PaginacioParamsDto paginacioParams);
+	PaginaDto<CieTableItemDto> findAmbFiltrePaginat(Long entitatId, CieFiltreDto filtre, PaginacioParamsDto paginacioParams);
 	
 	/**
 	 * Llistat amb tots els pagadors cie.
@@ -87,7 +81,13 @@ public interface PagadorCieService {
 	List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat);
 
 	@PreAuthorize("isAuthenticated()")
+	List<IdentificadorTextDto> findByEntitat(EntitatDto entitat);
+
+	@PreAuthorize("isAuthenticated()")
     List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat);
+
+	@PreAuthorize("isAuthenticated()")
+	List<IdentificadorTextDto> findByEntitatAndOrgan(EntitatDto entitat, String organCodi, boolean isAdminOrgan);
 
     List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitat, String organCodi, boolean isAdminOrgan);
 

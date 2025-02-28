@@ -350,6 +350,7 @@ public class ConversioTipusHelper {
 					@Override
 					public void mapAtoB(PagadorPostalEntity a, IdentificadorTextDto b, MappingContext context) {
 						b.setText(a.getNom() + " - " + a.getContracteNum());
+						b.setIcona(a.isCaducat() ? "caducat" : null);
 					}
 				}).byDefault().register();
 
@@ -358,7 +359,9 @@ public class ConversioTipusHelper {
 					@Override
 					public void mapAtoB(PagadorCieEntity a, IdentificadorTextDto b, MappingContext context) {
 						// add your custom mapping code here
-						b.setText(a.getNom() + " (Fins el " + a.getContracteDataVig() + ")");
+//						b.setText(a.getNom() + " (Fins el " + a.getContracteDataVig() + ")");
+						b.setText(a.getNom());
+						b.setIcona(a.isCaducat() ? "caducat" : null);
 					}
 				}).byDefault().register();
 

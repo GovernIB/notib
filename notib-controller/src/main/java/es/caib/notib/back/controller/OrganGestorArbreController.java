@@ -136,7 +136,7 @@ public class OrganGestorArbreController extends BaseUserController {
             var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
             var operadorPostalList = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, codi, isAdminOrgan);
             model.addAttribute("operadorPostalList", operadorPostalList);
-            var cieList = pagadorCieService.findNoCaducatsByEntitatAndOrgan(entitat, codi, isAdminOrgan);
+            var cieList = pagadorCieService.findByEntitatAndOrgan(entitat, codi, isAdminOrgan);
             model.addAttribute("cieList", cieList);
             var o = organGestorService.findByCodi(entitat.getId(), codi);
             var usr = SecurityContextHolder.getContext().getAuthentication().getName();

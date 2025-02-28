@@ -259,6 +259,7 @@ $(document).ready(function() {
 				</div>
 			</c:if>
 			<not:inputCheckbox name="permetreSir" generalClass="row" textKey="organgestor.form.camp.permetre.sir" labelSize="2"/>
+			<not:inputCheckbox name="entregaCieDesactivada" generalClass="row" textKey="organgestor.form.camp.entregacie.desactivada" labelSize="2"/>
 			<c:choose>
 				<c:when test="${not empty operadorPostalList && not empty cieList}">
 					<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" labelSize="2"/>

@@ -90,12 +90,12 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				}
 			}
 
+			var organCodi = notificacio.getOrganGestor();
+			var organ = organService.findByCodi(null, organCodi);
 			if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {
-				var organ = notificacio.getOrganGestor();
-				var o = organService.findByCodi(null, organ);
-				if (o != null) {
-					var entitat = entitatService.findById(o.getEntitatId());
-					valid = entitat.isOficinaEntitat() || o.getOficina() != null && !Strings.isNullOrEmpty(o.getOficina().getCodi());
+				if (organ != null) {
+					var entitat = entitatService.findById(organ.getEntitatId());
+					valid = entitat.isOficinaEntitat() || organ.getOficina() != null && !Strings.isNullOrEmpty(organ.getOficina().getCodi());
 					if (!valid) {
 						var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.sense.oficina", null, locale);
 						context.buildConstraintViolationWithTemplate(msg).addNode("organGestor").addConstraintViolation();
@@ -261,6 +261,11 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				for (var enviament : notificacio.getEnviaments()) {
 
 					cieActiu = cieActiu || enviament.getEntregaPostal().isActiva();
+
+					if (cieActiu && organ.isEntregaCieDesactivada()) {
+						var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.entregapostal.desactivada", null, locale);
+						context.buildConstraintViolationWithTemplate(msg).addNode("enviaments["+envCount+"].entregaPostal.activa").addConstraintViolation();
+					}
 
 					// Incapacitat -> Destinataris no null
 					if (enviament.getTitular() != null && enviament.getTitular().isIncapacitat() && (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty())) {

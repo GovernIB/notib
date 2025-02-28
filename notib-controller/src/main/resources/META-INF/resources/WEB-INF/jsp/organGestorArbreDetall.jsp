@@ -89,6 +89,18 @@
 
     <script type="text/javascript">
 
+        let operadorsPostal = [];
+        operadorsPostal.push({id:"", text:"", estat:"V"});
+        <c:forEach items="${operadorPostalList}" var="operadorsPostal">
+        operadorsPostal.push({id:"${operadorsPostal.id}", text:"${operadorsPostal.text}", icona:"${operadorsPostal.icona}"});
+        </c:forEach>
+
+        let operadorsCie = [];
+        operadorsCie.push({id:"", text:"", estat:"V"});
+        <c:forEach items="${cieList}" var="operadorsCie">
+        operadorsCie.push({id:"${operadorsCie.id}", text:"${operadorsCie.text}", icona:"${operadorsCie.icona}"});
+        </c:forEach>
+
         function isAdminOrgan() {
             return ${isRolActualAdministradorOrgan};
         }
@@ -106,6 +118,10 @@
         });
 
         $(document).ready(function() {
+
+            loadPagadorPostal($("#operadorPostalId"), operadorsPostal, "<spring:message code='operador.postal.obsolet'/>");
+            loadPagadorPostal($("#cieId"), operadorsCie, "<spring:message code='operador.postal.obsolet'/>");
+
 
             if (!${id} || ${id} === 0) {
                 $("#permisosPanel").hide();
@@ -205,6 +221,7 @@
                                  textKey="organgestor.form.camp.oficina" placeholderKey="organgestor.form.camp.oficina" optionMinimumResultsForSearch="0"/>
             </c:if>
             <not:inputCheckbox name="permetreSir" generalClass="row" textKey="organgestor.form.camp.permetre.sir"/>
+            <not:inputCheckbox name="entregaCieDesactivada" generalClass="row" textKey="organgestor.form.camp.entregacie.desactivada"/>
             <c:choose>
                 <c:when test="${not empty operadorPostalList && not empty cieList}">
                     <not:inputCheckbox name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
@@ -214,12 +231,21 @@
 <%--                    <spring:message code="organgestor.form.camp.entregacie.no.configurada"></spring:message>--%>
                 </c:otherwise>
             </c:choose>
+
             <c:if test="${not empty operadorPostalList && not empty cieList}">
                 <div id="entrega-cie-form" class="flex-column">
-                    <not:inputSelect generalClass="row" name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"
+<%--                    <not:inputSelect generalClass="row" name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"--%>
+<%--                                     optionTextAttribute="text" required="true" emptyOption="true"--%>
+<%--                                     textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>--%>
+<%--                    <not:inputSelect generalClass="row" name="cieId" optionItems="${cieList}" optionValueAttribute="id"--%>
+<%--                                     optionTextAttribute="text" required="true" emptyOption="true"--%>
+<%--                                     textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>--%>
+
+
+                    <not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id" labelSize="2"
                                      optionTextAttribute="text" required="true" emptyOption="true"
                                      textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
-                    <not:inputSelect generalClass="row" name="cieId" optionItems="${cieList}" optionValueAttribute="id"
+                    <not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id" labelSize="2"
                                      optionTextAttribute="text" required="true" emptyOption="true"
                                      textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>
 

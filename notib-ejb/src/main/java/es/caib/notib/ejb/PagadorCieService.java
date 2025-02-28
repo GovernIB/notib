@@ -73,9 +73,20 @@ public class PagadorCieService extends AbstractService<es.caib.notib.logic.intf.
 	}
 
 	@Override
+	public List<IdentificadorTextDto> findByEntitat(EntitatDto entitat) {
+		return getDelegateService().findByEntitat(entitat);
+	}
+
+	@Override
 	@RolesAllowed("**")
 	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
 		return getDelegateService().findNoCaducatsByEntitat(entitat);
+	}
+
+	@Override
+	@RolesAllowed("**")
+	public List<IdentificadorTextDto> findByEntitatAndOrgan(EntitatDto entitat, String organCodi, boolean isAdminOrgan) {
+		return getDelegateService().findByEntitatAndOrgan(entitat, organCodi, isAdminOrgan);
 	}
 
 	@Override

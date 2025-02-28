@@ -617,6 +617,9 @@ public class NotificacioValidator implements Validator {
         }
         // Entrega postal
         if (enviament.isEntregaPostalActiva()) {
+            if (organGestor.getEntregaCieDesactivada().booleanValue()) {
+                errors.rejectValue(envName, error(ENVIAMENT_POSTAL_DESACTIVAR_PER_ORGAN, l, prefix));
+            }
             if (!entregaPostalActiva) {
                 errors.rejectValue(envName, error(ENVIAMENT_POSTAL_INACTIU, l, prefix));
             } else {
