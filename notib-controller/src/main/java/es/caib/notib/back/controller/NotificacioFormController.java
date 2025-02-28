@@ -51,6 +51,7 @@ import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.GestioDocumentalService;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.service.NotificacioService;
+import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PagadorCieFormatFullaService;
 import es.caib.notib.logic.intf.service.PagadorCieFormatSobreService;
@@ -128,6 +129,10 @@ public class NotificacioFormController extends BaseUserController {
     private GestioDocumentalService gestioDocumentalService;
     @Autowired
     private PermisosService permisosService;
+    @Autowired
+    private PagadorCieService pagadorCieService;
+    @Autowired
+    private OperadorPostalService operadorPostalService;
 
 
     DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -141,8 +146,7 @@ public class NotificacioFormController extends BaseUserController {
     private static final String ENVIAMENT_TIPUS = "enviament_tipus";
     private static final String NOM_DOCUMENT = "nomDocument_";
     private static final String FALSE = "false";
-    @Autowired
-    private PagadorCieService pagadorCieService;
+
 
 
     @GetMapping(value = "/new/notificacio")
@@ -528,7 +532,12 @@ public class NotificacioFormController extends BaseUserController {
         }
         // Mirar si organ seleccionat te entrega postal actvia
         var organ = organGestorService.findByCodi(entitatActual.getId(), organCodi);
-        dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva());
+//        var pagadorsCie = pagadorCieService.findNoCaducatsByEntitatAndOrgan(entitatActual, organCodi, false);
+//        var pagadorsPostal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitatActual, organCodi, false);
+//        var cieActiuPerPare = (pagadorsCie == null || !pagadorsCie.isEmpty()) && (pagadorsPostal == null || !pagadorsPostal.isEmpty());
+        var cieActiuPerPare = organGestorService.entregaCieActiva(entitatActual, organCodi);
+//        dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva() || cieActiuPerPare);
+        dadesProcediment.setEntregaCieActiva(cieActiuPerPare);
         return dadesProcediment;
     }
 

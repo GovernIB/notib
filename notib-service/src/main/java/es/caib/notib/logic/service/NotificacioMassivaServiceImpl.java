@@ -43,6 +43,9 @@ import es.caib.notib.logic.intf.exception.WriteCsvException;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificacioMassivaService;
+import es.caib.notib.logic.intf.service.OperadorPostalService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
+import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.logic.objectes.MassivaColumnsEnum;
 import es.caib.notib.logic.objectes.MassivaFile;
@@ -163,11 +166,12 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     private OrganGestorCachable organGestorCachable;
     @Autowired
     private NotificacioTableMapper notificacioTableMapper;
-
     @Autowired
     private EnviamentSmService enviamentSmService;
     @Autowired
     protected JmsTemplate jmsTemplate;
+    @Autowired
+    private OrganGestorService organGestorService;
 
     @Override
     public NotificacioMassivaDataDto findById(Long entitatId, Long id) {
@@ -279,7 +283,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         messageHelper,
                         cacheHelper,
                         organGestorCachable,
-                        configHelper);
+                        configHelper,
+                        organGestorService,
+                        conversioTipusHelper);
                 notificacioValidator.setMassiva(true);
 
                 var procediment = !Strings.isNullOrEmpty(notificacio.getProcedimentCodi()) ? procSerRepository.findByCodiAndEntitat(notificacio.getProcedimentCodi(), entitat) : null;

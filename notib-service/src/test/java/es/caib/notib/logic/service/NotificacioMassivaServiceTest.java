@@ -30,6 +30,9 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
+import es.caib.notib.logic.intf.service.OperadorPostalService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
+import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.logic.service.ws.NotificacioValidator;
 import es.caib.notib.logic.test.NotificacioMassivaTests;
@@ -126,6 +129,9 @@ public class NotificacioMassivaServiceTest {
 	private ConfigHelper configHelper;
 	@Mock
 	private JmsTemplate jmsTemplate;
+	@Mock
+	private OrganGestorService organGestorService;
+
 
 	@InjectMocks
 	NotificacioMassivaServiceImpl notificacioMassivaService;

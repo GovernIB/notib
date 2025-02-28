@@ -22,6 +22,7 @@ import es.caib.notib.logic.intf.dto.ArbreNode;
 import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
+import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -50,6 +51,7 @@ import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OficinaEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
+import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.EntregaCieRepository;
 import es.caib.notib.persist.repository.GrupRepository;
@@ -83,6 +85,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1696,4 +1699,35 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean entregaCieActiva(EntitatDto entitat, String organCodi)  {
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			log.debug("Consulta de tots els pagadors postals");
+			var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+			var o = organGestorRepository.findByCodi(organCodi);
+			if (o.getEntregaCie() != null) {
+				return true;
+			}
+			if (!e.getDir3Codi().equals(organCodi)) {
+				return findOperadorsPare(entitat, o.getCodiPare());
+			}
+			return false;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	private boolean findOperadorsPare(EntitatDto entitat, String codi) {
+
+		var o = organGestorRepository.findByCodi(codi);
+		if (o.getEntregaCie() != null) {
+			return true;
+		}
+		return !"A99999999".equals(o.getCodiPare()) && findOperadorsPare(entitat, o.getCodiPare());
+	}
+
 }
