@@ -2,6 +2,7 @@ package es.caib.notib.persist.repository;
 
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
+import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,9 +38,13 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 	List<PagadorPostalEntity> findByEntitatAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, Date llindar);
 
 	List<PagadorPostalEntity> findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, OrganGestorEntity organ, Date llindar);
+
 	List<PagadorPostalEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsFills);
+
 	List<PagadorPostalEntity> findByOrganGestorId(Long organGestorId);
-	
+
+	List<PagadorPostalEntity> findByEntitatAndOrganGestor(EntitatEntity entitat, OrganGestorEntity organGestor);
+
 	@Query(	"from " +
 			"    PagadorPostalEntity b " +
 			"where " +

@@ -240,6 +240,46 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 			var o = organGestorRepository.findByCodi(organCodi);
 			var pagadors = pagadorPostalReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
 			if (!e.getDir3Codi().equals(organCodi)) {
+				var pagadorsPare = findOperadorsPareNoCaducats(entitat, o.getCodiPare());
+				pagadors.addAll(pagadorsPare);
+			}
+			var usr = SecurityContextHolder.getContext().getAuthentication().getName();
+			List<PagadorPostalEntity> p = new ArrayList<>();
+			for (var pagador : pagadors) {
+				if (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, pagador.getOrganGestor().getCodi(), PermisEnum.ADMIN)) {
+					continue;
+				}
+				p.add(pagador);
+			}
+			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	private List<PagadorPostalEntity> findOperadorsPareNoCaducats(EntitatDto entitat, String codi) {
+
+		List<PagadorPostalEntity> operadors = new ArrayList<>();
+		var o = organGestorRepository.findByCodi(codi);
+		var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		var p = pagadorPostalReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
+		if (!Strings.isNullOrEmpty(o.getCodiPare()) && !o.getCodi().equals(entitat.getDir3Codi()) && !"A99999999".equals(o.getCodiPare())) {
+			operadors = findOperadorsPareNoCaducats(entitat, o.getCodiPare());
+		}
+		p.addAll(operadors);
+		return p;
+	}
+
+	@Override
+	public List<IdentificadorTextDto> findByEntitatAndOrgan(EntitatDto entitat, String organCodi, boolean isAdminOrgan) {
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			log.debug("Consulta de tots els pagadors postals");
+			var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+			var o = organGestorRepository.findByCodi(organCodi);
+			var pagadors = pagadorPostalReposity.findByEntitatAndOrganGestor(e, o);
+			if (!e.getDir3Codi().equals(organCodi)) {
 				var pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
 				pagadors.addAll(pagadorsPare);
 			}
@@ -262,7 +302,7 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 		List<PagadorPostalEntity> operadors = new ArrayList<>();
 		var o = organGestorRepository.findByCodi(codi);
 		var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-		var p = pagadorPostalReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
+		var p = pagadorPostalReposity.findByEntitatAndOrganGestor(e, o);
 		if (!Strings.isNullOrEmpty(o.getCodiPare()) && !o.getCodi().equals(entitat.getDir3Codi()) && !"A99999999".equals(o.getCodiPare())) {
 			operadors = findOperadorsPare(entitat, o.getCodiPare());
 		}

@@ -297,7 +297,7 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 		List<PagadorCieEntity> operadors = new ArrayList<>();
 		var o = organGestorRepository.findByCodi(codi);
 		var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-		var p = pagadorCieReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
+		var p = pagadorCieReposity.findByEntitatAndOrganGestor(e, o);
 		if (!Strings.isNullOrEmpty(o.getCodiPare()) && !o.getCodi().equals(entitat.getDir3Codi()) && !"A99999999".equals(o.getCodiPare())) {
 			operadors = findOperadorsPare(entitat, o.getCodiPare());
 		}

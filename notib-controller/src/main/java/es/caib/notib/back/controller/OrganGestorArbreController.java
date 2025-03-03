@@ -134,11 +134,12 @@ public class OrganGestorArbreController extends BaseUserController {
             model.addAttribute("desactivarAvisos", true);
             var entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
             var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
-            var operadorPostalList = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, codi, isAdminOrgan);
+            var operadorPostalList = operadorPostalService.findByEntitatAndOrgan(entitat, codi, isAdminOrgan);
             model.addAttribute("operadorPostalList", operadorPostalList);
             var cieList = pagadorCieService.findByEntitatAndOrgan(entitat, codi, isAdminOrgan);
             model.addAttribute("cieList", cieList);
             var o = organGestorService.findByCodi(entitat.getId(), codi);
+            model.addAttribute("entregaCieHeredada", organGestorService.entregaCieActiva(entitat, codi));
             var usr = SecurityContextHolder.getContext().getAuthentication().getName();
             if (o == null || (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, codi, PermisEnum.ADMIN))) {
                 throw new NotFoundException(codi, OrganGestorDto.class);

@@ -7,6 +7,7 @@
 <%
     es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
     pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(ssc.getRolActual()));
+    pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()), PageContext.REQUEST_SCOPE);
 %>
     <title>
         <c:choose>
@@ -122,7 +123,6 @@
             loadPagadorPostal($("#operadorPostalId"), operadorsPostal, "<spring:message code='operador.postal.obsolet'/>");
             loadPagadorPostal($("#cieId"), operadorsCie, "<spring:message code='operador.postal.obsolet'/>");
 
-
             if (!${id} || ${id} === 0) {
                 $("#permisosPanel").hide();
                 $("#esborrar").hide();
@@ -221,18 +221,19 @@
                                  textKey="organgestor.form.camp.oficina" placeholderKey="organgestor.form.camp.oficina" optionMinimumResultsForSearch="0"/>
             </c:if>
             <not:inputCheckbox name="permetreSir" generalClass="row" textKey="organgestor.form.camp.permetre.sir"/>
-            <not:inputCheckbox name="entregaCieDesactivada" generalClass="row" textKey="organgestor.form.camp.entregacie.desactivada"/>
-            <c:choose>
-                <c:when test="${not empty operadorPostalList && not empty cieList}">
-                    <not:inputCheckbox name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
-                </c:when>
-                <c:otherwise>
-                    <not:inputCheckbox disabled="true" info="true" messageInfo="organgestor.form.camp.entregacie.no.configurada" name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
-<%--                    <spring:message code="organgestor.form.camp.entregacie.no.configurada"></spring:message>--%>
-                </c:otherwise>
-            </c:choose>
-
-            <c:if test="${not empty operadorPostalList && not empty cieList}">
+            <c:if test="${isRolActualAdministradorEntitat}">
+                <not:inputCheckbox name="entregaCieDesactivada" generalClass="row" textKey="organgestor.form.camp.entregacie.desactivada"/>
+                <c:choose>
+                    <c:when test="${not empty operadorPostalList && not empty cieList}">
+                        <not:inputCheckbox name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie" info="${entregaCieHeredada}" messageInfo="organgestor.form.camp.entregacie.heredada"/>
+                    </c:when>
+                    <c:otherwise>
+                        <not:inputCheckbox disabled="true" info="true" messageInfo="organgestor.form.camp.entregacie.no.configurada" name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
+    <%--                    <spring:message code="organgestor.form.camp.entregacie.no.configurada"></spring:message>--%>
+                    </c:otherwise>
+                </c:choose>
+            </c:if>
+            <c:if test="${isRolActualAdministradorEntitat and not empty operadorPostalList && not empty cieList}">
                 <div id="entrega-cie-form" class="flex-column">
 <%--                    <not:inputSelect generalClass="row" name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"--%>
 <%--                                     optionTextAttribute="text" required="true" emptyOption="true"--%>
@@ -242,12 +243,19 @@
 <%--                                     textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>--%>
 
 
-                    <not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id" labelSize="2"
+<%--                    <not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id" labelSize="2"--%>
+<%--                                     optionTextAttribute="text" required="true" emptyOption="true"--%>
+<%--                                     textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>--%>
+<%--                    <not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id" labelSize="2"--%>
+<%--                                     optionTextAttribute="text" required="true" emptyOption="true"--%>
+<%--                                     textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>--%>
+
+                    <not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"
                                      optionTextAttribute="text" required="true" emptyOption="true"
-                                     textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
-                    <not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id" labelSize="2"
+                                     textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal"/>
+                    <not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id"
                                      optionTextAttribute="text" required="true" emptyOption="true"
-                                     textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>
+                                     textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie"/>
 
 <%--                    <not:inputCheckbox name="sobrescriureOrganEmisor" generalClass="row" textKey="organgestor.form.camp.sobrescriure.cie.organ.emisor"/>--%>
 <%--                    <not:inputSelect name="cieOrganEmissor" required="true" textKey="operadorpostal.form.camp.organismeEmisor" inline="false" emptyOption="true" optionMinimumResultsForSearch="0"/>--%>

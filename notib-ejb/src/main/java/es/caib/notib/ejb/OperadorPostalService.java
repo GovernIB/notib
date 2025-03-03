@@ -85,6 +85,12 @@ public class OperadorPostalService extends AbstractService<es.caib.notib.logic.i
 
 	@Override
 	@RolesAllowed("**")
+	public List<IdentificadorTextDto> findByEntitatAndOrgan(EntitatDto entitatId, String organCodi, boolean isAdminOrgan) {
+		return getDelegateService().findByEntitatAndOrgan(entitatId, organCodi, isAdminOrgan);
+	}
+
+	@Override
+	@RolesAllowed("**")
 	public PaginaDto<OperadorPostalDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findAllPaginat(paginacioParams);
 	}

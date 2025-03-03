@@ -201,7 +201,7 @@ public class ProcedimentController extends BaseUserController {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
 		var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
-		var postal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
+		var postal = operadorPostalService.findByEntitatAndOrgan(entitat, organ, isAdminOrgan);
 		var cie = pagadorCieService.findByEntitatAndOrgan(entitat, organ, isAdminOrgan);
 		return Operadors.builder().operadorsPostal(postal).operadorsCie(cie).build();
 	}

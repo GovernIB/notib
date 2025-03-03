@@ -91,6 +91,9 @@ public interface OperadorPostalService {
 	@PreAuthorize("isAuthenticated()")
 	List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitatId, String organCodi, boolean isAdminOrgan);
 
+	@PreAuthorize("isAuthenticated()")
+	List<IdentificadorTextDto> findByEntitatAndOrgan(EntitatDto entitatId, String organCodi, boolean isAdminOrgan);
+
 	/**
 	 * Llistat amb els pagadors postal d'una entitat.
 	 * 

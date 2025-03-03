@@ -53,7 +53,25 @@ body {
 }
 </style>
 <script type="text/javascript">
-$(document).ready(function() {
+
+
+	let operadorsPostal = [];
+	operadorsPostal.push({id:"", text:"", estat:"V"});
+	<c:forEach items="${operadorPostalList}" var="operadorsPostal">
+	operadorsPostal.push({id:"${operadorsPostal.id}", text:"${operadorsPostal.text}", icona:"${operadorsPostal.icona}"});
+	</c:forEach>
+
+	let operadorsCie = [];
+	operadorsCie.push({id:"", text:"", estat:"V"});
+	<c:forEach items="${cieList}" var="operadorsCie">
+	operadorsCie.push({id:"${operadorsCie.id}", text:"${operadorsCie.text}", icona:"${operadorsCie.icona}"});
+	</c:forEach>
+
+
+	$(document).ready(function() {
+
+	loadPagadorPostal($("#operadorPostalId"), operadorsPostal, "<spring:message code='operador.postal.obsolet'/>");
+	loadPagadorPostal($("#cieId"), operadorsCie, "<spring:message code='operador.postal.obsolet'/>");
 	//Organismes
 	var entitatId = $('#entitatId').val();
 	var select2 = $('select');
@@ -259,23 +277,25 @@ $(document).ready(function() {
 				</div>
 			</c:if>
 			<not:inputCheckbox name="permetreSir" generalClass="row" textKey="organgestor.form.camp.permetre.sir" labelSize="2"/>
-			<not:inputCheckbox name="entregaCieDesactivada" generalClass="row" textKey="organgestor.form.camp.entregacie.desactivada" labelSize="2"/>
-			<c:choose>
-				<c:when test="${not empty operadorPostalList && not empty cieList}">
-					<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" labelSize="2"/>
-					<div id="entrega-cie-form">
-						<not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id" labelSize="2"
-										 optionTextAttribute="text" required="true" emptyOption="true"
-										 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
-						<not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id" labelSize="2"
-										 optionTextAttribute="text" required="true" emptyOption="true"
-										 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>
-					</div>
-				</c:when>
-				<c:otherwise>
-					<not:inputCheckbox disabled="true" info="true" messageInfo="organgestor.form.camp.entregacie.no.configurada" name="entregaCieActiva" labelSize="2" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
-				</c:otherwise>
-			</c:choose>
+			<c:if test="${isRolActualAdministradorEntitat}">
+				<not:inputCheckbox name="entregaCieDesactivada" generalClass="row" textKey="organgestor.form.camp.entregacie.desactivada" labelSize="2"/>
+				<c:choose>
+					<c:when test="${not empty operadorPostalList && not empty cieList}">
+						<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" labelSize="2" info="${entregaCieHeredada}" messageInfo="organgestor.form.camp.entregacie.heredada"/>
+						<div id="entrega-cie-form">
+							<not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id" labelSize="2"
+											 optionTextAttribute="text" required="true" emptyOption="true"
+											 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
+							<not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id" labelSize="2"
+											 optionTextAttribute="text" required="true" emptyOption="true"
+											 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>
+						</div>
+					</c:when>
+					<c:otherwise>
+						<not:inputCheckbox disabled="true" info="true" messageInfo="organgestor.form.camp.entregacie.no.configurada" name="entregaCieActiva" labelSize="2" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
+					</c:otherwise>
+				</c:choose>
+			</c:if>
 			<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
 				<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
 					<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>

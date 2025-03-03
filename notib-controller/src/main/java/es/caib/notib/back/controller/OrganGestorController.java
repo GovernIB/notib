@@ -7,6 +7,7 @@ import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
+import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
@@ -171,9 +172,10 @@ public class OrganGestorController extends BaseUserController{
 			model.addAttribute(SET_LLIBRE, !entitat.isLlibreEntitat());
 			model.addAttribute(SET_OFICINA, !entitat.isOficinaEntitat());
 			model.addAttribute("isModificacio", true);
-			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
+			var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
+			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findByEntitatAndOrgan(entitat, organGestorDto.getCodi(), isAdminOrgan);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			var cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
+			var cieList = pagadorCieService.findByEntitatAndOrgan(entitat, organGestorDto.getCodi(), isAdminOrgan);
 			model.addAttribute("cieList", cieList);
 			return "organGestorForm";
 		} catch (Exception e) {
