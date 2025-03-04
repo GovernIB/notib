@@ -43,7 +43,7 @@ public class OrganGestorCommand {
 	private boolean entregaCieActiva;
 	private Long operadorPostalId;
 	private Long cieId;
-	private boolean sobrescriureOrganEmisor;
+	private boolean sobrescriureCieOrganEmisor;
 	private String cieOrganEmissor;
 	private boolean permetreSir;
 

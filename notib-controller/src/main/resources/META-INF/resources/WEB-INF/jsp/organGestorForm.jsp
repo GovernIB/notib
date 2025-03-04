@@ -289,6 +289,8 @@ body {
 							<not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id" labelSize="2"
 											 optionTextAttribute="text" required="true" emptyOption="true"
 											 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>
+
+							<not:inputCheckbox name="sobrescriureCieOrganEmisor" generalClass="row" textKey="organgestor.form.camp.sobrescriure.cie.organ.emisor"/>
 						</div>
 					</c:when>
 					<c:otherwise>

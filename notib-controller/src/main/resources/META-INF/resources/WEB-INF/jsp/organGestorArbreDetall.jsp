@@ -257,8 +257,7 @@
                                      optionTextAttribute="text" required="true" emptyOption="true"
                                      textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie"/>
 
-<%--                    <not:inputCheckbox name="sobrescriureOrganEmisor" generalClass="row" textKey="organgestor.form.camp.sobrescriure.cie.organ.emisor"/>--%>
-<%--                    <not:inputSelect name="cieOrganEmissor" required="true" textKey="operadorpostal.form.camp.organismeEmisor" inline="false" emptyOption="true" optionMinimumResultsForSearch="0"/>--%>
+                    <not:inputCheckbox name="sobrescriureCieOrganEmisor" generalClass="row" textKey="organgestor.form.camp.sobrescriure.cie.organ.emisor"/>
 
                 </div>
             </c:if>

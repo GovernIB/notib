@@ -121,6 +121,9 @@ public class CiePluginHelper {
             var pagadorCieEntity = entregaCieEfectiva.getCie();
             var apiKey = getApiKey(pagadorCieEntity);
             var cie = conversioTipusHelper.convertir(pagadorCieEntity, CieDto.class);
+            if (notificacio.getOrganGestor().isSobrescriureCieOrganEmisor()) {
+                cie.setOrganismeEmisorCodi(notificacio.getOrganGestor().getCodi());
+            }
             cie.setApiKey(apiKey);
             enviamentCie.setEntregaCie(cie);
             enviamentCie.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEfectiva.getOperadorPostal(), OperadorPostalDto.class));

@@ -185,6 +185,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			OrganGestorEntity organGestor = organGestorRepository.findById(dto.getId()).orElseThrow();
 			organGestor.updateOficina(dto.getOficina().getCodi(), dto.getOficina().getNom());
 			organGestor.setEntregaCieDesactivada(dto.isEntregaCieDesactivada());
+			organGestor.setSobrescriureCieOrganEmisor(dto.isSobrescriureCieOrganEmisor());
 			organGestor.setPermetreSir(dto.isPermetreSir());
 			EntregaCieEntity entregaCie = organGestor.getEntregaCie();
 			if (dto.isEntregaCieActiva()) {

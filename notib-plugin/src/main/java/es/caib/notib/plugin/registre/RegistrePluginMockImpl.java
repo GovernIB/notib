@@ -6,12 +6,15 @@ import es.caib.comanda.salut.model.IntegracioPeticions;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.DatosInteresadoWsDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -37,6 +40,13 @@ public class RegistrePluginMockImpl implements RegistrePlugin {
 
 	public RegistrePluginMockImpl(Properties properties) {
 		this.properties = properties;
+	}
+
+	public RegistrePluginMockImpl(Properties properties, String codiDir3Entitat, boolean configuracioEspecifica) {
+
+		this.properties = properties;
+		this.codiDir3Entitat = codiDir3Entitat;
+		this.configuracioEspecifica = configuracioEspecifica;
 	}
 
 	@Override
@@ -360,8 +370,25 @@ public class RegistrePluginMockImpl implements RegistrePlugin {
 	    return getClass().getName() + "@" + Integer.toHexString(hashCode());
 	}
 
+
 	// Mètodes de SALUT
 	// /////////////////////////////////////////////////////////////////////////////////////////////
+
+	private boolean configuracioEspecifica = false;
+	private int operacionsOk = 0;
+	private int operacionsError = 0;
+	private String codiDir3Entitat;
+
+	@Synchronized
+	private void incrementarOperacioOk() {
+		operacionsOk++;
+	}
+
+	@Synchronized
+	private void incrementarOperacioError() {
+		operacionsError++;
+	}
+
 
 	@Override
 	public boolean teConfiguracioEspecifica() {
@@ -377,5 +404,6 @@ public class RegistrePluginMockImpl implements RegistrePlugin {
 	public IntegracioPeticions getPeticionsPlugin() {
 		return IntegracioPeticions.builder().build();
 	}
+
 	
 }
