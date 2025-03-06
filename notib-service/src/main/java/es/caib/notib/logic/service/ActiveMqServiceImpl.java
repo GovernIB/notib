@@ -48,7 +48,7 @@ public class ActiveMqServiceImpl implements ActiveMqService {
             var queues = getQueuesNames();
             ActiveMqInfo infoQueue;
             for (var queue : queues) {
-                if (queue == null) {
+                if (queue == null || "ActiveMQ.DLQ".equals(queue)) {
                     continue;
                 }
                 infoQueue = getQueueInfo(queue);
