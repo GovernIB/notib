@@ -1836,7 +1836,7 @@
 										<!-- INCAPACITAT -->
 										<c:if test="${isTitularAmbIncapacitat}">
 											<div class="col-md-12 incapacitat">
-												<not:inputCheckbox name="enviaments[${j}].titular.incapacitat" textKey="notificacio.form.camp.titular.incapacitat" funcio="mostrarDestinatari(this.id, ${isMultiplesDestinataris})"/>
+												<not:inputCheckbox name="enviaments[${j}].titular.incapacitat" textKey="notificacio.form.camp.titular.incapacitat" labelSize="2" funcio="mostrarDestinatari(this.id, ${isMultiplesDestinataris})"/>
 											</div>
 										</c:if>
 									</div>
@@ -2116,7 +2116,7 @@
 					<c:if test="${enviamentTipus != 'SIR'}">
 						<div id="normalitzat" class="row">
 							<div class="col-md-12">
-								<not:inputCheckbox name="documents[0].normalitzat" textKey="notificacio.form.camp.normalitzat" info="true" messageInfo="notificacio.form.camp.normalitzat.info" labelSize="2" />
+								<not:inputCheckbox name="documents[0].normalitzat" textKey="notificacio.form.camp.normalitzat" info="true" messageInfo="notificacio.form.camp.normalitzat.info" labelSize="1" />
 							</div>
 						</div>
 					</c:if>
