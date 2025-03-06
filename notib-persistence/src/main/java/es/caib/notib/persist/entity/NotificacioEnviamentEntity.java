@@ -323,12 +323,8 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.errorLastCallback = error;
 	}
 
-	public void updateRegistreEstat(
-			NotificacioRegistreEstatEnumDto registreEstat,
-			Date registreEstatData,
-			Date sirConsultaData,
-			Date sirRegDestiData,
-			String registreNumeroFormatat) {
+	public void updateRegistreEstat(NotificacioRegistreEstatEnumDto registreEstat, Date registreEstatData, Date sirConsultaData, Date sirRegDestiData, String registreNumeroFormatat) {
+
 		this.updateRegistreEstat(registreEstat);
 		this.registreData = registreEstatData;
 		this.sirRecepcioData = sirConsultaData;

@@ -1,7 +1,6 @@
 package es.caib.notib.api.interna.openapi.interficies;
 
 import es.caib.notib.api.interna.model.adviser.CieAdviser;
-import es.caib.notib.api.interna.model.adviser.EnviamentCieAdviser;
 import es.caib.notib.api.interna.openapi.model.consulta.RespostaConsultaV2Api;
 import es.caib.notib.logic.intf.dto.AdviserResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @RequestMapping("/cie/adviser")
 @Tag(name = "Consulta v2", description = "API de consulta v2")
-public interface EnviamentAdivserApiRestIntf {
+public interface CieAdivserApiRestIntf {
 
     @PostMapping(value = "/sincronitzar", headers="Content-Type=application/json")
     @Operation(summary = "Actualitza la informació de l'enviament postal rebut des del CIE", description = "Actualitza la informació de l'enviament postal rebut des del CIE")

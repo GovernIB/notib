@@ -27,21 +27,8 @@ public enum NotificacioEventTipusEnumDto implements Serializable {
 	AMPLIAR_PLAZO_OE, //15
 	CIE_ADVISER, //16
 	CIE_ADVISER_CERTIFICACIO, //17
-	CIE_ADVISER_DATAT; //18
-//	NOTIFICA_ENVIAMENT,  // 0			// Enviar notificacions a Notifica
-//	NOTIFICA_CALLBACK_DATAT,			// Rebre adviser amb datat
-//	NOTIFICA_CALLBACK_CERTIFICACIO,		// Rebre adviser amb certificació
-//	NOTIFICA_CONSULTA_INFO, // 3		// Consulta l'estat de la notificació a Notifica
-//	NOTIFICA_CONSULTA_ESTAT,
-//	NOTIFICA_CONSULTA_DATAT,
-//	NOTIFICA_CONSULTA_CERT, // 6
-//	NOTIFICA_REGISTRE,					//
-//	CALLBACK_CLIENT,					//
-//	CALLBACK_CLIENT_PENDENT, // 9		//
-//	REGISTRE_CONSULTA_INFO, 			// Consulta l'estat del registre
-//	REGISTRE_CALLBACK_ESTAT,			// Realitza el registre de la notificació
-//	NOTIFICA_CONSULTA_ERROR, // 12		//
-//	NOTIFICA_CONSULTA_SIR_ERROR,		//
-//	CALLBACK_ACTIVAR,
-//	EMAIL_ENVIAMENT						//
+	CIE_ADVISER_DATAT, //18
+	SIR_ADVISER;
+
+
 }

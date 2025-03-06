@@ -153,6 +153,4 @@ public class RegistreHelper {
 		}
 		log.debug("L'estat de la comunicació SIR s'ha actualitzat correctament.");
 	}
-
-//	private static final Logger logger = LoggerFactory.getLogger(RegistreHelper.class);
 }

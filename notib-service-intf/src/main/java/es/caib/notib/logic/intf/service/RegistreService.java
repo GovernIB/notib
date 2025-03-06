@@ -1,5 +1,7 @@
 package es.caib.notib.logic.intf.service;
 
+import es.caib.notib.logic.intf.dto.adviser.sir.RespostaSirAdviser;
+import es.caib.notib.logic.intf.dto.adviser.sir.SirAdviser;
 import es.caib.notib.logic.intf.statemachine.dto.ConsultaSirDto;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,4 +23,7 @@ public interface RegistreService {
 
 	@PreAuthorize("isAuthenticated()")
 	boolean consultaSir(ConsultaSirDto enviament);
+
+	@PreAuthorize("isAuthenticated()")
+	RespostaSirAdviser sincronitzarEnviamentSir(SirAdviser adviser);
 }

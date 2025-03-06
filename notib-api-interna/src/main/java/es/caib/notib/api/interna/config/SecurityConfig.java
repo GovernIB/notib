@@ -76,7 +76,8 @@ public class SecurityConfig {
 			"/adviser/**",
 			"/appInfo",
 			"/salut",
-			"/salutPerformance"
+			"/salutPerformance",
+			"/sir/adviser/sincronitzar"
 	};
 
 	@Bean

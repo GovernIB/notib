@@ -1,7 +1,7 @@
 package es.caib.notib.api.interna.controller;
 
 import es.caib.notib.api.interna.model.adviser.CieAdviser;
-import es.caib.notib.api.interna.openapi.interficies.EnviamentAdivserApiRestIntf;
+import es.caib.notib.api.interna.openapi.interficies.CieAdivserApiRestIntf;
 import es.caib.notib.logic.intf.dto.AdviserResponseDto;
 import es.caib.notib.logic.intf.service.CieAdviserService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -21,7 +21,7 @@ import javax.validation.Validation;
 @Slf4j
 @RestController
 @RequestMapping("/cie/adviser")
-public class CieAdviserController implements EnviamentAdivserApiRestIntf {
+public class CieAdviserController implements CieAdivserApiRestIntf {
 
     @Autowired
     private CieAdviserService cieAdviserService;
