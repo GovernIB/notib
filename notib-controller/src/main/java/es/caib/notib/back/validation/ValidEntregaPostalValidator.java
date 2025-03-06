@@ -79,7 +79,7 @@ public class ValidEntregaPostalValidator implements ConstraintValidator<ValidEnt
 			valid = false;
 			context.buildConstraintViolationWithTemplate(nacionalNotEmpty).addNode("poblacio").addConstraintViolation();
 		}
-		if (Strings.isNullOrEmpty(entregaPostal.getCodiPostal()) || entregaPostal.getCodiPostal().length() > 5) {
+		if (Strings.isNullOrEmpty(entregaPostal.getCodiPostal()) || entregaPostal.getCodiPostal().length() != 5) {
 			valid = false;
 			var msg = MessageHelper.getInstance().getMessage("entregapostal.form.valid.codi.postal.buit");
 			context.buildConstraintViolationWithTemplate(msg).addNode("codiPostal").addConstraintViolation();
@@ -103,7 +103,7 @@ public class ValidEntregaPostalValidator implements ConstraintValidator<ValidEnt
 			valid = false;
 			context.buildConstraintViolationWithTemplate(estrangerNotEmpty).addNode("poblacio").addConstraintViolation();
 		}
-		if (Strings.isNullOrEmpty(entregaPostal.getCodiPostal()) || entregaPostal.getCodiPostal().length() > 5) {
+		if (Strings.isNullOrEmpty(entregaPostal.getCodiPostal()) || entregaPostal.getCodiPostal().length() != 5) {
 			valid = false;
 			var msg = MessageHelper.getInstance().getMessage("entregapostal.form.valid.codi.postal.estranger.buit");
 			context.buildConstraintViolationWithTemplate(msg).addNode("codiPostal").addConstraintViolation();

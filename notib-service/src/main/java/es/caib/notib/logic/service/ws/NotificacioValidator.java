@@ -864,7 +864,7 @@ public class NotificacioValidator implements Validator {
         if (entregaPostal.getTipus() == null) {
             errors.rejectValue(envName + ".tipus", error(POSTAL_TIPUS_NULL, l, prefix));
         }
-        if(Strings.isNullOrEmpty(entregaPostal.getCodiPostal()) || entregaPostal.getCodiPostal().length() > 5) {
+        if(Strings.isNullOrEmpty(entregaPostal.getCodiPostal()) || entregaPostal.getCodiPostal().length() != 5) {
             errors.rejectValue(envName + ".codiPostal", error(POSTAL_CP_NULL, l, prefix));
         }
 
