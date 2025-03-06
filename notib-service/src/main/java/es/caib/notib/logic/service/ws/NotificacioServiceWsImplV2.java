@@ -1225,17 +1225,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private PersonaEntity saveTitular(Enviament enviament) {
 
 		var titular = enviament.getTitular();
+		var docTipus = !Strings.isNullOrEmpty(titular.getNif()) && EidasValidator.isFormatEidas(titular.getNif())? DocumentTipus.ALTRE : null;
 		return personaRepository.save(
-//				PersonaEntity.getBuilderV2(
-//				enviament.getTitular().getInteressatTipus(),
-//				enviament.getTitular().getEmail(),
-//				enviament.getTitular().getLlinatge1(),
-//				enviament.getTitular().getLlinatge2(),
-//				enviament.getTitular().getNif(),
-//				enviament.getTitular().getNom(),
-//				enviament.getTitular().getTelefon(),
-//				enviament.getTitular().getRaoSocial(),
-//				enviament.getTitular().getDir3Codi()
 				PersonaEntity.builder()
 							.interessatTipus(titular.getInteressatTipus())
 							.email(titular.getEmail())
@@ -1247,7 +1238,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 							.raoSocial(titular.getRaoSocial())
 							.dir3Codi(titular.getDir3Codi())
 							.incapacitat(titular.isIncapacitat())
-							.documentTipus(EidasValidator.isFormatEidas(titular.getNif())? DocumentTipus.ALTRE : null)
+							.documentTipus(docTipus)
 							.build());
 	}
 
