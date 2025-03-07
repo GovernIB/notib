@@ -586,6 +586,7 @@
             $(".filtreOcult").toggle();
             $("#filtreAvancat").hide();
             $("#filtreSimple").show();
+            $("#filtreSimpleActiu").val(false);
             $("#div-concepte").removeClass("col-md-2").addClass("col-md-4");
             $('#btn-netejar-filtre').appendTo('#botons-filtre-avancat');
             $('#filtrar').appendTo('#botons-filtre-avancat');
@@ -597,10 +598,14 @@
             $(".filtreOcult").toggle();
             $("#filtreAvancat").show();
             $("#filtreSimple").hide();
+            $("#filtreSimpleActiu").val(true);
             $("#div-concepte").removeClass("col-md-4").addClass("col-md-2");
             $('#btn-netejar-filtre').appendTo('#botons-filtre-simple');
             $('#filtrar').appendTo('#botons-filtre-simple');
         });
+        <c:if test="${mostrarFiltreAvancat == true}">
+            $("#filtreAvancat").click();
+        </c:if>
     });
 
     function omplirProcediments() {
@@ -809,6 +814,7 @@
         </div>
     </div>
     <div class ="row col-md-2 pull-right form-buttons">
+        <not:inputHidden name="filtreSimpleActiu"/>
         <span id="filtreAvancat" class="botonsTipusFiltre" title="<spring:message code="notificacio.list.boto.filtre.avancat.tooltip"/>"><spring:message code="notificacio.list.boto.filtre.avancat"/></span>
         <span id="filtreSimple" class="botonsTipusFiltre filtreOcult" title="<spring:message code="notificacio.list.boto.filtre.simple.tooltip"/>"><spring:message code="notificacio.list.boto.filtre.simple"/></span>
 <%--        <button id="filtreAvancat" title="<spring:message code="notificacio.list.boto.filtre.avancat.tooltip"/>" class="btn btn-default "><span class="fa fa-eraser"></span><spring:message code="notificacio.list.boto.filtre.avancat"/></button>--%>

@@ -170,6 +170,7 @@
 			$("#div-concepte").removeClass("col-md-2").addClass("col-md-4");
 			$("#filtreAvancat").hide();
 			$("#filtreSimple").show();
+			$("#filtreSimpleActiu").val(false);
 		});
 
 		$("#filtreSimple").on("click", e => {
@@ -179,12 +180,18 @@
 			$("#div-concepte").removeClass("col-md-4").addClass("col-md-2");
 			$("#filtreAvancat").show();
 			$("#filtreSimple").hide();
+			$("#filtreSimpleActiu").val(true);
 		});
+
+		<c:if test="${mostrarFiltreAvancat == true}">
+		$("#filtreAvancat").click();
+		</c:if>
 
 		$('#nomesAmbEntregaPostalBtn').click(function() {
 			entregaPostal = !$(this).hasClass('active');
 			$('#entregaPostal').val(entregaPostal);
 		})
+
 	});
 
 	function deselecciona() {
@@ -442,6 +449,7 @@
 			</div>
 		</div>
 		<div class ="col-md-2 row pull-right form-buttons">
+			<not:inputHidden name="filtreSimpleActiu"/>
 			<span id="filtreAvancat" class="botonsTipusFiltre" title="<spring:message code="notificacio.list.boto.filtre.avancat.tooltip"/>"><spring:message code="notificacio.list.boto.filtre.avancat"/></span>
 			<span id="filtreSimple" class="botonsTipusFiltre filtreOcult" style="margin-top:5px" title="<spring:message code="notificacio.list.boto.filtre.simple.tooltip"/>"><spring:message code="notificacio.list.boto.filtre.simple"/></span>
 		</div>

@@ -117,6 +117,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         model.addAttribute(filtre);
         var codiUsuari = getCodiUsuariActual();
         var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), codiUsuari);
+        model.addAttribute("mostrarFiltreAvancat", !filtre.isFiltreSimpleActiu());
         model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
         model.addAttribute("nomesFiReintents", filtre.isNomesFiReintents());
         notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
@@ -170,6 +171,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var organGestorActual = getOrganGestorActual(request);
         notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
         var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), codiUsuari);
+        model.addAttribute("mostrarFiltreAvancat", !command.isFiltreSimpleActiu());
         model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
         model.addAttribute("notificacioFiltreCommand", command);
         model.addAttribute("nomesAmbErrors", command.isNomesAmbErrors());

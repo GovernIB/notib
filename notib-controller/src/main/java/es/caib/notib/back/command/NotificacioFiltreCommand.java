@@ -26,7 +26,8 @@ import java.util.Date;
 @Getter
 @Setter
 public class NotificacioFiltreCommand extends FiltreCommand {
-	
+
+	private boolean filtreSimpleActiu;
 	private Long entitatId;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private EnviamentTipus enviamentTipus;

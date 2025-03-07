@@ -89,6 +89,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 		var entitatActual = sessionScopedContext.getEntitatActual();
 		ColumnesDto columnes = null;
 		var filtreEnviaments = getFiltreCommand(request);
+		model.addAttribute("mostrarFiltreAvancat", !filtreEnviaments.isFiltreSimpleActiu());
 		model.addAttribute(filtreEnviaments);
 		model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
 		if(entitatActual != null) {
@@ -133,6 +134,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 		if (!command.getErrors().isEmpty()) {
 			MissatgesHelper.error(request, getErrorMsg(request, command.getErrors()));
 		}
+		model.addAttribute("mostrarFiltreAvancat", !command.isFiltreSimpleActiu());
 		return "redirect:enviament";
 	}
 
