@@ -77,40 +77,22 @@ input[type='checkbox']:checked{
 				<div class="col-md-3">
 					<not:inputCheckbox name="concepte" textKey="enviament.list.concepte" labelSize="10"/>
 				</div>
-				<div class="col-md-3">
-					<not:inputCheckbox name="descripcio" textKey="enviament.list.descripcio" labelSize="10"/>
-				</div>
-				<div class="col-md-2">
-					<not:inputCheckbox name="referenciaNotificacio" textKey="enviament.list.identificador.notificacio" labelSize="10"/>
-				</div>
 			</div>
 			<div class="row col-xs-6">
 				<div class="col-md-3">
 					<not:inputCheckbox name="titularNomLlinatge" textKey="enviament.list.nomLlinatgetitular" labelSize="10"/>
 				</div>
-				<div class="col-md-2">
-					<not:inputCheckbox name="titularEmail" textKey="enviament.list.emailtitular" labelSize="10"/>
-				</div>
 				<div class="col-md-3">
 					<not:inputCheckbox name="destinataris" textKey="enviament.list.destinataris" labelSize="10"/>
 				</div>
-				<div class="col-md-3">
-					<not:inputCheckbox name="llibreRegistre" textKey="enviament.list.llibreregistre" labelSize="10"/>
-				</div>
 				<div class="col-md-2">
 					<not:inputCheckbox name="numeroRegistre" textKey="enviament.list.numeroregistre" labelSize="10"/>
-				</div>
-				<div class="col-md-3">
-					<not:inputCheckbox name="dataRegistre" textKey="enviament.list.dataregistre" labelSize="10"/>
 				</div>
 				<div class="col-md-3">
 					<not:inputCheckbox name="dataCaducitat" textKey="enviament.list.datacaducitat" labelSize="10"/>
 				</div>
 				<div class="col-md-2">
 					<not:inputCheckbox name="codiNotibEnviament" textKey="enviament.list.codinotibenviament" labelSize="10"/>
-				</div>
-				<div class="col-md-3">
-					<not:inputCheckbox name="numCertificacio" textKey="enviament.list.numerocertificatcorreus" labelSize="10"/>
 				</div>
 				<div class="col-md-3">
 					<not:inputCheckbox name="csvUuid" textKey="enviament.list.codicsvuuid" labelSize="10"/>
@@ -120,6 +102,12 @@ input[type='checkbox']:checked{
 				</div>
 				<div class="col-md-2">
 					<not:inputCheckbox name="entregaPostal" textKey="enviament.list.entrega.postal" labelSize="10"/>
+				</div>
+				<div class="col-md-3">
+					<not:inputCheckbox name="descripcio" textKey="enviament.list.descripcio" labelSize="10"/>
+				</div>
+				<div class="col-md-2">
+					<not:inputCheckbox name="referenciaNotificacio" textKey="enviament.list.identificador.notificacio" labelSize="10"/>
 				</div>
 			</div>
 		</div>
