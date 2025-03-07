@@ -69,20 +69,26 @@ public abstract class EmailHelper<T> {
     }
 
 //    public static final Pattern EMAIL_REGEX = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$", Pattern.CASE_INSENSITIVE);
-    public static final Pattern EMAIL_REGEX = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", Pattern.CASE_INSENSITIVE);
-
-    public static boolean isEmailValid(String email) {
-
-        if (Strings.isNullOrEmpty(email)) {
-            return false;
-        }
-        try {
-            var matcher = EMAIL_REGEX.matcher(email);
-            return matcher.find();
-        } catch (Exception e) {
-            return false;
-        }
-    }
+//    public static final Pattern EMAIL_REGEX = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", Pattern.CASE_INSENSITIVE);
+//    public static final Pattern EMAIL_REGEX = Pattern.compile(
+//            "^(?![\\.-])[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*" +  // local part
+//                    "@" +  // @ symbol
+//                    "(?![\\.-])[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*" +  // domain part
+//                    "(?:\\.[A-Za-z]{2,})$" +  // top-level domain
+//                    "(?![\\.-])", Pattern.CASE_INSENSITIVE);
+//
+//    public static boolean isEmailValid(String email) {
+//
+//        if (Strings.isNullOrEmpty(email)) {
+//            return false;
+//        }
+//        try {
+//            var matcher = EMAIL_REGEX.matcher(email);
+//            return matcher.find();
+//        } catch (Exception e) {
+//            return false;
+//        }
+//    }
 
 
     public String getRemitent() {
