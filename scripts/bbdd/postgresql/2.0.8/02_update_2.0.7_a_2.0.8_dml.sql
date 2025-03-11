@@ -1,0 +1,1 @@
+INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (1, 'es.caib.notib.adviser.sir.actiu', 'true', 'Activar adviser SIR', 'BOOL', 'GENERAL' );
