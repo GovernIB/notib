@@ -29,17 +29,6 @@ public class SirAdviserController implements SirAdviserApiRestIntf {
     public RespostaSirAdviser sincronitzarEnviamentSir(HttpServletRequest request, @RequestBody SirAdviser adviser, Model model) {
 
         try {
-//            var factory = Validation.buildDefaultValidatorFactory();
-//            var validator = factory.getValidator();
-//            var violations = validator.validate(adviser);
-//
-//            if (!violations.isEmpty()) {
-//                var errorDescripcio = new StringBuilder("Error validant enviament SIR: ");
-//                for (ConstraintViolation<SirAdviser> violation: violations) {
-//                    errorDescripcio.append("[" + violation.getPropertyPath() + ": " + violation.getMessage() + "] ");
-//                }
-//                return RespostaSirAdviser.builder().ok(false).errorDescripcio(errorDescripcio.toString()).build();
-//            }
             return registreService.sincronitzarEnviamentSir(adviser);
         } catch (Exception ex) {
             log.error("[SIR ADVISER CONTROLLER] Error al sincronitzar enviament SIR", ex);

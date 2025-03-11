@@ -24,6 +24,5 @@ public interface RegistreService {
 	@PreAuthorize("isAuthenticated()")
 	boolean consultaSir(ConsultaSirDto enviament);
 
-	@PreAuthorize("isAuthenticated()")
 	RespostaSirAdviser sincronitzarEnviamentSir(SirAdviser adviser);
 }

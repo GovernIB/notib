@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.statemachine.dto.ConsultaSirDto;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
 import org.springframework.context.annotation.Primary;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
@@ -38,7 +39,7 @@ public class RegistreService extends AbstractService<es.caib.notib.logic.intf.se
 	}
 
 	@Override
-	@RolesAllowed("**")
+	@PermitAll
 	public RespostaSirAdviser sincronitzarEnviamentSir(SirAdviser adviser) {
 		return getDelegateService().sincronitzarEnviamentSir(adviser);
 	}

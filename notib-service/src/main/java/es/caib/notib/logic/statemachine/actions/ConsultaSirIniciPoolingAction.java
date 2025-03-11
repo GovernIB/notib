@@ -42,6 +42,9 @@ public class ConsultaSirIniciPoolingAction implements Action<EnviamentSmEstat, E
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 30000, multiplier = 10, maxDelay = 3600000))
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
+        if (isSirAdviserActiu()) {
+            return;
+        }
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         NotibLogger.getInstance().info("[SM] ConsultaSirIniciPoolingAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var delay = configHelper.getConfigAsLong("es.caib.notib.pooling.delay", DELAY_DEFECTE);
@@ -70,5 +73,9 @@ public class ConsultaSirIniciPoolingAction implements Action<EnviamentSmEstat, E
             enviament.getNotificacio().getEnviaments().forEach(e -> enviamentSmService.sirConsulta(e.getNotificaReferencia()));
             NotibLogger.getInstance().info("[SM] Tots els enviaments de la notificació estan registrats. S'ha d'avançar la màquina d'estats - enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         }
+    }
+
+    public boolean isSirAdviserActiu() {
+        return configHelper.getConfigAsBoolean("es.caib.notib.adviser.sir.actiu");
     }
 }

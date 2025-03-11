@@ -24,6 +24,7 @@
         <web-resource-collection>
             <web-resource-name>Obert</web-resource-name>
             <url-pattern>/adviser</url-pattern>
+            <url-pattern>/sir/adviser/sincronitzar</url-pattern>
             <url-pattern>/rest</url-pattern>
             <url-pattern>/api/rest</url-pattern>
             <url-pattern>/api/rest/appinfo</url-pattern>

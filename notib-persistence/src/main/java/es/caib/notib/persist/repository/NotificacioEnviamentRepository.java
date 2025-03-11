@@ -38,6 +38,9 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 
 	Optional<NotificacioEnviamentEntity> findByRegistreNumeroFormatat(String registreNumeroFormatat);
 
+	@Query("from NotificacioEnviamentEntity e where e.notificacio.entitat.dir3Codi = :entitatDir3Codi and e.registreNumeroFormatat = :registreNumeroFormatat")
+	Optional<NotificacioEnviamentEntity> findByEntitatDir3CodiAndRegistreNumeroFormatat(@Param("entitatDir3Codi") String entitatDir3Codi, @Param("registreNumeroFormatat") String registreNumeroFormatat);
+
 	Optional<NotificacioEnviamentEntity> findTopByNotificaIdentificadorNullOrderByIdDesc();
 
 	@Query("select id from NotificacioEnviamentEntity where notificaReferencia is null")

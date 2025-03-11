@@ -58,6 +58,10 @@ public class ConsultaSirPoolingAction implements Action<EnviamentSmEstat, Enviam
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 30000, multiplier = 10, maxDelay = 3600000))
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
+
+        if (isSirAdviserActiu()) {
+            return;
+        }
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         NotibLogger.getInstance().info("[SM] ConsultaSirPoolingAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
@@ -122,6 +126,10 @@ public class ConsultaSirPoolingAction implements Action<EnviamentSmEstat, Enviam
 
     public Long refrescarPeriode() {
         return configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_RATE, 7200000L);
+    }
+
+    public boolean isSirAdviserActiu() {
+        return configHelper.getConfigAsBoolean("es.caib.notib.adviser.sir.actiu");
     }
 
     private Integer getMaxReintents() {

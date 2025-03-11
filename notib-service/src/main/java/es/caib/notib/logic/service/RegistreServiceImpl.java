@@ -127,17 +127,8 @@ public class RegistreServiceImpl implements RegistreService {
         if (Strings.isNullOrEmpty(adviser.getRegistreNumero())) {
             error.add("El número de registre no pot ser null");
         }
-        if (adviser.getEstat() == null) {
-            error.add("L'estat no pot ser null");
-        }
-        if (adviser.getRegistreData() == null) {
-            error.add("La data de registre not pot ser null");
-        }
-        if (adviser.getSirRecepcioData() == null) {
-            error.add("La data de rececpió SIR no pot ser null");
-        }
-        if (adviser.getSirRegistreDestiData() == null) {
-            error.add("La data de registre SIR destí no pot ser null");
+        if (Strings.isNullOrEmpty(adviser.getEntitatDir3Codi())) {
+            error.add("El codi DIR3 de la entitat no pot ser null");
         }
         return error.toString();
     }
@@ -146,45 +137,21 @@ public class RegistreServiceImpl implements RegistreService {
     @Override
     public RespostaSirAdviser sincronitzarEnviamentSir(SirAdviser adviser) {
 
-        var errorsValidacio = validarAdviserSir(adviser);
-        if (!Strings.isNullOrEmpty(errorsValidacio)) {
-            return RespostaSirAdviser.builder().ok(false).errorDescripcio(errorsValidacio).build();
-        }
-        var enviament = notificacioEnviamentRepository.findByRegistreNumeroFormatat(adviser.getRegistreNumero()).orElse(null);
-        if (enviament == null ) {
-            return RespostaSirAdviser.builder().ok(false).errorDescripcio("No existeix l'enviament amb el número de registre " + adviser.getRegistreNumero()).build();
-        }
-        var notificacio = enviament.getNotificacio();
-        var canviEstat = false;
-        var errorDescripcio = "";
-        var error = false;
         try {
-            canviEstat = !enviament.getRegistreEstat().equals(adviser.getEstat());
-            log.info("[SIR ADVISER] Actualitzar estat comunicació SIR [Id: " + enviament.getId() + " - estat enviament:" + enviament.getRegistreEstat()
-                    + " - estat adviser " + adviser.getEstat() +"]: ");
-            registreHelper.enviamentUpdateDatat(adviser.getEstat(), adviser.getRegistreData(), adviser.getSirRecepcioData(), adviser.getSirRegistreDestiData(), adviser.getRegistreNumero(), enviament);
-            if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA && canviEstat) {
-                try {
-                    log.info("[SIR ADVISER] Preparar enviament mail notificació [Id: " + enviament.getId() + "]");
-                    jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_NOTIFICACIO, notificacio.getId());
-                } catch (JmsException ex) {
-                    log.error("[SIR ADVISER] Hi ha hagut un error al intentar enviar el correu electrònic de la notificació amb id: ." + notificacio.getId(), ex);
-                }
+            var errorsValidacio = validarAdviserSir(adviser);
+            if (!Strings.isNullOrEmpty(errorsValidacio)) {
+                return RespostaSirAdviser.builder().ok(false).errorDescripcio(errorsValidacio).build();
             }
+            var enviament = notificacioEnviamentRepository.findByEntitatDir3CodiAndRegistreNumeroFormatat(adviser.getEntitatDir3Codi(), adviser.getRegistreNumero()).orElse(null);
+            if (enviament == null) {
+                var desc = "No existeix l'enviament amb el número de registre " + adviser.getRegistreNumero() + " per la entitat amb codi DIR3 " + adviser.getEntitatDir3Codi();
+                return RespostaSirAdviser.builder().ok(false).errorDescripcio(desc).build();
+            }
+            registreHelper.enviamentRefrescarEstatRegistre(enviament.getId());
+            return RespostaSirAdviser.builder().ok(true).build();
         } catch (Exception ex) {
-            log.error("[SIR ADVISER] Error al sincronitzar enviament SIR", ex);
-            error = true;
-            errorDescripcio = "[SIR ADVISER] Error sincronitzant enviament SIR: " + ex.getMessage();
-            notificacioEventHelper.addSirAdviserEvent(enviament, true, errorDescripcio, false);
+            log.error("[SIR ADVISER] Error sincronitzant l'enviament SIR", ex);
+            return RespostaSirAdviser.builder().ok(false).errorDescripcio("Error inesperat al sincronitzar l'enviament sir " + ex.getMessage()).build();
         }
-
-        notificacioEventHelper.addSirAdviserEvent(enviament, false, null, false);
-        if (canviEstat) {
-            callbackHelper.updateCallback(enviament, false, null);
-        }
-        notificacioTableHelper.actualitzarRegistre(notificacio);
-        enviamentTableHelper.actualitzarRegistre(enviament);
-        auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "RegistreService.sincronitzarEnviamentSir");
-        return RespostaSirAdviser.builder().ok(!error).errorDescripcio(errorDescripcio).build();
     }
 }
