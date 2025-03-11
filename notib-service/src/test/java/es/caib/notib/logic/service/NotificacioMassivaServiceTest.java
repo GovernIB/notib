@@ -33,6 +33,7 @@ import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PagadorCieService;
+import es.caib.notib.logic.intf.service.RegistreService;
 import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.logic.service.ws.NotificacioValidator;
 import es.caib.notib.logic.test.NotificacioMassivaTests;
