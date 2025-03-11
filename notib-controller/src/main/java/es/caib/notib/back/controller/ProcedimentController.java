@@ -176,9 +176,9 @@ public class ProcedimentController extends BaseUserController {
 		if (bindingResult.hasErrors()) {
 			emplenarModelProcediment(request, procSerCommand.getId(), model);
 			model.addAttribute("errors", bindingResult.getAllErrors());
-			var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
+			var operadorPostalList = operadorPostalService.findByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			var cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
+			var cieList = pagadorCieService.findByEntitat(entitat);
 			model.addAttribute("cieList", cieList);
 			return "procedimentAdminForm";
 		}
@@ -190,7 +190,7 @@ public class ProcedimentController extends BaseUserController {
 			var rol = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
 			procedimentService.update(procSerCommand.getEntitatId(), ProcSerCommand.asDto(procSerCommand), isAdministrador(), rol);
 		} catch(NotFoundException | ValidationException ev) {
-			log.debug("Error al actualitzar el procediment", ev);
+			log.info("Error al actualitzar el procediment", ev);
 		}
 		return getModalControllerReturnValueSuccess(request, redirect, "procediment.controller.modificat.ok");
 	}
@@ -234,9 +234,9 @@ public class ProcedimentController extends BaseUserController {
 			procSerCommand = new ProcSerCommand();
 		}
 		model.addAttribute(procSerCommand);
-		var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
+		var operadorPostalList = operadorPostalService.findByEntitat(entitat);
 		model.addAttribute("operadorPostalList", operadorPostalList);
-		var cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
+		var cieList = pagadorCieService.findByEntitat(entitat);
 		model.addAttribute("cieList", cieList);
 		return "procedimentAdminForm";
 	}

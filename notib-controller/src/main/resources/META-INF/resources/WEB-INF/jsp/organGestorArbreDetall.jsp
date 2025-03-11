@@ -120,8 +120,7 @@
 
         $(document).ready(function() {
 
-            loadPagadorPostal($("#operadorPostalId"), operadorsPostal, "<spring:message code='operador.postal.obsolet'/>");
-            loadPagadorPostal($("#cieId"), operadorsCie, "<spring:message code='operador.postal.obsolet'/>");
+
 
             if (!${id} || ${id} === 0) {
                 $("#permisosPanel").hide();
@@ -185,6 +184,8 @@
                  $('#entrega-cie-form').hide();
              }
 
+            loadPagadorPostal($("#operadorPostalId"), operadorsPostal, "<spring:message code='operador.postal.obsolet'/>");
+            loadPagadorPostal($("#cieId"), operadorsCie, "<spring:message code='operador.postal.obsolet'/>");
         });
 
     </script>
@@ -235,25 +236,10 @@
             </c:if>
             <c:if test="${isRolActualAdministradorEntitat and not empty operadorPostalList && not empty cieList}">
                 <div id="entrega-cie-form" class="flex-column">
-<%--                    <not:inputSelect generalClass="row" name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"--%>
-<%--                                     optionTextAttribute="text" required="true" emptyOption="true"--%>
-<%--                                     textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>--%>
-<%--                    <not:inputSelect generalClass="row" name="cieId" optionItems="${cieList}" optionValueAttribute="id"--%>
-<%--                                     optionTextAttribute="text" required="true" emptyOption="true"--%>
-<%--                                     textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>--%>
-
-
-<%--                    <not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id" labelSize="2"--%>
-<%--                                     optionTextAttribute="text" required="true" emptyOption="true"--%>
-<%--                                     textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>--%>
-<%--                    <not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id" labelSize="2"--%>
-<%--                                     optionTextAttribute="text" required="true" emptyOption="true"--%>
-<%--                                     textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>--%>
-
-                    <not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"
+                    <not:inputSelect id="operadorPostalId" name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"
                                      optionTextAttribute="text" required="true" emptyOption="true"
                                      textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal"/>
-                    <not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id"
+                    <not:inputSelect id="cieId" name="cieId" optionItems="${cieList}" optionValueAttribute="id"
                                      optionTextAttribute="text" required="true" emptyOption="true"
                                      textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie"/>
 

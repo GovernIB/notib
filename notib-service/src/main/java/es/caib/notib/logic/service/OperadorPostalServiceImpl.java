@@ -216,6 +216,21 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 
 	@Override
 	@Transactional(readOnly = true)
+	public List<IdentificadorTextDto> findByEntitat(EntitatDto entitat) {
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			log.debug(LOG_MSG);
+			var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+			var p = pagadorPostalReposity.findByEntitat(e);
+			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
 
 		var timer = metricsHelper.iniciMetrica();

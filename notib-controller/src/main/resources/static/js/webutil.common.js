@@ -741,12 +741,13 @@ function loadOrgans($selector, organsGestors, missatgeObsolets){
 
 function loadPagadorPostal($selector, pagadors, missatgeObsolets){
 
-	console.log(pagadors);
-	let formatState = organ => { let foo = !organ.icona ? organ.text
-		: $("<span title='" + missatgeObsolets + "'>" + organ.text + " <span class='fa fa-warning text-danger'></span></span>"); console.log(foo); return foo;};
+	let formatState = organ => !organ.icona ? organ.text : $("<span title='" + missatgeObsolets + "'>" + organ.text + " <span class='fa fa-warning text-danger'></span></span>");
+	let selectedValue = $selector.val();
 	$selector.empty();
 	$selector.select2({ data: pagadors, templateResult: formatState, templateSelection: formatState, minimumResultsForSearch: Infinity});
-	$selector.change();
+	// $selector.change();
+	$selector.val(selectedValue).trigger('change');
+
 }
 
 jQuery.fn.highlight = function(pat) {

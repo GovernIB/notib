@@ -164,9 +164,9 @@ public class ServeiController extends BaseUserController {
 		if (bindingResult.hasErrors()) {
 			emplenarModelServei(request, procSerCommand.getId(), model);
 			model.addAttribute("errors", bindingResult.getAllErrors());
-			var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
+			var operadorPostalList = operadorPostalService.findByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			var cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
+			var cieList = pagadorCieService.findByEntitat(entitat);
 			model.addAttribute("cieList", cieList);
 			return "serveiAdminForm";
 		}
@@ -190,9 +190,9 @@ public class ServeiController extends BaseUserController {
 		var servei = emplenarModelServei(request, serveiId, model);
 		var procSerCommand = servei != null ? ProcSerCommand.asCommand(servei) : new ProcSerCommand();
 		model.addAttribute(procSerCommand);
-		var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
+		var operadorPostalList = operadorPostalService.findByEntitat(entitat);
 		model.addAttribute("operadorPostalList", operadorPostalList);
-		var cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
+		var cieList = pagadorCieService.findByEntitat(entitat);
 		model.addAttribute("cieList", cieList);
 		return "serveiAdminForm";
 	}

@@ -236,8 +236,8 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 		return pagadors;
 	}
 
-	@Transactional(readOnly = true)
 	@Override
+	@Transactional(readOnly = true)
 	public List<IdentificadorTextDto> findByEntitat(EntitatDto entitat) {
 
 		var timer = metricsHelper.iniciMetrica();

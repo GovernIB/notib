@@ -144,9 +144,10 @@ public class OrganGestorController extends BaseUserController{
 			model.addAttribute("entitat", entitat);
 			model.addAttribute(SET_LLIBRE, !entitat.isLlibreEntitat());
 			model.addAttribute(SET_OFICINA, !entitat.isOficinaEntitat());
-			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
+			var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
+			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findByEntitatAndOrgan(entitat, organGestorCommand.getCodi(), isAdminOrgan);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			var cieList = pagadorCieService.findNoCaducatsByEntitat(entitat);
+			var cieList = pagadorCieService.findByEntitatAndOrgan(entitat, organGestorCommand.getCodi(), isAdminOrgan);
 			model.addAttribute("cieList", cieList);
 			if (organGestorCommand.getId() != null) {
 				model.addAttribute("isModificacio", true);

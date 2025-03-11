@@ -11,6 +11,7 @@ import es.caib.notib.logic.intf.dto.cie.OperadorPostalTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -84,6 +85,9 @@ public interface OperadorPostalService {
 
 	@PreAuthorize("isAuthenticated()")
 	List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat);
+
+	@PreAuthorize("isAuthenticated()")
+	List<IdentificadorTextDto> findByEntitat(EntitatDto entitat);
 
 	@PreAuthorize("isAuthenticated()")
 	List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitatId);

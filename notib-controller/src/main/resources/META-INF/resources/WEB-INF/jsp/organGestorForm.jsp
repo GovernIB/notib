@@ -75,8 +75,6 @@ body {
 
 	$(document).ready(function() {
 
-	loadPagadorPostal($("#operadorPostalId"), operadorsPostal, "<spring:message code='operador.postal.obsolet'/>");
-	loadPagadorPostal($("#cieId"), operadorsCie, "<spring:message code='operador.postal.obsolet'/>");
 	//Organismes
 	var entitatId = $('#entitatId').val();
 	var select2 = $('select');
@@ -177,6 +175,9 @@ body {
 	if (!$('#entregaCieActiva')[0].checked) {
 		$('#entrega-cie-form').hide();
 	}
+
+	loadPagadorPostal($("#operadorPostalId"), operadorsPostal, "<spring:message code='operador.postal.obsolet'/>");
+	loadPagadorPostal($("#cieId"), operadorsCie, "<spring:message code='operador.postal.obsolet'/>");
 });
 			
 	function getOficines(organSeleccionatValue) {
@@ -288,12 +289,12 @@ body {
 					<c:when test="${not empty operadorPostalList && not empty cieList}">
 						<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" labelSize="2" info="${entregaCieHeredada}" messageInfo="organgestor.form.camp.entregacie.heredada"/>
 						<div id="entrega-cie-form">
-							<not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id" labelSize="2"
+							<not:inputSelect id="operadorPostalId" name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"
 											 optionTextAttribute="text" required="true" emptyOption="true"
-											 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
-							<not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id" labelSize="2"
+											 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" labelSize="2"/>
+							<not:inputSelect id="cieId" name="cieId" optionItems="${cieList}" optionValueAttribute="id"
 											 optionTextAttribute="text" required="true" emptyOption="true"
-											 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>
+											 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" labelSize="2"/>
 
 							<not:inputCheckbox name="sobrescriureCieOrganEmisor" generalClass="row" textKey="organgestor.form.camp.sobrescriure.cie.organ.emisor"/>
 						</div>

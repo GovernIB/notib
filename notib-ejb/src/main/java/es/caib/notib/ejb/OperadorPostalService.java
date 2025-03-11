@@ -73,6 +73,12 @@ public class OperadorPostalService extends AbstractService<es.caib.notib.logic.i
 
 	@Override
 	@RolesAllowed("**")
+	public List<IdentificadorTextDto> findByEntitat(EntitatDto entitat) {
+		return getDelegateService().findByEntitat(entitat);
+	}
+
+	@Override
+	@RolesAllowed("**")
 	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
 		return getDelegateService().findNoCaducatsByEntitat(entitat);
 	}

@@ -190,10 +190,14 @@ $(document).ready(function() {
 		$('#entrega-cie-form').hide();
 	}
 
-	$("#selOrganismes").change(() => {
+	$("#selOrganismes").change( () => {
 		let organSelect = document.getElementById('selOrganismes');
 		let organ = organSelect.options[organSelect.selectedIndex].value;
-		let entitatId = $('#entitatId').val();
+		carregarOperadors(organ)
+	});
+
+	let carregarOperadors = organ => {
+
 		$.ajax({
 			type: 'GET',
 			url: "<c:url value="/procediment/operadors/"/>" + organ,
@@ -203,7 +207,11 @@ $(document).ready(function() {
 			},
 			error: () => console.log("error obtenint els codis d'assumpte...")
 		});
-	});
+	};
+
+	carregarOperadors("${procSerCommand.organGestor}");
+
+
 
 	// CANVIS EN EL FORMULARI SEGONS SI EL SERVEI ES CREAT ES COMÚ O NO
 	$('#comu').change(function() {
@@ -271,10 +279,10 @@ $(document).ready(function() {
 				<div id="entrega-cie">
 					<not:inputCheckbox name="entregaCieActiva" textKey="procediment.form.camp.entregacie" labelSize="2"/>
 					<div id="entrega-cie-form">
-						<not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id" labelSize="2"
+						<not:inputSelect id="operadorPostalId" name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id" labelSize="2"
 										 optionTextAttribute="text" required="true" emptyOption="true"
 										 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
-						<not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id" labelSize="2"
+						<not:inputSelect id="cieId" name="cieId" optionItems="${cieList}" optionValueAttribute="id" labelSize="2"
 										 optionTextAttribute="text" required="true" emptyOption="true"
 										 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>
 					</div>
