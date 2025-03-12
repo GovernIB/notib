@@ -26,6 +26,7 @@ public class OrganGestorFiltreDto extends AuditoriaDto implements Serializable {
 	private OrganGestorEstatEnum estat;
 	private boolean entregaCie;
 	private boolean permetreSir;
+	private NumeroPermisos numeroPermisos;
 
 	private boolean isFiltre;
 
@@ -50,6 +51,13 @@ public class OrganGestorFiltreDto extends AuditoriaDto implements Serializable {
 			ok = ok && true;
 		}
 		return ok;
+	}
+
+	public Long getNumeroPermisosLong() {
+		return numeroPermisos == null ? null
+				: NumeroPermisos.SENSE_PERMISOS.equals(numeroPermisos)  ? 0L
+				: numeroPermisos.equals(NumeroPermisos.UN_PERMIS) ? 1L
+				: numeroPermisos.equals(NumeroPermisos.DOS_PERMISOS) ? 2L : 3L;
 	}
 
 	public boolean filtrarOkOrganPare(OrganGestorDto organ) {

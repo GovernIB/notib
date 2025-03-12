@@ -190,6 +190,10 @@
                     <not:inputSelect name="estat" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
                                      placeholderKey="organgestor.list.columna.estat" textKey="organgestor.list.columna.estat" required="true" labelSize="0"/>
                 </div>
+                <div class="col-md-2">
+                    <not:inputSelect name="numeroPermisos" optionItems="${numeroPermisosList}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
+                                     placeholderKey="organgestor.filtre.numero.permisos" textKey="organgestor.filtre.numero.permisos" required="true" labelSize="0"/>
+                </div>
                 <c:if test="${setOficina}">
                     <div class="col-md-3">
                         <not:inputSelect name="oficina" textKey="organgestor.list.columna.oficina" required="true" optionItems="${oficinesEntitat}" optionValueAttribute="codi"

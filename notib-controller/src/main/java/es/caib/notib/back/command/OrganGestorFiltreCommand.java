@@ -2,6 +2,7 @@ package es.caib.notib.back.command;
 
 import com.google.common.base.Strings;
 import es.caib.notib.back.helper.ConversioTipusHelper;
+import es.caib.notib.logic.intf.dto.organisme.NumeroPermisos;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorFiltreDto;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class OrganGestorFiltreCommand {
 	private OrganGestorEstatEnum estat;
 	private boolean entregaCie;
 	private boolean permetreSir;
+	private NumeroPermisos numeroPermisos;
 
 	private String isFiltre;
 

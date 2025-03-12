@@ -10,6 +10,7 @@ import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
+import es.caib.notib.logic.intf.dto.organisme.NumeroPermisos;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.exception.NotFoundException;
@@ -68,6 +69,7 @@ public class OrganGestorArbreController extends BaseUserController {
             var filtres = OrganGestorController.getFiltreCommand(request);
             model.addAttribute("organGestorFiltreCommand", filtres);
             model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, "es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum."));
+            model.addAttribute("numeroPermisosList", EnumHelper.getOptionsForEnum(NumeroPermisos.class, "es.caib.notib.logic.intf.dto.organisme.NumeroPermisos."));
             var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
             var organ = getOrganGestorActual(request);
             var arbre = organGestorService.generarArbreOrgans(entitat, filtres.asDto(), isAdminOrgan, organ);

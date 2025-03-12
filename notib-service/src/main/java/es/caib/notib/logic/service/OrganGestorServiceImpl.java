@@ -22,7 +22,6 @@ import es.caib.notib.logic.intf.dto.ArbreNode;
 import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
-import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -36,6 +35,7 @@ import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.TipusEnumDto;
+import es.caib.notib.logic.intf.dto.organisme.NumeroPermisos;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorFiltreDto;
@@ -51,7 +51,6 @@ import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OficinaEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
-import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.EntregaCieRepository;
 import es.caib.notib.persist.repository.GrupRepository;
@@ -85,7 +84,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -158,10 +156,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	protected static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
 	private static final String AUTO_TEMPS_TEXT = "procediment.actualitzacio.auto.temps";
 
-	private List<OrganGestorDto> sotredOrgans = new ArrayList<>();
+	private List<OrganGestorDto> storedOrgans = new ArrayList<>();
 	private List<String> codisAmbPermis = new ArrayList<>();
 	private boolean isAdminOrgan;
 	private OrganGestorDto organActual;
+	private Long entitatId;
 
 	@Getter
 	private List<OrganGestorDto> organsList;
@@ -396,8 +395,27 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				filtre.getCodiPare() == null || filtre.getCodiPare().isEmpty(),
 				filtre.getCodiPare() == null ? "" : filtre.getCodiPare());
 //				pageable);
-
+		if (filtre.getNumeroPermisos() != null) {
+			organs = filtrarPerNumeroDePermisos(organs, entitat.getId(), filtre.getNumeroPermisos(), filtre.getNumeroPermisosLong());
+		}
 		return getPageFiltrada(organs, filtre.getNom());
+	}
+
+	private List<OrganGestorEntity> filtrarPerNumeroDePermisos(List<OrganGestorEntity> organs, Long entitatId, NumeroPermisos numeroPermisos, Long numeroPermisosLong) {
+
+		List<OrganGestorEntity> organsAux = new ArrayList<>();
+		for (var organ : organs) {
+			if (checkNumeroDePermisos(entitatId, organ.getId(), numeroPermisos, numeroPermisosLong)) {
+				organsAux.add(organ);
+			}
+		}
+		return organsAux;
+	}
+
+	private boolean checkNumeroDePermisos(Long entitatId, Long organId, NumeroPermisos numeroPermisos, Long numeroPermisosLong) {
+
+		var permisos = permisFind(entitatId, organId);
+		return permisos.size() == numeroPermisosLong || permisos.size() >= 3 && NumeroPermisos.MES_DE_3_PERMISOS.equals(numeroPermisos);
 	}
 
 	private Page<OrganGestorEntity> findAmbFiltrePaginatByAdminOrgan(EntitatEntity entitat, String organActualCodiDir3, OrganGestorFiltreDto filtre, Pageable pageable) {
@@ -428,7 +446,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
                 filtre.isEntregaCie(),
                 filtre.isPermetreSir());
 //				pageable);
-
+		if (filtre.getNumeroPermisos() != null) {
+			organs = filtrarPerNumeroDePermisos(organs, entitat.getId(), filtre.getNumeroPermisos(), filtre.getNumeroPermisosLong());
+		}
 		return getPageFiltrada(organs, filtre.getNom());
 	}
 
@@ -438,7 +458,10 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			return new PageImpl<>(organs);
 		}
 		var nom = StringUtils.stripAccents(filtre).toLowerCase();
-		var contingut = organs.stream().filter(organ -> Strings.isNullOrEmpty(nom) || StringUtils.stripAccents(organ.getNom().toLowerCase()).contains(nom)).collect(Collectors.toList());
+		var contingut = organs.stream().filter(organ -> {
+
+			return Strings.isNullOrEmpty(nom) || StringUtils.stripAccents(organ.getNom().toLowerCase()).contains(nom);
+		}).collect(Collectors.toList());
 		return new PageImpl<>(contingut);
 	}
 	
@@ -1310,10 +1333,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			if (organs.isEmpty()) {
 				return arbre;
 			}
-			sotredOrgans = findByEntitat(entitat.getId());
+			storedOrgans = findByEntitat(entitat.getId());
 			organsList = new ArrayList<>();
 			this.isAdminOrgan = isAdminOrgan;
 			this.organActual = organActual;
+			entitatId = entitat.getId();
 			var codiArrel = isAdminOrgan ? organActual.getCodi() : entitat.getDir3Codi();
 			if (isAdminOrgan) {
 				addCodisOrgansAmbPermis(entitat);
@@ -1342,6 +1366,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		}
 		var organExistent = buscarOrgan(organ.getCodi());
 		var o = organExistent != null ? organExistent : conversioTipusHelper.convertir(organ, OrganGestorDto.class);
+		if (filtres.getNumeroPermisos() != null && !checkNumeroDePermisos(entitatId, o.getId(), filtres.getNumeroPermisos(), filtres.getNumeroPermisosLong())) {
+			return nodes;
+		}
 		organsList.add(o);
 		List<String> fills = organ.getFills();
 		if (fills == null || fills.isEmpty()) {
@@ -1390,7 +1417,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		codisAmbPermis  = organigramaHelper.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organActual.getCodi());
 	}
 	private OrganGestorDto buscarOrgan(String codi) {
-		for (var o : sotredOrgans) {
+		for (var o : storedOrgans) {
 			if (codi.equals(o.getCodi())) {
 				return o;
 			}

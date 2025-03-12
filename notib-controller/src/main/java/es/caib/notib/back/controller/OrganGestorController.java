@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
+import es.caib.notib.logic.intf.dto.organisme.NumeroPermisos;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.exception.NotFoundException;
@@ -85,6 +86,7 @@ public class OrganGestorController extends BaseUserController{
 		model.addAttribute("organGestorFiltreCommand", filtres);
 		model.addAttribute("organsEntitat", organGestorService.getOrgansAsList(entitat));
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
+		model.addAttribute("numeroPermisosList", EnumHelper.getOptionsForEnum(NumeroPermisos.class, "es.caib.notib.logic.intf.dto.organisme.NumeroPermisos."));
 		var estats = EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, "es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.");
 		model.addAttribute("organGestorEstats", estats);
 		model.addAttribute(SET_LLIBRE, !entitat.isLlibreEntitat());
