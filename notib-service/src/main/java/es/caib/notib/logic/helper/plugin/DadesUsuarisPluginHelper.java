@@ -54,7 +54,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 //	@Monitor(codi = USUARIS, descripcio = "Consulta rols usuari amb codi", tipus = ENVIAMENT)
 	public List<String> consultarRolsAmbCodi(String usuariCodi) {
 
-		var info = new IntegracioInfo(USUARIS,"Consulta rols usuari amb codi",
+		var info = new IntegracioInfo(USUARIS,"Consulta rols usuari amb codi " + usuariCodi,
 				ENVIAMENT, new AccioParam("Codi d'usuari", usuariCodi));
 		try {
 			// peticionsPlugin.updatePeticioTotal(null);
@@ -72,7 +72,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 	
 	public DadesUsuari dadesUsuariConsultarAmbCodi(String usuariCodi) {
 		
-		var info = new IntegracioInfo(USUARIS,"Consulta d'usuari amb codi", ENVIAMENT,
+		var info = new IntegracioInfo(USUARIS,"Consulta d'usuari amb codi " + usuariCodi, ENVIAMENT,
 				new AccioParam("Codi d'usuari", usuariCodi));
 
 		try {
