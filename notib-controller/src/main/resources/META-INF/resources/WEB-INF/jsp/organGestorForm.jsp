@@ -284,7 +284,7 @@ body {
 			</c:if>
 			<not:inputCheckbox name="permetreSir" generalClass="row" textKey="organgestor.form.camp.permetre.sir" labelSize="2"/>
 			<c:if test="${isRolActualAdministradorEntitat}">
-				<not:inputCheckbox name="entregaCieDesactivada" generalClass="row" textKey="organgestor.form.camp.entregacie.desactivada" labelSize="2"/>
+
 				<c:choose>
 					<c:when test="${not empty operadorPostalList && not empty cieList}">
 						<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" labelSize="2" info="${entregaCieHeredada}" messageInfo="organgestor.form.camp.entregacie.heredada"/>
@@ -296,13 +296,14 @@ body {
 											 optionTextAttribute="text" required="true" emptyOption="true"
 											 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" labelSize="2"/>
 
-							<not:inputCheckbox name="sobrescriureCieOrganEmisor" generalClass="row" textKey="organgestor.form.camp.sobrescriure.cie.organ.emisor"/>
+							<not:inputCheckbox name="sobrescriureCieOrganEmisor" generalClass="row" textKey="organgestor.form.camp.sobrescriure.cie.organ.emisor" labelSize="2"/>
 						</div>
 					</c:when>
 					<c:otherwise>
 						<not:inputCheckbox disabled="true" info="true" messageInfo="organgestor.form.camp.entregacie.no.configurada" name="entregaCieActiva" labelSize="2" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
 					</c:otherwise>
 				</c:choose>
+				<not:inputCheckbox name="entregaCieDesactivada" generalClass="row" textKey="organgestor.form.camp.entregacie.desactivada" labelSize="2"/>
 			</c:if>
 			<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
 				<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">

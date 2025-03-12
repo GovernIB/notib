@@ -223,7 +223,6 @@
             </c:if>
             <not:inputCheckbox name="permetreSir" generalClass="row" textKey="organgestor.form.camp.permetre.sir"/>
             <c:if test="${isRolActualAdministradorEntitat}">
-                <not:inputCheckbox name="entregaCieDesactivada" generalClass="row" textKey="organgestor.form.camp.entregacie.desactivada"/>
                 <c:choose>
                     <c:when test="${not empty operadorPostalList && not empty cieList}">
                         <not:inputCheckbox name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie" info="${entregaCieHeredada}" messageInfo="organgestor.form.camp.entregacie.heredada"/>
@@ -247,6 +246,7 @@
 
                 </div>
             </c:if>
+            <not:inputCheckbox name="entregaCieDesactivada" generalClass="row" textKey="organgestor.form.camp.entregacie.desactivada"/>
         </div>
         <div class="flex-space-around">
 <%--
