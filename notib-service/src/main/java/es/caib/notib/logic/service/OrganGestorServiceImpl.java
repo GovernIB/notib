@@ -1710,9 +1710,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			log.debug("Consulta de tots els pagadors postals");
 			var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
 			var o = organGestorRepository.findByCodi(organCodi);
-			if (o.getEntregaCie() != null) {
-				return true;
-			}
 			if (!e.getDir3Codi().equals(organCodi)) {
 				return findOperadorsPare(entitat, o.getCodiPare());
 			}
