@@ -16,7 +16,7 @@ import es.caib.notib.back.helper.ConversioTipusHelper;
 @Data
 public class EnviamentFiltreCommand extends FiltreCommand {
 
-	private boolean filtreSimpleActiu;
+	private boolean filtreSimpleActiu = true;
 	private Long id;
 	private String dataCreacioInici;
 	private String dataCreacioFi;
