@@ -16,6 +16,6 @@ public class EidasValidator {
     }
 
     public static boolean isFormatEidas(String eidas) {
-        return eidas.split("/").length == 3;
+        return !Strings.isNullOrEmpty(eidas) && eidas.split("/").length == 3;
     }
 }
