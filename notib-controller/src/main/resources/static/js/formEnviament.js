@@ -313,9 +313,11 @@ function mostrarEntregaPostal(className) {
 
     if($('.entregaPostal_'+enviament_id_num).css('display') != 'none') {
         $('.entregaPostal_'+enviament_id_num).hide();
+        $('#tipusEntregaPostal_'+enviament_id_num).hide();
         $("#rowRetard").hide();
     } else {
         $('.entregaPostal_'+enviament_id_num).show();
+        $('#tipusEntregaPostal_'+enviament_id_num).show();
         $("#rowRetard").show();
         validarEntregaPostalCie();
     }
