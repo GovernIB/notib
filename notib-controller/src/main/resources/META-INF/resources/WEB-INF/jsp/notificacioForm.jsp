@@ -1968,26 +1968,26 @@
 											<div class="col-md-12">
 												<not:inputText name="enviaments[${j}].entregaPostal.complement" textKey="notificacio.form.camp.entregapostal.complement" labelClass="labelcss" inputClass="inputcss" />
 											</div>
-											<div class="col-md-3 formatFulla">
-											<c:choose>
-												<c:when test="${not empty formatsFulla}">
-													<not:inputSelect name="enviaments[${j}].entregaPostal.formatFulla" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatfulla" optionItems="${formatsFulla}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
-												</c:when>
-												<c:otherwise>
-													<not:inputText name="enviaments[${j}].entregaPostal.formatFulla" textKey="notificacio.form.camp.entregapostal.formatfulla" labelClass="labelcss" inputClass="inputcss"/>
-												</c:otherwise>
-											</c:choose>
-											</div>
-											<div class="col-md-3 formatSobre">
-											<c:choose>
-												<c:when test="${not empty formatsSobre}">
-													<not:inputSelect name="enviaments[${j}].entregaPostal.formatSobre" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatsobre" optionItems="${formatsSobre}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
-												</c:when>
-												<c:otherwise>
-													<not:inputText name="enviaments[${j}].entregaPostal.formatSobre" textKey="notificacio.form.camp.entregapostal.formatsobre" labelClass="labelcss" inputClass="inputcss"/>
-												</c:otherwise>
-											</c:choose>	
-											</div>
+<%--											<div class="col-md-3 formatFulla">--%>
+<%--											<c:choose>--%>
+<%--												<c:when test="${not empty formatsFulla}">--%>
+<%--													<not:inputSelect name="enviaments[${j}].entregaPostal.formatFulla" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatfulla" optionItems="${formatsFulla}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>--%>
+<%--												</c:when>--%>
+<%--												<c:otherwise>--%>
+<%--													<not:inputText name="enviaments[${j}].entregaPostal.formatFulla" textKey="notificacio.form.camp.entregapostal.formatfulla" labelClass="labelcss" inputClass="inputcss"/>--%>
+<%--												</c:otherwise>--%>
+<%--											</c:choose>--%>
+<%--											</div>--%>
+<%--											<div class="col-md-3 formatSobre">--%>
+<%--											<c:choose>--%>
+<%--												<c:when test="${not empty formatsSobre}">--%>
+<%--													<not:inputSelect name="enviaments[${j}].entregaPostal.formatSobre" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatsobre" optionItems="${formatsSobre}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>--%>
+<%--												</c:when>--%>
+<%--												<c:otherwise>--%>
+<%--													<not:inputText name="enviaments[${j}].entregaPostal.formatSobre" textKey="notificacio.form.camp.entregapostal.formatsobre" labelClass="labelcss" inputClass="inputcss"/>--%>
+<%--												</c:otherwise>--%>
+<%--											</c:choose>	--%>
+<%--											</div>--%>
 										</div>	
 										<div class="senseNormalitzar hidden">
 											<div class="col-md-6">
