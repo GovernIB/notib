@@ -105,6 +105,11 @@
 #entregaPostal .help-block {
 /* 	font-size: 8px; */
 }
+
+#entregaPostalCheckBox {
+	padding-top: 0px;
+}
+
 .inputcss {
 	width: calc(100% - 175px);
 	float: left;
@@ -1867,38 +1872,37 @@
 									<div class="entrega-activa" style="margin-bottom:15px;">
 										<p class="comentari"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
 									</div>
-									<div class="entrega-cie-activa">
-										<not:inputCheckbox  name="enviaments[${j}].entregaPostal.activa" textKey="notificacio.form.camp.entregapostal.activa" labelSize="1" funcio="mostrarEntregaPostal(this.id)" />
+									<div class="entrega-cie-activa flex">
+										<div class="col-xs-2">
+											<not:inputCheckbox name="enviaments[${j}].entregaPostal.activa" textKey="notificacio.form.camp.entregapostal.activa" labelSize="8" funcio="mostrarEntregaPostal(this.id)" />
+										</div>
+										<div id="tipusEntregaPostal_${j}" class="form-group  col-xs-10" <c:if test="${!enviament.entregaPostal.activa}">style="display:none;</c:if> padding-top:7px">
+											<label class="control-label col-xs-2" style="padding-top: 0px; padding-right:0px; width:12%" for="enviaments[${j}].domiciliConcretTipus.viaTipus"><spring:message code="notificacio.form.camp.entregapostal.tipus" /></label>
+											<div class="controls" style="padding-left:0px;">
+												<div class="col-xs-1">
+													<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="NACIONAL" checked="checked"/>
+													<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.NACIONAL" />
+												</div>
+												<div class="col-xs-1">
+													<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="ESTRANGER" />
+													<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.ESTRANGER" />
+												</div>
+												<div class="col-xs-3" style="width:10.667%">
+													<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="APARTAT_CORREUS" />
+													<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.APARTAT_CORREUS" />
+												</div>
+												<div class="col-xs-2">
+													<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="SENSE_NORMALITZAR" />
+													<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.SENSE_NORMALITZAR" />
+												</div>
+											</div>
+										</div>
 									</div>
 								</div>
 								<!-- ENTREGA POSTAL -->
-								<div id="entregaPostal" class="entregaPostal_${j}" <c:if test="${!enviament.entregaPostal.activa}">style="display:none"</c:if>>
+								<div id="entregaPostal" class="entregaPostal_${j}" <c:if test="${!enviament.entregaPostal.activa}">style="padding-left:15px; display:none"</c:if>>
 									<div class="col-md-12">
 										<div id="entregaPostalCaducada" class="alert alert-warning"><spring:message code="notificacio.form.camp.entregapostal.caducada"/></div>
-										<div class="col-md-12">
-											<div class="form-group">
-												<label class="control-label col-xs-2" style="width:9.667%; padding-right:0px;" for="enviaments[${j}].domiciliConcretTipus.viaTipus"><spring:message code="notificacio.form.camp.entregapostal.tipus" /></label>
-												<div class="controls col-xs-10" style="padding-left:0px;">
-													<div class="col-xs-1">
-														<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="NACIONAL" checked="checked"/>
-														<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.NACIONAL" />
-													</div>
-													<div class="col-xs-1">
-														<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="ESTRANGER" />
-														<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.ESTRANGER" />
-													</div>
-													<div class="col-xs-2" style="width:11.667%">
-														<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="APARTAT_CORREUS" />
-														<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.APARTAT_CORREUS" />
-													</div>
-													<div class="col-xs-2">
-														<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="SENSE_NORMALITZAR" />
-														<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.SENSE_NORMALITZAR" />
-													</div>
-												</div>
-											</div>
-
-										</div>
 										<div class="normalitzat">
 											<div class="col-md-4">
 												<not:inputSelect name="enviaments[${j}].entregaPostal.viaTipus" generalClass="tipusVia" textKey="notificacio.form.camp.entregapostal.tipusvia" labelClass="labelcss" inputClass="inputcss" required="true" />
@@ -1964,26 +1968,26 @@
 											<div class="col-md-12">
 												<not:inputText name="enviaments[${j}].entregaPostal.complement" textKey="notificacio.form.camp.entregapostal.complement" labelClass="labelcss" inputClass="inputcss" />
 											</div>
-											<div class="col-md-3 formatFulla">
-											<c:choose>
-												<c:when test="${not empty formatsFulla}">
-													<not:inputSelect name="enviaments[${j}].entregaPostal.formatFulla" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatfulla" optionItems="${formatsFulla}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
-												</c:when>
-												<c:otherwise>
-													<not:inputText name="enviaments[${j}].entregaPostal.formatFulla" textKey="notificacio.form.camp.entregapostal.formatfulla" labelClass="labelcss" inputClass="inputcss"/>
-												</c:otherwise>
-											</c:choose>
-											</div>
-											<div class="col-md-3 formatSobre">
-											<c:choose>
-												<c:when test="${not empty formatsSobre}">
-													<not:inputSelect name="enviaments[${j}].entregaPostal.formatSobre" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatsobre" optionItems="${formatsSobre}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
-												</c:when>
-												<c:otherwise>
-													<not:inputText name="enviaments[${j}].entregaPostal.formatSobre" textKey="notificacio.form.camp.entregapostal.formatsobre" labelClass="labelcss" inputClass="inputcss"/>
-												</c:otherwise>
-											</c:choose>	
-											</div>
+<%--											<div class="col-md-3 formatFulla">--%>
+<%--											<c:choose>--%>
+<%--												<c:when test="${not empty formatsFulla}">--%>
+<%--													<not:inputSelect name="enviaments[${j}].entregaPostal.formatFulla" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatfulla" optionItems="${formatsFulla}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>--%>
+<%--												</c:when>--%>
+<%--												<c:otherwise>--%>
+<%--													<not:inputText name="enviaments[${j}].entregaPostal.formatFulla" textKey="notificacio.form.camp.entregapostal.formatfulla" labelClass="labelcss" inputClass="inputcss"/>--%>
+<%--												</c:otherwise>--%>
+<%--											</c:choose>--%>
+<%--											</div>--%>
+<%--											<div class="col-md-3 formatSobre">--%>
+<%--											<c:choose>--%>
+<%--												<c:when test="${not empty formatsSobre}">--%>
+<%--													<not:inputSelect name="enviaments[${j}].entregaPostal.formatSobre" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatsobre" optionItems="${formatsSobre}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>--%>
+<%--												</c:when>--%>
+<%--												<c:otherwise>--%>
+<%--													<not:inputText name="enviaments[${j}].entregaPostal.formatSobre" textKey="notificacio.form.camp.entregapostal.formatsobre" labelClass="labelcss" inputClass="inputcss"/>--%>
+<%--												</c:otherwise>--%>
+<%--											</c:choose>	--%>
+<%--											</div>--%>
 										</div>	
 										<div class="senseNormalitzar hidden">
 											<div class="col-md-6">
@@ -2004,7 +2008,7 @@
 								<input class="enviaments[${j}].entregaPostal.municipiCodi hidden" value="${enviament.entregaPostal.municipiCodi}"/>
 								<c:if test="${ambEntregaDeh}">
 									<c:set var="entregaDehActiva" value="${enviament.entregaDeh.activa}"></c:set>
-									<div class="col-md-12">
+									<div class="col-md-12" style="padding-left:29px;">
 										<not:inputCheckbox name="enviaments[${j}].entregaDeh.activa" textKey="notificacio.form.camp.entregadeh.activa" labelSize="3" funcio="mostrarEntregaDeh(this.id)" />
 									</div>
 									<!-- ENTREGA DEH -->

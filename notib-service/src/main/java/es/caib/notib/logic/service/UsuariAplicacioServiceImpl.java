@@ -24,17 +24,13 @@ import es.caib.notib.logic.intf.service.AuditService.TipusObjecte;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
 import es.caib.notib.logic.intf.service.UsuariAplicacioService;
 import es.caib.notib.persist.entity.AplicacioEntity;
-import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +69,12 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		try {
 			log.debug("Creant una nova aplicació (aplicació=" + aplicacio.toString() + ")");
 			var entitat = entityComprovarHelper.comprovarEntitat(aplicacio.getEntitatId(), true, true, false, false);
-			var entity = AplicacioEntity.getBuilder(entitat, aplicacio.getUsuariCodi(), aplicacio.getCallbackUrl()).build();
+			var entity = AplicacioEntity.builder()
+							.entitat(entitat)
+							.usuariCodi(aplicacio.getUsuariCodi())
+							.callbackUrl(aplicacio.getCallbackUrl())
+								.activa(true)
+							.headerCsrf(aplicacio.isHeaderCsrf()).build();
 			return conversioTipusHelper.convertir(aplicacioRepository.save(entity), AplicacioDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

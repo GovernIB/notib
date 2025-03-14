@@ -4,7 +4,7 @@ databaseChangeLog:
       author: limit
       changes:
         - addColumn:
-            tableName: not_mon_int
+            tableName: not_aplicacio
             columns:
               - column:
                   name: header_csrf

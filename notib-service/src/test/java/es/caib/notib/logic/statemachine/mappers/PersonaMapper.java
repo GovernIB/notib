@@ -68,7 +68,7 @@ public interface PersonaMapper {
             case ADMINISTRACIO:
                 return "O";
             case FISICA:
-                return EidasValidator.isFormatEidas(persona.getNif()) ? "X" : isDocumentEstranger(persona.getNif()) ? "E" : " N ";
+                return EidasValidator.isFormatEidas(persona.getNif()) ? "X" : isDocumentEstranger(persona.getNif()) ? "E" : "N";
             case FISICA_SENSE_NIF:
                 return !Strings.isNullOrEmpty(persona.getNif()) && persona.getDocumentTipus() != null ?
                         (persona.getDocumentTipus() == DocumentTipus.PASSAPORT ? "P" : "X") : null;

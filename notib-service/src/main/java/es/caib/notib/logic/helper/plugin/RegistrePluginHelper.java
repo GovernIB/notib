@@ -848,7 +848,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			interessatDades.setTipoDocumentoIdentificacion("O");
 		}  else if (persona.getInteressatTipus() == InteressatTipus.FISICA) {
 			interessatDades.setDocumento(persona.getNif() != null ? persona.getNif().trim() : null);
-			var tipo = EidasValidator.isFormatEidas(persona.getNif())? "X" : isDocumentEstranger(persona.getNif()) ? "E" : " N ";
+			var tipo = EidasValidator.isFormatEidas(persona.getNif())? "X" : isDocumentEstranger(persona.getNif()) ? "E" : "N";
 			interessatDades.setTipoDocumentoIdentificacion(tipo);
 		}  else if (persona.getInteressatTipus() == InteressatTipus.FISICA_SENSE_NIF) {
 			// Pot tenir un document (No NIF), que s'ha desat al camp NIF

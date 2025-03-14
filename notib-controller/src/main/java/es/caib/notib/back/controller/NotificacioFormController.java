@@ -519,9 +519,9 @@ public class NotificacioFormController extends BaseUserController {
         dadesProcediment.setComu(procedimentActual.isComu());
         dadesProcediment.setEntregaCieActiva(procedimentActual.isEntregaCieActivaAlgunNivell());
         dadesProcediment.setEntregaCieVigent(procedimentActual.isEntregaCieVigent());
-        if (!procedimentActual.isComu()) {
-            return dadesProcediment;
-        }
+//        if (!procedimentActual.isComu()) {
+//            return dadesProcediment;
+//        }
             // Obtenim òrgans seleccionables
         var permis = EnviamentTipus.SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
                 EnviamentTipus.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
@@ -532,12 +532,9 @@ public class NotificacioFormController extends BaseUserController {
         }
         // Mirar si organ seleccionat te entrega postal actvia
         var organ = organGestorService.findByCodi(entitatActual.getId(), organCodi);
-//        var pagadorsCie = pagadorCieService.findNoCaducatsByEntitatAndOrgan(entitatActual, organCodi, false);
-//        var pagadorsPostal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitatActual, organCodi, false);
-//        var cieActiuPerPare = (pagadorsCie == null || !pagadorsCie.isEmpty()) && (pagadorsPostal == null || !pagadorsPostal.isEmpty());
         var cieActiuPerPare = organGestorService.entregaCieActiva(entitatActual, organCodi);
-//        dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva() || cieActiuPerPare);
-        dadesProcediment.setEntregaCieActiva(cieActiuPerPare);
+        dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva() || cieActiuPerPare);
+//        dadesProcediment.setEntregaCieActiva(cieActiuPerPare);
         return dadesProcediment;
     }
 
