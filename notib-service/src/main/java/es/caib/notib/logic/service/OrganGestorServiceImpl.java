@@ -1366,9 +1366,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		}
 		var organExistent = buscarOrgan(organ.getCodi());
 		var o = organExistent != null ? organExistent : conversioTipusHelper.convertir(organ, OrganGestorDto.class);
-		if (filtres.getNumeroPermisos() != null && !checkNumeroDePermisos(entitatId, o.getId(), filtres.getNumeroPermisos(), filtres.getNumeroPermisosLong())) {
-			return nodes;
-		}
+
 		organsList.add(o);
 		List<String> fills = organ.getFills();
 		if (fills == null || fills.isEmpty()) {
@@ -1393,6 +1391,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				continue;
 			}
 			if (isAdminOrgan && !checkPermisOrgan(actual)) {
+				continue;
+			}
+			if (codiEntitat.equals(o.getCodi()) || nets.isEmpty() && filtres.getNumeroPermisos() != null && !checkNumeroDePermisos(entitatId, o.getId(), filtres.getNumeroPermisos(), filtres.getNumeroPermisosLong())) {
 				continue;
 			}
 			nodes.add(actual);
