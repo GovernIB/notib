@@ -192,6 +192,7 @@ public class OrganGestorHelper {
 		}
 		var prefix = "[SYNC-ORGANS] ";
 		// checks if unitat already exists in database
+//		var unitat = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodi());
 		var unitat = organGestorRepository.findByCodi(unitatWS.getCodi());
 		// if not it creates a new one
 		var nom = !Strings.isNullOrEmpty(unitatWS.getDenominacionCooficial()) ? unitatWS.getDenominacionCooficial() : unitatWS.getDenominacio();

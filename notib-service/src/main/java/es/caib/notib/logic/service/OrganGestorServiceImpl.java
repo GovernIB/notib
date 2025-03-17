@@ -398,7 +398,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		if (filtre.getNumeroPermisos() != null) {
 			organs = filtrarPerNumeroDePermisos(organs, entitat.getId(), filtre.getNumeroPermisos(), filtre.getNumeroPermisosLong());
 		}
-		return getPageFiltrada(organs, filtre.getNom());
+		return getPageFiltrada(organs, filtre.getNom(), pageable);
 	}
 
 	private List<OrganGestorEntity> filtrarPerNumeroDePermisos(List<OrganGestorEntity> organs, Long entitatId, NumeroPermisos numeroPermisos, Long numeroPermisosLong) {
@@ -449,20 +449,25 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		if (filtre.getNumeroPermisos() != null) {
 			organs = filtrarPerNumeroDePermisos(organs, entitat.getId(), filtre.getNumeroPermisos(), filtre.getNumeroPermisosLong());
 		}
-		return getPageFiltrada(organs, filtre.getNom());
+		return getPageFiltrada(organs, filtre.getNom(), pageable);
 	}
 
-	private Page<OrganGestorEntity> getPageFiltrada(List<OrganGestorEntity> organs, String filtre) {
+	private Page<OrganGestorEntity> getPageFiltrada(List<OrganGestorEntity> organs, String filtre, Pageable pageable) {
 
+		var start = pageable.getPageNumber() * pageable.getPageSize();
 		if (Strings.isNullOrEmpty(filtre)) {
-			return new PageImpl<>(organs);
+			var end = Math.min(start + pageable.getPageSize(), organs.size());
+			var pageContent = organs.subList(start, end);
+			return new PageImpl<>(pageContent, pageable, organs.size());
 		}
 		var nom = StringUtils.stripAccents(filtre).toLowerCase();
 		var contingut = organs.stream().filter(organ -> {
 
 			return Strings.isNullOrEmpty(nom) || StringUtils.stripAccents(organ.getNom().toLowerCase()).contains(nom);
 		}).collect(Collectors.toList());
-		return new PageImpl<>(contingut);
+		var end = Math.min(start + pageable.getPageSize(), contingut.size());
+		var pageContent = contingut.subList(start, end);
+		return new PageImpl<>(pageContent, pageable, contingut.size());
 	}
 	
 	public boolean isUpdatingOrgans(EntitatDto entitatDto) {
@@ -1382,9 +1387,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			o = organExistent != null ? organExistent : conversioTipusHelper.convertir(node, OrganGestorDto.class);
 			actual = new ArbreNode<>(pare, o);
 			ok = filtres.filtresOk(o);
-			if (!filtres.isEmpty() && ok) {
-				actual.setRetornatFiltre(true);
-			}
+			actual.setRetornatFiltre(!filtres.isEmpty() && ok);
 			nets = generarFillsArbre(organs, actual, node.getCodi(), filtres);
 			actual.setFills(nets);
 			if (nets != null && nets.isEmpty() && !ok) {
@@ -1395,6 +1398,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			}
 			if (codiEntitat.equals(o.getCodi()) || nets.isEmpty() && filtres.getNumeroPermisos() != null && !checkNumeroDePermisos(entitatId, o.getId(), filtres.getNumeroPermisos(), filtres.getNumeroPermisosLong())) {
 				continue;
+			} else if (filtres.getNumeroPermisos() != null && !checkNumeroDePermisos(entitatId, o.getId(), filtres.getNumeroPermisos(), filtres.getNumeroPermisosLong())) {
+				actual.setRetornatFiltre(false);
 			}
 			nodes.add(actual);
 		}
