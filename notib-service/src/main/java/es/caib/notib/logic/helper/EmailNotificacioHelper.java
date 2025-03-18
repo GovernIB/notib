@@ -1,6 +1,7 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -138,6 +139,9 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 	protected String getMailHtmlBody(NotificacioEntity notificacio) {
 
 		var appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
+		var enviamenTipus = notificacio.getEnviamentTipus();
+		var enviamentTipusString = messageHelper.getMessage(EnviamentTipus.NOTIFICACIO.equals(enviamenTipus) ? "notificacio"
+									: EnviamentTipus.COMUNICACIO.equals(enviamenTipus) ? "comunicacio" : "comunicacio.sir");
 		var htmlText = "";
 		htmlText += "<!DOCTYPE html>"+
 				"<html>"+
@@ -220,12 +224,20 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 				"<div class=\"content\">"+
 				"	<table>"+
 				"		<tr>"+
-				"			<th class=\"tableHeader\" colspan=\"2\">" + messageHelper.getMessage("notificacio.email.titol") + notificacio.getId() + "</th>"+
+				"			<th class=\"tableHeader\" colspan=\"2\">" + messageHelper.getMessage("notificacio.email.titol") + enviamentTipusString + "</th>"+
 				"		</tr>"+
 				"		<tr>"+
-				"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio") +"</th>"+
-				"			<td>"+ notificacio.getId() + "</td>"+
+				"			<th>"+ messageHelper.getMessage("notificacio.email.identificador") +"</th>"+
+				"			<td>"+ notificacio.getReferencia() + "</td>"+
 				"		</tr>"+
+				"		<tr>"+
+				"			<th>"+ messageHelper.getMessage("notificacio.email.entitat") +"</th>"+
+				"			<td>"+ notificacio.getEntitat().getNom() + "</td>"+
+				"		</tr>"+
+//				"		<tr>"+
+//				"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio") +"</th>"+
+//				"			<td>"+ notificacio.getId() + "</td>"+
+//				"		</tr>"+
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio.concepte") +"</th>"+
 				"			<td>"+ notificacio.getConcepte() + "</td>"+
@@ -234,10 +246,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 				"			<th>"+ messageHelper.getMessage("notificacio.email.procediment") +"</th>"+
 				"			<td>"+ (notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : "----") + "</td>"+
 				"		</tr>"+
-				"		<tr>"+
-				"			<th>"+ messageHelper.getMessage("notificacio.email.entitat") +"</th>"+
-				"			<td>"+ notificacio.getEntitat().getNom() + "</td>"+
-				"		</tr>"+
+
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.estat.nou") +"</th>"+
 				"			<td>"+ messageHelper.getMessage("notificacio.estat.enum." + notificacio.getEstat()) + "</td>"+
