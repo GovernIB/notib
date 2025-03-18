@@ -291,7 +291,7 @@
                 <all>
                     <element name="estado" type="xsd:string"/>
                     <element name="identificador" type="xsd:string"/>
-                    <element name="fechaCaducidad" type="xsd:dateTime"/>
+                    <element name="fechaCaducidad" type="xsd:string"/>
                     <element name="mensajeError" type="xsd:string"/>
                     <element name="codigo" type="xsd:string"/>
                 </all>

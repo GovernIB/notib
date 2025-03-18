@@ -2,6 +2,8 @@ package es.caib.notib.logic.utils;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Calendar;
@@ -74,5 +76,47 @@ public class DatesUtils {
 
     public static Date toDate(XMLGregorianCalendar calendar) {
         return calendar != null ? calendar.toGregorianCalendar().getTime() : null;
+    }
+
+
+    public static final String FORMAT1 = "dd/MM/yyyy";
+    public static final String FORMAT2 = "dd-MM-yyyy";
+    public static final String FORMAT3 = "dd/MM/yy";
+    public static final String FORMAT4 = "dd-MM-yy";
+    public static final String FORMAT5 = "yyyy/MM/dd";
+    public static final String FORMAT6 = "yyyy-MM-dd";
+
+    public static Date checkDate(Object dateObj, String format) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat(FORMAT1);
+        Date dataDate = null;
+        if (dateObj instanceof Date) {
+            dataDate = (Date) dateObj;
+        } else if (dateObj instanceof String) {
+            // Validar format data
+            String dataText = (String) dateObj;
+            try {
+                String[] formats = {format, FORMAT2, FORMAT3, FORMAT4, FORMAT5, FORMAT6};
+                if (format != null && !format.isEmpty()) {
+                    dataDate = parseDate(dataText, FORMAT1, FORMAT2, FORMAT3, FORMAT4, FORMAT5, FORMAT6, format);
+                } else {
+                    dataDate = parseDate(dataText, FORMAT1, FORMAT2, FORMAT3, FORMAT4, FORMAT5, FORMAT6);
+                }
+            } catch (Exception ex) {
+                dataDate = null;
+            }
+        }
+
+        return dataDate;
+    }
+
+    public static Date parseDate(String dateString, String... formatStrings) {
+        for (String formatString : formatStrings) {
+            try {
+                return new SimpleDateFormat(formatString).parse(dateString);
+            } catch (ParseException e) {
+            }
+        }
+        return null;
     }
 }

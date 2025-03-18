@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.Envios;
@@ -249,6 +250,7 @@ public class ConversioTipusHelper {
 		mapperFactory.classMap(AmpliarPlazoOE.class, es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.AmpliarPlazoOE.class).byDefault().register();
 		mapperFactory.classMap(Envios.class, es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.Envios.class).byDefault().register();
 		mapperFactory.classMap(es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.AmpliacionesPlazo.class, AmpliacionesPlazo.class).byDefault().register();
+		mapperFactory.classMap(es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.AmpliacionPlazo.class, AmpliacionPlazo.class).byDefault().register();
 		mapperFactory.classMap(AmpliacionesPlazo.class, es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.AmpliacionesPlazo.class).byDefault().register();
 
 		mapperFactory.classMap(UsuariEntity.class, UsuariDto.class).
