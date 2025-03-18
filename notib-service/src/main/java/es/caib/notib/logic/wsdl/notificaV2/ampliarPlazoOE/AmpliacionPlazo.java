@@ -4,9 +4,7 @@ package es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 
@@ -44,9 +42,7 @@ public class AmpliacionPlazo {
     @XmlElement(required = true)
     protected String identificador;
     @XmlElement(required = true, nillable = true)
-    @XmlJavaTypeAdapter(XMLGregorianCalendarAdapter.class)
-    @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar fechaCaducidad;
+    protected String fechaCaducidad;
     @XmlElement(required = true)
     protected String mensajeError;
     @XmlElement(required = true)
@@ -105,22 +101,22 @@ public class AmpliacionPlazo {
      * 
      * @return
      *     possible object is
-     *     {@link XMLGregorianCalendar }
+     *     {@link String }
      *     
      */
-    public XMLGregorianCalendar getFechaCaducidad() {
+    public String getFechaCaducidad() {
         return fechaCaducidad;
     }
 
     /**
      * Sets the value of the fechaCaducidad property.
-     * 
+     *
      * @param value
      *     allowed object is
-     *     {@link XMLGregorianCalendar }
-     *     
+     *     {@link String }
+     *
      */
-    public void setFechaCaducidad(XMLGregorianCalendar value) {
+    public void setFechaCaducidad(String value) {
         this.fechaCaducidad = value;
     }
 

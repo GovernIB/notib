@@ -19,7 +19,7 @@ public class AmpliacionPlazo {
 
     protected String estado;
     protected String identificador;
-    protected XMLGregorianCalendar fechaCaducidad;
+    protected String fechaCaducidad;
     protected String mensajeError;
     protected String codigo;
 

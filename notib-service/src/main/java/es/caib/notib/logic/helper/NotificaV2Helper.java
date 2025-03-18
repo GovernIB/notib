@@ -410,7 +410,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		try {
 			var apiKey = enviaments.get(0).getNotificacio().getEntitat().getApiKey();
 			var organEmisor = enviaments.get(0).getNotificacio().getEmisorDir3Codi();
-			Holder<AmpliacionesPlazo> ampliacionesPlazo = new Holder<>();
 			var ap = conversioTipusHelper.convertir(ampliarPlazo, es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.AmpliarPlazoOE.class);
 			ap.setOrganismoEmisor(organEmisor);
 			System.setProperty("jaxb.debug", "true");
@@ -418,12 +417,13 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			resposta = new RespuestaAmpliarPlazoOE();
 			resposta.setCodigoRespuesta(respuesta.getCodigoRespuesta());
 			resposta.setDescripcionRespuesta(respuesta.getDescripcionRespuesta());
-			resposta.setAmpliacionesPlazo(conversioTipusHelper.convertir(ampliacionesPlazo.value, es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo.class));
+			resposta.setAmpliacionesPlazo(conversioTipusHelper.convertir(respuesta.getAmpliacionesPlazo(), es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo.class));
 		} catch (Exception ex) {
 			var msg = "Error inesperat al ampliarPlazosOE ";
 			log.error(msg, ex);
 			resposta = new RespuestaAmpliarPlazoOE();
 			resposta.setCodigoRespuesta("error");
+			resposta.setError(true);
 			resposta.setDescripcionRespuesta(msg + ex.getMessage());
 		}
 		var ok = false;
@@ -434,10 +434,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		for (var enviament : enviaments) {
 			info.addParam("Notificacio/Enviament", enviament.getNotificacio().getId() + "/" + enviament.getId());
 			codiEntitat +=  enviament.getNotificacio().getEntitat().getCodi();
-			if (!ok) {
-				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, !ok, errorDesc, false);
-				continue;
-			}
+//			if (!ok) {
+//				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, !ok, errorDesc, false);
+//				continue;
+//			}
 			var ampliaciones = resposta.getAmpliacionesPlazo();
 			if (ampliaciones == null || ampliaciones.getAmpliacionPlazo() == null || ampliaciones.getAmpliacionPlazo().isEmpty()) {
 				errorDesc = "[ampliarPlazoOE] No han arribat dades suficients per guardar la informacio a Notib";
@@ -450,8 +450,38 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					continue;
 				}
 
-				var dataCaducitat = ampliacion.getFechaCaducidad().toGregorianCalendar().getTime();
-				enviament.setNotificaDataCaducitat(dataCaducitat);
+				if ("KO".equals(ampliacion.getEstado())) {
+					resposta.setError(true);
+					resposta.setCodigoRespuesta(ampliacion.getCodigo());
+					resposta.setDescripcionRespuesta(ampliacion.getMensajeError());
+					errorDesc += ampliacion.getMensajeError();
+					ok = false;
+					notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, ampliacion.getMensajeError(), false);
+					continue;
+				}
+				Date dataCaducitat;
+				if (Strings.isNullOrEmpty(ampliacion.getFechaCaducidad())) {
+					var error = "[ampliarPlazoOE] Data de caducitat buida";
+					resposta.setError(true);
+					resposta.setCodigoRespuesta("Error");
+					resposta.setDescripcionRespuesta(error);
+					ok = false;
+					notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, error, false);
+					continue;
+				}
+				try {
+					dataCaducitat = new SimpleDateFormat("dd/MM/yyyy").parse(ampliacion.getFechaCaducidad());
+					enviament.setNotificaDataCaducitat(dataCaducitat);
+				} catch (Exception ex) {
+					var error = "[ampliarPlazoOE] Error convertit la data de caducitat " + ampliacion.getFechaCaducidad();
+					log.error(error, ex);
+					resposta.setError(true);
+					resposta.setCodigoRespuesta("Error");
+					resposta.setDescripcionRespuesta(error);
+					ok = false;
+					notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, error, false);
+					continue;
+				}
 				enviament.setPlazoAmpliado(true);
 				var caducitatOriginal = enviament.getNotificacio().getCaducitatOriginal();
 				if (caducitatOriginal == null) {
