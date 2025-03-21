@@ -18,10 +18,8 @@ import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
-import es.caib.notib.logic.intf.util.EidasValidator;
-import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
-import es.caib.notib.logic.intf.service.PagadorCieService;
+import es.caib.notib.logic.intf.util.EidasValidator;
 import es.caib.notib.logic.intf.util.MimeUtils;
 import es.caib.notib.logic.intf.util.NifHelper;
 import es.caib.notib.logic.intf.util.PdfUtils;
@@ -993,7 +991,7 @@ public class NotificacioValidator implements Validator {
     }
 
     private Set<Character> validFormat(String value) {
-        String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
+        String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-–_/:().,¿?!¡;ºª";
         Set<Character> charsNoValids = new HashSet<>();
         char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
 
