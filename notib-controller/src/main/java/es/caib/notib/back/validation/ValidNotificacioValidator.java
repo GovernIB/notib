@@ -374,7 +374,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 
 	public static ArrayList<Character> validFormat(String value) {
 
-		String controlCaracters = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
+		String controlCaracters = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-–_/:().,¿?!¡;ºª";
 		ArrayList<Character> charsNoValids = new ArrayList<>();
 		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
 		boolean esCaracterValid = true;
