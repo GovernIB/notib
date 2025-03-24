@@ -234,19 +234,38 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 				"			<th>"+ messageHelper.getMessage("notificacio.email.entitat") +"</th>"+
 				"			<td>"+ notificacio.getEntitat().getNom() + "</td>"+
 				"		</tr>"+
-//				"		<tr>"+
-//				"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio") +"</th>"+
-//				"			<td>"+ notificacio.getId() + "</td>"+
-//				"		</tr>"+
+				"		<tr>"+
+				"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio.organ") +"</th>"+
+				"			<td>"+ notificacio.getOrganGestor().getCodi() + " - " + notificacio.getOrganGestor().getNom()+ "</td>"+
+				"		</tr>"+
+				"		<tr>"+
+				"			<th>"+ messageHelper.getMessage("notificacio.email.procediment") +"</th>"+
+				"			<td>"+ (notificacio.getProcediment() != null ? notificacio.getProcediment().getCodi() + " - " + notificacio.getProcediment().getNom() : "----") + "</td>"+
+				"		</tr>"+
+				"		<tr>"+
+				"			<th>"+ messageHelper.getMessage("notificacio.email.num.expedient") +"</th>"+
+				"			<td>"+ notificacio.getNumExpedient() + "</td>"+
+				"		</tr>"+
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio.concepte") +"</th>"+
 				"			<td>"+ notificacio.getConcepte() + "</td>"+
 				"		</tr>"+
 				"		<tr>"+
-				"			<th>"+ messageHelper.getMessage("notificacio.email.procediment") +"</th>"+
-				"			<td>"+ (notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : "----") + "</td>"+
+				"			<th>"+ messageHelper.getMessage("notificacio.email.enviament.interessat") +"</th>"+
+				"			<td>"+ notificacio.getConcepte() + "</td>"+
 				"		</tr>"+
-
+				"		<tr>"+
+				"			<th>"+ messageHelper.getMessage("notificacio.email.enviament.representat") +"</th>"+
+				"			<td>"+ notificacio.getConcepte() + "</td>"+
+				"		</tr>"+
+				"		<tr>"+
+				"			<th>"+ messageHelper.getMessage("notificacio.email.enviament.creada.enviada.el") +"</th>"+
+				"			<td>"+ notificacio.getConcepte() + "</td>"+
+				"		</tr>"+
+				"		<tr>"+
+				"			<th>"+ messageHelper.getMessage("notificacio.email.enviament.num.registre") +"</th>"+
+				"			<td>"+ notificacio.getConcepte() + "</td>"+
+				"		</tr>"+
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.estat.nou") +"</th>"+
 				"			<td>"+ messageHelper.getMessage("notificacio.estat.enum." + notificacio.getEstat()) + "</td>"+
