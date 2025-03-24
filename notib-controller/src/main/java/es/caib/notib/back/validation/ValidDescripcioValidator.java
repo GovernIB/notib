@@ -43,8 +43,9 @@ public class ValidDescripcioValidator implements ConstraintValidator<ValidDescri
 	}
 
 	// Validació del concepte
+//	private static final String CONTROL_CARAC_OLD = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;";
 	private static final String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-–_/:().,¿?!¡;ºª";
-	
+
 	@SuppressWarnings("deprecation")
 	private static boolean validacioConcepte(String concepte, final ConstraintValidatorContext context) {
 
