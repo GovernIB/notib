@@ -66,7 +66,13 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         } catch (Exception ex) {
             log.error("Excepcio no controlada al obtenir la variable ENVIAMENT_DELAY per l'enviament " + enviamentUuid, ex);
         }
+        //El valor del delay s'ha d'accedir i actualitzar amb un semaphor
+        //Si NO es retry agafar el valor delay global de l'aplicació
+            // el valor global es la data de l'ultim enviament a registre + el valor de la propietat de delay
+            // si valor inferior a ARA el delay serà 0 sinó serà valor menys ARA
+        //Si es retry agafar el valor de retry maxim entre el global i el retry
         var delay = !isRetry ? SmConstants.delay(reintents, delayMassiu) : 0L;
+//        var delay = SmConstants.delay(reintents, delayMassiu);
         variables.put(SmConstants.RG_RETRY, false);
         variables.put(SmConstants.ENVIAMENT_DELAY, 0L);
 

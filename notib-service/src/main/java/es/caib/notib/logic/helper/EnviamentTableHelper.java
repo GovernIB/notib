@@ -6,6 +6,7 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.repository.EnviamentTableRepository;
+import joptsimple.internal.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,6 +26,8 @@ public class EnviamentTableHelper {
         var notificacio = enviament.getNotificacio();
         var titular = enviament.getTitular();
         var document = notificacio.getDocument();
+        var csv = document != null && !Strings.isNullOrEmpty(document.getCsv()) ? document.getCsv() : "";
+        var uuid = document != null && !Strings.isNullOrEmpty(document.getUuid()) ? document.getUuid() : "";
 
         EnviamentTableEntity tableViewItem = EnviamentTableEntity.builder()
                 .enviament(enviament)
@@ -49,7 +52,7 @@ public class EnviamentTableHelper {
                 .descripcio(notificacio.getDescripcio())
                 .registreLlibreNom(notificacio.getRegistreLlibreNom())
                 .estat(notificacio.getEstat())
-                .csv_uuid(document != null ? document.getCsv() + document.getUuid() : null)
+                .csv_uuid(csv + " " + uuid)
                 .hasErrors(false)
                 .procedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu())
                 .procedimentOrganId(notificacio.getProcedimentOrgan() != null ? notificacio.getProcedimentOrgan().getId() : null)
@@ -106,7 +109,9 @@ public class EnviamentTableHelper {
         tableViewItem.setDescripcio(notificacio.getDescripcio());
         tableViewItem.setRegistreLlibreNom(notificacio.getRegistreLlibreNom());
         tableViewItem.setEstat(notificacio.getEstat());
-        tableViewItem.setCsv_uuid(document != null ? document.getCsv() + document.getUuid() : null);
+        var csv = document != null && !Strings.isNullOrEmpty(document.getCsv()) ? document.getCsv() : "";
+        var uuid = document != null && !Strings.isNullOrEmpty(document.getUuid()) ? document.getUuid() : "";
+        tableViewItem.setCsv_uuid(csv + " " + uuid);
         tableViewItem.setHasErrors(false);
 
         tableViewItem.setProcedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu());

@@ -18,7 +18,7 @@ import javax.validation.constraints.Size;
 @Getter @Setter
 public class EntregapostalCommand {
 
-	private NotificaDomiciliConcretTipus domiciliConcretTipus;
+	private NotificaDomiciliConcretTipus domiciliConcretTipus = NotificaDomiciliConcretTipus.NACIONAL;
 	private EntregaPostalVia viaTipus;
 	@Size(max=50)
 	private String viaNom;
