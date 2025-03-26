@@ -934,9 +934,9 @@ public class NotificacioValidator implements Validator {
             if (Strings.isNullOrEmpty(entregaPostal.getViaNom())) {
                 errors.rejectValue(envName + ".viaNom", error(POSTAL_VIA_NOM_NULL, l, prefix, tipus));
             } else {
-                var charsNoValids = validFormatCampEntregaPostal(entregaPostal.getPoblacio());
+                var charsNoValids = validFormatCampEntregaPostal(entregaPostal.getViaNom());
                 if (!charsNoValids.isEmpty()) {
-                    errors.rejectValue(envName + ".linea1", error(POSTAL_VIA_NOM_CAMPS_NO_VALIDS, l, prefix, charsNoValids));
+                    errors.rejectValue(envName + ".viaNom", error(POSTAL_VIA_NOM_CAMPS_NO_VALIDS, l, prefix, charsNoValids));
                 }
             }
             if (Strings.isNullOrEmpty(entregaPostal.getPuntKm()) && Strings.isNullOrEmpty(entregaPostal.getNumeroCasa())) {
@@ -953,7 +953,7 @@ public class NotificacioValidator implements Validator {
             } else {
                 var charsNoValids = validFormatCampEntregaPostal(entregaPostal.getPoblacio());
                 if (!charsNoValids.isEmpty()) {
-                    errors.rejectValue(envName + ".linea1", error(POSTAL_POBLACIO_CAMPS_NO_VALIDS, l, prefix, charsNoValids));
+                    errors.rejectValue(envName + ".poblacio", error(POSTAL_POBLACIO_CAMPS_NO_VALIDS, l, prefix, charsNoValids));
                 }
             }
             if (Strings.isNullOrEmpty(entregaPostal.getPaisCodi())) {
@@ -963,6 +963,11 @@ public class NotificacioValidator implements Validator {
         if(isEstranger) {
             if (Strings.isNullOrEmpty(entregaPostal.getViaNom())) {
                 errors.rejectValue(envName + ".viaNom", error(POSTAL_VIA_NOM_NULL, l, prefix, tipus));
+            } else {
+                var charsNoValids = validFormatCampEntregaPostal(entregaPostal.getViaNom());
+                if (!charsNoValids.isEmpty()) {
+                    errors.rejectValue(envName + ".viaNom", error(POSTAL_VIA_NOM_CAMPS_NO_VALIDS, l, prefix, charsNoValids));
+                }
             }
             if (Strings.isNullOrEmpty(entregaPostal.getPaisCodi())) {
                 errors.rejectValue(envName + ".paisCodi", error(POSTAL_PAIS_CODI_NULL, l, prefix, tipus));
@@ -972,7 +977,7 @@ public class NotificacioValidator implements Validator {
             } else {
                 var charsNoValids = validFormatCampEntregaPostal(entregaPostal.getPoblacio());
                 if (!charsNoValids.isEmpty()) {
-                    errors.rejectValue(envName + ".linea1", error(POSTAL_POBLACIO_CAMPS_NO_VALIDS, l, prefix, charsNoValids));
+                    errors.rejectValue(envName + ".poblacio", error(POSTAL_POBLACIO_CAMPS_NO_VALIDS, l, prefix, charsNoValids));
                 }
             }
         }
@@ -991,7 +996,7 @@ public class NotificacioValidator implements Validator {
             } else {
                 var charsNoValids = validFormatCampEntregaPostal(entregaPostal.getPoblacio());
                 if (!charsNoValids.isEmpty()) {
-                    errors.rejectValue(envName + ".linea1", error(POSTAL_POBLACIO_CAMPS_NO_VALIDS, l, prefix, charsNoValids));
+                    errors.rejectValue(envName + ".poblacio", error(POSTAL_POBLACIO_CAMPS_NO_VALIDS, l, prefix, charsNoValids));
                 }
             }
         }
