@@ -185,7 +185,7 @@ public class EmailNotificacioHelperTest {
 		Mockito.when(procSerHelper.findUsuaris(Mockito.any(NotificacioEntity.class))).thenReturn(usuaris);
 
 		// When	
-		String resposta = emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacioMock);
+		String resposta = emailNotificacioHelper.prepararEnvioEmailNotificacio(enviamentMock);
 		
 		// Then
 		Mockito.verify(grupRepository, Mockito.times(0)).findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class));

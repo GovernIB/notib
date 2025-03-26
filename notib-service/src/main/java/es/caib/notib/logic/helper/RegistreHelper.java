@@ -87,11 +87,11 @@ public class RegistreHelper {
 			logTimeHelper.info(" [TIMER-SIR] Actualitzar estat comunicació SIR [Id: " + enviamentId + "]: ");
 			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA && canviEstat) {
 				try {
-					jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_NOTIFICACIO, notificacio.getId());
+					jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_NOTIFICACIO, enviament.getId());
 				} catch (JmsException ex) {
-					log.error("Hi ha hagut un error al intentar enviar el correu electrònic de la notificació amb id: ." + notificacio.getId(), ex);
+					log.error("Hi ha hagut un error al intentar enviar el correu electronic de l'enviament " + enviament.getId() + " de la notificacio amb id: ." + notificacio.getId(), ex);
 				}
-				logTimeHelper.info(" [TIMER-SIR] Preparar enviament mail notificació [Id: " + enviamentId + "]");
+				logTimeHelper.info(" [TIMER-SIR] Preparar enviament mail enviament [Id: " + enviamentId + "]");
 			}
 //			enviament.refreshSirConsulta();
 			logTimeHelper.infoWithoutTime(fiActEstatRegistreText + enviament.getId() + estatText + enviament.getNotificaEstat() + "]");

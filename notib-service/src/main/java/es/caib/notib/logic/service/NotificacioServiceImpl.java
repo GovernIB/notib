@@ -1336,11 +1336,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 			var usuari = usuariHelper.getUsuariAutenticat();
 			if (usuari != null && notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
-				try {
-					jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_NOTIFICACIO, notificacioId);
-				} catch (JmsException ex) {
-					log.error("Hi ha hagut un error al intentar enviar el correu electrònic de la notificació amb id: ." + notificacioId, ex);
-					resposta = "No s'ha pogut avisar per correu electrònic: " + ex.getMessage();
+				for (var enviament : notificacioEntity.getEnviaments()) {
+					try {
+						jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_NOTIFICACIO, enviament.getId());
+					} catch (JmsException ex) {
+						log.error("Hi ha hagut un error al intentar enviar el correu electrònic de l'enviament " + enviament.getId() + " de la notificació amb id: ." + notificacioId, ex);
+						resposta = "No s'ha pogut avisar per correu electrònic: " + ex.getMessage();
+					}
 				}
 			}
 			log.info("PRC >> Email enviat si s'escau");

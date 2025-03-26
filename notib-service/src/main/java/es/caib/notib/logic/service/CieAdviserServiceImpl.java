@@ -499,9 +499,9 @@ public class CieAdviserServiceImpl implements CieAdviserService {
             if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
                 try {
                     log.info("Enviar email en cas d'usuaris INTERFICIE WEB");
-                    jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_NOTIFICACIO, notificacio.getId());
+                    jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_NOTIFICACIO, enviament.getId());
                 } catch (JmsException ex) {
-                    log.error("Hi ha hagut un error al intentar enviar el correu electrònic de la notificació amb id: ." + notificacio.getId(), ex);
+                    log.error("Hi ha hagut un error al intentar enviar el correu electronic de l'enviament " + enviament.getId() + " de la notificacio amb id: ." + notificacio.getId(), ex);
                 }
             }
         }
