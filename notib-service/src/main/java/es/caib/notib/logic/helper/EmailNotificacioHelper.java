@@ -6,11 +6,15 @@ import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.UsuariDto;
+import es.caib.notib.logic.mapper.NotificacioTableMapperImpl;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEntity;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -27,12 +31,15 @@ import java.util.Set;
  */
 @Slf4j
 @Component
-public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
+public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEntity> {
 
 	@Resource ProcSerHelper procSerHelper;
 	@Resource IntegracioHelper integracioHelper;
+    @Autowired
+    private NotificacioTableMapperImpl notificacioTableMapperImpl;
 
-	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws Exception {
+	public String prepararEnvioEmailNotificacio(NotificacioEnviamentEntity enviament) throws Exception {
+
 
 		var info = new IntegracioInfo(IntegracioCodi.EMAIL, "Enviament de emails per notificació " + notificacio.getId(), IntegracioAccioTipusEnumDto.ENVIAMENT);
 		info.setCodiEntitat(notificacio.getEntitat().getCodi());
@@ -136,12 +143,33 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 	}
 
 	@Override
-	protected String getMailHtmlBody(NotificacioEntity notificacio) {
+	protected String getMailHtmlBody(NotificacioEnviamentEntity enviament) {
 
 		var appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
+		var notificacio = enviament.getNotificacio();
 		var enviamenTipus = notificacio.getEnviamentTipus();
 		var enviamentTipusString = messageHelper.getMessage(EnviamentTipus.NOTIFICACIO.equals(enviamenTipus) ? "notificacio"
 									: EnviamentTipus.COMUNICACIO.equals(enviamenTipus) ? "comunicacio" : "comunicacio.sir");
+		var nif = "";
+		var interessat = "";
+		var persona = enviament.getTitular();
+		nif = !Strings.isNullOrEmpty(persona.getNif()) ? "(" + persona.getNif() + ")" : persona.getRaoSocial();
+		interessat += "<tr>" +
+				"			<th>" + messageHelper.getMessage("notificacio.email.enviament.interessat") + "</th>" +
+				"			<td>" + persona.getNomSencer() + nif + "</td>" +
+				"		</tr>";
+		for (var destinatari : enviament.getDestinataris()) {
+			nif = !Strings.isNullOrEmpty(destinatari.getNif()) ? "(" + nif + ")" : destinatari.getRaoSocial();
+			interessat += "<tr>" +
+					"			<th>" + messageHelper.getMessage("notificacio.email.enviament.representat") + "</th>" +
+					"			<td>" + destinatari.getNomSencer() + nif + "</td>" +
+					"		</tr>";
+		}
+
+		var enviadaEl = enviament.getNotificaEstatData() != null ? enviament.getNotificaEstatData()
+						: EnviamentTipus.SIR.equals(enviamenTipus) ? enviament.getSirRegDestiData() != null ? enviament.getSirRegDestiData() : null
+						: enviament.getRegistreData() != null ? enviament.getRegistreData() : null;
+
 		var htmlText = "";
 		htmlText += "<!DOCTYPE html>"+
 				"<html>"+
@@ -238,43 +266,44 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 				"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio.organ") +"</th>"+
 				"			<td>"+ notificacio.getOrganGestor().getCodi() + " - " + notificacio.getOrganGestor().getNom()+ "</td>"+
 				"		</tr>"+
+				(notificacio.getProcediment() != null ?
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.procediment") +"</th>"+
-				"			<td>"+ (notificacio.getProcediment() != null ? notificacio.getProcediment().getCodi() + " - " + notificacio.getProcediment().getNom() : "----") + "</td>"+
-				"		</tr>"+
+				"			<td>"+ notificacio.getProcediment().getCodi() + " - " + notificacio.getProcediment().getNom() + "</td>"+
+				"		</tr>" : "") +
+				(!Strings.isNullOrEmpty(notificacio.getNumExpedient()) ?
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.num.expedient") +"</th>"+
 				"			<td>"+ notificacio.getNumExpedient() + "</td>"+
-				"		</tr>"+
+				"		</tr>" : "") +
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio.concepte") +"</th>"+
 				"			<td>"+ notificacio.getConcepte() + "</td>"+
+				"		</tr>"
+				+ interessat +
+				"		<tr>"+
+				"			<th>"+ messageHelper.getMessage("notificacio.email.enviament.creada.el") +"</th>"+
+				"			<td>"+ notificacio.getCreatedDate() + "</td>"+
 				"		</tr>"+
 				"		<tr>"+
-				"			<th>"+ messageHelper.getMessage("notificacio.email.enviament.interessat") +"</th>"+
-				"			<td>"+ notificacio.getConcepte() + "</td>"+
+				"			<th>"+ messageHelper.getMessage("notificacio.email.enviament.enviada.el") +"</th>"+
+				"			<td>"+ enviadaEl + "</td>"+
 				"		</tr>"+
-				"		<tr>"+
-				"			<th>"+ messageHelper.getMessage("notificacio.email.enviament.representat") +"</th>"+
-				"			<td>"+ notificacio.getConcepte() + "</td>"+
-				"		</tr>"+
-				"		<tr>"+
-				"			<th>"+ messageHelper.getMessage("notificacio.email.enviament.creada.enviada.el") +"</th>"+
-				"			<td>"+ notificacio.getConcepte() + "</td>"+
-				"		</tr>"+
+				(!Strings.isNullOrEmpty(notificacio.getRegistreNumeroFormatat()) ?
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.enviament.num.registre") +"</th>"+
-				"			<td>"+ notificacio.getConcepte() + "</td>"+
-				"		</tr>"+
+				"			<td>"+ enviament.getRegistreNumeroFormatat() + "</td>"+
+				"		</tr>" : "") +
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.estat.nou") +"</th>"+
 				"			<td>"+ messageHelper.getMessage("notificacio.estat.enum." + notificacio.getEstat()) + "</td>"+
-				"		</tr>"+
-				"		<tr>"+
-				"			<th>"+ messageHelper.getMessage("notificacio.email.estat.motiu") +"</th>"+
-				"			<td>"+ notificacio.getMotiu() + "</td>"+
-				"		</tr>"+
-				"		<tr>"+
+				"		</tr>" +
+				(!Strings.isNullOrEmpty(notificacio.getMotiu()) ?
+					"		<tr>" +
+							"			<th>" + messageHelper.getMessage("notificacio.email.estat.motiu") + "</th>" +
+							"			<td>" + notificacio.getMotiu() + "</td>" +
+							"		</tr>" +
+							"		<tr>" : "") +
 				"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio.info") + "</th>"+
 				"			<td> <a href=\""+appBaseUrl+"/notificacio/"+notificacio.getId()+ "/info\">"+ messageHelper.getMessage("notificacio.email.notificacio.detall") + "</a>" +
 				"			</td>"+
