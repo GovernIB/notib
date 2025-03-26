@@ -18,10 +18,8 @@ import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.Persona;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
-import es.caib.notib.logic.intf.util.EidasValidator;
-import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
-import es.caib.notib.logic.intf.service.PagadorCieService;
+import es.caib.notib.logic.intf.util.EidasValidator;
 import es.caib.notib.logic.intf.util.MimeUtils;
 import es.caib.notib.logic.intf.util.NifHelper;
 import es.caib.notib.logic.intf.util.PdfUtils;
@@ -935,6 +933,11 @@ public class NotificacioValidator implements Validator {
             }
             if (Strings.isNullOrEmpty(entregaPostal.getViaNom())) {
                 errors.rejectValue(envName + ".viaNom", error(POSTAL_VIA_NOM_NULL, l, prefix, tipus));
+            } else {
+                var charsNoValids = validFormatCampEntregaPostal(entregaPostal.getPoblacio());
+                if (!charsNoValids.isEmpty()) {
+                    errors.rejectValue(envName + ".linea1", error(POSTAL_VIA_NOM_CAMPS_NO_VALIDS, l, prefix, charsNoValids));
+                }
             }
             if (Strings.isNullOrEmpty(entregaPostal.getPuntKm()) && Strings.isNullOrEmpty(entregaPostal.getNumeroCasa())) {
                 errors.rejectValue(envName + ".numeroCasa", error(POSTAL_NUM_KM_NULL, l, prefix, tipus));
@@ -947,6 +950,11 @@ public class NotificacioValidator implements Validator {
             }
             if (Strings.isNullOrEmpty(entregaPostal.getPoblacio())) {
                 errors.rejectValue(envName + ".poblacio", error(POSTAL_POBLACIO_NULL, l, prefix, tipus));
+            } else {
+                var charsNoValids = validFormatCampEntregaPostal(entregaPostal.getPoblacio());
+                if (!charsNoValids.isEmpty()) {
+                    errors.rejectValue(envName + ".linea1", error(POSTAL_POBLACIO_CAMPS_NO_VALIDS, l, prefix, charsNoValids));
+                }
             }
             if (Strings.isNullOrEmpty(entregaPostal.getPaisCodi())) {
                 errors.rejectValue(envName + ".paisCodi", error(POSTAL_PAIS_CODI_NULL, l, prefix, tipus));
@@ -961,6 +969,11 @@ public class NotificacioValidator implements Validator {
             }
             if (Strings.isNullOrEmpty(entregaPostal.getPoblacio())) {
                 errors.rejectValue(envName + ".poblacio", error(POSTAL_POBLACIO_NULL, l, prefix, tipus));
+            } else {
+                var charsNoValids = validFormatCampEntregaPostal(entregaPostal.getPoblacio());
+                if (!charsNoValids.isEmpty()) {
+                    errors.rejectValue(envName + ".linea1", error(POSTAL_POBLACIO_CAMPS_NO_VALIDS, l, prefix, charsNoValids));
+                }
             }
         }
         if(isApartatCorreus) {
@@ -975,14 +988,29 @@ public class NotificacioValidator implements Validator {
             }
             if (Strings.isNullOrEmpty(entregaPostal.getPoblacio())) {
                 errors.rejectValue(envName + ".poblacio", error(POSTAL_POBLACIO_NULL, l, prefix, tipus));
+            } else {
+                var charsNoValids = validFormatCampEntregaPostal(entregaPostal.getPoblacio());
+                if (!charsNoValids.isEmpty()) {
+                    errors.rejectValue(envName + ".linea1", error(POSTAL_POBLACIO_CAMPS_NO_VALIDS, l, prefix, charsNoValids));
+                }
             }
         }
         if(isSenseNormalitzar) {
             if (Strings.isNullOrEmpty(entregaPostal.getLinea1())) {
                 errors.rejectValue(envName + ".linea1", error(POSTAL_LINIA1_NULL, l, prefix, tipus));
+            } else {
+                var charsNoValids = validFormatCampEntregaPostal(entregaPostal.getLinea1());
+                if (!charsNoValids.isEmpty()) {
+                    errors.rejectValue(envName + ".linea1", error(POSTAL_LINIA1_CAMPS_NO_VALIDS, l, prefix, charsNoValids));
+                }
             }
             if (Strings.isNullOrEmpty(entregaPostal.getLinea2())) {
                 errors.rejectValue(envName + ".linea2", error(POSTAL_LINIA2_NULL, l, prefix, tipus));
+            } else {
+                var charsNoValids = validFormatCampEntregaPostal(entregaPostal.getLinea2());
+                if (!charsNoValids.isEmpty()) {
+                    errors.rejectValue(envName + ".linea2", error(POSTAL_LINIA2_CAMPS_NO_VALIDS, l, prefix, charsNoValids));
+                }
             }
         }
     }
@@ -993,7 +1021,24 @@ public class NotificacioValidator implements Validator {
     }
 
     private Set<Character> validFormat(String value) {
-        String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
+
+        String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-–_/:().,¿?!¡;ºª";
+        Set<Character> charsNoValids = new HashSet<>();
+        char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
+
+        boolean esCaracterValid = true;
+        for (int i = 0; i < chars.length; i++) {
+            esCaracterValid = !(CONTROL_CARACTERS.indexOf(chars[i]) < 0);
+            if (!esCaracterValid) {
+                charsNoValids.add(chars[i]);
+            }
+        }
+        return charsNoValids;
+    }
+
+    private Set<Character> validFormatCampEntregaPostal(String value) {
+
+        String CONTROL_CARACTERS = " 0123456789(),/_ªºÑÇñçÁÉÍÓÚÀÈÌÒÙáéíóúàèìòùüABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         Set<Character> charsNoValids = new HashSet<>();
         char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
 

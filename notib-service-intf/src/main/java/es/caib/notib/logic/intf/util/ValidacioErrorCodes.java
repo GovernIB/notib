@@ -119,6 +119,7 @@ public class ValidacioErrorCodes {
     public static final int POSTAL_VIA_TIPUS_NULL = 1163;
     public static final int POSTAL_VIA_NOM_NULL = 1164;
     public static final int POSTAL_VIA_NOM_SIZE = 1165;
+    public static final int POSTAL_VIA_NOM_CAMPS_NO_VALIDS = 11655;
     public static final int POSTAL_NUM_KM_NULL = 1166;
     public static final int POSTAL_NUM_CASA_SIZE = 1167;
     public static final int POSTAL_PUNT_KM_SIZE = 1168;
@@ -139,8 +140,11 @@ public class ValidacioErrorCodes {
     public static final int POSTAL_PAIS_CODI_SIZE = 1183;
     public static final int POSTAL_POBLACIO_NULL = 1184;
     public static final int POSTAL_POBLACIO_SIZE = 1185;
+    public static final int POSTAL_POBLACIO_CAMPS_NO_VALIDS = 11855;
     public static final int POSTAL_LINIA1_NULL = 1186;
     public static final int POSTAL_LINIA1_SIZE = 1187;
+    public static final int POSTAL_LINIA1_CAMPS_NO_VALIDS = 11877;
     public static final int POSTAL_LINIA2_NULL = 1188;
     public static final int POSTAL_LINIA2_SIZE = 1189;
+    public static final int POSTAL_LINIA2_CAMPS_NO_VALIDS = 11899;
 }

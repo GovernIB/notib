@@ -27,7 +27,7 @@ import java.util.Date;
 @Entity
 @Builder(builderMethodName = "hiddenBuilder")
 @NoArgsConstructor @AllArgsConstructor
-@Table(name="not_entitat", 
+	@Table(name="not_entitat",
 	uniqueConstraints = {
 			@UniqueConstraint(columnNames = "codi"),
 			@UniqueConstraint(columnNames = "dir3_codi")

@@ -870,18 +870,36 @@
 			$('#removeDocument').removeClass('hidden');
 		}
 
-		$(document).on('change','select.enviamentTipus', function() {
-			var dadesNormalitzat = $(this).closest("#entregaPostal").find("div[class*='normalitzat']");
-			var dadesSenseNormalitzar = $(this).closest("#entregaPostal").find("div[class*='senseNormalitzar']");
+		$(document).on('change', 'input[name*=".entregaPostal.domiciliConcretTipus"]', function() {
 
-			if ($(this).val() == 'SENSE_NORMALITZAR') {
-				$(dadesNormalitzat).addClass('hidden');
-				$(dadesSenseNormalitzar).removeClass('hidden');
+			let numEnviament = $(this)[0].id.split(".")[0];
+			numEnviament = numEnviament[numEnviament.length-1];
+			let entregaPostal = $(".entregaPostal_" + numEnviament);
+			let dadesNormalitzat = entregaPostal.find("div[class*='normalitzat']");
+			let dadesSenseNormalitzar = entregaPostal.find("div[class*='senseNormalitzar']");
+			if ($(this).val() === "SENSE_NORMALITZAR") {
+				$(dadesNormalitzat[0]).hide();
+				$(dadesSenseNormalitzar[0]).show();
 			} else {
-				$(dadesNormalitzat).removeClass('hidden');
-				$(dadesSenseNormalitzar).addClass('hidden');
+				$(dadesNormalitzat[0]).show();
+				$(dadesSenseNormalitzar[0]).hide();
 			}
 		});
+
+		$('input[name*=".entregaPostal.domiciliConcretTipus"]:checked').each(function() {
+			console.log('Radio button with partial name is checked: ' + $(this).val());
+			if ($(this).val() !== "SENSE_NORMALITZAR") {
+				return;
+			}
+			let numEnviament = $(this)[0].id.split(".")[0];
+			numEnviament = numEnviament[numEnviament.length-1];
+			let entregaPostal = $(".entregaPostal_" + numEnviament);
+			let dadesNormalitzat = entregaPostal.find("div[class*='normalitzat']");
+			let dadesSenseNormalitzar = entregaPostal.find("div[class*='senseNormalitzar']");
+			$(dadesNormalitzat[0]).hide();
+			$(dadesSenseNormalitzar[0]).show();
+		});
+
 
 		$('input[name="arxiu[0]"]').change(function(){
 			var arxiuGestdocId = $('input[name="documents[0].arxiuGestdocId"]');
@@ -939,16 +957,11 @@
 			}
 		});
 
-		var numPlus = 1;
-
 		$(".container-envios").find('.enviamentsForm').each(function() {
 			if($(this).find('.eliminar_enviament').attr('id') != 'enviamentDelete_0') {
 				$(this).find('.eliminar_enviament').removeClass('hidden');
 			}
 		});
-
-		// var agrupable = $("#procedimentId").children(":selected").attr("class");
-		// var procedimentId = $("#procedimentId").children(":selected").attr("value");
 
 		$('#organGestor').on('change', function() {
 			//### seleccionat per defecte si només hi ha un (empty + òrgan)
@@ -1880,19 +1893,19 @@
 											<label class="control-label col-xs-2" style="padding-top: 0px; padding-right:0px; width:12%" for="enviaments[${j}].domiciliConcretTipus.viaTipus"><spring:message code="notificacio.form.camp.entregapostal.tipus" /></label>
 											<div class="controls" style="padding-left:0px;">
 												<div class="col-xs-1">
-													<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="NACIONAL" checked="checked"/>
+													<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="NACIONAL" checked="${enviament.entregaPostal.domiciliConcretTipus == 'NACIONAL' ? 'checked' : ''}"/>
 													<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.NACIONAL" />
 												</div>
 												<div class="col-xs-1">
-													<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="ESTRANGER" />
+													<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="ESTRANGER" checked="${enviament.entregaPostal.domiciliConcretTipus == 'ESTRANGER' ? 'checked' : ''}"/>
 													<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.ESTRANGER" />
 												</div>
 												<div class="col-xs-3" style="width:10.667%">
-													<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="APARTAT_CORREUS" />
+													<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="APARTAT_CORREUS" checked="${enviament.entregaPostal.domiciliConcretTipus == 'APARTAT_CORREUS' ? 'checked' : ''}"/>
 													<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.APARTAT_CORREUS" />
 												</div>
 												<div class="col-xs-2">
-													<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="SENSE_NORMALITZAR" />
+													<form:radiobutton path="enviaments[${j}].entregaPostal.domiciliConcretTipus" value="SENSE_NORMALITZAR" checked="${enviament.entregaPostal.domiciliConcretTipus == 'SENSE_NORMALITZAR' ? 'checked' : ''}"/>
 													<spring:message code="es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus.SENSE_NORMALITZAR" />
 												</div>
 											</div>
@@ -1989,7 +2002,7 @@
 <%--											</c:choose>	--%>
 <%--											</div>--%>
 										</div>	
-										<div class="senseNormalitzar hidden">
+										<div class="senseNormalitzar" style="display:none">
 											<div class="col-md-6">
 												<not:inputTextarea name="enviaments[${j}].entregaPostal.linea1" textKey="notificacio.form.camp.entregapostal.linea1" required="true"/>
 											</div>

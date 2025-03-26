@@ -26,8 +26,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.ENVIAMENT_DEH_INACTIU;
-
 /**
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -379,7 +377,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 
 	public static ArrayList<Character> validFormat(String value) {
 
-		String controlCaracters = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
+		String controlCaracters = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-–_/:().,¿?!¡;ºª";
 		ArrayList<Character> charsNoValids = new ArrayList<>();
 		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
 		boolean esCaracterValid = true;
