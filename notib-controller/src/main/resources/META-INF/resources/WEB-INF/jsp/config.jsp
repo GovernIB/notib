@@ -179,7 +179,56 @@
             });
         });
         $('.a-config-group:first').tab('show');
+
+
+        // document.addEventListener("DOMContentLoaded", function() {
+        //     var forms = document.querySelectorAll('form[id*="dades_usuari_jdbc"]');
+        //     console.log(forms); // Check what is returned
+        // });
+        $(document.getElementById("config_es.caib.notib.plugin.dades.usuari.class")).on("change", function () {
+
+            let actual = $(this).val();
+            if (!actual) {
+                return;
+            }
+            mostrarInputsPluginUsuaris(actual);
+        });
+
+        let pluginUsuaris = $(document.getElementById("config_es.caib.notib.plugin.dades.usuari.class")).val();
+        if (pluginUsuaris) {
+            mostrarInputsPluginUsuaris(pluginUsuaris);
+        }
     });
+
+    function mostrarInputsPluginUsuaris(plugin) {
+
+        let actual = plugin.toLowerCase();
+        let jdbc = document.querySelectorAll('form[id*="jdbc"]');
+        let ldap = document.querySelectorAll('form[id*="ldap"]');
+        let keycloak = document.querySelectorAll('form[id*="keycloak"]');
+        if (actual.includes("jdbc")) {
+            jdbc.forEach(x => $(x).show());
+            ldap.forEach(x => $(x).hide());
+            keycloak.forEach(x => $(x).hide());
+            return;
+        }
+        if (actual.includes("ldap")) {
+            ldap.forEach(x => $(x).show());
+            jdbc.forEach(x => $(x).hide());
+            keycloak.forEach(x => $(x).hide());
+            return;
+        }
+        if (actual.includes("keycloak")) {
+            keycloak.forEach(x => $(x).show());
+            jdbc.forEach(x => $(x).hide());
+            ldap.forEach(x => $(x).hide());
+        }
+        if (actual.includes("mock")) {
+            keycloak.forEach(x => $(x).hide());
+            jdbc.forEach(x => $(x).hide());
+            ldap.forEach(x => $(x).hide());
+        }
+    }
 </script>
 <div class="text-right" data-toggle="botons-titol">
     <a id="btn-sync" class="btn btn-default" data-toggle="modal" data-target="#syncModal"><span class="fa fa-refresh"></span>&nbsp;Sincronitzar amb JBoss</a>
