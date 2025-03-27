@@ -105,6 +105,8 @@ public class NotificacioValidator implements Validator {
 
     private boolean cieActiu;
 
+    private final int MAX_SIZE_RAO_SOCIAL = 80;
+
     @Override
     public boolean supports(Class<?> clazz) {
         return Notificacio.class.equals(clazz);
@@ -806,8 +808,8 @@ public class NotificacioValidator implements Validator {
         if ((isPersonaJuridica || isAdministracio) && Strings.isNullOrEmpty(persona.getRaoSocial()) && Strings.isNullOrEmpty(persona.getNom()))  {
             errors.rejectValue(envName + ".raoSocial", error(PERSONA_RAO_SOCIAL_NULL, l, prefix, tipus));
         }
-        if (!Strings.isNullOrEmpty(persona.getRaoSocial()) && persona.getRaoSocial().length() > 255) {
-            errors.rejectValue(envName + ".raoSocial", error(PERSONA_RAO_SOCIAL_SIZE, l, prefix, 255));
+        if (!Strings.isNullOrEmpty(persona.getRaoSocial()) && persona.getRaoSocial().length() > MAX_SIZE_RAO_SOCIAL) {
+            errors.rejectValue(envName + ".raoSocial", error(PERSONA_RAO_SOCIAL_SIZE, l, prefix, MAX_SIZE_RAO_SOCIAL));
         }
         // - Codi Dir3
         if (Strings.isNullOrEmpty(persona.getDir3Codi()) && isAdministracio) {
