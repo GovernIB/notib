@@ -37,6 +37,7 @@ import java.util.Date;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Hidden
+@Deprecated
 @RestController
 @RequestMapping("/notificacio/v1")
 @Tag(name = "Notificacio v1", description = "API de notificació v1")

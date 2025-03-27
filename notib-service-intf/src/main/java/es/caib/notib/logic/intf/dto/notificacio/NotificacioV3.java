@@ -35,7 +35,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Notificacio implements Serializable {
+public class NotificacioV3 implements Serializable {
 
     private Long id;
     private Long procedimentId;
@@ -46,15 +46,15 @@ public class Notificacio implements Serializable {
      * Camp obligatori
      */
     @JsonDeserialize(using = TrimStringDeserializer.class)
-    private String emisorDir3Codi;
-
+    private String entitatDir3Codi;
 
     /**
      * Codi DIR3 de l’òrgan gestor que realitza la notificació/comunicació.
      * Obligatori en el cas de procediments comuns. En cas contrari s’utilitzarà l’òrgan gestor al que pertany el procediment.
      */
+
     @JsonDeserialize(using = TrimStringDeserializer.class)
-    private String organGestor;
+    private String organEmissorDir3Codi;
 
     /**
      * Enumerat que indica si l’enviament és una comunicació o una notificació.
@@ -179,32 +179,6 @@ public class Notificacio implements Serializable {
      */
     private Document document5;
 
-    public Notificacio(NotificacioV3 notificacio) {
-
-        this.id = notificacio.getId();
-        this.procedimentId = notificacio.getProcedimentId();
-        this.grupId = notificacio.getGrupId();
-        this.emisorDir3Codi = notificacio.getEntitatDir3Codi();
-        this.organGestor = notificacio.getOrganEmissorDir3Codi();
-        this.enviamentTipus = notificacio.getEnviamentTipus();
-        this.concepte = notificacio.getConcepte();
-        this.descripcio = notificacio.getDescripcio();
-        this.enviamentDataProgramada = notificacio.getEnviamentDataProgramada();
-        this.retard = notificacio.getRetard();
-        this.caducitat = notificacio.getCaducitat();
-        this.caducitatDiesNaturals = notificacio.getCaducitatDiesNaturals();
-        this.usuariCodi = notificacio.getUsuariCodi();
-        this.procedimentCodi = notificacio.getProcedimentCodi();
-        this.grupCodi = notificacio.getGrupCodi();
-        this.numExpedient = notificacio.getNumExpedient();
-        this.enviaments = notificacio.getEnviaments();
-        this.idioma = notificacio.getIdioma();
-        this.document = notificacio.getDocument();
-        this.document2 = notificacio.getDocument2();
-        this.document3 = notificacio.getDocument3();
-        this.document4 = notificacio.getDocument4();
-        this.document5 = notificacio.getDocument5();
-    }
 
     public List<Enviament> getEnviaments() {
         if (enviaments == null) {
@@ -240,5 +214,7 @@ public class Notificacio implements Serializable {
     public boolean isSir() {
         return EnviamentTipus.SIR.equals(getEnviamentTipus());
     }
+
+
 
 }

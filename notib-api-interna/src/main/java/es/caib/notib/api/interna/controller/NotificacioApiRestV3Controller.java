@@ -4,6 +4,7 @@
 package es.caib.notib.api.interna.controller;
 
 import es.caib.notib.api.interna.openapi.interficies.NotificacioApiRestV2Intf;
+import es.caib.notib.api.interna.openapi.interficies.NotificacioApiRestV3Intf;
 import es.caib.notib.client.domini.DadesConsulta;
 import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaAltaV2;
@@ -14,14 +15,13 @@ import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioV3;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
-import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,21 +40,21 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Hidden
 @Slf4j
 @RestController
-@RequestMapping("/notificacio/v2")
-public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseController implements NotificacioApiRestV2Intf {
+@RequestMapping("/notificacio/v3")
+public class NotificacioApiRestV3Controller extends NotificacioApiRestBaseController implements NotificacioApiRestV3Intf {
 
 	@Autowired
 	private EnviamentSmService enviamentSmService;
 
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(value = "/alta", produces = MediaType.APPLICATION_JSON_VALUE)
-	public RespostaAltaV2 alta(@RequestBody Notificacio notificacio) {
+	public RespostaAltaV2 alta(@RequestBody NotificacioV3 notificacio) {
 
 		try {
-			var resposta = notificacioServiceWs.altaV2(notificacio);
+			var not = new Notificacio(notificacio);
+			var resposta = notificacioServiceWs.altaV2(not);
 			resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
 			return resposta;
 		} catch (Exception e) {
