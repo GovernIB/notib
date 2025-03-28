@@ -419,7 +419,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
      	}
 //		######## FI DADES TITULAR #########
      	dadesTitular.add(dadesTitularTable);
-        
+
      	contingutCell.addElement(dadesRegistreTitol);
      	contingutCell.addElement(dadesRegistre);
      	if (dadesNotificaTitol != null) {
@@ -486,6 +486,149 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 		}
 //		######## FI DADES DESTINATARIS #########
 //		######## FI DADES INTERESSATS #########
+//		######## INICI DADES ENTREGA POSTAL #########
+		if (enviament.getEntregaPostal() != null) {
+			var dadesEntregaPostalTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.titol"), calibri10);
+			dadesEntregaPostalTitol.setAlignment(Element.ALIGN_LEFT);
+
+			var dadesEntregaPostal = new Paragraph();
+			var dadesEntregaPostalTable = new PdfPTable(2);
+			dadesEntregaPostalTable.setWidthPercentage(80f);
+			dadesEntregaPostalTable.setWidths(headingTablewidths);
+			var entregaPostal = enviament.getEntregaPostal();
+
+			var message = "";
+			Chunk titleChunk;
+			Chunk contentChunk;
+			if (entregaPostal.getDomiciliConcretTipus() != null) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.tipus.entrega");
+				var valor = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificaDomiciliConcretTipus."+entregaPostal.getDomiciliConcretTipus());
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(valor, calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (entregaPostal.getViaTipus() != null) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.via.tipus");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getViaTipus().getVal(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getViaNom())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.via.nom");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getViaNom(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getNumeroCasa())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.numero.casa");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getNumeroCasa(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getPuntKm())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.punt.km");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getPuntKm(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getPortal())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.portal");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getPortal(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getBloc())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.bloc");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getBloc(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getEscala())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.escala");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getEscala(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getPlanta())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.planta");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getPlanta(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getPorta())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.porta");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getPorta(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getCodiPostal())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.codi.postal");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getCodiPostal(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getPoblacio())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.poblacio");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getPoblacio(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getMunicipiCodi())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.municipi.codi");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getMunicipiCodi(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getProvincia())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.provincia");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getProvincia(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getPaisCodi())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.pais");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getPaisCodi(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getApartatCorreus())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.apartat.correus");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getApartatCorreus(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getNumeroQualificador())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.numero.qualificador");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getNumeroQualificador(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getComplement())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.complement");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getComplement(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getLinea1())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.linia1");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getLinea1(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+			if (!Strings.isNullOrEmpty(entregaPostal.getLinea2())) {
+				message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.entrega.postal.linia2");
+				titleChunk = new Chunk(message, calibri10);
+				contentChunk = new Chunk(entregaPostal.getLinea1(), calibri10);
+				createNewTableContent(dadesEntregaPostalTable, titleChunk, contentChunk);
+			}
+
+			contingutCell.addElement(dadesEntregaPostalTitol);
+			dadesEntregaPostal.add(dadesEntregaPostalTable);
+			contingutCell.addElement(dadesEntregaPostal);
+		}
+//		######## FI DADES ENTREGA POSTAL #########
+
+
 
         //## [CONFIGURACIÓ CELLA CONTINGUT]
      	contingutCell.setPaddingLeft(7f);
