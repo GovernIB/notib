@@ -23,7 +23,7 @@ public enum MassivaColumnsEnum {
     TIPUS_DOC(      "Tipo documento",           "Tipus de document de destinatari sense NIF (PASSAPORT / ESTRANGER / ALTRE)",                       "PASSAPORT"),
     ADDR_LIN1(      "Linea 1",                  "Primera línia de l'adreça del destinatari, en cas d'enviament postal",                             "Castelló 115"),
     ADDR_LIN2(      "Linea 2",                  "Segona línia de l'adreça del destinatari, en cas d'enviament postal",                              "28016 Madrid"),
-    ADDR_CP(        "Codigo Postal",            "Codi postal del destinatari, en cas d'enviament postal",                                           "37891"),
+    CODI_POSTAL(    "Codigo Postal",            "Codi postal del destinatari, en cas d'enviament postal",                                           "37891"),
     RETARD(         "Retardo Postal",           "Dies que s'ha d'esperar abans de realitzar l'enviament postal",                                    "0"),
     PROCEDIMENT(    "Codigo Procedimiento",     "Codi SIA del procediment al que pertany l'enviament",                                              "101310"),
     DATA_PROG(      "Fecha Envio Programado",   "Data en que es vol realitzar l'enviament, en cas de no voler-lo realitzar immediatament",          "01/01/1970"),
@@ -31,7 +31,25 @@ public enum MassivaColumnsEnum {
     META_ESTAT_ELAB("Estado Elaboracion",       "Metadata que informa de l'estat d'elaboració del document (Original / Copia / Copia autentica)",   "ORIGINAL"),
     META_TIPUS_DOC( "Tipo documental",          "Metadata que informa del tipus documental del document (COMUNICACIO, NOTIFICACIO, ACORD, ...)",    "INFORME"),
     META_FIRMAT(    "PDF Firmado",              "Metadata que informa si el document està firmat o no (Si|true / No|false)",                        "Si"),
-    DESCRIPCIO(     "Descripcion",              "Text amb la descripció de l'enviament",                                                            "Descripció");
+    DESCRIPCIO(     "Descripcion",              "Text amb la descripció de l'enviament",                                                            "Descripció"),
+    ENTREGA_POSTAL( "Entrega postal",           "Si|true/No|false indicant si hi ha entrega postal activa",                                         "Si"),
+    DOMICILI_CONCRET_TIPUS("Tipo entrega postal","NACIONAL|ESTRANGER|APARTAT_CORREUS|SENSE_NORMALITZAR",                                             "SENSE_NORMALITZAR"),
+    VIA_TIPUS(      "Via tipo",                 "Tipus de via per l'entrega postal",                                                                "CALLE"),
+    VIA_NOM(        "Nombre via",               "Nom de la via per l'entrega postal",                                                                "Nombre de la via"),
+    APARTAT_CORREUS("Apartado de correos",      "Apartat de correus on enviar l'entrega en cas de tipus de via APARTAT_CORREUS",                     "012345"),
+    NUMERO_CASA(    "Numero de casa",           "Número de l'habitatge per l'entrega postal",                                                        "1"),
+    PUNT_KM(        "Punto kilometrico",        "Punt kilomètric de l'habitatge per l'entrega postal",                                               "1"),
+    PORTAL(         "Portal",                   "Portal de l'habitatge per l'entrega postal",                                                        "1"),
+    ESCALA(         "Escalera",                 "Escalera de l'habitatge per l'entrega postal",                                                      "A"),
+    PLANTA(         "Planta",                   "Número de planta de l'habitatge per l'entrega postal",                                              "1"),
+    PORTA(          "Puerta",                   "Porta de l'habitatge per l'entrega postal",                                                         "A"),
+    BLOC(           "Bloque",                   "Bloc de l'habitatge per l'entrega postal",                                                          "1"),
+    PAIS_CODI(      "Pais codigo",              "Codi del país per l'entrega postal",                                                                "es"),
+    PROVINCIA(      "Provincia",                "Codi de la província per l'entrega postal",                                                         "07"),
+    MUNICIPI_CODI(  "Municipio codigo",         "Codi del municipi per l'entrega postal",                                                            "070407"),
+    POBLACIO(       "Poblacion",                "Població per l'entrega postal",                                                                     "Manacor"),
+    COMPLEMENT(     "Complemento",              "Informació extra de la direcció per l'entrega postal",                                               "Casa azul");
+
 
     private final String nom;
     private final String descripcio;
