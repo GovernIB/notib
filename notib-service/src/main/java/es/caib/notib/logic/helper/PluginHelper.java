@@ -354,10 +354,11 @@ public class PluginHelper {
 	}
 	
 	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma, Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi) throws SistemaExternException {
+
 		var organs = unitatsOrganitzativesPluginHelper.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
 		OrganGestorEntity organ;
 		for (var o : organs) {
-			organ = organGestorRepository.findByCodi(o.getCodi());
+			organ = organGestorRepository.findByEntitatIdAndCodi(o.getEntitatId(), o.getCodi());
 			if (organ == null) {
 				continue;
 			}

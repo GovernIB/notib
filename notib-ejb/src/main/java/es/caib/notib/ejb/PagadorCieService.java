@@ -114,9 +114,9 @@ public class PagadorCieService extends AbstractService<es.caib.notib.logic.intf.
 		return getDelegateService().findByEntitatAndOrganGestor(entitat, organGestor);
 	}
 
-	@Override
-	@RolesAllowed("**")
-	public boolean existeixCieByEntitatAndOrganGestor(String organGestor) {
-		return getDelegateService().existeixCieByEntitatAndOrganGestor(organGestor);
-	}
+//	@Override
+//	@RolesAllowed("**")
+//	public boolean existeixCieByEntitatAndOrganGestor(String organGestor) {
+//		return getDelegateService().existeixCieByEntitatAndOrganGestor(organGestor);
+//	}
 }

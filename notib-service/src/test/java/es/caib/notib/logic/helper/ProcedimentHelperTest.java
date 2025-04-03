@@ -75,7 +75,7 @@ public class ProcedimentHelperTest {
                 .oficinaNom("oficina nom")
                 .estat("E")
                 .build();
-        Mockito.when(organGestorRepository.findByCodi(Mockito.eq(ORGAN_CODI))).thenReturn(organGestor);
+        Mockito.when(organGestorRepository.findByEntitatAndCodi(Mockito.any(EntitatEntity.class), Mockito.eq(ORGAN_CODI))).thenReturn(organGestor);
     }
 
     @Test

@@ -576,7 +576,7 @@ public class PermisosServiceImpl implements PermisosService {
                 if (codis.contains(fill)) {
                     continue;
                 }
-                OrganGestorEntity organFill = organGestorRepository.findByCodi(fill);
+                OrganGestorEntity organFill = organGestorRepository.findByEntitatAndCodi(entitat, fill);
                 if (organFill != null) {
                     boolean excloureFill = isOficinaOrganSir && Strings.isNullOrEmpty(organFill.getOficina());
                     if (!excloureFill) {

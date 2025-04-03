@@ -188,7 +188,7 @@ public class NotificacioMassivaServiceTest {
 		Mockito.when(notificacioHelper.saveNotificacio(Mockito.any(EntitatEntity.class), Mockito.any(Notificacio.class), Mockito.anyBoolean(), Mockito.any(NotificacioMassivaEntity.class), Mockito.<Map<String, Long>>any()))
 				.thenReturn(NotificacioEntity.builder().enviaments(new HashSet<>()).build());
 		Mockito.when(procSerRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.<EntitatEntity>any())).thenReturn(procSerMock);
-		Mockito.when(organGestorRepository.findByCodi(Mockito.anyString())).thenReturn(organMock);
+		Mockito.when(organGestorRepository.findByEntitatAndCodi(Mockito.any(EntitatEntity.class), Mockito.anyString())).thenReturn(organMock);
 		Mockito.when(messageHelper.getMessage(Mockito.anyString())).thenReturn("Missatge mock");
 		Mockito.when(configHelper.getConfigAsLong(eq("es.caib.notib.massives.maxim.files"), eq(999L))).thenReturn(999L);
 		Mockito.when(cacheHelper.findUsuariAmbCodi(anyString())).thenReturn(DadesUsuari.builder().codi(codiUsuari).build());

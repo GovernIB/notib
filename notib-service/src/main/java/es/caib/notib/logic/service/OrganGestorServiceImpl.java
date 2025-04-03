@@ -404,7 +404,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 		log.debug("Consulta taula òrgans gestors per administrador d'òrgan");
 		//Comprovació permisos organ
-		entityComprovarHelper.comprovarPermisosOrganGestor(organActualCodiDir3);
+		entityComprovarHelper.comprovarPermisosOrganGestor(entitat, organActualCodiDir3);
 		//OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(entitat,organActualId);
 		var organGestorsListCodisDir3 = organigramaHelper.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organActualCodiDir3);
 		if (filtre == null) {
@@ -753,9 +753,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 			// Obtenir el llistat d'unitats que son totalment noves (no existeixen en BBDD): Creació
 			// ====================  NOUS ===================
-			List<UnitatOrganitzativaDto> unitatsNew = getNewFromWS(mapVersionsUnitats, splitMap, substMap, mergeMap);
+			List<UnitatOrganitzativaDto> unitatsNew = getNewFromWS(entitat, mapVersionsUnitats, splitMap, substMap, mergeMap);
 
-			afegirDenominacioSiNull(entitat.getCodi(), mergeMap.keySet());
+			afegirDenominacioSiNull(entitat, mergeMap.keySet());
 
 			return PrediccioSincronitzacio.builder()
 					.unitatsVigents(unitatsVigents)
@@ -772,19 +772,19 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		}
 	}
 
-	private void afegirDenominacioSiNull(String entitat, Set<UnitatOrganitzativaDto> organs) {
+	private void afegirDenominacioSiNull(EntitatEntity entitat, Set<UnitatOrganitzativaDto> organs) {
 
 		for (var key : organs) {
 			if (!Strings.isNullOrEmpty(key.getDenominacio()) || !Strings.isNullOrEmpty(key.getDenominacioCooficial())) {
 				continue;
 			}
-			var organ = organGestorRepository.findByCodi(key.getCodi());
+			var organ = organGestorRepository.findByEntitatAndCodi(entitat, key.getCodi());
 			if (organ != null) {
 				key.setDenominacio(organ.getNom());
 				key.setDenominacioCooficial(organ.getNomEs());
 				continue;
 			}
-			var unitat = pluginHelper.unitatOrganitzativaFindByCodi(entitat, key.getCodi(), null, null);
+			var unitat = pluginHelper.unitatOrganitzativaFindByCodi(entitat.getCodi(), key.getCodi(), null, null);
 			key.setDenominacio(unitat.getDenominacio());
 			key.setDenominacioCooficial(unitat.getDenominacionCooficial());
 		}
@@ -814,7 +814,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		List<UnitatOrganitzativaDto> noves = new ArrayList<>();
 		OrganGestorEntity o;
 		for (UnitatOrganitzativaDto u : vigents) {
-			o = organGestorRepository.findByCodi(u.getCodi());
+			o = organGestorRepository.findByEntitatAndCodi(entitat, u.getCodi());
 			if (o == null) {
 				noves.add(u);
 				continue;
@@ -884,8 +884,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		for (var entry : unitats.entrySet()){
 			nodes = entry.getValue();
 			node = nodes.get(nodes.size()-1);
-			if (organGestorRepository.findByCodi(entry.getKey()) != null && "E".equals(node.getEstat())) {
-				node.setLastHistoricosUnitats(getLastHistoricos(node, unitatsWS));
+			if (organGestorRepository.findByEntitatAndCodi(entitat, entry.getKey()) != null && "E".equals(node.getEstat())) {
+				node.setLastHistoricosUnitats(getLastHistoricos(entitat, node, unitatsWS));
 				extingides.add(conversioTipusHelper.convertir(node, UnitatOrganitzativaDto.class));
 			}
 		}
@@ -907,7 +907,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		OrganGestorEntity org;
 		for(var vigent : unitatsVigentsWithChangedAttributes){
 			unitatOrganitzativaDto = conversioTipusHelper.convertir(vigent, UnitatOrganitzativaDto.class);
-			org = organGestorRepository.findByCodi(unitatOrganitzativaDto.getCodi());
+			org = organGestorRepository.findByEntitatAndCodi(entitat, unitatOrganitzativaDto.getCodi());
 			if (org == null) {
 				continue;
 			}
@@ -918,7 +918,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	}
 
 	// Obtenir unitats organitzatives noves (No provenen de cap transició d'una altre unitat)
-	private List<UnitatOrganitzativaDto> getNewFromWS(Map<String, List<NodeDir3>> unitats, MultiValuedMap splitMap,  MultiValuedMap substMap, MultiValuedMap mergeMap){
+	private List<UnitatOrganitzativaDto> getNewFromWS(EntitatEntity entitat, Map<String, List<NodeDir3>> unitats, MultiValuedMap splitMap,  MultiValuedMap substMap, MultiValuedMap mergeMap){
 
 //		// converting from UnitatOrganitzativa to UnitatOrganitzativaDto
 		List<UnitatOrganitzativaDto> newUnitatsDto = new ArrayList<>();
@@ -928,7 +928,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		for (Map.Entry<String, List<NodeDir3>> entry : unitats.entrySet()){
 			nodes = entry.getValue();
 			node = nodes.get(nodes.size()-1);
-			if (organGestorRepository.findByCodi(entry.getKey()) != null || "E".equals(node.getEstat())) {
+			if (organGestorRepository.findByEntitatAndCodi(entitat, entry.getKey()) != null || "E".equals(node.getEstat())) {
 				continue;
 			}
 			unitat = conversioTipusHelper.convertir(node, UnitatOrganitzativaDto.class);
@@ -953,14 +953,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	// Retorna la/les unitat/s a la que un organ obsolet ha fet la transició
 	// Inici de mètode recursiu
-	private List<NodeDir3> getLastHistoricos(NodeDir3 unitat, List<NodeDir3> unitatsFromWebService){
+	private List<NodeDir3> getLastHistoricos(EntitatEntity entitat, NodeDir3 unitat, List<NodeDir3> unitatsFromWebService){
 
 		List<NodeDir3> lastHistorcos = new ArrayList<>();
-		getLastHistoricosRecursive(unitat, unitatsFromWebService, lastHistorcos);
+		getLastHistoricosRecursive(entitat, unitat, unitatsFromWebService, lastHistorcos);
 		return lastHistorcos;
 	}
 
-	private void getLastHistoricosRecursive(NodeDir3 unitat, List<NodeDir3> unitatsFromWebService, List<NodeDir3> lastHistorics) {
+	private void getLastHistoricosRecursive(EntitatEntity entitat, NodeDir3 unitat, List<NodeDir3> unitatsFromWebService, List<NodeDir3> lastHistorics) {
 
 		log.info("Coloca historics recursiu(" + "unitatCodi=" + unitat.getCodi() + ")");
 
@@ -972,7 +972,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			NodeDir3 unitatFromCodi = getUnitatFromCodi(historicCodi, unitatsFromWebService);
 			if (unitatFromCodi == null) {
 				// Looks for historico in database
-				OrganGestorEntity entity = organGestorRepository.findByCodi(historicCodi);
+				OrganGestorEntity entity = organGestorRepository.findByEntitatAndCodi(entitat, historicCodi);
 				if (entity != null) {
 					NodeDir3 uo = conversioTipusHelper.convertir(entity, NodeDir3.class);
 					lastHistorics.add(uo);
@@ -993,7 +993,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				log.info("Detected organ division with transitioning to itself : " + historicCodi + ". Probably caused by error in DIR3");
 			} else {
 				if (!unitatFromCodi.equals(unitat)) {
-					getLastHistoricosRecursive(unitatFromCodi, unitatsFromWebService, lastHistorics);
+					getLastHistoricosRecursive(entitat, unitatFromCodi, unitatsFromWebService, lastHistorics);
 				} else {
 					lastHistorics.add(unitat);
 				}
@@ -1037,7 +1037,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		try {
 			log.debug("Consulta de l'organ gestor (entitatId=" + entitatId + ", codi=" + codi + ")");
 			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
-			var organGestor = organGestorRepository.findByCodi(codi);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			var organGestor = organGestorRepository.findByEntitatAndCodi(entitat, codi);
 			if (organGestor == null) {
 				return null;
 			}
@@ -1448,7 +1449,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			OficinaEntity oficina;
 			for (OficinaDto ofi: oficines) {
 				try {
-					organGestor = organGestorRepository.findByCodi(ofi.getOrganCodi());
+					organGestor = organGestorRepository.findByEntitatAndCodi(entitat, ofi.getOrganCodi());
 					oficina = OficinaEntity.builder().codi(ofi.getCodi()).nom(ofi.getNom()).sir(ofi.isSir()).actiu(true).organGestor(organGestor).entitat(entitat).build();
 					oficinaRepository.save(oficina);
 				} catch (Exception ex) {
@@ -1601,7 +1602,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		setOrgansGestors.addAll(organsGestorsAmbPermis);
 		organsGestors = new ArrayList<>(setOrgansGestors);
 		if (Boolean.FALSE.equals(configHelper.getConfigAsBoolean("es.caib.notib.notifica.dir3.entitat.permes"))) {
-			organsGestors.remove(organGestorRepository.findByCodi(entitat.getDir3Codi()));
+			organsGestors.remove(organGestorRepository.findByEntitatAndCodi(entitat, entitat.getDir3Codi()));
 		}
 		if (procedimentsDisponibles.isEmpty() && organsGestors.isEmpty()) {
 			throw new NoPermisosException("Usuari sense permios assignats");
@@ -1641,7 +1642,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			 OrganGestorEntity organ;
 			 String nom;
 			 for (var node : nodesDir3) {
-				 organ = organGestorRepository.findByCodi(node.getCodi());
+				 organ = organGestorRepository.findByEntitatAndCodi(entitat, node.getCodi());
 				 if (organ == null) {
 					 continue;
 				 }
@@ -1709,7 +1710,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		try {
 			log.debug("Consulta de tots els pagadors postals");
 			var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-			var o = organGestorRepository.findByCodi(organCodi);
+			var o = organGestorRepository.findByEntitatAndCodi(e, organCodi);
 			if (!e.getDir3Codi().equals(organCodi)) {
 				return findOperadorsPare(entitat, o.getCodiPare());
 			}
@@ -1721,7 +1722,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	private boolean findOperadorsPare(EntitatDto entitat, String codi) {
 
-		var o = organGestorRepository.findByCodi(codi);
+		var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		var o = organGestorRepository.findByEntitatAndCodi(e, codi);
 		if (o.getEntregaCie() != null) {
 			return true;
 		}

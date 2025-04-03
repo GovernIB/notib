@@ -195,8 +195,8 @@ public interface ServeiService {
 	 *
 	 * @return
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
-	List<ProcSerDto> findServeisByOrganGestor(String organGestorCodi);
+//	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
+//	List<ProcSerDto> findServeisByOrganGestor(String organGestorCodi);
 
 	@PreAuthorize("isAuthenticated()")
 	List<CodiValorOrganGestorComuDto> getServeisOrgan(Long entitatId, String organCodi, Long organFiltre, RolEnumDto rol, PermisEnum permis);

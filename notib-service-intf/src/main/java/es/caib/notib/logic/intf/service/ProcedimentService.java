@@ -329,9 +329,9 @@ public interface ProcedimentService {
      */
     @PreAuthorize("hasRole('NOT_ADMIN')")
     void refrescarCache(EntitatDto entitat);
-
-    @PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
-    List<ProcSerDto> findProcedimentsByOrganGestor(String organGestorCodi);
+//
+//    @PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
+//    List<ProcSerDto> findProcedimentsByOrganGestor(String organGestorCodi);
 
     @PreAuthorize("isAuthenticated()")
     List<ProcSerDto> findProcedimentsByOrganGestorWithPermis(Long entitatId, String organGestorCodi, List<String> grups, PermisEnum permis);

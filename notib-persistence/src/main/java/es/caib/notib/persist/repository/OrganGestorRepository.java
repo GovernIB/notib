@@ -24,10 +24,13 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	Optional<OrganGestorEntity> findById(Long id);
 
 	List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
-	public List<OrganGestorEntity> findByEntitatAndEstat(EntitatEntity entitat, OrganGestorEstatEnum estat);
-	public Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
+	List<OrganGestorEntity> findByEntitatAndEstat(EntitatEntity entitat, OrganGestorEstatEnum estat);
+	Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
 	OrganGestorEntity findByEntitatAndCodi(EntitatEntity entitat, String codi);
-	OrganGestorEntity findByCodi(String codi);
+//	OrganGestorEntity findByCodi(String codi);
+
+	@Query("from OrganGestorEntity o where o.entitat.id = :entitatId and o.codi = :organCodi")
+	OrganGestorEntity findByEntitatIdAndCodi(@Param("entitatId") Long entitatId, @Param("organCodi") String organCodi);
 
 	List<OrganGestorEntity> findByNoVigentIsTrue();
 

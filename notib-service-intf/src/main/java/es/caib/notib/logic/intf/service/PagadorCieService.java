@@ -102,8 +102,8 @@ public interface PagadorCieService {
 	@PreAuthorize("isAuthenticated()")
 	Object findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor);
 
-	@PreAuthorize("isAuthenticated()")
-	boolean existeixCieByEntitatAndOrganGestor(String organGestor);
+//	@PreAuthorize("isAuthenticated()")
+//	boolean existeixCieByEntitatAndOrganGestor(String organGestor);
 
 	/**
 	 * Llistat amb tots els pagadros cie paginats.

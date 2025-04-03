@@ -252,7 +252,7 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 		try {
 			log.debug(LOG_MSG);
 			var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-			var o = organGestorRepository.findByCodi(organCodi);
+			var o = organGestorRepository.findByEntitatAndCodi(e, organCodi);
 			var pagadors = pagadorPostalReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
 			if (!e.getDir3Codi().equals(organCodi)) {
 				var pagadorsPare = findOperadorsPareNoCaducats(entitat, o.getCodiPare());
@@ -275,8 +275,8 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	private List<PagadorPostalEntity> findOperadorsPareNoCaducats(EntitatDto entitat, String codi) {
 
 		List<PagadorPostalEntity> operadors = new ArrayList<>();
-		var o = organGestorRepository.findByCodi(codi);
 		var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		var o = organGestorRepository.findByEntitatAndCodi(e, codi);
 		var p = pagadorPostalReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
 		if (!Strings.isNullOrEmpty(o.getCodiPare()) && !o.getCodi().equals(entitat.getDir3Codi()) && !"A99999999".equals(o.getCodiPare())) {
 			operadors = findOperadorsPareNoCaducats(entitat, o.getCodiPare());
@@ -292,7 +292,7 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 		try {
 			log.debug("Consulta de tots els pagadors postals");
 			var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-			var o = organGestorRepository.findByCodi(organCodi);
+			var o = organGestorRepository.findByEntitatAndCodi(e, organCodi);
 			var pagadors = pagadorPostalReposity.findByEntitatAndOrganGestor(e, o);
 			if (!e.getDir3Codi().equals(organCodi)) {
 				var pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
@@ -315,8 +315,8 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	private List<PagadorPostalEntity> findOperadorsPare(EntitatDto entitat, String codi) {
 
 		List<PagadorPostalEntity> operadors = new ArrayList<>();
-		var o = organGestorRepository.findByCodi(codi);
 		var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		var o = organGestorRepository.findByEntitatAndCodi(e, codi);
 		var p = pagadorPostalReposity.findByEntitatAndOrganGestor(e, o);
 		if (!Strings.isNullOrEmpty(o.getCodiPare()) && !o.getCodi().equals(entitat.getDir3Codi()) && !"A99999999".equals(o.getCodiPare())) {
 			operadors = findOperadorsPare(entitat, o.getCodiPare());

@@ -192,7 +192,7 @@ public class OrganGestorHelper {
 		}
 		var prefix = "[SYNC-ORGANS] ";
 		// checks if unitat already exists in database
-		var unitat = organGestorRepository.findByCodi(unitatWS.getCodi());
+		var unitat = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodi());
 		// if not it creates a new one
 		var nom = !Strings.isNullOrEmpty(unitatWS.getDenominacionCooficial()) ? unitatWS.getDenominacionCooficial() : unitatWS.getDenominacio();
 		if (unitat != null) {
@@ -306,16 +306,16 @@ public class OrganGestorHelper {
 		if (Strings.isNullOrEmpty(organ.getOficina()) || !Strings.isNullOrEmpty(organ.getOficina()) && !oficines.toString().contains(organ.getOficina())) {
 			log.info("OFISYNC - Actualitzant oficina. Antiga: {} - {} , Nova: {} - {}", new Object[] {organ.getOficina(), organ.getOficinaNom(), oficines.get(0).getCodi(), oficines.get(0).getNom()});
 			info.addParam(organ.getCodi(), "Actualitzant la oficina. Antiga: " + organ.getOficina() + " - Nova: " + oficines.get(0).getCodi());
-			actualitzarOficinaOrgan(organ.getCodi(), oficines.get(0));
+			actualitzarOficinaOrgan(organ, oficines.get(0));
 			log.info("OFISYNC - Oficina actualitzada");
 		} else {
 			log.info("OFISYNC - L'oficina no s'ha d'actualitzar");
 		}
 	}
 
-	public void actualitzarOficinaOrgan(String organCodi, OficinaDto oficina) {
+	public void actualitzarOficinaOrgan(OrganGestorEntity organ, OficinaDto oficina) {
 
-		var organ = organGestorRepository.findByCodi(organCodi);
+//		var organ = organGestorRepository.findByCodi(organCodi);
 		organ.setOficina(oficina.getCodi());
 		organ.setOficinaNom(oficina.getNom());
 		organGestorRepository.save(organ);

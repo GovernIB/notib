@@ -289,7 +289,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 notificacioValidator.setMassiva(true);
 
                 var procediment = !Strings.isNullOrEmpty(notificacio.getProcedimentCodi()) ? procSerRepository.findByCodiAndEntitat(notificacio.getProcedimentCodi(), entitat) : null;
-                var organGestor = !Strings.isNullOrEmpty(notificacio.getOrganGestor()) ? organGestorRepository.findByCodi(notificacio.getOrganGestor()) : null;
+                var organGestor = !Strings.isNullOrEmpty(notificacio.getOrganGestor()) ? organGestorRepository.findByEntitatAndCodi(entitat, notificacio.getOrganGestor()) : null;
                 var document = documentHelper.getDocument(notificacio.getDocument());
                 // En massives només podem tenir un document
 //                if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {

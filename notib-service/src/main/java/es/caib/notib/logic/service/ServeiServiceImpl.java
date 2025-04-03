@@ -153,7 +153,7 @@ public class ServeiServiceImpl implements ServeiService {
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 
 			// Organ gestor
-			var organGestor = organGestorRepository.findByCodi(servei.getOrganGestor());
+			var organGestor = organGestorRepository.findByEntitatAndCodi(entitat, servei.getOrganGestor());
 			if (organGestor == null) {
 				throw new NotFoundException(servei.getOrganGestor(), OrganGestorEntity.class);
 			}
@@ -222,7 +222,7 @@ public class ServeiServiceImpl implements ServeiService {
 			}
 			
 			// Organ gestor
-			OrganGestorEntity organGestor = organGestorRepository.findByCodi(servei.getOrganGestor()); 
+			OrganGestorEntity organGestor = organGestorRepository.findByEntitatAndCodi(entitat, servei.getOrganGestor());
 			if (organGestor == null) {
 				throw new NotFoundException(servei.getOrganGestor(), OrganGestorEntity.class);
 			}
@@ -802,24 +802,21 @@ public class ServeiServiceImpl implements ServeiService {
 		}
 	}
 
-	@Override
-	@Transactional(readOnly = true)
-	public List<ProcSerDto> findServeisByOrganGestor(String organGestorCodi) {
-		var timer = metricsHelper.iniciMetrica();
-		try {
-			OrganGestorEntity organGestor = organGestorRepository.findByCodi(organGestorCodi);
-			if (organGestor == null) {
-				throw new NotFoundException(
-						organGestorCodi,
-						OrganGestorEntity.class);
-			}
-			return conversioTipusHelper.convertirList(
-					serveiRepository.findByOrganGestorId(organGestor.getId()),
-					ProcSerDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
+//	@Override
+//	@Transactional(readOnly = true)
+//	public List<ProcSerDto> findServeisByOrganGestor(String organGestorCodi) {
+//
+//		var timer = metricsHelper.iniciMetrica();
+//		try {
+//			var organGestor = organGestorRepository.findByCodi(organGestorCodi);
+//			if (organGestor == null) {
+//				throw new NotFoundException(organGestorCodi, OrganGestorEntity.class);
+//			}
+//			return conversioTipusHelper.convertirList(serveiRepository.findByOrganGestorId(organGestor.getId()), ProcSerDto.class);
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
+//	}
 
 	@Override
 	@Transactional(readOnly = true)

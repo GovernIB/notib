@@ -258,7 +258,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				organGestor = procediment.getOrganGestor();
 			}
 			if (organGestor == null && !Strings.isNullOrEmpty(notificacio.getOrganGestor())) {
-				organGestor = organGestorRepository.findByCodi(notificacio.getOrganGestor());
+				organGestor = organGestorRepository.findByEntitatAndCodi(entitat, notificacio.getOrganGestor());
 			}
 			// Procediment-Òrgan
 			if (procediment != null && procediment.isComu() && organGestor != null) {

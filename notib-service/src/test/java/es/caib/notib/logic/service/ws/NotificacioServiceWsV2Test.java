@@ -267,8 +267,8 @@ public class NotificacioServiceWsV2Test {
 		lenient().when(procSerRepository.findByCodiAndEntitat(eq(IDENTIFICADOR_PROCEDIMENT_POSTAL), any(EntitatEntity.class))).thenReturn(procedimentPostalMock);
 //		lenient().when(procSerRepository.findByCodiAndEntitat(anyString(), any(EntitatEntity.class))).thenReturn(procedimentMock);
 		lenient().when(procSerRepository.findByCodiAndEntitat(eq("COMU"), any(EntitatEntity.class))).thenReturn(procedimentComuMock);
-		lenient().when(organGestorRepository.findByCodi(eq(ORGAN_CODI))).thenReturn(organGestorMock);
-		lenient().when(organGestorRepository.findByCodi(eq(ORGAN_POSTAL_CODI))).thenReturn(organGestorPostalMock);
+		lenient().when(organGestorRepository.findByEntitatAndCodi(any(EntitatEntity.class), eq(ORGAN_CODI))).thenReturn(organGestorMock);
+		lenient().when(organGestorRepository.findByEntitatAndCodi(any(EntitatEntity.class), eq(ORGAN_POSTAL_CODI))).thenReturn(organGestorPostalMock);
 		lenient().when(procedimentOrganRepository.findByProcSerIdAndOrganGestorId(anyLong(), anyLong())).thenReturn(procedimentOrganMock);
 		lenient().when(documentRepository.saveAndFlush(any(DocumentEntity.class))).thenReturn(documentEntityMock);
 		lenient().when(pluginHelper.arxiuGetImprimible(anyString(), anyBoolean())).thenReturn(documentArxiuMock.getContingut());
@@ -319,10 +319,10 @@ public class NotificacioServiceWsV2Test {
 				when(procSerRepository.findByCodiAndEntitat(eq("SERVEI"), any(EntitatEntity.class))).thenReturn(serveiMock);
 				break;
 			case ORGAN_ALTRE_ENTITAT:
-				when(organGestorRepository.findByCodi(eq("NO_EXIST"))).thenReturn(null);
+				when(organGestorRepository.findByEntitatAndCodi(any(EntitatEntity.class), eq("NO_EXIST"))).thenReturn(null);
 				break;
 			case ORGAN_DIFF_AL_DEL_PROCEDIMENT:
-				lenient().when(organGestorRepository.findByCodi(eq("ORGAN_DIFERENT"))).thenReturn(OrganGestorEntity.builder().codi("XXXXXXXX").nom("Qualsevol altre organ").entitat(entitatMock).build());
+				lenient().when(organGestorRepository.findByEntitatAndCodi(any(EntitatEntity.class), eq("ORGAN_DIFERENT"))).thenReturn(OrganGestorEntity.builder().codi("XXXXXXXX").nom("Qualsevol altre organ").entitat(entitatMock).build());
 				break;
 			case USUARI_INEXISTENT:
 				when(cacheHelper.findUsuariAmbCodi(eq("NO_EXIST"))).thenReturn(null);
