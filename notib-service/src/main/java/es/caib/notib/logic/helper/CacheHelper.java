@@ -123,12 +123,13 @@ public class CacheHelper {
 	@Cacheable(value = "organigramaOriginal", key="#entitatDir3Codi")
 	public Map<String, OrganismeDto> findOrganigramaNodeByEntitat(final String entitatDir3Codi) {
 
-		Map<String, OrganismeDto> organigrama = new HashMap<>();
 		var organs = organGestorRepository.findByEntitatDir3Codi(entitatDir3Codi);
 		if (organs == null || organs.isEmpty()) {
-			return organigrama;
+			return new HashMap<>();
 		}
-		var arrel = organGestorRepository.findByCodi(entitatDir3Codi);
+		var entitat = entitatRepository.findByDir3Codi(entitatDir3Codi);
+		Map<String, OrganismeDto> organigrama = new HashMap<>();
+		var arrel = organGestorRepository.findByEntitatAndCodi(entitat, entitatDir3Codi);
 		if (arrel == null) {
 			return organigrama;
 		}

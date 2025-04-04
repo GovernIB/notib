@@ -45,8 +45,8 @@ public class OficinaEntity implements Serializable {
     private EntitatEntity entitat;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "organ_codi", referencedColumnName = "codi")
-    @ForeignKey(name = "not_oficina_procorgan_fk")
+    @JoinColumn(name = "organ_gestor", referencedColumnName = "id")
+    @ForeignKey(name = "NOT_OFI_ORGAN_GESTOR_FK")
     private OrganGestorEntity organGestor;
 
 }

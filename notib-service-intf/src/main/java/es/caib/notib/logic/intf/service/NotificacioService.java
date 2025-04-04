@@ -10,6 +10,7 @@ import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.DocCieValid;
 import es.caib.notib.logic.intf.dto.DocumentDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.LocalitatsDto;
 import es.caib.notib.logic.intf.dto.NotificacioAuditDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamenEstatDto;
@@ -400,7 +401,7 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("isAuthenticated()")
 	List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma,
-			Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi);
+									  Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi);
 
 	/**
 	 * Actualitza enviaments expirats sense certificació

@@ -272,7 +272,7 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 		try {
 			log.debug("Consulta de tots els pagadors postals");
 			var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-			var o = organGestorRepository.findByCodi(organCodi);
+			var o = organGestorRepository.findByEntitatAndCodi(e, organCodi);
 			var pagadors = pagadorCieReposity.findByEntitatAndOrganGestor(e, o);
 			if (!e.getDir3Codi().equals(organCodi)) {
 				var pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
@@ -295,8 +295,8 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 	private List<PagadorCieEntity> findOperadorsPare(EntitatDto entitat, String codi) {
 
 		List<PagadorCieEntity> operadors = new ArrayList<>();
-		var o = organGestorRepository.findByCodi(codi);
 		var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		var o = organGestorRepository.findByEntitatAndCodi(e, codi);
 		var p = pagadorCieReposity.findByEntitatAndOrganGestor(e, o);
 		if (!Strings.isNullOrEmpty(o.getCodiPare()) && !o.getCodi().equals(entitat.getDir3Codi()) && !"A99999999".equals(o.getCodiPare())) {
 			operadors = findOperadorsPare(entitat, o.getCodiPare());
@@ -313,7 +313,7 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 		try {
 			log.debug("Consulta de tots els pagadors postals");
 			var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-			var o = organGestorRepository.findByCodi(organCodi);
+			var o = organGestorRepository.findByEntitatAndCodi(e, organCodi);
 			var pagadors = pagadorCieReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
 			if (!e.getDir3Codi().equals(organCodi)) {
 				var pagadorsPare = findOperadorsPareNoCaducats(entitat, o.getCodiPare());
@@ -336,8 +336,8 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 	private List<PagadorCieEntity> findOperadorsPareNoCaducats(EntitatDto entitat, String codi) {
 
 		List<PagadorCieEntity> operadors = new ArrayList<>();
-		var o = organGestorRepository.findByCodi(codi);
 		var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		var o = organGestorRepository.findByEntitatAndCodi(e, codi);
 		var p = pagadorCieReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
 		if (!Strings.isNullOrEmpty(o.getCodiPare()) && !o.getCodi().equals(entitat.getDir3Codi()) && !"A99999999".equals(o.getCodiPare())) {
 			operadors = findOperadorsPareNoCaducats(entitat, o.getCodiPare());
@@ -376,14 +376,14 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 		}
 	}
 
-	@Transactional(readOnly = true)
-	@Override
-	public boolean existeixCieByEntitatAndOrganGestor(String organGestor) {
-
-		var organ = organGestorRepository.findByCodi(organGestor);
-		var cie = pagadorCieReposity.findByEntitatAndOrganGestor(organ.getEntitat(), organ);
-		return cie != null && !cie.isEmpty();
-	}
+//	@Transactional(readOnly = true)
+//	@Override
+//	public boolean existeixCieByEntitatAndOrganGestor(String organGestor) {
+//
+//		var organ = organGestorRepository.findByCodi(organGestor);
+//		var cie = pagadorCieReposity.findByEntitatAndOrganGestor(organ.getEntitat(), organ);
+//		return cie != null && !cie.isEmpty();
+//	}
 
 	@Override
 	public PaginaDto<CieDto> findAllPaginat(PaginacioParamsDto paginacioParams) {

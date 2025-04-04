@@ -102,7 +102,7 @@ public class OrganGestorServiceTest {
                 .oficinaNom("oficina nom")
                 .estat("E")
                 .sir(false).build();
-        Mockito.when(organGestorRepository.findByCodi(Mockito.eq(ORGAN_CODI))).thenReturn(organGestor);
+        Mockito.when(organGestorRepository.findByEntitatAndCodi(entitatEntity, Mockito.eq(ORGAN_CODI))).thenReturn(organGestor);
     }
 
 //    @Test

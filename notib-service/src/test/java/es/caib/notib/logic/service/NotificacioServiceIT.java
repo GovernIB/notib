@@ -512,7 +512,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 		notificacioRepository.saveAndFlush(notEntity);
 
 		// Given: notificacio amb permis processar òrgan
-		var organGestorId = organGestorRepository.findByCodi(notificacio.getOrganGestor()).getId();
+		var organGestorId = organGestorRepository.findByEntitatAndCodi(notEntity.getEntitat(), notificacio.getOrganGestor()).getId();
 		var permis = new PermisDto();
 		permis.setProcessar(true);
 		permis.setTipus(TipusEnumDto.USUARI);
@@ -535,7 +535,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 		notificacioRepository.saveAndFlush(notEntity);
 
 		// Given: notificacio amb permis processar procediment per a l'òrgan gestor
-		var organGestorId = organGestorRepository.findByCodi(notificacio.getOrganGestor()).getId();
+		var organGestorId = organGestorRepository.findByEntitatAndCodi(notEntity.getEntitat(), notificacio.getOrganGestor()).getId();
 		var procediment = notificacio.getProcedimentId();
 		var permisProcessar = new PermisDto();
 		permisProcessar.setProcessar(true);

@@ -120,7 +120,7 @@ public class ServeiController extends BaseUserController {
 		var organsDto = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
 		List<CodiValorEstatDto> organsGestors = new ArrayList<>();
 		for (var organ : organsDto) {
-			organsGestors.add(CodiValorEstatDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
+			organsGestors.add(CodiValorEstatDto.builder().id(organ.getId()).codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
 		}
 		return organsGestors;
 	}

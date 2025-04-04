@@ -31,7 +31,7 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			"where (pro.entitat_id = :entitatId)" +
 			" and (:isCodiNull = true or lower(pro.codi) like lower('%'||:codi||'%'))" +
 			" and (:isNomNull = true or lower(pro.nom) like lower('%'||:nom||'%'))" +
-			" and (:isOrganGestorNull = true or pro.organGestor like :organ)" +
+			" and (:isOrganGestorNull = true or pro.organGestorCodi like :organ)" +
 			" and (:isEstatNull = true or pro.actiu = :estat)" +
 			" and (:isComu = false or pro.comu = true)" +
 			" and (:isManual = false or pro.manual = true)" +
@@ -56,7 +56,7 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 	@Query(	"from ProcedimentFormEntity pro " +
 			"where ((:isCodiNull = true) or (lower(pro.codi) like lower('%'||:codi||'%')))" + 
 			" and ((:isNomNull = true) or (lower(pro.nom) like lower('%'||:nom||'%')))" +
-			" and (:isOrganGestorNull = true or pro.organGestor like :organ)" +
+			" and (:isOrganGestorNull = true or pro.organGestorCodi like :organ)" +
 			" and (:isEstatNull = true or pro.actiu = :estat)" +
 			" and (:isComu = false or pro.comu = true)" +
 			" and (:isManual = false or pro.manual = true)" +
@@ -81,7 +81,7 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			"where (pro.entitat_id = :entitatId)" +
 			" and (:isCodiNull = true or lower(pro.codi) like lower('%'||:codi||'%'))" +
 			" and (:isNomNull = true or lower(pro.nom) like lower('%'||:nom||'%'))" +
-			" and (:isOrganGestorNull = true or pro.organGestor like :organ)" +
+			" and (:isOrganGestorNull = true or pro.organGestorCodi like :organ)" +
 			" and ((pro.organGestor in (:organsGestors)) or pro.comu = true)" +
 			" and (:isEstatNull = true or pro.actiu = :estat)" +
 			" and (:isComu = false or pro.comu = true)" +

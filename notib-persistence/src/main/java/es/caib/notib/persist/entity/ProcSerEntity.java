@@ -102,9 +102,13 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
     private EntregaCieEntity entregaCie;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "organ_gestor", referencedColumnName = "codi")
-    @ForeignKey(name = "not_procser_procorgan_fk")
+    @JoinColumn(name = "organ_gestor", referencedColumnName = "id")
+    @ForeignKey(name = "NOT_PROCSER_ORGAN_FK")
     protected OrganGestorEntity organGestor;
+
+    @Column(name ="organ_codi", nullable = false)
+    private String organCodi;
+
 
     public boolean isEntregaCieVigent() {
 

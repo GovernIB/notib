@@ -399,7 +399,7 @@ public class ProcSerHelper {
 			// Organ gestor
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ", new Object[]{procedimentGda.getOrganGestor()}));
 			if (!procedimentGda.isComu() && procedimentGda.getOrganGestor() != null && !procedimentGda.getOrganGestor().isEmpty()) {
-				organGestorGda = organGestorRepository.findByCodi(procedimentGda.getOrganGestor());
+				organGestorGda = organGestorRepository.findByEntitatAndCodi(entitat, procedimentGda.getOrganGestor());
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.result." + (organGestorGda == null ? "no" : "si")));
 			}
 			log.trace(">>>> >> organ gestor " + (organGestorGda == null ? "NOU" : "EXISTENT"));
@@ -503,7 +503,7 @@ public class ProcSerHelper {
 			// Organ gestor
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.organ", new Object[]{serveiGda.getOrganGestor()}));
 			if (!serveiGda.isComu() && serveiGda.getOrganGestor() != null && !serveiGda.getOrganGestor().isEmpty()) {
-				organGestorGda = organGestorRepository.findByCodi(serveiGda.getOrganGestor());
+				organGestorGda = organGestorRepository.findByEntitatAndCodi(entitat, serveiGda.getOrganGestor());
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.organ.result." + (organGestorGda == null ? "no" : "si")));
 			}
 			log.trace(">>>> >> organ gestor " + (organGestorGda == null ? "NOU" : "EXISTENT"));

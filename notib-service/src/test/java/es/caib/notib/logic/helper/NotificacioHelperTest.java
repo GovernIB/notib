@@ -157,7 +157,7 @@ public class NotificacioHelperTest {
 		Mockito.when(grupRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class))).thenReturn(grupNotificacio);
 		Mockito.when(documentRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(documentEntity));
 		Mockito.when(documentRepository.save(Mockito.any(DocumentEntity.class))).thenReturn(documentEntity2, documentEntity3);
-		Mockito.when(organGestorRepository.findByCodi(Mockito.any(String.class))).thenReturn(organGestor);
+		Mockito.when(organGestorRepository.findByEntitatAndCodi(Mockito.any(EntitatEntity.class), Mockito.any(String.class))).thenReturn(organGestor);
 
 		//base64
 		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class))).thenReturn(documentGesdocId);

@@ -151,6 +151,8 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 	private static Map<String, ProgresActualitzacioProcSer> progresActualitzacio = new HashMap<>();
 	@Getter
 	private static Map<Long, Integer> procedimentsAmbOrganNoSincronitzat = new HashMap<>();
+    @Autowired
+    private ProcSerHelper procSerHelper;
 
 	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Override
@@ -162,7 +164,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			log.debug("Creant un nou procediment (procediment=" + procediment + ")");
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			// Organ gestor
-			var organGestor = organGestorRepository.findByCodi(procediment.getOrganGestor());
+			var organGestor = organGestorRepository.findByEntitatAndCodi(entitat, procediment.getOrganGestor());
 			if (organGestor == null) {
 				throw new NotFoundException(procediment.getOrganGestor(), OrganGestorEntity.class);
 			}
@@ -225,7 +227,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			}
 			
 			// Organ gestor
-			var organGestor = organGestorRepository.findByCodi(procediment.getOrganGestor());
+			var organGestor = organGestorRepository.findByEntitatAndCodi(entitat, procediment.getOrganGestor());
 			if (organGestor == null) {
 				throw new NotFoundException(procediment.getOrganGestor(), OrganGestorEntity.class);
 			}
@@ -384,7 +386,8 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			if (!procediment.isComu() || Strings.isNullOrEmpty(organCodi)) {
 				return false;
 			}
-			var organ = organGestorRepository.findByCodi(organCodi);
+			var entitat = procediment.getEntitat();
+			var organ = organGestorRepository.findByEntitatAndCodi(entitat, organCodi);
 			if (organ == null || organ.getEntregaCie() == null) {
 				return false;
 			}
@@ -779,21 +782,21 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 		}
 	}
 	
-	@Override
-	@Transactional(readOnly = true)
-	public List<ProcSerDto> findProcedimentsByOrganGestor(String organGestorCodi) {
-
-		var timer = metricsHelper.iniciMetrica();
-		try {
-			var organGestor = organGestorRepository.findByCodi(organGestorCodi);
-			if (organGestor == null) {
-				throw new NotFoundException(organGestorCodi, OrganGestorEntity.class);
-			}
-			return conversioTipusHelper.convertirList(procedimentRepository.findByOrganGestorId(organGestor.getId()), ProcSerDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
+//	@Override
+//	@Transactional(readOnly = true)
+//	public List<ProcSerDto> findProcedimentsByOrganGestor(String organGestorCodi) {
+//
+//		var timer = metricsHelper.iniciMetrica();
+//		try {
+//			var organGestor = organGestorRepository.findByCodi(organGestorCodi);
+//			if (organGestor == null) {
+//				throw new NotFoundException(organGestorCodi, OrganGestorEntity.class);
+//			}
+//			return conversioTipusHelper.convertirList(procedimentRepository.findByOrganGestorId(organGestor.getId()), ProcSerDto.class);
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
+//	}
 
 	@Override
 	@Transactional(readOnly = true)
@@ -1154,7 +1157,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			if (procediment.isComu() && permis.getOrgan() != null && !permis.getOrgan().isEmpty() && !entitat.getDir3Codi().equals(permis.getOrgan())) {
 				var procedimentOrgan = procedimentOrganRepository.findByProcSerIdAndOrganGestorCodi(procediment.getId(), permis.getOrgan());
 				if (procedimentOrgan == null) {
-					organGestor = organGestorRepository.findByCodi(permis.getOrgan());
+					organGestor = organGestorRepository.findByEntitatAndCodi(entitat, permis.getOrgan());
 					if (organGestor == null) {
 						throw new NotFoundException(procediment.getOrganGestor(), OrganGestorEntity.class);
 					}

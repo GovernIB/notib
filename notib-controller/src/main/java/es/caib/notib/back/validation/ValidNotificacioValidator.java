@@ -89,10 +89,10 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			}
 
 			var organCodi = notificacio.getOrganGestor();
-			var organ = organService.findByCodi(null, organCodi);
+			var entitat = entitatService.findByDir3codi(notificacio.getEmisorDir3Codi());
+			var organ = organService.findByCodi(entitat.getId(), organCodi);
 			if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {
 				if (organ != null) {
-					var entitat = entitatService.findById(organ.getEntitatId());
 					valid = entitat.isOficinaEntitat() || organ.getOficina() != null && !Strings.isNullOrEmpty(organ.getOficina().getCodi());
 					if (!valid) {
 						var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.sense.oficina", null, locale);

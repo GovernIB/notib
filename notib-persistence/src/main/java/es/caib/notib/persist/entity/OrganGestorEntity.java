@@ -43,8 +43,9 @@ import java.util.List;
 //@EntityListeners(AuditingEntityListener.class)
 public class OrganGestorEntity extends AbstractPersistable<Long> implements Serializable {
 	
-	@NaturalId
-	@Column(name = "codi", length = 64, nullable = false, unique = true)
+//	@NaturalId
+//	@Column(name = "codi", length = 64, nullable = false, unique = true)
+	@Column(name = "codi", length = 64, nullable = false)
 	protected String codi;
 
 	@Column(name = "codi_pare", length = 64)

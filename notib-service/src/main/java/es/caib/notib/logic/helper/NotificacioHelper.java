@@ -218,7 +218,7 @@ public class NotificacioHelper {
 		// Recuperar òrgan gestor notificació
 		log.trace("Processam organ gestor");
 		if (organGestor == null && notificacio.getOrganGestor() != null ) {
-			organGestor = organGestorRepository.findByCodi(notificacio.getOrganGestor());
+			organGestor = organGestorRepository.findByEntitatAndCodi(entitat, notificacio.getOrganGestor());
 		}
 		if (organGestor == null) {
 			throw new NotFoundException(notificacio.getOrganGestor(), OrganGestorEntity.class);

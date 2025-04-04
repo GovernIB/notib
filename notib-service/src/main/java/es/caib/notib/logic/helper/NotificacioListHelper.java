@@ -87,13 +87,18 @@ public class NotificacioListHelper {
 
     public FiltreNotificacio getFiltre(NotificacioFiltreDto f, Long entitatId, RolEnumDto rol, String usuariCodi, List<String> rols) {
 
+        var isUsuari = RolEnumDto.tothom.equals(rol);
+        var isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
+        var isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
+        var isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
+        var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat,false);
         OrganGestorEntity organGestor = null;
         if (f.getOrganGestor() != null && !f.getOrganGestor().isEmpty()) {
             try {
                 var id = Long.valueOf(f.getOrganGestor());
                 organGestor = organGestorRepository.findById(id).orElse(null);
             } catch (NumberFormatException ex) {
-                organGestor = organGestorRepository.findByCodi(f.getOrganGestor());
+                organGestor = organGestorRepository.findByEntitatAndCodi(entitatActual, f.getOrganGestor());
             }
         }
         ProcSerEntity procediment = null;
@@ -102,11 +107,7 @@ public class NotificacioListHelper {
         } else if (f.getServeiId() != null) {
             procediment = serveiRepository.findById(f.getServeiId()).orElse(null);
         }
-        var isUsuari = RolEnumDto.tothom.equals(rol);
-        var isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
-        var isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
-        var isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
-        var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat,false);
+
         var nomesSenseErrors = false;
         var nomesAmbErrors = f.isNomesAmbErrors();
         var nomesFiReintents = f.isNomesFiReintents();

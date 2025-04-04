@@ -155,11 +155,11 @@ public class ServeiService extends AbstractService<es.caib.notib.logic.intf.serv
 		return getDelegateService().hasAnyServeisWithPermis(entitatId, grups, permis);
 	}
 
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
-	public List<ProcSerDto> findServeisByOrganGestor(String organGestorCodi) {
-		return getDelegateService().findServeisByOrganGestor(organGestorCodi);
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+//	public List<ProcSerDto> findServeisByOrganGestor(String organGestorCodi) {
+//		return getDelegateService().findServeisByOrganGestor(organGestorCodi);
+//	}
 
 	@Override
 	@RolesAllowed("**")

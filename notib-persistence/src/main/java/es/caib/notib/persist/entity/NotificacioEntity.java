@@ -199,8 +199,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
-	@JoinColumn(name = "organ_gestor", referencedColumnName = "codi")
-	@ForeignKey(name = "not_not_organ_fk")
+	@JoinColumn(name = "organ_gestor", referencedColumnName = "id")
+	@ForeignKey(name = "NOT_ORGAN_GESTOR_FK")
 	protected OrganGestorEntity organGestor;
 
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)

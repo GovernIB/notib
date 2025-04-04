@@ -232,12 +232,12 @@ public class ProcedimentService extends AbstractService<es.caib.notib.logic.intf
 	public void refrescarCache(EntitatDto entitat) {
 		getDelegateService().refrescarCache(entitat);
 	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
-	public List<ProcSerDto> findProcedimentsByOrganGestor(String organGestorCodi) {
-		return getDelegateService().findProcedimentsByOrganGestor(organGestorCodi);
-	}
+//
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+//	public List<ProcSerDto> findProcedimentsByOrganGestor(String organGestorCodi) {
+//		return getDelegateService().findProcedimentsByOrganGestor(organGestorCodi);
+//	}
 
 	@Override
 	@RolesAllowed("**")

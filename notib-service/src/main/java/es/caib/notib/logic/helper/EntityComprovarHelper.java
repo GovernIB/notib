@@ -274,10 +274,10 @@ public class EntityComprovarHelper {
 		}
 	}
 	
-	public void comprovarPermisosOrganGestor(String organCodiDir3) {
+	public void comprovarPermisosOrganGestor(EntitatEntity entitat, String organCodiDir3) {
 
 		var auth = SecurityContextHolder.getContext().getAuthentication();
-		var organGestorEntity = organGestorRepository.findByCodi(organCodiDir3);
+		var organGestorEntity = organGestorRepository.findByEntitatAndCodi(entitat, organCodiDir3);
 		var hasPermisAdminOrgan = permisosHelper.isGrantedAny(organGestorEntity.getId(), OrganGestorEntity.class, new Permission[]{ExtendedPermission.ADMINISTRADOR}, auth);
 		if (Boolean.FALSE.equals(hasPermisAdminOrgan)) {
 			throw new PermissionDeniedException(organGestorEntity.getId(), OrganGestorEntity.class, auth.getName(), "ADMINISTRADOR");
@@ -297,7 +297,7 @@ public class EntityComprovarHelper {
 	}
 	public OrganGestorEntity comprovarOrganGestor(EntitatEntity entitat, String codi) {
 		
-		var organGestor = organGestorRepository.findByCodi(codi);
+		var organGestor = organGestorRepository.findByEntitatAndCodi(entitat, codi);
 		if (organGestor == null) {
 			throw new NotFoundException(codi, OrganGestorEntity.class);
 		}
