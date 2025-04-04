@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - sql: "UPDATE NOT_CONFIG_TYPE SET VALUE = 'es.caib.notib.plugin.validatesignature.afirmacxf.AfirmaCxfValidateSignaturePlugin,es.caib.notib.plugin.valsig.ValidacioFirmesPluginMock' WHERE CODE = 'VALSIG_CLASS';"
