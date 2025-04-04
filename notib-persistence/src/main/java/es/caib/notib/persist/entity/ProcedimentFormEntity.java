@@ -25,9 +25,10 @@ import javax.persistence.Id;
 		+ "			ent.nom as entitatNom, "
 		+ "			pro.organ_gestor as organGestor, "
 		+ "			og.nom as organGestorNom, "	
+		+ " 		og.codi as organGestorCodi,"
 		+ "			og.estat as organGestorEstat, "
 		+ "			pro.codiassumpte as codiassumpte, "
-		+ " 		pro.tipusassumpte as tipusassumpte, "		
+		+ " 		pro.tipusassumpte as tipusassumpte, "
 		+ "			og.llibre as llibre, "
 		+ "			ent.oficina as oficina, "
 		+ "         pro.agrupar as agrupar, "
@@ -49,7 +50,7 @@ import javax.persistence.Id;
 		+ " from	not_procediment pro "
 		+ " left outer join not_entitat ent on ent.id = pro.entitat "
 //		+ " left outer join not_pagador_postal postal on postal.id = pro.pagadorpostal "
-		+ " left outer join not_organ_gestor og on pro.organ_gestor = og.codi "
+		+ " left outer join not_organ_gestor og on pro.organ_gestor = og.id "
 		+ " where pro.tipus = 'PROCEDIMENT'")
 @Immutable
 public class ProcedimentFormEntity {
@@ -75,6 +76,9 @@ public class ProcedimentFormEntity {
 
 	@Column(name = "organGestorNom")
 	protected String organGestorNom;
+
+	@Column(name = "organGestorCodi")
+	protected String organGestorCodi;
 	
 	@Column(name = "organGestorEstat")
 	@Enumerated(EnumType.STRING)

@@ -277,7 +277,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			List<CodiValorEstatDto> organsGestors = new ArrayList<>();
 			var organs = organGestorRepository.findByEntitat(entitat);
 			for (var organ: organs) {
-				organsGestors.add(CodiValorEstatDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
+				organsGestors.add(CodiValorEstatDto.builder().id(organ.getId()).codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
 			}
 			return organsGestors;
 		} finally {

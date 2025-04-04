@@ -151,6 +151,8 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 	private static Map<String, ProgresActualitzacioProcSer> progresActualitzacio = new HashMap<>();
 	@Getter
 	private static Map<Long, Integer> procedimentsAmbOrganNoSincronitzat = new HashMap<>();
+    @Autowired
+    private ProcSerHelper procSerHelper;
 
 	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Override
