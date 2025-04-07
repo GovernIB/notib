@@ -293,7 +293,7 @@ public class MassivaFile {
                     } catch (Exception ex) {
                     }
                     entregaPostal = EntregaPostal.builder()
-                            .domiciliConcretTipus(tipus)
+                            .tipus(tipus)
                             .viaTipus(via)
                             .viaNom(viaNom)
                             .apartatCorreus(apartatCorreus)
