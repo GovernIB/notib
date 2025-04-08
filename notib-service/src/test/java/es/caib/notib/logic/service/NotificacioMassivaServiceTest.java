@@ -249,7 +249,7 @@ public class NotificacioMassivaServiceTest {
 	@Test
 	public void whenCreate_GivenNoErrors_ThenCallAltaNotificacioWeb() throws Exception {
 		// Given
-		Mockito.when(organMock.getCodi()).thenReturn("E04975701");
+		Mockito.when(organMock.getCodi()).thenReturn("A04027061");
 		Mockito.when(organMock.getEstat()).thenReturn(OrganGestorEstatEnum.V);
 //		Mockito.when(notificacioValidatorHelper.validarNotificacioMassiu(
 //				Mockito.any(NotificacioDatabaseDto.class), Mockito.any(EntitatEntity.class), Mockito.<Map<String, Long>>any()))

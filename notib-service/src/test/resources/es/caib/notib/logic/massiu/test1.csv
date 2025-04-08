@@ -1,5 +1,6 @@
-Codigo Unidad Remisora;Concepto;Tipo de Envio;Referencia Emisor;Nombre Fichero;Normalizado;Prioridad Servicio;Nombre;APELLIDOS;CIF/NIF;Tipo documento;Email;Codigo destino;Línea 1;Línea 2;Codigo Postal;Retardo Postal;Código Procedimiento;Fecha Envio Programado;Origen;Estado Elaboración;Tipo documental;PDF Firmado;Descripción
-E04975701;Concepto 1;Notificacion;NOTIF2103021;prueba.pdf;Si;Normal;ANF;RODRIGUEZ SANCHEZ;12345678Z;;mail@mail.com;L01280796;Castelló 115;28016 Madrid;37891;0;101310;;CIUTADA;ORIGINAL;INFORME;true;Desc 1
-E04975701;Concepto 2;Comunicacion;NOTIF2103022;prueba.pdf;Si;Normal;ANF;DELGADO Y DELGADO;12345678Z;;mail@mail.com;L01280796;Castelló 115;28016 Madrid;49419;0;101310;;CIUTADA;ORIGINAL;INFORME;true;Desc 2
-E04975701;Concepto 3;Notificacion;NOTIF2103023;prueba.pdf;Si;Normal;ANF;DELGADO Y DELGADO;12345678Z;;mail@mail.com;L01280796;Castelló 115;28016 Madrid;49419;0;101310;;CIUTADA;ORIGINAL;INFORME;true;Desc 3
-E04975701;Concepto 4;Notificacion;NOTIF2103024;prueba.pdf;Si;Normal;ANF;GUISASOLA BERDUGO;12345678Z;;mail@mail.com;L01280796;Castelló 115;28016 Madrid;28003;0;101310;;CIUTADA;ORIGINAL;INFORME;true;Desc 4
+Codigo Unidad Remisora;Concepto;Tipo de Envio;Referencia Emisor;Nombre Fichero;UUID Fichero;CSV Fichero;Normalizado;Prioridad Servicio;Nombre;Apellidos;CIF/NIF;Email;Codigo destino;Tipo documento;Linea 1;Linea 2;Codigo Postal;Retardo Postal;Codigo Procedimiento;Fecha Envio Programado;Descripcion;Entrega postal;Tipo entrega postal;Via tipo;Nombre via;Apartado de correos;Numero de casa;Punto kilometrico;Portal;Escalera;Planta;Puerta;Bloque;Pais codigo;Provincia;Municipio codigo;Poblacion;Complemento
+A04027061;Concepte;NOTIFICACIO;;prueba.pdf;;;No;NORMAL;nom;llinatge1 llinatge2;99999999R;;A04027005;;;;12345;0;894623;;Descripció;;;;;;;;;;;;;;;;;
+A04027061;Concepte;NOTIFICACIO;;prueba.pdf;;;No;NORMAL;nom;llinatge1 llinatge2;99999999R;;A04027005;;;;12345;0;894623;;Descripció;;;;;;;;;;;;;;;;;
+A04027061;Concepte;NOTIFICACIO;;prueba.pdf;;;No;NORMAL;nom;llinatge1 llinatge2;99999999R;;A04027005;;;;12345;0;894623;;Descripció;;;;;;;;;;;;;;;;;
+A04027061;Concepte;NOTIFICACIO;;prueba.pdf;;;No;NORMAL;nom;llinatge1 llinatge2;99999999R;;A04027005;;;;12345;0;894623;;Descripció;;;;;;;;;;;;;;;;;
+
