@@ -4,16 +4,18 @@
 package es.caib.notib.logic.helper;
 
 import es.caib.notib.logic.email.EmailConstants;
-import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
+import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +85,7 @@ public class RegistreHelper {
 			}
 			// Consulta retorna correctement
 			canviEstat = !enviament.getRegistreEstat().equals(resposta.getEstat());
-			enviamentUpdateDatat(resposta.getEstat(), resposta.getRegistreData(), resposta.getSirRecepecioData(), resposta.getSirRegistreDestiData(), resposta.getRegistreNumeroFormatat(), enviament);
+			enviamentUpdateDatat(resposta, enviament);
 			logTimeHelper.info(" [TIMER-SIR] Actualitzar estat comunicació SIR [Id: " + enviamentId + "]: ");
 			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA && canviEstat) {
 				try {
@@ -123,10 +125,16 @@ public class RegistreHelper {
 	}
 
 
-	public void enviamentUpdateDatat(NotificacioRegistreEstatEnumDto registreEstat, Date registreEstatData, Date sirRecepcioData, Date sirRegistreDestiData, String registreNumeroFormatat, NotificacioEnviamentEntity enviament) {
+	public void enviamentUpdateDatat(RespostaConsultaRegistre resposta, NotificacioEnviamentEntity enviament) {
 
-		log.debug("Estat actual: " + registreEstat.name());
-		enviament.updateRegistreEstat(registreEstat, registreEstatData, sirRecepcioData, sirRegistreDestiData, registreNumeroFormatat);
+		var registreEstat = resposta.getEstat();
+		var registreEstatData = resposta.getRegistreData();
+		var sirRecepcioData = resposta.getSirRecepecioData();
+		var sirRegistreDestiData = resposta.getSirRegistreDestiData();
+		var registreNumeroFormatat = resposta.getRegistreNumeroFormatat();
+		var motiu = resposta.getMotivo();
+		NotibLogger.getInstance().info("Estat actual: " + registreEstat.name(), log, LoggingTipus.SIR);
+		enviament.updateRegistreEstat(registreEstat, registreEstatData, sirRecepcioData, sirRegistreDestiData, registreNumeroFormatat, motiu);
 		var estatsEnviamentsFinals = true;
 		var enviaments = enviament.getNotificacio().getEnviaments();
 		for (var env: enviaments) {
@@ -138,7 +146,7 @@ public class RegistreHelper {
 				break;
 			}
 		}
-		log.debug("Estat final: " + estatsEnviamentsFinals);
+		NotibLogger.getInstance().info("Estat final: " + estatsEnviamentsFinals, log, LoggingTipus.SIR);
 		if (estatsEnviamentsFinals) {
 			var nouEstat = NotificacioEstatEnumDto.FINALITZADA;
 			//Marcar com a processada si la notificació s'ha fet des de una aplicació
@@ -151,6 +159,6 @@ public class RegistreHelper {
 			notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(enviament.getNotificacio().getId()).estat(nouEstat).estatDate(new Date()).build());
 			auditHelper.auditaNotificacio(enviament.getNotificacio(), TipusOperacio.UPDATE, "RegistreHelper.enviamentUpdateDatat");
 		}
-		log.debug("L'estat de la comunicació SIR s'ha actualitzat correctament.");
+		NotibLogger.getInstance().info("L'estat de la comunicació SIR s'ha actualitzat correctament.", log, LoggingTipus.SIR);
 	}
 }

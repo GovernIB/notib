@@ -49,7 +49,7 @@ class StateMachineConfigTest {
 
         Mockito.when(registreSmHelper.registrarEnviament(any(NotificacioEnviamentEntity.class), anyInt())).thenAnswer( input -> {
             var enviament = (NotificacioEnviamentEntity) input.getArgument(0);
-            enviament.updateRegistreEstat(NotificacioRegistreEstatEnumDto.VALID, new Date(), null, null, "0000/2023");
+            enviament.updateRegistreEstat(NotificacioRegistreEstatEnumDto.VALID, new Date(), null, null, "0000/2023", "Motiu test");
             return enviament;
         });
         

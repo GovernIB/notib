@@ -216,8 +216,7 @@ public class RegistreNotificaHelper {
 		if (params.isComSir() && totsAdministracio) {
 			log.debug("Comunicació SIR --> actualitzar estat...");
 			not.updateEstat(NotificacioEstatEnumDto.ENVIAT_SIR);
-			registreHelper.enviamentUpdateDatat(arbResposta.getEstat(), arbResposta.getRegistreData(), arbResposta.getSirRecepecioData(),
-					arbResposta.getSirRegistreDestiData(), arbResposta.getRegistreNumeroFormatat(), env);
+			registreHelper.enviamentUpdateDatat(arbResposta, env);
 		} else {
 			info.getParams().add(new AccioParam(PROCES_DESC_PARAM, " Procedim a enviar la notificació a Notific@"));
 		}

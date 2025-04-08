@@ -786,6 +786,12 @@ $(document).ready(function() {
 								<td><spring:message code="es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto.${enviament.registreEstat}"/></td>
 							</tr>
 						</c:if>
+						<c:if test="${not empty enviament.registreMotiu}">
+							<tr>
+								<td width="30%"><strong><spring:message code="enviament.info.registre.motiu"/></strong></td>
+								<td>${enviament.registreMotiu}</td>
+							</tr>
+						</c:if>
 					</tbody>
 					</table>
 				</div>

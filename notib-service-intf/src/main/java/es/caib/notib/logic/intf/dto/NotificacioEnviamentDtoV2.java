@@ -65,6 +65,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private Date sirRegDestiData;
 	private int registreNumero;
 	private Date registreData;
+	private String registreMotiu;
 	//Notific@
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;

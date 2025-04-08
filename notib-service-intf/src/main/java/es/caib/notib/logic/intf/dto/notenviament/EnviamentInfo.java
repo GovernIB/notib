@@ -46,6 +46,7 @@ public class EnviamentInfo extends NotificacioEnviamentDatatableDto{
 	private boolean sirFiPooling;
 	private int registreNumero;
 	private Date registreData;
+	private String registreMotiu;
 
 	//Notific@
 	private Date notificaErrorData;

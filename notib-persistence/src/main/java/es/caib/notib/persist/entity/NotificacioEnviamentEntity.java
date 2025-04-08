@@ -229,6 +229,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name="registre_numero_formatat", length = 50)
 	private String registreNumeroFormatat;
 
+	@Column(name="registre_motiu", length = 255)
+	private String registreMotiu;
+
 	@Column(name="registre_data")
 	private Date registreData;
 	
@@ -323,14 +326,14 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.errorLastCallback = error;
 	}
 
-	public void updateRegistreEstat(NotificacioRegistreEstatEnumDto registreEstat, Date registreEstatData, Date sirConsultaData, Date sirRegDestiData, String registreNumeroFormatat) {
+	public void updateRegistreEstat(NotificacioRegistreEstatEnumDto registreEstat, Date registreEstatData, Date sirConsultaData, Date sirRegDestiData, String registreNumeroFormatat, String registreMotiu) {
 
 		this.updateRegistreEstat(registreEstat);
 		this.registreData = registreEstatData;
 		this.sirRecepcioData = sirConsultaData;
 		this.sirRegDestiData = sirRegDestiData;
 		this.registreNumeroFormatat = registreNumeroFormatat;
-		
+		this.registreMotiu = registreMotiu;
 	}
 
 	public void updateRegistreEstat(NotificacioRegistreEstatEnumDto registreEstat) {

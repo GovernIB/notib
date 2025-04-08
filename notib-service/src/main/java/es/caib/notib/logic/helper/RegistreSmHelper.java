@@ -158,7 +158,7 @@ public class RegistreSmHelper {
 			sirRecepcioData = arbResposta.getSirRecepecioData();
 			sirDestiData = arbResposta.getSirRegistreDestiData();
 		}
-		enviament.updateRegistreEstat(registreEstat, registreData, sirRecepcioData, sirDestiData, registreNum);
+		enviament.updateRegistreEstat(registreEstat, registreData, sirRecepcioData, sirDestiData, registreNum, arbResposta.getMotivo());
 		var valors = llibreOficina.get(enviament.getNotificacio().getId());
 		if (valors == null) {
 			return;

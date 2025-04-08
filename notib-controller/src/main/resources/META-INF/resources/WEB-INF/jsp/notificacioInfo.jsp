@@ -812,6 +812,12 @@ $(document).ready(function() {
 																		<td><fmt:formatDate value="${enviament.sirRecepcioData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 																	</tr>
 																</c:if>
+																<c:if test="${not empty enviament.registreMotiu}">
+																	<tr>
+																		<td width="30%"><strong><spring:message code="enviament.info.registre.motiu"/></strong></td>
+																		<td>${enviament.registreMotiu}</td>
+																	</tr>
+																</c:if>
 																<c:if test="${not empty enviament.sirRegDestiData}">
 																	<tr>
 																		<td><strong><spring:message code="enviament.info.seu.registre.data.sir.desti"/></strong></td>

@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - property:
+      dbms: oracle
+      name: varcharUnit
+      value: CHAR
+  - property:
+      dbms: postgresql
+      name: varcharUnit
+      value: ''
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_notificacio_enviament
+            columns:
+              - column:
+                  name: registre_motiu
+                  type: varchar(255 ${varcharUnit})
