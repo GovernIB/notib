@@ -31,10 +31,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -825,12 +825,20 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var sequence = request.getParameter("sequence");
-        var justificant = justificantService.generarJustificantComunicacioSIR(enviamentId, entitatActual.getId(), sequence);
-        if (justificant == null) {
-            throw new ValidationException("Existeix un altre procés iniciat. Esperau que finalitzi la descàrrega del document.");
+        FitxerDto justificant = null;
+        try {
+            justificant = justificantService.generarJustificantComunicacioSIR(enviamentId, entitatActual.getId(), sequence);
+            if (justificant == null) {
+                throw new ValidationException("Existeix un altre procés iniciat. Esperau que finalitzi la descàrrega del document.");
+            }
+            response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
+            writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
+        } finally {
+            if (justificant == null) {
+                writeFileToResponse("error_justificant.pdf", "Error generant el justificant".getBytes(StandardCharsets.UTF_8), response);
+            }
         }
-        response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
-        writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
+
     }
 
     ////
