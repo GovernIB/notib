@@ -833,6 +833,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             }
             response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
             writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
+        } catch (Exception ex) {
+            log.error("Error generant el justificant " + ex.getMessage());
         } finally {
             if (justificant == null) {
                 writeFileToResponse("error_justificant.pdf", "Error generant el justificant".getBytes(StandardCharsets.UTF_8), response);
