@@ -32,4 +32,14 @@ public interface EntitatTipusDocRepository extends JpaRepository<EntitatTipusDoc
 	@Modifying
 	@Query("delete from EntitatTipusDocEntity tipus where tipus.tipusDocEnum != :tipusDoc AND tipus.entitat.id = :entitatId")
 	public int deleteNotInList(@Param("entitatId") Long entitatId, @Param("tipusDoc") TipusDocumentEnumDto tipusDoc);
+
+
+	@Modifying
+	@Query(value = "UPDATE NOT_ENTITAT_TIPUS_DOC " +
+			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
+			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
+			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
+			nativeQuery = true)
+	void updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
 }

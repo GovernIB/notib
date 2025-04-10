@@ -40,4 +40,5 @@
 	<jee:local-slsb id="ColumnesService" jndi-name="notib/ColumnesServiceBean/local" business-interface="es.caib.notib.logic.intf.service.ColumnesService"/>
 	<jee:local-slsb id="ActiveMqService" jndi-name="notib/ActiveMqServiceBean/local" business-interface="es.caib.notib.logic.intf.service.ActiveMqService"/>
 	<jee:local-slsb id="RegistreService" jndi-name="notib/RegistreServiceBean/local" business-interface="es.caib.notib.logic.intf.service.RegistreService"/>
+	<jee:local-slsb id="UsuariService" jndi-name="notib/UsuarierviceBean/local" business-interface="es.caib.notib.logic.intf.service.UsuariService"/>
 </beans>

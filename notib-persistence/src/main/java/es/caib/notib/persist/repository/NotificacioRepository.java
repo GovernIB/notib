@@ -254,4 +254,12 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	@Query(value = "select nn.id FROM NOT_NOTIFICACIO nn WHERE nn.ESTAT  IN (0, 1, 2, 28) AND  nn.CREATEDDATE > TO_DATE(:data, 'dd/MM/yyyy')", nativeQuery = true)
 	List<Long> findNotificacionsEnProgres(@Param("data") String data);
 
+	@Modifying
+	@Query(value = "UPDATE NOT_NOTIFICACIO SET CREATEDBY_CODI = :codiNou WHERE CREATEDBY_CODI = :codiAntic", nativeQuery = true)
+	void updateCreatedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+	@Modifying
+	@Query(value = "UPDATE NOT_NOTIFICACIO SET LASTMODIFIEDBY_CODI = :codiNou WHERE LASTMODIFIEDBY_CODI = :codiAntic", nativeQuery = true)
+	void updateLastModifiedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
 }

@@ -3,6 +3,7 @@
  */
 package es.caib.notib.back.controller;
 
+import es.caib.notib.back.command.UsuariCodiCommand;
 import es.caib.notib.back.command.UsuariCommand;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.EnumHelper;
@@ -10,6 +11,9 @@ import es.caib.notib.client.domini.NumElementsPaginaDefecte;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.UsuariAplicacioService;
+import es.caib.notib.logic.intf.service.UsuariService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +35,7 @@ import java.util.Locale;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Controller
 @RequestMapping("/usuari")
 public class UsuariController extends BaseController {
@@ -39,6 +44,8 @@ public class UsuariController extends BaseController {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private SessionScopedContext sessionScopedContext;
+    @Autowired
+    private UsuariService usuariService;
 
 	private static final String REDIRECT = "redirect:/";
 
@@ -95,6 +102,30 @@ public class UsuariController extends BaseController {
 	@ResponseBody
 	public String getInfoSessio(HttpServletRequest request) throws IOException {
 		return RequestSessionHelper.getJsonSession(request);
+	}
+
+	@RequestMapping(value = "/username", method = RequestMethod.GET)
+	public String getCanviCodi(HttpServletRequest request, Model model) {
+
+		var usuariCodiCommand = new UsuariCodiCommand();
+		model.addAttribute("usuariCodiCommand", usuariCodiCommand);
+		return "usuariCodiForm";
+	}
+
+	@RequestMapping(value = "/username", method = RequestMethod.POST)
+	public String setCanviCodi(HttpServletRequest request, HttpServletResponse response, @Valid UsuariCodiCommand command, BindingResult bindingResult, Model model) {
+
+		if (bindingResult.hasErrors()) {
+			return "usuariCodiForm";
+		}
+		try {
+			usuariService.updateUsuariCodi(command.getCodiAntic(), command.getCodiNou());
+			getModalControllerReturnValueSuccess(request, REDIRECT,"usuari.controller.codi.modificat.ok");
+		} catch (Exception e) {
+			getModalControllerReturnValueError(request, REDIRECT, "usuari.controller.codi.modificat.error", new Object[]{e.getMessage()});
+			log.error("Error modificant el codi de l'usuari", e);
+		}
+		return "usuariCodiForm";
 	}
 
 }

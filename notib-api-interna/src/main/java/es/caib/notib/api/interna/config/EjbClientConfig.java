@@ -69,6 +69,11 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(RegistreService.class);
 	}
 
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean usuariService() {
+		return getLocalEjbFactoyBean(UsuariService.class);
+	}
+
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {
 
 		var jndiName = EJB_JNDI_PREFIX + serviceClass.getSimpleName() + EJB_JNDI_SUFFIX;

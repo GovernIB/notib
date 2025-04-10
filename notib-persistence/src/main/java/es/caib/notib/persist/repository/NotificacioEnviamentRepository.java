@@ -334,4 +334,13 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 
 	@Query("select e.notificaReferencia from NotificacioEnviamentEntity e where e.id = :enviamentId")
 	String getUuidById(@Param("enviamentId") Long enviamentId);
+
+	@Modifying
+	@Query(value = "UPDATE NOT_NOTIFICACIO_ENV SET CREATEDBY_CODI = :codiNou WHERE CREATEDBY_CODI = :codiAntic", nativeQuery = true)
+	void updateCreatedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+	@Modifying
+	@Query(value = "UPDATE NOT_NOTIFICACIO_ENV SET LASTMODIFIEDBY_CODI = :codiNou WHERE LASTMODIFIEDBY_CODI = :codiAntic", nativeQuery = true)
+	void updateLastModifiedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
 }

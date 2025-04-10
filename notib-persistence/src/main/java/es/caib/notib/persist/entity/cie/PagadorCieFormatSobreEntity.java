@@ -92,8 +92,6 @@ public class PagadorCieFormatSobreEntity extends NotibAuditable<Long> {
 		this.pagadorCie = pagadorCie;
 	}
 
-
-
 	private static final long serialVersionUID = 8596990469127710436L;
 	
 }

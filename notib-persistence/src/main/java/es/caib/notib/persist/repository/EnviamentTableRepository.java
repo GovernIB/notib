@@ -211,4 +211,13 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 	)
 	List<Long> findIdsAmbFiltre(FiltreEnviament filtre);
 
+	@Modifying
+	@Query(value = "UPDATE NOT_NOTIFICACIO_ENV_TABLE SET CREATEDBY_CODI = :codiNou WHERE CREATEDBY_CODI = :codiAntic", nativeQuery = true)
+	void updateCreatedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+	@Modifying
+	@Query(value = "UPDATE NOT_NOTIFICACIO_ENV_TABLE SET LASTMODIFIEDBY_CODI = :codiNou WHERE LASTMODIFIEDBY_CODI = :codiAntic", nativeQuery = true)
+	void updateLastModifiedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+
 }

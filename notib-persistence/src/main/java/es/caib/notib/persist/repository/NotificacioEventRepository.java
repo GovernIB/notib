@@ -108,7 +108,7 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 //	List<Long> findEventsAmbCallbackPendentByNotificacioId(@Param("notificacioId") Long notificacioId);
 
 
-	@Query("select ne " + 
+	@Query("select ne " +
 			   "  from NotificacioEventEntity ne " +
 		       " where ne.id = ( " +
 			   "		select max(e.id) " +
@@ -248,4 +248,14 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 	Long findNotificacioIdByEventId(@Param("eventId") Long eventId);
 
     List<NotificacioEventEntity> findByEnviamentAndTipusOrderByIdDesc(NotificacioEnviamentEntity enviament, NotificacioEventTipusEnumDto tipus);
+
+	@Modifying
+	@Query(value = "UPDATE NOT_NOTIFICACIO_EVENT SET CREATEDBY_CODI = :codiNou WHERE CREATEDBY_CODI = :codiAntic", nativeQuery = true)
+	void updateCreatedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+	@Modifying
+	@Query(value = "UPDATE NOT_NOTIFICACIO_EVENT SET LASTMODIFIEDBY_CODI = :codiNou WHERE LASTMODIFIEDBY_CODI = :codiAntic", nativeQuery = true)
+	void updateLastModifiedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+
 }
