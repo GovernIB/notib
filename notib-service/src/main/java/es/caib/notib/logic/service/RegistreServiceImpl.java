@@ -1,13 +1,14 @@
 package es.caib.notib.logic.service;
 
-import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.helper.AuditHelper;
-import es.caib.notib.logic.helper.CallbackHelper;
-import es.caib.notib.logic.helper.EnviamentTableHelper;
-import es.caib.notib.logic.helper.NotificacioEventHelper;
+import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.helper.RegistreHelper;
 import es.caib.notib.logic.helper.RegistreSmHelper;
+import es.caib.notib.logic.intf.dto.AccioParam;
+import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
+import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.RegistreAnotacioDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.adviser.sir.RespostaSirAdviser;
@@ -20,6 +21,7 @@ import es.caib.notib.logic.intf.statemachine.dto.ConsultaSirDto;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.NotibLogger;
+import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import joptsimple.internal.Strings;
 import lombok.RequiredArgsConstructor;
@@ -43,10 +45,8 @@ public class RegistreServiceImpl implements RegistreService {
     private final NotificacioTableHelper notificacioTableHelper;
     private final AuditHelper auditHelper;
     private final RegistreHelper registreHelper;
-    private final JmsTemplate jmsTemplate;
-    private final NotificacioEventHelper notificacioEventHelper;
-    private final CallbackHelper callbackHelper;
-    private final EnviamentTableHelper enviamentTableHelper;
+    private final IntegracioHelper integracioHelper;
+    private final EntitatRepository entitatRepository;
 
 
     @Override
@@ -137,6 +137,17 @@ public class RegistreServiceImpl implements RegistreService {
     @Override
     public RespostaSirAdviser sincronitzarEnviamentSir(SirAdviser adviser) {
 
+        var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "Recepció de canvi d'estat via Adviser", IntegracioAccioTipusEnumDto.RECEPCIO,
+                new AccioParam("Num.Registre", adviser.getRegistreNumero()),
+                new AccioParam("Entitat DIR3", adviser.getEntitatDir3Codi()));
+        var entitat = entitatRepository.findByDir3Codi(adviser.getEntitatDir3Codi());
+        if (entitat == null) {
+            var error = "No existeix l'entitat " + adviser.getEntitatDir3Codi();
+            info.setCodiEntitat(adviser.getEntitatDir3Codi());
+            integracioHelper.addAccioError(info, error);
+            return RespostaSirAdviser.builder().ok(false).errorDescripcio(error).build();
+        }
+        info.setCodiEntitat(entitat.getCodi());
         try {
             var errorsValidacio = validarAdviserSir(adviser);
             if (!Strings.isNullOrEmpty(errorsValidacio)) {
@@ -145,13 +156,17 @@ public class RegistreServiceImpl implements RegistreService {
             var enviament = notificacioEnviamentRepository.findByEntitatDir3CodiAndRegistreNumeroFormatat(adviser.getEntitatDir3Codi(), adviser.getRegistreNumero()).orElse(null);
             if (enviament == null) {
                 var desc = "No existeix l'enviament amb el número de registre " + adviser.getRegistreNumero() + " per la entitat amb codi DIR3 " + adviser.getEntitatDir3Codi();
+                integracioHelper.addAccioError(info, desc);
                 return RespostaSirAdviser.builder().ok(false).errorDescripcio(desc).build();
             }
             registreHelper.enviamentRefrescarEstatRegistre(enviament.getId());
+            integracioHelper.addAccioOk(info);
             return RespostaSirAdviser.builder().ok(true).build();
         } catch (Exception ex) {
-            log.error("[SIR ADVISER] Error sincronitzant l'enviament SIR", ex);
-            return RespostaSirAdviser.builder().ok(false).errorDescripcio("Error inesperat al sincronitzar l'enviament sir " + ex.getMessage()).build();
+            var error = "[SIR ADVISER] Error sincronitzant l'enviament SIR ";
+            log.error(error, ex);
+            integracioHelper.addAccioError(info, error + ex.getMessage());
+            return RespostaSirAdviser.builder().ok(false).errorDescripcio("Error inesperat al sincronitzar l'enviament SIR " + ex.getMessage()).build();
         }
     }
 }
