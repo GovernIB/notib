@@ -9,5 +9,5 @@ public interface UsuariService {
     UsuariDto findByCodi(String codi);
 
     @PreAuthorize("hasRole('NOT_SUPER')")
-    void updateUsuariCodi(String codiAntic, String codiNou);
+    Long updateUsuariCodi(String codiAntic, String codiNou);
 }

@@ -337,10 +337,10 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 
 	@Modifying
 	@Query(value = "UPDATE NOT_NOTIFICACIO_ENV SET CREATEDBY_CODI = :codiNou WHERE CREATEDBY_CODI = :codiAntic", nativeQuery = true)
-	void updateCreatedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	int updateCreatedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 
 	@Modifying
 	@Query(value = "UPDATE NOT_NOTIFICACIO_ENV SET LASTMODIFIEDBY_CODI = :codiNou WHERE LASTMODIFIEDBY_CODI = :codiAntic", nativeQuery = true)
-	void updateLastModifiedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	int updateLastModifiedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 
 }

@@ -20,7 +20,7 @@ public class UsuariService extends AbstractService<es.caib.notib.logic.intf.serv
     @Override
     @RolesAllowed({"NOT_SUPER"})
     @TransactionTimeout(value = 1200)
-    public void updateUsuariCodi(String codiAntic, String codiNou) {
-        getDelegateService().updateUsuariCodi(codiAntic, codiNou);
+    public Long updateUsuariCodi(String codiAntic, String codiNou) {
+        return getDelegateService().updateUsuariCodi(codiAntic, codiNou);
     }
 }

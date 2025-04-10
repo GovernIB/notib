@@ -51,5 +51,5 @@ public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 
 	@Modifying
 	@Query(value = "UPDATE NOT_ACL_SID SET SID = :codiNou WHERE SID = :codiAntic AND PRINCIPAL = 1", nativeQuery = true)
-	void updateUsuariPermis(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	int updateUsuariPermis(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }
