@@ -450,13 +450,29 @@ $(document).ready(function() {
 									<c:when test="${notificacio.enviant}">
 										<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIANT"/>
 									</c:when>
-									<c:when test="${enviament.comunicacioSir and enviament.notificaEstat == 'FINALITZADA' and enviament.notificaEstat == 'PROCESSADA'}">
-										<spring:message code="es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto.${notificacio.registreEstat}"/>
-									</c:when>
 									<c:otherwise>
 										<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.${notificacio.estat}" />
 									</c:otherwise>
 								</c:choose>
+								<c:if test="${notificacio.estat == 'FINALITZADA' or notificacio.estat == 'PROCESSADA'}">
+									(<c:forEach items="${notificacio.enviaments}" var="enviament" varStatus="status">
+										<c:choose>
+											<c:when test="${enviament.notificat == true}">
+												<spring:message code="es.caib.notib.client.domini.EnviamentEstat.NOTIFICADA"/>
+											</c:when>
+											<c:when test="${notificacio.comunicacioSir}">
+												<spring:message code="es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto.${notificacio.registreEstat}"/>
+											</c:when>
+											<c:otherwise>
+												<c:if test="${not empty enviament.notificaEstat}">
+													<spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/>
+													${!status.last ? ', ' : ''}
+												</c:if>
+
+											</c:otherwise>
+										</c:choose>
+									</c:forEach>)
+								</c:if>
 <%--								<c:if test="${notificacio.notificaError and notificacio.estat != 'FINALITZADA' and notificacio.estat != 'PROCESSADA'}">--%>
 								<c:if test="${not empty notificacio.notificaErrorData}">
 									<span class="fa fa-warning text-danger" title="<c:out value='${notificacio.notificaErrorDescripcio}' escapeXml='true'/>"></span>
@@ -478,21 +494,7 @@ $(document).ready(function() {
 <%--									<span class="horaProcessat"><fmt:formatDate value="${notificacio.estatDate}" pattern="dd/MM/yyyy HH:mm:ss" /></span>--%>
 <%--									<br>--%>
 <%--								</c:if>--%>
-								<c:if test="${notificacio.estat == 'FINALITZADA' or notificacio.estat == 'PROCESSADA'}">
-									(<c:forEach items="${notificacio.enviaments}" var="enviament" varStatus="status">
-										<c:choose>
-											<c:when test="${enviament.notificat == true}">
-												<spring:message code="es.caib.notib.client.domini.EnviamentEstat.NOTIFICADA"/>
-											</c:when>
-											<c:otherwise>
-												<c:if test="${not empty enviament.notificaEstat}">
-													<spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/>
-													${!status.last ? ', ' : ''}
-												</c:if>
-											</c:otherwise>
-										</c:choose>
-									</c:forEach>)
-								</c:if>
+
 							</td>
 						</tr>
 						</c:if>
