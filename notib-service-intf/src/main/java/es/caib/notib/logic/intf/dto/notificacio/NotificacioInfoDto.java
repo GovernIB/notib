@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.logic.intf.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.cie.CieDataDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDataDto;
@@ -81,6 +82,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private String registreLlibreNom;
 	private String registreOficinaNom;
 	private int registreEnviamentIntent;
+	private NotificacioRegistreEstatEnumDto registreEstat;
 
 	private Date notificaEnviamentData;
 	private Date notificaEnviamentNotificaData;

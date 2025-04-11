@@ -66,6 +66,7 @@ public class NotificacioBackHelper {
 		ompleProcediments(entitatActual, organGestorActual, request, model);
 		model.addAttribute("tipusUsuari", EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class, "es.caib.notib.logic.intf.dto.TipusUsuariEnumDto."));
 		model.addAttribute("notificacioEnviamentEstats", EnumHelper.getOptionsForEnum(EnviamentEstat.class, "es.caib.notib.client.domini.EnviamentEstat."));
+		model.addAttribute("registreEstats", EnumHelper.getOptionsForEnum(NotificacioRegistreEstatEnumDto.class, "es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto."));
 		model.addAttribute("notificacioComunicacioTipus", EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class, "es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto."));
 		model.addAttribute("notificacioEnviamentTipus", EnumHelper.getOptionsForEnum(EnviamentTipus.class, "es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto."));
 		model.addAttribute("mostrarColumnaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.columna.entitat"));

@@ -5,6 +5,7 @@ package es.caib.notib.logic.intf.dto.notificacio;
 
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
@@ -80,6 +81,7 @@ public class NotificacioTableItemDto {
 
 
 	private Map<EnviamentEstat, Integer> contadorEstat = new HashMap<>();
+	private Map<NotificacioRegistreEstatEnumDto, Integer> contadorEstatSir = new HashMap<>();
 
 	public String getEstatColor()  {
 
@@ -136,6 +138,16 @@ public class NotificacioTableItemDto {
 		}
 		contadorEstat.put(estat, contadorEstat.get(estat) + 1);
 	}
+
+	public void updateEstatSirTipusCount(NotificacioRegistreEstatEnumDto estat) {
+
+		if (!contadorEstatSir.containsKey(estat)) {
+			contadorEstatSir.put(estat, 1);
+			return;
+		}
+		contadorEstatSir.put(estat, contadorEstatSir.get(estat) + 1);
+	}
+
 
 	public boolean isPlazoAmpliable() {
 		return !entregaPostal && NotificacioEstatEnumDto.ENVIADA.equals(estat);

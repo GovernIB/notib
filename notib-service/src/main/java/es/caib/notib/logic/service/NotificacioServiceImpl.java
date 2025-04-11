@@ -588,6 +588,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioEnviamentEntity enviament;
 			for (var env : dto.getEnviaments()) {
 
+				if (notificacio.isComunicacioSir()) {
+					dto.setRegistreEstat(env.getRegistreEstat());
+				}
 				if (!entregaPostal && env.getEntregaPostal() != null) {
 					entregaPostal = true;
 				}

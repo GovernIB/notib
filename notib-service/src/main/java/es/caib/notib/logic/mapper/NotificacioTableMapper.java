@@ -197,7 +197,7 @@ public abstract class NotificacioTableMapper {
         String dataEstat = getDataEstat(dto);
         // Estats enviaments
         String registreEstat = getRegistreEstat(dto, enviaments);
-        String notificaEstats = getNotificaEstats(dto, enviaments);
+        String notificaEstats = dto.isComunicacioSir() ? getSirEstats(dto, enviaments) : getNotificaEstats(dto, enviaments);
 
         var columnaEstat = new StringBuilder(entregaPostal + "<div class=\"flex-column\">")
                 .append("<div style=\"display:flex; justify-content:space-between\">")
@@ -369,10 +369,31 @@ public abstract class NotificacioTableMapper {
         return registreEstat.length() > 0 ? registreEstat.toString() : "";
     }
 
+    private String getSirEstats(NotificacioTableItemDto dto, Set<NotificacioEnviamentEntity> enviaments) {
+
+        StringBuilder notificacioEstat = new StringBuilder();
+        for (NotificacioEnviamentEntity env : enviaments) {
+            dto.updateEstatSirTipusCount(env.getRegistreEstat());
+        }
+        if (NotificacioEstatEnumDto.FINALITZADA.equals(dto.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(dto.getEstat())
+                || NotificacioEstatEnumDto.PROCESSADA.equals(dto.getEstat()) || dto.getContadorEstat().size() > 1) {
+
+            for (var entry : dto.getContadorEstatSir().entrySet()) {
+                notificacioEstat.append("<div style=\"font-size:11px; box-shadow: inset 3px 0px 0px ").append(entry.getKey().getColor()).append("; padding-left: 5px;").append("\">")
+                        .append(entry.getValue()).append(" ").append(getMessage + "es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto." + entry.getKey() + fiGetMessage)
+                        .append("</div>");
+            }
+        }
+        return notificacioEstat.length() > 0 ? notificacioEstat.toString() : "";
+    }
+
     private String getNotificaEstats(NotificacioTableItemDto dto, Set<NotificacioEnviamentEntity> enviaments) {
 
         StringBuilder notificacioEstat = new StringBuilder();
         for (NotificacioEnviamentEntity env : enviaments) {
+            if (dto.isComunicacioSir()) {
+
+            }
             var estat = env.getEntregaPostal() != null && CieEstat.NOTIFICADA.equals(env.getEntregaPostal().getCieEstat()) ? EnviamentEstat.NOTIFICADA : env.getNotificaEstat();
 //            dto.updateEstatTipusCount(env.getNotificaEstat());
             dto.updateEstatTipusCount(estat);
@@ -386,15 +407,6 @@ public abstract class NotificacioTableMapper {
                         .append("</div>");
             }
         }
-//        var prefixNotifica = "es.caib.notib.client.domini.EnviamentEstat.";
-//        var prefixCie = "es.caib.notib.client.domini.CieEstat.";
-//        if (!NotificacioEstatEnumDto.FINALITZADA.equals(dto.getEstat()) && !NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(dto.getEstat())) {
-//            return "";
-//        }
-//        for (var enviament : enviaments) {
-//
-//
-//        }
         return notificacioEstat.length() > 0 ? notificacioEstat.toString() : "";
     }
 

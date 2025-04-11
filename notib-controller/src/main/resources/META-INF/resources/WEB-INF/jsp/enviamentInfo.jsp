@@ -335,6 +335,9 @@ $(document).ready(function() {
 								<c:when test="${enviament.notificat}">
 									<spring:message code="es.caib.notib.client.domini.EnviamentEstat.NOTIFICADA"/>
 								</c:when>
+								<c:when test="${enviament.sir and enviament.notificaEstat == 'FINALITZADA' and enviament.notificaEstat == 'PROCESSADA'}">
+									<spring:message code="es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto.${enviament.registreEstat}"/>
+								</c:when>
 								<c:otherwise>
 									<spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/>
 								</c:otherwise>

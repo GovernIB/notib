@@ -525,6 +525,7 @@ public class ConversioTipusHelper {
 		@Override
 		public void mapAtoB(NotificacioEnviamentEntity entity, NotificacioEnviamentDatatableDto dto, MappingContext context) {
 
+			dto.setSir(entity.getNotificacio().isComunicacioSir());
 			dto.setEstatColor(entity.getNotificaEstat().getColor());
 			dto.setEstatIcona(entity.getNotificaEstat().getIcona());
 			var event = entity.getUltimEvent();

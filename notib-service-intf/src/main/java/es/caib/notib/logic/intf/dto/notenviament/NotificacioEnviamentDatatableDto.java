@@ -24,7 +24,7 @@ import java.util.List;
 public class NotificacioEnviamentDatatableDto {
 
 	private Long id;
-
+	private boolean sir;
 	private PersonaDto titular;
 	private List<PersonaDto> destinataris;
 

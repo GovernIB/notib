@@ -211,6 +211,10 @@
     <c:forEach var="estat" items="${notificacioEnviamentEstats}">
     notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
     </c:forEach>
+    var registreEstats = [];
+    <c:forEach var="estat" items="${registreEstats}">
+    registreEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
+    </c:forEach>
     var comunicacioTipus = [];
     <c:forEach var="tipus" items="${notificacioComunicacioTipus}">
     comunicacioTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
@@ -357,7 +361,7 @@
 
                 contingutTbody +=  data[i].estatColor ? '<td style="box-shadow: inset 3px 0px 0px ' + data[i].estatColor + ';"> ' +
                     '              <span class="' + data[i].estatIcona + '"></span><span>  </span>' : '<td>';
-                contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
+                contingutTbody += data[i].sir  && data[i].registreEstat ? registreEstats[data[i].registreEstat] : data[i].notificaEstat ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
                 if (data[i].notificaEstat == "FINALITZADA" && data[i].perEmail) {
                     if (rowData.enviamentTipus == "NOTIFICACIO") {
                         contingutTbody += " (<spring:message code="notificacio.list.enviament.list.finalitzat.avis.email"/>)"

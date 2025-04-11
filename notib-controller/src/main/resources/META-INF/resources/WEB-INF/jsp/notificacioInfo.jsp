@@ -171,7 +171,7 @@ $(document).ready(function() {
 		});
 		return false;
     });	
-	
+
 	$('#enviar-btn').click(function() {
 		if (${notificacio.notificacioAntiga}) {
 			alert("<spring:message code="notificacio.info.notificacio.antiga.avis" />");
@@ -449,6 +449,9 @@ $(document).ready(function() {
 								<c:choose>
 									<c:when test="${notificacio.enviant}">
 										<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIANT"/>
+									</c:when>
+									<c:when test="${enviament.comunicacioSir and enviament.notificaEstat == 'FINALITZADA' and enviament.notificaEstat == 'PROCESSADA'}">
+										<spring:message code="es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto.${notificacio.registreEstat}"/>
 									</c:when>
 									<c:otherwise>
 										<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.${notificacio.estat}" />
