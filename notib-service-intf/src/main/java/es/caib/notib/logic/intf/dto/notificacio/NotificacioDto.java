@@ -38,6 +38,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private String referencia;
 	private String cifEntitat;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
+	private boolean comunicacioSir;
 	private EnviamentTipus enviamentTipus;
 	private Date enviamentDataProgramada;
 	private String concepte;
