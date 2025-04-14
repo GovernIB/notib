@@ -177,6 +177,14 @@
             bsIconCode = "fa fa-clock-o";
             translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIANT"/>";
         }
+        if (element.id == 'OFICI_ACCEPTAT') {
+            bsIconCode = "fa fa-check-circle";
+            translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.OFICI_ACCEPTAT"/>";
+        }
+        if (element.id == 'REBUTJADA_SIR') {
+            bsIconCode = "fa fa-times";
+            translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.REBUTJADA_SIR"/>";
+        }
 
         return $('<span style= " ' + style + ' " class="' + bsIconCode + '">' + text + ' </span><span>  ' + translate + '</span>');
     }

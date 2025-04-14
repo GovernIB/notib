@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - sql: "
+          UPDATE NOT_NOTIFICACIO_TABLE SET estat_mask = estat_mask + 4096 WHERE id IN (SELECT t.id FROM not_notificacio_table t
+          JOIN NOT_NOTIFICACIO_ENV nne ON t.id = nne.NOTIFICACIO_ID WHERE t.ENV_TIPUS  = 2 AND nne.ESTAT_REGISTRE = 5);
+          UPDATE NOT_NOTIFICACIO_TABLE SET estat_mask = estat_mask + 8192 WHERE id IN (SELECT t.id FROM not_notificacio_table t 
+          JOIN NOT_NOTIFICACIO_ENV nne ON t.id = nne.NOTIFICACIO_ID WHERE t.ENV_TIPUS  = 2 AND nne.ESTAT_REGISTRE = 9);"

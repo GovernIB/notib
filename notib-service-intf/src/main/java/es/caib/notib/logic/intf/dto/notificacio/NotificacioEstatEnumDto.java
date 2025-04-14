@@ -14,7 +14,7 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum NotificacioEstatEnumDto implements Serializable {
-	PENDENT(0, 1<<0, "#f0ad4e"), 		// 15, M=1				00000000000001
+	PENDENT(0, 1<<0, "#f0ad4e"), 	// 15, M=1				00000000000001
 	ENVIADA(1, 1<<1, "#5bc0de"),		// 23, M=2				00000000000010
 	REGISTRADA(2, 1<<2, "#007bff"),	// 24, M=4				00000000000100
 	FINALITZADA(3, 1<<3, "#00ff00"),	// 22, M=8				00000000001000
@@ -25,7 +25,9 @@ public enum NotificacioEstatEnumDto implements Serializable {
 	ENVIAT_SIR(27, 1<<8, "#5bc0de"),	// 27, M=256
 	ENVIADA_AMB_ERRORS(28, 1<<9, "#d9534f"),	// 28, M=512
 	FINALITZADA_AMB_ERRORS(29, 1<<10, "#d9534f"),	// 29, M=1024
-	ENVIANT(40, 1<<11, "#f0ad4e");	// M=2048
+	ENVIANT(40, 1<<11, "#f0ad4e"),	// M=2048
+	OFICI_ACCEPTAT(41, 1<<12, "#f0ad4e"),	// M=4096
+	REBUTJADA_SIR(42, 1<<13, "#f0ad4e"); // M=8192
 
 	private Integer numVal;
 	private Integer mask;

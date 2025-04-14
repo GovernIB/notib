@@ -9,6 +9,8 @@ public enum NotificacioEstatOrdreFiltre implements Serializable {
     REGISTRADA,
     ENVIADA,
     ENVIAT_SIR,
+    OFICI_ACCEPTAT,
+    REBUTJADA_SIR,
     ENVIADA_AMB_ERRORS,
     NOTIFICADA,
     REBUTJADA,
