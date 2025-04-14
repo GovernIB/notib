@@ -30,6 +30,7 @@ import es.caib.notib.persist.repository.ProcedimentRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.domain.SpringCacheBasedAclCache;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -84,6 +85,8 @@ public class UsuariServiceImpl implements UsuariService {
     private AvisRepository avisRepository;
     @Autowired
     private AplicacioRepository aplicacioRepository;
+    @Autowired
+    private SpringCacheBasedAclCache aclCache;
 
     @Override
     public UsuariDto findByCodi(String codi) {
@@ -124,7 +127,7 @@ public class UsuariServiceImpl implements UsuariService {
         registresModificats += updateUsuariReferencies(codiAntic, codiNou);
         // Eliminam l'usuari antic
         usuariRepository.delete(usuariAntic);
-
+        aclCache.clearCache();
         return registresModificats;
     }
 
