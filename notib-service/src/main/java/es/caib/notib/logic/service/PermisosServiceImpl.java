@@ -567,7 +567,7 @@ public class PermisosServiceImpl implements PermisosService {
                 continue;
             }
             boolean excloure = isOficinaOrganSir && Strings.isNullOrEmpty(organ.getOficina());
-            if ((entitatPermesa || !organ.getCodi().equals(entitat.getDir3Codi())) && !excloure) {
+            if ((entitatPermesa || !organ.getCodi().equals(entitat.getDir3Codi()) || !"A04003003".equals(entitat.getDir3Codi())) && !excloure) {
                 resposta.add(CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build());
             }
             //buscar fills
