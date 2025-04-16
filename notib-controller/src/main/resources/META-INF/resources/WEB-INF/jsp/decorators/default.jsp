@@ -317,6 +317,7 @@
 										<li><a id="mc_propietats" href="<c:url value="/config"/>" title="<spring:message code="decorator.menu.config.properties"/>"> <spring:message code="decorator.menu.config.properties"/></a></li>
 										<li><a id="mc_scheduler" href="<c:url value="/api/scheduling/restart"/>" title="<spring:message code="decorator.menu.reinici.scheduler"/>"> <spring:message code="decorator.menu.reinici.scheduler"/></a></li>
 										<li><a id="mc_broker" href="<c:url value="/api/sm/broker/restart"/>" title="<spring:message code="decorator.menu.reinici.state.machine.broker"/>"> <spring:message code="decorator.menu.reinici.state.machine.broker"/></a></li>
+										<li><a href="<c:url value="/usuari/usernames/change"/>"><spring:message code="decorator.menu.canvi.usuari.codis"/></a></li>
 									</ul>
 								</div>
 								<a id="ma_avisos" href="<c:url value="/avis"/>" class="btn btn-primary colorConfig"><spring:message code="decorator.menu.avisos"/></a>

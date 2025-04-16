@@ -32,4 +32,18 @@ public interface ColumnesRepository extends JpaRepository<ColumnesEntity, Long> 
 	@Modifying
 	@Query("UPDATE ColumnesEntity c SET c.referenciaNotificacio = false WHERE c.referenciaNotificacio is NULL")
 	void refNotUpdateNulls();
+
+
+	@Modifying
+	@Query(value = "UPDATE NOT_COLUMNES " +
+			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
+			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
+			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
+			nativeQuery = true)
+	int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+	@Modifying
+	@Query(value = "UPDATE NOT_COLUMNES SET USUARI_CODI = :codiNou WHERE USUARI_CODI = :codiAntic", nativeQuery = true)
+	int updateUsuariCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
 }

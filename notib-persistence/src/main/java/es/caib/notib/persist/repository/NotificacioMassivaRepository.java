@@ -9,6 +9,7 @@ import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -70,4 +71,13 @@ public interface NotificacioMassivaRepository extends JpaRepository<NotificacioM
 			" from NotificacioEntity n " +
 			" where n.notificacioMassivaEntity = :notificacioMassivaEntity and n.estat <> es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PENDENT")
 	Integer countNotificacionsNoPendents(@Param("notificacioMassivaEntity") NotificacioMassivaEntity notificacioMassivaEntity);
+
+	@Modifying
+	@Query(value = "UPDATE NOT_NOTIFICACIO_MASSIVA SET CREATEDBY_CODI = :codiNou WHERE CREATEDBY_CODI = :codiAntic", nativeQuery = true)
+	int updateCreatedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+	@Modifying
+	@Query(value = "UPDATE NOT_NOTIFICACIO_MASSIVA SET LASTMODIFIEDBY_CODI = :codiNou WHERE LASTMODIFIEDBY_CODI = :codiAntic", nativeQuery = true)
+	int updateLastModifiedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
 }

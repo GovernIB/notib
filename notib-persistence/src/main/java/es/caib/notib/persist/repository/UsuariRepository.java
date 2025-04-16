@@ -5,6 +5,7 @@ package es.caib.notib.persist.repository;
 
 import es.caib.notib.persist.entity.UsuariEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Propagation;
@@ -47,4 +48,8 @@ public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 	Set<String> getNotibRolsDisponibles(@Param("codi") String codi);
 
 	Optional<UsuariEntity> getByCodi(String name);
+
+	@Modifying
+	@Query(value = "UPDATE NOT_ACL_SID SET SID = :codiNou WHERE SID = :codiAntic AND PRINCIPAL = 1", nativeQuery = true)
+	int updateUsuariPermis(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }
