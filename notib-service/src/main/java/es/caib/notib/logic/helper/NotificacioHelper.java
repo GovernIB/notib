@@ -39,6 +39,7 @@ import es.caib.plugins.arxiu.api.ArxiuException;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,6 +186,57 @@ public class NotificacioHelper {
 
 	public NotificacioData buildNotificacioData(EntitatEntity entitat, Notificacio notificacio, boolean checkProcedimentPermissions, NotificacioMassivaEntity notificacioMassivaEntity, Map<String, Long> documentsProcessatsMassiu) {
 
+		var notificacioData = buildDadesComunes(entitat, notificacio, checkProcedimentPermissions, notificacioMassivaEntity, documentsProcessatsMassiu);
+		log.trace("Processam documents");
+		var documentEntity = getDocumentEntity(notificacio.getDocument(), documentsProcessatsMassiu);
+		var document2Entity = getDocumentEntity(notificacio.getDocument2());
+		var document3Entity = getDocumentEntity(notificacio.getDocument3());
+		var document4Entity = getDocumentEntity(notificacio.getDocument4());
+		var document5Entity = getDocumentEntity(notificacio.getDocument5());
+		if (documentEntity == null) {
+			throw new NoDocumentException(messageHelper.getMessage("error.alta.remesa.sense.document"));
+		}
+		notificacioData.setDocumentEntity(documentEntity);
+		notificacioData.setDocument2Entity(document2Entity);
+		notificacioData.setDocument3Entity(document3Entity);
+		notificacioData.setDocument4Entity(document4Entity);
+		notificacioData.setDocument5Entity(document5Entity);
+		return notificacioData;
+	}
+
+	public List<NotificacioData> buildNotificacioSirDividides(EntitatEntity entitat, Notificacio notificacio, boolean checkProcedimentPermissions) {
+
+		List<NotificacioData> notificacions = new ArrayList<>();
+		var notificacioData = buildDadesComunes(entitat, notificacio, checkProcedimentPermissions, null, null);
+		var numDocuments = notificacio.getNumDocuments();
+		var concepte = notificacio.getConcepte();
+		for (int i = 0; i < numDocuments; i++) {
+			notificacioData.getNotificacio().setConcepte(concepte + "PARCIAL " + i + " DE " + numDocuments);
+//			notificacioData.getNotificacio().setDescripcio(concepte + "PARCIAL " + i + " DE " + numDocuments);
+			switch (i) {
+				case 0:
+					notificacioData.setDocumentEntity(getDocumentEntity(notificacio.getDocument()));
+					break;
+				case 1:
+					notificacioData.setDocumentEntity(getDocumentEntity(notificacio.getDocument2()));
+					break;
+				case 2:
+					notificacioData.setDocumentEntity(getDocumentEntity(notificacio.getDocument3()));
+					break;
+				case 3:
+					notificacioData.setDocumentEntity(getDocumentEntity(notificacio.getDocument4()));
+					break;
+				case 4:
+					notificacioData.setDocumentEntity(getDocumentEntity(notificacio.getDocument5()));
+					break;
+			}
+			notificacions.add(notificacioData);
+		}
+		return notificacions;
+	}
+
+	private NotificacioData buildDadesComunes(EntitatEntity entitat, Notificacio notificacio, boolean checkProcedimentPermissions, NotificacioMassivaEntity notificacioMassivaEntity, Map<String, Long> documentsProcessatsMassiu) {
+
 		log.debug("Construint les dades d'una notificació");
 		GrupEntity grupNotificacio = null;
 		OrganGestorEntity organGestor = null;
@@ -230,19 +282,14 @@ public class NotificacioHelper {
 			grupNotificacio = grupRepository.findByCodiAndEntitat(notificacio.getGrupCodi(), entitat);
 		}
 
-		log.trace("Processam documents");
-		var documentEntity = getDocumentEntity(notificacio.getDocument(), documentsProcessatsMassiu);
-		var document2Entity = getDocumentEntity(notificacio.getDocument2());
-		var document3Entity = getDocumentEntity(notificacio.getDocument3());
-		var document4Entity = getDocumentEntity(notificacio.getDocument4());
-		var document5Entity = getDocumentEntity(notificacio.getDocument5());
-		if (documentEntity == null) {
-			throw new NoDocumentException(messageHelper.getMessage("error.alta.remesa.sense.document"));
-		}
-		return NotificacioData.builder().notificacio(notificacio).entitat(entitat).grupNotificacio(grupNotificacio).organGestor(organGestor).procSer(procSer)
-				.documentEntity(documentEntity).document2Entity(document2Entity).document3Entity(document3Entity).document4Entity(document4Entity).document5Entity(document5Entity)
-				.notificacioMassivaEntity(notificacioMassivaEntity).build();
+		return NotificacioData.builder().notificacio(notificacio)
+										.entitat(entitat)
+										.grupNotificacio(grupNotificacio)
+										.organGestor(organGestor)
+										.procSer(procSer)
+										.notificacioMassivaEntity(notificacioMassivaEntity).build();
 	}
+
 
 	private boolean isAllEnviamentsAAdministracio(Notificacio notificacio) {
 
@@ -469,6 +516,7 @@ public class NotificacioHelper {
 	}
 
 	@Getter
+	@Setter
 	@Builder
 	public static class NotificacioData {
 

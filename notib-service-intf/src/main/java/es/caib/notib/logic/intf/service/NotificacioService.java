@@ -60,6 +60,17 @@ public interface NotificacioService {
 	@PreAuthorize("isAuthenticated()")
 	Notificacio create(Long entitatId, Notificacio notificacio) throws RegistreNotificaException;
 
+
+	/**
+	 * Crea una nova notificació.
+	 *
+	 * @param notificacio Informació de la notificació a crear
+	 * @return Llista de notificacions SIR creades resultat de dividider-les en diferents documents
+	 * @throws Exception
+	 */
+	@PreAuthorize("isAuthenticated()")
+	List<Notificacio> crearSirDividida(Long entitatId, Notificacio notificacio) throws Exception;
+
 	/**
 	 * Esborra la notificació indicada per paràmetre
 	 * 

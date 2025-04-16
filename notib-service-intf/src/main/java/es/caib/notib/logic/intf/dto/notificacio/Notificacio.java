@@ -241,4 +241,28 @@ public class Notificacio implements Serializable {
         return EnviamentTipus.SIR.equals(getEnviamentTipus());
     }
 
+
+    public final Long FILE_TOTAL_MAX_SIZE = 15728640L; // 15MB
+
+    public boolean docMidaMaximaSuperada() {
+
+        var docsMida = document != null ? document.getMida() : 0;
+        docsMida += document2 != null ? document2.getMida() : 0;
+        docsMida += document3 != null ? document3.getMida() : 0;
+        docsMida += document4 != null ? document4.getMida() : 0;
+        docsMida += document5 != null ? document5.getMida() : 0;
+        return docsMida > FILE_TOTAL_MAX_SIZE;
+    }
+
+    public int getNumDocuments() {
+
+        var num = 0;
+        num += document != null ? 1 : 0;
+        num += document2 != null ? 1 : 0;
+        num += document3 != null ? 1 : 0;
+        num += document4 != null ? 1 : 0;
+        num += document5 != null ? 1 : 0;
+        return num;
+    }
+
 }

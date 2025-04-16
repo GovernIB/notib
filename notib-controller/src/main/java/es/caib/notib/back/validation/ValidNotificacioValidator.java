@@ -245,7 +245,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				}
 			}
 
-			if (fileTotalSize > fileTotalMaxSize) {
+			if (!notificacio.isComunicacioSIR() && fileTotalSize > fileTotalMaxSize) {
 				valid = false;
 				maxSizeError = MessageHelper.getInstance().getMessage("notificacio.form.valid.document.total.size", null, locale);
 				context.buildConstraintViolationWithTemplate(maxSizeError);

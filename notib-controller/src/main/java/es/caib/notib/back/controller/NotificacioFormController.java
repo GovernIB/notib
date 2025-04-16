@@ -317,8 +317,14 @@ public class NotificacioFormController extends BaseUserController {
                 relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
                 return NOTIFICACIO_FORM;
             }
-            if (notificacioCommand.getId() != null) {
-                notificacioService.update(entitatActual.getId(), notificacioCommand.asNotificacioV2(), RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()));
+            var notificacio = notificacioCommand.asNotificacioV2();
+            if (notificacio.getId() != null) {
+                notificacioService.update(entitatActual.getId(), notificacio, RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()));
+            } else if (notificacio.isSir() && notificacio.docMidaMaximaSuperada()) {
+                var nots = notificacioService.crearSirDividida(entitatActual.getId(), notificacio);
+                for (var not : nots) {
+                    not.getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
+                }
             } else {
                 var not = notificacioService.create(entitatActual.getId(), notificacioCommand.asNotificacioV2());
                 // SM

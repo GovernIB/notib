@@ -229,6 +229,27 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
+	@Override
+	public List<Notificacio> crearSirDividida(Long entitatId, Notificacio notificacio) throws Exception {
+
+		var timer = metricsHelper.iniciMetrica();
+		List<Notificacio> notificacions = new ArrayList<>();
+		try {
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			var sirDividides = notificacioHelper.buildNotificacioSirDividides(entitat, notificacio, false);
+			for (var sir : sirDividides) {
+				var notificacioEntity = notificacioHelper.saveNotificacio(sir);
+				notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
+				auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceImpl.create");
+				notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.acquireStateMachine(e.getNotificaReferencia()));
+				notificacions.add(conversioTipusHelper.convertir(notificacioEntity, Notificacio.class));
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+		return notificacions;
+	}
+
 //	@Transactional
 //	@Override
 //	public void delete(Long entitatId, Long notificacioId) throws NotFoundException {

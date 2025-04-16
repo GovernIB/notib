@@ -151,6 +151,11 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
+	public List<Notificacio> crearSirDividida(Long entitatId, Notificacio notificacio) throws Exception {
+		return getDelegateService().crearSirDividida(entitatId, notificacio);
+	}
+
+	@Override
 	@RolesAllowed("**")
 	public Notificacio update(Long entitatId, Notificacio notificacio, boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
 		return getDelegateService().update(entitatId, notificacio, isAdministradorEntitat);
