@@ -138,6 +138,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 						valid = false;
 						var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.juridica.rao.max.length", new Object[] {MAX_SIZE_RAO_SOCIAL}, locale);
 						context.buildConstraintViolationWithTemplate(msg).addNode("raoSocial").addConstraintViolation();
+						context.buildConstraintViolationWithTemplate(msg).addNode("dir3CodiInput").addConstraintViolation();
 					}
 					if (Strings.isNullOrEmpty(persona.getDir3Codi())) {
 						valid = false;
