@@ -287,7 +287,7 @@ $(document).ready(function() {
 				<spring:message code="notificacio.info.tab.events" />
 			</a>
 		</li>
-		<c:if test="${permisGestio == null || permisGestio || isRolActualAdministradorEntitat || isRolActualAdministradorOrgan}">
+		<c:if test="${not notificacio.deleted && (permisGestio == null || permisGestio || isRolActualAdministradorEntitat || isRolActualAdministradorOrgan)}">
 			<li role="presentation" <c:if test='${activeTab == "accions"}'>class="active"</c:if>>
 				<a href="#accions" aria-controls="accions" role="tab" data-toggle="tab"> 
 					<spring:message code="notificacio.info.tab.accions" />
@@ -1037,7 +1037,8 @@ $(document).ready(function() {
 				<div class="alert alert-info well-sm"><span class="fa fa-clock-o"></span> <span><spring:message code="callback.pendent.notificiacio"/> ${notificacio.dataCallbackPendent}</span></div>
 			</c:if>
 		</div>
-		<div id="accions" role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'accions'}"> active</c:if>">
+		<c:if test="${not notificacio.deleted}">
+			<div id="accions" role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'accions'}"> active</c:if>">
 			<c:set var="algunaAccioDisponible" value="${false}" />
 			<ul class="list-group">
 
@@ -1176,6 +1177,7 @@ $(document).ready(function() {
 				</div>
 			</c:if>
 		</div>
+		</c:if>
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>" id="historic">
 			<table id="table-historic"
 				   data-toggle="datatable"

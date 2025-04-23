@@ -6,6 +6,7 @@ import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
@@ -26,6 +27,7 @@ public class ConsultaSirListener {
 
     private final RegistreService registreService;
     private final EnviamentSmService enviamentSmService;
+    private final NotificacioEnviamentRepository notificacioEnviamentRepository;
 
     private Semaphore semaphore = new Semaphore(5);
 
@@ -39,7 +41,8 @@ public class ConsultaSirListener {
             return;
         }
         NotibLogger.getInstance().info("[SM] Rebut consulta d'estat a Sir <" + enviament.getUuid() + ">", log, LoggingTipus.STATE_MACHINE);
-        if (enviament.isDeleted()) {
+        var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElse(null);
+        if (enviament.isDeleted() || enviamentEntity != null && enviamentEntity.getNotificacio().isDeleted()) {
             NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid(), log, LoggingTipus.STATE_MACHINE);
             return;
         }

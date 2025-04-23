@@ -179,6 +179,33 @@ public class Notificacio implements Serializable {
      */
     private Document document5;
 
+    public Notificacio(Notificacio notificacio) {
+
+        this.id = notificacio.getId();
+        this.procedimentId = notificacio.getProcedimentId();
+        this.grupId = notificacio.getGrupId();
+        this.emisorDir3Codi = notificacio.getEmisorDir3Codi();
+        this.organGestor = notificacio.getOrganGestor();
+        this.enviamentTipus = notificacio.getEnviamentTipus();
+        this.concepte = notificacio.getConcepte();
+        this.descripcio = notificacio.getDescripcio();
+        this.enviamentDataProgramada = notificacio.getEnviamentDataProgramada();
+        this.retard = notificacio.getRetard();
+        this.caducitat = notificacio.getCaducitat();
+        this.caducitatDiesNaturals = notificacio.getCaducitatDiesNaturals();
+        this.usuariCodi = notificacio.getUsuariCodi();
+        this.procedimentCodi = notificacio.getProcedimentCodi();
+        this.grupCodi = notificacio.getGrupCodi();
+        this.numExpedient = notificacio.getNumExpedient();
+        this.enviaments = notificacio.getEnviaments();
+        this.idioma = notificacio.getIdioma();
+        this.document = notificacio.getDocument();
+        this.document2 = notificacio.getDocument2();
+        this.document3 = notificacio.getDocument3();
+        this.document4 = notificacio.getDocument4();
+        this.document5 = notificacio.getDocument5();
+    }
+
     public Notificacio(NotificacioV3 notificacio) {
 
         this.id = notificacio.getId();
