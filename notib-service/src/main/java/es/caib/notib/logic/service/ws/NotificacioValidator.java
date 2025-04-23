@@ -572,7 +572,7 @@ public class NotificacioValidator implements Validator {
 
         if (!entregaPostalActiva) {
             var entitatDto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
-            entregaPostalActiva = organGestorService.entregaCieActiva(entitatDto, organGestor.getCodi());;
+            entregaPostalActiva = organGestor != null && organGestorService.entregaCieActiva(entitatDto, organGestor.getCodi());
         }
 
         boolean entregaDehActiva = entitat != null && entitat.isAmbEntregaDeh();
