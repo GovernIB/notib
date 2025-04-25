@@ -219,7 +219,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			var notData = notificacioHelper.buildNotificacioData(entitat, notificacio, false);
 			// Dades generals de la notificació
-			var notificacioEntity = notificacioHelper.saveNotificacio(notData);
+			var notificacioEntity = notificacioHelper.saveNotificacio(notData, TipusUsuariEnumDto.INTERFICIE_WEB);
 			notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
 			auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceImpl.create");
 			notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.acquireStateMachine(e.getNotificaReferencia()));
@@ -229,6 +229,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
+	@Transactional(rollbackFor=Exception.class)
 	@Override
 	public List<Notificacio> crearSirDividida(Long entitatId, Notificacio notificacio) throws Exception {
 
@@ -238,7 +239,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			var sirDividides = notificacioHelper.buildNotificacioSirDividides(entitat, notificacio, false);
 			for (var sir : sirDividides) {
-				var notificacioEntity = notificacioHelper.saveNotificacio(sir);
+				var notificacioEntity = notificacioHelper.saveNotificacio(sir, TipusUsuariEnumDto.INTERFICIE_WEB);
 				notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
 				auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceImpl.create");
 				notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.acquireStateMachine(e.getNotificaReferencia()));

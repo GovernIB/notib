@@ -39,6 +39,17 @@ public class RespostaAltaV2 extends RespostaBase {
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Date dataCreacio;
 
+    public RespostaAltaV2(List<RespostaAltaV2> respostes) {
+
+        referencies = new ArrayList<>();
+        for (RespostaAltaV2 resposta : respostes) {
+            identificador += resposta.getIdentificador() + " ";
+            estat = resposta.getEstat();
+            referencies.addAll(resposta.getReferencies());
+            dataCreacio = resposta.getDataCreacio();
+        }
+    }
+
     public List<EnviamentReferenciaV2> getReferencies() {
         if (referencies == null) {
             referencies = new ArrayList<>();

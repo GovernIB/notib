@@ -151,6 +151,7 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public List<Notificacio> crearSirDividida(Long entitatId, Notificacio notificacio) throws Exception {
 		return getDelegateService().crearSirDividida(entitatId, notificacio);
 	}

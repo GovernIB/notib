@@ -143,10 +143,10 @@ public class NotificacioHelper {
 
 		var notData = buildNotificacioData(entitat, notificacio, checkProcedimentPermissions, notificacioMassivaEntity, documentsProcessatsMassiu);
 		// Dades generals de la notificació
-		return saveNotificacio(notData);
+		return saveNotificacio(notData, TipusUsuariEnumDto.INTERFICIE_WEB);
 	}
 
-	public NotificacioEntity saveNotificacio(NotificacioHelper.NotificacioData data) {
+	public NotificacioEntity saveNotificacio(NotificacioHelper.NotificacioData data, TipusUsuariEnumDto tipusUsuari) {
 
 		var notificacio = NotificacioEntity.getBuilderV2(
 						data.getEntitat(),
@@ -164,7 +164,7 @@ public class NotificacioHelper {
 						data.getProcSer(),
 						data.getGrupNotificacio() != null ? data.getGrupNotificacio().getCodi() : null,
 						data.getNotificacio().getNumExpedient(),
-						TipusUsuariEnumDto.INTERFICIE_WEB,
+						tipusUsuari,
 						data.getProcedimentOrgan(),
 						data.getNotificacio().getIdioma(),
 						UUID.randomUUID().toString())
@@ -207,11 +207,12 @@ public class NotificacioHelper {
 	public List<NotificacioData> buildNotificacioSirDividides(EntitatEntity entitat, Notificacio notificacio, boolean checkProcedimentPermissions) {
 
 		List<NotificacioData> notificacions = new ArrayList<>();
-		var notificacioData = buildDadesComunes(entitat, notificacio, checkProcedimentPermissions, null, null);
 		var numDocuments = notificacio.getNumDocuments();
 		var concepte = notificacio.getConcepte();
 		for (int i = 0; i < numDocuments; i++) {
-			notificacioData.getNotificacio().setConcepte(concepte + "PARCIAL " + i + " DE " + numDocuments);
+			var not = new Notificacio(notificacio);
+			var notificacioData = buildDadesComunes(entitat, not, checkProcedimentPermissions, null, null);
+			notificacioData.getNotificacio().setConcepte(concepte + " PARCIAL " + i + 1 + " DE " + numDocuments);
 //			notificacioData.getNotificacio().setDescripcio(concepte + "PARCIAL " + i + " DE " + numDocuments);
 			switch (i) {
 				case 0:
