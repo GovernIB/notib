@@ -15,6 +15,7 @@ import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.exception.JustificantException;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import joptsimple.internal.Strings;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,13 +56,17 @@ public class JustificantRecepcioSIRHelper extends JustificantHelper<NotificacioE
 		var resposta = pluginHelper.obtenerAsientoRegistral(enviament.getNotificacio().getEntitat().getDir3Codi(), enviament.getRegistreNumeroFormatat(), 2L, false);
 		progres.setProgres(30);
 		var paragrafContingut = new Paragraph();
+		var decodificacionEntidadRegistralProcesado = !Strings.isNullOrEmpty(resposta.getDecodificacionEntidadRegistralProcesado()) ? resposta.getDecodificacionEntidadRegistralProcesado() : "";
+		var codigoEntidadRegistralProcesado = !Strings.isNullOrEmpty(resposta.getCodigoEntidadRegistralProcesado()) ? resposta.getCodigoEntidadRegistralProcesado() : "";
+		codigoEntidadRegistralProcesado = !Strings.isNullOrEmpty(decodificacionEntidadRegistralProcesado) && !Strings.isNullOrEmpty(codigoEntidadRegistralProcesado) ?
+											" (" + codigoEntidadRegistralProcesado + ")" : codigoEntidadRegistralProcesado;
+		String nomOficina = decodificacionEntidadRegistralProcesado + codigoEntidadRegistralProcesado;
 		if (NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT.equals(resposta.getEstat())) {
 			setParametersBold(paragrafContingut, messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat"));
 			var list = new List(false, LIST_SYMBOL_INDENT);
 			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat.item1"), resposta.getNumeroRegistroDestino()));
 			String dataRegistre = resposta.getSirRegistreDestiData() == null ? "" : dt.format(resposta.getSirRegistreDestiData());
 			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat.item2"), dataRegistre));
-			String nomOficina = resposta.getDecodificacionEntidadRegistralProcesado() + " (" + resposta.getCodigoEntidadRegistralProcesado() + ")";
 			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat.item3"), nomOficina));
 			paragrafContingut.add(list);
 			paragrafContingut.add(Chunk.NEWLINE);
@@ -71,7 +76,6 @@ public class JustificantRecepcioSIRHelper extends JustificantHelper<NotificacioE
 			paragrafContingut.add(Chunk.NEWLINE);
 			var list = new List(false, LIST_SYMBOL_INDENT);
 			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.rebutjat.item1"), resposta.getMotivo()));
-			var nomOficina = resposta.getDecodificacionEntidadRegistralProcesado() + " (" + resposta.getCodigoEntidadRegistralProcesado() + ")";
 			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.rebutjat.item2"), nomOficina));
 			paragrafContingut.add(list);
 			paragrafContingut.add(Chunk.NEWLINE);
