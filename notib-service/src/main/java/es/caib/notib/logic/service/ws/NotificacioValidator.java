@@ -1027,7 +1027,9 @@ public class NotificacioValidator implements Validator {
 
     private Set<Character> validFormat(String value) {
 
+        var apostrofPermes = configHelper.getConfigAsBoolean("es.caib.notib.notifica.apostrof.permes");
         String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-–_/:().,¿?!¡;ºª";
+        CONTROL_CARACTERS += apostrofPermes ? "'" : "";
         Set<Character> charsNoValids = new HashSet<>();
         char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
 

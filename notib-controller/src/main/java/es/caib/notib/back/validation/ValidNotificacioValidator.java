@@ -11,6 +11,7 @@ import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.ConfigService;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
@@ -42,6 +43,10 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 	private EntitatService entitatService;
 	@Autowired
 	private SessionScopedContext sessionScopedContext;
+	@Autowired
+	private ConfigService configService;
+
+	private static boolean apostrofPermes;
 
 	@Override
 	public void initialize(final ValidNotificacio constraintAnnotation) {
@@ -58,6 +63,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 		Locale locale = new Locale(sessionScopedContext.getIdiomaUsuari());
 		context.disableDefaultConstraintViolation();
 		String maxSizeError = "";
+		apostrofPermes = Boolean.getBoolean(configService.getPropertyValue("es.caib.notib.notifica.apostrof.permes"));
 		try {
 
 			// Validació del Concepte
@@ -378,6 +384,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 	public static ArrayList<Character> validFormat(String value) {
 
 		String controlCaracters = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-–_/:().,¿?!¡;ºª";
+		controlCaracters += apostrofPermes ? "'" : "";
 		ArrayList<Character> charsNoValids = new ArrayList<>();
 		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
 		boolean esCaracterValid = true;

@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - sql: "INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (1, 'es.caib.notib.notifica.apostrof.permes', 'true', 'Permetre el caràcter apòstrof en els enviaments a Notific@', 'BOOL', 'NOTIFICA');"
