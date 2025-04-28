@@ -243,7 +243,8 @@ public class NotificacioFormController extends BaseUserController {
             return new ArrayList<>();
         }
         try {
-            return notificacioService.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, null, null, provincia, municipi);
+            var entitat = getEntitatActualComprovantPermisos(request);
+            return notificacioService.cercaUnitats(entitat.getId(), codi, denominacio, nivellAdministracio, comunitatAutonoma, null, null, provincia, municipi);
         } catch (Exception ex) {
             log.error("Error obtinguent les unitats codi " + codi + " denominacio: " + denominacio + ", nivellAdministracio: " + nivellAdministracio +
                     ", comunitatAutonoma: " + comunitatAutonoma + ", provincia: " + provincia + ", municipi: " + municipi, ex);

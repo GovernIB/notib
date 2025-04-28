@@ -907,12 +907,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma, Boolean ambOficines,
+	public List<OrganGestorDto> cercaUnitats(Long entitatId, String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma, Boolean ambOficines,
 											 Boolean esUnitatArrel, Long provincia, String municipi) {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			return pluginHelper.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
+			return pluginHelper.cercaUnitats(entitatId, codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

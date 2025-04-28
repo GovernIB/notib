@@ -345,9 +345,9 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed("**")
-	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio,
+	public List<OrganGestorDto> cercaUnitats(Long entitatId, String codi, String denominacio, Long nivellAdministracio,
 											 Long comunitatAutonoma, Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi) {
-		return getDelegateService().cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
+		return getDelegateService().cercaUnitats(entitatId, codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
 	}
 
 
