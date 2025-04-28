@@ -314,8 +314,10 @@ public class PermisosServiceImpl implements PermisosService {
             return true;
         }
         // 3. Comprovam si es té permís per a comunicacions sense procediment
-        if ((ExtendedPermission.COMUNICACIO.equals(permisos[0]) || ExtendedPermission.COMUNICACIO_SIR.equals(permisos[0])) &&
-                Boolean.TRUE.equals(hasPermisComunicacionsSenseProcediment(entitat, grups))) {
+        if (ExtendedPermission.COMUNICACIO.equals(permisos[0]) && Boolean.TRUE.equals(hasPermisComunicacionsSenseProcediment(entitat, grups, ExtendedPermission.COMUNICACIO))) {
+            return true;
+        }
+        if (ExtendedPermission.COMUNICACIO_SIR.equals(permisos[0]) && Boolean.TRUE.equals(hasPermisComunicacionsSenseProcediment(entitat, grups, ExtendedPermission.COMUNICACIO_SIR))) {
             return true;
         }
         // 4. Comprovam si es té permís sobre procediments comuns per òrgan gestor
@@ -373,9 +375,9 @@ public class PermisosServiceImpl implements PermisosService {
     }
 
     // PERMIS COMUNICACIONS SENSE PROCEDIMENTS
-    private Boolean hasPermisComunicacionsSenseProcediment(EntitatEntity entitat, List<String> grups) {
+    private Boolean hasPermisComunicacionsSenseProcediment(EntitatEntity entitat, List<String> grups, Permission permis) {
 
-        var organsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, new Permission[]{ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT});
+        var organsAmbPermisIds = permisosHelper.getObjectsIdsWithAllPermission (OrganGestorEntity.class, new Permission[]{permis, ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT});
         return hasElementsGivenIds(organsAmbPermisIds, new OrgansPermisSenseProcedimentCountCommand(), entitat, grups);
     }
 

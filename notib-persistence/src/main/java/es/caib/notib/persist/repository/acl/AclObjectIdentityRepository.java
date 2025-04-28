@@ -18,12 +18,9 @@ import java.util.List;
  */
 public interface AclObjectIdentityRepository extends JpaRepository<AclObjectIdentityEntity, Long> {
 
-	@Query(	"select distinct " +
-			"    oi.objectId " +
-			"from " +
-			"    AclObjectIdentityEntity oi JOIN oi.entries entry " +
-			"where " +
-			"      oi.classname.classname = :classname   " +
+	@Query(	"select distinct oi.objectId " +
+			"from AclObjectIdentityEntity oi JOIN oi.entries entry " +
+			"where oi.classname.classname = :classname   " +
 			" and  entry.sid in (:sids)   " +
 			" and  entry.mask in (:masks)   " +
 			" and  entry.granting = true   ")
@@ -31,6 +28,24 @@ public interface AclObjectIdentityRepository extends JpaRepository<AclObjectIden
 			@Param("classname") String classname,
 			@Param("sids") List<AclSidEntity> sids,
 			@Param("masks") List<Integer> masks);
+
+	@Query(
+			"select distinct oi.objectId " +
+					"from AclObjectIdentityEntity oi JOIN oi.entries entry " +
+					"where oi.classname.classname = :classname " +
+					"and entry.sid in (:sids) " +
+					"and entry.granting = true " +
+					"and size(oi.entries) = :maskCount " +
+					"and entry.mask in (:masks) " +
+					"group by oi.objectId " +
+					"having count(distinct entry.mask) = :maskCount"
+	)
+	List<Long> findObjectsIdWithAllPermissions(
+			@Param("classname") String classname,
+			@Param("sids") List<AclSidEntity> sids,
+			@Param("masks") List<Integer> masks,
+			@Param("maskCount") int maskCount);
+
 
 	@Query(	"select " +
 			"   CASE WHEN count(oi) > 0 THEN true ELSE false END " +
