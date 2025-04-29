@@ -34,6 +34,7 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
+import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.plugin.arxiu.ArxiuPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
@@ -100,6 +101,7 @@ public class PluginHelper {
 
 	private final ConfigHelper configHelper;
 	private final OrganGestorRepository organGestorRepository;
+	private final EntitatRepository entitatRepository;
 
 
 	// REGISTRE
@@ -353,12 +355,12 @@ public class PluginHelper {
 		return unitatsOrganitzativesPluginHelper.getDenominacio(codiDir3);
 	}
 	
-	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma, Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi) throws SistemaExternException {
+	public List<OrganGestorDto> cercaUnitats(Long entitatId, String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma, Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi) throws SistemaExternException {
 
 		var organs = unitatsOrganitzativesPluginHelper.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
 		OrganGestorEntity organ;
 		for (var o : organs) {
-			organ = organGestorRepository.findByEntitatIdAndCodi(o.getEntitatId(), o.getCodi());
+			organ = organGestorRepository.findByEntitatIdAndCodi(entitatId, o.getCodi());
 			if (organ == null) {
 				continue;
 			}
@@ -368,7 +370,10 @@ public class PluginHelper {
 	}
 
 	public List<OrganGestorDto> unitatsPerCodi(String codi) throws SistemaExternException {
-		return cercaUnitats(codi,null,null,null,null,null,null,null);
+
+		var entitatCodi = ConfigHelper.getEntitatCodi();
+		var entitat = entitatRepository.findByCodi(entitatCodi.get());
+		return cercaUnitats(entitat.getId(), codi,null,null,null,null,null,null,null);
 	}
 
 	public List<OrganGestorDto> unitatsPerDenominacio(String denominacio) throws SistemaExternException {

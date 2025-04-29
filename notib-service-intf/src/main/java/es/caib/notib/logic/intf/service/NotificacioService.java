@@ -411,7 +411,7 @@ public interface NotificacioService {
 	 * @return Una llista amb les administracions cercades.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma,
+	List<OrganGestorDto> cercaUnitats(Long entitatId, String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma,
 									  Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi);
 
 	/**

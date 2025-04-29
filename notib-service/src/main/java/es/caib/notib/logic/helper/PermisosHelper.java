@@ -266,6 +266,22 @@ public class PermisosHelper {
 		return aclObjectIdentityRepository.findObjectsIdWithAnyPermissions(clazz.getName(), sids, masks);
 	}
 
+	public List<Long> getObjectsIdsWithAllPermission(Class<?> clazz, Permission[] permissions) {
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		List<AclSidEntity> sids = getSids(auth);
+		if (sids.isEmpty()) {
+			return new ArrayList<>();
+		}
+		// TODO: no estic segur si hauriem de fer un and binari de totes les mascares en lloc de passar una llista de masks
+		List<Integer> masks = new ArrayList<>();
+		for (var p : permissions){
+			masks.add(p.getMask());
+		}
+		return aclObjectIdentityRepository.findObjectsIdWithAllPermissions(clazz.getName(), sids, masks, masks.size());
+	}
+
+
 	public List<PermisDto> findPermisos(Long objectIdentifier, Class<?> objectClass) {
 
 		try {
