@@ -67,7 +67,9 @@ public class JustificantRecepcioSIRHelper extends JustificantHelper<NotificacioE
 			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat.item1"), resposta.getNumeroRegistroDestino()));
 			String dataRegistre = resposta.getSirRegistreDestiData() == null ? "" : dt.format(resposta.getSirRegistreDestiData());
 			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat.item2"), dataRegistre));
-			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat.item3"), nomOficina));
+			if (!Strings.isNullOrEmpty(nomOficina)) {
+				list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat.item3"), nomOficina));
+			}
 			paragrafContingut.add(list);
 			paragrafContingut.add(Chunk.NEWLINE);
 
@@ -76,7 +78,9 @@ public class JustificantRecepcioSIRHelper extends JustificantHelper<NotificacioE
 			paragrafContingut.add(Chunk.NEWLINE);
 			var list = new List(false, LIST_SYMBOL_INDENT);
 			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.rebutjat.item1"), resposta.getMotivo()));
-			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.rebutjat.item2"), nomOficina));
+			if (!Strings.isNullOrEmpty(nomOficina)) {
+				list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.rebutjat.item2"), nomOficina));
+			}
 			paragrafContingut.add(list);
 			paragrafContingut.add(Chunk.NEWLINE);
 
