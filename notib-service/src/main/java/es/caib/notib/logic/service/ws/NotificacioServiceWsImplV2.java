@@ -332,25 +332,25 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				avisos = notificacioValidator.getWarns().getAllErrors().stream().map(e -> e.getCode()).collect(Collectors.joining(", "));
 			}
 
-			if (notificacio.isSir() && notificacio.docMidaMaximaSuperada()) {
-				var sirDividides = notificacioHelper.buildNotificacioSirDividides(entitat, notificacio, false);
-				EnviamentReferenciaV2 ref;
-				List<EnviamentReferenciaV2> referencies;
-				List<RespostaAltaV2> respostes = new ArrayList<>();
-				for (var sir : sirDividides) {
-					var notificacioEntity = notificacioHelper.saveNotificacio(sir, TipusUsuariEnumDto.APLICACIO);
-					auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceWsImplV2.altaV2");
-					referencies = new ArrayList<>();
-					for (var enviament: notificacio.getEnviaments()) {
-						ref = saveEnviament(entitat, notificacioEntity, enviament);
-						referencies.add(ref);
-					}
-					log.debug(">> [ALTA] enviaments creats");
-					notificacioEntity = notificacioRepository.saveAndFlush(notificacioEntity);
-					respostes.add(generaResposta(info, notificacioEntity, referencies, avisos));
-				}
-				return new RespostaAltaV2(respostes);
-			}
+//			if (notificacio.isSir() && notificacio.docMidaMaximaSuperada()) {
+//				var sirDividides = notificacioHelper.buildNotificacioSirDividides(entitat, notificacio, false);
+//				EnviamentReferenciaV2 ref;
+//				List<EnviamentReferenciaV2> referencies;
+//				List<RespostaAltaV2> respostes = new ArrayList<>();
+//				for (var sir : sirDividides) {
+//					var notificacioEntity = notificacioHelper.saveNotificacio(sir, TipusUsuariEnumDto.APLICACIO);
+//					auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceWsImplV2.altaV2");
+//					referencies = new ArrayList<>();
+//					for (var enviament: notificacio.getEnviaments()) {
+//						ref = saveEnviament(entitat, notificacioEntity, enviament);
+//						referencies.add(ref);
+//					}
+//					log.debug(">> [ALTA] enviaments creats");
+//					notificacioEntity = notificacioRepository.saveAndFlush(notificacioEntity);
+//					respostes.add(generaResposta(info, notificacioEntity, referencies, avisos));
+//				}
+//				return new RespostaAltaV2(respostes);
+//			}
 
 			// Desat
 			// DOCUMENTS

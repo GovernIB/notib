@@ -792,6 +792,9 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 		registre.setAplicacionTelematica("NOTIB v." + CacheHelper.getAppVersion());
 		registre.setAplicacion("RWE");
 		registre.setVersion("3.1");
+		var parcial = "";
+		if (isComunicacioSir && notificacio.getConcepte().contains("PARCIAL")) {
+		}
 		registre.setObservaciones("Notib: " + notificacio.getUsuariCodi());
 		registre.setExpone("");
 		registre.setSolicita("");

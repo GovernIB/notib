@@ -46,6 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -204,37 +205,136 @@ public class NotificacioHelper {
 		return notificacioData;
 	}
 
+	public static Map<Integer, List<Document>> createSizeMap(List<Document> documents, Long maxSize) {
+
+		Map<Integer, List<Document>> sizeMap = new HashMap<>();
+		int currentKey = 0; // Start with the first key
+		List<Document> currentList = new ArrayList<>();
+		long currentSum = 0; // To keep track of the sum of sizes in the current list
+
+		for (Document doc : documents) {
+			Long docSize = doc.getMida();
+			// Check if adding this document would exceed maxSize
+			if (currentSum + docSize < maxSize) {
+				currentList.add(doc);
+				currentSum += docSize;
+			} else {
+				// Store the current list in the map
+				sizeMap.put(currentKey, currentList);
+				// Move to the next key
+				currentKey++;
+				// Start a new list with the current document
+				currentList = new ArrayList<>();
+				currentList.add(doc);
+				currentSum = docSize; // Reset the sum to the size of the new document
+			}
+		}
+
+		// Don't forget to add the last list if it's not empty
+		if (!currentList.isEmpty()) {
+			sizeMap.put(currentKey, currentList);
+		}
+
+		return sizeMap;
+	}
+
 	public List<NotificacioData> buildNotificacioSirDividides(EntitatEntity entitat, Notificacio notificacio, boolean checkProcedimentPermissions) {
 
-		List<NotificacioData> notificacions = new ArrayList<>();
 		var numDocuments = notificacio.getNumDocuments();
-		var concepte = notificacio.getConcepte();
+		List<Document> documents = new ArrayList<>();
 		for (int i = 0; i < numDocuments; i++) {
-			var not = new Notificacio(notificacio);
-			var notificacioData = buildDadesComunes(entitat, not, checkProcedimentPermissions, null, null);
-			notificacioData.getNotificacio().setConcepte(concepte + " PARCIAL " + i + 1 + " DE " + numDocuments);
-//			notificacioData.getNotificacio().setDescripcio(concepte + "PARCIAL " + i + " DE " + numDocuments);
 			switch (i) {
 				case 0:
-					notificacioData.setDocumentEntity(getDocumentEntity(notificacio.getDocument()));
+					documents.add(notificacio.getDocument());
 					break;
 				case 1:
-					notificacioData.setDocumentEntity(getDocumentEntity(notificacio.getDocument2()));
+					if (notificacio.getDocument2() != null) {
+						documents.add(notificacio.getDocument2());
+					}
 					break;
 				case 2:
-					notificacioData.setDocumentEntity(getDocumentEntity(notificacio.getDocument3()));
+					if (notificacio.getDocument3() != null) {
+						documents.add(notificacio.getDocument3());
+					}
 					break;
 				case 3:
-					notificacioData.setDocumentEntity(getDocumentEntity(notificacio.getDocument4()));
+					if (notificacio.getDocument4() != null) {
+						documents.add(notificacio.getDocument4());
+					}
 					break;
 				case 4:
-					notificacioData.setDocumentEntity(getDocumentEntity(notificacio.getDocument5()));
+					if (notificacio.getDocument5() != null) {
+						documents.add(notificacio.getDocument5());
+					}
 					break;
+			}
+		}
+		var fileTotalMaxSize = 15728640L; // 15MB
+		var map = createSizeMap(documents, fileTotalMaxSize);
+		List<NotificacioData> notificacions = new ArrayList<>();
+		var concepte = notificacio.getConcepte();
+		for (int i = 0; i < map.size(); i++) {
+			var not = new Notificacio(notificacio);
+			var notificacioData = buildDadesComunes(entitat, not, checkProcedimentPermissions, null, null);
+			int parcial = i+1;
+			notificacioData.getNotificacio().setConcepte(concepte + " PARCIAL " + parcial + " DE " + map.size());
+			var docs = map.get(i);
+			for (int j = 0; j < docs.size(); j++) {
+				switch (j) {
+					case 0:
+						notificacioData.setDocumentEntity(getDocumentEntity(docs.get(j)));
+						break;
+					case 1:
+						notificacioData.setDocument2Entity(getDocumentEntity(docs.get(j)));
+						break;
+					case 2:
+						notificacioData.setDocument3Entity(getDocumentEntity(docs.get(j)));
+						break;
+					case 3:
+						notificacioData.setDocument4Entity(getDocumentEntity(docs.get(j)));
+						break;
+					case 4:
+						notificacioData.setDocument5Entity(getDocumentEntity(docs.get(j)));
+						break;
+				}
 			}
 			notificacions.add(notificacioData);
 		}
 		return notificacions;
 	}
+
+//	public List<NotificacioData> buildNotificacioSirDividides(EntitatEntity entitat, Notificacio notificacio, boolean checkProcedimentPermissions) {
+//
+//		List<NotificacioData> notificacions = new ArrayList<>();
+//		var numDocuments = notificacio.getNumDocuments();
+//		var concepte = notificacio.getConcepte();
+//		var fileTotalMaxSize = 15728640L; // 15MB
+//		for (int i = 0; i < numDocuments; i++) {
+//			var not = new Notificacio(notificacio);
+//			var notificacioData = buildDadesComunes(entitat, not, checkProcedimentPermissions, null, null);
+//			notificacioData.getNotificacio().setConcepte(concepte + " PARCIAL " + i + 1 + " DE " + numDocuments);
+////			notificacioData.getNotificacio().setDescripcio(concepte + "PARCIAL " + i + " DE " + numDocuments);
+//			switch (i) {
+//				case 0:
+//					notificacioData.setDocumentEntity(getDocumentEntity(notificacio.getDocument()));
+//					break;
+//				case 1:
+//					notificacioData.setDocumentEntity(getDocumentEntity(notificacio.getDocument2()));
+//					break;
+//				case 2:
+//					notificacioData.setDocumentEntity(getDocumentEntity(notificacio.getDocument3()));
+//					break;
+//				case 3:
+//					notificacioData.setDocumentEntity(getDocumentEntity(notificacio.getDocument4()));
+//					break;
+//				case 4:
+//					notificacioData.setDocumentEntity(getDocumentEntity(notificacio.getDocument5()));
+//					break;
+//			}
+//			notificacions.add(notificacioData);
+//		}
+//		return notificacions;
+//	}
 
 	private NotificacioData buildDadesComunes(EntitatEntity entitat, Notificacio notificacio, boolean checkProcedimentPermissions, NotificacioMassivaEntity notificacioMassivaEntity, Map<String, Long> documentsProcessatsMassiu) {
 
