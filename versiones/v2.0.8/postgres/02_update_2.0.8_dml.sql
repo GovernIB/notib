@@ -1,12 +1,5 @@
 INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (1, 'es.caib.notib.adviser.sir.actiu', 'true', 'Activar adviser SIR', 'BOOL', 'GENERAL' );
 
-UPDATE NOT_OFICINA ofi SET ofi.ORGAN_GESTOR = (SELECT id FROM NOT_ORGAN_GESTOR o WHERE ofi.ORGAN_CODI = o.CODI);
-UPDATE NOT_NOTIFICACIO n SET n.ORGAN_GESTOR_AUX = (SELECT id FROM NOT_ORGAN_GESTOR o WHERE n.ORGAN_GESTOR = o.CODI);
-
-UPDATE NOT_PROCEDIMENT n SET n.ORGAN_GESTOR_AUX = (SELECT id FROM NOT_ORGAN_GESTOR o WHERE n.ORGAN_GESTOR = o.CODI AND n.ENTITAT = o.ENTITAT);
-UPDATE NOT_PROCEDIMENT n SET n.ORGAN_GESTOR_AUX = (SELECT codi FROM NOT_ORGAN_GESTOR o WHERE n.ORGAN_GESTOR = o.id);
-
-
 UPDATE NOT_CONFIG_TYPE SET VALUE = 'es.caib.notib.plugin.validatesignature.afirmacxf.AfirmaCxfValidateSignaturePlugin,es.caib.notib.plugin.valsig.ValidacioFirmesPluginMock' WHERE CODE = 'VALSIG_CLASS';
 
 INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (1, 'es.caib.notib.notifica.apostrof.permes', 'true', 'Permetre el caràcter apòstrof en els enviaments a Notific@', 'BOOL', 'NOTIFICA');
