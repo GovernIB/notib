@@ -1,14 +1,14 @@
 package es.caib.notib.logic.service;
 
-import es.caib.comanda.salut.model.AppInfo;
-import es.caib.comanda.salut.model.DetallSalut;
-import es.caib.comanda.salut.model.EstatSalut;
-import es.caib.comanda.salut.model.EstatSalutEnum;
-import es.caib.comanda.salut.model.IntegracioInfo;
-import es.caib.comanda.salut.model.IntegracioSalut;
-import es.caib.comanda.salut.model.MissatgeSalut;
-import es.caib.comanda.salut.model.SalutInfo;
-import es.caib.comanda.salut.model.SubsistemaSalut;
+import es.caib.comanda.ms.salut.model.AppInfo;
+import es.caib.comanda.ms.salut.model.DetallSalut;
+import es.caib.comanda.ms.salut.model.EstatSalut;
+import es.caib.comanda.ms.salut.model.EstatSalutEnum;
+import es.caib.comanda.ms.salut.model.IntegracioInfo;
+import es.caib.comanda.ms.salut.model.IntegracioSalut;
+import es.caib.comanda.ms.salut.model.MissatgeSalut;
+import es.caib.comanda.ms.salut.model.SalutInfo;
+import es.caib.comanda.ms.salut.model.SubsistemaSalut;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.plugin.AbstractPluginHelper;
 import es.caib.notib.logic.intf.service.SalutService;

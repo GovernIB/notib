@@ -1,8 +1,8 @@
 package es.caib.notib.plugin.valsig;
 
-import es.caib.comanda.salut.model.EstatSalut;
-import es.caib.comanda.salut.model.EstatSalutEnum;
-import es.caib.comanda.salut.model.IntegracioPeticions;
+import es.caib.comanda.ms.salut.model.EstatSalut;
+import es.caib.comanda.ms.salut.model.EstatSalutEnum;
+import es.caib.comanda.ms.salut.model.IntegracioPeticions;
 import es.caib.notib.plugin.validatesignature.ValidateSignaturePlugin;
 import lombok.Synchronized;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;

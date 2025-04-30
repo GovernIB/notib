@@ -54,4 +54,6 @@ public interface SchedulledService {
 	void comprimirDocumentsAntics();
 
 	void evictCachePaisosProvincies();
+
+	void generarEstadistiques();
 }

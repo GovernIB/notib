@@ -1,8 +1,9 @@
 package es.caib.notib.logic.intf.service;
 
-import es.caib.comanda.salut.model.AppInfo;
-import es.caib.comanda.salut.model.IntegracioInfo;
-import es.caib.comanda.salut.model.SalutInfo;
+
+import es.caib.comanda.ms.salut.model.AppInfo;
+import es.caib.comanda.ms.salut.model.IntegracioInfo;
+import es.caib.comanda.ms.salut.model.SalutInfo;
 
 import java.util.List;
 

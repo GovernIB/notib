@@ -1,6 +1,6 @@
 package es.caib.notib.logic.mapper;
 
-import es.caib.comanda.salut.model.MissatgeSalut;
+import es.caib.comanda.ms.salut.model.MissatgeSalut;
 import es.caib.notib.persist.entity.AvisEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;

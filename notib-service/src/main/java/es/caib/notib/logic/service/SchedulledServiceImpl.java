@@ -80,6 +80,9 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private MonitorIntegracioRepository monitorRepository;
     @Autowired
     private CacheHelper cacheHelper;
+    @Autowired
+    private EstadisticaService estadisticaService;
+
 
 	// 1. Actualització dels procediments a partir de la informació de Rolsac
 	/////////////////////////////////////////////////////////////////////////
@@ -350,6 +353,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 		log.info("Els documents antics s'han comprimit correctament");
     }
 
+	// 11. Buidar cache paisos i provincies
+	/////////////////////////////////////////////////////////////////////////
 	@Override
 	public void evictCachePaisosProvincies() {
 
@@ -357,6 +362,16 @@ public class SchedulledServiceImpl implements SchedulledService {
 		cacheHelper.evictLlistarProvincies();
 		cacheHelper.evictLlistarProvinciesCodiCA();
 
+	}
+
+	// 12. Generar dades estadístiques
+	/////////////////////////////////////////////////////////////////////////
+	@Transactional
+	@Override
+	public void generarEstadistiques() {
+		if (isTasquesActivesProperty() && isGenerarEstadistiquesActiuProperty()) {
+			estadisticaService.generarDadesExplotacio();
+		}
 	}
 
 	private void esborrarTemporals(String dir) throws Exception {
@@ -421,6 +436,9 @@ public class SchedulledServiceImpl implements SchedulledService {
 	}
 	private boolean isActualitzacioServeisActiuProperty() {
 		return configHelper.getConfigAsBoolean("es.caib.notib.actualitzacio.serveis.actiu");
+	}
+	private boolean isGenerarEstadistiquesActiuProperty() {
+		return configHelper.getConfigAsBoolean("es.caib.notib.generar.dades.explotacio.actiu", false);
 	}
 
 }

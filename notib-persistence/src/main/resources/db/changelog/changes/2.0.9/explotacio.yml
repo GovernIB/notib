@@ -1,0 +1,216 @@
+databaseChangeLog:
+  - changeSet:
+      id: 17458513344725
+      author: limit
+      changes:
+        - createTable:
+            tableName: not_explot_fet
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: pendent
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reg_env_error
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: registrada
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reg_acceptada
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reg_rebutjada
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: not_env_error
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: not_enviada
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: not_notificada
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: not_rebutjada
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: not_expirada
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cie_env_error
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cie_enviada
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cie_notificada
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cie_rebutjada
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cie_error
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: processada
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: dimensio_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: temps_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: not_explot_fet
+            baseColumnNames: dimensio_id
+            referencedTableName: not_explot_dim
+            referencedColumnNames: id
+            constraintName: fk_not_explot_fet_dim
+
+        - addForeignKeyConstraint:
+            baseTableName: not_explot_fet
+            baseColumnNames: temps_id
+            referencedTableName: not_explot_temps
+            referencedColumnNames: id
+            constraintName: fk_not_explot_fet_temps
+
+        - createTable:
+            tableName: not_explot_dim
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: entitat_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: procediment_id
+                  type: BIGINT
+              - column:
+                  name: organ_codi
+                  type: VARCHAR(100 CHAR)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: usuari_codi
+                  type: VARCHAR(100 CHAR)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tipus
+                  type: VARCHAR(16 CHAR)
+              - column:
+                  name: origen
+                  type: VARCHAR(16 CHAR)
+
+        - addUniqueConstraint:
+            tableName: not_explot_dim
+            columnNames: entitat_id, procediment_id, organ_codi, usuari_codi, tipus, origen
+            constraintName: not_explot_dim_uk
+
+        - createTable:
+            tableName: not_explot_temps
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: data
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: anualitat
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: mes
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: trimestre
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: setmana
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: dia
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: dia_setmana
+                  type: VARCHAR(2 CHAR)
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: not_notificacio
+            columns:
+              - column:
+                  name: origen
+                  type: VARCHAR2(8 CHAR)
+
+        - sql:
+            sql: "INSERT INTO NOT_CONFIG_GROUP (CODE,PARENT_CODE,POSITION,DESCRIPTION) VALUES ('SCHEDULLED_EXPLOTACIO','SCHEDULLED',10,'Explotació de dades estadístiques');
+            INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.generar.dades.explotacio.actiu', 'true', 'Activar la generació de dades estadístiques', 'SCHEDULLED_EXPLOTACIO', 0, 0, 'BOOL', 0);
+            INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.generar.dades.explotacio.cron', '0 30 0 * * *', 'Especificar l'expressió 'cron' indicant la freqüencia en que s'han generar les dades estadístiques', 'SCHEDULLED_EXPLOTACIO', 1, 0, 'CRON', 0);
+            UPDATE NOT_NOTIFI
+            "

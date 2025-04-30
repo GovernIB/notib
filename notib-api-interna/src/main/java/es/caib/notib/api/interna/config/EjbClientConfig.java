@@ -56,6 +56,10 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(SalutService.class);
 	}
 	@Bean
+	public LocalStatelessSessionProxyFactoryBean estadisticaService() {
+		return getLocalEjbFactoyBean(EstadisticaService.class);
+	}
+	@Bean
 	public LocalStatelessSessionProxyFactoryBean activeMqService() {
 		return getLocalEjbFactoyBean(ActiveMqService.class);
 	}

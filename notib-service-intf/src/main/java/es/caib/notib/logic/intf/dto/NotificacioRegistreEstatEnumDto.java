@@ -8,7 +8,7 @@ import lombok.Getter;
 import java.io.Serializable;
 
 /**
- * Enumerat que indica l'estat d'una notificació a dins NotIB.
+ * Enumerat que indica l'estat del registre d'una notificació a dins NotIB.
  * 
  * Els possibles estats son:
  *  - PENDENT: Pendent d'enviament a Notifica.
