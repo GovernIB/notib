@@ -13,8 +13,10 @@ import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.statemachine.mappers.EnviamentRegistreMapper;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,8 +48,10 @@ public class RegistreSmHelper {
 	private final AuditHelper auditHelper;
 	private final CallbackHelper callbackHelper;
 	private final EnviamentRegistreMapper enviamentRegistreMapper;
+	private final EnviamentSmService enviamentSmService;
 
 	public static Map<Long, String[]> llibreOficina = new HashMap<>();
+	private final NotificacioRepository notificacioRepository;
 
 	public boolean registrarEnviament(NotificacioEnviamentEntity enviament, Integer numIntent) throws RegistreNotificaException {
 
@@ -133,6 +137,11 @@ public class RegistreSmHelper {
 
 		if (request.isEnviamentSir()) {
 			notificacioEventHelper.addSirEnviamentEvent(eventInfo);
+			if (!Strings.isNullOrEmpty(notificacio.getSeguentRemesa())) {
+				var seguentRemesa = notificacioRepository.findByReferencia(notificacio.getSeguentRemesa());
+				seguentRemesa.setNumRegistrePrevi(arbResposta.getRegistreNumeroFormatat());
+				seguentRemesa.getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
+			}
 		} else {
 			notificacioEventHelper.addRegistreEnviamentEvent(eventInfo);
 		}

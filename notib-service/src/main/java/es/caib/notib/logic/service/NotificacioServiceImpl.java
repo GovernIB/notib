@@ -235,6 +235,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		var timer = metricsHelper.iniciMetrica();
 		List<Notificacio> notificacions = new ArrayList<>();
+		List<NotificacioEntity> notificacionsEntity = new ArrayList<>();
 		try {
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			var sirDividides = notificacioHelper.buildNotificacioSirDividides(entitat, notificacio, false);
@@ -242,8 +243,20 @@ public class NotificacioServiceImpl implements NotificacioService {
 				var notificacioEntity = notificacioHelper.saveNotificacio(sir, TipusUsuariEnumDto.INTERFICIE_WEB);
 				notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
 				auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceImpl.create");
-				notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.acquireStateMachine(e.getNotificaReferencia()));
 				notificacions.add(conversioTipusHelper.convertir(notificacioEntity, Notificacio.class));
+				notificacionsEntity.add(notificacioEntity);
+			}
+			if (!notificacions.isEmpty()) {
+				for (int i = 0; i < notificacionsEntity.size(); i++) {
+					var not = notificacionsEntity.get(i);
+					if (i == notificacions.size() - 1) {
+						continue;
+					}
+					not.setSeguentRemesa(notificacionsEntity.get(i+1).getReferencia());
+					not.getEnviaments().forEach(e -> enviamentSmService.acquireStateMachine(e.getNotificaReferencia()));
+//					notificacioRepository.saveAndFlush(not);
+				}
+
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);

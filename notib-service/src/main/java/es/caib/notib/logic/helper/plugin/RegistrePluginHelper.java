@@ -794,6 +794,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 		registre.setVersion("3.1");
 		var parcial = "";
 		if (isComunicacioSir && notificacio.getConcepte().contains("PARCIAL")) {
+			parcial = "REGISTRO CONTINUACIÓN DEl ANTERIOR ";
 		}
 		registre.setObservaciones("Notib: " + notificacio.getUsuariCodi());
 		registre.setExpone("");

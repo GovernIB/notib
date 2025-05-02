@@ -214,6 +214,13 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "referencia", length = 36)
 	protected String referencia;
 
+	@Column(name = "seguent_remesa", length = 36)
+	protected String seguentRemesa;
+
+	@Column(name = "num_registre_previ", length = 50)
+	protected String numRegistrePrevi;
+
+
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,

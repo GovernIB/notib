@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - property:
+      dbms: oracle
+      name: varcharUnit
+      value: CHAR
+  - property:
+      dbms: postgresql
+      name: varcharUnit
+      value: ''
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+
+      changes:
+        - addColumn:
+            tableName: not_notificacio
+            columns:
+              - column:
+                  name: seguent_remesa
+                  type: varchar(36 ${varcharUnit})
+              - column:
+                  name: num_registre_previ
+                  type: varchar(50 ${varcharUnit})

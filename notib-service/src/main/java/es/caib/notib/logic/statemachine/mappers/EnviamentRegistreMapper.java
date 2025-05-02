@@ -485,7 +485,12 @@ public abstract class EnviamentRegistreMapper {
         if (enviament == null || enviament.getNotificacio().getUsuariCodi() == null) {
             return "Notib: ";
         }
-        return "Notib: " + enviament.getNotificacio().getUsuariCodi();
+        var notificacio = enviament.getNotificacio();
+        var observacions = "Notib: " + enviament.getNotificacio().getUsuariCodi();
+        if (notificacio.isComunicacioSir() && !Strings.isNullOrEmpty(notificacio.getNumRegistrePrevi())) {
+            observacions += " REGISTRO CONTINUACIÓN DEL ANTERIOR " + notificacio.getNumRegistrePrevi();
+        }
+        return observacions;
     }
 
     @Named("resumen")
