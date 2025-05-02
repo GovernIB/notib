@@ -3,6 +3,7 @@ package es.caib.notib.logic.service.ws;
 import com.google.common.base.Strings;
 import com.itextpdf.text.pdf.codec.Base64;
 import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
@@ -105,7 +106,8 @@ public class NotificacioValidator implements Validator {
 
     private boolean cieActiu;
 
-    private final int MAX_SIZE_RAO_SOCIAL = 80;
+    private final int MAX_SIZE_RAO_SOCIAL_JURIDICA = 80;
+    private final int MAX_SIZE_RAO_SOCIAL = 255;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -808,7 +810,10 @@ public class NotificacioValidator implements Validator {
         if ((isPersonaJuridica || isAdministracio) && Strings.isNullOrEmpty(persona.getRaoSocial()) && Strings.isNullOrEmpty(persona.getNom()))  {
             errors.rejectValue(envName + ".raoSocial", error(PERSONA_RAO_SOCIAL_NULL, l, prefix, tipus));
         }
-        if (!Strings.isNullOrEmpty(persona.getRaoSocial()) && persona.getRaoSocial().length() > MAX_SIZE_RAO_SOCIAL) {
+        if (!Strings.isNullOrEmpty(persona.getRaoSocial()) && InteressatTipus.JURIDICA.equals(persona.getInteressatTipus()) && persona.getRaoSocial().length() > MAX_SIZE_RAO_SOCIAL_JURIDICA) {
+            errors.rejectValue(envName + ".raoSocial", error(PERSONA_RAO_SOCIAL_SIZE, l, prefix, MAX_SIZE_RAO_SOCIAL_JURIDICA));
+        }
+        if (!Strings.isNullOrEmpty(persona.getRaoSocial()) && !InteressatTipus.JURIDICA.equals(persona.getInteressatTipus()) && persona.getRaoSocial().length() > MAX_SIZE_RAO_SOCIAL) {
             errors.rejectValue(envName + ".raoSocial", error(PERSONA_RAO_SOCIAL_SIZE, l, prefix, MAX_SIZE_RAO_SOCIAL));
         }
         // - Codi Dir3

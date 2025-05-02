@@ -24,7 +24,8 @@ import java.util.Locale;
 public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, PersonaCommand> {
 
 	public static final int MAX_SIZE_NOM = 30;
-	public static final int MAX_SIZE_RAO_SOCIAL = 80;
+	public static final int MAX_SIZE_RAO_SOCIAL_JURIDICA = 80;
+	public static final int MAX_SIZE_RAO_SOCIAL = 255;
 	private static final int MIN_SIZE_LLINATGES = 2;
 	private static final int MIN_SIZE_NOM_RAO = 2;
 
@@ -199,10 +200,10 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 			ok = false;
 			msgKey = "notificacio.form.valid.fisica.nom";
 		}
-		if (isJuridica && raoSocialInteressat.length() > MAX_SIZE_RAO_SOCIAL) {
+		if (isJuridica && raoSocialInteressat.length() > MAX_SIZE_RAO_SOCIAL_JURIDICA) {
 			ok = false;
 			msgKey = "notificacio.form.valid.juridica.rao.max.length";
-			vars = new Object[] {MAX_SIZE_RAO_SOCIAL};
+			vars = new Object[] {MAX_SIZE_RAO_SOCIAL_JURIDICA};
 		}
 		if (isJuridica && !raoSocialInteressat.isEmpty() && raoSocialInteressat.length() < MIN_SIZE_NOM_RAO) {
 			ok = false;
