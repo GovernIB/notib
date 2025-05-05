@@ -3,6 +3,7 @@
  */
 package es.caib.notib.ejb;
 
+import org.jboss.ejb3.annotation.TransactionTimeout;
 import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
@@ -81,6 +82,13 @@ public class SchedulledService extends AbstractService<es.caib.notib.logic.intf.
 	@Override
 	public void evictCachePaisosProvincies() {
 		getDelegateService().evictCachePaisosProvincies();
+	}
+
+	@Override
+	@PermitAll
+	@TransactionTimeout(3600)
+	public void generarEstadistiques() {
+		getDelegateService().generarEstadistiques();
 	}
 
 }

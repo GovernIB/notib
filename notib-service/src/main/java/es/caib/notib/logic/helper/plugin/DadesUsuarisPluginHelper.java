@@ -1,10 +1,10 @@
 package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
-import es.caib.comanda.salut.model.EstatSalut;
-import es.caib.comanda.salut.model.EstatSalutEnum;
-import es.caib.comanda.salut.model.IntegracioApp;
-import es.caib.comanda.salut.model.IntegracioSalut;
+import es.caib.comanda.ms.salut.model.EstatSalut;
+import es.caib.comanda.ms.salut.model.EstatSalutEnum;
+import es.caib.comanda.ms.salut.model.IntegracioApp;
+import es.caib.comanda.ms.salut.model.IntegracioSalut;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
@@ -173,8 +173,8 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 	// SALUT
 
 	@Override
-	public List<es.caib.comanda.salut.model.IntegracioInfo> getIntegracionsInfo() {
-		return List.of(es.caib.comanda.salut.model.IntegracioInfo.builder()
+	public List<es.caib.comanda.ms.salut.model.IntegracioInfo> getIntegracionsInfo() {
+		return List.of(es.caib.comanda.ms.salut.model.IntegracioInfo.builder()
 				.codi(getCodiApp().name())
 				.nom(getCodiApp().getNom())
 				.build());

@@ -17,7 +17,8 @@ public enum IntegracioCodi {
     VALIDASIG,
     CARPETA,
     EMAIL,
-    CIE;
+    CIE,
+    EXPLOTACIO;
 
 //    private final String descripcio;
 //

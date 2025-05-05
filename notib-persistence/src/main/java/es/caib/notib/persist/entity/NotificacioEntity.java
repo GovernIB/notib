@@ -4,6 +4,7 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.client.domini.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -21,6 +22,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -250,6 +253,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Setter
 	@Column(name = "deleted")
 	private boolean deleted = false;
+
+	@Column(name = "origen")
+	@Enumerated(EnumType.STRING)
+	private EnviamentOrigen origen;
 
 	public void addEnviament(NotificacioEnviamentEntity enviament) {
 		this.enviaments.add(enviament);
@@ -639,6 +646,11 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			return this;
 		}
 		public NotificacioEntity build() {
+			if (built.notificacioMassivaEntity != null) {
+				built.setOrigen(EnviamentOrigen.MASSIVA);
+			} else {
+				built.setOrigen(TipusUsuariEnumDto.APLICACIO.equals(built.getTipusUsuari()) ? EnviamentOrigen.REST : EnviamentOrigen.WEB);
+			}
 			return built;
 		}
 	}
