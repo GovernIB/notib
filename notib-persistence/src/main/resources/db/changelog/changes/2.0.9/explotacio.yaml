@@ -212,5 +212,7 @@ databaseChangeLog:
             sql: "INSERT INTO NOT_CONFIG_GROUP (CODE,PARENT_CODE,POSITION,DESCRIPTION) VALUES ('SCHEDULLED_EXPLOTACIO','SCHEDULLED',10,'Explotació de dades estadístiques');
             INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.generar.dades.explotacio.actiu', 'true', 'Activar la generació de dades estadístiques', 'SCHEDULLED_EXPLOTACIO', 0, 0, 'BOOL', 0);
             INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.generar.dades.explotacio.cron', '0 30 0 * * *', 'Especificar l'expressió 'cron' indicant la freqüencia en que s'han generar les dades estadístiques', 'SCHEDULLED_EXPLOTACIO', 1, 0, 'CRON', 0);
-            UPDATE NOT_NOTIFI
+            UPDATE not_notificacio n SET origen = 'MASSIVA' WHERE n.NOTIFICACIO_MASSIVA_ID IS NOT null;
+            UPDATE not_notificacio n SET origen = 'WEB' WHERE n.TIPUS_USUARI = 1 AND (n.ORIGEN != 'MASSIVA' OR n.ORIGEN IS NULL);
+            UPDATE not_notificacio n SET origen = 'REST' WHERE n.TIPUS_USUARI = 0 AND (n.ORIGEN != 'MASSIVA' OR n.ORIGEN IS NULL);
             "

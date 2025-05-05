@@ -20,7 +20,6 @@ import es.caib.notib.persist.entity.explotacio.ExplotDimensioEntity;
 import es.caib.notib.persist.entity.explotacio.ExplotFets;
 import es.caib.notib.persist.entity.explotacio.ExplotFetsEntity;
 import es.caib.notib.persist.entity.explotacio.ExplotTempsEntity;
-import es.caib.notib.persist.repository.explotacio.ExplotDimensioListRepository;
 import es.caib.notib.persist.repository.explotacio.ExplotDimensioRepository;
 import es.caib.notib.persist.repository.explotacio.ExplotFetsRepository;
 import es.caib.notib.persist.repository.explotacio.ExplotTempsRepository;
@@ -47,7 +46,6 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     private final ExplotDimensioRepository explotDimensioRepository;
     private final ExplotFetsRepository explotFetsRepository;
     private final IntegracioHelper integracioHelper;
-    private final ExplotDimensioListRepository explotDimensioListRepository;
 
     @Override
     @Transactional(timeout = 3600)
@@ -171,20 +169,6 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         return actualitzarDimensions(dimensionsEnDb, dimensionsPerEstadistiques);
     }
-
-//    private List<ExplotDimensio> getDimensionsPerEstadistiques() {
-//        List<ExplotDimensioList> dimensions = explotDimensioListRepository.findAll();
-//
-//        return dimensions.stream().map(dim -> ExplotDimensio.builder()
-//                .entitatId(dim.getEntitatId())
-//                .procedimentId(dim.getProcedimentId())
-//                .organCodi(dim.getOrganCodi())
-//                .usuariCodi(dim.getUsuariCodi())
-//                .tipus(dim.getTipus())
-//                .origen(dim.getOrigen())
-//                .build())
-//                .collect(Collectors.toList());
-//    }
 
     private List<ExplotDimensioEntity> actualitzarDimensions(List<ExplotDimensioEntity> dimensionsEnDb, List<ExplotDimensio> dimensionsPerEstadistiques) {
         List<ExplotDimensioEntity> dimensions = new ArrayList<>();
