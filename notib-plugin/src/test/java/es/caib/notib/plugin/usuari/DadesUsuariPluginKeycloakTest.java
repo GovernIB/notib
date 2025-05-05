@@ -1,6 +1,6 @@
 package es.caib.notib.plugin.usuari;
 
-import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.ms.salut.model.EstatSalutEnum;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;

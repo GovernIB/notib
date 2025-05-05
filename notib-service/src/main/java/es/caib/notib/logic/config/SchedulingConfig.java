@@ -46,6 +46,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private static String REFRESCAR_NOT_EXPIR_DEFCRON = "0 30 3 * * *";
     private static String MONITOR_BUIDA_DADES_DEFCRON = "0 30 4 * * *";
     private static String COMPRIMIR_DOCUMENTS_ANTICS_DEFCRON = "0 0 0 * * *";
+    private static String GENERAR_DADES_EXPLOTACIO_DEFCRON = "0 30 0 * * *";
 
     private static Integer CALLBACK_CLIENT = 0;
     private static Integer CERT_DEH = 1;
@@ -208,6 +209,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 0,
                 PropertiesConstants.EVICT_CACHE_PAISOS_PROVINCIES,
                 420000L);
+        // 12. Generar dades estadístiques
+        ////////////////////////////////////////////////////////////////////////
+        registerCronTask(
+                "generarEstadistiques",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().generarEstadistiques(),
+                PropertiesConstants.GENERAR_DADES_EXPLOTACIO_CRON,
+                GENERAR_DADES_EXPLOTACIO_DEFCRON);
 
     }
 

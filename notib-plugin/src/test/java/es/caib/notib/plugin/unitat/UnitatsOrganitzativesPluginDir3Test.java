@@ -1,7 +1,7 @@
 package es.caib.notib.plugin.unitat;
 
-import es.caib.comanda.salut.model.EstatSalut;
-import es.caib.comanda.salut.model.EstatSalutEnum;
+import es.caib.comanda.ms.salut.model.EstatSalut;
+import es.caib.comanda.ms.salut.model.EstatSalutEnum;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

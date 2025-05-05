@@ -2,8 +2,8 @@ package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
 import com.google.common.net.MediaType;
-import es.caib.comanda.salut.model.EstatSalutEnum;
-import es.caib.comanda.salut.model.IntegracioApp;
+import es.caib.comanda.ms.salut.model.EstatSalutEnum;
+import es.caib.comanda.ms.salut.model.IntegracioApp;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
