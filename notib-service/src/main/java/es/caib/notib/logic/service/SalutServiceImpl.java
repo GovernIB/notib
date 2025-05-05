@@ -149,9 +149,9 @@ public class SalutServiceImpl implements SalutService {
 
         Instant start = Instant.now();
         EstatSalutEnum estat = EstatSalutEnum.UP;
-        try {
-            executePerformanceTest();
-        } catch (Exception e) {}
+//        try {
+//            executePerformanceTest();
+//        } catch (Exception e) {}
         String response = null;
         for (int i = 1; i <= MAX_CONNECTION_RETRY; i++) {
             try {

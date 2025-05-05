@@ -4,7 +4,6 @@ import es.caib.comanda.ms.estadistica.model.Dimensio;
 import es.caib.comanda.ms.estadistica.model.DimensioDesc;
 import es.caib.comanda.ms.estadistica.model.Fet;
 import es.caib.comanda.ms.estadistica.model.Format;
-import es.caib.comanda.ms.estadistica.model.GenericDimensio;
 import es.caib.comanda.ms.estadistica.model.IndicadorDesc;
 import es.caib.comanda.ms.estadistica.model.RegistreEstadistic;
 import es.caib.comanda.ms.estadistica.model.RegistresEstadistics;
@@ -104,11 +103,12 @@ public class EstadisticaServiceImpl implements EstadisticaService {
         LocalDate data = ahir();
         ExplotTempsEntity temps = explotTempsRepository.findFirstByData(data);
         if (temps == null) {
+            Date ahir = Date.from(ahir().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
             return RegistresEstadistics.builder()
-                    .temps(Temps.builder().data(ahir()).build())
-                    .dimensionsDescripcio(getDimensions().stream()
-                            .map(d -> GenericDimensio.builder().nom(d.getNom()).valor(d.getDescripcio()).build())
-                            .collect(Collectors.toList()))
+                    .temps(Temps.builder().data(ahir).build())
+//                    .dimensionsDescripcio(getDimensions().stream()
+//                            .map(d -> GenericDimensio.builder().nom(d.getNom()).valor(d.getDescripcio()).build())
+//                            .collect(Collectors.toList()))
                     .fets(List.of())
                     .build();
         }
@@ -149,7 +149,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
                 IndicadorDesc.builder().nom("Acceptada al CIE").descripcio("La comunicació/notificació ha estat entregada per l'operador postal al destinatari").format(Format.LONG).build(),
                 IndicadorDesc.builder().nom("Rebutjada al CIE").descripcio("La comunicació/notificació s'ha intentat entregar per l'operador postal, però ha estat rebutjada pel destinatari").format(Format.LONG).build(),
                 IndicadorDesc.builder().nom("Error en l'entrega per CIE").descripcio("S'ha produït algun problema que ha impedit realitzar la entrega postal").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Processada").descripcio("").format(Format.LONG).build()
+                IndicadorDesc.builder().nom("Processada").descripcio("La comunicació/notificació ha estat processada").format(Format.LONG).build()
         );
     }
 
@@ -290,8 +290,9 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     }
 
     private RegistresEstadistics toRegistresEstadistics(List<ExplotFetsEntity> fets, LocalDate data) {
+        Date dia = Date.from(data.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
         return RegistresEstadistics.builder()
-                .temps(Temps.builder().data(data).build())
+                .temps(Temps.builder().data(dia).build())
                 .fets(fets.stream().map(this::toRegistreEstadistic).collect(Collectors.toList()))
                 .build();
     }
