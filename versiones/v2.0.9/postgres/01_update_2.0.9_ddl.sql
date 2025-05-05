@@ -1,0 +1,10 @@
+ALTER TABLE not_notificacio ADD seguent_remesa VARCHAR(36);
+ALTER TABLE not_notificacio ADD num_registre_previ VARCHAR(50);
+ALTER TABLE not_notificacio_enviament ADD registre_motiu VARCHAR(255);
+CREATE TABLE not_explot_fet (id BIGINT NOT NULL, pendent BIGINT NOT NULL, reg_env_error BIGINT NOT NULL, registrada BIGINT NOT NULL, reg_acceptada BIGINT NOT NULL, reg_rebutjada BIGINT NOT NULL, not_env_error BIGINT NOT NULL, not_enviada BIGINT NOT NULL, not_notificada BIGINT NOT NULL, not_rebutjada BIGINT NOT NULL, not_expirada BIGINT NOT NULL, cie_env_error BIGINT NOT NULL, cie_enviada BIGINT NOT NULL, cie_notificada BIGINT NOT NULL, cie_rebutjada BIGINT NOT NULL, cie_error BIGINT NOT NULL, processada BIGINT NOT NULL, dimensio_id BIGINT NOT NULL, temps_id BIGINT NOT NULL, CONSTRAINT not_explot_fet_pkey PRIMARY KEY (id));
+CREATE TABLE not_explot_dim (id BIGINT NOT NULL, entitat_id BIGINT NOT NULL, procediment_id BIGINT, organ_codi VARCHAR(100 CHAR) NOT NULL, usuari_codi VARCHAR(100 CHAR) NOT NULL, tipus VARCHAR(16 CHAR), origen VARCHAR(16 CHAR), CONSTRAINT not_explot_dim_pkey PRIMARY KEY (id));
+CREATE TABLE not_explot_temps (id BIGINT NOT NULL, data date NOT NULL, anualitat INTEGER NOT NULL, mes INTEGER NOT NULL, trimestre INTEGER NOT NULL, setmana INTEGER NOT NULL, dia INTEGER NOT NULL, dia_setmana VARCHAR(2 CHAR), CONSTRAINT not_explot_temps_pkey PRIMARY KEY (id));
+ALTER TABLE not_explot_fet ADD CONSTRAINT fk_not_explot_fet_dim FOREIGN KEY (dimensio_id) REFERENCES not_explot_dim (id);
+ALTER TABLE not_explot_fet ADD CONSTRAINT fk_not_explot_fet_temps FOREIGN KEY (temps_id) REFERENCES not_explot_temps (id);
+ALTER TABLE not_explot_dim ADD CONSTRAINT not_explot_dim_uk UNIQUE (entitat_id, procediment_id, organ_codi, usuari_codi, tipus, origen);
+ALTER TABLE not_notificacio ADD origen VARCHAR(8 CHAR);

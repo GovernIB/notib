@@ -1,0 +1,6 @@
+UPDATE NOT_NOTIFICACIO_TABLE SET estat_mask = estat_mask + 4096 WHERE id IN (SELECT t.id FROM not_notificacio_table t JOIN NOT_NOTIFICACIO_ENV nne ON t.id = nne.NOTIFICACIO_ID WHERE t.ENV_TIPUS  = 2 AND nne.ESTAT_REGISTRE = 5);
+UPDATE NOT_NOTIFICACIO_TABLE SET estat_mask = estat_mask + 8192 WHERE id IN (SELECT t.id FROM not_notificacio_table t JOIN NOT_NOTIFICACIO_ENV nne ON t.id = nne.NOTIFICACIO_ID WHERE t.ENV_TIPUS  = 2 AND nne.ESTAT_REGISTRE = 9);
+INSERT INTO NOT_CONFIG_GROUP (CODE,PARENT_CODE,POSITION,DESCRIPTION) VALUES ('SCHEDULLED_EXPLOTACIO','SCHEDULLED',10,'Explotació de dades estadístiques');
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.generar.dades.explotacio.actiu', 'true', 'Activar la generació de dades estadístiques', 'SCHEDULLED_EXPLOTACIO', 0, 0, 'BOOL', 0);
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.generar.dades.explotacio.cron', '0 30 0 * * *', 'Especificar l''expressió ''cron'' indicant la freqüencia en que s''han generar les dades estadístiques', 'SCHEDULLED_EXPLOTACIO', 1, 0, 'CRON', 0);
+UPDATE NOT_NOTIFICACIO SET origen = (CASE WHEN NOTIFICACIO_MASSIVA_ID IS NOT NULL THEN 'MASSIVA' WHEN TIPUS_USUARI = 0 THEN 'REST' ELSE 'WEB' END);
