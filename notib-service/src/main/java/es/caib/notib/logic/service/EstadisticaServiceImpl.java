@@ -120,10 +120,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     public List<DimensioDesc> getDimensions() {
         List<ExplotDimensio> dim = explotDimensioRepository.getDimensionsPerEstadistiques();
         return List.of(
-                DimensioDesc.builder().nom("Entitat").descripcio("Codi de l'entitat a la que pertany la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getEntitatId()).map(Object::toString).orElse("")).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().nom("Organ Gestor").descripcio("Organ gestor al que pertany la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getOrganCodi()).orElse("")).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().nom("Entitat").descripcio("Codi de l'entitat a la que pertany la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getEntitatId()).map(Object::toString).orElse("")).filter(s -> !s.isEmpty()).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().nom("Organ Gestor").descripcio("Organ gestor al que pertany la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getOrganCodi()).orElse("")).filter(s -> !s.isEmpty()).distinct().sorted().collect(Collectors.toList())).build(),
                 DimensioDesc.builder().nom("Procediment").descripcio("Procediment al que pertany la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getProcedimentId()).map(Object::toString).orElse("")).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().nom("Usuari").descripcio("Codi de l'usuari que ha creat la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getUsuariCodi()).orElse("")).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().nom("Usuari").descripcio("Codi de l'usuari que ha creat la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getUsuariCodi()).orElse("DESCONEGUT")).distinct().sorted().collect(Collectors.toList())).build(),
                 DimensioDesc.builder().nom("Tipus").descripcio("Tipus de comunicació oficial: notificació, comunicació o comunicació SIR").valors(dim.stream().map(d -> d.getTipus().name()).distinct().sorted().collect(Collectors.toList())).build(),
                 DimensioDesc.builder().nom("Origen").descripcio("Des d'on s'ha creat la comunicació/notificació: des de la interfície web, des de la API Rest o com a enviament massiu").valors(dim.stream().map(d -> d.getOrigen().name()).distinct().sorted().collect(Collectors.toList())).build());
 
@@ -164,7 +164,6 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Obtenim totes les dimensions per procedimentServei/usuari. Les que no existeixin les crearem
         List<ExplotDimensio> dimensionsPerEstadistiques = explotDimensioRepository.getDimensionsPerEstadistiques();
-//        List<ExplotDimensio> dimensionsPerEstadistiques = getDimensionsPerEstadistiques();
         List<ExplotDimensioEntity> dimensionsEnDb = explotDimensioRepository.findAllOrdered();
 
         return actualitzarDimensions(dimensionsEnDb, dimensionsPerEstadistiques);
@@ -233,7 +232,15 @@ public class EstadisticaServiceImpl implements EstadisticaService {
         int comparison = estadistiques.getEntitatId().compareTo(dimension.getEntitatId());
         if (comparison != 0) return comparison;
 
-        comparison = estadistiques.getProcedimentId().compareTo(dimension.getProcedimentId());
+        if (estadistiques.getProcedimentId() == null && dimension.getProcedimentId() == null) {
+            comparison = 0;
+        } else if (estadistiques.getProcedimentId() == null) {
+            comparison = -1;
+        } else if (dimension.getProcedimentId() == null) {
+            comparison = 1;
+        } else {
+            comparison = estadistiques.getProcedimentId().compareTo(dimension.getProcedimentId());
+        }
         if (comparison != 0) return comparison;
 
         comparison = estadistiques.getOrganCodi().compareTo(dimension.getOrganCodi());
