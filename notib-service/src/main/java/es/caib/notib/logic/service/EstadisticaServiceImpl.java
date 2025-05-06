@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -118,12 +119,11 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     @Override
     public List<DimensioDesc> getDimensions() {
         List<ExplotDimensio> dim = explotDimensioRepository.getDimensionsPerEstadistiques();
-//        List<ExplotDimensio> dim = getDimensionsPerEstadistiques();
         return List.of(
-                DimensioDesc.builder().nom("Entitat").descripcio("Codi de l'entitat a la que pertany la comunicació/notificació").valors(dim.stream().map(d -> d.getEntitatId().toString()).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().nom("Organ Gestor").descripcio("Organ gestor al que pertany la comunicació/notificació").valors(dim.stream().map(d -> d.getOrganCodi()).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().nom("Procediment").descripcio("Procediment al que pertany la comunicació/notificació").valors(dim.stream().map(d -> d.getProcedimentId() != null ? d.getProcedimentId().toString() : "").distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().nom("Usuari").descripcio("Codi de l'usuari que ha creat la comunicació/notificació").valors(dim.stream().map(d -> d.getUsuariCodi()).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().nom("Entitat").descripcio("Codi de l'entitat a la que pertany la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getEntitatId()).map(Object::toString).orElse("")).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().nom("Organ Gestor").descripcio("Organ gestor al que pertany la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getOrganCodi()).orElse("")).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().nom("Procediment").descripcio("Procediment al que pertany la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getProcedimentId()).map(Object::toString).orElse("")).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().nom("Usuari").descripcio("Codi de l'usuari que ha creat la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getUsuariCodi()).orElse("")).distinct().sorted().collect(Collectors.toList())).build(),
                 DimensioDesc.builder().nom("Tipus").descripcio("Tipus de comunicació oficial: notificació, comunicació o comunicació SIR").valors(dim.stream().map(d -> d.getTipus().name()).distinct().sorted().collect(Collectors.toList())).build(),
                 DimensioDesc.builder().nom("Origen").descripcio("Des d'on s'ha creat la comunicació/notificació: des de la interfície web, des de la API Rest o com a enviament massiu").valors(dim.stream().map(d -> d.getOrigen().name()).distinct().sorted().collect(Collectors.toList())).build());
 
