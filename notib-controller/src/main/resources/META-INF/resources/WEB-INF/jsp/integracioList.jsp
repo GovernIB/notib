@@ -157,11 +157,11 @@
 		<div class="col-md-2">
 			<not:inputDate name="dataFi" inline="true" placeholderKey="notificacio.list.filtre.camp.datafi" required="false"/>
 		</div>
-		<c:if test="${'CALLBACK' == codiActual}">
+<%--		<c:if test="${'CALLBACK' == codiActual}">--%>
 			<div class="col-md-2">
 				<not:inputText name="aplicacio" inline="true" placeholderKey="integracio.filtre.codi.aplicacio"/>
 			</div>
-		</c:if>
+<%--		</c:if>--%>
 
 		<div class="col-md-2 pull-right">
 			<div class="pull-right">
