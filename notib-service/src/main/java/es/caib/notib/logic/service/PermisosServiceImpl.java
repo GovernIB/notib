@@ -377,7 +377,8 @@ public class PermisosServiceImpl implements PermisosService {
     // PERMIS COMUNICACIONS SENSE PROCEDIMENTS
     private Boolean hasPermisComunicacionsSenseProcediment(EntitatEntity entitat, List<String> grups, Permission permis) {
 
-        var organsAmbPermisIds = permisosHelper.getObjectsIdsWithAllPermission (OrganGestorEntity.class, new Permission[]{permis, ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT});
+//        var organsAmbPermisIds = permisosHelper.getObjectsIdsWithAllPermission (OrganGestorEntity.class, new Permission[]{permis, ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT});
+        var organsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission (OrganGestorEntity.class, new Permission[]{permis, ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT});
         return hasElementsGivenIds(organsAmbPermisIds, new OrgansPermisSenseProcedimentCountCommand(), entitat, grups);
     }
 
@@ -493,6 +494,9 @@ public class PermisosServiceImpl implements PermisosService {
             if (!entitat.getDir3Codi().equals(e.getOrganGestor().getCodi())) {
                 o.add(CodiValorDto.builder().codi(e.getOrganGestor().getCodi()).valor(e.getOrganGestor().getCodi() + " - " + e.getOrganGestor().getNom()).build());
             }
+        }
+        for (var organ : organs) {
+                o.add(CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build());
         }
         Set<CodiValorDto> organsFinals = new HashSet<>(o);
         return new ArrayList<>(organsFinals);
