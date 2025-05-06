@@ -9,7 +9,7 @@ UPDATE NOT_NOTIFICACIO_TABLE SET estat_mask = estat_mask + 4096 WHERE id IN (SEL
 UPDATE NOT_NOTIFICACIO_TABLE SET estat_mask = estat_mask + 8192 WHERE id IN (SELECT t.id FROM not_notificacio_table t JOIN NOT_NOTIFICACIO_ENV nne ON t.id = nne.NOTIFICACIO_ID WHERE t.ENV_TIPUS  = 2 AND nne.ESTAT_REGISTRE = 9);
 
 -- Changeset db/changelog/changes/2.0.9/984.yaml::1634114082437-1::limit
-ALTER TABLE not_notificacio_enviament ADD registre_motiu VARCHAR2(255 CHAR);
+ALTER TABLE not_notificacio_env ADD registre_motiu VARCHAR2(255 CHAR);
 
 -- Changeset db/changelog/changes/2.0.9/explotacio.yaml::17458513344725::limit
 CREATE TABLE not_explot_fet (id NUMBER(38, 0) NOT NULL, pendent NUMBER(38, 0) NOT NULL, reg_env_error NUMBER(38, 0) NOT NULL, registrada NUMBER(38, 0) NOT NULL, reg_acceptada NUMBER(38, 0) NOT NULL, reg_rebutjada NUMBER(38, 0) NOT NULL, not_env_error NUMBER(38, 0) NOT NULL, not_enviada NUMBER(38, 0) NOT NULL, not_notificada NUMBER(38, 0) NOT NULL, not_rebutjada NUMBER(38, 0) NOT NULL, not_expirada NUMBER(38, 0) NOT NULL, cie_env_error NUMBER(38, 0) NOT NULL, cie_enviada NUMBER(38, 0) NOT NULL, cie_notificada NUMBER(38, 0) NOT NULL, cie_rebutjada NUMBER(38, 0) NOT NULL, cie_error NUMBER(38, 0) NOT NULL, processada NUMBER(38, 0) NOT NULL, dimensio_id NUMBER(38, 0) NOT NULL, temps_id NUMBER(38, 0) NOT NULL, CONSTRAINT PK_NOT_EXPLOT_FET PRIMARY KEY (id));
