@@ -17,8 +17,8 @@ public class FetCieRebutjada implements Fet {
     private Double cieRebutjada;
 
     @Override
-    public String getNom() {
-        return "Rebutjada al CIE";
+    public String getCodi() {
+        return FetEnum.CIE_REB.name();
     }
 
     @Override

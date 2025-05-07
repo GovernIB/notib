@@ -17,8 +17,8 @@ public class FetCieEnviamentError implements Fet {
     private Double cieEnviamentError;
 
     @Override
-    public String getNom() {
-        return "Error enviant al CIE";
+    public String getCodi() {
+        return FetEnum.CIE_ERR.name();
     }
 
     @Override

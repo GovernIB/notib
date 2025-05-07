@@ -17,8 +17,8 @@ public class DimensioUsuari implements Dimensio {
     private String usuariCodi;
 
     @Override
-    public String getNom() {
-        return "Usuari";
+    public String getCodi() {
+        return DimEnum.USU.name();
     }
 
     @Override

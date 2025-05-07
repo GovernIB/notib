@@ -17,8 +17,8 @@ public class FetNotNotificada implements Fet {
     private Double notNotificada;
 
     @Override
-    public String getNom() {
-        return "Acceptada a Notific@";
+    public String getCodi() {
+        return FetEnum.NOT_ACC.name();
     }
 
     @Override

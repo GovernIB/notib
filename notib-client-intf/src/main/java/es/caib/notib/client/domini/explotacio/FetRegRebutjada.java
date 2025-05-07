@@ -17,8 +17,8 @@ public class FetRegRebutjada implements Fet {
     private Double regRebutjada;
 
     @Override
-    public String getNom() {
-        return "Registre SIR rebutjat";
+    public String getCodi() {
+        return FetEnum.SIR_REB.name();
     }
 
     @Override

@@ -17,8 +17,8 @@ public class FetNotRebutjada implements Fet {
     private Double notRebutjada;
 
     @Override
-    public String getNom() {
-        return "Rebutjada a Notific@";
+    public String getCodi() {
+        return FetEnum.NOT_REB.name();
     }
 
     @Override

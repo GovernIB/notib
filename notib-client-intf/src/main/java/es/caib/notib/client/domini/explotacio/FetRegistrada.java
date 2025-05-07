@@ -17,8 +17,8 @@ public class FetRegistrada implements Fet {
     private Double registrada;
 
     @Override
-    public String getNom() {
-        return "Registrada";
+    public String getCodi() {
+        return FetEnum.REG.name();
     }
 
     @Override
