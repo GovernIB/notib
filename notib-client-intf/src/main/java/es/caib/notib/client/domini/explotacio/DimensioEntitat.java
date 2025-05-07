@@ -17,8 +17,8 @@ public class DimensioEntitat implements Dimensio {
     private Long entitatId;
 
     @Override
-    public String getNom() {
-        return "Entitat";
+    public String getCodi() {
+        return DimEnum.ENT.name();
     }
 
     @Override

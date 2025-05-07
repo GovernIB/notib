@@ -17,8 +17,8 @@ public class FetPendent implements Fet {
     private Double pendent;
 
     @Override
-    public String getNom() {
-        return "Pendent";
+    public String getCodi() {
+        return FetEnum.PND.name();
     }
 
     @Override

@@ -18,8 +18,8 @@ public class DimensioTipus implements Dimensio {
     private EnviamentTipus tipus;
 
     @Override
-    public String getNom() {
-        return "Tipus";
+    public String getCodi() {
+        return DimEnum.TIP.name();
     }
 
     @Override

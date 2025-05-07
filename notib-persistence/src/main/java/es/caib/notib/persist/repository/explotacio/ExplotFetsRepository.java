@@ -81,6 +81,6 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             @Param("esNullData") boolean esNullData,
             @Param("data") Date data);
 
-    @Query("from ExplotFetsEntity where temps = temps order by dimensio.entitatId, dimensio.organCodi, dimensio.procedimentId, dimensio.tipus, dimensio.origen, dimensio.usuariCodi")
-    List<ExplotFetsEntity> findByTemps(ExplotTempsEntity temps);
+    @Query("from ExplotFetsEntity where temps = :temps order by dimensio.entitatId, dimensio.organCodi, dimensio.procedimentId, dimensio.tipus, dimensio.origen, dimensio.usuariCodi")
+    List<ExplotFetsEntity> findByTemps(@Param("temps") ExplotTempsEntity temps);
 }

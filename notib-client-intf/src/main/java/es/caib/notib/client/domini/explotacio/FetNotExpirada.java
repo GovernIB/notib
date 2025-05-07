@@ -17,8 +17,8 @@ public class FetNotExpirada implements Fet {
     private Double notExpirada;
 
     @Override
-    public String getNom() {
-        return "Expirada a Notific@";
+    public String getCodi() {
+        return FetEnum.NOT_EXP.name();
     }
 
     @Override

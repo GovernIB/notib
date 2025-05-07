@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -118,36 +119,35 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     @Override
     public List<DimensioDesc> getDimensions() {
         List<ExplotDimensio> dim = explotDimensioRepository.getDimensionsPerEstadistiques();
-//        List<ExplotDimensio> dim = getDimensionsPerEstadistiques();
         return List.of(
-                DimensioDesc.builder().nom("Entitat").descripcio("Codi de l'entitat a la que pertany la comunicació/notificació").valors(dim.stream().map(d -> d.getEntitatId().toString()).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().nom("Organ Gestor").descripcio("Organ gestor al que pertany la comunicació/notificació").valors(dim.stream().map(d -> d.getOrganCodi()).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().nom("Procediment").descripcio("Procediment al que pertany la comunicació/notificació").valors(dim.stream().map(d -> d.getProcedimentId() != null ? d.getProcedimentId().toString() : "").distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().nom("Usuari").descripcio("Codi de l'usuari que ha creat la comunicació/notificació").valors(dim.stream().map(d -> d.getUsuariCodi()).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().nom("Tipus").descripcio("Tipus de comunicació oficial: notificació, comunicació o comunicació SIR").valors(dim.stream().map(d -> d.getTipus().name()).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().nom("Origen").descripcio("Des d'on s'ha creat la comunicació/notificació: des de la interfície web, des de la API Rest o com a enviament massiu").valors(dim.stream().map(d -> d.getOrigen().name()).distinct().sorted().collect(Collectors.toList())).build());
+                DimensioDesc.builder().codi(DimEnum.ENT.name()).nom("Entitat").descripcio("Codi de l'entitat a la que pertany la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getEntitatId()).map(Object::toString).orElse("")).filter(s -> !s.isEmpty()).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().codi(DimEnum.ORG.name()).nom("Organ Gestor").descripcio("Organ gestor al que pertany la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getOrganCodi()).orElse("")).filter(s -> !s.isEmpty()).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().codi(DimEnum.PRC.name()).nom("Procediment").descripcio("Procediment al que pertany la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getProcedimentId()).map(Object::toString).orElse("")).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().codi(DimEnum.USU.name()).nom("Usuari").descripcio("Codi de l'usuari que ha creat la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getUsuariCodi()).orElse("DESCONEGUT")).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().codi(DimEnum.TIP.name()).nom("Tipus").descripcio("Tipus de comunicació oficial: notificació, comunicació o comunicació SIR").valors(dim.stream().map(d -> d.getTipus().name()).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().codi(DimEnum.ORI.name()).nom("Origen").descripcio("Des d'on s'ha creat la comunicació/notificació: des de la interfície web, des de la API Rest o com a enviament massiu").valors(dim.stream().map(d -> d.getOrigen().name()).distinct().sorted().collect(Collectors.toList())).build());
 
     }
 
     @Override
     public List<IndicadorDesc> getIndicadors() {
         return List.of(
-                IndicadorDesc.builder().nom("Pendent").descripcio("La comunicació/notificació està pendent de ser registrada").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Error enviant a registre").descripcio("S'ha produït un error al intentar registrar la comunicació/notificació").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Registrada").descripcio("La comunicació/notificació ha estat registrada i està pendent de ser enviada al destinatari").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Registre SIR acceptat").descripcio("La comunicació SIR ha estat acceptada per l'administració destinatària").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Registre SIR rebutjat").descripcio("La comunicació SIR ha estat rebutjada per l'administració destinatària").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Error enviant a Notific@").descripcio("S'ha produït un error al intentar enviar la comunicació/notificació al destinatari mitjançant Notific@").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Enviada a Notific@").descripcio("La comunicació/notificació s'ha enviat a Notific@ i està pendent de compareixença del destinatari a DEHú").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Acceptada a Notific@").descripcio("La comunicació/notificació ha estat acceptada pel destinatari a DEHú").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Rebutjada a Notific@").descripcio("La comunicació/notificació ha estat rebutjada pel destinatari a DEHú").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Expirada a Notific@").descripcio("Ha passat el termini establert per a la compareixença del destinatari a DEHú").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Error enviant al CIE").descripcio("S'ha produït un error al intentar enviar la comunicació/notificació al destinatari mitjançant CIE + Operador postal").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Enviada a CIE").descripcio("La comunicació/notificació s'ha enviat al CIE i està pendent de ser entregada per l'operador postal").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Acceptada al CIE").descripcio("La comunicació/notificació ha estat entregada per l'operador postal al destinatari").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Rebutjada al CIE").descripcio("La comunicació/notificació s'ha intentat entregar per l'operador postal, però ha estat rebutjada pel destinatari").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Error en l'entrega per CIE").descripcio("S'ha produït algun problema que ha impedit realitzar la entrega postal").format(Format.LONG).build(),
-                IndicadorDesc.builder().nom("Processada").descripcio("La comunicació/notificació ha estat processada").format(Format.LONG).build()
+                IndicadorDesc.builder().codi(FetEnum.PND.name()).nom("Pendent").descripcio("La comunicació/notificació està pendent de ser registrada").format(Format.LONG).build(),
+                IndicadorDesc.builder().codi(FetEnum.REG_ERR.name()).nom("Error enviant a registre").descripcio("S'ha produït un error al intentar registrar la comunicació/notificació").format(Format.LONG).build(),
+                IndicadorDesc.builder().codi(FetEnum.REG.name()).nom("Registrada").descripcio("La comunicació/notificació ha estat registrada i està pendent de ser enviada al destinatari").format(Format.LONG).build(),
+                IndicadorDesc.builder().codi(FetEnum.SIR_ACC.name()).nom("Registre SIR acceptat").descripcio("La comunicació SIR ha estat acceptada per l'administració destinatària").format(Format.LONG).build(),
+                IndicadorDesc.builder().codi(FetEnum.SIR_REB.name()).nom("Registre SIR rebutjat").descripcio("La comunicació SIR ha estat rebutjada per l'administració destinatària").format(Format.LONG).build(),
+                IndicadorDesc.builder().codi(FetEnum.NOT_ERR.name()).nom("Error enviant a Notific@").descripcio("S'ha produït un error al intentar enviar la comunicació/notificació al destinatari mitjançant Notific@").format(Format.LONG).build(),
+                IndicadorDesc.builder().codi(FetEnum.NOT_ENV.name()).nom("Enviada a Notific@").descripcio("La comunicació/notificació s'ha enviat a Notific@ i està pendent de compareixença del destinatari a DEHú").format(Format.LONG).build(),
+                IndicadorDesc.builder().codi(FetEnum.NOT_ACC.name()).nom("Acceptada a Notific@").descripcio("La comunicació/notificació ha estat acceptada pel destinatari a DEHú").format(Format.LONG).build(),
+                IndicadorDesc.builder().codi(FetEnum.NOT_REB.name()).nom("Rebutjada a Notific@").descripcio("La comunicació/notificació ha estat rebutjada pel destinatari a DEHú").format(Format.LONG).build(),
+                IndicadorDesc.builder().codi(FetEnum.NOT_EXP.name()).nom("Expirada a Notific@").descripcio("Ha passat el termini establert per a la compareixença del destinatari a DEHú").format(Format.LONG).build(),
+                IndicadorDesc.builder().codi(FetEnum.CIE_ERR.name()).nom("Error enviant al CIE").descripcio("S'ha produït un error al intentar enviar la comunicació/notificació al destinatari mitjançant CIE + Operador postal").format(Format.LONG).build(),
+                IndicadorDesc.builder().codi(FetEnum.CIE_ENV.name()).nom("Enviada a CIE").descripcio("La comunicació/notificació s'ha enviat al CIE i està pendent de ser entregada per l'operador postal").format(Format.LONG).build(),
+                IndicadorDesc.builder().codi(FetEnum.CIE_ACC.name()).nom("Acceptada al CIE").descripcio("La comunicació/notificació ha estat entregada per l'operador postal al destinatari").format(Format.LONG).build(),
+                IndicadorDesc.builder().codi(FetEnum.CIE_REB.name()).nom("Rebutjada al CIE").descripcio("La comunicació/notificació s'ha intentat entregar per l'operador postal, però ha estat rebutjada pel destinatari").format(Format.LONG).build(),
+                IndicadorDesc.builder().codi(FetEnum.CIE_ERE.name()).nom("Error en l'entrega per CIE").descripcio("S'ha produït algun problema que ha impedit realitzar la entrega postal").format(Format.LONG).build(),
+                IndicadorDesc.builder().codi(FetEnum.PRC.name()).nom("Processada").descripcio("La comunicació/notificació ha estat processada").format(Format.LONG).build()
         );
     }
 
@@ -164,7 +164,6 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Obtenim totes les dimensions per procedimentServei/usuari. Les que no existeixin les crearem
         List<ExplotDimensio> dimensionsPerEstadistiques = explotDimensioRepository.getDimensionsPerEstadistiques();
-//        List<ExplotDimensio> dimensionsPerEstadistiques = getDimensionsPerEstadistiques();
         List<ExplotDimensioEntity> dimensionsEnDb = explotDimensioRepository.findAllOrdered();
 
         return actualitzarDimensions(dimensionsEnDb, dimensionsPerEstadistiques);
@@ -233,7 +232,15 @@ public class EstadisticaServiceImpl implements EstadisticaService {
         int comparison = estadistiques.getEntitatId().compareTo(dimension.getEntitatId());
         if (comparison != 0) return comparison;
 
-        comparison = estadistiques.getProcedimentId().compareTo(dimension.getProcedimentId());
+        if (estadistiques.getProcedimentId() == null && dimension.getProcedimentId() == null) {
+            comparison = 0;
+        } else if (estadistiques.getProcedimentId() == null) {
+            comparison = -1;
+        } else if (dimension.getProcedimentId() == null) {
+            comparison = 1;
+        } else {
+            comparison = estadistiques.getProcedimentId().compareTo(dimension.getProcedimentId());
+        }
         if (comparison != 0) return comparison;
 
         comparison = estadistiques.getOrganCodi().compareTo(dimension.getOrganCodi());
