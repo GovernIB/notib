@@ -17,8 +17,8 @@ public class FetCieNotificada implements Fet {
     private Double cieNotificada;
 
     @Override
-    public String getNom() {
-        return "Acceptada al CIE";
+    public String getCodi() {
+        return FetEnum.CIE_ACC.name();
     }
 
     @Override

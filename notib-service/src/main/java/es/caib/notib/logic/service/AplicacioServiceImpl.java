@@ -124,6 +124,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			log.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
 			var dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 			if (dadesUsuari == null) {
+				cacheHelper.evictUsuariByCodi();
 				throw new NotFoundException(auth.getName(), DadesUsuari.class);
 			}
 			if (dadesUsuari.getNomSencer() != null) {

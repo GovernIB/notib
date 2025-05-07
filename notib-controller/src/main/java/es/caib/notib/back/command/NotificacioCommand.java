@@ -221,6 +221,10 @@ public class NotificacioCommand {
 	public int getRaoSocialDefaultsize() {
 		return ValidPersonaValidator.MAX_SIZE_RAO_SOCIAL;
 	}
+
+	public int getRaoSocialJuridicaDefaultsize() {
+		return ValidPersonaValidator.MAX_SIZE_RAO_SOCIAL_JURIDICA;
+	}
 	
 	public int getLlinatge1DefaultSize() {
 		int concepteSize = 0;

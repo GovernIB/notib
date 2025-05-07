@@ -17,8 +17,8 @@ public class FetRegEnviamentError implements Fet {
     private Double regEnviamentError;
 
     @Override
-    public String getNom() {
-        return "Error enviant a registre";
+    public String getCodi() {
+        return FetEnum.REG_ERR.name();
     }
 
     @Override

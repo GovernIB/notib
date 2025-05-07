@@ -17,8 +17,8 @@ public class FetNotEnviamentError implements Fet {
     private Double notEnviamentError;
 
     @Override
-    public String getNom() {
-        return "Error enviant a Notific@";
+    public String getCodi() {
+        return FetEnum.NOT_ERR.name();
     }
 
     @Override

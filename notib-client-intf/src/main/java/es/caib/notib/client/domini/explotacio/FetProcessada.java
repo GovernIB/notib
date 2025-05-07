@@ -17,8 +17,8 @@ public class FetProcessada implements Fet {
     private Double processada;
 
     @Override
-    public String getNom() {
-        return "Processada";
+    public String getCodi() {
+        return FetEnum.PRC.name();
     }
 
     @Override

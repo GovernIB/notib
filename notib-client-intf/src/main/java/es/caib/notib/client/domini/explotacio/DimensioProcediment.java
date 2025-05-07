@@ -17,8 +17,8 @@ public class DimensioProcediment implements Dimensio {
     private Long procedimentId;
 
     @Override
-    public String getNom() {
-        return "Procediment";
+    public String getCodi() {
+        return DimEnum.PRC.name();
     }
 
     @Override

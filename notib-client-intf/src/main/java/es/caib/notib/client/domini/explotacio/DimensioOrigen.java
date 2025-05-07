@@ -17,8 +17,8 @@ public class DimensioOrigen implements Dimensio {
     private EnviamentOrigen origen;
 
     @Override
-    public String getNom() {
-        return "Origen";
+    public String getCodi() {
+        return DimEnum.ORI.name();
     }
 
     @Override

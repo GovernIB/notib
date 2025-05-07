@@ -17,8 +17,8 @@ public class FetRegAcceptada implements Fet {
     private Double regAcceptada;
 
     @Override
-    public String getNom() {
-        return "Registre SIR acceptat";
+    public String getCodi() {
+        return FetEnum.SIR_ACC.name();
     }
 
     @Override

@@ -17,8 +17,8 @@ public class FetNotEnviada implements Fet {
     private Double notEnviada;
 
     @Override
-    public String getNom() {
-        return "Enviada a Notific@";
+    public String getCodi() {
+        return FetEnum.NOT_ENV.name();
     }
 
     @Override

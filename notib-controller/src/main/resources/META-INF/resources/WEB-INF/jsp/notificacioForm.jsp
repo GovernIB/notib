@@ -403,12 +403,12 @@
 			<div class="form-group"> \
 				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].raoSocialInput"><spring:message code="notificacio.form.camp.titular.rao.social"/> *</label> \
 				<div class="col-xs-12"> \
-					<input maxlength="${raoSocialSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].raoSocialInput" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].raoSocialInput" class="form-control " type="text" value=""> \
+					<input maxlength="${raoSocialSizeJuridica}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].raoSocialInput" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].raoSocialInput" class="form-control " type="text" value=""> \
 					<p class="info-length text-success"> \
 						<span class="glyphicon glyphicon-info-sign"></span> \
 						<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].raoSocialInput">0</span> \
 							<spring:message code="notificacio.form.camp.logitud"/> \
-						<span> ${raoSocialSize}</span> \
+						<span> ${raoSocialSizeJuridica}</span> \
 					</p> \
 				</div> \
 				\
@@ -1814,9 +1814,8 @@
 										<!-- NOM / RAÓ SOCIAL -->
 										<div class="col-md-6 rao nomInput">
 											<not:inputText name="enviaments[${j}].titular.nomInput" textKey="notificacio.form.camp.titular.nom.sol" required="true" inputMaxLength="${nomSize}" showsize="true"/>
-										</div>
 										<div class="col-md-6 rao raoSocialInput">
-											<not:inputText name="enviaments[${j}].titular.raoSocialInput" textKey="notificacio.form.camp.titular.rao.social" required="true" inputMaxLength="${raoSocialSize}" showsize="true"/>
+											<not:inputText name="enviaments[${j}].titular.raoSocialInput" textKey="notificacio.form.camp.titular.rao.social" required="true" inputMaxLength="${raoSocialSizeJuridica}" showsize="true"/>
 										</div>
 										<!-- PRIMER LLINATGE -->
 										<div class="col-md-6 llinatge1">

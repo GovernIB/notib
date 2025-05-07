@@ -12,7 +12,7 @@ databaseChangeLog:
       author: limit
       changes:
         - addColumn:
-            tableName: not_notificacio_enviament
+            tableName: not_notificacio_env
             columns:
               - column:
                   name: registre_motiu

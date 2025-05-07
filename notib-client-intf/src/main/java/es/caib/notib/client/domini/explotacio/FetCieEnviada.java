@@ -17,8 +17,8 @@ public class FetCieEnviada implements Fet {
     private Double cieEnviada;
 
     @Override
-    public String getNom() {
-        return "Enviada a CIE";
+    public String getCodi() {
+        return FetEnum.CIE_ENV.name();
     }
 
     @Override

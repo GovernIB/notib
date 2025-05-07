@@ -130,8 +130,11 @@ public class NotificacioValidator implements Validator {
             return;
         }
         validateAplicacio();
+        var organValid = validateOrgan();
+        if (!organValid) {
+            return;
+        }
         validateProcediment();
-        validateOrgan();
         validateDadesBasiquesNotificacio();
         validateUsuari();
         validateEnviaments();
@@ -263,31 +266,36 @@ public class NotificacioValidator implements Validator {
         return grups;
     }
 
-    private void validateOrgan() {
+    private boolean validateOrgan() {
 
+        var valid = true;
         if (!EnviamentTipus.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) && Strings.isNullOrEmpty(notificacio.getProcedimentCodi())
                 && Strings.isNullOrEmpty(notificacio.getOrganGestor())) {
 
             errors.rejectValue("organGestor", error(ORGAN_NULL, locale));
+            valid = false;
         }
         if (!Strings.isNullOrEmpty(notificacio.getOrganGestor()) && notificacio.getOrganGestor().length() > 64) {
             errors.rejectValue("organGestor", error(ORGAN_SIZE, locale));
+            valid = false;
         }
         if (!Strings.isNullOrEmpty(notificacio.getOrganGestor()) && organGestor != null && !notificacio.getOrganGestor().equals(organGestor.getCodi())) {
             errors.rejectValue("organGestor", error(ORGAN_DIFF_AL_DEL_PROCEDIMENT, locale));
+            valid = false;
         }
         if (organGestor == null) {
             errors.rejectValue("organGestor", error(ORGAN_ALTRE_ENTITAT, locale));
-            return;
+            return false;
         }
-
         if (!OrganGestorEstatEnum.V.equals(organGestor.getEstat())) {
             errors.rejectValue("organGestor", error(ORGAN_NO_VIGENT, locale));
+            valid = false;
         }
-
         if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus()) && entitat != null && !entitat.isOficinaEntitat() && Strings.isNullOrEmpty(organGestor.getOficina())) {
             errors.rejectValue("organGestor", error(ORGAN_I_ENTITA_SENSE_OFICINA_EN_SIR, locale));
+            valid = false;
         }
+        return valid;
     }
 
     private void validateDadesBasiquesNotificacio() {

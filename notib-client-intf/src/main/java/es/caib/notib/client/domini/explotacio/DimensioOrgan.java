@@ -17,8 +17,8 @@ public class DimensioOrgan implements Dimensio {
     private String organCodi;
 
     @Override
-    public String getNom() {
-        return "Organ Gestor";
+    public String getCodi() {
+        return DimEnum.ORG.name();
     }
 
     @Override

@@ -260,6 +260,10 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 				"			<td>"+ enviament.getUuid() + "</td>"+
 				"		</tr>"+
 				"		<tr>"+
+				"			<th>"+ messageHelper.getMessage("notificacio.email.entitat") +"</th>"+
+				"			<td>"+ notificacio.getEntitat() + "</td>"+
+				"		</tr>"+
+				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio.organ") +"</th>"+
 				"			<td>"+ notificacio.getOrganGestor().getCodi() + " - " + notificacio.getOrganGestor().getNom()+ "</td>"+
 				"		</tr>"+
@@ -328,6 +332,8 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 
 		return messageHelper.getMessage("notificacio.email.identificador")+
 						t+ Objects.toString(enviament.getUuid(), "")+"\n"+
+						messageHelper.getMessage("notificacio.email.entitat")+
+						t+ Objects.toString(notificacio.getEntitat(), "")+"\n"+
 						"\t"+messageHelper.getMessage("notificacio.email.notificacio.organ") +
 						t+ Objects.toString(notificacio.getOrganGestor().getCodi() + " - " + notificacio.getOrganGestor().getNom(), "") +"\n"+
 						(notificacio.getProcediment() != null ?
