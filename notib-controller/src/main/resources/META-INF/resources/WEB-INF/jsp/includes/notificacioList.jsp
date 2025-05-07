@@ -881,7 +881,7 @@
         data-toggle="datatable"
         data-url="${urlDatatable}"
         data-search-enabled="false"
-        data-default-order="0"
+        data-default-order="7"
         data-default-dir="desc"
         class="table table-striped table-bordered"
         style="width:100%"
