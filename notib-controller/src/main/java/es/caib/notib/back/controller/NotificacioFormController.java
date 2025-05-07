@@ -637,6 +637,7 @@ public class NotificacioFormController extends BaseUserController {
             model.addAttribute("descripcioSize", notificacioCommand.getDescripcioDefaultSize());
             model.addAttribute("nomSize", notificacioCommand.getNomDefaultSize());
             model.addAttribute( "raoSocialSize", notificacioCommand.getRaoSocialDefaultsize());
+            model.addAttribute( "raoSocialSizeJuridica", notificacioCommand.getRaoSocialJuridicaDefaultsize());
             model.addAttribute("llinatge1Size", notificacioCommand.getLlinatge1DefaultSize());
             model.addAttribute("llinatge2Size", notificacioCommand.getLlinatge2DefaultSize());
             model.addAttribute("emailSize", notificacioCommand.getEmailDefaultSize());
