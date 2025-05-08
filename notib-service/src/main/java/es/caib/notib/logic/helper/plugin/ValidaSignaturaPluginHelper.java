@@ -82,10 +82,13 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 			info.addParam("Error de firma", Boolean.toString(signatureInfoDto.isError()));
 			if (signatureInfoDto.isError()) {
 				info.addParam("Missatge d'error", signatureInfoDto.getErrorMsg());
+				integracioHelper.addAccioError(info, "Error al validar la firma");
+				return signatureInfoDto;
 			}
 			integracioHelper.addAccioOk(info);
 			return signatureInfoDto;
 		} catch (Exception e) {
+			var errorDesc = "Error al validar la firma";
 			var throwable = ExceptionUtils.getRootCause(e) != null ? ExceptionUtils.getRootCause(e) : e;
 			var isNull = throwable == null || Strings.isNullOrEmpty(throwable.getMessage());
 			if (!isNull && (throwable.getMessage().contains("El formato de la firma no es valido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)")
@@ -95,11 +98,11 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 				info.addParam("Document firmat", "false");
 				info.addParam("Error de firma", "false");
 				info.addParam("Missatge d'error", throwable.getMessage());
-				integracioHelper.addAccioOk(info);
+				integracioHelper.addAccioError(info, errorDesc);
 				return SignatureInfoDto.builder().signed(false).error(false).build();
 			}
 			log.error("Error al detectar firma de document", e);
-			integracioHelper.addAccioError(info, "Error al validar la firma", throwable);
+			integracioHelper.addAccioError(info, errorDesc, throwable);
 			// peticionsPlugin.updatePeticioError(getCodiEntitatActual());
 			return SignatureInfoDto.builder().signed(false).error(true).errorMsg(e.getMessage()).build();
 		}
