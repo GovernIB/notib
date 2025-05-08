@@ -896,10 +896,12 @@ $(document).ready(function() {
 																	<td>${enviament.notificaCertificacioMime}</td>
 																</tr>
 															</c:if>
-															<tr>
-																<td><strong><spring:message code="enviament.info.notifica.certificacio.origen"/></strong></td>
-																<td><spring:message code="enviament.datat.origen.enum.${enviament.notificaCertificacioOrigen}"/> (${enviament.notificaCertificacioOrigen})</td>
-															</tr>
+															<c:if test="${not empty enviament.notificaCertificacioOrigen}">
+																<tr>
+																	<td><strong><spring:message code="enviament.info.notifica.certificacio.origen"/></strong></td>
+																	<td><spring:message code="enviament.datat.origen.enum.${enviament.notificaCertificacioOrigen}"/> (${enviament.notificaCertificacioOrigen})</td>
+																</tr>
+															</c:if>
 															<c:if test="${not empty enviament.notificaCertificacioMetadades}">
 																<tr>
 																	<td><strong><spring:message code="enviament.info.notifica.certificacio.metadades"/></strong></td>

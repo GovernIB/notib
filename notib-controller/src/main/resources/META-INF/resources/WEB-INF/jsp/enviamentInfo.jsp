@@ -197,7 +197,15 @@ $(document).ready(function() {
 });
 </script>
 </head>
-<body>
+
+<c:choose>
+	<c:when test="${empty enviament}">
+		<body>
+		<spring:message code="enviament.info.enviament.inexistent" />
+		</body>
+	</c:when>
+	<c:otherwise>
+		<body>
 <div id="contingut-missatges"></div>
 <%-- TODO EVENTS: mostrar missatges d'events --%>
 	<c:if test="${enviament.notificacio.notificaError}">
@@ -690,10 +698,12 @@ $(document).ready(function() {
 											<td>${enviament.notificaCertificacioMime}</td>
 										</tr>
 									</c:if>
-									<tr>
-										<td><strong><spring:message code="enviament.info.notifica.certificacio.origen"/></strong></td>
-										<td><spring:message code="enviament.datat.origen.enum.${enviament.notificaCertificacioOrigen}"/> (${enviament.notificaCertificacioOrigen})</td>
-									</tr>
+									<c:if test="${not empty enviament.notificaCertificacioOrigen}">
+										<tr>
+											<td><strong><spring:message code="enviament.info.notifica.certificacio.origen"/></strong></td>
+											<td><spring:message code="enviament.datat.origen.enum.${enviament.notificaCertificacioOrigen}"/> (${enviament.notificaCertificacioOrigen})</td>
+										</tr>
+									</c:if>
 									<c:if test="${not empty enviament.notificaCertificacioMetadades}">
 										<tr>
 											<td><strong><spring:message code="enviament.info.notifica.certificacio.metadades"/></strong></td>
@@ -972,10 +982,12 @@ $(document).ready(function() {
 														<td>${enviament.entregaPostal.cieCertificacioMime}</td>
 													</tr>
 												</c:if>
-												<tr>
-													<td><strong><spring:message code="enviament.info.notifica.certificacio.origen"/></strong></td>
-													<td><spring:message code="enviament.datat.origen.enum.${enviament.entregaPostal.cieCertificacioOrigen}"/> (${enviament.entregaPostal.cieCertificacioOrigen})</td>
-												</tr>
+												<c:if test="${not empty enviament.enviament.entregaPostal.cieCertificacioOrigen}">
+													<tr>
+														<td><strong><spring:message code="enviament.info.notifica.certificacio.origen"/></strong></td>
+														<td><spring:message code="enviament.datat.origen.enum.${enviament.entregaPostal.cieCertificacioOrigen}"/> (${enviament.entregaPostal.cieCertificacioOrigen})</td>
+													</tr>
+												</c:if>
 												<c:if test="${not empty enviament.entregaPostal.cieCertificacioMetadades}">
 													<tr>
 														<td><strong><spring:message code="enviament.info.notifica.certificacio.metadades"/></strong></td>
@@ -1219,4 +1231,6 @@ $(document).ready(function() {
 		<a href="<c:url value="/notificacions"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>
 	</div>
 </body>
+	</c:otherwise>
+</c:choose>
 </html>

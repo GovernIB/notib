@@ -257,6 +257,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 				}
 			}
 			return enviamentToDto(enviament);
+		} catch (Exception ex) {
+			log.error("Error obtinguent l'enviament amb id " + enviamentId, ex);
+			return null;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
