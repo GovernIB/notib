@@ -227,7 +227,14 @@ $(document).ready(function() {
 }
 </style>
 </head>
-<body>
+<c:choose>
+	<c:when test="${empty notificacio}">
+		<body>
+		<spring:message code="notificacio.info.remesa.inexistent" />
+		</body>
+	</c:when>
+	<c:otherwise>
+		<body>
 	<c:if test="${notificacio.notificaError and notificacio.estat != 'FINALITZADA' and notificacio.estat != 'PROCESSADA'}">
 		<div class="alert alert-danger well-sm">
 			<span class="fa fa-warning text-danger"></span>+
@@ -1246,4 +1253,6 @@ $(document).ready(function() {
 		<button class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar" /></button>
 	</div>
 </body>
+	</c:otherwise>
+</c:choose>
 </html>
