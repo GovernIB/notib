@@ -372,6 +372,7 @@
 										<li><a id="mg_nerror" href="<c:url value="/massiu/registre/notificacionsError"/>"><spring:message code="decorator.menu.massiu.registre"/></a></li>
 										<li><a id="mg_massiu" href="<c:url value="/notificacio/massiva/"/>"><spring:message code="decorator.menu.notificacio.massiva.consulta"/></a></li>
 										<li><a id="mg_esborrades" href="<c:url value="/notificacio/notificacionsEsborrades"/>"><spring:message code="decorator.menu.massiu.esborrades"/></a></li>
+										<li><a id="mg_callback_pendents" href="<c:url value="/callback"/>"><spring:message code="decorator.menu.accions.callback.pendents"/></a></li>
 									</ul>
 								</div>
 
