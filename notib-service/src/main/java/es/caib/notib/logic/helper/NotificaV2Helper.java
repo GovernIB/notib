@@ -662,8 +662,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					envios.setFechaEnvioProgramado(toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
 				}
 			}
-			envios.setConcepto(notificacio.getConcepte().replace('·', '.'));
-			if (notificacio.getDescripcio() != null) {
+			envios.setConcepto(notificacio.getConcepte().replace('·', '.').replace("'","´"));
+			if (!Strings.isNullOrEmpty(notificacio.getDescripcio())) {
 				envios.setDescripcion(notificacio.getDescripcio().replace('·', '.'));
 			}
 			envios.setProcedimiento(notificacio.getProcedimentCodiNotib());
@@ -906,8 +906,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					entregaPostal.setPais(entregaPostalEntity.getDomiciliPaisCodiIso());
 					entregaPostal.setPoblacion(entregaPostalEntity.getDomiciliPoblacio());
 				} else {
-					entregaPostal.setLinea1(entregaPostalEntity.getDomiciliLinea1());
-					entregaPostal.setLinea2(entregaPostalEntity.getDomiciliLinea2());
+					var linea1 = !Strings.isNullOrEmpty(entregaPostalEntity.getDomiciliLinea1()) ?
+									entregaPostalEntity.getDomiciliLinea1().replace("'", "´") : null;
+					var linea2 = !Strings.isNullOrEmpty(entregaPostalEntity.getDomiciliLinea2()) ?
+							entregaPostalEntity.getDomiciliLinea2().replace("'", "´") : null;
+					entregaPostal.setLinea1(linea1);
+					entregaPostal.setLinea2(linea2);
 					entregaPostal.setCodigoPostal(entregaPostalEntity.getDomiciliCodiPostal());
 					entregaPostal.setPais(entregaPostalEntity.getDomiciliPaisCodiIso());
 				}
