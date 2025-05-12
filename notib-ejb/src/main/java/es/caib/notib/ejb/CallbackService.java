@@ -1,8 +1,13 @@
 package es.caib.notib.ejb;
 
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.callback.CallbackDto;
 import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
 /**
@@ -33,5 +38,12 @@ public class CallbackService extends AbstractService<es.caib.notib.logic.intf.se
 	public boolean findByNotificacio(Long notId) {
 		return false;
 	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public PaginaDto<CallbackDto> findPendentsByeEntitat(EntitatDto entitat, PaginacioParamsDto paginacioParams) {
+		return getDelegateService().findPendentsByeEntitat(entitat, paginacioParams);
+	}
+
 
 }

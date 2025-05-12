@@ -2,8 +2,14 @@ package es.caib.notib.logic.service;
 
 import es.caib.notib.logic.helper.CallbackHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.helper.PropertiesConstants;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.callback.CallbackDto;
 import es.caib.notib.logic.intf.service.CallbackService;
 import es.caib.notib.logic.threads.CallbackProcessarPendentsThread;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -13,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +48,10 @@ public class CallbackServiceImpl implements CallbackService {
     private MetricsHelper metricsHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private PaginacioHelper paginacioHelper;
+    @Autowired
+    private ConversioTipusHelper conversioTipusHelper;
 
 	@Override
 	public void processarPendents() {
@@ -130,6 +141,27 @@ public class CallbackServiceImpl implements CallbackService {
 	@Override
 	public boolean findByNotificacio(Long notId) {
 		return false;
+	}
+
+	@Override
+	public PaginaDto<CallbackDto> findPendentsByeEntitat(EntitatDto entitat, PaginacioParamsDto paginacioParams) {
+
+		var pageable = getMappeigPropietats(paginacioParams);
+
+		var pendents = callbackRepository.findPendentsByEntitat(entitat.getId(), pageable);
+		return paginacioHelper.toPaginaDto(pendents, CallbackDto.class);
+	}
+
+	private Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
+
+		Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<>();
+//		mapeigPropietatsOrdenacio.put("procediment.organGestor", new String[] {"pro.organGestor.codi"});
+//		mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organCodi"});
+//		mapeigPropietatsOrdenacio.put("procediment.nom", new String[] {"procedimentNom"});
+//		mapeigPropietatsOrdenacio.put("procedimentDesc", new String[] {"procedimentCodi"});
+//		mapeigPropietatsOrdenacio.put("createdByComplet", new String[] {"createdBy"});
+//		mapeigPropietatsOrdenacio.put("estatString", new String[] {"estat"});
+		return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 	}
 
 	private boolean isTasquesActivesProperty() {

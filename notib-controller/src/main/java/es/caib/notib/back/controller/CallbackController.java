@@ -1,8 +1,12 @@
 package es.caib.notib.back.controller;
 
 import com.google.common.base.Strings;
+import es.caib.notib.back.command.CallbackFiltreCommand;
+import es.caib.notib.back.command.ColumnesRemesesCommand;
+import es.caib.notib.back.command.NotificacioFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
+import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
@@ -14,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -47,15 +52,26 @@ public class CallbackController extends TableAccionsMassivesController {
     @GetMapping
     public String get(HttpServletRequest request, Model model) {
 
-
+        model.addAttribute(new CallbackFiltreCommand());
         return "callback";
+    }
+
+    @PostMapping
+    public String post(HttpServletRequest request, NotificacioFiltreCommand command, Model model) {
+
+        var entitatActual = getEntitatActualComprovantPermisos(request);
+        RequestSessionHelper.actualitzarObjecteSessio(request, CALLBACK_FILTRE, command);
+        model.addAttribute("callbackFiltreCommand", command);
+        return "notificacioList";
     }
 
     @GetMapping(value = "/datatable")
     @ResponseBody
     public DatatablesHelper.DatatablesResponse datatable(HttpServletRequest request) {
 
-        return DatatablesHelper.getDatatableResponse(request, null, "id", SESSION_ATTRIBUTE_SELECCIO);
+        var entitat = getEntitatActualComprovantPermisos(request);
+        var callbacks = callbackService.findPendentsByeEntitat(entitat, DatatablesHelper.getPaginacioDtoFromRequest(request));
+        return DatatablesHelper.getDatatableResponse(request, callbacks, "id", SESSION_ATTRIBUTE_SELECCIO);
     }
 
 }
