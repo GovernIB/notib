@@ -1,6 +1,5 @@
 package es.caib.notib.logic.intf.dto.callback;
 
-import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,12 +13,15 @@ import java.util.Date;
 @AllArgsConstructor
 public class CallbackDto {
 
+    private Long id;
     private String usuariCodi;
+    private String notificacioReferencia;
     private Long notificacioId;
-    private Long enviamentId;
+    private String endpoint;
+    private Date dataCreacio;
     private Date data;
-    private boolean error;
-    private String errorDesc;
-    private CallbackEstatEnumDto estat;
+    private String estat;
     private int intents;
+    private int maxIntents;
+    private Date properIntent;
 }

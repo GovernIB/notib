@@ -38,6 +38,9 @@ public class CallbackEntity extends AbstractPersistable<Long> implements Seriali
     private Long notificacioId;
     @Column(name = "enviament_id", nullable = false)
     private Long enviamentId;
+    @Column(name = "data_creacio", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dataCreacio;
     @Column(name = "data", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date data;

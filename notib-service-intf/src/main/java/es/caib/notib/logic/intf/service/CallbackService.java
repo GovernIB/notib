@@ -7,6 +7,8 @@ import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.callback.CallbackDto;
+import es.caib.notib.logic.intf.dto.callback.CallbackFiltre;
+import es.caib.notib.logic.intf.dto.callback.CallbackResposta;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
@@ -35,5 +37,11 @@ public interface CallbackService {
 	boolean findByNotificacio(Long notId);
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	PaginaDto<CallbackDto> findPendentsByeEntitat(EntitatDto entitat, PaginacioParamsDto paginacioParams);
+	PaginaDto<CallbackDto> findPendentsByeEntitat(EntitatDto entitat, CallbackFiltre filtre, PaginacioParamsDto paginacioParams);
+
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	CallbackResposta enviarCallback(Long callbackId);
+
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	boolean pausarCallback(Long callbackId);
 }

@@ -1,6 +1,3 @@
-callback pendents<%@ page import="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatOrdreFiltre" %>
-<%@ page import="es.caib.notib.client.domini.EnviamentTipus" %><%--<%@ page import="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto" %>--%>
-<%--<%@ page import="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatOrdreFiltre" %>--%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -8,23 +5,6 @@ callback pendents<%@ page import="es.caib.notib.logic.intf.dto.notificacio.Notif
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%
-    es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
-    pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(ssc.getRolActual()));
-    pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()));
-//	pageContext.setAttribute("notificacioComunicacioEnumOptions", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(es.caib.notib.logic.intf.dto.EnviamentTipus.class, "notificacio.tipus.enviament.enum."));
-//	pageContext.setAttribute("notificacioEstatEnumOptions", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(NotificacioEstatOrdreFiltre.class, "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto."));
-    pageContext.setAttribute("notificacioEnviamentTipus", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(EnviamentTipus.class, "es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto."));
-%>
-<c:set var="ampladaConcepte">
-    <c:choose>
-        <c:when test="${isRolActualAdministrador}">35%</c:when>
-        <c:otherwise>55%</c:otherwise>
-    </c:choose>
-</c:set>
-<c:set var="refresh_state_succes"><spring:message code="notificacio.list.enviament.list.refresca.estat.exitos"/></c:set>
-<c:set var="refresh_state_error"><spring:message code="notificacio.list.enviament.list.refresca.estat.error"/></c:set>
-<c:set var="notificacioEnviamentTipus" value="${notificacioEnviamentTipus}" scope="request"/>
 <html>
 <head>
     <title><spring:message code="callback.list.titol"/></title>
@@ -52,8 +32,26 @@ callback pendents<%@ page import="es.caib.notib.logic.intf.dto.notificacio.Notif
     <script>
         $(document).ready(function () {
 
+            $("#filtrar").click(() => {
+                deselecciona()
+            });
 
         });
+
+        function deselecciona() {
+
+            $(".seleccioCount").html(0);
+            $.ajax({
+                type: 'GET',
+                url: "<c:url value="/callback/deselect"/>",
+                async: false,
+                success: function (data) {
+                    $(".seleccioCount").html(data);
+                    $('#callback').webutilDatatable('select-none');
+                }
+            });
+        }
+
     </script>
     <style type="text/css">
         .label-primary {
@@ -103,21 +101,19 @@ callback pendents<%@ page import="es.caib.notib.logic.intf.dto.notificacio.Notif
     </div>
 </script>
 
-<script id="cellFilterTemplate" type="text/x-jsrender">
-    <div class="dropdown">
-        <button type="submit" id="btnFiltrar" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-search"></span></button>
-    </div>
-</script>
-<script id="rowhrefTemplate" type="text/x-jsrender">enviament/{{:id}}/detall</script>
+<%--<script id="cellFilterTemplate" type="text/x-jsrender">--%>
+<%--    <div class="dropdown">--%>
+<%--        <button type="submit" id="btnFiltrar" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-search"></span></button>--%>
+<%--    </div>--%>
+<%--</script>--%>
 <div id="cover-spin"></div>
 <form:form id="form-filtre" action="" method="post" cssClass="well" modelAttribute="callbackFiltreCommand">
     <div class="row">
         <div id="div-concepte" class="col-md-2">
-            <not:inputText name="usuariCodi" inline="true" placeholderKey="enviament.list.concepte"/>
+            <not:inputText name="usuariCodi" inline="true" placeholderKey="callback.list.codi.aplicacio"/>
         </div>
-        <div class="col-md-2">
-            <not:inputSelect id="estat" name="estat" optionMinimumResultsForSearch="0" optionTextKeyAttribute="text" emptyOption="true"
-                             placeholderKey="notificacio.list.filtre.camp.estat" inline="true" templateResultFunction="showEstat" />
+        <div id="div-concepte" class="col-md-2">
+            <not:inputText name="referenciaRemesa" inline="true" placeholderKey="callback.list.remesa.referencia"/>
         </div>
         <div class="col-md-2">
             <not:inputDate name="dataInici" placeholderKey="enviament.list.dataenviament.inici" inline="true" required="false" />
@@ -125,6 +121,10 @@ callback pendents<%@ page import="es.caib.notib.logic.intf.dto.notificacio.Notif
         <div class="col-md-2">
             <not:inputDate name="dataFi" placeholderKey="enviament.list.dataenviament.fi" inline="true" required="false" />
         </div>
+<%--        <div class="col-md-2">--%>
+<%--            <not:inputSelect name="estat" optionMinimumResultsForSearch="0" optionTextKeyAttribute="text" emptyOption="true"--%>
+<%--                             placeholderKey="notificacio.list.filtre.camp.estat" inline="true" templateResultFunction="showEstat" />--%>
+<%--        </div>--%>
 
         <div class="col-md-2 pull-right flex-justify-end">
             <div id="botons-filtre-simple" class="pull-right form-buttons"  style="text-align: right;">
@@ -135,7 +135,7 @@ callback pendents<%@ page import="es.caib.notib.logic.intf.dto.notificacio.Notif
     </div>
 </form:form>
 <table
-        id="enviament"
+        id="callback"
         data-toggle="datatable"
         data-url="<c:url value="/callback/datatable"/>"
         class="table table-striped table-bordered"
@@ -153,10 +153,35 @@ callback pendents<%@ page import="es.caib.notib.logic.intf.dto.notificacio.Notif
         style="width:100%">
     <thead>
     <tr>
-        <th data-col-name="id" data-visible="false"></th>
-        <th data-col-name="usuariCodi" data-converter="date"><spring:message code="enviament.list.datacreacio"/></th>
-        <th data-col-name="notificacioId" data-converter="date"><spring:message code="enviament.list.dataenviament"/></th>
-        <th data-col-name="data" data-converter="datetime"><spring:message code="enviament.list.dataprogramada"/></th>
+<%--        <th data-col-name="id" data-visible="false"></th>--%>
+        <th data-col-name="notificacioId" data-visible="false"></th>
+        <th data-col-name="maxIntents" data-visible="false"></th>
+        <th data-col-name="usuariCodi"><spring:message code="callback.list.codi.aplicacio"/></th>
+        <th data-col-name="endpoint"><spring:message code="callback.list.endpoint"/></th>
+        <th data-col-name="intents" data-template="#intentsTemplate"><spring:message code="callback.list.intent"/>
+            <script id="intentsTemplate" type="text/x-jsrender">
+                {{:intents}}/{{:maxIntents}}
+            </script>
+        </th>
+        <th data-col-name="dataCreacio" data-converter="datetime"><spring:message code="callback.list.data.creacio"/></th>
+        <th data-col-name="data" data-converter="datetime"><spring:message code="callback.list.data.ultim.intent"/></th>
+        <th data-col-name="properIntent" data-converter="datetime"><spring:message code="callback.list.data.propera.execucio"/></th>
+        <th data-col-name="notificacioReferencia" data-template="#referenciaTemplate"><spring:message code="callback.list.remesa.referencia"/>
+            <script id="referenciaTemplate" type="text/x-jsrender">
+                <a href="<c:url value='/notificacio/{{:notificacioId}}/info'/>" data-toggle="modal" data-height="700px" data-processar="true"> {{:notificacioReferencia}}</a>
+            </script>
+        </th>
+        <th data-col-name="id" data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px" style="z-index:99999;">
+            <script id="cellAccionsTemplate" type="text/x-jsrender">
+                <div class="dropdown">
+                    <button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a href="<c:url value="/callback/{{:id}}/enviar"/>"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="callback.boto.enviar"/></a></li>
+                        <li><a href="<c:url value="/callback/{{:id}}/pausar"/>"><span class="fa fa-download"></span>&nbsp; <spring:message code="callback.boto.pausar"/></a></li>
+                    </ul>
+                </div>
+            </script>
+        </th>
     </tr>
     </thead>
 </table>

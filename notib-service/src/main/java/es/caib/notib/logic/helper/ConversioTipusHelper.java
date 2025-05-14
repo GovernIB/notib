@@ -23,6 +23,7 @@ import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.TipusDocumentDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
+import es.caib.notib.logic.intf.dto.callback.CallbackDto;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatFullaDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatSobreDto;
@@ -49,6 +50,7 @@ import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.persist.entity.AplicacioEntity;
+import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.EnviamentTableEntity;
 import es.caib.notib.persist.entity.GrupEntity;
@@ -70,7 +72,9 @@ import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieFormatFullaEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieFormatSobreEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
+import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.CallbackRepository;
+import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.plugin.cie.EnviamentCie;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -112,6 +116,12 @@ public class ConversioTipusHelper {
 	private CallbackRepository callbackRepository;
 	@Autowired
 	private NotificacioTableHelper notificacioTableHelper;
+    @Autowired
+    private AplicacioRepository aplicacioRepository;
+    @Autowired
+    private NotificacioRepository notificacioRepository;
+    @Autowired
+    private ConfigHelper configHelper;
 
 	public ConversioTipusHelper() {
 
@@ -227,6 +237,9 @@ public class ConversioTipusHelper {
 
 		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDto.class).
 				customize(new NotificacioEnviamentEntitytoMapper()).byDefault().register();
+
+		mapperFactory.classMap(CallbackEntity.class, CallbackDto.class).
+				customize(new CallbackEntityDtoMapper()).byDefault().register();
 
 		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDatatableDto.class).
 				field("notificacio.estat", "notificacioEstat").
@@ -600,6 +613,22 @@ public class ConversioTipusHelper {
 		public void mapAtoB(NotificacioMassivaEntity entity, NotificacioMassivaInfoDto dto, MappingContext context) {
 
 			dto.setCreatedDate(Date.from(entity.getCreatedDate().orElseThrow().atZone(ZoneId.systemDefault()).toInstant()));
+		}
+	}
+
+	public class CallbackEntityDtoMapper extends CustomMapper<CallbackEntity, CallbackDto> {
+		@Override
+		public void mapAtoB(CallbackEntity entity, CallbackDto dto, MappingContext context) {
+
+			var notificacio = notificacioRepository.findById(entity.getNotificacioId()).orElseThrow();
+			dto.setNotificacioReferencia(notificacio.getReferencia());
+			var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(entity.getUsuariCodi(), notificacio.getEntitat().getId());
+			if (aplicacio != null) {
+				dto.setEndpoint(aplicacio.getCallbackUrl());
+			}
+			var maxIntents = configHelper.getConfigAsInteger("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max");
+			dto.setMaxIntents(maxIntents);
+			
 		}
 	}
 

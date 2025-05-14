@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - property:
+      dbms: oracle
+      name: varcharUnit
+      value: CHAR
+  - property:
+      dbms: postgresql
+      name: varcharUnit
+      value: ''
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_callback
+            columns:
+              - column:
+                  name: data_creacio
+                  type: TIMESTAMP(6)
+        - sql: "update not_callback set data_creacio = data"

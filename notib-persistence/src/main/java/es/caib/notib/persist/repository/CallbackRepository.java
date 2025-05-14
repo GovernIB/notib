@@ -27,7 +27,16 @@ public interface CallbackRepository extends JpaRepository<CallbackEntity, Long> 
 
     List<CallbackEntity> findByNotificacioIdAndEstatOrderByDataDesc(Long notId, CallbackEstatEnumDto estat);
 
-    @Query("from CallbackEntity c where c.estat = es.caib.notib.logic.intf.dto.CallbackEstatEnumDto.PENDENT order by c.data asc nulls first")
+    @Query("select c from CallbackEntity c join NotificacioEntity n on c.notificacioId = n.id " +
+            "where n.entitat.id = :entitat " +
+            "   and (c.estat = es.caib.notib.logic.intf.dto.CallbackEstatEnumDto.PENDENT " +
+            "   or c.error = true) " +
+            "order by c.data asc nulls first")
     Page<CallbackEntity> findPendentsByEntitat(@Param("entitat") Long entitat, Pageable page);
+
+    @Query("from CallbackEntity c join NotificacioEntity n on c.notificacioId = n.id " +
+            "   where c.estat = es.caib.notib.logic.intf.dto.CallbackEstatEnumDto.PENDENT ")
+    Page<CallbackEntity> findPendents(Pageable page);
+
 
 }

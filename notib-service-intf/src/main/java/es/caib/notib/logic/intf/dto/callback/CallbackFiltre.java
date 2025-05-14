@@ -1,4 +1,4 @@
-package es.caib.notib.back.command;
+package es.caib.notib.logic.intf.dto.callback;
 
 import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
 import lombok.AllArgsConstructor;
@@ -12,11 +12,12 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CallbackFiltreCommand extends FiltreCommand {
+public class CallbackFiltre {
 
     private String usuariCodi;
     private String referenciaRemesa;
     private Date dataInici;
     private Date dataFi;
+    private CallbackEstatEnumDto estat;
     private Boolean fiReintents;
 }

@@ -10,10 +10,13 @@ import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.callback.CallbackDto;
+import es.caib.notib.logic.intf.dto.callback.CallbackFiltre;
+import es.caib.notib.logic.intf.dto.callback.CallbackResposta;
 import es.caib.notib.logic.intf.service.CallbackService;
 import es.caib.notib.logic.threads.CallbackProcessarPendentsThread;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.repository.CallbackRepository;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -42,6 +45,8 @@ public class CallbackServiceImpl implements CallbackService {
 	private CallbackRepository callbackRepository;
 	@Autowired
 	private NotificacioRepository notificacioRepository;
+	@Autowired
+	private NotificacioEnviamentRepository notificacioEnviamentRepository;
     @Autowired
 	private CallbackHelper callbackHelper;
     @Autowired
@@ -144,12 +149,39 @@ public class CallbackServiceImpl implements CallbackService {
 	}
 
 	@Override
-	public PaginaDto<CallbackDto> findPendentsByeEntitat(EntitatDto entitat, PaginacioParamsDto paginacioParams) {
+	public PaginaDto<CallbackDto> findPendentsByeEntitat(EntitatDto entitat, CallbackFiltre filtre, PaginacioParamsDto paginacioParams) {
 
 		var pageable = getMappeigPropietats(paginacioParams);
 
 		var pendents = callbackRepository.findPendentsByEntitat(entitat.getId(), pageable);
 		return paginacioHelper.toPaginaDto(pendents, CallbackDto.class);
+	}
+
+	@Override
+	public CallbackResposta enviarCallback(Long callbackId) {
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			log.info("Notificant canvi al client...");
+			// Recupera l'event
+			var callback = callbackRepository.findById(callbackId).orElseThrow();
+			var enviament = notificacioEnviamentRepository.findById(callback.getEnviamentId()).orElseThrow();
+			try {
+				var notificacio = callbackHelper.notifica(enviament);
+				var isError = (notificacio != null && !notificacio.isErrorLastCallback());
+				return CallbackResposta.builder().ok(isError).errorMsg(callback.getErrorDesc()).build();
+			} catch (Exception e) {
+				log.error(String.format("[Callback]L'enviament [Id: %d] ha provocat la següent excepcio:", enviament.getId()), e);
+				return CallbackResposta.builder().ok(false).errorMsg(e.getMessage()).build();
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	public boolean pausarCallback(Long callbackId) {
+		return false;
 	}
 
 	private Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
@@ -161,7 +193,8 @@ public class CallbackServiceImpl implements CallbackService {
 //		mapeigPropietatsOrdenacio.put("procedimentDesc", new String[] {"procedimentCodi"});
 //		mapeigPropietatsOrdenacio.put("createdByComplet", new String[] {"createdBy"});
 //		mapeigPropietatsOrdenacio.put("estatString", new String[] {"estat"});
-		return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
+//		return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
+		return paginacioHelper.toSpringDataPageable(paginacioParams);
 	}
 
 	private boolean isTasquesActivesProperty() {
