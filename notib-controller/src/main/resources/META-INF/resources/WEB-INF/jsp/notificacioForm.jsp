@@ -1814,6 +1814,7 @@
 										<!-- NOM / RAÓ SOCIAL -->
 										<div class="col-md-6 rao nomInput">
 											<not:inputText name="enviaments[${j}].titular.nomInput" textKey="notificacio.form.camp.titular.nom.sol" required="true" inputMaxLength="${nomSize}" showsize="true"/>
+										</div>
 										<div class="col-md-6 rao raoSocialInput">
 											<not:inputText name="enviaments[${j}].titular.raoSocialInput" textKey="notificacio.form.camp.titular.rao.social" required="true" inputMaxLength="${raoSocialSizeJuridica}" showsize="true"/>
 										</div>

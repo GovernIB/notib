@@ -1755,6 +1755,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	private boolean findOperadorsPare(EntitatDto entitat, String codi) {
 
+		if (Strings.isNullOrEmpty(codi)) {
+			return false;
+		}
 		var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
 		var o = organGestorRepository.findByEntitatAndCodi(e, codi);
 		if (o.getEntregaCie() != null) {

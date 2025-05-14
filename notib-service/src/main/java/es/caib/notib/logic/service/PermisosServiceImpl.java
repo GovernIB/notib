@@ -491,12 +491,14 @@ public class PermisosServiceImpl implements PermisosService {
         var o =  getOrgansAfegintFills(entitat, organs, permis, true);
         // Afegir procediments amb permis directe
         for (var e : procSerAmbPermisDirecte) {
-            if (!entitat.getDir3Codi().equals(e.getOrganGestor().getCodi())) {
+            if (!entitat.getDir3Codi().equals(e.getOrganGestor().getCodi()) && OrganGestorEstatEnum.V.equals(e.getOrganGestor().getEstat())) {
                 o.add(CodiValorDto.builder().codi(e.getOrganGestor().getCodi()).valor(e.getOrganGestor().getCodi() + " - " + e.getOrganGestor().getNom()).build());
             }
         }
         for (var organ : organs) {
+            if (OrganGestorEstatEnum.V.equals(organ.getEstat())) {
                 o.add(CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build());
+            }
         }
         Set<CodiValorDto> organsFinals = new HashSet<>(o);
         return new ArrayList<>(organsFinals);
