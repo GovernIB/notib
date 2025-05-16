@@ -60,7 +60,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "from NotificacioEnviamentEntity e " +
             "     left outer join e.notificacio n " +
             "     left outer join e.entregaPostal ep " +
-            "where (:esNullData = true or n.createdDate < :data) " +
+            "where (:esNullData = true or n.createdDate <= :data) " +
             "  and n.procediment.id is not null " +
             "  and n.organGestor is not null " +
             "group by " +

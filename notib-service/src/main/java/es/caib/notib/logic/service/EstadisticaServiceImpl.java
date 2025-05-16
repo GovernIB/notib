@@ -206,7 +206,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
         explotFetsRepository.deleteAllByTemps(ete);
         List<ExplotFets> estadistiques = explotFetsRepository.getFetsPerEstadistiques(
                 false,
-                Date.from(dema().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+                Date.from(ete.getData().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
 
         int dadaIndex = 0;
         int dimensionIndex = 0;
