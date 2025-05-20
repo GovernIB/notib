@@ -16,7 +16,7 @@ public interface ExplotDimensioRepository extends JpaRepository<ExplotDimensioEn
             + "       n.entitat.id, "
             + "       p.id, "
             + "       n.organGestor.codi, "
-            + "       n.usuariCodi, "
+            + "       CASE WHEN n.usuariCodi is null THEN 'DESCONEGUT' ELSE n.usuariCodi END, "
             + "       n.enviamentTipus, "
             + "       n.origen) "
             + "  FROM NotificacioEntity n "
