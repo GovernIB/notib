@@ -2,11 +2,13 @@ package es.caib.notib.persist.entity.explotacio;
 
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.explotacio.EnviamentOrigen;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class ExplotFets {
 
     private final Long entitatId;
@@ -16,6 +18,8 @@ public class ExplotFets {
     private final String usuariCodi = "DESCONEGUT";
     private final EnviamentTipus tipus;
     private final EnviamentOrigen origen;
+
+    // Total en estat
     private final long pendent;
     private final long regEnviamentError;
     private final long registrada;
@@ -33,7 +37,64 @@ public class ExplotFets {
     private final long cieError;
     private final long processada;
 
-    public ExplotFets(Long entitatId, Long procedimentId, String organCodi, String usuariCodi, EnviamentTipus tipus, EnviamentOrigen origen, long pendent, long regEnviamentError, long registrada, long regAcceptada, long regRebutjada, long notEnviamentError, long notEnviada, long notNotificada, long notRebutjada, long notExpirada, long cieEnviamentError, long cieEnviada, long cieNotificada, long cieRebutjada, long cieError, long processada) {
+    // Transicions
+    private final Long trCreades;
+    private final Long trRegEnviadesError;
+    private final Long trRegistrades;
+    private final Long trSirAcceptades;
+    private final Long trSirRebutjades;
+    private final Long trNotEnviadesError;
+    private final Long trNotEnviades;
+    private final Long trNotNotificades;
+    private final Long trNotRebujtades;
+    private final Long trNotExpirades;
+    private final Long trNotFallades;
+    private final Long trCieEnviadesError;
+    private final Long trCieEnviades;
+    private final Long trCieNotificades;
+    private final Long trCieRebutjades;
+    private final Long trCieCancelades;
+    private final Long trCieFallades;
+    private final Long trEmailEnviadesError;
+    private final Long trEmailEnviades;
+
+    // Temps mig en estat
+    private final Long temsMigPendent;
+    private final Long temsMigRegistrada;
+    private final Long temsMigNotEnviada;
+    private final Long temsMigCieEnviada;
+    private final Long temsMigTotal;
+
+    // Nombre mig d'intents
+    private final Long intentsRegistre;
+    private final Long intentsSir;
+    private final Long intentsNotEnviament;
+    private final Long intentsCieEnviament;
+    private final Long intentsEmailEnviament;
+
+    public ExplotFets(
+            Long entitatId,
+            Long procedimentId,
+            String organCodi,
+            String usuariCodi,
+            EnviamentTipus tipus,
+            EnviamentOrigen origen,
+            long pendent,
+            long regEnviamentError,
+            long registrada,
+            long regAcceptada,
+            long regRebutjada,
+            long notEnviamentError,
+            long notEnviada,
+            long notNotificada,
+            long notRebutjada,
+            long notExpirada,
+            long cieEnviamentError,
+            long cieEnviada,
+            long cieNotificada,
+            long cieRebutjada,
+            long cieError,
+            long processada) {
         this.entitatId = entitatId;
         this.procedimentId = procedimentId;
         this.organCodi = organCodi;
@@ -56,47 +117,36 @@ public class ExplotFets {
         this.cieRebutjada = cieRebutjada;
         this.cieError = cieError;
         this.processada = processada;
+
+        this.trCreades = null;
+        this.trRegEnviadesError = null;
+        this.trRegistrades = null;
+        this.trSirAcceptades = null;
+        this.trSirRebutjades = null;
+        this.trNotEnviadesError = null;
+        this.trNotEnviades = null;
+        this.trNotNotificades = null;
+        this.trNotRebujtades = null;
+        this.trNotExpirades = null;
+        this.trNotFallades = null;
+        this.trCieEnviadesError = null;
+        this.trCieEnviades = null;
+        this.trCieNotificades = null;
+        this.trCieRebutjades = null;
+        this.trCieCancelades = null;
+        this.trCieFallades = null;
+        this.trEmailEnviadesError = null;
+        this.trEmailEnviades = null;
+        this.temsMigPendent = null;
+        this.temsMigRegistrada = null;
+        this.temsMigNotEnviada = null;
+        this.temsMigCieEnviada = null;
+        this.temsMigTotal = null;
+        this.intentsRegistre = null;
+        this.intentsSir = null;
+        this.intentsNotEnviament = null;
+        this.intentsCieEnviament = null;
+        this.intentsEmailEnviament = null;
     }
 
-//    public ExplotFets minus(ExplotFets fetAnterior) {
-//        if (!this.entitatId.equals(fetAnterior.entitatId)) {
-//            throw new RuntimeException("Error al obtenir les dades estadístiques. Entitat incorrecte");
-//        }
-//        if (!this.procedimentId.equals(fetAnterior.procedimentId)) {
-//            throw new RuntimeException("Error al obtenir les dades estadístiques. Procediment incorrecte");
-//        }
-//        if (!this.organCodi.equals(fetAnterior.organCodi)) {
-//            throw new RuntimeException("Error al obtenir les dades estadístiques. Organ incorrecte");
-//        }
-//        if (!this.tipus.equals(fetAnterior.tipus)) {
-//            throw new RuntimeException("Error al obtenir les dades estadístiques. Tipus incorrecte");
-//        }
-//        if (!this.origen.equals(fetAnterior.origen)) {
-//            throw new RuntimeException("Error al obtenir les dades estadístiques. Origen incorrecte");
-//        }
-//        return ExplotFets.builder()
-//                .entitatId(this.entitatId)
-//                .procedimentId(this.procedimentId)
-//                .organCodi(this.organCodi)
-////                .usuariCodi(this.usuariCodi)
-//                .tipus(this.tipus)
-//                .origen(this.origen)
-//                .pendent(this.pendent - fetAnterior.getPendent())
-//                .regEnviamentError(this.regEnviamentError - fetAnterior.getRegEnviamentError())
-//                .registrada(this.registrada - fetAnterior.getRegistrada())
-//                .regAcceptada(this.regAcceptada - fetAnterior.getRegAcceptada())
-//                .regRebutjada(this.regRebutjada - fetAnterior.getRegRebutjada())
-//                .notEnviamentError(this.notEnviamentError - fetAnterior.getNotEnviamentError())
-//                .notEnviada(this.notEnviada - fetAnterior.getNotEnviada())
-//                .notNotificada(this.notNotificada - fetAnterior.getNotNotificada())
-//                .notRebutjada(this.notRebutjada - fetAnterior.getNotRebutjada())
-//                .notExpirada(this.notExpirada - fetAnterior.getNotExpirada())
-//                .cieEnviamentError(this.cieEnviamentError - fetAnterior.getCieEnviamentError())
-//                .cieEnviada(this.cieEnviada - fetAnterior.getCieEnviada())
-//                .cieNotificada(this.cieNotificada - fetAnterior.getCieNotificada())
-//                .cieRebutjada(this.cieRebutjada - fetAnterior.getCieRebutjada())
-//                .cieError(this.cieError - fetAnterior.getCieError())
-//                .processada(this.processada - fetAnterior.getProcessada())
-//                .build();
-//    }
 }

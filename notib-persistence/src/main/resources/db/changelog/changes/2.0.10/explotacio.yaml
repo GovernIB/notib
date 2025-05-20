@@ -1,0 +1,398 @@
+databaseChangeLog:
+  - changeSet:
+      id: 17458513344726
+      author: limit
+      changes:
+        - createTable:
+            tableName: not_explot_env_info
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: data_creacio
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: temps_pendent
+                  type: BIGINT
+              - column:
+                  name: data_reg_env_error
+                  type: TIMESTAMP
+              - column:
+                  name: intents_reg_enviament
+                  type: INT
+              - column:
+                  name: data_registrada
+                  type: TIMESTAMP
+              - column:
+                  name: temps_registrada
+                  type: BIGINT
+              - column:
+                  name: intents_sir_consulta
+                  type: INT
+              - column:
+                  name: data_reg_acceptada
+                  type: TIMESTAMP
+              - column:
+                  name: data_reg_rebutjada
+                  type: TIMESTAMP
+              - column:
+                  name: data_not_enviament_error
+                  type: TIMESTAMP
+              - column:
+                  name: intents_not_enviament
+                  type: INT
+              - column:
+                  name: data_not_enviada
+                  type: TIMESTAMP
+              - column:
+                  name: temps_not_enviada
+                  type: BIGINT
+              - column:
+                  name: data_not_notificada
+                  type: TIMESTAMP
+              - column:
+                  name: data_not_rebutjada
+                  type: TIMESTAMP
+              - column:
+                  name: data_not_expirada
+                  type: TIMESTAMP
+              - column:
+                  name: data_not_error
+                  type: TIMESTAMP
+              - column:
+                  name: data_cie_enviament_error
+                  type: TIMESTAMP
+              - column:
+                  name: intents_cie_enviament
+                  type: INT
+              - column:
+                  name: data_cie_enviada
+                  type: TIMESTAMP
+              - column:
+                  name: temps_cie_enviada
+                  type: BIGINT
+              - column:
+                  name: data_cie_notificada
+                  type: TIMESTAMP
+              - column:
+                  name: data_cie_rebutjada
+                  type: TIMESTAMP
+              - column:
+                  name: data_cie_cancelada
+                  type: TIMESTAMP
+              - column:
+                  name: data_cie_error
+                  type: TIMESTAMP
+              - column:
+                  name: data_email_enviament_error
+                  type: TIMESTAMP
+              - column:
+                  name: intents_email_enviament
+                  type: INT
+              - column:
+                  name: data_email_enviada
+                  type: TIMESTAMP
+              - column:
+                  name: temps_total
+                  type: BIGINT
+              - column:
+                  name: enviament_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            columnNames: enviament_id
+            tableName: not_explot_env_info
+            constraintName: not_explot_env_uk
+
+        # Índexs per dates, aplicant només a DATE(data) per parts LocalDate
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dcreacio_i
+            columns:
+              - name: "TRUNC(data_creacio)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dreg_env_error_i
+            columns:
+              - name: "TRUNC(data_reg_env_error)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dregistrada_i
+            columns:
+              - name: "TRUNC(data_registrada)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dreg_acceptada_i
+            columns:
+              - name: "TRUNC(data_reg_acceptada)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dreg_rebutjada_i
+            columns:
+              - name: "TRUNC(data_reg_rebutjada)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dnot_env_error_i
+            columns:
+              - name: "TRUNC(data_not_enviament_error)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dnot_enviada_i
+            columns:
+              - name: "TRUNC(data_not_enviada)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dnot_notificada_i
+            columns:
+              - name: "TRUNC(data_not_notificada)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dnot_rebutjada_i
+            columns:
+              - name: "TRUNC(data_not_rebutjada)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dnot_expirada_i
+            columns:
+              - name: "TRUNC(data_not_expirada)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dnot_error_i
+            columns:
+              - name: "TRUNC(data_not_error)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dcie_env_error_i
+            columns:
+              - name: "TRUNC(data_cie_enviament_error)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dcie_enviada_i
+            columns:
+              - name: "TRUNC(data_cie_enviada)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dcie_notificada_i
+            columns:
+              - name: "TRUNC(data_cie_notificada)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dcie_rebutjada_i
+            columns:
+              - name: "TRUNC(data_cie_rebutjada)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dcie_cancelada_i
+            columns:
+              - name: "TRUNC(data_cie_cancelada)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_dcie_error_i
+            columns:
+              - name: "TRUNC(data_cie_error)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_demail_env_error_i
+            columns:
+              - name: "TRUNC(data_email_enviament_error)"
+        - createIndex:
+            tableName: not_explot_env_info
+            indexName: not_expinfo_demail_enviada_i
+            columns:
+              - name: "TRUNC(data_email_enviada)"
+        - sql:
+            dbms: oracle
+            sql: "GRANT SELECT, UPDATE, INSERT, DELETE ON not_explot_env_info TO www_notib;"
+
+  - changeSet:
+      id: 17458513344727
+      author: limit
+      changes:
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: pendent
+            newColumnName: tot_pendent
+            columnDataType: BIGINT
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: reg_env_error
+            newColumnName: tot_reg_err
+            columnDataType: BIGINT
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: registrada
+            newColumnName: tot_registr
+            columnDataType: BIGINT
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: reg_acceptada
+            newColumnName: tot_sir_acc
+            columnDataType: BIGINT
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: reg_rebutjada
+            newColumnName: tot_sir_reb
+            columnDataType: BIGINT
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: not_env_error
+            newColumnName: tot_not_err
+            columnDataType: BIGINT
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: not_enviada
+            newColumnName: tot_not_env
+            columnDataType: BIGINT
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: not_notificada
+            newColumnName: tot_not_not
+            columnDataType: BIGINT
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: not_rebutjada
+            newColumnName: tot_not_reb
+            columnDataType: BIGINT
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: not_expirada
+            newColumnName: tot_not_exp
+            columnDataType: BIGINT
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: cie_env_error
+            newColumnName: tot_cie_err
+            columnDataType: BIGINT
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: cie_enviada
+            newColumnName: tot_cie_env
+            columnDataType: BIGINT
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: cie_notificada
+            newColumnName: tot_cie_not
+            columnDataType: BIGINT
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: cie_rebutjada
+            newColumnName: tot_cie_reb
+            columnDataType: BIGINT
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: cie_error
+            newColumnName: tot_cie_fal
+            columnDataType: BIGINT
+        - renameColumn:
+            tableName: not_explot_fet
+            oldColumnName: processada
+            newColumnName: tot_process
+            columnDataType: BIGINT
+
+        - addColumn:
+            tableName: not_explot_fet
+            columns:
+              - column:
+                  name: tr_creades
+                  type: BIGINT
+              - column:
+                  name: tr_reg_err
+                  type: BIGINT
+              - column:
+                  name: tr_registr
+                  type: BIGINT
+              - column:
+                  name: tr_sir_acc
+                  type: BIGINT
+              - column:
+                  name: tr_sir_reb
+                  type: BIGINT
+              - column:
+                  name: tr_not_err
+                  type: BIGINT
+              - column:
+                  name: tr_not_env
+                  type: BIGINT
+              - column:
+                  name: tr_not_not
+                  type: BIGINT
+              - column:
+                  name: tr_not_reb
+                  type: BIGINT
+              - column:
+                  name: tr_not_exp
+                  type: BIGINT
+              - column:
+                  name: tr_not_fal
+                  type: BIGINT
+              - column:
+                  name: tr_cie_err
+                  type: BIGINT
+              - column:
+                  name: tr_cie_env
+                  type: BIGINT
+              - column:
+                  name: tr_cie_not
+                  type: BIGINT
+              - column:
+                  name: tr_cie_reb
+                  type: BIGINT
+              - column:
+                  name: tr_cie_can
+                  type: BIGINT
+              - column:
+                  name: tr_cie_fal
+                  type: BIGINT
+              - column:
+                  name: tr_eml_err
+                  type: BIGINT
+              - column:
+                  name: tr_eml_env
+                  type: BIGINT
+
+        # Afegir columnes de temps mig en estat
+        - addColumn:
+            tableName: not_explot_fet
+            columns:
+              - column:
+                  name: tmp_pnd
+                  type: BIGINT
+              - column:
+                  name: tmp_reg
+                  type: BIGINT
+              - column:
+                  name: tmp_not
+                  type: BIGINT
+              - column:
+                  name: tmp_cie
+                  type: BIGINT
+              - column:
+                  name: tmp_tot
+                  type: BIGINT
+
+        # Afegir columnes de nombre mig d'intents
+        - addColumn:
+            tableName: not_explot_fet
+            columns:
+              - column:
+                  name: int_reg
+                  type: BIGINT
+              - column:
+                  name: int_sir
+                  type: BIGINT
+              - column:
+                  name: int_not
+                  type: BIGINT
+              - column:
+                  name: int_cie
+                  type: BIGINT
+              - column:
+                  name: int_eml
+                  type: BIGINT
