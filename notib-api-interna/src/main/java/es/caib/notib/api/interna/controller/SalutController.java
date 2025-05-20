@@ -32,8 +32,7 @@ public class SalutController {
     @GetMapping("/appInfo")
     public AppInfo appInfo() throws IOException {
 
-        ManifestInfo manifestInfo = getManifestInfo();
-
+        var manifestInfo = getManifestInfo();
         return AppInfo.builder()
                 .codi("NOT")
                 .nom("Notib")
@@ -47,11 +46,8 @@ public class SalutController {
     @GetMapping("/salut")
     public SalutInfo health(HttpServletRequest request) throws IOException {
 
-        ManifestInfo manifestInfo = getManifestInfo();
-
-        return salutService.checkSalut(
-                manifestInfo.getVersion(),
-                request.getRequestURL().toString() + "Performance");
+        var manifestInfo = getManifestInfo();
+        return salutService.checkSalut(manifestInfo.getVersion(), request.getRequestURL().toString() + "Performance");
     }
 
     @GetMapping("/salutPerformance")
@@ -60,6 +56,7 @@ public class SalutController {
     }
 
     private ManifestInfo getManifestInfo() throws IOException {
+
         if (manifestInfo == null) {
             manifestInfo = buildManifestInfo();
         }
@@ -68,8 +65,8 @@ public class SalutController {
     }
 
     private ManifestInfo buildManifestInfo() throws IOException {
-        ManifestInfo manifestInfo = ManifestInfo.builder().build();
 
+        ManifestInfo manifestInfo = ManifestInfo.builder().build();
         var manifest = new Manifest(servletContext.getResourceAsStream("/" + JarFile.MANIFEST_NAME));
         var manifestAtributs = manifest.getMainAttributes();
         Map<String, Object>manifestAtributsMap = new HashMap<>();
@@ -94,6 +91,7 @@ public class SalutController {
     }
 
     public static Date getDate(String isoDate) {
+
         try {
             Instant instant = Instant.parse(isoDate);
             return Date.from(instant);
@@ -106,6 +104,7 @@ public class SalutController {
     @Builder
     @Getter
     public static class ManifestInfo {
+
         private final String version;
         private final Date buildDate;
         private final String buildJDK;
