@@ -17,6 +17,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
@@ -41,6 +42,9 @@ public class CallbackEntity extends AbstractPersistable<Long> implements Seriali
     @Column(name = "data_creacio", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataCreacio;
+    @Column(name = "ultim_intent", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date ultimIntent;
     @Column(name = "data", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date data;
@@ -53,6 +57,8 @@ public class CallbackEntity extends AbstractPersistable<Long> implements Seriali
     private CallbackEstatEnumDto estat;
     @Column(name = "intents")
     private int intents;
+    @Column(name = "pausat", nullable = false)
+    private boolean pausat;
 
     public CallbackEntity() {
         data = new Date();
@@ -64,6 +70,7 @@ public class CallbackEntity extends AbstractPersistable<Long> implements Seriali
         this.intents = intents;
         this.estat = estat;
         var cal = Calendar.getInstance();
+        this.ultimIntent = cal.getTime();
         cal.add(Calendar.SECOND, (int) (((double)reintentsPeriode/7200)*Math.pow(3, intents)));
         this.data = cal.getTime();
         this.error = StringUtils.isNotBlank(error);

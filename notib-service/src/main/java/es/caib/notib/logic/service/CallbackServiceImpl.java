@@ -6,7 +6,6 @@ import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.helper.PropertiesConstants;
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.callback.CallbackDto;
@@ -14,7 +13,9 @@ import es.caib.notib.logic.intf.dto.callback.CallbackFiltre;
 import es.caib.notib.logic.intf.dto.callback.CallbackResposta;
 import es.caib.notib.logic.intf.service.CallbackService;
 import es.caib.notib.logic.threads.CallbackProcessarPendentsThread;
+import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.CallbackRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
@@ -27,7 +28,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -149,12 +152,18 @@ public class CallbackServiceImpl implements CallbackService {
 	}
 
 	@Override
-	public PaginaDto<CallbackDto> findPendentsByeEntitat(EntitatDto entitat, CallbackFiltre filtre, PaginacioParamsDto paginacioParams) {
+	public PaginaDto<CallbackDto> findPendentsByEntitat(CallbackFiltre filtre, PaginacioParamsDto paginacioParams) {
 
 		var pageable = getMappeigPropietats(paginacioParams);
-
-		var pendents = callbackRepository.findPendentsByEntitat(entitat.getId(), pageable);
-		return paginacioHelper.toPaginaDto(pendents, CallbackDto.class);
+		var map = callbackRepository.findIdAndAdjustedDate();
+		filtre.setMaxReintents(configHelper.getConfigAsInteger("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max"));
+		var pendents = callbackRepository.findPendentsByEntitat(filtre, pageable);
+		var dtos = paginacioHelper.toPaginaDto(pendents, CallbackDto.class);
+		for (var pendent : dtos.getContingut()) {
+			var properIntent = map.get(pendent.getId());
+			pendent.setProperIntent(properIntent);
+		}
+		return dtos;
 	}
 
 	@Override
@@ -180,21 +189,60 @@ public class CallbackServiceImpl implements CallbackService {
 	}
 
 	@Override
-	public boolean pausarCallback(Long callbackId) {
-		return false;
+	public CallbackResposta enviarCallback(Set<Long> callbacks) {
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			log.info("Enviant callbacks massius");
+			CallbackEntity callback;
+			NotificacioEnviamentEntity enviament;
+			var isError = false;
+			for (var callbackId : callbacks) {
+				callback = callbackRepository.findById(callbackId).orElseThrow();
+				enviament = notificacioEnviamentRepository.findById(callback.getEnviamentId()).orElseThrow();
+				try {
+					var notificacio = callbackHelper.notifica(enviament);
+					isError = isError || (notificacio != null && !notificacio.isErrorLastCallback());
+				} catch (Exception e) {
+					log.error(String.format("[Callback]L'enviament [Id: %d] ha provocat la següent excepcio:", enviament.getId()), e);
+				}
+			}
+			return CallbackResposta.builder().ok(isError).errorMsg("Error").build();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	@Transactional
+	public boolean pausarCallback(Long callbackId, boolean pausat) {
+		try {
+			var callback = callbackRepository.findById(callbackId).orElseThrow();
+			callback.setPausat(pausat);
+			return true;
+		} catch (Exception e) {
+			log.error("Error pausant el callback amb id " + callbackId, e);
+			return false;
+		}
+	}
+
+	@Override
+	@Transactional
+	public CallbackResposta pausarCallback(Set<Long> callbacks, boolean pausat) {
+		return null;
 	}
 
 	private Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
 
 		Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<>();
 //		mapeigPropietatsOrdenacio.put("procediment.organGestor", new String[] {"pro.organGestor.codi"});
-//		mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organCodi"});
-//		mapeigPropietatsOrdenacio.put("procediment.nom", new String[] {"procedimentNom"});
+		mapeigPropietatsOrdenacio.put("usuariCodi", new String[] {"usuariCodi"});
+		mapeigPropietatsOrdenacio.put("usuariCodi", new String[] {"endpoint"});
 //		mapeigPropietatsOrdenacio.put("procedimentDesc", new String[] {"procedimentCodi"});
-//		mapeigPropietatsOrdenacio.put("createdByComplet", new String[] {"createdBy"});
+		mapeigPropietatsOrdenacio.put("data", new String[] {"data"});
 //		mapeigPropietatsOrdenacio.put("estatString", new String[] {"estat"});
 //		return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
-		return paginacioHelper.toSpringDataPageable(paginacioParams);
+		return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 	}
 
 	private boolean isTasquesActivesProperty() {

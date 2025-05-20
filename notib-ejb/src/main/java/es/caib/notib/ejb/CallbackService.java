@@ -1,6 +1,5 @@
 package es.caib.notib.ejb;
 
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.callback.CallbackDto;
@@ -11,6 +10,7 @@ import org.springframework.context.annotation.Primary;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
+import java.util.Set;
 
 /**
  * Implementació de CallbackService com a EJB que empra una clase
@@ -43,8 +43,8 @@ public class CallbackService extends AbstractService<es.caib.notib.logic.intf.se
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public PaginaDto<CallbackDto> findPendentsByeEntitat(EntitatDto entitat, CallbackFiltre filtre, PaginacioParamsDto paginacioParams) {
-		return getDelegateService().findPendentsByeEntitat(entitat, filtre, paginacioParams);
+	public PaginaDto<CallbackDto> findPendentsByEntitat(CallbackFiltre filtre, PaginacioParamsDto paginacioParams) {
+		return getDelegateService().findPendentsByEntitat(filtre, paginacioParams);
 	}
 
 	@Override
@@ -55,8 +55,20 @@ public class CallbackService extends AbstractService<es.caib.notib.logic.intf.se
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public boolean pausarCallback(Long callbackId) {
-		return getDelegateService().pausarCallback(callbackId);
+	public CallbackResposta enviarCallback(Set<Long> callbacks) {
+		return getDelegateService().enviarCallback(callbacks);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public boolean pausarCallback(Long callbackId, boolean pausat) {
+		return getDelegateService().pausarCallback(callbackId, pausat);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public CallbackResposta pausarCallback(Set<Long> callbacks, boolean pausat) {
+		return getDelegateService().pausarCallback(callbacks, pausat);
 	}
 
 

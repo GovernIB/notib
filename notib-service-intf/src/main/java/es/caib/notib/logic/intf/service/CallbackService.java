@@ -11,6 +11,9 @@ import es.caib.notib.logic.intf.dto.callback.CallbackFiltre;
 import es.caib.notib.logic.intf.dto.callback.CallbackResposta;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * Mètodes de servei per a gestionar les cridades al servei callback dels clients
  * de Notib. 
@@ -37,11 +40,18 @@ public interface CallbackService {
 	boolean findByNotificacio(Long notId);
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	PaginaDto<CallbackDto> findPendentsByeEntitat(EntitatDto entitat, CallbackFiltre filtre, PaginacioParamsDto paginacioParams);
+	PaginaDto<CallbackDto> findPendentsByEntitat(CallbackFiltre filtre, PaginacioParamsDto paginacioParams);
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	CallbackResposta enviarCallback(Long callbackId);
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	boolean pausarCallback(Long callbackId);
+	CallbackResposta enviarCallback(Set<Long> callbacks);
+
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	boolean pausarCallback(Long callbackId, boolean pausat);
+
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	CallbackResposta pausarCallback(Set<Long> callbacks, boolean pausat);
+
 }

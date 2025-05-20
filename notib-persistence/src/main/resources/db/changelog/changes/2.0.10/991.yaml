@@ -17,4 +17,11 @@ databaseChangeLog:
               - column:
                   name: data_creacio
                   type: TIMESTAMP(6)
+              - column:
+                  name: ultim_intent
+                  type: TIMESTAMP(6)
+              - column:
+                  name: pausat
+                  type: boolean
+                  defaultValue: 0
         - sql: "update not_callback set data_creacio = data"

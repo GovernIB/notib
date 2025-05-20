@@ -41,7 +41,6 @@ let deseleccionar = () => {
 
 let selectionAll = false;
 function initEvents($table, url_prefix, eventMessages) {
-
     $table.on('selectionchange.dataTable', function (e, accio, ids) {
         if (!selectionAll && (accio === "select" || accio === "deselect")) {
             $.get(
@@ -209,18 +208,44 @@ function initEvents($table, url_prefix, eventMessages) {
             return false;
         });
 
-        // $('#enviarCallback').on('click', function() {
-        //
-        //     let count = Number($(".seleccioCount").html());
-        //     if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
-        //         return;
-        //     }
-        //     if(confirm(eventMessages['confirm-enviar-callback'])){
-        //         location.href =  url_prefix + "/enviar/callback";
-        //         setTimeout(() => $table.DataTable().rows().deselect(), 100);
-        //     }
-        //     return false;
-        // });
+        $('#enviarCallbacks').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
+            if(confirm(eventMessages['confirm-enviar-callback'])){
+                location.href =  url_prefix + "/enviar";
+                setTimeout(() => $table.DataTable().rows().deselect(), 100);
+            }
+            return false;
+        });
+
+        $('#pausarCallbacks').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
+            if(confirm(eventMessages['confirm-enviar-callback'])){
+                location.href =  url_prefix + "/pausar";
+                setTimeout(() => $table.DataTable().rows().deselect(), 100);
+            }
+            return false;
+        });
+
+        $('#activarCallbacks').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
+            if(confirm(eventMessages['confirm-enviar-callback'])){
+                location.href =  url_prefix + "/activar";
+                setTimeout(() => $table.DataTable().rows().deselect(), 100);
+            }
+            return false;
+        });
 
         $("#exportarODS").on("click", (e) => {
 

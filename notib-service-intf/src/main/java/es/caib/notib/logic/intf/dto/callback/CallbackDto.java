@@ -19,9 +19,10 @@ public class CallbackDto {
     private Long notificacioId;
     private String endpoint;
     private Date dataCreacio;
-    private Date data;
+    private Date ultimIntent;
     private String estat;
     private int intents;
     private int maxIntents;
     private Date properIntent;
+    private boolean pausat;
 }

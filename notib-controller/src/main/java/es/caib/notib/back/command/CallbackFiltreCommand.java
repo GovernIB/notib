@@ -1,6 +1,8 @@
 package es.caib.notib.back.command;
 
 import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
+import es.caib.notib.logic.intf.dto.SiNo;
+import es.caib.notib.logic.intf.dto.callback.CallbackFiltre;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,9 +16,16 @@ import java.util.Date;
 @NoArgsConstructor
 public class CallbackFiltreCommand extends FiltreCommand {
 
+    private Long id;
     private String usuariCodi;
     private String referenciaRemesa;
-    private Date dataInici;
-    private Date dataFi;
-    private Boolean fiReintents;
+    private String dataInici;
+    private String dataFi;
+    private SiNo fiReintents;
+
+    public CallbackFiltre asDto() {
+        return CallbackFiltre.builder().usuariCodi(usuariCodi).dataInici(dataInici).dataFi(dataFi).referenciaRemesa(referenciaRemesa).fiReintents(fiReintents).build();
+    }
+
+
 }

@@ -85,6 +85,7 @@ public class CallbackHelper {
 				c = CallbackEntity.builder().usuariCodi(usuari.getCodi()).notificacioId(not.getId()).enviamentId(env.getId()).build();
 			}
 			c.setData(new Date());
+			c.setDataCreacio(new Date());
 			c.setError(isError);
 			c.setErrorDesc(errorDesc);
 			c.setEstat(CallbackEstatEnumDto.PENDENT);
