@@ -5,6 +5,7 @@ import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.helper.RegistreHelper;
 import es.caib.notib.logic.helper.RegistreSmHelper;
+import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
@@ -26,13 +27,13 @@ import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import joptsimple.internal.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jms.JmsException;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.StringJoiner;
+
+import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CSR;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -137,6 +138,7 @@ public class RegistreServiceImpl implements RegistreService {
     @Override
     public RespostaSirAdviser sincronitzarEnviamentSir(SirAdviser adviser) {
 
+        long start = System.currentTimeMillis();
         var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "Recepció de canvi d'estat via Adviser", IntegracioAccioTipusEnumDto.RECEPCIO,
                 new AccioParam("Num.Registre", adviser.getRegistreNumero()),
                 new AccioParam("Entitat DIR3", adviser.getEntitatDir3Codi()));
@@ -161,11 +163,13 @@ public class RegistreServiceImpl implements RegistreService {
             }
             registreHelper.enviamentRefrescarEstatRegistre(enviament.getId());
             integracioHelper.addAccioOk(info);
+            SubsistemesHelper.addSuccessOperation(CSR, System.currentTimeMillis() - start);
             return RespostaSirAdviser.builder().ok(true).build();
         } catch (Exception ex) {
             var error = "[SIR ADVISER] Error sincronitzant l'enviament SIR ";
             log.error(error, ex);
             integracioHelper.addAccioError(info, error + ex.getMessage());
+            SubsistemesHelper.addErrorOperation(CSR, System.currentTimeMillis() - start);
             return RespostaSirAdviser.builder().ok(false).errorDescripcio("Error inesperat al sincronitzar l'enviament SIR " + ex.getMessage()).build();
         }
     }

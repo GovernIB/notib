@@ -1,5 +1,11 @@
 CREATE TABLE not_explot_env_info (
     id                         NUMBER(38, 0) NOT NULL,
+    entitat_id                 NUMBER(38, 0) NOT NULL,
+    procediment_id             NUMBER(38, 0),
+    organ_gestor_codi          VARCHAR2(64 CHAR) NOT NULL,
+    usuari_codi                VARCHAR2(64 CHAR),
+    enviament_tipus            VARCHAR2(16 CHAR) NOT NULL,
+    origen                     VARCHAR2(16 CHAR) NOT NULL,
     data_creacio               TIMESTAMP NOT NULL,
     temps_pendent              NUMBER(38, 0),
     data_reg_env_error         TIMESTAMP,
@@ -97,6 +103,22 @@ ALTER TABLE not_explot_fet ADD tmp_reg NUMBER(38, 0);
 ALTER TABLE not_explot_fet ADD tmp_not NUMBER(38, 0);
 ALTER TABLE not_explot_fet ADD tmp_cie NUMBER(38, 0);
 ALTER TABLE not_explot_fet ADD tmp_tot NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_reg_sac NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_reg_srb NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_reg_not NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_not_not NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_not_reb NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_not_exp NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_not_fal NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_cie_not NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_cie_reb NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_cie_can NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_cie_fal NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_tot_nac NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_tot_nrb NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_tot_nex NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_tot_nfl NUMBER(38, 0);
+ALTER TABLE not_explot_fet ADD tmp_tot_cac NUMBER(38, 0);
 ALTER TABLE not_explot_fet ADD int_reg NUMBER(38, 0);
 ALTER TABLE not_explot_fet ADD int_sir NUMBER(38, 0);
 ALTER TABLE not_explot_fet ADD int_not NUMBER(38, 0);

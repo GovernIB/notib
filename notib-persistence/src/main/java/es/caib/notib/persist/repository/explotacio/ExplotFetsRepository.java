@@ -1,5 +1,6 @@
 package es.caib.notib.persist.repository.explotacio;
 
+import es.caib.notib.persist.entity.explotacio.ExplotEnvStats;
 import es.caib.notib.persist.entity.explotacio.ExplotFets;
 import es.caib.notib.persist.entity.explotacio.ExplotFetsEntity;
 import es.caib.notib.persist.entity.explotacio.ExplotTempsEntity;
@@ -83,4 +84,369 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
 
     @Query("from ExplotFetsEntity where temps = :temps order by dimensio.entitatId, dimensio.organCodi, dimensio.procedimentId, dimensio.tipus, dimensio.origen, dimensio.usuariCodi")
     List<ExplotFetsEntity> findByTemps(@Param("temps") ExplotTempsEntity temps);
+
+
+
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    cast(null AS java.lang.Double), " +
+            "    cast(null AS java.lang.Double), " +
+            "    cast(null AS java.lang.Double) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataCreacio IS NOT NULL AND e.dataCreacio >= :iniciDelDia AND e.dataCreacio < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsCreacioPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    AVG(e.tempsPendent), " +
+            "    AVG(CASE WHEN e.intentsRegEnviament > 1 THEN e.intentsRegEnviament ELSE null END), " +
+            "    cast(null AS java.lang.Double) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataRegistrada IS NOT NULL AND e.dataRegistrada >= :iniciDelDia AND e.dataRegistrada < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsRegistradaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    cast(null AS java.lang.Double), " +
+            "    AVG(e.intentsRegEnviament), " +
+            "    cast(null AS java.lang.Double) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataRegEnviamentError IS NOT NULL AND e.dataRegEnviamentError >= :iniciDelDia AND e.dataRegEnviamentError < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsRegEnviamentErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    AVG(e.tempsRegistrada), " +
+            "    AVG(CASE WHEN e.intentsSirConsulta > 1 THEN e.intentsSirConsulta ELSE null END), " +
+            "    cast(null AS java.lang.Double) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataRegAcceptada IS NOT NULL AND e.dataRegAcceptada >= :iniciDelDia AND e.dataRegAcceptada < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsRegAcceptadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    AVG(e.tempsRegistrada), " +
+            "    AVG(CASE WHEN e.intentsSirConsulta > 1 THEN e.intentsSirConsulta ELSE null END), " +
+            "    cast(null AS java.lang.Double) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataRegRebutjada IS NOT NULL AND e.dataRegRebutjada >= :iniciDelDia AND e.dataRegRebutjada < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsRegRebutjadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    cast(null AS java.lang.Double), " +
+            "    AVG(e.intentsNotEnviament), " +
+            "    cast(null AS java.lang.Double) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataNotEnviamentError IS NOT NULL AND e.dataNotEnviamentError >= :iniciDelDia AND e.dataNotEnviamentError < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsNotEnviamentErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    AVG(e.tempsRegistrada), " +
+            "    AVG(CASE WHEN e.intentsNotEnviament > 1 THEN e.intentsNotEnviament ELSE null END)," +
+            "    cast(null AS java.lang.Double) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataNotEnviada IS NOT NULL AND e.dataNotEnviada >= :iniciDelDia AND e.dataNotEnviada < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsNotEnviadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    AVG(e.tempsNotEnviada), " +
+            "    cast(null AS java.lang.Double), " +
+            "    AVG(e.tempsTotal) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataNotNotificada IS NOT NULL AND e.dataNotNotificada >= :iniciDelDia AND e.dataNotNotificada < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsNotNotificadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    AVG(e.tempsNotEnviada), " +
+            "    cast(null AS java.lang.Double), " +
+            "    AVG(e.tempsTotal) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataNotRebutjada IS NOT NULL AND e.dataNotRebutjada >= :iniciDelDia AND e.dataNotRebutjada < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsNotRebutjadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    AVG(e.tempsNotEnviada), " +
+            "    cast(null AS java.lang.Double), " +
+            "    AVG(e.tempsTotal) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataNotExpirada IS NOT NULL AND e.dataNotExpirada >= :iniciDelDia AND e.dataNotExpirada < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsNotExpiradaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    AVG(e.tempsNotEnviada), " +
+            "    cast(null AS java.lang.Double), " +
+            "    AVG(e.tempsTotal) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataNotError IS NOT NULL AND e.dataNotError >= :iniciDelDia AND e.dataNotError < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsNotErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    cast(null AS java.lang.Double), " +
+            "    AVG(e.intentsCieEnviament), " +
+            "    cast(null AS java.lang.Double) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataCieEnviamentError IS NOT NULL AND e.dataCieEnviamentError >= :iniciDelDia AND e.dataCieEnviamentError < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsCieEnviamentErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    cast(null AS java.lang.Double), " +
+            "    AVG(CASE WHEN e.intentsCieEnviament > 1 THEN e.intentsCieEnviament ELSE null END), " +
+            "    cast(null AS java.lang.Double) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataCieEnviada IS NOT NULL AND e.dataCieEnviada >= :iniciDelDia AND e.dataCieEnviada < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsCieEnviadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    AVG(e.tempsCieEnviada), " +
+            "    cast(null AS java.lang.Double), " +
+            "    AVG(e.tempsTotal) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataCieNotificada IS NOT NULL AND e.dataCieNotificada >= :iniciDelDia AND e.dataCieNotificada < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsCieNotificadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    AVG(e.tempsCieEnviada), " +
+            "    cast(null AS java.lang.Double), " +
+            "    cast(null AS java.lang.Double) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataCieRebutjada IS NOT NULL AND e.dataCieRebutjada >= :iniciDelDia AND e.dataCieRebutjada < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsCieRebutjadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    AVG(e.tempsCieEnviada), " +
+            "    cast(null AS java.lang.Double), " +
+            "    cast(null AS java.lang.Double) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataCieCancelada IS NOT NULL AND e.dataCieCancelada >= :iniciDelDia AND e.dataCieCancelada < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsCieCanceladaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    AVG(e.tempsCieEnviada), " +
+            "    cast(null AS java.lang.Double), " +
+            "    cast(null AS java.lang.Double) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataCieError IS NOT NULL AND e.dataCieError >= :iniciDelDia AND e.dataCieError < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsCieErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    cast(null AS java.lang.Double), " +
+            "    AVG(e.intentsEmailEnviament), " +
+            "    cast(null AS java.lang.Double) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataEmailEnviamentError IS NOT NULL AND e.dataEmailEnviamentError >= :iniciDelDia AND e.dataEmailEnviamentError < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsEmailEnviamentErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
+    @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
+            "    e.entitatId, " +
+            "    e.procedimentId, " +
+            "    e.organGestorCodi, " +
+            "    e.usuariCodi, " +
+            "    e.enviamentTipus, " +
+            "    e.origen, " +
+            "    COUNT(e), " +
+            "    cast(null AS java.lang.Double), " +
+            "    AVG(CASE WHEN e.intentsEmailEnviament > 1 THEN e.intentsEmailEnviament ELSE null END), " +
+            "    cast(null AS java.lang.Double) " +
+            ") " +
+            "FROM ExplotEnvInfoEntity e " +
+            "WHERE e.dataEmailEnviada IS NOT NULL AND e.dataEmailEnviada >= :iniciDelDia AND e.dataEmailEnviada < :finalDelDia " +
+            "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
+            "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
+    List<ExplotEnvStats> getStatsEmailEnviadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
+);
+
 }

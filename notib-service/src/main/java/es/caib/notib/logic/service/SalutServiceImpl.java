@@ -8,8 +8,8 @@ import es.caib.comanda.ms.salut.model.IntegracioInfo;
 import es.caib.comanda.ms.salut.model.IntegracioSalut;
 import es.caib.comanda.ms.salut.model.MissatgeSalut;
 import es.caib.comanda.ms.salut.model.SalutInfo;
-import es.caib.comanda.ms.salut.model.SubsistemaSalut;
 import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.helper.plugin.AbstractPluginHelper;
 import es.caib.notib.logic.intf.service.SalutService;
 import es.caib.notib.logic.mapper.MissatgeSalutMapper;
@@ -40,6 +40,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -63,19 +64,6 @@ public class SalutServiceImpl implements SalutService {
 
     @Override
     public List<IntegracioInfo> getIntegracions() {
-//        return List.of(
-//                IntegracioInfo.builder().integracioApp(IntegracioApp.CAR).build(),
-//                IntegracioInfo.builder().integracioApp(IntegracioApp.AFI).build(),
-//                IntegracioInfo.builder().integracioApp(IntegracioApp.PFI).build(),
-//                IntegracioInfo.builder().integracioApp(IntegracioApp.RSC).build(),
-//                IntegracioInfo.builder().integracioApp(IntegracioApp.DIR).build(),
-//                IntegracioInfo.builder().integracioApp(IntegracioApp.ARX).build(),
-//                IntegracioInfo.builder().integracioApp(IntegracioApp.REG).build(),
-//                IntegracioInfo.builder().integracioApp(IntegracioApp.NTF).build(),
-//                IntegracioInfo.builder().integracioApp(IntegracioApp.USR).build(),
-//                IntegracioInfo.builder().integracioApp(IntegracioApp.EML).build()
-//        );
-
         return pluginHelper.getPluginHelpers().stream()
                 .flatMap(pluginHelper -> pluginHelper.getIntegracionsInfo().stream())
                 .collect(Collectors.toList());
@@ -83,17 +71,9 @@ public class SalutServiceImpl implements SalutService {
 
     @Override
     public List<AppInfo> getSubsistemes() {
-        return List.of(
-                AppInfo.builder().codi("AWE").nom("Alta web").build(),
-                AppInfo.builder().codi("ARE").nom("Alta REST").build(),
-                AppInfo.builder().codi("MAS").nom("Alta massiva").build(),
-                AppInfo.builder().codi("REG").nom("Registre").build(),
-                AppInfo.builder().codi("SIR").nom("SIR").build(),
-                AppInfo.builder().codi("NOT").nom("Notificació").build(),
-                AppInfo.builder().codi("CBK").nom("Callback de client").build(),
-                AppInfo.builder().codi("CIE").nom("CIE").build(),
-                AppInfo.builder().codi("GDO").nom("Gestió documental FileSystem").build()
-        );
+        return Arrays.stream(SubsistemesHelper.SubsistemesEnum.values())
+                .map(subsistema -> AppInfo.builder().codi(subsistema.name()).nom(subsistema.getNom()).build())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -102,9 +82,18 @@ public class SalutServiceImpl implements SalutService {
         var estatSalut = checkEstatSalut(performanceUrl);   // Estat
         var salutDatabase = checkDatabase();                // Base de dades
         var integracions = checkIntegracions();             // Integracions
-        var subsistemes = checkSubsistemes();               // Subsistemes
         var altres = checkAltres();                         // Altres
         var missatges = checkMissatges();                   // Missatges
+
+        SubsistemesHelper.SubsistemesInfo subsistemesInfo = SubsistemesHelper.getSubsistemesInfo();
+        var subsistemes = subsistemesInfo.getSubsistemesSalut();  // Subsistemes
+        var estatGlobalSubsistemes = subsistemesInfo.getEstatGlobal();
+        if (EstatSalutEnum.UP.equals(estatSalut.getEstat()) && !EstatSalutEnum.UP.equals(estatGlobalSubsistemes)) {
+            estatSalut = EstatSalut.builder()
+                    .estat(estatGlobalSubsistemes)
+                    .latencia(estatSalut.getLatencia())
+                    .build();
+        }
 
         return SalutInfo.builder()
                 .codi("NOT")
@@ -159,7 +148,7 @@ public class SalutServiceImpl implements SalutService {
                 break;
             } catch (Exception e) {
                 if (i == MAX_CONNECTION_RETRY) {
-                    estat = EstatSalutEnum.UNKNOWN; // After 3 connection failed attempts
+                    estat = EstatSalutEnum.DOWN; // After 3 connection failed attempts
                 }
             }
         }
@@ -200,16 +189,6 @@ public class SalutServiceImpl implements SalutService {
             return Collections.emptyList();
         }
         return integracionsSalut;
-    }
-
-    public List<SubsistemaSalut> checkSubsistemes() {
-
-        try {
-
-            return null;
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     public List<DetallSalut> checkAltres() {

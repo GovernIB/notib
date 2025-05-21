@@ -81,10 +81,97 @@ public class ExplotFetsEntity extends AbstractPersistable<Long> implements Seria
 	@Column(name = "tmp_cie") 	private Long temsMigCieEnviada;
 	@Column(name = "tmp_tot") 	private Long temsMigTotal;
 
+	@Column(name = "tmp_reg_sac") 	private Long temsMigRegistradaPerSirAcceptada;
+	@Column(name = "tmp_reg_srb") 	private Long temsMigRegistradaPerSirRebutjada;
+	@Column(name = "tmp_reg_not") 	private Long temsMigRegistradaPerNotificada;
+	@Column(name = "tmp_reg_eml") 	private Long temsMigRegistradaPerEmail;
+	@Column(name = "tmp_not_not") 	private Long temsMigNotEnviadaPerNotificada;
+	@Column(name = "tmp_not_reb") 	private Long temsMigNotEnviadaPerRebubjada;
+	@Column(name = "tmp_not_exp") 	private Long temsMigNotEnviadaPerExpirada;
+	@Column(name = "tmp_not_fal") 	private Long temsMigNotEnviadaPerFallada;
+	@Column(name = "tmp_cie_not") 	private Long temsMigCieEnviadaPerNotificada;
+	@Column(name = "tmp_cie_reb") 	private Long temsMigCieEnviadaPerRebubjada;
+	@Column(name = "tmp_cie_can") 	private Long temsMigCieEnviadaPerCancelada;
+	@Column(name = "tmp_cie_fal") 	private Long temsMigCieEnviadaPerFallada;
+	@Column(name = "tmp_tot_nac") 	private Long temsMigTotalPerNotAcceptada;
+	@Column(name = "tmp_tot_nrb") 	private Long temsMigTotalPerNotRebutjada;
+	@Column(name = "tmp_tot_nex") 	private Long temsMigTotalPerNotExpirada;
+	@Column(name = "tmp_tot_nfl") 	private Long temsMigTotalPerNotFallada;
+	@Column(name = "tmp_tot_cac") 	private Long temsMigTotalPerCieAcceptada;
+
 	// Nombre mig d'intents
 	@Column(name = "int_reg") 	private Long intentsRegistre;
 	@Column(name = "int_sir") 	private Long intentsSir;
 	@Column(name = "int_not") 	private Long intentsNotEnviament;
 	@Column(name = "int_cie") 	private Long intentsCieEnviament;
 	@Column(name = "int_eml") 	private Long intentsEmailEnviament;
+
+
+	public ExplotFetsEntity(ExplotDimensioEntity dimension, ExplotTempsEntity ete, ExplotFets fets) {
+		this.dimensio = dimension;
+		this.temps = ete;
+		this.pendent = fets.getPendent();
+		this.regEnviamentError = fets.getRegEnviamentError();
+		this.registrada = fets.getRegistrada();
+		this.regAcceptada = fets.getRegAcceptada();
+		this.regRebutjada = fets.getRegRebutjada();
+		this.notEnviamentError = fets.getNotEnviamentError();
+		this.notEnviada = fets.getNotEnviada();
+		this.notNotificada = fets.getNotNotificada();
+		this.notRebutjada = fets.getNotRebutjada();
+		this.notExpirada = fets.getNotExpirada();
+		this.cieEnviamentError = fets.getCieEnviamentError();
+		this.cieEnviada = fets.getCieEnviada();
+		this.cieNotificada = fets.getCieNotificada();
+		this.cieRebutjada = fets.getCieRebutjada();
+		this.cieError = fets.getCieError();
+		this.processada = fets.getProcessada();
+		this.trCreades = fets.getTrCreades();
+		this.trRegEnviadesError = fets.getTrRegEnviadesError();
+		this.trRegistrades = fets.getTrRegistrades();
+		this.trSirAcceptades = fets.getTrSirAcceptades();
+		this.trSirRebutjades = fets.getTrSirRebutjades();
+		this.trNotEnviadesError = fets.getTrNotEnviadesError();
+		this.trNotEnviades = fets.getTrNotEnviades();
+		this.trNotNotificades = fets.getTrNotNotificades();
+		this.trNotRebujtades = fets.getTrNotRebujtades();
+		this.trNotExpirades = fets.getTrNotExpirades();
+		this.trNotFallades = fets.getTrNotFallades();
+		this.trCieEnviadesError = fets.getTrCieEnviadesError();
+		this.trCieEnviades = fets.getTrCieEnviades();
+		this.trCieNotificades = fets.getTrCieNotificades();
+		this.trCieRebutjades = fets.getTrCieRebutjades();
+		this.trCieCancelades = fets.getTrCieCancelades();
+		this.trCieFallades = fets.getTrCieFallades();
+		this.trEmailEnviadesError = fets.getTrEmailEnviadesError();
+		this.trEmailEnviades = fets.getTrEmailEnviades();
+		this.temsMigPendent = fets.getTemsMigPendent();
+		this.temsMigRegistrada = fets.getTemsMigRegistrada();
+		this.temsMigNotEnviada = fets.getTemsMigNotEnviada();
+		this.temsMigCieEnviada = fets.getTemsMigCieEnviada();
+		this.temsMigTotal = fets.getTemsMigTotal();
+		this.temsMigRegistradaPerSirAcceptada = fets.getTemsMigRegistradaPerSirAcceptada();
+		this.temsMigRegistradaPerSirRebutjada = fets.getTemsMigRegistradaPerSirRebutjada();
+		this.temsMigRegistradaPerNotificada = fets.getTemsMigRegistradaPerNotificada();
+		this.temsMigRegistradaPerEmail = fets.getTemsMigRegistradaPerEmail();
+		this.temsMigNotEnviadaPerNotificada = fets.getTemsMigNotEnviadaPerNotificada();
+		this.temsMigNotEnviadaPerRebubjada = fets.getTemsMigNotEnviadaPerRebubjada();
+		this.temsMigNotEnviadaPerExpirada = fets.getTemsMigNotEnviadaPerExpirada();
+		this.temsMigNotEnviadaPerFallada = fets.getTemsMigNotEnviadaPerFallada();
+		this.temsMigCieEnviadaPerNotificada = fets.getTemsMigCieEnviadaPerNotificada();
+		this.temsMigCieEnviadaPerRebubjada = fets.getTemsMigCieEnviadaPerRebubjada();
+		this.temsMigCieEnviadaPerCancelada = fets.getTemsMigCieEnviadaPerCancelada();
+		this.temsMigCieEnviadaPerFallada = fets.getTemsMigCieEnviadaPerFallada();
+		this.temsMigTotalPerNotAcceptada = fets.getTemsMigTotalPerNotAcceptada();
+		this.temsMigTotalPerNotRebutjada = fets.getTemsMigTotalPerNotRebutjada();
+		this.temsMigTotalPerNotExpirada = fets.getTemsMigTotalPerNotExpirada();
+		this.temsMigTotalPerNotFallada = fets.getTemsMigTotalPerNotFallada();
+		this.temsMigTotalPerCieAcceptada = fets.getTemsMigTotalPerCieAcceptada();
+		this.intentsRegistre = fets.getIntentsRegistre();
+		this.intentsSir = fets.getIntentsSir();
+		this.intentsNotEnviament = fets.getIntentsNotEnviament();
+		this.intentsCieEnviament = fets.getIntentsCieEnviament();
+		this.intentsEmailEnviament = fets.getIntentsEmailEnviament();
+	}
+	
 }

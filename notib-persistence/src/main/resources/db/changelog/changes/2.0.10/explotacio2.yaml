@@ -1,0 +1,92 @@
+databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 17458513344826
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_explot_env_info
+            columns:
+              - column:
+                  name: entitat_id
+                  type: BIGINT
+              - column:
+                  name: procediment_id
+                  type: BIGINT
+              - column:
+                  name: organ_gestor_codi
+                  type: VARCHAR(64 ${varcharUnit})
+              - column:
+                  name: usuari_codi
+                  type: VARCHAR(64 ${varcharUnit})
+              - column:
+                  name: enviament_tipus
+                  type: VARCHAR(16 ${varcharUnit})
+              - column:
+                  name: origen
+                  type: VARCHAR(16 ${varcharUnit})
+  - changeSet:
+      id: 17458513344827
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_explot_fet
+            columns:
+              - column:
+                  name: tmp_reg_sac
+                  type: BIGINT
+              - column:
+                  name: tmp_reg_srb
+                  type: BIGINT
+              - column:
+                  name: tmp_reg_not
+                  type: BIGINT
+              - column:
+                  name: tmp_reg_eml
+                  type: BIGINT
+              - column:
+                  name: tmp_not_not
+                  type: BIGINT
+              - column:
+                  name: tmp_not_reb
+                  type: BIGINT
+              - column:
+                  name: tmp_not_exp
+                  type: BIGINT
+              - column:
+                  name: tmp_not_fal
+                  type: BIGINT
+              - column:
+                  name: tmp_cie_not
+                  type: BIGINT
+              - column:
+                  name: tmp_cie_reb
+                  type: BIGINT
+              - column:
+                  name: tmp_cie_can
+                  type: BIGINT
+              - column:
+                  name: tmp_cie_fal
+                  type: BIGINT
+              - column:
+                  name: tmp_tot_nac
+                  type: BIGINT
+              - column:
+                  name: tmp_tot_nrb
+                  type: BIGINT
+              - column:
+                  name: tmp_tot_nex
+                  type: BIGINT
+              - column:
+                  name: tmp_tot_nfl
+                  type: BIGINT
+              - column:
+                  name: tmp_tot_cac
+                  type: BIGINT

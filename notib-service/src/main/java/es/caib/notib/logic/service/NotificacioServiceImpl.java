@@ -103,6 +103,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.AWE;
+
 /**
  * Implementació del servei de gestió de notificacions.
  * 
@@ -215,6 +217,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public Notificacio create(Long entitatId, Notificacio notificacio) throws RegistreNotificaException {
 
 		var timer = metricsHelper.iniciMetrica();
+		long start = System.currentTimeMillis();
 		try {
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			var notData = notificacioHelper.buildNotificacioData(entitat, notificacio, false);
@@ -223,7 +226,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 			notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
 			auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceImpl.create");
 			notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.acquireStateMachine(e.getNotificaReferencia()));
+			SubsistemesHelper.addSuccessOperation(AWE, System.currentTimeMillis() - start);
 			return conversioTipusHelper.convertir(notificacioEntity, Notificacio.class);
+		} catch (Exception e) {
+			SubsistemesHelper.addErrorOperation(AWE, System.currentTimeMillis() - start);
+			throw e;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

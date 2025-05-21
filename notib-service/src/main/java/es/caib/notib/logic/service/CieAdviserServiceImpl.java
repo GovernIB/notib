@@ -14,12 +14,11 @@ import es.caib.notib.logic.helper.NotificaHelper;
 import es.caib.notib.logic.helper.NotificacioEventHelper;
 import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
-import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
-import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.adviser.ResultatEnviamentEnum;
@@ -40,8 +39,6 @@ import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnv
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.logic.utils.NotibLogger;
-import es.caib.notib.logic.wsdl.notificaV2.getcies.Cie;
-import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.EntregaPostalRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
@@ -49,7 +46,6 @@ import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
@@ -61,8 +57,8 @@ import javax.xml.ws.Holder;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Set;
 
+import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CCI;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Slf4j
@@ -105,6 +101,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
     @Override
     public ResultadoSincronizarEnvio sincronizarEnvio(SincronizarEnvio sincronizarEnvio) {
 
+        long start = System.currentTimeMillis();
         var info = new IntegracioInfo(IntegracioCodi.CIE, "Sincronitzar enviament REST", IntegracioAccioTipusEnumDto.RECEPCIO,
                 new AccioParam("Identificador Nexea", sincronizarEnvio.getIdentificador()),
                 new AccioParam("Estat", sincronizarEnvio.getEstado()));
@@ -270,6 +267,8 @@ public class CieAdviserServiceImpl implements CieAdviserService {
 
     private ResultadoSincronizarEnvio updateEnviament(SincronizarEnvio sincronizarEnvio, Date dataEstat, IntegracioInfo info) {
 
+        long start = System.currentTimeMillis();
+        boolean errorSbs = false;
         var identificador = sincronizarEnvio.getIdentificador();
         var tipoEntrega = sincronizarEnvio.getTipoEntrega().intValue();
         var receptor = sincronizarEnvio.getReceptor();
@@ -283,94 +282,103 @@ public class CieAdviserServiceImpl implements CieAdviserService {
         String eventErrorDescripcio = null;
         ResultatEnviamentEnum resultatEnum = null;
         try {
-            enviament = enviamentRepository.findByCieId(identificador);
-            if (enviament == null) {
-                log.error(ERROR_CALLBACK_NOTIFICA + "No s'ha trobat cap enviament amb l'identificador especificat (" + identificador + ").");
-                var forcarOk = configHelper.getConfigAsBoolean("es.caib.notib.adviser.forcar.resposta.ok");
-                setResultadoEnvio(resultadoSincronizarEnvio, forcarOk ? ResultatEnviamentEnum.OK : ResultatEnviamentEnum.ERROR_IDENTIFICADOR);
-                integracioHelper.addAccioWarn(info, "No s'ha trobat cap enviament amb l'identificador especificat");
-                return resultadoSincronizarEnvio;
-            }
-            var entregaPostal = enviament.getEntregaPostal();
-            updateCodiEntitatPerInfoAndConfig(info, enviament);
-            if (entregaPostal.isCieEstatFinal()) {
-                var msg = "[CIE ADVISER] L'enviament amb identificador " + identificador + " ha rebut un callback de l'adviser de tipus " + tipoEntrega + " quan ja es troba en estat final." ;
-                NotibLogger.getInstance().info(msg, log, LoggingTipus.ENTREGA_CIE);
-                setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
-                // DATAT
-                switch (tipoEntrega) {
-                    case DATAT:
-                        info.addParam("Nota", "L'enviament ja es troba en un estat final");
-                        NotibLogger.getInstance().info("[CIE ADVISER] tipoEntrega DATAT", log, LoggingTipus.ENTREGA_CIE);
-                        if (receptor != null && !isBlank(receptor.getNifReceptor())) {
-                            entregaPostal.updateReceptorDatat(receptor.getNifReceptor(), receptor.getNombreReceptor());
-                        }
+            try {
+                enviament = enviamentRepository.findByCieId(identificador);
+                if (enviament == null) {
+                    log.error(ERROR_CALLBACK_NOTIFICA + "No s'ha trobat cap enviament amb l'identificador especificat (" + identificador + ").");
+                    var forcarOk = configHelper.getConfigAsBoolean("es.caib.notib.adviser.forcar.resposta.ok");
+                    setResultadoEnvio(resultadoSincronizarEnvio, forcarOk ? ResultatEnviamentEnum.OK : ResultatEnviamentEnum.ERROR_IDENTIFICADOR);
+                    integracioHelper.addAccioWarn(info, "No s'ha trobat cap enviament amb l'identificador especificat");
+                    SubsistemesHelper.addErrorOperation(CCI, System.currentTimeMillis() - start);
+                    return resultadoSincronizarEnvio;
+                }
+                var entregaPostal = enviament.getEntregaPostal();
+                updateCodiEntitatPerInfoAndConfig(info, enviament);
+                if (entregaPostal.isCieEstatFinal()) {
+                    var msg = "[CIE ADVISER] L'enviament amb identificador " + identificador + " ha rebut un callback de l'adviser de tipus " + tipoEntrega + " quan ja es troba en estat final.";
+                    NotibLogger.getInstance().info(msg, log, LoggingTipus.ENTREGA_CIE);
+                    setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
+                    // DATAT
+                    switch (tipoEntrega) {
+                        case DATAT:
+                            info.addParam("Nota", "L'enviament ja es troba en un estat final");
+                            NotibLogger.getInstance().info("[CIE ADVISER] tipoEntrega DATAT", log, LoggingTipus.ENTREGA_CIE);
+                            if (receptor != null && !isBlank(receptor.getNifReceptor())) {
+                                entregaPostal.updateReceptorDatat(receptor.getNifReceptor(), receptor.getNombreReceptor());
+                            }
 //                        eventErrorDescripcio = msg;
-                        integracioHelper.addAccioOk(info);
-                        break;
-                    case CERTIFICACIO:
-                    case DATAT_CERT:
-                        NotibLogger.getInstance().info("[CIE ADVISER] tipoEntrega DATAT + Certificacio", log, LoggingTipus.ENTREGA_CIE);
-                        if (entregaPostal.getCieCertificacioData() != null && !Strings.isNullOrEmpty(entregaPostal.getCieCertificacioArxiuId())) {
+                            integracioHelper.addAccioOk(info);
                             break;
-                        }
-                        NotibLogger.getInstance().info("[CIE ADVISER] Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + identificador + "]",  log, LoggingTipus.ENTREGA_CIE);
+                        case CERTIFICACIO:
+                        case DATAT_CERT:
+                            NotibLogger.getInstance().info("[CIE ADVISER] tipoEntrega DATAT + Certificacio", log, LoggingTipus.ENTREGA_CIE);
+                            if (entregaPostal.getCieCertificacioData() != null && !Strings.isNullOrEmpty(entregaPostal.getCieCertificacioArxiuId())) {
+                                break;
+                            }
+                            NotibLogger.getInstance().info("[CIE ADVISER] Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + identificador + "]", log, LoggingTipus.ENTREGA_CIE);
+                            certificacionOrganismo(acusePDF, modoNotificacion, identificador, enviament, resultadoSincronizarEnvio);
+                            NotibLogger.getInstance().info("Certificació guardada correctament.", log, LoggingTipus.ENTREGA_CIE);
+                            integracioHelper.addAccioOk(info);
+                            break;
+                        default:
+                            NotibLogger.getInstance().info("[CIE ADVISER] Tipo de entrega desconegut: " + tipoEntrega, log, LoggingTipus.ENTREGA_CIE);
+                            eventErrorDescripcio = msg;
+                            setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.ERROR_DESCONEGUT);
+                            integracioHelper.addAccioError(info, "Tipus d'entrega " + tipoEntrega + " no reconeguda");
+                            break;
+                    }
+                } else {
+                    NotibLogger.getInstance().info("[CIE ADVISER] Entrega postal " + identificador + " no esta en estat final. Estat: " + entregaPostal.getCieEstat(), log, LoggingTipus.ENTREGA_CIE);
+                    var receptorNombre = receptor != null ? receptor.getNombreReceptor() : null;
+                    var receptorNif = receptor != null ? receptor.getNifReceptor() : null;
+//                var cieEstat = getCieEstat(estado);
+                    CieEstat cieEstat;
+                    try {
+                        cieEstat = CieEstat.valueOf(estado.toUpperCase());
+                    } catch (Exception ex) {
+                        resultatEnum = ResultatEnviamentEnum.ESTAT_DESCONEGUT;
+                        throw new Exception("[CIE ADVISER] Estat no trobat " + estado);
+                    }
+                    //Update enviament
+                    updateDatat(cieEstat, dataEstat, estado, getModoNotificacion(modoNotificacion), receptorNif, receptorNombre,
+                            null, null, enviament, sincronizarEnvio.getOpcionesSincronizarEnvio());
+
+                    NotibLogger.getInstance().info("Registrant event callback datat de l'Adviser...", log, LoggingTipus.ENTREGA_CIE);
+                    setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
+                    if (tipoEntrega == DATAT_CERT || tipoEntrega == CERTIFICACIO) {
+                        NotibLogger.getInstance().info("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]", log, LoggingTipus.ENTREGA_CIE);
                         certificacionOrganismo(acusePDF, modoNotificacion, identificador, enviament, resultadoSincronizarEnvio);
                         NotibLogger.getInstance().info("Certificació guardada correctament.", log, LoggingTipus.ENTREGA_CIE);
-                        integracioHelper.addAccioOk(info);
-                        break;
-                    default:
-                        NotibLogger.getInstance().info("[CIE ADVISER] Tipo de entrega desconegut: " + tipoEntrega, log, LoggingTipus.ENTREGA_CIE);
-                        eventErrorDescripcio = msg;
-                        setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.ERROR_DESCONEGUT);
-                        integracioHelper.addAccioError(info, "Tipus d'entrega " + tipoEntrega + " no reconeguda");
-                        break;
+                    }
+                    integracioHelper.addAccioOk(info);
                 }
-            } else {
-                NotibLogger.getInstance().info("[CIE ADVISER] Entrega postal " + identificador + " no esta en estat final. Estat: "  + entregaPostal.getCieEstat() , log, LoggingTipus.ENTREGA_CIE);
-                var receptorNombre = receptor != null ? receptor.getNombreReceptor() : null;
-                var receptorNif = receptor != null ? receptor.getNifReceptor() : null;
-//                var cieEstat = getCieEstat(estado);
-                CieEstat cieEstat;
-                try {
-                    cieEstat = CieEstat.valueOf(estado.toUpperCase());
-                 } catch (Exception ex) {
-                    resultatEnum = ResultatEnviamentEnum.ESTAT_DESCONEGUT;
-                    throw new Exception("[CIE ADVISER] Estat no trobat " + estado);
-                }
-                //Update enviament
-                updateDatat(cieEstat, dataEstat, estado, getModoNotificacion(modoNotificacion), receptorNif, receptorNombre,
-                        null, null, enviament, sincronizarEnvio.getOpcionesSincronizarEnvio());
-
-                NotibLogger.getInstance().info("Registrant event callback datat de l'Adviser...", log, LoggingTipus.ENTREGA_CIE);
-                setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
-                if (tipoEntrega == DATAT_CERT || tipoEntrega == CERTIFICACIO) {
-                    NotibLogger.getInstance().info("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]", log, LoggingTipus.ENTREGA_CIE);
-                    certificacionOrganismo(acusePDF, modoNotificacion, identificador, enviament, resultadoSincronizarEnvio);
-                    NotibLogger.getInstance().info("Certificació guardada correctament.", log, LoggingTipus.ENTREGA_CIE);
-                }
-                integracioHelper.addAccioOk(info);
+            } catch (Exception ex) {
+                setResultadoEnvio(resultadoSincronizarEnvio, resultatEnum != null ? resultatEnum : ResultatEnviamentEnum.ERROR_DESCONEGUT);
+                eventErrorDescripcio = ExceptionUtils.getStackTrace(ex);
+                log.error(ERROR_CALLBACK_NOTIFICA + identificador + ")", ex);
+                integracioHelper.addAccioError(info, "Error processant la petició", ex);
+                errorSbs = true;
             }
-        } catch (Exception ex) {
-            setResultadoEnvio(resultadoSincronizarEnvio, resultatEnum != null ? resultatEnum : ResultatEnviamentEnum.ERROR_DESCONEGUT);
-            eventErrorDescripcio = ExceptionUtils.getStackTrace(ex);
-            log.error(ERROR_CALLBACK_NOTIFICA + identificador + ")", ex);
-            integracioHelper.addAccioError(info, "Error processant la petició", ex);
+            NotibLogger.getInstance().info("Peticició processada correctament.", log, LoggingTipus.ENTREGA_CIE);
+            if (enviament == null || enviament.getNotificacio() == null) {
+                log.error("Error greu enviament o notificació son nulls ");
+                SubsistemesHelper.addErrorOperation(CCI, System.currentTimeMillis() - start);
+                return resultadoSincronizarEnvio;
+            }
+            var isError = !Strings.isNullOrEmpty(eventErrorDescripcio);
+            if (tipoEntrega == DATAT || tipoEntrega == DATAT_CERT) {
+                notificacioEventHelper.addCieAdviserDatatEvent(enviament, isError, eventErrorDescripcio);
+            }
+            updateEntregaPostal(enviament, sincronizarEnvio);
+            sincronitzarEnviamentAmbNotifica(enviament, sincronizarEnvio);
+            callbackHelper.updateCallback(enviament, isError, eventErrorDescripcio);
+            auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaAdviserWsV2Impl.sincronizarEnvio");
+            log.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");
+            SubsistemesHelper.addOperation(CCI, System.currentTimeMillis() - start, errorSbs);
+        } catch (Exception e) {
+            SubsistemesHelper.addErrorOperation(CCI, System.currentTimeMillis() - start);
+            throw e;
         }
-        NotibLogger.getInstance().info("Peticició processada correctament.", log, LoggingTipus.ENTREGA_CIE);
-        if (enviament == null || enviament.getNotificacio() == null) {
-            log.error("Error greu enviament o notificació son nulls ");
-            return resultadoSincronizarEnvio;
-        }
-        var isError = !Strings.isNullOrEmpty(eventErrorDescripcio);
-        if (tipoEntrega == DATAT || tipoEntrega == DATAT_CERT) {
-            notificacioEventHelper.addCieAdviserDatatEvent(enviament, isError, eventErrorDescripcio);
-        }
-        updateEntregaPostal(enviament, sincronizarEnvio);
-        sincronitzarEnviamentAmbNotifica(enviament, sincronizarEnvio);
-        callbackHelper.updateCallback(enviament, isError, eventErrorDescripcio);
-        auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaAdviserWsV2Impl.sincronizarEnvio");
-        log.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");
         return resultadoSincronizarEnvio;
     }
 

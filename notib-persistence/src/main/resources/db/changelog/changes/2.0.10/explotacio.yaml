@@ -13,6 +13,32 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
+                  name: entitat_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: procediment_id
+                  type: BIGINT
+              - column:
+                  name: organ_gestor_codi
+                  type: VARCHAR(64 ${varcharUnit})
+                  constraints:
+                    nullable: false
+              - column:
+                  name: usuari_codi
+                  type: VARCHAR(64 ${varcharUnit})
+              - column:
+                  name: enviament_tipus
+                  type: VARCHAR(16 ${varcharUnit})
+                  constraints:
+                    nullable: false
+              - column:
+                  name: origen
+                  type: VARCHAR(16 ${varcharUnit})
+                  constraints:
+                    nullable: false
+              - column:
                   name: data_creacio
                   type: TIMESTAMP
                   constraints:
@@ -375,6 +401,57 @@ databaseChangeLog:
                   type: BIGINT
               - column:
                   name: tmp_tot
+                  type: BIGINT
+              - column:
+                  name: tmp_reg_sac
+                  type: BIGINT
+              - column:
+                  name: tmp_reg_srb
+                  type: BIGINT
+              - column:
+                  name: tmp_reg_not
+                  type: BIGINT
+              - column:
+                  name: tmp_reg_eml
+                  type: BIGINT
+              - column:
+                  name: tmp_not_not
+                  type: BIGINT
+              - column:
+                  name: tmp_not_reb
+                  type: BIGINT
+              - column:
+                  name: tmp_not_exp
+                  type: BIGINT
+              - column:
+                  name: tmp_not_fal
+                  type: BIGINT
+              - column:
+                  name: tmp_cie_not
+                  type: BIGINT
+              - column:
+                  name: tmp_cie_reb
+                  type: BIGINT
+              - column:
+                  name: tmp_cie_can
+                  type: BIGINT
+              - column:
+                  name: tmp_cie_fal
+                  type: BIGINT
+              - column:
+                  name: tmp_tot_nac
+                  type: BIGINT
+              - column:
+                  name: tmp_tot_nrb
+                  type: BIGINT
+              - column:
+                  name: tmp_tot_nex
+                  type: BIGINT
+              - column:
+                  name: tmp_tot_nfl
+                  type: BIGINT
+              - column:
+                  name: tmp_tot_cac
                   type: BIGINT
 
         # Afegir columnes de nombre mig d'intents

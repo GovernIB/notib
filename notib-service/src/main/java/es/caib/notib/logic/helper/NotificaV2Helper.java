@@ -33,7 +33,6 @@ import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorCIE;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorPostal;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.Persona;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
-import es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.AmpliacionesPlazo;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.Datado;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.InfoEnvioLigero;
 import es.caib.notib.logic.wsdl.notificaV2.infoEnvioLigero.RespuestaInfoEnvioLigero;
@@ -84,6 +83,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.NOT;
+
 /**
  * Helper per a interactuar amb la versió 2 del servei web de Notific@.
  * 
@@ -114,6 +115,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
 
+		long start = System.currentTimeMillis();
+		boolean errorSbs = false;
  		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
 
@@ -203,10 +206,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					error = true;
 					var errorNotib = NOTIB.equals(resultadoAlta.getCodigoRespuesta());
 					var origenError = !errorNotib ? "Error retornat per Notifica: " : "Error retornat per Notib: ";
+					errorSbs = errorNotib;
 					errorDescripcio = origenError + " [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
 					log.info(" >>> ... ERROR: " + errorDescripcio);
 					if (!Strings.isNullOrEmpty(resultadoAlta.getDescripcionRespuesta()) && resultadoAlta.getDescripcionRespuesta().equals("SistemaExternException")) {
 						integracioHelper.addAccioError(info, errorDescripcio);
+						errorSbs = true;
 					}
 				}
 			} catch (Exception ex) {
@@ -214,6 +219,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				error = true;
 				errorDescripcio = ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
 				integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
+				errorSbs = true;
 			}
 			var fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
 			if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat()) /*|| NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())*/)) {
@@ -225,9 +231,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			log.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 			notificacioTableHelper.actualitzarRegistre(notificacio);
 			auditHelper.auditaNotificacio(notificacio, TipusOperacio.UPDATE, "NotificaV2Helper.notificacioEnviar");
+			SubsistemesHelper.addOperation(NOT, System.currentTimeMillis() - start, errorSbs);
 			return notificacio;
 		} catch (Exception ex) {
 			log.error("Error inesperat enviant la notificacio", ex);
+			SubsistemesHelper.addErrorOperation(NOT, System.currentTimeMillis() - start);
 			throw ex;
 		}
 	}

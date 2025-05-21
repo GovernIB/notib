@@ -10,6 +10,7 @@ import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotificaHelper;
 import es.caib.notib.logic.helper.NotificacioEventHelper;
 import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
@@ -42,6 +43,7 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CNT;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Slf4j
@@ -76,6 +78,7 @@ public class AdviserServiceImpl implements AdviserService {
     @Transactional
     public ResultadoSincronizarEnvio sincronizarEnvio(SincronizarEnvio sincronizarEnvio) {
 
+        long start = System.currentTimeMillis();
         var timer = metricsHelper.iniciMetrica();
         try {
             var identificador = sincronizarEnvio.getIdentificador();
@@ -104,6 +107,8 @@ public class AdviserServiceImpl implements AdviserService {
     private ResultadoSincronizarEnvio updateEnviament(String identificador, int tipoEntrega, BigInteger modoNotificacion, String estado,
                                                       Date dataEstat, Receptor receptor, Acuse acusePDF, Opciones opciones, IntegracioInfo info) {
 
+        long start = System.currentTimeMillis();
+        boolean errorSbs = false;
         var resultadoSincronizarEnvio = new ResultadoSincronizarEnvio();
         resultadoSincronizarEnvio.setIdentificador(identificador);
         NotificacioEnviamentEntity enviament = null;
@@ -116,6 +121,7 @@ public class AdviserServiceImpl implements AdviserService {
                 var forcarOk = configHelper.getConfigAsBoolean("es.caib.notib.adviser.forcar.resposta.ok");
                 setResultadoEnvio(resultadoSincronizarEnvio, forcarOk ? ResultatEnviamentEnum.OK : ResultatEnviamentEnum.ERROR_IDENTIFICADOR);
                 integracioHelper.addAccioWarn(info, "No s'ha trobat cap enviament amb l'identificador especificat");
+                SubsistemesHelper.addErrorOperation(CNT, System.currentTimeMillis() - start);
                 return resultadoSincronizarEnvio;
             }
             updateCodiEntitatPerInfoAndConfig(info, enviament);
@@ -174,10 +180,12 @@ public class AdviserServiceImpl implements AdviserService {
             eventErrorDescripcio = ExceptionUtils.getStackTrace(ex);
             log.error(ERROR_CALLBACK_NOTIFICA + identificador + ")", ex);
             integracioHelper.addAccioError(info, "Error processant la petició", ex);
+            errorSbs = true;
         }
         NotibLogger.getInstance().info("Peticició processada correctament.", log, LoggingTipus.ADVISER);
         if (enviament == null || enviament.getNotificacio() == null) {
             log.error("Error greu enviament o notificació son nulls ");
+            SubsistemesHelper.addErrorOperation(CNT, System.currentTimeMillis() - start);
             return resultadoSincronizarEnvio;
         }
         var isError = !Strings.isNullOrEmpty(eventErrorDescripcio);
@@ -187,6 +195,7 @@ public class AdviserServiceImpl implements AdviserService {
         callbackHelper.updateCallback(enviament, isError, eventErrorDescripcio);
         auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaAdviserWsV2Impl.sincronizarEnvio");
         log.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");
+        SubsistemesHelper.addOperation(CNT, System.currentTimeMillis() - start, errorSbs);
         return resultadoSincronizarEnvio;
     }
 

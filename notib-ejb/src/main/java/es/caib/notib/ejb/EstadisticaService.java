@@ -3,6 +3,7 @@ package es.caib.notib.ejb;
 import es.caib.comanda.ms.estadistica.model.DimensioDesc;
 import es.caib.comanda.ms.estadistica.model.IndicadorDesc;
 import es.caib.comanda.ms.estadistica.model.RegistresEstadistics;
+import org.jboss.ejb3.annotation.TransactionTimeout;
 import org.springframework.context.annotation.Primary;
 
 import javax.ejb.Stateless;
@@ -19,6 +20,7 @@ public class EstadisticaService extends AbstractService<es.caib.notib.logic.intf
     }
 
     @Override
+    @TransactionTimeout(value = 3600)
     public void generarDadesExplotacio(LocalDate data) {
         getDelegateService().generarDadesExplotacio(data);
     }
@@ -26,6 +28,11 @@ public class EstadisticaService extends AbstractService<es.caib.notib.logic.intf
     @Override
     public RegistresEstadistics consultaUltimesEstadistiques() {
         return getDelegateService().consultaUltimesEstadistiques();
+    }
+
+    @Override
+    public RegistresEstadistics consultaEstadistiques(LocalDate data) {
+        return getDelegateService().consultaEstadistiques(data);
     }
 
     @Override

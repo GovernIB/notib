@@ -5,6 +5,7 @@ import es.caib.comanda.ms.salut.model.IntegracioApp;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
@@ -22,6 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.Properties;
+
+import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.GDO;
 
 /**
  * Helper per a interactuar amb els plugins.
@@ -62,7 +65,8 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 
 	@Synchronized
 	public String gestioDocumentalCreate(String agrupacio, byte[] contingut) {
-		
+
+		long start = System.currentTimeMillis();
 		var info = new IntegracioInfo(IntegracioCodi.GESDOC, "Creació d'un arxiu", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Agrupacio", agrupacio),
 				new AccioParam("Núm bytes", (contingut != null) ? Integer.toString(contingut.length) : "0"));
@@ -75,11 +79,13 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			var gestioDocumentalId = getPlugin().create(agrupacio, new ByteArrayInputStream(contingut));
 			info.getParams().add(new AccioParam("Id retornat", gestioDocumentalId));
 			integracioHelper.addAccioOk(info);
+			SubsistemesHelper.addSuccessOperation(GDO, System.currentTimeMillis() - start);
 			return gestioDocumentalId;
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al crear document a dins la gestió documental";
 			log.error("Error creant el document en el gestor documental amb agrupacio " + agrupacio);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			SubsistemesHelper.addErrorOperation(GDO, System.currentTimeMillis() - start);
 			// peticionsPlugin.updatePeticioError(codiEntitat);
 			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), errorDescripcio, ex);
 		}
@@ -87,7 +93,8 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 
 	@Synchronized
 	public void gestioDocumentalUpdate(String id, String agrupacio, byte[] contingut) {
-		
+
+		long start = System.currentTimeMillis();
 		var info = new IntegracioInfo(IntegracioCodi.GESDOC, "Modificació d'un arxiu", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Id del document", id),
 				new AccioParam("Agrupacio", agrupacio),
@@ -100,10 +107,12 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			// peticionsPlugin.updatePeticioTotal(codiEntitat);
 			getPlugin().update(id, agrupacio, new ByteArrayInputStream(contingut));
 			integracioHelper.addAccioOk(info);
+			SubsistemesHelper.addSuccessOperation(GDO, System.currentTimeMillis() - start);
 		} catch (Exception ex) {
 			var errorDescripcio = "Error al accedir al plugin de gestió documental";
 			log.error("Error actualitzant el document " + id);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			SubsistemesHelper.addErrorOperation(GDO, System.currentTimeMillis() - start);
 			// peticionsPlugin.updatePeticioError(codiEntitat);
 			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), errorDescripcio, ex);
 		}

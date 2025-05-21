@@ -45,6 +45,20 @@ public class EstadistiquesController {
         return estadisticaService.consultaUltimesEstadistiques();
     }
 
+    @GetMapping("/estadistiques/{dies}")
+    public List<RegistresEstadistics> estadistiques(
+            HttpServletRequest request,
+            @PathVariable Integer dies) throws IOException {
+
+        List<RegistresEstadistics> result = null;
+        LocalDate data = LocalDate.now().minusDays(1);
+        for (int i = 0; i < dies; i++) {
+            result.add(estadisticaService.consultaEstadistiques(data));
+            data = data.minusDays(1);
+        }
+        return result;
+    }
+
     @Hidden
     @RequestMapping(value = "/generarDadesExplotacio", method = RequestMethod.GET)
     @ResponseBody
@@ -60,7 +74,7 @@ public class EstadistiquesController {
             HttpServletRequest request,
             @PathVariable Integer dies) throws Exception {
 
-        LocalDate data = LocalDate.now().minusDays(dies + 1);
+        LocalDate data = LocalDate.now().minusDays(1);
         for (int i = 0; i < dies; i++) {
             estadisticaService.generarDadesExplotacio(data);
             data = data.minusDays(1);

@@ -5,6 +5,8 @@ package es.caib.notib.logic.aspect;
 
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.client.domini.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -24,10 +26,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Advice AspectJ que intercepta les excepcions llençades des dels
@@ -48,6 +52,14 @@ public class EstadistiquesAdvice {
 	@Autowired
 	private NotificacioRepository notificacioRepository;
 
+	private final ConcurrentHashMap<Long, Lock> locks = new ConcurrentHashMap<>();
+
+	private Lock getLockForId(Long id) {
+		return locks.computeIfAbsent(id, key -> new ReentrantLock());
+	}
+	private void releaseLockForId(Long id) {
+		locks.remove(id); // Alliberem la referència quan ja no es necessita
+	}
 
 	// REGISTRE
 	@AfterReturning(
@@ -65,18 +77,20 @@ public class EstadistiquesAdvice {
 				return;
 			}
 
-			ExplotEnvInfoEntity explotEnvInfoEntity = explotEnvInfoRepository.findByEnviamentId(enviament.getId())
-					.orElseGet(() -> createExplotEnvInfo(enviament));
+			ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviament, EstatActualEnv.NOU);
 
 			int intents = explotEnvInfoEntity.getIntentsRegEnviament() + 1;
 			explotEnvInfoEntity.setIntentsRegEnviament(intents);
 			if (success) {
-				LocalDateTime dataRegistre = enviament.getRegistreData().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-				long tempsPendent = ChronoUnit.MILLIS.between(explotEnvInfoEntity.getDataCreacio(), dataRegistre);
+				Date dataRegistre = enviament.getRegistreData();
+				long tempsPendent = getMillisBetween(explotEnvInfoEntity.getDataCreacio(), dataRegistre);
 				explotEnvInfoEntity.setDataRegistrada(dataRegistre);
 				explotEnvInfoEntity.setTempsPendent(tempsPendent);
-			} else if (explotEnvInfoEntity.getDataRegEnviamentError() == null) {
-				explotEnvInfoEntity.setDataRegEnviamentError(LocalDateTime.now());
+			} else {
+				Date dataIntent = new Date();
+				long tempsPendent = getMillisBetween(explotEnvInfoEntity.getDataCreacio(), dataIntent);
+				explotEnvInfoEntity.setDataRegEnviamentError(dataIntent);
+				explotEnvInfoEntity.setTempsPendent(tempsPendent);
 			}
 			explotEnvInfoRepository.save(explotEnvInfoEntity);
 		} catch (Exception e) {
@@ -101,25 +115,25 @@ public class EstadistiquesAdvice {
 				return;
 			}
 
-			ExplotEnvInfoEntity explotEnvInfoEntity = explotEnvInfoRepository.findByEnviamentId(enviament.getId())
-					.orElseGet(() -> createExplotEnvInfo(enviament));
+			ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviament, EstatActualEnv.REGISTRAT);
 
 			int intents = explotEnvInfoEntity.getIntentsSirConsulta() + 1;
 			explotEnvInfoEntity.setIntentsSirConsulta(intents);
-			if (NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT.equals(enviament.getRegistreEstat())) {
-				LocalDateTime dataSir = enviament.getSirRecepcioData() != null
-						? enviament.getSirRecepcioData().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
-						: enviament.getSirRegDestiData().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-				long tempsRegistrada = ChronoUnit.MILLIS.between(explotEnvInfoEntity.getDataRegistrada(), dataSir);
-				explotEnvInfoEntity.setDataRegAcceptada(dataSir);
+
+			if (NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT.equals(enviament.getRegistreEstat()) ||
+					NotificacioRegistreEstatEnumDto.REBUTJAT.equals(enviament.getRegistreEstat())) {
+				Date dataSir = enviament.getSirRecepcioData() != null ? enviament.getSirRecepcioData() : enviament.getSirRegDestiData();
+				long tempsRegistrada = getMillisBetween(explotEnvInfoEntity.getDataRegistrada(), dataSir);
+				long tempsTotal = getMillisBetween(explotEnvInfoEntity.getDataCreacio(), dataSir);
+
 				explotEnvInfoEntity.setTempsRegistrada(tempsRegistrada);
-			} else if (NotificacioRegistreEstatEnumDto.REBUTJAT.equals(enviament.getRegistreEstat())) {
-				LocalDateTime dataSir = enviament.getSirRecepcioData() != null
-						? enviament.getSirRecepcioData().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
-						: enviament.getSirRegDestiData().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-				long tempsRegistrada = ChronoUnit.MILLIS.between(explotEnvInfoEntity.getDataRegistrada(), dataSir);
-				explotEnvInfoEntity.setDataRegRebutjada(dataSir);
-				explotEnvInfoEntity.setTempsRegistrada(tempsRegistrada);
+				explotEnvInfoEntity.setTempsTotal(tempsTotal);
+
+				if (NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT.equals(enviament.getRegistreEstat())) {
+					explotEnvInfoEntity.setDataRegAcceptada(dataSir);
+				} else if (NotificacioRegistreEstatEnumDto.REBUTJAT.equals(enviament.getRegistreEstat())) {
+					explotEnvInfoEntity.setDataRegRebutjada(dataSir);
+				}
 			}
 			explotEnvInfoRepository.save(explotEnvInfoEntity);
 		} catch (Exception e) {
@@ -142,18 +156,17 @@ public class EstadistiquesAdvice {
 
 		notificacio.getEnviaments().forEach(enviament -> {
 			try {
-				ExplotEnvInfoEntity explotEnvInfoEntity = explotEnvInfoRepository.findByEnviamentId(enviament.getId())
-						.orElseGet(() -> createExplotEnvInfo(enviament));
+				ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviament, EstatActualEnv.REGISTRAT);
 
 				int intents = explotEnvInfoEntity.getIntentsNotEnviament() + 1;
 				explotEnvInfoEntity.setIntentsNotEnviament(intents);
 				if (EnviamentEstat.NOTIB_ENVIADA.equals(enviament.getNotificaEstat())) {
-					LocalDateTime dataNotifica = enviament.getNotificaEstatData().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-					long tempsRegistrada = ChronoUnit.MILLIS.between(explotEnvInfoEntity.getDataRegistrada(), dataNotifica);
+					Date dataNotifica = enviament.getNotificaEstatData();
+					long tempsRegistrada = getMillisBetween(explotEnvInfoEntity.getDataRegistrada(), dataNotifica);
 					explotEnvInfoEntity.setDataNotEnviada(dataNotifica);
 					explotEnvInfoEntity.setTempsRegistrada(tempsRegistrada);
-				} else if (EnviamentEstat.REGISTRADA.equals(enviament.getNotificaEstat()) && explotEnvInfoEntity.getDataNotEnviamentError() == null) {
-					explotEnvInfoEntity.setDataNotEnviamentError(LocalDateTime.now());
+				} else if (EnviamentEstat.REGISTRADA.equals(enviament.getNotificaEstat())) {
+					explotEnvInfoEntity.setDataNotEnviamentError(new Date());
 				}
 				explotEnvInfoRepository.save(explotEnvInfoEntity);
 			} catch (Exception e) {
@@ -175,13 +188,12 @@ public class EstadistiquesAdvice {
 		}
 
 		try {
-			ExplotEnvInfoEntity explotEnvInfoEntity = explotEnvInfoRepository.findByEnviamentId(enviament.getId())
-					.orElseGet(() -> createExplotEnvInfo(enviament));
+			ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviament, EstatActualEnv.ENVIAT_NOT);
 
 			if (enviament.isNotificaEstatFinal()) {
-				LocalDateTime dataEstatFinal = enviament.getNotificaEstatData().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-				long tempsNotEnviada = ChronoUnit.MILLIS.between(explotEnvInfoEntity.getDataNotEnviada(), dataEstatFinal);
-				long tempsTotal = ChronoUnit.MILLIS.between(explotEnvInfoEntity.getDataCreacio(), dataEstatFinal);
+				Date dataEstatFinal = enviament.getNotificaEstatData();
+				long tempsNotEnviada = getMillisBetween(explotEnvInfoEntity.getDataNotEnviada(), dataEstatFinal);
+				long tempsTotal = getMillisBetween(explotEnvInfoEntity.getDataCreacio(), dataEstatFinal);
 
 				if (EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.LLEGIDA.equals(enviament.getNotificaEstat())) {
 					explotEnvInfoEntity.setDataNotNotificada(dataEstatFinal);
@@ -226,17 +238,16 @@ public class EstadistiquesAdvice {
 
 		notificacio.getEnviaments().forEach(enviament -> {
 			try {
-				ExplotEnvInfoEntity explotEnvInfoEntity = explotEnvInfoRepository.findByEnviamentId(enviament.getId())
-						.orElseGet(() -> createExplotEnvInfo(enviament));
+				ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviament, EstatActualEnv.ENVIAT_NOT);
 
 				int intents = explotEnvInfoEntity.getIntentsCieEnviament() + 1;
 				explotEnvInfoEntity.setIntentsCieEnviament(intents);
 				if ("000".equals(resposta.getCodiResposta())
 						&& enviament.getEntregaPostal() != null && CieEstat.ENVIADO_CI.equals(enviament.getEntregaPostal().getCieEstat())) {
-					LocalDateTime dataCie = LocalDateTime.now();
+					Date dataCie = new Date();
 					explotEnvInfoEntity.setDataCieEnviada(dataCie);
-				} else if (explotEnvInfoEntity.getDataNotEnviamentError() == null) {
-					explotEnvInfoEntity.setDataCieEnviamentError(LocalDateTime.now());
+				} else {
+					explotEnvInfoEntity.setDataCieEnviamentError(new Date());
 				}
 				explotEnvInfoRepository.save(explotEnvInfoEntity);
 			} catch (Exception e) {
@@ -262,17 +273,16 @@ public class EstadistiquesAdvice {
 		}
 
 		try {
-			ExplotEnvInfoEntity explotEnvInfoEntity = explotEnvInfoRepository.findByEnviamentId(enviament.getId())
-					.orElseGet(() -> createExplotEnvInfo(enviament));
+			ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviament, EstatActualEnv.ENVIAT_CIE);
 
 			EntregaPostalEntity entregaPostal = enviament.getEntregaPostal();
 			CieEstat cieEstat = entregaPostal.getCieEstat();
 			boolean cieEstatFinal = isCieEstatFinal(cieEstat);
 
 			if (cieEstatFinal) {
-				LocalDateTime dataEstatFinal = entregaPostal.getCieEstatData().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-				long tempsCieEnviada = ChronoUnit.MILLIS.between(explotEnvInfoEntity.getDataCieEnviada(), dataEstatFinal);
-				long tempsTotal = ChronoUnit.MILLIS.between(explotEnvInfoEntity.getDataCreacio(), dataEstatFinal);
+				Date dataEstatFinal = entregaPostal.getCieEstatData();
+				long tempsCieEnviada = getMillisBetween(explotEnvInfoEntity.getDataCieEnviada(), dataEstatFinal);
+				long tempsTotal = getMillisBetween(explotEnvInfoEntity.getDataCreacio(), dataEstatFinal);
 
 				if (CieEstat.NOTIFICADA.equals(entregaPostal.getCieEstat())) {
 					explotEnvInfoEntity.setDataCieNotificada(dataEstatFinal);
@@ -284,8 +294,9 @@ public class EstadistiquesAdvice {
 					explotEnvInfoEntity.setDataCieError(dataEstatFinal);
 				}
 
-				if (explotEnvInfoEntity.getTempsTotal() == null &&
-						(enviament.isNotificaEstatFinal() || CieEstat.NOTIFICADA.equals(entregaPostal.getCieEstat()))) {
+				if (!EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat())
+						&& !EnviamentEstat.LLEGIDA.equals(enviament.getNotificaEstat())
+						&& CieEstat.NOTIFICADA.equals(entregaPostal.getCieEstat())) {
 					explotEnvInfoEntity.setTempsTotal(tempsTotal);
 				}
 				explotEnvInfoEntity.setTempsCieEnviada(tempsCieEnviada);
@@ -311,18 +322,17 @@ public class EstadistiquesAdvice {
 
 		enviamentsSenseNif.forEach(enviament -> {
 			try {
-				ExplotEnvInfoEntity explotEnvInfoEntity = explotEnvInfoRepository.findByEnviamentId(enviament.getId())
-						.orElseGet(() -> createExplotEnvInfo(enviament));
+				ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviament, EstatActualEnv.REGISTRAT);
 
 				int intents = explotEnvInfoEntity.getIntentsEmailEnviament() + 1;
 				explotEnvInfoEntity.setIntentsEmailEnviament(intents);
 				if (EnviamentEstat.FINALITZADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.PROCESSADA.equals(enviament.getNotificaEstat())) {
-					LocalDateTime dataEmail = enviament.getNotificaEstatData().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-					long tempsRegistrada = ChronoUnit.MILLIS.between(explotEnvInfoEntity.getDataRegistrada(), dataEmail);
+					Date dataEmail = enviament.getNotificaEstatData();
+					long tempsRegistrada = getMillisBetween(explotEnvInfoEntity.getDataRegistrada(), dataEmail);
 					explotEnvInfoEntity.setDataEmailEnviada(dataEmail);
 					explotEnvInfoEntity.setTempsRegistrada(tempsRegistrada);
-				} else if (explotEnvInfoEntity.getDataNotEnviamentError() == null) {
-					explotEnvInfoEntity.setDataEmailEnviamentError(LocalDateTime.now());
+				} else {
+					explotEnvInfoEntity.setDataEmailEnviamentError(new Date());
 				}
 				explotEnvInfoRepository.save(explotEnvInfoEntity);
 			} catch (Exception e) {
@@ -331,27 +341,46 @@ public class EstadistiquesAdvice {
 		});
 	}
 
+	private ExplotEnvInfoEntity getExplotEnvInfo(NotificacioEnviamentEntity enviament, EstatActualEnv estat) {
+		Long id = enviament.getId();
+		Lock lock = getLockForId(id);
 
-	private static ExplotEnvInfoEntity createExplotEnvInfo(NotificacioEnviamentEntity enviament) {
+		lock.lock(); // Bloquegem pel valor específic d'enviament
+		try {
+			return explotEnvInfoRepository.findByEnviamentId(enviament.getId())
+				.orElseGet(() -> createExplotEnvInfo(enviament, estat));
+		} finally {
+			lock.unlock();
+			releaseLockForId(id);
+		}
+	}
+
+	private static ExplotEnvInfoEntity createExplotEnvInfo(NotificacioEnviamentEntity enviament, EstatActualEnv estat) {
+
 		Long tempsPendent = null;
 		Long tempsRegistre = null;
-		LocalDateTime dataRegistre = null;
-		LocalDateTime dataEnviament = null;
-		LocalDateTime dataCieEnviament = null;
+		Date dataRegistre = null;
+		Date dataEnviament = null;
+		Date dataCieEnviament = null;
 		int intentsRegistre = 0;
 		int intentsNotEnviament = 0;
 		int intentsCieEnviament = 0;
-		if (enviament.getRegistreData() != null) {
+
+		Date dataCreadio = enviament.getCreatedDate().map(d -> Date.from(d.atZone(ZoneId.systemDefault()).toInstant())).orElse(new Date());
+
+		// Controlam l'estat actual degut a que el procés de notificació es realitza mitjançant events,
+		// i es podria donar el cas que s'accedeixi abans a alguna acció com registrar o notificar abans d'haver guardat les dades estadístiques
+		if (!EstatActualEnv.NOU.equals(estat) && enviament.getRegistreData() != null) {
 			intentsRegistre = 1;
-			dataRegistre = enviament.getRegistreData().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-			tempsPendent = ChronoUnit.MILLIS.between(enviament.getCreatedDate().get(), dataRegistre);
+			dataRegistre = enviament.getRegistreData();
+			tempsPendent = getMillisBetween(dataCreadio, dataRegistre);
 
-			if (enviament.getNotificaEstatData() != null) {
+			if ((EstatActualEnv.ENVIAT_NOT.equals(estat) || EstatActualEnv.ENVIAT_CIE.equals(estat)) && enviament.getNotificaEstatData() != null) {
 				intentsNotEnviament = Math.max(enviament.getNotificaIntentNum(), 1);
-				dataEnviament = enviament.getNotificaEstatData().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-				tempsRegistre = ChronoUnit.MILLIS.between(dataRegistre, dataEnviament);
+				dataEnviament = enviament.getNotificaEstatData();
+				tempsRegistre = getMillisBetween(dataRegistre, dataEnviament);
 
-				if (enviament.getEntregaPostal() != null) {
+				if (EstatActualEnv.ENVIAT_CIE.equals(estat) && enviament.getEntregaPostal() != null) {
 					intentsCieEnviament = 1;
 					if (CieEstat.ENVIADO_CI.equals(enviament.getEntregaPostal().getCieEstat())) {
 						dataCieEnviament = dataEnviament;
@@ -359,9 +388,21 @@ public class EstadistiquesAdvice {
 				}
 			}
 		}
+		Long entitatId = enviament.getNotificacio().getEntitat().getId();
+		Long procedimentId = enviament.getNotificacio().getProcediment() != null ? enviament.getNotificacio().getProcediment().getId() : null;
+		String organGestorCodi = enviament.getNotificacio().getOrganGestor() != null ? enviament.getNotificacio().getOrganGestor().getCodi() : null;
+		String usuariCodi = enviament.getCreatedBy().map(createdBy -> createdBy.getCodi()).orElse("DESCONEGUT");
+		EnviamentTipus enviamentTipus = enviament.getNotificacio().getEnviamentTipus();
+		EnviamentOrigen origen = enviament.getNotificacio().getOrigen();
 		return ExplotEnvInfoEntity.builder()
 				.enviament(enviament)
-				.dataCreacio(enviament.getCreatedDate().get())
+				.entitatId(entitatId)
+				.procedimentId(procedimentId)
+				.organGestorCodi(organGestorCodi)
+				.usuariCodi(usuariCodi)
+				.enviamentTipus(enviamentTipus)
+				.origen(origen)
+				.dataCreacio(dataCreadio)
 				.tempsPendent(tempsPendent)
 				.intentsRegEnviament(intentsRegistre)
 				.dataRegistrada(dataRegistre)
@@ -385,5 +426,19 @@ public class EstadistiquesAdvice {
 				|| CieEstat.ERROR.equals(cieEstat)
 				|| CieEstat.DEVUELTO.equals(cieEstat);
 		return cieEstatFinal;
+	}
+
+	private static long getMillisBetween(Date dataInicial, Date dataFinal) {
+		if (dataInicial == null || dataFinal == null) {
+			return 0;
+		}
+		return dataFinal.getTime() - dataInicial.getTime();
+	}
+
+	private enum EstatActualEnv {
+		NOU,
+		REGISTRAT,
+		ENVIAT_NOT,
+		ENVIAT_CIE
 	}
 }

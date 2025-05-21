@@ -3,12 +3,13 @@ package es.caib.notib.logic.service;
 import es.caib.comanda.ms.estadistica.model.Dimensio;
 import es.caib.comanda.ms.estadistica.model.DimensioDesc;
 import es.caib.comanda.ms.estadistica.model.Fet;
-import es.caib.comanda.ms.estadistica.model.Format;
 import es.caib.comanda.ms.estadistica.model.IndicadorDesc;
 import es.caib.comanda.ms.estadistica.model.RegistreEstadistic;
 import es.caib.comanda.ms.estadistica.model.RegistresEstadistics;
 import es.caib.comanda.ms.estadistica.model.Temps;
-import es.caib.notib.client.domini.explotacio.*;
+import es.caib.notib.client.domini.explotacio.DimEnum;
+import es.caib.notib.client.domini.explotacio.DimensioNotib;
+import es.caib.notib.client.domini.explotacio.FetNotib;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
@@ -19,6 +20,7 @@ import es.caib.notib.persist.entity.explotacio.ExplotDimensio;
 import es.caib.notib.persist.entity.explotacio.ExplotDimensioEntity;
 import es.caib.notib.persist.entity.explotacio.ExplotFets;
 import es.caib.notib.persist.entity.explotacio.ExplotFetsEntity;
+import es.caib.notib.persist.entity.explotacio.ExplotFetsKey;
 import es.caib.notib.persist.entity.explotacio.ExplotTempsEntity;
 import es.caib.notib.persist.repository.explotacio.ExplotDimensioRepository;
 import es.caib.notib.persist.repository.explotacio.ExplotFetsRepository;
@@ -35,8 +37,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static es.caib.comanda.ms.estadistica.model.Format.DECIMAL;
+import static es.caib.comanda.ms.estadistica.model.Format.LONG;
+import static es.caib.notib.client.domini.explotacio.FetEnum.*;
 
 @Slf4j
 @Service
@@ -99,20 +106,21 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     @Transactional(readOnly = true)
     public RegistresEstadistics consultaUltimesEstadistiques() {
 
-        LocalDate data = ahir();
+        return consultaEstadistiques(ahir());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public RegistresEstadistics consultaEstadistiques(LocalDate data) {
         ExplotTempsEntity temps = explotTempsRepository.findFirstByData(data);
         if (temps == null) {
-            Date ahir = Date.from(ahir().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            Date dia = Date.from(ahir().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
             return RegistresEstadistics.builder()
-                    .temps(Temps.builder().data(ahir).build())
-//                    .dimensionsDescripcio(getDimensions().stream()
-//                            .map(d -> GenericDimensio.builder().nom(d.getNom()).valor(d.getDescripcio()).build())
-//                            .collect(Collectors.toList()))
+                    .temps(Temps.builder().data(dia).build())
                     .fets(List.of())
                     .build();
         }
         List<ExplotFetsEntity> fets = explotFetsRepository.findByTemps(temps);
-
         return toRegistresEstadistics(fets, data);
     }
 
@@ -120,34 +128,85 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     public List<DimensioDesc> getDimensions() {
         List<ExplotDimensio> dim = explotDimensioRepository.getDimensionsPerEstadistiques();
         return List.of(
-                DimensioDesc.builder().codi(DimEnum.ENT.name()).nom("Entitat").descripcio("Codi de l'entitat a la que pertany la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getEntitatId()).map(Object::toString).orElse("")).filter(s -> !s.isEmpty()).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().codi(DimEnum.ORG.name()).nom("Organ Gestor").descripcio("Organ gestor al que pertany la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getOrganCodi()).orElse("")).filter(s -> !s.isEmpty()).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().codi(DimEnum.PRC.name()).nom("Procediment").descripcio("Procediment al que pertany la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getProcedimentId()).map(Object::toString).orElse("")).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().codi(DimEnum.USU.name()).nom("Usuari").descripcio("Codi de l'usuari que ha creat la comunicació/notificació").valors(dim.stream().map(d -> Optional.ofNullable(d.getUsuariCodi()).orElse("DESCONEGUT")).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().codi(DimEnum.TIP.name()).nom("Tipus").descripcio("Tipus de comunicació oficial: notificació, comunicació o comunicació SIR").valors(dim.stream().map(d -> d.getTipus().name()).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().codi(DimEnum.ORI.name()).nom("Origen").descripcio("Des d'on s'ha creat la comunicació/notificació: des de la interfície web, des de la API Rest o com a enviament massiu").valors(dim.stream().map(d -> d.getOrigen().name()).distinct().sorted().collect(Collectors.toList())).build());
-
+                DimensioDesc.builder().codi(DimEnum.ENT.name()).nom(DimEnum.ENT.getNom()).descripcio(DimEnum.ENT.getDescripcio()).valors(dim.stream().map(d -> Optional.ofNullable(d.getEntitatId()).map(Object::toString).orElse("")).filter(s -> !s.isEmpty()).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().codi(DimEnum.ORG.name()).nom(DimEnum.ORG.getNom()).descripcio(DimEnum.ORG.getDescripcio()).valors(dim.stream().map(d -> Optional.ofNullable(d.getOrganCodi()).orElse("")).filter(s -> !s.isEmpty()).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().codi(DimEnum.PRC.name()).nom(DimEnum.PRC.getNom()).descripcio(DimEnum.PRC.getDescripcio()).valors(dim.stream().map(d -> Optional.ofNullable(d.getProcedimentId()).map(Object::toString).orElse("")).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().codi(DimEnum.USU.name()).nom(DimEnum.USU.getNom()).descripcio(DimEnum.USU.getDescripcio()).valors(dim.stream().map(d -> Optional.ofNullable(d.getUsuariCodi()).orElse("DESCONEGUT")).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().codi(DimEnum.TIP.name()).nom(DimEnum.TIP.getNom()).descripcio(DimEnum.TIP.getDescripcio()).valors(dim.stream().map(d -> d.getTipus().name()).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().codi(DimEnum.ORI.name()).nom(DimEnum.ORI.getNom()).descripcio(DimEnum.ORI.getDescripcio()).valors(dim.stream().map(d -> d.getOrigen().name()).distinct().sorted().collect(Collectors.toList())).build()
+        );
     }
 
     @Override
     public List<IndicadorDesc> getIndicadors() {
         return List.of(
-                IndicadorDesc.builder().codi(FetEnum.PND.name()).nom("Pendent").descripcio("La comunicació/notificació està pendent de ser registrada").format(Format.LONG).build(),
-                IndicadorDesc.builder().codi(FetEnum.REG_ERR.name()).nom("Error enviant a registre").descripcio("S'ha produït un error al intentar registrar la comunicació/notificació").format(Format.LONG).build(),
-                IndicadorDesc.builder().codi(FetEnum.REG.name()).nom("Registrada").descripcio("La comunicació/notificació ha estat registrada i està pendent de ser enviada al destinatari").format(Format.LONG).build(),
-                IndicadorDesc.builder().codi(FetEnum.SIR_ACC.name()).nom("Registre SIR acceptat").descripcio("La comunicació SIR ha estat acceptada per l'administració destinatària").format(Format.LONG).build(),
-                IndicadorDesc.builder().codi(FetEnum.SIR_REB.name()).nom("Registre SIR rebutjat").descripcio("La comunicació SIR ha estat rebutjada per l'administració destinatària").format(Format.LONG).build(),
-                IndicadorDesc.builder().codi(FetEnum.NOT_ERR.name()).nom("Error enviant a Notific@").descripcio("S'ha produït un error al intentar enviar la comunicació/notificació al destinatari mitjançant Notific@").format(Format.LONG).build(),
-                IndicadorDesc.builder().codi(FetEnum.NOT_ENV.name()).nom("Enviada a Notific@").descripcio("La comunicació/notificació s'ha enviat a Notific@ i està pendent de compareixença del destinatari a DEHú").format(Format.LONG).build(),
-                IndicadorDesc.builder().codi(FetEnum.NOT_ACC.name()).nom("Acceptada a Notific@").descripcio("La comunicació/notificació ha estat acceptada pel destinatari a DEHú").format(Format.LONG).build(),
-                IndicadorDesc.builder().codi(FetEnum.NOT_REB.name()).nom("Rebutjada a Notific@").descripcio("La comunicació/notificació ha estat rebutjada pel destinatari a DEHú").format(Format.LONG).build(),
-                IndicadorDesc.builder().codi(FetEnum.NOT_EXP.name()).nom("Expirada a Notific@").descripcio("Ha passat el termini establert per a la compareixença del destinatari a DEHú").format(Format.LONG).build(),
-                IndicadorDesc.builder().codi(FetEnum.CIE_ERR.name()).nom("Error enviant al CIE").descripcio("S'ha produït un error al intentar enviar la comunicació/notificació al destinatari mitjançant CIE + Operador postal").format(Format.LONG).build(),
-                IndicadorDesc.builder().codi(FetEnum.CIE_ENV.name()).nom("Enviada a CIE").descripcio("La comunicació/notificació s'ha enviat al CIE i està pendent de ser entregada per l'operador postal").format(Format.LONG).build(),
-                IndicadorDesc.builder().codi(FetEnum.CIE_ACC.name()).nom("Acceptada al CIE").descripcio("La comunicació/notificació ha estat entregada per l'operador postal al destinatari").format(Format.LONG).build(),
-                IndicadorDesc.builder().codi(FetEnum.CIE_REB.name()).nom("Rebutjada al CIE").descripcio("La comunicació/notificació s'ha intentat entregar per l'operador postal, però ha estat rebutjada pel destinatari").format(Format.LONG).build(),
-                IndicadorDesc.builder().codi(FetEnum.CIE_ERE.name()).nom("Error en l'entrega per CIE").descripcio("S'ha produït algun problema que ha impedit realitzar la entrega postal").format(Format.LONG).build(),
-                IndicadorDesc.builder().codi(FetEnum.PRC.name()).nom("Processada").descripcio("La comunicació/notificació ha estat processada").format(Format.LONG).build()
+                IndicadorDesc.builder().codi(PND.name()).nom(PND.getNom()).descripcio(PND.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(REG_ERR.name()).nom(REG_ERR.getNom()).descripcio(REG_ERR.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(REG.name()).nom(REG.getNom()).descripcio(REG.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(SIR_ACC.name()).nom(SIR_ACC.getNom()).descripcio(SIR_ACC.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(SIR_REB.name()).nom(SIR_REB.getNom()).descripcio(SIR_REB.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(NOT_ERR.name()).nom(NOT_ERR.getNom()).descripcio(NOT_ERR.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(NOT_ENV.name()).nom(NOT_ENV.getNom()).descripcio(NOT_ENV.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(NOT_ACC.name()).nom(NOT_ACC.getNom()).descripcio(NOT_ACC.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(NOT_REB.name()).nom(NOT_REB.getNom()).descripcio(NOT_REB.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(NOT_EXP.name()).nom(NOT_EXP.getNom()).descripcio(NOT_EXP.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(CIE_ERR.name()).nom(CIE_ERR.getNom()).descripcio(CIE_ERR.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(CIE_ENV.name()).nom(CIE_ENV.getNom()).descripcio(CIE_ENV.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(CIE_ACC.name()).nom(CIE_ACC.getNom()).descripcio(CIE_ACC.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(CIE_REB.name()).nom(CIE_REB.getNom()).descripcio(CIE_REB.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(CIE_FAL.name()).nom(CIE_FAL.getNom()).descripcio(CIE_FAL.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(PRC.name()).nom(PRC.getNom()).descripcio(PRC.getDescripcio()).format(LONG).build(),
+                // Transicions
+                IndicadorDesc.builder().codi(TR_CRE.name()).nom(TR_CRE.getNom()).descripcio(TR_CRE.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_REG_ERR.name()).nom(TR_REG_ERR.getNom()).descripcio(TR_REG_ERR.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_REG.name()).nom(TR_REG.getNom()).descripcio(TR_REG.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_SIR_ACC.name()).nom(TR_SIR_ACC.getNom()).descripcio(TR_SIR_ACC.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_SIR_REB.name()).nom(TR_SIR_REB.getNom()).descripcio(TR_SIR_REB.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_NOT_ERR.name()).nom(TR_NOT_ERR.getNom()).descripcio(TR_NOT_ERR.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_NOT_ENV.name()).nom(TR_NOT_ENV.getNom()).descripcio(TR_NOT_ENV.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_NOT_ACC.name()).nom(TR_NOT_ACC.getNom()).descripcio(TR_NOT_ACC.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_NOT_REB.name()).nom(TR_NOT_REB.getNom()).descripcio(TR_NOT_REB.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_NOT_EXP.name()).nom(TR_NOT_EXP.getNom()).descripcio(TR_NOT_EXP.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_NOT_FAL.name()).nom(TR_NOT_FAL.getNom()).descripcio(TR_NOT_FAL.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_CIE_ERR.name()).nom(TR_CIE_ERR.getNom()).descripcio(TR_CIE_ERR.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_CIE_ENV.name()).nom(TR_CIE_ENV.getNom()).descripcio(TR_CIE_ENV.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_CIE_ACC.name()).nom(TR_CIE_ACC.getNom()).descripcio(TR_CIE_ACC.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_CIE_REB.name()).nom(TR_CIE_REB.getNom()).descripcio(TR_CIE_REB.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_CIE_CAN.name()).nom(TR_CIE_CAN.getNom()).descripcio(TR_CIE_CAN.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_CIE_FAL.name()).nom(TR_CIE_FAL.getNom()).descripcio(TR_CIE_FAL.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_EML_ERR.name()).nom(TR_EML_ERR.getNom()).descripcio(TR_EML_ERR.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TR_EML_ENV.name()).nom(TR_EML_ENV.getNom()).descripcio(TR_EML_ENV.getDescripcio()).format(LONG).build(),
+
+                // Temps mig en estat
+                IndicadorDesc.builder().codi(TMP_PND.name()).nom(TMP_PND.getNom()).descripcio(TMP_PND.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_REG.name()).nom(TMP_REG.getNom()).descripcio(TMP_REG.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_NOT.name()).nom(TMP_NOT.getNom()).descripcio(TMP_NOT.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_CIE.name()).nom(TMP_CIE.getNom()).descripcio(TMP_CIE.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_TOT.name()).nom(TMP_TOT.getNom()).descripcio(TMP_TOT.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_REG_SAC.name()).nom(TMP_REG_SAC.getNom()).descripcio(TMP_REG_SAC.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_REG_SRB.name()).nom(TMP_REG_SRB.getNom()).descripcio(TMP_REG_SRB.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_REG_NOT.name()).nom(TMP_REG_NOT.getNom()).descripcio(TMP_REG_NOT.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_REG_EML.name()).nom(TMP_REG_EML.getNom()).descripcio(TMP_REG_EML.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_NOT_NOT.name()).nom(TMP_NOT_NOT.getNom()).descripcio(TMP_NOT_NOT.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_NOT_REB.name()).nom(TMP_NOT_REB.getNom()).descripcio(TMP_NOT_REB.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_NOT_EXP.name()).nom(TMP_NOT_EXP.getNom()).descripcio(TMP_NOT_EXP.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_NOT_FAL.name()).nom(TMP_NOT_FAL.getNom()).descripcio(TMP_NOT_FAL.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_CIE_NOT.name()).nom(TMP_CIE_NOT.getNom()).descripcio(TMP_CIE_NOT.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_CIE_REB.name()).nom(TMP_CIE_REB.getNom()).descripcio(TMP_CIE_REB.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_CIE_CAN.name()).nom(TMP_CIE_CAN.getNom()).descripcio(TMP_CIE_CAN.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_CIE_FAL.name()).nom(TMP_CIE_FAL.getNom()).descripcio(TMP_CIE_FAL.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_TOT_NAC.name()).nom(TMP_TOT_NAC.getNom()).descripcio(TMP_TOT_NAC.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_TOT_NRB.name()).nom(TMP_TOT_NRB.getNom()).descripcio(TMP_TOT_NRB.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_TOT_NEX.name()).nom(TMP_TOT_NEX.getNom()).descripcio(TMP_TOT_NEX.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_TOT_NFL.name()).nom(TMP_TOT_NFL.getNom()).descripcio(TMP_TOT_NFL.getDescripcio()).format(LONG).build(),
+                IndicadorDesc.builder().codi(TMP_TOT_CAC.name()).nom(TMP_TOT_CAC.getNom()).descripcio(TMP_TOT_CAC.getDescripcio()).format(LONG).build(),
+
+                // Intents
+                IndicadorDesc.builder().codi(INT_REG.name()).nom(INT_REG.getNom()).descripcio(INT_REG.getDescripcio()).format(DECIMAL).build(),
+                IndicadorDesc.builder().codi(INT_SIR.name()).nom(INT_SIR.getNom()).descripcio(INT_SIR.getDescripcio()).format(DECIMAL).build(),
+                IndicadorDesc.builder().codi(INT_NOT.name()).nom(INT_NOT.getNom()).descripcio(INT_NOT.getDescripcio()).format(DECIMAL).build(),
+                IndicadorDesc.builder().codi(INT_CIE.name()).nom(INT_CIE.getNom()).descripcio(INT_CIE.getDescripcio()).format(DECIMAL).build(),
+                IndicadorDesc.builder().codi(INT_EML.name()).nom(INT_EML.getNom()).descripcio(INT_EML.getDescripcio()).format(DECIMAL).build()
         );
     }
 
@@ -204,9 +263,12 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     private void actualitzarDadesEstadistiques(ExplotTempsEntity ete, List<ExplotDimensioEntity> dimensions) {
         // Eliminam les dades d'explotació de la data
         explotFetsRepository.deleteAllByTemps(ete);
+
         List<ExplotFets> estadistiques = explotFetsRepository.getFetsPerEstadistiques(
                 false,
                 Date.from(ete.getData().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+
+        addAdditionalStats(estadistiques, ete.getData());
 
         int dadaIndex = 0;
         int dimensionIndex = 0;
@@ -226,6 +288,160 @@ public class EstadisticaServiceImpl implements EstadisticaService {
                 dimensionIndex++;
             }
         }
+    }
+
+    private void addAdditionalStats(List<ExplotFets> estadistiques, LocalDate localData) {
+        Map<ExplotFetsKey, ExplotFets> statsMap = new HashMap<>();
+        Date iniciDelDia = Date.from(localData.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        Date finalDelDia = Date.from(localData.plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+
+
+        estadistiques.forEach(stat -> statsMap.put(
+                new ExplotFetsKey(stat.getEntitatId(), stat.getProcedimentId(), stat.getOrganCodi(), stat.getUsuariCodi(), stat.getTipus(), stat.getOrigen()),
+                stat));
+
+        // Notificacions creades
+        explotFetsRepository.getStatsCreacioPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrCreades(stat.getTotalEnviaments());
+        });
+
+        // Notificacions amb error al intentar registrar
+        explotFetsRepository.getStatsRegEnviamentErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrRegEnviadesError(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setIntentsRegistre(stat.getIntentsMig().longValue());
+        });
+
+        // Notificacions registrades
+        explotFetsRepository.getStatsRegistradaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrRegistrades(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setTemsMigPendent(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setIntentsRegistre(stat.getIntentsMig().longValue());
+        });
+
+        // Comunicacions acceptades via SIR
+        explotFetsRepository.getStatsRegAcceptadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrSirAcceptades(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setTemsMigRegistrada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigRegistradaPerSirAcceptada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setIntentsRegistre(stat.getIntentsMig().longValue());
+            statsMap.get(stat.getKey()).setTemsMigTotal(stat.getTempsTotal().longValue());
+        });
+
+        // Comunicacions rebutjades via SIR
+        explotFetsRepository.getStatsRegRebutjadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrSirRebutjades(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setTemsMigRegistrada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigRegistradaPerSirRebutjada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setIntentsRegistre(stat.getIntentsMig().longValue());
+            statsMap.get(stat.getKey()).setTemsMigTotal(stat.getTempsTotal().longValue());
+        });
+
+        // Notificacions amb error al intentar enviar a Notifica
+        explotFetsRepository.getStatsNotEnviamentErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrNotEnviadesError(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setIntentsRegistre(stat.getIntentsMig().longValue());
+        });
+
+        // Notificacions enviades a Notifica
+        explotFetsRepository.getStatsNotEnviadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrNotEnviades(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setTemsMigRegistrada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigRegistradaPerNotificada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setIntentsNotEnviament(stat.getIntentsMig().longValue());
+        });
+
+        // Notificacions notificades via Notifica
+        explotFetsRepository.getStatsNotNotificadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrNotNotificades(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setTemsMigNotEnviada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigNotEnviadaPerNotificada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigTotalPerNotAcceptada(stat.getTempsTotal().longValue());
+            statsMap.get(stat.getKey()).setTemsMigTotal(stat.getTempsTotal().longValue());
+        });
+
+        // Notificacions rebutjades via Notifica
+        explotFetsRepository.getStatsNotRebutjadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrNotRebujtades(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setTemsMigNotEnviada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigNotEnviadaPerRebubjada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigTotalPerNotRebutjada(stat.getTempsTotal().longValue());
+            statsMap.get(stat.getKey()).setTemsMigTotal(stat.getTempsTotal().longValue());
+        });
+
+        // Notificacions expirades via Notifica
+        explotFetsRepository.getStatsNotExpiradaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrNotExpirades(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setTemsMigNotEnviada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigNotEnviadaPerExpirada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigTotalPerNotExpirada(stat.getTempsTotal().longValue());
+            statsMap.get(stat.getKey()).setTemsMigTotal(stat.getTempsTotal().longValue());
+        });
+
+        // Notificacions fallades via Notifica
+        explotFetsRepository.getStatsNotErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrNotFallades(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setTemsMigNotEnviada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigNotEnviadaPerFallada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigTotalPerNotFallada(stat.getTempsTotal().longValue());
+            statsMap.get(stat.getKey()).setTemsMigTotal(stat.getTempsTotal().longValue());
+        });
+
+        // Notificacions amb error al intentar enviar al CIE
+        explotFetsRepository.getStatsCieEnviamentErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrCieEnviadesError(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setIntentsCieEnviament(stat.getIntentsMig().longValue());
+        });
+
+        // Notificacions enviades al CIE
+        explotFetsRepository.getStatsCieEnviadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrCieEnviades(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setIntentsCieEnviament(stat.getIntentsMig().longValue());
+        });
+
+        // Notificacions notificades via CIE
+        explotFetsRepository.getStatsCieNotificadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrCieNotificades(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setTemsMigCieEnviada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigCieEnviadaPerNotificada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigTotalPerCieAcceptada(stat.getTempsTotal().longValue());
+            statsMap.get(stat.getKey()).setTemsMigTotal(stat.getTempsTotal().longValue());
+        });
+
+        // Notificacions rebutjades via CIE
+        explotFetsRepository.getStatsCieRebutjadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrCieRebutjades(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setTemsMigCieEnviada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigCieEnviadaPerRebubjada(stat.getTempsMigEstat().longValue());
+        });
+
+        // Notificacions cancel·lades via CIE
+        explotFetsRepository.getStatsCieCanceladaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrCieCancelades(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setTemsMigCieEnviada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigCieEnviadaPerCancelada(stat.getTempsMigEstat().longValue());
+        });
+
+        // Notificacions fallades via CIE
+        explotFetsRepository.getStatsCieErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrCieFallades(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setTemsMigCieEnviada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigCieEnviadaPerFallada(stat.getTempsMigEstat().longValue());
+        });
+
+        // Notificacions amb error al intentar enviar via email
+        explotFetsRepository.getStatsEmailEnviamentErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrEmailEnviadesError(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setIntentsEmailEnviament(stat.getIntentsMig().longValue());
+        });
+
+        // Notificacions enviades via email
+        explotFetsRepository.getStatsEmailEnviadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            statsMap.get(stat.getKey()).setTrEmailEnviades(stat.getTotalEnviaments());
+            statsMap.get(stat.getKey()).setTemsMigRegistrada(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setTemsMigRegistradaPerEmail(stat.getTempsMigEstat().longValue());
+            statsMap.get(stat.getKey()).setIntentsEmailEnviament(stat.getIntentsMig().longValue());
+        });
+
     }
 
     private int compareEstadistiquesAndDimensions(ExplotFets estadistiques, ExplotDimensioEntity dimension) {
@@ -256,27 +472,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     }
 
     private void saveToFetsEntity(ExplotFets estadistiques, ExplotDimensioEntity dimension, ExplotTempsEntity ete) {
-        ExplotFetsEntity fetsEntity = new ExplotFetsEntity();
-        fetsEntity.setDimensio(dimension);
-        fetsEntity.setTemps(ete);
-
-        fetsEntity.setPendent(estadistiques.getPendent());
-        fetsEntity.setRegEnviamentError(estadistiques.getRegEnviamentError());
-        fetsEntity.setRegistrada(estadistiques.getRegistrada());
-        fetsEntity.setRegAcceptada(estadistiques.getRegAcceptada());
-        fetsEntity.setRegRebutjada(estadistiques.getRegRebutjada());
-        fetsEntity.setNotEnviamentError(estadistiques.getNotEnviamentError());
-        fetsEntity.setNotEnviada(estadistiques.getNotEnviada());
-        fetsEntity.setNotNotificada(estadistiques.getNotNotificada());
-        fetsEntity.setNotRebutjada(estadistiques.getNotRebutjada());
-        fetsEntity.setNotExpirada(estadistiques.getNotExpirada());
-        fetsEntity.setCieEnviamentError(estadistiques.getCieEnviamentError());
-        fetsEntity.setCieEnviada(estadistiques.getCieEnviada());
-        fetsEntity.setCieNotificada(estadistiques.getCieNotificada());
-        fetsEntity.setCieRebutjada(estadistiques.getCieRebutjada());
-        fetsEntity.setCieError(estadistiques.getCieError());
-        fetsEntity.setProcessada(estadistiques.getProcessada());
-
+        ExplotFetsEntity fetsEntity = new ExplotFetsEntity(dimension, ete, estadistiques);
         explotFetsRepository.save(fetsEntity);
     }
 
@@ -297,34 +493,90 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
     private List<Dimensio> toDimensions(ExplotDimensioEntity dimensio) {
         return List.of(
-                DimensioEntitat.builder().entitatId(dimensio.getEntitatId()).build(),
-                DimensioProcediment.builder().procedimentId(dimensio.getProcedimentId()).build(),
-                DimensioOrgan.builder().organCodi(dimensio.getOrganCodi()).build(),
-                DimensioUsuari.builder().usuariCodi(dimensio.getUsuariCodi()).build(),
-                DimensioTipus.builder().tipus(dimensio.getTipus()).build(),
-                DimensioOrigen.builder().origen(dimensio.getOrigen()).build()
+                new DimensioNotib(DimEnum.ENT, dimensio.getEntitatId()),
+                new DimensioNotib(DimEnum.PRC, dimensio.getProcedimentId()),
+                new DimensioNotib(DimEnum.ORG, dimensio.getOrganCodi()),
+                new DimensioNotib(DimEnum.USU, dimensio.getUsuariCodi()),
+                new DimensioNotib(DimEnum.TIP, dimensio.getTipus()),
+                new DimensioNotib(DimEnum.ORI, dimensio.getOrigen())
         );
     }
 
     private List<Fet> toFets(ExplotFetsEntity fet) {
         return List.of(
-                FetPendent.builder().pendent(Double.valueOf(fet.getPendent())).build(),
-                FetRegEnviamentError.builder().regEnviamentError(Double.valueOf(fet.getRegEnviamentError())).build(),
-                FetRegistrada.builder().registrada(Double.valueOf(fet.getRegistrada())).build(),
-                FetRegAcceptada.builder().regAcceptada(Double.valueOf(fet.getRegAcceptada())).build(),
-                FetRegRebutjada.builder().regRebutjada(Double.valueOf(fet.getRegRebutjada())).build(),
-                FetNotEnviamentError.builder().notEnviamentError(Double.valueOf(fet.getNotEnviamentError())).build(),
-                FetNotEnviada.builder().notEnviada(Double.valueOf(fet.getNotEnviada())).build(),
-                FetNotNotificada.builder().notNotificada(Double.valueOf(fet.getNotNotificada())).build(),
-                FetNotRebutjada.builder().notRebutjada(Double.valueOf(fet.getNotRebutjada())).build(),
-                FetNotExpirada.builder().notExpirada(Double.valueOf(fet.getNotExpirada())).build(),
-                FetCieEnviamentError.builder().cieEnviamentError(Double.valueOf(fet.getCieEnviamentError())).build(),
-                FetCieEnviada.builder().cieEnviada(Double.valueOf(fet.getCieEnviada())).build(),
-                FetCieNotificada.builder().cieNotificada(Double.valueOf(fet.getCieNotificada())).build(),
-                FetCieRebutjada.builder().cieRebutjada(Double.valueOf(fet.getCieRebutjada())).build(),
-                FetCieError.builder().cieError(Double.valueOf(fet.getCieError())).build(),
-                FetProcessada.builder().processada(Double.valueOf(fet.getProcessada())).build()
+                new FetNotib(PND, fet.getPendent()),
+                new FetNotib(REG_ERR, fet.getRegEnviamentError()),
+                new FetNotib(REG, fet.getRegistrada()),
+                new FetNotib(SIR_ACC, fet.getRegAcceptada()),
+                new FetNotib(SIR_REB, fet.getRegRebutjada()),
+                new FetNotib(NOT_ERR, fet.getNotEnviamentError()),
+                new FetNotib(NOT_ENV, fet.getNotEnviada()),
+                new FetNotib(NOT_ACC, fet.getNotNotificada()),
+                new FetNotib(NOT_REB, fet.getNotRebutjada()),
+                new FetNotib(NOT_EXP, fet.getNotExpirada()),
+                new FetNotib(CIE_ERR, fet.getCieEnviamentError()),
+                new FetNotib(CIE_ENV, fet.getCieEnviada()),
+                new FetNotib(CIE_ACC, fet.getCieNotificada()),
+                new FetNotib(CIE_REB, fet.getCieRebutjada()),
+                new FetNotib(CIE_FAL, fet.getCieError()),
+                new FetNotib(PRC, fet.getProcessada()),
+
+                // Transicions
+                new FetNotib(TR_CRE, fet.getTrCreades()),
+                new FetNotib(TR_REG_ERR, fet.getTrRegEnviadesError()),
+                new FetNotib(TR_REG, fet.getTrRegistrades()),
+                new FetNotib(TR_SIR_ACC, fet.getTrSirAcceptades()),
+                new FetNotib(TR_SIR_REB, fet.getTrSirRebutjades()),
+                new FetNotib(TR_NOT_ERR, fet.getTrNotEnviadesError()),
+                new FetNotib(TR_NOT_ENV, fet.getTrNotEnviades()),
+                new FetNotib(TR_NOT_ACC, fet.getTrNotNotificades()),
+                new FetNotib(TR_NOT_REB, fet.getTrNotRebujtades()),
+                new FetNotib(TR_NOT_EXP, fet.getTrNotExpirades()),
+                new FetNotib(TR_NOT_FAL, fet.getTrNotFallades()),
+                new FetNotib(TR_CIE_ERR, fet.getTrCieEnviadesError()),
+                new FetNotib(TR_CIE_ENV, fet.getTrCieEnviades()),
+                new FetNotib(TR_CIE_ACC, fet.getTrCieNotificades()),
+                new FetNotib(TR_CIE_REB, fet.getTrCieRebutjades()),
+                new FetNotib(TR_CIE_CAN, fet.getTrCieCancelades()),
+                new FetNotib(TR_CIE_FAL, fet.getTrCieFallades()),
+                new FetNotib(TR_EML_ERR, fet.getTrEmailEnviadesError()),
+                new FetNotib(TR_EML_ENV, fet.getTrEmailEnviades()),
+
+                // Temps mig en estat
+                new FetNotib(TMP_PND, fet.getTemsMigPendent()),
+                new FetNotib(TMP_REG, fet.getTemsMigRegistrada()),
+                new FetNotib(TMP_NOT, fet.getTemsMigNotEnviada()),
+                new FetNotib(TMP_CIE, fet.getTemsMigCieEnviada()),
+                new FetNotib(TMP_TOT, fet.getTemsMigTotal()),
+                new FetNotib(TMP_REG_SAC, fet.getTemsMigRegistradaPerSirAcceptada()),
+                new FetNotib(TMP_REG_SRB, fet.getTemsMigRegistradaPerSirRebutjada()),
+                new FetNotib(TMP_REG_NOT, fet.getTemsMigRegistradaPerNotificada()),
+                new FetNotib(TMP_REG_EML, fet.getTemsMigRegistradaPerEmail()),
+                new FetNotib(TMP_NOT_NOT, fet.getTemsMigNotEnviadaPerNotificada()),
+                new FetNotib(TMP_NOT_REB, fet.getTemsMigNotEnviadaPerRebubjada()),
+                new FetNotib(TMP_NOT_EXP, fet.getTemsMigNotEnviadaPerExpirada()),
+                new FetNotib(TMP_NOT_FAL, fet.getTemsMigNotEnviadaPerFallada()),
+                new FetNotib(TMP_CIE_NOT, fet.getTemsMigCieEnviadaPerNotificada()),
+                new FetNotib(TMP_CIE_REB, fet.getTemsMigCieEnviadaPerRebubjada()),
+                new FetNotib(TMP_CIE_CAN, fet.getTemsMigCieEnviadaPerCancelada()),
+                new FetNotib(TMP_CIE_FAL, fet.getTemsMigCieEnviadaPerFallada()),
+                new FetNotib(TMP_TOT_NAC, fet.getTemsMigTotalPerNotAcceptada()),
+                new FetNotib(TMP_TOT_NRB, fet.getTemsMigTotalPerNotRebutjada()),
+                new FetNotib(TMP_TOT_NEX, fet.getTemsMigTotalPerNotExpirada()),
+                new FetNotib(TMP_TOT_NFL, fet.getTemsMigTotalPerNotFallada()),
+                new FetNotib(TMP_TOT_CAC, fet.getTemsMigTotalPerCieAcceptada()),
+
+                // Intents
+                new FetNotib(INT_REG, fet.getIntentsRegistre()),
+                new FetNotib(INT_SIR, fet.getIntentsSir()),
+                new FetNotib(INT_NOT, fet.getIntentsNotEnviament()),
+                new FetNotib(INT_CIE, fet.getIntentsCieEnviament()),
+                new FetNotib(INT_EML, fet.getIntentsEmailEnviament())
         );
+    }
+
+    private Double toDouble(Long value) {
+        return value == null ? null : Double.valueOf(value);
     }
 
 }

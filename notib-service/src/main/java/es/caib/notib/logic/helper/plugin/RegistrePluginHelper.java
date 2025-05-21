@@ -13,6 +13,7 @@ import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.HibernateHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.AnexoWsDto;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
@@ -51,7 +52,6 @@ import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
-import liquibase.pro.packaged.N;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -73,6 +73,8 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.REG;
 
 /**
  * Helper per a interactuar amb els plugins.
@@ -117,6 +119,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 	public RespostaConsultaRegistre crearAsientoRegistral(String codiDir3Entitat, AsientoRegistralBeanDto arb, Long tipusOperacio,
 														  Long notificacioId, String enviamentIds, boolean generarJustificant) {
 
+		long start = System.currentTimeMillis();
 		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "Enviament notificació a registre (SIR activat)", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Id de la notificacio", String.valueOf(notificacioId)),
@@ -142,9 +145,11 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			} else {
 				integracioHelper.addAccioError(info, resposta.getErrorDescripcio());
 			}
+			SubsistemesHelper.addSuccessOperation(REG, System.currentTimeMillis() - start);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de registre";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			SubsistemesHelper.addErrorOperation(REG, System.currentTimeMillis() - start);
 			if (ex.getCause() != null) {
 				errorDescripcio += " :" + ex.getCause().getMessage();
 			}
@@ -158,7 +163,8 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 	}
 
 	public RespostaConsultaRegistre obtenerAsientoRegistral(String codiDir3Entitat, String numeroRegistreFormatat, Long tipusRegistre,  boolean ambAnnexos) {
-		
+
+		long start = System.currentTimeMillis();
 		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "Consulta de assentament registral SIR", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Número de registre", numeroRegistreFormatat),
@@ -180,9 +186,11 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			} else {
 				integracioHelper.addAccioError(info, resposta.getErrorDescripcio());
 			}
+			SubsistemesHelper.addSuccessOperation(REG, System.currentTimeMillis() - start);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de registre";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			SubsistemesHelper.addErrorOperation(REG, System.currentTimeMillis() - start);
 			if (ex.getCause() != null) {
 				errorDescripcio += " :" + ex.getCause().getMessage();
 			}
@@ -260,7 +268,8 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 	}
 	
 	public RespostaJustificantRecepcio obtenirOficiExtern(String codiDir3Entitat, String numeroRegistreFormatat) {
-		
+
+		long start = System.currentTimeMillis();
 		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "Obtenir ofici extern", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Número de registre", numeroRegistreFormatat));

@@ -13,6 +13,7 @@ public interface EstadisticaService {
     public void generarDadesExplotacio();
     public void generarDadesExplotacio(LocalDate data);
     public RegistresEstadistics consultaUltimesEstadistiques();
+    public RegistresEstadistics consultaEstadistiques(LocalDate data);
 
     public List<DimensioDesc> getDimensions();
     public List<IndicadorDesc> getIndicadors();

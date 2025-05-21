@@ -9,6 +9,7 @@ import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.NotificacioEventHelper;
 import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
@@ -40,6 +41,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
+
+import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CIE;
 
 @Slf4j
 @Component
@@ -86,65 +89,74 @@ public class CiePluginHelper {
     @Transactional
     public RespostaCie enviar(String notificacioReferencia) {
 
-        var notificacio = notificacioRepository.findByReferencia(notificacioReferencia);
-        var codiDir3Entitat = notificacio.getEntitat().getDir3Codi();
-        var info = new IntegracioInfo(IntegracioCodi.CIE, "Enviar entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
-                new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
-                new AccioParam("Notificacio", notificacio.getId() + ""));
-        info.setNotificacioId(notificacio.getId());
-        info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
+        long start = System.currentTimeMillis();
+        boolean errorSbs = false;
         var resposta = new RespostaCie();
         try {
-            EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
-            if (entitat == null) {
-                throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
-            }
-            info.setCodiEntitat(entitat.getCodi());
-            byte[] contingut = null;
-            if(notificacio.getDocument() != null && notificacio.getDocument().getArxiuGestdocId() != null) {
-                var baos = new ByteArrayOutputStream();
-                ConfigHelper.setEntitatCodi(entitat.getCodi());
-                pluginHelper.gestioDocumentalGet(notificacio.getDocument().getArxiuGestdocId(), PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, baos);
-                contingut = baos.size() > 0 ? baos.toByteArray() : null;
-            } else {
-                contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
-            }
-            if (contingut == null) {
-                throw new Exception("El document no te contingut " + notificacio.getDocument().getId());
-            }
-            var enviamentCie = conversioTipusHelper.convertir(notificacio, EnviamentCie.class);
-            enviamentCie.setEnviaments(enviamentCie.getEnviaments().stream().filter(e -> e.getEntregaPostal() != null).collect(Collectors.toList()));
-            enviamentCie.setContingutDocument(contingut);
-            enviamentCie.setCodiDir3Entitat(configHelper.getConfigAsBoolean("es.caib.notib.plugin.codi.dir3.entitat"));
-            var entregaCieEfectiva = notificacio.getProcediment().getEntregaCieEfectiva();
-            entregaCieEfectiva = entregaCieEfectiva == null ? notificacio.getOrganGestor().getEntregaCie() : entregaCieEfectiva;
-            var pagadorCieEntity = entregaCieEfectiva.getCie();
-            var apiKey = getApiKey(pagadorCieEntity);
-            var cie = conversioTipusHelper.convertir(pagadorCieEntity, CieDto.class);
-            if (notificacio.getOrganGestor().isSobrescriureCieOrganEmisor()) {
-                cie.setOrganismeEmisorCodi(notificacio.getOrganGestor().getCodi());
-            }
-            cie.setApiKey(apiKey);
-            enviamentCie.setEntregaCie(cie);
-            enviamentCie.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEfectiva.getOperadorPostal(), OperadorPostalDto.class));
-            resposta = getCiePlugin(entitat.getCodi()).enviar(enviamentCie);
-            if ("000".equals(resposta.getCodiResposta())) {
-                integracioHelper.addAccioOk(info);
-            } else {
-                integracioHelper.addAccioError(info, resposta.getDescripcioError());
-            }
-        } catch (Exception ex) {
-            var errorDescripcio = "Error al accedir al plugin CIE";
-            integracioHelper.addAccioError(info, errorDescripcio, ex);
-            if (ex.getCause() != null) {
-                errorDescripcio += " :" + ex.getCause().getMessage();
-            }
-            resposta.setCodiResposta(ERROR_INESPERAT);
-            resposta.setDescripcioError(errorDescripcio);
+            var notificacio = notificacioRepository.findByReferencia(notificacioReferencia);
+            var codiDir3Entitat = notificacio.getEntitat().getDir3Codi();
+            var info = new IntegracioInfo(IntegracioCodi.CIE, "Enviar entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
+                    new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
+                    new AccioParam("Notificacio", notificacio.getId() + ""));
+            info.setNotificacioId(notificacio.getId());
+            info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
+            try {
+                EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+                if (entitat == null) {
+                    throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat + "no trobada");
+                }
+                info.setCodiEntitat(entitat.getCodi());
+                byte[] contingut = null;
+                if (notificacio.getDocument() != null && notificacio.getDocument().getArxiuGestdocId() != null) {
+                    var baos = new ByteArrayOutputStream();
+                    ConfigHelper.setEntitatCodi(entitat.getCodi());
+                    pluginHelper.gestioDocumentalGet(notificacio.getDocument().getArxiuGestdocId(), PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, baos);
+                    contingut = baos.size() > 0 ? baos.toByteArray() : null;
+                } else {
+                    contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
+                }
+                if (contingut == null) {
+                    throw new Exception("El document no te contingut " + notificacio.getDocument().getId());
+                }
+                var enviamentCie = conversioTipusHelper.convertir(notificacio, EnviamentCie.class);
+                enviamentCie.setEnviaments(enviamentCie.getEnviaments().stream().filter(e -> e.getEntregaPostal() != null).collect(Collectors.toList()));
+                enviamentCie.setContingutDocument(contingut);
+                enviamentCie.setCodiDir3Entitat(configHelper.getConfigAsBoolean("es.caib.notib.plugin.codi.dir3.entitat"));
+                var entregaCieEfectiva = notificacio.getProcediment().getEntregaCieEfectiva();
+                entregaCieEfectiva = entregaCieEfectiva == null ? notificacio.getOrganGestor().getEntregaCie() : entregaCieEfectiva;
+                var pagadorCieEntity = entregaCieEfectiva.getCie();
+                var apiKey = getApiKey(pagadorCieEntity);
+                var cie = conversioTipusHelper.convertir(pagadorCieEntity, CieDto.class);
+                if (notificacio.getOrganGestor().isSobrescriureCieOrganEmisor()) {
+                    cie.setOrganismeEmisorCodi(notificacio.getOrganGestor().getCodi());
+                }
+                cie.setApiKey(apiKey);
+                enviamentCie.setEntregaCie(cie);
+                enviamentCie.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEfectiva.getOperadorPostal(), OperadorPostalDto.class));
+                resposta = getCiePlugin(entitat.getCodi()).enviar(enviamentCie);
+                if ("000".equals(resposta.getCodiResposta())) {
+                    integracioHelper.addAccioOk(info);
+                } else {
+                    integracioHelper.addAccioError(info, resposta.getDescripcioError());
+                }
+            } catch (Exception ex) {
+                var errorDescripcio = "Error al accedir al plugin CIE";
+                integracioHelper.addAccioError(info, errorDescripcio, ex);
+                if (ex.getCause() != null) {
+                    errorDescripcio += " :" + ex.getCause().getMessage();
+                }
+                resposta.setCodiResposta(ERROR_INESPERAT);
+                resposta.setDescripcioError(errorDescripcio);
+                errorSbs = true;
 //            throw new SistemaExternException(IntegracioCodiEnum.CIE.name(), errorDescripcio, ex);
+            }
+            guardarRespostaCie(notificacioReferencia, resposta);
+            notificacioTableHelper.actualitzarRegistre(notificacio);
+        } catch (Exception ex) {
+            SubsistemesHelper.addErrorOperation(CIE, System.currentTimeMillis() - start);
+            throw ex;
         }
-        guardarRespostaCie(notificacioReferencia, resposta);
-        notificacioTableHelper.actualitzarRegistre(notificacio);
+        SubsistemesHelper.addOperation(CIE, System.currentTimeMillis() - start, errorSbs);
         return resposta;
     }
 

@@ -2,20 +2,17 @@ package es.caib.notib.persist.entity.explotacio;
 
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.explotacio.EnviamentOrigen;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@Builder
-@AllArgsConstructor
+@Getter
+@Setter
 public class ExplotFets {
 
     private final Long entitatId;
     private final Long procedimentId;
     private final String organCodi;
-    @Builder.Default
-    private final String usuariCodi = "DESCONEGUT";
+    private final String usuariCodi;
     private final EnviamentTipus tipus;
     private final EnviamentOrigen origen;
 
@@ -38,39 +35,57 @@ public class ExplotFets {
     private final long processada;
 
     // Transicions
-    private final Long trCreades;
-    private final Long trRegEnviadesError;
-    private final Long trRegistrades;
-    private final Long trSirAcceptades;
-    private final Long trSirRebutjades;
-    private final Long trNotEnviadesError;
-    private final Long trNotEnviades;
-    private final Long trNotNotificades;
-    private final Long trNotRebujtades;
-    private final Long trNotExpirades;
-    private final Long trNotFallades;
-    private final Long trCieEnviadesError;
-    private final Long trCieEnviades;
-    private final Long trCieNotificades;
-    private final Long trCieRebutjades;
-    private final Long trCieCancelades;
-    private final Long trCieFallades;
-    private final Long trEmailEnviadesError;
-    private final Long trEmailEnviades;
+    private Long trCreades;
+    private Long trRegEnviadesError;
+    private Long trRegistrades;
+    private Long trSirAcceptades;
+    private Long trSirRebutjades;
+    private Long trNotEnviadesError;
+    private Long trNotEnviades;
+    private Long trNotNotificades;
+    private Long trNotRebujtades;
+    private Long trNotExpirades;
+    private Long trNotFallades;
+    private Long trCieEnviadesError;
+    private Long trCieEnviades;
+    private Long trCieNotificades;
+    private Long trCieRebutjades;
+    private Long trCieCancelades;
+    private Long trCieFallades;
+    private Long trEmailEnviadesError;
+    private Long trEmailEnviades;
 
     // Temps mig en estat
-    private final Long temsMigPendent;
-    private final Long temsMigRegistrada;
-    private final Long temsMigNotEnviada;
-    private final Long temsMigCieEnviada;
-    private final Long temsMigTotal;
+    private Long temsMigPendent;
+    private Long temsMigRegistrada;
+    private Long temsMigNotEnviada;
+    private Long temsMigCieEnviada;
+    private Long temsMigTotal;
+
+    private Long temsMigRegistradaPerSirAcceptada;
+    private Long temsMigRegistradaPerSirRebutjada;
+    private Long temsMigRegistradaPerNotificada;
+    private Long temsMigRegistradaPerEmail;
+    private Long temsMigNotEnviadaPerNotificada;
+    private Long temsMigNotEnviadaPerRebubjada;
+    private Long temsMigNotEnviadaPerExpirada;
+    private Long temsMigNotEnviadaPerFallada;
+    private Long temsMigCieEnviadaPerNotificada;
+    private Long temsMigCieEnviadaPerRebubjada;
+    private Long temsMigCieEnviadaPerCancelada;
+    private Long temsMigCieEnviadaPerFallada;
+    private Long temsMigTotalPerNotAcceptada;
+    private Long temsMigTotalPerNotRebutjada;
+    private Long temsMigTotalPerNotExpirada;
+    private Long temsMigTotalPerNotFallada;
+    private Long temsMigTotalPerCieAcceptada;
 
     // Nombre mig d'intents
-    private final Long intentsRegistre;
-    private final Long intentsSir;
-    private final Long intentsNotEnviament;
-    private final Long intentsCieEnviament;
-    private final Long intentsEmailEnviament;
+    private Long intentsRegistre;
+    private Long intentsSir;
+    private Long intentsNotEnviament;
+    private Long intentsCieEnviament;
+    private Long intentsEmailEnviament;
 
     public ExplotFets(
             Long entitatId,
@@ -118,35 +133,26 @@ public class ExplotFets {
         this.cieError = cieError;
         this.processada = processada;
 
-        this.trCreades = null;
-        this.trRegEnviadesError = null;
-        this.trRegistrades = null;
-        this.trSirAcceptades = null;
-        this.trSirRebutjades = null;
-        this.trNotEnviadesError = null;
-        this.trNotEnviades = null;
-        this.trNotNotificades = null;
-        this.trNotRebujtades = null;
-        this.trNotExpirades = null;
-        this.trNotFallades = null;
-        this.trCieEnviadesError = null;
-        this.trCieEnviades = null;
-        this.trCieNotificades = null;
-        this.trCieRebutjades = null;
-        this.trCieCancelades = null;
-        this.trCieFallades = null;
-        this.trEmailEnviadesError = null;
-        this.trEmailEnviades = null;
-        this.temsMigPendent = null;
-        this.temsMigRegistrada = null;
-        this.temsMigNotEnviada = null;
-        this.temsMigCieEnviada = null;
-        this.temsMigTotal = null;
-        this.intentsRegistre = null;
-        this.intentsSir = null;
-        this.intentsNotEnviament = null;
-        this.intentsCieEnviament = null;
-        this.intentsEmailEnviament = null;
+        this.trCreades = 0L;
+        this.trRegEnviadesError = 0L;
+        this.trRegistrades = 0L;
+        this.trSirAcceptades = 0L;
+        this.trSirRebutjades = 0L;
+        this.trNotEnviadesError = 0L;
+        this.trNotEnviades = 0L;
+        this.trNotNotificades = 0L;
+        this.trNotRebujtades = 0L;
+        this.trNotExpirades = 0L;
+        this.trNotFallades = 0L;
+        this.trCieEnviadesError = 0L;
+        this.trCieEnviades = 0L;
+        this.trCieNotificades = 0L;
+        this.trCieRebutjades = 0L;
+        this.trCieCancelades = 0L;
+        this.trCieFallades = 0L;
+        this.trEmailEnviadesError = 0L;
+        this.trEmailEnviades = 0L;
+
     }
 
 }

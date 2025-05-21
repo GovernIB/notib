@@ -29,6 +29,7 @@ import es.caib.notib.logic.helper.NotificacioHelper;
 import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.DocumentValidDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
@@ -48,10 +49,8 @@ import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioServiceWs;
-import es.caib.notib.logic.intf.util.EidasValidator;
-import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
-import es.caib.notib.logic.intf.service.PagadorCieService;
+import es.caib.notib.logic.intf.util.EidasValidator;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.persist.entity.DocumentEntity;
@@ -103,6 +102,7 @@ import java.util.stream.Collectors;
 
 import static es.caib.notib.client.domini.InteressatTipus.ADMINISTRACIO;
 import static es.caib.notib.client.domini.InteressatTipus.FISICA_SENSE_NIF;
+import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.ARE;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 
@@ -221,6 +221,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	public RespostaAltaV2 altaV2(Notificacio notificacio) throws NotificacioServiceWsException {
 
 		var timer = metricsHelper.iniciMetrica();
+		long start = System.currentTimeMillis();
 		// Generar informació per al monitor d'integracions
 		EntitatEntity entitat = null;
 		try {
@@ -401,10 +402,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			}
 			log.debug(">> [ALTA] enviaments creats");
 			notificacioGuardada = notificacioRepository.saveAndFlush(notificacioGuardada);
-			return generaResposta(info, notificacioGuardada, referencies, avisos);
+			var respostaAlta = generaResposta(info, notificacioGuardada, referencies, avisos);
+			SubsistemesHelper.addSuccessOperation(ARE, System.currentTimeMillis() - start);
+			return respostaAlta;
 		} catch (Exception ex) {
 			log.error("Error creant notificació", ex);
 			integracioHelper.addAccioError(info, "Error creant la notificació", ex);
+			SubsistemesHelper.addErrorOperation(ARE, System.currentTimeMillis() - start);
 			throw new RuntimeException("[NOTIFICACIO/COMUNICACIO] Hi ha hagut un error creant la " + notificacio.getEnviamentTipus().name() + ": " + ex.getMessage(), ex);
 		} finally {
 			metricsHelper.fiMetrica(timer);

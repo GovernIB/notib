@@ -1,5 +1,7 @@
 package es.caib.notib.persist.entity.explotacio;
 
+import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.client.domini.explotacio.EnviamentOrigen;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,13 +12,15 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(
@@ -30,66 +34,81 @@ public class ExplotEnvInfoEntity extends AbstractPersistable<Long> implements Se
 	private static final long serialVersionUID = 3034708072746624642L;
 
 	@Column(name = "data_creacio", nullable = false)
-	private LocalDateTime dataCreacio;
+	private Date dataCreacio;
 	@Column(name = "temps_pendent")
 	private Long tempsPendent;
 	@Column(name = "data_reg_env_error")
-	private LocalDateTime dataRegEnviamentError;
+	private Date dataRegEnviamentError;
 	@Column(name = "intents_reg_enviament")
 	private int intentsRegEnviament;
 	@Column(name = "data_registrada")
-	private LocalDateTime dataRegistrada;
+	private Date dataRegistrada;
 	@Column(name = "temps_registrada")
 	private Long tempsRegistrada;
 	@Column(name = "intents_sir_consulta")
 	private int intentsSirConsulta;
 	@Column(name = "data_reg_acceptada")
-	private LocalDateTime dataRegAcceptada;
+	private Date dataRegAcceptada;
 	@Column(name = "data_reg_rebutjada")
-	private LocalDateTime dataRegRebutjada;
+	private Date dataRegRebutjada;
 	@Column(name = "data_not_enviament_error")
-	private LocalDateTime dataNotEnviamentError;
+	private Date dataNotEnviamentError;
 	@Column(name = "intents_not_enviament")
 	private int intentsNotEnviament;
 	@Column(name = "data_not_enviada")
-	private LocalDateTime dataNotEnviada;
+	private Date dataNotEnviada;
 	@Column(name = "temps_not_enviada")
 	private Long tempsNotEnviada;
 	@Column(name = "data_not_notificada")
-	private LocalDateTime dataNotNotificada;
+	private Date dataNotNotificada;
 	@Column(name = "data_not_rebutjada")
-	private LocalDateTime dataNotRebutjada;
+	private Date dataNotRebutjada;
 	@Column(name = "data_not_expirada")
-	private LocalDateTime dataNotExpirada;
+	private Date dataNotExpirada;
 	@Column(name = "data_not_error")
-	private LocalDateTime dataNotError;
+	private Date dataNotError;
 	@Column(name = "data_cie_enviament_error")
-	private LocalDateTime dataCieEnviamentError;
+	private Date dataCieEnviamentError;
 	@Column(name = "intents_cie_enviament")
 	private int intentsCieEnviament;
 	@Column(name = "data_cie_enviada")
-	private LocalDateTime dataCieEnviada;
+	private Date dataCieEnviada;
 	@Column(name = "temps_cie_enviada")
 	private Long tempsCieEnviada;
 	@Column(name = "data_cie_notificada")
-	private LocalDateTime dataCieNotificada;
+	private Date dataCieNotificada;
 	@Column(name = "data_cie_rebutjada")
-	private LocalDateTime dataCieRebutjada;
+	private Date dataCieRebutjada;
 	@Column(name = "data_cie_cancelada")
-	private LocalDateTime dataCieCancelada;
+	private Date dataCieCancelada;
 	@Column(name = "data_cie_error")
-	private LocalDateTime dataCieError;
+	private Date dataCieError;
 	@Column(name = "data_email_enviament_error")
-	private LocalDateTime dataEmailEnviamentError;
+	private Date dataEmailEnviamentError;
 	@Column(name = "intents_email_enviament")
 	private int intentsEmailEnviament;
 	@Column(name = "data_email_enviada")
-	private LocalDateTime dataEmailEnviada;
+	private Date dataEmailEnviada;
 	@Column(name = "temps_total")
 	private Long tempsTotal;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name="enviament_id")
-	protected NotificacioEnviamentEntity enviament;
+	private NotificacioEnviamentEntity enviament;
+
+	@Column(name = "entitat_id")
+	private Long entitatId;
+	@Column(name = "procediment_id")
+	private Long procedimentId;
+	@Column(name = "organ_gestor_codi")
+	private String organGestorCodi;
+	@Column(name = "usuari_codi")
+	private String usuariCodi;
+	@Column(name = "enviament_tipus")
+	@Enumerated(EnumType.STRING)
+	private EnviamentTipus enviamentTipus;
+	@Column(name = "origen")
+	@Enumerated(EnumType.STRING)
+	private EnviamentOrigen origen;
 
 }

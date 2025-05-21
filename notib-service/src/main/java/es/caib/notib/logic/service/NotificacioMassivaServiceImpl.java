@@ -19,6 +19,7 @@ import es.caib.notib.logic.helper.NotificacioMassivaHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.RegistreNotificaHelper;
+import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.intf.dto.DocumentValidDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
@@ -43,9 +44,7 @@ import es.caib.notib.logic.intf.exception.WriteCsvException;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificacioMassivaService;
-import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
-import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.logic.objectes.MassivaColumnsEnum;
 import es.caib.notib.logic.objectes.MassivaFile;
@@ -98,6 +97,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.MAS;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -254,6 +255,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     public NotificacioMassivaDataDto create(Long entitatId, @NonNull String usuariCodi, @NonNull NotificacioMassivaDto notificacioMassiva) throws RegistreNotificaException {
 
         var timer = metricsHelper.iniciMetrica();
+        long start = System.currentTimeMillis();
         try (var writerListErrors = new StringWriter();var writerListInforme = new StringWriter()){
             log.info("[NOT-MASSIVA] Alta de nova notificacio massiva (usuari: {}). Fitxer csv: {}", usuariCodi, notificacioMassiva.getFicheroCsvNom());
             var listWriterErrors = new CsvListWriter(writerListErrors, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
@@ -355,9 +357,11 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 notificacioMassivaHelper.posposarNotificacions(notificacioMassivaEntity.getId());
             }
             enviarCorreuElectronic(notificacioMassivaEntity);
+            SubsistemesHelper.addSuccessOperation(MAS, System.currentTimeMillis() - start);
             return conversioTipusHelper.convertir(notificacioMassivaEntity, NotificacioMassivaDataDto.class);
         } catch (Throwable t) {
             log.error("[NOT-MASSIVA] Error no controlat en l'enviament massiu", t);
+            SubsistemesHelper.addErrorOperation(MAS, System.currentTimeMillis() - start);
             throw new RegistreNotificaException(t.getMessage());
         } finally {
             metricsHelper.fiMetrica(timer);
