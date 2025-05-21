@@ -43,6 +43,9 @@
 
             let eventMessages = {
                 'confirm-accio-massiva': "<spring:message code="enviament.list.user.confirm.accio.massiva"/>",
+                'confirm-accio-massiva-enviar': "<spring:message code="callback.list.confirm.accio.massiva.enviar"/>",
+                'confirm-accio-massiva-pausar': "<spring:message code="callback.list.confirm.accio.massiva.pausar"/>",
+                'confirm-accio-massiva-activar': "<spring:message code="callback.list.confirm.accio.massiva.activar"/>",
             };
 
             $('#btn-netejar-filtre').click(function () {
@@ -131,10 +134,10 @@
 <div id="cover-spin"></div>
 <form:form id="form-filtre" action="" method="post" cssClass="well" modelAttribute="callbackFiltreCommand">
     <div class="row">
-        <div id="div-concepte" class="col-md-2">
+        <div class="col-md-2">
             <not:inputText name="usuariCodi" inline="true" placeholderKey="callback.list.codi.aplicacio"/>
         </div>
-        <div id="div-concepte" class="col-md-2">
+        <div class="col-md-2">
             <not:inputText name="referenciaRemesa" inline="true" placeholderKey="callback.list.remesa.referencia"/>
         </div>
         <div class="col-md-2">
@@ -143,7 +146,7 @@
         <div class="col-md-2">
             <not:inputDate name="dataFi" placeholderKey="callback.filtre.data.creacio.fi" inline="true" required="false" />
         </div>
-        <div class="col-md-2">
+        <div class="col-md-1">
             <not:inputSelect name="fiReintents" optionItems="${fiReintentsList}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
                              placeholderKey="callback.filtre.fi.reintents" textKey="callback.filtre.fi.reintents" required="true" labelSize="0"/>
         </div>
@@ -187,7 +190,7 @@
         </th>
         <th data-col-name="dataCreacio" data-converter="datetime"><spring:message code="callback.list.data.creacio"/></th>
         <th data-col-name="ultimIntent" data-converter="datetime"><spring:message code="callback.list.data.ultim.intent"/></th>
-        <th data-col-name="properIntent" data-converter="datetime"><spring:message code="callback.list.data.propera.execucio"/></th>
+        <th data-col-name="properIntent" data-orderable="false" data-converter="datetime"><spring:message code="callback.list.data.propera.execucio"/></th>
         <th data-col-name="estat"><spring:message code="callback.list.estat"/></th>
         <th data-col-name="pausat" data-template="#cellPausatTemplate" class="th-checkbox">
             <spring:message code="callback.list.pausat"/>
@@ -195,7 +198,7 @@
                 {{if pausat}}<span class="fa fa-check"></span>{{/if}}
             </script>
         </th>
-        <th data-col-name="notificacioReferencia" data-template="#referenciaTemplate"><spring:message code="callback.list.remesa.referencia"/>
+        <th data-col-name="notificacioReferencia" data-orderable="false" data-template="#referenciaTemplate"><spring:message code="callback.list.remesa.referencia"/>
             <script id="referenciaTemplate" type="text/x-jsrender">
                 <a href="<c:url value='/notificacio/{{:notificacioId}}/info'/>" data-toggle="modal" data-height="700px" data-processar="true"> {{:notificacioReferencia}}</a>
             </script>

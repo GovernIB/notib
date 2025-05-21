@@ -723,7 +723,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 //			var asientoRegistralWs = getAsientoRegistralApi().obtenerAsientoRegistral(codiDir3Entitat, "fakeReg", 2L, false);
 //			toRespostaConsultaRegistre(asientoRegistralWs);
 			var result = obtenerAsientoRegistral(codiDir3Entitat, "00/2000", 2L, false);
-			if (result.isOk() || result.isError() && Integer.valueOf(result.getErrorCodi()) < 2) {
+			if (result.isOk() ||Integer.valueOf(result.getErrorCodi()) < 2) {
 				return EstatSalut.builder()
 						.latencia((int) Duration.between(start, Instant.now()).toMillis())
 						.estat(EstatSalutEnum.UP)

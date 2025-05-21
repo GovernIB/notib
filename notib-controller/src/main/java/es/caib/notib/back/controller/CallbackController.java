@@ -67,7 +67,7 @@ public class CallbackController extends TableAccionsMassivesController {
         model.addAttribute("mantenirPaginacio", mantenirPaginacio != null && mantenirPaginacio);
         model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
         model.addAttribute("fiReintetsList", EnumHelper.getOptionsForEnum(SiNo.class, "es.caib.notib.logic.intf.dto.SiNo."));
-        model.addAttribute(new CallbackFiltreCommand());
+        model.addAttribute(getFiltreCommand(request));
         return "callback";
     }
 
@@ -82,6 +82,7 @@ public class CallbackController extends TableAccionsMassivesController {
             RequestSessionHelper.actualitzarObjecteSessio(request, CALLBACK_ID, command.getId());
         }
         RequestSessionHelper.actualitzarObjecteSessio(request, CALLBACK_FILTRE, command);
+        model.addAttribute("fiReintentsList", EnumHelper.getOptionsForEnum(SiNo.class, "es.caib.notib.logic.intf.dto.SiNo."));
         model.addAttribute("callbackFiltreCommand", command);
         return "callback";
     }
@@ -126,10 +127,10 @@ public class CallbackController extends TableAccionsMassivesController {
             }
             log.info("Enviant callbacks amb id: " + StringUtils.join(seleccio, ", "));
             var resposta = callbackService.enviarCallback(seleccio);
-            return resposta.isOk() ? getAjaxControllerReturnValueSuccess(request, "redirect:/callback", "callback.controller.enviat.ok")
-                    : getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.enviat.error", new Object[] {resposta.getErrorMsg()});
+            return resposta.isOk() ? getAjaxControllerReturnValueSuccess(request, "redirect:/callback", "callback.controller.massiu.ok")
+                    : getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.massiu.error", new Object[] {resposta.getErrorMsg()});
         } catch (Exception ex) {
-            return getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.enviat.error");
+            return getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.massiu.error");
         }
     }
 
@@ -138,10 +139,10 @@ public class CallbackController extends TableAccionsMassivesController {
 
         try {
             var anulat = callbackService.pausarCallback(callbackId, true);
-            return anulat ? getAjaxControllerReturnValueSuccess(request, "redirect:/callback", "callback.controller.pausat.ok")
-                : getAjaxControllerReturnValueSuccess(request, "redirect:/callback", "callback.controller.pausat.error");
+            return anulat ? getAjaxControllerReturnValueSuccess(request, "redirect:/callback", "callback.controller.massiu.ok")
+                : getAjaxControllerReturnValueSuccess(request, "redirect:/callback", "callback.controller.massiu.error");
         } catch (Exception ex) {
-            return getAjaxControllerReturnValueSuccess(request, "redirect:/callback", "callback.controller.pausat.error");
+            return getAjaxControllerReturnValueSuccess(request, "redirect:/callback", "callback.controller.massiu.error");
         }
     }
 
@@ -152,14 +153,14 @@ public class CallbackController extends TableAccionsMassivesController {
             var seleccio = getIdsSeleccionats(request);
             if (seleccio == null || seleccio.isEmpty()) {
                 var msg = getMessage(request,"callback.controller.massiva.buida");
-                getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.pausat.error", new Object[] {msg});
+                getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.massiu.error", new Object[] {msg});
             }
             log.info("Pausant callbacks amb id: " + StringUtils.join(seleccio, ", "));
             var resposta = callbackService.pausarCallback(seleccio, true);
-            return resposta.isOk() ? getAjaxControllerReturnValueSuccess(request, "redirect:/callback", "callback.controller.pausat.ok")
-                    : getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.pausat.error", new Object[] {resposta.getErrorMsg()});
+            return resposta.isOk() ? getAjaxControllerReturnValueSuccess(request, "redirect:/callback", "callback.controller.massiu.ok")
+                    : getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.massiu.error", new Object[] {resposta.getErrorMsg()});
         } catch (Exception ex) {
-            return getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.pausat.error");
+            return getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.massiu.error");
         }
     }
 
@@ -182,14 +183,14 @@ public class CallbackController extends TableAccionsMassivesController {
             var seleccio = getIdsSeleccionats(request);
             if (seleccio == null || seleccio.isEmpty()) {
                 var msg = getMessage(request,"callback.controller.massiva.buida");
-                getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.activar.error", new Object[] {msg});
+                getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.massiu.error", new Object[] {msg});
             }
             log.info("Activant callbacks amb id: " + StringUtils.join(seleccio, ", "));
             var resposta = callbackService.pausarCallback(seleccio, false);
-            return resposta.isOk() ? getAjaxControllerReturnValueSuccess(request, "redirect:/callback", "callback.controller.activar.ok")
-                    : getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.activar.error", new Object[] {resposta.getErrorMsg()});
+            return resposta.isOk() ? getAjaxControllerReturnValueSuccess(request, "redirect:/callback", "callback.controller.massiu.ok")
+                    : getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.massiu.error", new Object[] {resposta.getErrorMsg()});
         } catch (Exception ex) {
-            return getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.activar.error");
+            return getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.massiu.error");
         }
     }
 
@@ -198,11 +199,11 @@ public class CallbackController extends TableAccionsMassivesController {
 
         var filtreCommand = (CallbackFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(request, CALLBACK_FILTRE);
         if (filtreCommand != null) {
-//            setDefaultFiltreData(filtreCommand);
+            setDefaultFiltreData(filtreCommand);
             return filtreCommand;
         }
         filtreCommand = new CallbackFiltreCommand();
-//        setDefaultFiltreData(filtreCommand);
+        setDefaultFiltreData(filtreCommand);
         RequestSessionHelper.actualitzarObjecteSessio(request, CALLBACK_FILTRE, filtreCommand);
         return filtreCommand;
     }

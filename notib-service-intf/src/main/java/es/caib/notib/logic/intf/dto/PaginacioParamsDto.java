@@ -105,14 +105,15 @@ public class PaginacioParamsDto implements Serializable {
 		DESCENDENT
 	}
 	public static class OrdreDto implements Serializable {
+
 		private String camp;
 		private OrdreDireccioDto direccio;
-		public OrdreDto(
-				String camp,
-				OrdreDireccioDto direccio) {
+
+		public OrdreDto(String camp, OrdreDireccioDto direccio) {
 			this.camp = camp;
 			this.direccio = direccio;
 		}
+
 		public String getCamp() {
 			return camp;
 		}

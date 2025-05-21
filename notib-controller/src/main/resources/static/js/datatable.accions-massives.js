@@ -211,10 +211,10 @@ function initEvents($table, url_prefix, eventMessages) {
         $('#enviarCallbacks').on('click', function() {
 
             let count = Number($(".seleccioCount").html());
-            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva-100"])) {
                 return;
             }
-            if(confirm(eventMessages['confirm-enviar-callback'])){
+            if(confirm(eventMessages['confirm-accio-massiva-enviar'])){
                 location.href =  url_prefix + "/enviar";
                 setTimeout(() => $table.DataTable().rows().deselect(), 100);
             }
@@ -227,7 +227,7 @@ function initEvents($table, url_prefix, eventMessages) {
             if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
                 return;
             }
-            if(confirm(eventMessages['confirm-enviar-callback'])){
+            if(confirm(eventMessages['confirm-accio-massiva-pausar'])){
                 location.href =  url_prefix + "/pausar";
                 setTimeout(() => $table.DataTable().rows().deselect(), 100);
             }
@@ -240,7 +240,7 @@ function initEvents($table, url_prefix, eventMessages) {
             if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
                 return;
             }
-            if(confirm(eventMessages['confirm-enviar-callback'])){
+            if(confirm(eventMessages['confirm-accio-massiva-activar'])){
                 location.href =  url_prefix + "/activar";
                 setTimeout(() => $table.DataTable().rows().deselect(), 100);
             }
