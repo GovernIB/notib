@@ -23,6 +23,18 @@ public class CallbackFiltreCommand extends FiltreCommand {
     private String dataFi;
     private SiNo fiReintents;
 
+    public void setDataInici(String dataInici) {
+
+        validarData(dataInici, "enviament.list.dataenviament.inici");
+        this.dataInici = dataInici;
+    }
+
+    public void setDataFi(String dataEnviamentFi) {
+
+        validarData(dataFi, "enviament.list.dataenviament.fi");
+        this.dataFi = dataFi;
+    }
+
     public CallbackFiltre asDto() {
         return CallbackFiltre.builder().usuariCodi(usuariCodi).dataInici(dataInici).dataFi(dataFi).referenciaRemesa(referenciaRemesa).fiReintents(fiReintents).build();
     }

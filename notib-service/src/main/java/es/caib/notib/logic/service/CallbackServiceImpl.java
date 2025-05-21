@@ -194,20 +194,21 @@ public class CallbackServiceImpl implements CallbackService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.info("Enviant callbacks massius");
-			CallbackEntity callback;
-			NotificacioEnviamentEntity enviament;
-			var isError = false;
 			for (var callbackId : callbacks) {
-				callback = callbackRepository.findById(callbackId).orElseThrow();
-				enviament = notificacioEnviamentRepository.findById(callback.getEnviamentId()).orElseThrow();
-				try {
-					var notificacio = callbackHelper.notifica(enviament);
-					isError = isError || (notificacio != null && !notificacio.isErrorLastCallback());
-				} catch (Exception e) {
-					log.error(String.format("[Callback]L'enviament [Id: %d] ha provocat la següent excepcio:", enviament.getId()), e);
-				}
+				new Thread(() -> {
+				var callback = callbackRepository.findById(callbackId).orElseThrow();
+				var enviament = notificacioEnviamentRepository.findById(callback.getEnviamentId()).orElseThrow();
+					try {
+						var notificacio = callbackHelper.notifica(enviament);
+					} catch (Exception e) {
+						log.error(String.format("[Callback]L'enviament [Id: %d] ha provocat la següent excepcio:", enviament.getId()), e);
+					}
+				});
 			}
-			return CallbackResposta.builder().ok(isError).errorMsg("Error").build();
+			return CallbackResposta.builder().ok(true).build();
+		} catch (Exception e) {
+			log.error("Error executant els callbacks massius " + e);
+			return CallbackResposta.builder().ok(false).errorMsg(e.getMessage()).build();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -229,19 +230,31 @@ public class CallbackServiceImpl implements CallbackService {
 	@Override
 	@Transactional
 	public CallbackResposta pausarCallback(Set<Long> callbacks, boolean pausat) {
-		return null;
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			log.info("Pausant callbacks massius pausat = " + pausat);
+			CallbackEntity callback;
+			NotificacioEnviamentEntity enviament;
+			for (var callbackId : callbacks) {
+				callback = callbackRepository.findById(callbackId).orElseThrow();
+				callback.setPausat(pausat);
+			}
+			return CallbackResposta.builder().ok(true).build();
+		} catch (Exception e) {
+			return CallbackResposta.builder().ok(false).errorMsg(e.getMessage()).build();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	private Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
 
 		Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<>();
-//		mapeigPropietatsOrdenacio.put("procediment.organGestor", new String[] {"pro.organGestor.codi"});
 		mapeigPropietatsOrdenacio.put("usuariCodi", new String[] {"usuariCodi"});
-		mapeigPropietatsOrdenacio.put("usuariCodi", new String[] {"endpoint"});
-//		mapeigPropietatsOrdenacio.put("procedimentDesc", new String[] {"procedimentCodi"});
+		mapeigPropietatsOrdenacio.put("endpoint", new String[] {"usuariCodi"});
 		mapeigPropietatsOrdenacio.put("data", new String[] {"data"});
-//		mapeigPropietatsOrdenacio.put("estatString", new String[] {"estat"});
-//		return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
+
 		return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 	}
 

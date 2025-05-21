@@ -56,16 +56,22 @@ public class PaginacioHelper {
 		for (var ordre: ordres) {
 			var direccio = OrdreDireccioDto.DESCENDENT.equals(ordre.getDireccio()) ? Sort.Direction.DESC : Sort.Direction.ASC;
 			if (mapeigPropietatsOrdenacio == null) {
-				orders.add(new Order(direccio, ordre.getCamp()));
+				var order = new Order(direccio, ordre.getCamp());
+				order.nullsFirst();
+				orders.add(order);
 				continue;
 			}
 			var mapeig = mapeigPropietatsOrdenacio.get(ordre.getCamp());
 			if (mapeig == null) {
-				orders.add(new Order(direccio, ordre.getCamp()));
+				var order = new Order(direccio, ordre.getCamp());
+				order.nullsFirst();
+				orders.add(order);
 				continue;
 			}
 			for (var prop: mapeig) {
-				orders.add(new Order(direccio, prop));
+				var order = new Order(direccio, prop);
+				order.nullsFirst();
+				orders.add(order);
 			}
 		}
 		return !orders.isEmpty() ? Sort.by(orders) : null;
