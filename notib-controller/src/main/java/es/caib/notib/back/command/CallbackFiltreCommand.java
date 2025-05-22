@@ -31,8 +31,8 @@ public class CallbackFiltreCommand extends FiltreCommand {
 
     public void setDataFi(String dataEnviamentFi) {
 
-        validarData(dataFi, "enviament.list.dataenviament.fi");
-        this.dataFi = dataFi;
+        validarData(dataEnviamentFi, "enviament.list.dataenviament.fi");
+        this.dataFi = dataEnviamentFi;
     }
 
     public CallbackFiltre asDto() {
