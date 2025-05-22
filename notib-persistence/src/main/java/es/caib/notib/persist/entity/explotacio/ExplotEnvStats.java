@@ -34,5 +34,17 @@ public class ExplotEnvStats {
         this.intentsMig = intentsMig;
         this.tempsTotal = tempsTotal;
     }
+
+    public Double getTempsMigEstat() {
+        return tempsMigEstat != null ? tempsMigEstat : 0.0;
+    }
+
+    public Double getIntentsMig() {
+        return intentsMig != null ? intentsMig : 0.0;
+    }
+
+    public Double getTempsTotal() {
+        return tempsTotal != null ? tempsTotal : 0.0;
+    }
 }
 
