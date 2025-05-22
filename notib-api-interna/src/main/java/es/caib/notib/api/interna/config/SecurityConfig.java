@@ -78,6 +78,7 @@ public class SecurityConfig {
 			"/salutPerformance",
 			"/estadistiquesInfo",
 			"/estadistiques",
+			"/estadistiques/**",
 			"/sir/adviser/sincronitzar"
 	};
 
