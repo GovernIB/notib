@@ -980,10 +980,10 @@
 			let organ = $(this).val();
 			if (organ == undefined || organ == "") {
 				organ = "-";
+			} else {
+				$("#organGestor").closest(".form-group").removeClass("has-error");
+				$("#organGestor").closest(".form-group").find(".help-block").remove();
 			}
-
-			$("#organGestor").closest(".form-group").removeClass("has-error");
-			$("#organGestor").closest(".form-group").find(".help-block").remove();
 
 			$.ajax({
 				type: 'GET',

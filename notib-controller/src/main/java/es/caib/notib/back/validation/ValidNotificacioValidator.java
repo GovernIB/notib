@@ -95,6 +95,10 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			}
 
 			var organCodi = notificacio.getOrganGestor();
+//			if (Strings.isNullOrEmpty(organCodi)) {
+//				var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.buit", null, locale);
+//				context.buildConstraintViolationWithTemplate(msg).addNode("organGestor").addConstraintViolation();
+//			}
 			var entitat = entitatService.findByDir3codi(notificacio.getEmisorDir3Codi());
 			var organ = organService.findByCodi(entitat.getId(), organCodi);
 			if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {
