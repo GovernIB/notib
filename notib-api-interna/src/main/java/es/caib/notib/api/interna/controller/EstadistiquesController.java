@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -50,7 +51,7 @@ public class EstadistiquesController {
             HttpServletRequest request,
             @PathVariable Integer dies) throws IOException {
 
-        List<RegistresEstadistics> result = null;
+        List<RegistresEstadistics> result = new ArrayList<>();
         LocalDate data = LocalDate.now().minusDays(1);
         for (int i = 0; i < dies; i++) {
             result.add(estadisticaService.consultaEstadistiques(data));

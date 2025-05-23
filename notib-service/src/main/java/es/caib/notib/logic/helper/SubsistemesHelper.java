@@ -72,6 +72,8 @@ public class SubsistemesHelper {
                     .codi(subsistema.name())
                     .latencia((int) metrica.getTempsMigOperacio())
                     .estat(metrica.calculateEstatSalut())
+                    .totalOk(metrica.getTotalOperacions())
+                    .totalError(metrica.getOperacionsError())
                     .build());
             metrica.reset();
         }
