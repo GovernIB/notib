@@ -533,6 +533,13 @@ public class NotificacioFormController extends BaseUserController {
         var organsDisponibles = permisosService.getOrgansCodisAmbPermisPerProcedimentComu(entitatActual.getId(), getCodiUsuariActual(), permis, procedimentActual);
         dadesProcediment.setOrgansDisponibles(organsDisponibles);
         if (!organsDisponibles.contains(organCodi)) {
+            if (organsDisponibles.size() > 1) {
+                return dadesProcediment;
+            }
+            var codi = organsDisponibles.get(0);
+            var organ = organGestorService.findByCodi(entitatActual.getId(), codi);
+            var cieActiuPerPare = organGestorService.entregaCieActiva(entitatActual, codi);
+            dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva() || cieActiuPerPare);
             return dadesProcediment;
         }
         // Mirar si organ seleccionat te entrega postal actvia
