@@ -82,7 +82,7 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 			info.addParam("Error de firma", Boolean.toString(signatureInfoDto.isError()));
 			if (signatureInfoDto.isError()) {
 				info.addParam("Missatge d'error", signatureInfoDto.getErrorMsg());
-				integracioHelper.addAccioError(info, "Error al validar la firma");
+				integracioHelper.addAccioError(info, "Error al validar la firma: " + signatureInfoDto.getErrorMsg());
 				return signatureInfoDto;
 			}
 			integracioHelper.addAccioOk(info);
