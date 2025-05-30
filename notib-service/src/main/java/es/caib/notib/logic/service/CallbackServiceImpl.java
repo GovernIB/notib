@@ -197,13 +197,12 @@ public class CallbackServiceImpl implements CallbackService {
 			for (var callbackId : callbacks) {
 				new Thread(() -> {
 				var callback = callbackRepository.findById(callbackId).orElseThrow();
-				var enviament = notificacioEnviamentRepository.findById(callback.getEnviamentId()).orElseThrow();
-					try {
-						var notificacio = callbackHelper.notifica(enviament);
+				try {
+						callbackHelper.notifica(callback.getEnviamentId());
 					} catch (Exception e) {
-						log.error(String.format("[Callback]L'enviament [Id: %d] ha provocat la següent excepcio:", enviament.getId()), e);
+						log.error(String.format("[Callback]L'enviament [Id: %d] ha provocat la següent excepcio:", callback.getEnviamentId()), e);
 					}
-				});
+				}).start();
 			}
 			return CallbackResposta.builder().ok(true).build();
 		} catch (Exception e) {
