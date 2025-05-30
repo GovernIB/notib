@@ -128,9 +128,9 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     public List<DimensioDesc> getDimensions() {
         List<ExplotDimensio> dim = explotDimensioRepository.getDimensionsPerEstadistiques();
         return List.of(
-                DimensioDesc.builder().codi(DimEnum.ENT.name()).nom(DimEnum.ENT.getNom()).descripcio(DimEnum.ENT.getDescripcio()).valors(dim.stream().map(d -> Optional.ofNullable(d.getEntitatId()).map(Object::toString).orElse("")).filter(s -> !s.isEmpty()).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().codi(DimEnum.ENT.name()).nom(DimEnum.ENT.getNom()).descripcio(DimEnum.ENT.getDescripcio()).valors(dim.stream().map(d -> Optional.ofNullable(d.getEntitatCodi()).orElse("")).filter(s -> !s.isEmpty()).distinct().sorted().collect(Collectors.toList())).build(),
                 DimensioDesc.builder().codi(DimEnum.ORG.name()).nom(DimEnum.ORG.getNom()).descripcio(DimEnum.ORG.getDescripcio()).valors(dim.stream().map(d -> Optional.ofNullable(d.getOrganCodi()).orElse("")).filter(s -> !s.isEmpty()).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().codi(DimEnum.PRC.name()).nom(DimEnum.PRC.getNom()).descripcio(DimEnum.PRC.getDescripcio()).valors(dim.stream().map(d -> Optional.ofNullable(d.getProcedimentId()).map(Object::toString).orElse("")).distinct().sorted().collect(Collectors.toList())).build(),
+                DimensioDesc.builder().codi(DimEnum.PRC.name()).nom(DimEnum.PRC.getNom()).descripcio(DimEnum.PRC.getDescripcio()).valors(dim.stream().map(d -> Optional.ofNullable(d.getProcedimentCodi()).orElse("")).distinct().sorted().collect(Collectors.toList())).build(),
                 DimensioDesc.builder().codi(DimEnum.USU.name()).nom(DimEnum.USU.getNom()).descripcio(DimEnum.USU.getDescripcio()).valors(dim.stream().map(d -> Optional.ofNullable(d.getUsuariCodi()).orElse("DESCONEGUT")).distinct().sorted().collect(Collectors.toList())).build(),
                 DimensioDesc.builder().codi(DimEnum.TIP.name()).nom(DimEnum.TIP.getNom()).descripcio(DimEnum.TIP.getDescripcio()).valors(dim.stream().map(d -> d.getTipus().name()).distinct().sorted().collect(Collectors.toList())).build(),
                 DimensioDesc.builder().codi(DimEnum.ORI.name()).nom(DimEnum.ORI.getNom()).descripcio(DimEnum.ORI.getDescripcio()).valors(dim.stream().map(d -> d.getOrigen().name()).distinct().sorted().collect(Collectors.toList())).build()
@@ -252,7 +252,9 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     private ExplotDimensioEntity toConsultaDimensioEntity(ExplotDimensio dimensio) {
         return ExplotDimensioEntity.builder()
                 .entitatId(dimensio.getEntitatId())
+                .entitatCodi(dimensio.getEntitatCodi())
                 .procedimentId(dimensio.getProcedimentId())
+                .procedimentCodi(dimensio.getProcedimentCodi())
                 .organCodi(dimensio.getOrganCodi())
                 .usuariCodi(dimensio.getUsuariCodi())
                 .tipus(dimensio.getTipus())
@@ -493,8 +495,8 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
     private List<Dimensio> toDimensions(ExplotDimensioEntity dimensio) {
         return List.of(
-                new DimensioNotib(DimEnum.ENT, dimensio.getEntitatId()),
-                new DimensioNotib(DimEnum.PRC, dimensio.getProcedimentId()),
+                new DimensioNotib(DimEnum.ENT, dimensio.getEntitatCodi()),
+                new DimensioNotib(DimEnum.PRC, dimensio.getProcedimentCodi()),
                 new DimensioNotib(DimEnum.ORG, dimensio.getOrganCodi()),
                 new DimensioNotib(DimEnum.USU, dimensio.getUsuariCodi()),
                 new DimensioNotib(DimEnum.TIP, dimensio.getTipus()),

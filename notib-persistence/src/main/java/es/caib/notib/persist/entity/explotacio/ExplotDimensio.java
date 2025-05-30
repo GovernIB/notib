@@ -12,7 +12,9 @@ import lombok.Data;
 public class ExplotDimensio {
 
     private final Long entitatId;
+    private final String entitatCodi;
     private final Long procedimentId;
+    private final String procedimentCodi;
     private final String organCodi;
     private final String usuariCodi;
     private final EnviamentTipus tipus;

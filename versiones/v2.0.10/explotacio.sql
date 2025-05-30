@@ -124,3 +124,9 @@ ALTER TABLE not_explot_fet ADD int_sir NUMBER(38, 0);
 ALTER TABLE not_explot_fet ADD int_not NUMBER(38, 0);
 ALTER TABLE not_explot_fet ADD int_cie NUMBER(38, 0);
 ALTER TABLE not_explot_fet ADD int_eml NUMBER(38, 0);
+
+ALTER TABLE not_explot_dim ADD entitat_codi VARCHAR2(64 CHAR);
+ALTER TABLE not_explot_dim ADD procediment_codi VARCHAR2(64 CHAR);
+
+UPDATE NOT_EXPLOT_DIM SET entitat_codi = (SELECT e.codi FROM NOT_ENTITAT e WHERE entitat_id = e.id);
+UPDATE NOT_EXPLOT_DIM SET procediment_codi = (SELECT p.codi FROM NOT_PROCEDIMENT p WHERE procediment_id = p.id) WHERE procediment_id IS NOT NULL;
