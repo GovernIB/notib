@@ -928,7 +928,7 @@ $(document).ready(function() {
 													<td>${enviament.entregaPostal.cieDatatErrorDescripcio}</td>
 												</tr>
 											</c:if>
-											<c:if test="${not empty enviament.notificaDatatOrigen}">
+											<c:if test="${not empty enviament.entregaPostal.cieDatatOrigen}">
 												<tr>
 													<td><strong><spring:message code="enviament.info.notifica.datat.origen"/></strong></td>
 													<td><spring:message code="enviament.datat.origen.enum.${enviament.entregaPostal.cieDatatOrigen}"/> (${enviament.entregaPostal.cieDatatOrigen})</td>
@@ -982,7 +982,7 @@ $(document).ready(function() {
 														<td>${enviament.entregaPostal.cieCertificacioMime}</td>
 													</tr>
 												</c:if>
-												<c:if test="${not empty enviament.enviament.entregaPostal.cieCertificacioOrigen}">
+												<c:if test="${not empty enviament.entregaPostal.cieCertificacioOrigen}">
 													<tr>
 														<td><strong><spring:message code="enviament.info.notifica.certificacio.origen"/></strong></td>
 														<td><spring:message code="enviament.datat.origen.enum.${enviament.entregaPostal.cieCertificacioOrigen}"/> (${enviament.entregaPostal.cieCertificacioOrigen})</td>
