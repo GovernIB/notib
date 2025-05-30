@@ -32,13 +32,19 @@ public class ExplotDimensioEntity extends AbstractPersistable<Long> implements S
 	@Column(name = "entitat_id")
 	private Long entitatId;
 
+	@Column(name = "entitat_codi", length = 64)
+	private String entitatCodi;
+
 	@Column(name = "procediment_id")
 	private Long procedimentId;
 
-	@Column(name = "organ_codi")
+	@Column(name = "procediment_codi", length = 64)
+	private String procedimentCodi;
+
+	@Column(name = "organ_codi", length = 100)
 	private String organCodi;
 
-	@Column(name = "usuari_codi")
+	@Column(name = "usuari_codi", length = 100)
 	private String usuariCodi;
 
 	@Column(name = "tipus")

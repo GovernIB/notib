@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 17458513344926
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_explot_dim
+            columns:
+              - column:
+                  name: entitat_codi
+                  type: VARCHAR(64 ${varcharUnit})
+              - column:
+                  name: procediment_codi
+                  type: VARCHAR(64 ${varcharUnit})
+        - sql:
+            sql: "UPDATE NOT_EXPLOT_DIM SET entitat_codi = (SELECT e.codi FROM NOT_ENTITAT e WHERE entitat_id = e.id);
+                  UPDATE NOT_EXPLOT_DIM SET procediment_codi = (SELECT p.codi FROM NOT_PROCEDIMENT p WHERE procediment_id = p.id) WHERE procediment_id IS NOT NULL;"
