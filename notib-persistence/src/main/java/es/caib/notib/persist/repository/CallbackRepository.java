@@ -23,6 +23,11 @@ public interface CallbackRepository extends JpaRepository<CallbackEntity, Long> 
             "order by c.data asc nulls first")
     List<Long> findEnviamentIdPendents(Pageable page);
 
+    @Query("select c.enviamentId from CallbackEntity c " +
+            "where c.estat = es.caib.notib.logic.intf.dto.CallbackEstatEnumDto.PENDENT and c.pausat = false " +
+            "and c.ultimIntent = null and c.intents = 0")
+    List<Long> findEnviamentIdPendentsNoEnviats();
+
     CallbackEntity findByEnviamentId(Long envId);
 
     CallbackEntity findByEnviamentIdAndEstat(Long envId, CallbackEstatEnumDto estat);

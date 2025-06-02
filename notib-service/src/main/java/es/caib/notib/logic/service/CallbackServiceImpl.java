@@ -12,6 +12,7 @@ import es.caib.notib.logic.intf.dto.callback.CallbackDto;
 import es.caib.notib.logic.intf.dto.callback.CallbackFiltre;
 import es.caib.notib.logic.intf.dto.callback.CallbackResposta;
 import es.caib.notib.logic.intf.service.CallbackService;
+import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.threads.CallbackProcessarPendentsThread;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -20,10 +21,13 @@ import es.caib.notib.persist.repository.CallbackRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jms.core.JmsMessageOperations;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,14 +64,32 @@ public class CallbackServiceImpl implements CallbackService {
 	private PaginacioHelper paginacioHelper;
     @Autowired
     private ConversioTipusHelper conversioTipusHelper;
+    @Autowired
+	private JmsTemplate jmsTemplate;
+
+
+	private void processarPendentsJms() {
+
+		var noEnviats = callbackRepository.findEnviamentIdPendentsNoEnviats();
+		for (var noEnviat : noEnviats) {
+			jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, noEnviat,
+					m -> {
+						m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 1000L);
+						return m;
+					});
+		}
+	}
 
 	@Override
 	public void processarPendents() {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
+
 			if (!isTasquesActivesProperty() || !isCallbackPendentsActiu()) {
-				log.info("[Callback] Enviament callbacks deshabilitat. ");
+				log.info("[Callback] Enviament periodic de callbacks deshabilitat. ");
+				processarPendentsJms();
+				return;
 			}
 			log.info("[Callback] Cercant notificacions pendents d'enviar al client");
 			var maxPendents = getEventsProcessarMaxProperty();

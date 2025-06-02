@@ -11,6 +11,7 @@ import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -20,8 +21,10 @@ import es.caib.notib.persist.repository.CallbackRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,6 +71,8 @@ public class CallbackHelper {
 	private AuditHelper auditHelper;
 	@Autowired
 	private NotificacioTableHelper notificacioTableHelper;
+	@Autowired
+	private JmsTemplate jmsTemplate;
 
 	private boolean isInterficieWeb(NotificacioEntity not) {
 		return not.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB;
@@ -91,7 +96,12 @@ public class CallbackHelper {
 			c.setError(isError);
 			c.setErrorDesc(errorDesc);
 			c.setEstat(CallbackEstatEnumDto.PENDENT);
-			callbackRepository.save(c);
+			callbackRepository.saveAndFlush(c);
+			jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId(),
+					m -> {
+						m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 1000L);
+						return m;
+					});
 		} catch (NoSuchElementException ex) {
 			log.error("L'enviament " + env.getId() + " i la notificacio " + env.getNotificacio().getId() + " no tenen assignat el createdBy", ex);
 		} catch (Exception ex) {
@@ -127,6 +137,11 @@ public class CallbackHelper {
 		}
 		callback.setData(new Date());
 		callback.setEstat(CallbackEstatEnumDto.PENDENT);
+		jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId(),
+				m -> {
+					m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 1000L);
+					return m;
+				});
 		return callback;
 	}
 
