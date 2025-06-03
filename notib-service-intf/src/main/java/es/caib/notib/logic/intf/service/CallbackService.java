@@ -54,4 +54,5 @@ public interface CallbackService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	CallbackResposta pausarCallback(Set<Long> callbacks, boolean pausat);
 
+	void processarPendentsJms();
 }

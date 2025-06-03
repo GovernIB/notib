@@ -1,6 +1,7 @@
 package es.caib.notib.logic.helper;
 
 import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.CallbackService;
 import es.caib.notib.logic.intf.service.ConfigService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificacioService;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -37,6 +39,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     private OrganGestorService organGestorService;
     @Autowired
     private EnviamentSmService smService;
+    @Autowired
+    private CallbackService callbackService;
 
     private Authentication auth;
 
@@ -62,6 +66,9 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                         break;
                     case AFEGIR_NOTIFICACIONS_MAQUINA_ESTATS:
                         smService.afegirNotificacions();
+                        break;
+                    case AFEGIR_CALLBACKS_CUA_JMS:
+                        callbackService.processarPendentsJms();
                         break;
                     default:
                         log.error("Procés inicial no definit");

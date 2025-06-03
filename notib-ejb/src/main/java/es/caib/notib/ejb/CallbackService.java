@@ -71,5 +71,10 @@ public class CallbackService extends AbstractService<es.caib.notib.logic.intf.se
 		return getDelegateService().pausarCallback(callbacks, pausat);
 	}
 
+	@Override
+	@PermitAll
+	public void processarPendentsJms() {
+		getDelegateService().processarPendentsJms();
+	}
 
 }

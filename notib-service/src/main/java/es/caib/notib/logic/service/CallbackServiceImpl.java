@@ -29,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jms.core.JmsMessageOperations;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
@@ -68,7 +69,9 @@ public class CallbackServiceImpl implements CallbackService {
 	private JmsTemplate jmsTemplate;
 
 
-	private void processarPendentsJms() {
+	@Override
+	@Transactional(readOnly=true, propagation = Propagation.REQUIRES_NEW)
+	public void processarPendentsJms() {
 
 		var noEnviats = callbackRepository.findEnviamentIdPendentsNoEnviats();
 		for (var noEnviat : noEnviats) {
@@ -88,7 +91,6 @@ public class CallbackServiceImpl implements CallbackService {
 
 			if (!isTasquesActivesProperty() || !isCallbackPendentsActiu()) {
 				log.info("[Callback] Enviament periodic de callbacks deshabilitat. ");
-				processarPendentsJms();
 				return;
 			}
 			log.info("[Callback] Cercant notificacions pendents d'enviar al client");

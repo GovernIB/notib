@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - sql: "INSERT INTO NOT_PROCESSOS_INICIALS (CODI, INIT, ID) VALUES ('AFEGIR_CALLBACKS_CUA_JMS', 1, 6)"
