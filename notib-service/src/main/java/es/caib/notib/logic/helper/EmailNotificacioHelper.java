@@ -9,13 +9,16 @@ import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.mapper.NotificacioTableMapperImpl;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.NotibLogger;
+import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -145,8 +148,6 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 	@Override
 	protected String getMailHtmlBody(NotificacioEnviamentEntity enviament) {
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-
 		var appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
 		var notificacio = enviament.getNotificacio();
 		var enviamenTipus = notificacio.getEnviamentTipus();
@@ -155,22 +156,39 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 		var nif = "";
 		var interessat = "";
 		var persona = enviament.getTitular();
-		nif = !Strings.isNullOrEmpty(persona.getNif()) ? "(" + persona.getNif() + ")" : persona.getRaoSocial();
+		var nom = !Strings.isNullOrEmpty(persona.getNom()) ? persona.getNomSencer()
+				: !Strings.isNullOrEmpty(persona.getRaoSocial()) ? persona.getRaoSocial() : "";
+		nif = !Strings.isNullOrEmpty(persona.getNif()) ? "(" + persona.getNif() + ")" :
+				!Strings.isNullOrEmpty(persona.getDir3Codi()) ? "(" + persona.getDir3Codi() + ")" : "";
 		interessat += "<tr>" +
 				"			<th>" + messageHelper.getMessage("notificacio.email.enviament.interessat") + "</th>" +
-				"			<td>" + persona.getNomSencer() + nif + "</td>" +
+				"			<td>" + nom + nif + "</td>" +
 				"		</tr>";
 		for (var destinatari : enviament.getDestinataris()) {
 			nif = !Strings.isNullOrEmpty(destinatari.getNif()) ? "(" + nif + ")" : destinatari.getRaoSocial();
+			var destinatariNom = !Strings.isNullOrEmpty(persona.getNom()) ? persona.getNomSencer()
+					: !Strings.isNullOrEmpty(persona.getRaoSocial()) ? persona.getRaoSocial() : "";
 			interessat += "<tr>" +
 					"			<th>" + messageHelper.getMessage("notificacio.email.enviament.representat") + "</th>" +
-					"			<td>" + destinatari.getNomSencer() + nif + "</td>" +
+					"			<td>" + destinatariNom + nif + "</td>" +
 					"		</tr>";
 		}
 
 		var enviadaEl = enviament.getNotificaEstatData() != null ? enviament.getNotificaEstatData()
 						: EnviamentTipus.SIR.equals(enviamenTipus) ? enviament.getSirRegDestiData() != null ? enviament.getSirRegDestiData() : null
 						: enviament.getRegistreData() != null ? enviament.getRegistreData() : null;
+		var enviadaElString = enviadaEl != null ? new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(enviadaEl)  : "";
+
+		var organGestor = (!Strings.isNullOrEmpty(notificacio.getOrganGestor().getCodi()) ? notificacio.getOrganGestor().getCodi() : "");
+		organGestor += (!Strings.isNullOrEmpty(notificacio.getOrganGestor().getNom()) ? (!Strings.isNullOrEmpty(organGestor) ? " - " : "") + notificacio.getOrganGestor().getNom() : "");
+
+		var procediment = 	(notificacio.getProcediment() != null ?
+				"		<tr>"+
+						"			<th>"+ messageHelper.getMessage("notificacio.email.procediment") +"</th>"+
+						"			<td>"+ (!Strings.isNullOrEmpty(notificacio.getProcediment().getCodi()) ? notificacio.getProcediment().getCodi() : "")
+										 + (!Strings.isNullOrEmpty(notificacio.getProcediment().getNom()) ? (!Strings.isNullOrEmpty(notificacio.getProcediment().getCodi()) ? " - " : "")
+						 				 + notificacio.getProcediment().getNom() : "") + "</td>"+
+						"		</tr>" : "");
 
 		var htmlText = "";
 		htmlText += "<!DOCTYPE html>"+
@@ -258,7 +276,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 				"		</tr>"+
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.identificador") +"</th>"+
-				"			<td>"+ enviament.getUuid() + "</td>"+
+				"			<td>"+ (!Strings.isNullOrEmpty(enviament.getUuid()) ? enviament.getUuid() : "") + "</td>"+
 				"		</tr>"+
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.entitat") +"</th>"+
@@ -266,13 +284,9 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 				"		</tr>"+
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio.organ") +"</th>"+
-				"			<td>"+ notificacio.getOrganGestor().getCodi() + " - " + notificacio.getOrganGestor().getNom()+ "</td>"+
+				"			<td>"+ organGestor + "</td>"+
 				"		</tr>"+
-				(notificacio.getProcediment() != null ?
-				"		<tr>"+
-				"			<th>"+ messageHelper.getMessage("notificacio.email.procediment") +"</th>"+
-				"			<td>"+ notificacio.getProcediment().getCodi() + " - " + notificacio.getProcediment().getNom() + "</td>"+
-				"		</tr>" : "") +
+				procediment +
 				(!Strings.isNullOrEmpty(notificacio.getNumExpedient()) ?
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.num.expedient") +"</th>"+
@@ -285,11 +299,12 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 				+ interessat +
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.enviament.creada.el") +"</th>"+
-				"			<td>"+ (notificacio.getCreatedDate() != null && notificacio.getCreatedDate().isPresent() ? notificacio.getCreatedDate().get().format(formatter) : "")+ "</td>"+
+				"			<td>"+ (notificacio.getCreatedDate().isPresent() ? notificacio.getCreatedDate().map(dateTime -> dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")))
+									.orElse("") : "") + "</td>"+
 				"		</tr>"+
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.enviament.enviada.el") +"</th>"+
-				"			<td>"+ enviadaEl + "</td>"+
+				"			<td>"+ enviadaElString + "</td>"+
 				"		</tr>"+
 				(!Strings.isNullOrEmpty(notificacio.getRegistreNumeroFormatat()) ?
 				"		<tr>"+
