@@ -35,8 +35,11 @@ import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Properties;
@@ -44,7 +47,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertNull;
 
-@Ignore
+//@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class EmailNotificacioHelperTest {
 
@@ -143,14 +146,56 @@ public class EmailNotificacioHelperTest {
 		Mockito.when(messageHelper.getMessage(Mockito.eq("notificacio.email.estat.motiu"))).thenReturn("Motiu");
 		Mockito.when(messageHelper.getMessage(Mockito.eq("notificacio.email.notificacio.info"))).thenReturn("Detall");
 		Mockito.when(messageHelper.getMessage(Mockito.eq("notificacio.email.notificacio.detall"))).thenReturn("Detall notificació");
+		Mockito.when(messageHelper.getMessage(Mockito.eq("notificacio.email.identificador"))).thenReturn("Identificador");
+		Mockito.when(messageHelper.getMessage(Mockito.eq("notificacio.email.notificacio.organ"))).thenReturn("Organ Gestor");
+		Mockito.when(messageHelper.getMessage(Mockito.eq("notificacio.email.enviament.interessat"))).thenReturn("Titular");
+		Mockito.when(messageHelper.getMessage(Mockito.eq("notificacio.email.enviament.creada.el"))).thenReturn("Creada el");
+		Mockito.when(messageHelper.getMessage(Mockito.eq("notificacio.email.enviament.enviada.el"))).thenReturn("Enviada el");
 		Mockito.when(configHelper.getPrefix()).thenReturn("[NOTIB]");
+	}
+
+	@Test
+	public void whenGetMailHtmlBody() {
+
+		EntitatEntity entidad = EntitatEntity.hiddenBuilder().nom("Govern de les Illes Balears").build(); // TODO: Afegir logos
+		PersonaEntity persona = PersonaEntity.builder().nom("Nom").llinatge1("Llinatge1").llinatge2("Llinatge2").email(EMAIL_DEST).build();
+		Set<String> usuaris = new HashSet<>(Arrays.asList("user"));
+		DadesUsuari dadesUsuari = DadesUsuari.builder().email(EMAIL_DEST).build();
+		UsuariEntity usuari = UsuariEntity.builder().codi("user").rebreEmailsNotificacio(true).rebreEmailsNotificacioCreats(true).build();
+		ProcedimentEntity procediment = ProcedimentEntity.builder().nom("Procediment Test").codi("111").agrupar(false).createdBy(usuari).build();
+		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entidad).codi("A000000").nom("OrganTest").build();
+		GrupEntity grupNotificacio = GrupEntity.getBuilder(null, null, entidad, organGestor).build();
+		notificacioMock =  Mockito.mock(NotificacioEntity.class);
+		Mockito.when(notificacioMock.getId()).thenReturn(29754378L);
+		Mockito.when(notificacioMock.getProcediment()).thenReturn(procediment);
+		Mockito.when(notificacioMock.getGrupCodi()).thenReturn(null);
+		Mockito.when(notificacioMock.getEntitat()).thenReturn(entidad);
+		Mockito.when(notificacioMock.getConcepte()).thenReturn("Concepte de la notificació");
+		Mockito.when(notificacioMock.getEstat()).thenReturn(NotificacioEstatEnumDto.ENVIADA);
+		Mockito.when(notificacioMock.getMotiu()).thenReturn("Motiu de la notificació");
+		Mockito.when(notificacioMock.getEmisorDir3Codi()).thenReturn("A03001234");
+		Mockito.when(notificacioMock.getCreatedBy()).thenReturn(Optional.of(usuari));
+		Mockito.when(notificacioMock.getOrganGestor()).thenReturn(organGestor);
+		Mockito.when(notificacioMock.getCreatedDate()).thenReturn(Optional.of(LocalDateTime.now()));
+
+		enviamentMock = Mockito.mock(NotificacioEnviamentEntity.class);
+		Mockito.when(enviamentMock.getId()).thenReturn(29754381L);
+		Mockito.when(enviamentMock.getNotificacio()).thenReturn(notificacioMock);
+		Mockito.when(enviamentMock.getTitular()).thenReturn(persona);
+		Mockito.when(enviamentMock.getUuid()).thenReturn("48bd0894-0a40-48e1-8ffb-8f2c6c11f0d0");
+		Mockito.when(enviamentMock.getNotificaEstatData()).thenReturn(new Date());
+
+		var text = emailNotificacioHelper.getMailHtmlBody(enviamentMock);
+		System.out.println(text);
+
 	}
 	
 	@Test
 	public void whenSendEmailNotificacio_thenReturn() throws Exception {
 
 		// Given
-		EntitatEntity entidad = new EntitatEntity();
+		EntitatEntity entidad = EntitatEntity.hiddenBuilder().nom("Govern de les Illes Balears").build(); // TODO: Afegir logos
+		PersonaEntity persona = PersonaEntity.builder().nom("Nom").llinatge1("Llinatge1").llinatge2("Llinatge2").email(EMAIL_DEST).build();
 		Set<String> usuaris = new HashSet<>(Arrays.asList("user"));
 		DadesUsuari dadesUsuari = DadesUsuari.builder().email(EMAIL_DEST).build();
 		UsuariEntity usuari = UsuariEntity.builder().codi("user").rebreEmailsNotificacio(true).rebreEmailsNotificacioCreats(true).build();
@@ -184,6 +229,11 @@ public class EmailNotificacioHelperTest {
 		Mockito.when(usuariRepository.findById(Mockito.anyString())).thenReturn(Optional.of(usuari));
 		Mockito.when(procSerHelper.findUsuaris(Mockito.any(NotificacioEntity.class))).thenReturn(usuaris);
 
+		enviamentMock = Mockito.mock(NotificacioEnviamentEntity.class);
+		Mockito.when(enviamentMock.getId()).thenReturn(666L);
+		Mockito.when(enviamentMock.getNotificacio()).thenReturn(notificacioMock);
+		Mockito.when(enviamentMock.getTitular()).thenReturn(persona);
+		Mockito.when(enviamentMock.getNotificaReferencia()).thenReturn("48bd0894-0a40-48e1-8ffb-8f2c6c11f0d0");
 		// When	
 		String resposta = emailNotificacioHelper.prepararEnvioEmailNotificacio(enviamentMock);
 		
