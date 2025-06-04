@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - sql: "INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.USUARIS', 'false', 'Mostrar logs de les accions fetes per un usuari', 'LOGS', 22, 0, 'BOOL', 0);"

@@ -23,6 +23,8 @@ import es.caib.notib.logic.intf.dto.ProcessosInicialsEnum;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.repository.ProcessosInicialsRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
@@ -113,7 +115,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var auth = SecurityContextHolder.getContext().getAuthentication();
-			log.debug("Processant autenticació (usuariCodi=" + auth.getName() + ")");
+			NotibLogger.getInstance().info("[AplicacioService] Processant autenticació (usuariCodi=" + auth.getName() + ")", log, LoggingTipus.USUARIS);
 			var usuari = usuariRepository.findById(auth.getName()).orElse(null);
 			if (usuari == null) {
 				crearUsuari(auth.getName());
@@ -121,11 +123,17 @@ public class AplicacioServiceImpl implements AplicacioService {
 				procedimentsCacheable.clearAuthenticationProcedimentsCaches(auth);
 				return;
 			}
-			log.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
+
+			NotibLogger.getInstance().info("[AplicacioService] Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")", log, LoggingTipus.USUARIS);
 			var dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 			if (dadesUsuari == null) {
 				cacheHelper.evictUsuariByCodi();
-				throw new NotFoundException(auth.getName(), DadesUsuari.class);
+				NotibLogger.getInstance().info("[AplicacioService] Buidada cache ja que no hi ha dades per l'usuari (usuariCodi=" + auth.getName() + ")", log, LoggingTipus.USUARIS);
+				dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+				if (dadesUsuari == null) {
+					log.error("[AplicacioService] Error buscant l'usuari " + auth.getName() + ". No s'ha trobat informacio de l'usuari un cop buidada la cache");
+					throw new NotFoundException(auth.getName(), DadesUsuari.class);
+				}
 			}
 			if (dadesUsuari.getNomSencer() != null) {
 				usuari.update(dadesUsuari.getNomSencer(), dadesUsuari.getNif(), dadesUsuari.getEmail());
