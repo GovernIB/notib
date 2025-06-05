@@ -2,6 +2,7 @@ package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.CieEstat;
+import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -208,8 +209,16 @@ public class NotificacioTableHelper {
                         }
                     }
 
-                    entregaPostal = entregaPostal || e.getEntregaPostal() != null;
+                    var registreEstat = e.getRegistreEstat();
+                    if (notificacio.isComunicacioSir()) {
+                        if(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT.equals(registreEstat)) {
+                            estatMask += NotificacioEstatEnumDto.OFICI_ACCEPTAT.getMask();
+                        } else if (NotificacioRegistreEstatEnumDto.REBUTJAT.equals(registreEstat)) {
+                            estatMask += NotificacioEstatEnumDto.REBUTJADA_SIR.getMask();
+                        }
+                    }
 
+                    entregaPostal = entregaPostal || e.getEntregaPostal() != null;
                     entregaPostalError = entregaPostalError || e.getEntregaPostal() != null && CieEstat.ERROR.equals(e.getEntregaPostal().getCieEstat());
                 }
                 if (titular.length() > 2) {
