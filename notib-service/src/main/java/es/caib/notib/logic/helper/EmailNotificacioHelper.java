@@ -6,15 +6,11 @@ import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.UsuariDto;
-import es.caib.notib.logic.mapper.NotificacioTableMapperImpl;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.NotibLogger;
-import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
-import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -37,8 +33,6 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 
 	@Resource ProcSerHelper procSerHelper;
 	@Resource IntegracioHelper integracioHelper;
-    @Autowired
-    private NotificacioTableMapperImpl notificacioTableMapperImpl;
 
 	public String prepararEnvioEmailNotificacio(NotificacioEnviamentEntity enviament) throws Exception {
 
