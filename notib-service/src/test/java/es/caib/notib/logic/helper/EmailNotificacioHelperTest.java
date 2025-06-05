@@ -47,7 +47,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertNull;
 
-//@Ignore
+@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class EmailNotificacioHelperTest {
 
@@ -189,7 +189,7 @@ public class EmailNotificacioHelperTest {
 		System.out.println(text);
 
 	}
-	
+
 	@Test
 	public void whenSendEmailNotificacio_thenReturn() throws Exception {
 
@@ -234,7 +234,7 @@ public class EmailNotificacioHelperTest {
 		Mockito.when(enviamentMock.getNotificacio()).thenReturn(notificacioMock);
 		Mockito.when(enviamentMock.getTitular()).thenReturn(persona);
 		Mockito.when(enviamentMock.getNotificaReferencia()).thenReturn("48bd0894-0a40-48e1-8ffb-8f2c6c11f0d0");
-		// When	
+		// When
 		String resposta = emailNotificacioHelper.prepararEnvioEmailNotificacio(enviamentMock);
 		
 		// Then
