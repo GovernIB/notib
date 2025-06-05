@@ -86,6 +86,7 @@ public class MonitorSystemController extends BaseController {
 		}
 		sistema.add(getMessage(request, "monitor.deadlocked")+": " + numDeadlocked);
 		sistema.add(getMessage(request, "monitor.daemon_thread")+": " + bean.getDaemonThreadCount());
+		sistema.add(getMessage(request, "monitor.versio.java")+": " + getVersioJava());
 		bean.resetPeakThreadCount();
 		if (bean.isThreadCpuTimeSupported()) {
 			long[] ids = bean.getAllThreadIds();
@@ -117,6 +118,19 @@ public class MonitorSystemController extends BaseController {
 		mjson.put("espera", espera);
 		mjson.put("blockedtime", blockedtime);
 		return mjson;
+	}
+
+	public String getVersioJava() {
+
+		String version = System.getProperty("java.version");
+		if(version.startsWith("1.")) {
+			return version.substring(2, 3);
+		}
+		int dot = version.indexOf(".");
+		if(dot != -1) {
+			version = version.substring(0, dot);
+		}
+		return version;
 	}
 
 	@SuppressWarnings("unchecked")
