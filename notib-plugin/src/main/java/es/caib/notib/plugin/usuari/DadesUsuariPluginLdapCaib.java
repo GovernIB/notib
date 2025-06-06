@@ -75,7 +75,9 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 		try {
 			UserInfo userInfo = getUserInfoByUserName(usuariCodi);
 			incrementarOperacioOk();
-			return toDadesUsuari(userInfo);
+			var dadesUsuari = toDadesUsuari(userInfo);
+			logger.info("Dades d'usuari " + dadesUsuari);
+			return dadesUsuari;
 		} catch (Exception ex) {
 			incrementarOperacioError();
 			throw new SistemaExternException("Error al consultar l'usuari amb codi " + usuariCodi, ex);

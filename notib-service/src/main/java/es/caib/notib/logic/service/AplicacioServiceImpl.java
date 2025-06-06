@@ -127,7 +127,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			NotibLogger.getInstance().info("[AplicacioService] Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")", log, LoggingTipus.USUARIS);
 			var dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 			if (dadesUsuari == null) {
-				cacheHelper.evictUsuariByCodi();
+				cacheHelper.evictUsuariAmbCodi(auth.getName());
 				NotibLogger.getInstance().info("[AplicacioService] Buidada cache ja que no hi ha dades per l'usuari (usuariCodi=" + auth.getName() + ")", log, LoggingTipus.USUARIS);
 				dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 				if (dadesUsuari == null) {
