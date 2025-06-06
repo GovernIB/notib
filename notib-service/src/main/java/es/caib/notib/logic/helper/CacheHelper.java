@@ -76,6 +76,11 @@ public class CacheHelper {
 		return pluginHelper.dadesUsuariConsultarAmbCodi(usuariCodi);
 	}
 
+	@CacheEvict(value = "usuariAmbCodi",  key="#usuariCodi")
+	public void evictUsuariAmbCodi(final String usuariCodi) {
+		// evictUsuariByCodi
+	}
+
 	@Cacheable(value = "rolsAmbCodi", key="#usuariCodi")
 	public List<String> findRolsUsuariAmbCodi(String usuariCodi) {
 		return pluginHelper.consultarRolsAmbCodi(usuariCodi);
