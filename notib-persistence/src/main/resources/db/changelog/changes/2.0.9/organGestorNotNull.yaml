@@ -1,0 +1,9 @@
+
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - addNotNullConstraint:
+            tableName: not_notificacio
+            columnName: organ_gestor
