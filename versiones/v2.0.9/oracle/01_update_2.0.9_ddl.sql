@@ -12,3 +12,5 @@ ALTER TABLE not_notificacio ADD origen VARCHAR2(8 CHAR);
 GRANT SELECT, UPDATE, INSERT, DELETE ON not_explot_temps TO www_notib;
 GRANT SELECT, UPDATE, INSERT, DELETE ON not_explot_dim TO www_notib;
 GRANT SELECT, UPDATE, INSERT, DELETE ON not_explot_fet TO www_notib;
+
+ALTER TABLE not_notificacio MODIFY organ_gestor NOT NULL;

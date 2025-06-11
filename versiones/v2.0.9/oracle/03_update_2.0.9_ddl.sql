@@ -1,0 +1,1 @@
+ALTER TABLE not_notificacio MODIFY organ_gestor NOT NULL;

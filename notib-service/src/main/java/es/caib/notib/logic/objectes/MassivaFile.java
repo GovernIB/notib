@@ -242,7 +242,7 @@ public class MassivaFile {
         boolean perEmail;
         boolean isEntregaPostal;
         String entregaPostalCol;
-        EntregaPostal entregaPostal;
+        EntregaPostal entregaPostal = null;
         Persona titular;
         Enviament enviament;
         Notificacio notificacio;
@@ -255,61 +255,66 @@ public class MassivaFile {
             email = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DEST_EMAIL));
             dir3Codi = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.UNITAT_DESTI));
             interessatTipus = getInteressatTipus(numDocument, email, dir3Codi);
-            entregaPostalCol = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.ENTREGA_POSTAL));
-            isEntregaPostal = !Strings.isNullOrEmpty(entregaPostalCol) && entregaPostalCol.toLowerCase().contains("s");
             perEmail = InteressatTipus.FISICA_SENSE_NIF.equals(interessatTipus);
-            entregaPostal = null;
-            if (!perEmail && isEntregaPostal) {
-                var linia1 = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.ADDR_LIN1));
-                var linia2 = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.ADDR_LIN2));
-                var domiciliConcretTipus = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DOMICILI_CONCRET_TIPUS));
-                var codiPostal = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.CODI_POSTAL));
-                var viaTipus = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.VIA_TIPUS));
-                var viaNom = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.VIA_NOM));
-                var apartatCorreus = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.APARTAT_CORREUS));
-                var numeroCasa = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.NUMERO_CASA));
-                var puntKm = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PUNT_KM));
-                var portal = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PORTAL));
-                var escala = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.ESCALA));
-                var planta = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PLANTA));
-                var porta = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PORTA));
-                var bloc = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.BLOC));
-                var paisCodi = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PAIS_CODI));
-                var provincia = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PROVINCIA));
-                var municipiCodi = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.MUNICIPI_CODI));
-                var poblacio = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.POBLACIO));
-                var complement = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.COMPLEMENT));
 
-                if (isEntregaPostal) {
+            var headerEntregaPostal = headerColumns.get(MassivaColumnsEnum.ENTREGA_POSTAL);
 
-                    NotificaDomiciliConcretTipus tipus = null;
-                    try {
-                        tipus = NotificaDomiciliConcretTipus.valueOf(domiciliConcretTipus);
-                    } catch (Exception ex) {
+            if (headerEntregaPostal != null) {
+                entregaPostalCol = enviamentCsv.get(headerEntregaPostal);
+                isEntregaPostal = !Strings.isNullOrEmpty(entregaPostalCol) && entregaPostalCol.toLowerCase().contains("s");
+                entregaPostal = null;
+                if (!perEmail && isEntregaPostal) {
+                    var linia1 = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.ADDR_LIN1));
+                    var linia2 = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.ADDR_LIN2));
+                    var domiciliConcretTipus = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DOMICILI_CONCRET_TIPUS));
+                    var codiPostal = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.CODI_POSTAL));
+                    var viaTipus = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.VIA_TIPUS));
+                    var viaNom = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.VIA_NOM));
+                    var apartatCorreus = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.APARTAT_CORREUS));
+                    var numeroCasa = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.NUMERO_CASA));
+                    var puntKm = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PUNT_KM));
+                    var portal = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PORTAL));
+                    var escala = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.ESCALA));
+                    var planta = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PLANTA));
+                    var porta = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PORTA));
+                    var bloc = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.BLOC));
+                    var paisCodi = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PAIS_CODI));
+                    var provincia = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.PROVINCIA));
+                    var municipiCodi = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.MUNICIPI_CODI));
+                    var poblacio = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.POBLACIO));
+                    var complement = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.COMPLEMENT));
+
+                    if (isEntregaPostal) {
+
+                        NotificaDomiciliConcretTipus tipus = null;
+                        try {
+                            tipus = NotificaDomiciliConcretTipus.valueOf(domiciliConcretTipus);
+                        } catch (Exception ex) {
+                        }
+                        EntregaPostalVia via = null;
+                        try {
+                            via = EntregaPostalVia.valueOf(viaTipus);
+                        } catch (Exception ex) {
+                        }
+                        entregaPostal = EntregaPostal.builder()
+                                .tipus(tipus)
+                                .viaTipus(via)
+                                .viaNom(viaNom)
+                                .apartatCorreus(apartatCorreus)
+                                .numeroCasa(numeroCasa)
+                                .puntKm(puntKm)
+                                .portal(portal)
+                                .escala(escala)
+                                .planta(planta)
+                                .porta(porta)
+                                .bloc(bloc)
+                                .paisCodi(paisCodi)
+                                .provincia(provincia)
+                                .municipiCodi(municipiCodi)
+                                .poblacio(poblacio)
+                                .complement(complement)
+                                .linea1(linia1).linea2(linia2).codiPostal(codiPostal).build();
                     }
-                    EntregaPostalVia via = null;
-                    try {
-                        via = EntregaPostalVia.valueOf(viaTipus);
-                    } catch (Exception ex) {
-                    }
-                    entregaPostal = EntregaPostal.builder()
-                            .tipus(tipus)
-                            .viaTipus(via)
-                            .viaNom(viaNom)
-                            .apartatCorreus(apartatCorreus)
-                            .numeroCasa(numeroCasa)
-                            .puntKm(puntKm)
-                            .portal(portal)
-                            .escala(escala)
-                            .planta(planta)
-                            .porta(porta)
-                            .bloc(bloc)
-                            .paisCodi(paisCodi)
-                            .provincia(provincia)
-                            .municipiCodi(municipiCodi)
-                            .poblacio(poblacio)
-                            .complement(complement)
-                            .linea1(linia1).linea2(linia2).codiPostal(codiPostal).build();
                 }
             }
             titular = Persona.builder()
@@ -624,7 +629,7 @@ public class MassivaFile {
     }
 
     private boolean isNeededAndNotPresent(MassivaColumnsEnum column, boolean requereixMetadades) {
-        return !headerColumns.containsKey(column) && (requereixMetadades || !column.name().startsWith("META_"));
+        return !headerColumns.containsKey(column) && (requereixMetadades || !column.name().startsWith("META_") && !column.isOpcional());
     }
 
     private void checkCSVContent() {

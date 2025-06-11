@@ -8,3 +8,4 @@ ALTER TABLE not_explot_fet ADD CONSTRAINT fk_not_explot_fet_dim FOREIGN KEY (dim
 ALTER TABLE not_explot_fet ADD CONSTRAINT fk_not_explot_fet_temps FOREIGN KEY (temps_id) REFERENCES not_explot_temps (id);
 ALTER TABLE not_explot_dim ADD CONSTRAINT not_explot_dim_uk UNIQUE (entitat_id, procediment_id, organ_codi, usuari_codi, tipus, origen);
 ALTER TABLE not_notificacio ADD origen VARCHAR2(8 CHAR);
+ALTER TABLE not_notificacio MODIFY organ_gestor NOT NULL;
