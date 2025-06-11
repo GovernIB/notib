@@ -332,6 +332,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 	}
 	protected String getMailPlainTextBody(NotificacioEnviamentEntity enviament) {
 
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 		var appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
 		var t = "\t\t\t\t";
 		var notificacio = enviament.getNotificacio();
@@ -343,7 +344,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 		return messageHelper.getMessage("notificacio.email.identificador")+
 						t+ Objects.toString(enviament.getUuid(), "")+"\n"+
 						messageHelper.getMessage("notificacio.email.entitat")+
-						t+ Objects.toString(notificacio.getEntitat(), "")+"\n"+
+						t+ Objects.toString(notificacio.getEntitat().getNom(), "")+"\n"+
 						"\t"+messageHelper.getMessage("notificacio.email.notificacio.organ") +
 						t+ Objects.toString(notificacio.getOrganGestor().getCodi() + " - " + notificacio.getOrganGestor().getNom(), "") +"\n"+
 						(notificacio.getProcediment() != null ?
