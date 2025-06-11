@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - sql: "UPDATE NOT_CONFIG_GROUP SET description = 'Plugin de registre' WHERE code = 'REGISTRE';
+                UPDATE NOT_CONFIG_GROUP SET description = 'Plugin de Notifica' WHERE code = 'NOTIFICA';
+                UPDATE NOT_CONFIG_GROUP SET description = 'Plugin de Directori comú d''unitats organitzatives (DIR3)' WHERE code = 'DIR3';
+                UPDATE NOT_CONFIG_GROUP SET description = 'Plugin d''usuaris' WHERE code = 'USUARIS';
+                UPDATE NOT_CONFIG_GROUP SET description = 'Plugin de notificacions mòbils (API CARPETA)' WHERE code = 'CARPETA';
+                UPDATE NOT_CONFIG_GROUP SET description = 'Plugin d''inventari de procediments i serveis (ROLSAC)' WHERE code = 'GESCONADM';
+                UPDATE NOT_CONFIG_GROUP SET description = 'Plugin de centre d''impressió i ensobrat (CIE)' WHERE code = 'CIE';"

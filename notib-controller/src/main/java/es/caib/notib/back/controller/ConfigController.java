@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Controlador per a la gestió de la configuració de l'aplicació.
@@ -46,11 +47,13 @@ public class ConfigController extends BaseUserController{
     @GetMapping
     public String get(HttpServletRequest request, Model model) {
 
-        var configGroups = configService.findAll();
         List<EntitatDto> entitats = new ArrayList<>();
         if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
             entitats = entitatService.findAll();
         }
+        var configGroups = configService.findAll();
+        var pluginGroup = configGroups.stream().filter(x -> "PLUGINS".equals(x.getKey())).collect(Collectors.toList());
+        configGroups.addAll(pluginGroup.get(0).getInnerConfigs());
         model.addAttribute("config_groups", configGroups);
         for (var cGroup: configGroups) {
             fillFormsModel(cGroup, model, entitats);
