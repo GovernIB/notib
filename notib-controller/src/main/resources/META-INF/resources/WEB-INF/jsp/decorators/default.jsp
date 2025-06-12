@@ -94,12 +94,13 @@
 			width: 96%;
 		}
 		<c:choose>
-		<c:when test="${sessionScope['EntitatHelper.entitatActual'].colorFons!=null  && not empty sessionScope['EntitatHelper.entitatActual'].colorFons}">
+<%--		<c:when test="${sessionScope['EntitatHelper.entitatActual'].colorFons!=null  && not empty sessionScope['EntitatHelper.entitatActual'].colorFons}">--%>
+		<c:when test="${entitatActual.colorFons !=null  && not empty entitatActual.colorFons}">
 		.navbar-app {
-			background-color: ${sessionScope['EntitatHelper.entitatActual'].colorFons} !important;
+			background-color: ${entitatActual.colorFons} !important;
 		}
 		.navbar-app .list-inline li.dropdown>a {
-			background-color: ${sessionScope['EntitatHelper.entitatActual'].colorFons} !important;
+			background-color: ${entitatActual.colorFons} !important;
 		}
 		</c:when>
 		<c:otherwise>
@@ -115,15 +116,15 @@
 		</c:choose>
 
 		<c:choose>
-		<c:when test="${sessionScope['EntitatHelper.entitatActual'].colorLletra!=null  && not empty sessionScope['EntitatHelper.entitatActual'].colorLletra}">
+		<c:when test="${entitatActual.colorLletra!=null  && not empty entitatActual.colorLletra}">
 		.navbar-app .list-inline li.dropdown>a {
-			color: ${sessionScope['EntitatHelper.entitatActual'].colorLletra};
+			color: ${entitatActual.colorLletra};
 		}
 		.caret-white {
-			border-top-color: ${sessionScope['EntitatHelper.entitatActual'].colorLletra} !important;
+			border-top-color: ${entitatActual.colorLletra} !important;
 		}
 		.list-inline.pull-right {
-			color: ${sessionScope['EntitatHelper.entitatActual'].colorLletra} !important;
+			color: ${entitatActual.colorLletra} !important;
 		}
 		</c:when>
 		<c:otherwise>
