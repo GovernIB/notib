@@ -53,7 +53,8 @@ public class ConfigController extends BaseUserController{
         }
         var configGroups = configService.findAll();
         var pluginGroup = configGroups.stream().filter(x -> "PLUGINS".equals(x.getKey())).collect(Collectors.toList());
-        configGroups.addAll(pluginGroup.get(0).getInnerConfigs());
+        var pluginGroups = pluginGroup.get(0).getInnerConfigs();
+        configGroups.addAll(pluginGroups);
         model.addAttribute("config_groups", configGroups);
         for (var cGroup: configGroups) {
             fillFormsModel(cGroup, model, entitats);

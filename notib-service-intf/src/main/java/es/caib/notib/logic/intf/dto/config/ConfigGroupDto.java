@@ -11,4 +11,5 @@ public class ConfigGroupDto {
     private String description;
     private List<ConfigDto> configs;
     private List<ConfigGroupDto> innerConfigs;
+    private String parentCode;
 }

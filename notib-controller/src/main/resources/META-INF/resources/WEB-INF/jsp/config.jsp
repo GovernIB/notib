@@ -255,12 +255,12 @@
             <ul id="tab-list" class="nav nav-pills nav-stacked">
                 <c:forEach items="${config_groups}" var="group" varStatus="status_group">
                         <c:choose>
-                            <c:when test="${group.key != 'PLUGINS'}">
+                            <c:when test="${group.key != 'PLUGINS' and group.parentCode == null}">
                                 <li role="presentation">
                                     <a class="a-config-group" data-toggle="tab" href="#group-${group.key}">${group.description}</a>
                                 </li>
                             </c:when>
-                            <c:otherwise>
+                            <c:when test="${group.key == 'PLUGINS'}">
                                 <li role="presentation" class="dropdown">
                                     <a class="dropdown-toggle" href="#plugins" data-toggle="collapse" data-target="#plugin-list" aria-expanded="false" aria-controls="plugin-list">
                                         ${group.description} <span class="caret"></span>
@@ -271,7 +271,7 @@
                                         </c:forEach>
                                     </ul>
                                 </li>
-                            </c:otherwise>
+                            </c:when>
                         </c:choose>
                 </c:forEach>
             </ul>
@@ -282,16 +282,7 @@
                 <c:set var="group" value="${group}" scope="request"/>
                 <c:set var="level" value="0" scope="request"/>
                 <div id="group-${group.key}" class="tab-pane fade">
-                    <c:choose>
-                        <c:when test="${group.key != 'PLUGINS'}">
-                            <jsp:include page="includes/configGroup.jsp"/>
-                        </c:when>
-                        <c:otherwise>
-                            <c:forEach items="${group.innerConfigs}" var="innerGroup">
-                                <jsp:include page="includes/configGroup.jsp"/>
-                            </c:forEach>
-                        </c:otherwise>
-                    </c:choose>
+                    <jsp:include page="includes/configGroup.jsp"/>
                 </div>
             </c:forEach>
             </div>
