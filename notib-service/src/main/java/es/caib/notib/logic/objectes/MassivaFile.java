@@ -336,6 +336,10 @@ public class MassivaFile {
                     .titular(titular)
                     .perEmail(perEmail)
                     .build();
+
+            var enviamentTipus = getEnviamentTipus(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.TIPUS_ENV)));
+
+
             notificacio = Notificacio.builder()
                     .emisorDir3Codi(entitat.getDir3Codi())
                     .organGestor(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.UNITAT_EMISORA)))
@@ -343,14 +347,18 @@ public class MassivaFile {
                     .concepte(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.CONCEPTE)))
                     .descripcio(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DESCRIPCIO)))
                     .numExpedient(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.REF_EMISOR)))
-                    .enviamentTipus(getEnviamentTipus(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.TIPUS_ENV))))
+                    .enviamentTipus(enviamentTipus)
                     .caducitat(caducitat)
                     .retard(getRetard(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.RETARD))))
                     .enviamentDataProgramada(getData(enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DATA_PROG))))
-                    .document(documents.get(getDocumentKey(enviamentCsv)))
                     .enviaments(List.of(enviament))
                     .usuariCodi(usuari)
                     .build();
+            if (EnviamentTipus.SIR.equals(enviamentTipus)) {
+                setDocumentsSir(notificacio, enviamentCsv);
+            } else {
+                notificacio.setDocument(documents.get(getDocumentKey(enviamentCsv)));
+            }
             notis.add(notificacio);
         }
         return notis;
@@ -472,46 +480,60 @@ public class MassivaFile {
             // Document físic
             if (!Strings.isNullOrEmpty(documentNom)) {
                 int liniaLamda = linia;
-                var arxiuNom = fileNames.stream().filter(nom -> nom.equals(documentNom)).findFirst()
-                        .orElseThrow(() -> new Exception(messageHelper.getMessage("notificacio.massiva.nom.fitxer.no.coincident", new Object[]{liniaLamda})));
-                if (arxiuNom != null && !documentMap.containsKey(arxiuNom)) {
-                    var arxiuBytes = ZipFileUtils.readZipFile(contingutZip, arxiuNom);
-                    var mime = MimeUtils.getMimeTypeFromContingut(arxiuNom, arxiuBytes);
-                    document = Document.builder()
-                            .arxiuNom(arxiuNom)
-                            .contingutBase64(Base64.encodeBase64String(arxiuBytes))
-                            .normalitzat(normalitzat != null ? normalitzat : false)
-                            .generarCsv(false)
-                            .mediaType(mime)
-                            .mida(Long.valueOf(arxiuBytes.length))
-                            .build();
-                    documentMap.put(documentNom, document);
+                var nomSplit = documentNom.split("/");
+                for (var split : nomSplit) {
+                    var arxiuNom = fileNames.stream().filter(nom -> nom.equals(split)).findFirst()
+                            .orElseThrow(() -> new Exception(messageHelper.getMessage("notificacio.massiva.nom.fitxer.no.coincident", new Object[]{liniaLamda})));
+                    if (arxiuNom != null && !documentMap.containsKey(arxiuNom)) {
+                        var arxiuBytes = ZipFileUtils.readZipFile(contingutZip, arxiuNom);
+                        var mime = MimeUtils.getMimeTypeFromContingut(arxiuNom, arxiuBytes);
+                        document = Document.builder()
+                                .arxiuNom(arxiuNom)
+                                .contingutBase64(Base64.encodeBase64String(arxiuBytes))
+                                .normalitzat(normalitzat != null ? normalitzat : false)
+                                .generarCsv(false)
+                                .mediaType(mime)
+                                .mida(Long.valueOf(arxiuBytes.length))
+                                .build();
+                        documentMap.put(split, document);
+                    }
                 }
             }
 
             // UUID
-            if (document == null && !Strings.isNullOrEmpty(documentUuid) && !documentMap.containsKey(documentUuid)) {
+            if (!Strings.isNullOrEmpty(documentUuid)) {
+                var uuidSplit = documentUuid.split("/");
+                for (var split : uuidSplit) {
+                    if (!documentMap.containsKey(documentUuid)) {
+
 //                var uuidPattern = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$";
 //                var pUuid = Pattern.compile(uuidPattern);
 //                var mUuid = pUuid.matcher(documentUuid);
 //                if (mUuid.matches() && !documents.containsKey(documentUuid)) {
-                document = Document.builder()
-                        .uuid(documentUuid)
-                        .normalitzat(normalitzat != null ? normalitzat : false)
-                        .generarCsv(false)
-                        .build();
-                documentMap.put(documentUuid, document);
+                        document = Document.builder()
+                                .uuid(split)
+                                .normalitzat(normalitzat != null ? normalitzat : false)
+                                .generarCsv(false)
+                                .build();
+                        documentMap.put(split, document);
 //                }
+                    }
+                }
             }
 
             // CSV
-            if (document == null && !Strings.isNullOrEmpty(documentCsv) && !documentMap.containsKey(documentCsv)) {
-                document = Document.builder()
-                        .csv(documentCsv)
-                        .normalitzat(normalitzat != null ? normalitzat : false)
-                        .generarCsv(false)
-                        .build();
-                documentMap.put(documentCsv, document);
+            if (!Strings.isNullOrEmpty(documentCsv)) {
+                var csvSplit = documentCsv.split("/");
+                for (var split : csvSplit) {
+                    if (!documentMap.containsKey(documentCsv)) {
+                        document = Document.builder()
+                                .csv(split)
+                                .normalitzat(normalitzat != null ? normalitzat : false)
+                                .generarCsv(false)
+                                .build();
+                        documentMap.put(split, document);
+                    }
+                }
             }
 
             if (document != null) {
@@ -556,6 +578,7 @@ public class MassivaFile {
     }
 
     private ValidesaEnum getValidesa(String validesa) {
+
         if (Strings.isNullOrEmpty(validesa)) {
             return null;
         }
@@ -570,6 +593,7 @@ public class MassivaFile {
     }
 
     private OrigenEnum getOrigen(String origen) {
+
         if (Strings.isNullOrEmpty(origen)) {
             return null;
         }
@@ -582,7 +606,68 @@ public class MassivaFile {
         }
     }
 
+    private int setDocuments(Notificacio notificacio, int totalDocuments, String nomDocument) {
+
+        var nomSplit = nomDocument.split("/");
+        for (var numDocument = 0; numDocument < nomSplit.length; numDocument++) {
+            var split = nomSplit[numDocument];
+            switch (totalDocuments) {
+                case 0:
+                    if (isValidDocumentKey(split)) {
+                        notificacio.setDocument(documents.get(split));
+                    }
+                    break;
+                case 1:
+                    if (isValidDocumentKey(split)) {
+                        notificacio.setDocument2(documents.get(split));
+                    }
+                    break;
+                case 2:
+                    if (isValidDocumentKey(split)) {
+                        notificacio.setDocument3(documents.get(split));
+                    }
+                    break;
+                case 3:
+                    if (isValidDocumentKey(split)) {
+                        notificacio.setDocument4(documents.get(split));
+                    }
+                    break;
+                case 4:
+                    if (isValidDocumentKey(split)) {
+                        notificacio.setDocument5(documents.get(split));
+                    }
+                    break;
+            }
+            totalDocuments++;
+        }
+        return totalDocuments;
+    }
+
+    private void setDocumentsSir(Notificacio notificacio, List<String> enviamentCsv) {
+
+        var documentNom = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.FITXER_NOM));
+        var totalDocuments = 0;
+        if (!Strings.isNullOrEmpty(documentNom)) {
+            totalDocuments = setDocuments(notificacio, totalDocuments, documentNom);
+            if (totalDocuments == 5) {
+                return;
+            }
+        }
+        var documentUuid = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.FITXER_UUID));
+        if (!Strings.isNullOrEmpty(documentUuid)) {
+            totalDocuments = setDocuments(notificacio, totalDocuments, documentUuid);
+            if (totalDocuments == 5) {
+                return;
+            }
+        }
+        var documentCsv = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.FITXER_CSV));
+        if (!Strings.isNullOrEmpty(documentCsv)) {
+            setDocuments(notificacio, totalDocuments, documentCsv);
+        }
+    }
+
     private String getDocumentKey(List<String> enviamentCsv) {
+
         var documentNom = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.FITXER_NOM));
         if (isValidDocumentKey(documentNom)) {
             return documentNom;
