@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - addDefaultValue:
+            tableName: not_notificacio
+            columnName: retard_postal
+            defaultValue: 0
+        - sql: "UPDATE not_notificacio SET retard_postal = 0 WHERE retard_postal IS NULL;"
