@@ -195,15 +195,10 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 				case ARXIU:
 					diagnostic.setCorrecte(pluginHelper.diagnosticarArxiu(diagnostics));
 					break;
-				case CALLBACK:
-					diagnostic.setProva(messageHelper.getMessage("integracio.diagnostic.callback.descripcio"));
-					usuariAplicacioService.diagnosticarAplicacions(diagnostics);
-//					var aplicacio = aplicacioRepository.findTopByCallbackUrlNotNullOrderByIdDesc().orElseThrow();
-//					var r = requestsHelper.callbackAplicacioNotificaCanvi(aplicacio.getCallbackUrl(), new NotificacioCanviClient());
-//					var ok = r != null && ClientResponse.Status.OK.getStatusCode() == r.getStatusInfo().getStatusCode();
-//					diagnostic.setCorrecte(ok);
-//					diagnostic.setErrMsg(!ok ? r.getStatus() + " " + r.getStatusInfo() : null);
-					break;
+//				case CALLBACK:
+//					diagnostic.setProva(messageHelper.getMessage("integracio.diagnostic.callback.descripcio"));
+//					usuariAplicacioService.diagnosticarAplicacions(diagnostics);
+//					break;
 				case GESDOC:
 					diagnostic.setCorrecte(pluginHelper.diagnosticarGestorDocumental(diagnostics));
 					break;

@@ -5,7 +5,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
-<c:set var="titol"><spring:message code="integracio.diagnostic.titol"/></c:set>
+<c:set var="titol"><spring:message code="aplicacio.diagnostic.titol"/></c:set>
 <html>
 <head>
     <title>${titol}</title>
@@ -33,7 +33,7 @@
                 $("#span-refresh-" + integracio).removeClass("text-danger");
                 $.ajax({
                     method: "GET",
-                    url: "<c:url value='/integracio/diagnostic'/>/" + integracio,
+                    url: "<c:url value='/entitat/${entitatId}/aplicacio/diagnosticar'/>/",
                     async: true,
                     success: function(data){
                         $("#span-refresh-" + integracio).removeClass('fa-circle-o-notch');
@@ -53,7 +53,7 @@
                             $('#integracio_' + integracio + '_info').append(textNode);
                         } else {
                             const map = new Map(Object.entries(data.diagnosticsEntitat));
-                            $('#integracio_' + integracio + '_info').append(document.createTextNode(data.prova));
+                            // $('#integracio_' + integracio + '_info').append(document.createTextNode(data.prova));
                             map.forEach((diagnostic, codi) => {
                                 let div = crearDiagnosticInfo(diagnostic, codi)
                                 $('#integracio_' + integracio + '_info').append(div);
@@ -68,26 +68,21 @@
 
             let div = document.createElement("div");
             let span = document.createElement("span");
-            let clase;
-            let textNode;
-            if (diagnostic && diagnostic.correcte) {
-                clase = "fa fa-check text-succes";
-                textNode = document.createTextNode("    " + codi);
-            } else if (diagnostic.errMsg) {
+            let clase = "fa fa-check text-succes";
+            let textError;
+            let textNode = document.createTextNode("    " + codi);
+            if (!diagnostic.correcte || diagnostic.errMsg) {
                 clase = "fa fa-times text-danger";
-                textNode = document.createTextNode("    " + codi + "    " + diagnostic.errMsg);
-            } else {
-                textNode = document.createTextNode("    " + codi);
+                textError = document.createTextNode("  -  " + diagnostic.errMsg);
             }
             let p = document.createElement("p");
             $(span).addClass(clase);
             p.append(span);
-            if (clase) {
-                p.append(textNode);
-            } else {
-                let b = document.createElement("b");
-                b.append(textNode)
-                p.append(b);
+            let b = document.createElement("b");
+            b.append(textNode)
+            p.append(b);
+            if (textError) {
+                p.append(textError);
             }
             div.append(p);
             if (!diagnostic.diagnosticsEntitat) {
@@ -104,20 +99,18 @@
 
 </head>
 <body>
-    <ul class="nav nav-tabs" role="tablist">
-        <c:forEach var="integracio" items="${integracions}">
-            <c:if test="${not empty integracio and integracio.codi != 'EMAIL'}">
-                <dl class="dl-horizontal">
-                    <dt class="integracio" id="integracio_${integracio.codi}" data-codi="${integracio.codi}"><spring:message code="${integracio.nom}"/></dt>
-                    <dd><span id="span-refresh-${integracio.codi}" class="ml-2 fa fa-refresh "></span>
-                        <p id="integracio_${integracio.codi}_info" style="display:inline;"></p></dd>
-                </dl>
-            </c:if>
-        </c:forEach>
+    <ul class="nav nav-tabs" role="tablist" style="height: 450px;">
+        <c:if test="${not empty integracio}">
+            <dl class="dl-horizontal">
+                <dt class="integracio" id="integracio_${integracio.codi}" data-codi="${integracio.codi}"><spring:message code="${integracio.nom}"/></dt>
+                <dd><span id="span-refresh-${integracio.codi}" class="ml-2 fa fa-refresh "></span>
+                    <p id="integracio_${integracio.codi}_info" style="display:inline;"></p></dd>
+            </dl>
+        </c:if>
     </ul>
     <div id="modal-botons">
         <button name="btnRefrescarDiagnostic" type="button" id="btnRefrescarDiagnostic" class="btn btn-success"> <span class="fa fa-refresh"></span> <spring:message code="comu.boto.refrescar"/> </button>
-        <a href="<c:url value="/integracio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>
+        <a href="<c:url value="/aplicacio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>
     </div>
 
 </body>

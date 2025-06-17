@@ -138,7 +138,8 @@ public class IntegracioController extends BaseUserController {
 	public String diagnostic(HttpServletRequest request, Model model) {
 
 		List<IntegracioDto> integracions = new ArrayList<>();
-		IntegracioCodi.stream().forEach(integracioCodi -> integracions.add(IntegracioDto.builder()
+		IntegracioCodi.stream().filter(integracioCodi -> !IntegracioCodi.CALLBACK.equals(integracioCodi))
+				.forEach(integracioCodi -> integracions.add(IntegracioDto.builder()
 				.codi(integracioCodi)
 				.nom(EnumHelper.getOneOptionForEnum(IntegracioCodi.class, "integracio.list.pipella." + integracioCodi).getText())
 				.build()));

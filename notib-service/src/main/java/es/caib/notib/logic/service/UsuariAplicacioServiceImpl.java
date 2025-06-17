@@ -283,5 +283,34 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		return false;
 	}
 
+	@Override
+	public IntegracioDiagnostic diagnosticarAplicacions(Long entitatId) {
+
+		IntegracioDiagnostic diagnostic;
+		IntegracioDiagnostic diagnosticEntitat;
+		Map<String, IntegracioDiagnostic> diagnosticsEntitat;
+		RespostaTestAplicacio resposta;
+		String error;
+		try {
+			var entitat = entitatRepository.findById(entitatId).orElseThrow();
+			var aplicacions = aplicacioRepository.findByEntitat(entitat);
+			if (aplicacions.isEmpty()) {
+				return IntegracioDiagnostic.builder().correcte(false).errMsg("No hi han aplicacions per aquesta entitat").build();
+			}
+			diagnosticsEntitat = new HashMap<>();
+			for (var aplicacio : aplicacions) {
+				resposta = provarAplicacio(aplicacio.getId());
+				error = !resposta.isOk()? resposta.getError() : null;
+				diagnostic = IntegracioDiagnostic.builder().correcte(resposta.isOk()).errMsg(error).build();
+				diagnosticsEntitat.put(aplicacio.getUsuariCodi(), diagnostic);
+			}
+			return IntegracioDiagnostic.builder().correcte(true).diagnosticsEntitat(diagnosticsEntitat).build();
+		} catch (Exception ex) {
+			log.error("Error al diagnosticar les aplicacions per l'entitat " + entitatId, ex);
+			return IntegracioDiagnostic.builder().correcte(false).errMsg(ex.getMessage()).build();
+
+		}
+	}
+
 
 }

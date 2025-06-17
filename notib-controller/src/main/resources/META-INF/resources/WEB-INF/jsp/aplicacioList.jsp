@@ -52,7 +52,13 @@
 			<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 		</div>
 	</form:form>
-	<script id="botonsTemplate" type="text/x-jsrender"></script>
+	<script id="botonsTemplate" type="text/x-jsrender">
+		<div class="text-right">
+        	<div class="btn-group">
+				<a class="btn btn-success" href="<c:url value="/entitat/${entitat.id}/aplicacio/diagnostic"/>" data-toggle="modal" style="margin-right:10px"><span class="fa fa-list"></span>&nbsp;<spring:message code="integracio.diagnostic"/></a>
+			</div>
+		</div>
+	</script>
 	<table
 		id="taulaAplicacions"
 		data-toggle="datatable"
@@ -63,7 +69,6 @@
 		data-default-dir="asc"
 		data-botons-template="#botonsTemplate"
 		class="table table-bordered table-striped"
-		data-info-type="search"
 		style="width:100%">
 		<thead>
 			<tr>
