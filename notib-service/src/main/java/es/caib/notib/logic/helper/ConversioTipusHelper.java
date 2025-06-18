@@ -7,6 +7,7 @@ import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.Envios;
+import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
@@ -105,7 +106,7 @@ public class ConversioTipusHelper {
 
 	private MapperFactory mapperFactory;
 	@Autowired
-	private CacheHelper cacheHelper;
+	private CacheBridge cacheBridge;
 	@Autowired
 	private MessageHelper messageHelper;
 	@Autowired
@@ -134,7 +135,7 @@ public class ConversioTipusHelper {
 				.customize(new CustomMapper<>() {
 					@Override
 					public void mapAtoB(NotificacioEntity a, NotificacioInfoDto b, MappingContext context) {
-						DadesUsuari d = cacheHelper.findUsuariAmbCodi(a.getUsuariCodi());
+						DadesUsuari d = cacheBridge.findUsuariAmbCodi(a.getUsuariCodi());
 						if (d != null) {
 							b.setUsuariNom(d.getNomSencer());
 						}

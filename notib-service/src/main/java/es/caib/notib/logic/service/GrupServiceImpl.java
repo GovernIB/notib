@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerGrupDto;
@@ -51,6 +52,8 @@ public class GrupServiceImpl implements GrupService{
 	private GrupProcSerRepository grupProcSerRepository;
 	@Resource
 	private ProcSerRepository procSerRepository;
+	@Resource
+	private CacheBridge cacheBridge;
 	@Resource
 	private CacheHelper cacheHelper;
 	@Resource
@@ -150,7 +153,7 @@ public class GrupServiceImpl implements GrupService{
 			DadesUsuari usuariGrup;
 			List<String> rols;
 			for (var grupProcediment : grupsProcediment) {
-				usuariGrup = cacheHelper.findUsuariAmbCodi(auth.getName());
+				usuariGrup = cacheBridge.findUsuariAmbCodi(auth.getName());
 				if (usuariGrup == null) {
 					continue;
 				}

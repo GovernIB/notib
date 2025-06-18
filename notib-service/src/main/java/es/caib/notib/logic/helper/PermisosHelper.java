@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
@@ -74,7 +75,7 @@ public class PermisosHelper {
 	@Resource
 	private NotibMutableAclService aclService;
 	@Autowired
-	private CacheHelper cacheHelper;
+	private CacheBridge cacheBridge;
 	@Autowired
 	private ConfigHelper configHelper;
 	@Resource
@@ -414,7 +415,7 @@ public class PermisosHelper {
 					permis = new PermisDto();
 					permis.setId((Long)ace.getId());
 					permis.setPrincipal(principal);
-					DadesUsuari usuari = cacheHelper.findUsuariAmbCodi(principal);
+					DadesUsuari usuari = cacheBridge.findUsuariAmbCodi(principal);
 					if(usuari != null) {
 						permis.setNomSencerAmbCodi(usuari.getNomSencerAmbCodi()!=null?usuari.getNomSencerAmbCodi():principal);
 					} else {
@@ -458,7 +459,7 @@ public class PermisosHelper {
 				permis = new PermisDto();
 				permis.setId(permisId);
 				permis.setPrincipal(principal);
-				DadesUsuari usuari = cacheHelper.findUsuariAmbCodi(principal);
+				DadesUsuari usuari = cacheBridge.findUsuariAmbCodi(principal);
 				if(usuari != null) {
 					permis.setNomSencerAmbCodi(usuari.getNomSencerAmbCodi() != null ? usuari.getNomSencerAmbCodi() : principal);
 				} else {

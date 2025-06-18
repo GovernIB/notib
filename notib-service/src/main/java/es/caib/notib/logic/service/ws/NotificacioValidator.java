@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import com.itextpdf.text.pdf.codec.Base64;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
@@ -82,6 +83,7 @@ public class NotificacioValidator implements Validator {
     private final ConfigHelper configHelper;
     private final OrganGestorService organGestorService;
     private final ConversioTipusHelper conversioTipusHelper;
+    private final CacheBridge cacheBridge;
 
     @Setter
     private Notificacio notificacio;
@@ -254,7 +256,7 @@ public class NotificacioValidator implements Validator {
         var procediment = procSerRepository.findById(procedimentId).orElseThrow();
         var grupsProcediment = grupProcSerRepository.findByProcSer(procediment);
         for (var grupProcediment : grupsProcediment) {
-            var usuariGrup = cacheHelper.findUsuariAmbCodi(auth.getName());
+            var usuariGrup = cacheBridge.findUsuariAmbCodi(auth.getName());
             if (usuariGrup == null) {
                 continue;
             }
@@ -389,7 +391,7 @@ public class NotificacioValidator implements Validator {
         if (notificacio.getUsuariCodi().length() > 64) {
             errors.rejectValue("usuariCodi", error(USUARI_CODI_SIZE, locale));
         }
-        var dades = cacheHelper.findUsuariAmbCodi(notificacio.getUsuariCodi());
+        var dades = cacheBridge.findUsuariAmbCodi(notificacio.getUsuariCodi());
         if (dades == null || Strings.isNullOrEmpty(dades.getCodi())) {
             errors.rejectValue("usuariCodi", error(USUARI_INEXISTENT, locale));
         }

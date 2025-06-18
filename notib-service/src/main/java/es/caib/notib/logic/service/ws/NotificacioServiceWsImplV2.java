@@ -13,6 +13,7 @@ import com.google.common.base.Strings;
 import es.caib.notib.client.domini.*;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
+import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.CacheHelper;
@@ -164,6 +165,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	@Autowired
 	private CacheHelper cacheHelper;
 	@Autowired
+	private CacheBridge cacheBridge;
+	@Autowired
 	private MetricsHelper metricsHelper;
 	@Autowired
 	private NotificacioTableHelper notificacioTableHelper;
@@ -311,7 +314,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 					organGestorCachable,
 					configHelper,
 					organGestorService,
-					conversioTipusHelper);
+					conversioTipusHelper,
+					cacheBridge);
 			notificacioValidator.setWarns(new BindException(notificacio, "notificacio"));
 			notificacioValidator.setNotificacio(notificacio);
 			notificacioValidator.setEntitat(entitat);
