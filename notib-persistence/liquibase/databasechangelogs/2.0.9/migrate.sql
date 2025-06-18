@@ -28,3 +28,6 @@ UPDATE NOT_NOTIFICACIO n SET n.organ_gestor = (SELECT o.id FROM NOT_ORGAN_GESTOR
 UPDATE NOT_NOTIFICACIO n SET n.organ_gestor = (SELECT o.id FROM NOT_ORGAN_GESTOR o WHERE o.CODI = n.emisor_dir3codi) WHERE n.ORGAN_GESTOR IS NULL;
 UPDATE NOT_NOTIFICACIO n SET n.organ_gestor = (SELECT DISTINCT o.id FROM NOT_ENTITAT e JOIN NOT_ORGAN_GESTOR o ON o.codi = e.DIR3_CODI AND o.entitat = e.id WHERE n.ENTITAT_ID = e.id) WHERE n.ORGAN_GESTOR IS NULL;
 ALTER TABLE not_notificacio MODIFY organ_gestor NOT NULL;
+
+ALTER TABLE not_notificacio MODIFY retard_postal DEFAULT '0';
+UPDATE not_notificacio SET retard_postal = 0 WHERE retard_postal IS NULL;

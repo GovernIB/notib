@@ -7,6 +7,7 @@ import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.NumElementsPaginaDefecte;
+import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.cacheable.PermisosCacheable;
 import es.caib.notib.logic.cacheable.ProcSerCacheable;
 import es.caib.notib.logic.config.SchedulingConfig;
@@ -16,7 +17,6 @@ import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.ExcepcioLogHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
-import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
 import es.caib.notib.logic.intf.dto.ProcessosInicialsEnum;
@@ -75,6 +75,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired
 	private CacheHelper cacheHelper;
 	@Autowired
+	private CacheBridge cacheBridge;
+	@Autowired
 	private PermisosCacheable permisosCacheable;
 	@Autowired
 	private ProcSerCacheable procedimentsCacheable;
@@ -125,16 +127,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			}
 
 			NotibLogger.getInstance().info("[AplicacioService] Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")", log, LoggingTipus.USUARIS);
-			var dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
-			if (dadesUsuari == null) {
-				cacheHelper.evictUsuariAmbCodi(auth.getName());
-				NotibLogger.getInstance().info("[AplicacioService] Buidada cache ja que no hi ha dades per l'usuari (usuariCodi=" + auth.getName() + ")", log, LoggingTipus.USUARIS);
-				dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
-				if (dadesUsuari == null) {
-					log.error("[AplicacioService] Error buscant l'usuari " + auth.getName() + ". No s'ha trobat informacio de l'usuari un cop buidada la cache");
-					throw new NotFoundException(auth.getName(), DadesUsuari.class);
-				}
-			}
+			var dadesUsuari = cacheBridge.findUsuariAmbCodi(auth.getName());
 			if (dadesUsuari.getNomSencer() != null) {
 				usuari.update(dadesUsuari.getNomSencer(), dadesUsuari.getNif(), dadesUsuari.getEmail());
 			} else {
@@ -155,7 +148,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public boolean existeixUsuariSeycon(String codi) {
-		return cacheHelper.findUsuariAmbCodi(codi) != null;
+		return cacheBridge.findUsuariAmbCodi(codi) != null;
 	}
 
 	@Transactional
@@ -163,7 +156,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public void crearUsuari(String codi) {
 
 		log.debug("Consultant plugin de dades d'usuari (usuariCodi=" + codi + ")");
-		var dadesUsuari = cacheHelper.findUsuariAmbCodi(codi);
+		var dadesUsuari = cacheBridge.findUsuariAmbCodi(codi);
 		var idioma = configHelper.getConfig("es.caib.notib.default.user.language");
 		if (dadesUsuari == null) {
 			throw new NotFoundException(codi, DadesUsuari.class);

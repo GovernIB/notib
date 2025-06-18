@@ -1,6 +1,7 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
+import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.exception.DocumentNotFoundException;
@@ -173,6 +174,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     protected JmsTemplate jmsTemplate;
     @Autowired
     private OrganGestorService organGestorService;
+    @Autowired
+    private CacheBridge cacheBridge;
 
     @Override
     public NotificacioMassivaDataDto findById(Long entitatId, Long id) {
@@ -287,7 +290,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         organGestorCachable,
                         configHelper,
                         organGestorService,
-                        conversioTipusHelper);
+                        conversioTipusHelper,
+                        cacheBridge);
                 notificacioValidator.setMassiva(true);
 
                 var procediment = !Strings.isNullOrEmpty(notificacio.getProcedimentCodi()) ? procSerRepository.findByCodiAndEntitat(notificacio.getProcedimentCodi(), entitat) : null;

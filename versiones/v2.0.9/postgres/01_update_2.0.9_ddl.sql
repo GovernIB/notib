@@ -9,3 +9,4 @@ ALTER TABLE not_explot_fet ADD CONSTRAINT fk_not_explot_fet_temps FOREIGN KEY (t
 ALTER TABLE not_explot_dim ADD CONSTRAINT not_explot_dim_uk UNIQUE (entitat_id, procediment_id, organ_codi, usuari_codi, tipus, origen);
 ALTER TABLE not_notificacio ADD origen VARCHAR(8 CHAR);
 ALTER TABLE not_notificacio ALTER COLUMN organ_gestor SET NOT NULL;
+ALTER TABLE not_notificacio ALTER COLUMN retard_postal SET DEFAULT 0;
