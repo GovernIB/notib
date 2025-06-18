@@ -1,6 +1,6 @@
 package es.caib.notib.logic.helper;
 
-import com.google.common.base.Strings;
+import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.persist.repository.UsuariRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @Slf4j
 @Component
@@ -22,6 +21,8 @@ public abstract class EmailHelper<T> {
 
     @Resource
     protected CacheHelper cacheHelper;
+    @Resource
+    protected CacheBridge cacheBridge;
     @Resource
     protected UsuariRepository usuariRepository;
     @Autowired

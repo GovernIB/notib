@@ -117,7 +117,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 		DadesUsuari dadesUsuari = null;
 		for (var usuari: usuaris) {
 			try {
-				dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
+				dadesUsuari = cacheBridge.findUsuariAmbCodi(usuari);
 			} catch (Exception ex) {
 				log.error("[EMAIL] Error al consultar l'usuari", ex);
 			}

@@ -14,3 +14,4 @@ GRANT SELECT, UPDATE, INSERT, DELETE ON not_explot_dim TO www_notib;
 GRANT SELECT, UPDATE, INSERT, DELETE ON not_explot_fet TO www_notib;
 
 ALTER TABLE not_notificacio MODIFY organ_gestor NOT NULL;
+ALTER TABLE not_notificacio MODIFY retard_postal DEFAULT '0';

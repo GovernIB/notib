@@ -3,9 +3,9 @@
  */
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.persist.entity.UsuariEntity;
-import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -36,7 +36,7 @@ public class UsuariHelper {
 	private UsuariRepository usuariRepository;
 
 	@Resource
-	private CacheHelper cacheHelper;
+	private CacheBridge cacheBridge;
 	@Resource
 	private ConfigHelper configHelper;
 
@@ -110,7 +110,7 @@ public class UsuariHelper {
 			return usuari;
 		}
 		log.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
-		var dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+		var dadesUsuari = cacheBridge.findUsuariAmbCodi(auth.getName());
 		var idioma = configHelper.getConfig("es.caib.notib.default.user.language");
 		if (dadesUsuari == null) {
 			throw new NotFoundException(auth.getName(), UsuariEntity.class);
