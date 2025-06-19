@@ -20,6 +20,7 @@ public class RolHelper {
 
 	public static final String ROLE_SUPER = RolEnumDto.NOT_SUPER.name();
 	public static final String ROLE_ADMIN_ENTITAT = RolEnumDto.NOT_ADMIN.name();
+	public static final String ROLE_ADMIN_LECTURA = RolEnumDto.NOT_ADMIN.name();
 	public static final String ROLE_USUARI = RolEnumDto.tothom.name();
 	public static final String ROLE_APLICACIO = RolEnumDto.NOT_APL.name();
 	public static final String ROLE_ADMIN_ORGAN = RolEnumDto.NOT_ADMIN_ORGAN.name();

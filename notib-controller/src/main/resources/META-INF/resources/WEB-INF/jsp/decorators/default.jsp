@@ -374,6 +374,7 @@
 										<li><a id="mg_massiu" href="<c:url value="/notificacio/massiva/"/>"><spring:message code="decorator.menu.notificacio.massiva.consulta"/></a></li>
 										<li><a id="mg_esborrades" href="<c:url value="/notificacio/notificacionsEsborrades"/>"><spring:message code="decorator.menu.massiu.esborrades"/></a></li>
 										<li><a id="mg_callback_pendents" href="<c:url value="/callback"/>"><spring:message code="decorator.menu.accions.callback.pendents"/></a></li>
+										<li><a id="mg_accions_massives" href="<c:url value="/accions/massives"/>"><spring:message code="decorator.menu.accions.accions.massives"/></a></li>
 									</ul>
 								</div>
 
