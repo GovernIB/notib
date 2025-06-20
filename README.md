@@ -1,7 +1,7 @@
 # ![Logo notib](https://github.com/GovernIB/notib/raw/master/assets/logo2.png) Notib
 
 **Versions**
-> - Versió Estable: __notib-2.0.9__ (tag [NOTIB 2.0.5](https://github.com/GovernIB/notib/releases/tag/v2.0.9.rc9))
+> - Versió Estable: __notib-2.0.9__ (tag [NOTIB 2.0.9](https://github.com/GovernIB/notib/releases/tag/v2.0.9.rc9))
 > - Versió Desenvolupament: __notib-2.0.10__ (branca [notib2-dev](https://github.com/GovernIB/notib/tree/notib2-dev))  
 >  
 > - Versió actual del client REST: __2.0.1__
