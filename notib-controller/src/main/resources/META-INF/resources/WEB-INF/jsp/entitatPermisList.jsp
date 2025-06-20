@@ -48,6 +48,7 @@
 						{{if usuari}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.usuari"/></span>{{/if}}
 						{{if administrador}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.administrador"/></span>{{/if}}
 						{{if administradorEntitat}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.administradorentitat"/></span>{{/if}}
+						{{if administradorLectura}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.administradorlectura"/></span>{{/if}}
 						{{if aplicacio}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.aplicacio"/></span>{{/if}}
 					</script>
 				</th>

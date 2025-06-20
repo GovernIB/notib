@@ -8,5 +8,6 @@ public enum RolEnumDto {
 	NOT_ADMIN,
 	tothom,
 	NOT_APL,
-	NOT_ADMIN_ORGAN
+	NOT_ADMIN_ORGAN,
+	NOT_ADMIN_LECTURA;
 }

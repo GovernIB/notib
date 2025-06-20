@@ -309,7 +309,7 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
 
         // Només es carregarà si l'usuari té rols per accedir a l'aplicació
         var rolsDisponibles = sessionScopedContext.getRolsDisponibles();
-        var rolsAvisos = List.of(ROLE_USUARI, ROLE_ADMIN_ENTITAT, ROLE_ADMIN_ORGAN, ROLE_SUPER);
+        var rolsAvisos = List.of(ROLE_USUARI, ROLE_ADMIN_ENTITAT, ROLE_ADMIN_LECTURA, ROLE_ADMIN_ORGAN, ROLE_SUPER);
         if (Collections.disjoint(rolsDisponibles, rolsAvisos)) {
             return;
         }
@@ -411,9 +411,15 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
             if (sessionScopedContext.getEntitatActual().isUsuariActualAdministradorEntitat() && request.isUserInRole(ROLE_ADMIN_ENTITAT) && sessionScopedContext.getAdminEntitat()) {
                 rols.add(ROLE_ADMIN_ENTITAT);
             }
+            if (sessionScopedContext.getEntitatActual().isUsuariActualAdministradorEntitat() && request.isUserInRole(ROLE_ADMIN_LECTURA) && sessionScopedContext.getAdminLectura()) {
+                rols.add(ROLE_ADMIN_LECTURA);
+            }
         } else {
             if (request.isUserInRole(ROLE_ADMIN_ENTITAT) && sessionScopedContext.getAdminEntitat()) {
                 rols.add(ROLE_ADMIN_ENTITAT);
+            }
+            if (request.isUserInRole(ROLE_ADMIN_LECTURA) && sessionScopedContext.getAdminLectura()) {
+                rols.add(ROLE_ADMIN_LECTURA);
             }
         }
         return rols;
@@ -432,6 +438,8 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
                 rolActual = ROLE_USUARI;
             } else if (request.isUserInRole(ROLE_ADMIN_ENTITAT) && rolsDisponibles.contains(ROLE_ADMIN_ENTITAT)) {
                 rolActual = ROLE_ADMIN_ENTITAT;
+            } else if (request.isUserInRole(ROLE_ADMIN_LECTURA) && rolsDisponibles.contains(ROLE_ADMIN_LECTURA)) {
+                rolActual = ROLE_ADMIN_LECTURA;
             } else if (request.isUserInRole(ROLE_SUPER) && rolsDisponibles.contains(ROLE_SUPER)) {
                 rolActual = ROLE_SUPER;
             } else if (request.isUserInRole(ROLE_APLICACIO) && rolsDisponibles.contains(ROLE_APLICACIO)) {

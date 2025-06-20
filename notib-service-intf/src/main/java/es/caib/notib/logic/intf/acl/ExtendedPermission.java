@@ -28,6 +28,7 @@ public class ExtendedPermission extends BasePermission {
 	public static final Permission COMUNICACIO_SIR = new ExtendedPermission(1 << 12, 'S'); // 4096
 	public static final Permission COMUNICACIO = new ExtendedPermission(1 << 13, 'U'); // 8192
 	public static final Permission COMUNICACIO_SENSE_PROCEDIMENT = new ExtendedPermission(1 << 14, 'X'); // 16284
+	public static final Permission ADMINISTRADORLECTURA = new ExtendedPermission(1 << 15, 'T'); // 32768
 
 	protected ExtendedPermission(int mask) {
 		super(mask);

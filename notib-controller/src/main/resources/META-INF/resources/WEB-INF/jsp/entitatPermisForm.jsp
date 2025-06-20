@@ -97,6 +97,7 @@
 		<not:inputText name="principal" textKey="entitat.permis.form.camp.principal" readonly="${not empty permisCommand.id}" inputMaxLength="${principalSize}" showsize="true"/>
 		<not:inputCheckbox name="usuari" textKey="entitat.permis.form.camp.usuari"/>
 		<not:inputCheckbox name="administradorEntitat" textKey="entitat.permis.form.camp.administradorentitat"/>
+		<not:inputCheckbox name="administradorLectura" textKey="entitat.permis.form.camp.administradorlectura"/>
 		<not:inputCheckbox name="aplicacio" textKey="entitat.permis.form.camp.aplicacio"/>
 		<div id="modal-botons" class="col-xs-12 text-right">
 			<div id="guardar" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></div>

@@ -31,6 +31,7 @@ public class SessionScopedContext {
     // Permisos
     private Boolean usuariEntitat;
     private Boolean adminEntitat;
+    private Boolean adminLectura;
     private Boolean adminOrgan;
     private Boolean aplicacioEntitat;
     private Boolean menuNotificacions;

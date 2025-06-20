@@ -626,6 +626,9 @@ public class PermisosHelper {
 		if (permis.isAdministradorEntitat()) {
 			permissions.add(ExtendedPermission.ADMINISTRADORENTITAT);
 		}
+		if (permis.isAdministradorLectura()) {
+			permissions.add(ExtendedPermission.ADMINISTRADORLECTURA);
+		}
 		if (permis.isAplicacio()) {
 			permissions.add(ExtendedPermission.APLICACIO);
 		}
