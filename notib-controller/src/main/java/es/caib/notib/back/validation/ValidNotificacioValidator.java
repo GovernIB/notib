@@ -63,7 +63,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 		Locale locale = new Locale(sessionScopedContext.getIdiomaUsuari());
 		context.disableDefaultConstraintViolation();
 		String maxSizeError = "";
-		apostrofPermes = Boolean.getBoolean(configService.getPropertyValue("es.caib.notib.notifica.apostrof.permes"));
+		apostrofPermes = Boolean.parseBoolean(configService.getPropertyValue("es.caib.notib.notifica.apostrof.permes"));
 		try {
 
 			// Validació del Concepte
