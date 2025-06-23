@@ -96,7 +96,7 @@ public class ProcSerSyncHelper {
 			progres.setTotalInicial(procedimentRepository.countByEntitatId(entitatDto.getId()));
 			progres.setActiusInicial(procedimentRepository.countByEntitatIdAndActiuTrue(entitatDto.getId()));
 			progres.setInactiusInicial(procedimentRepository.countByEntitatIdAndActiuFalse(entitatDto.getId()));
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false, false);
 			var procedimentsGda = obtenirProcediments(entitatDto, progres);
 			if (procedimentsGda.isEmpty()) {
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.actualitzacio.error.rolsac"));
@@ -415,7 +415,7 @@ public class ProcSerSyncHelper {
 			progres.setTotalInicial(serveiRepository.countByEntitatId(entitatDto.getId()));
 			progres.setActiusInicial(serveiRepository.countByEntitatIdAndActiuTrue(entitatDto.getId()));
 			progres.setInactiusInicial(serveiRepository.countByEntitatIdAndActiuFalse(entitatDto.getId()));
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false, false);
 			List<ProcSerDto> procedimentsGda = obtenirServeis(entitatDto, progres);
 			if (procedimentsGda.isEmpty()) {
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("serveis.actualitzacio.error.rolsac"));

@@ -110,7 +110,7 @@ public class OrganGestorHelper {
 	public void sincronitzarOrgans(Long entitatId, List<NodeDir3> unitatsWs, List<OrganGestorEntity> obsoleteUnitats, List<OrganGestorEntity> organsDividits,
 								   List<OrganGestorEntity> organsFusionats, List<OrganGestorEntity> organsSubstituits, ProgresActualitzacioDto progres) {
 
-		var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+		var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false);
 		var nombreUnitatsTotal = unitatsWs.size();
 		var nombreUnitatsProcessades = 0;
 		// Agafa totes les unitats del WS i les guarda a BBDD. Si la unitat no existeix la crea, i si existeix la sobreescriu.

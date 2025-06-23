@@ -181,7 +181,7 @@ public class PermisosServiceImpl implements PermisosService {
     public List<String> getOrgansCodisAmbPermisPerProcedimentComu(Long entitatId, String usuariCodi, PermisEnum permis, ProcSerDto procSetDto) {
 
         try {
-            var entitat = entityComprovarHelper.comprovarEntitat(entitatId,true,false,false);
+            var entitat = entityComprovarHelper.comprovarEntitat(entitatId,true,false,false, true);
             var grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
             var permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
             var organsAmbPermisComu = getOrgansAmbPermisComu(entitat, grups);
@@ -304,7 +304,7 @@ public class PermisosServiceImpl implements PermisosService {
     private Boolean hasPermis(Long entitatId, String usuariCodi, Permission[] permisos) {
 
         var grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
-        var entitat = entityComprovarHelper.comprovarEntitat(entitatId,true,false,false);
+        var entitat = entityComprovarHelper.comprovarEntitat(entitatId,true,false,false, true);
         // 1. Comprovam si es té permís directe sobre procediments
         if (Boolean.TRUE.equals(hasProcSerAmbPermisDirecte(entitat, permisos, grups, true))) {
             return true;

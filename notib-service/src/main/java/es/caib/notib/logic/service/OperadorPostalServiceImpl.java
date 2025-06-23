@@ -132,7 +132,7 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarPermisos(null, true, true, true);
+			entityComprovarHelper.comprovarPermisos(null, true, true, true, true);
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<>();
 			mapeigPropietatsOrdenacio.put("organismePagador", new String[] {"organGestor"});
@@ -174,7 +174,7 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug(LOG_MSG);
-			entityComprovarHelper.comprovarPermisos(null, true, true, false);
+			entityComprovarHelper.comprovarPermisos(null, true, true, false, true);
 			return conversioTipusHelper.convertirList(pagadorPostalReposity.findAll(), OperadorPostalDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -188,7 +188,7 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug(LOG_MSG);
-			entityComprovarHelper.comprovarPermisos(null, true, true, false);
+			entityComprovarHelper.comprovarPermisos(null, true, true, false, true);
 			return conversioTipusHelper.convertirList(pagadorPostalReposity.findByContracteDataVigGreaterThanEqual(new Date()), IdentificadorTextDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

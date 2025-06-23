@@ -121,7 +121,7 @@ public class EntitatServiceImpl implements EntitatService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Creant una nova entitat (entitat=" + entitat + ")");
-			entityComprovarHelper.comprovarPermisos(null,true,false,false);
+			entityComprovarHelper.comprovarPermisos(null,true,false,false, false);
 			var entitatBuilder = EntitatEntity.getBuilder(entitat.getCodi(), entitat.getNom(), entitat.getTipus(), entitat.getDir3Codi(),
 					entitat.getDir3CodiReg(), entitat.getApiKey(), entitat.isAmbEntregaDeh(), entitat.getLogoCapBytes(), entitat.getLogoPeuBytes(),
 					entitat.getColorFons(), entitat.getColorLletra(), entitat.getTipusDocDefault().getTipusDocEnum(), entitat.getOficina(), entitat.getNomOficinaVirtual(),
@@ -155,7 +155,7 @@ public class EntitatServiceImpl implements EntitatService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Actualitzant entitat existent (entitat=" + entitat + ")");
-			entityComprovarHelper.comprovarEntitat(entitat.getId(),true,true,false,false);
+			entityComprovarHelper.comprovarEntitat(entitat.getId(),true,true,false,false, false);
 			byte[] logoCapActual = null;
 			byte[] logoPeuActual = null;
 			var entity = entitatRepository.findById(entitat.getId()).orElseThrow();
@@ -220,7 +220,7 @@ public class EntitatServiceImpl implements EntitatService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Actualitzant propietat activa d'una entitat existent (id=" + id + ", activa=" + activa + ")");
-			entityComprovarHelper.comprovarPermisos(null,true,false,false);
+			entityComprovarHelper.comprovarPermisos(null,true,false,false, false);
 			var entitat = entitatRepository.findById(id).orElseThrow();
 			entitat.updateActiva(activa);
 			return conversioTipusHelper.convertir(entitat, EntitatDto.class);
@@ -238,7 +238,7 @@ public class EntitatServiceImpl implements EntitatService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Esborrant entitat (id=" + id +  ")");
-			entityComprovarHelper.comprovarPermisos(null, true,false,false );
+			entityComprovarHelper.comprovarPermisos(null, true,false,false, false);
 			var entitat = entitatRepository.findById(id).orElseThrow();
 			var notificacions = notificacioRepository.findByEntitatId(entitat.getId());
 			if (!notificacions.isEmpty()) {
@@ -316,7 +316,7 @@ public class EntitatServiceImpl implements EntitatService {
 			if (entitat == null) {
 				return null;
 			}
-			entityComprovarHelper.comprovarPermisos(null,true,true,true);
+			entityComprovarHelper.comprovarPermisos(null,true,true,true, true);
 			return conversioTipusHelper.convertir(entitat, EntitatDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -343,7 +343,7 @@ public class EntitatServiceImpl implements EntitatService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de totes les entitats");
-			entityComprovarHelper.comprovarPermisos(null,true,false,false);
+			entityComprovarHelper.comprovarPermisos(null,true,false,false, false);
 			return conversioTipusHelper.convertirList(entitatRepository.findAll(), EntitatDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -357,7 +357,7 @@ public class EntitatServiceImpl implements EntitatService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de totes les entitats paginades (paginacioParams=" + paginacioParams + ")");
-			entityComprovarHelper.comprovarPermisos(null,true,false,false);
+			entityComprovarHelper.comprovarPermisos(null,true,false,false, false);
 			var pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
 			var resposta = paginacioHelper.toPaginaDto(entitatRepository.findByFiltre(paginacioParams.getFiltre(), pageable), EntitatDto.class);
 			List<PermisDto> permisos;
@@ -393,7 +393,7 @@ public class EntitatServiceImpl implements EntitatService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta dels permisos de l'entitat (entitatId=" + entitatId + ")");
-			entityComprovarHelper.comprovarPermisos(null,true,true,true);
+			entityComprovarHelper.comprovarPermisos(null,true,true,true, true);
 			var permisos = permisosHelper.findPermisos(entitatId, EntitatEntity.class);
 			permisosHelper.ordenarPermisos(paginacioParams, permisos);
 			return permisos;
@@ -416,7 +416,7 @@ public class EntitatServiceImpl implements EntitatService {
 			} else if (TipusEnumDto.USUARI.equals(permis.getTipus())) {
 				permis.setPrincipal(principal.toLowerCase());
 			}
-			entityComprovarHelper.comprovarEntitat(entitatId,true,true,false,false);
+			entityComprovarHelper.comprovarEntitat(entitatId,true,true,false,false, false);
 			permisosHelper.updatePermis(entitatId, EntitatEntity.class, permis);
 			updateEntitatsSessio();
 		} finally {
@@ -432,7 +432,7 @@ public class EntitatServiceImpl implements EntitatService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Eliminació com a superusuari del permis de l'entitat (entitatId=" + entitatId + ", permisId=" + permisId + ")");
-			entityComprovarHelper.comprovarEntitat(entitatId,true,true,false,false);
+			entityComprovarHelper.comprovarEntitat(entitatId,true,true,false,false, false);
 			permisosHelper.deletePermis(entitatId, EntitatEntity.class, permisId);
 			updateEntitatsSessio();
 		} finally {
@@ -459,6 +459,18 @@ public class EntitatServiceImpl implements EntitatService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var resposta = entityComprovarHelper.findPermisEntitat(new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT});
+			return !resposta.isEmpty();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	public boolean hasPermisAdminLectura() {
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			var resposta = entityComprovarHelper.findPermisEntitat(new Permission[] {ExtendedPermission.ADMINISTRADORLECTURA});
 			return !resposta.isEmpty();
 		} finally {
 			metricsHelper.fiMetrica(timer);

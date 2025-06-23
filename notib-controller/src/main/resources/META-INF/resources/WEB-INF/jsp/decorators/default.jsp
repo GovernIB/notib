@@ -16,6 +16,7 @@
 	pageContext.setAttribute("rolsUsuariActual", sessionScopedContext.getRolsDisponibles());
 	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual()));
 	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()), PageContext.REQUEST_SCOPE);
+	pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(sessionScopedContext.getRolActual()), PageContext.REQUEST_SCOPE);
 	pageContext.setAttribute("isRolActualUsuari", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuari(sessionScopedContext.getRolActual()));
 	pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual()));
 	pageContext.setAttribute("requestParameterCanviRol", es.caib.notib.back.helper.RolHelper.REQUEST_PARAMETER_CANVI_ROL);
@@ -188,7 +189,7 @@
 			<div class="nav navbar-nav navbar-right">
 				<ul class="list-inline pull-right">
 
-					<c:if test="${hiHaEntitats && isRolActualAdministradorEntitat || isRolActualUsuari || isRolActualAdministradorOrgan}">
+					<c:if test="${hiHaEntitats && isRolActualAdministradorEntitat || isRolActualAdministradorLectura || isRolActualUsuari || isRolActualAdministradorOrgan}">
 						<li class="dropdown">
 							<c:if test="${hiHaMesEntitats}"><a id="dd_entitat" href="#" data-toggle="dropdown"></c:if>
 							<span class="fa fa-home"></span> <span id="dds_entitat" class="truncate" title="${entitatActual.nom}">${entitatActual.nom}</span> <c:if test="${hiHaMesEntitats}"><b class="caret caret-white"></b></c:if>
@@ -360,7 +361,7 @@
 								</div>
 							</c:when>
 
-							<c:when test="${isRolActualAdministradorEntitat}">
+							<c:when test="${isRolActualAdministradorEntitat || isRolActualAdministradorLectura}">
 								<div class="btn-group">
 									<a id="ml_notificacio" href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 								</div>
@@ -416,14 +417,6 @@
 							</c:when>
 						</c:choose>
 					</div>
-					<%--
-                                            <div class="btn-group">
-                                                <a class="btn btn-success" href="https://github.com/GovernIB/notib/raw/${manifestAtributes['Implementation-SCM-Branch']}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
-                    <!-- 									Per a diferents rol, ara sol esta el manual d'usuari -->
-                    <!-- 									<a class="btn btn-primary" href="https://github.com/GovernIB/notib/raw/notib-${versioMajorActual}/doc/pdf/NOTIB_${rolActual}.pdf" } download/><spring:message code="decorator.menu.manual.usuari"/></a> -->
-                                            </div>
-                    --%>
-
 				</div>
 
 

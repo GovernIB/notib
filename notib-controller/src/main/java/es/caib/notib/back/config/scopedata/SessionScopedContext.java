@@ -109,6 +109,7 @@ public class SessionScopedContext {
     public void cleanPermisosUsuari() {
         this.usuariEntitat = null;
         this.adminEntitat = null;
+        this.adminLectura = null;
         this.adminOrgan = null;
         this.aplicacioEntitat = null;
     }

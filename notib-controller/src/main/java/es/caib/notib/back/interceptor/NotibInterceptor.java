@@ -123,6 +123,7 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
         var permisos = entitatService.getPermisosEntitatsUsuariActual();
         sessionScopedContext.setUsuariEntitat(permisos.get(RolEnumDto.tothom));
         sessionScopedContext.setAdminEntitat(permisos.get(RolEnumDto.NOT_ADMIN));
+        sessionScopedContext.setAdminLectura(permisos.get(RolEnumDto.NOT_ADMIN_LECTURA));
         sessionScopedContext.setAplicacioEntitat(permisos.get(RolEnumDto.NOT_APL));
         sessionScopedContext.setAdminOrgan(permisos.get(RolEnumDto.NOT_ADMIN_ORGAN));
 
@@ -411,7 +412,7 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
             if (sessionScopedContext.getEntitatActual().isUsuariActualAdministradorEntitat() && request.isUserInRole(ROLE_ADMIN_ENTITAT) && sessionScopedContext.getAdminEntitat()) {
                 rols.add(ROLE_ADMIN_ENTITAT);
             }
-            if (sessionScopedContext.getEntitatActual().isUsuariActualAdministradorEntitat() && request.isUserInRole(ROLE_ADMIN_LECTURA) && sessionScopedContext.getAdminLectura()) {
+            if (sessionScopedContext.getEntitatActual().isUsuariActualAdministradorLectura() && request.isUserInRole(ROLE_ADMIN_LECTURA) && sessionScopedContext.getAdminLectura()) {
                 rols.add(ROLE_ADMIN_LECTURA);
             }
         } else {

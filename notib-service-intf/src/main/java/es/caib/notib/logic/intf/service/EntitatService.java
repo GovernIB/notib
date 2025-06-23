@@ -175,7 +175,15 @@ public interface EntitatService {
 	 */
 	@PreAuthorize("isAuthenticated()")
 	public boolean hasPermisAdminEntitat();
-	
+
+
+	/**
+	 * Comprova si l'usuari acutal té permisos d'administrador de lectura per l'entitat actual
+	 * @return El llistat d'entitats.
+	 */
+	@PreAuthorize("isAuthenticated()")
+	boolean hasPermisAdminLectura();
+
 	/**
 	 * Comprova si l'usuari acutal té permisos d'aplicació de l'entitat actual
 	 * 

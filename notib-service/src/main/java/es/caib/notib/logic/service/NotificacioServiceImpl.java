@@ -321,7 +321,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarEntitat(entitatId,false,true,true,false);
+			entityComprovarHelper.comprovarEntitat(entitatId,false,true,true,false, false);
 			log.debug("Esborrant la notificació (notificacioId=" + notificacioId + ")");
 			var notificacioEntity = notificacioRepository.findById(notificacioId).orElse(null);
 			var notificacioTableEntity = notificacioTableViewRepository.findById(notificacioId).orElse(null);
@@ -359,7 +359,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarEntitat(entitatId,false,true,true,false);
+			entityComprovarHelper.comprovarEntitat(entitatId,false,true,true,false,false);
 			NotibLogger.getInstance().info("Recuperant la notificació (notificacioId=" + notificacioId + ")", log, LoggingTipus.TAULA_REMESES);
 			var notificacioEntity = notificacioRepository.findById(notificacioId).orElse(null);
 			var notificacioTableEntity = notificacioTableViewRepository.findById(notificacioId).orElse(null);
@@ -415,7 +415,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false, false);
 			var enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
 			if (enviamentsPendents == null || enviamentsPendents.isEmpty()) {
 				throw new ValidationException("Aquesta notificació està enviada i no es pot modificar");
@@ -585,7 +585,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if(notificacio == null) {
 				return null;
 			}
-			entityComprovarHelper.comprovarPermisos(null, false, false, false);
+			entityComprovarHelper.comprovarPermisos(null, false, false, false, false);
 			var enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
 			notificacio.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
 //			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
@@ -1051,7 +1051,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			log.debug("Consulta dels events associats a un destinatari (notificacioId=" + notificacioId + ", enviamentId=" + enviamentId + ")");
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-			entityComprovarHelper.comprovarPermisos(enviament.getNotificacio().getId(), true, true, true);
+			entityComprovarHelper.comprovarPermisos(enviament.getNotificacio().getId(), true, true, true, true);
 			return conversioTipusHelper.convertirList(notificacioEventRepository.findByEnviamentIdOrderByDataAsc(enviamentId), NotificacioEventDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1066,7 +1066,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			log.debug("Consulta dels events associats a un destinatari (notificacioId=" + notificacioId + ", enviamentId=" + enviamentId + ")");
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-			entityComprovarHelper.comprovarPermisos(enviament.getNotificacio().getId(), true, true, true);
+			entityComprovarHelper.comprovarPermisos(enviament.getNotificacio().getId(), true, true, true, true);
 			return conversioTipusHelper.convertirList(notificacioEnviamentAuditRepository.findByEnviamentIdOrderByCreatedDateAsc(enviamentId), NotificacioEnviamentAuditDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

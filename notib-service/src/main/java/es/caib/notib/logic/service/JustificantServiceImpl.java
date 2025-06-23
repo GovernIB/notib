@@ -92,7 +92,7 @@ public class JustificantServiceImpl implements JustificantService {
             if (enviamentsPendents != null && !enviamentsPendents.isEmpty() && !NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
                 throw new Exception("No es pot generar el justificant d'una notificació amb enviaments pendents.");
             }
-            entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false);
+            entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false, true);
             if (isABackgroundProcessRunning(sequence)) {
                 log.error(PROCES_INICIAT_EXISTENT);
                 getProgress(sequence).addInfo(ProgresDescarregaDto.TipusInfo.ERROR, messageHelper.getMessage(PROCES_INICIAT_EXISTENT_TEXT));
@@ -114,7 +114,7 @@ public class JustificantServiceImpl implements JustificantService {
             if (!enviament.isRegistreEstatFinal()){
                 throw new ValidationException("No es pot generar un justificant de un enviament que no està en un estat final");
             }
-            entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false);
+            entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false, true);
             if (isABackgroundProcessRunning(sequence)) {
                 log.error(PROCES_INICIAT_EXISTENT);
                 getProgress(sequence).addInfo(ProgresDescarregaDto.TipusInfo.ERROR, messageHelper.getMessage(PROCES_INICIAT_EXISTENT_TEXT));

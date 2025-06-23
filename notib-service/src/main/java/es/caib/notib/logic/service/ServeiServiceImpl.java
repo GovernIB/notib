@@ -186,7 +186,7 @@ public class ServeiServiceImpl implements ServeiService {
 				throw new PermissionDeniedException(servei.getId(), ServeiEntity.class, auth.getName(), "ADMINISTRADORENTITAT");
 			}
 			
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 			ServeiEntity serveiEntity;
 			if(!isAdmin) {
 				serveiEntity = (ServeiEntity) entityComprovarHelper.comprovarProcediment(entitat, servei.getId());
@@ -314,7 +314,7 @@ public class ServeiServiceImpl implements ServeiService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var auth = SecurityContextHolder.getContext().getAuthentication();
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 			var serveiEntity = (ServeiEntity) entityComprovarHelper.comprovarProcediment(entitat, id);
 			if (!isAdminEntitat && serveiEntity.isComu()) {
 				throw new PermissionDeniedException(serveiEntity.getId(), ServeiEntity.class, auth.getName(), "ADMINISTRADORENTITAT");
@@ -375,7 +375,7 @@ public class ServeiServiceImpl implements ServeiService {
 		try {
 			var proc = pluginHelper.getProcSerByCodiSia(codiSia, true);
 			if (proc == null) {
-				var entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false);
+				var entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false, false);
 				var servei = serveiRepository.findByCodiAndEntitat(codiSia, entity);
 				if (servei != null) {
 					servei.updateActiu(false);
@@ -391,7 +391,7 @@ public class ServeiServiceImpl implements ServeiService {
 			for (var unitat: unitatsWs) {
 				codiOrgansGda.add(unitat.getCodi());
 			}
-			var entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false);
+			var entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false, false);
 			serveiHelper.actualitzarServeiFromGda(progres, proc, entity, codiOrgansGda, true, organsModificats, avisosServeisOrgans);
 			if (avisosServeisOrgans.size() > 0) {
 				if (serveisAmbOrganNoSincronitzat.containsKey(entitat)) {
@@ -444,34 +444,19 @@ public class ServeiServiceImpl implements ServeiService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public ProcSerDto findById(
-			Long entitatId,
-			boolean isAdministrador,
-			Long serveiId) {
+	public ProcSerDto findById(Long entitatId, boolean isAdministrador, Long serveiId) {
+
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta del servei ("
-					+ "entitatId=" + entitatId + ", "
-					+ "serveiId=" + serveiId + ")");
-				
-			if (entitatId != null && !isAdministrador)
-				entityComprovarHelper.comprovarEntitat(
-						entitatId, 
-						false, 
-						false, 
-						false);
-	
-			ServeiEntity servei = (ServeiEntity) entityComprovarHelper.comprovarProcediment(
-					entitatId, 
-					serveiId);
-			ProcSerDto resposta = conversioTipusHelper.convertir(
-					servei,
-					ProcSerDto.class);
-			
+			log.debug("Consulta del servei (entitatId=" + entitatId + ", serveiId=" + serveiId + ")");
+			if (entitatId != null && !isAdministrador) {
+				entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
+			}
+			var servei = (ServeiEntity) entityComprovarHelper.comprovarProcediment(entitatId, serveiId);
+			var resposta = conversioTipusHelper.convertir(servei, ProcSerDto.class);
 			if (resposta != null) {
 				serveiHelper.omplirPermisos(resposta, false);
 			}
-			
 			return resposta;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -480,28 +465,17 @@ public class ServeiServiceImpl implements ServeiService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public ProcSerDto findByCodi(
-			Long entitatId,
-			String codiServei) throws NotFoundException {
+	public ProcSerDto findByCodi(Long entitatId, String codiServei) throws NotFoundException {
+
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta del servei ("
-					+ "entitatId=" + entitatId + ", "
-					+ "codi=" + codiServei + ")");
+			log.debug("Consulta del servei (entitatId=" + entitatId + ", codi=" + codiServei + ")");
 			EntitatEntity entitat = null;
-				
-			if (entitatId != null)
-				entitat = entityComprovarHelper.comprovarEntitat(
-						entitatId, 
-						false, 
-						false, 
-						false);
-			
+			if (entitatId != null) {
+				entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
+			}
 			ServeiEntity servei = serveiRepository.findByCodiAndEntitat(codiServei, entitat);
-			
-			return conversioTipusHelper.convertir(
-					servei, 
-					ProcSerDto.class);
+			return conversioTipusHelper.convertir(servei, ProcSerDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -509,32 +483,17 @@ public class ServeiServiceImpl implements ServeiService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public ProcSerDto findByNom(
-			Long entitatId,
-			String nomServei) throws NotFoundException {
+	public ProcSerDto findByNom(Long entitatId, String nomServei) throws NotFoundException {
+
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Consulta del servei ("
-					+ "entitatId=" + entitatId + ", "
-					+ "nom=" + nomServei + ")");
+			log.debug("Consulta del servei (entitatId=" + entitatId + ", nom=" + nomServei + ")");
 			EntitatEntity entitat = null;
-				
-			if (entitatId != null)
-				entitat = entityComprovarHelper.comprovarEntitat(
-						entitatId, 
-						false, 
-						false, 
-						false);
-			
-			List<ServeiEntity> serveis = serveiRepository.findByNomAndEntitat(nomServei, entitat);
-			if (serveis != null && !serveis.isEmpty()) {
-				return conversioTipusHelper.convertir(
-						serveis.get(0),
-						ProcSerDto.class);
-
-			} else {
-				return null;
+			if (entitatId != null) {
+				entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 			}
+			List<ServeiEntity> serveis = serveiRepository.findByNomAndEntitat(nomServei, entitat);
+			return serveis != null && !serveis.isEmpty() ? conversioTipusHelper.convertir(serveis.get(0), ProcSerDto.class) : null;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -553,15 +512,12 @@ public class ServeiServiceImpl implements ServeiService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<ProcSerSimpleDto> findByEntitat(Long entitatId) {
+
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			
 			List<ServeiEntity> servei = serveiRepository.findByEntitat(entitat);
-			
-			return conversioTipusHelper.convertirList(
-					servei,
-					ProcSerSimpleDto.class);
+			return conversioTipusHelper.convertirList(servei, ProcSerSimpleDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -569,27 +525,19 @@ public class ServeiServiceImpl implements ServeiService {
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<ProcSerSimpleDto> findByOrganGestorIDescendents(
-			Long entitatId, 
-			OrganGestorDto organGestor) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
-				entitat.getDir3Codi(), 
-				organGestor.getCodi());
-		return conversioTipusHelper.convertirList(
-				serveiRepository.findByOrganGestorCodiIn(organsFills),
-				ProcSerSimpleDto.class);
+	public List<ProcSerSimpleDto> findByOrganGestorIDescendents(Long entitatId, OrganGestorDto organGestor) {
+
+		var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		var organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
+		return conversioTipusHelper.convertirList(serveiRepository.findByOrganGestorCodiIn(organsFills), ProcSerSimpleDto.class);
 	}
 
 	@Override
 	public List<ProcSerDto> findByOrganGestorIDescendentsAndComu(Long entitatId, OrganGestorDto organGestor) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
-				entitat.getDir3Codi(),
-				organGestor.getCodi());
-		return conversioTipusHelper.convertirList(
-				serveiRepository.findByOrganGestorCodiInOrComu(organsFills, entitat),
-				ProcSerDto.class);
+
+		var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		var organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
+		return conversioTipusHelper.convertirList(serveiRepository.findByOrganGestorCodiInOrComu(organsFills, entitat), ProcSerDto.class);
 	}
 
 	@Override
@@ -599,7 +547,7 @@ public class ServeiServiceImpl implements ServeiService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+			entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 			var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId);
 			var entitatsActiva = entitatRepository.findByActiva(true);
 			List<Long> entitatsActivaId = new ArrayList<>();
@@ -711,7 +659,7 @@ public class ServeiServiceImpl implements ServeiService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de tots els serveis");
-			entityComprovarHelper.comprovarPermisos(null, true, true, false);
+			entityComprovarHelper.comprovarPermisos(null, true, true, false, false);
 			return conversioTipusHelper.convertirList(serveiRepository.findAll(), ProcSerDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -725,7 +673,7 @@ public class ServeiServiceImpl implements ServeiService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de tots els serveis");
-			entityComprovarHelper.comprovarPermisos(null, true, true, false);
+			entityComprovarHelper.comprovarPermisos(null, true, true, false, true);
 			List<GrupProcSerEntity> grupsServeis = grupServeiRepository.findAll();
 			return conversioTipusHelper.convertirList(grupsServeis, ProcSerGrupDto.class);
 		} finally {
@@ -740,7 +688,7 @@ public class ServeiServiceImpl implements ServeiService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de tots els serveis d'una entitat");
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 			List<GrupProcSerEntity> grupsServeis = grupServeiRepository.findByProcSerEntitat(entitat);
 			return conversioTipusHelper.convertirList(grupsServeis, ProcSerGrupDto.class);
 		} finally {
@@ -751,16 +699,11 @@ public class ServeiServiceImpl implements ServeiService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<ProcSerDto> findServeis(Long entitatId, List<String> grups) {
+
 		var timer = metricsHelper.iniciMetrica();
 		try {	
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId,
-					true,
-					false,
-					false);
-			return conversioTipusHelper.convertirList(
-					serveiRepository.findServeisByEntitatAndGrup(entitat, grups),
-					ProcSerDto.class);
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
+			return conversioTipusHelper.convertirList(serveiRepository.findServeisByEntitatAndGrup(entitat, grups), ProcSerDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -769,16 +712,11 @@ public class ServeiServiceImpl implements ServeiService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<ProcSerDto> findServeisAmbGrups(Long entitatId, List<String> grups) {
+
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId,
-					true,
-					false,
-					false);
-			return conversioTipusHelper.convertirList(
-					serveiRepository.findServeisAmbGrupsByEntitatAndGrup(entitat, grups),
-					ProcSerDto.class);
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
+			return conversioTipusHelper.convertirList(serveiRepository.findServeisAmbGrupsByEntitatAndGrup(entitat, grups), ProcSerDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -787,16 +725,11 @@ public class ServeiServiceImpl implements ServeiService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<ProcSerDto> findServeisSenseGrups(Long entitatId) {
+
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId,
-					true,
-					false,
-					false);
-			return conversioTipusHelper.convertirList(
-					serveiRepository.findServeisSenseGrupsByEntitat(entitat),
-					ProcSerDto.class);
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
+			return conversioTipusHelper.convertirList(serveiRepository.findServeisSenseGrupsByEntitat(entitat), ProcSerDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -965,17 +898,14 @@ public class ServeiServiceImpl implements ServeiService {
 	@Override
 	@Transactional(readOnly = true)
 	public boolean hasAnyServeisWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
+
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId,
-					true,
-					false,
-					false);
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 			List<ServeiEntity> serveis = serveiRepository.findServeisByEntitatAndGrup(entitat, grups);
-			if (serveis == null || serveis.isEmpty())
+			if (serveis == null || serveis.isEmpty()) {
 				return false;
-			
+			}
 			permisosHelper.filterGrantedAny(
 					serveis,
 					(ObjectIdentifierExtractor<ServeiEntity>) servei -> servei.getId(),

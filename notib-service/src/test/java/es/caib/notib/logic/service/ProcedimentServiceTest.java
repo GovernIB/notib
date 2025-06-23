@@ -153,7 +153,7 @@ public class ProcedimentServiceTest {
 		procedimentOrgans.add(procedimentOrgan);
 		
 		
-		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.anyLong(), Mockito.eq(false), Mockito.eq(false), Mockito.eq(false))).thenReturn(entitatEntityMock);
+		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.anyLong(), Mockito.eq(false), Mockito.eq(false), Mockito.eq(false), Mockito.eq(false))).thenReturn(entitatEntityMock);
 		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.anyLong())).thenReturn(entitatEntityMock);
 		Mockito.when(entitatRepository.findByActiva(Mockito.anyBoolean())).thenReturn(entitatEntityList);		
 		Mockito.when(paginacioHelper.toSpringDataPageable(Mockito.any(PaginacioParamsDto.class), Mockito.eq(mapeigPropietatsOrdenacio))).thenReturn(pageableMock);	

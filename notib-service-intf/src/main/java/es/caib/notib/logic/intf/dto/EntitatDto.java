@@ -18,6 +18,7 @@ public class EntitatDto extends EntitatDataDto {
 	private boolean activa;
 	private List<PermisDto> permisos;
 	private boolean usuariActualAdministradorEntitat;
+	private boolean usuariActualAdministradorLectura;
 	private boolean usuariActualAdministradorOrgan;
 	private Long numAplicacions;
 

@@ -133,6 +133,13 @@ public class EntitatService extends AbstractService<es.caib.notib.logic.intf.ser
 
 	@Override
 	@RolesAllowed("**")
+	public boolean hasPermisAdminLectura() {
+		return getDelegateService().hasPermisAdminLectura();
+	}
+
+
+	@Override
+	@RolesAllowed("**")
 	public boolean hasPermisAplicacioEntitat() {
 		return getDelegateService().hasPermisAplicacioEntitat();
 	}

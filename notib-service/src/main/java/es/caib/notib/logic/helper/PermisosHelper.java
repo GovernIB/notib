@@ -508,6 +508,9 @@ public class PermisosHelper {
 		if (ExtendedPermission.ADMINISTRADORENTITAT.equals(ace.getPermission())) {
 			permis.setAdministradorEntitat(true);
 		}
+		if (ExtendedPermission.ADMINISTRADORLECTURA.equals(ace.getPermission())) {
+			permis.setAdministradorLectura(true);
+		}
 		if (ExtendedPermission.APLICACIO.equals(ace.getPermission())) {
 			permis.setAplicacio(true);
 		}

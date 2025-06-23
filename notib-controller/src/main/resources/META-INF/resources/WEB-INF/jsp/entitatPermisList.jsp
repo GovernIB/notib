@@ -37,6 +37,7 @@
 				<th data-col-name="usuari" data-visible="false"></th>
 				<th data-col-name="administrador" data-visible="false"></th>
 				<th data-col-name="administradorEntitat" data-visible="false"></th>
+				<th data-col-name="administradorLectura" data-visible="false"></th>
 				<th data-col-name="aplicacio" data-visible="false"></th>
 				<th data-col-name="tipus" data-renderer="enum(TipusEnumDto)">
 					<spring:message code="entitat.permis.list.columna.tipus"/>

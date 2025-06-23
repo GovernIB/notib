@@ -382,7 +382,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     @Override
     public PaginaDto<NotificacioTableItemDto> findNotificacions(Long entitatId, Long notificacioMassivaId, NotificacioFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 
-        var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+        var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
         var pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
         var f = notificacioListHelper.getFiltre(filtre, entitatId, null, null, null);
         f.setNotificacioMassiva(notificacioMassivaRepository.findById(notificacioMassivaId).orElse(null));

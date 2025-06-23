@@ -176,7 +176,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta els destinataris d'una notificació (notificacioId=" + notificacioId + ")");
-			entityComprovarHelper.comprovarPermisos(null,true,true,true);
+			entityComprovarHelper.comprovarPermisos(null,true,true,true, true);
 			var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
 			var enviaments = notificacioEnviamentRepository.findByNotificacio(notificacio);
 			var envs = conversioTipusHelper.convertirList(enviaments, NotificacioEnviamentDatatableDto.class);
@@ -221,7 +221,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consultant els ids d'expedient segons el filtre (entitatId=" + entitatId + ", filtre=" + filtre + ")");
-			entityComprovarHelper.comprovarPermisos(entitatId, false, false, false);
+			entityComprovarHelper.comprovarPermisos(entitatId, false, false, false, false);
 			log.debug(CONSULTA_ENV_LOG);
 			log.info("Consulta ids d'enviament, accions massives");
 			entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
@@ -241,7 +241,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarPermisos(null, false, false, false);
+			entityComprovarHelper.comprovarPermisos(null, false, false, false, false);
 			log.debug("Consulta de destinatari donat el seu id (destinatariId=" + enviamentId + ")");
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 			// #779: Obtenim la certificació de forma automàtica
@@ -346,10 +346,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 		var isUsuari = RolEnumDto.tothom.equals(rol);
 		var isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
+		var isUsuariLectura = RolEnumDto.NOT_ADMIN_LECTURA.equals(rol);
 		var isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
 		var isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
 		var entitatsActives = isSuperAdmin ? entitatRepository.findByActiva(true) : null;
-		var entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat, false);
+		var entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat, isUsuari, isUsuariLectura);
 		var auth = SecurityContextHolder.getContext().getAuthentication();
 		entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
 		// Procediments accessibles per qualsevol òrgan gestor
@@ -510,7 +511,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		try {
 			log.debug("Exportant informació dels enviaments (entitatId=" + entitatId + ", enviamentsIds=" + enviamentIds + ", format=" + format + ")");
 			var entitatEntity = entitatRepository.findById(entitatId).orElseThrow();
-			entityComprovarHelper.comprovarPermisos(null, true, true, true);
+			entityComprovarHelper.comprovarPermisos(null, true, true, true, true);
 			var enviaments = notificacioEnviamentRepository.findByIdIn(enviamentIds);
 			//Genera les columnes
 			int numColumnes = 24;
@@ -653,7 +654,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta dels events de la notificació (notificacioId=" + notificacioId + ")");
-			entityComprovarHelper.comprovarPermisos(null, true, true, true);
+			entityComprovarHelper.comprovarPermisos(null, true, true, true, true);
 			return conversioTipusHelper.convertirList(notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacioId), NotificacioEventDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

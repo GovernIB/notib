@@ -89,10 +89,10 @@ public class EntityComprovarHelper {
 	@Autowired
 	private ProcSerOrganRepository procedimentOrganRepository;
 
-	public EntitatEntity comprovarEntitat(Long entitatId, boolean comprovarPermisUsuari, boolean comprovarPermisAdminEntitat, boolean comprovarPermisAplicacio) throws NotFoundException {
-		return comprovarEntitat(entitatId, comprovarPermisUsuari, comprovarPermisAdminEntitat, comprovarPermisAplicacio, false);
+	public EntitatEntity comprovarEntitat(Long entitatId, boolean comprovarPermisSuper, boolean comprovarPermisAdminEntitat, boolean comprovarPermisUsuari, boolean comprovarPermisAdminLectura) throws NotFoundException {
+		return comprovarEntitat(entitatId, comprovarPermisSuper, comprovarPermisAdminEntitat, comprovarPermisUsuari, false, comprovarPermisAdminLectura);
 	}
-	public EntitatEntity comprovarEntitat(Long entitatId, boolean comprovarPermisSuper, boolean comprovarPermisAdminEntitat, boolean comprovarPermisUsuari, boolean comprovarPermisAplicacio) throws NotFoundException {
+	public EntitatEntity comprovarEntitat(Long entitatId, boolean comprovarPermisSuper, boolean comprovarPermisAdminEntitat, boolean comprovarPermisUsuari, boolean comprovarPermisAplicacio, boolean comprovarPermisAdminLectura) throws NotFoundException {
 
 		if (entitatId == null) {
 			throw new NotFoundException(entitatId, EntitatEntity.class);
@@ -118,6 +118,9 @@ public class EntityComprovarHelper {
 		if (comprovarPermisAdminEntitat && (permisosHelper.isGrantedAll(entitatId, EntitatEntity.class, new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT}, auth))) {
 			tePermis = true;
 		}
+		if (comprovarPermisAdminLectura && (permisosHelper.isGrantedAll(entitatId, EntitatEntity.class, new Permission[] {ExtendedPermission.ADMINISTRADORLECTURA}, auth))) {
+			tePermis = true;
+		}
 		if (comprovarPermisAplicacio && (permisosHelper.isGrantedAny(entitatId, EntitatEntity.class, new Permission[] {ExtendedPermission.APLICACIO}, auth))) {
 			tePermis = true;
 		}
@@ -128,7 +131,7 @@ public class EntityComprovarHelper {
 		return entitat;
 	}
 	
-	public void comprovarPermisos(Long entitatId, boolean comprovarSuper, boolean comprovarAdmin, boolean comprovarUser) {
+	public void comprovarPermisos(Long entitatId, boolean comprovarSuper, boolean comprovarAdmin, boolean comprovarUser, boolean comprovarAdminLectura) {
 
 		var auth = SecurityContextHolder.getContext().getAuthentication();
 		var tePermis = !(comprovarSuper || comprovarAdmin || comprovarUser);
@@ -148,6 +151,16 @@ public class EntityComprovarHelper {
 				}
 			}
 		}
+
+		if (comprovarAdminLectura) {
+			for (var ga: auth.getAuthorities()) {
+				if (ga.toString().equals("NOT_ADMIN_LECTURA")) {
+					tePermis = true;
+					break;
+				}
+			}
+		}
+
 		if (comprovarUser) {
 			for (var ga: auth.getAuthorities()) {
 				if (ga.toString().equals("tothom")) {
