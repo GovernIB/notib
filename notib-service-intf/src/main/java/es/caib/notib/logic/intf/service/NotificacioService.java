@@ -374,10 +374,10 @@ public interface NotificacioService {
 	List<Long> getNotificacionsCIEPendentsRefrescarCert();
 	List<Long> getNotificacionsPendentsRefrescarEstatRegistre();
 
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_ADMIN_LECTURA')")
 	PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre, PaginacioParamsDto paginacioDtoFromRequest);
 	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_ADMIN_LECTURA')")
 	List<Long> findNotificacionsIdAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre);
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")

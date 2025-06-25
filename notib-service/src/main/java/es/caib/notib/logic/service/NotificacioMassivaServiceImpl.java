@@ -425,7 +425,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         Page<NotificacioMassivaEntity> pageNotificacionsMassives;
         if (RolEnumDto.tothom.equals(rol)){
             pageNotificacionsMassives = findAmbFiltrePaginatByUser(entitat, filtre, paginacioParams);
-        } else if (RolEnumDto.NOT_ADMIN.equals(rol)){
+        } else if (RolEnumDto.NOT_ADMIN.equals(rol) || RolEnumDto.NOT_ADMIN_LECTURA.equals(rol)){
             pageNotificacionsMassives = findAmbFiltrePaginatByAdminEntitat(entitat, filtre, paginacioParams);
         } else {
             throw new AccessDeniedException("Només es poden consultar les notificacions massives amb els rols d'usuari o d'administrador d'entitat");
