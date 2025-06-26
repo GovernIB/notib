@@ -819,6 +819,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (filtre.getProcedimentId() != null) {
 					procediment = procedimentRepository.findById(filtre.getProcedimentId()).orElse(null);
 				}
+
+				EnviamentEstat enviamentEstat = null;
+				if (filtre.getEstat() != null) {
+					try {
+						enviamentEstat = EnviamentEstat.valueOf(filtre.getEstat().toString());
+					} catch (IllegalArgumentException e) {
+					}
+				}
 				page = notificacioRepository.findNotificacioLastEventAmbErrorAmbFiltre(
 						procediment == null,
 						procediment,
@@ -830,7 +838,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						filtre.getConcepte() == null ? "" : filtre.getConcepte(),
 						filtre.getEstat() == null,
 						filtre.getEstat(),
-						filtre.getEstat() == null ? null : EnviamentEstat.valueOf(filtre.getEstat().toString()),
+//						enviamentEstat,
 						filtre.getUsuari() == null || filtre.getUsuari().trim().isEmpty(),
 						filtre.getUsuari() == null ? "" : filtre.getUsuari(),
 						paginacioHelper.toSpringDataPageable(paginacioParams));
