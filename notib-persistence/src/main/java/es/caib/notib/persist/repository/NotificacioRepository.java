@@ -153,11 +153,12 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 		       "   and (:isDataIniciNull = true or n.createdDate >= :dataInici) " +
 		       "   and (:isDataFiNull = true or n.createdDate <= :dataFi) " +
 		       "   and (:isConcepteNull = true or lower(n.concepte) like concat('%', lower(:concepte), '%')) " +
-		       "   and (:isEstatNull = true or n.estat = :estat or (" +
-			   "    select count(env.id) " +
-			   "    from n.enviaments env " +
-			   "    where env.notificaEstat = :notificaEstat" +
-			   "    ) > 0 ) " +
+		       "   and (:isEstatNull = true or n.estat = :estat) " +
+//			"or (" +
+//			   "    select count(env.id) " +
+//			   "    from n.enviaments env " +
+//			   "    where env.notificaEstat = :notificaEstat" +
+//			   "    ) > 0 ) " +
 			   "   and (:isUsuariNull = true or n.createdBy.codi = :usuariCodi)")
 	Page<NotificacioEntity> findNotificacioLastEventAmbErrorAmbFiltre(
 			@Param("isProcedimentNull") boolean isProcedimentNull,
@@ -170,7 +171,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull, 
 			@Param("estat") NotificacioEstatEnumDto estat,
-			@Param("notificaEstat") EnviamentEstat notificaEstat,
+//			@Param("notificaEstat") EnviamentEstat notificaEstat,
 			@Param("isUsuariNull") boolean isUsuariNull, 
 			@Param("usuariCodi") String usuariCodi, 
 			Pageable springDataPageable);
