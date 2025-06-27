@@ -850,15 +850,18 @@
                     <span class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-left">
-                    <li><a id="processarMassiu" href="<c:url value="/notificacio/processar/massiu"/>" data-toggle="modal" data-refresh-pagina="true" title='<spring:message code="notificacio.list.accio.massiva.processar.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>
-                    <li><a id="updateEstat" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.actualitzar.estat.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.actualitzar.estat"/></a></li>
-                    <li><a id="reintentarErrors" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.reintentar.errors.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
-                    <li><a id="eliminar" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.eliminar.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
+                    <c:if test="${!isRolActualAdministradorLectura}">
+                        <li><a id="processarMassiu" href="<c:url value="/notificacio/processar/massiu"/>" data-toggle="modal" data-refresh-pagina="true" title='<spring:message code="notificacio.list.accio.massiva.processar.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>
+                        <li><a id="updateEstat" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.actualitzar.estat.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.actualitzar.estat"/></a></li>
+                        <li><a id="reintentarErrors" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.reintentar.errors.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
+                        <li><a id="eliminar" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.eliminar.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
+                    </c:if>
                     <li><a id="exportarODS" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.exportar.tooltip"/>' ><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
                     <li><a id="descarregarJustificantMassiu" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.justificant"/></a></li>
                     <li><a id="descarregarCertificacioMassiu" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.certificacio"/></a></li>
-                    <li><a id="ampliarPlazoOE" href="<c:url value="/notificacio/ampliacion/plazo/massiu"/>" data-toggle="modal" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
-
+                    <c:if test="${!isRolActualAdministradorLectura}">
+                        <li><a id="ampliarPlazoOE" href="<c:url value="/notificacio/ampliacion/plazo/massiu"/>" data-toggle="modal" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
+                    </c:if>
                     <c:if test="${isRolActualAdministradorEntitat}">
                         <hr/>
                         <li><a style="cursor: pointer;" id="reactivarConsulta" title='<spring:message code="notificacio.list.accio.massiva.reactivar.consultes.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica"/></a></li>
@@ -994,19 +997,21 @@
                         {^{if envCerData != null }}
                             <li><a href="<c:url value="/notificacio/{{:id}}/enviament/certificacionsDescarregar"/>" download><span class="fa fa-download"></span>&nbsp; <spring:message code="enviament.info.notifica.certificacio.num.descarregar"/></a></li>
                         {{/if}}
-                    {^{if (~hlpIsAdministradorEntitat() && estat == 'FINALITZADA') || permisProcessar }}
-                        <li><a href="<c:url value="/notificacio/{{:id}}/processar"/>" data-toggle="modal"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
-                    {{/if}}
-                    {{if justificant}}
-                        <li><a href="<c:url value="/notificacio/{{:id}}/justificant"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-download"></span>&nbsp; <spring:message code="comu.boto.justificant"/></a></li>
-                    {{/if}}
-                    {^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan())  && (enviant || estat == 'PENDENT' || estat == 'REGISTRADA')}}
-                        <li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
-                        <li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-                    {{/if}}
-                    {{if plazoAmpliable}}
-                        <li><a href="<c:url value="/notificacio/{{:id}}/ampliacion/plazo"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;<spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
-                    {{/if}}
+                        {^{if ${!isRolActualAdministradorLectura} && ((~hlpIsAdministradorEntitat() && estat == 'FINALITZADA') || permisProcessar)}}
+                            <li><a href="<c:url value="/notificacio/{{:id}}/processar"/>" data-toggle="modal"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
+                        {{/if}}
+                        {{if justificant}}
+                            <li><a href="<c:url value="/notificacio/{{:id}}/justificant"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-download"></span>&nbsp; <spring:message code="comu.boto.justificant"/></a></li>
+                        {{/if}}
+                        <c:if test="${!isRolActualAdministradorLectura}">
+                            {^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan())  && (enviant || estat == 'PENDENT' || estat == 'REGISTRADA')}}
+                                <li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
+                                <li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+                            {{/if}}
+                            {{if plazoAmpliable}}
+                                <li><a href="<c:url value="/notificacio/{{:id}}/ampliacion/plazo"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;<spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
+                            {{/if}}
+                        </c:if>
                     </ul>
                 </div>
             </script>

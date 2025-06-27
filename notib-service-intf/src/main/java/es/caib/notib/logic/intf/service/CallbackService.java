@@ -39,7 +39,7 @@ public interface CallbackService {
 	@PreAuthorize("isAuthenticated()")
 	boolean findByNotificacio(Long notId);
 
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_ADMIN_LECTURA')")
 	PaginaDto<CallbackDto> findPendentsByEntitat(CallbackFiltre filtre, PaginacioParamsDto paginacioParams);
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")

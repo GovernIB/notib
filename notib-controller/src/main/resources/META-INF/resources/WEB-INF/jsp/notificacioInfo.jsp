@@ -11,6 +11,7 @@
 	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()));
 	pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(ssc.getRolActual()));
 	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(ssc.getRolActual()));
+	pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()));
 %>
 
 <html>
@@ -301,7 +302,7 @@ $(document).ready(function() {
 				</a>
 			</li>
 		</c:if>
-		<c:if test="${isRolActualAdministradorEntitat || isRolActualAdministradorOrgan || isRolActualAdministrador}">
+		<c:if test="${isRolActualAdministradorEntitat || isRolActualAdministradorOrgan || isRolActualAdministrador || isRolActualAdministradorLectura}">
 			<li role="presentation" <c:if test='${activeTab == "historic"}'>class="active"</c:if>>
 				<a href="#historic" aria-controls="historic" role="tab" data-toggle="tab">
 					<spring:message code="notificacio.info.tab.historic" />

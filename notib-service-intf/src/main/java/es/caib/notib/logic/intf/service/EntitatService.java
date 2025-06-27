@@ -208,7 +208,7 @@ public interface EntitatService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_ADMIN_LECTURA')")
 	List<PermisDto> permisFindByEntitatId(Long entitatId, PaginacioParamsDto paramsDto) throws NotFoundException;
 
 	/**

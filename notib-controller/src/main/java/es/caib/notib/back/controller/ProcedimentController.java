@@ -140,7 +140,8 @@ public class ProcedimentController extends BaseUserController {
 	public DatatablesResponse datatable(HttpServletRequest request ) {
 		
 		var isUsuari = RolHelper.isUsuariActualUsuari(sessionScopedContext.getRolActual());
-		var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
+		var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual())
+								|| RolHelper.isUsuariActualAdministradorLectura(sessionScopedContext.getRolActual());
 		var isAdministrador = RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
 		var organGestorActual = getOrganGestorActual(request);
 		var procSerFiltreCommand = getFiltreCommand(request);

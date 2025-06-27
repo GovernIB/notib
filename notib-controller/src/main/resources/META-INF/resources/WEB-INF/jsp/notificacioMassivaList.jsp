@@ -9,6 +9,7 @@
 	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(ssc.getRolActual()));
 	pageContext.setAttribute("isRolActualUsuari", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuari(ssc.getRolActual()));
 	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()));
+	pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()));
 	pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(ssc.getRolActual()));
 %>
 <html>
@@ -240,7 +241,7 @@
 						{{/if}}
 					</script>
 				</th>
-				<c:if test="${isRolActualAdministradorEntitat}">
+				<c:if test="${isRolActualAdministradorEntitat || isRolActualAdministradorLectura}">
 					<th data-col-name="createdByComplet" data-converter="String" width="150px"><spring:message code="notificacio.massiva.list.columna.creadaPer"/></th>
 				</c:if>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="60px">
@@ -252,10 +253,12 @@
 								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/resum/download"/>"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="notificacio.massiva.list.accio.resum.download"/></a></li>
 								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/errors/validacio/download"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.errors.validacio.download"/></a></li>
 								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/errors/execucio/download"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.errors.execucio.download"/></a></li>
-								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/posposar"/>"><span class="fa fa-clock-o"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.posposar"/></a></li>
-								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/reactivar"/>"><span class="fa fa-bolt"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.reactivar"/></a></li>
+								{{if ${!isRolActualAdministradorLectura}}}
+									<li><a href="<c:url value="/notificacio/massiva/{{:id}}/posposar"/>"><span class="fa fa-clock-o"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.posposar"/></a></li>
+									<li><a href="<c:url value="/notificacio/massiva/{{:id}}/reactivar"/>"><span class="fa fa-bolt"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.reactivar"/></a></li>
+								{{/if}}
 								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/remeses"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.remeses"/></a></li>
-								{{if estatProces == 'PENDENT' || estatProces == 'EN_PROCES' || estatProces == 'EN_PROCES_AMB_ERRORS'}}
+								{{if ${!isRolActualAdministradorLectura} && (estatProces == 'PENDENT' || estatProces == 'EN_PROCES' || estatProces == 'EN_PROCES_AMB_ERRORS')}}
 									<li><a href="<c:url value="/notificacio/massiva/{{:id}}/cancelar"/>"><span class="fa fa-ban"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.cancelar"/></a></li>
 								{{/if}}
 							</ul>

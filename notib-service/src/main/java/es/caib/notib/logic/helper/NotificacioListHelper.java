@@ -193,7 +193,7 @@ public class NotificacioListHelper {
                 .procedimentOrgansIdsNotib(esProcedimentOrgansAmbPermisNull ?  null : codisProcedimentsOrgans)
                 .usuariCodi(usuariCodi)
                 .isSuperAdmin(isSuperAdmin)
-                .isUsuariEntitat(isUsuariEntitat)
+                .isUsuariEntitat(isUsuariEntitat || isUsuariLectura)
                 .entitatsActives(entitatsActives)
                 .isAdminOrgan(isAdminOrgan)
                 .organs(organs)

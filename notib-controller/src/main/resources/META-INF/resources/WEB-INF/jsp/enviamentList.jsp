@@ -1,6 +1,5 @@
 <%@ page import="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatOrdreFiltre" %>
-<%@ page import="es.caib.notib.client.domini.EnviamentTipus" %><%--<%@ page import="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto" %>--%>
-<%--<%@ page import="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatOrdreFiltre" %>--%>
+<%@ page import="es.caib.notib.client.domini.EnviamentTipus" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -12,8 +11,7 @@
 	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
 	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(ssc.getRolActual()));
 	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()));
-//	pageContext.setAttribute("notificacioComunicacioEnumOptions", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(es.caib.notib.logic.intf.dto.EnviamentTipus.class, "notificacio.tipus.enviament.enum."));
-//	pageContext.setAttribute("notificacioEstatEnumOptions", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(NotificacioEstatOrdreFiltre.class, "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto."));
+	pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()));
 	pageContext.setAttribute("notificacioEnviamentTipus", es.caib.notib.back.helper.EnumHelper.getOptionsForEnum(EnviamentTipus.class, "es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto."));
 %>
 <c:set var="ampladaConcepte">
@@ -66,61 +64,6 @@
 				this.rows[row].firstChild.style = "border-left: 3px solid " + classes[classes.length - 1];
 			}
 		});
-		<%--var $estatColumn = $('#estat');--%>
-		<%--var $entregaPostalColumn = $('#entregaPostal');--%>
-		<%--var $enviamentTipusColumn = $('#enviamentTipus');--%>
-		<%--$estatColumn.select2({--%>
-		<%--	width: '100%',--%>
-		<%--	allowClear: true,--%>
-		<%--	placeholder: 'Selecciona una opció'//'${placeholderText}'--%>
-		<%--});--%>
-		<%--$entregaPostalColumn.select2({--%>
-		<%--	width: '100%',--%>
-		<%--	allowClear: true,--%>
-		<%--	placeholder: 'Selecciona una opció'//'${placeholderText}'--%>
-		<%--});--%>
-		<%--$enviamentTipusColumn.select2({--%>
-		<%--	width: '100%',--%>
-		<%--	allowClear: true,--%>
-		<%--	placeholder: '<spring:message code="notificacio.list.filtre.camp.enviament.tipus"/>'--%>
-		<%--});--%>
-
-		<%--function configureColumnSelectFilter($selector) {--%>
-		<%--	$selector.on('select2:select', function (e) {--%>
-		<%--		$("#enviament").dataTable().api().ajax.reload();--%>
-		<%--	});--%>
-		<%--	$selector.on('select2:unselect', function (e) {--%>
-		<%--		$("#enviament").dataTable().api().ajax.reload();--%>
-		<%--	});--%>
-		<%--	$selector.on('change', function () {--%>
-		<%--		$selector.val($selector.val());--%>
-		<%--		$("#btnFiltrar").first().click();--%>
-		<%--	});--%>
-		<%--}--%>
-
-		<%--configureColumnSelectFilter($estatColumn);--%>
-		<%--configureColumnSelectFilter($entregaPostalColumn);--%>
-		<%--configureColumnSelectFilter($enviamentTipusColumn);--%>
-
-		<%--if ("${filtreEnviaments.estat}" != "") {--%>
-		<%--	$estatColumn.val("${filtreEnviaments.estat}").trigger('change');--%>
-		<%--}--%>
-
-		<%--if ("${filtreEnviaments.entregaPostal}" != "") {--%>
-		<%--	$entregaPostalColumn.val("${filtreEnviaments.entregaPostal}").trigger('change');--%>
-		<%--}--%>
-
-		<%--if ("${filtreEnviaments.enviamentTipus}" != "") {--%>
-		<%--	$enviamentTipusColumn.val("${filtreEnviaments.enviamentTipus}".toLowerCase()).trigger('change');--%>
-		<%--}--%>
-
-		<%--$('.data').datepicker({--%>
-		<%--	orientation: "bottom",--%>
-		<%--	dateFormat: 'dd/mm/yy',--%>
-		<%--	weekStart: 1,--%>
-		<%--	todayHighlight: true,--%>
-		<%--	language: "${requestLocale}"--%>
-		<%--});--%>
 
 		let eventMessages = {
 			'confirm-reintentar-errors': "<spring:message code="enviament.list.user.reintentar.errors.misatge.avis"/>",
@@ -334,18 +277,19 @@
 					</button>
 					<ul class="dropdown-menu dropdown-left">
 						<li><a style="cursor: pointer;" id="exportarODS"><spring:message code="enviament.list.user.exportar"/> a <spring:message code="enviament.list.user.exportar.EXCEL"/></a></li>
-						<li><a id="reintentarErrors" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.reintentar.errors.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
-						<li><a style="cursor: pointer;" id="updateEstat"><spring:message code="enviament.list.user.actualitzar.estat"/></a></li>
-						<li><a style="cursor: pointer;" id="ampliarPlazoOe"><spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
-
-						<c:if test="${isRolActualAdministradorEntitat}">
-							<hr/>
-							<li><a style="cursor: pointer;" id="reactivarConsulta" title='<spring:message code="notificacio.list.accio.massiva.reactivar.consultes.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica"/></a></li>
-							<%--        <li><a style="cursor: pointer;" id="reactivarSir" title='<spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir"/></a></li>--%>
-							<li><a style="cursor: pointer;" id="reactivarCallback" title='<spring:message code="notificacio.list.accio.massiva.reactivar.callbacks.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.callbacks"/></a></li>
-							<%--        <li><a style="cursor: pointer;" id="enviarCallback" title='<spring:message code="notificacio.list.accio.massiva.enviar.callbacks.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.enviar.callbacks"/></a></li>--%>
-							<li><a style="cursor: pointer;" id="enviarNotificacionsMovil" title='<spring:message code="notificacio.list.accio.massiva.enviar.notificacions.movil.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.enviar.notificacions.movil"/></a></li>
-							<%--        <li><a style="cursor: pointer;" id="reactivarRegistre" title='<spring:message code="notificacio.list.accio.massiva.reactivar.registre.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.registre"/></a></li>--%>
+						<c:if test="${!isRolActualAdministradorLectura}">
+								<li><a id="reintentarErrors" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.reintentar.errors.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
+								<li><a style="cursor: pointer;" id="updateEstat"><spring:message code="enviament.list.user.actualitzar.estat"/></a></li>
+								<li><a style="cursor: pointer;" id="ampliarPlazoOe"><spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
+							<c:if test="${isRolActualAdministradorEntitat}">
+								<hr/>
+								<li><a style="cursor: pointer;" id="reactivarConsulta" title='<spring:message code="notificacio.list.accio.massiva.reactivar.consultes.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica"/></a></li>
+								<%--        <li><a style="cursor: pointer;" id="reactivarSir" title='<spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir"/></a></li>--%>
+								<li><a style="cursor: pointer;" id="reactivarCallback" title='<spring:message code="notificacio.list.accio.massiva.reactivar.callbacks.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.callbacks"/></a></li>
+								<%--        <li><a style="cursor: pointer;" id="enviarCallback" title='<spring:message code="notificacio.list.accio.massiva.enviar.callbacks.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.enviar.callbacks"/></a></li>--%>
+								<li><a style="cursor: pointer;" id="enviarNotificacionsMovil" title='<spring:message code="notificacio.list.accio.massiva.enviar.notificacions.movil.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.enviar.notificacions.movil"/></a></li>
+								<%--        <li><a style="cursor: pointer;" id="reactivarRegistre" title='<spring:message code="notificacio.list.accio.massiva.reactivar.registre.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.registre"/></a></li>--%>
+							</c:if>
 						</c:if>
 					</ul>
 				</div>
@@ -552,7 +496,7 @@
                     		<ul class="dropdown-menu dropdown-menu-right">
 								<li><a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 								<li><a href="<c:url value="/notificacio/{{:notificacioId}}/info"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detall.remesa"/></a></li>
-								{{if plazoAmpliable}}
+								{{if plazoAmpliable && ${!isRolActualAdministradorLectura}}}
 									<li><a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}/ampliacion/plazo"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;<spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
 								{{/if}}
 							</ul>

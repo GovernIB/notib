@@ -7,6 +7,7 @@
 <%
 	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
 	pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(ssc.getRolActual()));
+	pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()));
 %>
 <html>
 <head>
@@ -58,8 +59,10 @@
 		data-search-enabled="false" 
 		data-paging-enabled="false" 
 		data-default-order="1" 
-		data-default-dir="asc" 
-		data-botons-template="#tableButtonsTemplate" 
+		data-default-dir="asc"
+<c:if test="${!isRolActualAdministradorLectura}">
+		data-botons-template="#tableButtonsTemplate"
+</c:if>
 		class="table table-striped table-bordered" 
 		style="width:100%">
 		<thead>
@@ -129,27 +132,31 @@
 						{{if comunicacioSenseProcediment}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" class="th-boto-accions">
-					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<div class="dropdown">
-							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-							<ul class="dropdown-menu dropdown-menu-right">
-								{^{if ~hlpIsAdminOrgan() && !administrador}}
-									<li><a href="../../organgestor/${organGestor.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								{{else !~hlpIsAdminOrgan()}}		
-									<li><a href="../../organgestor/${organGestor.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>				
-								{{/if}}								
-								<li><a href="../../organgestor/${organGestor.id}/permis/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-							</ul>
-						</div>
-					</script>
-				</th>
+				<c:if test="${!isRolActualAdministradorLectura}">
+					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" class="th-boto-accions">
+						<script id="cellAccionsTemplate" type="text/x-jsrender">
+							<div class="dropdown">
+								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+								<ul class="dropdown-menu dropdown-menu-right">
+									{^{if ~hlpIsAdminOrgan() && !administrador}}
+										<li><a href="../../organgestor/${organGestor.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									{{else !~hlpIsAdminOrgan()}}
+										<li><a href="../../organgestor/${organGestor.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									{{/if}}
+									<li><a href="../../organgestor/${organGestor.id}/permis/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								</ul>
+							</div>
+						</script>
+					</th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>
+	<c:if test="${!isRolActualAdministradorLectura}">
 	<script id="tableButtonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a class="btn btn-default" href="../../organgestor/${organGestor.id}/permis/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.permis.boto.nou.permis"/></a></p>
+			<p style="text-align:right"><a class="btn btn-default" href="../../organgestor/${organGestor.id}/permis/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.permis.boto.nou.permis"/></a></p>
 	</script>
+	</c:if>
 	<a href="<c:url value="/organgestor?mantenirPaginacio=true"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 	<div class="clearfix"></div>
 </body>

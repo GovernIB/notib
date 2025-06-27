@@ -9,6 +9,7 @@
 <%
 	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
 	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()));
+	pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()));
 	pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(ssc.getRolActual()));
 	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(ssc.getRolActual()));
 %>
@@ -267,7 +268,7 @@ $(document).ready(function() {
 				<spring:message code="enviament.info.tab.events"/>
 			</a>
 		</li>
-		<c:if test="${isRolActualAdministradorEntitat || isRolActualAdministradorOrgan || isRolActualAdministrador}">
+		<c:if test="${isRolActualAdministradorEntitat || isRolActualAdministradorOrgan || isRolActualAdministrador || isRolActualAdministradorLectura}">
 		<li role="presentation"<c:if test="${pipellaActiva == 'historic'}"> class="active"</c:if>>
 			<a href="#historic" aria-controls="historic" role="tab" data-toggle="tab">
 				<spring:message code="notificacio.info.tab.historic"/>
@@ -568,7 +569,7 @@ $(document).ready(function() {
 			</c:if>
 			<c:if test="${enviament.notificacio.estat != 'PENDENT'}">
 				<c:choose>
-					<c:when test="${((notificacio.enviamentTipus == 'COMUNICACIO' || notificacio.enviamentTipus == 'SIR')  && enviament.titular.interessatTipus == 'ADMINISTRACIO')}">
+					<c:when test="${(notificacio.enviamentTipus == 'COMUNICACIO' || notificacio.enviamentTipus == 'SIR')  && enviament.titular.interessatTipus == 'ADMINISTRACIO' && !isRolActualAdministradorLectura}">
 						<p class="text-right" style="margin-top: 1em">
 							<button id="refrescarEstatSir" class="btn btn-default">
 								<span class="fa fa-refresh"></span>
@@ -580,13 +581,15 @@ $(document).ready(function() {
 						<br/>
 					</c:when>
 					<c:otherwise>
-						<p class="text-right" style="margin-top: 1em">
-<%--							<a id="refrescarEstat" href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatNotifica"/>" class="btn btn-default">--%>
-							<button id="refrescarEstat" class="btn btn-default">
-								<span class="fa fa-refresh"></span>
-								<spring:message code="enviament.info.accio.refrescar.estat"/>
-							</button>
-						</p>
+						<c:if test="${!isRolActualAdministradorLectura}">
+							<p class="text-right" style="margin-top: 1em">
+	<%--							<a id="refrescarEstat" href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatNotifica"/>" class="btn btn-default">--%>
+								<button id="refrescarEstat" class="btn btn-default">
+									<span class="fa fa-refresh"></span>
+									<spring:message code="enviament.info.accio.refrescar.estat"/>
+								</button>
+							</p>
+						</c:if>
 					</c:otherwise>
 				</c:choose>
 				<div class="row">
@@ -755,25 +758,25 @@ $(document).ready(function() {
 				<div class="alert alert-warning well-sm" role="alert" style="margin-top: 1em">
 					<spring:message code="enviament.info.estat.registre.no.enviada"/>
 				</div>
-				<c:if test="${enviament.notificacio.estat != 'PENDENT'}"><%-- TODO: Els dos botons que hi ha a continuació es poden eliminar --%>
-					<c:if test="${notificacio.enviamentTipus == 'COMUNICACIO' || notificacio.enviamentTipus == 'SIR'}">
-						<p class="well well-sm text-right" style="margin-top: 1em">
-							<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/comunicacioSeu"/>" class="btn btn-default">
-								<span class="fa fa-check-square-o"></span>
-								<spring:message code="enviament.info.accio.seu.informar.obertura"/>
-							</a>
-						</p>
-					</c:if>
-					<c:if test="${notificacio.enviamentTipus == 'NOTIFICACIO'}">
-						<form action="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/certificacioSeu"/>" class="well well-sm text-right" style="margin-top: 1em" method="post" enctype="multipart/form-data">
-							<input type="file" name="certificat" class="pull-left"/>
-							<button type="submit" class="btn btn-default">
-								<span class="fa fa-send-o"></span>
-								<spring:message code="enviament.info.accio.seu.enviar.certificacio"/>
-							</button>
-						</form>
-					</c:if>
-				</c:if>
+<%--				<c:if test="${enviament.notificacio.estat != 'PENDENT'}">&lt;%&ndash; TODO: Els dos botons que hi ha a continuació es poden eliminar &ndash;%&gt;--%>
+<%--					<c:if test="${notificacio.enviamentTipus == 'COMUNICACIO' || notificacio.enviamentTipus == 'SIR'}">--%>
+<%--						<p class="well well-sm text-right" style="margin-top: 1em">--%>
+<%--							<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/comunicacioSeu"/>" class="btn btn-default">--%>
+<%--								<span class="fa fa-check-square-o"></span>--%>
+<%--								<spring:message code="enviament.info.accio.seu.informar.obertura"/>--%>
+<%--							</a>--%>
+<%--						</p>--%>
+<%--					</c:if>--%>
+<%--					<c:if test="${notificacio.enviamentTipus == 'NOTIFICACIO'}">--%>
+<%--						<form action="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/certificacioSeu"/>" class="well well-sm text-right" style="margin-top: 1em" method="post" enctype="multipart/form-data">--%>
+<%--							<input type="file" name="certificat" class="pull-left"/>--%>
+<%--							<button type="submit" class="btn btn-default">--%>
+<%--								<span class="fa fa-send-o"></span>--%>
+<%--								<spring:message code="enviament.info.accio.seu.enviar.certificacio"/>--%>
+<%--							</button>--%>
+<%--						</form>--%>
+<%--					</c:if>--%>
+<%--				</c:if>--%>
 			</c:if>
 			<c:if test="${not empty enviament.registreNumeroFormatat}">
 				<br>
@@ -837,203 +840,158 @@ $(document).ready(function() {
 								<spring:message code="enviament.info.dada.entrega.cie.erronia" />
 							</div>
 						</c:if>
-						<p class="text-right" style="margin-top: 1em">
-							<c:if test="${enviament.entregaPostal.cieEstat == 'ENVIADO_CI'}">
-								<button id="cancelarEntregaPostal" class="btn btn-default">
-									<spring:message code="notificacio.info.accio.cancelar.entrega.postal"/>
+						<c:if test="${!isRolActualAdministradorLectura}">
+							<p class="text-right" style="margin-top: 1em">
+								<c:if test="${enviament.entregaPostal.cieEstat == 'ENVIADO_CI'}">
+									<button id="cancelarEntregaPostal" class="btn btn-default">
+										<spring:message code="notificacio.info.accio.cancelar.entrega.postal"/>
+									</button>
+								</c:if>
+								<button id="consultaEstatEntregaPostal" class="btn btn-default">
+									<span class="fa fa-refresh"></span>
+									<spring:message code="enviament.info.accio.refrescar.estat"/>
 								</button>
-							</c:if>
-							<button id="consultaEstatEntregaPostal" class="btn btn-default">
-								<span class="fa fa-refresh"></span>
-								<spring:message code="enviament.info.accio.refrescar.estat"/>
-							</button>
-						</p>
+							</p>
+						</c:if>
 						<br>
-<%--						<div class="panel panel-default">--%>
-<%--							<div class="panel-heading">--%>
-<%--								<h3 class="panel-title">--%>
-<%--									<strong><spring:message code="enviament.info.seccio.entrega.postal"/></strong>--%>
-<%--								</h3>--%>
-<%--							</div>--%>
-<%--							<table class="table table-bordered" style="width:100%">--%>
-<%--								<tbody>--%>
-<%--									<tr>--%>
-<%--										<td width="30%"><strong><spring:message code="enviament.info.dada.entrega.cie.id"/></strong></td>--%>
-<%--										<td>${enviament.entregaPostal.cieId}</td>--%>
-<%--									</tr>--%>
-<%--									<tr>--%>
-<%--										<td width="30%"><strong><spring:message code="enviament.info.dada.entrega.cie.estat"/></strong></td>--%>
-<%--										<td><spring:message code="es.caib.notib.client.domini.CieEstat.${enviament.entregaPostal.cieEstat}"/></td>--%>
-<%--									</tr>--%>
-<%--									<c:if test="${enviament.entregaPostal.cieErrorDesc != null}">--%>
-<%--										<tr>--%>
-<%--											<td width="30%"><strong><spring:message code="enviament.info.error.error"/></strong></td>--%>
-<%--											<td>${enviament.entregaPostal.cieErrorDesc}</td>--%>
-<%--										</tr>--%>
-<%--									</c:if>--%>
-<%--								</tbody>--%>
-<%--							</table>--%>
-							<div class="row">
-								<c:set var="datatColSize" value="12"/>
-								<c:if test="${not empty enviament.entregaPostal.cieCertificacioData}"><c:set var="datatColSize" value="5"/></c:if>
-								<div class="col-sm-${datatColSize}">
+						<div class="row">
+							<c:set var="datatColSize" value="12"/>
+							<c:if test="${not empty enviament.entregaPostal.cieCertificacioData}"><c:set var="datatColSize" value="5"/></c:if>
+							<div class="col-sm-${datatColSize}">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h3 class="panel-title">
+											<strong><spring:message code="enviament.info.seccio.notifica.datat"/></strong>
+										</h3>
+									</div>
+									<table class="table table-bordered" style="width:100%">
+										<tbody>
+										<tr>
+											<td width="30%"><strong><spring:message code="enviament.info.notifica.estat"/></strong></td>
+											<td><spring:message code="es.caib.notib.client.domini.CieEstat.${enviament.entregaPostal.cieEstat}"/></td>
+										</tr>
+										<c:if test="${not empty enviament.entregaPostal.cieEstatData}">
+											<tr>
+												<td><strong><spring:message code="enviament.info.notifica.estat.data"/></strong></td>
+												<td><fmt:formatDate value="${enviament.entregaPostal.cieEstatData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+											</tr>
+										</c:if>
+										<c:if test="${not empty enviament.entregaPostal.cieId}">
+											<tr>
+												<td><strong><spring:message code="notificacio.list.filtre.camp.identificador"/></strong></td>
+												<td>${enviament.entregaPostal.cieId}</td>
+											</tr>
+										</c:if>
+										<c:if test="${not empty enviament.entregaPostal.cieDatatErrorDescripcio}">
+											<tr>
+												<td><strong><spring:message code="enviament.info.notifica.estat.descripcio"/></strong></td>
+												<td>${enviament.entregaPostal.cieDatatErrorDescripcio}</td>
+											</tr>
+										</c:if>
+										<c:if test="${not empty enviament.entregaPostal.cieDatatOrigen}">
+											<tr>
+												<td><strong><spring:message code="enviament.info.notifica.datat.origen"/></strong></td>
+												<td><spring:message code="enviament.datat.origen.enum.${enviament.entregaPostal.cieDatatOrigen}"/> (${enviament.entregaPostal.cieDatatOrigen})</td>
+											</tr>
+										</c:if>
+										<c:if test="${not empty enviament.entregaPostal.cieDatatReceptorNif}">
+											<tr>
+												<td><strong><spring:message code="enviament.info.notifica.datat.receptor.nif"/></strong></td>
+												<td>${enviament.entregaPostal.cieDatatReceptorNif}</td>
+											</tr>
+										</c:if>
+										<c:if test="${not empty enviament.entregaPostal.cieDatatReceptorNom}">
+											<tr>
+												<td><strong><spring:message code="enviament.info.notifica.datat.receptor.nom"/></strong></td>
+												<td>${enviament.entregaPostal.cieDatatReceptorNom}</td>
+											</tr>
+										</c:if>
+										<c:if test="${not empty enviament.entregaPostal.cieDatatNumSeguiment}">
+											<tr>
+												<td><strong><spring:message code="enviament.info.notifica.datat.num.seguiment"/></strong></td>
+												<td>${enviament.entregaPostal.cieDatatNumSeguiment}</td>
+											</tr>
+										</c:if>
+										<c:if test="${not empty enviament.entregaPostal.cieDatatErrorDescripcio}">
+											<tr>
+												<td><strong><spring:message code="enviament.info.notifica.datat.error.desc"/></strong></td>
+												<td>${enviament.entregaPostal.cieDatatErrorDescripcio}</td>
+											</tr>
+										</c:if>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<c:if test="${not empty enviament.entregaPostal.cieCertificacioData}">
+								<div class="col-sm-7">
 									<div class="panel panel-default">
 										<div class="panel-heading">
 											<h3 class="panel-title">
-												<strong><spring:message code="enviament.info.seccio.notifica.datat"/></strong>
+												<strong><spring:message code="enviament.info.seccio.notifica.certificacio"/></strong>
 											</h3>
 										</div>
 										<table class="table table-bordered" style="width:100%">
 											<tbody>
 											<tr>
-												<td width="30%"><strong><spring:message code="enviament.info.notifica.estat"/></strong></td>
-												<td><spring:message code="es.caib.notib.client.domini.CieEstat.${enviament.entregaPostal.cieEstat}"/></td>
+												<td width="30%"><strong><spring:message code="enviament.info.notifica.certificacio.data"/></strong></td>
+												<td><fmt:formatDate value="${enviament.entregaPostal.cieCertificacioData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 											</tr>
-<%--											<tr>--%>
-<%--												<td><strong><spring:message code="enviament.historic.list.columna.notificaDataCaducitat"/></strong></td>--%>
-<%--												<td>--%>
-<%--													<fmt:formatDate value="${enviament.entregaPostal.cieDataCaducitat}" pattern="dd/MM/yyyy HH:mm:ss"/>--%>
-<%--													<c:if test="${enviament.plazoAmpliado == true}">--%>
-<%--														<span class="label label-warning"><spring:message code="enviament.info.notifica.caducitat.plazo.ampliado"/></span>--%>
-<%--													</c:if>--%>
-<%--												</td>--%>
-<%--											</tr>--%>
-<%--											<c:if test="${not empty enviament.sirRecepcioData}">--%>
-<%--												<tr>--%>
-<%--													<td><strong><spring:message code="enviament.info.sir.recepcio.data"/></strong></td>--%>
-<%--													<td><fmt:formatDate value="${enviament.sirRecepcioData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>--%>
-<%--												</tr>--%>
-<%--											</c:if>--%>
-<%--											<c:if test="${not empty enviament.sirRegDestiData}">--%>
-<%--												<tr>--%>
-<%--													<td><strong><spring:message code="enviament.info.sir.registre.desti.data"/></strong></td>--%>
-<%--													<td><fmt:formatDate value="${enviament.sirRegDestiData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>--%>
-<%--												</tr>--%>
-<%--											</c:if>--%>
-											<c:if test="${not empty enviament.entregaPostal.cieEstatData}">
+											<c:if test="${not empty enviament.entregaPostal.cieCertificacioMime}">
 												<tr>
-													<td><strong><spring:message code="enviament.info.notifica.estat.data"/></strong></td>
-													<td><fmt:formatDate value="${enviament.entregaPostal.cieEstatData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+													<td><strong><spring:message code="enviament.info.notifica.certificacio.mime"/></strong></td>
+													<td>${enviament.entregaPostal.cieCertificacioMime}</td>
 												</tr>
 											</c:if>
-											<c:if test="${not empty enviament.entregaPostal.cieId}">
+											<c:if test="${not empty enviament.entregaPostal.cieCertificacioOrigen}">
 												<tr>
-													<td><strong><spring:message code="notificacio.list.filtre.camp.identificador"/></strong></td>
-													<td>${enviament.entregaPostal.cieId}</td>
+													<td><strong><spring:message code="enviament.info.notifica.certificacio.origen"/></strong></td>
+													<td><spring:message code="enviament.datat.origen.enum.${enviament.entregaPostal.cieCertificacioOrigen}"/> (${enviament.entregaPostal.cieCertificacioOrigen})</td>
 												</tr>
 											</c:if>
-											<c:if test="${not empty enviament.entregaPostal.cieDatatErrorDescripcio}">
+											<c:if test="${not empty enviament.entregaPostal.cieCertificacioMetadades}">
 												<tr>
-													<td><strong><spring:message code="enviament.info.notifica.estat.descripcio"/></strong></td>
-													<td>${enviament.entregaPostal.cieDatatErrorDescripcio}</td>
+													<td><strong><spring:message code="enviament.info.notifica.certificacio.metadades"/></strong></td>
+													<td>${enviament.entregaPostal.cieCertificacioMetadades}</td>
 												</tr>
 											</c:if>
-											<c:if test="${not empty enviament.entregaPostal.cieDatatOrigen}">
+											<c:if test="${not empty enviament.entregaPostal.cieCertificacioCsv}">
 												<tr>
-													<td><strong><spring:message code="enviament.info.notifica.datat.origen"/></strong></td>
-													<td><spring:message code="enviament.datat.origen.enum.${enviament.entregaPostal.cieDatatOrigen}"/> (${enviament.entregaPostal.cieDatatOrigen})</td>
+													<td><strong><spring:message code="enviament.info.notifica.certificacio.csv"/></strong></td>
+													<td>${enviament.entregaPostal.cieCertificacioCsv}</td>
 												</tr>
 											</c:if>
-											<c:if test="${not empty enviament.entregaPostal.cieDatatReceptorNif}">
+											<c:if test="${not empty enviament.entregaPostal.cieCertificacioTipus}">
 												<tr>
-													<td><strong><spring:message code="enviament.info.notifica.datat.receptor.nif"/></strong></td>
-													<td>${enviament.entregaPostal.cieDatatReceptorNif}</td>
+													<td><strong><spring:message code="enviament.info.notifica.certificacio.tipus"/></strong></td>
+													<td>${enviament.entregaPostal.cieCertificacioTipus}</td>
 												</tr>
 											</c:if>
-											<c:if test="${not empty enviament.entregaPostal.cieDatatReceptorNom}">
+											<c:if test="${not empty enviament.entregaPostal.cieCertificacioArxiuTipus}">
 												<tr>
-													<td><strong><spring:message code="enviament.info.notifica.datat.receptor.nom"/></strong></td>
-													<td>${enviament.entregaPostal.cieDatatReceptorNom}</td>
+													<td><strong><spring:message code="enviament.info.notifica.certificacio.arxiu.tipus"/></strong></td>
+													<td>${enviament.entregaPostal.cieCertificacioArxiuTipus}</td>
 												</tr>
 											</c:if>
-											<c:if test="${not empty enviament.entregaPostal.cieDatatNumSeguiment}">
+											<c:if test="${not empty enviament.entregaPostal.cieCertificacioNumSeguiment}">
 												<tr>
-													<td><strong><spring:message code="enviament.info.notifica.datat.num.seguiment"/></strong></td>
-													<td>${enviament.entregaPostal.cieDatatNumSeguiment}</td>
+													<td><strong><spring:message code="enviament.info.notifica.certificacio.num.seguiment"/></strong></td>
+													<td>${enviament.entregaPostal.cieCertificacioNumSeguiment}</td>
 												</tr>
 											</c:if>
-											<c:if test="${not empty enviament.entregaPostal.cieDatatErrorDescripcio}">
-												<tr>
-													<td><strong><spring:message code="enviament.info.notifica.datat.error.desc"/></strong></td>
-													<td>${enviament.entregaPostal.cieDatatErrorDescripcio}</td>
-												</tr>
-											</c:if>
+											<tr>
+												<td><strong><spring:message code="enviament.info.notifica.certificacio.document"/></strong></td>
+												<td>
+													<div></div>
+														${enviament.entregaPostal.cieCertificacioArxiuNom}
+													<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/certificacioPostalDescarregar"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.notifica.certificacio.num.descarregar"/>"><span class="fa fa-download"></span></a>
+												</td>
+											</tr>
 											</tbody>
 										</table>
 									</div>
 								</div>
-								<c:if test="${not empty enviament.entregaPostal.cieCertificacioData}">
-									<div class="col-sm-7">
-										<div class="panel panel-default">
-											<div class="panel-heading">
-												<h3 class="panel-title">
-													<strong><spring:message code="enviament.info.seccio.notifica.certificacio"/></strong>
-												</h3>
-											</div>
-											<table class="table table-bordered" style="width:100%">
-												<tbody>
-												<tr>
-													<td width="30%"><strong><spring:message code="enviament.info.notifica.certificacio.data"/></strong></td>
-													<td><fmt:formatDate value="${enviament.entregaPostal.cieCertificacioData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-												</tr>
-												<c:if test="${not empty enviament.entregaPostal.cieCertificacioMime}">
-													<tr>
-														<td><strong><spring:message code="enviament.info.notifica.certificacio.mime"/></strong></td>
-														<td>${enviament.entregaPostal.cieCertificacioMime}</td>
-													</tr>
-												</c:if>
-												<c:if test="${not empty enviament.entregaPostal.cieCertificacioOrigen}">
-													<tr>
-														<td><strong><spring:message code="enviament.info.notifica.certificacio.origen"/></strong></td>
-														<td><spring:message code="enviament.datat.origen.enum.${enviament.entregaPostal.cieCertificacioOrigen}"/> (${enviament.entregaPostal.cieCertificacioOrigen})</td>
-													</tr>
-												</c:if>
-												<c:if test="${not empty enviament.entregaPostal.cieCertificacioMetadades}">
-													<tr>
-														<td><strong><spring:message code="enviament.info.notifica.certificacio.metadades"/></strong></td>
-														<td>${enviament.entregaPostal.cieCertificacioMetadades}</td>
-													</tr>
-												</c:if>
-												<c:if test="${not empty enviament.entregaPostal.cieCertificacioCsv}">
-													<tr>
-														<td><strong><spring:message code="enviament.info.notifica.certificacio.csv"/></strong></td>
-														<td>${enviament.entregaPostal.cieCertificacioCsv}</td>
-													</tr>
-												</c:if>
-												<c:if test="${not empty enviament.entregaPostal.cieCertificacioTipus}">
-													<tr>
-														<td><strong><spring:message code="enviament.info.notifica.certificacio.tipus"/></strong></td>
-														<td>${enviament.entregaPostal.cieCertificacioTipus}</td>
-													</tr>
-												</c:if>
-												<c:if test="${not empty enviament.entregaPostal.cieCertificacioArxiuTipus}">
-													<tr>
-														<td><strong><spring:message code="enviament.info.notifica.certificacio.arxiu.tipus"/></strong></td>
-														<td>${enviament.entregaPostal.cieCertificacioArxiuTipus}</td>
-													</tr>
-												</c:if>
-												<c:if test="${not empty enviament.entregaPostal.cieCertificacioNumSeguiment}">
-													<tr>
-														<td><strong><spring:message code="enviament.info.notifica.certificacio.num.seguiment"/></strong></td>
-														<td>${enviament.entregaPostal.cieCertificacioNumSeguiment}</td>
-													</tr>
-												</c:if>
-												<tr>
-													<td><strong><spring:message code="enviament.info.notifica.certificacio.document"/></strong></td>
-													<td>
-														<div></div>
-															${enviament.entregaPostal.cieCertificacioArxiuNom}
-														<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/certificacioPostalDescarregar"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.notifica.certificacio.num.descarregar"/>"><span class="fa fa-download"></span></a>
-													</td>
-												</tr>
-												</tbody>
-											</table>
-										</div>
-									</div>
-								</c:if>
-							</div>
-
-<%--						</div>--%>
+							</c:if>
+						</div>
 					</c:otherwise>
 				</c:choose>
 			</div>

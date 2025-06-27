@@ -308,13 +308,13 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_ADMIN_LECTURA"})
 	public PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre, PaginacioParamsDto paginacioDtoFromRequest) {
 		return getDelegateService().findNotificacionsAmbErrorRegistre(entitatId, filtre, paginacioDtoFromRequest);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_ADMIN_LECTURA"})
 	public List<Long> findNotificacionsIdAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre) {
 		return getDelegateService().findNotificacionsIdAmbErrorRegistre(entitatId, filtre);
 	}

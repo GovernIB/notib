@@ -7,6 +7,7 @@
 <%
 	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
 	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()));
+	pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()));
 %>
 <script type="text/javascript">
 
@@ -220,32 +221,34 @@
 						<a href="${unitatCodiUrlPrefix}procediment/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="procediment.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
 					</script>
 			</th>
-			<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="2%">
-				<script id="cellAccionsTemplate" type="text/x-jsrender">
-					{^{if (~hlpIsAdministradorEntitat()) || (!~hlpIsAdministradorEntitat() && !comu) }}
-						<div class="dropdown">
-							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-							<ul class="dropdown-menu dropdown-menu-right">
-								{{if !manual}}
-								<li><a href="${unitatCodiUrlPrefix}procediment/{{:codi}}/update" data-toggle="ajax"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="procediment.list.boto.actualitzar"/></a></li>
-								{{/if}}
-								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}" data-toggle="modal" data-maximized="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								{{if !actiu}}
-								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
-								{{else}}
-								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
-								{{/if}}
-								{{if !manual}}
-								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/sync_manual" data-toggle="ajax"><span class="fa fa-hand-paper-o"></span>&nbsp;&nbsp;<spring:message code="procediment.list.boto.sync.manual"/></a></li>
-								{{else}}
-								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/sync_auto" data-toggle="ajax"><span class="fa fa-cog"></span>&nbsp;&nbsp;<spring:message code="procediment.list.boto.sync.auto"/></a></li>
-								{{/if}}
-								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-							</ul>
-						</div>
-					{{/if}}
-					</script>
-			</th>
+			<c:if test="${!isRolActualAdministradorLectura}">
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="2%">
+					<script id="cellAccionsTemplate" type="text/x-jsrender">
+						{^{if (~hlpIsAdministradorEntitat()) || (!~hlpIsAdministradorEntitat() && !comu) }}
+							<div class="dropdown">
+								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+								<ul class="dropdown-menu dropdown-menu-right">
+									{{if !manual}}
+									<li><a href="${unitatCodiUrlPrefix}procediment/{{:codi}}/update" data-toggle="ajax"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="procediment.list.boto.actualitzar"/></a></li>
+									{{/if}}
+									<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}" data-toggle="modal" data-maximized="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									{{if !actiu}}
+									<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
+									{{else}}
+									<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
+									{{/if}}
+									{{if !manual}}
+									<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/sync_manual" data-toggle="ajax"><span class="fa fa-hand-paper-o"></span>&nbsp;&nbsp;<spring:message code="procediment.list.boto.sync.manual"/></a></li>
+									{{else}}
+									<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/sync_auto" data-toggle="ajax"><span class="fa fa-cog"></span>&nbsp;&nbsp;<spring:message code="procediment.list.boto.sync.auto"/></a></li>
+									{{/if}}
+									<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								</ul>
+							</div>
+						{{/if}}
+						</script>
+				</th>
+			</c:if>
 		</c:if>
 		<th data-col-name="organNoSincronitzat" data-visible="false"></th>
 	</tr>
@@ -255,18 +258,20 @@
 <script id="botonsTemplate" type="text/x-jsrender">
 <c:if test="${not simplifiedView}">
 	<p style="text-align:right">
-	<c:if test="${isRolActualAdministradorEntitat}">
-		<a id="procediment-boto-cache" class="btn btn-warning" href="${unitatCodiUrlPrefix}procediment/cache/refrescar"><span class="fa fa-trash"></span>&nbsp;<spring:message code="procediment.list.boto.cache"/></a>
-		<%--			<c:if test="${!isCodiDir3Entitat}">--%>
-		<a id="procediment-boto-update"
-		class="btn btn-default" href="${unitatCodiUrlPrefix}procediment/update/auto"
-		data-toggle="modal"
-		data-maximized="false">
-		<span class="fa fa-refresh"></span>&nbsp;<spring:message code="procediment.list.boto.procediment.auto"/>
-		</a>
-		<%--			</c:if>--%>
-	</c:if>
-	<a id="procediment-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}procediment/new" data-toggle="modal" data-maximized="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.list.boto.nou.procediment"/></a>
+		<c:if test="${isRolActualAdministradorEntitat}">
+			<a id="procediment-boto-cache" class="btn btn-warning" href="${unitatCodiUrlPrefix}procediment/cache/refrescar"><span class="fa fa-trash"></span>&nbsp;<spring:message code="procediment.list.boto.cache"/></a>
+			<%--			<c:if test="${!isCodiDir3Entitat}">--%>
+			<a id="procediment-boto-update"
+			class="btn btn-default" href="${unitatCodiUrlPrefix}procediment/update/auto"
+			data-toggle="modal"
+			data-maximized="false">
+			<span class="fa fa-refresh"></span>&nbsp;<spring:message code="procediment.list.boto.procediment.auto"/>
+			</a>
+			<%--			</c:if>--%>
+		</c:if>
+		<c:if test="${!isRolActualAdministradorLectura}">
+			<a id="procediment-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}procediment/new" data-toggle="modal" data-maximized="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.list.boto.nou.procediment"/></a>
+		</c:if>
 	</p>
 </c:if>
 </script>

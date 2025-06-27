@@ -8,6 +8,7 @@
     es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
     pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(ssc.getRolActual()));
     pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()), PageContext.REQUEST_SCOPE);
+    pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()), PageContext.REQUEST_SCOPE);
 %>
     <title>
         <c:choose>
@@ -205,7 +206,7 @@
                 <br/>
                 <form:hidden path="llibreNom"/>
                 <not:inputSelect name="llibre" required="true" optionItems="${llibres}" optionValueAttribute="codi"
-                                 optionTextAttribute="nomCurt" emptyOption="true"
+                                 optionTextAttribute="nomCurt" emptyOption="true" disabled="${isRolActualAdministradorLectura}"
                                  textKey="organgestor.form.camp.llibre" placeholderKey="organgestor.form.camp.llibre.info" optionMinimumResultsForSearch="0"/>
             </c:if>
             <c:if test="${setLlibre and isModificacio}">
@@ -218,14 +219,14 @@
                 <br/>
                 <form:hidden path="oficinaNom"/>
                 <not:inputSelect generalClass="row" name="oficina" optionItems="${oficines}" optionValueAttribute="codi"
-                                 optionTextAttribute="nom" required="true" emptyOption="true"
+                                 optionTextAttribute="nom" required="true" emptyOption="true" disabled="${isRolActualAdministradorLectura}"
                                  textKey="organgestor.form.camp.oficina" placeholderKey="organgestor.form.camp.oficina" optionMinimumResultsForSearch="0"/>
             </c:if>
-            <not:inputCheckbox name="permetreSir" generalClass="row" textKey="organgestor.form.camp.permetre.sir"/>
-            <c:if test="${isRolActualAdministradorEntitat}">
+            <not:inputCheckbox name="permetreSir" generalClass="row" textKey="organgestor.form.camp.permetre.sir" disabled="${isRolActualAdministradorLectura}"/>
+            <c:if test="${isRolActualAdministradorEntitat || isRolActualAdministradorLectura}">
                 <c:choose>
                     <c:when test="${not empty operadorPostalList && not empty cieList}">
-                        <not:inputCheckbox name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie" info="${entregaCieHeredada}" messageInfo="organgestor.form.camp.entregacie.heredada"/>
+                        <not:inputCheckbox disabled="${isRolActualAdministradorLectura}" name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie" info="${entregaCieHeredada}" messageInfo="organgestor.form.camp.entregacie.heredada"/>
                     </c:when>
                     <c:otherwise>
                         <not:inputCheckbox disabled="true" info="true" messageInfo="organgestor.form.camp.entregacie.no.configurada" name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
@@ -233,20 +234,20 @@
                     </c:otherwise>
                 </c:choose>
             </c:if>
-            <c:if test="${isRolActualAdministradorEntitat and not empty operadorPostalList && not empty cieList}">
+            <c:if test="${(isRolActualAdministradorEntitat || isRolActualAdministradorLectura) and not empty operadorPostalList && not empty cieList}">
                 <div id="entrega-cie-form" class="flex-column">
                     <not:inputSelect id="operadorPostalId" name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"
-                                     optionTextAttribute="text" required="true" emptyOption="true"
+                                     optionTextAttribute="text" required="true" emptyOption="true" disabled="${isRolActualAdministradorLectura}"
                                      textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal"/>
                     <not:inputSelect id="cieId" name="cieId" optionItems="${cieList}" optionValueAttribute="id"
-                                     optionTextAttribute="text" required="true" emptyOption="true"
+                                     optionTextAttribute="text" required="true" emptyOption="true" disabled="${isRolActualAdministradorLectura}"
                                      textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie"/>
 
-                    <not:inputCheckbox name="sobrescriureCieOrganEmisor" generalClass="row" textKey="organgestor.form.camp.sobrescriure.cie.organ.emisor"/>
+                    <not:inputCheckbox name="sobrescriureCieOrganEmisor" disabled="${isRolActualAdministradorLectura}" generalClass="row" textKey="organgestor.form.camp.sobrescriure.cie.organ.emisor"/>
 
                 </div>
             </c:if>
-            <not:inputCheckbox name="entregaCieDesactivada" generalClass="row" textKey="organgestor.form.camp.entregacie.desactivada"/>
+            <not:inputCheckbox name="entregaCieDesactivada" disabled="${isRolActualAdministradorLectura}" generalClass="row" textKey="organgestor.form.camp.entregacie.desactivada"/>
         </div>
         <div class="flex-space-around">
 <%--
@@ -266,21 +267,25 @@
                     <span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.servei"/>
                 </a>
             </div>
-            <div>
-                <a id="sincronitzar" class="btn btn-default" href="" data-toggle="ajax" data-adjust-height="false" data-height="650px">
-                    <span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="organgestor.list.boto.synchronize"/>
-                </a>
-            </div>
-            <button id="guardar" type="" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+            <c:if test="${!isRolActualAdministradorLectura}">
+                <div>
+                    <a id="sincronitzar" class="btn btn-default" href="" data-toggle="ajax" data-adjust-height="false" data-height="650px">
+                        <span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="organgestor.list.boto.synchronize"/>
+                    </a>
+                </div>
+                <button id="guardar" type="" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+            </c:if>
         </div>
     </form:form>
 
     <div id="permisosPanel" class="panel panel-default" style='margin-top:20px; <c:if test="${empty id}">display:none;"</c:if>'>
         <div class="panel-heading flex-space-between">
             <h2><spring:message code="organgestor.permis.titol"/><small></small></h2>
-            <div class="flex-column-center">
-                <a id="permis-boto-nou" class="btn btn-default" href="" data-toggle="modal" data-datatable-id="permisos"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.permis.boto.nou.permis"/></a>
-            </div>
+            <c:if test="${!isRolActualAdministradorLectura}">
+                <div class="flex-column-center">
+                    <a id="permis-boto-nou" class="btn btn-default" href="" data-toggle="modal" data-datatable-id="permisos"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.permis.boto.nou.permis"/></a>
+                </div>
+            </c:if>
         </div>
         <div class="panel-body">
             <table id="permisos" data-toggle="datatable" data-url="<c:url value="/organgestor/${id}/permis/datatable"/>" data-search-enabled="false"
@@ -366,21 +371,23 @@
                             {{if comunicacioSenseProcediment}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" data-class="overflow-visible" class="th-boto-accions">
-                        <script id="cellAccionsTemplate" type="text/x-jsrender">
-                            <div class="dropdown">
-                                <button aria-expanded="true" class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;&nbsp;<span class="caret"></span></button>
-                                <ul class="dropdown-menu">
-                                    {^{if ~hlpIsAdminOrgan() && !administrador}}
-                                        <li><a class="boto-permis" href="../modal/organgestor/idOrgan/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-                                    {{else !~hlpIsAdminOrgan()}}
-                                        <li><a class="boto-permis" href="../modal/organgestor/idOrgan/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-                                    {{/if}}
-                                    <li><a class="boto-permis" href="../organgestor/idOrgan/permis/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-                                </ul>
-                            </div>
-                        </script>
-                    </th>
+                    <c:if test="${!isRolActualAdministradorLectura}">
+                        <th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" data-class="overflow-visible" class="th-boto-accions">
+                            <script id="cellAccionsTemplate" type="text/x-jsrender">
+                                <div class="dropdown">
+                                    <button aria-expanded="true" class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;&nbsp;<span class="caret"></span></button>
+                                    <ul class="dropdown-menu">
+                                        {^{if ~hlpIsAdminOrgan() && !administrador}}
+                                            <li><a class="boto-permis" href="../modal/organgestor/idOrgan/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+                                        {{else !~hlpIsAdminOrgan()}}
+                                            <li><a class="boto-permis" href="../modal/organgestor/idOrgan/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+                                        {{/if}}
+                                        <li><a class="boto-permis" href="../organgestor/idOrgan/permis/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+                                    </ul>
+                                </div>
+                            </script>
+                        </th>
+                    </c:if>
                 </tr>
                 </thead>
             </table>

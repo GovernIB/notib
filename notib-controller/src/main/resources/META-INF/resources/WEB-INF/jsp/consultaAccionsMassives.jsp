@@ -7,6 +7,7 @@
     es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
     pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(ssc.getRolActual()));
     pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()));
+    pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()));
     pageContext.setAttribute("isRolActualUsuari", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuari(ssc.getRolActual()));
 %>
 <html>
@@ -48,22 +49,6 @@
         <th data-col-name="dataInici"><spring:message code="accions.massives.data.inici"/></th>
         <th data-col-name="dataFi"><spring:message code="accions.massives.data.fi"/></th>
         <th data-col-name="createdByCodi"><spring:message code="accions.massives.codi.usuari"/></th>
-<%--        <th data-col-name="activa" data-template="#cellActivaTemplate">--%>
-<%--            <spring:message code="entitat.list.columna.activa"/>--%>
-<%--            <script id="cellActivaTemplate" type="text/x-jsrender">--%>
-<%--                {{if activa}}<span class="fa fa-check"></span>{{/if}}--%>
-<%--            </script>--%>
-<%--        </th>--%>
-<%--        <th data-col-name="numAplicacions" data-orderable="false" data-template="#cellAplicacionsTemplate" width="10%">--%>
-<%--            <script id="cellAplicacionsTemplate" type="text/x-jsrender">--%>
-<%--                <a href="<c:url value="/entitat/{{:id}}/aplicacio"/>" class="btn btn-default"><span class="fa fa-puzzle-piece"></span>&nbsp;<spring:message code="entitat.list.boto.aplicacions"/>&nbsp;<span class="badge">{{:numAplicacions}}</span></a>--%>
-<%--            </script>--%>
-<%--        </th>--%>
-<%--        <th data-col-name="permisosCount" data-orderable="false" data-template="#cellPermisosTemplate" width="10%">--%>
-<%--            <script id="cellPermisosTemplate" type="text/x-jsrender">--%>
-<%--                <a href="<c:url value="/entitat/{{:id}}/permis"/>" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="entitat.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>--%>
-<%--            </script>--%>
-<%--        </th>--%>
         <th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
             <script id="cellAccionsTemplate" type="text/x-jsrender">
                 <div class="dropdown">
