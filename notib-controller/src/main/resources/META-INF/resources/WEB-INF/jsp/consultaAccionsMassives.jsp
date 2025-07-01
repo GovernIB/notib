@@ -3,71 +3,210 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+
 <%
     es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
-    pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(ssc.getRolActual()));
     pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()));
     pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()));
-    pageContext.setAttribute("isRolActualUsuari", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuari(ssc.getRolActual()));
 %>
 <html>
 <head>
     <title><spring:message code="accions.massives.list.titol"/></title>
     <script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
     <script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
-    <link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+    <link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"/>
+    <link href="<c:url value="/webjars/datatables.net-select-bs/1.1.2/css/select.bootstrap.min.css"/>" rel="stylesheet"/>
+    <script src="<c:url value="/webjars/datatables.net-select/1.1.2/js/dataTables.select.min.js"/>"></script>
+    <link href="<c:url value="/webjars/select2/4.0.5/dist/css/select2.min.css"/>" rel="stylesheet"/>
+    <link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
+    <script src="<c:url value="/webjars/select2/4.0.5/dist/js/select2.min.js"/>"></script>
+    <script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script>
     <script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
+    <script src="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.min.js"/>"></script>
+    <link href="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.css"/>" rel="stylesheet"/>
+    <link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
+    <script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
+    <script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
     <script src="<c:url value="/js/webutil.common.js"/>"></script>
     <script src="<c:url value="/js/webutil.datatable.js"/>"></script>
     <script src="<c:url value="/js/webutil.modal.js"/>"></script>
-    <link href="<c:url value="/css/entitat.css"/>" rel="stylesheet" type="text/css">
+    <script src="<c:url value="/js/datatable.accions-massives.js"/>"></script>
+    <link href="<c:url value="/css/datatable-accions-massives.css"/>" rel="stylesheet"/>
+
+    <script>
+        $(document).ready(function () {
+
+            $("#filtrar").click(() => {
+                deselecciona()
+            });
+
+            let eventMessages = {
+                'confirm-accio-massiva': "<spring:message code="enviament.list.user.confirm.accio.massiva"/>",
+                'confirm-accio-massiva-enviar': "<spring:message code="callback.list.confirm.accio.massiva.enviar"/>",
+                'confirm-accio-massiva-pausar': "<spring:message code="callback.list.confirm.accio.massiva.pausar"/>",
+                'confirm-accio-massiva-activar': "<spring:message code="callback.list.confirm.accio.massiva.activar"/>",
+            };
+
+            $('#btn-netejar-filtre').click(function () {
+                $(':input', $('#form-filtre')).each(function () {
+                    let type = this.type, tag = this.tagName.toLowerCase();
+                    if (type == 'text' || type == 'password' || tag == 'textarea') {
+                        this.value = '';
+                    } else if (type == 'checkbox' || type == 'radio') {
+                        this.checked = false;
+                    } else if (tag == 'select') {
+                        this.selectedIndex = 0;
+                    }
+
+                });
+                deselecciona();
+            });
+
+            initEvents($('#callback'), 'callback', eventMessages)
+
+        });
+
+        function deselecciona() {
+
+            $(".seleccioCount").html(0);
+            $.ajax({
+                type: 'GET',
+                url: "<c:url value="/callback/deselect"/>",
+                async: false,
+                success: function (data) {
+                    $(".seleccioCount").html(data);
+                    $('#callback').webutilDatatable('select-none');
+                }
+            });
+        }
+
+    </script>
+    <style type="text/css">
+        .label-primary {
+            background-color: #999999;
+        }
+
+        .label-warning {
+            background-color: #dddddd;
+            color: #333333;
+        }
+        .div-filter-data-sep {
+            padding: 0;
+        }
+        .dropdown-left {
+            right: 0;
+            left: auto
+        }
+    </style>
 </head>
 <body>
-<script id="botonsTemplate" type="text/x-jsrender">
-<%--
-		<c:if test="${isRolActualAdministrador}">
-			<p style="text-align:right"><a id="grup-entitat-nou" class="btn btn-default" href="entitat/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="entitat.list.boto.nova.entitat"/></a></p>
-		</c:if>
---%>
-	</script>
 
-<table id="accionsMassives"
+<div id="loading-screen" class="loading-screen" >
+    <div id="processing-icon" class="processing-icon">
+        <span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: dimgray;margin-top: 10px;"></span>
+    </div>
+</div>
+<c:if test="${!isRolActualAdministradorLectura}">
+    <script id="botonsTemplate" type="text/x-jsrender">
+        <div class="text-right">
+            <div class="btn-group">
+                    <button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
+                        <button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
+                        <div id="seleccioCount" class="btn-group">
+                            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-left">
+                                <li><a id="enviarCallbacks" style="cursor: pointer;"><spring:message code="callback.boto.enviar"/></a></li>
+                                <li><a id="pausarCallbacks" style="cursor: pointer;"><spring:message code="callback.boto.pausar"/></a></li>
+                                <li><a id="activarCallbacks" style="cursor: pointer;"><spring:message code="callback.boto.activar"/></a></li>
+                            </ul>
+                        </div>
+                </div>
+            </div>
+    </script>
+</c:if>
+
+<script id="cellFilterTemplate" type="text/x-jsrender">
+    <div class="dropdown">
+        <button type="submit" id="btnFiltrar" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-search"></span></button>
+    </div>
+</script>
+<div id="cover-spin"></div>
+<%--<form:form id="form-filtre" action="" method="post" cssClass="well" modelAttribute="callbackFiltreCommand">--%>
+<%--    <div class="row">--%>
+<%--        <div class="col-md-2">--%>
+<%--            <not:inputText name="usuariCodi" inline="true" placeholderKey="callback.list.codi.aplicacio"/>--%>
+<%--        </div>--%>
+<%--        <div class="col-md-2">--%>
+<%--            <not:inputText name="referenciaRemesa" inline="true" placeholderKey="callback.list.remesa.referencia"/>--%>
+<%--        </div>--%>
+<%--        <div class="col-md-2">--%>
+<%--            <not:inputDate name="dataInici" placeholderKey="callback.filtre.data.creacio.inici" inline="true" required="false" />--%>
+<%--        </div>--%>
+<%--        <div class="col-md-2">--%>
+<%--            <not:inputDate name="dataFi" placeholderKey="callback.filtre.data.creacio.fi" inline="true" required="false" />--%>
+<%--        </div>--%>
+<%--        <div class="col-md-1">--%>
+<%--            <not:inputSelect name="fiReintents" optionItems="${fiReintentsList}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"--%>
+<%--                             placeholderKey="callback.filtre.fi.reintents" textKey="callback.filtre.fi.reintents" required="true" labelSize="0"/>--%>
+<%--        </div>--%>
+
+
+<%--        <div class="col-md-2 pull-right flex-justify-end">--%>
+<%--            <button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default" style="padding: 6px 9px; margin-right:5px;" title="<spring:message code="comu.boto.netejar"/>"><span class="fa fa-eraser icona_ocultable" style="padding: 2px 0px;"></span><span class="text_ocultable"><spring:message code="comu.boto.netejar"/></span></button>--%>
+<%--            <button id="filtrar" type="submit" name="accio" value="filtrar" class="btn btn-primary" title="<spring:message code="comu.boto.filtrar"/>"><span class="fa fa-filter" id="botoFiltrar"></span><span class="text_ocultable"><spring:message code="comu.boto.filtrar"/></span></button>--%>
+<%--        </div>--%>
+<%--    </div>--%>
+<%--</form:form>--%>
+<table
+        id="callback"
         data-toggle="datatable"
         data-url="<c:url value="/accions/massives/datatable"/>"
-        data-search-enabled="true"
-        data-default-order=""
-        data-default-dir="desc"
-        data-botons-template="#botonsTemplate"
         class="table table-striped table-bordered"
-        data-info-type="search"
+        data-default-order="2"
+        data-default-dir="desc"
+<%--		data-individual-filter="true"--%>
+        <c:if test="${!isRolActualAdministradorLectura}">
+            data-botons-template="#botonsTemplate"
+        </c:if>
+        data-date-template="#dataTemplate"
+        data-cell-template="#cellFilterTemplate"
+        data-paging-style-x="true"
+        data-scroll-overflow="adaptMax"
+        data-selection-enabled="true"
+        data-save-state="true"
+        data-mantenir-paginacio="${mantenirPaginacio}"
         style="width:100%">
     <thead>
     <tr>
         <th data-col-name="id" data-visible="false">#</th>
         <th data-col-name="tipus"><spring:message code="accions.massives.tipus"/></th>
-        <th data-col-name="createdDate"><spring:message code="accions.massives.data.creacio"/></th>
-        <th data-col-name="dataInici"><spring:message code="accions.massives.data.inici"/></th>
-        <th data-col-name="dataFi"><spring:message code="accions.massives.data.fi"/></th>
+        <th data-col-name="createdDate" data-converter="datetime"><spring:message code="accions.massives.data.creacio"/></th>
+        <th data-col-name="dataInici" data-converter="datetime"><spring:message code="accions.massives.data.inici"/></th>
+        <th data-col-name="dataFi" data-converter="datetime"><spring:message code="accions.massives.data.fi"/></th>
         <th data-col-name="createdByCodi"><spring:message code="accions.massives.codi.usuari"/></th>
-        <th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
-            <script id="cellAccionsTemplate" type="text/x-jsrender">
-                <div class="dropdown">
-                <button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-                <ul class="dropdown-menu">
-<%--                <li><a href="<c:url value="/entitat/{{:id}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>--%>
-<%--                <li><a href="<c:url value="/entitat/{{:id}}/configurar"/>"><span class="fa fa-gear"></span>&nbsp;&nbsp;<spring:message code="comu.boto.configurar"/></a></li>--%>
-<%--                <li><a href="<c:url value="/entitat/{{:id}}/reset/actualitzacio/organs"/>" data-toggle="ajax"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="entitat.boto.reset.actualitzacions.organs"/></a></li>--%>
-<%--                {{if !activa}}--%>
-<%--                <li><a href="<c:url value="/entitat/{{:id}}/enable"/>" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>--%>
-<%--                {{else}}--%>
-<%--                <li><a href="<c:url value="/entitat/{{:id}}/disable"/>" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>--%>
-<%--                {{/if}}--%>
-<%--                <li><a href="<c:url value="/entitat/{{:id}}/delete"/>" data-toggle="ajax" data-confirm="<spring:message code="entitat.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>--%>
-                </ul>
-                </div>
-            </script>
-        </th>
+        <c:if test="${!isRolActualAdministradorLectura}">
+            <th data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px" style="z-index:99999;">
+                <script id="cellAccionsTemplate" type="text/x-jsrender">
+                    <div class="dropdown">
+                        <button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="<c:url value="/callback/{{:id}}/enviar"/>"><span class="fa fa-paper-plane-o"></span>&nbsp; <spring:message code="callback.boto.enviar"/></a></li>
+                                {{if pausat}}
+                                    <li><a href="<c:url value="/callback/{{:id}}/activar"/>"><span class="fa fa-play"></span>&nbsp; <spring:message code="callback.boto.activar"/></a></li>
+                                {{else}}
+                                    <li><a href="<c:url value="/callback/{{:id}}/pausar"/>"><span class="fa fa-pause"></span>&nbsp; <spring:message code="callback.boto.pausar"/></a></li>
+                                {{/if}}
+                            </ul>
+                        </div>
+                </script>
+            </th>
+        </c:if>
     </tr>
     </thead>
 </table>
 </body>
+</html>

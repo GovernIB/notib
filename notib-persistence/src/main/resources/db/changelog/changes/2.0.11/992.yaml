@@ -31,10 +31,34 @@ databaseChangeLog:
                   type: ${type.pk}
               - column:
                   name: tipus
-                  type: varchar(1024 ${varcharUnit})
+                  type: varchar(50 ${varcharUnit})
               - column:
                   name: data_inici
                   type: TIMESTAMP(6)
               - column:
                   name: data_fi
                   type: TIMESTAMP(6)
+              - column:
+                  name: createdby_codi
+                  type: varchar(64 ${varcharUnit})
+              - column:
+                  name: LASTMODIFIEDBY_CODI
+                  type: varchar(64 ${varcharUnit})
+              - column:
+                  name: LASTMODIFIEDDATE
+                  type: TIMESTAMP(6)
+              - column:
+                  name: createddate
+                  type: TIMESTAMP(6)
+              - column:
+                  name: entitat_id
+                  type: BIGINT
+              - column:
+                  name: error
+                  type: boolean
+              - column:
+                  name: error_descripcio
+                  type: varchar(1024 ${varcharUnit})
+              - column:
+                  name: excepcio_stacktrace
+                  type: varchar(2048 ${varcharUnit})

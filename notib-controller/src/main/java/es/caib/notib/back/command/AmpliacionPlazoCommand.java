@@ -17,4 +17,5 @@ public class AmpliacionPlazoCommand {
     private String motiu;
     private List<Long> notificacionsId;
     private List<Long> enviamentsId;
+    private boolean massiu;
 }
