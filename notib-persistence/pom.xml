@@ -88,6 +88,9 @@
         </profile>
         <profile>
             <id>oracle</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <dependencies>
                 <dependency>
                     <groupId>com.oracle.database.jdbc</groupId>
@@ -99,7 +102,7 @@
         <profile>
             <id>postgresql</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <dependencies>
                 <dependency>

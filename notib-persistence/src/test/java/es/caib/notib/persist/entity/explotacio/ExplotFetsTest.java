@@ -25,22 +25,22 @@ public class ExplotFetsTest {
                 null,                       // usuariCodi (default value)
                 EnviamentTipus.NOTIFICACIO, // tipus
                 EnviamentOrigen.WEB,        // origen
-                0,                          // pendent
-                0,                          // regEnviamentError
-                0,                          // registrada
-                0,                          // regAcceptada
-                0,                          // regRebutjada
-                0,                          // notEnviamentError
-                0,                          // notEnviada
-                0,                          // notNotificada
-                0,                          // notRebutjada
-                0,                          // notExpirada
-                0,                          // cieEnviamentError
-                0,                          // cieEnviada
-                0,                          // cieNotificada
-                0,                          // cieRebutjada
-                0,                          // cieError
-                0                           // processada
+                0L,                          // pendent
+                0L,                          // regEnviamentError
+                0L,                          // registrada
+                0L,                          // regAcceptada
+                0L,                          // regRebutjada
+                0L,                          // notEnviamentError
+                0L,                          // notEnviada
+                0L,                          // notNotificada
+                0L,                          // notRebutjada
+                0L,                          // notExpirada
+                0L,                          // cieEnviamentError
+                0L,                          // cieEnviada
+                0L,                          // cieNotificada
+                0L,                          // cieRebutjada
+                0L,                          // cieError
+                0L                           // processada
         );
 
         // Verify that usuariCodi has the default value "DESCONEGUT"
@@ -61,22 +61,22 @@ public class ExplotFetsTest {
                 expectedUsuariCodi,         // usuariCodi (provided value)
                 EnviamentTipus.NOTIFICACIO, // tipus
                 EnviamentOrigen.WEB,        // origen
-                0,                          // pendent
-                0,                          // regEnviamentError
-                0,                          // registrada
-                0,                          // regAcceptada
-                0,                          // regRebutjada
-                0,                          // notEnviamentError
-                0,                          // notEnviada
-                0,                          // notNotificada
-                0,                          // notRebutjada
-                0,                          // notExpirada
-                0,                          // cieEnviamentError
-                0,                          // cieEnviada
-                0,                          // cieNotificada
-                0,                          // cieRebutjada
-                0,                          // cieError
-                0                           // processada
+                0L,                          // pendent
+                0L,                          // regEnviamentError
+                0L,                          // registrada
+                0L,                          // regAcceptada
+                0L,                          // regRebutjada
+                0L,                          // notEnviamentError
+                0L,                          // notEnviada
+                0L,                          // notNotificada
+                0L,                          // notRebutjada
+                0L,                          // notExpirada
+                0L,                          // cieEnviamentError
+                0L,                          // cieEnviada
+                0L,                          // cieNotificada
+                0L,                          // cieRebutjada
+                0L,                          // cieError
+                0L                           // processada
         );
 
         // Verify that usuariCodi has the provided value
