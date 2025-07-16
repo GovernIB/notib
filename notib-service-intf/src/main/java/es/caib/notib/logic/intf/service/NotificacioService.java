@@ -26,6 +26,8 @@ import es.caib.notib.logic.intf.dto.ProvinciesDto;
 import es.caib.notib.logic.intf.dto.RespostaAccio;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElement;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
@@ -284,11 +286,11 @@ public interface NotificacioService {
 	/**
 	 * Reseteja els intents de les consultes a Notifica@ o SIR.
 	 *
-	 * @param ids Identificadors dels enviaments.
-	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
+	 * @param accio Accio massiva a executar
+	 * @return true si els diferents elements s'ha pogut enviar o false en cas contrari.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	boolean resetConsultaEstat(Set<Long> ids);
+	RespostaAccio<AccioMassivaElement> resetConsultaEstat(AccioMassivaExecucio accio);
 	
 	/**
 	 * Registra i notifica una notificació
@@ -308,7 +310,7 @@ public interface NotificacioService {
 	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	RespostaAccio<String> resetNotificacioARegistre(Long notificacioId);
+	RespostaAccio<AccioMassivaElement> resetNotificacioARegistre(Long notificacioId);
 
 	/**
 	 * Refresca l'estat d'un enviament (datat i certificació).
@@ -453,7 +455,7 @@ public interface NotificacioService {
 	boolean reenviarNotificacioAmbErrors(Long notificacioId);
 
 	@PreAuthorize("isAuthenticated()")
-	RespostaAccio<String> reactivarNotificacioAmbErrors(Set<Long> notificacioId);
+	RespostaAccio<AccioMassivaElement> reactivarNotificacioAmbErrors(Set<Long> notificacioId);
 
 	@PreAuthorize("isAuthenticated()")
 	boolean reactivarNotificacioAmbErrors(Long notificacioId);

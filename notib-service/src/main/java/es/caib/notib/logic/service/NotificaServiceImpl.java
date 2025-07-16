@@ -126,7 +126,7 @@ public class NotificaServiceImpl implements NotificaService {
             var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElseThrow();
             return enviamentEntity.getNotificaIntentNum() == 0;
         } catch (Exception ex) {
-            log.error("Error en la consulta de l'estat de l'enviament " + enviament.getUuid());
+            log.error("Error en la consulta de l'estat de l'enviament " + enviament.getUuid(), ex);
             return false;
         }
     }

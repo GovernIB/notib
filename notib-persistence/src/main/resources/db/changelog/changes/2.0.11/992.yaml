@@ -57,8 +57,57 @@ databaseChangeLog:
                   name: error
                   type: boolean
               - column:
+                  name: num_errors
+                  type: int
+              - column:
                   name: error_descripcio
                   type: varchar(1024 ${varcharUnit})
               - column:
                   name: excepcio_stacktrace
                   type: varchar(2048 ${varcharUnit})
+        - createTable:
+            tableName: NOT_ACCIO_MASSIVA_ELEMENT
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: NOT_ACC_MASS_ELEM_PK
+                  name: ID
+                  type: ${type.pk}
+              - column:
+                  name: ACCIO_MASSIVA_ID
+                  type: ${type.pk}
+              - column:
+                  name: seleccio_tipus
+                  type: varchar(20 ${varcharUnit})
+              - column:
+                  name: element_id
+                  type: ${long}
+              - column:
+                  name: data_execucio
+                  type: TIMESTAMP(6)
+              - column:
+                  name: error_descripcio
+                  type: varchar(1024 ${varcharUnit})
+              - column:
+                  name: excepcio_stacktrace
+                  type: varchar(2048 ${varcharUnit})
+        - addColumn:
+            tableName: not_notificacio
+            columns:
+              - column:
+                  name: accio_massiva_elem_id
+                  type: ${long}
+        - addColumn:
+            tableName: not_notificacio_env
+            columns:
+              - column:
+                  name: accio_massiva_elem_id
+                  type: ${long}
+        - addForeignKeyConstraint:
+            baseTableName: NOT_ACCIO_MASSIVA_ELEMENT
+            baseColumnNames: ACCIO_MASSIVA_ID
+            referencedTableName: NOT_ACCIO_MASSIVA
+            referencedColumnNames: ID
+            constraintName: FK_ACCIOMASSIVA_ELEMENT

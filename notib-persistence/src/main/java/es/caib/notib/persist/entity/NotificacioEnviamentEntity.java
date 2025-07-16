@@ -198,6 +198,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "notifica_error", nullable = false)
 	protected boolean notificaError;
 
+	@Column(name = "accio_massiva_elem_id", nullable = false)
+	private Long accioMassivaElemId;
+
 //	@Setter
 //	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
 //	@JoinColumn(name = "CALLBACK_ERROR_EVENT_ID")

@@ -6,7 +6,9 @@ import es.caib.notib.back.helper.*;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus;
+import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
 import es.caib.notib.logic.intf.dto.missatges.Missatge;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
@@ -922,7 +924,13 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             Long accioMassivaId;
             if (ampliacionPlazo.isMassiu()) {
                 var entitatActual = sessionScopedContext.getEntitatActual();
-                accioMassivaId = accioMassivaService.altaAccioMassiva(AccioMassivaTipus.AMPLIAR_TERMINI, entitatActual.getId());
+                var seleccio = ampliacionPlazo.getNotificacionsId() != null && !ampliacionPlazo.getNotificacionsId().isEmpty() ? ampliacionPlazo.getNotificacionsId() : ampliacionPlazo.getEnviamentsId();
+                var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
+                var accio = AccioMassivaExecucio.builder().tipus(AccioMassivaTipus.AMPLIAR_TERMINI).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+                accioMassivaId = accioMassivaService.altaAccioMassiva(accio);
+                accio.setAccioId(accioMassivaId);
+                accio.setAmpliacionPlazo(ConversioTipusHelper.convertir(ampliacionPlazo, AmpliacionPlazoDto.class));
+                accioMassivaService.executarAccio(accio);
             }
             var resposta = notificacioService.ampliacionPlazoOE(ConversioTipusHelper.convertir(ampliacionPlazo, AmpliacionPlazoDto.class));
             return resposta != null && resposta.isOk() ? getModalControllerReturnValueSuccess(request, "redirect:/enviament", "ampliar.plazo.ok")
@@ -952,25 +960,34 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
         List<String> notificacionsError = new ArrayList<>();
         var entitatActual = sessionScopedContext.getEntitatActual();
-        var accioId = accioMassivaService.altaAccioMassiva(AccioMassivaTipus.ENVIAR_NOT_MOVIL, entitatActual.getId());
-        for (Long notificacioId : seleccio) {
-            try {
-                notificacioService.reenviarNotificaionsMovil(notificacioId);
-            } catch (Exception e) {
-                notificacionsError.add("[" + notificacioId + "]: " + e.getMessage());
-            }
-        }
-        if (notificacionsError.isEmpty()) {
-            return getModalControllerReturnValueSuccess(request, redirect,"accio.massiva.creat.ok");
-        }
-        if (notificacionsError.size() == seleccio.size()) {
+        var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
+        var accio = AccioMassivaExecucio.builder().tipus(AccioMassivaTipus.ENVIAR_NOT_MOVIL).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accioId = accioMassivaService.altaAccioMassiva(accio);
+        accio.setAccioId(accioId);
+        try {
+            accioMassivaService.executarAccio(accio);
+        } catch (Exception ex) {
             return getModalControllerReturnValueError(request, redirect,"accio.massiva.creat.ko");
         }
-        var desc = new StringBuilder();
-        for (var err: notificacionsError) {
-            desc.append(err).append(" \n");
-        }
-        return getModalControllerReturnValueErrorWithDescription(request,redirect,"accio.massiva.creat.part", desc.toString());
+        return getModalControllerReturnValueSuccess(request, redirect,"accio.massiva.creat.ok");
+//        for (Long notificacioId : seleccio) {
+//            try {
+//                notificacioService.reenviarNotificaionsMovil(notificacioId);
+//            } catch (Exception e) {
+//                notificacionsError.add("[" + notificacioId + "]: " + e.getMessage());
+//            }
+//        }
+//        if (notificacionsError.isEmpty()) {
+//            return getModalControllerReturnValueSuccess(request, redirect,"accio.massiva.creat.ok");
+//        }
+//        if (notificacionsError.size() == seleccio.size()) {
+//            return getModalControllerReturnValueError(request, redirect,"accio.massiva.creat.ko");
+//        }
+//        var desc = new StringBuilder();
+//        for (var err: notificacionsError) {
+//            desc.append(err).append(" \n");
+//        }
+//        return getModalControllerReturnValueErrorWithDescription(request,redirect,"accio.massiva.creat.part", desc.toString());
     }
 
     @GetMapping(value = "/reactivar/registre")
@@ -986,15 +1003,19 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
         List<String> notificacionsError = new ArrayList<>();
         var entitatActual = sessionScopedContext.getEntitatActual();
-        var accioId = accioMassivaService.altaAccioMassiva(AccioMassivaTipus.REACTIVAR_REGISTRE, entitatActual.getId());
-        for (var notificacioId : seleccio) {
-            try {
-                notificacioService.reactivarRegistre(notificacioId);
-                notificacioService.resetNotificacioARegistre(notificacioId);
-            } catch (Exception e) {
-                notificacionsError.add("[" + notificacioId + "]: " + e.getMessage());
-            }
-        }
+        var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
+        var accio = AccioMassivaExecucio.builder().tipus(AccioMassivaTipus.REACTIVAR_REGISTRE).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accioId = accioMassivaService.altaAccioMassiva(accio);
+        accio.setAccioId(accioId);
+        accioMassivaService.executarAccio(accio);
+//        for (var notificacioId : seleccio) {
+//            try {
+//                notificacioService.reactivarRegistre(notificacioId);
+//                notificacioService.resetNotificacioARegistre(notificacioId);
+//            } catch (Exception e) {
+//                notificacionsError.add("[" + notificacioId + "]: " + e.getMessage());
+//            }
+//        }
         if (notificacionsError.isEmpty()) {
             return getModalControllerReturnValueSuccess(request,REDIRECT_2_PARENTS,"accio.massiva.creat.ok");
         }
@@ -1033,29 +1054,35 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             model.addAttribute(IS_MASSIU, true);
             return MARCAR_PROCESSAT;
         }
-        boolean allOK = true;
-        String resposta;
+//        boolean allOK = true;
+//        String resposta;
         var entitatActual = sessionScopedContext.getEntitatActual();
-        var accioId = accioMassivaService.altaAccioMassiva(AccioMassivaTipus.MARCAR_PROCESSADES, entitatActual.getId());
-        for (var notificacioId : seleccio) {
-            try {
-                resposta = notificacioService.marcarComProcessada(notificacioId, command.getMotiu(), isAdminEntitat());
-                if (resposta != null) {
-                    MissatgesHelper.warning(request, resposta);
-                    continue;
-                }
-                MissatgesHelper.success(request, String.format("La notificació (Id=%d) s'ha marcat com a processada", notificacioId));
-            } catch (Exception ex) {
-                var error = "Hi ha hagut un error processant la notificació";
-                log.error(error, ex);
-                allOK = false;
-                MissatgesHelper.error(request, String.format("%s (Id=%d): %s", error, notificacioId, ex.getMessage()));
-            }
-        }
-
+        var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
+        var accio = AccioMassivaExecucio.builder().tipus(AccioMassivaTipus.MARCAR_PROCESSADES).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accioId = accioMassivaService.altaAccioMassiva(accio);
+        accio.setAccioId(accioId);
+        accioMassivaService.executarAccio(accio);
         RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, new HashSet<>());
-        return allOK ? getModalControllerReturnValueSuccess(request, REDIRECT_2_PARENTS, "notificacio.controller.processar.massiu.ok")
-            : getModalControllerReturnValueError(request, REDIRECT_2_PARENTS, "notificacio.controller.processar.massiu.ko");
+        return getModalControllerReturnValueSuccess(request, REDIRECT_2_PARENTS, "accio.massiva.creat.ok");
+
+//        for (var notificacioId : seleccio) {
+//            try {
+//                resposta = notificacioService.marcarComProcessada(notificacioId, command.getMotiu(), isAdminEntitat());
+//                if (resposta != null) {
+//                    MissatgesHelper.warning(request, resposta);
+//                    continue;
+//                }
+//                MissatgesHelper.success(request, String.format("La notificació (Id=%d) s'ha marcat com a processada", notificacioId));
+//            } catch (Exception ex) {
+//                var error = "Hi ha hagut un error processant la notificació";
+//                log.error(error, ex);
+//                allOK = false;
+//                MissatgesHelper.error(request, String.format("%s (Id=%d): %s", error, notificacioId, ex.getMessage()));
+//            }
+//        }
+//        RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, new HashSet<>());
+//        return allOK ? getModalControllerReturnValueSuccess(request, REDIRECT_2_PARENTS, "notificacio.controller.processar.massiu.ok")
+//            : getModalControllerReturnValueError(request, REDIRECT_2_PARENTS, "notificacio.controller.processar.massiu.ko");
     }
 
     @GetMapping(value = {"/eliminar", "{notificacioId}/notificacio/eliminar/"})
@@ -1070,18 +1097,19 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         if (seleccio.size() == 1 && seleccio.contains(-1L)) {
             return getModalControllerReturnValueError(request,REDIRECT + referer,"notificacio.controller.esborrar.massiu.ko");
         }
-        var accioId = accioMassivaService.altaAccioMassiva(AccioMassivaTipus.ESBORRAR, entitatActual.getId());
-        Set<Long> notificacionsNoEsborrades = new HashSet<>();
-        for (var notificacioId : seleccio) {
-            try {
-                notificacioService.delete(entitatActual.getId(), notificacioId);
-            } catch (Exception ex) {
-                notificacionsNoEsborrades.add(notificacioId);
-                log.error("Hi ha hagut un error esborrant la notificació", ex);
-                MissatgesHelper.error(request, String.format("Hi ha hagut un error esborrant la notificació (Id: %s): %s", notificacioId, ex.getMessage()));
+        var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
+        var accio = AccioMassivaExecucio.builder().tipus(AccioMassivaTipus.ESBORRAR).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accioId = accioMassivaService.altaAccioMassiva(accio);
+        accio.setAccioId(accioId);
+        var notificacionsNoEsborrades = accioMassivaService.esborrarNotificacions(accio);
+        Set<Long> noEsborrades = new HashSet<>();
+        if (!notificacionsNoEsborrades.isEmpty()) {
+            for (var not : notificacionsNoEsborrades) {
+                MissatgesHelper.error(request, not.getErrorDesc());
+                noEsborrades.add(not.getId());
             }
         }
-        RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, notificacionsNoEsborrades);
+        RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, noEsborrades);
         return notificacionsNoEsborrades.isEmpty() ?
                 getModalControllerReturnValueSuccess(request,REDIRECT + referer,"notificacio.controller.esborrar.massiu.ok")
                 : getModalControllerReturnValueError(request,REDIRECT + referer,"notificacio.controller.esborrar.massiu.ko");
@@ -1099,14 +1127,16 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         if (seleccio.size() == 1 && seleccio.contains(-1L)) {
             return getModalControllerReturnValueError(request,REDIRECT + referer,"notificacio.controller.esborrar.massiu.ko");
         }
-        Set<Long> notificacionsNoRecuperades = new HashSet<>();
-        for (var notificacioId : seleccio) {
-            try {
-                notificacioService.restore(entitatActual.getId(), notificacioId);
-            } catch (Exception ex) {
-                notificacionsNoRecuperades.add(notificacioId);
-                log.error("Hi ha hagut un error recuperant la notificació", ex);
-                MissatgesHelper.error(request, String.format("Hi ha hagut un error recuperant la notificació (Id: %s): %s", notificacioId, ex.getMessage()));
+        var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
+        var accio = AccioMassivaExecucio.builder().tipus(AccioMassivaTipus.RECUPERAR_ESBORRADES).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accioId = accioMassivaService.altaAccioMassiva(accio);
+        accio.setAccioId(accioId);
+        var notificacionsNoRecuperades = accioMassivaService.recuperarNotificacionsEsborrades(accio);
+        Set<Long> noRecuperades = new HashSet<>();
+        if (!notificacionsNoRecuperades.isEmpty()) {
+            for (var not : notificacionsNoRecuperades) {
+                MissatgesHelper.error(request, not.getErrorDesc());
+                noRecuperades.add(not.getId());
             }
         }
         RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, notificacionsNoRecuperades);

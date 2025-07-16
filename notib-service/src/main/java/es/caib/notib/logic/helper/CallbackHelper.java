@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -73,6 +74,8 @@ public class CallbackHelper {
 	private NotificacioTableHelper notificacioTableHelper;
 	@Autowired
 	private JmsTemplate jmsTemplate;
+    @Autowired
+    private AccioMassivaHelper accioMassivaHelper;
 
 	private boolean isInterficieWeb(NotificacioEntity not) {
 		return not.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB;
@@ -182,7 +185,9 @@ public class CallbackHelper {
 				new AccioParam("Identificador de la notificació", String.valueOf(notificacio.getId())));
 		info.setNotificacioId(env.getNotificacio().getId());
 		if (callback == null) {
-			integracioHelper.addAccioError(info, "Error enviant avis de canvi d'estat. No existeix un callback per l'enviament " + env.getId());
+			var msg = "Error enviant avis de canvi d'estat. No existeix un callback per l'enviament " + env.getId();
+			integracioHelper.addAccioError(info, msg);
+			accioMassivaHelper.actualitzar(env, msg, "");
 			return notificacio;
 		}
 		log.trace("[Callback] Consultant aplicacio de l'event. ");
@@ -202,6 +207,7 @@ public class CallbackHelper {
 			auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "CallbackHelper.notifica");
 			// Marcar per actualitzar
 			notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(notificacio.getId()).build());
+			accioMassivaHelper.actualitzar(env, errorDescripcio, "");
 			return notificacio;
 		}
 		info.addParam("Codi aplicació", aplicacio.getUsuariCodi());
@@ -239,6 +245,7 @@ public class CallbackHelper {
 			log.info(String.format("[Callback] Enviament del callback [Id: %d] de la notificacio [Id: %d] exitos", callback.getId(), notificacio.getId()));
 			elapsedTime = System.nanoTime() - start;
 			log.info("marcar com a notificat: "  + elapsedTime);
+			accioMassivaHelper.actualitzar(env, "", "");
 		} catch (Exception ex) {
 			var start = System.nanoTime();
 			isError = true;
@@ -254,6 +261,7 @@ public class CallbackHelper {
 			integracioHelper.addAccioError(info, "Error enviant l'avis de canvi d'estat", ex);
 			var elapsedTime = System.nanoTime() - start;
 			log.info("excepcio: "  + elapsedTime);
+			accioMassivaHelper.actualitzar(env, errorDescripcio, Arrays.toString(ex.getStackTrace()));
 		}
 		var start = System.nanoTime();
 		notificacioEventHelper.addCallbackEnviamentEvent(env, isError, errorDescripcio, errorMaxReintents);

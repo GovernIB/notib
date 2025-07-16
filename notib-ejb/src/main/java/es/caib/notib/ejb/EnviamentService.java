@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.dto.NotificacioEventDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
@@ -103,8 +104,8 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed("**")
-	public void reactivaSir(Set<Long> enviaments) {
-		getDelegateService().reactivaSir(enviaments);
+	public void reactivaSir(AccioMassivaExecucio accio) {
+		getDelegateService().reactivaSir(accio);
 	}
 
 	@Override

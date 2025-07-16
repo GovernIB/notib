@@ -118,7 +118,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 		filtre.setCodiNotibEnviament(uuid);
 		model.addAttribute(filtre);
 //		notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
-		return "redirect:/enviament";
+		return "redirect:enviament";
 	}
 
 	@PostMapping

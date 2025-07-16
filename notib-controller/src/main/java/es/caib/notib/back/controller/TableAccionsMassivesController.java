@@ -9,6 +9,7 @@ import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus;
+import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
@@ -154,8 +155,10 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
         var entitatActual = getEntitatActualComprovantPermisos(request);
         try {
-            var accioId = accioMassivaService.altaAccioMassiva(AccioMassivaTipus.EXPORTAR_FULL_CALCUL, entitatActual.getId());
-            var accio = AccioMassivaExecucio.builder().accioId(accioId).entitatId(entitatActual.getId()).seleccio(seleccio).format(format).build();
+            var seleccioTipus = SeleccioTipus.ENVIAMENT;
+            var accio = AccioMassivaExecucio.builder().tipus(AccioMassivaTipus.EXPORTAR_FULL_CALCUL).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).format(format).build();
+            var accioId = accioMassivaService.altaAccioMassiva(accio);
+            accio.setAccioId(accioId);
             var fitxer = accioMassivaService.exportar(accio);
             if (fitxer == null) {
                 return null;
@@ -178,8 +181,10 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             return;
         }
 
-        var accioId = accioMassivaService.altaAccioMassiva(AccioMassivaTipus.DESCARREGA_JUSTIFICANT_ENVIAMENT, entitatActual.getId());
-        var accio = AccioMassivaExecucio.builder().accioId(accioId).seleccio(seleccio).entitatId(entitatActual.getId()).build();
+        var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
+        var accio = AccioMassivaExecucio.builder().tipus(AccioMassivaTipus.DESCARREGA_JUSTIFICANT_ENVIAMENT).seleccio(seleccio).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).build();
+        var accioId = accioMassivaService.altaAccioMassiva(accio);
+        accio.setAccioId(accioId);
         var justificants = accioMassivaService.descarregarJustificant(accio);
         response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
         try (var baos = new ByteArrayOutputStream(); var zos = new ZipOutputStream(baos)) {
@@ -207,46 +212,14 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             return;
         }
         var entitatActual = sessionScopedContext.getEntitatActual();
-        var accioId = accioMassivaService.altaAccioMassiva(AccioMassivaTipus.DESCARREGA_CERTIFICAT_RECEPCIO, entitatActual.getId());
+        var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
+        var accio = AccioMassivaExecucio.builder().tipus(AccioMassivaTipus.DESCARREGA_CERTIFICAT_RECEPCIO).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accioId = accioMassivaService.altaAccioMassiva(accio);
+        accio.setAccioId(accioId);
         response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
-        List<List<ArxiuDto>> certificacions = new ArrayList<>();
-        List<ArxiuDto> notCertificacions;
-        var contingut = false;
-        for (var notificacioId : seleccio) {
-            var enviaments = enviamentService.enviamentFindAmbNotificacio(notificacioId);
-            Map<String, Integer> interessats = new HashMap<>();
-            int numInteressats = 0;
-            notCertificacions = new ArrayList<>();
-            ArxiuDto certificacio;
-            for (var env : enviaments) {
-                if (env.getNotificaCertificacioData() == null) {
-                    continue;
-                }
-                try {
-                    certificacio = notificacioService.enviamentGetCertificacioArxiu(env.getId());
-                } catch (Exception ex) {
-                    log.error("Error descarregant la certificacio per l'enviament " + env.getId());
-                    continue;
-                }
-                certificacio.setNom(env.getTitular().getNif() + "_" + certificacio.getNom());
-                if (interessats.get(env.getTitular().getNif()) == null) {
-                    numInteressats++;
-                    interessats.put(env.getTitular().getNif(), numInteressats);
-                    certificacio.setNom(numInteressats + "_" + certificacio.getNom());
-                }
-                contingut = true;
-                notCertificacions.add(certificacio);
-            }
-
-            if (!contingut) {
-                continue;
-            }
-            certificacions.add(notCertificacions);
-        }
-
+        var certificacions = accioMassivaService.descarregarCertificacio(accio);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ZipOutputStream zos = new ZipOutputStream(baos);
-
         for (var notCerts : certificacions) {
             for (var certificacio : notCerts) {
                 ZipEntry entry = new ZipEntry(StringUtils.stripAccents(certificacio.getNom()));
@@ -277,9 +250,12 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
         log.info("Reactivam els enviaments amb error: " + StringUtils.join(seleccio, ", "));
         var entitatActual = sessionScopedContext.getEntitatActual();
-        var accioId = accioMassivaService.altaAccioMassiva(AccioMassivaTipus.TORNA_ENVIAR_AMB_ERROR, entitatActual.getId());
+        var seleccioTipus = SeleccioTipus.ENVIAMENT;
+        var accio = AccioMassivaExecucio.builder().tipus(AccioMassivaTipus.TORNA_ENVIAR_AMB_ERROR).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accioId = accioMassivaService.altaAccioMassiva(accio);
+        accio.setAccioId(accioId);
         try {
-            var resposta = notificacioService.reactivarNotificacioAmbErrors(seleccio);
+            var resposta = accioMassivaService.reactivarErrors(accio);
             var msg = "enviament.controller.reactivar.enviament.error.fi.reintents.";
             msg += !resposta.getNoExecutables().isEmpty() ? "notificacions.antigues" : !resposta.getErrors().isEmpty() ? "KO" : "OK";
             MissatgesHelper.info(request, getMessage(request, msg));
@@ -302,9 +278,12 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
         log.info("Reactivam consulta dels canvis d'estat: " + StringUtils.join(seleccio, ", "));
         var entitatActual = sessionScopedContext.getEntitatActual();
-        var accioId = accioMassivaService.altaAccioMassiva(AccioMassivaTipus.TORNA_ACTIVAR_CONSULTES_CANVI_ESTAT, entitatActual.getId());
+        var seleccioTipus = SeleccioTipus.ENVIAMENT;
+        var accio = AccioMassivaExecucio.builder().tipus(AccioMassivaTipus.TORNA_ACTIVAR_CONSULTES_CANVI_ESTAT).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accioId = accioMassivaService.altaAccioMassiva(accio);
+        accio.setAccioId(accioId);
         try {
-            notificacioService.resetConsultaEstat(seleccio);
+            accioMassivaService.executarAccio(accio);
             MissatgesHelper.info(request, getMessage(request, "enviament.controller.reactivar.consultes.OK"));
         } catch (Exception e) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.consultes.KO"));
@@ -326,9 +305,12 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
         log.info("Reactivam SIR dels enviaments: " + StringUtils.join(seleccio, ", "));
         var entitatActual = sessionScopedContext.getEntitatActual();
-        var accioId = accioMassivaService.altaAccioMassiva(AccioMassivaTipus.REACTIVAR_SIR, entitatActual.getId());
+        var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
+        var accio = AccioMassivaExecucio.builder().tipus(AccioMassivaTipus.REACTIVAR_SIR).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accioId = accioMassivaService.altaAccioMassiva(accio);
+        accio.setAccioId(accioId);
         try {
-            enviamentService.reactivaSir(seleccio);
+            accioMassivaService.executarAccio(accio);
             MissatgesHelper.info(request, getMessage(request, "enviament.controller.reactivar.sir.OK"));
         } catch (Exception e) {
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.sir.KO"));
@@ -351,22 +333,25 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         MissatgesHelper.info( request, getMessage(request, "enviament.controller.actualitzarestat.executant"));
         log.info("Acualitzam estat dels enviaments: " + StringUtils.join(seleccio, ", "));
         var entitatActual = sessionScopedContext.getEntitatActual();
-        var accioId = accioMassivaService.altaAccioMassiva(AccioMassivaTipus.ACTUALITZAR_ESTAT, entitatActual.getId());
-        var hasErrors = false;
-        for(var enviamentId : seleccio) {
-            try {
-                enviamentService.actualitzarEstat(enviamentId);
-            } catch (Exception e) {
-                hasErrors = true;
-                MissatgesHelper.error(request,getMessage(request, "enviament.controller.actualitzarestat.KO") + " [" + enviamentId + "]");
-            }
-        }
+        var accio = AccioMassivaExecucio.builder().tipus(AccioMassivaTipus.ACTUALITZAR_ESTAT).seleccioTipus(SeleccioTipus.ENVIAMENT).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accioId = accioMassivaService.altaAccioMassiva(accio);
+        accio.setAccioId(accioId);
+        accioMassivaService.executarAccio(accio);
+//        var hasErrors = false;
+//        for(var enviamentId : seleccio) {
+//            try {
+//                enviamentService.actualitzarEstat(enviamentId);
+//            } catch (Exception e) {
+//                hasErrors = true;
+//                MissatgesHelper.error(request,getMessage(request, "enviament.controller.actualitzarestat.KO") + " [" + enviamentId + "]");
+//            }
+//        }
         RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, new HashSet<Long>());
-        if (!hasErrors) {
+//        if (!hasErrors) {
             MissatgesHelper.info(request, getMessage(request,"enviament.controller.actualitzarestat.OK"));
             return "ok";
-        }
-        return "";
+//        }
+//        return "";
     }
 
     @GetMapping(value = {"{notificacioId}/enviar/callback", "{notifiacioId}/notificacio/enviar/callback"})
@@ -385,14 +370,18 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         seleccio = notificacioId != null ? new HashSet<>(List.of(notificacioId)) : seleccio;
         log.info("Reactivam callback dels enviaments: " + StringUtils.join(seleccio, ", "));
         var entitatActual = sessionScopedContext.getEntitatActual();
-        var accioId = accioMassivaService.altaAccioMassiva(AccioMassivaTipus.ENVIAR_CALLBACK, entitatActual.getId());
+        var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
+        var accio = AccioMassivaExecucio.builder().tipus(AccioMassivaTipus.ENVIAR_CALLBACK).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accioId = accioMassivaService.altaAccioMassiva(accio);
+        accio.setAccioId(accioId);
         var hasErrors = false;
         try {
-            var enviamentsAmbError = enviamentService.enviarCallback(seleccio);
-            if (!enviamentsAmbError.isEmpty()) {
-                hasErrors = true;
-                MissatgesHelper.error(request, getMessage(request, "enviament.controller.enviar.callback.KO") + " " + enviamentsAmbError);
-            }
+            accioMassivaService.executarAccio(accio);
+//            var enviamentsAmbError = enviamentService.enviarCallback(seleccio);
+//            if (!enviamentsAmbError.isEmpty()) {
+//                hasErrors = true;
+//                MissatgesHelper.error(request, getMessage(request, "enviament.controller.enviar.callback.KO") + " " + enviamentsAmbError);
+//            }
         } catch (Exception e) {
             hasErrors = true;
             MissatgesHelper.error(request, getMessage(request, "enviament.controller.enviar.callback.KO"));
@@ -416,19 +405,23 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
         log.info("Reactivam callback dels enviaments: " + StringUtils.join(seleccio, ", "));
         var entitatActual = sessionScopedContext.getEntitatActual();
-        var accioId = accioMassivaService.altaAccioMassiva(AccioMassivaTipus.TORNA_ACTIVAR_CALLBACK, entitatActual.getId());
-        var hasErrors = false;
-        for(var enviamentId : seleccio) {
-            try {
-                enviamentService.activarCallback(enviamentId);
-            } catch (Exception e) {
-                hasErrors = true;
-                MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.callback.KO"));
-            }
-        }
-        if (!hasErrors) {
+        var seleccioTipus = SeleccioTipus.ENVIAMENT;
+        var accio = AccioMassivaExecucio.builder().tipus(AccioMassivaTipus.TORNA_ACTIVAR_CALLBACK).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accioId = accioMassivaService.altaAccioMassiva(accio);
+        accio.setAccioId(accioId);
+        accioMassivaService.executarAccio(accio);
+//        var hasErrors = false;
+//        for(var enviamentId : seleccio) {
+//            try {
+//                enviamentService.activarCallback(enviamentId);
+//            } catch (Exception e) {
+//                hasErrors = true;
+//                MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.callback.KO"));
+//            }
+//        }
+//        if (!hasErrors) {
             MissatgesHelper.info(request, getMessage(request,"enviament.controller.reactivar.callback.OK"));
-        }
+//        }
         return REDIRECT + request.getHeader(REFERER);
     }
 

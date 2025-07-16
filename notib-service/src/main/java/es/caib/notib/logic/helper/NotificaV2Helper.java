@@ -77,6 +77,7 @@ import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -108,6 +109,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
 	private EnviamentTableHelper enviamentTableHelper;
+	@Autowired
+	private AccioMassivaHelper accioMassivaHelper;
 
 	private static final String NOTIB = "Notib";
     @Autowired
@@ -128,9 +131,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			notificacio.updateNotificaNouEnviament();
 			// Validacions
 			if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
-				log.error(" [NOT] la notificació no té l'estat REGISTRADA o ENVIADA AMB ERRORS.");
-				integracioHelper.addAccioError(info, "La notificació no està registrada, o enviada amb errors");
-				throw new ValidationException(notificacioId, NotificacioEntity.class, "La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA.name() + " o " + NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.name());
+				var msg = "la notificació no té l'estat REGISTRADA o ENVIADA AMB ERRORS.";
+				log.error(" [NOT] " + msg);
+				integracioHelper.addAccioError(info, msg);
+				accioMassivaHelper.actualitzar(notificacio, msg, null);
+				throw new ValidationException(notificacioId, NotificacioEntity.class, msg);
 			}
 			var error = false;
 			String errorDescripcio = null;
@@ -232,6 +237,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			notificacioTableHelper.actualitzarRegistre(notificacio);
 			auditHelper.auditaNotificacio(notificacio, TipusOperacio.UPDATE, "NotificaV2Helper.notificacioEnviar");
 			SubsistemesHelper.addOperation(NOT, System.currentTimeMillis() - start, errorSbs);
+			accioMassivaHelper.actualitzar(notificacio, errorDescripcio, null);
 			return notificacio;
 		} catch (Exception ex) {
 			log.error("Error inesperat enviant la notificacio", ex);
@@ -286,6 +292,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				errorDescripcio = "L'enviament no té identificador de Notifica";
 				integracioHelper.addAccioError(info, errorDescripcio);
+				accioMassivaHelper.actualitzar(enviament, errorDescripcio, null);
 				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 			}
 			startTime = System.nanoTime();
@@ -308,6 +315,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			log.info(" [EST] Enviament actualitzat");
 			enviament.refreshNotificaConsulta();
 			integracioHelper.addAccioOk(info);
+			accioMassivaHelper.actualitzar(enviament, null, null);
 			log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 
 		} catch (Exception ex) {
@@ -317,6 +325,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 			integracioHelper.addAccioError(info, "Error consultat l'estat de l'enviament", ex);
 			excepcio = ex;
+			accioMassivaHelper.actualitzar(enviament, ex.getMessage(), Arrays.toString(ex.getStackTrace()));
 			var msg = "Error al consultar l'estat d'un enviament fet amb NotificaV2 (notificacioId=";
 			log.error(msg + enviament.getNotificacio().getId() + ", notificaIdentificador=" + enviament.getNotificaIdentificador() + ")", ex);
 
@@ -451,6 +460,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				errorDesc = "[ampliarPlazoOE] No han arribat dades suficients per guardar la informacio a Notib";
 				log.error(errorDesc);
 				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, errorDesc, false);
+				if (enviament.getAccioMassivaElemId() != null) {
+					accioMassivaHelper.actualitzar(enviament, errorDesc, "");
+				}
+
 				continue;
 			}
 			for (var ampliacion : ampliaciones.getAmpliacionPlazo()) {
@@ -465,6 +478,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					errorDesc += ampliacion.getMensajeError();
 					ok = false;
 					notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, ampliacion.getMensajeError(), false);
+					if (enviament.getAccioMassivaElemId() != null) {
+						accioMassivaHelper.actualitzar(enviament, ampliacion.getMensajeError(), "");
+					}
 					continue;
 				}
 				Date dataCaducitat;
@@ -475,6 +491,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					resposta.setDescripcionRespuesta(error);
 					ok = false;
 					notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, error, false);
+					if (enviament.getAccioMassivaElemId() != null) {
+						accioMassivaHelper.actualitzar(enviament, error, "");
+					}
 					continue;
 				}
 				try {
@@ -488,6 +507,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					resposta.setDescripcionRespuesta(error);
 					ok = false;
 					notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, error, false);
+					if (enviament.getAccioMassivaElemId() != null) {
+						accioMassivaHelper.actualitzar(enviament, error, "");
+					}
 					continue;
 				}
 				enviament.setPlazoAmpliado(true);
@@ -499,6 +521,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				enviament.getNotificacio().setCaducitat(dataCaducitat);
 				notificacioEnviamentRepository.save(enviament);
 				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);
+				if (enviament.getAccioMassivaElemId() != null) {
+					accioMassivaHelper.actualitzar(enviament, "", "");
+				}
 			}
 		}
 		info.setCodiEntitat(codiEntitat);

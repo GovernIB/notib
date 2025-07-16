@@ -45,6 +45,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -70,6 +71,9 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private EnviamentTableHelper enviamentTableHelper;
+	@Autowired
+	private AccioMassivaHelper accioMassivaHelper;
+
 	private MockPlay mockPlay;
 
 	private final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -237,6 +241,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			if (enviament.getNotificaIdentificador() == null || enviament.getNotificaIntentNum() < mockPlay.getIntentsConsulta()) {
 				log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				errorDescripcio = "L'enviament no té identificador de Notifica";
+				accioMassivaHelper.actualitzar(enviament, errorDescripcio, "");
 				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 			}
 			var infoEnvio = new InfoEnvioLigero();
@@ -244,6 +249,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			var resultadoInfoEnvio = infoEnviament(enviament);
 			if (resultadoInfoEnvio.getDatados() == null) {
 				errorDescripcio = "La resposta rebuda de Notifica no conté informació de datat";
+				accioMassivaHelper.actualitzar(enviament, errorDescripcio, "");
 				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 			}
 
@@ -264,6 +270,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			}
 			if (datatDarrer == null) {
 				errorDescripcio = "No s'ha pogut trobar el darrer datat dins la resposta rebuda de Notifica";
+				accioMassivaHelper.actualitzar(enviament, errorDescripcio, "");
 				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 			}
 
@@ -318,6 +325,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 //			}
 			log.info("Enviament actualitzat");
 			enviament.refreshNotificaConsulta();
+			accioMassivaHelper.actualitzar(enviament, errorDescripcio, "");
 			log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 
 		} catch (Exception ex) {
@@ -327,6 +335,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			errorMaxReintents = enviament.getNotificaIntentNum() >= pluginHelper.getConsultaReintentsMaxProperty();
 			errorDescripcio = getErrorDescripcio(ex);
 			excepcio = ex;
+			accioMassivaHelper.actualitzar(enviament, errorDescripcio, Arrays.toString(ex.getStackTrace()));
 			log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		}
 		notificacioEventHelper.addNotificaConsultaEvent(enviament, error, errorDescripcio, errorMaxReintents);

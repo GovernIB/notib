@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
@@ -257,11 +258,28 @@ public class ConversioTipusHelper {
 					@Override
 					public void mapAtoB(AccioMassivaEntity entity, AccioMassivaDto dto, MappingContext context) {
 						entity.getCreatedBy().ifPresent(usuari -> {
-							dto.setCreatedByCodi(usuari.getCodi());
+							dto.setCreatedByCodi(usuari.getCodi() + " (" + usuari.getNomSencer() + ")");
 						});
 						var data = entity.getCreatedDate().orElseThrow();
 						Date date = Date.from(data.atZone(ZoneId.systemDefault()).toInstant());
 						dto.setCreatedDate(date);
+						var numErrors = 0;
+						var numOk = 0;
+						var numPendent = 0;
+						for (var element : entity.getElements()) {
+							if (element.getDataExecucio() == null && Strings.isNullOrEmpty(element.getErrorDescripcio())) {
+								numPendent++;
+								continue;
+							}
+							if (element.getDataExecucio() != null && !Strings.isNullOrEmpty(element.getErrorDescripcio())) {
+								numErrors++;
+								continue;
+							}
+							numOk++;
+						}
+						dto.setNumErrors(numErrors);
+						dto.setNumOk(numOk);
+						dto.setNumPendent(numPendent);
 					}
 				}).byDefault().register();
 
