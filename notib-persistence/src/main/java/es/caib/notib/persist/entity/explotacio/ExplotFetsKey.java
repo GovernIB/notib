@@ -5,11 +5,17 @@ import es.caib.notib.client.domini.explotacio.EnviamentOrigen;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class ExplotFetsKey {
+public class ExplotFetsKey implements Serializable {
+    private static final long serialVersionUID = 2524275859893279117L;
+
     private Long entitatId;
     private Long procedimentId;
     private String organCodi;

@@ -12,6 +12,8 @@ public interface EstadisticaService {
 
     public void generarDadesExplotacio();
     public void generarDadesExplotacio(LocalDate data);
+    public void generarDadesExplotacioBasiques(LocalDate fromDate, LocalDate toDate);
+
     public RegistresEstadistics consultaUltimesEstadistiques();
     public RegistresEstadistics consultaEstadistiques(LocalDate data);
 

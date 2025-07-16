@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +61,31 @@ public class EstadistiquesController {
         return result;
     }
 
+    @GetMapping("/estadistiques/from/{dataInici}/to/{dataFi}")
+    public List<RegistresEstadistics> estadistiques(
+            HttpServletRequest request,
+            @PathVariable String dataInici,
+            @PathVariable String dataFi) throws Exception {
+
+        List<RegistresEstadistics> result = new ArrayList<>();
+        LocalDate dataFrom = LocalDate.parse(dataInici, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        LocalDate dataTo = LocalDate.parse(dataFi, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+
+        LocalDate startDate = dataFrom.isBefore(dataTo) ? dataFrom : dataTo;
+        LocalDate endDate = dataFrom.isBefore(dataTo) ? dataTo : dataFrom;
+        LocalDate ahir = LocalDate.now().minusDays(1);
+        if (endDate.isAfter(ahir)) {
+            endDate = ahir;
+        }
+
+        LocalDate currentDate = startDate;
+        while (!currentDate.isAfter(endDate)) {
+            result.add(estadisticaService.consultaEstadistiques(currentDate));
+            currentDate = currentDate.plusDays(1);
+        }
+        return result;
+    }
+
     @Hidden
     @RequestMapping(value = "/generarDadesExplotacio", method = RequestMethod.GET)
     @ResponseBody
@@ -81,5 +107,27 @@ public class EstadistiquesController {
             data = data.minusDays(1);
         }
         return "Done";
+    }
+
+    @Hidden
+    @RequestMapping(value = "/generarDadesBasiquesExplotacio/from/{dataInici}/to/{dataFi}", method = RequestMethod.GET)
+    @ResponseBody
+    public String generarDadesBasiquesExplotacio(
+            HttpServletRequest request,
+            @PathVariable String dataInici,
+            @PathVariable String dataFi) throws Exception {
+
+        try {
+            LocalDate dataFrom = LocalDate.parse(dataInici, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            LocalDate dataTo = LocalDate.parse(dataFi, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            estadisticaService.generarDadesExplotacioBasiques(dataFrom, dataTo);
+            return "Done";
+        } catch (Exception e) {
+            String message = e.getMessage() + "<br/>";
+            for (StackTraceElement element : e.getStackTrace()) {
+                message += element.toString() + "<br/>";
+            }
+            return message;
+        }
     }
 }
