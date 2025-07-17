@@ -250,7 +250,7 @@
             <not:inputDate name="dataFi" placeholderKey="callback.filtre.data.creacio.fi" inline="true" required="false" />
         </div>
         <div class="col-md-2">
-            <not:inputSelect name="tipus" optionItems="${elementEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
+            <not:inputSelect name="estat" optionItems="${elementEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
                              placeholderKey="accions.massives.estat" textKey="accions.massives.estat" required="true" labelSize="0"/>
         </div>
         <div class="col-md-2 pull-right flex-justify-end">

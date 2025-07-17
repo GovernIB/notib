@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -27,6 +29,7 @@ public class AccioMassivaFiltre {
     private String dataInici;
     private String dataFi;
     private AccioMassivaElementEstat estat;
+    private String estatString;
 
     public boolean dataIniciNull() {
         return Strings.isNullOrEmpty(dataInici);

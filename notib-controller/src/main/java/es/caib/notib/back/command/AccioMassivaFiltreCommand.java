@@ -28,6 +28,8 @@ public class AccioMassivaFiltreCommand {
         return AccioMassivaFiltre.builder()
                 .tipus(tipus)
                 .usuariCodi(usuariCodi)
+                .estat(estat)
+                .estatString(estat != null ? estat.name() : null)
                 .dataInici(dataInici)
                 .dataFi(dataFi).build();
     }
