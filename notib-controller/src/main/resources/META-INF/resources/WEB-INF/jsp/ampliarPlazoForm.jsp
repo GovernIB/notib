@@ -20,6 +20,7 @@
     <form:hidden path="enviamentId"/>
     <form:hidden path="notificacionsId"/>
     <form:hidden path="enviamentsId"/>
+    <form:hidden path="massiu"/>
     <div class="row">
         <c:if test="${ampliacionPlazoCommand.caducitat != null}">
             <div class="col-md-2">

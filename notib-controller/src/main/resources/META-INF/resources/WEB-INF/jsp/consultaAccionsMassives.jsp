@@ -185,6 +185,9 @@
             right: 0;
             left: auto
         }
+        .margin {
+            margin-right:3px;
+        }
     </style>
 </head>
 <body>
@@ -275,7 +278,7 @@
 <%--        data-cell-template="#cellFilterTemplate"--%>
         data-paging-style-x="true"
         data-scroll-overflow="adaptMax"
-        data-selection-enabled="true"
+<%--        data-selection-enabled="true"--%>
         data-save-state="true"
         data-mantenir-paginacio="${mantenirPaginacio}"
         style="width:100%">
@@ -326,7 +329,9 @@
         <th data-col-name="numErrors" data-template="#cellNumErrorsTemplate">
             <spring:message code="accions.massives.num.resultats"/>
             <script id="cellNumErrorsTemplate" type="text/x-jsrender">
-                {{:numOk}}/{{:numErrors}}/{{:numPendent}}
+                <span class="label label-success margin">{{:numOk}} <span class="fa fa-check"></span></span>
+                <span class="label label-danger margin">{{:numErrors}} <span class="fa fa-times"></span></span>
+                <span class="label label-info">{{:numPendent}} <span class="fa fa-clock-o"></span></span>
             </script>
         </th>
         <th data-col-name="createdByCodi"><spring:message code="accions.massives.codi.usuari"/></th>
