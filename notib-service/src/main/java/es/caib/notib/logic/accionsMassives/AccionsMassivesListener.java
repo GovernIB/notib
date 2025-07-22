@@ -1,9 +1,11 @@
 package es.caib.notib.logic.accionsMassives;
 
 
+import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.intf.dto.AmpliacionPlazoDto;
 import es.caib.notib.logic.intf.dto.RespostaAccio;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDto;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElement;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
@@ -42,6 +44,7 @@ public class AccionsMassivesListener {
     private final NotificacioEnviamentRepository enviamentRepository;
     private final NotificacioService notificacioService;
     private final EnviamentService enviamentService;
+    private final ConversioTipusHelper conversioTipusHelper;
 
     @Transactional
     @JmsListener(destination = SmConstants.CUA_ACCIONS_MASSIVES, containerFactory = SmConstants.JMS_FACTORY_ACK)
@@ -72,7 +75,7 @@ public class AccionsMassivesListener {
                 case ACTUALITZAR_ESTAT:
                     for(var enviamentId : seleccio) {
                         try {
-                            enviamentService.actualitzarEstat(enviamentId);
+                            enviamentService.actualitzarEstat(enviamentId, accioEntity.getId());
 //                            accioEntity.getElement(enviamentId).actualitzarData();
                         } catch (Exception ex) {
                             error = true;
@@ -82,7 +85,7 @@ public class AccionsMassivesListener {
                     break;
                 case ENVIAR_CALLBACK:
                     try {
-                        var enviamentsAmbError = enviamentService.enviarCallback(seleccio);
+                        var enviamentsAmbError = enviamentService.enviarCallback(seleccio, accioEntity.getId());
                         error = !enviamentsAmbError.isEmpty();
                         accioEntity.setError(error);
                         if (error) {
@@ -137,6 +140,7 @@ public class AccionsMassivesListener {
                     accioEntity.setDataFi(new Date());
                     break;
                 case AMPLIAR_TERMINI:
+                    accio.getAmpliacionPlazo().setAccioMassiva(accioEntity.getId());
                     var respostaAmpliarPlazo = notificacioService.ampliacionPlazoOE(accio.getAmpliacionPlazo());
                     NotificacioEnviamentEntity enviamentEntity;
                     Long id;

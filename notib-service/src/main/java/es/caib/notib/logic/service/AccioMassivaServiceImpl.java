@@ -133,26 +133,11 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
         try {
             var entity = AccioMassivaEntity.builder().tipus(accio.getTipus()).entitatId(accio.getEntitatId()).build();
             entity = accioMassivaRepository.saveAndFlush(entity);
-            List<AccioMassivaElementEntity> elements = new ArrayList<>();
             AccioMassivaElementEntity elem;
-
             for (var element : accio.getSeleccio()) {
                 elem = AccioMassivaElementEntity.builder().accioMassiva(entity).elementId(element).seleccioTipus(accio.getSeleccioTipus()).build();
                 var elementEntity = accioMassivaElementRepository.saveAndFlush(elem);
-                elements.add(elem);
-                if (SeleccioTipus.NOTIFICACIO.equals(accio.getSeleccioTipus())) {
-                    var notificacio = notificacioRepository.findById(element).orElseThrow();
-                    notificacio.setAccioMassivaElemId(elem.getId());
-                    notificacio.getEnviaments().forEach(e -> e.setAccioMassivaElemId(elementEntity.getId()));
-                    notificacioRepository.save(notificacio);
-                } else {
-                    var enviament = notificacioEnviamentRepository.findById(element).orElseThrow();
-                    enviament.setAccioMassivaElemId(elem.getId());
-                    enviament.getNotificacio().setAccioMassivaElemId(elementEntity.getId());
-                    notificacioEnviamentRepository.save(enviament);
-                }
             }
-            entity.setElements(elements);
             return entity.getId();
         } catch (Exception ex) {
             log.error("Error creant l'accio massiva de tipus " + accio.getTipus() + " per l'entitat " + accio.getEntitatId(), ex);

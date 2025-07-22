@@ -1,5 +1,6 @@
 package es.caib.notib.logic.intf.dto.accioMassiva;
 
+import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,4 +24,8 @@ public class AccioMassivaElementDto implements Serializable  {
     private Date dataExecucio;
     private String errorDescripcio;
     private String excepcioStackTrace;
+
+    public boolean isPendent() {
+        return dataExecucio == null && Strings.isNullOrEmpty(errorDescripcio);
+    }
 }

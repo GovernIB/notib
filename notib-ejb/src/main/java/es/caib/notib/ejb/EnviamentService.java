@@ -122,8 +122,8 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@PermitAll
-	public void actualitzarEstat(Long enviamentId) {
-		getDelegateService().actualitzarEstat(enviamentId);
+	public void actualitzarEstat(Long enviamentId, Long accioMassivaId) {
+		getDelegateService().actualitzarEstat(enviamentId, accioMassivaId);
 	}
 
 	@Override
@@ -134,8 +134,8 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed("**")
-	public List<Long> enviarCallback(Set<Long> notificacions) throws Exception {
-		return getDelegateService().enviarCallback(notificacions);
+	public List<Long> enviarCallback(Set<Long> notificacions, Long accioMassivaId) throws Exception {
+		return getDelegateService().enviarCallback(notificacions, accioMassivaId);
 	}
 
 	@Override

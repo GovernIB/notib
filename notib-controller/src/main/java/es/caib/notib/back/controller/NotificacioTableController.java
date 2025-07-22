@@ -153,7 +153,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         filtre.setDataFi(null);
         filtre.setReferencia(referencia);
         model.addAttribute(filtre);
-//        notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
+        notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
         return "redirect:/notificacio";
     }
 
@@ -639,7 +639,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @GetMapping(value = "/{notificacioId}/enviament/{enviamentId}/certificacioDescarregar")
     @ResponseBody
-    public void certificacioDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long enviamentId) throws IOException {
+    public void certificacioDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long enviamentId) throws Exception {
 
         try {
             var arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
@@ -657,7 +657,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @GetMapping(value = "/{notificacioId}/enviament/{enviamentId}/certificacioPostalDescarregar")
     @ResponseBody
-    public void certificacioPostalDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long enviamentId) throws IOException {
+    public void certificacioPostalDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long enviamentId) throws Exception {
 
         try {
             var arxiu = enviamentService.getCertificacioPostalArxiu(enviamentId);

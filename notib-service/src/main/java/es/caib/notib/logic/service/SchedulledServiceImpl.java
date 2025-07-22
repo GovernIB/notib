@@ -4,6 +4,8 @@ import com.google.common.base.Strings;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.service.*;
+import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
@@ -145,7 +147,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 					for (Long enviament: pendents) {
 						log.info("[DEH] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + enviament + "]");
 						enviamentHelper.updateDEHCertNovaConsulta(enviament);
-						notificacioService.enviamentRefrescarEstat(enviament);
+						var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviament).build()).build();
+						notificacioService.enviamentRefrescarEstat(consulta);
 					}
 				} else {
 					log.info("[DEH] No hi ha enviaments DEH sense certificació");
@@ -173,7 +176,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 					for (Long enviament: pendents) {
 						log.info("[CIE] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + enviament + "]");
 						enviamentHelper.updateCIECertNovaConsulta(enviament);
-						notificacioService.enviamentRefrescarEstat(enviament);
+						var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviament).build()).build();
+						notificacioService.enviamentRefrescarEstat(consulta);
 					}
 				} else {
 					log.info("[CIE] No hi ha enviaments CIE sense certificació");

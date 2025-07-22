@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface AccioMassivaRepository extends JpaRepository<AccioMassivaEntity, Long>  {
 
 
-    @Query("select a from AccioMassivaEntity a " +
+    @Query("select distinct a from AccioMassivaEntity a " +
             "LEFT JOIN a.elements e " +
             "where a.entitatId = :#{#filtre.entitatId} " +
             "and (:#{#filtre.usuariCodiNull} = true or a.createdBy.codi = :#{#filtre.usuariCodi}) " +

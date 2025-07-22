@@ -11,6 +11,7 @@ import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.logic.statemachine.SmConstants;
@@ -67,12 +68,12 @@ public class NotificaHelper {
 		return getNotificaHelper().notificacioEnviar(notificacioId, ambEnviamentPerEmail);
 	}
 
-	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
-		return getNotificaHelper().enviamentRefrescarEstat(enviamentId);
+	public NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta) throws Exception {
+		return getNotificaHelper().enviamentRefrescarEstat(consulta);
 	}
 
-	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseException) throws Exception {
-		return getNotificaHelper().enviamentRefrescarEstat(enviamentId, raiseException);
+	public NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta, boolean raiseException) throws Exception {
+		return getNotificaHelper().enviamentRefrescarEstat(consulta, raiseException);
 	}
 
 	@Transactional

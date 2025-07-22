@@ -1,5 +1,6 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import org.junit.After;
 import org.junit.Before;
@@ -39,33 +40,26 @@ public class EnviamentHelperTest {
 	public void whenRefrescarEnviamentsExpirats_thenCallEnviamentRefrescarEstatForEachEnviament() throws Exception {
 		// Given
 		List<Long> enviamentsIds = Arrays.asList(1L, 2L, 10L);
-		Mockito .when(notificacioEnviamentRepository.findIdExpiradesAndNotificaCertificacioDataNull())
-				.thenReturn(enviamentsIds);
+		Mockito .when(notificacioEnviamentRepository.findIdExpiradesAndNotificaCertificacioDataNull()).thenReturn(enviamentsIds);
 
 		// When
 		enviamentHelper.refrescarEnviamentsExpirats();
 
 		// Then
-		Mockito.verify(notificaHelper, Mockito.times(enviamentsIds.size())).enviamentRefrescarEstat(
-				Mockito.anyLong(),
-				Mockito.anyBoolean()
+		Mockito.verify(notificaHelper, Mockito.times(enviamentsIds.size())).enviamentRefrescarEstat(Mockito.any(ConsultaNotificaRequest.class), Mockito.anyBoolean()
 		);
 	}
 
 	@Test
 	public void GivenNoEnviamentsExpirats_whenRefrescarEnviamentsExpirats_thenNotCallEnviamentRefrescar() throws Exception {
+
 		// Given
 		List<Long> enviamentsIds = new ArrayList<>();
-		Mockito .when(notificacioEnviamentRepository.findIdExpiradesAndNotificaCertificacioDataNull())
-				.thenReturn(enviamentsIds);
-
+		Mockito .when(notificacioEnviamentRepository.findIdExpiradesAndNotificaCertificacioDataNull()).thenReturn(enviamentsIds);
 		// When
 		enviamentHelper.refrescarEnviamentsExpirats();
-
 		// Then
-		Mockito.verify(notificaHelper, Mockito.times(0)).enviamentRefrescarEstat(
-				Mockito.anyLong(),
-				Mockito.anyBoolean()
+		Mockito.verify(notificaHelper, Mockito.times(0)).enviamentRefrescarEstat(Mockito.any(ConsultaNotificaRequest.class), Mockito.anyBoolean()
 		);
 	}
 

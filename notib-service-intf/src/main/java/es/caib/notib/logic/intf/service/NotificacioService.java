@@ -37,6 +37,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.io.IOException;
@@ -269,7 +270,7 @@ public interface NotificacioService {
 	 * @return el fitxer de certificació associat.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId);
+	ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId) throws Exception;
 
 	@PreAuthorize("isAuthenticated()")
     void refrescarEstatEnviamentASir(Long enviamentId, boolean retry);
@@ -364,8 +365,11 @@ public interface NotificacioService {
 
 	// Mètodes per cridar des de l'schedulled
 	void notificacioEnviar(Long notificacioId);
-	void enviamentRefrescarEstat(Long notificacioId);
+
+	void enviamentRefrescarEstat(ConsultaNotificaRequest consulta);
+
 	void enviamentRefrescarEstatRegistre(Long enviamentId);
+
 	Boolean enviamentRefrescarEstatSir(Long enviamentId);
 
 	List<Long> getNotificacionsPendentsRegistrar();

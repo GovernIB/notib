@@ -55,7 +55,8 @@ public class ConsultaSirAction implements Action<EnviamentSmEstat, EnviamentSmEv
         NotibLogger.getInstance().info("[SM] EnviamentNotificaAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
-        var env = ConsultaSirRequest.builder().enviamentUuid(enviamentUuid).consultaSirDto(enviamentSirMapper.toDto(enviament)).numIntent(reintents + 1).build();
+        var accioMassivaElementId = (Long) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ACCIO_MASSIVA_ID, null);
+        var env = ConsultaSirRequest.builder().enviamentUuid(enviamentUuid).accioMassivaId(accioMassivaElementId).consultaSirDto(enviamentSirMapper.toDto(enviament)).numIntent(reintents + 1).build();
         var isRetry = EnviamentSmEvent.SR_RETRY.equals(stateContext.getMessage().getPayload());
         jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_SIR, env,
                 m -> {

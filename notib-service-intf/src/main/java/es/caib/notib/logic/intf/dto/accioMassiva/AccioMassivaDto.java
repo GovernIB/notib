@@ -10,6 +10,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -31,4 +32,19 @@ public class AccioMassivaDto implements Serializable {
     private String errorDescripcio;
     private String excepcioStacktrace;
     private List<AccioMassivaElementDto> elements;
+    private int progresBar;
+
+    public int getProgresBar() {
+
+        if (elements == null || elements.isEmpty()) {
+            return 0;
+        }
+        var nPendents = elements.stream().filter(e -> e.isPendent()).collect(Collectors.toList()).size();
+        if (nPendents == 0) {
+            return 100;
+        }
+        var total = elements.size();
+        return 100 - (int) ((double) nPendents / total * 100);
+
+    }
 }

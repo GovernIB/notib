@@ -93,18 +93,6 @@ databaseChangeLog:
               - column:
                   name: excepcio_stacktrace
                   type: varchar(2048 ${varcharUnit})
-        - addColumn:
-            tableName: not_notificacio
-            columns:
-              - column:
-                  name: accio_massiva_elem_id
-                  type: ${long}
-        - addColumn:
-            tableName: not_notificacio_env
-            columns:
-              - column:
-                  name: accio_massiva_elem_id
-                  type: ${long}
         - addForeignKeyConstraint:
             baseTableName: NOT_ACCIO_MASSIVA_ELEMENT
             baseColumnNames: ACCIO_MASSIVA_ID

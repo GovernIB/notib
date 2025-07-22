@@ -57,7 +57,9 @@ import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.PermisosService;
+import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
 import es.caib.notib.logic.intf.statemachine.dto.ParametresSm;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
@@ -255,7 +257,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 			if (enviament.getNotificaCertificacioArxiuId() == null && isEstatFinal) {
 
 				try {
-					notificaHelper.enviamentRefrescarEstat(enviamentId);
+					var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentId).build()).build();
+					notificaHelper.enviamentRefrescarEstat(consulta);
 					notificacioEnviamentRepository.flush();
 					enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 				} catch (Exception ex) {
@@ -708,7 +711,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 						event.setFiReintents(false);
 					}
 					auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "EnviamentServiceImpl.reactivaSir");
-					enviamentSmService.sirReset(enviament.getUuid());
+					parametres = ParametresSm.builder().enviamentUuid(enviament.getUuid()).build();
+					enviamentSmService.sirReset(parametres);
 					accioEntity.getElement(enviamentId).actualitzar();
 				} catch (Exception ex) {
 					accioEntity.getElement(enviamentId).actualitzar(ex.getMessage(), Arrays.toString(ex.getStackTrace()));
@@ -965,7 +969,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 	@Transactional
 	@Override
-	public void actualitzarEstat(Long enviamentId) {
+	public void actualitzarEstat(Long enviamentId, Long accioMassivaId) {
 
 		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 		enviament.refreshNotificaConsulta();
@@ -973,13 +977,15 @@ public class EnviamentServiceImpl implements EnviamentService {
 		if (enviament.getNotificacio().isComunicacioSir()) {
 			// si l'enviament esta pendent de refrescar l'estat enviat SIR
 			if (enviament.isPendentRefrescarEstatRegistre()) {
-				enviamentSmService.sirRetry(enviament.getUuid());
+				var parametres = ParametresSm.builder().enviamentUuid(enviament.getUuid()).accioMassivaId(accioMassivaId).build();
+				enviamentSmService.sirRetry(parametres);
 			}
 			return;
 		}
 		// si l'enviament esta pendent de refrescar estat a notifica
 		if (enviament.isPendentRefrescarEstatNotifica()) {
-			enviamentSmService.consultaRetry(enviament.getUuid());
+			var parametres = ParametresSm.builder().enviamentUuid(enviament.getUuid()).accioMassivaId(accioMassivaId).build();
+			enviamentSmService.consultaRetry(parametres);
 		}
 	}
 
@@ -1006,14 +1012,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 
 	@Override
-	public List<Long> enviarCallback(Set<Long> notificacions) throws Exception {
+	public List<Long> enviarCallback(Set<Long> notificacions, Long accioMassivaId) throws Exception {
 
 		var callbacks = callbackRepository.findByNotificacioIdIn(notificacions);
 		List<Long> enviamentsAmbError = new ArrayList<>();
 		boolean isError;
 		for (var callback : callbacks) {
 			log.info(String.format("[callback] Enviar callback de l'enviment [id=%d]", callback.getEnviamentId()));
-			isError = callbackHelper.notifica(callback.getEnviamentId());
+			isError = callbackHelper.notifica(callback.getEnviamentId(), accioMassivaId);
 			if (isError) {
 				enviamentsAmbError.add(callback.getEnviamentId());
 				continue;

@@ -112,7 +112,7 @@ public class ConsusltaApiRestV2Test {
     }
 
     @Test
-    public void enviamentGetCertificacioArxiu() {
+    public void enviamentGetCertificacioArxiu() throws Exception {
 
         byte [] c = new byte[0];
         var arxiu = ArxiuDto.builder().nom("certificacio_" + foo + ".pdf").contingut(c).build();

@@ -26,7 +26,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -53,8 +52,8 @@ public class ConsultaNotificaAction implements Action<EnviamentSmEstat, Enviamen
         NotibLogger.getInstance().info("[SM] ConsultaNotificaAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
-        var accioMassivaId = (Long) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ACCIO_MASSIVA_ID, null);
-        var consulta = ConsultaNotificaRequest.builder().enviamentUuid(enviamentUuid).accioMassivaId(accioMassivaId).consultaNotificaDto(consultaNotificaMapper.toDto(enviament)).numIntent(reintents + 1).build();
+        var accioMassivaElementId = (Long) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ACCIO_MASSIVA_ID, null);
+        var consulta = ConsultaNotificaRequest.builder().enviamentUuid(enviamentUuid).accioMassivaId(accioMassivaElementId).consultaNotificaDto(consultaNotificaMapper.toDto(enviament)).numIntent(reintents + 1).build();
         jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_ESTAT, consulta,
                 m -> {
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));

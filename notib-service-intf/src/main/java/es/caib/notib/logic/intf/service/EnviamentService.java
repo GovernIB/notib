@@ -147,7 +147,7 @@ public interface EnviamentService {
 	 * @param enviamentId id de l'enviament.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	void actualitzarEstat(Long enviamentId);
+	void actualitzarEstat(Long enviamentId, Long accioMassivaId);
 
 	/**
 	 * Activa un event de callback de l'enviament indicat
@@ -163,7 +163,7 @@ public interface EnviamentService {
 	 * @param notificacions id de l'enviament.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	List<Long> enviarCallback(Set<Long> notificacions) throws Exception;
+	List<Long> enviarCallback(Set<Long> notificacions, Long accioMassivaId) throws Exception;
 
 	@PreAuthorize("isAuthenticated()")
 	ArxiuDto getCertificacioPostalArxiu(Long enviamentId);

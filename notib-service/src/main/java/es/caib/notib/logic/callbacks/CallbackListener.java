@@ -48,7 +48,7 @@ public class CallbackListener {
         }
         var delay = SmConstants.delay(callback.getIntents());
         try {
-            var error = callbackHelper.notifica(enviamentId);
+            var error = callbackHelper.notifica(enviamentId, null);
             if (error) {
                enviarCua(enviamentId, delay);
             }

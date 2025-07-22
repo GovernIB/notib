@@ -35,6 +35,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
@@ -117,7 +118,7 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed("**")
-	public ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId) {
+	public ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId) throws Exception{
 		return getDelegateService().enviamentGetCertificacioArxiu(enviamentId);
 	}
 
@@ -251,8 +252,8 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@PermitAll
-	public void enviamentRefrescarEstat(Long notificacioId) {
-		getDelegateService().enviamentRefrescarEstat(notificacioId);
+	public void enviamentRefrescarEstat(ConsultaNotificaRequest consulta) {
+		getDelegateService().enviamentRefrescarEstat(consulta);
 	}
 
 	@Override

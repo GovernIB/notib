@@ -1,6 +1,7 @@
 package es.caib.notib.logic.statemachine.listeners;
 
 import com.google.common.base.Strings;
+import es.caib.notib.logic.helper.AccioMassivaHelper;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificaService;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
@@ -29,6 +30,7 @@ public class ConsultaNotificaListener {
     private final NotificaService notificaService;
     private final EnviamentSmService enviamentSmService;
     private final NotificacioEnviamentRepository notificacioEnviamentRepository;
+    private final AccioMassivaHelper accioMassivaHelper;
     private Semaphore semaphore = new Semaphore(5);
 
 
@@ -44,12 +46,16 @@ public class ConsultaNotificaListener {
         NotibLogger.getInstance().info("[SM] Rebut consulta d'estat a notifica <" + enviament.getUuid() + ">", log, LoggingTipus.STATE_MACHINE);
         var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElse(null);
         if (enviament.isDeleted() || enviamentEntity != null && enviamentEntity.getNotificacio().isDeleted()) {
-            NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid(), log, LoggingTipus.STATE_MACHINE);
+            var msg = "[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid();
+            NotibLogger.getInstance().info(msg, log, LoggingTipus.STATE_MACHINE);
+            if (consultaNotificaRequest.getAccioMassivaId() != null) {
+               accioMassivaHelper.actualitzar(consultaNotificaRequest.getAccioMassivaId(), enviament.getId(), msg, "");
+            }
             return;
         }
         semaphore.acquire();
         try {
-            var success = notificaService.consultaEstatEnviament(enviament);
+            var success = notificaService.consultaEstatEnviament(consultaNotificaRequest);
             NotibLogger.getInstance().info("[SM] Consulta per l'enviament <" + enviament.getUuid() + "> ok -> " + success, log, LoggingTipus.STATE_MACHINE);
             if (success) {
                 enviamentSmService.consultaSuccess(enviament.getUuid());

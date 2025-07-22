@@ -64,12 +64,15 @@
 
         function obrirReferenciaLink(referencia, seleccioTipus) {
 
-            let url = seleccioTipus === "NOTIFICACIO" ? '<c:url value="/notificacio/filtrades"/>' : '<c:url value="/enviament/filtrades"/>';
-            $.ajax({
-                    url:  url + "/" + referencia,
-                    success: () => window.open('<c:url value="/"/>', "_blank"),
-                    error: err => console.error(err)
-            });
+            let url = seleccioTipus === "NOTIFICACIO" ? '<c:url value="/notificacio/filtrades/"/>' : '<c:url value="/enviament/filtrades/"/>';
+            <%--$.ajax({--%>
+            <%--        url:  url + "/" + referencia,--%>
+            <%--        success: () => window.open('<c:url value="/"/>', "_blank"),--%>
+            <%--        error: err => console.error(err)--%>
+            <%--});--%>
+
+            return seleccioTipus === "NOTIFICACIO" ? '<a href="' + url + referencia + '" target="_blank">' + referencia + '</a>'
+                    : '<a href="' + url + referencia + '" target="_blank">' + referencia + '</a>';
         }
 
         function mostraElementsAccio(td, rowData) {
@@ -93,7 +96,8 @@
                     let button = '<button id="copyParametres" class="btn btn-default" title="' + '<spring:message code="comu.clipboard.copy"/>'
                         + '" onclick="copyToClipboard(\'' + detall.errorStacktrace + '\')">' + '<span class="fa fa-clipboard"></span></button>';
                     contingutTbody += '<tr>'
-                    contingutTbody += '<td><a style ="cursor:pointer" onclick="obrirReferenciaLink(\'' + detall.referencia + '\', \'' + detall.seleccioTipus + '\')">' + detall.referencia + '</a></td>';
+                    // contingutTbody += '<td><a style ="cursor:pointer" onclick="obrirReferenciaLink(\'' + detall.referencia + '\', \'' + detall.seleccioTipus + '\')">' + detall.referencia + '</a></td>';
+                    contingutTbody += '<td>' + obrirReferenciaLink(detall.referencia, detall.seleccioTipus) + '</td>';
                     contingutTbody += '<td>' + detall.dataString + '</td>';
                     contingutTbody += '<td>' +
                         (detall.pendent ?
@@ -267,7 +271,7 @@
         data-toggle="datatable"
         data-url="<c:url value="/accions/massives/datatable"/>"
         class="table table-striped table-bordered"
-        data-default-order="4"
+        data-default-order="5"
         data-default-dir="desc"
         data-row-info="true"
 <%--		data-individual-filter="true"--%>
@@ -287,6 +291,7 @@
         <th data-col-name="id" data-visible="false">#</th>
         <th data-col-name="numOk" data-visible="false">#</th>
         <th data-col-name="numPendent" data-visible="false">#</th>
+        <th data-col-name="numErrors" data-visible="false">#</th>
         <th data-col-name="tipus" data-template="#cellTipusTemplate">
             <spring:message code="accions.massives.tipus"/>
             <script id="cellTipusTemplate" type="text/x-jsrender">
@@ -329,9 +334,28 @@
         <th data-col-name="numErrors" data-template="#cellNumErrorsTemplate">
             <spring:message code="accions.massives.num.resultats"/>
             <script id="cellNumErrorsTemplate" type="text/x-jsrender">
-                <span class="label label-success margin">{{:numOk}} <span class="fa fa-check"></span></span>
-                <span class="label label-danger margin">{{:numErrors}} <span class="fa fa-times"></span></span>
-                <span class="label label-info">{{:numPendent}} <span class="fa fa-clock-o"></span></span>
+                {{if numOk > 0}}
+                    <span class="label label-success margin">{{:numOk}} <span class="fa fa-check"></span></span>
+                {{/if}}
+                {{if numErrors > 0}}
+                    <span class="label label-danger margin">{{:numErrors}} <span class="fa fa-times"></span></span>
+                {{/if}}
+                {{if numPendent > 0}}
+                    <span class="label label-info">{{:numPendent}} <span class="fa fa-clock-o"></span></span>
+                {{/if}}
+            </script>
+        </th>
+        <th data-col-name="progresBar" data-template="#cellProgresBarTemplate">
+            <spring:message code="accions.massives.num.progres"/>
+            <script id="cellProgresBarTemplate" type="text/x-jsrender">
+                <div class="progress">
+                  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{:progresBar}}" aria-valuemin="0" aria-valuemax="100"
+                    style="{{if progresBar > 0}}min-width: 2em;{{/if}} width: {{:progresBar}}%;">
+                    {{if progresBar > 0}}
+                        {{:progresBar}}%
+                    {{/if}}
+                  </div>
+                </div>
             </script>
         </th>
         <th data-col-name="createdByCodi"><spring:message code="accions.massives.codi.usuari"/></th>

@@ -165,18 +165,18 @@ public class CallbackHelper {
 	}
 
 	@Transactional (rollbackFor = RuntimeException.class, propagation = Propagation.REQUIRES_NEW)
-	public boolean notifica(@NonNull Long enviamentId) throws Exception {
+	public boolean notifica(@NonNull Long enviamentId, Long accioMassivaId) throws Exception {
 
 		var env = enviamentRepository.findById(enviamentId).orElse(null);
 		if (env == null) {
 			return false;
 		}
-		var notificacioProcessada = notifica(env);
+		var notificacioProcessada = notifica(env, accioMassivaId);
 		return notificacioProcessada == null || notificacioProcessada.isErrorLastCallback();
 	}
 
 	@Transactional (rollbackFor = RuntimeException.class)
-	public NotificacioEntity notifica(@NonNull NotificacioEnviamentEntity env) throws Exception {
+	public NotificacioEntity notifica(@NonNull NotificacioEnviamentEntity env, Long accioMassivaId) throws Exception {
 
 		var callback = callbackRepository.findByEnviamentId(env.getId());
 		var notificacio = env.getNotificacio();
@@ -187,7 +187,9 @@ public class CallbackHelper {
 		if (callback == null) {
 			var msg = "Error enviant avis de canvi d'estat. No existeix un callback per l'enviament " + env.getId();
 			integracioHelper.addAccioError(info, msg);
-			accioMassivaHelper.actualitzar(env, msg, "");
+			if (accioMassivaId != null) {
+				accioMassivaHelper.actualitzar(accioMassivaId, env.getId(), msg, "");
+			}
 			return notificacio;
 		}
 		log.trace("[Callback] Consultant aplicacio de l'event. ");
@@ -207,7 +209,9 @@ public class CallbackHelper {
 			auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "CallbackHelper.notifica");
 			// Marcar per actualitzar
 			notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(notificacio.getId()).build());
-			accioMassivaHelper.actualitzar(env, errorDescripcio, "");
+			if (accioMassivaId != null) {
+				accioMassivaHelper.actualitzar(accioMassivaId, env.getId(), errorDescripcio, "");
+			}
 			return notificacio;
 		}
 		info.addParam("Codi aplicació", aplicacio.getUsuariCodi());
@@ -245,7 +249,9 @@ public class CallbackHelper {
 			log.info(String.format("[Callback] Enviament del callback [Id: %d] de la notificacio [Id: %d] exitos", callback.getId(), notificacio.getId()));
 			elapsedTime = System.nanoTime() - start;
 			log.info("marcar com a notificat: "  + elapsedTime);
-			accioMassivaHelper.actualitzar(env, "", "");
+			if (accioMassivaId != null) {
+				accioMassivaHelper.actualitzar(accioMassivaId, env.getId(), "", "");
+			}
 		} catch (Exception ex) {
 			var start = System.nanoTime();
 			isError = true;
@@ -261,7 +267,9 @@ public class CallbackHelper {
 			integracioHelper.addAccioError(info, "Error enviant l'avis de canvi d'estat", ex);
 			var elapsedTime = System.nanoTime() - start;
 			log.info("excepcio: "  + elapsedTime);
-			accioMassivaHelper.actualitzar(env, errorDescripcio, Arrays.toString(ex.getStackTrace()));
+			if (accioMassivaId != null) {
+				accioMassivaHelper.actualitzar(accioMassivaId, env.getId(), errorDescripcio, Arrays.toString(ex.getStackTrace()));
+			}
 		}
 		var start = System.nanoTime();
 		notificacioEventHelper.addCallbackEnviamentEvent(env, isError, errorDescripcio, errorMaxReintents);
