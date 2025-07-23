@@ -61,6 +61,15 @@ public class EstadistiquesController {
         return result;
     }
 
+    @GetMapping("/estadistiques/of/{data}")
+    public RegistresEstadistics estadistiques(
+            HttpServletRequest request,
+            @PathVariable String data) throws Exception {
+
+        LocalDate date = LocalDate.parse(data, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        return estadisticaService.consultaEstadistiques(date);
+    }
+
     @GetMapping("/estadistiques/from/{dataInici}/to/{dataFi}")
     public List<RegistresEstadistics> estadistiques(
             HttpServletRequest request,

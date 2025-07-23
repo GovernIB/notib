@@ -31,10 +31,12 @@ import es.caib.notib.persist.repository.explotacio.ExplotFetsRepository;
 import es.caib.notib.persist.repository.explotacio.ExplotTempsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -64,7 +66,12 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     private final IntegracioHelper integracioHelper;
     private final JdbcTemplate jdbcTemplate;
 
-    private static final String SQL_INSERT_EXPLOT_TEMPS = "INSERT INTO not_explot_temps (" +
+    @Value("${es.caib.notib.hibernate.dialect:es.caib.notib.persist.dialect.OracleCaibDialect}")
+    private String hibernateDialect;
+
+    // Inicialitzar les consultes SQL segons el tipus de base de dades
+    // Oracle (per defecte)
+    private String SQL_INSERT_EXPLOT_TEMPS = "INSERT INTO not_explot_temps (" +
             "id, " +
             "data, " +
             "anualitat, " +
@@ -74,7 +81,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
             "dia, " +
             "dia_setmana) " +
             "VALUES (NOT_HIBERNATE_SEQ.nextval, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String SQL_INSERT_EXPLOT_FETS = "INSERT INTO not_explot_fet (" +
+    private String SQL_INSERT_EXPLOT_FETS = "INSERT INTO not_explot_fet (" +
             "id, " +
             "dimensio_id, " +
             "temps_id, " +
@@ -85,10 +92,48 @@ public class EstadisticaServiceImpl implements EstadisticaService {
             "tr_not_reb, " +
             "tr_not_exp, " +
             "tr_reg_err, " +
-            "tr_not_err," +
+            "tr_not_err, " +
             "tr_sir_acc, " +
             "tr_sir_reb) " +
             "VALUES (NOT_HIBERNATE_SEQ.nextval, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    @PostConstruct
+    public void init() {
+        boolean isPostgres = isPostgresDialect();
+        log.info("Inicialitzant consultes SQL per a base de dades: {}", isPostgres ? "PostgreSQL" : "Oracle");
+
+        if (isPostgres) {
+            SQL_INSERT_EXPLOT_TEMPS = "INSERT INTO not_explot_temps (" +
+                    "id, " +
+                    "data, " +
+                    "anualitat, " +
+                    "trimestre, " +
+                    "mes, " +
+                    "setmana, " +
+                    "dia, " +
+                    "dia_setmana) " +
+                    "VALUES (NEXTVAL('NOT_HIBERNATE_SEQ'), ?, ?, ?, ?, ?, ?, ?)";
+            SQL_INSERT_EXPLOT_FETS = "INSERT INTO not_explot_fet (" +
+                    "id, " +
+                    "dimensio_id, " +
+                    "temps_id, " +
+                    "tr_creades, " +
+                    "tr_registr, " +
+                    "tr_not_env, " +
+                    "tr_not_not, " +
+                    "tr_not_reb, " +
+                    "tr_not_exp, " +
+                    "tr_reg_err, " +
+                    "tr_not_err," +
+                    "tr_sir_acc, " +
+                    "tr_sir_reb) " +
+                    "VALUES (NEXTVAL('NOT_HIBERNATE_SEQ'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        }
+    }
+
+    private boolean isPostgresDialect() {
+        return hibernateDialect != null && hibernateDialect.toLowerCase().contains("postgresql");
+    }
 
     // Mida del lot per insercions en bloc
     private static final int BATCH_SIZE = 1000;
@@ -153,18 +198,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
             var dates = explotTempsRepository.findByDataBetween(fromDate, toDate);
 
             // Obtenir totes les estadístiques per al període complet
-//            List<ExplotEnvBasicStatsEntity> creadesIEnviades = explotFetsRepository.findCreadesIEnviades(fromDate, toDate);
-//            List<ExplotEnvBasicStatsEntity> registrades = explotFetsRepository.findRegistrades(fromDate, toDate);
-//            List<ExplotEnvBasicStatsEntity> perEstat = explotFetsRepository.findPerEstat(fromDate, toDate);
-//            List<ExplotEnvBasicStatsEntity> finalitzadesSir = explotFetsRepository.findFinalitzadesSir(fromDate, toDate);
             List<ExplotEnvBasicStatsEntity> stats = explotEnvBasicStatsRepository.findByDiaBetween(fromDate, toDate);
 
             // Convertir les estadístiques a un mapa per data
             Map<LocalDate, Map<String, Map<ExplotFetsKey, Long>>> estadistiquesPerData = convertirEstadistiquesPerData(stats);
-//                    creadesIEnviades,
-//                    registrades,
-//                    perEstat,
-//                    finalitzadesSir);
 
             processarDatesAmbEstadistiques(dates, dimensions, dimensionKeyCache, estadistiquesPerData);
 
@@ -221,20 +258,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     }
 
     private Map<LocalDate, Map<String, Map<ExplotFetsKey, Long>>> convertirEstadistiquesPerData(
-//            List<ExplotEnvBasicStatsEntity> creadesIEnviades,
-//            List<ExplotEnvBasicStatsEntity> registrades,
-//            List<ExplotEnvBasicStatsEntity> perEstat,
-//            List<ExplotEnvBasicStatsEntity> finalitzadesSir) {
             List<ExplotEnvBasicStatsEntity> stats) {
 
         Map<LocalDate, Map<String, Map<ExplotFetsKey, Long>>> result = new HashMap<>();
-
         processStats(stats, result);
-        // Processar cadascuna de les llistes
-//        processStats(creadesIEnviades, result);
-//        processStats(registrades, result);
-//        processStats(perEstat, result);
-//        processStats(finalitzadesSir, result);
 
         return result;
     }
