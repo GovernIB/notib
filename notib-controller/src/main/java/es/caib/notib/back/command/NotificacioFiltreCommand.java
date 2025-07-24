@@ -52,6 +52,7 @@ public class NotificacioFiltreCommand extends FiltreCommand {
 	private boolean nomesFiReintents;
 	private boolean hasErrors;
 	private boolean deleted;
+	private boolean massiu;
 
 	public void setDataInici(Date dataInici) {
 
@@ -83,6 +84,10 @@ public class NotificacioFiltreCommand extends FiltreCommand {
 	}
 
 	public void setDefaultFiltreData() {
+
+		if (massiu) {
+			return;
+		}
 
 		try {
 

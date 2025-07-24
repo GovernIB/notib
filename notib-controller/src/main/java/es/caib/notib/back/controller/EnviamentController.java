@@ -116,6 +116,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 		filtre.setDataEnviamentInici(null);
 		filtre.setDataEnviamentFi(null);
 		filtre.setCodiNotibEnviament(uuid);
+		filtre.setMassiu(true);
 		model.addAttribute(filtre);
 //		notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
 		return "redirect:/enviament";
@@ -210,7 +211,9 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 		var filtreCommand = (EnviamentFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENTS_FILTRE);
 		if (filtreCommand != null) {
-			setDefaultFiltreData(filtreCommand);
+			if (!filtreCommand.isMassiu()) {
+				setDefaultFiltreData(filtreCommand);
+			}
 			return filtreCommand;
 		}
 		filtreCommand = new EnviamentFiltreCommand();

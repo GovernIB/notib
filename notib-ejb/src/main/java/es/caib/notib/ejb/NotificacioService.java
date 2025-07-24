@@ -26,6 +26,7 @@ import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElement;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
+import es.caib.notib.logic.intf.dto.accioMassiva.ResultatAccio;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
@@ -330,8 +331,8 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public void reenviarNotificaionsMovil(Long notificacioId) {
-		getDelegateService().reenviarNotificaionsMovil(notificacioId);
+	public RespostaAccio<ResultatAccio> reenviarNotificaionsMovil(Long notificacioId) {
+		return getDelegateService().reenviarNotificaionsMovil(notificacioId);
 	}
 
 	@Override

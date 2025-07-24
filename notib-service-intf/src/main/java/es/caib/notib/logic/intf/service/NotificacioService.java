@@ -28,6 +28,7 @@ import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElement;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
+import es.caib.notib.logic.intf.dto.accioMassiva.ResultatAccio;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
@@ -390,7 +391,7 @@ public interface NotificacioService {
 	void reactivarRegistre(Long notificacioId);
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	void reenviarNotificaionsMovil(Long notificacioId);
+	RespostaAccio<ResultatAccio> reenviarNotificaionsMovil(Long notificacioId);
 
 	/**
 	 * Consulta les administracions disponibles dins DIR3 a partir del codi.

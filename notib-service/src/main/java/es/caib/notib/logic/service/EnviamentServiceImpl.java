@@ -986,6 +986,12 @@ public class EnviamentServiceImpl implements EnviamentService {
 		if (enviament.isPendentRefrescarEstatNotifica()) {
 			var parametres = ParametresSm.builder().enviamentUuid(enviament.getUuid()).accioMassivaId(accioMassivaId).build();
 			enviamentSmService.consultaRetry(parametres);
+			return;
+		}
+		if (accioMassivaId != null) {
+			var accioMassiva = accioMassivaRepository.findById(accioMassivaId).orElseThrow();
+			var estat = enviament.getNotificacio().isComunicacioSir() ? enviament.getRegistreEstat().name() : enviament.getNotificaEstat().name();
+			accioMassiva.getElement(enviamentId).actualitzar("L'enviament no s'ha actualitzat perquè no es troba en un estat enviat. Estat:  " + estat, "");
 		}
 	}
 

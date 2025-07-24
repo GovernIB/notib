@@ -6,7 +6,7 @@ databaseChangeLog:
         - modifyDataType:
             columnName: TOT_PENDENT
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: number ¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ REPASSAR !!!!!!!!!!!!!!!!!!!! (number38 bigInt)
         - modifyDataType:
             columnName: TOT_REG_ERR
             tableName: NOT_EXPLOT_FET

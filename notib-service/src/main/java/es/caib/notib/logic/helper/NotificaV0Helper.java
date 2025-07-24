@@ -3,6 +3,8 @@ package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.AccioParam;
@@ -46,6 +48,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -194,6 +197,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		StringBuilder codiEntitat = new StringBuilder();
 		Date data, dataAmpliada;
 		String entitat;
+		List<AmpliacionPlazo> ampliacionesPlazo = new ArrayList<>();
+		AmpliacionesPlazo ampliaciones =  new AmpliacionesPlazo();
 		for (var enviament : enviaments) {
 			data = enviament.getNotificaDataCaducitat();
 			if (data == null) {
@@ -215,7 +220,10 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			if (!codiEntitat.toString().contains(entitat)) {
 				codiEntitat.append(entitat);
 			}
+			ampliacionesPlazo.add(AmpliacionPlazo.builder().identificador(enviament.getUuid()).codigo("000").build());
 		}
+		ampliaciones.setAmpliacionPlazo(ampliacionesPlazo);
+		resposta.setAmpliacionesPlazo(ampliaciones);
 		info.setCodiEntitat(codiEntitat.toString());
 		integracioHelper.addAccioOk(info);
 		return resposta;

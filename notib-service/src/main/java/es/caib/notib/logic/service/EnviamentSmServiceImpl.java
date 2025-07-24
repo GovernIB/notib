@@ -606,7 +606,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	private void sendEvent(String enviamentUuid, StateMachine<EnviamentSmEstat, EnviamentSmEvent> sm, EnviamentSmEvent event) {
 
 		var msg = MessageBuilder.withPayload(event).setHeader(SmConstants.ENVIAMENT_UUID_HEADER, enviamentUuid).build();
-		log.debug("[SM] Sent event " + msg.getPayload().name() + " enviament " + enviamentUuid);
+		NotibLogger.getInstance().info("[SM] Sent event " + msg.getPayload().name() + " enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		sm.sendEvent(msg);
 	}
 }

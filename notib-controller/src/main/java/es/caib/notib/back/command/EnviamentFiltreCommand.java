@@ -43,6 +43,7 @@ public class EnviamentFiltreCommand extends FiltreCommand {
 	private NotificacioEstatOrdreFiltre estat;
 	private String referenciaNotificacio;
 	private Boolean entregaPostal;
+	private boolean isMassiu;
 
 	public void setDataEnviamentInici(String dataEnviamentInici) {
 

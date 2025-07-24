@@ -151,12 +151,24 @@ public class AccionsMassivesListener {
                         id = SeleccioTipus.NOTIFICACIO.equals(accio.getSeleccioTipus()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
                         accioEntity.getElement(id).actualitzar(errorAmpliacion, "");
                     }
+                    for (var uuid : respostaAmpliarPlazo.getNoExecutades()) {
+                        enviamentEntity = enviamentRepository.findByUuid(uuid).orElseThrow();
+                        errorAmpliacion = "Enviament amb entrega postal o sense identificador de Notific@. No es pot ampliar el termini";
+                        id = SeleccioTipus.NOTIFICACIO.equals(accio.getSeleccioTipus()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
+                        accioEntity.getElement(id).actualitzar(errorAmpliacion, "");
+                    }
                     break;
                 case ENVIAR_NOT_MOVIL:
                     for (Long notificacioId : seleccio) {
                         try {
-                            notificacioService.reenviarNotificaionsMovil(notificacioId);
-                            accioEntity.getElement(notificacioId).actualitzar();
+                            var respostaAccio = notificacioService.reenviarNotificaionsMovil(notificacioId);
+                            if (!respostaAccio.getErrors().isEmpty()) {
+                                for (var r : respostaAccio.getErrors()) {
+                                    accioEntity.getElement(notificacioId).actualitzar(r.getErrorDescripcio(), r.getErrorStackTrace());
+                                }
+                            } else {
+                                accioEntity.getElement(notificacioId).actualitzar();
+                            }
                         } catch (Exception e) {
                             error = true;
                             accioEntity.getElement(notificacioId).actualitzar(e.getMessage(), Arrays.toString(e.getStackTrace()));

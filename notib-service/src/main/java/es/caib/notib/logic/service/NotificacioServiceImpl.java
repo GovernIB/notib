@@ -19,6 +19,7 @@ import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElement;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
+import es.caib.notib.logic.intf.dto.accioMassiva.ResultatAccio;
 import es.caib.notib.logic.intf.dto.cie.CieDataDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.logic.intf.dto.notificacio.Enviament;
@@ -1854,21 +1855,28 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public void reenviarNotificaionsMovil(Long notificacioId) {
+	public RespostaAccio<ResultatAccio> reenviarNotificaionsMovil(Long notificacioId) {
 
 		var timer = metricsHelper.iniciMetrica();
+		RespostaAccio<ResultatAccio> resposta = new RespostaAccio<>();
 		try {
 
 			log.debug("Reenviar notificació movil pels enviaments de la notificació " + notificacioId );
 			var notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			for (var e : notificacio.getEnviaments()) {
-				pluginHelper.enviarNotificacioMobil(e);
+				var resultat = pluginHelper.enviarNotificacioMobil(e);
+				if (resultat.isError()) {
+					resposta.getErrors().add(resultat);
+					continue;
+				}
+				resposta.getExecutades().add(resultat);
 			}
 		} catch (Exception e) {
-			log.debug("Error reenviant la notifciació mòvil pels enviaments de la notificació " + notificacioId, e);
+			log.error("Error reenviant la notifciació mòvil pels enviaments de la notificació " + notificacioId, e);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+		return resposta;
 	}
 
 	@Transactional
@@ -2137,13 +2145,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<String> identificadors = new ArrayList<>();
 			var isNotificacio = dto.getNotificacioId() != null;
 			var isEnviament = dto.getEnviamentId() != null;
-			var isNotificacioMassiu = dto.getNotificacionsId() != null;
-			var isEnviamentMassiu = dto.getEnviamentsId() != null;
+			var isNotificacioMassiu = dto.getNotificacionsId() != null && dto.getNotificacionsId().size() > 0;
+			var isEnviamentMassiu = dto.getEnviamentsId() != null && dto.getEnviamentsId().size() > 0;
+			List<String> noExecutats = new ArrayList<>();
 			if (isNotificacio) {
 				var notificacio = notificacioRepository.findById(dto.getNotificacioId()).orElseThrow();
 				for (var enviament : notificacio.getEnviaments()) {
 					if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
 						identificadors.add(enviament.getNotificaReferencia());
+					} else {
+						noExecutats.add(enviament.getUuid());
 					}
 				}
 			}
@@ -2159,6 +2170,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 					for (var enviament : not.getEnviaments()) {
 						if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
 							identificadors.add(enviament.getNotificaReferencia());
+						} else {
+							noExecutats.add(enviament.getUuid());
 						}
 					}
 				}
@@ -2168,13 +2181,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 				for (var enviament : enviaments) {
 					if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
 						identificadors.add(enviament.getNotificaReferencia());
+					} else {
+						noExecutats.add(enviament.getUuid());
 					}
 				}
 			}
 			var envios = new Envios();
 			envios.setIdentificador(identificadors);
 			var ampliarPlazoOE = new AmpliarPlazoOE(envios, dto.getDies(), dto.getMotiu(), dto.getAccioMassiva());
-			return notificaHelper.ampliarPlazoOE(ampliarPlazoOE);
+			var resposta = notificaHelper.ampliarPlazoOE(ampliarPlazoOE);
+			resposta.setNoExecutades(noExecutats);
+			return resposta;
 		} catch (Exception ex) {
 			var msg = "Error inesperat al ampliarPlazoOE ";
 			log.error(msg, ex);

@@ -193,6 +193,9 @@ public class PermisosHelper {
 	private List<AclSidEntity> getSids(Authentication auth) {
 
 		List<AclSidEntity> sids = new ArrayList<>();
+		if (auth == null) {
+			return sids;
+		}
 		var userSid = aclSidRepository.getUserSid(auth.getName());
 		if (userSid != null) {
 			sids.add(userSid);

@@ -23,6 +23,7 @@ import es.caib.notib.logic.intf.dto.RegistreOrigenDtoEnum;
 import es.caib.notib.logic.intf.dto.RegistreTipusDocumentDtoEnum;
 import es.caib.notib.logic.intf.dto.RegistreTipusDocumentalDtoEnum;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
+import es.caib.notib.logic.intf.dto.accioMassiva.ResultatAccio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
@@ -443,8 +444,8 @@ public class PluginHelper {
 		return carpetaPluginHelper.diagnosticar(diagnostics);
 	}
 
-	public void enviarNotificacioMobil(NotificacioEnviamentEntity e) {
-		carpetaPluginHelper.enviarNotificacioMobil(e);
+	public ResultatAccio enviarNotificacioMobil(NotificacioEnviamentEntity e) {
+		return carpetaPluginHelper.enviarNotificacioMobil(e);
 	}
 
 	public boolean enviarCarpeta() {

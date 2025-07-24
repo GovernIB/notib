@@ -52,25 +52,13 @@
     </style>
     <script>
 
-        function copyToClipboard(clipBoard, buttonElement) {
+        function copyToClipboard(clipBoard) {
             navigator.clipboard.writeText(clipBoard);
-            <%--.then(() => {--%>
-            <%--    $(buttonElement).attr('data-original-title', '<spring:message code="accions.massives.copiat"/>').tooltip('show');--%>
-            <%--    setTimeout(() => $(buttonElement).tooltip('hide'), 2000);--%>
-            <%--}).catch(err => {--%>
-            <%--    console.error('Failed to copy: ', err);--%>
-            <%--});--%>
         }
 
         function obrirReferenciaLink(referencia, seleccioTipus) {
 
             let url = seleccioTipus === "NOTIFICACIO" ? '<c:url value="/notificacio/filtrades/"/>' : '<c:url value="/enviament/filtrades/"/>';
-            <%--$.ajax({--%>
-            <%--        url:  url + "/" + referencia,--%>
-            <%--        success: () => window.open('<c:url value="/"/>', "_blank"),--%>
-            <%--        error: err => console.error(err)--%>
-            <%--});--%>
-
             return seleccioTipus === "NOTIFICACIO" ? '<a href="' + url + referencia + '" target="_blank">' + referencia + '</a>'
                     : '<a href="' + url + referencia + '" target="_blank">' + referencia + '</a>';
         }
