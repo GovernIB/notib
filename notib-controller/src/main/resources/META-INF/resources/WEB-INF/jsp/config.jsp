@@ -254,9 +254,25 @@
         <div class="col-md-3">
             <ul id="tab-list" class="nav nav-pills nav-stacked">
                 <c:forEach items="${config_groups}" var="group" varStatus="status_group">
-                    <li role="presentation">
-                        <a class="a-config-group" data-toggle="tab" href="#group-${group.key}">${group.description}</a>
-                    </li>
+                        <c:choose>
+                            <c:when test="${group.key != 'PLUGINS' and group.parentCode == null}">
+                                <li role="presentation">
+                                    <a class="a-config-group" data-toggle="tab" href="#group-${group.key}">${group.description}</a>
+                                </li>
+                            </c:when>
+                            <c:when test="${group.key == 'PLUGINS'}">
+                                <li role="presentation" class="dropdown">
+                                    <a class="dropdown-toggle" href="#plugins" data-toggle="collapse" data-target="#plugin-list" aria-expanded="false" aria-controls="plugin-list">
+                                        ${group.description} <span class="caret"></span>
+                                    </a>
+                                    <ul class="nav nav-pills nav-stacked collapse" id="plugin-list">
+                                        <c:forEach items="${group.innerConfigs}" var="innerGroup">
+                                            <li style="margin-left:30px;"><a class="a-config-group" data-toggle="tab" href="#group-${innerGroup.key}">${innerGroup.description}</a></li>
+                                        </c:forEach>
+                                    </ul>
+                                </li>
+                            </c:when>
+                        </c:choose>
                 </c:forEach>
             </ul>
         </div>

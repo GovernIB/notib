@@ -26,6 +26,8 @@ import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.MonitorIntegracioService;
 import es.caib.notib.logic.intf.service.UsuariAplicacioService;
+import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
@@ -189,21 +191,17 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 					break;
 				case NOTIFICA:
 					enviament = enviamentRepository.findTopByNotificaIdentificadorNullOrderByIdDesc().orElseThrow();
-					notificaHelper.enviamentRefrescarEstat(enviament.getId());
+					var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviament.getId()).build()).build();
+					notificaHelper.enviamentRefrescarEstat(consulta);
 					diagnostic.setCorrecte(true);
 					break;
 				case ARXIU:
 					diagnostic.setCorrecte(pluginHelper.diagnosticarArxiu(diagnostics));
 					break;
-				case CALLBACK:
-					diagnostic.setProva(messageHelper.getMessage("integracio.diagnostic.callback.descripcio"));
-					usuariAplicacioService.diagnosticarAplicacions(diagnostics);
-//					var aplicacio = aplicacioRepository.findTopByCallbackUrlNotNullOrderByIdDesc().orElseThrow();
-//					var r = requestsHelper.callbackAplicacioNotificaCanvi(aplicacio.getCallbackUrl(), new NotificacioCanviClient());
-//					var ok = r != null && ClientResponse.Status.OK.getStatusCode() == r.getStatusInfo().getStatusCode();
-//					diagnostic.setCorrecte(ok);
-//					diagnostic.setErrMsg(!ok ? r.getStatus() + " " + r.getStatusInfo() : null);
-					break;
+//				case CALLBACK:
+//					diagnostic.setProva(messageHelper.getMessage("integracio.diagnostic.callback.descripcio"));
+//					usuariAplicacioService.diagnosticarAplicacions(diagnostics);
+//					break;
 				case GESDOC:
 					diagnostic.setCorrecte(pluginHelper.diagnosticarGestorDocumental(diagnostics));
 					break;

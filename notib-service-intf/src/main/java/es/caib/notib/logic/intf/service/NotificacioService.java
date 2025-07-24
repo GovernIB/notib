@@ -26,6 +26,9 @@ import es.caib.notib.logic.intf.dto.ProvinciesDto;
 import es.caib.notib.logic.intf.dto.RespostaAccio;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElement;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
+import es.caib.notib.logic.intf.dto.accioMassiva.ResultatAccio;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
@@ -35,6 +38,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.io.IOException;
@@ -267,7 +271,7 @@ public interface NotificacioService {
 	 * @return el fitxer de certificació associat.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId);
+	ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId) throws Exception;
 
 	@PreAuthorize("isAuthenticated()")
     void refrescarEstatEnviamentASir(Long enviamentId, boolean retry);
@@ -284,11 +288,11 @@ public interface NotificacioService {
 	/**
 	 * Reseteja els intents de les consultes a Notifica@ o SIR.
 	 *
-	 * @param ids Identificadors dels enviaments.
-	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
+	 * @param accio Accio massiva a executar
+	 * @return true si els diferents elements s'ha pogut enviar o false en cas contrari.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	boolean resetConsultaEstat(Set<Long> ids);
+	RespostaAccio<AccioMassivaElement> resetConsultaEstat(AccioMassivaExecucio accio);
 	
 	/**
 	 * Registra i notifica una notificació
@@ -308,7 +312,7 @@ public interface NotificacioService {
 	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	RespostaAccio<String> resetNotificacioARegistre(Long notificacioId);
+	RespostaAccio<AccioMassivaElement> resetNotificacioARegistre(Long notificacioId);
 
 	/**
 	 * Refresca l'estat d'un enviament (datat i certificació).
@@ -362,8 +366,11 @@ public interface NotificacioService {
 
 	// Mètodes per cridar des de l'schedulled
 	void notificacioEnviar(Long notificacioId);
-	void enviamentRefrescarEstat(Long notificacioId);
+
+	void enviamentRefrescarEstat(ConsultaNotificaRequest consulta);
+
 	void enviamentRefrescarEstatRegistre(Long enviamentId);
+
 	Boolean enviamentRefrescarEstatSir(Long enviamentId);
 
 	List<Long> getNotificacionsPendentsRegistrar();
@@ -374,17 +381,17 @@ public interface NotificacioService {
 	List<Long> getNotificacionsCIEPendentsRefrescarCert();
 	List<Long> getNotificacionsPendentsRefrescarEstatRegistre();
 
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_ADMIN_LECTURA')")
 	PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre, PaginacioParamsDto paginacioDtoFromRequest);
 	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_ADMIN_LECTURA')")
 	List<Long> findNotificacionsIdAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre);
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	void reactivarRegistre(Long notificacioId);
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	void reenviarNotificaionsMovil(Long notificacioId);
+	RespostaAccio<ResultatAccio> reenviarNotificaionsMovil(Long notificacioId);
 
 	/**
 	 * Consulta les administracions disponibles dins DIR3 a partir del codi.
@@ -453,7 +460,7 @@ public interface NotificacioService {
 	boolean reenviarNotificacioAmbErrors(Long notificacioId);
 
 	@PreAuthorize("isAuthenticated()")
-	RespostaAccio<String> reactivarNotificacioAmbErrors(Set<Long> notificacioId);
+	RespostaAccio<AccioMassivaElement> reactivarNotificacioAmbErrors(Set<Long> notificacioId);
 
 	@PreAuthorize("isAuthenticated()")
 	boolean reactivarNotificacioAmbErrors(Long notificacioId);

@@ -89,9 +89,10 @@ public class NotificacioListHelper {
 
         var isUsuari = RolEnumDto.tothom.equals(rol);
         var isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
+        var isUsuariLectura = RolEnumDto.NOT_ADMIN_LECTURA.equals(rol);
         var isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
         var isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
-        var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat,false);
+        var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat, isUsuari, isUsuariLectura);
         OrganGestorEntity organGestor = null;
         if (f.getOrganGestor() != null && !f.getOrganGestor().isEmpty()) {
             try {
@@ -192,7 +193,7 @@ public class NotificacioListHelper {
                 .procedimentOrgansIdsNotib(esProcedimentOrgansAmbPermisNull ?  null : codisProcedimentsOrgans)
                 .usuariCodi(usuariCodi)
                 .isSuperAdmin(isSuperAdmin)
-                .isUsuariEntitat(isUsuariEntitat)
+                .isUsuariEntitat(isUsuariEntitat || isUsuariLectura)
                 .entitatsActives(entitatsActives)
                 .isAdminOrgan(isAdminOrgan)
                 .organs(organs)

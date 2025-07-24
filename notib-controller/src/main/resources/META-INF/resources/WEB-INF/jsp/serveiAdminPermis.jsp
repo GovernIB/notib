@@ -7,6 +7,7 @@
 <%
 	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
 	pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(ssc.getRolActual()));
+	pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()));
 %>
 <html>
 <head>
@@ -49,8 +50,10 @@
 		data-search-enabled="false" 
 		data-paging-enabled="false" 
 		data-default-order="1" 
-		data-default-dir="asc" 
-		data-botons-template="#tableButtonsTemplate" 
+		data-default-dir="asc"
+		<c:if test="${!isRolActualAdministradorLectura}">
+			data-botons-template="#tableButtonsTemplate"
+		</c:if>
 		class="table table-striped table-bordered" 
 		style="width:100%">
 		<thead>
@@ -124,9 +127,11 @@
 			</tr>
 		</thead>
 	</table>
-	<script id="tableButtonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a class="btn btn-default" href="../../servei/${servei.id}/permis/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.permis.boto.nou.permis"/></a></p>
-	</script>
+	<c:if test="${!isRolActualAdministradorLectura}">
+		<script id="tableButtonsTemplate" type="text/x-jsrender">
+			<p style="text-align:right"><a class="btn btn-default" href="../../servei/${servei.id}/permis/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.permis.boto.nou.permis"/></a></p>
+		</script>
+	</c:if>
 	<a href="<c:url value="/servei?mantenirPaginacio=true"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 	<div class="clearfix"></div>
 </body>

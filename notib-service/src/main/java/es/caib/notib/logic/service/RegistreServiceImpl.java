@@ -18,7 +18,10 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.RegistreService;
+import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
 import es.caib.notib.logic.intf.statemachine.dto.ConsultaSirDto;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.NotibLogger;
@@ -109,15 +112,17 @@ public class RegistreServiceImpl implements RegistreService {
 
     @Transactional
     @Override
-    public boolean consultaSir(ConsultaSirDto enviament) {
+    public boolean consultaSir(ConsultaSirRequest consultaSirRequest) {
+
 
         try {
             // Consultar enviament a SIR
-            notificacioService.enviamentRefrescarEstatRegistre(enviament.getId());
-            var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElseThrow();
+//            notificacioService.enviamentRefrescarEstatRegistre(consultaSirRequest);
+            registreHelper.enviamentRefrescarEstatRegistre(consultaSirRequest);
+            var enviamentEntity = notificacioEnviamentRepository.findByUuid(consultaSirRequest.getEnviamentUuid()).orElseThrow();
             return enviamentEntity.getSirConsultaIntent() == 0;
         } catch (Exception ex) {
-            log.error("Error a la consulta SIR per l'enviament " + enviament.getUuid());
+            log.error("Error a la consulta SIR per l'enviament " + consultaSirRequest.getEnviamentUuid());
             return false;
         }
     }
@@ -161,7 +166,8 @@ public class RegistreServiceImpl implements RegistreService {
                 integracioHelper.addAccioError(info, desc);
                 return RespostaSirAdviser.builder().ok(false).errorDescripcio(desc).build();
             }
-            registreHelper.enviamentRefrescarEstatRegistre(enviament.getId());
+            var consulta = ConsultaSirRequest.builder().consultaSirDto(ConsultaSirDto.builder().id(enviament.getId()).build()).build();
+            registreHelper.enviamentRefrescarEstatRegistre(consulta);
             integracioHelper.addAccioOk(info);
             SubsistemesHelper.addSuccessOperation(CSR, System.currentTimeMillis() - start);
             return RespostaSirAdviser.builder().ok(true).build();

@@ -36,7 +36,7 @@ public class ProcSerCacheable {
 
     public void clearAuthenticationProcedimentsCaches(Authentication auth) {
 
-        var permisos = new Permission[] {ExtendedPermission.USUARI, ExtendedPermission.APLICACIO, ExtendedPermission.ADMINISTRADORENTITAT};
+        var permisos = new Permission[] {ExtendedPermission.USUARI, ExtendedPermission.APLICACIO, ExtendedPermission.ADMINISTRADORENTITAT, ExtendedPermission.ADMINISTRADORLECTURA};
         var entitatsIds = permisosHelper.getObjectsIdsWithPermission(EntitatEntity.class, permisos);
         if (entitatsIds == null || entitatsIds.isEmpty()) {
             return;

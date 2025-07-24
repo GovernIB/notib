@@ -7,6 +7,7 @@
 <%
 	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
 	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()));
+	pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()));
 %>
 <html>
 <head>
@@ -67,7 +68,9 @@
 		data-default-order="1"
 		data-default-dir="desc"
 		class="table table-striped table-bordered"
-		data-botons-template="#botonsTemplate"
+		<c:if test="${!isRolActualAdministradorLectura}">
+			data-botons-template="#botonsTemplate"
+		</c:if>
 		style="width:100%"
 		data-filter="#filtre">
 		<thead>
@@ -77,23 +80,25 @@
 				<th data-col-name="contracteNum"><spring:message code="operadorpostal.list.columna.contracteNum"/></th>
 				<th data-col-name="contracteDataVig" data-type="date" data-converter="date"><spring:message code="operadorpostal.list.columna.contracteDataVig"/></th>
 				<th data-col-name="facturacioClientCodi"><spring:message code="operadorpostal.list.columna.facturacioClientCodi"/></th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
-					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<div class="dropdown">
-							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-							<ul class="dropdown-menu">
-								<li><a href="${unitatCodiUrlPrefix}operadorPostal/{{:id}}" data-toggle="modal" data-height="400px" data-custom="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								<li><a href="${unitatCodiUrlPrefix}operadorPostal/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="operadorpostal.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-							</ul>
-						</div>
-					</script>
-				</th>
+				<c:if test="${!isRolActualAdministradorLectura}">
+					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+						<script id="cellAccionsTemplate" type="text/x-jsrender">
+							<div class="dropdown">
+								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+								<ul class="dropdown-menu">
+									<li><a href="${unitatCodiUrlPrefix}operadorPostal/{{:id}}" data-toggle="modal" data-height="400px" data-custom="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									<li><a href="${unitatCodiUrlPrefix}operadorPostal/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="operadorpostal.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								</ul>
+							</div>
+						</script>
+					</th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>
-	
-	<script id="botonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a class="btn btn-default" href="${unitatCodiUrlPrefix}operadorPostal/new" data-toggle="modal" data-height="400px" data-custom="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="operadorpostal.list.boto.nou.operadorpostal"/></a></p>
-	</script>
-	
+	<c:if test="${!isRolActualAdministradorLectura}">
+		<script id="botonsTemplate" type="text/x-jsrender">
+			<p style="text-align:right"><a class="btn btn-default" href="${unitatCodiUrlPrefix}operadorPostal/new" data-toggle="modal" data-height="400px" data-custom="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="operadorpostal.list.boto.nou.operadorpostal"/></a></p>
+		</script>
+	</c:if>
 </body>

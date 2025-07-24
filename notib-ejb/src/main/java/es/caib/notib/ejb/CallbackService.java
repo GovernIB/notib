@@ -42,7 +42,7 @@ public class CallbackService extends AbstractService<es.caib.notib.logic.intf.se
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_ADMIN_LECTURA"})
 	public PaginaDto<CallbackDto> findPendentsByEntitat(CallbackFiltre filtre, PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findPendentsByEntitat(filtre, paginacioParams);
 	}

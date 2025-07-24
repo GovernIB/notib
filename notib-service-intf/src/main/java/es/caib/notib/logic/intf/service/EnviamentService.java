@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.dto.NotificacioEventDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
@@ -131,11 +132,9 @@ public interface EnviamentService {
 	
 	/**
 	 * Reactiva les consultes d'estat a SIR
-	 * 
-	 * @param enviaments Llistat de atributs id dels enviaments
 	 */
 	@PreAuthorize("isAuthenticated()")
-	void reactivaSir(Set<Long> enviaments);
+	void reactivaSir(AccioMassivaExecucio accio);
 	
 	@PreAuthorize("hasRole('NOT_CARPETA') or hasRole('NOT_SUPER')")
 	Resposta findEnviaments(ApiConsulta consulta);
@@ -148,7 +147,7 @@ public interface EnviamentService {
 	 * @param enviamentId id de l'enviament.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	void actualitzarEstat(Long enviamentId);
+	void actualitzarEstat(Long enviamentId, Long accioMassivaId);
 
 	/**
 	 * Activa un event de callback de l'enviament indicat
@@ -164,7 +163,7 @@ public interface EnviamentService {
 	 * @param notificacions id de l'enviament.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	List<Long> enviarCallback(Set<Long> notificacions) throws Exception;
+	List<Long> enviarCallback(Set<Long> notificacions, Long accioMassivaId) throws Exception;
 
 	@PreAuthorize("isAuthenticated()")
 	ArxiuDto getCertificacioPostalArxiu(Long enviamentId);

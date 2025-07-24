@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
@@ -24,6 +25,7 @@ import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.TipusDocumentDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDto;
 import es.caib.notib.logic.intf.dto.callback.CallbackDto;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatFullaDto;
@@ -50,6 +52,7 @@ import es.caib.notib.logic.intf.dto.organisme.UnitatOrganitzativaDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
+import es.caib.notib.persist.entity.AccioMassivaEntity;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
@@ -202,19 +205,8 @@ public class ConversioTipusHelper {
 							}
 				}).register();
 
-		mapperFactory.classMap(NotificacioMassivaEntity.class, NotificacioMassivaTableItemDto.class).byDefault()
-				.customize(new CustomMapper<>() {
-							@Override
-							public void mapAtoB(NotificacioMassivaEntity entity, NotificacioMassivaTableItemDto dto, MappingContext context) {
-								entity.getCreatedBy().ifPresent(usuari -> {
-									dto.setCreatedByNom(usuari.getNomSencer());
-									dto.setCreatedByCodi(usuari.getCodi());
-								});
-								var data = entity.getCreatedDate().orElseThrow();
-								Date date = Date.from(data.atZone(ZoneId.systemDefault()).toInstant());
-								dto.setCreatedDate(date);
-							}
-				}).register();
+		mapperFactory.classMap(NotificacioMassivaEntity.class, NotificacioMassivaTableItemDto.class).byDefault();
+
 
 		mapperFactory.classMap(NotificacioMassivaEntity.class, NotificacioMassivaDataDto.class).byDefault().
 				customize(new CustomMapper<>() {
@@ -260,6 +252,36 @@ public class ConversioTipusHelper {
 				field("entitat.id", "entitatId").
 				byDefault().
 				register();
+
+		mapperFactory.classMap(AccioMassivaEntity.class, AccioMassivaDto.class)
+				.customize(new CustomMapper<>() {
+					@Override
+					public void mapAtoB(AccioMassivaEntity entity, AccioMassivaDto dto, MappingContext context) {
+						entity.getCreatedBy().ifPresent(usuari -> {
+							dto.setCreatedByCodi(usuari.getCodi() + " (" + usuari.getNomSencer() + ")");
+						});
+						var data = entity.getCreatedDate().orElseThrow();
+						Date date = Date.from(data.atZone(ZoneId.systemDefault()).toInstant());
+						dto.setCreatedDate(date);
+						var numErrors = 0;
+						var numOk = 0;
+						var numPendent = 0;
+						for (var element : entity.getElements()) {
+							if (element.getDataExecucio() == null && Strings.isNullOrEmpty(element.getErrorDescripcio())) {
+								numPendent++;
+								continue;
+							}
+							if (element.getDataExecucio() != null && !Strings.isNullOrEmpty(element.getErrorDescripcio())) {
+								numErrors++;
+								continue;
+							}
+							numOk++;
+						}
+						dto.setNumErrors(numErrors);
+						dto.setNumOk(numOk);
+						dto.setNumPendent(numPendent);
+					}
+				}).byDefault().register();
 
 		mapperFactory.classMap(AmpliarPlazoOE.class, es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.AmpliarPlazoOE.class).byDefault().register();
 		mapperFactory.classMap(Envios.class, es.caib.notib.logic.wsdl.notificaV2.ampliarPlazoOE.Envios.class).byDefault().register();

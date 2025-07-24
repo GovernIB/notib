@@ -175,7 +175,15 @@ public interface EntitatService {
 	 */
 	@PreAuthorize("isAuthenticated()")
 	public boolean hasPermisAdminEntitat();
-	
+
+
+	/**
+	 * Comprova si l'usuari acutal té permisos d'administrador de lectura per l'entitat actual
+	 * @return El llistat d'entitats.
+	 */
+	@PreAuthorize("isAuthenticated()")
+	boolean hasPermisAdminLectura();
+
 	/**
 	 * Comprova si l'usuari acutal té permisos d'aplicació de l'entitat actual
 	 * 
@@ -200,7 +208,7 @@ public interface EntitatService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_ADMIN_LECTURA')")
 	List<PermisDto> permisFindByEntitatId(Long entitatId, PaginacioParamsDto paramsDto) throws NotFoundException;
 
 	/**

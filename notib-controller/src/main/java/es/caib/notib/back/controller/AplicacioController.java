@@ -5,14 +5,20 @@ package es.caib.notib.back.controller;
 
 import es.caib.notib.back.command.AplicacioCommand;
 import es.caib.notib.back.command.AplicacioFiltreCommand;
+import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.logic.intf.dto.AplicacioDto;
+import es.caib.notib.logic.intf.dto.IntegracioCodi;
+import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
+import es.caib.notib.logic.intf.dto.IntegracioDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EntitatService;
+import es.caib.notib.logic.intf.service.MonitorIntegracioService;
 import es.caib.notib.logic.intf.service.UsuariAplicacioService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +34,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Controlador per al manteniment d'aplicacions.
@@ -50,6 +59,8 @@ public class AplicacioController extends BaseController {
 	private static final String ENTITAT = "entitat";
 	private static final String REDIRECT = "redirect:../../entitat";
 	private static final String APLICACIO_FORM = "aplicacioForm";
+    @Autowired
+    private MonitorIntegracioService monitorIntegracioService;
 
 
 	@GetMapping
@@ -182,6 +193,24 @@ public class AplicacioController extends BaseController {
 		command = new AplicacioFiltreCommand();
 		RequestSessionHelper.actualitzarObjecteSessio(request, APLICACIO_FILTRE, command);
 		return command;
+	}
+
+	@GetMapping(value = "/diagnostic")
+	public String diagnostic(HttpServletRequest request, Model model, @PathVariable Long entitatId) {
+
+		IntegracioDto integracio = IntegracioDto.builder()
+				.codi(IntegracioCodi.CALLBACK)
+				.nom(EnumHelper.getOneOptionForEnum(IntegracioCodi.class, "integracio.list.pipella.CALLBACK").getText())
+				.build();
+		model.addAttribute("integracio", integracio);
+		return "aplicacioDiagnostic";
+	}
+
+	@ResponseBody
+	@GetMapping(value = "/diagnosticar")
+	public IntegracioDiagnostic diagnosticAjax(HttpServletRequest request,@PathVariable Long entitatId, Model model) {
+
+		return usuariAplicacioService.diagnosticarAplicacions(entitatId);
 	}
 
 }

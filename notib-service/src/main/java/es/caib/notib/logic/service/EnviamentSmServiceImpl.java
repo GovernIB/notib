@@ -8,6 +8,7 @@ import es.caib.notib.logic.intf.dto.stateMachine.StateMachineInfo;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
+import es.caib.notib.logic.intf.statemachine.dto.ParametresSm;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
@@ -475,23 +476,27 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	@Override
 	@Transactional
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaReset(String enviamentUuid) {
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaReset(ParametresSm parametres) {
 
+		var enviamentUuid = parametres.getEnviamentUuid();
 		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl consultaReset " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
+		sm.getExtendedState().getVariables().put(SmConstants.ACCIO_MASSIVA_ID, parametres.getAccioMassivaId());
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.CN_RETRY);
 		return sm;
 	}
 
 	@Override
 	@Transactional
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaRetry(String enviamentUuid) {
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaRetry(ParametresSm parametres) {
 
+		var enviamentUuid = parametres.getEnviamentUuid();
 		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl consultaRetry " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 //		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		var event = EnviamentSmEstat.NOTIFICA_SENT.equals(sm.getState().getId()) ? EnviamentSmEvent.CN_CONSULTAR : EnviamentSmEvent.CN_RETRY;
+		sm.getExtendedState().getVariables().put(SmConstants.ACCIO_MASSIVA_ID, parametres.getAccioMassivaId());
 		sendEvent(enviamentUuid, sm, event);
 		return sm;
 	}
@@ -547,12 +552,14 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	@Override
 	@Transactional
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirReset(String enviamentUuid) {
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirReset(ParametresSm parametres) {
 
+		var enviamentUuid = parametres.getEnviamentUuid();
 		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl sirReset " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		sm.getExtendedState().getVariables().put(SmConstants.ENVIAMENT_REINTENTS, 0);
 		sm.getExtendedState().getVariables().put(SmConstants.CONSULTA_SIR_POOLING_DATA_INICI, new Date());
+		sm.getExtendedState().getVariables().put(SmConstants.ACCIO_MASSIVA_ID, parametres.getAccioMassivaId());
 		//actualitzar la data pk torni a entrar
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_RESET);
 		return sm;
@@ -560,10 +567,12 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	@Override
 	@Transactional
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirRetry(String enviamentUuid) {
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirRetry(ParametresSm parametres) {
 
+		var enviamentUuid = parametres.getEnviamentUuid();
 		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl sirRetry " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		sm.getExtendedState().getVariables().put(SmConstants.ACCIO_MASSIVA_ID, parametres.getAccioMassivaId());
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.SR_RETRY);
 		return sm;
 	}
@@ -597,7 +606,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	private void sendEvent(String enviamentUuid, StateMachine<EnviamentSmEstat, EnviamentSmEvent> sm, EnviamentSmEvent event) {
 
 		var msg = MessageBuilder.withPayload(event).setHeader(SmConstants.ENVIAMENT_UUID_HEADER, enviamentUuid).build();
-		log.debug("[SM] Sent event " + msg.getPayload().name() + " enviament " + enviamentUuid);
+		NotibLogger.getInstance().info("[SM] Sent event " + msg.getPayload().name() + " enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		sm.sendEvent(msg);
 	}
 }

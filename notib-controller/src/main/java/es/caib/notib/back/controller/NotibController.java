@@ -94,6 +94,9 @@ public class NotibController implements ErrorController {
 		if (RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual())) {
 			return REDIRECT_NOTIFICACIO;
 		}
+		if (RolHelper.isUsuariActualAdministradorLectura(sessionScopedContext.getRolActual())) {
+			return REDIRECT_NOTIFICACIO;
+		}
 		return "index";
 	}
 

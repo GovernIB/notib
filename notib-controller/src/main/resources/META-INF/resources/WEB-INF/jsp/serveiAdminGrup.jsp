@@ -3,6 +3,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%
+	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
+	pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()));
+%>
 <html>
 <head>
 	<title><spring:message code="servei.grup.titol"/></title>
@@ -23,9 +27,11 @@
 		data-search-enabled="false" 
 		data-paging-enabled="false" 
 		data-default-order="1" 
-		data-default-dir="asc" 
-		data-botons-template="#tableButtonsTemplate" 
-		class="table table-striped table-bordered" 
+		data-default-dir="asc"
+		<c:if test="${!isRolActualAdministradorLectura}">
+			data-botons-template="#tableButtonsTemplate"
+		</c:if>
+		class="table table-striped table-bordered"
 		style="width:100%">
 		<thead>
 			<tr>
@@ -48,7 +54,9 @@
 	<script id="tableButtonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right"><a class="btn btn-default" href="../../servei/${servei.id}/grup/new" data-height="300px" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="servei.grup.boto.nou.grup"/></a></p>
 	</script>
-	<a href="<c:url value="/servei?mantenirPaginacio=true"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+	<c:if test="${!isRolActualAdministradorLectura}">
+		<a href="<c:url value="/servei?mantenirPaginacio=true"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+	</c:if>
 	<div class="clearfix"></div>
 </body>
 </html>

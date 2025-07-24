@@ -1,0 +1,101 @@
+databaseChangeLog:
+  - property:
+      dbms: oracle
+      name: type.pk
+      value: number(19,0)
+  - property:
+      dbms: postgresql
+      name: type.pk
+      value: SERIAL
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - createTable:
+            tableName: NOT_ACCIO_MASSIVA
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: NOT_ACC_MASS_PK
+                  name: ID
+                  type: ${type.pk}
+              - column:
+                  name: tipus
+                  type: varchar(50 ${varcharUnit})
+              - column:
+                  name: data_inici
+                  type: TIMESTAMP(6)
+              - column:
+                  name: data_fi
+                  type: TIMESTAMP(6)
+              - column:
+                  name: createdby_codi
+                  type: varchar(64 ${varcharUnit})
+              - column:
+                  name: LASTMODIFIEDBY_CODI
+                  type: varchar(64 ${varcharUnit})
+              - column:
+                  name: LASTMODIFIEDDATE
+                  type: TIMESTAMP(6)
+              - column:
+                  name: createddate
+                  type: TIMESTAMP(6)
+              - column:
+                  name: entitat_id
+                  type: BIGINT
+              - column:
+                  name: error
+                  type: boolean
+              - column:
+                  name: num_errors
+                  type: int
+              - column:
+                  name: error_descripcio
+                  type: varchar(1024 ${varcharUnit})
+              - column:
+                  name: excepcio_stacktrace
+                  type: varchar(2048 ${varcharUnit})
+        - createTable:
+            tableName: NOT_ACCIO_MASSIVA_ELEMENT
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: NOT_ACC_MASS_ELEM_PK
+                  name: ID
+                  type: ${type.pk}
+              - column:
+                  name: ACCIO_MASSIVA_ID
+                  type: ${type.pk}
+              - column:
+                  name: seleccio_tipus
+                  type: varchar(20 ${varcharUnit})
+              - column:
+                  name: element_id
+                  type: ${long}
+              - column:
+                  name: data_execucio
+                  type: TIMESTAMP(6)
+              - column:
+                  name: error_descripcio
+                  type: varchar(1024 ${varcharUnit})
+              - column:
+                  name: excepcio_stacktrace
+                  type: varchar(2048 ${varcharUnit})
+        - addForeignKeyConstraint:
+            baseTableName: NOT_ACCIO_MASSIVA_ELEMENT
+            baseColumnNames: ACCIO_MASSIVA_ID
+            referencedTableName: NOT_ACCIO_MASSIVA
+            referencedColumnNames: ID
+            constraintName: FK_ACCIOMASSIVA_ELEMENT

@@ -4,6 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+
 <html>
     <head>
         <title><spring:message code="organgestor.list.titol"/></title>
@@ -241,30 +242,31 @@
                            fullesAtributDreta="estat" fullesMissatgeDreta="es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum."
                            fullesIconaDreta="fa fa-warning text-danger" fullesCondicioDreta="V"/>
             </div>
-            <div class="col-md-7">
-                <div style="padding-bottom: 10px; text-align: right">
-                    <c:if test="${setOficina}">
-                        <a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines/ARBRE"
-                           title='<spring:message code="organgestor.list.boto.actualitzar.oficines.tooltip"/>'
-                           data-refresh-pagina="true" data-maximized="false">
-                            <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
-                        </a>
+                <div class="col-md-7">
+                    <c:if test="${isRolActualAdministradorLectura}">
+                        <div style="padding-bottom: 10px; text-align: right">
+                            <c:if test="${setOficina}">
+                                <a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines/ARBRE"
+                                   title='<spring:message code="organgestor.list.boto.actualitzar.oficines.tooltip"/>'
+                                   data-refresh-pagina="true" data-maximized="false">
+                                    <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
+                                </a>
+                            </c:if>
+                            <a id="organ-boto-update" title='<spring:message code="organgestor.list.boto.actualitzar.tots.tooltip"/>'
+                               class="btn btn-success" href="organgestor/sync/dir3"
+                               data-toggle="modal"
+                               data-refresh-pagina="true"
+                               data-maximized="false">
+                                <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.tots"/>
+                            </a>
+                        </div>
                     </c:if>
-                    <a id="organ-boto-update" title='<spring:message code="organgestor.list.boto.actualitzar.tots.tooltip"/>'
-                       class="btn btn-success" href="organgestor/sync/dir3"
-                       data-toggle="modal"
-                       data-refresh-pagina="true"
-                       data-maximized="false">
-                        <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.tots"/>
-                    </a>
+                    <div id="detall">
+                    </div>
+                    <div class="datatable-dades-carregant" style="display: none; text-align: center; margin-top: 100px;">
+                        <span class="fa fa-circle-o-notch fa-spin fa-3x"></span>
+                    </div>
                 </div>
-                <div id="detall">
-
-                </div>
-                <div class="datatable-dades-carregant" style="display: none; text-align: center; margin-top: 100px;">
-                    <span class="fa fa-circle-o-notch fa-spin fa-3x"></span>
-                </div>
-            </div>
         </div>
     </body>
 </html>

@@ -4,6 +4,7 @@ import es.caib.notib.logic.intf.dto.RegistreAnotacioDto;
 import es.caib.notib.logic.intf.dto.adviser.sir.RespostaSirAdviser;
 import es.caib.notib.logic.intf.dto.adviser.sir.SirAdviser;
 import es.caib.notib.logic.intf.statemachine.dto.ConsultaSirDto;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
 import org.springframework.context.annotation.Primary;
 
@@ -34,8 +35,8 @@ public class RegistreService extends AbstractService<es.caib.notib.logic.intf.se
 	}
 
 	@Override
-	public boolean consultaSir(ConsultaSirDto enviament) {
-		return getDelegateService().consultaSir(enviament);
+	public boolean consultaSir(ConsultaSirRequest consulta) {
+		return getDelegateService().consultaSir(consulta);
 	}
 
 	@Override

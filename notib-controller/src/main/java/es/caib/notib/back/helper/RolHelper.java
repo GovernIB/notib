@@ -20,6 +20,7 @@ public class RolHelper {
 
 	public static final String ROLE_SUPER = RolEnumDto.NOT_SUPER.name();
 	public static final String ROLE_ADMIN_ENTITAT = RolEnumDto.NOT_ADMIN.name();
+	public static final String ROLE_ADMIN_LECTURA = RolEnumDto.NOT_ADMIN_LECTURA.name();
 	public static final String ROLE_USUARI = RolEnumDto.tothom.name();
 	public static final String ROLE_APLICACIO = RolEnumDto.NOT_APL.name();
 	public static final String ROLE_ADMIN_ORGAN = RolEnumDto.NOT_ADMIN_ORGAN.name();
@@ -33,6 +34,9 @@ public class RolHelper {
 	}
 	public static boolean isUsuariActualAdministradorEntitat(String rolActual) {
 		return ROLE_ADMIN_ENTITAT.equals(rolActual);
+	}
+	public static boolean isUsuariActualAdministradorLectura(String rolActual) {
+		return ROLE_ADMIN_LECTURA.equals(rolActual);
 	}
 	public static boolean isUsuariActualUsuari(String rolActual) {
 		return ROLE_USUARI.equals(rolActual);

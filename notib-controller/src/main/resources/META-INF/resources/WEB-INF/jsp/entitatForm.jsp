@@ -120,7 +120,9 @@ $(document).ready(function() {
 				};
 		});
 	    addDefault(data);
-
+		if ($("#tipusDocName").val().length == 1) {
+			$("#tipusDocDefault").val(data[0].valor).trigger("change");
+		}
 
 	});
 
@@ -208,7 +210,8 @@ $(document).ready(function() {
 		}
 	});
 
-	if (!$('#entregaCieActiva')[0].checked) {
+	let entregaCieActiva = $('#entregaCieActiva')[0];
+	if (entregaCieActiva && !entregaCieActiva.checked) {
 		$('#entrega-cie-form').hide();
 	}
 });
@@ -339,7 +342,7 @@ function updateLlibre(dir3codi) {
 				<div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>">
 					<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/> *</label>
 					<div class="controls col-xs-8">
-						<select name="tipusDocName" id="tipusDocName" class="customSelect" multiple>
+							<select name="tipusDocName" id="tipusDocName" class="customSelect" multiple>
 						<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
 <%-- 							<c:set var="documentVar"> --%>
 <%-- 						      <spring:message code="tipus.document.enum.${enumValue}" /> --%>

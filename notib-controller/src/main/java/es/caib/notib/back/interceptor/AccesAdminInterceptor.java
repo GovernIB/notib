@@ -32,7 +32,9 @@ public class AccesAdminInterceptor implements AsyncHandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-		if (RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()) || RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual())) {
+		if (RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual())
+				|| RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual())
+				|| RolHelper.isUsuariActualAdministradorLectura(sessionScopedContext.getRolActual())) {
 			return true;
 		}
 		throw new SecurityException(aplicacioService.getMissatgeErrorAccesAdmin(), null);

@@ -8,6 +8,7 @@ import es.caib.notib.logic.intf.service.NotificaService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentNotificaRequest;
 import es.caib.notib.logic.websocket.WebSocketJms;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -118,15 +119,16 @@ public class NotificaServiceImpl implements NotificaService {
 
     @Transactional
     @Override
-    public boolean consultaEstatEnviament(ConsultaNotificaDto enviament) {
+    public boolean consultaEstatEnviament(ConsultaNotificaRequest consulta) {
 
+        var consultaDto = consulta.getConsultaNotificaDto();
         try {
         // Consultar enviament a notifica
-            notificacioService.enviamentRefrescarEstat(enviament.getId());
-            var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElseThrow();
+            notificacioService.enviamentRefrescarEstat(consulta);
+            var enviamentEntity = notificacioEnviamentRepository.findByUuid(consultaDto.getUuid()).orElseThrow();
             return enviamentEntity.getNotificaIntentNum() == 0;
         } catch (Exception ex) {
-            log.error("Error en la consulta de l'estat de l'enviament " + enviament.getUuid());
+            log.error("Error en la consulta de l'estat de l'enviament " + consultaDto.getUuid(), ex);
             return false;
         }
     }

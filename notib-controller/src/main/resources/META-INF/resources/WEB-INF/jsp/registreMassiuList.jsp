@@ -4,6 +4,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%
+	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
+	pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()));
+%>
 <html>
 <head>
 	<title><spring:message code="accio.massiva.registre.titol"/></title>
@@ -175,23 +179,24 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 
 </head>
 <body>
-	
-	<script id="botonsTemplate" type="text/x-jsrender">
-		<div class="btn-group pull-right">
-			<div class="btn-group">
-				<button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
-				<button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
+	<c:if test="${!isRolActualAdministradorLectura}">
+		<script id="botonsTemplate" type="text/x-jsrender">
+			<div class="btn-group pull-right">
 				<div class="btn-group">
-					<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-  						<span id="seleccioCount" class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
-					</button>
-					<ul class="dropdown-menu">
-						<li><a href="./notificacionsError/reintentar"><spring:message code="accio.massiva.registre.boto"/></a></li>
-					</ul>
+					<button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
+					<button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
+					<div class="btn-group">
+						<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<span id="seleccioCount" class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<li><a href="./notificacionsError/reintentar"><spring:message code="accio.massiva.registre.boto"/></a></li>
+						</ul>
+					</div>
 				</div>
 			</div>
-		</div>
-	</script>
+		</script>
+	</c:if>
 		
 	<form:form id="filtre" action="" method="post" cssClass="well" modelAttribute="notificacioRegistreErrorFiltreCommand" >
 		<div class="row">
@@ -228,7 +233,9 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 		data-url="<c:url value="/massiu/registre/datatable"/>"
 		class="table table-bordered table-striped" 
 		data-default-dir="desc"
-		data-botons-template="#botonsTemplate"
+		<c:if test="${!isRolActualAdministradorLectura}">
+			data-botons-template="#botonsTemplate"
+		</c:if>
 		data-selection-enabled="true"
 		style="width:100%">
 		<thead>

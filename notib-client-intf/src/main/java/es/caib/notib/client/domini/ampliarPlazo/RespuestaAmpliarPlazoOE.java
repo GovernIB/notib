@@ -31,6 +31,8 @@ public class RespuestaAmpliarPlazoOE extends RespostaBase {
     private List<String> codis;
     private List<String> descripcions;
 
+    private List<String> noExecutades;
+
     public boolean isOk() {
 
         if (codigoRespuesta != null) {

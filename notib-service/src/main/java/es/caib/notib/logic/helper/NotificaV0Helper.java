@@ -3,6 +3,8 @@ package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.AccioParam;
@@ -14,6 +16,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
@@ -45,6 +48,8 @@ import javax.xml.ws.soap.SOAPFaultException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -70,6 +75,9 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private EnviamentTableHelper enviamentTableHelper;
+	@Autowired
+	private AccioMassivaHelper accioMassivaHelper;
+
 	private MockPlay mockPlay;
 
 	private final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -148,28 +156,25 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 
 	@SneakyThrows
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
-	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
+	public NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta) throws Exception {
 
 		Thread.sleep(1000);
-		log.info(String.format(" [NOT] Refrescant estat de notific@ de l'enviament (Id=%d)", enviamentId));
-		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+		var consultaDto = consulta.getConsultaNotificaDto();
+		log.info(String.format(" [NOT] Refrescant estat de notific@ de l'enviament (Id=%d)", consultaDto.getId()));
 		try {
-			return enviamentRefrescarEstat(enviament, false);
+			return enviamentRefrescarEstat(consulta, false);
 		} catch (Exception e) {
-			if (e instanceof SistemaExternException) {
-				throw (SistemaExternException) e;
-			}
+			throw e;
 		}
-		return enviament;
 	}
 
-	@SneakyThrows
-	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
-	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception {
-		Thread.sleep(1000);
-		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-		return enviamentRefrescarEstat(enviament, raiseExceptions);
-	}
+//	@SneakyThrows
+//	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
+//	public NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta, boolean raiseExceptions) throws Exception {
+//
+//		Thread.sleep(1000);
+//		return enviamentRefrescarEstat(consulta, raiseExceptions);
+//	}
 
 	@Override
 	public RespuestaSincronizarEnvioOE enviamentEntregaPostalNotificada(SincronizarEnvio sincronizarEnvio) throws Exception {
@@ -192,6 +197,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		StringBuilder codiEntitat = new StringBuilder();
 		Date data, dataAmpliada;
 		String entitat;
+		List<AmpliacionPlazo> ampliacionesPlazo = new ArrayList<>();
+		AmpliacionesPlazo ampliaciones =  new AmpliacionesPlazo();
 		for (var enviament : enviaments) {
 			data = enviament.getNotificaDataCaducitat();
 			if (data == null) {
@@ -213,15 +220,21 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			if (!codiEntitat.toString().contains(entitat)) {
 				codiEntitat.append(entitat);
 			}
+			ampliacionesPlazo.add(AmpliacionPlazo.builder().identificador(enviament.getUuid()).codigo("000").build());
 		}
+		ampliaciones.setAmpliacionPlazo(ampliacionesPlazo);
+		resposta.setAmpliacionesPlazo(ampliaciones);
 		info.setCodiEntitat(codiEntitat.toString());
 		integracioHelper.addAccioOk(info);
 		return resposta;
 	}
 
 
-	private NotificacioEnviamentEntity enviamentRefrescarEstat(NotificacioEnviamentEntity enviament, boolean raiseExceptions) throws Exception {
+	@SneakyThrows
+	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
+	public NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta, boolean raiseExceptions) throws Exception {
 
+		var enviament = notificacioEnviamentRepository.findById(consulta.getConsultaNotificaDto().getId()).orElseThrow();
 		log.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		var notificacio = notificacioRepository.findById(enviament.getNotificacio().getId()).orElseThrow();
 		mockPlay = new MockPlay(notificacio.getConcepte());
@@ -237,6 +250,9 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			if (enviament.getNotificaIdentificador() == null || enviament.getNotificaIntentNum() < mockPlay.getIntentsConsulta()) {
 				log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				errorDescripcio = "L'enviament no té identificador de Notifica";
+				if (consulta.getAccioMassivaId() != null) {
+					accioMassivaHelper.actualitzar(consulta.getAccioMassivaId(), enviament.getId(), errorDescripcio, "");
+				}
 				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 			}
 			var infoEnvio = new InfoEnvioLigero();
@@ -244,6 +260,9 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			var resultadoInfoEnvio = infoEnviament(enviament);
 			if (resultadoInfoEnvio.getDatados() == null) {
 				errorDescripcio = "La resposta rebuda de Notifica no conté informació de datat";
+				if (consulta.getAccioMassivaId() != null) {
+					accioMassivaHelper.actualitzar(consulta.getAccioMassivaId(), enviament.getId(), errorDescripcio, "");
+				}
 				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 			}
 
@@ -264,6 +283,9 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			}
 			if (datatDarrer == null) {
 				errorDescripcio = "No s'ha pogut trobar el darrer datat dins la resposta rebuda de Notifica";
+				if (consulta.getAccioMassivaId() != null) {
+					accioMassivaHelper.actualitzar(consulta.getAccioMassivaId(), enviament.getId(), errorDescripcio, "");
+				}
 				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 			}
 
@@ -318,6 +340,9 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 //			}
 			log.info("Enviament actualitzat");
 			enviament.refreshNotificaConsulta();
+			if (consulta.getAccioMassivaId() != null) {
+				accioMassivaHelper.actualitzar(consulta.getAccioMassivaId(), enviament.getId(), errorDescripcio, "");
+			}
 			log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 
 		} catch (Exception ex) {
@@ -327,6 +352,9 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			errorMaxReintents = enviament.getNotificaIntentNum() >= pluginHelper.getConsultaReintentsMaxProperty();
 			errorDescripcio = getErrorDescripcio(ex);
 			excepcio = ex;
+			if (consulta.getAccioMassivaId() != null) {
+				accioMassivaHelper.actualitzar(consulta.getAccioMassivaId(), enviament.getId(), errorDescripcio, Arrays.toString(ex.getStackTrace()));
+			}
 			log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		}
 		notificacioEventHelper.addNotificaConsultaEvent(enviament, error, errorDescripcio, errorMaxReintents);

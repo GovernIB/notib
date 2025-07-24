@@ -4,6 +4,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%
+	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
+	pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()), PageContext.REQUEST_SCOPE);
+%>
 <html>
 <head>
 	<title><spring:message code="cie.fulla.list.titol"/></title>
@@ -29,30 +33,36 @@
 		data-default-order="1"
 		data-default-dir="desc"
 		class="table table-striped table-bordered"
-		data-botons-template="#botonsTemplate"
+		<c:if test="${!isRolActualAdministradorLectura}">
+			data-botons-template="#botonsTemplate"
+		</c:if>
 		style="width:100%"
 		data-filter="#filtre">
 		<thead>
 			<tr>
+				<th data-col-name="id" data-visible="false">#</th>
 				<th data-col-name="codi"><spring:message code="cie.list.columna.format.fulla.codi"/></th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
-					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<div class="dropdown">
-							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-							<ul class="dropdown-menu">
-								<li><a href="${unitatCodiUrlPrefix}fulla/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								<li><a href="${unitatCodiUrlPrefix}fulla/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="cie.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-							</ul>
-						</div>
-					</script>
-				</th>
+				<c:if test="${!isRolActualAdministradorLectura}">
+					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+						<script id="cellAccionsTemplate" type="text/x-jsrender">
+							<div class="dropdown">
+								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+								<ul class="dropdown-menu">
+									<li><a href="${unitatCodiUrlPrefix}fulla/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									<li><a href="${unitatCodiUrlPrefix}fulla/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="cie.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								</ul>
+							</div>
+						</script>
+					</th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>
-	
-	<script id="botonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a id="pagadorcie-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}fulla/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="cie.list.boto.nou.format.fulla"/></a></p>
-	</script>
+	<c:if test="${!isRolActualAdministradorLectura}">
+		<script id="botonsTemplate" type="text/x-jsrender">
+			<p style="text-align:right"><a id="pagadorcie-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}fulla/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="cie.list.boto.nou.format.fulla"/></a></p>
+		</script>
+	</c:if>
 	<a href="<c:url value="/cie?mantenirPaginacio=true"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 	<div class="clearfix"></div>
 </body>

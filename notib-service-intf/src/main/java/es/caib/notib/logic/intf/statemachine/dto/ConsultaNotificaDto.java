@@ -27,5 +27,6 @@ public class ConsultaNotificaDto {
     private Date notificaCertificacioData;
     private String notificaCertificacioArxiuId;
     private boolean deleted;
+    private Long accioMassivaId;
 
 }

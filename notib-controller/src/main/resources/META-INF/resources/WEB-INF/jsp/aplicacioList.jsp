@@ -7,6 +7,7 @@
 <%
 	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
 	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(ssc.getRolActual()));
+	pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()));
 %>
 <html>
 <head>
@@ -31,9 +32,11 @@
 	<link href="<c:url value="/css/entitatusuari.css"/>" rel="stylesheet" type="text/css">
 </head>
 <body>
-	<div class="text-right" data-toggle="botons-titol">
-		<a class="btn btn-default" href="<c:url value="/entitat/${entitat.id}/aplicacio/new"/>" data-toggle="modal" data-datatable-id="taulaAplicacions"><span class="fa fa-plus"></span>&nbsp;<spring:message code="aplicacio.list.boto.nova.aplicacio"/></a>
-	</div>
+	<c:if test="${!isRolActualAdministradorLectura}">
+		<div class="text-right" data-toggle="botons-titol">
+			<a class="btn btn-default" href="<c:url value="/entitat/${entitat.id}/aplicacio/new"/>" data-toggle="modal" data-datatable-id="taulaAplicacions"><span class="fa fa-plus"></span>&nbsp;<spring:message code="aplicacio.list.boto.nova.aplicacio"/></a>
+		</div>
+	</c:if>
 	<form:form id="form-filtre" action="" method="post" cssClass="well" modelAttribute="aplicacioFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
@@ -52,7 +55,13 @@
 			<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 		</div>
 	</form:form>
-	<script id="botonsTemplate" type="text/x-jsrender"></script>
+	<script id="botonsTemplate" type="text/x-jsrender">
+		<div class="text-right">
+        	<div class="btn-group">
+				<a class="btn btn-success" href="<c:url value="/entitat/${entitat.id}/aplicacio/diagnostic"/>" data-toggle="modal" style="margin-right:10px"><span class="fa fa-list"></span>&nbsp;<spring:message code="integracio.diagnostic"/></a>
+			</div>
+		</div>
+	</script>
 	<table
 		id="taulaAplicacions"
 		data-toggle="datatable"
@@ -63,7 +72,6 @@
 		data-default-dir="asc"
 		data-botons-template="#botonsTemplate"
 		class="table table-bordered table-striped"
-		data-info-type="search"
 		style="width:100%">
 		<thead>
 			<tr>
@@ -86,14 +94,18 @@
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="aplicacio/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								{{if !activa}}
-								<li><a href="aplicacio/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
-								{{else}}
-								<li><a href="aplicacio/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
+								{{if ${!isRolActualAdministradorLectura}}}
+									<li><a href="aplicacio/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									{{if !activa}}
+										<li><a href="aplicacio/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
+									{{else}}
+										<li><a href="aplicacio/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
+									{{/if}}
 								{{/if}}
 								<li><a href="aplicacio/{{:id}}/provar" data-toggle="ajax"><span class="fa fa-cog"></span>&nbsp;&nbsp;<spring:message code="comu.boto.provar"/></a></li>
-								<li><a href="aplicacio/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="aplicacio.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								{{if ${!isRolActualAdministradorLectura}}}
+									<li><a href="aplicacio/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="aplicacio.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								{{/if}}
 							</ul>
 						</div>
 					</script>

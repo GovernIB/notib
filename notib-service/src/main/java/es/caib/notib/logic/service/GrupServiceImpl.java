@@ -193,7 +193,7 @@ public class GrupServiceImpl implements GrupService{
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			if (entitatId != null) {
-				entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+				entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 			}
 			var procSer = procSerRepository.findById(procedimentId).orElse(null);
 			var grupsProcediment = grupProcSerRepository.findByProcSer(procSer, paginacioHelper.toSpringDataPageable(paginacioParams));
@@ -281,7 +281,7 @@ public class GrupServiceImpl implements GrupService{
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarPermisos(null, true, true, true );
+			entityComprovarHelper.comprovarPermisos(null, true, true, true, true);
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			Page<GrupEntity> grup = null;
 			List<String> organsFills = null;

@@ -17,6 +17,6 @@ public class EnviamentSm implements Serializable, IEnviamentMQ {
 
     Integer numIntent;
     String enviamentUuid;
-
+    Long accioMassivaId;
     String codiUsuari;
 }

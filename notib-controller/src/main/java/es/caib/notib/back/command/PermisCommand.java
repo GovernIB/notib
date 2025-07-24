@@ -47,6 +47,7 @@ public class PermisCommand {
 	private boolean usuari;
 	private boolean administrador;
 	private boolean administradorEntitat;
+	private boolean administradorLectura;
 	private boolean aplicacio;
 	
 	private boolean processar;

@@ -41,8 +41,6 @@
                         $("#span-refresh-" + integracio).removeClass('fa-refresh');
                         let clase;
                         let textNode;
-                        console.log("int " + integracio);
-                        console.log(data);
                         if (!data.diagnosticsEntitat || Object.keys(data.diagnosticsEntitat).length === 0) {
                             if (data.correcte) {
                                 clase = "fa-check text-succes";

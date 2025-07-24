@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 @Getter
 @Setter
 @Builder
@@ -18,4 +19,6 @@ public class AmpliarPlazoOE {
 //    protected String organismoEmisor;
     protected int plazo;
     protected String motivo;
+    protected Long accioMassiva;
+
 }

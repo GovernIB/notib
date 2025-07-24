@@ -197,7 +197,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 				throw new PermissionDeniedException(procediment.getId(), ProcedimentEntity.class, auth.getName(), "ADMINISTRADORENTITAT");
 			}
 			
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 			var procedimentEntity = !isAdmin ? (ProcedimentEntity) entityComprovarHelper.comprovarProcediment(entitat, procediment.getId())
 						:procedimentRepository.findById(procediment.getId()).orElseThrow();
 
@@ -308,7 +308,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var auth = SecurityContextHolder.getContext().getAuthentication();
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 			var procedimentEntity = entityComprovarHelper.comprovarProcediment(entitat, id);
 			if (!isAdminEntitat && procedimentEntity.isComu()) {
 				throw new PermissionDeniedException(procedimentEntity.getId(), ProcedimentEntity.class, auth.getName(), "ADMINISTRADORENTITAT");
@@ -409,7 +409,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 		try {
 			var proc = pluginHelper.getProcSerByCodiSia(codiSia, false);
 			if (proc == null) {
-				var entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false);
+				var entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false, false);
 				var procediment = procedimentRepository.findByCodiAndEntitat(codiSia, entity);
 				if (procediment != null) {
 					procediment.updateActiu(false);
@@ -425,7 +425,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			for (var unitat: unitatsWs) {
 				codiOrgansGda.add(unitat.getCodi());
 			}
-			var entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false);
+			var entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false, false);
 			procedimentHelper.actualitzarProcedimentFromGda(progres, proc, entity, codiOrgansGda, true, organsModificats, avisosProcedimentsOrgans);
 			if (avisosProcedimentsOrgans.size() > 0) {
 				if (procedimentsAmbOrganNoSincronitzat.containsKey(entitat)) {
@@ -485,7 +485,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 		try {
 			log.debug("Consulta del procediment (entitatId=" + entitatId + ", procedimentId=" + procedimentId + ")");
 			if (entitatId != null && !isAdministrador) {
-				entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+				entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 			}
 			var procediment = entityComprovarHelper.comprovarProcediment(entitatId, procedimentId);
 			var resposta = conversioTipusHelper.convertir(procediment, ProcSerDto.class);
@@ -507,7 +507,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			log.debug("Consulta del procediment (entitatId=" + entitatId + ", codi=" + codiProcediment + ")");
 			EntitatEntity entitat = null;
 			if (entitatId != null) {
-				entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+				entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 			}
 			var procediment = procedimentRepository.findByCodiAndEntitat(codiProcediment, entitat);
 			return conversioTipusHelper.convertir(procediment, ProcSerDto.class);
@@ -525,7 +525,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			log.debug("Consulta del procediment (entitatId=" + entitatId + ", nom=" + nomProcediment + ")");
 			EntitatEntity entitat = null;
 			if (entitatId != null) {
-				entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+				entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 			}
 			var procediments = procedimentRepository.findByNomAndEntitat(nomProcediment, entitat);
 			return procediments != null && !procediments.isEmpty() ? conversioTipusHelper.convertir(procediments.get(0), ProcSerDto.class) : null;
@@ -584,7 +584,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+			entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 			var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId);
 			var entitatsActiva = entitatRepository.findByActiva(true);
 			List<Long> entitatsActivaId = new ArrayList<>();
@@ -695,7 +695,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de tots els procediments");
-			entityComprovarHelper.comprovarPermisos(null, true, true, false);
+			entityComprovarHelper.comprovarPermisos(null, true, true, false, true);
 			return conversioTipusHelper.convertirList(procedimentRepository.findAll(), ProcSerDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -720,7 +720,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de tots els procediments");
-			entityComprovarHelper.comprovarPermisos(null, true, true, false);
+			entityComprovarHelper.comprovarPermisos(null, true, true, false, true);
 			var grupsProcediments = grupProcedimentRepository.findAll();
 			return conversioTipusHelper.convertirList(grupsProcediments, ProcSerGrupDto.class);
 		} finally {
@@ -735,7 +735,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de tots els procediments d'una entitat");
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 			var grupsProcediments = grupProcedimentRepository.findByProcSerEntitat(entitat);
 			return conversioTipusHelper.convertirList(grupsProcediments, ProcSerGrupDto.class);
 		} finally {
@@ -749,7 +749,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {	
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 			return conversioTipusHelper.convertirList(procedimentRepository.findProcedimentsByEntitatAndGrup(entitat, grups), ProcSerDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -762,7 +762,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 			return conversioTipusHelper.convertirList(procedimentRepository.findProcedimentsAmbGrupsByEntitatAndGrup(entitat, grups), ProcSerDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -775,7 +775,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 			return conversioTipusHelper.convertirList(procedimentRepository.findProcedimentsSenseGrupsByEntitat(entitat), ProcSerDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -805,7 +805,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var auth = SecurityContextHolder.getContext().getAuthentication();
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 			var permisos = entityComprovarHelper.getPermissionsFromName(permis);
 			var organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, organGestorCodi);
 			// 1. Obtenim tots els procediments de l'òrgan gestor
@@ -976,7 +976,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 			var procediments = procedimentRepository.findProcedimentsByEntitatAndGrup(entitat, grups);
 			if (procediments == null || procediments.isEmpty()) {
 				return false;
@@ -1049,7 +1049,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			log.debug("Consulta dels permisos del procediment (entitatId=" + entitatId +  ", procedimentId=" + procedimentId + ", tipus=" + tipus + ")");
 			EntitatEntity entitat = null;
 			if (entitatId != null && !isAdministrador) {
-				entitat = entityComprovarHelper.comprovarEntitat(entitatId, false,false,false);
+				entitat = entityComprovarHelper.comprovarEntitat(entitatId, false,false,false, false);
 			}
 			var procediment = entityComprovarHelper.comprovarProcediment(entitat, procedimentId);
 			boolean adminOrgan = organActual != null;
@@ -1257,7 +1257,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Modificació del grup del procediment (entitatId=" + entitatId +  ", " + "procedimentGrupID=" + procedimentGrupId + ")");
-			entityComprovarHelper.comprovarEntitat(entitatId,false,false,false);
+			entityComprovarHelper.comprovarEntitat(entitatId,false,false,false, false);
 			var grupProcedimentEntity = grupProcedimentRepository.findById(procedimentGrupId).orElseThrow();
 			grupProcedimentRepository.delete(grupProcedimentEntity);
 			cacheHelper.evictFindProcedimentServeisWithPermis();

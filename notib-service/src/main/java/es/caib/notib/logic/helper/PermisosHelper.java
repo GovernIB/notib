@@ -193,6 +193,9 @@ public class PermisosHelper {
 	private List<AclSidEntity> getSids(Authentication auth) {
 
 		List<AclSidEntity> sids = new ArrayList<>();
+		if (auth == null) {
+			return sids;
+		}
 		var userSid = aclSidRepository.getUserSid(auth.getName());
 		if (userSid != null) {
 			sids.add(userSid);
@@ -508,6 +511,9 @@ public class PermisosHelper {
 		if (ExtendedPermission.ADMINISTRADORENTITAT.equals(ace.getPermission())) {
 			permis.setAdministradorEntitat(true);
 		}
+		if (ExtendedPermission.ADMINISTRADORLECTURA.equals(ace.getPermission())) {
+			permis.setAdministradorLectura(true);
+		}
 		if (ExtendedPermission.APLICACIO.equals(ace.getPermission())) {
 			permis.setAplicacio(true);
 		}
@@ -625,6 +631,9 @@ public class PermisosHelper {
 		}
 		if (permis.isAdministradorEntitat()) {
 			permissions.add(ExtendedPermission.ADMINISTRADORENTITAT);
+		}
+		if (permis.isAdministradorLectura()) {
+			permissions.add(ExtendedPermission.ADMINISTRADORLECTURA);
 		}
 		if (permis.isAplicacio()) {
 			permissions.add(ExtendedPermission.APLICACIO);

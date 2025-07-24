@@ -180,7 +180,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarEntitat(dto.getEntitatId(), false, true, false);
+			entityComprovarHelper.comprovarEntitat(dto.getEntitatId(), false, true, false, false);
 			OrganGestorEntity organGestor = organGestorRepository.findById(dto.getId()).orElseThrow();
 			organGestor.updateOficina(dto.getOficina().getCodi(), dto.getOficina().getNom());
 			organGestor.setEntregaCieDesactivada(dto.isEntregaCieDesactivada());
@@ -501,7 +501,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@SuppressWarnings("unchecked")
 	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto) throws Exception {
 
-		var entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false);
+		var entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false, false);
 		var prefix = "[SYNC-ORGANS] ";
 		log.debug(prefix + "Inici sync organs gestors");
 		var msg = "";
@@ -687,7 +687,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Override
 	public byte[] getJsonOrgansGestorDir3(Long entitatId) {
 
-		var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+		var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false);
 		try {
 			return pluginHelper.unitatsOrganitzativesFindByPareJSON(entitat.getCodi(), entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
 		} catch (Exception ex) {
@@ -700,7 +700,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Transactional(readOnly = true)
 	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) {
 
- 		var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+ 		var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false);
 		var isFirstSincronization = entitat.getDataSincronitzacio() == null;
 		List<UnitatOrganitzativaDto> unitatsVigents;
 		if (isFirstSincronization) {
@@ -1245,7 +1245,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, true);
 			try {
 				//Recupera el llibre de l'òrgan gestor especificat (organisme)
 				return cacheHelper.getLlibreOrganGestor(entitat.getDir3Codi(), organGestorDir3Codi);
@@ -1558,7 +1558,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, true);
 			List<OficinaDto> oficines = new ArrayList<>();
 			try {
 				if (!isFiltre) {
@@ -1697,7 +1697,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		try (var listWriter = new CsvListWriter(writer, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE)) {
 			log.debug("Exportant informació dels Òrgans Gestors");
 			var entitatEntity = entitatRepository.findById(entitatId).orElseThrow();
-			entityComprovarHelper.comprovarPermisos(null, true, true, false);
+			entityComprovarHelper.comprovarPermisos(null, true, true, false, false);
 			var organs = organGestorRepository.findByEntitat(entitatEntity);
 			// Genera les columnes
 			int numColumnes = 8;

@@ -25,7 +25,7 @@ public class CallbackProcessarPendentsThread implements Callable<Boolean> {
 
         log.info("[Callback] >>> Realitzant callback de la notificació amb id " + enviamentId);
         try {
-            return callbackHelper.notifica(enviamentId);
+            return callbackHelper.notifica(enviamentId, null);
         } catch (Exception e) {
             error = true;
             log.error(String.format("[Callback] L'enviament [Id: %d] ha provocat la següent excepcio:", enviamentId), e);

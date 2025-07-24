@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.DatesUtils;
@@ -85,9 +86,9 @@ public abstract class AbstractNotificaHelper {
 
 	public abstract NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail);
 
-	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException;
+	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta) throws Exception;
 
-	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception;
+	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta, boolean raiseExceptions) throws Exception;
 
 	public abstract RespuestaSincronizarEnvioOE enviamentEntregaPostalNotificada(SincronizarEnvio sincronizarEnvio) throws Exception;
 

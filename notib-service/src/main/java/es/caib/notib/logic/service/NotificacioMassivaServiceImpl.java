@@ -2,6 +2,7 @@ package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
 import es.caib.notib.logic.cacheable.CacheBridge;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.exception.DocumentNotFoundException;
@@ -298,17 +299,22 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 var organGestor = !Strings.isNullOrEmpty(notificacio.getOrganGestor()) ? organGestorRepository.findByEntitatAndCodi(entitat, notificacio.getOrganGestor()) : null;
                 var document = documentHelper.getDocument(notificacio.getDocument());
                 // En massives només podem tenir un document
-//                if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {
-//                    document2 = documentHelper.getDocument(notificacio.getDocument2());
-//                    document3 = documentHelper.getDocument(notificacio.getDocument3());
-//                    document4 = documentHelper.getDocument(notificacio.getDocument4());
-//                    document5 = documentHelper.getDocument(notificacio.getDocument5());
-//                }
+                DocumentValidDto document2 = null;
+                DocumentValidDto document3 = null;
+                DocumentValidDto document4 = null;
+                DocumentValidDto document5 = null;
+                if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {
+                    document2 = documentHelper.getDocument(notificacio.getDocument2());
+                    document3 = documentHelper.getDocument(notificacio.getDocument3());
+                    document4 = documentHelper.getDocument(notificacio.getDocument4());
+                    document5 = documentHelper.getDocument(notificacio.getDocument5());
+                }
 
+                //TODO AQUEST IF S'HA DE COMPROVAR SI REALMENT ES NECESITA, EN MASIVES ES POT CREAR SENSE DOCUMENT I VALIDA
                 if (notificacio.getDocument() == null || Strings.isNullOrEmpty(notificacio.getDocument().getContingutBase64())) {
                     notificacioValidator.setValidarDocuments(false);
                 }
-                var docs = new DocumentValidDto[] { document, null, null, null, null };
+                var docs = new DocumentValidDto[] { document, document2, document3, document4, document5 };
                 var errors = new BindException(notificacio, "notificacio");
                 notificacioValidator.setNotificacio(notificacio);
                 notificacioValidator.setEntitat(entitat);
@@ -376,7 +382,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     @Override
     public PaginaDto<NotificacioTableItemDto> findNotificacions(Long entitatId, Long notificacioMassivaId, NotificacioFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 
-        var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+        var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
         var pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
         var f = notificacioListHelper.getFiltre(filtre, entitatId, null, null, null);
         f.setNotificacioMassiva(notificacioMassivaRepository.findById(notificacioMassivaId).orElse(null));
@@ -419,7 +425,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         Page<NotificacioMassivaEntity> pageNotificacionsMassives;
         if (RolEnumDto.tothom.equals(rol)){
             pageNotificacionsMassives = findAmbFiltrePaginatByUser(entitat, filtre, paginacioParams);
-        } else if (RolEnumDto.NOT_ADMIN.equals(rol)){
+        } else if (RolEnumDto.NOT_ADMIN.equals(rol) || RolEnumDto.NOT_ADMIN_LECTURA.equals(rol)){
             pageNotificacionsMassives = findAmbFiltrePaginatByAdminEntitat(entitat, filtre, paginacioParams);
         } else {
             throw new AccessDeniedException("Només es poden consultar les notificacions massives amb els rols d'usuari o d'administrador d'entitat");

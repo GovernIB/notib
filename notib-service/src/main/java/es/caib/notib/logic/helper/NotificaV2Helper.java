@@ -11,9 +11,9 @@ import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
-import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.logic.objectes.LoggingTipus;
@@ -44,7 +44,6 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
 import es.caib.notib.plugin.utils.WsClientHelper;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
@@ -77,6 +76,7 @@ import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -108,6 +108,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
 	private EnviamentTableHelper enviamentTableHelper;
+	@Autowired
+	private AccioMassivaHelper accioMassivaHelper;
 
 	private static final String NOTIB = "Notib";
     @Autowired
@@ -128,9 +130,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			notificacio.updateNotificaNouEnviament();
 			// Validacions
 			if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
-				log.error(" [NOT] la notificació no té l'estat REGISTRADA o ENVIADA AMB ERRORS.");
-				integracioHelper.addAccioError(info, "La notificació no està registrada, o enviada amb errors");
-				throw new ValidationException(notificacioId, NotificacioEntity.class, "La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA.name() + " o " + NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.name());
+				var msg = "la notificació no té l'estat REGISTRADA o ENVIADA AMB ERRORS.";
+				log.error(" [NOT] " + msg);
+				integracioHelper.addAccioError(info, msg);
+				throw new ValidationException(notificacioId, NotificacioEntity.class, msg);
 			}
 			var error = false;
 			String errorDescripcio = null;
@@ -243,29 +246,27 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
-	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
+	public NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta) throws Exception {
 
-		log.info(String.format(" [NOT] Refrescant estat de notific@ de l'enviament (Id=%d)", enviamentId));
-		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+		log.info(String.format(" [NOT] Refrescant estat de notific@ de l'enviament (Id=%d)", consulta.getConsultaNotificaDto().getId()));
 		try {
-			return enviamentRefrescarEstat(enviament, false);
+			return enviamentRefrescarEstat(consulta, false);
 		} catch (Exception e) {
-			if (e instanceof SistemaExternException) {
-				throw (SistemaExternException) e;
-			}
+			throw e;
 		}
-		return enviament;
 	}
+
+//	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
+//	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception {
+//
+//		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+//		return enviamentRefrescarEstat(enviament, raiseExceptions);
+//	}
 
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
-	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception {
+	public NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta, boolean raiseExceptions) throws Exception {
 
-		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-		return enviamentRefrescarEstat(enviament, raiseExceptions);
-	}
-
-	private NotificacioEnviamentEntity enviamentRefrescarEstat(@NonNull NotificacioEnviamentEntity enviament, boolean raiseExceptions) throws Exception {
-
+		var enviament = notificacioEnviamentRepository.findById(consulta.getConsultaNotificaDto().getId()).orElseThrow();
 		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA,"Consultar estat d'un enviament", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de l'enviament", String.valueOf(enviament.getId())));
 		info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getCreatedBy().get().getCodi());
@@ -286,6 +287,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				errorDescripcio = "L'enviament no té identificador de Notifica";
 				integracioHelper.addAccioError(info, errorDescripcio);
+				if (consulta.getAccioMassivaId() != null) {
+					accioMassivaHelper.actualitzar(consulta.getAccioMassivaId(), enviament.getId(), errorDescripcio, null);
+				}
 				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 			}
 			startTime = System.nanoTime();
@@ -308,6 +312,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			log.info(" [EST] Enviament actualitzat");
 			enviament.refreshNotificaConsulta();
 			integracioHelper.addAccioOk(info);
+			if (consulta.getAccioMassivaId() != null) {
+				accioMassivaHelper.actualitzar(consulta.getAccioMassivaId(), enviament.getId(), null, null);
+			}
 			log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 
 		} catch (Exception ex) {
@@ -317,6 +324,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 			integracioHelper.addAccioError(info, "Error consultat l'estat de l'enviament", ex);
 			excepcio = ex;
+			if (consulta.getAccioMassivaId() != null) {
+				accioMassivaHelper.actualitzar(consulta.getAccioMassivaId(), enviament.getId(), ex.getMessage(), Arrays.toString(ex.getStackTrace()));
+			}
 			var msg = "Error al consultar l'estat d'un enviament fet amb NotificaV2 (notificacioId=";
 			log.error(msg + enviament.getNotificacio().getId() + ", notificaIdentificador=" + enviament.getNotificaIdentificador() + ")", ex);
 
@@ -451,6 +461,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				errorDesc = "[ampliarPlazoOE] No han arribat dades suficients per guardar la informacio a Notib";
 				log.error(errorDesc);
 				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, errorDesc, false);
+				if (ampliarPlazo.getAccioMassiva() != null) {
+					accioMassivaHelper.actualitzar(ampliarPlazo.getAccioMassiva(), enviament.getId(), errorDesc, "");
+				}
+
 				continue;
 			}
 			for (var ampliacion : ampliaciones.getAmpliacionPlazo()) {
@@ -465,6 +479,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					errorDesc += ampliacion.getMensajeError();
 					ok = false;
 					notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, ampliacion.getMensajeError(), false);
+					if (ampliarPlazo.getAccioMassiva() != null) {
+						accioMassivaHelper.actualitzar(ampliarPlazo.getAccioMassiva(), enviament.getId(), ampliacion.getMensajeError(), "");
+					}
 					continue;
 				}
 				Date dataCaducitat;
@@ -475,6 +492,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					resposta.setDescripcionRespuesta(error);
 					ok = false;
 					notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, error, false);
+					if (ampliarPlazo.getAccioMassiva() != null) {
+						accioMassivaHelper.actualitzar(ampliarPlazo.getAccioMassiva(), enviament.getId(), error, "");
+					}
 					continue;
 				}
 				try {
@@ -488,6 +508,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					resposta.setDescripcionRespuesta(error);
 					ok = false;
 					notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, error, false);
+					if (ampliarPlazo.getAccioMassiva() != null) {
+						accioMassivaHelper.actualitzar(ampliarPlazo.getAccioMassiva(), enviament.getId(), error, "");
+					}
 					continue;
 				}
 				enviament.setPlazoAmpliado(true);
@@ -499,6 +522,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				enviament.getNotificacio().setCaducitat(dataCaducitat);
 				notificacioEnviamentRepository.save(enviament);
 				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, false, "", false);
+				if (ampliarPlazo.getAccioMassiva() != null) {
+					accioMassivaHelper.actualitzar(ampliarPlazo.getAccioMassiva(), enviament.getId(), "", "");
+				}
 			}
 		}
 		info.setCodiEntitat(codiEntitat);

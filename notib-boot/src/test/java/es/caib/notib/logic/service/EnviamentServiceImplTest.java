@@ -155,7 +155,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
 
                         // When: Actualitzam l'estat de l'enviament
                         try {
-                            enviamentService.actualitzarEstat(enviament.getId());
+                            enviamentService.actualitzarEstat(enviament.getId(), null);
 
                             // Then: Comptadors d'intents a 0
                             var envEntity = enviamentRepository.findById(enviament.getId()).orElseThrow();

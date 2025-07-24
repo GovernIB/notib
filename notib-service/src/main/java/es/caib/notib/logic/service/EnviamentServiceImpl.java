@@ -39,6 +39,7 @@ import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -56,6 +57,9 @@ import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.PermisosService;
+import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
+import es.caib.notib.logic.intf.statemachine.dto.ParametresSm;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
@@ -63,6 +67,7 @@ import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.filtres.FiltreConsultaEviament;
 import es.caib.notib.persist.filtres.FiltreEnviament;
+import es.caib.notib.persist.repository.AccioMassivaRepository;
 import es.caib.notib.persist.repository.CallbackRepository;
 import es.caib.notib.persist.repository.ColumnesRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
@@ -95,6 +100,7 @@ import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -168,6 +174,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private static final String CONSULTA_ENV_LOG = "Consulta els enviaments de les notificacións que te una entitat";
 	private static final String FORMAT_DATA = "dd/MM/yyyy";
 	private static final String FORMAT_DATA_HORA = "dd/MM/yyyy HH:mm:ss";
+    @Autowired
+    private AccioMassivaRepository accioMassivaRepository;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -176,7 +184,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta els destinataris d'una notificació (notificacioId=" + notificacioId + ")");
-			entityComprovarHelper.comprovarPermisos(null,true,true,true);
+			entityComprovarHelper.comprovarPermisos(null,true,true,true, true);
 			var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
 			var enviaments = notificacioEnviamentRepository.findByNotificacio(notificacio);
 			var envs = conversioTipusHelper.convertirList(enviaments, NotificacioEnviamentDatatableDto.class);
@@ -221,7 +229,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consultant els ids d'expedient segons el filtre (entitatId=" + entitatId + ", filtre=" + filtre + ")");
-			entityComprovarHelper.comprovarPermisos(entitatId, false, false, false);
+			entityComprovarHelper.comprovarPermisos(entitatId, false, false, false, false);
 			log.debug(CONSULTA_ENV_LOG);
 			log.info("Consulta ids d'enviament, accions massives");
 			entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
@@ -241,7 +249,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarPermisos(null, false, false, false);
+			entityComprovarHelper.comprovarPermisos(null, false, false, false, false);
 			log.debug("Consulta de destinatari donat el seu id (destinatariId=" + enviamentId + ")");
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 			// #779: Obtenim la certificació de forma automàtica
@@ -249,7 +257,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 			if (enviament.getNotificaCertificacioArxiuId() == null && isEstatFinal) {
 
 				try {
-					notificaHelper.enviamentRefrescarEstat(enviamentId);
+					var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentId).build()).build();
+					notificaHelper.enviamentRefrescarEstat(consulta);
 					notificacioEnviamentRepository.flush();
 					enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 				} catch (Exception ex) {
@@ -346,10 +355,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 		var isUsuari = RolEnumDto.tothom.equals(rol);
 		var isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
+		var isUsuariLectura = RolEnumDto.NOT_ADMIN_LECTURA.equals(rol);
 		var isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
 		var isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
 		var entitatsActives = isSuperAdmin ? entitatRepository.findByActiva(true) : null;
-		var entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat, false);
+		var entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat, isUsuari, isUsuariLectura);
 		var auth = SecurityContextHolder.getContext().getAuthentication();
 		entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
 		// Procediments accessibles per qualsevol òrgan gestor
@@ -510,7 +520,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		try {
 			log.debug("Exportant informació dels enviaments (entitatId=" + entitatId + ", enviamentsIds=" + enviamentIds + ", format=" + format + ")");
 			var entitatEntity = entitatRepository.findById(entitatId).orElseThrow();
-			entityComprovarHelper.comprovarPermisos(null, true, true, true);
+			entityComprovarHelper.comprovarPermisos(null, true, true, true, true);
 			var enviaments = notificacioEnviamentRepository.findByIdIn(enviamentIds);
 			//Genera les columnes
 			int numColumnes = 24;
@@ -653,7 +663,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta dels events de la notificació (notificacioId=" + notificacioId + ")");
-			entityComprovarHelper.comprovarPermisos(null, true, true, true);
+			entityComprovarHelper.comprovarPermisos(null, true, true, true, true);
 			return conversioTipusHelper.convertirList(notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacioId), NotificacioEventDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -683,25 +693,36 @@ public class EnviamentServiceImpl implements EnviamentService {
 	
 	@Override
 	@Transactional
-	public void reactivaSir(Set<Long> enviaments) {
+	public void reactivaSir(AccioMassivaExecucio accio) {
 
 		var timer = metricsHelper.iniciMetrica();
+		var accioEntity = accioMassivaRepository.findById(accio.getAccioId()).orElseThrow();
+		accioEntity.setDataInici(new Date());
 		try {
 			NotificacioEnviamentEntity enviament;
 			NotificacioEventEntity event;
-			for (Long enviamentId: enviaments) {
-				enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-				enviament.refreshSirConsulta();
-				event = enviament.getUltimEvent();
-				if (event != null) {
-					event.setFiReintents(false);
+			ParametresSm parametres;
+			for (Long enviamentId : accio.getSeleccio()) {
+				try {
+					enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+					enviament.refreshSirConsulta();
+					event = enviament.getUltimEvent();
+					if (event != null) {
+						event.setFiReintents(false);
+					}
+					auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "EnviamentServiceImpl.reactivaSir");
+					parametres = ParametresSm.builder().enviamentUuid(enviament.getUuid()).build();
+					enviamentSmService.sirReset(parametres);
+					accioEntity.getElement(enviamentId).actualitzar();
+				} catch (Exception ex) {
+					accioEntity.getElement(enviamentId).actualitzar(ex.getMessage(), Arrays.toString(ex.getStackTrace()));
 				}
-				auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "EnviamentServiceImpl.reactivaSir");
-				enviamentSmService.sirReset(enviament.getUuid());
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+		accioEntity.setDataFi(new Date());
+		accioMassivaRepository.save(accioEntity);
 	}
 
 	private NotificacioEnviamentDto enviamentToDto(NotificacioEnviamentEntity enviament) {
@@ -948,7 +969,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 	@Transactional
 	@Override
-	public void actualitzarEstat(Long enviamentId) {
+	public void actualitzarEstat(Long enviamentId, Long accioMassivaId) {
 
 		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 		enviament.refreshNotificaConsulta();
@@ -956,23 +977,21 @@ public class EnviamentServiceImpl implements EnviamentService {
 		if (enviament.getNotificacio().isComunicacioSir()) {
 			// si l'enviament esta pendent de refrescar l'estat enviat SIR
 			if (enviament.isPendentRefrescarEstatRegistre()) {
-				enviamentSmService.sirRetry(enviament.getUuid());
-//				notificacioService.enviamentRefrescarEstatRegistre(enviamentId);
-//				enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-//				if (enviament.isRegistreEstatFinal()) {
-//					enviamentSmService.sirForward(enviament.getUuid());
-//				}
+				var parametres = ParametresSm.builder().enviamentUuid(enviament.getUuid()).accioMassivaId(accioMassivaId).build();
+				enviamentSmService.sirRetry(parametres);
 			}
 			return;
 		}
 		// si l'enviament esta pendent de refrescar estat a notifica
 		if (enviament.isPendentRefrescarEstatNotifica()) {
-			enviamentSmService.consultaRetry(enviament.getUuid());
-//			notificacioService.enviamentRefrescarEstat(enviamentId);
-//			enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-//			if (enviament.isNotificaEstatFinal()) {
-//				enviamentSmService.consultaForward(enviament.getUuid());
-//			}
+			var parametres = ParametresSm.builder().enviamentUuid(enviament.getUuid()).accioMassivaId(accioMassivaId).build();
+			enviamentSmService.consultaRetry(parametres);
+			return;
+		}
+		if (accioMassivaId != null) {
+			var accioMassiva = accioMassivaRepository.findById(accioMassivaId).orElseThrow();
+			var estat = enviament.getNotificacio().isComunicacioSir() ? enviament.getRegistreEstat().name() : enviament.getNotificaEstat().name();
+			accioMassiva.getElement(enviamentId).actualitzar("L'enviament no s'ha actualitzat perquè no es troba en un estat enviat. Estat:  " + estat, "");
 		}
 	}
 
@@ -999,14 +1018,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 
 	@Override
-	public List<Long> enviarCallback(Set<Long> notificacions) throws Exception {
+	public List<Long> enviarCallback(Set<Long> notificacions, Long accioMassivaId) throws Exception {
 
 		var callbacks = callbackRepository.findByNotificacioIdIn(notificacions);
 		List<Long> enviamentsAmbError = new ArrayList<>();
 		boolean isError;
 		for (var callback : callbacks) {
 			log.info(String.format("[callback] Enviar callback de l'enviment [id=%d]", callback.getEnviamentId()));
-			isError = callbackHelper.notifica(callback.getEnviamentId());
+			isError = callbackHelper.notifica(callback.getEnviamentId(), accioMassivaId);
 			if (isError) {
 				enviamentsAmbError.add(callback.getEnviamentId());
 				continue;

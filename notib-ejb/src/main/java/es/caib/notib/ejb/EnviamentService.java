@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.dto.NotificacioEventDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
@@ -103,8 +104,8 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed("**")
-	public void reactivaSir(Set<Long> enviaments) {
-		getDelegateService().reactivaSir(enviaments);
+	public void reactivaSir(AccioMassivaExecucio accio) {
+		getDelegateService().reactivaSir(accio);
 	}
 
 	@Override
@@ -121,8 +122,8 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@PermitAll
-	public void actualitzarEstat(Long enviamentId) {
-		getDelegateService().actualitzarEstat(enviamentId);
+	public void actualitzarEstat(Long enviamentId, Long accioMassivaId) {
+		getDelegateService().actualitzarEstat(enviamentId, accioMassivaId);
 	}
 
 	@Override
@@ -133,8 +134,8 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed("**")
-	public List<Long> enviarCallback(Set<Long> notificacions) throws Exception {
-		return getDelegateService().enviarCallback(notificacions);
+	public List<Long> enviarCallback(Set<Long> notificacions, Long accioMassivaId) throws Exception {
+		return getDelegateService().enviarCallback(notificacions, accioMassivaId);
 	}
 
 	@Override

@@ -9,6 +9,7 @@
 <%
     es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
     pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(ssc.getRolActual()));
+    pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()));
 %>
 <html>
 <head>
@@ -102,124 +103,130 @@
 </head>
 <body>
 
-<div id="loading-screen" class="loading-screen" >
-    <div id="processing-icon" class="processing-icon">
-        <span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: dimgray;margin-top: 10px;"></span>
+    <div id="loading-screen" class="loading-screen" >
+        <div id="processing-icon" class="processing-icon">
+            <span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: dimgray;margin-top: 10px;"></span>
+        </div>
     </div>
-</div>
-<script id="botonsTemplate" type="text/x-jsrender">
-    <div class="text-right">
-        <div class="btn-group">
-				<button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
-				<button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
-				<div id="seleccioCount" class="btn-group">
-					<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-  						<span class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
-					</button>
-					<ul class="dropdown-menu dropdown-left">
-						<li><a id="enviarCallbacks" style="cursor: pointer;"><spring:message code="callback.boto.enviar"/></a></li>
-						<li><a id="pausarCallbacks" style="cursor: pointer;"><spring:message code="callback.boto.pausar"/></a></li>
-						<li><a id="activarCallbacks" style="cursor: pointer;"><spring:message code="callback.boto.activar"/></a></li>
-                    </ul>
+    <c:if test="${!isRolActualAdministradorLectura}">
+        <script id="botonsTemplate" type="text/x-jsrender">
+            <div class="text-right">
+                <div class="btn-group">
+                        <button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
+                        <button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
+                        <div id="seleccioCount" class="btn-group">
+                            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-left">
+                                <li><a id="enviarCallbacks" style="cursor: pointer;"><spring:message code="callback.boto.enviar"/></a></li>
+                                <li><a id="pausarCallbacks" style="cursor: pointer;"><spring:message code="callback.boto.pausar"/></a></li>
+                                <li><a id="activarCallbacks" style="cursor: pointer;"><spring:message code="callback.boto.activar"/></a></li>
+                            </ul>
+                        </div>
                 </div>
-        </div>
-    </div>
-</script>
+            </div>
+        </script>
+    </c:if>
 
-<script id="cellFilterTemplate" type="text/x-jsrender">
-    <div class="dropdown">
-        <button type="submit" id="btnFiltrar" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-search"></span></button>
-    </div>
-</script>
-<div id="cover-spin"></div>
-<form:form id="form-filtre" action="" method="post" cssClass="well" modelAttribute="callbackFiltreCommand">
-    <div class="row">
-        <div class="col-md-2">
-            <not:inputText name="usuariCodi" inline="true" placeholderKey="callback.list.codi.aplicacio"/>
+    <script id="cellFilterTemplate" type="text/x-jsrender">
+        <div class="dropdown">
+            <button type="submit" id="btnFiltrar" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-search"></span></button>
         </div>
-        <div class="col-md-2">
-            <not:inputText name="referenciaRemesa" inline="true" placeholderKey="callback.list.remesa.referencia"/>
-        </div>
-        <div class="col-md-2">
-            <not:inputDate name="dataInici" placeholderKey="callback.filtre.data.creacio.inici" inline="true" required="false" />
-        </div>
-        <div class="col-md-2">
-            <not:inputDate name="dataFi" placeholderKey="callback.filtre.data.creacio.fi" inline="true" required="false" />
-        </div>
-        <div class="col-md-1">
-            <not:inputSelect name="fiReintents" optionItems="${fiReintentsList}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
-                             placeholderKey="callback.filtre.fi.reintents" textKey="callback.filtre.fi.reintents" required="true" labelSize="0"/>
-        </div>
+    </script>
+    <div id="cover-spin"></div>
+    <form:form id="form-filtre" action="" method="post" cssClass="well" modelAttribute="callbackFiltreCommand">
+        <div class="row">
+            <div class="col-md-2">
+                <not:inputText name="usuariCodi" inline="true" placeholderKey="callback.list.codi.aplicacio"/>
+            </div>
+            <div class="col-md-2">
+                <not:inputText name="referenciaRemesa" inline="true" placeholderKey="callback.list.remesa.referencia"/>
+            </div>
+            <div class="col-md-2">
+                <not:inputDate name="dataInici" placeholderKey="callback.filtre.data.creacio.inici" inline="true" required="false" />
+            </div>
+            <div class="col-md-2">
+                <not:inputDate name="dataFi" placeholderKey="callback.filtre.data.creacio.fi" inline="true" required="false" />
+            </div>
+            <div class="col-md-1">
+                <not:inputSelect name="fiReintents" optionItems="${fiReintentsList}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
+                                 placeholderKey="callback.filtre.fi.reintents" textKey="callback.filtre.fi.reintents" required="true" labelSize="0"/>
+            </div>
 
 
-        <div class="col-md-2 pull-right flex-justify-end">
-            <button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default" style="padding: 6px 9px; margin-right:5px;" title="<spring:message code="comu.boto.netejar"/>"><span class="fa fa-eraser icona_ocultable" style="padding: 2px 0px;"></span><span class="text_ocultable"><spring:message code="comu.boto.netejar"/></span></button>
-            <button id="filtrar" type="submit" name="accio" value="filtrar" class="btn btn-primary" title="<spring:message code="comu.boto.filtrar"/>"><span class="fa fa-filter" id="botoFiltrar"></span><span class="text_ocultable"><spring:message code="comu.boto.filtrar"/></span></button>
+            <div class="col-md-2 pull-right flex-justify-end">
+                <button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default" style="padding: 6px 9px; margin-right:5px;" title="<spring:message code="comu.boto.netejar"/>"><span class="fa fa-eraser icona_ocultable" style="padding: 2px 0px;"></span><span class="text_ocultable"><spring:message code="comu.boto.netejar"/></span></button>
+                <button id="filtrar" type="submit" name="accio" value="filtrar" class="btn btn-primary" title="<spring:message code="comu.boto.filtrar"/>"><span class="fa fa-filter" id="botoFiltrar"></span><span class="text_ocultable"><spring:message code="comu.boto.filtrar"/></span></button>
+            </div>
         </div>
-    </div>
-</form:form>
-<table
-        id="callback"
-        data-toggle="datatable"
-        data-url="<c:url value="/callback/datatable"/>"
-        class="table table-striped table-bordered"
-        data-default-order="7"
-        data-default-dir="desc"
-<%--		data-individual-filter="true"--%>
-        data-botons-template="#botonsTemplate"
-        data-date-template="#dataTemplate"
-        data-cell-template="#cellFilterTemplate"
-        data-paging-style-x="true"
-        data-scroll-overflow="adaptMax"
-        data-selection-enabled="true"
-        data-save-state="true"
-        data-mantenir-paginacio="${mantenirPaginacio}"
-        style="width:100%">
-    <thead>
-    <tr>
-        <th data-col-name="id" data-visible="false"></th>
-        <th data-col-name="notificacioId" data-visible="false"></th>
-        <th data-col-name="maxIntents" data-visible="false"></th>
-        <th data-col-name="pausat" data-visible="false"></th>
-        <th data-col-name="usuariCodi"><spring:message code="callback.list.codi.aplicacio"/></th>
-        <th data-col-name="endpoint"><spring:message code="callback.list.endpoint"/></th>
-        <th data-col-name="intents" data-template="#intentsTemplate"><spring:message code="callback.list.intent"/>
-            <script id="intentsTemplate" type="text/x-jsrender">
-                {{:intents}}/{{:maxIntents}}
-            </script>
-        </th>
-        <th data-col-name="dataCreacio" data-converter="datetime"><spring:message code="callback.list.data.creacio"/></th>
-        <th data-col-name="ultimIntent" data-converter="datetime"><spring:message code="callback.list.data.ultim.intent"/></th>
-        <th data-col-name="properIntent" data-orderable="false" data-converter="datetime"><spring:message code="callback.list.data.propera.execucio"/></th>
-        <th data-col-name="estat"><spring:message code="callback.list.estat"/></th>
-        <th data-col-name="pausat" data-template="#cellPausatTemplate" class="th-checkbox">
-            <spring:message code="callback.list.pausat"/>
-            <script id="cellPausatTemplate" type="text/x-jsrender">
-                {{if pausat}}<span class="fa fa-check"></span>{{/if}}
-            </script>
-        </th>
-        <th data-col-name="notificacioReferencia" data-orderable="false" data-template="#referenciaTemplate"><spring:message code="callback.list.remesa.referencia"/>
-            <script id="referenciaTemplate" type="text/x-jsrender">
-                <a href="<c:url value='/notificacio/{{:notificacioId}}/info'/>" data-toggle="modal" data-height="700px" data-processar="true"> {{:notificacioReferencia}}</a>
-            </script>
-        </th>
-        <th data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px" style="z-index:99999;">
-            <script id="cellAccionsTemplate" type="text/x-jsrender">
-                <div class="dropdown">
-                    <button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-                    <ul class="dropdown-menu dropdown-menu-right">
-                        <li><a href="<c:url value="/callback/{{:id}}/enviar"/>"><span class="fa fa-paper-plane-o"></span>&nbsp; <spring:message code="callback.boto.enviar"/></a></li>
-                        {{if pausat}}
-                            <li><a href="<c:url value="/callback/{{:id}}/activar"/>"><span class="fa fa-play"></span>&nbsp; <spring:message code="callback.boto.activar"/></a></li>
-                        {{else}}
-                            <li><a href="<c:url value="/callback/{{:id}}/pausar"/>"><span class="fa fa-pause"></span>&nbsp; <spring:message code="callback.boto.pausar"/></a></li>
-                        {{/if}}
-                    </ul>
-                </div>
-            </script>
-        </th>
-    </tr>
-    </thead>
-</table>
+    </form:form>
+    <table
+            id="callback"
+            data-toggle="datatable"
+            data-url="<c:url value="/callback/datatable"/>"
+            class="table table-striped table-bordered"
+            data-default-order="7"
+            data-default-dir="desc"
+    <%--		data-individual-filter="true"--%>
+            <c:if test="${!isRolActualAdministradorLectura}">
+                data-botons-template="#botonsTemplate"
+            </c:if>
+            data-date-template="#dataTemplate"
+            data-cell-template="#cellFilterTemplate"
+            data-paging-style-x="true"
+            data-scroll-overflow="adaptMax"
+            data-selection-enabled="true"
+            data-save-state="true"
+            data-mantenir-paginacio="${mantenirPaginacio}"
+            style="width:100%">
+        <thead>
+        <tr>
+            <th data-col-name="id" data-visible="false"></th>
+            <th data-col-name="notificacioId" data-visible="false"></th>
+            <th data-col-name="maxIntents" data-visible="false"></th>
+            <th data-col-name="pausat" data-visible="false"></th>
+            <th data-col-name="usuariCodi"><spring:message code="callback.list.codi.aplicacio"/></th>
+            <th data-col-name="endpoint"><spring:message code="callback.list.endpoint"/></th>
+            <th data-col-name="intents" data-template="#intentsTemplate"><spring:message code="callback.list.intent"/>
+                <script id="intentsTemplate" type="text/x-jsrender">
+                    {{:intents}}/{{:maxIntents}}
+                </script>
+            </th>
+            <th data-col-name="dataCreacio" data-converter="datetime"><spring:message code="callback.list.data.creacio"/></th>
+            <th data-col-name="ultimIntent" data-converter="datetime"><spring:message code="callback.list.data.ultim.intent"/></th>
+            <th data-col-name="properIntent" data-orderable="false" data-converter="datetime"><spring:message code="callback.list.data.propera.execucio"/></th>
+            <th data-col-name="estat"><spring:message code="callback.list.estat"/></th>
+            <th data-col-name="pausat" data-template="#cellPausatTemplate" class="th-checkbox">
+                <spring:message code="callback.list.pausat"/>
+                <script id="cellPausatTemplate" type="text/x-jsrender">
+                    {{if pausat}}<span class="fa fa-check"></span>{{/if}}
+                </script>
+            </th>
+            <th data-col-name="notificacioReferencia" data-orderable="false" data-template="#referenciaTemplate"><spring:message code="callback.list.remesa.referencia"/>
+                <script id="referenciaTemplate" type="text/x-jsrender">
+                    <a href="<c:url value='/notificacio/{{:notificacioId}}/info'/>" data-toggle="modal" data-height="700px" data-processar="true"> {{:notificacioReferencia}}</a>
+                </script>
+            </th>
+            <c:if test="${!isRolActualAdministradorLectura}">
+                <th data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px" style="z-index:99999;">
+                    <script id="cellAccionsTemplate" type="text/x-jsrender">
+                        <div class="dropdown">
+                            <button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="<c:url value="/callback/{{:id}}/enviar"/>"><span class="fa fa-paper-plane-o"></span>&nbsp; <spring:message code="callback.boto.enviar"/></a></li>
+                                {{if pausat}}
+                                    <li><a href="<c:url value="/callback/{{:id}}/activar"/>"><span class="fa fa-play"></span>&nbsp; <spring:message code="callback.boto.activar"/></a></li>
+                                {{else}}
+                                    <li><a href="<c:url value="/callback/{{:id}}/pausar"/>"><span class="fa fa-pause"></span>&nbsp; <spring:message code="callback.boto.pausar"/></a></li>
+                                {{/if}}
+                            </ul>
+                        </div>
+                    </script>
+                </th>
+            </c:if>
+        </tr>
+        </thead>
+    </table>
 </body>
 </html>

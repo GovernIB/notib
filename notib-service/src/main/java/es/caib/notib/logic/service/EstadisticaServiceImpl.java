@@ -7,6 +7,7 @@ import es.caib.comanda.ms.estadistica.model.IndicadorDesc;
 import es.caib.comanda.ms.estadistica.model.RegistreEstadistic;
 import es.caib.comanda.ms.estadistica.model.RegistresEstadistics;
 import es.caib.comanda.ms.estadistica.model.Temps;
+import es.caib.notib.client.domini.explotacio.DiaSetmanaEnum;
 import es.caib.notib.client.domini.explotacio.DimEnum;
 import es.caib.notib.client.domini.explotacio.DimensioNotib;
 import es.caib.notib.client.domini.explotacio.FetNotib;
@@ -18,22 +19,30 @@ import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.service.EstadisticaService;
 import es.caib.notib.persist.entity.explotacio.ExplotDimensio;
 import es.caib.notib.persist.entity.explotacio.ExplotDimensioEntity;
+import es.caib.notib.persist.entity.explotacio.ExplotEnvBasicStatsEntity;
+import es.caib.notib.persist.entity.explotacio.ExplotEnvStats;
 import es.caib.notib.persist.entity.explotacio.ExplotFets;
 import es.caib.notib.persist.entity.explotacio.ExplotFetsEntity;
 import es.caib.notib.persist.entity.explotacio.ExplotFetsKey;
 import es.caib.notib.persist.entity.explotacio.ExplotTempsEntity;
 import es.caib.notib.persist.repository.explotacio.ExplotDimensioRepository;
+import es.caib.notib.persist.repository.explotacio.ExplotEnvBasicStatsRepository;
 import es.caib.notib.persist.repository.explotacio.ExplotFetsRepository;
 import es.caib.notib.persist.repository.explotacio.ExplotTempsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +62,81 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     private final ExplotTempsRepository explotTempsRepository;
     private final ExplotDimensioRepository explotDimensioRepository;
     private final ExplotFetsRepository explotFetsRepository;
+    private final ExplotEnvBasicStatsRepository explotEnvBasicStatsRepository;
     private final IntegracioHelper integracioHelper;
+    private final JdbcTemplate jdbcTemplate;
+
+    @Value("${es.caib.notib.hibernate.dialect:es.caib.notib.persist.dialect.OracleCaibDialect}")
+    private String hibernateDialect;
+
+    // Inicialitzar les consultes SQL segons el tipus de base de dades
+    // Oracle (per defecte)
+    private String SQL_INSERT_EXPLOT_TEMPS = "INSERT INTO not_explot_temps (" +
+            "id, " +
+            "data, " +
+            "anualitat, " +
+            "trimestre, " +
+            "mes, " +
+            "setmana, " +
+            "dia, " +
+            "dia_setmana) " +
+            "VALUES (NOT_HIBERNATE_SEQ.nextval, ?, ?, ?, ?, ?, ?, ?)";
+    private String SQL_INSERT_EXPLOT_FETS = "INSERT INTO not_explot_fet (" +
+            "id, " +
+            "dimensio_id, " +
+            "temps_id, " +
+            "tr_creades, " +
+            "tr_registr, " +
+            "tr_not_env, " +
+            "tr_not_not, " +
+            "tr_not_reb, " +
+            "tr_not_exp, " +
+            "tr_reg_err, " +
+            "tr_not_err, " +
+            "tr_sir_acc, " +
+            "tr_sir_reb) " +
+            "VALUES (NOT_HIBERNATE_SEQ.nextval, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    @PostConstruct
+    public void init() {
+        boolean isPostgres = isPostgresDialect();
+        log.info("Inicialitzant consultes SQL per a base de dades: {}", isPostgres ? "PostgreSQL" : "Oracle");
+
+        if (isPostgres) {
+            SQL_INSERT_EXPLOT_TEMPS = "INSERT INTO not_explot_temps (" +
+                    "id, " +
+                    "data, " +
+                    "anualitat, " +
+                    "trimestre, " +
+                    "mes, " +
+                    "setmana, " +
+                    "dia, " +
+                    "dia_setmana) " +
+                    "VALUES (NEXTVAL('NOT_HIBERNATE_SEQ'), ?, ?, ?, ?, ?, ?, ?)";
+            SQL_INSERT_EXPLOT_FETS = "INSERT INTO not_explot_fet (" +
+                    "id, " +
+                    "dimensio_id, " +
+                    "temps_id, " +
+                    "tr_creades, " +
+                    "tr_registr, " +
+                    "tr_not_env, " +
+                    "tr_not_not, " +
+                    "tr_not_reb, " +
+                    "tr_not_exp, " +
+                    "tr_reg_err, " +
+                    "tr_not_err," +
+                    "tr_sir_acc, " +
+                    "tr_sir_reb) " +
+                    "VALUES (NEXTVAL('NOT_HIBERNATE_SEQ'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        }
+    }
+
+    private boolean isPostgresDialect() {
+        return hibernateDialect != null && hibernateDialect.toLowerCase().contains("postgresql");
+    }
+
+    // Mida del lot per insercions en bloc
+    private static final int BATCH_SIZE = 1000;
 
     @Override
     @Transactional(timeout = 3600)
@@ -66,9 +149,8 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     public void generarDadesExplotacio(LocalDate data) {
         // Generar dades d'explotació
         String accioDesc = "GenerarDadesExplotacio - Recupera dades per taules d'explotació.";
-        HashMap<String, String> accioParams = new HashMap<>();
-        long t0 = System.currentTimeMillis();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        if (data == null) data = ahir();
         var info = new IntegracioInfo(
                 IntegracioCodi.EXPLOTACIO,
                 accioDesc,
@@ -76,14 +158,12 @@ public class EstadisticaServiceImpl implements EstadisticaService {
                 new AccioParam("Data de recollida de dades", formatter.format(data)));
 
         try {
-
-            log.debug("Iniciant procés de syncExplotacioDadesConvocatories. Data: " + data);
-            if (data == null) data = ahir();
-
+            log.debug("Iniciant procés de generarDadesExplotacio. Data: {}", data);
 
             ExplotTempsEntity ete = explotTempsRepository.findFirstByData(data);
 
             if (ete == null) {
+                generateMissingExplotTempsEntities(data);
                 ete = new ExplotTempsEntity(data);
                 ete = explotTempsRepository.save(ete);
             }
@@ -91,7 +171,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
             List<ExplotDimensioEntity> dimensions = obtenirDimensions();
             actualitzarDadesEstadistiques(ete, dimensions);
 
-            log.debug("Finalitzant procés de syncExplotacioDadesConvocatories, guardant a monitor de integracions.");
+            log.debug("Finalitzant procés de generarDadesExplotacio, guardant a monitor de integracions.");
 
             integracioHelper.addAccioOk(info);
 
@@ -101,6 +181,228 @@ public class EstadisticaServiceImpl implements EstadisticaService {
             integracioHelper.addAccioError(info, "Error generant informació estadística", ex);
         }
     }
+
+    @Transactional(timeout = 3600)
+    @Override
+    public void generarDadesExplotacioBasiques(LocalDate fromDate, LocalDate toDate) {
+        var info = crearIntegracioInfo(fromDate);
+
+        try {
+            log.debug("Iniciant generació bàsica des de {} fins {}", fromDate, toDate);
+
+            var dimensions = obtenirDimensions();
+            var dimensionKeyCache = cachejarDimensions(dimensions);
+
+            // Generar les entitats ExplotTempsEntity que faltes
+            generateNativeSqlMissingExplotTempsEntities(fromDate);
+            var dates = explotTempsRepository.findByDataBetween(fromDate, toDate);
+
+            // Obtenir totes les estadístiques per al període complet
+            List<ExplotEnvBasicStatsEntity> stats = explotEnvBasicStatsRepository.findByDiaBetween(fromDate, toDate);
+
+            // Convertir les estadístiques a un mapa per data
+            Map<LocalDate, Map<String, Map<ExplotFetsKey, Long>>> estadistiquesPerData = convertirEstadistiquesPerData(stats);
+
+            processarDatesAmbEstadistiques(dates, dimensions, dimensionKeyCache, estadistiquesPerData);
+
+            integracioHelper.addAccioOk(info);
+            log.debug("Finalitzat procés bàsic.");
+        } catch (Exception ex) {
+            log.error("Error generant dades simplificades", ex);
+            integracioHelper.addAccioError(info, "Error generant dades simplificades", ex);
+            throw new RuntimeException("S'ha produït un error al generar les dades estadístiques simplificades", ex);
+        }
+    }
+
+    private IntegracioInfo crearIntegracioInfo(LocalDate fromDate) {
+        var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return new IntegracioInfo(
+                IntegracioCodi.EXPLOTACIO,
+                "generarDadesExplotacioBasiques",
+                IntegracioAccioTipusEnumDto.PROCESSAR,
+                new AccioParam("Data inici", formatter.format(fromDate)),
+                new AccioParam("Data fi", formatter.format(ahir()))
+        );
+    }
+
+    private Map<Long, ExplotFetsKey> cachejarDimensions(List<ExplotDimensioEntity> dimensions) {
+        return dimensions.stream()
+                .collect(Collectors.toMap(ExplotDimensioEntity::getId, this::createKeyFromDimension));
+    }
+
+    private void processarDatesAmbEstadistiques(List<ExplotTempsEntity> dates,
+                                                List<ExplotDimensioEntity> dimensions,
+                                                Map<Long, ExplotFetsKey> keyCache,
+                                                Map<LocalDate, Map<String, Map<ExplotFetsKey, Long>>> estadistiquesPerData) {
+        int processedDays = 0;
+        int skippedDays = 0;
+
+        List<Object[]> batchArgs = new ArrayList<>();
+
+        for (ExplotTempsEntity temps : dates) {
+            if (jaHiHaDades(temps)) {
+                skippedDays++;
+                System.out.println("Skipped dia: " + temps.getData());
+                continue;
+            }
+
+            Map<String, Map<ExplotFetsKey, Long>> estadistiques = estadistiquesPerData.getOrDefault(temps.getData(), new HashMap<>());
+            batchArgs.addAll(prepararInsertions(dimensions, keyCache, temps, estadistiques));
+
+            processedDays++;
+            System.out.println("Processat dia: " + temps.getData());
+        }
+        insercioFetsEnBloc(batchArgs);
+
+        log.debug("Dies processats: {}, Dies omesos: {}", processedDays, skippedDays);
+    }
+
+    private Map<LocalDate, Map<String, Map<ExplotFetsKey, Long>>> convertirEstadistiquesPerData(
+            List<ExplotEnvBasicStatsEntity> stats) {
+
+        Map<LocalDate, Map<String, Map<ExplotFetsKey, Long>>> result = new HashMap<>();
+        processStats(stats, result);
+
+        return result;
+    }
+
+    private void processStats(List<ExplotEnvBasicStatsEntity> statsList,
+                              Map<LocalDate, Map<String, Map<ExplotFetsKey, Long>>> result) {
+        int i = 0;
+        for (ExplotEnvBasicStatsEntity stat : statsList) {
+            result.computeIfAbsent(stat.getDia(), k -> new HashMap<>())
+                    .computeIfAbsent(stat.getTipus(), k -> new HashMap<>())
+                    .put(stat.getKey(), stat.getTotalEnviaments());
+            System.out.println("Stat: " + i++);
+        }
+    }
+
+    private boolean jaHiHaDades(ExplotTempsEntity temps) {
+        return explotFetsRepository.existsByTemps(temps);
+    }
+
+    private List<Object[]> prepararInsertions(List<ExplotDimensioEntity> dimensions, Map<Long, ExplotFetsKey> keyCache, ExplotTempsEntity temps, Map<String, Map<ExplotFetsKey, Long>> statsMap) {
+        List<Object[]> argsList = new ArrayList<>();
+
+        for (ExplotDimensioEntity dim : dimensions) {
+            ExplotFetsKey key = keyCache.get(dim.getId());
+
+            long trCreades = statsMap.getOrDefault("CREADA", Map.of()).getOrDefault(key, 0L);
+            long trRegistrades = statsMap.getOrDefault("REGISTRADA", Map.of()).getOrDefault(key, 0L);
+            long trNotEnv = statsMap.getOrDefault("ENVIADA", Map.of()).getOrDefault(key, 0L);
+            long trNotNotificacio = statsMap.getOrDefault("NOTIFICADA", Map.of()).getOrDefault(key, 0L);
+            long trNotRebutjada = statsMap.getOrDefault("REBUTJADA", Map.of()).getOrDefault(key, 0L);
+            long trNotExpirada = statsMap.getOrDefault("EXPIRADA", Map.of()).getOrDefault(key, 0L);
+            long trNotRegError = statsMap.getOrDefault("REG_ERR", Map.of()).getOrDefault(key, 0L);
+            long trNotNotError = statsMap.getOrDefault("NOT_ERR", Map.of()).getOrDefault(key, 0L);
+            long trSirAcc = statsMap.getOrDefault("SIR_ACC", Map.of()).getOrDefault(key, 0L);
+            long trSirReb = statsMap.getOrDefault("SIR_REB", Map.of()).getOrDefault(key, 0L);
+
+            Object[] args = new Object[] {
+                    dim.getId(),
+                    temps.getId(),
+                    trCreades,
+                    trRegistrades,
+                    trNotEnv,
+                    trNotNotificacio,
+                    trNotRebutjada,
+                    trNotExpirada,
+                    trNotRegError,
+                    trNotNotError,
+                    trSirAcc,
+                    trSirReb
+            };
+
+            long total = Arrays.stream(args).skip(2).mapToLong(o -> (Long) o).sum();
+            if (total > 0) argsList.add(args);
+        }
+
+        return argsList;
+    }
+
+    private void insercioFetsEnBloc(List<Object[]> batchArgs) {
+        jdbcTemplate.batchUpdate(SQL_INSERT_EXPLOT_FETS, batchArgs, BATCH_SIZE, (ps, args) -> {
+            ps.setObject(1, args[0]);
+            ps.setObject(2, args[1]);
+            ps.setObject(3, args[2]);
+            ps.setObject(4, args[3]);
+            ps.setObject(5, args[4]);
+            ps.setObject(6, args[5]);
+            ps.setObject(7, args[6]);
+            ps.setObject(8, args[7]);
+            ps.setObject(9, args[8]);
+            ps.setObject(10, args[9]);
+            ps.setObject(11, args[9]);
+            ps.setObject(12, args[9]);
+        });
+    }
+
+    /**
+     * Crea una clau ExplotFetsKey a partir d'una dimensió
+     */
+    private ExplotFetsKey createKeyFromDimension(ExplotDimensioEntity dimension) {
+        return new ExplotFetsKey(
+            dimension.getEntitatId(),
+            dimension.getProcedimentId(),
+            dimension.getOrganCodi(),
+            dimension.getUsuariCodi(),
+            dimension.getTipus(),
+            dimension.getOrigen()
+        );
+    }
+
+    private void generateNativeSqlMissingExplotTempsEntities(LocalDate fromDate) {
+        LocalDate yesterday = ahir();
+
+        // Obtenim totes les dates per al rang corresponent
+        List<LocalDate> existingDates = explotTempsRepository.findDatesBetween(fromDate, yesterday);
+        List<LocalDate> missingDates = new ArrayList<>();
+
+        // Iterem només pels dies que no estan a la base de dades
+        while (!fromDate.isAfter(yesterday)) {
+            if (!existingDates.contains(fromDate)) {
+                missingDates.add(fromDate);
+            }
+            fromDate = fromDate.plusDays(1);
+        }
+
+        if (!missingDates.isEmpty()) {
+            tempsBulkInsert(missingDates);
+        }
+    }
+
+    private void tempsBulkInsert(List<LocalDate> dates) {
+
+        jdbcTemplate.batchUpdate(SQL_INSERT_EXPLOT_TEMPS, dates, BATCH_SIZE, (ps, data) -> {
+            ps.setObject(1, java.sql.Date.valueOf(data));
+            ps.setObject(2, data.getYear());
+            ps.setObject(3, data.getMonthValue() / 3);
+            ps.setObject(4, data.getMonthValue());
+            ps.setObject(5, data.get(WeekFields.ISO.weekOfWeekBasedYear()));
+            ps.setObject(6, data.getDayOfMonth());
+            DiaSetmanaEnum diaSetmanaEnum = DiaSetmanaEnum.valueOfData(data.getDayOfWeek().name());
+            ps.setObject(7, diaSetmanaEnum != null ? diaSetmanaEnum.name() : null);
+        });
+
+    }
+
+    private void generateMissingExplotTempsEntities(LocalDate fromDate) {
+        LocalDate yesterday = ahir();
+
+        // Obtenim totes les dates per al rang corresponent
+        List<LocalDate> existingDates = explotTempsRepository.findDatesBetween(fromDate, yesterday);
+
+        // Iterem només pels dies que no estan a la base de dades
+        while (!fromDate.isAfter(yesterday)) {
+            if (!existingDates.contains(fromDate)) {
+                ExplotTempsEntity newEntity = new ExplotTempsEntity(fromDate);
+                explotTempsRepository.save(newEntity);
+            }
+            fromDate = fromDate.plusDays(1);
+        }
+
+    }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -177,7 +479,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
                 IndicadorDesc.builder().codi(TR_EML_ERR.name()).nom(TR_EML_ERR.getNom()).descripcio(TR_EML_ERR.getDescripcio()).format(LONG).build(),
                 IndicadorDesc.builder().codi(TR_EML_ENV.name()).nom(TR_EML_ENV.getNom()).descripcio(TR_EML_ENV.getDescripcio()).format(LONG).build(),
 
-                // Temps mig en estat
+                // Temps mitjà en estat
                 IndicadorDesc.builder().codi(TMP_PND.name()).nom(TMP_PND.getNom()).descripcio(TMP_PND.getDescripcio()).format(LONG).build(),
                 IndicadorDesc.builder().codi(TMP_REG.name()).nom(TMP_REG.getNom()).descripcio(TMP_REG.getDescripcio()).format(LONG).build(),
                 IndicadorDesc.builder().codi(TMP_NOT.name()).nom(TMP_NOT.getNom()).descripcio(TMP_NOT.getDescripcio()).format(LONG).build(),
@@ -213,10 +515,6 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
     private LocalDate ahir() {
         return LocalDate.now().minusDays(1);
-    }
-
-    private LocalDate dema() {
-        return LocalDate.now().plusDays(1);
     }
 
     private List<ExplotDimensioEntity> obtenirDimensions() {
@@ -303,11 +601,11 @@ public class EstadisticaServiceImpl implements EstadisticaService {
                 stat));
 
         // Notificacions creades
-        explotFetsRepository.getStatsCreacioPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
-            statsMap.get(stat.getKey()).setTrCreades(stat.getTotalEnviaments());
-        });
+        for (ExplotEnvStats explotEnvStats : explotFetsRepository.getStatsCreacioPerDay(iniciDelDia, finalDelDia)) {
+            statsMap.get(explotEnvStats.getKey()).setTrCreades(explotEnvStats.getTotalEnviaments());
+        }
 
-        // Notificacions amb error al intentar registrar
+        // Notificacions amb error a l'intentar registrar
         explotFetsRepository.getStatsRegEnviamentErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
             statsMap.get(stat.getKey()).setTrRegEnviadesError(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setIntentsRegistre(stat.getIntentsMig().longValue());
@@ -338,7 +636,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
             statsMap.get(stat.getKey()).setTemsMigTotal(stat.getTempsTotal().longValue());
         });
 
-        // Notificacions amb error al intentar enviar a Notifica
+        // Notificacions amb error a l'intentar enviar a Notifica
         explotFetsRepository.getStatsNotEnviamentErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
             statsMap.get(stat.getKey()).setTrNotEnviadesError(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setIntentsRegistre(stat.getIntentsMig().longValue());
@@ -388,7 +686,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
             statsMap.get(stat.getKey()).setTemsMigTotal(stat.getTempsTotal().longValue());
         });
 
-        // Notificacions amb error al intentar enviar al CIE
+        // Notificacions amb error a l'intentar enviar al CIE
         explotFetsRepository.getStatsCieEnviamentErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
             statsMap.get(stat.getKey()).setTrCieEnviadesError(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setIntentsCieEnviament(stat.getIntentsMig().longValue());
@@ -430,7 +728,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
             statsMap.get(stat.getKey()).setTemsMigCieEnviadaPerFallada(stat.getTempsMigEstat().longValue());
         });
 
-        // Notificacions amb error al intentar enviar via email
+        // Notificacions amb error a l'intentar enviar via email
         explotFetsRepository.getStatsEmailEnviamentErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
             statsMap.get(stat.getKey()).setTrEmailEnviadesError(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setIntentsEmailEnviament(stat.getIntentsMig().longValue());
@@ -447,31 +745,38 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     }
 
     private int compareEstadistiquesAndDimensions(ExplotFets estadistiques, ExplotDimensioEntity dimension) {
-        int comparison = estadistiques.getEntitatId().compareTo(dimension.getEntitatId());
-        if (comparison != 0) return comparison;
+        int result = compareFields(estadistiques.getEntitatId(), dimension.getEntitatId());
+        if (result != 0) return result;
 
-        if (estadistiques.getProcedimentId() == null && dimension.getProcedimentId() == null) {
-            comparison = 0;
-        } else if (estadistiques.getProcedimentId() == null) {
-            comparison = -1;
-        } else if (dimension.getProcedimentId() == null) {
-            comparison = 1;
-        } else {
-            comparison = estadistiques.getProcedimentId().compareTo(dimension.getProcedimentId());
-        }
-        if (comparison != 0) return comparison;
+        result = compareProcediments(estadistiques.getProcedimentId(), dimension.getProcedimentId());
+        if (result != 0) return result;
 
-        comparison = estadistiques.getOrganCodi().compareTo(dimension.getOrganCodi());
-        if (comparison != 0) return comparison;
+        result = compareFields(estadistiques.getOrganCodi(), dimension.getOrganCodi());
+        if (result != 0) return result;
 
-        comparison = estadistiques.getTipus().compareTo(dimension.getTipus());
-        if (comparison != 0) return comparison;
+        result = compareFields(estadistiques.getTipus(), dimension.getTipus());
+        if (result != 0) return result;
 
-        comparison = estadistiques.getOrigen().compareTo(dimension.getOrigen());
-        if (comparison != 0) return comparison;
+        result = compareFields(estadistiques.getOrigen(), dimension.getOrigen());
+        if (result != 0) return result;
 
-        return estadistiques.getUsuariCodi().compareTo(dimension.getUsuariCodi());
+        return compareFields(estadistiques.getUsuariCodi(), dimension.getUsuariCodi());
     }
+
+    private <T extends Comparable<T>> int compareFields(T field1, T field2) {
+        if (field1 == null && field2 == null) return 0;
+        if (field1 == null) return -1;
+        if (field2 == null) return 1;
+        return field1.compareTo(field2);
+    }
+
+    private int compareProcediments(Long procediment1, Long procediment2) {
+        if (procediment1 == null && procediment2 == null) return 0;
+        if (procediment1 == null) return -1;
+        if (procediment2 == null) return 1;
+        return procediment1.compareTo(procediment2);
+    }
+
 
     private void saveToFetsEntity(ExplotFets estadistiques, ExplotDimensioEntity dimension, ExplotTempsEntity ete) {
         ExplotFetsEntity fetsEntity = new ExplotFetsEntity(dimension, ete, estadistiques);
@@ -544,7 +849,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
                 new FetNotib(TR_EML_ERR, fet.getTrEmailEnviadesError()),
                 new FetNotib(TR_EML_ENV, fet.getTrEmailEnviades()),
 
-                // Temps mig en estat
+                // Temps mitjà en estat
                 new FetNotib(TMP_PND, fet.getTemsMigPendent()),
                 new FetNotib(TMP_REG, fet.getTemsMigRegistrada()),
                 new FetNotib(TMP_NOT, fet.getTemsMigNotEnviada()),
@@ -575,10 +880,6 @@ public class EstadisticaServiceImpl implements EstadisticaService {
                 new FetNotib(INT_CIE, fet.getIntentsCieEnviament()),
                 new FetNotib(INT_EML, fet.getIntentsEmailEnviament())
         );
-    }
-
-    private Double toDouble(Long value) {
-        return value == null ? null : Double.valueOf(value);
     }
 
 }

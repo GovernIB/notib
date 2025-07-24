@@ -422,17 +422,21 @@ public class NotificacioValidator implements Validator {
             }
             return;
         }
-        if (notificacio.getDocument2() != null && !notificacio.getDocument2().isEmpty()) {
-            validateDocument(notificacio.getDocument2(), documents[1], enviamentTipus, 2, errors, locale);
+        var document2 = notificacio.getDocument2();
+        if (document2 != null && !document2.isEmpty() && !Strings.isNullOrEmpty(document2.getContingutBase64())) {
+            validateDocument(document2, documents[1], enviamentTipus, 2, errors, locale);
         }
-        if (notificacio.getDocument3() != null && !notificacio.getDocument3().isEmpty()) {
-            validateDocument(notificacio.getDocument3(), documents[2], enviamentTipus, 3, errors, locale);
+        var document3 = notificacio.getDocument3();
+        if (document3 != null && !document3.isEmpty() && !Strings.isNullOrEmpty(document3.getContingutBase64())) {
+            validateDocument(document3, documents[2], enviamentTipus, 3, errors, locale);
         }
-        if (notificacio.getDocument4() != null && !notificacio.getDocument4().isEmpty()) {
-            validateDocument(notificacio.getDocument4(), documents[3], enviamentTipus, 4, errors, locale);
+        var document4 = notificacio.getDocument4();
+        if (document4 != null && !document4.isEmpty() && !Strings.isNullOrEmpty(document4.getContingutBase64())) {
+            validateDocument(document4, documents[3], enviamentTipus, 4, errors, locale);
         }
-        if (notificacio.getDocument5() != null && !notificacio.getDocument5().isEmpty()) {
-            validateDocument(notificacio.getDocument5(), documents[4], enviamentTipus, 5, errors, locale);
+        var document5 = notificacio.getDocument5();
+        if (document5 != null && !document5.isEmpty() && !Strings.isNullOrEmpty(document5.getContingutBase64())) {
+            validateDocument(document5, documents[4], enviamentTipus, 5, errors, locale);
         }
         // Midal màxima
         var totalFileSize = Arrays.asList(documents).stream().filter(d -> d != null && d.getMida() != null).map(d -> d.getMida()).reduce(0L, (d1, d2) -> d1 + d2);

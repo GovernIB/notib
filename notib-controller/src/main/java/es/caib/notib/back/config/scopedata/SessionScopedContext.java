@@ -31,6 +31,7 @@ public class SessionScopedContext {
     // Permisos
     private Boolean usuariEntitat;
     private Boolean adminEntitat;
+    private Boolean adminLectura;
     private Boolean adminOrgan;
     private Boolean aplicacioEntitat;
     private Boolean menuNotificacions;
@@ -108,6 +109,7 @@ public class SessionScopedContext {
     public void cleanPermisosUsuari() {
         this.usuariEntitat = null;
         this.adminEntitat = null;
+        this.adminLectura = null;
         this.adminOrgan = null;
         this.aplicacioEntitat = null;
     }

@@ -117,7 +117,7 @@ public class CallbackServiceImpl implements CallbackService {
 						futurs.put(id, futur);
 						continue;
 					}
-					if(!callbackHelper.notifica(id)) {
+					if(!callbackHelper.notifica(id, null)) {
 						errors++;
 					}
 				} catch (Exception ex) {
@@ -157,7 +157,7 @@ public class CallbackServiceImpl implements CallbackService {
 			NotificacioEntity notificacio;
 			for (var env : not.getEnviaments()) {
 				try {
-					notificacio = callbackHelper.notifica(env);
+					notificacio = callbackHelper.notifica(env, null);
 					isError = (notificacio != null && !notificacio.isErrorLastCallback());
 				} catch (Exception e) {
 					log.error(String.format("[Callback]L'enviament [Id: %d] ha provocat la següent excepcio:", env.getId()), e);
@@ -200,7 +200,7 @@ public class CallbackServiceImpl implements CallbackService {
 			var callback = callbackRepository.findById(callbackId).orElseThrow();
 			var enviament = notificacioEnviamentRepository.findById(callback.getEnviamentId()).orElseThrow();
 			try {
-				var notificacio = callbackHelper.notifica(enviament);
+				var notificacio = callbackHelper.notifica(enviament, null);
 				var isError = (notificacio != null && !notificacio.isErrorLastCallback());
 				return CallbackResposta.builder().ok(isError).errorMsg(callback.getErrorDesc()).build();
 			} catch (Exception e) {
@@ -222,7 +222,7 @@ public class CallbackServiceImpl implements CallbackService {
 				new Thread(() -> {
 				var callback = callbackRepository.findById(callbackId).orElseThrow();
 				try {
-						callbackHelper.notifica(callback.getEnviamentId());
+						callbackHelper.notifica(callback.getEnviamentId(), null);
 					} catch (Exception e) {
 						log.error(String.format("[Callback]L'enviament [Id: %d] ha provocat la següent excepcio:", callback.getEnviamentId()), e);
 					}

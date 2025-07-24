@@ -3,6 +3,7 @@ package es.caib.notib.logic.service;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
+import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
@@ -132,6 +133,8 @@ public class NotificacioMassivaServiceTest {
 	private JmsTemplate jmsTemplate;
 	@Mock
 	private OrganGestorService organGestorService;
+	@Mock
+	private CacheBridge cacheBridge;
 
 
 	@InjectMocks
@@ -182,7 +185,7 @@ public class NotificacioMassivaServiceTest {
 		Mockito.when(procSerMock.isActiu()).thenReturn(true);
 		Mockito.when(metricsHelper.iniciMetrica()).thenReturn(null);
 		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.eq(entitatId))).thenReturn(entitatMock);
-		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.eq(entitatId), Mockito.anyBoolean(), Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(entitatMock);
+		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.eq(entitatId), Mockito.anyBoolean(), Mockito.anyBoolean(), Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(entitatMock);
 //		Mockito.when(registreNotificaHelper.isSendDocumentsActive()).thenReturn(false);
 		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class))).thenReturn("rnd_gesid");
 		Mockito.when(notificacioHelper.saveNotificacio(Mockito.any(EntitatEntity.class), Mockito.any(Notificacio.class), Mockito.anyBoolean(), Mockito.any(NotificacioMassivaEntity.class), Mockito.<Map<String, Long>>any()))
@@ -191,7 +194,8 @@ public class NotificacioMassivaServiceTest {
 		Mockito.when(organGestorRepository.findByEntitatAndCodi(Mockito.any(EntitatEntity.class), Mockito.anyString())).thenReturn(organMock);
 		Mockito.when(messageHelper.getMessage(Mockito.anyString())).thenReturn("Missatge mock");
 		Mockito.when(configHelper.getConfigAsLong(eq("es.caib.notib.massives.maxim.files"), eq(999L))).thenReturn(999L);
-		Mockito.when(cacheHelper.findUsuariAmbCodi(anyString())).thenReturn(DadesUsuari.builder().codi(codiUsuari).build());
+//		Mockito.when(cacheHelper.findUsuariAmbCodi(anyString())).thenReturn(DadesUsuari.builder().codi(codiUsuari).build());
+		Mockito.when(cacheBridge.findUsuariAmbCodi(anyString())).thenReturn(DadesUsuari.builder().codi(codiUsuari).build());
 		setUpNotificacioMassiva();
 //		setUpAuthentication();
 	}

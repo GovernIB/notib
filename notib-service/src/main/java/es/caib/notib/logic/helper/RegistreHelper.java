@@ -10,11 +10,11 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
-import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -23,6 +23,7 @@ import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -33,17 +34,13 @@ import java.util.Date;
 @Slf4j
 @Component
 public class RegistreHelper {
-	
-	@Autowired
-	private NotificacioRepository notificacioRepository;
+
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
 	private CallbackHelper callbackHelper;
-	@Autowired
-	private EmailNotificacioHelper emailNotificacioHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
@@ -54,12 +51,15 @@ public class RegistreHelper {
 	private EnviamentTableHelper enviamentTableHelper;
 	@Autowired
 	protected JmsTemplate jmsTemplate;
+    @Autowired
+    private AccioMassivaHelper accioMassivaHelper;
 
 
-	public NotificacioEnviamentEntity enviamentRefrescarEstatRegistre(Long enviamentId) {
+	public NotificacioEnviamentEntity enviamentRefrescarEstatRegistre(ConsultaSirRequest consulta) {
 
+		var enviamentId = consulta.getConsultaSirDto().getId();
 		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-		var notificacio = notificacioRepository.findById(enviament.getNotificacio().getId()).orElseThrow();
+		var notificacio = enviament.getNotificacio();
 		var logTimeHelper = new LogTimeHelper(log);
 		var estatText =  ", Estat: ";
 		var fiActEstatRegistreText = " [SIR] Fi actualitzar estat registre enviament [Id: ";
@@ -72,8 +72,12 @@ public class RegistreHelper {
 		try {
 			// Validacions
 			if (enviament.getRegistreNumeroFormatat() == null) {
-				logTimeHelper.infoWithoutTime(fiActEstatRegistreText + enviament.getId() + estatText + enviament.getNotificaEstat() + "]. L'enviament no té número de registre SIR");
-				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, "L'enviament no té número de registre SIR");
+				var msg = "L'enviament no té número de registre SIR";
+				logTimeHelper.infoWithoutTime(fiActEstatRegistreText + enviament.getId() + estatText + enviament.getNotificaEstat() + "]. " + msg);
+				if (consulta.getAccioMassivaId() != null) {
+					accioMassivaHelper.actualitzar(consulta.getAccioMassivaId(), enviamentId, msg, "");
+				}
+				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, msg);
 			}
 			logTimeHelper.debugWithoutTime("Comunicació SIR --> número registre formatat: " + enviament.getRegistreNumeroFormatat());
 			// Consulta al registre
@@ -84,6 +88,9 @@ public class RegistreHelper {
 				throw new RegistreNotificaException(resposta.getErrorDescripcio());
 			}
 			// Consulta retorna correctement
+			if (consulta.getAccioMassivaId() != null) {
+				accioMassivaHelper.actualitzar(consulta.getAccioMassivaId(), enviamentId, "", "");
+			}
 			canviEstat = !enviament.getRegistreEstat().equals(resposta.getEstat());
 			enviamentUpdateDatat(resposta, enviament);
 			logTimeHelper.info(" [TIMER-SIR] Actualitzar estat comunicació SIR [Id: " + enviamentId + "]: ");
@@ -91,7 +98,11 @@ public class RegistreHelper {
 				try {
 					jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_NOTIFICACIO, enviament.getId());
 				} catch (JmsException ex) {
-					log.error("Hi ha hagut un error al intentar enviar el correu electronic de l'enviament " + enviament.getId() + " de la notificacio amb id: ." + notificacio.getId(), ex);
+					var msg = "Hi ha hagut un error al intentar enviar el correu electronic de l'enviament " + enviament.getId() + " de la notificacio amb id: ." + notificacio.getId();
+					log.error(msg, ex);
+					if (consulta.getAccioMassivaId() != null) {
+						accioMassivaHelper.actualitzar(consulta.getAccioMassivaId(), enviamentId, msg, "");
+					}
 				}
 				logTimeHelper.info(" [TIMER-SIR] Preparar enviament mail enviament [Id: " + enviamentId + "]");
 			}
@@ -100,6 +111,9 @@ public class RegistreHelper {
 		} catch (Exception ex) {
 			error = true;
 			errorDescripcio = getErrorDescripcio(ex);
+			if (consulta.getAccioMassivaId() != null) {
+				accioMassivaHelper.actualitzar(consulta.getAccioMassivaId(), enviamentId, ex.getMessage(), Arrays.toString(ex.getStackTrace()));
+			}
 			log.error(errorPrefix, ex);
 		}
 		var errorMaxReintents = false;

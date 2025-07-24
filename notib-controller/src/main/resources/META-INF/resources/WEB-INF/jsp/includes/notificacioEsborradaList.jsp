@@ -4,7 +4,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
-
+<%
+    es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
+    pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()), PageContext.REQUEST_SCOPE);
+%>
 <c:set var="ampladaConcepte">
     <c:choose>
         <c:when test="${isRolActualAdministrador}">200px</c:when>
@@ -620,7 +623,9 @@
                     <button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
                     <ul class="dropdown-menu dropdown-menu-right">
                         <li><a href="<c:url value="/notificacio/{{:id}}/info"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a></li>
-                        <li><a href="<c:url value="/notificacio/{{:id}}/restore"/>"><span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.recuperar"/></a></li>
+                        {{if ${!isRolActualAdministradorLectura}}}
+                            <li><a href="<c:url value="/notificacio/{{:id}}/restore"/>"><span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.recuperar"/></a></li>
+                        {{/if}}
                     </ul>
                 </div>
             </script>

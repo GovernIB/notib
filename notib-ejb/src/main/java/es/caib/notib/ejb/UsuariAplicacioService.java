@@ -105,4 +105,10 @@ public class UsuariAplicacioService extends AbstractService<es.caib.notib.logic.
 		return false;
 	}
 
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public IntegracioDiagnostic diagnosticarAplicacions(Long entitatId) {
+		return getDelegateService().diagnosticarAplicacions(entitatId);
+	}
+
 }

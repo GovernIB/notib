@@ -17,6 +17,9 @@ import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElement;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
+import es.caib.notib.logic.intf.dto.accioMassiva.ResultatAccio;
 import es.caib.notib.logic.intf.dto.cie.CieDataDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.logic.intf.dto.notificacio.Enviament;
@@ -39,6 +42,11 @@ import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
+import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
+import es.caib.notib.logic.intf.statemachine.dto.ConsultaSirDto;
+import es.caib.notib.logic.intf.statemachine.dto.ParametresSm;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
 import es.caib.notib.logic.intf.util.MimeUtils;
 import es.caib.notib.logic.intf.util.PdfUtils;
 import es.caib.notib.logic.mapper.NotificacioMapper;
@@ -56,6 +64,7 @@ import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.entity.ProcedimentEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
+import es.caib.notib.persist.repository.AccioMassivaRepository;
 import es.caib.notib.persist.repository.CallbackRepository;
 import es.caib.notib.persist.repository.ColumnesRepository;
 import es.caib.notib.persist.repository.DocumentRepository;
@@ -84,6 +93,7 @@ import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -93,6 +103,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -210,6 +221,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	protected static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
     @Autowired
     private NotificacioEventHelper notificacioEventHelper;
+    @Autowired
+    private AccioMassivaRepository accioMassivaRepository;
 
 
 	@Transactional(rollbackFor=Exception.class)
@@ -315,13 +328,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 //		}
 //	}
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public void delete(Long entitatId, Long notificacioId) throws NotFoundException {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarEntitat(entitatId,false,true,true,false);
+			entityComprovarHelper.comprovarEntitat(entitatId,false,true,true,false, false);
 			log.debug("Esborrant la notificació (notificacioId=" + notificacioId + ")");
 			var notificacioEntity = notificacioRepository.findById(notificacioId).orElse(null);
 			var notificacioTableEntity = notificacioTableViewRepository.findById(notificacioId).orElse(null);
@@ -336,7 +349,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 
 			if ((enviamentsPendents == null || enviamentsPendents.isEmpty()) && !(notificacioTableEntity.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA))) {
-				throw new ValidationException("Aquesta notificació està enviada i no està registrada, per tant, no es pot esborrar");
+				throw new ValidationException("Aquesta notificació està enviada, per tant, no es pot esborrar");
 			}
 
 			notificacioEntity.setDeleted(true);
@@ -359,7 +372,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarEntitat(entitatId,false,true,true,false);
+			entityComprovarHelper.comprovarEntitat(entitatId,false,true,true,false,false);
 			NotibLogger.getInstance().info("Recuperant la notificació (notificacioId=" + notificacioId + ")", log, LoggingTipus.TAULA_REMESES);
 			var notificacioEntity = notificacioRepository.findById(notificacioId).orElse(null);
 			var notificacioTableEntity = notificacioTableViewRepository.findById(notificacioId).orElse(null);
@@ -415,7 +428,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false, false);
 			var enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
 			if (enviamentsPendents == null || enviamentsPendents.isEmpty()) {
 				throw new ValidationException("Aquesta notificació està enviada i no es pot modificar");
@@ -585,7 +598,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if(notificacio == null) {
 				return null;
 			}
-			entityComprovarHelper.comprovarPermisos(null, false, false, false);
+			entityComprovarHelper.comprovarPermisos(null, false, false, false, false);
 			var enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
 			notificacio.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
 //			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
@@ -1059,7 +1072,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			log.debug("Consulta dels events associats a un destinatari (notificacioId=" + notificacioId + ", enviamentId=" + enviamentId + ")");
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-			entityComprovarHelper.comprovarPermisos(enviament.getNotificacio().getId(), true, true, true);
+			entityComprovarHelper.comprovarPermisos(enviament.getNotificacio().getId(), true, true, true, true);
 			return conversioTipusHelper.convertirList(notificacioEventRepository.findByEnviamentIdOrderByDataAsc(enviamentId), NotificacioEventDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1074,7 +1087,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			log.debug("Consulta dels events associats a un destinatari (notificacioId=" + notificacioId + ", enviamentId=" + enviamentId + ")");
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-			entityComprovarHelper.comprovarPermisos(enviament.getNotificacio().getId(), true, true, true);
+			entityComprovarHelper.comprovarPermisos(enviament.getNotificacio().getId(), true, true, true, true);
 			return conversioTipusHelper.convertirList(notificacioEnviamentAuditRepository.findByEnviamentIdOrderByCreatedDateAsc(enviamentId), NotificacioEnviamentAuditDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1139,7 +1152,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId) {
+	public ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId) throws Exception {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
@@ -1151,7 +1164,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 			// #779: Obtenim la certificació de forma automàtica
 			if (enviament.getNotificaCertificacioArxiuId() == null) {
-				enviament = notificaHelper.enviamentRefrescarEstat(enviamentId);
+				var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentId).build()).build();
+				try {
+					enviament = notificaHelper.enviamentRefrescarEstat(consulta);
+				} catch (Exception ex) {
+					throw ex;
+				}
 			}
 			if (enviament.getNotificaCertificacioArxiuId() == null) {
 				throw new RuntimeException("No s'ha trobat la certificació de l'enviament amb id: " + enviamentId);
@@ -1206,22 +1224,27 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public RespostaAccio<String> resetNotificacioARegistre(Long notificacioId) {
+	public RespostaAccio<AccioMassivaElement> resetNotificacioARegistre(Long notificacioId) {
 
 		var timer = metricsHelper.iniciMetrica();
-		var resposta = new RespostaAccio<String>();
+		var resposta = new RespostaAccio<AccioMassivaElement>();
+		AccioMassivaElement element = new  AccioMassivaElement();
+		element.setId(notificacioId);
 		try {
 			var notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			notificacioEntity.getEnviaments().forEach(e -> {
 				var estatEnviament = enviamentSmService.getEstatEnviament(e.getUuid());
 				try {
 					if (!EnviamentSmEstat.REGISTRE_ERROR.equals(estatEnviament)) {
+						resposta.getNoExecutables().add(element);
 						return;
 					}
 					enviamentSmService.registreReset(e.getUuid(), 0);
-					resposta.getExecutades().add(e.getUuid());
+					resposta.getExecutades().add(element);
 				} catch (Exception ex) {
-					resposta.getErrors().add(e.getUuid());
+					element.setErrorDesc("Error en el enviament amb id " + e.getId() + ex.getMessage());
+					element.setErrorStackTrace(Arrays.toString(ex.getStackTrace()));
+					resposta.getErrors().add(element);
 				}
 			});
 			return resposta;
@@ -1283,7 +1306,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							break;
 						case SIR_PENDENT:
 						case SIR_ERROR:
-							enviamentSmService.sirRetry(e.getUuid());
+							enviamentSmService.sirRetry(ParametresSm.builder().enviamentUuid(e.getUuid()).build());
 						default:
 							resposta.getNoExecutables().add(e.getUuid());
 					}
@@ -1299,39 +1322,46 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public boolean resetConsultaEstat(Set<Long> ids) {
+	public RespostaAccio<AccioMassivaElement> resetConsultaEstat(AccioMassivaExecucio accio) {
 
 		var timer = metricsHelper.iniciMetrica();
-		var resposta = new RespostaAccio<String>();
+		var resposta = new RespostaAccio<AccioMassivaElement>();
 		try {
-			NotibLogger.getInstance().info("[MASSIVA] Reset enviamentS " + ids, log, LoggingTipus.MASSIVA);
+			NotibLogger.getInstance().info("[MASSIVA] Reset enviamentS " + accio.getSeleccio(), log, LoggingTipus.MASSIVA);
 			var isSir = false;
 			NotificacioEnviamentEntity enviament;
+			AccioMassivaElement element;
+			var accioEntity = accioMassivaRepository.findById(accio.getAccioId()).orElseThrow();
 			var isAdviser = configHelper.getConfigAsBoolean("es.caib.notib.adviser.actiu");
-			for (var id : ids) {
+			for (var id : accio.getSeleccio()) {
+				element = new AccioMassivaElement();
+				element.setId(id);
 				enviament = enviamentRepository.findById(id).orElseThrow();
 				var estatEnviament = enviamentSmService.getEstatEnviament(enviament.getUuid());
 				try {
 					isSir = EnviamentTipus.SIR.equals(enviament.getNotificacio().getEnviamentTipus());
 					if (isSir && (EnviamentSmEstat.SIR_ERROR.equals(estatEnviament) || enviament.isSirFiPooling())) {
 						enviament.refreshSirConsulta();
-						enviamentSmService.sirReset(enviament.getUuid());
+						enviamentSmService.sirReset(ParametresSm.builder().enviamentUuid(enviament.getUuid()).accioMassivaId(accio.getAccioId()).build());
 					}
-					// mirar si te adivser o no  si en té fer la consulta al momnent
-					if (!isAdviser && EnviamentSmEstat.NOTIFICA_SENT.equals(estatEnviament)) {
+					if (EnviamentSmEstat.NOTIFICA_SENT.equals(estatEnviament)) {
 						enviament.refreshNotificaConsulta();
-						enviamentSmService.consultaReset(enviament.getUuid());
+						enviamentSmService.consultaReset(ParametresSm.builder().enviamentUuid(enviament.getUuid()).accioMassivaId(accio.getAccioId()).build());
 					}
-					if (isAdviser && (EnviamentSmEstat.CONSULTA_ERROR.equals(estatEnviament) || EnviamentSmEstat.NOTIFICA_SENT.equals(estatEnviament))) {
-						notificaHelper.enviamentRefrescarEstat(enviament.getId());
-					}
-
-					resposta.getExecutades().add(enviament.getUuid());
+					// mirar si te adivser o no  si en té fer la consulta al moment
+//					if (isAdviser && (EnviamentSmEstat.CONSULTA_ERROR.equals(estatEnviament) || EnviamentSmEstat.NOTIFICA_SENT.equals(estatEnviament))) {
+//						notificaHelper.enviamentRefrescarEstat(enviament.getId());
+//						accioEntity.getElement(id).actualitzar();
+//					}
+					resposta.getExecutades().add(element);
 				} catch (Exception ex) {
-					resposta.getErrors().add(enviament.getUuid());
+					element.setErrorDesc(ex.getMessage());
+					element.setErrorStackTrace(Arrays.toString(ex.getStackTrace()));
+					accioEntity.getElement(id).actualitzar(ex.getMessage(), Arrays.toString(ex.getStackTrace()));
+					resposta.getErrors().add(element);
 				}
 			}
-			return !resposta.getExecutades().isEmpty();
+			return resposta;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1343,7 +1373,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			log.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviamentId + ")");
+			NotibLogger.getInstance().info("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviamentId + ")", log, LoggingTipus.NOTIFICA);
 			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 			if (!enviament.isPendentRefrescarEstatNotifica()) {
 				return null;
@@ -1352,10 +1382,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (enviament.isNotificaEstatFinal()) {
 				enviamentSmService.consultaForward(enviament.getUuid());
 			}
-			enviament = notificaHelper.enviamentRefrescarEstat(enviament.getId());
+			var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentId).build()).build();
+			enviament = notificaHelper.enviamentRefrescarEstat(consulta);
 			var estatDto = conversioTipusHelper.convertir(enviament, NotificacioEnviamenEstatDto.class);
 			estatCalcularCampsAddicionals(enviament, estatDto);
 			return estatDto;
+		} catch (Exception ex) {
+			log.error("Error actualitant l'estat de l'enviament " + enviamentId, ex);
+			return null;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1446,7 +1480,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			for(var enviament: notificacio.getEnviaments()) {
 				enviament.refreshNotificaConsulta();
-				enviamentSmService.consultaReset(enviament.getUuid());
+				var consulta = ParametresSm.builder().enviamentUuid(enviament.getUuid()).build();
+				enviamentSmService.consultaReset(consulta);
 			}
 			notificacioTableHelper.actualitzarRegistre(notificacio);
 			notificacioRepository.saveAndFlush(notificacio);
@@ -1624,11 +1659,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Transactional
 	@Override
-	public void enviamentRefrescarEstat(Long enviamentId) {
+	public void enviamentRefrescarEstat(ConsultaNotificaRequest consulta) {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			notificaHelper.enviamentRefrescarEstat(enviamentId);
+			notificaHelper.enviamentRefrescarEstat(consulta);
+		} catch (Exception ex) {
+			log.error("Error refrescant l'estat de l'enviament " + consulta.getEnviamentUuid());
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1653,7 +1690,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			registreHelper.enviamentRefrescarEstatRegistre(enviamentId);
+			registreHelper.enviamentRefrescarEstatRegistre(ConsultaSirRequest.builder().consultaSirDto(ConsultaSirDto.builder().id(enviamentId).build()).build());
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1670,7 +1707,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!enviament.isPendentRefrescarEstatRegistre()) {
 				return null;
 			}
-			enviament = registreHelper.enviamentRefrescarEstatRegistre(enviamentId);
+			var consulta = ConsultaSirRequest.builder().consultaSirDto(ConsultaSirDto.builder().id(enviament.getId()).build()).build();
+			enviament = registreHelper.enviamentRefrescarEstatRegistre(consulta);
 			totBe = enviament.getSirConsultaIntent() == 0;
 			if (totBe) {
 				enviamentSmService.sirSuccess(enviament.getUuid());
@@ -1817,21 +1855,28 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public void reenviarNotificaionsMovil(Long notificacioId) {
+	public RespostaAccio<ResultatAccio> reenviarNotificaionsMovil(Long notificacioId) {
 
 		var timer = metricsHelper.iniciMetrica();
+		RespostaAccio<ResultatAccio> resposta = new RespostaAccio<>();
 		try {
 
 			log.debug("Reenviar notificació movil pels enviaments de la notificació " + notificacioId );
 			var notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			for (var e : notificacio.getEnviaments()) {
-				pluginHelper.enviarNotificacioMobil(e);
+				var resultat = pluginHelper.enviarNotificacioMobil(e);
+				if (resultat.isError()) {
+					resposta.getErrors().add(resultat);
+					continue;
+				}
+				resposta.getExecutades().add(resultat);
 			}
 		} catch (Exception e) {
-			log.debug("Error reenviant la notifciació mòvil pels enviaments de la notificació " + notificacioId, e);
+			log.error("Error reenviant la notifciació mòvil pels enviaments de la notificació " + notificacioId, e);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+		return resposta;
 	}
 
 	@Transactional
@@ -1858,10 +1903,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public RespostaAccio<String> reactivarNotificacioAmbErrors(Set<Long> enviaments) {
+	public RespostaAccio<AccioMassivaElement> reactivarNotificacioAmbErrors(Set<Long> enviaments) {
 
 		var timer = metricsHelper.iniciMetrica();
-		var resposta = new RespostaAccio<String>();
+		var resposta = new RespostaAccio<AccioMassivaElement>();
 		try {
 			Set<NotificacioEntity> notificacionsPostals = new HashSet<>();
 			NotibLogger.getInstance().info("[MASSIVA] Reactivar enviaments amb error a registre, notifica o entrega apostal amb fi reintents" + enviaments, log, LoggingTipus.MASSIVA);
@@ -1870,17 +1915,24 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var llindarDies = configHelper.getConfigAsInteger("es.caib.notib.llindar.dies.enviament.remeses");
 			AtomicInteger enviamentCounter = new AtomicInteger(1);
 			var globalDelay = configHelper.getConfigAsLong("es.caib.notib.massives.state.machine.inici.delay", SmConstants.MASSIU_DELAY);
+			AccioMassivaElement element;
 			for (var id : enviaments) {
 				enviament = enviamentRepository.findById(id).orElse(null);
+				element = new AccioMassivaElement();
+				element.setData(new Date());
+				element.setId(id);
 				if (enviament == null) {
-					log.error("MASSIVA] No existeix cap enviament amb id " + id);
-					resposta.getErrors().add(id + "");
+					var msg = "No existeix cap enviament amb id " + id;
+					log.error("[MASSIVA] " + msg);
+					element.setErrorDesc(msg);
+					resposta.getErrors().add(element);
 					continue;
 				}
 				notificacio = enviament.getNotificacio();
 				var saltar = DatesUtils.isNowAfterDate(notificacio.getCreatedDate().get(), llindarDies);
 				if (saltar) {
-					resposta.getNoExecutables().add(enviament.getUuid());
+					element.setErrorDesc("Enviament no reactivat, la seva data de creació és massa antiga");
+					resposta.getNoExecutables().add(element);
 					continue;
 				}
 				try {
@@ -1891,25 +1943,30 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificacio.refreshRegistre();
 						new Thread(() -> enviamentSmService.registreReset(e.getUuid(), delay)).start();
 //						enviamentSmService.registreReset(enviament.getUuid());
-						resposta.getExecutades().add(enviament.getUuid());
+						resposta.getExecutades().add(element);
 						continue;
 					}
 					if (EnviamentSmEstat.NOTIFICA_ERROR.equals(estatEnviament) || EnviamentSmEstat.NOTIFICA_PENDENT.equals(estatEnviament)) {
 						notificacio.resetIntentsNotificacio();
 						new Thread(() -> enviamentSmService.notificaReset(e.getUuid(), delay)).start();
 //						enviamentSmService.notificaReset(enviament.getUuid(), delay);
-						resposta.getExecutades().add(enviament.getUuid());
+						resposta.getExecutades().add(element);
 						continue;
 					}
 					if (enviament.getEntregaPostal() != null) {
 						var ultimEvent = enviament.getUltimEvent();
 						if (ultimEvent != null && NotificacioEventTipusEnumDto.CIE_ENVIAMENT.equals(ultimEvent.getTipus()) && ultimEvent.isError()) {
 							notificacionsPostals.add(notificacio);
-							resposta.getExecutades().add(enviament.getUuid());
+							resposta.getExecutades().add(element);
+							continue;
 						}
 					}
+					element.setErrorDesc("No reactivable ja que no té errors");
+					resposta.getNoExecutables().add(element);
 				} catch (Exception ex) {
-					resposta.getErrors().add(enviament.getUuid());
+					element.setErrorDesc(ex.getMessage());
+					element.setErrorStackTrace(ex.getStackTrace().toString());
+					resposta.getErrors().add(element);
 				}
 			}
 			var ok = true;
@@ -1917,7 +1974,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 				ok = ciePluginJms.enviarMissatge(not.getReferencia(), false);
 				if (!ok) {
 					for (var env : notificacio.getEnviaments()) {
-						resposta.getErrors().add(env.getUuid());
+						element = new  AccioMassivaElement();
+						element.setData(new Date());
+						element.setId(env.getId());
+						element.setErrorDesc("Error enviament el missatge a la cua d'enviaments postals");
+						resposta.getErrors().add(element);
 					}
 				}
 			}
@@ -1943,7 +2004,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var enviaments = notificacio.getEnviaments();
 			for (var env : enviaments) {
 				if (EnviamentSmEstat.NOTIFICA_ERROR.equals(enviamentSmService.getEstat(env.getUuid()))) {
-					enviamentSmService.consultaReset(env.getUuid());
+					var consulta = ParametresSm.builder().enviamentUuid(env.getUuid()).build();
+					enviamentSmService.consultaReset(consulta);
 				}
 				if (env.getUltimEvent() != null && env.getUltimEvent().getFiReintents()) {
 					env.getUltimEvent().setFiReintents(false);
@@ -2083,13 +2145,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<String> identificadors = new ArrayList<>();
 			var isNotificacio = dto.getNotificacioId() != null;
 			var isEnviament = dto.getEnviamentId() != null;
-			var isNotificacioMassiu = dto.getNotificacionsId() != null;
-			var isEnviamentMassiu = dto.getEnviamentsId() != null;
+			var isNotificacioMassiu = dto.getNotificacionsId() != null && dto.getNotificacionsId().size() > 0;
+			var isEnviamentMassiu = dto.getEnviamentsId() != null && dto.getEnviamentsId().size() > 0;
+			List<String> noExecutats = new ArrayList<>();
 			if (isNotificacio) {
 				var notificacio = notificacioRepository.findById(dto.getNotificacioId()).orElseThrow();
 				for (var enviament : notificacio.getEnviaments()) {
 					if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
 						identificadors.add(enviament.getNotificaReferencia());
+					} else {
+						noExecutats.add(enviament.getUuid());
 					}
 				}
 			}
@@ -2105,6 +2170,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 					for (var enviament : not.getEnviaments()) {
 						if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
 							identificadors.add(enviament.getNotificaReferencia());
+						} else {
+							noExecutats.add(enviament.getUuid());
 						}
 					}
 				}
@@ -2114,13 +2181,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 				for (var enviament : enviaments) {
 					if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
 						identificadors.add(enviament.getNotificaReferencia());
+					} else {
+						noExecutats.add(enviament.getUuid());
 					}
 				}
 			}
 			var envios = new Envios();
 			envios.setIdentificador(identificadors);
-			var ampliarPlazoOE = new AmpliarPlazoOE(envios, dto.getDies(), dto.getMotiu());
-			return notificaHelper.ampliarPlazoOE(ampliarPlazoOE);
+			var ampliarPlazoOE = new AmpliarPlazoOE(envios, dto.getDies(), dto.getMotiu(), dto.getAccioMassiva());
+			var resposta = notificaHelper.ampliarPlazoOE(ampliarPlazoOE);
+			resposta.setNoExecutades(noExecutats);
+			return resposta;
 		} catch (Exception ex) {
 			var msg = "Error inesperat al ampliarPlazoOE ";
 			log.error(msg, ex);

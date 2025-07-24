@@ -16,6 +16,7 @@
 	pageContext.setAttribute("rolsUsuariActual", sessionScopedContext.getRolsDisponibles());
 	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual()));
 	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()), PageContext.REQUEST_SCOPE);
+	pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(sessionScopedContext.getRolActual()), PageContext.REQUEST_SCOPE);
 	pageContext.setAttribute("isRolActualUsuari", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuari(sessionScopedContext.getRolActual()));
 	pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual()));
 	pageContext.setAttribute("requestParameterCanviRol", es.caib.notib.back.helper.RolHelper.REQUEST_PARAMETER_CANVI_ROL);
@@ -94,12 +95,13 @@
 			width: 96%;
 		}
 		<c:choose>
-		<c:when test="${sessionScope['EntitatHelper.entitatActual'].colorFons!=null  && not empty sessionScope['EntitatHelper.entitatActual'].colorFons}">
+<%--		<c:when test="${sessionScope['EntitatHelper.entitatActual'].colorFons!=null  && not empty sessionScope['EntitatHelper.entitatActual'].colorFons}">--%>
+		<c:when test="${entitatActual.colorFons !=null  && not empty entitatActual.colorFons}">
 		.navbar-app {
-			background-color: ${sessionScope['EntitatHelper.entitatActual'].colorFons} !important;
+			background-color: ${entitatActual.colorFons} !important;
 		}
 		.navbar-app .list-inline li.dropdown>a {
-			background-color: ${sessionScope['EntitatHelper.entitatActual'].colorFons} !important;
+			background-color: ${entitatActual.colorFons} !important;
 		}
 		</c:when>
 		<c:otherwise>
@@ -115,15 +117,15 @@
 		</c:choose>
 
 		<c:choose>
-		<c:when test="${sessionScope['EntitatHelper.entitatActual'].colorLletra!=null  && not empty sessionScope['EntitatHelper.entitatActual'].colorLletra}">
+		<c:when test="${entitatActual.colorLletra!=null  && not empty entitatActual.colorLletra}">
 		.navbar-app .list-inline li.dropdown>a {
-			color: ${sessionScope['EntitatHelper.entitatActual'].colorLletra};
+			color: ${entitatActual.colorLletra};
 		}
 		.caret-white {
-			border-top-color: ${sessionScope['EntitatHelper.entitatActual'].colorLletra} !important;
+			border-top-color: ${entitatActual.colorLletra} !important;
 		}
 		.list-inline.pull-right {
-			color: ${sessionScope['EntitatHelper.entitatActual'].colorLletra} !important;
+			color: ${entitatActual.colorLletra} !important;
 		}
 		</c:when>
 		<c:otherwise>
@@ -187,7 +189,7 @@
 			<div class="nav navbar-nav navbar-right">
 				<ul class="list-inline pull-right">
 
-					<c:if test="${hiHaEntitats && isRolActualAdministradorEntitat || isRolActualUsuari || isRolActualAdministradorOrgan}">
+					<c:if test="${hiHaEntitats && isRolActualAdministradorEntitat || isRolActualAdministradorLectura || isRolActualUsuari || isRolActualAdministradorOrgan}">
 						<li class="dropdown">
 							<c:if test="${hiHaMesEntitats}"><a id="dd_entitat" href="#" data-toggle="dropdown"></c:if>
 							<span class="fa fa-home"></span> <span id="dds_entitat" class="truncate" title="${entitatActual.nom}">${entitatActual.nom}</span> <c:if test="${hiHaMesEntitats}"><b class="caret caret-white"></b></c:if>
@@ -359,7 +361,7 @@
 								</div>
 							</c:when>
 
-							<c:when test="${isRolActualAdministradorEntitat}">
+							<c:when test="${isRolActualAdministradorEntitat || isRolActualAdministradorLectura}">
 								<div class="btn-group">
 									<a id="ml_notificacio" href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 								</div>
@@ -373,13 +375,16 @@
 										<li><a id="mg_massiu" href="<c:url value="/notificacio/massiva/"/>"><spring:message code="decorator.menu.notificacio.massiva.consulta"/></a></li>
 										<li><a id="mg_esborrades" href="<c:url value="/notificacio/notificacionsEsborrades"/>"><spring:message code="decorator.menu.massiu.esborrades"/></a></li>
 										<li><a id="mg_callback_pendents" href="<c:url value="/callback"/>"><spring:message code="decorator.menu.accions.callback.pendents"/></a></li>
+										<li><a id="mg_accions_massives" href="<c:url value="/accions/massives"/>"><spring:message code="decorator.menu.accions.accions.massives"/></a></li>
 									</ul>
 								</div>
 
 								<div class="btn-group">
 									<button id="m_conf" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
 									<ul class="dropdown-menu">
-										<li><a id="mc_entitat" href="<c:url value="/entitat/${entitatActual.id}"/>"><spring:message code="decorator.menu.entitat"/></a></li>
+										<c:if test="${!isRolActualAdministradorLectura}">
+											<li><a id="mc_entitat" href="<c:url value="/entitat/${entitatActual.id}"/>"><spring:message code="decorator.menu.entitat"/></a></li>
+										</c:if>
 										<li><a id="mc_permisos" href="<c:url value="/entitat/${entitatActual.id}/permis"/>"><spring:message code="decorator.menu.entitat.permisos"/></a></li>
 										<li><a id="mc_aplicacions" href="<c:url value="/entitat/${entitatActual.id}/aplicacio"/>"><spring:message code="decorator.menu.entitat.aplicacions"/></a></li>
 										<li class="divider"></li>
@@ -414,14 +419,6 @@
 							</c:when>
 						</c:choose>
 					</div>
-					<%--
-                                            <div class="btn-group">
-                                                <a class="btn btn-success" href="https://github.com/GovernIB/notib/raw/${manifestAtributes['Implementation-SCM-Branch']}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
-                    <!-- 									Per a diferents rol, ara sol esta el manual d'usuari -->
-                    <!-- 									<a class="btn btn-primary" href="https://github.com/GovernIB/notib/raw/notib-${versioMajorActual}/doc/pdf/NOTIB_${rolActual}.pdf" } download/><spring:message code="decorator.menu.manual.usuari"/></a> -->
-                                            </div>
-                    --%>
-
 				</div>
 
 

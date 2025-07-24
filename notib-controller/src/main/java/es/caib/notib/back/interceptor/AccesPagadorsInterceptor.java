@@ -27,7 +27,8 @@ public class AccesPagadorsInterceptor implements AsyncHandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-		if (RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual())) {
+		if (RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual())
+			|| RolHelper.isUsuariActualAdministradorLectura(sessionScopedContext.getRolActual())) {
 			return true;
 		}
 		var name = "";

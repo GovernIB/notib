@@ -145,4 +145,7 @@ public interface UsuariAplicacioService {
 
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	boolean diagnosticarAplicacions(Map<String, IntegracioDiagnostic> diagnostics);
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	IntegracioDiagnostic diagnosticarAplicacions(Long entitatId);
 }

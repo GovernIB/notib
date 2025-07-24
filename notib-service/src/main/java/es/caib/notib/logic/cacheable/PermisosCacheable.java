@@ -54,12 +54,14 @@ public class PermisosCacheable {
 
         var hasPermisUsuariEntitat = permisosHelper.isGrantedAny(auth, EntitatEntity.class, new Permission[] {ExtendedPermission.USUARI});
         var hasPermisAdminEntitat = permisosHelper.isGrantedAny(auth, EntitatEntity.class, new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT});
+        var hasPermisAdminLectura = permisosHelper.isGrantedAny(auth, EntitatEntity.class, new Permission[] {ExtendedPermission.ADMINISTRADORLECTURA});
         var hasPermisAplicacioEntitat = permisosHelper.isGrantedAny(auth, EntitatEntity.class, new Permission[] {ExtendedPermission.APLICACIO});
         var hasPermisAdminOrgan = permisosHelper.isGrantedAny(auth, OrganGestorEntity.class, new Permission[] {ExtendedPermission.ADMINISTRADOR});
 
         Map<RolEnumDto, Boolean> hasPermisos = new HashMap<>();
         hasPermisos.put(RolEnumDto.tothom, hasPermisUsuariEntitat);
         hasPermisos.put(RolEnumDto.NOT_ADMIN, hasPermisAdminEntitat);
+        hasPermisos.put(RolEnumDto.NOT_ADMIN_LECTURA, hasPermisAdminLectura);
         hasPermisos.put(RolEnumDto.NOT_APL, hasPermisAplicacioEntitat);
         hasPermisos.put(RolEnumDto.NOT_ADMIN_ORGAN, hasPermisAdminOrgan);
 
@@ -74,6 +76,7 @@ public class PermisosCacheable {
                 }
             log.info("### Permís Usuari: " + hasPermisUsuariEntitat);
             log.info("### Permís Adm entitat: " + hasPermisAdminEntitat);
+            log.info("### Permís Adm lectura: " + hasPermisAdminLectura);
             log.info("### Permís Adm òrgan: " + hasPermisAdminOrgan);
             log.info("### Permís Aplicació: " + hasPermisAplicacioEntitat);
             log.info("### -----------------------------------------------------------------------");
@@ -99,7 +102,8 @@ public class PermisosCacheable {
             return resposta;
         }
 
-        Permission[] permisos = new Permission[] {rolActual != null && rolActual.equals("tothom") ? ExtendedPermission.USUARI : ExtendedPermission.ADMINISTRADORENTITAT};
+        Permission[] permisos = new Permission[] {rolActual != null && rolActual.equals("tothom") ? ExtendedPermission.USUARI :
+                                "ADMIN_LECTURA".equals(rolActual) ? ExtendedPermission.ADMINISTRADORLECTURA : ExtendedPermission.ADMINISTRADORENTITAT};
         var entitatsIds = permisosHelper.getObjectsIdsWithPermission(EntitatEntity.class, permisos);
         var entitatsDisponibles = !entitatsIds.isEmpty() ? entitatRepository.findByIdsAndActiva(entitatsIds, true) : new ArrayList<EntitatEntity>();
         var resposta = !entitatsDisponibles.isEmpty() ? conversioTipusHelper.convertirList(entitatsDisponibles, EntitatDto.class) : new ArrayList<EntitatDto>();
@@ -108,6 +112,7 @@ public class PermisosCacheable {
         var organGestorsAmbPermisos = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, permisos);
         for(var dto : resposta) {
             dto.setUsuariActualAdministradorEntitat(true);
+            dto.setUsuariActualAdministradorLectura(true);
             dto.setUsuariActualAdministradorOrgan(!organGestorsAmbPermisos.isEmpty() && organGestorRepository.isAnyOfEntitat(organGestorsAmbPermisos, dto.getId()));
         }
         return resposta;
@@ -144,7 +149,7 @@ public class PermisosCacheable {
 
     public void clearAuthenticationPermissionsCaches(Authentication auth) {
 
-        var permisos = new Permission[] {ExtendedPermission.USUARI, ExtendedPermission.APLICACIO, ExtendedPermission.ADMINISTRADORENTITAT};
+        var permisos = new Permission[] {ExtendedPermission.USUARI, ExtendedPermission.APLICACIO, ExtendedPermission.ADMINISTRADORENTITAT, ExtendedPermission.ADMINISTRADORLECTURA};
         var entitatsIds = permisosHelper.getObjectsIdsWithPermission(EntitatEntity.class, permisos);
         if (entitatsIds != null && !entitatsIds.isEmpty()) {
             var entitatsAccessibles = entitatRepository.findByIds(entitatsIds);

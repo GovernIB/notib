@@ -102,7 +102,7 @@ public class EntitatService extends AbstractService<es.caib.notib.logic.intf.ser
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_ADMIN_LECTURA"})
 	public List<PermisDto> permisFindByEntitatId(Long id, PaginacioParamsDto paginacioParams) throws NotFoundException {
 		return getDelegateService().permisFindByEntitatId(id, paginacioParams);
 	}
@@ -130,6 +130,13 @@ public class EntitatService extends AbstractService<es.caib.notib.logic.intf.ser
 	public boolean hasPermisAdminEntitat() {
 		return getDelegateService().hasPermisAdminEntitat();
 	}
+
+	@Override
+	@RolesAllowed("**")
+	public boolean hasPermisAdminLectura() {
+		return getDelegateService().hasPermisAdminLectura();
+	}
+
 
 	@Override
 	@RolesAllowed("**")

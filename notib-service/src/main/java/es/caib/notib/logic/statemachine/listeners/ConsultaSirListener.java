@@ -1,5 +1,6 @@
 package es.caib.notib.logic.statemachine.listeners;
 
+import es.caib.notib.logic.helper.AccioMassivaHelper;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.RegistreService;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
@@ -28,6 +29,7 @@ public class ConsultaSirListener {
     private final RegistreService registreService;
     private final EnviamentSmService enviamentSmService;
     private final NotificacioEnviamentRepository notificacioEnviamentRepository;
+    private final AccioMassivaHelper accioMassivaHelper;
 
     private Semaphore semaphore = new Semaphore(5);
 
@@ -37,18 +39,26 @@ public class ConsultaSirListener {
         message.acknowledge();
         var enviament = consultaSirRequest.getConsultaSirDto();
         if (enviament == null || enviament.getUuid() == null) {
-            log.error("[SM] Rebuda consulta d'estat a Sir sense Enviament");
+            var msg = "[SM] Rebuda consulta d'estat a Sir sense Enviament";
+            log.error(msg);
+            if (consultaSirRequest.getAccioMassivaId() != null) {
+                accioMassivaHelper.actualitzar(consultaSirRequest.getAccioMassivaId(), enviament.getId(), msg, "");
+            }
             return;
         }
         NotibLogger.getInstance().info("[SM] Rebut consulta d'estat a Sir <" + enviament.getUuid() + ">", log, LoggingTipus.STATE_MACHINE);
         var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElse(null);
         if (enviament.isDeleted() || enviamentEntity != null && enviamentEntity.getNotificacio().isDeleted()) {
-            NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid(), log, LoggingTipus.STATE_MACHINE);
+            var msg = "[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid();
+            NotibLogger.getInstance().info(msg, log, LoggingTipus.STATE_MACHINE);
+            if (consultaSirRequest.getAccioMassivaId() != null) {
+                accioMassivaHelper.actualitzar(consultaSirRequest.getAccioMassivaId(), enviament.getId(), msg, "");
+            }
             return;
         }
         semaphore.acquire();
         try {
-            var success = registreService.consultaSir(enviament);
+            var success = registreService.consultaSir(consultaSirRequest);
             if (success) {
                 enviamentSmService.sirSuccess(enviament.getUuid());
             } else {

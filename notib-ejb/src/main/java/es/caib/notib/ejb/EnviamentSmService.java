@@ -6,7 +6,9 @@ package es.caib.notib.ejb;
 import es.caib.notib.logic.intf.dto.stateMachine.StateMachineInfo;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
+import es.caib.notib.logic.intf.statemachine.dto.ParametresSm;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.repository.query.Param;
 import org.springframework.statemachine.StateMachine;
 
 import javax.annotation.security.RolesAllowed;
@@ -186,14 +188,14 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed("**")
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaReset(String enviamentUuid) {
-		return getDelegateService().consultaReset(enviamentUuid);
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaReset(ParametresSm parametres) {
+		return getDelegateService().consultaReset(parametres);
 	}
 
 	@Override
 	@RolesAllowed("**")
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaRetry(String enviamentUuid) {
-		return getDelegateService().consultaRetry(enviamentUuid);
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> consultaRetry(ParametresSm parametres) {
+		return getDelegateService().consultaRetry(parametres);
 	}
 
 	@Override
@@ -222,14 +224,14 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed("**")
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirReset(String enviamentUuid) {
-		return getDelegateService().sirRetry(enviamentUuid);
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirReset(ParametresSm parametres) {
+		return getDelegateService().sirReset(parametres);
 	}
 
 	@Override
 	@RolesAllowed("**")
-	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirRetry(String enviamentUuid) {
-		return getDelegateService().sirRetry(enviamentUuid);
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> sirRetry(ParametresSm parametres) {
+		return getDelegateService().sirRetry(parametres);
 	}
 
     @Override

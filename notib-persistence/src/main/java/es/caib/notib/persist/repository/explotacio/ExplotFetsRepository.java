@@ -85,7 +85,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
     @Query("from ExplotFetsEntity where temps = :temps order by dimensio.entitatId, dimensio.organCodi, dimensio.procedimentId, dimensio.tipus, dimensio.origen, dimensio.usuariCodi")
     List<ExplotFetsEntity> findByTemps(@Param("temps") ExplotTempsEntity temps);
 
-
+    boolean existsByTemps(ExplotTempsEntity temps);
 
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
@@ -104,8 +104,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataCreacio IS NOT NULL AND e.dataCreacio >= :iniciDelDia AND e.dataCreacio < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsCreacioPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsCreacioPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -123,8 +122,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataRegistrada IS NOT NULL AND e.dataRegistrada >= :iniciDelDia AND e.dataRegistrada < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsRegistradaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsRegistradaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -142,8 +140,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataRegEnviamentError IS NOT NULL AND e.dataRegEnviamentError >= :iniciDelDia AND e.dataRegEnviamentError < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsRegEnviamentErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsRegEnviamentErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -161,8 +158,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataRegAcceptada IS NOT NULL AND e.dataRegAcceptada >= :iniciDelDia AND e.dataRegAcceptada < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsRegAcceptadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsRegAcceptadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -180,8 +176,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataRegRebutjada IS NOT NULL AND e.dataRegRebutjada >= :iniciDelDia AND e.dataRegRebutjada < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsRegRebutjadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsRegRebutjadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -199,8 +194,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataNotEnviamentError IS NOT NULL AND e.dataNotEnviamentError >= :iniciDelDia AND e.dataNotEnviamentError < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsNotEnviamentErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsNotEnviamentErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -218,8 +212,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataNotEnviada IS NOT NULL AND e.dataNotEnviada >= :iniciDelDia AND e.dataNotEnviada < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsNotEnviadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsNotEnviadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -237,8 +230,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataNotNotificada IS NOT NULL AND e.dataNotNotificada >= :iniciDelDia AND e.dataNotNotificada < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsNotNotificadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsNotNotificadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -256,8 +248,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataNotRebutjada IS NOT NULL AND e.dataNotRebutjada >= :iniciDelDia AND e.dataNotRebutjada < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsNotRebutjadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsNotRebutjadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -275,8 +266,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataNotExpirada IS NOT NULL AND e.dataNotExpirada >= :iniciDelDia AND e.dataNotExpirada < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsNotExpiradaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsNotExpiradaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -294,8 +284,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataNotError IS NOT NULL AND e.dataNotError >= :iniciDelDia AND e.dataNotError < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsNotErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsNotErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -313,8 +302,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataCieEnviamentError IS NOT NULL AND e.dataCieEnviamentError >= :iniciDelDia AND e.dataCieEnviamentError < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsCieEnviamentErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsCieEnviamentErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -332,8 +320,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataCieEnviada IS NOT NULL AND e.dataCieEnviada >= :iniciDelDia AND e.dataCieEnviada < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsCieEnviadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsCieEnviadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -351,8 +338,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataCieNotificada IS NOT NULL AND e.dataCieNotificada >= :iniciDelDia AND e.dataCieNotificada < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsCieNotificadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsCieNotificadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -370,8 +356,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataCieRebutjada IS NOT NULL AND e.dataCieRebutjada >= :iniciDelDia AND e.dataCieRebutjada < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsCieRebutjadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsCieRebutjadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -389,8 +374,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataCieCancelada IS NOT NULL AND e.dataCieCancelada >= :iniciDelDia AND e.dataCieCancelada < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsCieCanceladaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsCieCanceladaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -408,8 +392,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataCieError IS NOT NULL AND e.dataCieError >= :iniciDelDia AND e.dataCieError < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsCieErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsCieErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -427,8 +410,7 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataEmailEnviamentError IS NOT NULL AND e.dataEmailEnviamentError >= :iniciDelDia AND e.dataEmailEnviamentError < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsEmailEnviamentErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsEmailEnviamentErrorPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
     @Query("SELECT new es.caib.notib.persist.entity.explotacio.ExplotEnvStats( " +
             "    e.entitatId, " +
@@ -446,7 +428,6 @@ public interface ExplotFetsRepository extends JpaRepository<ExplotFetsEntity, Lo
             "WHERE e.dataEmailEnviada IS NOT NULL AND e.dataEmailEnviada >= :iniciDelDia AND e.dataEmailEnviada < :finalDelDia " +
             "GROUP BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen " +
             "ORDER BY e.entitatId, e.procedimentId, e.organGestorCodi, e.usuariCodi, e.enviamentTipus, e.origen ")
-    List<ExplotEnvStats> getStatsEmailEnviadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia
-);
+    List<ExplotEnvStats> getStatsEmailEnviadaPerDay(@Param("iniciDelDia") Date iniciDelDia, @Param("finalDelDia") Date finalDelDia);
 
 }

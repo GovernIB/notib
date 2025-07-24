@@ -5,6 +5,8 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
+import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
@@ -218,7 +220,8 @@ public class NotificaV2HelperTest {
         Assert.assertNull(enviamentMock.getNotificaCertificacioTamany());
 
         // When
-        notificaV2Helper.enviamentRefrescarEstat(enviamentMock.getId(), true);
+        var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentMock.getId()).build()).build();
+        notificaV2Helper.enviamentRefrescarEstat(consulta, true);
 
         // Then
         Mockito.verify(pluginHelper).gestioDocumentalCreate(Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS), Mockito.any(byte[].class));
@@ -266,7 +269,8 @@ public class NotificaV2HelperTest {
         );
 
         // When
-        notificaV2Helper.enviamentRefrescarEstat(enviamentMock.getId(), true);
+        var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentMock.getId()).build()).build();
+        notificaV2Helper.enviamentRefrescarEstat(consulta, true);
 
         // Then
         Mockito.verify(pluginHelper).gestioDocumentalCreate(Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS), Mockito.any(byte[].class));
@@ -315,7 +319,8 @@ public class NotificaV2HelperTest {
                 null);
 
         // When
-        notificaV2Helper.enviamentRefrescarEstat(enviamentMock.getId(), true);
+        var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentMock.getId()).build()).build();
+        notificaV2Helper.enviamentRefrescarEstat(consulta, true);
 
         // Then
         Mockito.verify(pluginHelper, Mockito.times(0)).gestioDocumentalCreate(Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS), Mockito.any(byte[].class));

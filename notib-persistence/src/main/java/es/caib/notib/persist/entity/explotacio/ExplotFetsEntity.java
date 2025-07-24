@@ -32,26 +32,26 @@ public class ExplotFetsEntity extends AbstractPersistable<Long> implements Seria
 	protected ExplotTempsEntity temps;
 
 	// Total en estat
-	@Column(name = "tot_pendent")	private long pendent; // Abans: pendent
+	@Column(name = "tot_pendent")	private Long pendent; // Abans: pendent
 
-	@Column(name = "tot_reg_err")	private long regEnviamentError; // Abans: reg_env_error
-	@Column(name = "tot_registr")	private long registrada; // Abans: registrada
-	@Column(name = "tot_sir_acc")	private long regAcceptada; // Abans: reg_acceptada
-	@Column(name = "tot_sir_reb")	private long regRebutjada; // Abans: reg_rebutjada
+	@Column(name = "tot_reg_err")	private Long regEnviamentError; // Abans: reg_env_error
+	@Column(name = "tot_registr")	private Long registrada; // Abans: registrada
+	@Column(name = "tot_sir_acc")	private Long regAcceptada; // Abans: reg_acceptada
+	@Column(name = "tot_sir_reb")	private Long regRebutjada; // Abans: reg_rebutjada
 
-	@Column(name = "tot_not_err")	private long notEnviamentError; // Abans: not_env_error
-	@Column(name = "tot_not_env")	private long notEnviada; // Abans: not_enviada
-	@Column(name = "tot_not_not")	private long notNotificada; // Abans: not_notificada
-	@Column(name = "tot_not_reb")	private long notRebutjada; // Abans: not_rebutjada
-	@Column(name = "tot_not_exp")	private long notExpirada; // Abans: not_expirada
+	@Column(name = "tot_not_err")	private Long notEnviamentError; // Abans: not_env_error
+	@Column(name = "tot_not_env")	private Long notEnviada; // Abans: not_enviada
+	@Column(name = "tot_not_not")	private Long notNotificada; // Abans: not_notificada
+	@Column(name = "tot_not_reb")	private Long notRebutjada; // Abans: not_rebutjada
+	@Column(name = "tot_not_exp")	private Long notExpirada; // Abans: not_expirada
 
-	@Column(name = "tot_cie_err")	private long cieEnviamentError; // Abans: cie_env_error
-	@Column(name = "tot_cie_env")	private long cieEnviada; // Abans: cie_enviada
-	@Column(name = "tot_cie_not")	private long cieNotificada; // Abans: cie_notificada
-	@Column(name = "tot_cie_reb")	private long cieRebutjada; // Abans: cie_rebutjada
-	@Column(name = "tot_cie_fal")	private long cieError; // Abans: cie_error
+	@Column(name = "tot_cie_err")	private Long cieEnviamentError; // Abans: cie_env_error
+	@Column(name = "tot_cie_env")	private Long cieEnviada; // Abans: cie_enviada
+	@Column(name = "tot_cie_not")	private Long cieNotificada; // Abans: cie_notificada
+	@Column(name = "tot_cie_reb")	private Long cieRebutjada; // Abans: cie_rebutjada
+	@Column(name = "tot_cie_fal")	private Long cieError; // Abans: cie_error
 
-	@Column(name = "tot_process")	private long processada; // Abans: processada
+	@Column(name = "tot_process")	private Long processada; // Abans: processada
 
 	// Transicions
 	@Column(name = "tr_creades")	private Long trCreades;

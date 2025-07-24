@@ -17,22 +17,22 @@ public class ExplotFets {
     private final EnviamentOrigen origen;
 
     // Total en estat
-    private final long pendent;
-    private final long regEnviamentError;
-    private final long registrada;
-    private final long regAcceptada;
-    private final long regRebutjada;
-    private final long notEnviamentError;
-    private final long notEnviada;
-    private final long notNotificada;
-    private final long notRebutjada;
-    private final long notExpirada;
-    private final long cieEnviamentError;
-    private final long cieEnviada;
-    private final long cieNotificada;
-    private final long cieRebutjada;
-    private final long cieError;
-    private final long processada;
+    private final Long pendent;
+    private final Long regEnviamentError;
+    private final Long registrada;
+    private final Long regAcceptada;
+    private final Long regRebutjada;
+    private final Long notEnviamentError;
+    private final Long notEnviada;
+    private final Long notNotificada;
+    private final Long notRebutjada;
+    private final Long notExpirada;
+    private final Long cieEnviamentError;
+    private final Long cieEnviada;
+    private final Long cieNotificada;
+    private final Long cieRebutjada;
+    private final Long cieError;
+    private final Long processada;
 
     // Transicions
     private Long trCreades;
@@ -94,22 +94,22 @@ public class ExplotFets {
             String usuariCodi,
             EnviamentTipus tipus,
             EnviamentOrigen origen,
-            long pendent,
-            long regEnviamentError,
-            long registrada,
-            long regAcceptada,
-            long regRebutjada,
-            long notEnviamentError,
-            long notEnviada,
-            long notNotificada,
-            long notRebutjada,
-            long notExpirada,
-            long cieEnviamentError,
-            long cieEnviada,
-            long cieNotificada,
-            long cieRebutjada,
-            long cieError,
-            long processada) {
+            Long pendent,
+            Long regEnviamentError,
+            Long registrada,
+            Long regAcceptada,
+            Long regRebutjada,
+            Long notEnviamentError,
+            Long notEnviada,
+            Long notNotificada,
+            Long notRebutjada,
+            Long notExpirada,
+            Long cieEnviamentError,
+            Long cieEnviada,
+            Long cieNotificada,
+            Long cieRebutjada,
+            Long cieError,
+            Long processada) {
         this.entitatId = entitatId;
         this.procedimentId = procedimentId;
         this.organCodi = organCodi;

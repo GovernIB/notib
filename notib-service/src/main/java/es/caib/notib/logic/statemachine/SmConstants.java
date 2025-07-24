@@ -40,6 +40,10 @@ public class SmConstants {
     public static final String CUA_CONSULTA_SIR = "qu_sir";
     public static final String CUA_POOLING_SIR = "qu_pool_sir";
     public static final String CUA_CALLBACKS = "qu_callbacks";
+    public static final String CUA_ACCIONS_MASSIVES = "qu_accions_massives";
+
+    // Accions massives
+    public static final String ACCIO_MASSIVA_ID = "accio_massiva_id";
 
     public static final String RG_RETRY = "rg_retry";
     public static final String NT_RETRY = "nt_retry";

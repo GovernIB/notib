@@ -5,15 +5,16 @@
 	<parent>
 		<groupId>es.caib.notib</groupId>
 		<artifactId>notib</artifactId>
-		<version>2.0.10</version>
+		<version>2.0.11</version>
 	</parent>
 	<artifactId>notib-ear</artifactId>
 	<packaging>ear</packaging>
 
-<!--	<properties>-->
+	<properties>
+		<docker.base.image>${project.parent.artifactId}</docker.base.image>
 <!--		<docker.image.prefix>280421</docker.image.prefix>-->
 <!--		<docker.image.name>notib</docker.image.name>-->
-<!--	</properties>-->
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -285,13 +286,15 @@
 					<verbose>true</verbose>
 					<images>
 						<image>
-							<name>280421/%g</name>
+<!--							<name>280421/%g</name>-->
+							<name>${docker.base.image}</name>
 							<alias>${project.parent.artifactId}</alias>
 							<build>
 								<from>280421/jboss-eap-caib-7.2</from>
 								<maintainer>limit@limit.es</maintainer>
 								<ports>
 									<port>8080</port>
+									<port>8787</port>
 								</ports>
 								<assemblies>
 									<assembly>
@@ -349,6 +352,16 @@
 									<tag>${project.version}</tag>
 								</tags>
 							</build>
+							<run>
+								<ports>
+									<!-- Mapeig del port de debug -->
+									<port>8787:8787</port>
+								</ports>
+								<env>
+									<!-- Defineix les JAVA_OPTS per habilitar el debug -->
+									<JAVA_OPTS>-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n</JAVA_OPTS>
+								</env>
+							</run>
 						</image>
 					</images>
 				</configuration>

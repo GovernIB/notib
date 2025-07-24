@@ -265,7 +265,7 @@ public class ConsultaApiRestV2Controller extends BaseController {
 		try {
 			arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
 		} catch (Exception e) {
-			log.debug("No s'ha trobat la certificació per a l'enviament amb identificador " + enviamentId);
+			log.error("No s'ha trobat la certificació per a l'enviament amb identificador " + enviamentId);
 		}
 		if (arxiu != null && arxiu.getContingut() != null) {
 			var contingutCertificacioBasse64 = Base64.encodeBase64String(arxiu.getContingut());

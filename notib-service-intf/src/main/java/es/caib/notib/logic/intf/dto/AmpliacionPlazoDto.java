@@ -1,5 +1,6 @@
 package es.caib.notib.logic.intf.dto;
 
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,4 +16,5 @@ public class AmpliacionPlazoDto {
     private String motiu;
     private List<Long> notificacionsId;
     private List<Long> enviamentsId;
+    private Long accioMassiva;
 }

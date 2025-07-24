@@ -24,6 +24,9 @@ import es.caib.notib.logic.intf.dto.ProvinciesDto;
 import es.caib.notib.logic.intf.dto.RespostaAccio;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElement;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
+import es.caib.notib.logic.intf.dto.accioMassiva.ResultatAccio;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
@@ -33,6 +36,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
+import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
@@ -115,7 +119,7 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed("**")
-	public ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId) {
+	public ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId) throws Exception{
 		return getDelegateService().enviamentGetCertificacioArxiu(enviamentId);
 	}
 
@@ -133,8 +137,8 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed("**")
-	public boolean resetConsultaEstat(Set<Long> ids) {
-		return getDelegateService().resetConsultaEstat(ids);
+	public RespostaAccio<AccioMassivaElement> resetConsultaEstat(AccioMassivaExecucio accio) {
+		return getDelegateService().resetConsultaEstat(accio);
 	}
 
 
@@ -200,7 +204,7 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed("**")
-	public RespostaAccio<String> resetNotificacioARegistre(Long notificacioId) {
+	public RespostaAccio<AccioMassivaElement> resetNotificacioARegistre(Long notificacioId) {
 		return getDelegateService().resetNotificacioARegistre(notificacioId);
 	}
 
@@ -249,8 +253,8 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@PermitAll
-	public void enviamentRefrescarEstat(Long notificacioId) {
-		getDelegateService().enviamentRefrescarEstat(notificacioId);
+	public void enviamentRefrescarEstat(ConsultaNotificaRequest consulta) {
+		getDelegateService().enviamentRefrescarEstat(consulta);
 	}
 
 	@Override
@@ -308,13 +312,13 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_ADMIN_LECTURA"})
 	public PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre, PaginacioParamsDto paginacioDtoFromRequest) {
 		return getDelegateService().findNotificacionsAmbErrorRegistre(entitatId, filtre, paginacioDtoFromRequest);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_ADMIN_LECTURA"})
 	public List<Long> findNotificacionsIdAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre) {
 		return getDelegateService().findNotificacionsIdAmbErrorRegistre(entitatId, filtre);
 	}
@@ -327,8 +331,8 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public void reenviarNotificaionsMovil(Long notificacioId) {
-		getDelegateService().reenviarNotificaionsMovil(notificacioId);
+	public RespostaAccio<ResultatAccio> reenviarNotificaionsMovil(Long notificacioId) {
+		return getDelegateService().reenviarNotificaionsMovil(notificacioId);
 	}
 
 	@Override
@@ -426,7 +430,7 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed("**")
-	public RespostaAccio<String> reactivarNotificacioAmbErrors(Set<Long> notificacioId) {
+	public RespostaAccio<AccioMassivaElement> reactivarNotificacioAmbErrors(Set<Long> notificacioId) {
 		return getDelegateService().reactivarNotificacioAmbErrors(notificacioId);
 	}
 

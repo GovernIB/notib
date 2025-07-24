@@ -12,6 +12,7 @@ import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.logic.intf.dto.accioMassiva.ResultatAccio;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
@@ -21,6 +22,7 @@ import es.caib.notib.plugin.carpeta.VincleInteressat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
@@ -47,16 +49,19 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
     }
 
 
-	public void enviarNotificacioMobil(NotificacioEnviamentEntity e) {
+	public ResultatAccio enviarNotificacioMobil(NotificacioEnviamentEntity e) {
 
 		if (e.isPerEmail() || InteressatTipus.ADMINISTRACIO.equals(e.getTitular().getInteressatTipus())) {
-			return;
+			var error = e.isPerEmail() ? "Enviament per email, no s'envien notificaions mòvils per aquest tipus d'enviament"
+					: "Interessat tipus administració, no s'envien notificacions mòvils per aquest tipus d'interessat";
+			return ResultatAccio.builder().id(e.getId()).error(true).errorDescripcio(error).build();
 		}
 		var info = new IntegracioInfo(IntegracioCodi.CARPETA, "Enviar notificació mòvil", IntegracioAccioTipusEnumDto.ENVIAMENT);
 		info.setNotificacioId(e.getNotificacio().getId());
 		info.setAplicacio(e.getNotificacio().getTipusUsuari(), e.getNotificacio().getCreatedBy().get().getCodi());
 		var eventInfo = NotificacioEventHelper.EventInfo.builder().enviament(e).tipus(NotificacioEventTipusEnumDto.API_CARPETA).build();
 		var enviarCarpeta = enviarCarpeta();
+		String errorStackTrace = null;
 		try {
 			if (!enviarCarpeta) {
 				throw new Exception("El plugin de CARPETA no està configurat");
@@ -75,12 +80,14 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 			log.error(msg, ex);
 			eventInfo.setError(true);
 			eventInfo.setErrorDescripcio(ex.getMessage());
+			errorStackTrace = Arrays.toString(ex.getStackTrace());
 			integracioHelper.addAccioError(info, msg, ex);
 			if (enviarCarpeta) {
 				// peticionsPlugin.updatePeticioError(configHelper.getEntitatActualCodi());
 			}
 		}
 		eventHelper.addEvent(eventInfo);
+		return ResultatAccio.builder().id(e.getId()).error(eventInfo.isError()).errorDescripcio(eventInfo.getErrorDescripcio()).errorStackTrace(errorStackTrace).build();
 	}
 
 	public static MissatgeCarpetaParams crearMissatgeCarpetaParams(NotificacioEnviamentEntity enviament) {

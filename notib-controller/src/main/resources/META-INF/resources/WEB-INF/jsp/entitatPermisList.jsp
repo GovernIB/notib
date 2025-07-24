@@ -6,6 +6,7 @@
 <%
 	es.caib.notib.back.config.scopedata.SessionScopedContext ssc = (es.caib.notib.back.config.scopedata.SessionScopedContext)request.getAttribute("sessionScopedContext");
 	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(ssc.getRolActual()));
+	pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorLectura(ssc.getRolActual()));
 %>
 <html>
 <head>
@@ -20,9 +21,11 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 </head>
 <body>
-	<div class="text-right" data-toggle="botons-titol">
-		<a class="btn btn-default" href="<c:url value="/entitat/${entitat.id}/permis/new"/>" data-toggle="modal" data-datatable-id="permisos"><span class="fa fa-plus"></span>&nbsp;<spring:message code="entitat.permis.list.boto.nou.permis"/></a>
-	</div>
+	<c:if test="${!isRolActualAdministradorLectura}">
+		<div class="text-right" data-toggle="botons-titol">
+			<a class="btn btn-default" href="<c:url value="/entitat/${entitat.id}/permis/new"/>" data-toggle="modal" data-datatable-id="permisos"><span class="fa fa-plus"></span>&nbsp;<spring:message code="entitat.permis.list.boto.nou.permis"/></a>
+		</div>
+	</c:if>
 	<table
 		id="permisos"
 		data-toggle="datatable"
@@ -37,6 +40,7 @@
 				<th data-col-name="usuari" data-visible="false"></th>
 				<th data-col-name="administrador" data-visible="false"></th>
 				<th data-col-name="administradorEntitat" data-visible="false"></th>
+				<th data-col-name="administradorLectura" data-visible="false"></th>
 				<th data-col-name="aplicacio" data-visible="false"></th>
 				<th data-col-name="tipus" data-renderer="enum(TipusEnumDto)">
 					<spring:message code="entitat.permis.list.columna.tipus"/>
@@ -48,20 +52,23 @@
 						{{if usuari}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.usuari"/></span>{{/if}}
 						{{if administrador}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.administrador"/></span>{{/if}}
 						{{if administradorEntitat}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.administradorentitat"/></span>{{/if}}
+						{{if administradorLectura}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.administradorlectura"/></span>{{/if}}
 						{{if aplicacio}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.aplicacio"/></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
-					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<div class="dropdown">
-							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-							<ul class="dropdown-menu">
-								<li><a href="<c:url value="/entitat/${entitatId}/permis/{{:id}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								<li><a href="<c:url value="/entitat/${entitatId}/permis/{{:id}}/delete"/>" data-confirm="<spring:message code="entitat.permis.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-							</ul>
-						</div>
-					</script>
-				</th>
+				<c:if test="${!isRolActualAdministradorLectura}">
+					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+						<script id="cellAccionsTemplate" type="text/x-jsrender">
+							<div class="dropdown">
+								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+								<ul class="dropdown-menu">
+									<li><a href="<c:url value="/entitat/${entitatId}/permis/{{:id}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									<li><a href="<c:url value="/entitat/${entitatId}/permis/{{:id}}/delete"/>" data-confirm="<spring:message code="entitat.permis.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								</ul>
+							</div>
+						</script>
+					</th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>
