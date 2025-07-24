@@ -123,4 +123,24 @@ public class OrganigramaHelper {
 		return unitats;
 	}
 
+//	public String getConselleriaCodi(String codiDir3Entitat, String codiDir3Organ) {
+//		if (codiDir3Organ == null) {
+//			return null;
+//		}
+//		var organigrama = organGestorCachable.findOrganigramaByEntitat(codiDir3Entitat);
+//		var organisme = organigrama.get(codiDir3Organ);
+//		if (organisme == null) {
+//			return null;
+//		}
+//		var pare = organisme.getPare();
+//		while (pare != null && !pare.equals(codiDir3Entitat)) {
+//			organisme = organigrama.get(pare);
+//			if (organisme == null) {
+//				return null;
+//			}
+//			pare = organisme.getPare();
+//		}
+//		return organisme.getCodi();
+//	}
+
 }
