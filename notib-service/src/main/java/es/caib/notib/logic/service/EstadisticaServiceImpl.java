@@ -7,9 +7,11 @@ import es.caib.comanda.ms.estadistica.model.IndicadorDesc;
 import es.caib.comanda.ms.estadistica.model.RegistreEstadistic;
 import es.caib.comanda.ms.estadistica.model.RegistresEstadistics;
 import es.caib.comanda.ms.estadistica.model.Temps;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.explotacio.DiaSetmanaEnum;
 import es.caib.notib.client.domini.explotacio.DimEnum;
 import es.caib.notib.client.domini.explotacio.DimensioNotib;
+import es.caib.notib.client.domini.explotacio.EnviamentOrigen;
 import es.caib.notib.client.domini.explotacio.FetNotib;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
@@ -25,6 +27,10 @@ import es.caib.notib.persist.entity.explotacio.ExplotFets;
 import es.caib.notib.persist.entity.explotacio.ExplotFetsEntity;
 import es.caib.notib.persist.entity.explotacio.ExplotFetsKey;
 import es.caib.notib.persist.entity.explotacio.ExplotTempsEntity;
+import es.caib.notib.persist.repository.EntitatRepository;
+import es.caib.notib.persist.repository.OrganGestorRepository;
+import es.caib.notib.persist.repository.ProcSerRepository;
+import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.persist.repository.explotacio.ExplotDimensioRepository;
 import es.caib.notib.persist.repository.explotacio.ExplotEnvBasicStatsRepository;
 import es.caib.notib.persist.repository.explotacio.ExplotFetsRepository;
@@ -43,11 +49,11 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static es.caib.comanda.ms.estadistica.model.Format.DECIMAL;
@@ -63,6 +69,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     private final ExplotDimensioRepository explotDimensioRepository;
     private final ExplotFetsRepository explotFetsRepository;
     private final ExplotEnvBasicStatsRepository explotEnvBasicStatsRepository;
+    private final EntitatRepository entitatRepository;
+    private final OrganGestorRepository organGestorRepository;
+    private final ProcSerRepository procSerRepository;
+    private final UsuariRepository usuariRepository;
     private final IntegracioHelper integracioHelper;
     private final JdbcTemplate jdbcTemplate;
 
@@ -428,14 +438,27 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
     @Override
     public List<DimensioDesc> getDimensions() {
-        List<ExplotDimensio> dim = explotDimensioRepository.getDimensionsPerEstadistiques();
+        List<String> entitatCodis = entitatRepository.findAllCodis();
+        List<String> organCodis = organGestorRepository.findAllCodis();
+        List<String> procedimentCodis = procSerRepository.findAllCodis();
+        procedimentCodis.add("");
+        List<String> usuariCodis = usuariRepository.findCodiAll();
+        // Si no existeix, afegirem un usuari "DESCONEGUT"
+        int index = Collections.binarySearch(usuariCodis, "DESCONEGUT");
+        if (index < 0) {
+            int insertionPoint = -(index + 1);
+            usuariCodis.add(insertionPoint, "DESCONEGUT");
+        }
+        List<String> tipus = Arrays.stream(EnviamentTipus.values()).map(Enum::name).sorted().collect(Collectors.toList());
+        List<String> origens = Arrays.stream(EnviamentOrigen.values()).map(Enum::name).sorted().collect(Collectors.toList());
+
         return List.of(
-                DimensioDesc.builder().codi(DimEnum.ENT.name()).nom(DimEnum.ENT.getNom()).descripcio(DimEnum.ENT.getDescripcio()).valors(dim.stream().map(d -> Optional.ofNullable(d.getEntitatCodi()).orElse("")).filter(s -> !s.isEmpty()).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().codi(DimEnum.ORG.name()).nom(DimEnum.ORG.getNom()).descripcio(DimEnum.ORG.getDescripcio()).valors(dim.stream().map(d -> Optional.ofNullable(d.getOrganCodi()).orElse("")).filter(s -> !s.isEmpty()).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().codi(DimEnum.PRC.name()).nom(DimEnum.PRC.getNom()).descripcio(DimEnum.PRC.getDescripcio()).valors(dim.stream().map(d -> Optional.ofNullable(d.getProcedimentCodi()).orElse("")).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().codi(DimEnum.USU.name()).nom(DimEnum.USU.getNom()).descripcio(DimEnum.USU.getDescripcio()).valors(dim.stream().map(d -> Optional.ofNullable(d.getUsuariCodi()).orElse("DESCONEGUT")).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().codi(DimEnum.TIP.name()).nom(DimEnum.TIP.getNom()).descripcio(DimEnum.TIP.getDescripcio()).valors(dim.stream().map(d -> d.getTipus().name()).distinct().sorted().collect(Collectors.toList())).build(),
-                DimensioDesc.builder().codi(DimEnum.ORI.name()).nom(DimEnum.ORI.getNom()).descripcio(DimEnum.ORI.getDescripcio()).valors(dim.stream().map(d -> d.getOrigen().name()).distinct().sorted().collect(Collectors.toList())).build()
+                DimensioDesc.builder().codi(DimEnum.ENT.name()).nom(DimEnum.ENT.getNom()).descripcio(DimEnum.ENT.getDescripcio()).valors(entitatCodis).build(),
+                DimensioDesc.builder().codi(DimEnum.ORG.name()).nom(DimEnum.ORG.getNom()).descripcio(DimEnum.ORG.getDescripcio()).valors(organCodis).build(),
+                DimensioDesc.builder().codi(DimEnum.PRC.name()).nom(DimEnum.PRC.getNom()).descripcio(DimEnum.PRC.getDescripcio()).valors(procedimentCodis).build(),
+                DimensioDesc.builder().codi(DimEnum.USU.name()).nom(DimEnum.USU.getNom()).descripcio(DimEnum.USU.getDescripcio()).valors(usuariCodis).build(),
+                DimensioDesc.builder().codi(DimEnum.TIP.name()).nom(DimEnum.TIP.getNom()).descripcio(DimEnum.TIP.getDescripcio()).valors(tipus).build(),
+                DimensioDesc.builder().codi(DimEnum.ORI.name()).nom(DimEnum.ORI.getNom()).descripcio(DimEnum.ORI.getDescripcio()).valors(origens).build()
         );
     }
 
