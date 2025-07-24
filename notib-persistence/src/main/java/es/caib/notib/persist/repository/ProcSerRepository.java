@@ -313,25 +313,9 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 
     List<ProcSerEntity> findByOrganGestorId(Long organId);
 
-//	public List<ProcedimentEntity> findByOrganGestorCodiIn(List<String> organsFills);
-//
-//	@Query(
-//			"from ProcedimentEntity pro " +
-//			"where (pro.organGestor.codi in (:organsCodis) " +
-//			"  	or pro.comu = true) " +
-//			"  and pro.entitat in (:entitat) " +
-//			"order by pro.nom asc")
-//	public List<ProcedimentEntity> findByOrganGestorCodiInOrComu(
-//            @Param("organsCodis") List<String> organsCodis,
-//            @Param("entitat") EntitatEntity entitat);
-//
-//	@Query(
-//			"from " +
-//			"    ProcedimentEntity pro " +
-//			"where pro.entitat = (:entitatActual) and " +
-//			"lower(pro.nom) = (lower(:nomProcediment))")
-//	List<ProcedimentEntity> findByNomAndEntitat(
-//            @Param("nomProcediment") String nomProcediment,
-//            @Param("entitatActual") EntitatEntity entitat);
-	
+	@Query(	"select distinct p.codi " +
+			"  from ProcSerEntity p " +
+			" order by p.codi")
+	List<String> findAllCodis();
+
 }

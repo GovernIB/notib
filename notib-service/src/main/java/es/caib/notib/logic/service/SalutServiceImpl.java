@@ -1,6 +1,7 @@
 package es.caib.notib.logic.service;
 
 import es.caib.comanda.ms.salut.model.AppInfo;
+import es.caib.comanda.ms.salut.model.ContextInfo;
 import es.caib.comanda.ms.salut.model.DetallSalut;
 import es.caib.comanda.ms.salut.model.EstatSalut;
 import es.caib.comanda.ms.salut.model.EstatSalutEnum;
@@ -74,6 +75,33 @@ public class SalutServiceImpl implements SalutService {
         return Arrays.stream(SubsistemesHelper.SubsistemesEnum.values())
                 .map(subsistema -> AppInfo.builder().codi(subsistema.name()).nom(subsistema.getNom()).build())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ContextInfo> getContexts(String baseUrl) {
+        return List.of(
+                ContextInfo.builder()
+                        .codi("BACK")
+                        .nom("Backoffice")
+                        .path(baseUrl + "/notibback")
+                        .manuals(List.of(
+                                "https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_usuari.pdf",
+                                "https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_administracio.pdf"))
+                        .build(),
+                ContextInfo.builder()
+                        .codi("INT")
+                        .nom("API interna")
+                        .path(baseUrl + "/notibapi/interna")
+                        .manuals(List.of("https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_integracio.pdf"))
+                        .api(baseUrl + "/notibapi/interna/rest")
+                        .build(),
+                ContextInfo.builder()
+                        .codi("EXT")
+                        .nom("API externa")
+                        .path(baseUrl + "/notibapi/externa")
+                        .api(baseUrl + "/notibapi/externa/rest")
+                        .build()
+        );
     }
 
     @Override

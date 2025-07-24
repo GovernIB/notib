@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +31,7 @@ public class SalutController {
     private ManifestInfo manifestInfo;
 
     @GetMapping("/appInfo")
-    public AppInfo appInfo() throws IOException {
+    public AppInfo appInfo(HttpServletRequest request) throws IOException {
 
         var manifestInfo = getManifestInfo();
         return AppInfo.builder()
@@ -40,7 +41,16 @@ public class SalutController {
                 .versio(manifestInfo.getVersion())
                 .integracions(salutService.getIntegracions())
                 .subsistemes(salutService.getSubsistemes())
+                .contexts(salutService.getContexts(getBaseUrl(request)))
                 .build();
+    }
+
+    public String getBaseUrl(HttpServletRequest request) {
+        return ServletUriComponentsBuilder
+                .fromRequestUri(request)
+                .replacePath(null) // elimina el context path "/comandaapi/..."
+                .build()
+                .toUriString();
     }
 
     @GetMapping("/salut")

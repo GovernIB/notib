@@ -197,6 +197,11 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"and (og.oficina is null or og.oficina not in (select codi from OficinaEntity))")
     List<OrganGestorEntity> findByEntitatAndOficinaInexistent(@Param("entitat") EntitatEntity entitat);
 
+	@Query(	"select distinct og.codi " +
+			"  from OrganGestorEntity og " +
+			" order by og.codi")
+	List<String> findAllCodis();
+
 	@Modifying
 	@Query(value = "delete from NOT_OG_SINC_REL", nativeQuery = true)
 	void deleteHistoricSincronitzacio();

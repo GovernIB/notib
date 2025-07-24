@@ -70,6 +70,11 @@ public interface EntitatRepository extends JpaRepository<EntitatEntity, Long> {
 			" where e.activa = true ")
     List<String> findCodiAllActives();
 
+	@Query(	"select distinct e.codi " +
+			"  from EntitatEntity e " +
+			" order by e.codi")
+	List<String> findAllCodis();
+
 
 	@Modifying
 	@Query(value = "UPDATE NOT_ENTITAT " +

@@ -49,6 +49,11 @@ public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 
 	Optional<UsuariEntity> getByCodi(String name);
 
+	@Query(	"select distinct u.codi " +
+			"  from UsuariEntity u " +
+			" order by u.codi")
+	List<String> findCodiAll();
+
 	@Modifying
 	@Query(value = "UPDATE NOT_ACL_SID SET SID = :codiNou WHERE SID = :codiAntic AND PRINCIPAL = 1 AND NOT EXISTS (SELECT 1 FROM NOT_ACL_SID WHERE SID = :codiNou AND PRINCIPAL = 1)", nativeQuery = true)
 	int updateUsuariPermis(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);

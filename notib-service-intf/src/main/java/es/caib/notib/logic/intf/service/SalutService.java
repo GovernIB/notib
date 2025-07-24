@@ -2,6 +2,7 @@ package es.caib.notib.logic.intf.service;
 
 
 import es.caib.comanda.ms.salut.model.AppInfo;
+import es.caib.comanda.ms.salut.model.ContextInfo;
 import es.caib.comanda.ms.salut.model.IntegracioInfo;
 import es.caib.comanda.ms.salut.model.SalutInfo;
 
@@ -11,6 +12,7 @@ public interface SalutService {
 
     public List<IntegracioInfo> getIntegracions();
     public List<AppInfo> getSubsistemes();
+    public List<ContextInfo> getContexts(String baseUrl);
     public SalutInfo checkSalut(String versio, String performanceUrl);
 
 }
