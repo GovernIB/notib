@@ -7,6 +7,7 @@ import es.caib.comanda.ms.salut.model.EstatSalut;
 import es.caib.comanda.ms.salut.model.EstatSalutEnum;
 import es.caib.comanda.ms.salut.model.IntegracioInfo;
 import es.caib.comanda.ms.salut.model.IntegracioSalut;
+import es.caib.comanda.ms.salut.model.Manual;
 import es.caib.comanda.ms.salut.model.MissatgeSalut;
 import es.caib.comanda.ms.salut.model.SalutInfo;
 import es.caib.notib.logic.helper.PluginHelper;
@@ -85,14 +86,14 @@ public class SalutServiceImpl implements SalutService {
                         .nom("Backoffice")
                         .path(baseUrl + "/notibback")
                         .manuals(List.of(
-                                "https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_usuari.pdf",
-                                "https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_administracio.pdf"))
+                                Manual.builder().nom("Manual d'usuari").path("https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_usuari.pdf").build(),
+                                Manual.builder().nom("Manual d'administració").path("https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_administracio.pdf").build()))
                         .build(),
                 ContextInfo.builder()
                         .codi("INT")
                         .nom("API interna")
                         .path(baseUrl + "/notibapi/interna")
-                        .manuals(List.of("https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_integracio.pdf"))
+                        .manuals(List.of(Manual.builder().nom("Manual d'integració").path("https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_integracio.pdf").build()))
                         .api(baseUrl + "/notibapi/interna/rest")
                         .build(),
                 ContextInfo.builder()

@@ -39,6 +39,8 @@ public class SalutController {
                 .nom("Notib")
                 .data(manifestInfo.getBuildDate())
                 .versio(manifestInfo.getVersion())
+                .revisio(manifestInfo.getBuildScmRevision())
+                .jdkVersion(manifestInfo.getBuildJDK())
                 .integracions(salutService.getIntegracions())
                 .subsistemes(salutService.getSubsistemes())
                 .contexts(salutService.getContexts(getBaseUrl(request)))
