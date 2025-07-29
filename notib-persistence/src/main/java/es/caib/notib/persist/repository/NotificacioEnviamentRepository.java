@@ -4,7 +4,6 @@
 package es.caib.notib.persist.repository;
 
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
@@ -343,4 +342,12 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	@Query(value = "UPDATE NOT_NOTIFICACIO_ENV SET LASTMODIFIEDBY_CODI = :codiNou WHERE LASTMODIFIEDBY_CODI = :codiAntic", nativeQuery = true)
 	int updateLastModifiedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 
+	@Query("SELECT e FROM NotificacioEnviamentEntity e " +
+			"LEFT JOIN FETCH e.notificacio n " +
+			"LEFT JOIN FETCH e.entregaPostal " +
+			"LEFT JOIN FETCH n.entitat " +
+			"LEFT JOIN FETCH n.procediment " +
+			"LEFT JOIN FETCH n.organGestor " +
+			"WHERE e.id = :enviamentId")
+	Optional<NotificacioEnviamentEntity> findByIdWithRelatedEntities(@Param("enviamentId") Long enviamentId);
 }
