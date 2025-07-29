@@ -1,4 +1,5 @@
-# ![Logo notib](https://github.com/GovernIB/notib/raw/master/assets/logo2.png) Notib
+![Logo notib](https://github.com/GovernIB/notib/raw/master/assets/logo_notib.png) 
+# Notib
 
 **Versions**
 > - Versió Estable: __notib-2.0.10__ (tag [NOTIB 2.0.10](https://github.com/GovernIB/notib/releases/tag/v2.0.10))
