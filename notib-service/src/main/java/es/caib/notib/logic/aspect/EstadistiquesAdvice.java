@@ -149,30 +149,41 @@ public class EstadistiquesAdvice {
 	)
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void estNotificacio(NotificacioEntity notificacio) {
-		if (notificacio == null || notificacio.getEnviaments() == null) {
+		if (notificacio == null) {
 			log.error("[estNotificacio] Notificacio no trobada.");
 			return;
 		}
 
-		notificacio.getEnviaments().forEach(enviament -> {
-			try {
-				ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviament, EstatActualEnv.REGISTRAT);
-
-				int intents = explotEnvInfoEntity.getIntentsNotEnviament() + 1;
-				explotEnvInfoEntity.setIntentsNotEnviament(intents);
-				if (EnviamentEstat.NOTIB_ENVIADA.equals(enviament.getNotificaEstat())) {
-					Date dataNotifica = enviament.getNotificaEstatData();
-					long tempsRegistrada = getMillisBetween(explotEnvInfoEntity.getDataRegistrada(), dataNotifica);
-					explotEnvInfoEntity.setDataNotEnviada(dataNotifica);
-					explotEnvInfoEntity.setTempsRegistrada(tempsRegistrada);
-				} else if (EnviamentEstat.REGISTRADA.equals(enviament.getNotificaEstat())) {
-					explotEnvInfoEntity.setDataNotEnviamentError(new Date());
-				}
-				explotEnvInfoRepository.save(explotEnvInfoEntity);
-			} catch (Exception e) {
-				log.error("[estNotificacio] Error generant informació estadística de enviamentId: " + enviament.getId(), e);
+		try {
+			// Recarregar la notificació amb els enviaments per evitar LazyInitializationException
+			NotificacioEntity notificacioWithEnviaments = notificacioRepository.findByIdWithEnviaments(notificacio.getId());
+			if (notificacioWithEnviaments == null || notificacioWithEnviaments.getEnviaments() == null) {
+				log.error("[estNotificacio] Notificacio amb ID: " + notificacio.getId() + " no trobada amb enviaments.");
+				return;
 			}
-		});
+
+			notificacioWithEnviaments.getEnviaments().forEach(enviament -> {
+				try {
+					ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviament, EstatActualEnv.REGISTRAT);
+
+					int intents = explotEnvInfoEntity.getIntentsNotEnviament() + 1;
+					explotEnvInfoEntity.setIntentsNotEnviament(intents);
+					if (EnviamentEstat.NOTIB_ENVIADA.equals(enviament.getNotificaEstat())) {
+						Date dataNotifica = enviament.getNotificaEstatData();
+						long tempsRegistrada = getMillisBetween(explotEnvInfoEntity.getDataRegistrada(), dataNotifica);
+						explotEnvInfoEntity.setDataNotEnviada(dataNotifica);
+						explotEnvInfoEntity.setTempsRegistrada(tempsRegistrada);
+					} else if (EnviamentEstat.REGISTRADA.equals(enviament.getNotificaEstat())) {
+						explotEnvInfoEntity.setDataNotEnviamentError(new Date());
+					}
+					explotEnvInfoRepository.save(explotEnvInfoEntity);
+				} catch (Exception e) {
+					log.error("[estNotificacio] Error generant informació estadística de enviamentId: " + enviament.getId(), e);
+				}
+			});
+		} catch (Exception e) {
+			log.error("[estNotificacio] Error generant informació estadística de la notificació: " + notificacio.getId(), e);
+		}
 	}
 
 	// Recepció
@@ -188,28 +199,36 @@ public class EstadistiquesAdvice {
 		}
 
 		try {
-			ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviament, EstatActualEnv.ENVIAT_NOT);
+			// Recarregar l'enviament amb totes les entitats relacionades per evitar LazyInitializationException
+			NotificacioEnviamentEntity enviamentWithRelatedEntities = notificacioEnviamentRepository.findByIdWithRelatedEntities(enviament.getId())
+					.orElse(null);
+			if (enviamentWithRelatedEntities == null) {
+				log.error("[estNotificacioRecepcio] Enviament amb ID: " + enviament.getId() + " no trobat amb entitats relacionades.");
+				return;
+			}
+			
+			ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviamentWithRelatedEntities, EstatActualEnv.ENVIAT_NOT);
 
-			if (enviament.isNotificaEstatFinal()) {
-				Date dataEstatFinal = enviament.getNotificaEstatData();
+			if (enviamentWithRelatedEntities.isNotificaEstatFinal()) {
+				Date dataEstatFinal = enviamentWithRelatedEntities.getNotificaEstatData();
 				long tempsNotEnviada = getMillisBetween(explotEnvInfoEntity.getDataNotEnviada(), dataEstatFinal);
 				long tempsTotal = getMillisBetween(explotEnvInfoEntity.getDataCreacio(), dataEstatFinal);
 
-				if (EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.LLEGIDA.equals(enviament.getNotificaEstat())) {
+				if (EnviamentEstat.NOTIFICADA.equals(enviamentWithRelatedEntities.getNotificaEstat()) || EnviamentEstat.LLEGIDA.equals(enviamentWithRelatedEntities.getNotificaEstat())) {
 					explotEnvInfoEntity.setDataNotNotificada(dataEstatFinal);
-				} else if (EnviamentEstat.REBUTJADA.equals(enviament.getNotificaEstat())) {
+				} else if (EnviamentEstat.REBUTJADA.equals(enviamentWithRelatedEntities.getNotificaEstat())) {
 					explotEnvInfoEntity.setDataNotRebutjada(dataEstatFinal);
-				} else if (EnviamentEstat.EXPIRADA.equals(enviament.getNotificaEstat())) {
+				} else if (EnviamentEstat.EXPIRADA.equals(enviamentWithRelatedEntities.getNotificaEstat())) {
 					explotEnvInfoEntity.setDataNotExpirada(dataEstatFinal);
 				} else {
 					explotEnvInfoEntity.setDataNotError(dataEstatFinal);
 				}
 
-				EntregaPostalEntity entregaPostal = enviament.getEntregaPostal();
+				EntregaPostalEntity entregaPostal = enviamentWithRelatedEntities.getEntregaPostal();
 				if (explotEnvInfoEntity.getTempsTotal() == null &&
-						(EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat())
-								|| EnviamentEstat.LLEGIDA.equals(enviament.getNotificaEstat())
-								|| enviament.getEntregaPostal() == null
+						(EnviamentEstat.NOTIFICADA.equals(enviamentWithRelatedEntities.getNotificaEstat())
+								|| EnviamentEstat.LLEGIDA.equals(enviamentWithRelatedEntities.getNotificaEstat())
+								|| enviamentWithRelatedEntities.getEntregaPostal() == null
 								|| isCieEstatFinal(entregaPostal.getCieEstat()))) {
 					explotEnvInfoEntity.setTempsTotal(tempsTotal);
 				}
@@ -230,30 +249,34 @@ public class EstadistiquesAdvice {
 	)
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void estNotificacioCie(String notificacioReferencia, RespostaCie resposta) {
-		NotificacioEntity notificacio = notificacioRepository.findByReferencia(notificacioReferencia);
+		NotificacioEntity notificacio = notificacioRepository.findByReferenciaWithEnviaments(notificacioReferencia);
 		if (notificacio == null) {
 			log.error("[estNotificacioCie] Notificacio amb Uuid: " + notificacioReferencia + " no trobat.");
 			return;
 		}
 
-		notificacio.getEnviaments().forEach(enviament -> {
-			try {
-				ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviament, EstatActualEnv.ENVIAT_NOT);
+		try {
+			notificacio.getEnviaments().forEach(enviament -> {
+				try {
+					ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviament, EstatActualEnv.ENVIAT_NOT);
 
-				int intents = explotEnvInfoEntity.getIntentsCieEnviament() + 1;
-				explotEnvInfoEntity.setIntentsCieEnviament(intents);
-				if ("000".equals(resposta.getCodiResposta())
-						&& enviament.getEntregaPostal() != null && CieEstat.ENVIADO_CI.equals(enviament.getEntregaPostal().getCieEstat())) {
-					Date dataCie = new Date();
-					explotEnvInfoEntity.setDataCieEnviada(dataCie);
-				} else {
-					explotEnvInfoEntity.setDataCieEnviamentError(new Date());
+					int intents = explotEnvInfoEntity.getIntentsCieEnviament() + 1;
+					explotEnvInfoEntity.setIntentsCieEnviament(intents);
+					if ("000".equals(resposta.getCodiResposta())
+							&& enviament.getEntregaPostal() != null && CieEstat.ENVIADO_CI.equals(enviament.getEntregaPostal().getCieEstat())) {
+						Date dataCie = new Date();
+						explotEnvInfoEntity.setDataCieEnviada(dataCie);
+					} else {
+						explotEnvInfoEntity.setDataCieEnviamentError(new Date());
+					}
+					explotEnvInfoRepository.save(explotEnvInfoEntity);
+				} catch (Exception e) {
+					log.error("[estNotificacioCie] Error generant informació estadística de enviamentId: " + enviament.getId(), e);
 				}
-				explotEnvInfoRepository.save(explotEnvInfoEntity);
-			} catch (Exception e) {
-				log.error("[estNotificacioCie] Error generant informació estadística de enviamentId: " + enviament.getId(), e);
-			}
-		});
+			});
+		} catch (Exception e) {
+			log.error("[estNotificacioCie] Error generant informació estadística de notificacioId: " + notificacio.getId(), e);
+		}
 	}
 
 	// Recepció
@@ -267,15 +290,23 @@ public class EstadistiquesAdvice {
 			log.error("[estNotificacioCieRecepcio] Enviament no trobat.");
 			return;
 		}
-		if (enviament.getEntregaPostal() == null) {
-			log.error("[estNotificacioCieRecepcio] Entrega postal no trobada per enviamentId: " + enviament.getId());
-			return;
-		}
 
 		try {
-			ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviament, EstatActualEnv.ENVIAT_CIE);
+			// Recarregar l'enviament amb totes les entitats relacionades per evitar LazyInitializationException
+			NotificacioEnviamentEntity enviamentWithRelatedEntities = notificacioEnviamentRepository.findByIdWithRelatedEntities(enviament.getId()).orElse(null);
+			if (enviamentWithRelatedEntities == null) {
+				log.error("[estNotificacioCieRecepcio] Enviament amb ID: " + enviament.getId() + " no trobat amb entitats relacionades.");
+				return;
+			}
 
-			EntregaPostalEntity entregaPostal = enviament.getEntregaPostal();
+			if (enviamentWithRelatedEntities.getEntregaPostal() == null) {
+				log.error("[estNotificacioCieRecepcio] Entrega postal no trobada per enviamentId: " + enviamentWithRelatedEntities.getId());
+				return;
+			}
+
+			ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviamentWithRelatedEntities, EstatActualEnv.ENVIAT_CIE);
+
+			EntregaPostalEntity entregaPostal = enviamentWithRelatedEntities.getEntregaPostal();
 			CieEstat cieEstat = entregaPostal.getCieEstat();
 			boolean cieEstatFinal = isCieEstatFinal(cieEstat);
 
@@ -294,8 +325,8 @@ public class EstadistiquesAdvice {
 					explotEnvInfoEntity.setDataCieError(dataEstatFinal);
 				}
 
-				if (!EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat())
-						&& !EnviamentEstat.LLEGIDA.equals(enviament.getNotificaEstat())
+				if (!EnviamentEstat.NOTIFICADA.equals(enviamentWithRelatedEntities.getNotificaEstat())
+						&& !EnviamentEstat.LLEGIDA.equals(enviamentWithRelatedEntities.getNotificaEstat())
 						&& CieEstat.NOTIFICADA.equals(entregaPostal.getCieEstat())) {
 					explotEnvInfoEntity.setTempsTotal(tempsTotal);
 				}
@@ -320,25 +351,29 @@ public class EstadistiquesAdvice {
 			return;
 		}
 
-		enviamentsSenseNif.forEach(enviament -> {
-			try {
-				ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviament, EstatActualEnv.REGISTRAT);
+		try {
+			enviamentsSenseNif.forEach(enviament -> {
+				try {
+					ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviament, EstatActualEnv.REGISTRAT);
 
-				int intents = explotEnvInfoEntity.getIntentsEmailEnviament() + 1;
-				explotEnvInfoEntity.setIntentsEmailEnviament(intents);
-				if (EnviamentEstat.FINALITZADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.PROCESSADA.equals(enviament.getNotificaEstat())) {
-					Date dataEmail = enviament.getNotificaEstatData();
-					long tempsRegistrada = getMillisBetween(explotEnvInfoEntity.getDataRegistrada(), dataEmail);
-					explotEnvInfoEntity.setDataEmailEnviada(dataEmail);
-					explotEnvInfoEntity.setTempsRegistrada(tempsRegistrada);
-				} else {
-					explotEnvInfoEntity.setDataEmailEnviamentError(new Date());
+					int intents = explotEnvInfoEntity.getIntentsEmailEnviament() + 1;
+					explotEnvInfoEntity.setIntentsEmailEnviament(intents);
+					if (EnviamentEstat.FINALITZADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.PROCESSADA.equals(enviament.getNotificaEstat())) {
+						Date dataEmail = enviament.getNotificaEstatData();
+						long tempsRegistrada = getMillisBetween(explotEnvInfoEntity.getDataRegistrada(), dataEmail);
+						explotEnvInfoEntity.setDataEmailEnviada(dataEmail);
+						explotEnvInfoEntity.setTempsRegistrada(tempsRegistrada);
+					} else {
+						explotEnvInfoEntity.setDataEmailEnviamentError(new Date());
+					}
+					explotEnvInfoRepository.save(explotEnvInfoEntity);
+				} catch (Exception e) {
+					log.error("[estNotificacioEmail] Error generant informació estadística de enviamentId: " + enviament.getId(), e);
 				}
-				explotEnvInfoRepository.save(explotEnvInfoEntity);
-			} catch (Exception e) {
-				log.error("[estNotificacioEmail] Error generant informació estadística de enviamentId: " + enviament.getId(), e);
-			}
-		});
+			});
+		} catch (Exception e) {
+			log.error("[estNotificacioEmail] Error generant informació estadística de notificacioId: " + notificacio.getId(), e);
+		}
 	}
 
 	private ExplotEnvInfoEntity getExplotEnvInfo(NotificacioEnviamentEntity enviament, EstatActualEnv estat) {
@@ -348,7 +383,11 @@ public class EstadistiquesAdvice {
 		lock.lock(); // Bloquegem pel valor específic d'enviament
 		try {
 			return explotEnvInfoRepository.findByEnviamentId(enviament.getId())
-				.orElseGet(() -> createExplotEnvInfo(enviament, estat));
+				.orElseGet(() -> {
+					// Carregar l'enviament amb totes les entitats relacionades per evitar LazyInitializationException
+					NotificacioEnviamentEntity enviamentWithRelatedEntities = notificacioEnviamentRepository.findByIdWithRelatedEntities(enviament.getId()).orElse(enviament);
+					return createExplotEnvInfo(enviamentWithRelatedEntities, estat);
+				});
 		} finally {
 			lock.unlock();
 			releaseLockForId(id);

@@ -248,6 +248,12 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("maxReintents")Integer maxReintents);
 
 	NotificacioEntity findByReferencia(String identificador);
+	
+	@Query("SELECT n FROM NotificacioEntity n LEFT JOIN FETCH n.enviaments WHERE n.referencia = :referencia")
+	NotificacioEntity findByReferenciaWithEnviaments(@Param("referencia") String referencia);
+	
+	@Query("SELECT n FROM NotificacioEntity n LEFT JOIN FETCH n.enviaments WHERE n.id = :id")
+	NotificacioEntity findByIdWithEnviaments(@Param("id") Long id);
 
 	@Query(	"select count(n.id) from NotificacioEntity n where n.organGestor = :organGestor")
 	Integer countByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);
