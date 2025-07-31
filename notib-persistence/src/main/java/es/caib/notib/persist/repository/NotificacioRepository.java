@@ -3,7 +3,6 @@
  */
 package es.caib.notib.persist.repository;
 
-import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.persist.entity.EntitatEntity;
@@ -249,7 +248,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 
 	NotificacioEntity findByReferencia(String identificador);
 	
-	@Query("SELECT n FROM NotificacioEntity n LEFT JOIN FETCH n.enviaments WHERE n.referencia = :referencia")
+	@Query("SELECT n FROM NotificacioEntity n LEFT JOIN FETCH n.enviaments e LEFT JOIN FETCH e.entregaPostal WHERE n.referencia = :referencia")
 	NotificacioEntity findByReferenciaWithEnviaments(@Param("referencia") String referencia);
 	
 	@Query("SELECT n FROM NotificacioEntity n LEFT JOIN FETCH n.enviaments WHERE n.id = :id")

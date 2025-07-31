@@ -1,14 +1,11 @@
 package es.caib.notib.back.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.logic.intf.dto.missatges.MissatgeWs;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.websocket.WebSocketConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
@@ -20,19 +17,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
 @Slf4j
 @RestController
@@ -66,6 +54,9 @@ public class SseController extends BaseController {
     public void sendEventToClient(@Payload MissatgeWs missatge, @Headers MessageHeaders headers, Message message) throws JMSException {
 
         message.acknowledge();
+        if (missatge.getNotificacioId() == null) {
+            return;
+        }
         var emits = emitters.get(missatge.getNotificacioId());
         if (emits == null || emits.isEmpty()) {
             return;
