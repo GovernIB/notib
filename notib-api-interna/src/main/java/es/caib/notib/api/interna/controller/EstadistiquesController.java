@@ -87,12 +87,7 @@ public class EstadistiquesController {
             endDate = ahir;
         }
 
-        LocalDate currentDate = startDate;
-        while (!currentDate.isAfter(endDate)) {
-            result.add(estadisticaService.consultaEstadistiques(currentDate));
-            currentDate = currentDate.plusDays(1);
-        }
-        return result;
+        return estadisticaService.consultaEstadistiques(startDate, endDate);
     }
 
     @Hidden
@@ -129,7 +124,15 @@ public class EstadistiquesController {
         try {
             LocalDate dataFrom = LocalDate.parse(dataInici, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
             LocalDate dataTo = LocalDate.parse(dataFi, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-            estadisticaService.generarDadesExplotacioBasiques(dataFrom, dataTo);
+            if (dataFrom == null) return "Error: Data inici es null";
+            if (dataTo == null) return "Error: Data fi es null";
+            LocalDate startDate = dataFrom.isBefore(dataTo) ? dataFrom : dataTo;
+            LocalDate endDate = dataFrom.isBefore(dataTo) ? dataTo : dataFrom;
+            LocalDate ahir = LocalDate.now().minusDays(1);
+            if (endDate.isAfter(ahir)) {
+                endDate = ahir;
+            }
+            estadisticaService.generarDadesExplotacioBasiques(startDate, endDate);
             return "Done";
         } catch (Exception e) {
             String message = e.getMessage() + "<br/>";
@@ -139,4 +142,5 @@ public class EstadistiquesController {
             return message;
         }
     }
+
 }

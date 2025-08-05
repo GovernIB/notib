@@ -27,4 +27,5 @@ public interface ExplotDimensioRepository extends JpaRepository<ExplotDimensioEn
             + " GROUP BY n.entitat.id, n.entitat.codi, p.id, p.codi, n.organGestor.codi, n.usuariCodi, n.enviamentTipus, n.origen "
             + " ORDER BY n.entitat.id, p.id, n.organGestor.codi, n.usuariCodi, n.enviamentTipus, n.origen")
     public List<ExplotDimensio> getDimensionsPerEstadistiques();
+
 }

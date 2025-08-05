@@ -16,4 +16,5 @@ public interface ExplotTempsRepository extends JpaRepository<ExplotTempsEntity, 
     @Query("SELECT e.data FROM ExplotTempsEntity e WHERE e.data BETWEEN :startDate AND :endDate")
     List<LocalDate> findDatesBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
+    List<ExplotTempsEntity> findByDataIn(List<LocalDate> missingDates);
 }

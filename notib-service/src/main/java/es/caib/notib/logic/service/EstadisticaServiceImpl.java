@@ -33,6 +33,7 @@ import es.caib.notib.persist.repository.ProcSerRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.persist.repository.explotacio.ExplotDimensioRepository;
 import es.caib.notib.persist.repository.explotacio.ExplotEnvBasicStatsRepository;
+import es.caib.notib.persist.repository.explotacio.ExplotEnvInfoRepository;
 import es.caib.notib.persist.repository.explotacio.ExplotFetsRepository;
 import es.caib.notib.persist.repository.explotacio.ExplotTempsRepository;
 import lombok.RequiredArgsConstructor;
@@ -75,6 +76,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     private final UsuariRepository usuariRepository;
     private final IntegracioHelper integracioHelper;
     private final JdbcTemplate jdbcTemplate;
+    private final ExplotEnvInfoRepository explotEnvInfoRepository;
 
     @Value("${es.caib.notib.hibernate.dialect:es.caib.notib.persist.dialect.OracleCaibDialect}")
     private String hibernateDialect;
@@ -173,7 +175,6 @@ public class EstadisticaServiceImpl implements EstadisticaService {
             ExplotTempsEntity ete = explotTempsRepository.findFirstByData(data);
 
             if (ete == null) {
-                generateMissingExplotTempsEntities(data);
                 ete = new ExplotTempsEntity(data);
                 ete = explotTempsRepository.save(ete);
             }
@@ -186,6 +187,50 @@ public class EstadisticaServiceImpl implements EstadisticaService {
             integracioHelper.addAccioOk(info);
 
             log.debug("Finalitzat procés de generarDadesExplotacio.");
+        } catch (Exception ex) {
+            log.error("Error generant informació estadística", ex);
+            integracioHelper.addAccioError(info, "Error generant informació estadística", ex);
+        }
+    }
+
+    @Override
+    @Transactional(timeout = 3600)
+    public void generarDadesExplotacio(LocalDate dataInici, LocalDate dataFi) {
+        if (dataFi == null) dataFi = ahir();
+        if (dataInici.isAfter(dataFi)) {
+            LocalDate temp = dataInici;
+            dataInici = dataFi;
+            dataFi = temp;
+        }
+
+        // Generar dades d'explotació
+        String accioDesc = "GenerarDadesExplotacio - Recupera dades per taules d'explotació.";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        var info = new IntegracioInfo(
+                IntegracioCodi.EXPLOTACIO,
+                accioDesc,
+                IntegracioAccioTipusEnumDto.PROCESSAR,
+                new AccioParam("Data inici", formatter.format(dataInici)),
+                new AccioParam("Data fi", formatter.format(dataFi)));
+
+        try {
+            log.debug("Iniciant procés de generarDadesExplotacio. Data inici: {}, Data fi: {}", dataInici, dataFi);
+
+            List<LocalDate> missingDates = geMissingExplotTempsEntities(dataInici, dataFi);
+            if (!missingDates.isEmpty()) {
+                generateNativeSqlMissingExplotTempsEntities(dataInici);
+            }
+
+            List<ExplotDimensioEntity> dimensions = obtenirDimensions();
+            List<ExplotTempsEntity> etes = explotTempsRepository.findByDataIn(missingDates);
+            if (etes == null || etes.isEmpty()) {
+                return;
+            }
+            etes.forEach(ete -> actualitzarDadesEstadistiques(ete, dimensions));
+
+            log.debug("Finalitzat procés de generarDadesExplotacio.");
+            integracioHelper.addAccioOk(info);
+
         } catch (Exception ex) {
             log.error("Error generant informació estadística", ex);
             integracioHelper.addAccioError(info, "Error generant informació estadística", ex);
@@ -396,21 +441,27 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
     }
 
-    private void generateMissingExplotTempsEntities(LocalDate fromDate) {
-        LocalDate yesterday = ahir();
-
-        // Obtenim totes les dates per al rang corresponent
-        List<LocalDate> existingDates = explotTempsRepository.findDatesBetween(fromDate, yesterday);
-
-        // Iterem només pels dies que no estan a la base de dades
-        while (!fromDate.isAfter(yesterday)) {
-            if (!existingDates.contains(fromDate)) {
-                ExplotTempsEntity newEntity = new ExplotTempsEntity(fromDate);
-                explotTempsRepository.save(newEntity);
-            }
-            fromDate = fromDate.plusDays(1);
+    // Obtenir dates sense dades estadístiques
+    private List<LocalDate> geMissingExplotTempsEntities(LocalDate fromDate, LocalDate toDate) {
+        List<LocalDate> missingDates = new ArrayList<>();
+        
+        if (toDate == null) {
+            toDate = ahir();
         }
 
+        // Obtenim totes les dates per al rang corresponent
+        List<LocalDate> existingDates = explotTempsRepository.findDatesBetween(fromDate, toDate);
+
+        // Iterem només pels dies que no estan a la base de dades
+        LocalDate currentDate = fromDate;
+        while (!currentDate.isAfter(toDate)) {
+            if (!existingDates.contains(currentDate)) {
+                missingDates.add(currentDate);
+            }
+            currentDate = currentDate.plusDays(1);
+        }
+
+        return missingDates;
     }
 
 
@@ -426,7 +477,19 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     public RegistresEstadistics consultaEstadistiques(LocalDate data) {
         ExplotTempsEntity temps = explotTempsRepository.findFirstByData(data);
         if (temps == null) {
-            Date dia = Date.from(ahir().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            // Si no existeixen dades, les generam
+            LocalDate ahir = LocalDate.now().minusDays(1);
+            if (!data.isAfter(ahir)) {
+                generarDadesExplotacio(data);
+            }
+        }
+        return getRegistresEstadistics(data);
+    }
+
+    private RegistresEstadistics getRegistresEstadistics(LocalDate data) {
+        ExplotTempsEntity temps = explotTempsRepository.findFirstByData(data);
+        if (temps == null) {
+            Date dia = Date.from(data.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
             return RegistresEstadistics.builder()
                     .temps(Temps.builder().data(dia).build())
                     .fets(List.of())
@@ -434,6 +497,38 @@ public class EstadisticaServiceImpl implements EstadisticaService {
         }
         List<ExplotFetsEntity> fets = explotFetsRepository.findByTemps(temps);
         return toRegistresEstadistics(fets, data);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RegistresEstadistics> consultaEstadistiques(LocalDate dataInici, LocalDate dataFi) {
+        List<RegistresEstadistics> result = new ArrayList<>();
+        
+        // Si no existeixen dades, les generam
+        List<LocalDate> localDates = geMissingExplotTempsEntities(dataInici, dataFi);
+        if (!localDates.isEmpty()) {
+            LocalDate localEnvInfoDate = LocalDate.now();
+            Date firstEnvInfoDate = explotEnvInfoRepository.getFirstDate();
+            if (firstEnvInfoDate != null) {
+                localEnvInfoDate = firstEnvInfoDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            }
+
+            if( localEnvInfoDate.isBefore(dataInici) ) {
+                generarDadesExplotacio(dataInici, dataFi);
+            } else if (localEnvInfoDate.isAfter(dataFi)) {
+                generarDadesExplotacioBasiques(dataFi, dataFi);
+            } else {
+                generarDadesExplotacioBasiques(dataInici, localEnvInfoDate.minusDays(1));
+                generarDadesExplotacio(localEnvInfoDate, dataFi);
+            }
+        }
+
+        LocalDate currentDate = dataInici;
+        while (!currentDate.isAfter(dataFi)) {
+            result.add(getRegistresEstadistics(currentDate));
+            currentDate = currentDate.plusDays(1);
+        }
+        return result;
     }
 
     @Override
