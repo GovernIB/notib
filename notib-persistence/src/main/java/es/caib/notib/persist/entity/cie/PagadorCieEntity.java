@@ -61,7 +61,7 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 	protected OrganGestorEntity organEmisor;
 
 	public boolean isCaducat() {
-		return new Date().getTime() > contracteDataVig.getTime();
+		return contracteDataVig != null && new Date().getTime() > contracteDataVig.getTime();
 	}
 
 

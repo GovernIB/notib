@@ -54,6 +54,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -415,9 +416,9 @@ public class PermisosHelper {
 					permis = new PermisDto();
 					permis.setId((Long)ace.getId());
 					permis.setPrincipal(principal);
-					DadesUsuari usuari = cacheBridge.findUsuariAmbCodi(principal);
-					if(usuari != null) {
-						permis.setNomSencerAmbCodi(usuari.getNomSencerAmbCodi()!=null?usuari.getNomSencerAmbCodi():principal);
+					Optional<DadesUsuari> usuari = cacheBridge.findOptionalUsuariAmbCodi(principal);
+					if(usuari.isPresent()) {
+						permis.setNomSencerAmbCodi(usuari.get().getNomSencerAmbCodi()!=null ? usuari.get().getNomSencerAmbCodi() : principal);
 					} else {
 						permis.setNomSencerAmbCodi(principal);
 					}

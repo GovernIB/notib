@@ -75,7 +75,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"		and nenv.procedimentIsComu = false) " +
 			// Té permís consulta sobre l'òrgan
 			"	or (:#{#filtre.organsGestorsCodisNotibNull} = false and nenv.organCodi is not null " +
-			"			and (nenv.procedimentIsComu = false or nenv.procedimentRequirePermission = false) " +
+			"			and nenv.procedimentIsComu = false and nenv.procedimentRequirePermission = false " +
 			"			and nenv.organCodi in (:#{#filtre.organsGestorsCodisNotib})) " +
 			// Procediment comú amb permís comú sobre l'òrgan
 			"	or (:#{#filtre.organsGestorsComunsCodisNotibNull} = false and nenv.organCodi is not null " +
@@ -152,7 +152,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"		and nenv.procedimentIsComu = false) " +
 			// Té permís consulta sobre l'òrgan
 			"	or (:#{#filtre.organsGestorsCodisNotibNull} = false and nenv.organCodi is not null " +
-			"			and (nenv.procedimentIsComu = false or nenv.procedimentRequirePermission = false) " +
+			"			and nenv.procedimentIsComu = false and nenv.procedimentRequirePermission = false " +
 			"			and nenv.organCodi in (:#{#filtre.organsGestorsCodisNotib})) " +
 			// Procediment comú amb permís comú sobre l'òrgan
 			"	or (:#{#filtre.organsGestorsComunsCodisNotibNull} = false and nenv.organCodi is not null " +
