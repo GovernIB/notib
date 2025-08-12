@@ -606,7 +606,14 @@ $(document).ready(function() {
 							<tbody>
 								<tr>
 									<td width="30%"><strong><spring:message code="enviament.info.notifica.estat"/></strong></td>
-									<td><spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/></td>
+									<c:choose>
+										<c:when test="${(notificacio.enviamentTipus == 'COMUNICACIO' || notificacio.enviamentTipus == 'SIR') && enviament.titular.interessatTipus == 'ADMINISTRACIO'}">
+											<td><spring:message code="es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto.${enviament.registreEstat}"/></td>
+										</c:when>
+										<c:otherwise>
+											<td><spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/></td>
+										</c:otherwise>
+									</c:choose>
 								</tr>
 								<tr>
 									<td><strong><spring:message code="enviament.historic.list.columna.notificaDataCaducitat"/></strong></td>
