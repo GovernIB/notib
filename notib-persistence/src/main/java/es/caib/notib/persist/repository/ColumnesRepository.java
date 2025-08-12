@@ -23,6 +23,9 @@ public interface ColumnesRepository extends JpaRepository<ColumnesEntity, Long> 
 
 	ColumnesEntity findByEntitatAndUser(EntitatEntity entitat, UsuariEntity usuari);
 
+	@Query(value = "FROM ColumnesEntity c WHERE c.entitat.id = :entitatId AND c.user.codi = :usuariCodi")
+	ColumnesEntity existeixUsuariPerEntitat(@Param("usuariCodi") String usuariCodi, @Param("entitatId") Long entitatId);
+
 	@Transactional
 	@Modifying
 	@Query("DELETE FROM ColumnesEntity c WHERE c.entitat.id = :entitatId")

@@ -124,7 +124,7 @@ public class UsuariServiceImpl implements UsuariService {
         // Actualitazam els permisos assignats per ACL
         registresModificats += updateUsuariPermisos(codiAntic, codiNou);
         // Actualitzam les referencis a l'usuari a taules:
-        registresModificats += updateUsuariReferencies(codiAntic, codiNou);
+        registresModificats += updateUsuariReferencies(codiAntic, codiNou, usuariAntic.getUltimaEntitat());
         // Eliminam l'usuari antic
         usuariRepository.delete(usuariAntic);
         aclCache.clearCache();
@@ -265,12 +265,15 @@ public class UsuariServiceImpl implements UsuariService {
         return usuariRepository.updateUsuariPermis(codiAntic, codiNou);
     }
 
-    private Long updateUsuariReferencies(String codiAntic, String codiNou) {
+    private Long updateUsuariReferencies(String codiAntic, String codiNou, Long entitatId) {
 
         var registresModificats = 0L;
         log.info(">>> UPDATE USUARIS TAULES AMB REFERENCIES:");
-        //		NOT_COLUMNES.USUARI_CODI
         var t0 = System.currentTimeMillis();
+        var columnes = columnesRepository.existeixUsuariPerEntitat(codiNou, entitatId);
+        if (columnes != null) {
+            return 0L;
+        }
         registresModificats += columnesRepository.updateUsuariCodi(codiAntic, codiNou);
         log.info("> NOT_COLUMNES.USUARI_CODI: " + (System.currentTimeMillis() - t0) + " ms");
         return registresModificats;
