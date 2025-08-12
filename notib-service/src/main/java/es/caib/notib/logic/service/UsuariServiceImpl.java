@@ -272,7 +272,9 @@ public class UsuariServiceImpl implements UsuariService {
         var t0 = System.currentTimeMillis();
         var columnes = columnesRepository.existeixUsuariPerEntitat(codiNou, entitatId);
         if (columnes != null) {
-            return 0L;
+//            columnes = columnesRepository.existeixUsuariPerEntitat(codiAntic, entitatId);
+            columnesRepository.delete(columnes);
+//            return 0L;
         }
         registresModificats += columnesRepository.updateUsuariCodi(codiAntic, codiNou);
         log.info("> NOT_COLUMNES.USUARI_CODI: " + (System.currentTimeMillis() - t0) + " ms");
