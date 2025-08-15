@@ -35,8 +35,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CBK;
-
 /**
  * Classe per englobar la tasca de notificar l'estat o la certificació a l'aplicació
  * client a partir de la referència del destinatari de la notificació.
@@ -292,7 +290,7 @@ public class CallbackHelper {
 			var headerCsrf = aplicacio.isHeaderCsrf();
 			var urlCallback = urlBase + (urlBase.endsWith("/") ? "" : "/") + NOTIFICACIO_CANVI;
 			var response = requestsHelper.callbackAplicacioNotificaCanvi(urlCallback, notificacioCanvi, headerCsrf);
-			SubsistemesHelper.addSuccessOperation(CBK, System.currentTimeMillis() - start);
+//			SubsistemesHelper.addSuccessOperation(CBK, System.currentTimeMillis() - start);
 			// Comprova que la resposta sigui 200 OK
 			if (ClientResponse.Status.OK.getStatusCode() != response.getStatusInfo().getStatusCode()) {
 				log.error("Error al enviar callback per l'enviament " + enviament.getUuid() + " a la url " + urlBase);
@@ -300,7 +298,7 @@ public class CallbackHelper {
 			}
 			return response.getEntity(String.class);
 		} catch (Exception e) {
-			SubsistemesHelper.addErrorOperation(CBK, System.currentTimeMillis() - start);
+//			SubsistemesHelper.addErrorOperation(CBK, System.currentTimeMillis() - start);
 			throw e;
 		}
 	}
