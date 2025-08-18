@@ -10,15 +10,15 @@ import java.util.List;
 
 public interface EstadisticaService {
 
-    public void generarDadesExplotacio();
-    public void generarDadesExplotacio(LocalDate data);
-    public void generarDadesExplotacio(LocalDate data, LocalDate toDate);
-    public void generarDadesExplotacioBasiques(LocalDate fromDate, LocalDate toDate);
+    boolean generarDadesExplotacio();
+    boolean generarDadesExplotacio(LocalDate data);
+    void generarDadesExplotacio(LocalDate data, LocalDate toDate);
+    void generarDadesExplotacioBasiques(LocalDate fromDate, LocalDate toDate);
 
-    public RegistresEstadistics consultaUltimesEstadistiques();
-    public RegistresEstadistics consultaEstadistiques(LocalDate data);
-    public List<RegistresEstadistics> consultaEstadistiques(LocalDate dataInici, LocalDate dataFi);
+    RegistresEstadistics consultaUltimesEstadistiques();
+    RegistresEstadistics consultaEstadistiques(LocalDate data);
+    List<RegistresEstadistics> consultaEstadistiques(LocalDate dataInici, LocalDate dataFi);
 
-    public List<DimensioDesc> getDimensions();
-    public List<IndicadorDesc> getIndicadors();
+    List<DimensioDesc> getDimensions();
+    List<IndicadorDesc> getIndicadors();
 }

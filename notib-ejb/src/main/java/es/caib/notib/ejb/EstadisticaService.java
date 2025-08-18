@@ -15,14 +15,14 @@ import java.util.List;
 public class EstadisticaService extends AbstractService<es.caib.notib.logic.intf.service.EstadisticaService> implements es.caib.notib.logic.intf.service.EstadisticaService {
 
     @Override
-    public void generarDadesExplotacio() {
-        getDelegateService().generarDadesExplotacio();
+    public boolean generarDadesExplotacio() {
+        return getDelegateService().generarDadesExplotacio();
     }
 
     @Override
     @TransactionTimeout(value = 3600)
-    public void generarDadesExplotacio(LocalDate data) {
-        getDelegateService().generarDadesExplotacio(data);
+    public boolean generarDadesExplotacio(LocalDate data) {
+        return getDelegateService().generarDadesExplotacio(data);
     }
 
     @Override

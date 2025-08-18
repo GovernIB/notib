@@ -152,13 +152,13 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
     @Override
     @Transactional(timeout = 3600)
-    public void generarDadesExplotacio() {
-        generarDadesExplotacio(ahir());
+    public boolean generarDadesExplotacio() {
+        return generarDadesExplotacio(ahir());
     }
 
     @Override
     @Transactional(timeout = 3600)
-    public void generarDadesExplotacio(LocalDate data) {
+    public boolean generarDadesExplotacio(LocalDate data) {
         // Generar dades d'explotació
         String accioDesc = "GenerarDadesExplotacio - Recupera dades per taules d'explotació.";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -187,9 +187,11 @@ public class EstadisticaServiceImpl implements EstadisticaService {
             integracioHelper.addAccioOk(info);
 
             log.debug("Finalitzat procés de generarDadesExplotacio.");
+            return true;
         } catch (Exception ex) {
             log.error("Error generant informació estadística", ex);
             integracioHelper.addAccioError(info, "Error generant informació estadística", ex);
+            return false;
         }
     }
 
@@ -684,7 +686,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         List<ExplotFets> estadistiques = explotFetsRepository.getFetsPerEstadistiques(
                 false,
-                Date.from(ete.getData().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+                Date.from(ete.getData().plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
 
         addAdditionalStats(estadistiques, ete.getData());
 
