@@ -27,7 +27,7 @@ public class SubsistemesHelper {
         CSR ("Callback SIR"),
         CNT ("Callback de Notificació"),
         CCI ("Callback de CIE"),
-        CBK ("Callback de client"),
+//        CBK ("Callback de client"),
         GDO ("Gestió documental FileSystem");
 
         private final String nom;
