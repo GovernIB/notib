@@ -40,7 +40,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	@Query("from NotificacioEnviamentEntity e where e.notificacio.entitat.dir3Codi = :entitatDir3Codi and e.registreNumeroFormatat = :registreNumeroFormatat")
 	Optional<NotificacioEnviamentEntity> findByEntitatDir3CodiAndRegistreNumeroFormatat(@Param("entitatDir3Codi") String entitatDir3Codi, @Param("registreNumeroFormatat") String registreNumeroFormatat);
 
-	Optional<NotificacioEnviamentEntity> findTopByNotificaIdentificadorNullOrderByIdDesc();
+	Optional<NotificacioEnviamentEntity> findTopByNotificaIdentificadorNotNullOrderByIdDesc();
 
 	@Query("select id from NotificacioEnviamentEntity where notificaReferencia is null")
 	List<Long> findIdsSenseReferencia();
@@ -64,6 +64,17 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	@Query(value = "FROM NotificacioEnviamentEntity e WHERE e.entregaPostal.cieId = :cieId")
 	NotificacioEnviamentEntity findByCieId(@Param("cieId") String cieId);
 
+	@Query(value = "SELECT nne.id FROM NOT_NOTIFICACIO_ENV nne \n" +
+			"JOIN NOT_NOTIFICACIO nn ON nn.id = nne.NOTIFICACIO_ID \n" +
+			"JOIN NOT_ORGAN_GESTOR nog ON nog.id = nn.ORGAN_GESTOR\n" +
+			"JOIN NOT_ENTREGA_CIE nec ON nog.ENTREGA_CIE_ID = nec.ID\n" +
+			"JOIN NOT_PAGADOR_CIE npc ON npc.id = nec.CIE_ID\n" +
+			"JOIN NOT_ENTREGA_POSTAL nep ON nep.id = nne.ENTREGA_POSTAL_ID\n" +
+			"WHERE nne.ENTREGA_POSTAL IS NOT NULL \n" +
+			"AND nep.CIE_ID IS NOT NULL\n" +
+			"AND npc.API_KEY IS NOT NULL AND npc.salt IS NOT NULL\n" +
+			"ORDER BY nne.id DESC", nativeQuery = true)
+	List<Long> getUltimEnviamentPostal();
 
 //	@Query(	" from NotificacioEnviamentEntity " +
 //			" where	notificacio = :notificacio " + 

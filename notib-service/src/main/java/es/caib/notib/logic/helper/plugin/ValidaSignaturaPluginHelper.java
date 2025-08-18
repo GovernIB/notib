@@ -45,7 +45,7 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 	@Override
 	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception {
 
-		try (var arxiuSignat = this.getClass().getResourceAsStream("/es/caib/notib/logic/diagnostic/test_firmat.pdf")){
+		try (var arxiuSignat = this.getClass().getResourceAsStream("/es/caib/notib/logic/diagnostic/test.pdf")){
 			if (arxiuSignat == null) {
 				log.error("L'Arxiu de proves per el diagnostic no existeix");
 				return false;

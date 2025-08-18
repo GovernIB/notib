@@ -17,7 +17,9 @@ import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.EncryptionUtil;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.cie.EntregaPostalEntity;
@@ -312,13 +314,16 @@ public class CiePluginHelper {
                 throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
             }
             info.setCodiEntitat(entitat.getCodi());
-            var cieEntity = notificacio.getProcediment().getEntregaCieEfectiva();
+//            var cieEntity = notificacio.getProcediment().getEntregaCieEfectiva();
+            var procediment = notificacio.getProcediment();
+            var cieEntity = procediment.getEntregaCieEfectiva() != null ? procediment.getEntregaCieEfectiva() : notificacio.getOrganGestor().getEntregaCie();
             var apiKey = getApiKey(cieEntity.getCie());
             var cie = conversioTipusHelper.convertir(cieEntity, CieDto.class);
             cie.setApiKey(apiKey);
             var enviamentCie = new EnviamentCie();
             enviamentCie.setIdentificador(enviament.getEntregaPostal().getCieId());
             enviamentCie.setEntregaCie(cie);
+            NotibLogger.getInstance().info("[CiePluginHelper] Consulta d'estat per l'envimanet " + enviamentId + " amb CIE id " + enviamentCie.getIdentificador(), log, LoggingTipus.ENTREGA_CIE);
             infoCie = getCiePlugin(entitat.getCodi()).consultarEstat(enviamentCie);
             if ("000".equals(infoCie.getCodiResposta())) {
                 integracioHelper.addAccioOk(info);

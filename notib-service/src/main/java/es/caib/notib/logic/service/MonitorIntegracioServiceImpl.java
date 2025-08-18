@@ -22,8 +22,8 @@ import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
-import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.EstadisticaService;
 import es.caib.notib.logic.intf.service.MonitorIntegracioService;
 import es.caib.notib.logic.intf.service.UsuariAplicacioService;
 import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
@@ -33,8 +33,6 @@ import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.filtres.FiltreMonitorIntegracio;
 import es.caib.notib.persist.repository.AplicacioRepository;
-import es.caib.notib.persist.repository.DocumentRepository;
-import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.EntregaPostalRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.monitor.MonitorIntegracioParamRepository;
@@ -90,6 +88,8 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	private UsuariAplicacioService usuariAplicacioService;
     @Autowired
     private EntregaPostalRepository entregaPostalRepository;
+    @Autowired
+    private EstadisticaService estadisticaService;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -190,10 +190,15 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 					diagnostic.setCorrecte(pluginHelper.diagnosticarRegistre(diagnostics));
 					break;
 				case NOTIFICA:
-					enviament = enviamentRepository.findTopByNotificaIdentificadorNullOrderByIdDesc().orElseThrow();
+					enviament = enviamentRepository.findTopByNotificaIdentificadorNotNullOrderByIdDesc().orElseThrow();
 					var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviament.getId()).build()).build();
-					notificaHelper.enviamentRefrescarEstat(consulta);
-					diagnostic.setCorrecte(true);
+					try {
+						notificaHelper.enviamentRefrescarEstat(consulta);
+						diagnostic.setCorrecte(true);
+					} catch (Exception e) {
+						diagnostic.setCorrecte(false);
+						diagnostic.setErrMsg(e.getMessage());
+					}
 					break;
 				case ARXIU:
 					diagnostic.setCorrecte(pluginHelper.diagnosticarArxiu(diagnostics));
@@ -226,13 +231,32 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 //					diagnostic.setCorrecte(true);
 //					break;
 				case CIE:
-					var entrega = entregaPostalRepository.findTopByCieIdNotNullOrderByIdDesc().orElseThrow();
-					enviament = enviamentRepository.findByCieId(entrega.getCieId());
-					var resultat = ciePluginHelper.consultarEstatEntregaPostal(enviament.getId());
+//					var entrega = entregaPostalRepository.findTopByCieIdNotNullOrderByIdDesc().orElseThrow();
+//					enviament = enviamentRepository.findByCieId(entrega.getCieId());
+//					enviament.getNotificacio().getOrganGestor().getEntregaCie().getCie().getApiKey().salt not null;
+					var enviaments = enviamentRepository.getUltimEnviamentPostal();
+					if (enviaments == null || enviaments.isEmpty()) {
+						diagnostic.setCorrecte(false);
+						diagnostic.setErrMsg("No hi ha enviaments dirigits a cap CIE extern");
+						break;
+					}
+					var enviamentId = enviaments.get(0);
+					var resultat = ciePluginHelper.consultarEstatEntregaPostal(enviamentId);
+//					var resultat = ciePluginHelper.consultarEstatEntregaPostal(enviament.getId());
 					var correcte = resultat != null && "000".equals(resultat.getCodiResposta());
 					diagnostic.setCorrecte(correcte);
 					if (!correcte) {
 						diagnostic.setErrMsg(resultat.getDescripcioResposta());
+					}
+					break;
+
+				case EXPLOTACIO:
+					try {
+						estadisticaService.consultaUltimesEstadistiques();
+						diagnostic.setCorrecte(true);
+					} catch (Exception e) {
+						diagnostic.setCorrecte(false);
+						diagnostic.setErrMsg(e.getMessage());
 					}
 					break;
 			}
