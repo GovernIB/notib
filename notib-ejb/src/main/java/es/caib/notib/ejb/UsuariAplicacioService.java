@@ -94,19 +94,19 @@ public class UsuariAplicacioService extends AbstractService<es.caib.notib.logic.
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_ADMIN", "NOT_ADMIN_LECTURA"})
 	public RespostaTestAplicacio provarAplicacio(Long aplicacioId) {
 		return getDelegateService().provarAplicacio(aplicacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN", "NOT_ADMIN_LECTURA"})
 	public boolean diagnosticarAplicacions(Map<String, IntegracioDiagnostic> diagnostics) {
-		return false;
+		return getDelegateService().diagnosticarAplicacions(diagnostics);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN", "NOT_ADMIN_LECTURA"})
 	public IntegracioDiagnostic diagnosticarAplicacions(Long entitatId) {
 		return getDelegateService().diagnosticarAplicacions(entitatId);
 	}
