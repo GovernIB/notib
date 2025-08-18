@@ -140,12 +140,12 @@ public interface UsuariAplicacioService {
 	public AplicacioDto updateActiva(Long id, boolean activa);
 
 
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_ADMIN') or hasRole('NOT_ADMIN_LECTURA')")
 	RespostaTestAplicacio provarAplicacio(Long aplicacioId);
 
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_ADMIN_LECTURA')")
 	boolean diagnosticarAplicacions(Map<String, IntegracioDiagnostic> diagnostics);
 
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_ADMIN_LECTURA')")
 	IntegracioDiagnostic diagnosticarAplicacions(Long entitatId);
 }
