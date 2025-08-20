@@ -39,6 +39,13 @@
 
     $(document).ready(function() {
 
+        $("#tab-list li").on("click", x => {
+            if ($(($(x)[0]).currentTarget).hasClass("dropdown") ) {
+                return;
+            }
+            ($('ul li').removeClass('active'));
+        });
+
         $(".entitats").click(e => {
 
             e.stopPropagation();
