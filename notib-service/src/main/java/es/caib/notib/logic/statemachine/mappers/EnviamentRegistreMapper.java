@@ -204,9 +204,14 @@ public abstract class EnviamentRegistreMapper {
 
     @Named("organismeRegistre")
     public static String getOrganismeRegistre(NotificacioEntity notificacio) {
+
         if (notificacio == null) {
             return null;
         }
+        if (!Strings.isNullOrEmpty(notificacio.getEntitat().getDir3CodiReg())) {
+            return notificacio.getEntitat().getDir3CodiReg();
+        }
+
         if (notificacio.getProcediment() != null && notificacio.getProcediment().getOrganGestor() != null) {
             return notificacio.getProcediment().getOrganGestor().getCodi();
         }
