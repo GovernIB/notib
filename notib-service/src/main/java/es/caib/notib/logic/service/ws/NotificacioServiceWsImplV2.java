@@ -414,7 +414,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		} catch (Exception ex) {
 			log.error("Error creant notificació", ex);
 			integracioHelper.addAccioError(info, "Error creant la notificació", ex);
-			SubsistemesHelper.addErrorOperation(ARE, System.currentTimeMillis() - start);
+			SubsistemesHelper.addErrorOperation(ARE);
 			throw new RuntimeException("[NOTIFICACIO/COMUNICACIO] Hi ha hagut un error creant la " + notificacio.getEnviamentTipus().name() + ": " + ex.getMessage(), ex);
 		} finally {
 			metricsHelper.fiMetrica(timer);

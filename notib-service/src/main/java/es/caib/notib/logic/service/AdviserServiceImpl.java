@@ -43,6 +43,7 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CIE;
 import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CNT;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -121,7 +122,7 @@ public class AdviserServiceImpl implements AdviserService {
                 var forcarOk = configHelper.getConfigAsBoolean("es.caib.notib.adviser.forcar.resposta.ok");
                 setResultadoEnvio(resultadoSincronizarEnvio, forcarOk ? ResultatEnviamentEnum.OK : ResultatEnviamentEnum.ERROR_IDENTIFICADOR);
                 integracioHelper.addAccioWarn(info, "No s'ha trobat cap enviament amb l'identificador especificat");
-                SubsistemesHelper.addErrorOperation(CNT, System.currentTimeMillis() - start);
+                SubsistemesHelper.addErrorOperation(CNT);
                 return resultadoSincronizarEnvio;
             }
             updateCodiEntitatPerInfoAndConfig(info, enviament);
@@ -185,7 +186,7 @@ public class AdviserServiceImpl implements AdviserService {
         NotibLogger.getInstance().info("Peticició processada correctament.", log, LoggingTipus.ADVISER);
         if (enviament == null || enviament.getNotificacio() == null) {
             log.error("Error greu enviament o notificació son nulls ");
-            SubsistemesHelper.addErrorOperation(CNT, System.currentTimeMillis() - start);
+            SubsistemesHelper.addErrorOperation(CNT);
             return resultadoSincronizarEnvio;
         }
         var isError = !Strings.isNullOrEmpty(eventErrorDescripcio);
@@ -195,7 +196,11 @@ public class AdviserServiceImpl implements AdviserService {
         callbackHelper.updateCallback(enviament, isError, eventErrorDescripcio);
         auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaAdviserWsV2Impl.sincronizarEnvio");
         log.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");
-        SubsistemesHelper.addOperation(CNT, System.currentTimeMillis() - start, errorSbs);
+        if (errorSbs) {
+            SubsistemesHelper.addErrorOperation(CNT);
+        } else {
+            SubsistemesHelper.addSuccessOperation(CNT, System.currentTimeMillis() - start);
+        }
         return resultadoSincronizarEnvio;
     }
 

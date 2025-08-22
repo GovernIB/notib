@@ -242,7 +242,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			SubsistemesHelper.addSuccessOperation(AWE, System.currentTimeMillis() - start);
 			return conversioTipusHelper.convertir(notificacioEntity, Notificacio.class);
 		} catch (Exception e) {
-			SubsistemesHelper.addErrorOperation(AWE, System.currentTimeMillis() - start);
+			SubsistemesHelper.addErrorOperation(AWE);
 			throw e;
 		} finally {
 			metricsHelper.fiMetrica(timer);

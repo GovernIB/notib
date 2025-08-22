@@ -298,7 +298,7 @@ public class CallbackHelper {
 			}
 			return response.getEntity(String.class);
 		} catch (Exception e) {
-//			SubsistemesHelper.addErrorOperation(CBK, System.currentTimeMillis() - start);
+//			SubsistemesHelper.addErrorOperation(CBK);
 			throw e;
 		}
 	}

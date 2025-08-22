@@ -59,6 +59,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CCI;
+import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CIE;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Slf4j
@@ -289,7 +290,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
                     var forcarOk = configHelper.getConfigAsBoolean("es.caib.notib.adviser.forcar.resposta.ok");
                     setResultadoEnvio(resultadoSincronizarEnvio, forcarOk ? ResultatEnviamentEnum.OK : ResultatEnviamentEnum.ERROR_IDENTIFICADOR);
                     integracioHelper.addAccioWarn(info, "No s'ha trobat cap enviament amb l'identificador especificat");
-                    SubsistemesHelper.addErrorOperation(CCI, System.currentTimeMillis() - start);
+                    SubsistemesHelper.addErrorOperation(CCI);
                     return resultadoSincronizarEnvio;
                 }
                 var entregaPostal = enviament.getEntregaPostal();
@@ -362,7 +363,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
             NotibLogger.getInstance().info("Peticició processada correctament.", log, LoggingTipus.ENTREGA_CIE);
             if (enviament == null || enviament.getNotificacio() == null) {
                 log.error("Error greu enviament o notificació son nulls ");
-                SubsistemesHelper.addErrorOperation(CCI, System.currentTimeMillis() - start);
+                SubsistemesHelper.addErrorOperation(CCI);
                 return resultadoSincronizarEnvio;
             }
             var isError = !Strings.isNullOrEmpty(eventErrorDescripcio);
@@ -374,9 +375,13 @@ public class CieAdviserServiceImpl implements CieAdviserService {
             callbackHelper.updateCallback(enviament, isError, eventErrorDescripcio);
             auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaAdviserWsV2Impl.sincronizarEnvio");
             log.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");
-            SubsistemesHelper.addOperation(CCI, System.currentTimeMillis() - start, errorSbs);
+            if (errorSbs) {
+                SubsistemesHelper.addErrorOperation(CCI);
+            } else {
+                SubsistemesHelper.addSuccessOperation(CCI, System.currentTimeMillis() - start);
+            }
         } catch (Exception e) {
-            SubsistemesHelper.addErrorOperation(CCI, System.currentTimeMillis() - start);
+            SubsistemesHelper.addErrorOperation(CCI);
             throw e;
         }
         return resultadoSincronizarEnvio;

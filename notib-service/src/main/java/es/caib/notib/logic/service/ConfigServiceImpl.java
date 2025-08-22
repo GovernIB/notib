@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -79,9 +78,6 @@ public class ConfigServiceImpl implements ConfigService {
         configEntity.update(!"null".equals(property.getValue()) ? property.getValue() : null);
         configHelper.reloadDbProperties();
         pluginHelper.resetPlugins(configEntity.getGroupCode());
-        if ("CIE".equals(configEntity.getGroupCode())) {
-            ciePluginHelper.reset();
-        }
         NotificacioEventHelper.clearNotificaConsultaActiva();
         cacheHelper.clearAllCaches();
         if ("es.caib.notib.state.machine.delay".equals(property.getKey())) {
@@ -147,7 +143,6 @@ public class ConfigServiceImpl implements ConfigService {
         }
         configHelper.reloadDbProperties();
         pluginHelper.resetAllPlugins();
-        ciePluginHelper.reset();
         return editedProperties;
     }
 
