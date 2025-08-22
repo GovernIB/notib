@@ -16,6 +16,7 @@ import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.validatesignature.ValidateSignaturePlugin;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformation;
@@ -38,8 +39,9 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 
 	public ValidaSignaturaPluginHelper(IntegracioHelper integracioHelper,
                                        ConfigHelper configHelper,
-									   EntitatRepository entitatRepository) {
-		super(integracioHelper, configHelper, entitatRepository);
+									   EntitatRepository entitatRepository,
+                                       MeterRegistry meterRegistry) {
+		super(integracioHelper, configHelper, entitatRepository, meterRegistry);
 	}
 
 	@Override
@@ -138,6 +140,7 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 			NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Username " + username, log, LoggingTipus.VALIDATE_SIGNATURE);
 			NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] TransformersTemplatesPath " + transformersPath, log, LoggingTipus.VALIDATE_SIGNATURE);
 			plugin = (ValidateSignaturePlugin) clazz.getDeclaredConstructor(String.class, Properties.class, boolean.class).newInstance(ConfigDto.prefix + ".", properties, configuracioEspecifica);
+            plugin.init(meterRegistry, getCodiApp().name());
 			pluginMap.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {

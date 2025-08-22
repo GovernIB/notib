@@ -15,6 +15,7 @@ import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -50,8 +51,9 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 	public GestioDocumentalPluginHelper(IntegracioHelper integracioHelper,
 										ConfigHelper configHelper,
 										EntitatRepository entitatRepository,
-										DocumentRepository documentRepository) {
-		super(integracioHelper, configHelper, entitatRepository);
+										DocumentRepository documentRepository,
+                                        MeterRegistry meterRegistry) {
+		super(integracioHelper, configHelper, entitatRepository, meterRegistry);
 		this.documentRepository = documentRepository;
 	}
 
@@ -85,7 +87,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			var errorDescripcio = "Error al crear document a dins la gestió documental";
 			log.error("Error creant el document en el gestor documental amb agrupacio " + agrupacio);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			SubsistemesHelper.addErrorOperation(GDO, System.currentTimeMillis() - start);
+			SubsistemesHelper.addErrorOperation(GDO);
 			// peticionsPlugin.updatePeticioError(codiEntitat);
 			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), errorDescripcio, ex);
 		}
@@ -112,7 +114,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			var errorDescripcio = "Error al accedir al plugin de gestió documental";
 			log.error("Error actualitzant el document " + id);
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			SubsistemesHelper.addErrorOperation(GDO, System.currentTimeMillis() - start);
+			SubsistemesHelper.addErrorOperation(GDO);
 			// peticionsPlugin.updatePeticioError(codiEntitat);
 			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), errorDescripcio, ex);
 		}
@@ -170,20 +172,6 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 		}
 	}
 	
-//	public boolean isGestioDocumentalPluginDisponible() {
-//
-//		var pluginClass = getPropertyPluginGestioDocumental();
-//		if (pluginClass == null || pluginClass.length() == 0) {
-//			return false;
-//		}
-//		try {
-//			return getGestioDocumentalPlugin() != null;
-//		} catch (SistemaExternException sex) {
-//			log.error("Error al obtenir la instància del plugin de gestió documental", sex);
-//			return false;
-//		}
-//	}
-
 	@Override
 	protected GestioDocumentalPlugin getPlugin() {
 
@@ -206,6 +194,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			var propietats = configHelper.getAllEntityProperties(codiEntitat);
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (GestioDocumentalPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(propietats, configuracioEspecifica);
+            plugin.init(meterRegistry, getCodiApp().name());
 			pluginMap.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {

@@ -1,20 +1,15 @@
 package es.caib.notib.plugin.registre;
 
-import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
-import es.caib.comanda.ms.salut.model.IntegracioPeticions;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.DatosInteresadoWsDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
-import lombok.Synchronized;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -31,7 +26,7 @@ import java.util.Scanner;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
-public class RegistrePluginMockImpl implements RegistrePlugin {
+public class RegistrePluginMockImpl extends AbstractSalutPlugin implements RegistrePlugin {
 
 	private final Properties properties;
 	private final Random rand = new Random();
@@ -42,10 +37,9 @@ public class RegistrePluginMockImpl implements RegistrePlugin {
 		this.properties = properties;
 	}
 
-	public RegistrePluginMockImpl(Properties properties, String codiDir3Entitat, boolean configuracioEspecifica) {
+	public RegistrePluginMockImpl(Properties properties, boolean configuracioEspecifica) {
 
 		this.properties = properties;
-		this.codiDir3Entitat = codiDir3Entitat;
 		this.configuracioEspecifica = configuracioEspecifica;
 	}
 
@@ -54,15 +48,6 @@ public class RegistrePluginMockImpl implements RegistrePlugin {
 
 		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
 		log.info(arb.toString());
-//		System.out.println(">>> DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//		ObjectMapper mapper = new ObjectMapper();
-//		try {
-//			String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(arb);
-//			System.out.println(json);
-//		} catch (JsonProcessingException e) {
-//			e.printStackTrace();
-//		}
-//		System.out.println(">>> FIIIIIIII  DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		DatosInteresadoWsDto interesado = arb.getInteresados().get(0).getInteresado();
  		if (arb.getResumen().toUpperCase().contains("ERROR") || interesado.getApellido1() != null && interesado.getApellido1().equals("error")) {
 			resposta.setErrorCodi("3");
@@ -370,40 +355,4 @@ public class RegistrePluginMockImpl implements RegistrePlugin {
 	    return getClass().getName() + "@" + Integer.toHexString(hashCode());
 	}
 
-
-	// Mètodes de SALUT
-	// /////////////////////////////////////////////////////////////////////////////////////////////
-
-	private boolean configuracioEspecifica = false;
-	private int operacionsOk = 0;
-	private int operacionsError = 0;
-	private String codiDir3Entitat;
-
-	@Synchronized
-	private void incrementarOperacioOk() {
-		operacionsOk++;
-	}
-
-	@Synchronized
-	private void incrementarOperacioError() {
-		operacionsError++;
-	}
-
-
-	@Override
-	public boolean teConfiguracioEspecifica() {
-		return false;
-	}
-
-	@Override
-	public EstatSalut getEstatPlugin() {
-		return EstatSalut.builder().estat(EstatSalutEnum.UP).latencia(1).build();
-	}
-
-	@Override
-	public IntegracioPeticions getPeticionsPlugin() {
-		return IntegracioPeticions.builder().build();
-	}
-
-	
 }

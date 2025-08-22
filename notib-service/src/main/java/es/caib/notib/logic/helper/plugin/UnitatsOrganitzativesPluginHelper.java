@@ -23,6 +23,7 @@ import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
 import es.caib.notib.plugin.unitat.OficinaSir;
 import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
@@ -50,9 +51,10 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 	public UnitatsOrganitzativesPluginHelper(IntegracioHelper integracioHelper,
                                              ConfigHelper configHelper,
 											 EntitatRepository entitatRepository,
-                                             MessageHelper messageManager) {
+                                             MessageHelper messageManager,
+                                             MeterRegistry meterRegistry) {
 
-		super(integracioHelper, configHelper, entitatRepository);
+		super(integracioHelper, configHelper, entitatRepository, meterRegistry);
 		this.messageManager = messageManager;
     }
 
@@ -537,6 +539,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			var propietats = configHelper.getAllEntityProperties(codiEntitat);
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (UnitatsOrganitzativesPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(propietats, configuracioEspecifica);
+            plugin.init(meterRegistry, getCodiApp().name());
 			pluginMap.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {

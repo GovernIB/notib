@@ -17,6 +17,7 @@ import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.plugin.arxiu.ArxiuPlugin;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -42,9 +43,10 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 							 ConfigHelper configHelper,
 							 EntitatRepository entitatRepository,
 							 DocumentRepository documentRepository,
-							 NotificacioRepository notificacioRepository) {
+							 NotificacioRepository notificacioRepository,
+                             MeterRegistry meterRegistry) {
 
-		super(integracioHelper, configHelper, entitatRepository);
+		super(integracioHelper, configHelper, entitatRepository, meterRegistry);
         this.documentRepository = documentRepository;
 		this.notificacioRepository = notificacioRepository;
 	}
@@ -174,6 +176,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 			var propietats = configHelper.getEnvironmentProperties();
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (ArxiuPlugin) clazz.getDeclaredConstructor(String.class, Properties.class, boolean.class).newInstance(propertyKeyBase, propietats, configuracioEspecifica);
+            plugin.init(meterRegistry, getCodiApp().name());
 			pluginMap.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {

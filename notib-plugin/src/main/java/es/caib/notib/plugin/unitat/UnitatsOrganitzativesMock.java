@@ -3,10 +3,8 @@
  */
 package es.caib.notib.plugin.unitat;
 
-import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
-import es.caib.comanda.ms.salut.model.IntegracioPeticions;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +21,7 @@ import java.util.Properties;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
+public class UnitatsOrganitzativesMock extends AbstractSalutPlugin implements UnitatsOrganitzativesPlugin {
 	
 	private static final String SERVEI_CERCA = "/rest/busqueda/";
 	private static final String SERVEI_CATALEG = "/rest/catalogo/";
@@ -155,22 +153,4 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 
 	private static final Logger logger = LoggerFactory.getLogger(UnitatsOrganitzativesMock.class);
 
-
-	// Mètodes de SALUT
-	// /////////////////////////////////////////////////////////////////////////////////////////////
-
-	@Override
-	public boolean teConfiguracioEspecifica() {
-		return false;
-	}
-
-	@Override
-	public EstatSalut getEstatPlugin() {
-		return EstatSalut.builder().estat(EstatSalutEnum.UP).latencia(1).build();
-	}
-
-	@Override
-	public IntegracioPeticions getPeticionsPlugin() {
-		return IntegracioPeticions.builder().build();
-	}
 }

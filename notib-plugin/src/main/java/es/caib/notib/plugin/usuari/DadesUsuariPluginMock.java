@@ -6,6 +6,7 @@ package es.caib.notib.plugin.usuari;
 import es.caib.comanda.ms.salut.model.EstatSalut;
 import es.caib.comanda.ms.salut.model.EstatSalutEnum;
 import es.caib.comanda.ms.salut.model.IntegracioPeticions;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 
 import java.util.Arrays;
@@ -17,7 +18,7 @@ import java.util.Properties;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class DadesUsuariPluginMock implements DadesUsuariPlugin {
+public class DadesUsuariPluginMock extends AbstractSalutPlugin implements DadesUsuariPlugin {
 
 	private final Properties properties;
 

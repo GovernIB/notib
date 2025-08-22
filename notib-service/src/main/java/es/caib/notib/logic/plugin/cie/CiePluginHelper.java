@@ -1,6 +1,7 @@
 package es.caib.notib.logic.plugin.cie;
 
 import com.google.common.base.Strings;
+import es.caib.comanda.ms.salut.model.IntegracioApp;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
@@ -10,16 +11,26 @@ import es.caib.notib.logic.helper.NotificacioEventHelper;
 import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.SubsistemesHelper;
+import es.caib.notib.logic.helper.plugin.AbstractPluginHelper;
+import es.caib.notib.logic.helper.plugin.ArxiuPluginHelper;
+import es.caib.notib.logic.helper.plugin.GestioDocumentalPluginHelper;
+import es.caib.notib.logic.helper.plugin.RegistrePluginHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
+import es.caib.notib.logic.intf.dto.RegistreAnnexDto;
+import es.caib.notib.logic.intf.dto.RegistreModeFirmaDtoEnum;
+import es.caib.notib.logic.intf.dto.RegistreOrigenDtoEnum;
+import es.caib.notib.logic.intf.dto.RegistreTipusDocumentDtoEnum;
+import es.caib.notib.logic.intf.dto.RegistreTipusDocumentalDtoEnum;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.EncryptionUtil;
 import es.caib.notib.logic.utils.NotibLogger;
+import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.cie.EntregaPostalEntity;
@@ -34,11 +45,15 @@ import es.caib.notib.plugin.cie.CiePlugin;
 import es.caib.notib.plugin.cie.EnviamentCie;
 import es.caib.notib.plugin.cie.InfoCie;
 import es.caib.notib.plugin.cie.RespostaCie;
+import es.caib.plugins.arxiu.api.ArxiuException;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -48,44 +63,55 @@ import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CIE;
 
 @Slf4j
 @Component
-public class CiePluginHelper {
+public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
 
     private final NotificacioTableViewRepository notificacioTableViewRepository;
     private final MessageHelper messageHelper;
     private final NotificacioTableHelper notificacioTableHelper;
-    private Map<String, CiePlugin> ciePlugin = new HashMap<>();
     private final ConversioTipusHelper conversioTipusHelper;
     private final NotificacioEventHelper notificacioEventHelper;
-    private final ConfigHelper configHelper;
-    private final EntitatRepository entitatRepository;
     private final NotificacioRepository notificacioRepository;
     private final NotificacioEventRepository notificacioEventRepository;
-    private final IntegracioHelper integracioHelper;
-    private final PluginHelper pluginHelper;
+    private final GestioDocumentalPluginHelper gestioDocumentalPluginHelper;
+    private final RegistrePluginHelper registrePluginHelper;
+    private final ArxiuPluginHelper arxiuPluginHelper;
     private final EntregaPostalRepository entregaPostalRepository;
     private final NotificacioEnviamentRepository enviamentRepository;
 
+    public static final String GRUP = "CIE";
     private static final String ERROR_INESPERAT = "Error inesperat";
 
-    public CiePluginHelper(ConfigHelper configHelper, EntitatRepository entitatRepository, IntegracioHelper integracioHelper, ConversioTipusHelper conversioTipusHelper, NotificacioEventHelper notificacioEventHelper, NotificacioRepository notificacioRepository, NotificacioEventRepository notificacioEventRepository, PluginHelper pluginHelper, EntregaPostalRepository entregaPostalRepository, NotificacioEnviamentRepository enviamentRepository, NotificacioTableViewRepository notificacioTableViewRepository, MessageHelper messageHelper, NotificacioTableHelper notificacioTableHelper) {
+    public CiePluginHelper(ConfigHelper configHelper,
+                           EntitatRepository entitatRepository,
+                           IntegracioHelper integracioHelper,
+                           ConversioTipusHelper conversioTipusHelper,
+                           NotificacioEventHelper notificacioEventHelper,
+                           NotificacioRepository notificacioRepository,
+                           NotificacioEventRepository notificacioEventRepository,
+                           GestioDocumentalPluginHelper gestioDocumentalPluginHelper,
+                           RegistrePluginHelper registrePluginHelper,
+                           ArxiuPluginHelper arxiuPluginHelper,
+                           EntregaPostalRepository entregaPostalRepository,
+                           NotificacioEnviamentRepository enviamentRepository,
+                           NotificacioTableViewRepository notificacioTableViewRepository,
+                           MessageHelper messageHelper,
+                           NotificacioTableHelper notificacioTableHelper,
+                           MeterRegistry meterRegistry) {
 
-        this.configHelper = configHelper;
-        this.entitatRepository = entitatRepository;
-        this.integracioHelper = integracioHelper;
+        super(integracioHelper, configHelper, entitatRepository, meterRegistry);
+
         this.conversioTipusHelper = conversioTipusHelper;
         this.notificacioEventHelper = notificacioEventHelper;
         this.notificacioRepository = notificacioRepository;
         this.notificacioEventRepository = notificacioEventRepository;
-        this.pluginHelper = pluginHelper;
+        this.gestioDocumentalPluginHelper = gestioDocumentalPluginHelper;
+        this.registrePluginHelper = registrePluginHelper;
+        this.arxiuPluginHelper = arxiuPluginHelper;
         this.entregaPostalRepository = entregaPostalRepository;
         this.enviamentRepository = enviamentRepository;
         this.notificacioTableViewRepository = notificacioTableViewRepository;
         this.messageHelper = messageHelper;
         this.notificacioTableHelper = notificacioTableHelper;
-    }
-
-    public void reset() {
-        ciePlugin = new HashMap<>();
     }
 
     @Transactional
@@ -107,15 +133,16 @@ public class CiePluginHelper {
                 if (entitat == null) {
                     throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat + "no trobada");
                 }
+                configHelper.setEntitatCodi(entitat.getCodi());
                 info.setCodiEntitat(entitat.getCodi());
                 byte[] contingut = null;
                 if (notificacio.getDocument() != null && notificacio.getDocument().getArxiuGestdocId() != null) {
                     var baos = new ByteArrayOutputStream();
                     ConfigHelper.setEntitatCodi(entitat.getCodi());
-                    pluginHelper.gestioDocumentalGet(notificacio.getDocument().getArxiuGestdocId(), PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, baos);
+                    gestioDocumentalPluginHelper.gestioDocumentalGet(notificacio.getDocument().getArxiuGestdocId(), PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS, baos);
                     contingut = baos.size() > 0 ? baos.toByteArray() : null;
                 } else {
-                    contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
+                    contingut = documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
                 }
                 if (contingut == null) {
                     throw new Exception("El document no te contingut " + notificacio.getDocument().getId());
@@ -135,7 +162,7 @@ public class CiePluginHelper {
                 cie.setApiKey(apiKey);
                 enviamentCie.setEntregaCie(cie);
                 enviamentCie.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEfectiva.getOperadorPostal(), OperadorPostalDto.class));
-                resposta = getCiePlugin(entitat.getCodi()).enviar(enviamentCie);
+                resposta = getPlugin().enviar(enviamentCie);
                 if ("000".equals(resposta.getCodiResposta())) {
                     integracioHelper.addAccioOk(info);
                 } else {
@@ -155,10 +182,14 @@ public class CiePluginHelper {
             guardarRespostaCie(notificacioReferencia, resposta);
             notificacioTableHelper.actualitzarRegistre(notificacio);
         } catch (Exception ex) {
-            SubsistemesHelper.addErrorOperation(CIE, System.currentTimeMillis() - start);
+            SubsistemesHelper.addErrorOperation(CIE);
             throw ex;
         }
-        SubsistemesHelper.addOperation(CIE, System.currentTimeMillis() - start, errorSbs);
+        if (errorSbs) {
+            SubsistemesHelper.addErrorOperation(CIE);
+        } else {
+            SubsistemesHelper.addSuccessOperation(CIE, System.currentTimeMillis() - start);
+        }
         return resposta;
     }
 
@@ -220,10 +251,50 @@ public class CiePluginHelper {
                 entregaPostal.setCieEstat(CieEstat.ERROR);
                 entregaPostal.setCieErrorDesc(resposta.getDescripcioError());
                 entregaPostalRepository.save(entregaPostal);
-//                var notTable = notificacioTableViewRepository.findById(notificacio.getId()).get();
-//                notTable.setErrorLastEvent(true);
             }
         }
+    }
+
+    private RegistreAnnexDto documentToRegistreAnnexDto (DocumentEntity document) {
+
+        var annex = new RegistreAnnexDto();
+        annex.setTipusDocument(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI);
+        annex.setTipusDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO);
+        annex.setOrigen(RegistreOrigenDtoEnum.ADMINISTRACIO);
+        annex.setData(new Date());
+        annex.setIdiomaCodi("ca");
+
+        if((document.getUuid() != null || document.getCsv() != null) && document.getContingutBase64() == null) {
+            var loadFromArxiu = registrePluginHelper.isReadDocsMetadataFromArxiu() && document.getUuid() != null || document.getCsv() == null;
+            DocumentContingut doc;
+            if(loadFromArxiu) {
+                try {
+                    annex.setModeFirma(RegistreModeFirmaDtoEnum.SENSE_FIRMA);
+
+                    doc = arxiuPluginHelper.arxiuGetImprimible(document.getUuid(), true);
+                    annex.setArxiuContingut(doc.getContingut());
+                    annex.setArxiuNom(doc.getArxiuNom());
+                } catch (ArxiuException ae) {
+                    log.error("Error Obtenint el document per l'uuid");
+                }
+                return annex;
+            }
+            try {
+                annex.setModeFirma(RegistreModeFirmaDtoEnum.AUTOFIRMA_SI);
+                doc = arxiuPluginHelper.arxiuGetImprimible(document.getCsv(), false);
+                annex.setArxiuContingut(doc.getContingut());
+                annex.setArxiuNom(doc.getArxiuNom());
+            } catch (ArxiuException ae) {
+                log.error("Error Obtenint el document per csv");
+            }
+            return annex;
+        }
+        if(document.getContingutBase64() != null && (document.getUuid() == null && document.getCsv() == null)) {
+            annex.setArxiuContingut(document.getContingutBase64().getBytes());
+            annex.setArxiuNom(document.getArxiuNom());
+            annex.setModeFirma(RegistreModeFirmaDtoEnum.SENSE_FIRMA);
+        }
+        return annex;
     }
 
     @Transactional
@@ -247,6 +318,7 @@ public class CiePluginHelper {
             if (entitat == null) {
                 throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
             }
+            configHelper.setEntitatCodi(entitat.getCodi());
             info.setCodiEntitat(entitat.getCodi());
             var cieEntity = notificacio.getProcediment().getEntregaCieEfectiva();
             var apiKey = getApiKey(cieEntity.getCie());
@@ -255,7 +327,7 @@ public class CiePluginHelper {
             var enviamentCie = new EnviamentCie();
             enviamentCie.setIdentificador(enviament.getEntregaPostal().getCieId());
             enviamentCie.setEntregaCie(cie);
-            resposta = getCiePlugin(entitat.getCodi()).cancelar(enviamentCie);
+            resposta = getPlugin().cancelar(enviamentCie);
             if ("000".equals(resposta.getCodiResposta())) {
                 integracioHelper.addAccioOk(info);
                 enviament.getEntregaPostal().setCieCancelat(true);
@@ -313,6 +385,7 @@ public class CiePluginHelper {
             if (entitat == null) {
                 throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
             }
+            configHelper.setEntitatCodi(entitat.getCodi());
             info.setCodiEntitat(entitat.getCodi());
 //            var cieEntity = notificacio.getProcediment().getEntregaCieEfectiva();
             var procediment = notificacio.getProcediment();
@@ -324,7 +397,7 @@ public class CiePluginHelper {
             enviamentCie.setIdentificador(enviament.getEntregaPostal().getCieId());
             enviamentCie.setEntregaCie(cie);
             NotibLogger.getInstance().info("[CiePluginHelper] Consulta d'estat per l'envimanet " + enviamentId + " amb CIE id " + enviamentCie.getIdentificador(), log, LoggingTipus.ENTREGA_CIE);
-            infoCie = getCiePlugin(entitat.getCodi()).consultarEstat(enviamentCie);
+            infoCie = getPlugin().consultarEstat(enviamentCie);
             if ("000".equals(infoCie.getCodiResposta())) {
                 integracioHelper.addAccioOk(info);
                 enviament.getEntregaPostal().setCieEstat(infoCie.getCodiEstat());
@@ -355,32 +428,56 @@ public class CiePluginHelper {
         return encripter.decrypt(pagadorCieEntity.getApiKey());
     }
 
-    private CiePlugin getCiePlugin(String codiEntitat) {
+    protected CiePlugin getPlugin() {
 
+        var codiEntitat = getCodiEntitatActual();
         if (Strings.isNullOrEmpty(codiEntitat)) {
             throw new RuntimeException("El codi d'entitat no pot ser nul");
         }
 
-        var plugin = ciePlugin.get(codiEntitat);
+        var plugin = pluginMap.get(codiEntitat);
         if (plugin != null) {
             return plugin;
         }
-        var pluginClass = configHelper.getConfig("es.caib.notib.plugin.cie.class");
+        var pluginClass = getPluginClassProperty();
         if (Strings.isNullOrEmpty(pluginClass)) {
             var msg = "\"La classe del plugin CIE no està definida\"";
             log.error(msg);
-            throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), msg);
+            throw new SistemaExternException(IntegracioCodi.CIE.name(), msg);
         }
         try {
+            var configuracioEspecifica = configHelper.hasEntityGroupPropertiesModified(codiEntitat, getConfigGrup());
+            var propietats = configHelper.getAllEntityProperties(codiEntitat);
             Class<?> clazz = Class.forName(pluginClass);
-            plugin = (CiePlugin) clazz.getDeclaredConstructor(Properties.class).newInstance(configHelper.getAllEntityProperties(codiEntitat));
-            ciePlugin.put(codiEntitat, plugin);
+            plugin = (CiePlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(propietats, configuracioEspecifica);
+            plugin.init(meterRegistry, getCodiApp().name());
+            pluginMap.put(codiEntitat, plugin);
             return plugin;
         } catch (Exception ex) {
             var msg = "\"Error al crear la instància del plugin CIE (\" + pluginClass + \") \"";
             log.error(msg, ex);
-            throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), msg, ex);
+            throw new SistemaExternException(IntegracioCodi.CIE.name(), msg, ex);
         }
+    }
+
+    @Override
+    protected String getPluginClassProperty() {
+        return configHelper.getConfig("es.caib.notib.plugin.cie.class");
+    }
+
+    @Override
+    protected IntegracioApp getCodiApp() {
+        return IntegracioApp.CIE;
+    }
+
+    @Override
+    protected String getConfigGrup() {
+        return GRUP;
+    }
+
+    @Override
+    public boolean diagnosticar(Map diagnostics) throws Exception {
+        return false;
     }
 
 

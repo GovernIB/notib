@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.cie.nexea.NotificaWsV2PortType;
 import es.caib.notib.plugin.cie.nexea.altaremesaenvios.AltaRemesaEnvios;
 import es.caib.notib.plugin.cie.nexea.altaremesaenvios.Destinatarios;
@@ -18,7 +19,6 @@ import es.caib.notib.plugin.cie.nexea.altaremesaenvios.OrganismoPagadorPostal;
 import es.caib.notib.plugin.cie.nexea.altaremesaenvios.Persona;
 import es.caib.notib.plugin.cie.nexea.cancelarenvio.CancelarEnvio;
 import es.caib.notib.plugin.cie.nexea.infoenvioligero.InfoEnvioLigero;
-import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import es.caib.notib.plugin.utils.WsClientHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -54,20 +54,22 @@ import java.util.Set;
 import java.util.TreeSet;
 
 @Slf4j
-public class CieNexeaPluginImpl implements CiePlugin {
+public class CieNexeaPluginImpl extends AbstractSalutPlugin implements CiePlugin {
 
     private final Properties properties;
     private static final String NOTIB = "Notib";
     private static final String CIE = "CIE";
 
-    public CieNexeaPluginImpl(Properties properties) {
+    public CieNexeaPluginImpl(Properties properties, boolean configuracioEspecifica) {
         this.properties = properties;
+        this.configuracioEspecifica = configuracioEspecifica;
     }
 
     @Override
     public RespostaCie enviar(EnviamentCie notificacio) {
 
         try {
+            long startTime = System.currentTimeMillis();
             var alta = generarAltaRemesaEnvios(notificacio);
             var r = getNotificaWs(notificacio.getEntregaCie().getApiKey()).altaRemesaEnvios(alta);
 //            NotibLogger.getInstance
@@ -81,15 +83,18 @@ public class CieNexeaPluginImpl implements CiePlugin {
                 error = Strings.isNullOrEmpty(r.getCodigoRespuesta());
                 ids.add(IdentificadorCie.builder().identificador(e.getIdentificador()).error(error).nifTitular(e.getNifTitular()).build());
             }
+            incrementarOperacioOk(System.currentTimeMillis() - startTime);
             return RespostaCie.builder().identificadors(ids).codiResposta(r.getCodigoRespuesta()).descripcioError(r.getDescripcionRespuesta()).build();
         } catch (SOAPFaultException sfe) {
             log.error("[CieCorreosPluginImpl.enviar] Error en la crida SOAP ", sfe);
             var codi = sfe.getFault().getFaultCode();
             var desc = sfe.getFault().getFaultString();
+            incrementarOperacioError();
             return RespostaCie.builder().codiResposta(codi).descripcioError(desc).build();
         } catch (Exception ex) {
             var desc = "Error inesperat al enviar a CIE la notificacio " + notificacio.getId() + " - " + ex.getMessage();
             log.error(desc, ex);
+            incrementarOperacioError();
             return RespostaCie.builder().codiResposta(CIE).descripcioError(desc).build();
         }
     }
@@ -99,13 +104,6 @@ public class CieNexeaPluginImpl implements CiePlugin {
         var envios = new AltaRemesaEnvios();
         Integer retardPostal = null;
         try {
-//            if (!notificacio.isCodiDir3Entitat() && notificacio.getOrganGestor() != null) {
-//                envios.setCodigoOrganismoEmisor(notificacio.getOrganGestor());
-//            } else if(!notificacio.isCodiDir3Entitat() && notificacio.getProcediment() != null && notificacio.getProcediment().getOrganGestor() != null) {
-//                envios.setCodigoOrganismoEmisor(notificacio.getProcediment().getOrganGestor());
-//            } else {
-//                envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
-//            }
             envios.setCodigoOrganismoEmisor(notificacio.getEntregaCie().getOrganismeEmisorCodi());
             switch (notificacio.getEnviamentTipus()) {
                 case COMUNICACIO:
@@ -131,7 +129,6 @@ public class CieNexeaPluginImpl implements CiePlugin {
             envios.setProcedimiento(notificacio.getProcedimentCodiNotib());
             var documento = new Documento();
             if(notificacio.getDocument() != null && notificacio.getDocument().getArxiuGestdocId() != null) {
-//                var baos = new ByteArrayOutputStream();
                 documento.setContenido(notificacio.getContingutDocument());
                 var opcionesDocumento = new Opciones();
                 var opcionNormalizado = new Opcion();
@@ -429,20 +426,24 @@ public class CieNexeaPluginImpl implements CiePlugin {
     public RespostaCie cancelar(EnviamentCie enviament) {
 
         try {
+            long startTime = System.currentTimeMillis();
             var cancelar = new CancelarEnvio();
             cancelar.setIdentificador(enviament.getIdentificador());
             var r = getNotificaWs(enviament.getEntregaCie().getApiKey()).cancelarEnvio(cancelar);
             List<IdentificadorCie> ids = new ArrayList<>();
             ids.add(IdentificadorCie.builder().identificador(r.getIdentificador()).build());
+            incrementarOperacioOk(System.currentTimeMillis() - startTime);
             return RespostaCie.builder().identificadors(ids).codiResposta(r.getCodigoRespuesta()).descripcioError(r.getDescripcionRespuesta()).build();
         } catch (SOAPFaultException sfe) {
             log.error("[CieCorreosPluginImpl.cancelar] Error en la crida SOAP ", sfe);
             var codi = sfe.getFault().getFaultCode();
             var desc = sfe.getFault().getFaultString();
+            incrementarOperacioError();
             return RespostaCie.builder().codiResposta(codi).descripcioError(desc).build();
         } catch (Exception ex) {
             var desc = "Error al cancelar l'enviament CIE " + enviament.getIdentificador();
             log.error(desc, ex);
+            incrementarOperacioError();
             return RespostaCie.builder().codiResposta(NOTIB).descripcioError(desc).build();
         }
     }
@@ -451,20 +452,24 @@ public class CieNexeaPluginImpl implements CiePlugin {
     public InfoCie consultarEstat(EnviamentCie enviament) {
 
         try {
+            long startTime = System.currentTimeMillis();
             var info = new InfoEnvioLigero();
             info.setIdentificador(enviament.getIdentificador());
             info.setNivelDetalle(BigInteger.valueOf(2));
             var r = getNotificaWs(enviament.getEntregaCie().getApiKey()).infoEnvioLigero(info);
             var estat = !Strings.isNullOrEmpty(r.getEstado()) ? CieEstat.valueOf(r.getEstado().toUpperCase()) : null;
+            incrementarOperacioOk(System.currentTimeMillis() - startTime);
             return InfoCie.builder().identificador(r.getIdentificador()).codiResposta(r.getCodigoRespuesta()).descripcioResposta(r.getDescripcionRespuesta()).codiEstat(estat).build();
         } catch (SOAPFaultException sfe) {
             log.error("[CieCorreosPluginImpl.cancelar] Error en la crida SOAP ", sfe);
             var codi = sfe.getFault().getFaultCode();
             var desc = sfe.getFault().getFaultString();
+            incrementarOperacioError();
             return InfoCie.builder().identificador(enviament.getIdentificador()).codiResposta(codi).descripcioResposta(desc).build();
         } catch (Exception ex) {
             var desc = "Error al consultar l'enviament CIE " + enviament.getIdentificador() + ex.getMessage();
             log.error(desc, ex);
+            incrementarOperacioError();
             return InfoCie.builder().identificador(enviament.getIdentificador()).codiResposta(NOTIB).descripcioResposta(desc).build();
         }
     }

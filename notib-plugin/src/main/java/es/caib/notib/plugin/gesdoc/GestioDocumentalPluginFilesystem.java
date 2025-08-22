@@ -1,10 +1,8 @@
 package es.caib.notib.plugin.gesdoc;
 
-import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
-import es.caib.comanda.ms.salut.model.IntegracioPeticions;
 import es.caib.notib.logic.intf.util.FitxerUtils;
 import es.caib.notib.logic.intf.util.MimeUtils;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import lombok.Getter;
@@ -34,7 +32,7 @@ import java.util.zip.ZipFile;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
-public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin {
+public class GestioDocumentalPluginFilesystem extends AbstractSalutPlugin implements GestioDocumentalPlugin {
 
 	@Getter
 	private static final long MAX_FILES_IN_FOLDER = 5000;
@@ -66,6 +64,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	public String create(String agrupacio, InputStream contingut) throws SistemaExternException {
 
 		try (contingut) {
+            long startTime = System.currentTimeMillis();
 			agrupacio = checkAgrupacio(agrupacio);
 			var basedir = getBaseDir(agrupacio);
 			var subfolderId = getValidSubfolder(agrupacio);
@@ -74,8 +73,10 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			try (var outContent = new FileOutputStream(basedir + "/" + id)) {
 				IOUtils.copy(contingut, outContent);
 			}
+            incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return id;
 		} catch (Exception ex) {
+            incrementarOperacioError();
 			throw new SistemaExternException("No s'ha pogut crear l'arxiu", ex);
 		}
 	}
@@ -84,6 +85,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	public void update(String id, String agrupacio, InputStream contingut) throws SistemaExternException {
 
 		try (contingut) {
+            long startTime = System.currentTimeMillis();
 			var fContent = getFile(agrupacio, id);
 			log.info("[GESDOC] Actalitzant fitxer, directori: " + getBaseDir(agrupacio) + AMB_ID + id);
 			if (fContent == null) {
@@ -92,7 +94,9 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			try (var outContent = new FileOutputStream(fContent, false)) {
 				IOUtils.copy(contingut, outContent);
 			}
+            incrementarOperacioOk(System.currentTimeMillis() - startTime);
 		} catch (Exception ex) {
+            incrementarOperacioError();
 			throw new SistemaExternException("No s'ha pogut actualitzar l'arxiu (id=" + id + ")", ex);
 		}
 	}
@@ -101,13 +105,16 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	public void delete(String id, String agrupacio) throws SistemaExternException {
 
 		try {
+            long startTime = System.currentTimeMillis();
 			var fContent = getFile(agrupacio, id);
 			log.info("[GESDOC] Eliminant fitxer, directori: " + getBaseDir(agrupacio) + AMB_ID + id);
 			if (fContent == null) {
 				throw new SistemaExternException(ARXIU_NO_TROBAT + id + ")");
 			}
 			FitxerUtils.esborrar(fContent);
+            incrementarOperacioOk(System.currentTimeMillis() - startTime);
 		} catch (Exception ex) {
+            incrementarOperacioError();
 			throw new SistemaExternException("No s'ha pogut esborrar l'arxiu (id=" + id + ")", ex);
 		}
 	}
@@ -116,6 +123,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	public void get(String id, String agrupacio, OutputStream contingutOut, boolean isZip) throws SistemaExternException {
 
 		try (contingutOut) {
+            long startTime = System.currentTimeMillis();
 			var fContent = getFile(agrupacio, id);
 			var isAgrupacio = true;
 			if (fContent == null && "notificacions".equals(agrupacio)) {
@@ -140,7 +148,9 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 					IOUtils.copy(is, contingutOut);
 				}
 			}
+            incrementarOperacioOk(System.currentTimeMillis() - startTime);
 		} catch (Exception ex) {
+            incrementarOperacioError();
 			throw new SistemaExternException("No s'ha pogut llegir l'arxiu (id=" + id + ")", ex);
 		}
 	}
@@ -257,18 +267,4 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 		return agrupacio;
 	}
 
-	@Override
-	public boolean teConfiguracioEspecifica() {
-		return configuracioEspecifica;
-	}
-
-	@Override
-	public EstatSalut getEstatPlugin() {
-		return EstatSalut.builder().estat(EstatSalutEnum.UP).latencia(1).build();
-	}
-
-	@Override
-	public IntegracioPeticions getPeticionsPlugin() {
-		return null;
-	}
 }

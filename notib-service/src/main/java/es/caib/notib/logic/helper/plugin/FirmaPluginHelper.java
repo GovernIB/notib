@@ -2,7 +2,6 @@ package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
 import com.google.common.net.MediaType;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
 import es.caib.comanda.ms.salut.model.IntegracioApp;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
@@ -22,11 +21,10 @@ import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
@@ -50,9 +48,10 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
                              NotificacioEnviamentRepository enviamentRepository,
                              JustificantEnviamentHelper justificantEnviamentHelper,
                              ConversioTipusHelper conversioTipusHelper,
-                             EntitatRepository entitatRepository) {
+                             EntitatRepository entitatRepository,
+                             MeterRegistry meterRegistry) {
 
-		super(integracioHelper, configHelper, entitatRepository);
+		super(integracioHelper, configHelper, entitatRepository, meterRegistry);
         this.enviamentRepository = enviamentRepository;
         this.justificantEnviamentHelper = justificantEnviamentHelper;
 		this.conversioTipusHelper = conversioTipusHelper;
@@ -115,6 +114,7 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 			var propietats = configHelper.getAllEntityProperties(codiEntitat);
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (FirmaServidorPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(propietats, configuracioEspecifica);
+            plugin.init(meterRegistry, getCodiApp().name());
 			pluginMap.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {

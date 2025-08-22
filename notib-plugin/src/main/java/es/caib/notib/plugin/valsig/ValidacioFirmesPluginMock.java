@@ -1,10 +1,7 @@
 package es.caib.notib.plugin.valsig;
 
 
-
-import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
-import es.caib.comanda.ms.salut.model.IntegracioPeticions;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.validatesignature.api.IValidateSignaturePlugin;
 import es.caib.notib.plugin.validatesignature.api.SignatureRequestedInformation;
 import es.caib.notib.plugin.validatesignature.api.ValidateSignatureRequest;
@@ -13,7 +10,7 @@ import es.caib.notib.plugin.validatesignature.api.ValidationStatus;
 
 import java.util.Properties;
 
-public class ValidacioFirmesPluginMock implements IValidateSignaturePlugin {
+public class ValidacioFirmesPluginMock extends AbstractSalutPlugin implements IValidateSignaturePlugin {
 
     private Properties properties;
     private String propertyKeyBase;
@@ -68,18 +65,4 @@ public class ValidacioFirmesPluginMock implements IValidateSignaturePlugin {
         return validateSignatureResponse;
     }
 
-    @Override
-    public boolean teConfiguracioEspecifica() {
-        return false;
-    }
-
-    @Override
-    public EstatSalut getEstatPlugin() {
-        return EstatSalut.builder().estat(EstatSalutEnum.UP).latencia(1).build();
-    }
-
-    @Override
-    public IntegracioPeticions getPeticionsPlugin() {
-        return IntegracioPeticions.builder().build();
-    }
 }

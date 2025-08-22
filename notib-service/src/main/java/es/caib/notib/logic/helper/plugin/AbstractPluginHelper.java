@@ -11,6 +11,7 @@ import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.SalutPlugin;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,17 +40,20 @@ public abstract class AbstractPluginHelper<T extends SalutPlugin> {
 	protected final IntegracioHelper integracioHelper;
 	protected final ConfigHelper configHelper;
 	protected final EntitatRepository entitatRepository;
+    protected final MeterRegistry meterRegistry;
 
 //	protected IntegracioPeticions peticionsPlugin = IntegracioPeticions.builder().organOk(new HashMap<>()).organError(new HashMap<>()).build();
 	protected Map<String, T> pluginMap = new HashMap<>();
 
 	public AbstractPluginHelper(IntegracioHelper integracioHelper,
 								ConfigHelper configHelper,
-								EntitatRepository entitatRepository) {
+								EntitatRepository entitatRepository,
+                                MeterRegistry meterRegistry) {
 
 		this.integracioHelper = integracioHelper;
 		this.configHelper = configHelper;
 		this.entitatRepository = entitatRepository;
+        this.meterRegistry = meterRegistry;
 	}
 
 	protected String getCodiEntitatActual() {

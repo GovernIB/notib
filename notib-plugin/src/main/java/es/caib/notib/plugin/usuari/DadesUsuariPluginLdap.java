@@ -3,12 +3,10 @@
  */
 package es.caib.notib.plugin.usuari;
 
-import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
-import es.caib.comanda.ms.salut.model.IntegracioPeticions;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
@@ -16,8 +14,6 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -29,13 +25,10 @@ import java.util.Properties;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
-public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
+public class DadesUsuariPluginLdap extends AbstractSalutPlugin implements DadesUsuariPlugin {
 
 	private final Properties properties;
 
-//	public DadesUsuariPluginLdap(Properties properties) {
-//		this.properties = properties;
-//	}
 	public DadesUsuariPluginLdap(Properties properties, boolean configuracioEspecifica) {
 		this.properties = properties;
 		this.configuracioEspecifica = configuracioEspecifica;
@@ -46,8 +39,9 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 
 		log.debug("Consulta dels rols de l'usuari (usuariCodi=" + usuariCodi + ")");
 		try {
+            long startTime = System.currentTimeMillis();
 			var result = consultaRolsUsuari(getLdapFiltreCodi(), usuariCodi);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return result;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -60,8 +54,9 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 
 		log.debug("Consulta de les dades de l'usuari (usuariCodi=" + usuariCodi + ")");
 		try {
+            long startTime = System.currentTimeMillis();
 			var result = consultaUsuariUnic(getLdapFiltreCodi(), usuariCodi);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return result;
 		} catch (SistemaExternException ex) {
 			incrementarOperacioError();
@@ -77,8 +72,9 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 
 		log.debug("Consulta dels usuaris del grup (grupCodi=" + grupCodi + ")");
 		try {
+            long startTime = System.currentTimeMillis();
 			var result = consultaUsuaris(getLdapFiltreGrup(), grupCodi);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return result;
 		} catch (NamingException ex) {
 			incrementarOperacioError();
@@ -233,59 +229,6 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 	
 	private String getLdapExcloureMembre() {
 		return properties.getProperty("es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.ldap.excloure.membre");
-	}
-
-
-	// Mètodes de SALUT
-	// /////////////////////////////////////////////////////////////////////////////////////////////
-
-	private boolean configuracioEspecifica = false;
-	private int operacionsOk = 0;
-	private int operacionsError = 0;
-
-	@Synchronized
-	private void incrementarOperacioOk() {
-		operacionsOk++;
-	}
-
-	@Synchronized
-	private void incrementarOperacioError() {
-		operacionsError++;
-	}
-
-	@Synchronized
-	private void resetComptadors() {
-		operacionsOk = 0;
-		operacionsError = 0;
-	}
-
-	@Override
-	public boolean teConfiguracioEspecifica() {
-		return this.configuracioEspecifica;
-	}
-
-	@Override
-	public EstatSalut getEstatPlugin() {
-		try {
-			Instant start = Instant.now();
-			consultaUsuaris(getLdapFiltreCodi(), "fakeUser");
-			return EstatSalut.builder()
-					.latencia((int) Duration.between(start, Instant.now()).toMillis())
-					.estat(EstatSalutEnum.UP)
-					.build();
-		} catch (Exception ex) {
-			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
-		}
-	}
-
-	@Override
-	public IntegracioPeticions getPeticionsPlugin() {
-		IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
-				.totalOk(operacionsOk)
-				.totalError(operacionsError)
-				.build();
-		resetComptadors();
-		return integracioPeticions;
 	}
 
 }

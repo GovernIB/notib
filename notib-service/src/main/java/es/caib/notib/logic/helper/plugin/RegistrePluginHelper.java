@@ -52,6 +52,7 @@ import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -102,9 +103,10 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 								ArxiuPluginHelper arxiuPluginHelper,
 								GestioDocumentalPluginHelper gestioDocumentalPluginHelper,
 								NotificacioEnviamentRepository notificacioEnviamentRepository,
-								NotificacioRepository notificacioRepository) {
+								NotificacioRepository notificacioRepository,
+                                MeterRegistry meterRegistry) {
 
-		super(integracioHelper, configHelper, entitatRepository);
+		super(integracioHelper, configHelper, entitatRepository, meterRegistry);
 		this.cacheHelper = cacheHelper;
 		this.arxiuPluginHelper = arxiuPluginHelper;
 		this.gestioDocumentalPluginHelper = gestioDocumentalPluginHelper;
@@ -149,7 +151,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de registre";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			SubsistemesHelper.addErrorOperation(REG, System.currentTimeMillis() - start);
+			SubsistemesHelper.addErrorOperation(REG);
 			if (ex.getCause() != null) {
 				errorDescripcio += " :" + ex.getCause().getMessage();
 			}
@@ -190,7 +192,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de registre";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			SubsistemesHelper.addErrorOperation(REG, System.currentTimeMillis() - start);
+			SubsistemesHelper.addErrorOperation(REG);
 			if (ex.getCause() != null) {
 				errorDescripcio += " :" + ex.getCause().getMessage();
 			}
@@ -1003,7 +1005,8 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var configuracioEspecifica = configHelper.hasEntityGroupPropertiesModified(codiEntitat, getConfigGrup());
 			var propietats = configHelper.getAllEntityProperties(codiEntitat);
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (RegistrePlugin) clazz.getDeclaredConstructor(Properties.class, String.class, boolean.class).newInstance(propietats, codiEntitat, configuracioEspecifica);
+			plugin = (RegistrePlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(propietats, configuracioEspecifica);
+            plugin.init(meterRegistry, getCodiApp().name());
 			pluginMap.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {

@@ -19,6 +19,7 @@ import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.carpeta.CarpetaPlugin;
 import es.caib.notib.plugin.carpeta.MissatgeCarpetaParams;
 import es.caib.notib.plugin.carpeta.VincleInteressat;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -42,9 +43,10 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 	public CarpetaPluginHelper(IntegracioHelper integracioHelper,
                                ConfigHelper configHelper,
 							   EntitatRepository entitatRepository,
-                               NotificacioEventHelper eventHelper) {
+                               NotificacioEventHelper eventHelper,
+                               MeterRegistry meterRegistry) {
 
-		super(integracioHelper, configHelper, entitatRepository);
+		super(integracioHelper, configHelper, entitatRepository, meterRegistry);
 		this.eventHelper = eventHelper;
     }
 
@@ -182,7 +184,8 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 			var propietats = configHelper.getAllEntityProperties(entitatCodi);
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (CarpetaPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(propietats, configuracioEspecifica);
-			pluginMap.put(entitatCodi, plugin);
+			plugin.init(meterRegistry, getCodiApp().name());
+            pluginMap.put(entitatCodi, plugin);
 			return (CarpetaPlugin) plugin;
 		} catch (Exception ex) {
 			throw new SistemaExternException(IntegracioCodi.CARPETA.name(), "Error al crear la instància del plugin de CARPETA", ex);
