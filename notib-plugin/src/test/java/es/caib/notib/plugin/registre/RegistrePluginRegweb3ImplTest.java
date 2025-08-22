@@ -22,7 +22,7 @@ public class RegistrePluginRegweb3ImplTest {
         properties.setProperty("es.caib.notib.plugin.registre.namespaceuri", "urn:es:caib:regweb:ws:v1:services");
         properties.setProperty("es.caib.notib.plugin.registre.service.name", "RegwebFacadeService");
         properties.setProperty("es.caib.notib.plugin.registre.port.name", "RegwebFacade");
-        RegistrePluginRegweb3Impl registrePlugin = new RegistrePluginRegweb3Impl(properties, "A04003003", false);
+        RegistrePluginRegweb3Impl registrePlugin = new RegistrePluginRegweb3Impl(properties, false);
 
         // Invoke the method
         EstatSalut estatSalut = registrePlugin.getEstatPlugin();
@@ -40,7 +40,7 @@ public class RegistrePluginRegweb3ImplTest {
         properties.setProperty("es.caib.notib.plugin.registre.url", "https://fakeUrl/regweb3/ws/v3");
         properties.setProperty("es.caib.notib.plugin.registre.usuari", "$notib_regweb");
         properties.setProperty("es.caib.notib.plugin.registre.contrasenya", "notib_regweb");
-        RegistrePluginRegweb3Impl registrePlugin = new RegistrePluginRegweb3Impl(properties, "A04003003", false);
+        RegistrePluginRegweb3Impl registrePlugin = new RegistrePluginRegweb3Impl(properties, false);
 
         // Invoke the method
         EstatSalut result = registrePlugin.getEstatPlugin();

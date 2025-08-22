@@ -2,6 +2,7 @@ package es.caib.notib.api.interna.controller;
 
 import es.caib.comanda.ms.salut.model.AppInfo;
 import es.caib.comanda.ms.salut.model.SalutInfo;
+import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.SalutService;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public class SalutController {
 
     private final ServletContext servletContext;
     private final SalutService salutService;
+    private final AplicacioService aplicacioService;
 
     private ManifestInfo manifestInfo;
 
@@ -74,6 +76,12 @@ public class SalutController {
         }
 
         return manifestInfo;
+    }
+
+    @GetMapping("/metriques")
+    public String metriques(HttpServletRequest request) throws Exception {
+
+        return aplicacioService.getMetriques();
     }
 
     private ManifestInfo buildManifestInfo() throws IOException {

@@ -84,6 +84,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CIE;
 import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.NOT;
 
 /**
@@ -239,11 +240,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			log.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 			notificacioTableHelper.actualitzarRegistre(notificacio);
 			auditHelper.auditaNotificacio(notificacio, TipusOperacio.UPDATE, "NotificaV2Helper.notificacioEnviar");
-			SubsistemesHelper.addOperation(NOT, System.currentTimeMillis() - start, errorSbs);
+            if (errorSbs) {
+                SubsistemesHelper.addErrorOperation(NOT);
+            } else {
+                SubsistemesHelper.addSuccessOperation(NOT, System.currentTimeMillis() - start);
+            }
 			return notificacio;
 		} catch (Exception ex) {
 			log.error("Error inesperat enviant la notificacio", ex);
-			SubsistemesHelper.addErrorOperation(NOT, System.currentTimeMillis() - start);
+			SubsistemesHelper.addErrorOperation(NOT);
 			throw ex;
 		}
 	}

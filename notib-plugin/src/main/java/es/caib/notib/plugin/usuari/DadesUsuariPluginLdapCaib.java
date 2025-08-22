@@ -4,17 +4,15 @@
 package es.caib.notib.plugin.usuari;
 
 import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
 import es.caib.comanda.ms.salut.model.IntegracioPeticions;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
-import lombok.Synchronized;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.fundaciobit.pluginsib.userinformation.UserInfo;
 import org.fundaciobit.pluginsib.userinformation.ldap.LdapUserInformationPlugin;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -50,7 +48,7 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 
 	public DadesUsuariPluginLdapCaib(String propertyKeyBase, Properties properties, boolean configuracioEspecifica) {
 		super(propertyKeyBase, properties);
-		this.configuracioEspecifica = configuracioEspecifica;
+		salutPluginComponent.setConfiguracioEspecifica(configuracioEspecifica);
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.LDAP")));
 	}
 
@@ -59,11 +57,12 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 
 		logger.info("Consulta dels rols de l'usuari (usuariCodi=" + usuariCodi + ")");
 		try {
+            long startTime = System.currentTimeMillis();
 			var info = getRolesByUsername(usuariCodi);
-			incrementarOperacioOk();
+			salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return info != null && info.getRoles() != null ? List.of(info.getRoles()) : new ArrayList<>();
 		} catch (Exception ex) {
-			incrementarOperacioError();
+			salutPluginComponent.incrementarOperacioError();
 			throw new SistemaExternException("Error al consultar els rols de l'usuari (usuariCodi=" + usuariCodi + ")", ex);
 		}
 	}
@@ -73,13 +72,14 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 
 		logger.info("Consulta de les dades de l'usuari LDAP CAIB (usuariCodi=" + usuariCodi + ")");
 		try {
+            long startTime = System.currentTimeMillis();
 			UserInfo userInfo = getUserInfoByUserName(usuariCodi);
-			incrementarOperacioOk();
+			salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			var dadesUsuari = toDadesUsuari(userInfo);
 			logger.info("Dades d'usuari " + dadesUsuari);
 			return dadesUsuari;
 		} catch (Exception ex) {
-			incrementarOperacioError();
+			salutPluginComponent.incrementarOperacioError();
 			throw new SistemaExternException("Error al consultar l'usuari amb codi " + usuariCodi, ex);
 		}
 	}
@@ -89,9 +89,10 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 
 		logger.info("Consulta dels usuaris del grup LDAP CAIB (grupCodi=" + grupCodi + ")");
 		try {
+            long startTime = System.currentTimeMillis();
 			List<DadesUsuari> dadesUsuaris = new ArrayList<>();
 			String [] codisUsuaris = this.getUsernamesByRol(grupCodi);
-			incrementarOperacioOk();
+			salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			if (codisUsuaris == null) {
 				return dadesUsuaris;
 			}
@@ -110,7 +111,7 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 			}
 			return dadesUsuaris;
 		} catch (Exception ex) {
-			incrementarOperacioError();
+			salutPluginComponent.incrementarOperacioError();
 			throw new SistemaExternException("Error al consultar els usuaris del grup LDAP CAIB " + grupCodi, ex);
 		}
 	}
@@ -132,55 +133,26 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 		return dadesUsuari;
 	}
 
-	// Mètodes de SALUT
-	// /////////////////////////////////////////////////////////////////////////////////////////////
+    // Mètodes de SALUT
+    // /////////////////////////////////////////////////////////////////////////////////////////////
+    private AbstractSalutPlugin salutPluginComponent = new AbstractSalutPlugin();
+    public void init(MeterRegistry registry, String codiPlugin) {
+        salutPluginComponent.init(registry, codiPlugin);
+    }
 
-	private boolean configuracioEspecifica = false;
-	private int operacionsOk = 0;
-	private int operacionsError = 0;
+    @Override
+    public boolean teConfiguracioEspecifica() {
+        return salutPluginComponent.teConfiguracioEspecifica();
+    }
 
-	@Synchronized
-	private void incrementarOperacioOk() {
-		operacionsOk++;
-	}
+    @Override
+    public EstatSalut getEstatPlugin() {
+        return salutPluginComponent.getEstatPlugin();
+    }
 
-	@Synchronized
-	private void incrementarOperacioError() {
-		operacionsError++;
-	}
+    @Override
+    public IntegracioPeticions getPeticionsPlugin() {
+        return salutPluginComponent.getPeticionsPlugin();
+    }
 
-	@Synchronized
-	private void resetComptadors() {
-		operacionsOk = 0;
-		operacionsError = 0;
-	}
-
-	@Override
-	public boolean teConfiguracioEspecifica() {
-		return this.configuracioEspecifica;
-	}
-
-	@Override
-	public EstatSalut getEstatPlugin() {
-		try {
-			Instant start = Instant.now();
-			consultarAmbCodi("fakeUser");
-			return EstatSalut.builder()
-					.latencia((int) Duration.between(start, Instant.now()).toMillis())
-					.estat(EstatSalutEnum.UP)
-					.build();
-		} catch (Exception ex) {
-			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
-		}
-	}
-
-	@Override
-	public IntegracioPeticions getPeticionsPlugin() {
-		IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
-				.totalOk(operacionsOk)
-				.totalError(operacionsError)
-				.build();
-		resetComptadors();
-		return integracioPeticions;
-	}
 }

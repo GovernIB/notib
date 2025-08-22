@@ -14,6 +14,7 @@
 		<resources>
 			<resource-root path="classgraph-*.jar"/>
 			<resource-root path="commons-lang3-*.jar"/>
+			<resource-root path="micrometer-*.jar"/>
 			<resource-root path="jackson-*.jar"/>
 			<resource-root path="jakarta.activation-api-*.jar"/>
 			<resource-root path="jakarta.annotation-api-*.jar"/>
@@ -72,6 +73,7 @@
 		</exclude-subsystems>
 		<dependencies>
 			<module name="jdk.management"/>
+            <module name="deployment.notib-service-intf"/>
 		</dependencies>
 	</sub-deployment>
 	<sub-deployment name="notib-api-interna.war">

@@ -10,12 +10,9 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
-import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
-import es.caib.comanda.ms.salut.model.IntegracioPeticions;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.ejb.CreateException;
@@ -26,8 +23,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.rmi.RemoteException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +30,7 @@ import java.util.Map;
 import java.util.Properties;
 
 @Slf4j
-public class GestorContingutsAdministratiuPluginRolsac implements GestorContingutsAdministratiuPlugin {
+public class GestorContingutsAdministratiuPluginRolsac extends AbstractSalutPlugin implements GestorContingutsAdministratiuPlugin {
 	
 	private static final String ROLSAC_SERVICE_PATH = "api/rest/v1/";
 	private static Map<String, String> unitatsAdministratives = new HashMap<>();
@@ -52,11 +47,6 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-//	public GestorContingutsAdministratiuPluginRolsac(Properties properties) {
-//		this.properties = properties;
-//		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.ROLSAC")));
-//	}
-
 	public GestorContingutsAdministratiuPluginRolsac(Properties properties, boolean configuracioEspecifica) {
 		this.properties = properties;
 		this.configuracioEspecifica = configuracioEspecifica;
@@ -68,6 +58,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 		var procSer = isServei ? "servei" : "procediment";
 		try {
+            long startTime = System.currentTimeMillis();
 			var url = getBaseUrl() + ROLSAC_SERVICE_PATH + (isServei ? SERVICIOS : PROCEDIMIENTOS);
 			logger.info("[ROLSAC] Obtinguent el " + procSer + " amb codi " + codiSia + " url " + url);
 			var jerseyClient = generarClient();
@@ -79,7 +70,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			var mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			var result = isServei ? getServeiByCodiSia(mapper, json) :getProcedimentByCodiSia(mapper, json);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return result;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -112,6 +103,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 		List<Procediment> procediments = new ArrayList<>();
 		try {
+            long startTime = System.currentTimeMillis();
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + PROCEDIMIENTOS;
 			logger.info("[ROLSAC] Obtinguent tots els procediments de la url " + urlAmbMetode);
 			var jerseyClient = generarClient();
@@ -127,7 +119,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 				procediments = resposta.getResultado();
 			}
 			var result = toProcedimentDto(procediments);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return result;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -140,6 +132,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 		List<Procediment> procediments = new ArrayList<>();
 		try {
+            long startTime = System.currentTimeMillis();
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + PROCEDIMIENTOS;
 			logger.info("[ROLSAC] Obtinguent tots els procediments (pagina " + numPagina + ") per la unitat " + codi + " de la url " + urlAmbMetode);
 			var jerseyClient = generarClient();
@@ -155,7 +148,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 				procediments = resposta.getResultado();
 			}
 			var result = toProcedimentDto(procediments);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return result;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -168,6 +161,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 		List<Procediment> procediments = new ArrayList<>();
 		try {
+            long startTime = System.currentTimeMillis();
 			var numElements = getTotalProcediments(codi);
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + PROCEDIMIENTOS;
 			logger.info("[ROLSAC] Obtinguent tots els procediments per la unitat " + codi + " de la url " + urlAmbMetode);
@@ -184,7 +178,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 				procediments = resposta.getResultado();
 			}
 			var result = toProcedimentDto(procediments);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return result;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -227,6 +221,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 		var numeroElements = 0;
 		try {
+            long startTime = System.currentTimeMillis();
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + PROCEDIMIENTOS;
 			logger.info("[ROLSAC] Obtinguent el total de procediments de la unitat administrativa " + codi + " de la url " + urlAmbMetode);
 			var jerseyClient = generarClient();
@@ -241,7 +236,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				numeroElements = resposta.getNumeroElementos();
 			}
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return numeroElements;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -254,6 +249,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 		List<Servei> serveis = new ArrayList<>();
 		try {
+            long startTime = System.currentTimeMillis();
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + SERVICIOS;
 			logger.info("[ROLSAC] Obtinguent tots els serveis de la url " + urlAmbMetode);
 			var jerseyClient = generarClient();
@@ -269,7 +265,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 				serveis = resposta.getResultado();
 			}
 			var result = toServeiDto(serveis);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return result;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -282,6 +278,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 		List<Servei> serveis = new ArrayList<>();
 		try {
+            long startTime = System.currentTimeMillis();
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + SERVICIOS;
 			logger.info("[ROLSAC] Obtinguent tots els serveis (pagina " + numPagina + ") per la unitat " + codi + " de la url " + urlAmbMetode);
 			Client jerseyClient = generarClient();
@@ -297,7 +294,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 				serveis = resposta.getResultado();
 			}
 			var result = toServeiDto(serveis);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return result;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -310,6 +307,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 		List<Servei> serveis = new ArrayList<>();
 		try {
+            long startTime = System.currentTimeMillis();
 			var numElements = getTotalServeis(codi);
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + SERVICIOS;
 			logger.info("[ROLSAC] Obtinguent tots els serveis de la unitat administrativa " + codi + " de la url " + urlAmbMetode);
@@ -326,7 +324,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 				serveis = resposta.getResultado();
 			}
 			var result = toServeiDto(serveis);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return result;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -339,6 +337,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 		var numeroElements = 0;
 		try {
+            long startTime = System.currentTimeMillis();
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + SERVICIOS;
 			logger.info("[ROLSAC] Obtinguent el total de serveis de la unitat administrativa " + codi + " de la url " + urlAmbMetode);
 			var jerseyClient = generarClient();
@@ -353,7 +352,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			if (resposta != null) {
 				numeroElements = resposta.getNumeroElementos();
 			}
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return numeroElements;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -488,59 +487,6 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 		var isBasicAuth = properties.getProperty("es.caib.notib.plugin.gesconadm.basic.authentication");
 		return Strings.isNullOrEmpty(isBasicAuth) || Boolean.parseBoolean(isBasicAuth);
-	}
-
-
-	// Mètodes de SALUT
-	// /////////////////////////////////////////////////////////////////////////////////////////////
-
-	private boolean configuracioEspecifica = false;
-	private int operacionsOk = 0;
-	private int operacionsError = 0;
-
-	@Synchronized
-	private void incrementarOperacioOk() {
-		operacionsOk++;
-	}
-
-	@Synchronized
-	private void incrementarOperacioError() {
-		operacionsError++;
-	}
-
-	@Synchronized
-	private void resetComptadors() {
-		operacionsOk = 0;
-		operacionsError = 0;
-	}
-
-	@Override
-	public boolean teConfiguracioEspecifica() {
-		return this.configuracioEspecifica;
-	}
-
-	@Override
-	public EstatSalut getEstatPlugin() {
-		try {
-			Instant start = Instant.now();
-			getProcedimentsByUnitat("000000000");
-			return EstatSalut.builder()
-					.latencia((int) Duration.between(start, Instant.now()).toMillis())
-					.estat(EstatSalutEnum.UP)
-					.build();
-		} catch (Exception ex) {
-			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
-		}
-	}
-
-	@Override
-	public IntegracioPeticions getPeticionsPlugin() {
-		IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
-				.totalOk(operacionsOk)
-				.totalError(operacionsError)
-				.build();
-		resetComptadors();
-		return integracioPeticions;
 	}
 
 }

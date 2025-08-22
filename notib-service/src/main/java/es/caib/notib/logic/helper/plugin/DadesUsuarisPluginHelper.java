@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -38,9 +39,10 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 
 	public DadesUsuarisPluginHelper(IntegracioHelper integracioHelper,
                                     ConfigHelper configHelper,
-									EntitatRepository entitatRepository) {
+									EntitatRepository entitatRepository,
+                                    MeterRegistry meterRegistry) {
 
-		super(integracioHelper, configHelper, entitatRepository);
+		super(integracioHelper, configHelper, entitatRepository, meterRegistry);
     }
 
 	@Override
@@ -140,6 +142,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 			plugin = pluginClass.endsWith("DadesUsuariPluginKeycloak") || pluginClass.endsWith("DadesUsuariPluginLdapCaib") ?
 							(DadesUsuariPlugin) clazz.getDeclaredConstructor(String.class, Properties.class, boolean.class).newInstance(propertyKeyBase, properties, false)
 							: (DadesUsuariPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(properties, false);
+            plugin.init(meterRegistry, getCodiApp().name());
 			pluginMap.put(GLOBAL, plugin);
 			return plugin;
 		} catch (Exception ex) {

@@ -155,7 +155,7 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+    @PermitAll
 	public String getMetrics() {
 		return getDelegateService().getMetrics();
 	}
@@ -244,4 +244,9 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 		getDelegateService().restartSmBroker();
 	}
 
+    @Override
+    @PermitAll
+    public String getMetriques() throws Exception {
+        return getDelegateService().getMetriques();
+    }
 }

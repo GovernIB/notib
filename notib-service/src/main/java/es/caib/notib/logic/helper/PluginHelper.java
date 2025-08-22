@@ -29,6 +29,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
+import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -99,6 +100,7 @@ public class PluginHelper {
 	private final FirmaPluginHelper firmaPluginHelper;
 	private final ValidaSignaturaPluginHelper validaSignaturaPluginHelper;
 	private final CarpetaPluginHelper carpetaPluginHelper;
+    private final CiePluginHelper ciePluginHelper;
 
 	private final ConfigHelper configHelper;
 	private final OrganGestorRepository organGestorRepository;
@@ -233,7 +235,6 @@ public class PluginHelper {
 	public DocumentContingut arxiuGetImprimible(String id, boolean isUuid) {
 		return arxiuPluginHelper.arxiuGetImprimible(id, isUuid);
 	}
-	
 	
 	// GESTOR DOCUMENTAL
 	// /////////////////////////////////////////////////////////////////////////////////////
@@ -497,6 +498,9 @@ public class PluginHelper {
 			case "CARPETA":
 				carpetaPluginHelper.resetPlugin();
 				break;
+            case "CIE":
+                ciePluginHelper.resetPlugin();
+                break;
 			default:
 				break;
 		}
@@ -513,6 +517,7 @@ public class PluginHelper {
 		registrePluginHelper.resetPlugin();
 		unitatsOrganitzativesPluginHelper.resetPlugin();
 		carpetaPluginHelper.resetPlugin();
+        ciePluginHelper.resetPlugin();
 	}
 
 //	public List<IntegracioSalut> getPeticionsPluginsAndReset() {
@@ -706,7 +711,8 @@ public class PluginHelper {
 				gestorDocumentalAdministratiuPluginHelper,
 				registrePluginHelper,
 				unitatsOrganitzativesPluginHelper,
-				carpetaPluginHelper
+				carpetaPluginHelper,
+                ciePluginHelper
 		);
 	}
 

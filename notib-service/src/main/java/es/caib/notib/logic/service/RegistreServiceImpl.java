@@ -175,7 +175,7 @@ public class RegistreServiceImpl implements RegistreService {
             var error = "[SIR ADVISER] Error sincronitzant l'enviament SIR ";
             log.error(error, ex);
             integracioHelper.addAccioError(info, error + ex.getMessage());
-            SubsistemesHelper.addErrorOperation(CSR, System.currentTimeMillis() - start);
+            SubsistemesHelper.addErrorOperation(CSR);
             return RespostaSirAdviser.builder().ok(false).errorDescripcio("Error inesperat al sincronitzar l'enviament SIR " + ex.getMessage()).build();
         }
     }

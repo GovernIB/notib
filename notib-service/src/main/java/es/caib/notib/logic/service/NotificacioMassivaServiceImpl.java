@@ -371,7 +371,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             return conversioTipusHelper.convertir(notificacioMassivaEntity, NotificacioMassivaDataDto.class);
         } catch (Throwable t) {
             log.error("[NOT-MASSIVA] Error no controlat en l'enviament massiu", t);
-            SubsistemesHelper.addErrorOperation(MAS, System.currentTimeMillis() - start);
+            SubsistemesHelper.addErrorOperation(MAS);
             throw new RegistreNotificaException(t.getMessage());
         } finally {
             metricsHelper.fiMetrica(timer);

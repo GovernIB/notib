@@ -12,6 +12,7 @@ import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -33,8 +34,9 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 
 	public GestorDocumentalAdministratiuPluginHelper(IntegracioHelper integracioHelper,
                                                      ConfigHelper configHelper,
-                                                     EntitatRepository entitatRepository) {
-		super(integracioHelper, configHelper, entitatRepository);
+                                                     EntitatRepository entitatRepository,
+                                                     MeterRegistry meterRegistry) {
+		super(integracioHelper, configHelper, entitatRepository, meterRegistry);
 	}
 
 
@@ -331,6 +333,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 			var propietats = configHelper.getAllEntityProperties(codiEntitat);
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (GestorContingutsAdministratiuPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(propietats, configuracioEspecifica);
+            plugin.init(meterRegistry, getCodiApp().name());
 			pluginMap.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {

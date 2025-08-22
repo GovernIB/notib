@@ -8,18 +8,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
-import es.caib.comanda.ms.salut.model.IntegracioPeticions;
 import es.caib.dir3caib.ws.api.catalogo.CatPais;
 import es.caib.dir3caib.ws.api.oficina.OficinaTF;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -32,8 +26,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -48,7 +40,7 @@ import java.util.Properties;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
-public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlugin {
+public class UnitatsOrganitzativesPluginDir3 extends AbstractSalutPlugin implements UnitatsOrganitzativesPlugin {
 	
 	private static final String SERVEI_CERCA = "/rest/busqueda/";
 	private static final String SERVEI_CATALEG = "/rest/catalogo/";
@@ -63,12 +55,6 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-//	public UnitatsOrganitzativesPluginDir3(Properties properties) {
-//
-//		this.properties = properties;
-//		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.UNITATS")));
-//	}
-
 	public UnitatsOrganitzativesPluginDir3(Properties properties, boolean configuracioEspecifica) {
 		this.properties = properties;
 		this.configuracioEspecifica = configuracioEspecifica;
@@ -80,6 +66,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 
 		Map<String, NodeDir3> organigrama = new HashMap<>();
 		try {
+            long startTime = System.currentTimeMillis();
 			var url = new URL(getServiceUrl() + SERVEI_ORGANIGRAMA + "?codigo=" + codiEntitat);
 			logger.info("[UNITATS] Consulta organigrama per entitat " + codiEntitat + " url" + url);
 			var httpConnection = (HttpURLConnection)url.openConnection();
@@ -93,7 +80,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 				var arrel = mapper.readValue(response, NodeDir3.class);
 				nodeToOrganigrama(arrel, organigrama);
 			}
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return organigrama;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -121,7 +108,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 
 
 		try {
-
+            long startTime = System.currentTimeMillis();
 			var url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerArbolUnidades?codigo=" + pareCodi +
 					(fechaActualizacion != null ? FECHA_ACT_PARAM + fechaActualizacion : "") +
 					(fechaSincronizacion != null ? FECHA_SINC_PARAM + fechaSincronizacion : ""));
@@ -130,11 +117,11 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			var mapper = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			if (response == null || response.length == 0) {
-				incrementarOperacioOk();
+				incrementarOperacioOk(System.currentTimeMillis() - startTime);
 				return new HashMap<>();
 			}
 			List<UnitatOrganitzativa> arbol = mapper.readValue(response, new TypeReference<>() {});
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return emplenearOrganigrama(pareCodi, arbol);
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -172,13 +159,14 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	@Override
 	public byte[] findAmbPareJson(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 		try {
+            long startTime = System.currentTimeMillis();
 			DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			var url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerArbolUnidades?codigo=" + pareCodi + "&denominacionCooficial=false" +
 					(dataActualitzacio != null ? FECHA_ACT_PARAM + sdf.format(dataActualitzacio) : "") +
 					(dataSincronitzacio != null ? FECHA_SINC_PARAM + sdf.format(dataSincronitzacio) : ""));
 			logger.info("[UNITATS] Consulta organigrama JSON per entitat. Codi pare " + pareCodi + " `data actualitzacio" + dataActualitzacio + " data sincronitzacio " + dataSincronitzacio + " url " + url);
 			byte[] response = getResponse(url);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return response;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -190,6 +178,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	public List<NodeDir3> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 
 		try {
+            long startTime = System.currentTimeMillis();
 			DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			List<NodeDir3> unitats = new ArrayList<>();
 			List<UnitatOrganitzativa> unidades = new ArrayList<>();
@@ -208,7 +197,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 					unitats.add(toNodeDir3(unidad));
 				}
 			}
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return unitats;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -220,6 +209,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	public NodeDir3 findAmbCodi(String codi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 
 		try {
+            long startTime = System.currentTimeMillis();
 			UnitatOrganitzativa unidad = null;
 			var url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerUnidad?codigo=" + codi + "&denominacionCooficial=false" +
 					(dataActualitzacio != null ? FECHA_ACT_PARAM + dataActualitzacio : "") +
@@ -231,7 +221,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			if (response != null && response.length > 0) {
 				unidad = mapper.readValue(response, UnitatOrganitzativa.class);
 			}
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return unidad != null ? toNodeDir3(unidad) : null;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -259,6 +249,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 
 		List<ObjetoDirectorio> unitats = new ArrayList<>();
 		try {
+            long startTime = System.currentTimeMillis();
 			var url = new URL(getServiceUrl() + SERVEI_UNITAT + "arbolUnidades?codigo=" + codiEntitat);
 			logger.info("[UNITATS] Consulta les untiats per la entitat " + codiEntitat + " inclourePare " + inclourePare + " url " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
@@ -278,7 +269,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 				unitats.add(pare);
 			}
 			Collections.sort(unitats);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return unitats;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -290,6 +281,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	public String unitatDenominacio(String codiDir3) throws SistemaExternException {
 
 		try {
+            long startTime = System.currentTimeMillis();
 			URL url = new URL(getServiceUrl() + SERVEI_UNITAT + "denominacion?codigo=" + codiDir3);
 			logger.info("[UNITATS] Consulta la denominacio per la unitat " + codiDir3 + " url " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
@@ -299,7 +291,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			var result = IOUtils.toString(httpConnection.getInputStream(), StandardCharsets.ISO_8859_1);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return result;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -313,6 +305,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 
 		List<NodeDir3> unitats = new ArrayList<>();
 		try {
+            long startTime = System.currentTimeMillis();
 			var url = new URL(getServiceUrl() + SERVEI_CERCA + "organismos?" + "codigo=" + (codi != null ? codi : "")
 					+ "&denominacion=" + (denominacio != null ? denominacio : "")
 					+ "&codNivelAdministracion=" + (nivellAdministracio != null ? nivellAdministracio : "-1")
@@ -334,7 +327,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 				unitats = mapper.readValue(response, TypeFactory.defaultInstance().constructCollectionType(List.class, NodeDir3.class));
 				Collections.sort(unitats);
 			}
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return unitats;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -356,6 +349,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 
 		List<ObjetoDirectorio> unitats = new ArrayList<>();
 		try {
+            long startTime = System.currentTimeMillis();
 			var url = new URL(getServiceUrl() + SERVEI_UNITAT + "unidadesDenominacion?denominacion=" + denominacio);
 			logger.info("[UNITATS] Consulta unitats amb denominacio " + denominacio + " url " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
@@ -368,7 +362,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			if (response != null && response.length > 0) {
 				unitats = mapper.readValue(response, TypeFactory.defaultInstance().constructCollectionType(List.class, ObjetoDirectorio.class));
 			}
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return unitats;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -380,6 +374,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	public List<NodeDir3> cercaOficines(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma, Long provincia, String municipi) throws SistemaExternException {
 
 		try {
+            long startTime = System.currentTimeMillis();
 			var url = new URL(getServiceUrl() + SERVEI_CERCA
 					+ "oficinas?"
 					+ "codigo=" + (codi != null ? codi : "")
@@ -399,7 +394,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			List<NodeDir3> oficines = mapper.readValue(httpConnection.getInputStream(), TypeFactory.defaultInstance().constructCollectionType(List.class, NodeDir3.class));
 			Collections.sort(oficines);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return oficines;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -413,6 +408,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	public List<CodiValor> nivellsAdministracio() throws SistemaExternException {
 
 		try {
+            long startTime = System.currentTimeMillis();
 			var url = new URL(getServiceUrl() + SERVEI_CATALEG + "nivelesAdministracion");
 			logger.info("[UNITATS] Consulta nivells administracio url " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
@@ -423,7 +419,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			List<CodiValor> nivellsAdministracio = mapper.readValue(httpConnection.getInputStream(), TypeFactory.defaultInstance().constructCollectionType(List.class, CodiValor.class));
 			Collections.sort(nivellsAdministracio);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return nivellsAdministracio;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -435,6 +431,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	public List<CodiValorPais> paisos() throws SistemaExternException {
 
 		List<CodiValorPais> paisos = new ArrayList<>();
+        long startTime = System.currentTimeMillis();
 		try {
 			URL url = new URL(getServiceUrl() + SERVEI_CATALEG + "paises?estado=V");
 			logger.info("[UNITATS] Consulta paisos url " + url);
@@ -458,13 +455,14 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			incrementarOperacioError();
 			throw new SistemaExternException("No s'han pogut consultar els paisos", ex);
 		}
-		incrementarOperacioOk();
+		incrementarOperacioOk(System.currentTimeMillis() - startTime);
 		return paisos;
 	}
 	
 	@Override
 	public List<CodiValor> comunitatsAutonomes() throws SistemaExternException {
 		try {
+            long startTime = System.currentTimeMillis();
 			URL url = new URL(getServiceUrl() + SERVEI_CATALEG + "comunidadesAutonomas");
 			logger.info("[UNITATS] Consulta comunitats autonomes url " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
@@ -475,7 +473,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			List<CodiValor> nivellsAdministracio = mapper.readValue(httpConnection.getInputStream(), TypeFactory.defaultInstance().constructCollectionType(List.class, CodiValor.class));
 			Collections.sort(nivellsAdministracio);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return nivellsAdministracio;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -487,6 +485,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	public List<CodiValor> provincies() throws SistemaExternException {
 
 		try {
+            long startTime = System.currentTimeMillis();
 			var url = new URL(getServiceUrl() + SERVEI_CATALEG + "provincias");
 			logger.info("[UNITATS] Consulta provincies url " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
@@ -498,7 +497,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			List<CodiValor> provincies = mapper.readValue(httpConnection.getInputStream(), TypeFactory.defaultInstance().constructCollectionType(List.class, CodiValor.class));
 			Collections.sort(provincies);
 			var result = afegirZerosProvincies(provincies);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return result;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -510,6 +509,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	public List<CodiValor> provincies(String codiCA) throws SistemaExternException {
 
 		try {
+            long startTime = System.currentTimeMillis();
 			var url = new URL(getServiceUrl() + SERVEI_CATALEG + "provincias/comunidadAutonoma?id=" + codiCA);
 			logger.info("[UNITATS] Consulta provincies de la comunitat autonoma " + codiCA + " url " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
@@ -520,7 +520,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			List<CodiValor> provincies = mapper.readValue(httpConnection.getInputStream(), TypeFactory.defaultInstance().constructCollectionType(List.class, CodiValor.class));Collections.sort(provincies);
 			var result = afegirZerosProvincies(provincies);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return result;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -545,6 +545,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	public List<CodiValor> localitats(String codiProvincia) throws SistemaExternException {
 
 		try {
+            long startTime = System.currentTimeMillis();
 			var url = new URL(getServiceUrl() + SERVEI_CATALEG
 					+ "localidades/provincia/entidadGeografica?"
 					+ "codigoProvincia=" + codiProvincia
@@ -568,7 +569,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 				}
 				localitat.setId(cp + id);
 			}
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return localitats;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -582,6 +583,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 		List<OficinaSir> oficinesSIR = new ArrayList<>();
 		List<OficinaTF> oficinesWS = new ArrayList<>();
 		try {
+            long startTime = System.currentTimeMillis();
 			getOficinesUnitatSuperior(unitat, oficinesWS, arbreUnitats);
 			for (OficinaTF oficinaTF : oficinesWS) {
 				OficinaSir oficinaSIR = new OficinaSir();
@@ -589,7 +591,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 				oficinaSIR.setNom(oficinaTF.getDenominacion());
 				oficinesSIR.add(oficinaSIR);
 			}
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return oficinesSIR;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -603,6 +605,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 		List<OficinaSir> oficines = new ArrayList<>();
 		List<OficinaTF> oficinesWS = new ArrayList<>();
 		try {
+            long startTime = System.currentTimeMillis();
 			var url = new URL(getServiceUrl() + SERVEI_OFICINES + "obtenerArbolOficinas?codigo=" + entitat);
 			logger.info("[UNITATS] Consulta oficines de la entitat " + entitat + " url " + url);
 			byte[] response = getResponse(url);
@@ -620,7 +623,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 						.sir(oficinaTF.getSirOfi() != null && !oficinaTF.getSirOfi().isEmpty())
 						.build());
 			}
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return oficines;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -701,63 +704,6 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 		reqContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpoint);
 		reqContext.put(BindingProvider.USERNAME_PROPERTY, usr);
 		reqContext.put(BindingProvider.PASSWORD_PROPERTY, pwd);
-	}
-
-
-	// Mètodes de SALUT
-	// /////////////////////////////////////////////////////////////////////////////////////////////
-
-	private boolean configuracioEspecifica = false;
-	private int operacionsOk = 0;
-	private int operacionsError = 0;
-
-	@Synchronized
-	private void incrementarOperacioOk() {
-		operacionsOk++;
-	}
-
-	@Synchronized
-	private void incrementarOperacioError() {
-		operacionsError++;
-	}
-
-	@Synchronized
-	private void resetComptadors() {
-		operacionsOk = 0;
-		operacionsError = 0;
-	}
-
-	@Override
-	public boolean teConfiguracioEspecifica() {
-		return this.configuracioEspecifica;
-	}
-
-	@Override
-	public EstatSalut getEstatPlugin() {
-		try {
-			Instant start = Instant.now();
-			String url = getServiceUrl() + SERVEI_CERCA + "organismos?codigo=fakeUnitat&denominacion=&codNivelAdministracion=-1&codComunidadAutonoma=-1&conOficinas=false&unidadRaiz=false&provincia=-1&localidad=-1&vigentes=true";
-			WebResource webResource = Client.create().resource(url);
-			ClientResponse response = webResource.get(ClientResponse.class);
-//			cercaUnitats("fakeUnitat", null, null, null, null, null, null, null);
-			if (response.getStatus() == 204 || response.getStatus() == 200) {
-				return EstatSalut.builder()
-						.latencia((int) Duration.between(start, Instant.now()).toMillis())
-						.estat(EstatSalutEnum.UP)
-						.build();
-			}
-		} catch (Exception ex) {}
-		return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
-	}
-
-	@Override
-	public IntegracioPeticions getPeticionsPlugin() {
-		IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
-				.totalOk(operacionsOk)
-				.totalError(operacionsError)
-				.build();
-		resetComptadors();
-		return integracioPeticions;
 	}
 
 }

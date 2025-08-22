@@ -3,12 +3,9 @@
  */
 package es.caib.notib.plugin.firmaservidor;
 
-import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
-import es.caib.comanda.ms.salut.model.IntegracioPeticions;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.fundaciobit.apisib.apifirmasimple.v1.ApiFirmaEnServidorSimple;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleAvailableProfile;
@@ -21,8 +18,6 @@ import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleSignedFileInfo;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStatus;
 import org.fundaciobit.apisib.apifirmasimple.v1.jersey.ApiFirmaEnServidorSimpleJersey;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.Properties;
 
@@ -33,19 +28,13 @@ import java.util.Properties;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
-public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
+public class FirmaSimpleServidorPluginPortafib extends AbstractSalutPlugin implements FirmaServidorPlugin {
 
 	private static final String PROPERTIES_BASE = "es.caib.notib.plugin.firmaservidor.portafib.";
 
 	private final Properties properties;
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
-
-//	public FirmaSimpleServidorPluginPortafib(Properties properties) {
-//
-//		this.properties = properties;
-//		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.FIRMA_SERVIDOR")));
-//	}
 
 	public FirmaSimpleServidorPluginPortafib(Properties properties, boolean configuracioEspecifica) {
 
@@ -61,6 +50,7 @@ public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
 
 	public byte[] signar(String id, String nom, String motiu, String tipusFirma, byte[] contingut, String tipusDocumental) {
 
+        long startTime = System.currentTimeMillis();
 		ApiFirmaEnServidorSimple api = new ApiFirmaEnServidorSimpleJersey(getPropertyEndpoint(), getPropertyUsername(), getPropertyPassword());
 		FirmaSimpleFile fileToSign = new FirmaSimpleFile(nom, "application/pdf", contingut);
 		FirmaSimpleSignatureResult result;
@@ -69,7 +59,7 @@ public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
 			String perfil = getPropertyPerfil();
 			result = internalSignDocument(api, perfil, fileToSign, motiu, tipusDocumental);
 			var resultat = result.getSignedFile().getData();
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return resultat;
 		} catch (Exception e) {
 			incrementarOperacioError();
@@ -167,60 +157,6 @@ public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
 
 	private String getPropertyUsuariFirma() {
 		return properties.getProperty(PROPERTIES_BASE + "username");
-	}
-
-
-	// Mètodes de SALUT
-	// /////////////////////////////////////////////////////////////////////////////////////////////
-
-	private boolean configuracioEspecifica = false;
-	private int operacionsOk = 0;
-	private int operacionsError = 0;
-
-	@Synchronized
-	private void incrementarOperacioOk() {
-		operacionsOk++;
-	}
-
-	@Synchronized
-	private void incrementarOperacioError() {
-		operacionsError++;
-	}
-
-	@Synchronized
-	private void resetComptadors() {
-		operacionsOk = 0;
-		operacionsError = 0;
-	}
-
-	@Override
-	public boolean teConfiguracioEspecifica() {
-		return this.configuracioEspecifica;
-	}
-
-	@Override
-	public EstatSalut getEstatPlugin() {
-		try {
-			Instant start = Instant.now();
-			ApiFirmaEnServidorSimple api = new ApiFirmaEnServidorSimpleJersey(getPropertyEndpoint(), getPropertyUsername(), getPropertyPassword());
-			api.getAvailableProfiles("ca");
-			return EstatSalut.builder()
-					.latencia((int) Duration.between(start, Instant.now()).toMillis())
-					.estat(EstatSalutEnum.UP)
-					.build();
-		} catch (Exception ex) {
-			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
-		}
-	}
-
-	@Override
-	public IntegracioPeticions getPeticionsPlugin() {
-		IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
-				.totalOk(operacionsOk)
-				.totalError(operacionsError)
-				.build();
-		resetComptadors();
-		return integracioPeticions;
 	}
 
 }

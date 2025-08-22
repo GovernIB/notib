@@ -7,32 +7,21 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
-import es.caib.comanda.ms.salut.model.IntegracioPeticions;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Properties;
 
 @Slf4j
-public class CarpetaCaibImpl implements CarpetaPlugin {
+public class CarpetaCaibImpl extends AbstractSalutPlugin implements CarpetaPlugin {
 
     private Client client;
     private final Properties properties;
 
     private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
-
-//    public CarpetaCaibImpl(Properties properties) {
-//
-//        this.properties = properties;
-//        logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.CARPETA")));
-//    }
 
     public CarpetaCaibImpl(Properties properties, boolean configuracioEspecifica) {
         this.properties = properties;
@@ -46,6 +35,7 @@ public class CarpetaCaibImpl implements CarpetaPlugin {
         log.info("[CARPETA] Enviant avís a CARPETA");
         RespostaSendNotificacioMovil resposta = null;
         try {
+            long startTime = System.currentTimeMillis();
             if (params.getTipus() == null) {
                 throw new Exception("No es pot enviar la notificació mòvil. Tipus = null");
             }
@@ -69,7 +59,7 @@ public class CarpetaCaibImpl implements CarpetaPlugin {
             mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             resposta = mapper.readValue(jsonResposta, RespostaSendNotificacioMovil.class);
             log.info("[CARPETA] Avís enviat a CARPETA");
-            incrementarOperacioOk();
+            incrementarOperacioOk(System.currentTimeMillis() - startTime);
             return resposta;
         } catch (Exception ex) {
             incrementarOperacioError();
@@ -112,59 +102,6 @@ public class CarpetaCaibImpl implements CarpetaPlugin {
         String password = properties.getProperty("es.caib.notib.plugin.carpeta.contrasenya");
         client = Client.create();
         client.addFilter(new HTTPBasicAuthFilter(username, password));
-    }
-
-
-    // Mètodes de SALUT
-    // /////////////////////////////////////////////////////////////////////////////////////////////
-
-    private boolean configuracioEspecifica = false;
-    private int operacionsOk = 0;
-    private int operacionsError = 0;
-
-    @Synchronized
-    private void incrementarOperacioOk() {
-        operacionsOk++;
-    }
-
-    @Synchronized
-    private void incrementarOperacioError() {
-        operacionsError++;
-    }
-
-    @Synchronized
-    private void resetComptadors() {
-        operacionsOk = 0;
-        operacionsError = 0;
-    }
-
-    @Override
-    public boolean teConfiguracioEspecifica() {
-        return this.configuracioEspecifica;
-    }
-
-    @Override
-    public EstatSalut getEstatPlugin() {
-        try {
-            Instant start = Instant.now();
-            existeixNif("99999999R");
-            return EstatSalut.builder()
-                    .latencia((int) Duration.between(start, Instant.now()).toMillis())
-                    .estat(EstatSalutEnum.UP)
-                    .build();
-        } catch (Exception ex) {
-            return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
-        }
-    }
-
-    @Override
-    public IntegracioPeticions getPeticionsPlugin() {
-        IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
-                .totalOk(operacionsOk)
-                .totalError(operacionsError)
-                .build();
-        resetComptadors();
-        return integracioPeticions;
     }
 
 }

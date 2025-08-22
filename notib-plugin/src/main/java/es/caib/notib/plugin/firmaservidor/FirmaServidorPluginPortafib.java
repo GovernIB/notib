@@ -1,12 +1,9 @@
 package es.caib.notib.plugin.firmaservidor;
 
-import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
-import es.caib.comanda.ms.salut.model.IntegracioPeticions;
 import es.caib.notib.logic.intf.util.FitxerUtils;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.fundaciobit.plugins.signature.api.CommonInfoSignature;
@@ -22,8 +19,6 @@ import org.fundaciobit.plugins.signatureserver.portafib.PortaFIBSignatureServerP
 
 import java.io.File;
 import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -33,7 +28,7 @@ import java.util.UUID;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
-public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
+public class FirmaServidorPluginPortafib extends AbstractSalutPlugin implements FirmaServidorPlugin {
 
 	private static final String PROPERTIES_BASE = "es.caib.notib.plugin.firmaservidor.portafib.";
 	private static final String FIRMASERVIDOR_TMPDIR = "avacat_firmaservidor";
@@ -44,18 +39,6 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 	private final Properties properties;
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
-
-//	public FirmaServidorPluginPortafib(Properties properties) {
-//
-//		super();
-//		plugin = new PortaFIBSignatureServerPlugin(PROPERTIES_BASE, properties);
-//		this.properties = properties;
-//		var tempDir = System.getProperty("java.io.tmpdir");
-//		final var base = new File(tempDir, FIRMASERVIDOR_TMPDIR);
-//		base.mkdirs();
-//		tempDirPath = base.getAbsolutePath();
-//		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.FIRMA_SERVIDOR")));
-//	}
 
 	public FirmaServidorPluginPortafib(Properties properties, boolean configuracioEspecifica) {
 
@@ -78,6 +61,7 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 		var uuid = UUID.randomUUID().toString();
 		logger.info("[FIRMA_SERVIDOR] Firmant document amb nom " + nom + " motiu " + motiu + " tipusFirma " + tipusFirma + " idioma " + idioma);
 		try {
+            long startTime = System.currentTimeMillis();
 			// Guarda el contingut en un arxiu temporal
 			sourceFile = getArxiuTemporal(uuid, contingut);
 			var sourcePath = sourceFile.getAbsolutePath();
@@ -99,7 +83,7 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 			signFile(uuid, sourcePath, destPath, signType, signMode, motiu, idioma, userRequiresTimeStamp);
 			destFile = new File(destPath);
 			var result = FileUtils.readFileToByteArray(destFile);
-			incrementarOperacioOk();
+			incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return result;
 		} catch (Exception ex) {
 			incrementarOperacioError();
@@ -178,59 +162,6 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 			throw new SistemaExternException(exceptionMessage, signaturesSetStatus.getErrorException());
 		}
 		throw new SistemaExternException(exceptionMessage);
-	}
-
-
-	// Mètodes de SALUT
-	// /////////////////////////////////////////////////////////////////////////////////////////////
-
-	private boolean configuracioEspecifica = false;
-	private int operacionsOk = 0;
-	private int operacionsError = 0;
-
-	@Synchronized
-	private void incrementarOperacioOk() {
-		operacionsOk++;
-	}
-
-	@Synchronized
-	private void incrementarOperacioError() {
-		operacionsError++;
-	}
-
-	@Synchronized
-	private void resetComptadors() {
-		operacionsOk = 0;
-		operacionsError = 0;
-	}
-
-	@Override
-	public boolean teConfiguracioEspecifica() {
-		return this.configuracioEspecifica;
-	}
-
-	@Override
-	public EstatSalut getEstatPlugin() {
-		try {
-			Instant start = Instant.now();
-			((PortaFIBSignatureServerPlugin)plugin).getPassarelaDeFirmaEnServidorApi().getVersion();
-			return EstatSalut.builder()
-					.latencia((int) Duration.between(start, Instant.now()).toMillis())
-					.estat(EstatSalutEnum.UP)
-					.build();
-		} catch (Exception ex) {
-			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
-		}
-	}
-
-	@Override
-	public IntegracioPeticions getPeticionsPlugin() {
-		IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
-				.totalOk(operacionsOk)
-				.totalError(operacionsError)
-				.build();
-		resetComptadors();
-		return integracioPeticions;
 	}
 
 }

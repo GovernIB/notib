@@ -2,7 +2,6 @@ package es.caib.notib.plugin.registre;
 
 import com.google.common.base.Strings;
 import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
 import es.caib.comanda.ms.salut.model.IntegracioPeticions;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.InteresadoWsDto;
@@ -10,6 +9,7 @@ import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.logic.intf.dto.RegistreInteressatDocumentTipusDtoEnum;
 import es.caib.notib.logic.intf.dto.RegistreInteressatDto;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import es.caib.regweb3.ws.api.v3.AnexoWs;
 import es.caib.regweb3.ws.api.v3.AsientoRegistralWs;
@@ -26,12 +26,10 @@ import es.caib.regweb3.ws.api.v3.OrganismoWs;
 import es.caib.regweb3.ws.api.v3.TipoAsuntoWs;
 import es.caib.regweb3.ws.api.v3.WsI18NException;
 import es.caib.regweb3.ws.api.v3.WsValidationException;
-import lombok.Synchronized;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -53,16 +51,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-//	public RegistrePluginRegweb3Impl(Properties properties) {
-//
-//		super(properties);
-//		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.REGISTRE")));
-//	}
-
-	public RegistrePluginRegweb3Impl(Properties properties, String codiDir3Entitat, boolean configuracioEspecifica) {
+	public RegistrePluginRegweb3Impl(Properties properties, boolean configuracioEspecifica) {
 		super(properties);
-		this.codiDir3Entitat = codiDir3Entitat;
-		this.configuracioEspecifica = configuracioEspecifica;
+		salutPluginComponent.setConfiguracioEspecifica(configuracioEspecifica);
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.REGISTRE")));
 	}
 
@@ -72,23 +63,28 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 		var rc = new RespostaConsultaRegistre();
 		try {
+            long startTime = System.currentTimeMillis();
 			var asiento = toAsientoRegistralBean(arb);
 			logger.info("[REGISTRE] Creant assentament registral codiDir3Entitat " + codiDir3Entitat  + " tipusOperacio " + tipusOperacio + " generarJustificant " + generarJustificant);
 			var resposta = getAsientoRegistralApi().crearAsientoRegistral(null, codiDir3Entitat, asiento, tipusOperacio, generarJustificant, false);
 			logger.info("[REGISTRE] Resposta assentament registral " + resposta);
+            salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return toRespostaConsultaRegistre(resposta);
 		} catch (WsI18NException e) {
 			rc.setErrorCodi("0");
 			rc.setErrorDescripcio(e.getMessage());
+            salutPluginComponent.incrementarOperacioError();
 			return rc;
 		} catch (WsValidationException e) {
 			rc.setErrorCodi("1");
 			rc.setErrorDescripcio(e.getMessage());
+            salutPluginComponent.incrementarOperacioError();
 			return rc;
 		} catch (Exception e) {
 			log.error(ERROR_TO_RESPOSTA_CONSULTA, e);
 			rc.setErrorCodi("2");
 			rc.setErrorDescripcio(!Strings.isNullOrEmpty(e.getMessage()) ? e.getMessage() : e.getCause().getMessage());
+            salutPluginComponent.incrementarOperacioError();
 			return rc;
 		}
 	}
@@ -98,22 +94,27 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 		var rc = new RespostaConsultaRegistre();
 		try {
+            long startTime = System.currentTimeMillis();
 			logger.info("[REGISTRE] Creant assentament registral codiDir3Entitat " + codiDir3Entitat + " numeroRegistre " + numeroRegistre + " tipusOperacio " + tipusOperacio + " ambAnnexos " + ambAnnexos);
 			var asientoRegistralWs = getAsientoRegistralApi().obtenerAsientoRegistral(codiDir3Entitat, numeroRegistre, tipusOperacio, ambAnnexos);
 			logger.info("[REGISTRE] Assentament registral " + asientoRegistralWs);
+            salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return toRespostaConsultaRegistre(asientoRegistralWs);
 		} catch (WsI18NException e) {
 			rc.setErrorCodi("0");
 			rc.setErrorDescripcio(e.getMessage());
+            salutPluginComponent.incrementarOperacioError();
 			return rc;
 		} catch (WsValidationException e) {
 			rc.setErrorCodi("1");
 			rc.setErrorDescripcio(e.getMessage());
+            salutPluginComponent.incrementarOperacioError();
 			return rc;
 		} catch (Exception e) {
 			log.error(ERROR_TO_RESPOSTA_CONSULTA, e);
 			rc.setErrorCodi("2");
 			rc.setErrorDescripcio(e.getMessage());
+            salutPluginComponent.incrementarOperacioError();
 			return rc;
 		}
 	}
@@ -123,21 +124,26 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 		var rj = new RespostaJustificantRecepcio();
 		try {
+            long startTime = System.currentTimeMillis();
 			logger.info("[REGISTRE] Obtenint justificant " + codiDir3Entitat + " numeroRegistreFormatat " + numeroRegistreFormatat);
 			var justificant = getAsientoRegistralApi().obtenerJustificante(codiDir3Entitat, numeroRegistreFormatat, tipusRegistre);
+            salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return toRespostaJustificantRecepcio(justificant);
 		} catch (WsI18NException e) {
 			rj.setErrorCodi("0");
 			rj.setErrorDescripcio("No s'ha pogut obtenir el justificant");
+            salutPluginComponent.incrementarOperacioError();
 			return rj;
 		} catch (WsValidationException e) {
 			rj.setErrorCodi("1");
 			rj.setErrorDescripcio("Error de validació a l'obtenir el justificant");
+            salutPluginComponent.incrementarOperacioError();
 			return rj;
 		} catch (Exception e) {
 			rj.setErrorCodi("2");
 			rj.setErrorDescripcio("Error obtenint el justificant");
 			log.error("Error no controlat toRespostaJustificantRecepcio ", e);
+            salutPluginComponent.incrementarOperacioError();
 			return rj;
 		}
 	}
@@ -147,19 +153,25 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 		var rj = new RespostaJustificantRecepcio();
 		try {
+            long startTime = System.currentTimeMillis();
 			logger.info("[REGISTRE] Obtenint ofici extern codiDir3Entitat " + codiDir3Entitat + " numeroRegistreFormatat " + numeroRegistreFormatat);
-			return toRespostaJustificantRecepcio(getAsientoRegistralApi().obtenerOficioExterno(codiDir3Entitat, numeroRegistreFormatat));
+            OficioWs oficioWs = getAsientoRegistralApi().obtenerOficioExterno(codiDir3Entitat, numeroRegistreFormatat);
+            salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
+            return toRespostaJustificantRecepcio(oficioWs);
 		} catch (WsI18NException e) {
 			rj.setErrorCodi("0");
 			rj.setErrorDescripcio("No s'ha pogut obtenir l'ofici extern");
+            salutPluginComponent.incrementarOperacioError();
 			return rj;
 		} catch (WsValidationException e) {
 			rj.setErrorCodi("1");
 			rj.setErrorDescripcio("Error de validació a l'obtenir l'ofici extern");
+            salutPluginComponent.incrementarOperacioError();
 			return rj;
 		} catch (Exception e) {
 			rj.setErrorCodi("2");
 			rj.setErrorDescripcio("Error obtenint l'ofici extern");
+            salutPluginComponent.incrementarOperacioError();
 			return rj;
 		}
 	}
@@ -441,9 +453,13 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	public List<TipusAssumpte> llistarTipusAssumpte(String entitatCodi) throws RegistrePluginException {
 
 		try {
+            long startTime = System.currentTimeMillis();
 			logger.info("[REGISTRE] Llistant tipus assumpte entitatCodi " + entitatCodi);
-			return toTipusAssumpte(getInfoApi().listarTipoAsunto(entitatCodi));
+            List<TipoAsuntoWs> tipoAsuntoWs = getInfoApi().listarTipoAsunto(entitatCodi);
+            salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
+            return toTipusAssumpte(tipoAsuntoWs);
 		} catch (Exception ex) {
+            salutPluginComponent.incrementarOperacioError();
 			throw new RegistrePluginException("Error recuperant tipus assumpte", ex);
 		}
 	}
@@ -452,9 +468,13 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	public List<CodiAssumpte> llistarCodisAssumpte(String entitatCodi, String tipusAssumpte) throws RegistrePluginException {
 
 		try {
+            long startTime = System.currentTimeMillis();
 			logger.info("[REGISTRE] Llistant tipus assumpte entitatCodi " + entitatCodi + " tipusAssumpte " + tipusAssumpte);
-			return toCodisAssumpte(getInfoApi().listarCodigoAsunto(entitatCodi, tipusAssumpte));
+            List<CodigoAsuntoWs> codigoAsuntoWs = getInfoApi().listarCodigoAsunto(entitatCodi, tipusAssumpte);
+            salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
+            return toCodisAssumpte(codigoAsuntoWs);
 		} catch (Exception ex) {
+            salutPluginComponent.incrementarOperacioError();
 			throw new RegistrePluginException("Error recuperant codi assumpte", ex);
 		}
 	}
@@ -464,9 +484,11 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 		String nomOficinaVirtual = nomOficinaVirtualEntitat != null ? nomOficinaVirtualEntitat : OFICINA_VIRTUAL_DEFAULT;
 		try {
+            long startTime = System.currentTimeMillis();
 			logger.info("[REGISTRE] Obtenir oficina virtual entitatCodi " + entitatCodi + " nomOficinaVirtualEntitat " + nomOficinaVirtualEntitat + " autoritzacioValor " + autoritzacioValor);
 			var oficines = toOficines(getInfoApi().listarOficinas(entitatCodi, autoritzacioValor));
 			if (oficines.isEmpty()) {
+                salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 				return new Oficina();
 			}
 			Oficina oficinaVirtual = new Oficina();
@@ -475,8 +497,10 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 					oficinaVirtual = oficina;
 				}
 			}
+            salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return oficinaVirtual;
 		} catch (Exception ex) {
+            salutPluginComponent.incrementarOperacioError();
 			throw new RegistrePluginException("Error recuperant oficina virtual", ex);
 		}
 	}
@@ -485,9 +509,13 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	public List<Oficina> llistarOficines(String entitatCodi, Long autoritzacioValor) throws RegistrePluginException {
 
 		try {
+            long startTime = System.currentTimeMillis();
 			logger.info("[REGISTRE] Obtenir oficines virtual entitatCodi " + entitatCodi + " autoritzacioValor " + autoritzacioValor);
-			return toOficines(getInfoApi().listarOficinas(entitatCodi, autoritzacioValor));
+            List<OficinaWs> oficinaWs = getInfoApi().listarOficinas(entitatCodi, autoritzacioValor);
+            salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
+            return toOficines(oficinaWs);
 		} catch (Exception ex) {
+            salutPluginComponent.incrementarOperacioError();
 			throw new RegistrePluginException("Error obtenint les oficines", ex);
 		}
 	}
@@ -496,9 +524,13 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	public List<Llibre> llistarLlibres(String entitatCodi, String oficina, Long autoritzacioValor) throws RegistrePluginException {
 
 		try {
+            long startTime = System.currentTimeMillis();
 			logger.info("[REGISTRE] Obtenir llibres entitatCodi " + entitatCodi + " oficina " + oficina + " autoritzacioValor " + autoritzacioValor);
-			return toLlibres(getInfoApi().listarLibros(entitatCodi, oficina, autoritzacioValor));
+            List<LibroWs> libroWs = getInfoApi().listarLibros(entitatCodi, oficina, autoritzacioValor);
+            salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
+            return toLlibres(libroWs);
 		} catch (Exception ex) {
+            salutPluginComponent.incrementarOperacioError();
 			throw new RegistrePluginException("Error obtenint els llibres", ex);
 		}
 	}
@@ -507,9 +539,13 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	public List<Organisme> llistarOrganismes(String entitatCodi) throws RegistrePluginException {
 
 		try {
+            long startTime = System.currentTimeMillis();
 			logger.info("[REGISTRE] Obtenir llibres entitatCodi " + entitatCodi);
-			return toOrganismes(getInfoApi().listarOrganismos(entitatCodi));
+            List<OrganismoWs> organismoWs = getInfoApi().listarOrganismos(entitatCodi);
+            salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
+            return toOrganismes(organismoWs);
 		} catch (Exception ex) {
+            salutPluginComponent.incrementarOperacioError();
 			throw new RegistrePluginException("Error obtenint els organismes", ex);
 		}
 	}
@@ -519,13 +555,19 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 		List<LlibreOficina> llibreOficina = null;
 		try {
+            long startTime = System.currentTimeMillis();
 			logger.info("[REGISTRE] Obtenir llibres oficines entitatCodi " + entitatCodi + " usuariCodi " + usuariCodi + " tipusRegistre " + tipusRegistre);
-			llibreOficina = toLlibreOficina(getInfoApi().obtenerLibrosOficinaUsuario(entitatCodi, usuariCodi, tipusRegistre));
+            List<LibroOficinaWs> libroOficinaWs = getInfoApi().obtenerLibrosOficinaUsuario(entitatCodi, usuariCodi, tipusRegistre);
+            salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
+            llibreOficina = toLlibreOficina(libroOficinaWs);
 		} catch (RegistrePluginException rex) {
+            salutPluginComponent.incrementarOperacioError();
 			log.error("Error a plugin registre obtenció llibres i oficina", rex);
 		} catch (WsI18NException wse) {
+            salutPluginComponent.incrementarOperacioError();
 			log.error("Error ws obtenció llibres i oficina", wse);
 		} catch (Exception ex) {
+            salutPluginComponent.incrementarOperacioError();
 			log.error("Error a l'hora d'obtenir els llibres i oficina", ex);
 		}
 		return llibreOficina;
@@ -536,13 +578,19 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 		var llibreOrganisme = new Llibre();
 		try {
+            long startTime = System.currentTimeMillis();
 			logger.info("[REGISTRE] Obtenir llibres oficines entitatCodi " + entitatCodi + " organismeCodi " + organismeCodi);
-			llibreOrganisme = toLlibreOrganisme(getInfoApi().listarLibroOrganismo(entitatCodi, organismeCodi));
+            LibroWs libroWs = getInfoApi().listarLibroOrganismo(entitatCodi, organismeCodi);
+            salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
+            llibreOrganisme = toLlibreOrganisme(libroWs);
 		} catch (RegistrePluginException rex) {
+            salutPluginComponent.incrementarOperacioError();
 			log.error("Error a plugin registre obtenció llibres d'organisme", rex);
 		} catch (WsI18NException wse) {
+            salutPluginComponent.incrementarOperacioError();
 			log.error("Error ws obtenció llibres organisme", wse);
 		} catch (Exception ex) {
+            salutPluginComponent.incrementarOperacioError();
 			log.error("Error a l'hora d'obtenir els llibres d'organisme", ex);
 		}
 		return llibreOrganisme;
@@ -686,63 +734,26 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	}
 
 
-	// Mètodes de SALUT
-	// /////////////////////////////////////////////////////////////////////////////////////////////
+    // Mètodes de SALUT
+    // /////////////////////////////////////////////////////////////////////////////////////////////
+    private AbstractSalutPlugin salutPluginComponent = new AbstractSalutPlugin();
+    public void init(MeterRegistry registry, String codiPlugin) {
+        salutPluginComponent.init(registry, codiPlugin);
+    }
 
-	private boolean configuracioEspecifica = false;
-	private int operacionsOk = 0;
-	private int operacionsError = 0;
-	private String codiDir3Entitat;
+    @Override
+    public boolean teConfiguracioEspecifica() {
+        return salutPluginComponent.teConfiguracioEspecifica();
+    }
 
-	@Synchronized
-	private void incrementarOperacioOk() {
-		operacionsOk++;
-	}
+    @Override
+    public EstatSalut getEstatPlugin() {
+        return salutPluginComponent.getEstatPlugin();
+    }
 
-	@Synchronized
-	private void incrementarOperacioError() {
-		operacionsError++;
-	}
-
-	@Synchronized
-	private void resetComptadors() {
-		operacionsOk = 0;
-		operacionsError = 0;
-	}
-
-	@Override
-	public boolean teConfiguracioEspecifica() {
-		return this.configuracioEspecifica;
-	}
-
-	@Override
-	public EstatSalut getEstatPlugin() {
-		try {
-			Instant start = Instant.now();
-			// TODO: Comprovar si és necessari indicar un número de registre vàlid
-//			var asientoRegistralWs = getAsientoRegistralApi().obtenerAsientoRegistral(codiDir3Entitat, "fakeReg", 2L, false);
-//			toRespostaConsultaRegistre(asientoRegistralWs);
-			var result = obtenerAsientoRegistral(codiDir3Entitat, "00/2000", 2L, false);
-			if (result.isOk() ||Integer.valueOf(result.getErrorCodi()) < 2) {
-				return EstatSalut.builder()
-						.latencia((int) Duration.between(start, Instant.now()).toMillis())
-						.estat(EstatSalutEnum.UP)
-						.build();
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
-	}
-
-	@Override
-	public IntegracioPeticions getPeticionsPlugin() {
-		IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
-				.totalOk(operacionsOk)
-				.totalError(operacionsError)
-				.build();
-		resetComptadors();
-		return integracioPeticions;
-	}
+    @Override
+    public IntegracioPeticions getPeticionsPlugin() {
+        return salutPluginComponent.getPeticionsPlugin();
+    }
 
 }

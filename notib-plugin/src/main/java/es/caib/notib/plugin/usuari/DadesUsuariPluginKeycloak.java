@@ -1,11 +1,11 @@
 package es.caib.notib.plugin.usuari;
 
 import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
 import es.caib.comanda.ms.salut.model.IntegracioPeticions;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
-import lombok.Synchronized;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.fundaciobit.pluginsib.userinformation.IUserInformationPlugin;
 import org.fundaciobit.pluginsib.userinformation.keycloak.KeyCloakUserInformationPlugin;
@@ -18,8 +18,6 @@ import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
 import javax.ws.rs.NotFoundException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,14 +39,9 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-//	public DadesUsuariPluginKeycloak(String propertyKeyBase, Properties properties) {
-//		super(propertyKeyBase, properties);
-//		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.KEYCLOAK")));
-//	}
-
 	public DadesUsuariPluginKeycloak(String propertyKeyBase, Properties properties, boolean configuracioEspecifica) {
 		super(propertyKeyBase, properties);
-		this.configuracioEspecifica = configuracioEspecifica;
+		salutPluginComponent.setConfiguracioEspecifica(configuracioEspecifica);
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.KEYCLOAK")));
 	}
 
@@ -63,12 +56,13 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 
 		logger.info("[Keycloak] Consulta dels rols de l'usuari (usuariCodi=" + usuariCodi + ")");
 		try {
+            long startTime = System.currentTimeMillis();
 			var rolesInfo = getRolesByUsername(usuariCodi);
 			logger.info("[Keycloak] Rols de l'usuari" + usuariCodi + " " + rolesInfo);
-			incrementarOperacioOk();
+			salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return rolesInfo != null && rolesInfo.getRoles() != null ? new ArrayList<>(Arrays.asList(rolesInfo.getRoles())) : new ArrayList<>();
 		} catch (Exception ex) {
-			incrementarOperacioError();
+			salutPluginComponent.incrementarOperacioError();
 			throw new SistemaExternException("Error al consultar els rols de l'usuari (usuariCodi=" + usuariCodi + ")", ex);
 		}
 	}
@@ -78,16 +72,17 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 
 		logger.info("[Keycloak] Consulta de les dades de l'usuari (usuariCodi=" + usuariCodi + ")");
 		try {
+            long startTime = System.currentTimeMillis();
 			var userInfo = getUserInfoByUserName(usuariCodi);
 			logger.info("[Keycloak] Dades de l'usuari" + usuariCodi + " " + userInfo);
-			incrementarOperacioOk();
+			salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			if (userInfo == null) {
 				return null;
 			}
 			return DadesUsuari.builder().codi(userInfo.getUsername()).nom(userInfo.getName()).llinatges(userInfo.getSurname1())
 					.nif(userInfo.getAdministrationID()).email(userInfo.getEmail()).build();
 		} catch (Exception ex) {
-			incrementarOperacioError();
+			salutPluginComponent.incrementarOperacioError();
 			throw new SistemaExternException("Error al consultar les dades de l'usuari (usuariCodi=" + usuariCodi + ")", ex);
 		}
 	}
@@ -97,15 +92,16 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 		
 		logger.info("[Keycloak] Consulta dels usuaris del grup (grupCodi=" + grupCodi + ")");
 		try {
+            long startTime = System.currentTimeMillis();
 			var usuariCodis = getUsernamesByRol(grupCodi);
 			logger.info("[Keycloak] Usuaris del grup " + grupCodi + " " + Arrays.toString(usuariCodis));
-			incrementarOperacioOk();
+			salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			if (usuariCodis == null || usuariCodis.length == 0) {
 				return new ArrayList<>();
 			}
 			return Arrays.stream(usuariCodis).map(u -> DadesUsuari.builder().codi(u).build()).collect(Collectors.toList());
 		} catch (Exception ex) {
-			incrementarOperacioError();
+			salutPluginComponent.incrementarOperacioError();
 			throw new SistemaExternException("[Keycloak] Error al consultar les dades dels usuaris amb grup (grup=" + grupCodi + ")", ex);
 		}
 	}
@@ -137,6 +133,8 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 		Set<String> usernamesClientPersons = null;
 		Set<String> usersRealm = null;
 		int numExcepcions = 0;
+
+        long startTime = System.currentTimeMillis();
 		try {
 			String appClient = this.getPropertyRequired("pluginsib.userinformation.keycloak.client_id");
 			usernamesClientApp = this.getUsernamesByRolOfClient(rol, appClient);
@@ -162,9 +160,9 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 		}
 
         if (numExcepcions > 0) {
-            incrementarOperacioError();
+            salutPluginComponent.incrementarOperacioError();
         } else {
-            incrementarOperacioOk();
+            salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
         }
 
         if (usernamesClientApp == null && usernamesClientPersons == null && usersRealm == null) {
@@ -233,56 +231,27 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 		}
 	}
 
-	
-	// Mètodes de SALUT
-	// /////////////////////////////////////////////////////////////////////////////////////////////
 
-	private boolean configuracioEspecifica = false;
-	private int operacionsOk = 0;
-	private int operacionsError = 0;
+    // Mètodes de SALUT
+    // /////////////////////////////////////////////////////////////////////////////////////////////
+    private AbstractSalutPlugin salutPluginComponent = new AbstractSalutPlugin();
+    public void init(MeterRegistry registry, String codiPlugin) {
+        salutPluginComponent.init(registry, codiPlugin);
+    }
 
-	@Synchronized
-	private void incrementarOperacioOk() {
-		operacionsOk++;
-	}
+    @Override
+    public boolean teConfiguracioEspecifica() {
+        return salutPluginComponent.teConfiguracioEspecifica();
+    }
 
-	@Synchronized
-	private void incrementarOperacioError() {
-		operacionsError++;
-	}
+    @Override
+    public EstatSalut getEstatPlugin() {
+        return salutPluginComponent.getEstatPlugin();
+    }
 
-	@Synchronized
-	private void resetComptadors() {
-		operacionsOk = 0;
-		operacionsError = 0;
-	}
-	
-	@Override
-	public boolean teConfiguracioEspecifica() {
-		return this.configuracioEspecifica;
-	}
+    @Override
+    public IntegracioPeticions getPeticionsPlugin() {
+        return salutPluginComponent.getPeticionsPlugin();
+    }
 
-	@Override
-	public EstatSalut getEstatPlugin() {
-		try {
-			Instant start = Instant.now();
-			consultarAmbCodi("fakeUser");
-			return EstatSalut.builder()
-					.latencia((int) Duration.between(start, Instant.now()).toMillis())
-					.estat(EstatSalutEnum.UP)
-					.build();
-		} catch (Exception ex) {
-			return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
-		}
-	}
-
-	@Override
-	public IntegracioPeticions getPeticionsPlugin() {
-		IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
-				.totalOk(operacionsOk)
-				.totalError(operacionsError)
-				.build();
-		resetComptadors();
-		return integracioPeticions;
-	}
 }

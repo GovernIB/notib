@@ -1,6 +1,8 @@
 package es.caib.notib.plugin.cie;
 
-public interface CiePlugin {
+import es.caib.notib.plugin.SalutPlugin;
+
+public interface CiePlugin extends SalutPlugin {
 
     RespostaCie enviar(EnviamentCie enviament);
     RespostaCie cancelar(EnviamentCie enviament);
