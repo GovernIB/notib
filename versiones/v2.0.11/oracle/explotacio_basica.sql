@@ -182,8 +182,9 @@ FROM notificacions
 WHERE SIR_DIA IS NOT NULL
 GROUP BY entitat_id, procediment_id, organ_codi, usuari_codi, env_tipus, origen, estat, SIR_DIA;
 
-CREATE OR REPLACE VIEW NOT_STATS_VIEW AS
+create OR REPLACE view NOTIB.NOT_STATS_VIEW as
 SELECT
+    ROW_NUMBER() OVER (ORDER BY entitat_id, dia) AS id,
     entitat_id,
     procediment_id,
     organ_codi,
@@ -193,46 +194,53 @@ SELECT
     tipus,
     dia,
     total
-FROM NOT_CREADES_ENVIADES_VIEW
+FROM (SELECT entitat_id,
+             procediment_id,
+             organ_codi,
+             usuari_codi,
+             env_tipus,
+             origen,
+             tipus,
+             dia,
+             total
+      FROM NOT_CREADES_ENVIADES_VIEW
 
-UNION ALL
+      UNION ALL
 
-SELECT
-    entitat_id,
-    procediment_id,
-    organ_codi,
-    usuari_codi,
-    env_tipus,
-    origen,
-    tipus,
-    dia,
-    total
-FROM NOT_REGISTRADES_VIEW
+      SELECT entitat_id,
+             procediment_id,
+             organ_codi,
+             usuari_codi,
+             env_tipus,
+             origen,
+             tipus,
+             dia,
+             total
+      FROM NOT_REGISTRADES_VIEW
 
-UNION ALL
+      UNION ALL
 
-SELECT
-    entitat_id,
-    procediment_id,
-    organ_codi,
-    usuari_codi,
-    env_tipus,
-    origen,
-    tipus,
-    dia,
-    total
-FROM NOT_ESTAT_VIEW
+      SELECT entitat_id,
+             procediment_id,
+             organ_codi,
+             usuari_codi,
+             env_tipus,
+             origen,
+             tipus,
+             dia,
+             total
+      FROM NOT_ESTAT_VIEW
 
-UNION ALL
+      UNION ALL
 
-SELECT
-    entitat_id,
-    procediment_id,
-    organ_codi,
-    usuari_codi,
-    env_tipus,
-    origen,
-    tipus,
-    dia,
-    total
-FROM NOT_SIR_VIEW;
+      SELECT entitat_id,
+             procediment_id,
+             organ_codi,
+             usuari_codi,
+             env_tipus,
+             origen,
+             tipus,
+             dia,
+             total
+      FROM NOT_SIR_VIEW
+     );

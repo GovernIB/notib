@@ -33,12 +33,7 @@ public class EstadistiquesController {
 
         List<DimensioDesc> dimensions = estadisticaService.getDimensions();
         List<IndicadorDesc> indicadors = estadisticaService.getIndicadors();
-
-        return EstadistiquesInfo.builder()
-                .codi("NOT")
-                .dimensions(dimensions)
-                .indicadors(indicadors)
-                .build();
+        return EstadistiquesInfo.builder().codi("NOT").dimensions(dimensions).indicadors(indicadors).build();
     }
 
     @GetMapping("/estadistiques")
@@ -48,9 +43,7 @@ public class EstadistiquesController {
     }
 
     @GetMapping("/estadistiques/{dies}")
-    public List<RegistresEstadistics> estadistiques(
-            HttpServletRequest request,
-            @PathVariable Integer dies) throws IOException {
+    public List<RegistresEstadistics> estadistiques(HttpServletRequest request, @PathVariable Integer dies) throws IOException {
 
         List<RegistresEstadistics> result = new ArrayList<>();
         LocalDate data = LocalDate.now().minusDays(1);
@@ -62,31 +55,24 @@ public class EstadistiquesController {
     }
 
     @GetMapping("/estadistiques/of/{data}")
-    public RegistresEstadistics estadistiques(
-            HttpServletRequest request,
-            @PathVariable String data) throws Exception {
+    public RegistresEstadistics estadistiques(HttpServletRequest request, @PathVariable String data) throws Exception {
 
         LocalDate date = LocalDate.parse(data, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         return estadisticaService.consultaEstadistiques(date);
     }
 
     @GetMapping("/estadistiques/from/{dataInici}/to/{dataFi}")
-    public List<RegistresEstadistics> estadistiques(
-            HttpServletRequest request,
-            @PathVariable String dataInici,
-            @PathVariable String dataFi) throws Exception {
+    public List<RegistresEstadistics> estadistiques(HttpServletRequest request, @PathVariable String dataInici, @PathVariable String dataFi) throws Exception {
 
         List<RegistresEstadistics> result = new ArrayList<>();
         LocalDate dataFrom = LocalDate.parse(dataInici, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         LocalDate dataTo = LocalDate.parse(dataFi, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-
         LocalDate startDate = dataFrom.isBefore(dataTo) ? dataFrom : dataTo;
         LocalDate endDate = dataFrom.isBefore(dataTo) ? dataTo : dataFrom;
         LocalDate ahir = LocalDate.now().minusDays(1);
         if (endDate.isAfter(ahir)) {
             endDate = ahir;
         }
-
         return estadisticaService.consultaEstadistiques(startDate, endDate);
     }
 
@@ -94,6 +80,7 @@ public class EstadistiquesController {
     @RequestMapping(value = "/generarDadesExplotacio", method = RequestMethod.GET)
     @ResponseBody
     public String generarDadesExplotacio(HttpServletRequest request) throws Exception {
+
         estadisticaService.generarDadesExplotacio();
         return "Done";
     }
@@ -101,9 +88,7 @@ public class EstadistiquesController {
     @Hidden
     @RequestMapping(value = "/generarDadesExplotacio/{dies}", method = RequestMethod.GET)
     @ResponseBody
-    public String generarDadesExplotacio(
-            HttpServletRequest request,
-            @PathVariable Integer dies) throws Exception {
+    public String generarDadesExplotacio(HttpServletRequest request, @PathVariable Integer dies) throws Exception {
 
         LocalDate data = LocalDate.now().minusDays(1);
         for (int i = 0; i < dies; i++) {
@@ -116,10 +101,7 @@ public class EstadistiquesController {
     @Hidden
     @RequestMapping(value = "/generarDadesBasiquesExplotacio/from/{dataInici}/to/{dataFi}", method = RequestMethod.GET)
     @ResponseBody
-    public String generarDadesBasiquesExplotacio(
-            HttpServletRequest request,
-            @PathVariable String dataInici,
-            @PathVariable String dataFi) throws Exception {
+    public String generarDadesBasiquesExplotacio(HttpServletRequest request, @PathVariable String dataInici, @PathVariable String dataFi) throws Exception {
 
         try {
             LocalDate dataFrom = LocalDate.parse(dataInici, DateTimeFormatter.ofPattern("dd-MM-yyyy"));

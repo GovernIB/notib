@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import com.sun.xml.bind.v2.TODO;
 import es.caib.comanda.ms.estadistica.model.Dimensio;
 import es.caib.comanda.ms.estadistica.model.DimensioDesc;
 import es.caib.comanda.ms.estadistica.model.Fet;
@@ -81,6 +82,8 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     @Value("${es.caib.notib.hibernate.dialect:es.caib.notib.persist.dialect.OracleCaibDialect}")
     private String hibernateDialect;
 
+    private static Date firstEnvInfoDate;
+
     // Inicialitzar les consultes SQL segons el tipus de base de dades
     // Oracle (per defecte)
     private String SQL_INSERT_EXPLOT_TEMPS = "INSERT INTO not_explot_temps (" +
@@ -159,6 +162,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     @Override
     @Transactional(timeout = 3600)
     public boolean generarDadesExplotacio(LocalDate data) {
+
         // Generar dades d'explotació
         String accioDesc = "GenerarDadesExplotacio - Recupera dades per taules d'explotació.";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -198,7 +202,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     @Override
     @Transactional(timeout = 3600)
     public void generarDadesExplotacio(LocalDate dataInici, LocalDate dataFi) {
-        if (dataFi == null) dataFi = ahir();
+
+        if (dataFi == null) {
+            dataFi = ahir();
+        }
         if (dataInici.isAfter(dataFi)) {
             LocalDate temp = dataInici;
             dataInici = dataFi;
@@ -242,6 +249,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     @Transactional(timeout = 3600)
     @Override
     public void generarDadesExplotacioBasiques(LocalDate fromDate, LocalDate toDate) {
+
         var info = crearIntegracioInfo(fromDate);
 
         try {
@@ -272,6 +280,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     }
 
     private IntegracioInfo crearIntegracioInfo(LocalDate fromDate) {
+
         var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return new IntegracioInfo(
                 IntegracioCodi.EXPLOTACIO,
@@ -283,8 +292,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     }
 
     private Map<Long, ExplotFetsKey> cachejarDimensions(List<ExplotDimensioEntity> dimensions) {
-        return dimensions.stream()
-                .collect(Collectors.toMap(ExplotDimensioEntity::getId, this::createKeyFromDimension));
+        return dimensions.stream().collect(Collectors.toMap(ExplotDimensioEntity::getId, this::createKeyFromDimension));
     }
 
     private void processarDatesAmbEstadistiques(List<ExplotTempsEntity> dates,
@@ -314,12 +322,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
         log.debug("Dies processats: {}, Dies omesos: {}", processedDays, skippedDays);
     }
 
-    private Map<LocalDate, Map<String, Map<ExplotFetsKey, Long>>> convertirEstadistiquesPerData(
-            List<ExplotEnvBasicStatsEntity> stats) {
+    private Map<LocalDate, Map<String, Map<ExplotFetsKey, Long>>> convertirEstadistiquesPerData(List<ExplotEnvBasicStatsEntity> stats) {
 
         Map<LocalDate, Map<String, Map<ExplotFetsKey, Long>>> result = new HashMap<>();
         processStats(stats, result);
-
         return result;
     }
 
@@ -339,8 +345,8 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     }
 
     private List<Object[]> prepararInsertions(List<ExplotDimensioEntity> dimensions, Map<Long, ExplotFetsKey> keyCache, ExplotTempsEntity temps, Map<String, Map<ExplotFetsKey, Long>> statsMap) {
-        List<Object[]> argsList = new ArrayList<>();
 
+        List<Object[]> argsList = new ArrayList<>();
         for (ExplotDimensioEntity dim : dimensions) {
             ExplotFetsKey key = keyCache.get(dim.getId());
 
@@ -409,8 +415,8 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     }
 
     private void generateNativeSqlMissingExplotTempsEntities(LocalDate fromDate) {
-        LocalDate yesterday = ahir();
 
+        LocalDate yesterday = ahir();
         // Obtenim totes les dates per al rang corresponent
         List<LocalDate> existingDates = explotTempsRepository.findDatesBetween(fromDate, yesterday);
         List<LocalDate> missingDates = new ArrayList<>();
@@ -445,8 +451,8 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
     // Obtenir dates sense dades estadístiques
     private List<LocalDate> geMissingExplotTempsEntities(LocalDate fromDate, LocalDate toDate) {
+
         List<LocalDate> missingDates = new ArrayList<>();
-        
         if (toDate == null) {
             toDate = ahir();
         }
@@ -477,18 +483,24 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     @Override
     @Transactional(readOnly = true)
     public RegistresEstadistics consultaEstadistiques(LocalDate data) {
+
         ExplotTempsEntity temps = explotTempsRepository.findFirstByData(data);
         if (temps == null) {
             // Si no existeixen dades, les generam
             LocalDate ahir = LocalDate.now().minusDays(1);
+            LocalDate dema = LocalDate.now().plusDays(1);
             if (!data.isAfter(ahir)) {
                 generarDadesExplotacio(data);
+            } else if (data.isBefore(dema)){
+                // data es el dia d'avui
+                generarDadesExplotacioBasiques(ahir, data);
             }
         }
         return getRegistresEstadistics(data);
     }
 
     private RegistresEstadistics getRegistresEstadistics(LocalDate data) {
+
         ExplotTempsEntity temps = explotTempsRepository.findFirstByData(data);
         if (temps == null) {
             Date dia = Date.from(data.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
@@ -504,13 +516,15 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     @Override
     @Transactional(readOnly = true)
     public List<RegistresEstadistics> consultaEstadistiques(LocalDate dataInici, LocalDate dataFi) {
+
         List<RegistresEstadistics> result = new ArrayList<>();
-        
         // Si no existeixen dades, les generam
         List<LocalDate> localDates = geMissingExplotTempsEntities(dataInici, dataFi);
         if (!localDates.isEmpty()) {
             LocalDate localEnvInfoDate = LocalDate.now();
-            Date firstEnvInfoDate = explotEnvInfoRepository.getFirstDate();
+            if (firstEnvInfoDate == null) {
+            firstEnvInfoDate = explotEnvInfoRepository.getFirstDate();
+            }
             if (firstEnvInfoDate != null) {
                 localEnvInfoDate = firstEnvInfoDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             }
@@ -535,6 +549,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
     @Override
     public List<DimensioDesc> getDimensions() {
+
         List<String> entitatCodis = entitatRepository.findAllCodis();
         List<String> organCodis = organGestorRepository.findAllCodis();
         List<String> procedimentCodis = procSerRepository.findAllCodis();
