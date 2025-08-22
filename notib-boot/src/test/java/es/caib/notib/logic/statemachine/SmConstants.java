@@ -41,6 +41,8 @@ public class SmConstants {
     public static final String CUA_POOLING_SIR = "qu_pool_sir";
     public static final String CUA_CALLBACKS = "qu_callbacks";
     public static final String CUA_ACCIONS_MASSIVES = "qu_accions_massives";
+    public static final String CUA_COMANDA_AVISOS = "qu_comanda_avisos";
+    public static final String CUA_COMANDA_TASQUES = "qu_comanda_tasques";
 
     // Accions massives
     public static final String ACCIO_MASSIVA_ID = "accio_massiva_id";

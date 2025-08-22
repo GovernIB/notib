@@ -244,6 +244,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 				cacheHelper.evictFindProcedimentsOrganWithPermis();
 				if (organGestor != null && !Strings.isNullOrEmpty(organGestor.getCodi())) {
 					cacheHelper.evictFindUsuarisAmbPermis(procediment.getId() + "", organGestor.getCodi());
+					cacheHelper.evictFindUsuarisAndRolsAmbPermis(procediment.getId() + "", organGestor.getCodi());
 				}
 			}
 			procedimentEntity.update(procediment.getCodi(), procediment.getNom(), entitat, procediment.isEntregaCieActiva() ? entregaCie : null, procediment.getRetard(),
@@ -1173,6 +1174,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			cacheHelper.evictFindProcedimentsOrganWithPermis();
 			if (organGestor != null && !Strings.isNullOrEmpty(organGestor.getCodi())) {
 				cacheHelper.evictFindUsuarisAmbPermis(procediment.getId() + "", organGestor.getCodi());
+				cacheHelper.evictFindUsuarisAndRolsAmbPermis(procediment.getId() + "", organGestor.getCodi());
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1201,6 +1203,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			cacheHelper.evictFindProcedimentsOrganWithPermis();
 			if (!Strings.isNullOrEmpty(organCodi)) {
 				cacheHelper.evictFindUsuarisAmbPermis(String.valueOf(procedimentId), organCodi);
+				cacheHelper.evictFindUsuarisAndRolsAmbPermis(String.valueOf(procedimentId), organCodi);
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);

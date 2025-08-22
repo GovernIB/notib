@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
@@ -53,9 +54,11 @@ public class RegistreHelper {
 	protected JmsTemplate jmsTemplate;
     @Autowired
     private AccioMassivaHelper accioMassivaHelper;
+    @Autowired
+    private ComandaListener comandaListener;
 
 
-	public NotificacioEnviamentEntity enviamentRefrescarEstatRegistre(ConsultaSirRequest consulta) {
+    public NotificacioEnviamentEntity enviamentRefrescarEstatRegistre(ConsultaSirRequest consulta) {
 
 		var enviamentId = consulta.getConsultaSirDto().getId();
 		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
@@ -92,6 +95,9 @@ public class RegistreHelper {
 				accioMassivaHelper.actualitzar(consulta.getAccioMassivaId(), enviamentId, "", "");
 			}
 			canviEstat = !enviament.getRegistreEstat().equals(resposta.getEstat());
+            if (canviEstat) {
+                comandaListener.enviarTasca(enviament);
+            }
 			enviamentUpdateDatat(resposta, enviament);
 			logTimeHelper.info(" [TIMER-SIR] Actualitzar estat comunicació SIR [Id: " + enviamentId + "]: ");
 			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA && canviEstat) {

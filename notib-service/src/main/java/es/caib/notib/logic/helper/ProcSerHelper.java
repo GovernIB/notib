@@ -8,6 +8,7 @@ import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.logic.intf.dto.permis.PermisProcSer;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDataDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProgresActualitzacioProcSer;
@@ -181,25 +182,54 @@ public class ProcSerHelper {
 		return usuaris;
 	}
 
+    @Cacheable(value = "findUsuarisAndRolsAmbPermis", key = "#notificacio.getProcediment().getId().toString().concat('-').concat(#notificacio.getOrganGestor().getCodi())")
+    public PermisProcSer findUsuarisAndRolsAmbPermis(NotificacioEntity notificacio) {
+
+        var permisos = findPermisos(notificacio);
+        Set<String> usuaris = new HashSet<>();
+        Set<String> rols = new HashSet<>();
+        for (var permis: permisos) {
+            if (!permis.isRead()) {
+                continue;
+            }
+            switch (permis.getTipus()) {
+                case USUARI:
+                    usuaris.add(permis.getPrincipal());
+                    break;
+                case ROL:
+                    rols.add(permis.getPrincipal());
+                    break;
+            }
+        }
+        return PermisProcSer.builder().usuarisAmbPermis(new ArrayList<>(usuaris)).rolsAmbPermis(new ArrayList<>(rols)).build();
+    }
+
+    private List<PermisDto> findPermisos(NotificacioEntity not) {
+
+        var procediment = not.getProcediment();
+        var permisos = permisosHelper.findPermisos(procediment.getId(), ProcedimentEntity.class);
+        List<OrganGestorEntity> organs = new ArrayList<>();
+        if (!procediment.isComu() && procediment.getOrganGestor() != null ) {
+            organs = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(not.getEntitat().getDir3Codi(), procediment.getOrganGestor().getCodi());
+        }
+        if (procediment.isComu() && not.getOrganGestor() != null) {
+            organs = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(not.getEntitat().getDir3Codi(), not.getOrganGestor().getCodi());
+            var procSerOrgansGestorsParesExistentsByOrgan = organigramaHelper.getProcSerOrgansGestorsParesExistentsByOrgan(procediment.getId(), not.getEntitat().getDir3Codi(), not.getOrganGestor().getCodi());
+            for (var po: procSerOrgansGestorsParesExistentsByOrgan) {
+                permisos.addAll(permisosHelper.findPermisos(po.getId(), ProcSerOrganEntity.class));
+            }
+        }
+        for (var po: organs) {
+            permisos.addAll(permisosHelper.findPermisos(po.getId(), OrganGestorEntity.class));
+        }
+
+        return permisos;
+    }
+
 	public Set<String> findUsuarisAmbPermisReadPerProcediment(NotificacioEntity not) {
 
-		var procediment = not.getProcediment();
-		var sb = new StringBuilder(LLISTA_MAIL_TEXT);
-		var permisos = permisosHelper.findPermisos(procediment.getId(), ProcedimentEntity.class);
-		List<OrganGestorEntity> organs = new ArrayList<>();
-		if (!procediment.isComu() && procediment.getOrganGestor() != null ) {
-			organs = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(not.getEntitat().getDir3Codi(), procediment.getOrganGestor().getCodi());
-		}
-		if (procediment.isComu() && not.getOrganGestor() != null) {
-			organs = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(not.getEntitat().getDir3Codi(), not.getOrganGestor().getCodi());
-			var procSerOrgansGestorsParesExistentsByOrgan = organigramaHelper.getProcSerOrgansGestorsParesExistentsByOrgan(procediment.getId(), not.getEntitat().getDir3Codi(), not.getOrganGestor().getCodi());
-			for (var po: procSerOrgansGestorsParesExistentsByOrgan) {
-				permisos.addAll(permisosHelper.findPermisos(po.getId(), ProcSerOrganEntity.class));
-			}
-		}
-		for (var po: organs) {
-			permisos.addAll(permisosHelper.findPermisos(po.getId(), OrganGestorEntity.class));
-		}
+        var permisos = findPermisos(not);
+        var sb = new StringBuilder(LLISTA_MAIL_TEXT);
 		Set<String> usuaris = new HashSet<>();
 		for (var permis: permisos) {
 			if (!permis.isRead()) {

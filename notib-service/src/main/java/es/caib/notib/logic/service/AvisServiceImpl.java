@@ -1,16 +1,20 @@
 package es.caib.notib.logic.service;
 
+import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.intf.dto.AvisDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.service.AvisService;
+import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.persist.entity.AvisEntity;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.persist.repository.AvisRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +37,8 @@ public class AvisServiceImpl implements AvisService {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
+    @Autowired
+    private ComandaListener comandaListener;
 
 	
 	@Transactional
@@ -42,8 +48,10 @@ public class AvisServiceImpl implements AvisService {
 		log.debug("Creant una nova avis (avis=" + avis + ")");
 		var entity = AvisEntity.getBuilder(avis.getAssumpte(), avis.getMissatge(), avis.getDataInici(), avis.getDataFinal(), avis.getAvisNivell(),
 							avis.getAvisAdministrador(), avis.getEntitatId()).build();
-		return conversioTipusHelper.convertir(avisRepository.save(entity), AvisDto.class);
-	}
+		var dto = conversioTipusHelper.convertir(avisRepository.save(entity), AvisDto.class);
+//        comandaListener.enviarAvisCommanda(dto);
+	    return dto;
+    }
 
 	@Transactional
 	@Override
@@ -52,8 +60,10 @@ public class AvisServiceImpl implements AvisService {
 		log.debug("Actualitzant avis existent (avis=" + avis + ")");
 		var avisEntity = avisRepository.findById(avis.getId()).orElseThrow();
 		avisEntity.update(avis.getAssumpte(), avis.getMissatge(), avis.getDataInici(), avis.getDataFinal(), avis.getAvisNivell());
-		return conversioTipusHelper.convertir(avisEntity, AvisDto.class);
-	}
+		var dto = conversioTipusHelper.convertir(avisEntity, AvisDto.class);
+//        comandaListener.enviarAvisCommanda(dto);
+	    return dto;
+    }
 
 	@Transactional
 	@Override
@@ -63,8 +73,10 @@ public class AvisServiceImpl implements AvisService {
 			log.debug("Actualitzant propietat activa d'una avis existent (id=" + id + ", activa=" + activa + ")");
 			var avisEntity = avisRepository.findById(id).orElseThrow();
 			avisEntity.updateActiva(activa);
-			return conversioTipusHelper.convertir(avisEntity, AvisDto.class);
-		} catch (Exception e) {
+			var dto = conversioTipusHelper.convertir(avisEntity, AvisDto.class);
+//            comandaListener.enviarAvisCommanda(dto);
+		    return dto;
+        } catch (Exception e) {
 			log.error("[Avis] Error arctualtizant la propietat activa per l'avis " + id, e);
 			return null;
 		}

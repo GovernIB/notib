@@ -267,6 +267,11 @@ public class CacheHelper {
 		//evictFindUsuarisAmbPermis
 	}
 
+    @CacheEvict(value = "findUsuarisAndRolsAmbPermis", key="#procedimentId.concat('-').concat(#codiOrgan)")
+    public void evictFindUsuarisAndRolsAmbPermis(String procedimentId, String codiOrgan) {
+        //evictFindUsuarisAndRolsAmbPermis
+    }
+
 	@CacheEvict(value = {"oficinesSIREntitat", "oficinesSIRUnitat"}, allEntries = true)
 	public void evictCercaOficines() {
 		//evictCercaOficines

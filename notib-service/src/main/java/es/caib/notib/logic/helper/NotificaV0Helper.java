@@ -7,6 +7,7 @@ import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
+import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
@@ -77,6 +78,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	private EnviamentTableHelper enviamentTableHelper;
 	@Autowired
 	private AccioMassivaHelper accioMassivaHelper;
+    @Autowired
+    private ComandaListener comandaListener;
 
 	private MockPlay mockPlay;
 
@@ -128,6 +131,9 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 						pluginHelper.enviarNotificacioMobil(e);
 					}
 				}
+                for (var enviament : notificacio.getEnviaments()) {
+                    comandaListener.enviarTasca(enviament);
+                }
 				integracioHelper.addAccioOk(info);
 			} else {
 				error = true;
@@ -277,6 +283,10 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 						datatDarrer = datado;
 					}
 				}
+                var estat = getEstatNotifica(datatDarrer.getResultado());
+                if (!datatData.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
+                    comandaListener.enviarTasca(enviament);
+                }
 				var event = new NotificaRespostaDatatDto.NotificaRespostaDatatEventDto();
 				event.setData(datatData);
 				event.setEstat(datado.getResultado());

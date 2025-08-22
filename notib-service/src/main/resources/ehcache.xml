@@ -44,6 +44,7 @@
 	<cache alias="entitatsUsuari" uses-template="default"><expiry><ttl unit="seconds">43200</ttl></expiry></cache>
 	<cache alias="organsGestorsUsuari" uses-template="default"/>
 	<cache alias="findUsuarisAmbPermis" uses-template="default"/>
+	<cache alias="findUsuarisAndRolsAmbPermis" uses-template="default"/>
 
 	<!-- ORGANIGRAMA -->
 	<cache alias="organismes" uses-template="default"><expiry><ttl unit="seconds">604800</ttl></expiry></cache>

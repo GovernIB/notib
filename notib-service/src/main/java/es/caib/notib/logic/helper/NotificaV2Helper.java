@@ -6,6 +6,7 @@ import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
+import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
@@ -110,6 +111,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private EnviamentTableHelper enviamentTableHelper;
 	@Autowired
 	private AccioMassivaHelper accioMassivaHelper;
+    @Autowired
+    private ComandaListener comandaListener;
 
 	private static final String NOTIB = "Notib";
     @Autowired
@@ -195,6 +198,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					for (var enviament: notificacio.getEnviamentsPerNotifica()) {
 						enviament.setNotificaDataCaducitat(dataCaducitat);
 						enviament.setNotificaDataDisposicio(dataDisposicio);
+                        //Enviar estat pendent a Comanda
+                        comandaListener.enviarTasca(enviament);
 					}
 
 					if (pluginHelper.enviarCarpeta()) {
@@ -641,6 +646,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				null,
 				null,
 				enviament);
+        //Enviar la informacio del canvi d'estat a Comanda
+        comandaListener.enviarTasca(enviament);
 		log.info(" [EST] Fi actualització Datat");
 	}
 

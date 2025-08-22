@@ -24,5 +24,6 @@ public enum LoggingTipus {
     METRIQUES_SISTEMA,
     NOTIFICA_SOAP,
     ENTREGA_CIE,
-    USUARIS;
+    USUARIS,
+    COMANDA;
 }
