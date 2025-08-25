@@ -69,6 +69,9 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 				throw new Exception("El plugin de CARPETA no està configurat");
 			}
 			// peticionsPlugin.updatePeticioTotal(configHelper.getEntitatActualCodi());
+            if (configHelper.getEntitatActualCodi() == null) {
+                configHelper.setEntitatCodi(e.getNotificacio().getEntitat().getCodi());
+            }
 			var res = getPlugin().enviarNotificacioMobil(crearMissatgeCarpetaParams(e));
 			if (!Strings.isNullOrEmpty(res.getCode()) && "OK".equalsIgnoreCase(res.getCode())) {
 				integracioHelper.addAccioOk(info);
