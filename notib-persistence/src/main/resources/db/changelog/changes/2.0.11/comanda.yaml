@@ -6,4 +6,4 @@ databaseChangeLog:
         - sql: "INSERT INTO NOT_CONFIG_GROUP (CODE, PARENT_CODE, POSITION, DESCRIPTION) VALUES ('COMANDA', 'PLUGINS', 12, 'Plugin de Comanda');
         INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE, POSITION) VALUES ('es.caib.notib.plugin.comanda.url', 'URL del plugin de Comanda', '', 'COMANDA', 0, 'TEXT', 0, '0');
         INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.COMANDA', 'false', 'Mostrar logs del plugin de Comanda', 'LOGS', 23, 0, 'BOOL', 0);
-        INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE, POSITION) VALUES ('es.caib.notib.plugin.comanda.entorn.codi', '', 'Codi entorn enviat a Comanda', 'COMANDA', 0, 'TEXT', 0, '0');"
+        INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE, POSITION) VALUES ('es.caib.notib.plugin.comanda.entorn.codi', '', 'Codi entorn enviat a Comanda', 'COMANDA', 0, 'TEXT', 0, '0'); "

@@ -6,67 +6,67 @@ databaseChangeLog:
         - modifyDataType:
             columnName: TOT_PENDENT
             tableName: NOT_EXPLOT_FET
-            newDataType: number ¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ REPASSAR !!!!!!!!!!!!!!!!!!!! (number38 bigInt)
+            newDataType: bigint
         - modifyDataType:
             columnName: TOT_REG_ERR
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: bigint
         - modifyDataType:
             columnName: TOT_REGISTR
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: bigint
         - modifyDataType:
             columnName: TOT_SIR_ACC
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: bigint
         - modifyDataType:
             columnName: TOT_SIR_REB
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: bigint
         - modifyDataType:
             columnName: TOT_NOT_ERR
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: bigint
         - modifyDataType:
             columnName: TOT_NOT_ENV
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: bigint
         - modifyDataType:
             columnName: TOT_NOT_NOT
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: bigint
         - modifyDataType:
             columnName: TOT_NOT_REB
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: bigint
         - modifyDataType:
             columnName: TOT_NOT_EXP
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: bigint
         - modifyDataType:
             columnName: TOT_CIE_ERR
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: bigint
         - modifyDataType:
             columnName: TOT_CIE_ENV
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: bigint
         - modifyDataType:
             columnName: TOT_CIE_NOT
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: bigint
         - modifyDataType:
             columnName: TOT_CIE_REB
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: bigint
         - modifyDataType:
             columnName: TOT_CIE_FAL
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: bigint
         - modifyDataType:
             columnName: TOT_PROCESS
             tableName: NOT_EXPLOT_FET
-            newDataType: NULL
+            newDataType: bigint
 
   - changeSet:
       id: add-calculated-columns
