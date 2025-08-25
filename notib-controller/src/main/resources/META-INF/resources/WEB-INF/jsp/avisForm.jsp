@@ -31,7 +31,7 @@
 		<not:inputText name="assumpte" textKey="avis.form.camp.assumpte" required="true"/>
 		<not:inputTextarea name="missatge" textKey="avis.form.camp.missatge" required="true"/>
 		<not:inputDate name="dataInici" textKey="avis.form.camp.dataInici" required="true"/>
-		<not:inputDate name="dataFinal" textKey="avis.form.camp.dataFinal" required="true"/>
+		<not:inputDate name="dataFinal" textKey="avis.form.camp.dataFinal"/>
 		<not:inputSelect name="avisNivell" textKey="avis.form.camp.avisNivell" optionEnum="AvisNivellEnumDto" required="true"/>
 		
 		<div id="modal-botons" class="well">>

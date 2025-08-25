@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - dropNotNullConstraint:
+            columnName: data_final
+            tableName: not_avis
+        - sql: ""

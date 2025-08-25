@@ -22,7 +22,7 @@ public interface AvisRepository extends JpaRepository<AvisEntity, Long> {
 			"    a.actiu = true " +
 			"and (a.entitatId is null or a.entitatId = :entitatId)" +
 			"and a.dataInici <= :currentDate " +
-			"and a.dataFinal >= :currentDate")
+			"and (a.dataFinal is null or a.dataFinal >= :currentDate)")
 	List<AvisEntity> findActiveAdmin(@Param("currentDate") Date currentDate, @Param("entitatId") Long entitatId);
 
 	@Query(	"from " +
@@ -31,7 +31,7 @@ public interface AvisRepository extends JpaRepository<AvisEntity, Long> {
 			"    a.actiu = true " +
 			"and a.avisAdministrador = false " +
 			"and a.dataInici <= :currentDate " +
-			"and a.dataFinal >= :currentDate")
+			"and (a.dataFinal is null or a.dataFinal >= :currentDate)")
 	List<AvisEntity> findActive(@Param("currentDate") Date currentDate);
 
 	List<AvisEntity> findByEntitatIdAndAssumpte(Long entitatId, String assumpte);
