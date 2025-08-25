@@ -221,7 +221,7 @@ public class SubsistemesHelper {
         } else {
             estat = EstatSalutEnum.WARN; // 5-10%
         }
-        
+
         setDarrerEstat(subsistema, estat);
         return estat;
     }
@@ -230,7 +230,7 @@ public class SubsistemesHelper {
         final Metrics m = METRICS.get(subsistema);
         return m != null && m.darrerEstat != null ? m.darrerEstat : EstatSalutEnum.UNKNOWN;
     }
-    
+
     private static void setDarrerEstat(SubsistemesEnum subsistema, EstatSalutEnum estat) {
         Metrics m = METRICS.get(subsistema);
         if (m == null) {
