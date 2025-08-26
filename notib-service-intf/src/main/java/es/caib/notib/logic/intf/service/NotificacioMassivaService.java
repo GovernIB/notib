@@ -173,6 +173,16 @@ public interface NotificacioMassivaService {
 	@PreAuthorize("isAuthenticated()")
 	byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException;
 
+    /**
+     * Obté un fitxer amb els codis de tipus de via, país, província i municipi per els enviaments amb entrega postal
+     *
+     * @return El fitxer d'exemple
+     * @throws NoSuchFileException Si no es troba el fitxer
+     * @throws IOException Si no es pot llegir el fitxer
+     */
+    @PreAuthorize("isAuthenticated()")
+    byte[] getCodisEntregaPostal() throws IOException;
+
 	/**
 	 * Cancelar la notificacio massiva.
 	 *

@@ -97,7 +97,13 @@ public class NotificacioMassivaService extends AbstractService<es.caib.notib.log
 		return getDelegateService().getModelDadesCarregaMassiuCSV();
 	}
 
-	@Override
+    @Override
+	@RolesAllowed("**")
+    public byte[] getCodisEntregaPostal() throws IOException {
+        return getDelegateService().getCodisEntregaPostal();
+    }
+
+    @Override
 	@RolesAllowed("**")
 	public void cancelar(Long entitatId, Long notificacioMassivaId) throws Exception {
 		getDelegateService().cancelar(entitatId, notificacioMassivaId);

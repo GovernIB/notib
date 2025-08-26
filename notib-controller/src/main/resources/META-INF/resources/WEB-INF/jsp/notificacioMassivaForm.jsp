@@ -10,15 +10,19 @@
 
 <html>
 <head>
-	<title>${titol} 	<div class="text-right col-md-12">
-		<a href="<c:url value="/notificacio/massiva/getModelDadesCarregaMassiuCSV"/>"
-		class="btn btn-info btn-sm fileDownloadSimpleRichExperience"
-		style="position: relative;top: -35px;right: -12px;"
-		title="<spring:message code="notificacio.massiva.accio.descarregar.modeloCsv"/>">
-		<spring:message code="notificacio.massiva.accio.descarregar.modeloCsv"/>
-		<span class="fa fa-download"></span>
-		</a>
-		</div></title>
+	<title>
+        ${titol}
+            <div class="text-right col-md-12">
+            <a href="<c:url value="/notificacio/massiva/getCodisEntregaPostal"/>" class="btn btn-danger btn-sm fileDownloadSimpleRichExperience"
+                style="position: relative;top: -35px;right: -6px;" title="<spring:message code="notificacio.massiva.accio.descarregar.codis.entrega.postal"/>">
+                <spring:message code="notificacio.massiva.accio.descarregar.codis.entrega.postal"/><span style="margin-left:3px;" class="fa fa-download"></span>
+            </a>
+            <a href="<c:url value="/notificacio/massiva/getModelDadesCarregaMassiuCSV"/>" class="btn btn-info btn-sm fileDownloadSimpleRichExperience"
+                style="position: relative;top: -35px;right: -12px;" title="<spring:message code="notificacio.massiva.accio.descarregar.modeloCsv"/>">
+                <spring:message code="notificacio.massiva.accio.descarregar.modeloCsv"/><span style="margin-left:3px;" class="fa fa-download"></span>
+            </a>
+		</div>
+    </title>
     <link href="<c:url value="/css/jasny-bootstrap.min.css"/>" rel="stylesheet">
 	<script src="<c:url value="/js/jasny-bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>

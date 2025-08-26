@@ -388,6 +388,18 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         }
     }
 
+    @GetMapping(value = "/getCodisEntregaPostal")
+    @ResponseBody
+    public void getCodisEntregaPostal(HttpServletResponse response) throws IOException {
+
+        response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
+        try {
+            writeFileToResponse("codisEntregaPostal.pdf", notificacioMassivaService.getCodisEntregaPostal(), response);
+        } catch (Exception ex) {
+            log.debug("Error descarregant el fitxer de codis per l'entrega postal", ex);
+        }
+    }
+
     @InitBinder
     protected void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
