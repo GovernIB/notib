@@ -30,6 +30,8 @@ public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long
 
 	List<AplicacioEntity> findByEntitat(EntitatEntity entitat);
 
+	List<AplicacioEntity> findByEntitatAndActivaIsTrue(EntitatEntity entitat);
+
 	AplicacioEntity findByUsuariCodiAndEntitatId(String usuariCodi,Long entitatId);
 
 	AplicacioEntity findByEntitatIdAndId(Long entitatId, Long id);

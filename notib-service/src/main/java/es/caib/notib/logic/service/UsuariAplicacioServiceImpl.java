@@ -293,7 +293,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		String error;
 		try {
 			var entitat = entitatRepository.findById(entitatId).orElseThrow();
-			var aplicacions = aplicacioRepository.findByEntitat(entitat);
+			var aplicacions = aplicacioRepository.findByEntitatAndActivaIsTrue(entitat);
 			if (aplicacions.isEmpty()) {
 				return IntegracioDiagnostic.builder().correcte(false).errMsg("No hi han aplicacions per aquesta entitat").build();
 			}
