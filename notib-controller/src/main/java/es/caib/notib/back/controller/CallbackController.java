@@ -5,6 +5,8 @@ import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
+import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
 import es.caib.notib.logic.intf.dto.SiNo;
 import es.caib.notib.logic.intf.dto.organisme.NumeroPermisos;
 import es.caib.notib.logic.intf.service.CallbackService;
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -67,6 +70,9 @@ public class CallbackController extends TableAccionsMassivesController {
         model.addAttribute("mantenirPaginacio", mantenirPaginacio != null && mantenirPaginacio);
         model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
         model.addAttribute("fiReintetsList", EnumHelper.getOptionsForEnum(SiNo.class, "es.caib.notib.logic.intf.dto.SiNo."));
+        var estats = EnumHelper.getOptionsForEnum(CallbackEstatEnumDto.class,"es.caib.notib.logic.intf.dto.CallbackEstatEnumDto.");
+        estats = estats.stream().filter(e -> CallbackEstatEnumDto.ERROR.name().equals(e.getValue()) || CallbackEstatEnumDto.PENDENT.name().equals(e.getValue())).collect(Collectors.toList());
+        model.addAttribute("estats", estats);
         model.addAttribute(getFiltreCommand(request));
         return "callback";
     }
@@ -82,6 +88,9 @@ public class CallbackController extends TableAccionsMassivesController {
             RequestSessionHelper.actualitzarObjecteSessio(request, CALLBACK_ID, command.getId());
         }
         RequestSessionHelper.actualitzarObjecteSessio(request, CALLBACK_FILTRE, command);
+        var estats = EnumHelper.getOptionsForEnum(CallbackEstatEnumDto.class,"es.caib.notib.logic.intf.dto.CallbackEstatEnumDto.");
+        estats = estats.stream().filter(e -> CallbackEstatEnumDto.ERROR.name().equals(e.getValue()) || CallbackEstatEnumDto.PENDENT.name().equals(e.getValue())).collect(Collectors.toList());
+        model.addAttribute("estats", estats);
         model.addAttribute("fiReintentsList", EnumHelper.getOptionsForEnum(SiNo.class, "es.caib.notib.logic.intf.dto.SiNo."));
         model.addAttribute("callbackFiltreCommand", command);
         return "callback";

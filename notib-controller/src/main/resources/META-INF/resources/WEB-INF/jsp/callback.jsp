@@ -149,6 +149,16 @@
             <div class="col-md-2">
                 <not:inputDate name="dataFi" placeholderKey="callback.filtre.data.creacio.fi" inline="true" required="false" />
             </div>
+            <div class="col-md-2">
+                <not:inputDate name="dataIniciUltimIntent" placeholderKey="callback.filtre.data.ultim.intent.inici" inline="true" required="false" />
+            </div>
+            <div class="col-md-2">
+                <not:inputDate name="dataFiUltimIntent" placeholderKey="callback.filtre.data.ultim.intent.fi" inline="true" required="false" />
+            </div>
+            <div class="col-md-2">
+                <not:inputSelect name="estat" optionItems="${estats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
+                             placeholderKey="callback.filtre.estat" textKey="callback.filtre.fi.reintents" required="true" labelSize="0"/>
+            </div>
             <div class="col-md-1">
                 <not:inputSelect name="fiReintents" optionItems="${fiReintentsList}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
                                  placeholderKey="callback.filtre.fi.reintents" textKey="callback.filtre.fi.reintents" required="true" labelSize="0"/>

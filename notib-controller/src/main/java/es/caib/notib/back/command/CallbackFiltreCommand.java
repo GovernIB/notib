@@ -21,6 +21,9 @@ public class CallbackFiltreCommand extends FiltreCommand {
     private String referenciaRemesa;
     private String dataInici;
     private String dataFi;
+    private String dataIniciUltimIntent;
+    private String dataFiUltimIntent;
+    private CallbackEstatEnumDto estat;
     private SiNo fiReintents;
 
     public void setDataInici(String dataInici) {
@@ -36,7 +39,15 @@ public class CallbackFiltreCommand extends FiltreCommand {
     }
 
     public CallbackFiltre asDto() {
-        return CallbackFiltre.builder().usuariCodi(usuariCodi).dataInici(dataInici).dataFi(dataFi).referenciaRemesa(referenciaRemesa).fiReintents(fiReintents).build();
+        return CallbackFiltre.builder()
+                .usuariCodi(usuariCodi)
+                .estat(estat)
+                .dataInici(dataInici)
+                .dataFi(dataFi)
+                .dataIniciUltimIntent(dataIniciUltimIntent)
+                .dataFiUltimIntent((dataFiUltimIntent))
+                .referenciaRemesa(referenciaRemesa)
+                .fiReintents(fiReintents).build();
     }
 
 

@@ -25,6 +25,8 @@ public class CallbackFiltre {
     private String referenciaRemesa;
     private String dataInici;
     private String dataFi;
+    private String dataIniciUltimIntent;
+    private String dataFiUltimIntent;
     private CallbackEstatEnumDto estat;
     private SiNo fiReintents;
     private int maxReintents;
@@ -43,6 +45,14 @@ public class CallbackFiltre {
 
     public boolean dataFiNull() {
         return Strings.isNullOrEmpty(dataFi);
+    }
+
+    public boolean dataIniciUltimIntentNull() {
+        return Strings.isNullOrEmpty(dataIniciUltimIntent);
+    }
+
+    public boolean dataFiUltimIntentNull() {
+        return Strings.isNullOrEmpty(dataFiUltimIntent);
     }
 
     public boolean fiReintentsNull() {
@@ -89,6 +99,46 @@ public class CallbackFiltre {
             return cal.getTime();
         } catch (Exception e) {
             log.error("[CallbackFiltre] dataFiDate, error parsejant la data : " + dataFi, e);
+            return null;
+        }
+    }
+
+    public Date dataIniciUltimIntentDate() {
+
+        if (Strings.isNullOrEmpty(dataIniciUltimIntent)) {
+            return null;
+        }
+        try {
+            var data = new SimpleDateFormat("dd/MM/yyyy").parse(dataIniciUltimIntent);
+            var cal = Calendar.getInstance();
+            cal.setTime(data);
+            cal.set(Calendar.HOUR, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            return cal.getTime();
+        } catch (Exception e) {
+            log.error("[CallbackFiltre] dataIniciDate, error parsejant la data : " + dataIniciUltimIntent, e);
+            return null;
+        }
+    }
+
+    public Date dataFiUltimIntentDate() {
+
+        if (Strings.isNullOrEmpty(dataFiUltimIntent)) {
+            return null;
+        }
+        try {
+            var data = new SimpleDateFormat("dd/MM/yyyy").parse(dataFiUltimIntent);
+            var cal = Calendar.getInstance();
+            cal.setTime(data);
+            cal.set(Calendar.HOUR, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.SECOND, 59);
+            cal.set(Calendar.MILLISECOND, 999);
+            return cal.getTime();
+        } catch (Exception e) {
+            log.error("[CallbackFiltre] dataFiDate, error parsejant la data : " + dataFiUltimIntent, e);
             return null;
         }
     }

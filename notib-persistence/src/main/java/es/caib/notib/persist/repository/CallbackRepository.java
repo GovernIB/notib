@@ -42,10 +42,13 @@ public interface CallbackRepository extends JpaRepository<CallbackEntity, Long> 
             "join NotificacioEntity n on c.notificacioId = n.id " +
             "where n.entitat.id = :#{#filtre.entitatId} " +
             "   and (c.estat = es.caib.notib.logic.intf.dto.CallbackEstatEnumDto.PENDENT or c.error = true) " +
+            "   and (:#{#filtre.estat} = true or c.estat = :#{#filtre.estat}) " +
             "   and (:#{#filtre.usuariCodiNull} = true or lower(c.usuariCodi) like concat('%', lower(:#{#filtre.usuariCodi}), '%'))" +
             "   and (:#{#filtre.referenciaRemesaNull} = true or lower(n.referencia) like concat('%', lower(:#{#filtre.referenciaRemesa}), '%'))" +
             "   and (:#{#filtre.dataIniciNull} = true or c.dataCreacio >= :#{#filtre.dataIniciDate}) " +
             "   and (:#{#filtre.dataFiNull} = true or c.dataCreacio <= :#{#filtre.dataFiDate}) "+
+            "   and (:#{#filtre.dataIniciUltimIntentNull} = true or c.ultimIntent >= :#{#filtre.dataIniciUltimIntentDate}) " +
+            "   and (:#{#filtre.dataFiUltimIntentNull} = true or c.ultimIntent <= :#{#filtre.dataFiUltimIntentDate}) "+
             "   and (:#{#filtre.fiReintentsNull} = true or (:#{#filtre.fiReintentsInt()} = 0 and c.intents < :#{#filtre.maxReintents} or :#{#filtre.fiReintentsInt()} = 1 and c.intents >= :#{#filtre.maxReintents})) ")
     Page<CallbackEntity> findPendentsByEntitat(CallbackFiltre filtre, Pageable page);
 
