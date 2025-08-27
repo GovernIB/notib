@@ -45,6 +45,11 @@
 		<not:inputSelect name="rols" textKey="usuari.form.camp.rols" optionItems="${usuariCommand.rols}" disabled="true"/>
 		<not:inputCheckbox name="rebreEmailsNotificacio" textKey="usuari.form.camp.rebre.emails.notificacio"/>
 		<not:inputCheckbox name="rebreEmailsNotificacioCreats" textKey="usuari.form.camp.rebre.emails.notificacio.creats"/>
+		<not:inputSelect name="entitatDefecte" optionItems="${entitats}" textKey="usuari.form.camp.entitat.defecte" optionValueAttribute="codi" optionTextKeyAttribute="valor" disabled="false"/>
+<%--        <not:inputSelect name="entitatDefecte" textKey="usuari.form.camp.entitat.defecte" optionItems="${entitats}" optionValueAttribute="codi" optionTextAttribute="valor" emptyOption="true"/>--%>
+
+		<not:inputSelect name="procedimentDefecte" optionItems="${procediments}" textKey="usuari.form.camp.procediment.defecte" optionValueAttribute="codi" optionTextKeyAttribute="valor" disabled="false"/>
+		<not:inputSelect name="organDefecte" optionItems="${organs}" textKey="usuari.form.camp.organ.defecte" optionValueAttribute="codi" optionTextKeyAttribute="valor" disabled="false"/>
 		<not:inputSelect name="idioma" optionItems="${idiomaEnumOptions}" textKey="usuari.form.camp.idioma" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="false"/>
 		<not:inputSelect name="numElementsPaginaDefecte" optionItems="${numElementsPaginaDefecte}" optionValueAttribute="value" optionTextKeyAttribute="text" textKey="usuari.form.camp.elements.pagina.defecte"/>
 		<div id="modal-botons">

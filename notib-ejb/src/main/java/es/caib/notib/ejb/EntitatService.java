@@ -3,6 +3,7 @@
  */
 package es.caib.notib.ejb;
 
+import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.EntitatDataDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
@@ -100,6 +101,12 @@ public class EntitatService extends AbstractService<es.caib.notib.logic.intf.ser
 	public List<EntitatDto> findAccessiblesUsuariActual(String rolActual) {
 		return getDelegateService().findAccessiblesUsuariActual(rolActual);
 	}
+
+    @Override
+    @RolesAllowed("**")
+    public List<CodiValorDto> findAccessiblesUsuariActualCodiValor(String rolActual) {
+        return getDelegateService().findAccessiblesUsuariActualCodiValor(rolActual);
+    }
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_ADMIN_LECTURA"})

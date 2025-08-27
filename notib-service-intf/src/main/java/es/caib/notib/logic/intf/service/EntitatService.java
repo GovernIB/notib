@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.intf.service;
 
+import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.EntitatDataDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
@@ -159,6 +160,9 @@ public interface EntitatService {
 	 */
 	@PreAuthorize("isAuthenticated()")
 	public List<EntitatDto> findAccessiblesUsuariActual(String rolActual);
+
+    @PreAuthorize("isAuthenticated()")
+	List<CodiValorDto> findAccessiblesUsuariActualCodiValor(String rolActual);
 
 	/**
 	 * Comprova si l'usuari acutal té permisos d'usuari de l'entitat actual

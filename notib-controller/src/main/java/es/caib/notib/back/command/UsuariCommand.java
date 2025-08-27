@@ -29,6 +29,9 @@ public class UsuariCommand implements Serializable {
 	private String nif;
 	private String email;
 	private String emailAlt;
+	private String entitatDefecte;
+	private Long procedimentDefecte;
+	private String organDefecte;
 	private String idioma;
 	private String[] rols;
 	private Boolean rebreEmailsNotificacio;

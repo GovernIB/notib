@@ -14,6 +14,7 @@ import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.intf.acl.ExtendedPermission;
+import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.EntitatDataDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
@@ -385,6 +386,19 @@ public class EntitatServiceImpl implements EntitatService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<CodiValorDto> findAccessiblesUsuariActualCodiValor(String rolActual) {
+
+        var entitats = findAccessiblesUsuariActual(rolActual);
+        List<CodiValorDto> enttitatsCodiValor = new ArrayList<>();
+        for (var entitat : entitats) {
+            enttitatsCodiValor.add(CodiValorDto.builder().codi(entitat.getCodi()).valor(entitat.getNom()).build());
+        }
+        return enttitatsCodiValor;
+    }
 	
 	@Transactional
 	@Override

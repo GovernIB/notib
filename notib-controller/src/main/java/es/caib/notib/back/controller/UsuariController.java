@@ -10,13 +10,16 @@ import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.client.domini.NumElementsPaginaDefecte;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.UsuariService;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
 import static es.caib.notib.back.controller.UsuariController.ResultatEstatEnum.ERROR;
@@ -55,8 +59,12 @@ public class UsuariController extends BaseController {
     private UsuariService usuariService;
 
 	private static final String REDIRECT = "redirect:/";
+    @Autowired
+    private EntitatService entitatService;
+//    @Autowired
+//    private LocalStatelessSessionProxyFactoryBean permisosService;
 
-	@RequestMapping(value = "/refresh", method = RequestMethod.HEAD)
+    @RequestMapping(value = "/refresh", method = RequestMethod.HEAD)
 	public void refresh(HttpServletRequest request, HttpServletResponse response) {
 		// EMPTY METHOD
 	}
@@ -66,7 +74,16 @@ public class UsuariController extends BaseController {
 
 		var usuari = aplicacioService.getUsuariActual();
 		model.addAttribute(UsuariCommand.asCommand(usuari));
+        var rolActual = sessionScopedContext.getRolActual();
+        if (rolActual == null) {
+            rolActual = "tothom";
+        }
+        var entitats = entitatService.findAccessiblesUsuariActualCodiValor(rolActual);
+//        var procediments = permisosService.getProcedimentsAmbPermis(entitat.getId(), usuari.getCodi(), permis);
 		model.addAttribute("idiomaEnumOptions", EnumHelper.getOptionsForEnum(Idioma.class,"usuari.form.camp.idioma.enum."));
+		model.addAttribute("entitats", entitats);
+		model.addAttribute("procediments", EnumHelper.getOptionsForEnum(Idioma.class,"usuari.form.camp.idioma.enum."));
+		model.addAttribute("organs", EnumHelper.getOptionsForEnum(Idioma.class,"usuari.form.camp.idioma.enum."));
 		model.addAttribute("numElementsPaginaDefecte", EnumHelper.getOptionsForEnum(NumElementsPaginaDefecte.class,"usuari.form.camp.elements.pagina.perdefecte.enum."));
 		return "usuariForm";
 	}
