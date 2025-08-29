@@ -117,7 +117,7 @@ public class SalutServiceImpl implements SalutService {
         SubsistemesHelper.SubsistemesInfo subsistemesInfo = SubsistemesHelper.getSubsistemesInfo();
         var subsistemes = subsistemesInfo.getSubsistemesSalut();  // Subsistemes
         var estatGlobalSubsistemes = subsistemesInfo.getEstatGlobal();
-        if (EstatSalutEnum.UP.equals(estatSalut.getEstat()) && !EstatSalutEnum.UP.equals(estatGlobalSubsistemes)) {
+        if (EstatSalutEnum.UP.equals(estatSalut.getEstat()) && !EstatSalutEnum.UP.equals(estatGlobalSubsistemes) && !EstatSalutEnum.UNKNOWN.equals(estatGlobalSubsistemes)) {
             estatSalut = EstatSalut.builder()
                     .estat(estatGlobalSubsistemes)
                     .latencia(estatSalut.getLatencia())
