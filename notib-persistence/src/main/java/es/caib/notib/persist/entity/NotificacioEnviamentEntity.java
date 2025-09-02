@@ -1,7 +1,9 @@
 package es.caib.notib.persist.entity;
 
+import es.caib.comanda.ms.broker.model.TascaEstat;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
@@ -655,4 +657,34 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
 		return EnviamentEstat.NOTIFICADA.equals(notificaEstat) || entregaPostal != null && CieEstat.NOTIFICADA.equals(entregaPostal.getCieEstat());
 	}
+
+
+    /* TODO S 'HA DE POSAR PENDENT NO S'USA A NOTIB,
+                       TODO INICIADA - ENVIADA A NOTIFICA O REGISTRE SI ES SIR, FINALITZADA SI ESTA EN ESTAT FINAL A NOTIFICA/NEXEA O LLEGIT A SIR,
+                        CANCELADA - issue #1027
+                        ERROR - si al enviar a Notifica/Nexea o a registre si és SIR han retornat un estat d'error
+                       */
+    public TascaEstat getEstatPerComanda() {
+
+        if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {
+            if (registreEstatFinal) {
+                return TascaEstat.FINALITZADA;
+            }
+        }
+        if (isCieEstatFinal() || isNotificaEstatFinal()) {
+            return TascaEstat.FINALITZADA;
+        }
+
+        return TascaEstat.INICIADA;
+    }
+
+    public boolean isNotificaEstatFinal() {
+
+        return EnviamentEstat.ANULADA.equals(notificaEstat)
+                || EnviamentEstat.ERROR_ENTREGA.equals(notificaEstat)
+                || EnviamentEstat.NOTIFICADA.equals(notificaEstat)
+                || EnviamentEstat.REBUTJADA.equals(notificaEstat)
+                || EnviamentEstat.EXPIRADA.equals(notificaEstat)
+                || EnviamentEstat.LLEGIDA.equals(notificaEstat);
+    }
 }
