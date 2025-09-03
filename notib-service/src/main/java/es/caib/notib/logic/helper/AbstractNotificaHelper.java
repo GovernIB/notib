@@ -170,8 +170,11 @@ public abstract class AbstractNotificaHelper {
 		NotificacioEntity notificacio = enviament.getNotificacio();
 		var dataEnviamentNotifica = notificacio.getNotificaEnviamentData();
 		var retard = notificacio.getRetard();
-		var dataRetard = DateUtils.addDays(dataEnviamentNotifica, retard);
-		var cancelar = dataRetard.before(dataEnviamentNotifica);
+        var cancelar = false;
+		if (retard != null) {
+            var dataRetard = DateUtils.addDays(dataEnviamentNotifica, retard);
+		    cancelar = dataRetard.before(dataEnviamentNotifica);
+        }
 		if (cancelar && enviament.getEntregaPostal() != null && estatFinal && enviament.getEntregaPostal().getCieId() == null) {
 			var ok = ciePluginJms.cancelarEnviament(enviament.getUuid());
 			if (!ok) {
