@@ -75,6 +75,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private AccioMassivaService accioMassivaService;
 
     private static final  String NOTIFICACIONS_FILTRE = "notificacions_filtre";
+    private static final  String NOTIFICACIONS_FILTRE_ESBORRADES = "notificacions_filtre_esborrades";
     private static final String SESSION_ATTRIBUTE_SELECCIO = "NotificacioController.session.seleccio";
     private static final String NOT_INFO = "notificacioInfo";
     private static final String REDIRECT = "redirect:";
@@ -131,6 +132,30 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @GetMapping(value = "/notificacionsEsborrades")
     public String getNotificacionsEsborrades(HttpServletRequest request, Model model) {
+
+        var entitatActual = getEntitatActualComprovantPermisos(request);
+        var organGestorActual = getOrganGestorActual(request);
+        var filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
+        filtre.setDeleted(true);
+        model.addAttribute(filtre);
+        var codiUsuari = getCodiUsuariActual();
+        var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), codiUsuari);
+        model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
+        notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
+        return "notificacioEsborradaList";
+    }
+
+    @PostMapping(value = "/notificacionsEsborrades")
+    public String getNotificacionsEsborradesPost(HttpServletRequest request, NotificacioFiltreCommand command, Model model) {
+        RequestSessionHelper.actualitzarObjecteSessio(request, NOTIFICACIONS_FILTRE, command);
+        if (!command.getErrors().isEmpty()) {
+            MissatgesHelper.error(request, getErrorMsg(request, command.getErrors()));
+        }
+        return notificacionsEsborrades(request, model);
+    }
+
+    public String notificacionsEsborrades(HttpServletRequest request, Model model) {
+
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var organGestorActual = getOrganGestorActual(request);
         var filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
