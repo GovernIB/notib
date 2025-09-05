@@ -35,6 +35,10 @@ public class CallbackFiltre {
         return Strings.isNullOrEmpty(usuariCodi);
     }
 
+    public boolean estatNull() {
+        return estat == null;
+    }
+
     public boolean referenciaRemesaNull() {
         return Strings.isNullOrEmpty(referenciaRemesa);
     }

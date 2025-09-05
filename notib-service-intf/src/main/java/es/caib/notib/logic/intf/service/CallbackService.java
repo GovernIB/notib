@@ -54,5 +54,11 @@ public interface CallbackService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	CallbackResposta pausarCallback(Set<Long> callbacks, boolean pausat);
 
+    @PreAuthorize("hasRole('NOT_ADMIN')")
+    boolean esborrarCallback(Long callbackId);
+
+    @PreAuthorize("hasRole('NOT_ADMIN')")
+    CallbackResposta esborrarCallback(Set<Long> callbacks);
+
 	void processarPendentsJms();
 }

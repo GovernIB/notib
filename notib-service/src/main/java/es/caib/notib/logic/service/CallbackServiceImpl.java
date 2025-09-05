@@ -3,6 +3,7 @@ package es.caib.notib.logic.service;
 import es.caib.notib.logic.helper.CallbackHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.helper.PropertiesConstants;
@@ -12,11 +13,14 @@ import es.caib.notib.logic.intf.dto.callback.CallbackDto;
 import es.caib.notib.logic.intf.dto.callback.CallbackFiltre;
 import es.caib.notib.logic.intf.dto.callback.CallbackResposta;
 import es.caib.notib.logic.intf.service.CallbackService;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.threads.CallbackProcessarPendentsThread;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.CallbackRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
@@ -32,10 +36,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -67,9 +74,13 @@ public class CallbackServiceImpl implements CallbackService {
     private ConversioTipusHelper conversioTipusHelper;
     @Autowired
 	private JmsTemplate jmsTemplate;
+    @Autowired
+    private AplicacioRepository aplicacioRepository;
+    @Autowired
+    private MessageHelper messageHelper;
 
 
-	@Override
+    @Override
 	@Transactional(readOnly=true, propagation = Propagation.REQUIRES_NEW)
 	public void processarPendentsJms() {
 
@@ -199,6 +210,11 @@ public class CallbackServiceImpl implements CallbackService {
 			// Recupera l'event
 			var callback = callbackRepository.findById(callbackId).orElseThrow();
 			var enviament = notificacioEnviamentRepository.findById(callback.getEnviamentId()).orElseThrow();
+            var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(callback.getUsuariCodi(), enviament.getNotificacio().getEntitat().getId());
+            if (!aplicacio.isActiva()) {
+                NotibLogger.getInstance().info("[CallbackServiceImpl] El callback no s'envia ja que l'aplicacio  amb id " + aplicacio.getId() + " no esta activa ", log, LoggingTipus.CALLBACK);
+                return CallbackResposta.builder().ok(false).errorMsg(messageHelper.getMessage("callback.aplicacio.no.activa")).build();
+            }
 			try {
 				var notificacio = callbackHelper.notifica(enviament, null);
 				var isError = (notificacio != null && !notificacio.isErrorLastCallback());
@@ -212,34 +228,88 @@ public class CallbackServiceImpl implements CallbackService {
 		}
 	}
 
-	@Override
-	public CallbackResposta enviarCallback(Set<Long> callbacks) {
+//	@Override
+//	public CallbackResposta enviarCallback(Set<Long> callbacks) {
+//
+//		var timer = metricsHelper.iniciMetrica();
+//		try {
+//			log.info("Enviant callbacks massius");
+//			for (var callbackId : callbacks) {
+//				new Thread(() -> {
+//				var callback = callbackRepository.findById(callbackId).orElseThrow();
+//                var enviament = notificacioEnviamentRepository.findById(callback.getEnviamentId()).orElseThrow();
+//                var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(callback.getUsuariCodi(), enviament.getNotificacio().getEntitat().getId());
+//                if (!aplicacio.isActiva()) {
+//                    NotibLogger.getInstance().info("[CallbackServiceImpl] El callback no s'envia ja que l'aplicacio  amb id " + aplicacio.getId() + " no esta activa ", log, LoggingTipus.CALLBACK);
+//                    return;
+//                }
+//				try {
+//						callbackHelper.notifica(callback.getEnviamentId(), null);
+//					} catch (Exception e) {
+//						log.error(String.format("[Callback]L'enviament [Id: %d] ha provocat la següent excepcio:", callback.getEnviamentId()), e);
+//					}
+//				}).start();
+//			}
+//			return CallbackResposta.builder().ok(true).build();
+//		} catch (Exception e) {
+//			log.error("Error executant els callbacks massius " + e);
+//			return CallbackResposta.builder().ok(false).errorMsg(e.getMessage()).build();
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
+//	}
 
-		var timer = metricsHelper.iniciMetrica();
-		try {
-			log.info("Enviant callbacks massius");
-			for (var callbackId : callbacks) {
-				new Thread(() -> {
-				var callback = callbackRepository.findById(callbackId).orElseThrow();
-				try {
-						callbackHelper.notifica(callback.getEnviamentId(), null);
-					} catch (Exception e) {
-						log.error(String.format("[Callback]L'enviament [Id: %d] ha provocat la següent excepcio:", callback.getEnviamentId()), e);
-					}
-				}).start();
-			}
-			return CallbackResposta.builder().ok(true).build();
-		} catch (Exception e) {
-			log.error("Error executant els callbacks massius " + e);
-			return CallbackResposta.builder().ok(false).errorMsg(e.getMessage()).build();
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
+
+    @Override
+    public CallbackResposta enviarCallback(Set<Long> callbacks) {
+
+        var timer = metricsHelper.iniciMetrica();
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        try {
+            log.info("Enviant callbacks massius");
+            List<Future<Void>> futures = new ArrayList<>();
+
+            for (var callbackId : callbacks) {
+                futures.add(executorService.submit(() -> {
+                    var callback = callbackRepository.findById(callbackId).orElseThrow();
+                    var enviament = notificacioEnviamentRepository.findById(callback.getEnviamentId()).orElseThrow();
+                    var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(callback.getUsuariCodi(), enviament.getNotificacio().getEntitat().getId());
+
+                    if (!aplicacio.isActiva()) {
+                        NotibLogger.getInstance().info("[CallbackServiceImpl] El callback no s'envia ja que l'aplicacio amb id " + aplicacio.getId() + " no esta activa ", log, LoggingTipus.CALLBACK);
+                        return null; // Return null for inactive applications
+                    }
+
+                    try {
+                        callbackHelper.notifica(callback.getEnviamentId(), null);
+                    } catch (Exception e) {
+                        log.error(String.format("[Callback]L'enviament [Id: %d] ha provocat la següent excepcio:", callback.getEnviamentId()), e);
+                    }
+                    return null;
+                }));
+            }
+            for (Future<Void> future : futures) {
+                try {
+                    future.get();
+                } catch (ExecutionException e) {
+                    log.error("Error executant callback task", e.getCause());
+                }
+            }
+
+            return CallbackResposta.builder().ok(true).build();
+        } catch (Exception e) {
+            log.error("Error executant els callbacks massius " + e);
+            return CallbackResposta.builder().ok(false).errorMsg(e.getMessage()).build();
+        } finally {
+            executorService.shutdown(); // Properly shutdown the executor service
+            metricsHelper.fiMetrica(timer);
+        }
+    }
 
 	@Override
 	@Transactional
 	public boolean pausarCallback(Long callbackId, boolean pausat) {
+
 		try {
 			var callback = callbackRepository.findById(callbackId).orElseThrow();
 			callback.setPausat(pausat);
@@ -271,7 +341,38 @@ public class CallbackServiceImpl implements CallbackService {
 		}
 	}
 
-	private Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
+    @Override
+    public boolean esborrarCallback(Long callbackId) {
+
+        var timer = metricsHelper.iniciMetrica();
+        try {
+            log.info("Esborrant callback " + callbackId);
+            callbackRepository.deleteById(callbackId);
+            return true;
+        } catch (Exception e) {
+            log.error("Error pausant el callback amb id " + callbackId, e);log.error("Error pausant el callback amb id " + callbackId, e);
+            return false;
+        } finally {
+            metricsHelper.fiMetrica(timer);
+        }
+    }
+
+    @Override
+    public CallbackResposta esborrarCallback(Set<Long> callbacks) {
+
+        var timer = metricsHelper.iniciMetrica();
+        try {
+            log.info("Esborrant callbacks massius = " + callbacks);
+            callbackRepository.deleteAllById(callbacks);
+            return CallbackResposta.builder().ok(true).build();
+        } catch (Exception e) {
+            return CallbackResposta.builder().ok(false).errorMsg(e.getMessage()).build();
+        } finally {
+            metricsHelper.fiMetrica(timer);
+        }
+    }
+
+    private Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
 
 		Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<>();
 		mapeigPropietatsOrdenacio.put("usuariCodi", new String[] {"usuariCodi"});

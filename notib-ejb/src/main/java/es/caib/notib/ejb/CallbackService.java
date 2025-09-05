@@ -71,6 +71,18 @@ public class CallbackService extends AbstractService<es.caib.notib.logic.intf.se
 		return getDelegateService().pausarCallback(callbacks, pausat);
 	}
 
+    @Override
+    @RolesAllowed({"NOT_ADMIN"})
+    public boolean esborrarCallback(Long callbackId) {
+        return getDelegateService().esborrarCallback(callbackId);
+    }
+
+    @Override
+    @RolesAllowed({"NOT_ADMIN"})
+    public CallbackResposta esborrarCallback(Set<Long> callbacks) {
+        return getDelegateService().esborrarCallback(callbacks);
+    }
+
 	@Override
 	@PermitAll
 	public void processarPendentsJms() {

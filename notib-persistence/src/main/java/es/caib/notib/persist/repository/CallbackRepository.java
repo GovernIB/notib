@@ -40,9 +40,11 @@ public interface CallbackRepository extends JpaRepository<CallbackEntity, Long> 
 
     @Query("select c from CallbackEntity c " +
             "join NotificacioEntity n on c.notificacioId = n.id " +
+            "join AplicacioEntity a on a.usuariCodi = c.usuariCodi " +
             "where n.entitat.id = :#{#filtre.entitatId} " +
+            " and a.activa = true " +
             "   and (c.estat = es.caib.notib.logic.intf.dto.CallbackEstatEnumDto.PENDENT or c.error = true) " +
-            "   and (:#{#filtre.estat} = true or c.estat = :#{#filtre.estat}) " +
+            "   and (:#{#filtre.estatNull} = true or c.estat = :#{#filtre.estat}) " +
             "   and (:#{#filtre.usuariCodiNull} = true or lower(c.usuariCodi) like concat('%', lower(:#{#filtre.usuariCodi}), '%'))" +
             "   and (:#{#filtre.referenciaRemesaNull} = true or lower(n.referencia) like concat('%', lower(:#{#filtre.referenciaRemesa}), '%'))" +
             "   and (:#{#filtre.dataIniciNull} = true or c.dataCreacio >= :#{#filtre.dataIniciDate}) " +

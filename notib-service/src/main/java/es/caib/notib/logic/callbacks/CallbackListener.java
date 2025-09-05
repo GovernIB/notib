@@ -3,8 +3,12 @@ package es.caib.notib.logic.callbacks;
 
 import es.caib.notib.logic.helper.CallbackHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.NotibLogger;
+import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.CallbackRepository;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
@@ -31,6 +35,8 @@ public class CallbackListener {
     private final JmsTemplate jmsTemplate;
     private final CallbackRepository callbackRepository;
     private final ConfigHelper configHelper;
+    private final AplicacioRepository aplicacioRepository;
+    private final NotificacioEnviamentRepository enviamentRepository;
 
     @Transactional
     @JmsListener(destination = SmConstants.CUA_CALLBACKS, containerFactory = SmConstants.JMS_FACTORY_ACK)
@@ -40,6 +46,12 @@ public class CallbackListener {
         var callback = callbackRepository.findByEnviamentId(enviamentId);
         if (callback == null) {
             log.error("[CallbackListener] Error no existeix cap callback per l'enviament " + enviamentId);
+            return;
+        }
+        var enviament = enviamentRepository.findById(enviamentId).orElseThrow();
+        var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(callback.getUsuariCodi(), enviament.getNotificacio().getEntitat().getId());
+        if (!aplicacio.isActiva()) {
+            NotibLogger.getInstance().info("[CallbackListener] El callback no s'envia ja que l'aplicacio  amb id " + aplicacio.getId() + " no esta activa ", log, LoggingTipus.CALLBACK);
             return;
         }
         var maxIntents = configHelper.getConfigAsInteger("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max");

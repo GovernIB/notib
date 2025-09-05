@@ -203,6 +203,36 @@ public class CallbackController extends TableAccionsMassivesController {
         }
     }
 
+    @GetMapping(value = {"/{callbackId}/esborrar"})
+    public String esborrar(HttpServletRequest request, Model model, @PathVariable Long callbackId) {
+
+        try {
+            var resposta = callbackService.esborrarCallback(callbackId);
+            return resposta ? getAjaxControllerReturnValueSuccess(request, "redirect:/callback", "callback.controller.esborrar.ok")
+                    : getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.esborrar.error");
+        } catch (Exception ex) {
+            return getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.esborrar.error");
+        }
+    }
+
+    @GetMapping(value = {"/esborrar"})
+    public String esborrarMassiu(HttpServletRequest request, Model model) {
+
+        try {
+            var seleccio = getIdsSeleccionats(request);
+            if (seleccio == null || seleccio.isEmpty()) {
+                var msg = getMessage(request,"callback.controller.massiva.buida");
+                getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.enviat.error", new Object[] {msg});
+            }
+            log.info("Enviant callbacks amb id: " + StringUtils.join(seleccio, ", "));
+            var resposta = callbackService.esborrarCallback(seleccio);
+            return resposta.isOk() ? getAjaxControllerReturnValueSuccess(request, "redirect:/callback", "callback.controller.massiu.ok")
+                    : getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.massiu.error", new Object[] {resposta.getErrorMsg()});
+        } catch (Exception ex) {
+            return getAjaxControllerReturnValueError(request, "redirect:/callback", "callback.controller.massiu.error");
+        }
+    }
+
 
     private CallbackFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
