@@ -12,6 +12,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.time.LocalTime;
 
 /**
  * Command per al manteniment d'aplicacions.
@@ -30,6 +31,12 @@ public class AplicacioCommand {
 	private String callbackUrl;
 	private Long entitatId;
 	private boolean headerCsrf;
+    private LocalTime horariLaboralInici;
+    private LocalTime horariLaboralFi;
+    private Integer limitEnviamentsMinutLaboral;
+    private Integer limitEnviamentsMinutNoLaboral;
+    private Integer limitEnviamentsDiaLaboral;
+    private Integer limitEnviamentsDiaNoLaboral;
 
 	public static AplicacioCommand asCommand(AplicacioDto dto) {
 		return ConversioTipusHelper.convertir(dto, AplicacioCommand.class);

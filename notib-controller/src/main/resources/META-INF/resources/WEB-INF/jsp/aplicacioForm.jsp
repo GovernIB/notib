@@ -42,19 +42,18 @@
 	<form:form action="${createAplication}"  method="post" cssClass="form-horizontal" modelAttribute="aplicacioCommand" role="form">
 		<form:hidden path="id"/>
 		<input type="hidden" name="entitatId" value="${entitat.id}"/>
-<%--		<c:choose>--%>
-<%--			<c:when test="${!empty aplicacioCommand.id}">--%>
-				<not:inputText name="usuariCodi" textKey="aplicacio.form.camp.codi" required="true" readonly="${!empty aplicacioCommand.id}"/>
-<%--			</c:when>--%>
-<%--			<c:otherwise>--%>
-<%--				<not:inputSuggest name="usuariCodi" inline="false" placeholderKey="aplicacio.form.camp.codi" textKey="aplicacio.form.camp.codi"--%>
-<%--								  urlConsultaInicial="../../../../userajax/usuariDades" urlConsultaLlistat="../../../../userajax/usuarisDades"--%>
-<%--								  suggestValue="codi" suggestText="codi" minimumInputLength="2" />--%>
-<%--			</c:otherwise>--%>
-<%--		</c:choose>--%>
+        <not:inputText name="usuariCodi" textKey="aplicacio.form.camp.codi" required="true" readonly="${!empty aplicacioCommand.id}"/>
 
 		<not:inputText name="callbackUrl" textKey="aplicacio.form.camp.callback.url" required="true"/>
 		<not:inputCheckbox name="headerCsrf" generalClass="row" textKey="aplicacio.form.camp.callback.header.csrf"/>
+        <not:inputTime name="horariLaboralInici" textKey="aplicacio.form.camp.horari.laboral.inici"/>
+        <not:inputTime name="horariLaboralFi" textKey="aplicacio.form.camp.horari.laboral.fi"/>
+<%--        <form:input  id="limitEnviamentsMinutLaboral" cssClass="form-control" path="limitEnviamentsMinutLaboral" placeholder="aplicacio.form.camp.limit.enviament.minut.laboral" type="number" step="1" maxlength="2048"/>--%>
+		<not:inputText name="limitEnviamentsMinutLaboral" textKey="aplicacio.form.camp.limit.enviament.minut.laboral" required="true"/>
+		<not:inputText name="limitEnviamentsMinutNoLaboral" textKey="aplicacio.form.camp.enviament.minut.no.laboral" required="true"/>
+		<not:inputText name="limitEnviamentsDiaLaboral" textKey="aplicacio.form.camp.enviament.dia.laboral" required="true"/>
+		<not:inputText name="limitEnviamentsDiaNoLaboral" textKey="aplicacio.form.camp.enviament.dia.no.laboral" required="true"/>
+
 		<div id="modal-botons">
 			<c:if test ="${!empty aplicacioCommand.id}">
 				<button id="btnProvar" class="btn btn-primary" href="<c:url value="/entitat/${entitat.id}/aplicacio/${aplicacioCommand.id}/provar"/>"><span class="fa fa-cog"></span>&nbsp;&nbsp;<spring:message code="comu.boto.provar"/></button>

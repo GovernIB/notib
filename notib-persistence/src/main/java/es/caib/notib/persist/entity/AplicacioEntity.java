@@ -37,6 +37,7 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 	@Column(name = "header_csrf", nullable = false)
 	private boolean headerCsrf;
 
+
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat_id", nullable = false)
 	@ForeignKey(name = "not_aplicacio_entitat_fk")
