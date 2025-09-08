@@ -73,8 +73,15 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 							.entitat(entitat)
 							.usuariCodi(aplicacio.getUsuariCodi())
 							.callbackUrl(aplicacio.getCallbackUrl())
-								.activa(true)
-							.headerCsrf(aplicacio.isHeaderCsrf()).build();
+                            .activa(true)
+							.headerCsrf(aplicacio.isHeaderCsrf())
+                            .horariLaboralInici(aplicacio.getHorariLaboralInici())
+                            .horariLaboralFi(aplicacio.getHorariLaboralFi())
+                            .maxEnviamentsMinutLaboral(aplicacio.getMaxEnviamentsMinutLaboral())
+                            .maxEnviamentsMinutNoLaboral(aplicacio.getMaxEnviamentsMinutNoLaboral())
+                            .maxEnviamentsDiaLaboral(aplicacio.getMaxEnviamentsDiaLaboral())
+                            .maxEnviamentsDiaNoLaboral(aplicacio.getMaxEnviamentsDiaNoLaboral())
+                            .build();
 			return conversioTipusHelper.convertir(aplicacioRepository.save(entity), AplicacioDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -91,7 +98,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 			log.debug("Actualitzant l'aplicació existent (aplicacio=" + aplicacio.toString() + ")");
 			entityComprovarHelper.comprovarEntitat(aplicacio.getEntitatId(), true, true, false, false, false);
 			var entity = aplicacioRepository.findById(aplicacio.getId()).orElseThrow();
-			entity.update(aplicacio.getUsuariCodi(), aplicacio.getCallbackUrl(), aplicacio.isHeaderCsrf());
+			entity.update(aplicacio);
 			return conversioTipusHelper.convertir(entity, AplicacioDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

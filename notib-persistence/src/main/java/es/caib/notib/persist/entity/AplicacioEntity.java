@@ -3,6 +3,7 @@
  */
 package es.caib.notib.persist.entity;
 
+import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.persist.audit.NotibAuditable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.time.LocalTime;
 
 /**
  * Classe del model de dades que representa una aplicació amb
@@ -36,18 +38,35 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 	private boolean activa;
 	@Column(name = "header_csrf", nullable = false)
 	private boolean headerCsrf;
-
+	@Column(name = "horari_laboral_inici", nullable = false)
+    private LocalTime horariLaboralInici;
+	@Column(name = "horari_laboral_fi", nullable = false)
+    private LocalTime horariLaboralFi;
+	@Column(name = "max_enviaments_minut_laboral", nullable = false)
+    private Integer maxEnviamentsMinutLaboral;
+	@Column(name = "max_enviaments_minut_no_laboral", nullable = false)
+    private Integer maxEnviamentsMinutNoLaboral;
+	@Column(name = "max_enviaments_dia_laboral", nullable = false)
+    private Integer maxEnviamentsDiaLaboral;
+	@Column(name = "max_enviaments_dia_no_laboral", nullable = false)
+    private Integer maxEnviamentsDiaNoLaboral;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat_id", nullable = false)
 	@ForeignKey(name = "not_aplicacio_entitat_fk")
 	protected EntitatEntity entitat;
 
-	public void update(String usuariCodi, String callbackUrl, boolean headerCsrf) {
+	public void update(AplicacioDto aplicacio) {
 
-		this.usuariCodi = usuariCodi;
-		this.callbackUrl = callbackUrl;
-		this.headerCsrf = headerCsrf;
+		usuariCodi = aplicacio.getUsuariCodi();
+		callbackUrl = aplicacio.getCallbackUrl();
+		headerCsrf = aplicacio.isHeaderCsrf();
+        horariLaboralInici = aplicacio.getHorariLaboralInici();
+        horariLaboralFi = aplicacio.getHorariLaboralFi();
+        maxEnviamentsMinutLaboral = aplicacio.getMaxEnviamentsMinutLaboral();
+        maxEnviamentsMinutNoLaboral = aplicacio.getMaxEnviamentsMinutNoLaboral();
+        maxEnviamentsDiaLaboral = aplicacio.getMaxEnviamentsDiaLaboral();
+        maxEnviamentsDiaNoLaboral = aplicacio.getMaxEnviamentsDiaNoLaboral();
 	}
 	
 	public void updateActiva(boolean activa) {

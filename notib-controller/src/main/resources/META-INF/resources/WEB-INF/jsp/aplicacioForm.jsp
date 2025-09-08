@@ -49,10 +49,10 @@
         <not:inputTime name="horariLaboralInici" textKey="aplicacio.form.camp.horari.laboral.inici"/>
         <not:inputTime name="horariLaboralFi" textKey="aplicacio.form.camp.horari.laboral.fi"/>
 <%--        <form:input  id="limitEnviamentsMinutLaboral" cssClass="form-control" path="limitEnviamentsMinutLaboral" placeholder="aplicacio.form.camp.limit.enviament.minut.laboral" type="number" step="1" maxlength="2048"/>--%>
-		<not:inputText name="limitEnviamentsMinutLaboral" textKey="aplicacio.form.camp.limit.enviament.minut.laboral" required="true"/>
-		<not:inputText name="limitEnviamentsMinutNoLaboral" textKey="aplicacio.form.camp.enviament.minut.no.laboral" required="true"/>
-		<not:inputText name="limitEnviamentsDiaLaboral" textKey="aplicacio.form.camp.enviament.dia.laboral" required="true"/>
-		<not:inputText name="limitEnviamentsDiaNoLaboral" textKey="aplicacio.form.camp.enviament.dia.no.laboral" required="true"/>
+		<not:inputText name="maxEnviamentsMinutLaboral" textKey="aplicacio.form.camp.limit.enviament.minut.laboral" required="true"/>
+		<not:inputText name="maxEnviamentsMinutNoLaboral" textKey="aplicacio.form.camp.enviament.minut.no.laboral" required="true"/>
+		<not:inputText name="maxEnviamentsDiaLaboral" textKey="aplicacio.form.camp.enviament.dia.laboral" required="true"/>
+		<not:inputText name="maxEnviamentsDiaNoLaboral" textKey="aplicacio.form.camp.enviament.dia.no.laboral" required="true"/>
 
 		<div id="modal-botons">
 			<c:if test ="${!empty aplicacioCommand.id}">

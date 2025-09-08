@@ -6,4 +6,3 @@ databaseChangeLog:
         - dropNotNullConstraint:
             columnName: data_final
             tableName: not_avis
-        - sql: ""

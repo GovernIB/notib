@@ -47,7 +47,7 @@
 		<div class="col-xs-${campInputSize}">
 			<div class="input-group" style="width:100%">
 				<form:input path="${campPath}" cssClass="form-control timepicker" id="${campPath}" disabled="${disabled}" data-toggle="timepicker" data-idioma="${idioma}" data-orientacio="${orientacio}" data-custom="${custom}"/>
-				<span class="input-group-addon" style="width:1%"><span class="fa fa-clock"></span></span>
+				<span class="input-group-addon" style="width:1%"><span class="fa-regular fa-clock"></span></span>
 			</div>
 			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 			<c:if test="${info == true}">
@@ -59,7 +59,7 @@
 		<label class="sr-only" for="${campPath}">${campLabelText}</label>
 		<div class="input-group">
 			<form:input path="${campPath}" cssClass="form-control timepicker classe" id="${campPath}" placeholder="${campPlaceholder}" disabled="${disabled}" data-toggle="timepicker" data-idioma="${idioma}" data-orientacio="bottom"/>
-			<span class="input-group-addon" style="width:1%"><span class="fa fa-clock"></span></span>
+			<span class="input-group-addon" style="width:1%"><span class="fa-regular fa-clock"></span></span>
 		</div>
 	</c:otherwise>
 </c:choose>

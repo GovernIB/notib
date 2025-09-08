@@ -8,6 +8,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalTime;
+
 /**
  * Informació d'una aplicació.
  * 
@@ -22,6 +24,12 @@ public class AplicacioDto extends AuditoriaDto {
 	private boolean activa;
 	private boolean headerCsrf;
 	private Long entitatId;
+    private LocalTime horariLaboralInici;
+    private LocalTime horariLaboralFi;
+    private Integer maxEnviamentsMinutLaboral;
+    private Integer maxEnviamentsMinutNoLaboral;
+    private Integer maxEnviamentsDiaLaboral;
+    private Integer maxEnviamentsDiaNoLaboral;
 
 
 	@Override

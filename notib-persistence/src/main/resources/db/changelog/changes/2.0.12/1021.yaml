@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_aplicacio
+            columns:
+              - column:
+                  name: horari_laboral_inici
+                  type: time
+                  constraints:
+                    nullable: false
+              - column:
+                  name: horari_laboral_fi
+                  type: time
+                  constraints:
+                    nullable: false
+              - column:
+                  name: max_enviaments_minut_laboral
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: max_enviaments_minut_no_laboral
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: max_enviaments_dia_laboral
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: max_enviaments_dia_no_laboral
+                  type: int
+                  constraints:
+                    nullable: false

@@ -33,10 +33,10 @@ public class AplicacioCommand {
 	private boolean headerCsrf;
     private LocalTime horariLaboralInici;
     private LocalTime horariLaboralFi;
-    private Integer limitEnviamentsMinutLaboral;
-    private Integer limitEnviamentsMinutNoLaboral;
-    private Integer limitEnviamentsDiaLaboral;
-    private Integer limitEnviamentsDiaNoLaboral;
+    private Integer maxEnviamentsMinutLaboral;
+    private Integer maxEnviamentsMinutNoLaboral;
+    private Integer maxEnviamentsDiaLaboral;
+    private Integer maxEnviamentsDiaNoLaboral;
 
 	public static AplicacioCommand asCommand(AplicacioDto dto) {
 		return ConversioTipusHelper.convertir(dto, AplicacioCommand.class);
