@@ -532,7 +532,7 @@ public class NotificacioFormController extends BaseUserController {
                 EnviamentTipus.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
         var organsDisponibles = permisosService.getOrgansCodisAmbPermisPerProcedimentComu(entitatActual.getId(), getCodiUsuariActual(), permis, procedimentActual);
         dadesProcediment.setOrgansDisponibles(organsDisponibles);
-        if (!organsDisponibles.contains(organCodi)) {
+        if (!organsDisponibles.isEmpty() && !organsDisponibles.contains(organCodi)) {
             if (organsDisponibles.size() > 1) {
                 return dadesProcediment;
             }
