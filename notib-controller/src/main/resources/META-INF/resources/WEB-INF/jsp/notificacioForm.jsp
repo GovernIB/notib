@@ -1469,6 +1469,9 @@
 				type: 'GET',
 				url: "<c:url value="/notificacio/procediment/"/>" + procediment + "/dades" + (organ ? "?organCodi=" + organ : ""),
 				success: function(data) {
+                    if (!data) {
+                        return;
+                    }
 					var select2Options = {
 						theme: 'bootstrap',
 						width: 'auto'};

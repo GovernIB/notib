@@ -1744,7 +1744,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			log.debug("Consulta de tots els pagadors postals");
 			var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
 			var o = organGestorRepository.findByEntitatAndCodi(e, organCodi);
-			if (!e.getDir3Codi().equals(organCodi)) {
+			if (!e.getDir3Codi().equals(organCodi) && o != null) {
 				return findOperadorsPare(entitat, o.getCodiPare());
 			}
 			return false;
