@@ -543,9 +543,12 @@ public class NotificacioFormController extends BaseUserController {
             return dadesProcediment;
         }
         // Mirar si organ seleccionat te entrega postal actvia
-        var organ = organGestorService.findByCodi(entitatActual.getId(), organCodi);
-        var cieActiuPerPare = organGestorService.entregaCieActiva(entitatActual, organCodi);
-        dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva() || cieActiuPerPare);
+        organCodi = dadesProcediment.getOrganCodi();
+        if (!Strings.isNullOrEmpty(organCodi)) {
+            var organ = organGestorService.findByCodi(entitatActual.getId(), organCodi);
+            var cieActiuPerPare = organGestorService.entregaCieActiva(entitatActual, organCodi);
+            dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva() || cieActiuPerPare);
+        }
 //        dadesProcediment.setEntregaCieActiva(cieActiuPerPare);
         return dadesProcediment;
     }
