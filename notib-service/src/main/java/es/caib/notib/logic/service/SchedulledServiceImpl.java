@@ -85,7 +85,7 @@ public class SchedulledServiceImpl implements SchedulledService {
     @Autowired
     private EstadisticaService estadisticaService;
     @Autowired
-    private CallbackHelper callbackHelper;
+    private NotificacioHelper notificacioHelper;
 
 
     // 1. Actualització dels procediments a partir de la informació de Rolsac
@@ -384,14 +384,14 @@ public class SchedulledServiceImpl implements SchedulledService {
     /////////////////////////////////////////////////////////////////////////
     @Override
     public void netejarLimitEnviamentsMinutAplicacions() {
-        callbackHelper.netejarLimitEnviamentsMinutAplicacions();
+        notificacioHelper.netejarLimitEnviamentsMinutAplicacions();
     }
 
     // 14. Reset limit enviaments per dia aplicacions callback
     /////////////////////////////////////////////////////////////////////////
     @Override
     public void netejarLimitEnviamentsDiesAplicacions() {
-        callbackHelper.netejarLimitEnviamentsDiesAplicacions();
+        notificacioHelper.netejarLimitEnviamentsDiesAplicacions();
     }
 
     private void esborrarTemporals(String dir) throws Exception {

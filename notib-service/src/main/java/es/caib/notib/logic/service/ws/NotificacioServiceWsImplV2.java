@@ -56,6 +56,8 @@ import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.util.EidasValidator;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
+import es.caib.notib.logic.utils.DatesUtils;
+import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -215,6 +217,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	@Override
 	public RespostaAlta alta(Notificacio notificacio) throws NotificacioServiceWsException {
 
+        EntitatEntity entitat = null;
+        try {
+            entitat = entitatRepository.findByDir3Codi(notificacio.getEmisorDir3Codi());
+        } catch (Exception ex) {
+            log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
+        }
+        var msg = notificacioHelper.checkLimitEnviamentsAplicacioSuperat(notificacio.getUsuariCodi(), entitat.getId());
+        if (!Strings.isNullOrEmpty(msg)) {
+            return RespostaAlta.builder().error(true).errorDescripcio(msg).build();
+        }
 		var resposta = altaV2(notificacio);
 		resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
 		return RespostaAlta.builder().identificador(resposta.getIdentificador()).estat(resposta.getEstat()).referencies(resposta.getReferenciesAsV1())
@@ -237,8 +249,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		var info = generateInfoAlta(notificacio, entitat != null ? entitat.getId() : null);
 		try {
 			log.debug("[ALTA] Alta de notificació: " + notificacio.toString());
-			var resposta = RespostaAltaV2.builder().build();
 
+            var msg = notificacioHelper.checkLimitEnviamentsAplicacioSuperat(notificacio.getUsuariCodi(), entitat.getId());
+            if (!Strings.isNullOrEmpty(msg)) {
+			    return RespostaAltaV2.builder().error(true).errorData(new Date()).errorDescripcio(msg).build();
+            }
 			// Obtenir dades bàsiques per a la notificació
 			ProcSerEntity procediment = null;
 			OrganGestorEntity organGestor = null;
@@ -420,6 +435,68 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+
+    private static Map<Long, Integer> contadorMinutsLaboral = new HashMap<>();
+    private static Map<Long, Integer> contadorMinutsNoLaboral = new HashMap<>();
+    private static Map<Long, Integer> contadorDiesLaboral = new HashMap<>();
+    private static Map<Long, Integer> contadorDiesNoLaboral = new HashMap<>();
+
+    private String checkLimitCallbackSuperat(AplicacioEntity aplicacio) {
+
+        String msg = null;
+        if (!DatesUtils.isDiaLaboral()) {
+            var maxEnvMinut =  aplicacio.getMaxEnviamentsMinutNoLaboral();
+            var maxEnvDies =  aplicacio.getMaxEnviamentsDiaNoLaboral();
+            var enviamentsMinutActual = contadorMinutsNoLaboral.getOrDefault(aplicacio.getId(), 0);
+            if (maxEnvMinut < enviamentsMinutActual) {
+                msg = "Superat el nombre màxim d'enviaments per minut en dies no laborals. ";
+            } else {
+                contadorMinutsNoLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
+            }
+            var enviamentsDiesActual = contadorDiesNoLaboral.getOrDefault(aplicacio.getId(),0);
+            if (maxEnvDies < enviamentsDiesActual) {
+                msg += "Superat el nombre màxim d'enviaments per dia en dies no laborals";
+            }  else {
+                contadorDiesNoLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
+            }
+            return msg;
+        }
+
+        var maxEnvMinut =  aplicacio.getMaxEnviamentsMinutLaboral();
+        var maxEnvDies =  aplicacio.getMaxEnviamentsDiaLaboral();
+        var isHorariLaboral = DatesUtils.isHorariLaboral(aplicacio.getHorariLaboralInici(), aplicacio.getHorariLaboralFi());
+        var enviamentsMinutActual = isHorariLaboral ? contadorMinutsLaboral.getOrDefault(aplicacio.getId(), 0)
+                : contadorMinutsNoLaboral.getOrDefault(aplicacio.getId(), 0);
+        if (maxEnvMinut <= enviamentsMinutActual) {
+            msg = "Superat el nombre màxim d'enviaments per minut en dies laborals. ";
+        } else if (isHorariLaboral){
+            contadorMinutsLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
+        } else {
+            contadorMinutsNoLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
+        }
+        var enviamentsDiesActual = contadorDiesLaboral.getOrDefault(aplicacio.getId(), 0);
+        if (maxEnvDies <= enviamentsDiesActual) {
+            msg += "Superat el nombre màxim d'enviaments per dia en dies laborals";
+        }  else if (isHorariLaboral) {
+            contadorDiesLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
+        }  else {
+            contadorDiesNoLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
+        }
+
+        return msg;
+    }
+
+    public void netejarLimitEnviamentsMinutAplicacions() {
+
+        contadorMinutsLaboral = new HashMap<>();
+        contadorMinutsNoLaboral = new HashMap<>();
+    }
+
+    public void netejarLimitEnviamentsDiesAplicacions() {
+
+        contadorDiesLaboral = new HashMap<>();
+        contadorDiesNoLaboral = new HashMap<>();
+    }
 
 	private IntegracioInfo generateInfoAlta(Notificacio notificacio, Long entitatId) {
 

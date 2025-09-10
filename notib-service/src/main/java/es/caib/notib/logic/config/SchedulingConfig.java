@@ -225,7 +225,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 "netejarLimitEnviamentsMinutAplicacions",
                 schedulledServiceSupplier,
                 (Supplier<SchedulledService> s) -> s.get().netejarLimitEnviamentsMinutAplicacions(),
-                NETEJAR_LIMIT_ENVIAMENTS_MINUT_APLICACIONS,
+                null,
                 NETEJAR_LIMIT_ENVIAMENTS_MINUT_APLICACIONS);
         // 14. Reset limit enviaments per dia aplicacions callback
         ////////////////////////////////////////////////////////////////////////
@@ -233,7 +233,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 "netejarLimitEnviamentsDiesAplicacions",
                 schedulledServiceSupplier,
                 (Supplier<SchedulledService> s) -> s.get().netejarLimitEnviamentsDiesAplicacions(),
-                NETEJAR_LIMIT_ENVIAMENTS_DIES_APLICACIONS,
+                null,
                 NETEJAR_LIMIT_ENVIAMENTS_DIES_APLICACIONS);
     }
 
@@ -244,10 +244,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 () -> executeSchedulledMethod(supplier, method, taskName),
                 triggerContext -> {
                     // Creating a trigger here
-                    CronTrigger trigger = new CronTrigger(configHelper.getConfig(cronConfig, defualtCron));
+                    var trigger = cronConfig != null ? new CronTrigger(configHelper.getConfig(cronConfig, defualtCron)) : new CronTrigger(defualtCron);
                     // Compute the next execution time
-                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                    Long millis = nextExecution.getTime() - System.currentTimeMillis();
+                    var nextExecution = trigger.nextExecutionTime(triggerContext);
+                    var millis = nextExecution.getTime() - System.currentTimeMillis();
                     monitorTasquesService.updateProperaExecucio(taskName, millis);
                     return nextExecution;
                 });

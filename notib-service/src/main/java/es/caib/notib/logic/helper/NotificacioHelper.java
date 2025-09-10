@@ -17,6 +17,7 @@ import es.caib.notib.logic.intf.exception.NoMetadadesException;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
+import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.GrupEntity;
@@ -28,10 +29,10 @@ import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
 import es.caib.notib.persist.entity.ProcSerOrganEntity;
+import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.notib.persist.repository.GrupRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
-import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.ProcSerOrganRepository;
@@ -86,6 +87,76 @@ public class NotificacioHelper {
 	private AuditHelper auditHelper;
 	@Autowired
 	private MessageHelper messageHelper;
+    @Autowired
+    private AplicacioRepository aplicacioRepository;
+
+    private static Map<Long, Integer> contadorMinutsLaboral = new HashMap<>();
+    private static Map<Long, Integer> contadorMinutsNoLaboral = new HashMap<>();
+    private static Map<Long, Integer> contadorDiesLaboral = new HashMap<>();
+    private static Map<Long, Integer> contadorDiesNoLaboral = new HashMap<>();
+
+    public String checkLimitEnviamentsAplicacioSuperat(String usuariCodi, Long entitatId) {
+
+        try {
+            String msg = null;
+            var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuariCodi, entitatId);
+            if (!DatesUtils.isDiaLaboral()) {
+                var maxEnvMinut =  aplicacio.getMaxEnviamentsMinutNoLaboral();
+                var maxEnvDies =  aplicacio.getMaxEnviamentsDiaNoLaboral();
+                var enviamentsMinutActual = contadorMinutsNoLaboral.getOrDefault(aplicacio.getId(), 0);
+                if (maxEnvMinut < enviamentsMinutActual) {
+                    msg = "Superat el nombre màxim d'enviaments per minut en dies no laborals. ";
+                } else {
+                    contadorMinutsNoLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
+                }
+                var enviamentsDiesActual = contadorDiesNoLaboral.getOrDefault(aplicacio.getId(),0);
+                if (maxEnvDies < enviamentsDiesActual) {
+                    msg += "Superat el nombre màxim d'enviaments per dia en dies no laborals";
+                }  else {
+                    contadorDiesNoLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
+                }
+                return msg;
+            }
+
+            var maxEnvMinut =  aplicacio.getMaxEnviamentsMinutLaboral();
+            var maxEnvDies =  aplicacio.getMaxEnviamentsDiaLaboral();
+            var isHorariLaboral = DatesUtils.isHorariLaboral(aplicacio.getHorariLaboralInici(), aplicacio.getHorariLaboralFi());
+            var enviamentsMinutActual = isHorariLaboral ? contadorMinutsLaboral.getOrDefault(aplicacio.getId(), 0)
+                    : contadorMinutsNoLaboral.getOrDefault(aplicacio.getId(), 0);
+            if (maxEnvMinut <= enviamentsMinutActual) {
+                msg = "Superat el nombre màxim d'enviaments per minut en dies laborals. ";
+            } else if (isHorariLaboral){
+                contadorMinutsLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
+            } else {
+                contadorMinutsNoLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
+            }
+            var enviamentsDiesActual = contadorDiesLaboral.getOrDefault(aplicacio.getId(), 0);
+            if (maxEnvDies <= enviamentsDiesActual) {
+                msg += "Superat el nombre màxim d'enviaments per dia en dies laborals";
+            }  else if (isHorariLaboral) {
+                contadorDiesLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
+            }  else {
+                contadorDiesNoLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
+            }
+            return msg;
+        } catch (Exception ex) {
+            var msg = "Error checkejant el limit d'enviaments per l'aplicacio";
+            log.error(msg, ex);
+            return msg;
+        }
+    }
+
+    public void netejarLimitEnviamentsMinutAplicacions() {
+
+        contadorMinutsLaboral = new HashMap<>();
+        contadorMinutsNoLaboral = new HashMap<>();
+    }
+
+    public void netejarLimitEnviamentsDiesAplicacions() {
+
+        contadorDiesLaboral = new HashMap<>();
+        contadorDiesNoLaboral = new HashMap<>();
+    }
 
 
 	public NotificacioEntity altaEnviamentsWeb(EntitatEntity entitat, NotificacioEntity notificacioEntity, List<Enviament> enviaments) throws RegistreNotificaException {
