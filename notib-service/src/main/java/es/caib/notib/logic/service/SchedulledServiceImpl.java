@@ -84,9 +84,11 @@ public class SchedulledServiceImpl implements SchedulledService {
     private CacheHelper cacheHelper;
     @Autowired
     private EstadisticaService estadisticaService;
+    @Autowired
+    private CallbackHelper callbackHelper;
 
 
-	// 1. Actualització dels procediments a partir de la informació de Rolsac
+    // 1. Actualització dels procediments a partir de la informació de Rolsac
 	/////////////////////////////////////////////////////////////////////////
 	@Override
 	public void actualitzarProcediments() {
@@ -378,7 +380,21 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 	}
 
-	private void esborrarTemporals(String dir) throws Exception {
+    // 13. Reset limit enviaments per minut aplicacions callback
+    /////////////////////////////////////////////////////////////////////////
+    @Override
+    public void netejarLimitEnviamentsMinutAplicacions() {
+        callbackHelper.netejarLimitEnviamentsMinutAplicacions();
+    }
+
+    // 14. Reset limit enviaments per dia aplicacions callback
+    /////////////////////////////////////////////////////////////////////////
+    @Override
+    public void netejarLimitEnviamentsDiesAplicacions() {
+        callbackHelper.netejarLimitEnviamentsDiesAplicacions();
+    }
+
+    private void esborrarTemporals(String dir) throws Exception {
 
 		if (Strings.isNullOrEmpty(dir)) {
 			return;

@@ -4,7 +4,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
@@ -118,5 +120,24 @@ public class DatesUtils {
             }
         }
         return null;
+    }
+
+    public static boolean isDiaLaboral() {
+
+        var ara = LocalDateTime.now();
+        DayOfWeek dia = ara.getDayOfWeek();
+        return dia != DayOfWeek.SATURDAY && dia != DayOfWeek.SUNDAY;
+    }
+
+    public static boolean isHorariLaboral(LocalTime horaInici, LocalTime horaFi) {
+
+        var calendar = Calendar.getInstance();
+        var dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        var isWeekday = dayOfWeek >= Calendar.MONDAY && dayOfWeek <= Calendar.FRIDAY;
+        if (!isWeekday) {
+            return false;
+        }
+        var now = LocalTime.of(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+        return !now.isBefore(horaInici) && now.isBefore(horaFi);
     }
 }

@@ -12,6 +12,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -19,6 +20,7 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.CallbackRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
+import joptsimple.internal.Strings;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
@@ -32,7 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
@@ -74,6 +78,7 @@ public class CallbackHelper {
 	private JmsTemplate jmsTemplate;
     @Autowired
     private AccioMassivaHelper accioMassivaHelper;
+
 
 	private boolean isInterficieWeb(NotificacioEntity not) {
 		return not.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB;
@@ -193,6 +198,7 @@ public class CallbackHelper {
 		log.trace("[Callback] Consultant aplicacio de l'event. ");
 		int intents = callback.getIntents() + 1;
 		var aplicacio = getAplicacio(callback, env);
+
 		if (!aplicacio.isActiva()) {
 			var start = System.nanoTime();
 			var errorDescripcio = "Error notificant canvis al client: No està activa la aplicació " + aplicacio.getCallbackUrl() ;
@@ -284,8 +290,11 @@ public class CallbackHelper {
 
 		long start = System.currentTimeMillis();
 		try {
+
+            var msg = checkLimitCallbackSuperat(aplicacio);
 			var notificacioCanvi = new NotificacioCanviClient(enviament.getNotificacio().getReferencia(), enviament.getNotificaReferencia());
-			// Completa la URL al mètode
+			notificacioCanvi.setMsg(msg);
+            // Completa la URL al mètode
 			var urlBase = aplicacio.getCallbackUrl();
 			var headerCsrf = aplicacio.isHeaderCsrf();
 			var urlCallback = urlBase + (urlBase.endsWith("/") ? "" : "/") + NOTIFICACIO_CANVI;
@@ -296,12 +305,77 @@ public class CallbackHelper {
 				log.error("Error al enviar callback per l'enviament " + enviament.getUuid() + " a la url " + urlBase);
 				throw new Exception("La resposta del client és: " + response.getStatusInfo().getStatusCode() + " - " + response.getStatusInfo().getReasonPhrase());
 			}
+            if (!Strings.isNullOrEmpty(msg)) {
+                throw new Exception(msg);
+            }
 			return response.getEntity(String.class);
 		} catch (Exception e) {
 //			SubsistemesHelper.addErrorOperation(CBK);
 			throw e;
 		}
 	}
+
+    private static Map<Long, Integer> contadorMinutsLaboral = new HashMap<>();
+    private static Map<Long, Integer> contadorMinutsNoLaboral = new HashMap<>();
+    private static Map<Long, Integer> contadorDiesLaboral = new HashMap<>();
+    private static Map<Long, Integer> contadorDiesNoLaboral = new HashMap<>();
+
+    private String checkLimitCallbackSuperat(AplicacioEntity aplicacio) {
+
+        String msg = null;
+        if (!DatesUtils.isDiaLaboral()) {
+            var maxEnvMinut =  aplicacio.getMaxEnviamentsMinutNoLaboral();
+            var maxEnvDies =  aplicacio.getMaxEnviamentsDiaNoLaboral();
+            var enviamentsMinutActual = contadorMinutsNoLaboral.getOrDefault(aplicacio.getId(), 0);
+            if (maxEnvMinut < enviamentsMinutActual) {
+                msg = "Superat el nombre màxim d'enviaments per minut en dies no laborals. ";
+            } else {
+                contadorMinutsNoLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
+            }
+            var enviamentsDiesActual = contadorDiesNoLaboral.getOrDefault(aplicacio.getId(),0);
+            if (maxEnvDies < enviamentsDiesActual) {
+                msg += "Superat el nombre màxim d'enviaments per dia en dies no laborals";
+            }  else {
+                contadorDiesNoLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
+            }
+            return msg;
+        }
+
+        var maxEnvMinut =  aplicacio.getMaxEnviamentsMinutLaboral();
+        var maxEnvDies =  aplicacio.getMaxEnviamentsDiaLaboral();
+        var isHorariLaboral = DatesUtils.isHorariLaboral(aplicacio.getHorariLaboralInici(), aplicacio.getHorariLaboralFi());
+        var enviamentsMinutActual = isHorariLaboral ? contadorMinutsLaboral.getOrDefault(aplicacio.getId(), 0)
+                                    : contadorMinutsNoLaboral.getOrDefault(aplicacio.getId(), 0);
+        if (maxEnvMinut <= enviamentsMinutActual) {
+            msg = "Superat el nombre màxim d'enviaments per minut en dies laborals. ";
+        } else if (isHorariLaboral){
+            contadorMinutsLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
+        } else {
+            contadorMinutsNoLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
+        }
+        var enviamentsDiesActual = contadorDiesLaboral.getOrDefault(aplicacio.getId(), 0);
+        if (maxEnvDies <= enviamentsDiesActual) {
+            msg += "Superat el nombre màxim d'enviaments per dia en dies laborals";
+        }  else if (isHorariLaboral) {
+            contadorDiesLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
+        }  else {
+            contadorDiesNoLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
+        }
+
+        return msg;
+    }
+
+    public void netejarLimitEnviamentsMinutAplicacions() {
+
+        contadorMinutsLaboral = new HashMap<>();
+        contadorMinutsNoLaboral = new HashMap<>();
+    }
+
+    public void netejarLimitEnviamentsDiesAplicacions() {
+
+        contadorDiesLaboral = new HashMap<>();
+        contadorDiesNoLaboral = new HashMap<>();
+    }
 
 	private AplicacioEntity getAplicacio(CallbackEntity callback, @NonNull NotificacioEnviamentEntity enviament) throws Exception {
 

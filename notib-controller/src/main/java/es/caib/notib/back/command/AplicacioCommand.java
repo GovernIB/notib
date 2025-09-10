@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalTime;
 
@@ -31,11 +32,17 @@ public class AplicacioCommand {
 	private String callbackUrl;
 	private Long entitatId;
 	private boolean headerCsrf;
+    @NotNull
     private LocalTime horariLaboralInici;
+    @NotNull
     private LocalTime horariLaboralFi;
+    @NotNull
     private Integer maxEnviamentsMinutLaboral;
+    @NotNull
     private Integer maxEnviamentsMinutNoLaboral;
+    @NotNull
     private Integer maxEnviamentsDiaLaboral;
+    @NotNull
     private Integer maxEnviamentsDiaNoLaboral;
 
 	public static AplicacioCommand asCommand(AplicacioDto dto) {

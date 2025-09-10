@@ -47,6 +47,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private static String MONITOR_BUIDA_DADES_DEFCRON = "0 30 4 * * *";
     private static String COMPRIMIR_DOCUMENTS_ANTICS_DEFCRON = "0 0 0 * * *";
     private static String GENERAR_DADES_EXPLOTACIO_DEFCRON = "0 30 0 * * *";
+    private static String NETEJAR_LIMIT_ENVIAMENTS_MINUT_APLICACIONS = "0 * * * * *";
+    private static String NETEJAR_LIMIT_ENVIAMENTS_DIES_APLICACIONS = "0 0 0 * * *";
 
     private static Integer CALLBACK_CLIENT = 0;
     private static Integer CERT_DEH = 1;
@@ -217,7 +219,22 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 (Supplier<SchedulledService> s) -> s.get().generarEstadistiques(),
                 PropertiesConstants.GENERAR_DADES_EXPLOTACIO_CRON,
                 GENERAR_DADES_EXPLOTACIO_DEFCRON);
-
+        // 13. Reset limit enviaments per minut aplicacions callback
+        ////////////////////////////////////////////////////////////////////////
+        registerCronTask(
+                "netejarLimitEnviamentsMinutAplicacions",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().netejarLimitEnviamentsMinutAplicacions(),
+                NETEJAR_LIMIT_ENVIAMENTS_MINUT_APLICACIONS,
+                NETEJAR_LIMIT_ENVIAMENTS_MINUT_APLICACIONS);
+        // 14. Reset limit enviaments per dia aplicacions callback
+        ////////////////////////////////////////////////////////////////////////
+        registerCronTask(
+                "netejarLimitEnviamentsDiesAplicacions",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().netejarLimitEnviamentsDiesAplicacions(),
+                NETEJAR_LIMIT_ENVIAMENTS_DIES_APLICACIONS,
+                NETEJAR_LIMIT_ENVIAMENTS_DIES_APLICACIONS);
     }
 
     private <T> void registerCronTask(String taskName, Supplier<T> supplier, Consumer<Supplier<T>> method, String cronConfig, String defualtCron) {

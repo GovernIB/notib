@@ -42,13 +42,13 @@ public class AplicacioEntity extends NotibAuditable<Long> {
     private LocalTime horariLaboralInici;
 	@Column(name = "horari_laboral_fi", nullable = false)
     private LocalTime horariLaboralFi;
-	@Column(name = "max_enviaments_minut_laboral", nullable = false)
+	@Column(name = "max_env_min_laboral", nullable = false)
     private Integer maxEnviamentsMinutLaboral;
-	@Column(name = "max_enviaments_minut_no_laboral", nullable = false)
+	@Column(name = "max_env_min_no_laboral", nullable = false)
     private Integer maxEnviamentsMinutNoLaboral;
-	@Column(name = "max_enviaments_dia_laboral", nullable = false)
+	@Column(name = "max_env_dia_laboral", nullable = false)
     private Integer maxEnviamentsDiaLaboral;
-	@Column(name = "max_enviaments_dia_no_laboral", nullable = false)
+	@Column(name = "max_env_dia_no_laboral", nullable = false)
     private Integer maxEnviamentsDiaNoLaboral;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)

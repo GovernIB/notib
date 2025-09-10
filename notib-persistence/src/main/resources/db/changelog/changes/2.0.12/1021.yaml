@@ -11,28 +11,34 @@ databaseChangeLog:
                   type: time
                   constraints:
                     nullable: false
+                  defaultValue: "TO_DATE('08:00:00', 'HH24:MI:SS')"
               - column:
                   name: horari_laboral_fi
                   type: time
                   constraints:
                     nullable: false
+                  defaultValue: "TO_DATE('16:00:00', 'HH24:MI:SS')"
               - column:
-                  name: max_enviaments_minut_laboral
+                  name: max_env_min_laboral
                   type: int
                   constraints:
                     nullable: false
+                  defaultValue: 4
               - column:
-                  name: max_enviaments_minut_no_laboral
+                  name: max_env_min_no_laboral
                   type: int
                   constraints:
                     nullable: false
+                  defaultValue: 8
               - column:
-                  name: max_enviaments_dia_laboral
+                  name: max_env_dia_laboral
                   type: int
                   constraints:
                     nullable: false
+                  defaultValue: 8000
               - column:
-                  name: max_enviaments_dia_no_laboral
+                  name: max_env_dia_no_laboral
                   type: int
                   constraints:
                     nullable: false
+                  defaultValue: 100000

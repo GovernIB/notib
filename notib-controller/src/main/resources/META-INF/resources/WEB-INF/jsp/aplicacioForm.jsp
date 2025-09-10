@@ -17,9 +17,16 @@
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script>
+    <%--    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>--%>
+    <%--    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"></script>--%>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script type="text/javascript">
 			$(document).ready(function() {
+                $('.timepicker').timepicker({
+                    showMeridian: false, // Set to true for 12-hour format
+                    minuteStep: 1, // Step for minutes
+                    defaultTime: false // Set to false to not show a default time
+                });
 				$("#btnProvar").click(e => {
 					e.preventDefault();
 					$.ajax({
