@@ -488,12 +488,17 @@ public class EstadisticaServiceImpl implements EstadisticaService {
         if (temps == null) {
             // Si no existeixen dades, les generam
             LocalDate ahir = LocalDate.now().minusDays(1);
-            LocalDate dema = LocalDate.now().plusDays(1);
-            if (!data.isAfter(ahir)) {
+            if (!data.isBefore(LocalDate.now())) {
+                //No generar dades estadistiques futures
+                Date dia = Date.from(data.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+                return RegistresEstadistics.builder().temps(Temps.builder().data(dia).build()).fets(List.of()).build();
+            }
+            var firstInfoDate = getFirstInfoDate();
+            if (!data.isBefore(firstInfoDate)) {
                 generarDadesExplotacio(data);
-            } else if (data.isBefore(dema)){
-                // data es el dia d'avui
-                generarDadesExplotacioBasiques(ahir, data);
+            } else {
+                // data es anterior a la primera data que te estadistiques torna les basiques
+                generarDadesExplotacioBasiques(data, data);
             }
         }
         return getRegistresEstadistics(data);
@@ -521,14 +526,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
         // Si no existeixen dades, les generam
         List<LocalDate> localDates = geMissingExplotTempsEntities(dataInici, dataFi);
         if (!localDates.isEmpty()) {
-            LocalDate localEnvInfoDate = LocalDate.now();
-            if (firstEnvInfoDate == null) {
-            firstEnvInfoDate = explotEnvInfoRepository.getFirstDate();
-            }
-            if (firstEnvInfoDate != null) {
-                localEnvInfoDate = firstEnvInfoDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            }
-
+            var localEnvInfoDate = getFirstInfoDate();
             if( localEnvInfoDate.isBefore(dataInici) ) {
                 generarDadesExplotacio(dataInici, dataFi);
             } else if (localEnvInfoDate.isAfter(dataFi)) {
@@ -546,6 +544,19 @@ public class EstadisticaServiceImpl implements EstadisticaService {
         }
         return result;
     }
+
+    private LocalDate getFirstInfoDate() {
+
+        LocalDate localEnvInfoDate = LocalDate.now();
+        if (firstEnvInfoDate == null) {
+            firstEnvInfoDate = explotEnvInfoRepository.getFirstDate();
+        }
+        if (firstEnvInfoDate != null) {
+            localEnvInfoDate = firstEnvInfoDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        return localEnvInfoDate;
+    }
+
 
     @Override
     public List<DimensioDesc> getDimensions() {
