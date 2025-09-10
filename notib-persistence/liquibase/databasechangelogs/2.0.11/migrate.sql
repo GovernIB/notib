@@ -188,3 +188,9 @@ CREATE VIEW NOT_STATS_VIEW AS SELECT entitat_id, procediment_id, organ_codi, usu
                               SELECT entitat_id, procediment_id, organ_codi, usuari_codi, env_tipus, origen, tipus, dia, total FROM NOT_ESTAT_VIEW
                               UNION ALL
                               SELECT entitat_id, procediment_id, organ_codi, usuari_codi, env_tipus, origen, tipus, dia, total FROM NOT_SIR_VIEW;
+
+ALTER TABLE not_explot_fet DISABLE CONSTRAINT FK_NOT_EXPLOT_FET_TEMPS;
+TRUNCATE TABLE NOT_EXPLOT_FET;
+TRUNCATE TABLE NOT_EXPLOT_ENV_INFO;
+TRUNCATE TABLE not_explot_temps;
+ALTER TABLE not_explot_fet ENABLE CONSTRAINT FK_NOT_EXPLOT_FET_TEMPS;
