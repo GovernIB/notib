@@ -114,7 +114,7 @@ public class EstadistiquesController {
             if (endDate.isAfter(ahir)) {
                 endDate = ahir;
             }
-            estadisticaService.generarDadesExplotacioBasiques(startDate, endDate);
+            estadisticaService.generarDadesExplotacioBasiques(startDate, endDate, true);
             return "Done";
         } catch (Exception e) {
             String message = e.getMessage() + "<br/>";

@@ -33,8 +33,8 @@ public class EstadisticaService extends AbstractService<es.caib.notib.logic.intf
 
     @Override
     @TransactionTimeout(value = 3600)
-    public void generarDadesExplotacioBasiques(LocalDate fromDate, LocalDate toDate) {
-        getDelegateService().generarDadesExplotacioBasiques(fromDate, toDate);
+    public void generarDadesExplotacioBasiques(LocalDate fromDate, LocalDate toDate, boolean regenerar) {
+        getDelegateService().generarDadesExplotacioBasiques(fromDate, toDate, regenerar);
     }
 
     @Override
