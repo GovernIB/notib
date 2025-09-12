@@ -1,6 +1,5 @@
 package es.caib.notib.logic.service;
 
-import com.sun.xml.bind.v2.TODO;
 import es.caib.comanda.ms.estadistica.model.Dimensio;
 import es.caib.comanda.ms.estadistica.model.DimensioDesc;
 import es.caib.comanda.ms.estadistica.model.Fet;
@@ -227,7 +226,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
             List<LocalDate> missingDates = geMissingExplotTempsEntities(dataInici, dataFi);
             if (!missingDates.isEmpty()) {
-                generateNativeSqlMissingExplotTempsEntities(dataInici);
+                generateNativeSqlMissingExplotTempsEntities(dataInici, dataFi);
             }
 
             List<ExplotDimensioEntity> dimensions = obtenirDimensions();
@@ -246,9 +245,13 @@ public class EstadisticaServiceImpl implements EstadisticaService {
         }
     }
 
+    private void generarDadesExplotacioBasiques(LocalDate fromDate, LocalDate toDate) {
+        generarDadesExplotacioBasiques(fromDate, toDate, false);
+    }
+
     @Transactional(timeout = 3600)
     @Override
-    public void generarDadesExplotacioBasiques(LocalDate fromDate, LocalDate toDate) {
+    public void generarDadesExplotacioBasiques(LocalDate fromDate, LocalDate toDate, boolean regenerar) {
 
         var info = crearIntegracioInfo(fromDate);
 
@@ -259,7 +262,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
             var dimensionKeyCache = cachejarDimensions(dimensions);
 
             // Generar les entitats ExplotTempsEntity que faltes
-            generateNativeSqlMissingExplotTempsEntities(fromDate);
+            generateNativeSqlMissingExplotTempsEntities(fromDate, toDate);
             var dates = explotTempsRepository.findByDataBetween(fromDate, toDate);
 
             // Obtenir totes les estadístiques per al període complet
@@ -268,7 +271,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
             // Convertir les estadístiques a un mapa per data
             Map<LocalDate, Map<String, Map<ExplotFetsKey, Long>>> estadistiquesPerData = convertirEstadistiquesPerData(stats);
 
-            processarDatesAmbEstadistiques(dates, dimensions, dimensionKeyCache, estadistiquesPerData);
+            processarDatesAmbEstadistiques(dates, dimensions, dimensionKeyCache, estadistiquesPerData, regenerar);
 
             integracioHelper.addAccioOk(info);
             log.debug("Finalitzat procés bàsic.");
@@ -298,7 +301,8 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     private void processarDatesAmbEstadistiques(List<ExplotTempsEntity> dates,
                                                 List<ExplotDimensioEntity> dimensions,
                                                 Map<Long, ExplotFetsKey> keyCache,
-                                                Map<LocalDate, Map<String, Map<ExplotFetsKey, Long>>> estadistiquesPerData) {
+                                                Map<LocalDate, Map<String, Map<ExplotFetsKey, Long>>> estadistiquesPerData,
+                                                boolean regenerar) {
         int processedDays = 0;
         int skippedDays = 0;
 
@@ -306,9 +310,14 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         for (ExplotTempsEntity temps : dates) {
             if (jaHiHaDades(temps)) {
-                skippedDays++;
-                System.out.println("Skipped dia: " + temps.getData());
-                continue;
+                if (!regenerar) {
+                    skippedDays++;
+                    System.out.println("Skipped dia: " + temps.getData());
+                    continue;
+                } else {
+                    // Eliminam les dades d'explotació de la data
+                    explotFetsRepository.deleteAllByTemps(temps);
+                }
             }
 
             Map<String, Map<ExplotFetsKey, Long>> estadistiques = estadistiquesPerData.getOrDefault(temps.getData(), new HashMap<>());
@@ -414,15 +423,17 @@ public class EstadisticaServiceImpl implements EstadisticaService {
         );
     }
 
-    private void generateNativeSqlMissingExplotTempsEntities(LocalDate fromDate) {
+    private void generateNativeSqlMissingExplotTempsEntities(LocalDate fromDate, LocalDate toDate) {
 
-        LocalDate yesterday = ahir();
+        if (toDate == null) {
+            toDate = ahir();
+        }
         // Obtenim totes les dates per al rang corresponent
-        List<LocalDate> existingDates = explotTempsRepository.findDatesBetween(fromDate, yesterday);
+        List<LocalDate> existingDates = explotTempsRepository.findDatesBetween(fromDate, toDate);
         List<LocalDate> missingDates = new ArrayList<>();
 
         // Iterem només pels dies que no estan a la base de dades
-        while (!fromDate.isAfter(yesterday)) {
+        while (!fromDate.isAfter(toDate)) {
             if (!existingDates.contains(fromDate)) {
                 missingDates.add(fromDate);
             }
@@ -474,20 +485,19 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public RegistresEstadistics consultaUltimesEstadistiques() {
 
         return consultaEstadistiques(ahir());
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public RegistresEstadistics consultaEstadistiques(LocalDate data) {
 
         ExplotTempsEntity temps = explotTempsRepository.findFirstByData(data);
         if (temps == null) {
             // Si no existeixen dades, les generam
-            LocalDate ahir = LocalDate.now().minusDays(1);
             if (!data.isBefore(LocalDate.now())) {
                 //No generar dades estadistiques futures
                 Date dia = Date.from(data.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
@@ -530,7 +540,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
             if( localEnvInfoDate.isBefore(dataInici) ) {
                 generarDadesExplotacio(dataInici, dataFi);
             } else if (localEnvInfoDate.isAfter(dataFi)) {
-                generarDadesExplotacioBasiques(dataFi, dataFi);
+                generarDadesExplotacioBasiques(dataInici, dataFi);
             } else {
                 generarDadesExplotacioBasiques(dataInici, localEnvInfoDate.minusDays(1));
                 generarDadesExplotacio(localEnvInfoDate, dataFi);

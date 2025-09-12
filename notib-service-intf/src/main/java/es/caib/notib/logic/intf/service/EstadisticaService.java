@@ -13,7 +13,7 @@ public interface EstadisticaService {
     boolean generarDadesExplotacio();
     boolean generarDadesExplotacio(LocalDate data);
     void generarDadesExplotacio(LocalDate data, LocalDate toDate);
-    void generarDadesExplotacioBasiques(LocalDate fromDate, LocalDate toDate);
+    void generarDadesExplotacioBasiques(LocalDate startDate, LocalDate endDate, boolean regenerar);
 
     RegistresEstadistics consultaUltimesEstadistiques();
     RegistresEstadistics consultaEstadistiques(LocalDate data);
@@ -21,4 +21,5 @@ public interface EstadisticaService {
 
     List<DimensioDesc> getDimensions();
     List<IndicadorDesc> getIndicadors();
+
 }
