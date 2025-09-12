@@ -58,7 +58,9 @@ public class CallbackController extends TableAccionsMassivesController {
             var organGestorActual = getOrganGestorActual(request);
             organGestorCodi = organGestorActual.getCodi();
         }
-        return new ArrayList<>();
+        var filtre = filtreCommand.asDto();
+        filtre.setEntitatId(entitatActual.getId());
+        return callbackService.findPendentsIdByEntitat(filtre);
     }
 
 
@@ -66,8 +68,9 @@ public class CallbackController extends TableAccionsMassivesController {
     public String get(HttpServletRequest request, Model model) {
 
 
-        Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
-        model.addAttribute("mantenirPaginacio", mantenirPaginacio != null && mantenirPaginacio);
+        Boolean mantenirPaginacio = true;
+//        Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
+        model.addAttribute("mantenirPaginacio", true);
         model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
         model.addAttribute("fiReintetsList", EnumHelper.getOptionsForEnum(SiNo.class, "es.caib.notib.logic.intf.dto.SiNo."));
         var estats = EnumHelper.getOptionsForEnum(CallbackEstatEnumDto.class,"es.caib.notib.logic.intf.dto.CallbackEstatEnumDto.");

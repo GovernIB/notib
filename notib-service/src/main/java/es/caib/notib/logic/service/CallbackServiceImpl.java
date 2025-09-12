@@ -201,7 +201,19 @@ public class CallbackServiceImpl implements CallbackService {
 		return dtos;
 	}
 
-	@Override
+    @Override
+    public List<Long> findPendentsIdByEntitat(CallbackFiltre filtre) {
+
+        try {
+            filtre.setMaxReintents(configHelper.getConfigAsInteger("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max"));
+            return callbackRepository.findPendentsIdByEntitat(filtre);
+        } catch (Exception ex){
+            log.error("Error obtinguent els ids amb filtre de les callbacks", ex);
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
 	public CallbackResposta enviarCallback(Long callbackId) {
 
 		var timer = metricsHelper.iniciMetrica();

@@ -792,9 +792,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			filtre.setOrganGestor(organGestorCodi);
 			var f = notificacioListHelper.getFiltre(filtre, entitatId, rol, usuariCodi, rols);
 			return notificacioTableViewRepository.findIdsAmbFiltre(f);
-		} finally {
-			log.error("Error obtinguent els ids amb filtre de les remeses")
-;		}
+		} catch (Exception ex) {
+            log.error("Error obtinguent els ids amb filtre de les remeses", ex);
+            return new ArrayList<>();
+        }
 	}
 
 	@Override

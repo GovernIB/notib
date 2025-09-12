@@ -42,6 +42,9 @@ public interface CallbackService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_ADMIN_LECTURA')")
 	PaginaDto<CallbackDto> findPendentsByEntitat(CallbackFiltre filtre, PaginacioParamsDto paginacioParams);
 
+    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_ADMIN_LECTURA')")
+    List<Long> findPendentsIdByEntitat(CallbackFiltre filtre);
+
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	CallbackResposta enviarCallback(Long callbackId);
 

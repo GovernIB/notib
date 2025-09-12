@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Primary;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -47,7 +48,13 @@ public class CallbackService extends AbstractService<es.caib.notib.logic.intf.se
 		return getDelegateService().findPendentsByEntitat(filtre, paginacioParams);
 	}
 
-	@Override
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_ADMIN_LECTURA"})
+    public List<Long> findPendentsIdByEntitat(CallbackFiltre filtre) {
+        return getDelegateService().findPendentsIdByEntitat(filtre);
+    }
+
+    @Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public CallbackResposta enviarCallback(Long callbackId) {
 		return getDelegateService().enviarCallback(callbackId);

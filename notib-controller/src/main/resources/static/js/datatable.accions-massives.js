@@ -216,7 +216,7 @@ function initEvents($table, url_prefix, eventMessages) {
             }
             if(confirm(eventMessages['confirm-accio-massiva-enviar'])){
                 location.href =  url_prefix + "/enviar";
-                setTimeout(() => $table.DataTable().rows().deselect(), 100);
+               // setTimeout(() => $table.DataTable().rows().deselect(), 100);
             }
             return false;
         });
@@ -229,7 +229,7 @@ function initEvents($table, url_prefix, eventMessages) {
             }
             if(confirm(eventMessages['confirm-accio-massiva-pausar'])){
                 location.href =  url_prefix + "/pausar";
-                setTimeout(() => $table.DataTable().rows().deselect(), 100);
+               // setTimeout(() => $table.DataTable().rows().deselect(), 100);
             }
             return false;
         });
@@ -242,7 +242,7 @@ function initEvents($table, url_prefix, eventMessages) {
             }
             if(confirm(eventMessages['confirm-accio-massiva-activar'])){
                 location.href =  url_prefix + "/activar";
-                setTimeout(() => $table.DataTable().rows().deselect(), 100);
+               // setTimeout(() => $table.DataTable().rows().deselect(), 100);
             }
             return false;
         });

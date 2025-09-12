@@ -230,7 +230,7 @@
                                 {{else}}
                                     <li><a href="<c:url value="/callback/{{:id}}/pausar"/>"><span class="fa fa-pause"></span>&nbsp; <spring:message code="callback.boto.pausar"/></a></li>
                                 {{/if}}
-                                <li><a href="<c:url value="/callback/{{:id}}/esborrar"/>"><span class="fa fa-paper-plane-o"></span>&nbsp; <spring:message code="callback.boto.enviar"/></a></li>
+                                <li><a href="<c:url value="/callback/{{:id}}/esborrar"/>"><span class="fa fa-paper-trash-o"></span>&nbsp; <spring:message code="callback.boto.esborrar"/></a></li>
                             </ul>
                         </div>
                     </script>

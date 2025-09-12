@@ -54,11 +54,21 @@ public interface CallbackRepository extends JpaRepository<CallbackEntity, Long> 
             "   and (:#{#filtre.fiReintentsNull} = true or (:#{#filtre.fiReintentsInt()} = 0 and c.intents < :#{#filtre.maxReintents} or :#{#filtre.fiReintentsInt()} = 1 and c.intents >= :#{#filtre.maxReintents})) ")
     Page<CallbackEntity> findPendentsByEntitat(CallbackFiltre filtre, Pageable page);
 
-    @Query("from CallbackEntity c join NotificacioEntity n on c.notificacioId = n.id " +
-            "   where c.estat = es.caib.notib.logic.intf.dto.CallbackEstatEnumDto.PENDENT ")
-    Page<CallbackEntity> findPendents(Pageable page);
-
-
+    @Query("select c.id from CallbackEntity c " +
+            "join NotificacioEntity n on c.notificacioId = n.id " +
+            "join AplicacioEntity a on a.usuariCodi = c.usuariCodi " +
+            "where n.entitat.id = :#{#filtre.entitatId} " +
+            " and a.activa = true " +
+            "   and (c.estat = es.caib.notib.logic.intf.dto.CallbackEstatEnumDto.PENDENT or c.error = true) " +
+            "   and (:#{#filtre.estatNull} = true or c.estat = :#{#filtre.estat}) " +
+            "   and (:#{#filtre.usuariCodiNull} = true or lower(c.usuariCodi) like concat('%', lower(:#{#filtre.usuariCodi}), '%'))" +
+            "   and (:#{#filtre.referenciaRemesaNull} = true or lower(n.referencia) like concat('%', lower(:#{#filtre.referenciaRemesa}), '%'))" +
+            "   and (:#{#filtre.dataIniciNull} = true or c.dataCreacio >= :#{#filtre.dataIniciDate}) " +
+            "   and (:#{#filtre.dataFiNull} = true or c.dataCreacio <= :#{#filtre.dataFiDate}) "+
+            "   and (:#{#filtre.dataIniciUltimIntentNull} = true or c.ultimIntent >= :#{#filtre.dataIniciUltimIntentDate}) " +
+            "   and (:#{#filtre.dataFiUltimIntentNull} = true or c.ultimIntent <= :#{#filtre.dataFiUltimIntentDate}) "+
+            "   and (:#{#filtre.fiReintentsNull} = true or (:#{#filtre.fiReintentsInt()} = 0 and c.intents < :#{#filtre.maxReintents} or :#{#filtre.fiReintentsInt()} = 1 and c.intents >= :#{#filtre.maxReintents})) ")
+    List<Long> findPendentsIdByEntitat(CallbackFiltre filtre);
 
     @Query("SELECT c.id, c.data FROM CallbackEntity c WHERE c.estat = es.caib.notib.logic.intf.dto.CallbackEstatEnumDto.PENDENT")
     List<Object[]> findIdAndData();
