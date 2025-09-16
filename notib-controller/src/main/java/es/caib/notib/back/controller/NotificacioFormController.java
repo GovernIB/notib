@@ -509,7 +509,7 @@ public class NotificacioFormController extends BaseUserController {
         var procedimentActual = procedimentService.findById(entitatActual.getId(),false, procedimentId);
         var enviamentTipus = (EnviamentTipus) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
         var dadesProcediment = new DadesProcediment();
-        dadesProcediment.setOrganCodi(procedimentActual.getOrganGestor());
+        dadesProcediment.setOrganCodi(procedimentActual.isComu() ? organCodi : procedimentActual.getOrganGestor());
         dadesProcediment.setCaducitat(CaducitatHelper.sumarDiesNaturals(procedimentActual.getCaducitat()));
         dadesProcediment.setCaducitatDiesNaturals(procedimentActual.getCaducitat());
         dadesProcediment.setRetard(procedimentActual.getRetard());
