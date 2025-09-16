@@ -10,6 +10,11 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>notib-boot</artifactId>
     <dependencies>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-micrometer-tracing</artifactId>-->
+<!--            <version>2.7.12</version> &lt;!&ndash; Ensure this version is compatible &ndash;&gt;-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-spring-boot-starter</artifactId>
@@ -78,7 +83,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-            <version>RELEASE</version>
+<!--            <version>RELEASE</version>-->
             <scope>compile</scope>
         </dependency>
 
