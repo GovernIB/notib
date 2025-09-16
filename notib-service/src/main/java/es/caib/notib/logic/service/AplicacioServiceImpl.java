@@ -187,8 +187,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 			var usr = UsuariEntity.builder()
 					.rebreEmailsNotificacio(dto.getRebreEmailsNotificacio())
 					.emailAlt(dto.getEmailAlt())
-					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats()).idioma(dto.getIdioma())
-					.numElementsPaginaDefecte(dto.getNumElementsPaginaDefecte().name()).build();
+					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats())
+                    .idioma(dto.getIdioma())
+					.numElementsPaginaDefecte(dto.getNumElementsPaginaDefecte().name())
+                    .entitatDefecte(dto.getEntitatDefecte())
+                    .organDefecte(dto.getOrganDefecte())
+                    .procedimentDefecte(dto.getProcedimentDefecte())
+                    .build();
 			usuari.update(usr);
 			cacheHelper.evictUsuariByCodi(usuari.getCodi());
 			return toUsuariDtoAmbRols(usuari);

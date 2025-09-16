@@ -62,8 +62,15 @@ public class UsuariEntity implements Serializable {
 	private String idioma;
 	@Column(name="NUM_ELEMENTS_PAGINA_DEFECTE", length=3)
 	private String numElementsPaginaDefecte;
-	
-	@Version
+    @Column(name = "entitat_defecte")
+    protected Long entitatDefecte;
+    @Column(name = "organ_defecte", length = 64)
+    protected String organDefecte;
+    @Column(name = "procediment_defecte")
+    protected Long procedimentDefecte;
+
+
+    @Version
 	private long version = 0;
 
 	public void update(String nom, String llinatges, String nif, String email) {
@@ -80,11 +87,14 @@ public class UsuariEntity implements Serializable {
 	
 	public void update(UsuariEntity usuari) {
 
-		this.rebreEmailsNotificacio = usuari.isRebreEmailsNotificacio();
-		this.rebreEmailsNotificacioCreats = usuari.isRebreEmailsNotificacioCreats();
-		this.idioma = usuari.getIdioma();
-		this.emailAlt = usuari.getEmailAlt();
-		this.numElementsPaginaDefecte = usuari.numElementsPaginaDefecte;
+		rebreEmailsNotificacio = usuari.isRebreEmailsNotificacio();
+		rebreEmailsNotificacioCreats = usuari.isRebreEmailsNotificacioCreats();
+		idioma = usuari.getIdioma();
+		emailAlt = usuari.getEmailAlt();
+		numElementsPaginaDefecte = usuari.numElementsPaginaDefecte;
+        entitatDefecte = usuari.getEntitatDefecte();
+        organDefecte = usuari.getOrganDefecte();
+        procedimentDefecte = usuari.getProcedimentDefecte();
 	}
 	
 	public void updateUltimRol(String ultimRol) {

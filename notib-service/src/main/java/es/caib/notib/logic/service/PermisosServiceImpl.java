@@ -143,6 +143,33 @@ public class PermisosServiceImpl implements PermisosService {
     }
 
     @Override
+//    @Cacheable(value = "organsAmbPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
+    @Transactional(readOnly = true)
+    public List<CodiValorDto> getOrgansAmbPermis(Long entitatId, String usuariCodi) {
+
+        try {
+            var grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+            var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+            Set<CodiValorDto> set = new HashSet<>();
+            var organs = getOrgansAmbPermisPerNotificar(entitat, grups, PermisEnum.NOTIFICACIO);
+            set.addAll(organs);
+            organs = getOrgansAmbPermisPerNotificar(entitat, grups, PermisEnum.COMUNICACIO);
+            set.addAll(organs);
+            organs = getOrgansAmbPermisPerNotificar(entitat, grups, PermisEnum.COMUNICACIO_SIR);
+            set.addAll(organs);
+            organs = getOrgansAmbPermisPerNotificar(entitat, grups, PermisEnum.CONSULTA);
+            set.addAll(organs);
+            organs = getOrgansAmbPermisPerNotificar(entitat, grups, PermisEnum.COMUNS);
+            set.addAll(organs);
+
+            return new ArrayList<>(set);
+        } catch (Exception ex) {
+            log.error("Error obtenint permisos de d'òrgan per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
+            throw ex;
+        }
+    }
+
+    @Override
     @Cacheable(value = "organsAmbPermisPerConsulta", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
     @Transactional(readOnly = true)
     public List<CodiValorDto> getOrgansAmbPermisPerConsulta(Long entitatId, String usuariCodi, PermisEnum permis) {

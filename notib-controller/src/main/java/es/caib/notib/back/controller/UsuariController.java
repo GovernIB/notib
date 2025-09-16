@@ -11,15 +11,21 @@ import es.caib.notib.client.domini.NumElementsPaginaDefecte;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
+import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.logic.intf.dto.PermisEnum;
+import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EntitatService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
+import es.caib.notib.logic.intf.service.PermisosService;
+import es.caib.notib.logic.intf.service.ProcedimentService;
+import es.caib.notib.logic.intf.service.ServeiService;
 import es.caib.notib.logic.intf.service.UsuariService;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,8 +41,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import static es.caib.notib.back.controller.UsuariController.ResultatEstatEnum.ERROR;
 import static es.caib.notib.back.controller.UsuariController.ResultatEstatEnum.OK;
@@ -57,17 +66,57 @@ public class UsuariController extends BaseController {
 	private SessionScopedContext sessionScopedContext;
     @Autowired
     private UsuariService usuariService;
+    @Autowired
+    private EntitatService entitatService;
+    @Autowired
+    private PermisosService permisosService;
 
 	private static final String REDIRECT = "redirect:/";
     @Autowired
-    private EntitatService entitatService;
-//    @Autowired
-//    private LocalStatelessSessionProxyFactoryBean permisosService;
+    private ServeiService serveiService;
+    @Autowired
+    private OrganGestorService organGestorService;
+    @Autowired
+    private ProcedimentService procedimentService;
+
+
 
     @RequestMapping(value = "/refresh", method = RequestMethod.HEAD)
 	public void refresh(HttpServletRequest request, HttpServletResponse response) {
 		// EMPTY METHOD
 	}
+
+    @ResponseBody
+    @GetMapping(value = "/entitat/defecte/{entitatId}")
+    public List<CodiValorDto> entitatDefecte(HttpServletRequest request, Model model, @PathVariable("entitatId") Long entitatId) {
+
+        var usuari = aplicacioService.getUsuariActual();
+        var entitat = entitatService.findById(entitatId);
+        List<CodiValorDto> entitats = new ArrayList<>();
+        entitats.add(CodiValorDto.builder().codi(entitat.getId() + "").build());
+        return findOrgansAmbPermis(entitats, usuari.getCodi());
+    }
+
+    @ResponseBody
+    @GetMapping(value = "/organ/defecte/{organCodi}/{entitatId}")
+    public List<CodiValorOrganGestorComuDto> organDefecte(HttpServletRequest request, Model model, @PathVariable("organCodi") String organCodi, @PathVariable("entitatId") Long entitatId) {
+
+        var usuari = aplicacioService.getUsuariActual();
+        RolEnumDto rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
+        rol = RolEnumDto.tothom;
+        return procedimentDefecte(entitatId, organCodi);
+    }
+
+    private List<CodiValorOrganGestorComuDto> procedimentDefecte(Long entitatId, String organCodi) {
+
+        var organ = organGestorService.findByCodi(entitatId, organCodi);
+        var serveis = serveiService.getServeisOrgan(entitatId, organCodi, organ.getId(), RolEnumDto.tothom, PermisEnum.CONSULTA);
+        var procediments = procedimentService.getProcedimentsOrgan(entitatId, organCodi, organ.getId(), RolEnumDto.tothom, PermisEnum.CONSULTA);
+        Set<CodiValorOrganGestorComuDto> procSer = new HashSet<>();
+        procSer.addAll(procediments);
+        procSer.addAll(serveis);
+        return new ArrayList<>(procSer);
+    }
 
 	@GetMapping(value = "/configuracio")
 	public String getConfiguracio(HttpServletRequest request, Model model) {
@@ -79,14 +128,38 @@ public class UsuariController extends BaseController {
             rolActual = "tothom";
         }
         var entitats = entitatService.findAccessiblesUsuariActualCodiValor(rolActual);
-//        var procediments = permisosService.getProcedimentsAmbPermis(entitat.getId(), usuari.getCodi(), permis);
+        var organs = usuari.getEntitatDefecte() != null ? entitatDefecte(request, model, usuari.getEntitatDefecte()) : findOrgansAmbPermis(entitats, usuari.getCodi());
+        var procediments = usuari.getOrganDefecte() != null ? procedimentDefecte(usuari.getEntitatDefecte(), usuari.getOrganDefecte()) : findProcedimentsAmbPermis(entitats, usuari.getCodi());
 		model.addAttribute("idiomaEnumOptions", EnumHelper.getOptionsForEnum(Idioma.class,"usuari.form.camp.idioma.enum."));
 		model.addAttribute("entitats", entitats);
-		model.addAttribute("procediments", EnumHelper.getOptionsForEnum(Idioma.class,"usuari.form.camp.idioma.enum."));
-		model.addAttribute("organs", EnumHelper.getOptionsForEnum(Idioma.class,"usuari.form.camp.idioma.enum."));
+		model.addAttribute("procediments", procediments);
+		model.addAttribute("organs", organs);
 		model.addAttribute("numElementsPaginaDefecte", EnumHelper.getOptionsForEnum(NumElementsPaginaDefecte.class,"usuari.form.camp.elements.pagina.perdefecte.enum."));
 		return "usuariForm";
 	}
+
+    private List<CodiValorDto> findProcedimentsAmbPermis(List<CodiValorDto> entitats, String usuariCodi) {
+
+        List<CodiValorDto> procediments = new ArrayList<>();
+        List<CodiValorOrganGestorComuDto> procs = new ArrayList<>();
+        for (var entitat : entitats) {
+            procs.addAll(permisosService.getProcSersAmbPermis(Long.valueOf(entitat.getCodi()), usuariCodi, PermisEnum.CONSULTA));
+        }
+        for (var proc : procs) {
+            procediments.add(CodiValorDto.builder().codi(proc.getId() + "").valor(proc.getValor()).build());
+        }
+        return procediments;
+    }
+
+
+    private List<CodiValorDto> findOrgansAmbPermis(List<CodiValorDto> entitats, String usuariCodi) {
+
+        List<CodiValorDto> organs = new ArrayList<>();
+        for (var entitat : entitats) {
+            organs.addAll(permisosService.getOrgansAmbPermis(Long.valueOf(entitat.getCodi()), usuariCodi));
+        }
+        return organs;
+    }
 
 	@GetMapping(value = "/num/elements/pagina/defecte")
 	@ResponseBody

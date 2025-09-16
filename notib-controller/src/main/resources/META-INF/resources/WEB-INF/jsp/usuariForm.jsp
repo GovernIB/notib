@@ -31,6 +31,53 @@
 				$("#rebreEmailsNotificacio").prop("checked", true);
 			}
 		});
+
+        $("#entitatDefecte").change(() =>  {
+
+            let entitat = $("#entitatDefecte").val();
+            $("#organDefecte").empty();
+            $("#procedimentDefecte").empty();
+            if (!entitat) {
+                return;
+            }
+            $.ajax({
+                type: 'GET',
+                url: "<c:url value="/usuari/entitat/defecte/"/>" + entitat,
+                success: organs => {
+                    let selector = $("#organDefecte");
+                    selector.empty();
+                    selector.append($('<option></option>').val("").text(""));
+                    $.each(organs, function(index, item) {
+                        selector.append($('<option></option>').val(item.codi).text(item.valor));
+                    });
+                    selector.select2();
+                }
+            });
+        });
+
+        $("#organDefecte").change(() =>  {
+
+            let entitat = $("#entitatDefecte").val();
+            let organ = $("#organDefecte").val();
+            $("#procedimentDefecte").empty();
+            if (!organ) {
+                return;
+            }
+            $.ajax({
+                type: 'GET',
+                url: "<c:url value="/usuari/organ/defecte/"/>" + organ + "/" + entitat,
+                success: procediments => {
+                    let selector = $("#procedimentDefecte");
+                    selector.empty();
+                    selector.append($('<option></option>').val("").text(""));
+                    $.each(procediments, function(index, item) {
+                        selector.append($('<option></option>').val(item.codi).text(item.valor));
+                    });
+                    selector.select2();
+                }
+            });
+        });
+
 	});
 </script>
 </head>
@@ -45,11 +92,9 @@
 		<not:inputSelect name="rols" textKey="usuari.form.camp.rols" optionItems="${usuariCommand.rols}" disabled="true"/>
 		<not:inputCheckbox name="rebreEmailsNotificacio" textKey="usuari.form.camp.rebre.emails.notificacio"/>
 		<not:inputCheckbox name="rebreEmailsNotificacioCreats" textKey="usuari.form.camp.rebre.emails.notificacio.creats"/>
-		<not:inputSelect name="entitatDefecte" optionItems="${entitats}" textKey="usuari.form.camp.entitat.defecte" optionValueAttribute="codi" optionTextKeyAttribute="valor" disabled="false"/>
-<%--        <not:inputSelect name="entitatDefecte" textKey="usuari.form.camp.entitat.defecte" optionItems="${entitats}" optionValueAttribute="codi" optionTextAttribute="valor" emptyOption="true"/>--%>
-
-		<not:inputSelect name="procedimentDefecte" optionItems="${procediments}" textKey="usuari.form.camp.procediment.defecte" optionValueAttribute="codi" optionTextKeyAttribute="valor" disabled="false"/>
-		<not:inputSelect name="organDefecte" optionItems="${organs}" textKey="usuari.form.camp.organ.defecte" optionValueAttribute="codi" optionTextKeyAttribute="valor" disabled="false"/>
+		<not:inputSelect name="entitatDefecte" optionItems="${entitats}" textKey="usuari.form.camp.entitat.defecte" optionValueAttribute="codi" optionTextAttribute="valor" emptyOption="true"/>
+		<not:inputSelect name="organDefecte" optionItems="${organs}" textKey="usuari.form.camp.organ.defecte" optionValueAttribute="codi" optionTextAttribute="valor" emptyOption="true"/>
+		<not:inputSelect name="procedimentDefecte" optionItems="${procediments}" textKey="usuari.form.camp.procediment.defecte" optionValueAttribute="codi" optionTextAttribute="valor" emptyOption="true"/>
 		<not:inputSelect name="idioma" optionItems="${idiomaEnumOptions}" textKey="usuari.form.camp.idioma" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="false"/>
 		<not:inputSelect name="numElementsPaginaDefecte" optionItems="${numElementsPaginaDefecte}" optionValueAttribute="value" optionTextKeyAttribute="text" textKey="usuari.form.camp.elements.pagina.defecte"/>
 		<div id="modal-botons">

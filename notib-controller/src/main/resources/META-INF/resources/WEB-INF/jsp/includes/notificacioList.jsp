@@ -459,8 +459,10 @@
             let rows = this.rows;
             for (let row=1; row < rows.length; row++) {
                 let tag = $(this.rows[row]).find(".estatColor")[0];
-                let classes = tag.classList;
-                this.rows[row].firstChild.style="border-left: 3px solid " + classes[classes.length-1];
+                if (tag) {
+                    let classes = tag.classList;
+                    this.rows[row].firstChild.style="border-left: 3px solid " + classes[classes.length-1];
+                }
             }
         });
 
@@ -573,7 +575,7 @@
 
         loadOrgans($('#organGestor'), organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
 
-        $('#organGestor').val(${notificacioFiltreCommand.organGestor})
+        $('#organGestor').val("${notificacioFiltreCommand.organGestor}");
         // $('#organGestor').select2().trigger('change');
         // $('#estat').select2().trigger('change');
         $('#organGestor').trigger('change');

@@ -366,7 +366,8 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
 
         // Si es disposa d'una entitat desada com a darrera entitat utilitzada, i és una de les accessibles, s'assigna aquesta
         if (entitatActual == null) {
-            var ultimaEntitat = aplicacioService.getUsuariActual().getUltimaEntitat();
+            var usuari = aplicacioService.getUsuariActual();
+            var ultimaEntitat = usuari.getEntitatDefecte() != null ? usuari.getEntitatDefecte() : usuari.getUltimaEntitat();
             for (var entitat : entitatsAccessibles) {
                 if (entitat.getId().equals(ultimaEntitat)) {
                     entitatActual = entitat;

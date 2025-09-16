@@ -395,7 +395,7 @@ public class EntitatServiceImpl implements EntitatService {
         var entitats = findAccessiblesUsuariActual(rolActual);
         List<CodiValorDto> enttitatsCodiValor = new ArrayList<>();
         for (var entitat : entitats) {
-            enttitatsCodiValor.add(CodiValorDto.builder().codi(entitat.getCodi()).valor(entitat.getNom()).build());
+            enttitatsCodiValor.add(CodiValorDto.builder().codi(entitat.getId() + "").valor(entitat.getNom()).build());
         }
         return enttitatsCodiValor;
     }

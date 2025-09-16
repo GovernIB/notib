@@ -73,6 +73,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private ConversioTipusHelper conversioTipusHelper;
     @Autowired
     private AccioMassivaService accioMassivaService;
+    @Autowired
+    private AplicacioService aplicacioService;
 
     private static final  String NOTIFICACIONS_FILTRE = "notificacions_filtre";
     private static final  String NOTIFICACIONS_FILTRE_ESBORRADES = "notificacions_filtre_esborrades";
@@ -119,6 +121,13 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var organGestorActual = getOrganGestorActual(request);
         var filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
+        var usuari = aplicacioService.getUsuariActual();
+        if (!Strings.isNullOrEmpty(usuari.getOrganDefecte())) {
+            filtre.setOrganGestor(usuari.getOrganDefecte());
+        }
+        if (usuari.getProcedimentDefecte() != null) {
+            filtre.setProcedimentId(usuari.getProcedimentDefecte());
+        }
         filtre.setDeleted(false);
         model.addAttribute(filtre);
         var codiUsuari = getCodiUsuariActual();
