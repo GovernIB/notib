@@ -532,17 +532,17 @@ public class NotificacioFormController extends BaseUserController {
                 EnviamentTipus.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
         var organsDisponibles = permisosService.getOrgansCodisAmbPermisPerProcedimentComu(entitatActual.getId(), getCodiUsuariActual(), permis, procedimentActual);
         dadesProcediment.setOrgansDisponibles(organsDisponibles);
-        if (!organsDisponibles.isEmpty() && !organsDisponibles.contains(organCodi)) {
-            if (organsDisponibles.size() > 1) {
-                return dadesProcediment;
-            }
-            var codi = organsDisponibles.get(0);
-            var organ = organGestorService.findByCodi(entitatActual.getId(), codi);
-            var cieActiuPerPare = organGestorService.entregaCieActiva(entitatActual, codi);
-            dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva() || cieActiuPerPare);
-            return dadesProcediment;
-        }
-        // Mirar si organ seleccionat te entrega postal actvia
+//        if (!organsDisponibles.isEmpty() && !organsDisponibles.contains(organCodi)) {
+//            if (organsDisponibles.size() > 1) {
+//                return dadesProcediment;
+//            }
+//            var codi = organsDisponibles.get(0);
+//            var organ = organGestorService.findByCodi(entitatActual.getId(), codi);
+//            var cieActiuPerPare = organGestorService.entregaCieActiva(entitatActual, codi);
+//            dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva() || cieActiuPerPare);
+//            return dadesProcediment;
+//        }
+        // Mirar si organ seleccionat te entrega postal activa.
         organCodi = dadesProcediment.getOrganCodi();
         if (!Strings.isNullOrEmpty(organCodi)) {
             var organ = organGestorService.findByCodi(entitatActual.getId(), organCodi);
