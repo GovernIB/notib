@@ -109,7 +109,7 @@ public class UsuariController extends BaseController {
 
     private List<CodiValorOrganGestorComuDto> procedimentDefecte(Long entitatId, String organCodi) {
 
-        var organ = organGestorService.findByCodi(entitatId, organCodi);
+        var organ = organGestorService.findById(entitatId, Long.valueOf(organCodi));
         var serveis = serveiService.getServeisOrgan(entitatId, organCodi, organ.getId(), RolEnumDto.tothom, PermisEnum.CONSULTA);
         var procediments = procedimentService.getProcedimentsOrgan(entitatId, organCodi, organ.getId(), RolEnumDto.tothom, PermisEnum.CONSULTA);
         Set<CodiValorOrganGestorComuDto> procSer = new HashSet<>();

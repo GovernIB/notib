@@ -519,12 +519,12 @@ public class PermisosServiceImpl implements PermisosService {
         // Afegir procediments amb permis directe
         for (var e : procSerAmbPermisDirecte) {
             if (!entitat.getDir3Codi().equals(e.getOrganGestor().getCodi()) && OrganGestorEstatEnum.V.equals(e.getOrganGestor().getEstat())) {
-                o.add(CodiValorDto.builder().codi(e.getOrganGestor().getCodi()).valor(e.getOrganGestor().getCodi() + " - " + e.getOrganGestor().getNom()).build());
+                o.add(CodiValorDto.builder().codi(e.getOrganGestor().getId() + "").valor(e.getOrganGestor().getCodi() + " - " + e.getOrganGestor().getNom()).build());
             }
         }
         for (var organ : organs) {
             if (OrganGestorEstatEnum.V.equals(organ.getEstat())) {
-                o.add(CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build());
+                o.add(CodiValorDto.builder().codi(organ.getId() + "").valor(organ.getCodi() + " - " + organ.getNom()).build());
             }
         }
         Set<CodiValorDto> organsFinals = new HashSet<>(o);
@@ -603,7 +603,7 @@ public class PermisosServiceImpl implements PermisosService {
             }
             boolean excloure = isOficinaOrganSir && Strings.isNullOrEmpty(organ.getOficina());
             if ((entitatPermesa || !organ.getCodi().equals(entitat.getDir3Codi()) || !"A04003003".equals(entitat.getDir3Codi())) && !excloure) {
-                resposta.add(CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build());
+                resposta.add(CodiValorDto.builder().codi(organ.getId()+ "").valor(organ.getCodi() + " - " + organ.getNom()).build());
             }
             //buscar fills
             List<String> codiFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organ.getCodi());
@@ -615,7 +615,7 @@ public class PermisosServiceImpl implements PermisosService {
                 if (organFill != null) {
                     boolean excloureFill = isOficinaOrganSir && Strings.isNullOrEmpty(organFill.getOficina());
                     if (!excloureFill) {
-                        resposta.add(CodiValorDto.builder().codi(organFill.getCodi()).valor(organFill.getCodi() + " - " + organFill.getNom()).build());
+                        resposta.add(CodiValorDto.builder().codi(organFill.getId() + "").valor(organFill.getCodi() + " - " + organFill.getNom()).build());
                     }
                 }
             }

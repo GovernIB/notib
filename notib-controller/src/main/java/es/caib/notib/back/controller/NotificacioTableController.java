@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.ejb.access.LocalSlsbInvokerInterceptor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
@@ -95,6 +96,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private static final String EVENT_TIPUS_ENUM = "es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.";
     private static final String SELECCIO_BUIDA = "accio.massiva.seleccio.buida";
     private static final String PERMIS_DENGAT = "Permís denegat";
+    @Autowired
+    private OrganGestorService organGestorService;
 
     public NotificacioTableController() {
         super.sessionAttributeSeleccio = SESSION_ATTRIBUTE_SELECCIO;
@@ -124,9 +127,11 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var usuari = aplicacioService.getUsuariActual();
         if (!Strings.isNullOrEmpty(usuari.getOrganDefecte())) {
             filtre.setOrganGestor(usuari.getOrganDefecte());
+            filtre.setFiltreSimpleActiu(false);
         }
         if (usuari.getProcedimentDefecte() != null) {
             filtre.setProcedimentId(usuari.getProcedimentDefecte());
+            filtre.setFiltreSimpleActiu(false);
         }
         filtre.setDeleted(false);
         model.addAttribute(filtre);
@@ -335,7 +340,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             organCodi = organActual.getCodi();
         }
         var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
-        return procedimentService.getProcedimentsOrgan(entitatId, organCodi, organGestor, rol, permis);
+        var organ = organGestorService.findById(entitatId, organGestor);
+        return procedimentService.getProcedimentsOrgan(entitatId, organ.getCodi(), organGestor, rol, permis);
     }
 
     @GetMapping(value = "/serveisOrgan/{organGestor}")

@@ -570,14 +570,17 @@
             $('#serveiId').select2('open');
         });
 
+        loadOrgans($('#organGestor'), organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
+        $('#organGestor').val("${notificacioFiltreCommand.organGestor}");
+
         omplirProcediments();
         omplirServeis();
 
-        loadOrgans($('#organGestor'), organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
-
-        $('#organGestor').val("${notificacioFiltreCommand.organGestor}");
+        $('#procedimentId').val("${notificacioFiltreCommand.procedimentId}");
+        <%--$('#serveiId').val("${notificacioFiltreCommand.serveiId}");--%>
         // $('#organGestor').select2().trigger('change');
         // $('#estat').select2().trigger('change');
+
         $('#organGestor').trigger('change');
         $('#estat').trigger('change');
 
@@ -665,7 +668,7 @@
                 } else {
                     selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
                 }
-                selProcediments.val(${notificacioFiltreCommand.procedimentId})
+                selProcediments.val("${notificacioFiltreCommand.procedimentId}");
                 formatSelects($('#procedimentId'));
             },
             error: function() {
