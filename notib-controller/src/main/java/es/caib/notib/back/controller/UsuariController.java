@@ -104,14 +104,14 @@ public class UsuariController extends BaseController {
         var usuari = aplicacioService.getUsuariActual();
         RolEnumDto rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
         rol = RolEnumDto.tothom;
-        return procedimentDefecte(entitatId, organCodi);
+        return procedimentDefecte(entitatId, Long.valueOf(organCodi));
     }
 
-    private List<CodiValorOrganGestorComuDto> procedimentDefecte(Long entitatId, String organCodi) {
+    private List<CodiValorOrganGestorComuDto> procedimentDefecte(Long entitatId, Long organCodi) {
 
-        var organ = organGestorService.findById(entitatId, Long.valueOf(organCodi));
-        var serveis = serveiService.getServeisOrgan(entitatId, organCodi, organ.getId(), RolEnumDto.tothom, PermisEnum.CONSULTA);
-        var procediments = procedimentService.getProcedimentsOrgan(entitatId, organCodi, organ.getId(), RolEnumDto.tothom, PermisEnum.CONSULTA);
+        var organ = organGestorService.findById(entitatId, organCodi);
+        var serveis = serveiService.getServeisOrgan(entitatId, organ.getCodi(), organ.getId(), RolEnumDto.tothom, PermisEnum.CONSULTA);
+        var procediments = procedimentService.getProcedimentsOrgan(entitatId, organ.getCodi(), organ.getId(), RolEnumDto.tothom, PermisEnum.CONSULTA);
         Set<CodiValorOrganGestorComuDto> procSer = new HashSet<>();
         procSer.addAll(procediments);
         procSer.addAll(serveis);

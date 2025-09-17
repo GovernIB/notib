@@ -64,8 +64,8 @@ public class UsuariEntity implements Serializable {
 	private String numElementsPaginaDefecte;
     @Column(name = "entitat_defecte")
     protected Long entitatDefecte;
-    @Column(name = "organ_defecte", length = 64)
-    protected String organDefecte;
+    @Column(name = "organ_defecte")
+    protected Long organDefecte;
     @Column(name = "procediment_defecte")
     protected Long procedimentDefecte;
 

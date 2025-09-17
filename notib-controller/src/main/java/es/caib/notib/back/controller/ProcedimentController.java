@@ -83,13 +83,24 @@ public class ProcedimentController extends BaseUserController {
 		var entitat = getEntitatActualComprovantPermisos(request);
 		var organGestorActual = getOrganGestorActual(request);
 		this.currentFiltre = PROCEDIMENTS_FILTRE;
-		var procSerFiltreCommand = getFiltreCommand(request);
+		var filtre = getFiltreCommand(request);
 		var codi = request.getParameter("codi");
 		if (!Strings.isNullOrEmpty(codi)) {
-			procSerFiltreCommand.setCodi(codi);
+			filtre.setCodi(codi);
 		}
+        var usuari = sessionScopedContext.getUsuariActual();
+        var comu = false;
+        if (usuari.getProcedimentDefecte() != null) {
+            var p = procedimentService.findById(entitat.getId(), isAdministrador(), usuari.getProcedimentDefecte());
+            filtre.setCodi(p.getCodi());
+            comu = p.isComu();
+        }
+        if (usuari.getOrganDefecte() != null && !comu) {
+            var o = organGestorService.findById(entitat.getId(), usuari.getOrganDefecte());
+            filtre.setOrganGestor(o.getCodi());
+        }
 		model.addAttribute("procedimentEstats", EnumHelper.getOptionsForEnum(ProcedimentEstat.class, "es.caib.notib.logic.intf.dto.procediment.ProcedimentEstat."));
-		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
+		model.addAttribute("procSerFiltreCommand", filtre);
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
 		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false")));
 		model.addAttribute("isModal", false);

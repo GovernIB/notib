@@ -67,6 +67,12 @@ public class OrganGestorArbreController extends BaseUserController {
         try {
             var entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
             var filtres = OrganGestorController.getFiltreCommand(request);
+            var usuari = sessionScopedContext.getUsuariActual();
+            if (usuari.getOrganDefecte() != null) {
+                var o = organGestorService.findById(entitat.getId(), usuari.getOrganDefecte());
+                filtres.setCodi(o.getCodi());
+                filtres.setIsFiltre("true");
+            }
             model.addAttribute("organGestorFiltreCommand", filtres);
             model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, "es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum."));
             model.addAttribute("numeroPermisosList", EnumHelper.getOptionsForEnum(NumeroPermisos.class, "es.caib.notib.logic.intf.dto.organisme.NumeroPermisos."));

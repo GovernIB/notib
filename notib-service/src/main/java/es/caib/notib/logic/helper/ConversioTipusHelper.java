@@ -310,8 +310,8 @@ public class ConversioTipusHelper {
 					}
 				}).byDefault().register();
 
-		mapperFactory.classMap(ProcedimentEntity.class, ProcSerDto.class).
-				field("organGestor.codi", "organGestor")
+		mapperFactory.classMap(ProcedimentEntity.class, ProcSerDto.class)
+                .field("organGestor.codi", "organGestor")
 				.field("organGestor.nom", "organGestorNom")
 				.customize(new CustomMapper<>() {
 					@Override

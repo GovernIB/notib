@@ -71,7 +71,7 @@
                     selector.empty();
                     selector.append($('<option></option>').val("").text(""));
                     $.each(procediments, function(index, item) {
-                        selector.append($('<option></option>').val(item.codi).text(item.valor));
+                        selector.append($('<option></option>').val(item.id).text(item.valor));
                     });
                     selector.select2();
                 }
@@ -94,7 +94,7 @@
 		<not:inputCheckbox name="rebreEmailsNotificacioCreats" textKey="usuari.form.camp.rebre.emails.notificacio.creats"/>
 		<not:inputSelect name="entitatDefecte" optionItems="${entitats}" textKey="usuari.form.camp.entitat.defecte" optionValueAttribute="codi" optionTextAttribute="valor" emptyOption="true"/>
 		<not:inputSelect name="organDefecte" optionItems="${organs}" textKey="usuari.form.camp.organ.defecte" optionValueAttribute="codi" optionTextAttribute="valor" emptyOption="true"/>
-		<not:inputSelect name="procedimentDefecte" optionItems="${procediments}" textKey="usuari.form.camp.procediment.defecte" optionValueAttribute="codi" optionTextAttribute="valor" emptyOption="true"/>
+		<not:inputSelect name="procedimentDefecte" optionItems="${procediments}" textKey="usuari.form.camp.procediment.defecte" optionValueAttribute="id" optionTextAttribute="valor" emptyOption="true"/>
 		<not:inputSelect name="idioma" optionItems="${idiomaEnumOptions}" textKey="usuari.form.camp.idioma" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="false"/>
 		<not:inputSelect name="numElementsPaginaDefecte" optionItems="${numElementsPaginaDefecte}" optionValueAttribute="value" optionTextKeyAttribute="text" textKey="usuari.form.camp.elements.pagina.defecte"/>
 		<div id="modal-botons">

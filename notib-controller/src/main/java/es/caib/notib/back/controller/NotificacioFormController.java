@@ -189,6 +189,15 @@ public class NotificacioFormController extends BaseUserController {
         notificacioCommand.setEnviaments(enviaments);
         notificacioCommand.setCaducitat(CaducitatHelper.sumarDiesNaturals(10));
         notificacioCommand.setCaducitatDiesNaturals(10);
+        var usuari = sessionScopedContext.getUsuariActual();
+        if (usuari.getOrganDefecte() != null) {
+            var o = organGestorService.findById(entitatActual.getId(), usuari.getOrganDefecte());
+            notificacioCommand.setOrganGestor(o.getCodi());
+        }
+        if (usuari.getProcedimentDefecte() != null) {
+            notificacioCommand.setProcedimentId(usuari.getProcedimentDefecte());
+        }
+
         var tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
         if (tipusDocumentDefault != null) {
             for(var i = 0; i < 5; i++) {
@@ -503,13 +512,13 @@ public class NotificacioFormController extends BaseUserController {
 
     @GetMapping(value = "/procediment/{procedimentId}/dades")
     @ResponseBody
-    public DadesProcediment getDadesProcSer(HttpServletRequest request, @PathVariable Long procedimentId, @RequestParam(required = false) String organCodi) {
+    public DadesProcediment getDadesProcSer(HttpServletRequest request, @PathVariable Long procedimentId, @RequestParam(required = false) String organId) {
 
         var entitatActual = sessionScopedContext.getEntitatActual();
         var procedimentActual = procedimentService.findById(entitatActual.getId(),false, procedimentId);
         var enviamentTipus = (EnviamentTipus) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
         var dadesProcediment = new DadesProcediment();
-        dadesProcediment.setOrganCodi(procedimentActual.isComu() ? organCodi : procedimentActual.getOrganGestor());
+        dadesProcediment.setOrganCodi(procedimentActual.isComu() ? organId : procedimentActual.getOrganGestor());
         dadesProcediment.setCaducitat(CaducitatHelper.sumarDiesNaturals(procedimentActual.getCaducitat()));
         dadesProcediment.setCaducitatDiesNaturals(procedimentActual.getCaducitat());
         dadesProcediment.setRetard(procedimentActual.getRetard());
@@ -543,10 +552,10 @@ public class NotificacioFormController extends BaseUserController {
 //            return dadesProcediment;
 //        }
         // Mirar si organ seleccionat te entrega postal activa.
-        organCodi = dadesProcediment.getOrganCodi();
-        if (!Strings.isNullOrEmpty(organCodi)) {
-            var organ = organGestorService.findByCodi(entitatActual.getId(), organCodi);
-            var cieActiuPerPare = organGestorService.entregaCieActiva(entitatActual, organCodi);
+        organId = dadesProcediment.getOrganCodi();
+        if (organId != null) {
+            var organ = organGestorService.findByCodi(entitatActual.getId(), organId);
+            var cieActiuPerPare = organGestorService.entregaCieActiva(entitatActual, organ.getCodi());
             dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva() || cieActiuPerPare);
         }
 //        dadesProcediment.setEntregaCieActiva(cieActiuPerPare);

@@ -125,8 +125,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var organGestorActual = getOrganGestorActual(request);
         var filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
         var usuari = aplicacioService.getUsuariActual();
-        if (!Strings.isNullOrEmpty(usuari.getOrganDefecte())) {
-            filtre.setOrganGestor(usuari.getOrganDefecte());
+        if (usuari.getOrganDefecte() != null) {
+            filtre.setOrganGestor(usuari.getOrganDefecte() + "");
             filtre.setFiltreSimpleActiu(false);
         }
         if (usuari.getProcedimentDefecte() != null) {

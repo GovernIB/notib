@@ -83,6 +83,12 @@ public class OrganGestorController extends BaseUserController{
 
 		var entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
 		var filtres = getFiltreCommand(request);
+        var usuari = sessionScopedContext.getUsuariActual();
+        if (usuari.getOrganDefecte() != null) {
+            var o = organGestorService.findById(entitat.getId(), usuari.getOrganDefecte());
+            filtres.setCodi(o.getCodi());
+            filtres.setIsFiltre("true");
+        }
 		model.addAttribute("organGestorFiltreCommand", filtres);
 		model.addAttribute("organsEntitat", organGestorService.getOrgansAsList(entitat));
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));

@@ -1,12 +1,4 @@
 databaseChangeLog:
-  - property:
-      name: varcharUnit
-      value: CHAR
-      dbms: oracle
-  - property:
-      name: varcharUnit
-      value: ''
-      dbms: postgresql
   - changeSet:
       id: 1634114082437-1
       author: limit
@@ -19,7 +11,7 @@ databaseChangeLog:
                   type: number
               - column:
                   name: organ_defecte
-                  type: varchar(64 ${varcharUnit})
+                  type: number
               - column:
                   name: procediment_defecte
                   type: number

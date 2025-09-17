@@ -44,7 +44,7 @@ public class UsuariDto implements Serializable {
 	private NumElementsPaginaDefecte numElementsPaginaDefecte;
     private Long entitatDefecte;
     private Long procedimentDefecte;
-    private String organDefecte;
+    private Long organDefecte;
 
 	private static final long serialVersionUID = -139254994389509932L;
 

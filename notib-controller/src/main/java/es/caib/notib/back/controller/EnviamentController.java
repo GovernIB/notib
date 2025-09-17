@@ -20,6 +20,8 @@ import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.ColumnesService;
 import es.caib.notib.logic.intf.service.EnviamentService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
+import es.caib.notib.logic.intf.service.ProcedimentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -60,9 +62,13 @@ public class EnviamentController extends TableAccionsMassivesController {
 	private EnviamentService enviamentService;
 	@Autowired
 	private ColumnesService columnesService;
+	@Autowired
+    private OrganGestorService organGestorService;
+	@Autowired
+    private ProcedimentService procedimentService;
 
 
-	public EnviamentController() {
+    public EnviamentController() {
 		super.sessionAttributeSeleccio = SESSION_ATTRIBUTE_SELECCIO;
 	}
 
@@ -84,13 +90,23 @@ public class EnviamentController extends TableAccionsMassivesController {
 	@GetMapping
 	public String get(HttpServletRequest request, Model model) {
 
+        var entitat = getEntitatActualComprovantPermisos(request);
 		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
 		model.addAttribute("mantenirPaginacio", mantenirPaginacio != null && mantenirPaginacio);
 		var entitatActual = sessionScopedContext.getEntitatActual();
 		ColumnesDto columnes = null;
-		var filtreEnviaments = getFiltreCommand(request);
-		model.addAttribute("mostrarFiltreAvancat", !filtreEnviaments.isFiltreSimpleActiu());
-		model.addAttribute(filtreEnviaments);
+		var filtre = getFiltreCommand(request);
+        var usuari = aplicacioService.getUsuariActual();
+        if (usuari.getOrganDefecte() != null) {
+            var o = organGestorService.findById(entitat.getId(), usuari.getOrganDefecte());
+            filtre.setDir3Codi(o.getCodi());
+        }
+        if (usuari.getProcedimentDefecte() != null) {
+            var p = procedimentService.findById(entitat.getId(), isAdministrador(), usuari.getProcedimentDefecte());
+            filtre.setCodiProcediment(p.getCodi());
+        }
+		model.addAttribute("mostrarFiltreAvancat", !filtre.isFiltreSimpleActiu());
+		model.addAttribute(filtre);
 		model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
 		if(entitatActual != null) {
 			var codiUsuari = getCodiUsuariActual();
@@ -103,7 +119,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 		}
 		model.addAttribute(new NotificacioEnviamentCommand());
 		model.addAttribute("columnes", ColumnesCommand.asCommand(columnes));
-		model.addAttribute("filtreEnviaments", filtreEnviaments);
+		model.addAttribute("filtreEnviaments", filtre);
 		return "enviamentList";
 	}
 
@@ -238,4 +254,8 @@ public class EnviamentController extends TableAccionsMassivesController {
 		var inici = c.getTime();
 		command.setDataEnviamentInici(df.format(inici));
 	}
+
+    private boolean isAdministrador() {
+        return RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
+    }
 }
