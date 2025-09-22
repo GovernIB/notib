@@ -184,18 +184,18 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 	}
 
 	@Override
-	public List<IntegracioSalut> getIntegracionsSalut() {
+	public IntegracioSalut getIntegracionsSalut() {
+
 		var plugin = pluginMap.get(GLOBAL);
 		if (plugin == null) {
-			return List.of(IntegracioSalut.builder().codi(getCodiApp().name()).estat(EstatSalutEnum.UNKNOWN).build());
+			return IntegracioSalut.builder().codi(getCodiApp().name()).estat(EstatSalutEnum.UNKNOWN).build();
 		}
-
 		EstatSalut estatSalut = plugin.getEstatPlugin();
-		return List.of(IntegracioSalut.builder()
+		return IntegracioSalut.builder()
 				.codi(getCodiApp().name())
 				.estat(estatSalut.getEstat())
 				.latencia(estatSalut.getLatencia())
 				.peticions(plugin.getPeticionsPlugin())
-				.build());
+				.build();
 	}
 }

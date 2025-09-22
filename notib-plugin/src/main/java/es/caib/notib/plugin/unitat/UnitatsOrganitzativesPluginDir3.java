@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.google.common.base.Strings;
 import es.caib.dir3caib.ws.api.catalogo.CatPais;
 import es.caib.dir3caib.ws.api.oficina.OficinaTF;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
@@ -55,9 +56,15 @@ public class UnitatsOrganitzativesPluginDir3 extends AbstractSalutPlugin impleme
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-	public UnitatsOrganitzativesPluginDir3(Properties properties, boolean configuracioEspecifica) {
+	public UnitatsOrganitzativesPluginDir3(Properties properties, boolean configuracioEspecifica, String codiEntitat) {
 		this.properties = properties;
 		this.configuracioEspecifica = configuracioEspecifica;
+        this.codiEntitat = codiEntitat;
+        var entitat = "";
+        if (configuracioEspecifica && !Strings.isNullOrEmpty(codiEntitat)) {
+            entitat = codiEntitat;
+        }
+        urlPlugin = properties.getProperty("es.caib.notib.plugin.unitats.dir3.url");
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.UNITATS")));
 	}
 

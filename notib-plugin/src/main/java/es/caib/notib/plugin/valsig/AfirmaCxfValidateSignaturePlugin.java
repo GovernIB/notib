@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.valsig;
 
+import com.google.common.base.Strings;
 import es.caib.comanda.ms.salut.model.EstatSalut;
 import es.caib.comanda.ms.salut.model.IntegracioPeticions;
 import es.caib.notib.plugin.AbstractSalutPlugin;
@@ -12,9 +13,16 @@ import java.util.Properties;
 
 public class AfirmaCxfValidateSignaturePlugin extends org.fundaciobit.plugins.validatesignature.afirmacxf.AfirmaCxfValidateSignaturePlugin implements ValidateSignaturePlugin {
 
-    public AfirmaCxfValidateSignaturePlugin(String propertyKeyBase, Properties properties, boolean configuracioEspecifica) {
+    public AfirmaCxfValidateSignaturePlugin(String propertyKeyBase, Properties properties, boolean configuracioEspecifica, String codiEntitat) {
         super(propertyKeyBase, properties);
         salutPluginComponent.setConfiguracioEspecifica(configuracioEspecifica);
+        salutPluginComponent.setCodiEntitat(codiEntitat);
+        var entitat = "";
+        if (configuracioEspecifica && !Strings.isNullOrEmpty(codiEntitat)) {
+            entitat = codiEntitat;
+        }
+        salutPluginComponent.setUrlPlugin(properties.getProperty("es.caib.notib. " + entitat + " .plugins.validatesignature.afirmacxf.endpoint"));
+
     }
 
     @Override

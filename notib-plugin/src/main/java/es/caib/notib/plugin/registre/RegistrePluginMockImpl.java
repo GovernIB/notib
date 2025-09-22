@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.registre;
 
+import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.DatosInteresadoWsDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
@@ -37,10 +38,16 @@ public class RegistrePluginMockImpl extends AbstractSalutPlugin implements Regis
 		this.properties = properties;
 	}
 
-	public RegistrePluginMockImpl(Properties properties, boolean configuracioEspecifica) {
+	public RegistrePluginMockImpl(Properties properties, boolean configuracioEspecifica, String codiEntitat) {
 
 		this.properties = properties;
 		this.configuracioEspecifica = configuracioEspecifica;
+        this.codiEntitat = codiEntitat;
+        var entitat = "";
+        if (configuracioEspecifica && !Strings.isNullOrEmpty(codiEntitat)) {
+            entitat = codiEntitat;
+        }
+        urlPlugin = properties.getProperty("es.caib.notib.plugin.registre.url");
 	}
 
 	@Override

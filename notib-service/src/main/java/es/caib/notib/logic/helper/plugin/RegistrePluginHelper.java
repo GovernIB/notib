@@ -1005,7 +1005,8 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			var configuracioEspecifica = configHelper.hasEntityGroupPropertiesModified(codiEntitat, getConfigGrup());
 			var propietats = configHelper.getAllEntityProperties(codiEntitat);
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (RegistrePlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(propietats, configuracioEspecifica);
+			plugin = (RegistrePlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class, String.class)
+                    .newInstance(propietats, configuracioEspecifica, codiEntitat);
             plugin.init(meterRegistry, getCodiApp().name());
 			pluginMap.put(codiEntitat, plugin);
 			return plugin;

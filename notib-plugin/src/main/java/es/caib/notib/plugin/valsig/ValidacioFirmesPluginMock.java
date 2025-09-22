@@ -1,6 +1,7 @@
 package es.caib.notib.plugin.valsig;
 
 
+import com.google.common.base.Strings;
 import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.validatesignature.api.IValidateSignaturePlugin;
 import es.caib.notib.plugin.validatesignature.api.SignatureRequestedInformation;
@@ -23,12 +24,18 @@ public class ValidacioFirmesPluginMock extends AbstractSalutPlugin implements IV
         this.properties = properties;
     }
 
-    public ValidacioFirmesPluginMock(String propertyKeyBase, Properties properties, boolean configuracioEspcifica) {
+    public ValidacioFirmesPluginMock(String propertyKeyBase, Properties properties, boolean configuracioEspcifica, String codiEntitat) {
 
         super();
         this.propertyKeyBase = propertyKeyBase;
         this.properties = properties;
         this.configuracioEspcifica = configuracioEspcifica;
+        this.codiEntitat = codiEntitat;
+        var entitat = "";
+        if (configuracioEspecifica && !Strings.isNullOrEmpty(codiEntitat)) {
+            entitat = codiEntitat;
+        }
+        urlPlugin = properties.getProperty("es.caib.notib.plugins.validatesignature.afirmacxf.endpoint");
     }
 
     public ValidacioFirmesPluginMock(Properties properties) {

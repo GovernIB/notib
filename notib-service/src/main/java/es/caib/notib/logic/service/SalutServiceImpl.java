@@ -15,6 +15,7 @@ import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.helper.plugin.AbstractPluginHelper;
 import es.caib.notib.logic.intf.service.SalutService;
 import es.caib.notib.logic.mapper.MissatgeSalutMapper;
+import es.caib.notib.logic.utils.CustomHealthIndicator;
 import es.caib.notib.logic.utils.NotibBenchmark;
 import es.caib.notib.persist.repository.AvisRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.springframework.boot.actuate.health.Health;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -61,6 +63,7 @@ public class SalutServiceImpl implements SalutService {
     private final PluginHelper pluginHelper;
     private final MissatgeSalutMapper missatgeSalutMapper;
     private final AvisRepository avisRepository;
+    private final CustomHealthIndicator healthIndicator;
 
     private static final int MAX_CONNECTION_RETRY = 3;
 
@@ -137,6 +140,11 @@ public class SalutServiceImpl implements SalutService {
                 .build();
     }
 
+    @Override
+    public Health checkHealthIndicator() {
+        return healthIndicator.health();
+    }
+
     private EstatSalut executePerformanceTest() {
 
         Options opt = new OptionsBuilder()
@@ -211,10 +219,11 @@ public class SalutServiceImpl implements SalutService {
         List<IntegracioSalut> integracionsSalut = new ArrayList<>();
         try {
             List<AbstractPluginHelper<?>> helpers = pluginHelper.getPluginHelpers();
-            for (AbstractPluginHelper helper : helpers) {
-                integracionsSalut.addAll(helper.getIntegracionsSalut());
+            for (var helper : helpers) {
+                integracionsSalut.add(helper.getIntegracionsSalut());
             }
         } catch (Exception e) {
+            log.error("Error checkIntegracions", e);
             return Collections.emptyList();
         }
         return integracionsSalut;

@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.firmaservidor;
 
+import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.util.FitxerUtils;
 import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
@@ -40,7 +41,7 @@ public class FirmaServidorPluginPortafib extends AbstractSalutPlugin implements 
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-	public FirmaServidorPluginPortafib(Properties properties, boolean configuracioEspecifica) {
+	public FirmaServidorPluginPortafib(Properties properties, boolean configuracioEspecifica, String codiEntitat) {
 
 		super();
 		plugin = new PortaFIBSignatureServerPlugin(PROPERTIES_BASE, properties);
@@ -50,6 +51,12 @@ public class FirmaServidorPluginPortafib extends AbstractSalutPlugin implements 
 		base.mkdirs();
 		tempDirPath = base.getAbsolutePath();
 		this.configuracioEspecifica = configuracioEspecifica;
+        this.codiEntitat = codiEntitat;
+        var entitat = "";
+        if (configuracioEspecifica && !Strings.isNullOrEmpty(codiEntitat)) {
+            entitat = codiEntitat;
+        }
+        urlPlugin = properties.getProperty("es.caib.notib.plugin.firmaservidor.portafib.endpoint");
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.FIRMA_SERVIDOR")));
 	}
 

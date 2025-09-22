@@ -193,7 +193,8 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			var configuracioEspecifica = configHelper.hasEntityGroupPropertiesModified(codiEntitat, getConfigGrup());
 			var propietats = configHelper.getAllEntityProperties(codiEntitat);
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (GestioDocumentalPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(propietats, configuracioEspecifica);
+			plugin = (GestioDocumentalPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class, String.class)
+                    .newInstance(propietats, configuracioEspecifica, codiEntitat);
             plugin.init(meterRegistry, getCodiApp().name());
 			pluginMap.put(codiEntitat, plugin);
 			return plugin;

@@ -7,7 +7,9 @@ import es.caib.notib.logic.intf.service.SalutService;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.actuate.health.Health;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -64,9 +66,11 @@ public class SalutController {
         return salutService.checkSalut(manifestInfo.getVersion(), request.getRequestURL().toString() + "Performance");
     }
 
+    @ResponseBody
     @GetMapping("/salutPerformance")
-    public String healthCheck() {
-        return "OK";
+    public Health healthCheck() {
+
+        return salutService.checkHealthIndicator();
     }
 
     private ManifestInfo getManifestInfo() throws IOException {

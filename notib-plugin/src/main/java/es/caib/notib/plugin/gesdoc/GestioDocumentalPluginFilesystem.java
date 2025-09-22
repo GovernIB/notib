@@ -50,13 +50,16 @@ public class GestioDocumentalPluginFilesystem extends AbstractSalutPlugin implem
 	public GestioDocumentalPluginFilesystem(Properties properties) {
 
 		this.properties = properties;
+	    this.urlPlugin = properties.getProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir");
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.GESDOC")));
-	}
+    }
 
-	public GestioDocumentalPluginFilesystem(Properties properties, boolean configuracioEspecifica) {
+	public GestioDocumentalPluginFilesystem(Properties properties, boolean configuracioEspecifica, String codiEntitat) {
 
 		this.properties = properties;
 		this.configuracioEspecifica = configuracioEspecifica;
+	    this.urlPlugin = properties.getProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir");
+        this.codiEntitat = codiEntitat;
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.GESDOC")));
 	}
 
@@ -73,6 +76,7 @@ public class GestioDocumentalPluginFilesystem extends AbstractSalutPlugin implem
 			try (var outContent = new FileOutputStream(basedir + "/" + id)) {
 				IOUtils.copy(contingut, outContent);
 			}
+
             incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return id;
 		} catch (Exception ex) {

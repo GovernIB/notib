@@ -2,6 +2,7 @@ package es.caib.notib.plugin.carpeta;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -23,9 +24,23 @@ public class CarpetaCaibImpl extends AbstractSalutPlugin implements CarpetaPlugi
 
     private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-    public CarpetaCaibImpl(Properties properties, boolean configuracioEspecifica) {
+    public CarpetaCaibImpl(Properties properties) {
+
+        this.properties = properties;
+        this.configuracioEspecifica = false;
+        logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.CARPETA")));
+    }
+
+    public CarpetaCaibImpl(Properties properties, boolean configuracioEspecifica, String codiEntitat) {
+
         this.properties = properties;
         this.configuracioEspecifica = configuracioEspecifica;
+        this.codiEntitat = codiEntitat;
+        var entitat = "";
+        if (configuracioEspecifica && !Strings.isNullOrEmpty(codiEntitat)) {
+            entitat = codiEntitat;
+        }
+        this.urlPlugin = properties.getProperty("es.caib.notib.plugin.carpeta.url");
         logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.CARPETA")));
     }
 

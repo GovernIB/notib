@@ -175,7 +175,8 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 			var configuracioEspecifica = configHelper.hasEntityGroupPropertiesModified(codiEntitat, getConfigGrup());
 			var propietats = configHelper.getEnvironmentProperties();
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (ArxiuPlugin) clazz.getDeclaredConstructor(String.class, Properties.class, boolean.class).newInstance(propertyKeyBase, propietats, configuracioEspecifica);
+			plugin = (ArxiuPlugin) clazz.getDeclaredConstructor(String.class, Properties.class, boolean.class, String.class)
+                    .newInstance(propertyKeyBase, propietats, configuracioEspecifica, codiEntitat);
             plugin.init(meterRegistry, getCodiApp().name());
 			pluginMap.put(codiEntitat, plugin);
 			return plugin;

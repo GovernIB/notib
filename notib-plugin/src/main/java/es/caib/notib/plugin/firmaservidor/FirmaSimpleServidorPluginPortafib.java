@@ -3,6 +3,7 @@
  */
 package es.caib.notib.plugin.firmaservidor;
 
+import com.google.common.base.Strings;
 import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
@@ -36,10 +37,16 @@ public class FirmaSimpleServidorPluginPortafib extends AbstractSalutPlugin imple
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-	public FirmaSimpleServidorPluginPortafib(Properties properties, boolean configuracioEspecifica) {
+	public FirmaSimpleServidorPluginPortafib(Properties properties, boolean configuracioEspecifica, String codiEntitat) {
 
 		this.properties = properties;
 		this.configuracioEspecifica = configuracioEspecifica;
+        this.codiEntitat = codiEntitat;
+        var entitat = "";
+        if (configuracioEspecifica && !Strings.isNullOrEmpty(codiEntitat)) {
+            entitat = codiEntitat;
+        }
+        urlPlugin = properties.getProperty("es.caib.notib.plugin.firmaservidor.portafib.endpoint");
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.FIRMA_SERVIDOR")));
 	}
 
