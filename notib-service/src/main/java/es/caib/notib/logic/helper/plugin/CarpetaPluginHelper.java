@@ -21,6 +21,7 @@ import es.caib.notib.plugin.carpeta.MissatgeCarpetaParams;
 import es.caib.notib.plugin.carpeta.VincleInteressat;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.actuate.endpoint.web.annotation.ControllerEndpointDiscoverer;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -39,15 +40,17 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 	public static final String GRUP = "CARPETA";
 
 	private final NotificacioEventHelper eventHelper;
+//    private final ControllerEndpointDiscoverer controllerEndpointDiscoverer;
 
-	public CarpetaPluginHelper(IntegracioHelper integracioHelper,
+    public CarpetaPluginHelper(IntegracioHelper integracioHelper,
                                ConfigHelper configHelper,
-							   EntitatRepository entitatRepository,
+                               EntitatRepository entitatRepository,
                                NotificacioEventHelper eventHelper,
-                               MeterRegistry meterRegistry) {
+                               MeterRegistry meterRegistry/*, ControllerEndpointDiscoverer controllerEndpointDiscoverer*/) {
 
 		super(integracioHelper, configHelper, entitatRepository, meterRegistry);
 		this.eventHelper = eventHelper;
+//        this.controllerEndpointDiscoverer = controllerEndpointDiscoverer;
     }
 
 
@@ -186,7 +189,8 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 			var configuracioEspecifica = configHelper.hasEntityGroupPropertiesModified(entitatCodi, getConfigGrup());
 			var propietats = configHelper.getAllEntityProperties(entitatCodi);
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (CarpetaPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(propietats, configuracioEspecifica);
+			plugin = (CarpetaPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class, String.class)
+                    .newInstance(propietats, configuracioEspecifica, entitatCodi);
 			plugin.init(meterRegistry, getCodiApp().name());
             pluginMap.put(entitatCodi, plugin);
 			return (CarpetaPlugin) plugin;

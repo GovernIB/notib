@@ -4,6 +4,7 @@ import es.caib.comanda.ms.salut.model.AppInfo;
 import es.caib.comanda.ms.salut.model.ContextInfo;
 import es.caib.comanda.ms.salut.model.IntegracioInfo;
 import es.caib.comanda.ms.salut.model.SalutInfo;
+import org.springframework.boot.actuate.health.Health;
 import org.springframework.context.annotation.Primary;
 
 import javax.ejb.Stateless;
@@ -31,6 +32,11 @@ public class SalutService extends AbstractService<es.caib.notib.logic.intf.servi
     @Override
     public SalutInfo checkSalut(String versio, String performanceUrl) {
         return getDelegateService().checkSalut(versio, performanceUrl);
+    }
+
+    @Override
+    public Health checkHealthIndicator() {
+        return getDelegateService().checkHealthIndicator();
     }
 
 }

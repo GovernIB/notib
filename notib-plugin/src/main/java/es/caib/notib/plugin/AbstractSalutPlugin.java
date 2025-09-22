@@ -1,8 +1,10 @@
 package es.caib.notib.plugin;
 
+import com.google.common.base.Strings;
 import es.caib.comanda.ms.salut.model.EstatSalut;
 import es.caib.comanda.ms.salut.model.EstatSalutEnum;
 import es.caib.comanda.ms.salut.model.IntegracioPeticions;
+import es.caib.notib.plugin.utils.CuaFifoBool;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
@@ -20,6 +22,10 @@ public class AbstractSalutPlugin implements SalutPlugin {
     private MeterRegistry registry;
     private MeterRegistry localRegistry;
     private String codiPlugin;
+    @Setter
+    protected String urlPlugin;
+    @Setter
+    protected String codiEntitat;
 
     @Setter
     protected boolean configuracioEspecifica = false;
@@ -30,6 +36,8 @@ public class AbstractSalutPlugin implements SalutPlugin {
     private Timer timerOk;
     private Counter counterError;
 
+    private CuaFifoBool cuaPeticions;
+
     // Llindars d'avís en percentatge (0-100)
     private static final int DOWN_PCT = 100;     // 100% errors
     private static final int ERROR_GT_PCT = 30;  // >30% errors
@@ -37,25 +45,28 @@ public class AbstractSalutPlugin implements SalutPlugin {
     private static final int UP_LT_PCT = 5;      // <5% errors
 
     public void init(MeterRegistry registry, String codiPlugin) {
+
         this.registry = registry;
         this.codiPlugin = codiPlugin;
-
-        timerOkGlobal = Timer.builder("plugin." + codiPlugin)
-                .tags("result", "success")
+        var timerBuilder = Timer.builder("plugin." + codiPlugin)
+                .tag("result", "success")
                 .publishPercentiles(0.5, 0.75, 0.95, 0.99)
-                .publishPercentileHistogram()
-                .register(registry);
+                .publishPercentileHistogram();
+        if (configuracioEspecifica && !Strings.isNullOrEmpty(codiEntitat)) {
+            timerBuilder.tag("entitat", codiEntitat);
+        }
+        timerOkGlobal = timerBuilder.register(registry);
         counterErrorGlobal = Counter.builder("plugin." + codiPlugin).register(registry);
-
+        cuaPeticions = new CuaFifoBool(20);
         initializeLocalTimers();
     }
 
     private void initializeLocalTimers() {
+
         if (localRegistry != null) {
             localRegistry.close(); // descarta mètriques existents
         }
         localRegistry = new SimpleMeterRegistry();
-
         timerOk = Timer.builder("plugin.peticions.ok")
                 .tags("result", "success")
                 .publishPercentiles(0.5, 0.75, 0.95, 0.99)
@@ -66,14 +77,18 @@ public class AbstractSalutPlugin implements SalutPlugin {
 
     @Synchronized
     public void incrementarOperacioOk(Long durada) {
+
         timerOkGlobal.record(durada, TimeUnit.MILLISECONDS);
         timerOk.record(durada, TimeUnit.MILLISECONDS);
+        cuaPeticions.add(true);
     }
 
     @Synchronized
     public void incrementarOperacioError() {
+
         counterErrorGlobal.increment();
         counterError.increment();
+        cuaPeticions.add(false);
     }
 
     @Synchronized
@@ -88,6 +103,7 @@ public class AbstractSalutPlugin implements SalutPlugin {
 
     @Override
     public EstatSalut getEstatPlugin() {
+
         Integer duradaMitja = null;
         Long totalPeticionsOk = null;
         Long totalPeticionsError = null;
@@ -110,8 +126,12 @@ public class AbstractSalutPlugin implements SalutPlugin {
     }
 
     private EstatSalutEnum calculaEstat(Long totalPeticionsOk, Long totalPeticionsError) {
-        final long peticionsOkSegures = (totalPeticionsOk != null) ? totalPeticionsOk : 0L;
-        final long peticionsErrorSegures = (totalPeticionsError != null) ? totalPeticionsError : 0L;
+
+        // TODO EN COMPTES DE CALCULAR AMB LES totalPeticions FER-HO AMB ELS ELEMENTS DE LA CUA
+//        final long peticionsOkSegures = (totalPeticionsOk != null) ? totalPeticionsOk : 0L;
+//        final long peticionsErrorSegures = (totalPeticionsError != null) ? totalPeticionsError : 0L;
+        final long peticionsOkSegures = !cuaPeticions.isEmpty() ? cuaPeticions.getOk() : 0L;
+        final long peticionsErrorSegures = !cuaPeticions.isEmpty() ? cuaPeticions.getError() : 0L;
 
         final long totalOperacions = peticionsOkSegures + peticionsErrorSegures;
         if (totalOperacions == 0L) {
@@ -123,11 +143,11 @@ public class AbstractSalutPlugin implements SalutPlugin {
 
         if (errorRatePct >= DOWN_PCT) {
             return EstatSalutEnum.DOWN;
-        } else if (errorRatePct > ERROR_GT_PCT) {
+        } else if (errorRatePct >= ERROR_GT_PCT) {
             return EstatSalutEnum.ERROR;
-        } else if (errorRatePct > DEGRADED_GT_PCT) {
+        } else if (errorRatePct >= DEGRADED_GT_PCT) {
             return EstatSalutEnum.DEGRADED;
-        } else if (errorRatePct < UP_LT_PCT) {
+        } else if (errorRatePct <= UP_LT_PCT) {
             return EstatSalutEnum.UP;
         } else {
             return EstatSalutEnum.WARN; // 5-10%
@@ -136,12 +156,24 @@ public class AbstractSalutPlugin implements SalutPlugin {
 
     @Override
     public IntegracioPeticions getPeticionsPlugin() {
-        Long peticionsOk = timerOk != null ? timerOk.count() : null;
-        Long peticionsError = counterError != null ? (long) counterError.count() : null;
-        
-        IntegracioPeticions integracioPeticions = IntegracioPeticions.builder()
-                .totalOk(peticionsOk)
-                .totalError(peticionsError)
+
+        final int tempsMigGlobal = timerOkGlobal != null ? (int) timerOkGlobal.mean(TimeUnit.MILLISECONDS) : 0;
+        Long peticionsOkGlobal = timerOkGlobal != null ? timerOkGlobal.count() : null;
+        Long peticionsErrorGlobal = counterErrorGlobal != null ? (long) counterErrorGlobal.count() : null;
+
+        final int tempsMigPeriode = timerOk != null ? (int) timerOk.mean(TimeUnit.MILLISECONDS) : 0;
+        Long peticionsOkUltimPeriode = timerOk != null ? timerOk.count() : null;
+        Long peticionsErrorUltimPeriode = counterError != null ? (long) counterError.count() : null;
+
+        var integracioPeticions = IntegracioPeticions.builder()
+                .totalOk(peticionsOkGlobal)
+                .totalError(peticionsErrorGlobal)
+                .totalTempsMig(tempsMigGlobal)
+                .peticionsOkUltimPeriode(peticionsOkUltimPeriode)
+                .peticionsErrorUltimPeriode(peticionsErrorUltimPeriode)
+                .tempsMigUltimPeriode(tempsMigPeriode)
+                .endpoint(urlPlugin)
+//                .peticionsPerEntorn()
                 .build();
         resetComptadors();
         return integracioPeticions;

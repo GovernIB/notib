@@ -243,7 +243,7 @@
                            fullesIconaDreta="fa fa-warning text-danger" fullesCondicioDreta="V"/>
             </div>
                 <div class="col-md-7">
-                    <c:if test="${isRolActualAdministradorLectura}">
+                    <c:if test="${!isRolActualAdministradorLectura}">
                         <div style="padding-bottom: 10px; text-align: right">
                             <c:if test="${setOficina}">
                                 <a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines/ARBRE"

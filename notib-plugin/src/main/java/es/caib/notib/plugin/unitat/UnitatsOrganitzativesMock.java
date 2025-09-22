@@ -3,9 +3,12 @@
  */
 package es.caib.notib.plugin.unitat;
 
+import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
+import es.caib.notib.plugin.utils.NotibLoggerPlugin;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +24,7 @@ import java.util.Properties;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class UnitatsOrganitzativesMock extends AbstractSalutPlugin implements UnitatsOrganitzativesPlugin {
 	
 	private static final String SERVEI_CERCA = "/rest/busqueda/";
@@ -33,9 +37,23 @@ public class UnitatsOrganitzativesMock extends AbstractSalutPlugin implements Un
 
 	private final Properties properties;
 
+    private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
+
 	public UnitatsOrganitzativesMock(Properties properties) {
 		this.properties = properties;
 	}
+
+    public UnitatsOrganitzativesMock(Properties properties, boolean configuracioEspecifica, String codiEntitat) {
+        this.properties = properties;
+        this.configuracioEspecifica = configuracioEspecifica;
+        this.codiEntitat = codiEntitat;
+        var entitat = "";
+        if (configuracioEspecifica && !Strings.isNullOrEmpty(codiEntitat)) {
+            entitat = codiEntitat;
+        }
+        urlPlugin = properties.getProperty("es.caib.notib.plugin.unitats.dir3.url");
+        logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.UNITATS")));
+    }
 
 	@Override
 	public Map<String, NodeDir3> organigramaPerEntitat(String codiEntitat) throws SistemaExternException {
@@ -150,7 +168,5 @@ public class UnitatsOrganitzativesMock extends AbstractSalutPlugin implements Un
 	public List<OficinaSir> getOficinesEntitat(String entitat) throws SistemaExternException {
 		return null;
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(UnitatsOrganitzativesMock.class);
 
 }

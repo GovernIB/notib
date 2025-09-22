@@ -178,18 +178,26 @@ public class SubsistemesHelper {
                 m = METRICS.get(s);
             }
 
-            final int latencia = m.timerOkLocal != null ? (int) m.timerOkLocal.mean(TimeUnit.MILLISECONDS) : 0;
-            final Long totalOk = m.timerOkLocal != null ? m.timerOkLocal.count() : 0L;
-            final Long totalError = m.counterErrorLocal != null ? (long) m.counterErrorLocal.count() : 0L;
+            final int tempsMigPeriode = m.timerOkLocal != null ? (int) m.timerOkLocal.mean(TimeUnit.MILLISECONDS) : 0;
+            final Long totalOkPeriode = m.timerOkLocal != null ? m.timerOkLocal.count() : 0L;
+            final Long totalErrorPeriode = m.counterErrorLocal != null ? (long) m.counterErrorLocal.count() : 0L;
 
-            final EstatSalutEnum estat = calculaEstat(totalOk, totalError, s);
+            final int tempsMigGlobal = m.timerOkGlobal != null ? (int) m.timerOkGlobal.mean(TimeUnit.MILLISECONDS) : 0;
+            final Long totalOkGlobal = m.timerOkGlobal != null ? m.timerOkGlobal.count() : 0L;
+            final Long totalErrorGlobal = m.counterErrorGlobal != null ? (long) m.counterErrorGlobal.count() : 0L;
+
+            final EstatSalutEnum estat = calculaEstat(totalOkPeriode, totalErrorPeriode, s);
 
             subsistemasSalut.add(SubsistemaSalut.builder()
                     .codi(s.name())
-                    .latencia(latencia)
+                    .latencia(tempsMigPeriode)
                     .estat(estat)
-                    .totalOk(totalOk)
-                    .totalError(totalError)
+                    .totalOk(totalOkGlobal)
+                    .totalError(totalErrorGlobal)
+                    .totalTempsMig(tempsMigGlobal)
+                    .peticionsOkUltimPeriode(totalOkPeriode)
+                    .peticionsErrorUltimPeriode(totalErrorPeriode)
+                    .tempsMigUltimPeriode(tempsMigPeriode)
                     .build());
         }
 
@@ -212,11 +220,11 @@ public class SubsistemesHelper {
         EstatSalutEnum estat = null;
         if (errorRatePct >= DOWN_PCT) {
             estat = EstatSalutEnum.DOWN;
-        } else if (errorRatePct > ERROR_GT_PCT) {
+        } else if (errorRatePct >= ERROR_GT_PCT) {
             estat = EstatSalutEnum.ERROR;
-        } else if (errorRatePct > DEGRADED_GT_PCT) {
+        } else if (errorRatePct >= DEGRADED_GT_PCT) {
             estat = EstatSalutEnum.DEGRADED;
-        } else if (errorRatePct < UP_LT_PCT) {
+        } else if (errorRatePct <= UP_LT_PCT) {
             estat = EstatSalutEnum.UP;
         } else {
             estat = EstatSalutEnum.WARN; // 5-10%

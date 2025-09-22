@@ -1,10 +1,12 @@
 package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
+import es.caib.comanda.ms.broker.model.Integracio;
 import es.caib.comanda.ms.salut.model.EstatSalut;
 import es.caib.comanda.ms.salut.model.EstatSalutEnum;
 import es.caib.comanda.ms.salut.model.IntegracioApp;
 import es.caib.comanda.ms.salut.model.IntegracioInfo;
+import es.caib.comanda.ms.salut.model.IntegracioPeticions;
 import es.caib.comanda.ms.salut.model.IntegracioSalut;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -69,16 +72,47 @@ public abstract class AbstractPluginHelper<T extends SalutPlugin> {
 		pluginMap = new HashMap<>();
 	}
 
-	public List<IntegracioSalut> getIntegracionsSalut() {
-
-//		List<String> codisFiltrats = getCodisFiltrats();
-//		return codisFiltrats.stream()
-//				.map(codiEntitat -> obtenirIntegracioSalut(codisFiltrats, codiEntitat))
-//				.collect(Collectors.toList());
+	public IntegracioSalut getIntegracionsSalut() {
 
 		Map<String, IntegracioSalut> integracionsMap = createIntegracionsFromPlugins();
-		addFilteredEntitiesToIntegracions(integracionsMap);
-		return new ArrayList<>(integracionsMap.values());
+        if (integracionsMap.size() == 1) {
+            var entry = integracionsMap.entrySet().iterator().next();
+            return entry.getValue();
+        }
+        // if nomes te un elment retornar-lo
+        // TODO AQUI FER LA LOGICA PER EMPLENAR EL MAP  si integracionsMap té mes d'un element. Sino ja retornar tal com esta
+        // crear nou integracio salut, posar codi plugin i anar afegin la info de cada una de les IntegracioSalut del integracionsMap
+        var keys = integracionsMap.keySet();
+        Map<String, IntegracioPeticions> peticionsMap = new HashMap<>();
+        var totalOk = 0L;
+        var totalError = 0L;
+        var peticionsOkUltimPeriode = 0L;
+        var peticionsErrorUltimPeriode = 0L;
+        var totalTempsMig = 0;
+        var tempsMigUltimPeriode = 0;
+        for (var entitatCodi : keys) {
+            var integracionsEntitat = integracionsMap.get(entitatCodi);
+            var peticionsEntitat = integracionsEntitat.getPeticions();
+            peticionsMap.put(entitatCodi, peticionsEntitat);
+            totalOk += peticionsEntitat.getTotalOk();
+            totalError += peticionsEntitat.getTotalError();
+            peticionsOkUltimPeriode += peticionsEntitat.getPeticionsOkUltimPeriode();
+            peticionsErrorUltimPeriode += peticionsEntitat.getPeticionsErrorUltimPeriode();
+            totalTempsMig += peticionsEntitat.getTotalTempsMig();
+            tempsMigUltimPeriode += peticionsEntitat.getTempsMigUltimPeriode();
+        }
+        var peticions = IntegracioPeticions.builder()
+                .totalOk(totalOk)
+                .totalError(totalError)
+                .peticionsOkUltimPeriode(peticionsOkUltimPeriode)
+                .totalTempsMig(totalTempsMig)
+                .peticionsErrorUltimPeriode(peticionsErrorUltimPeriode)
+                .peticionsPerEntorn(peticionsMap)
+                .tempsMigUltimPeriode(tempsMigUltimPeriode)
+                .build();
+//        var codi = !integracionsMap.isEmpty() ? integracionsMap.get(keys.iterator().next()).getCodi() : "";
+        var codi = getCodiApp().name();
+        return IntegracioSalut.builder().codi(codi).peticions(peticions).build();
 	}
 
 	private Map<String, IntegracioSalut> createIntegracionsFromPlugins() {
@@ -96,7 +130,7 @@ public abstract class AbstractPluginHelper<T extends SalutPlugin> {
 			}
 		});
 
-		return integracioResult;
+        return integracioResult;
 	}
 
 	private static <T extends SalutPlugin> void mergeGlobalIntegracio(Map<String, IntegracioSalut> integracioResult, T plugin, EstatSalut estatSalut, String codiIntegracio) {
