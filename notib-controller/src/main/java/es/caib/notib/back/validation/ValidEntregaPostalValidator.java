@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import es.caib.notib.back.command.EntregapostalCommand;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.MessageHelper;
+import es.caib.notib.logic.intf.service.ConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,8 +27,10 @@ public class ValidEntregaPostalValidator implements ConstraintValidator<ValidEnt
 
 	@Autowired
 	private SessionScopedContext sessionScopedContext;
+	@Autowired
+    private ConfigService configService;
 
-	@Override
+    @Override
 	public void initialize(final ValidEntregaPostal constraintAnnotation) {
 	}
 
@@ -113,7 +116,9 @@ public class ValidEntregaPostalValidator implements ConstraintValidator<ValidEnt
 
 	private Set<Character> validFormatCampEntregaPostal(String value) {
 
-		String CONTROL_CARACTERS = " 0123456789(),/_ªºÑÇñçÁÉÍÓÚÀÈÌÒÙáéíóúàèìòùüABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        String CONTROL_CARACTERS = " 0123456789(),/-_.;ªºÑÇñçÁÉÍÓÚÀÈÌÒÙáéíóúàèìòùüABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        var apostrofPermes = Boolean.parseBoolean(configService.getPropertyValue("es.caib.notib.notifica.apostrof.permes"));
+        CONTROL_CARACTERS += apostrofPermes ? "'" : "";
 		Set<Character> charsNoValids = new HashSet<>();
 		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
 
