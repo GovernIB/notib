@@ -54,12 +54,11 @@ public class GestioDocumentalPluginFilesystem extends AbstractSalutPlugin implem
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.GESDOC")));
     }
 
-	public GestioDocumentalPluginFilesystem(Properties properties, boolean configuracioEspecifica, String codiEntitat) {
+	public GestioDocumentalPluginFilesystem(Properties properties, boolean configuracioEspecifica) {
 
 		this.properties = properties;
 		this.configuracioEspecifica = configuracioEspecifica;
 	    this.urlPlugin = properties.getProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir");
-        this.codiEntitat = codiEntitat;
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.GESDOC")));
 	}
 

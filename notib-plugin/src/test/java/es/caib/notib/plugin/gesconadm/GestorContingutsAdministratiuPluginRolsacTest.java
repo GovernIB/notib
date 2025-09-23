@@ -20,7 +20,7 @@ class GestorContingutsAdministratiuPluginRolsacTest {
         mockProperties.setProperty("es.caib.notib.plugin.gesconadm.username", "$notib_rolsac");
         mockProperties.setProperty("es.caib.notib.plugin.gesconadm.password", "notib_rolsac");
         mockProperties.setProperty("es.caib.notib.plugin.gesconadm.basic.authentication", "true");
-        GestorContingutsAdministratiuPluginRolsac plugin = new GestorContingutsAdministratiuPluginRolsac(mockProperties, false, "test");
+        GestorContingutsAdministratiuPluginRolsac plugin = new GestorContingutsAdministratiuPluginRolsac(mockProperties, false);
 
         // Act
         EstatSalut result = plugin.getEstatPlugin();
@@ -39,7 +39,7 @@ class GestorContingutsAdministratiuPluginRolsacTest {
         mockProperties.setProperty("es.caib.notib.plugin.gesconadm.rolsac.usuari", "fake_user");
         mockProperties.setProperty("es.caib.notib.plugin.gesconadm.rolsac.contrasenya", "notib_rolsac");
         mockProperties.setProperty("es.caib.notib.plugin.gesconadm.basic.authentication", "true");
-        GestorContingutsAdministratiuPluginRolsac plugin = new GestorContingutsAdministratiuPluginRolsac(mockProperties, false,  null);
+        GestorContingutsAdministratiuPluginRolsac plugin = new GestorContingutsAdministratiuPluginRolsac(mockProperties, false);
 
         // Act
         EstatSalut result = plugin.getEstatPlugin();

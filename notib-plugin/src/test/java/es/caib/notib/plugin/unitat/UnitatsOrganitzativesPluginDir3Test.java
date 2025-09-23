@@ -17,7 +17,7 @@ class UnitatsOrganitzativesPluginDir3Test {
         // Setup
         Properties properties = new Properties();
         properties.setProperty("es.caib.notib.plugin.unitats.dir3.url", "https://proves.caib.es/dir3caib");
-        UnitatsOrganitzativesPluginDir3 plugin = new UnitatsOrganitzativesPluginDir3(properties, false, null);
+        UnitatsOrganitzativesPluginDir3 plugin = new UnitatsOrganitzativesPluginDir3(properties, false);
 
         // Execute
         EstatSalut result = plugin.getEstatPlugin();
@@ -33,7 +33,7 @@ class UnitatsOrganitzativesPluginDir3Test {
         // Setup
         Properties properties = new Properties();
         properties.setProperty("es.caib.notib.plugin.unitats.dir3.url", "https://fakeUrl/dir3caib");
-        UnitatsOrganitzativesPluginDir3 plugin = new UnitatsOrganitzativesPluginDir3(properties, false, null);
+        UnitatsOrganitzativesPluginDir3 plugin = new UnitatsOrganitzativesPluginDir3(properties, false);
 
         // Execute
         EstatSalut result = plugin.getEstatPlugin();

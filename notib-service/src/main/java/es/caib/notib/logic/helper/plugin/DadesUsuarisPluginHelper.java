@@ -142,7 +142,7 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 			plugin = pluginClass.endsWith("DadesUsuariPluginKeycloak") || pluginClass.endsWith("DadesUsuariPluginLdapCaib") ?
 							(DadesUsuariPlugin) clazz.getDeclaredConstructor(String.class, Properties.class, boolean.class).newInstance(propertyKeyBase, properties, false)
 							: (DadesUsuariPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class).newInstance(properties, false);
-            plugin.init(meterRegistry, getCodiApp().name());
+            plugin.init(meterRegistry, getCodiApp().name(), GLOBAL);
 			pluginMap.put(GLOBAL, plugin);
 			return plugin;
 		} catch (Exception ex) {

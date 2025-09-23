@@ -79,9 +79,7 @@ public abstract class AbstractPluginHelper<T extends SalutPlugin> {
             var entry = integracionsMap.entrySet().iterator().next();
             return entry.getValue();
         }
-        // if nomes te un elment retornar-lo
-        // TODO AQUI FER LA LOGICA PER EMPLENAR EL MAP  si integracionsMap té mes d'un element. Sino ja retornar tal com esta
-        // crear nou integracio salut, posar codi plugin i anar afegin la info de cada una de les IntegracioSalut del integracionsMap
+
         var keys = integracionsMap.keySet();
         Map<String, IntegracioPeticions> peticionsMap = new HashMap<>();
         var totalOk = 0L;
@@ -124,7 +122,7 @@ public abstract class AbstractPluginHelper<T extends SalutPlugin> {
 			EstatSalut estatSalut = plugin.getEstatPlugin();
 
 			if (plugin.teConfiguracioEspecifica()) {
-				integracioResult.put(codiEntitat, createIntegracioForPlugin(codiIntegracio, codiEntitat, estatSalut, plugin));
+				integracioResult.put(codiEntitat, createIntegracioForPlugin(codiIntegracio, estatSalut, plugin));
 			} else {
 				mergeGlobalIntegracio(integracioResult, plugin, estatSalut, codiIntegracio);
 			}
@@ -148,9 +146,9 @@ public abstract class AbstractPluginHelper<T extends SalutPlugin> {
 				});
 	}
 
-	private IntegracioSalut createIntegracioForPlugin(String codiIntegracio, String codiEntitat, EstatSalut estatSalut, T plugin) {
+	private IntegracioSalut createIntegracioForPlugin(String codiIntegracio, EstatSalut estatSalut, T plugin) {
 		return IntegracioSalut.builder()
-				.codi(setFormatIntegracio(codiIntegracio, codiEntitat, 16))
+				.codi(codiIntegracio)
 				.estat(estatSalut.getEstat())
 				.latencia(estatSalut.getLatencia())
 				.peticions(plugin.getPeticionsPlugin())

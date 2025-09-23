@@ -43,10 +43,9 @@ public class UnitatsOrganitzativesMock extends AbstractSalutPlugin implements Un
 		this.properties = properties;
 	}
 
-    public UnitatsOrganitzativesMock(Properties properties, boolean configuracioEspecifica, String codiEntitat) {
+    public UnitatsOrganitzativesMock(Properties properties, boolean configuracioEspecifica) {
         this.properties = properties;
         this.configuracioEspecifica = configuracioEspecifica;
-        this.codiEntitat = codiEntitat;
         urlPlugin = properties.getProperty("es.caib.notib.plugin.unitats.dir3.url");
         logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.UNITATS")));
     }

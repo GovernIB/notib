@@ -13,6 +13,7 @@ import es.caib.notib.plugin.validatesignature.api.ValidationStatus;
 import io.micrometer.core.instrument.MeterRegistry;
 
 import java.util.Properties;
+import java.util.Random;
 
 public class ValidacioFirmesPluginMock extends AbstractSalutPlugin implements IValidateSignaturePlugin {
 
@@ -27,7 +28,7 @@ public class ValidacioFirmesPluginMock extends AbstractSalutPlugin implements IV
         this.properties = properties;
     }
 
-    public ValidacioFirmesPluginMock(String propertyKeyBase, Properties properties, boolean configuracioEspecifica, String codiEntitat) {
+    public ValidacioFirmesPluginMock(String propertyKeyBase, Properties properties, boolean configuracioEspecifica) {
 
         this.configuracioEspecifica = configuracioEspecifica;
         salutPluginComponent.setCodiEntitat(codiEntitat);
@@ -65,19 +66,21 @@ public class ValidacioFirmesPluginMock extends AbstractSalutPlugin implements IV
 
     @Override
     public ValidateSignatureResponse validateSignature(ValidateSignatureRequest validateSignatureRequest) throws Exception {
+
         ValidateSignatureResponse validateSignatureResponse = new ValidateSignatureResponse();
         ValidationStatus validationStatus = new ValidationStatus();
         validationStatus.setStatus(ValidationStatus.SIGNATURE_VALID); // Validacio VALID
 //        validationStatus.setStatus(ValidationStatus.SIGNATURE_INVALID); // Validacio INVALID
         validateSignatureResponse.setValidationStatus(validationStatus);
+        salutPluginComponent.incrementarOperacioOk(new Random().nextLong());
         return validateSignatureResponse;
     }
 
     // Mètodes de SALUT
     // /////////////////////////////////////////////////////////////////////////////////////////////
     private AbstractSalutPlugin salutPluginComponent = new AbstractSalutPlugin();
-    public void init(MeterRegistry registry, String codiPlugin) {
-        salutPluginComponent.init(registry, codiPlugin);
+    public void init(MeterRegistry registry, String codiPlugin, String codiEntiat) {
+        salutPluginComponent.init(registry, codiPlugin, codiEntiat);
     }
 
     @Override

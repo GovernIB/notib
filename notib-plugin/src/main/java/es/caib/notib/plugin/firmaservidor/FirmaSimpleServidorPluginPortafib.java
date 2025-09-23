@@ -37,11 +37,10 @@ public class FirmaSimpleServidorPluginPortafib extends AbstractSalutPlugin imple
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-	public FirmaSimpleServidorPluginPortafib(Properties properties, boolean configuracioEspecifica, String codiEntitat) {
+	public FirmaSimpleServidorPluginPortafib(Properties properties, boolean configuracioEspecifica) {
 
 		this.properties = properties;
 		this.configuracioEspecifica = configuracioEspecifica;
-        this.codiEntitat = codiEntitat;
         urlPlugin = properties.getProperty("es.caib.notib.plugin.firmaservidor.portafib.endpoint");
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.FIRMA_SERVIDOR")));
 	}

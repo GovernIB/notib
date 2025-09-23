@@ -306,6 +306,7 @@ public class AfirmaCxfValidateSignaturePlugin extends AbstractValidateSignatureP
         super(propertyKeyBase, properties);
         init();
         salutPluginComponent.setConfiguracioEspecifica(configuracioEspecifica);
+        salutPluginComponent.setUrlPlugin(properties.getProperty("es.caib.notib.plugins.validatesignature.afirmacxf.endpoint"));
     }
 
     public AfirmaCxfValidateSignaturePlugin(String propertyKeyBase) {
@@ -1333,8 +1334,8 @@ public class AfirmaCxfValidateSignaturePlugin extends AbstractValidateSignatureP
     // Mètodes de SALUT
     // /////////////////////////////////////////////////////////////////////////////////////////////
     protected AbstractSalutPlugin salutPluginComponent = new AbstractSalutPlugin();
-    public void init(MeterRegistry registry, String codiPlugin) {
-        salutPluginComponent.init(registry, codiPlugin);
+    public void init(MeterRegistry registry, String codiPlugin, String codiEntiat ) {
+        salutPluginComponent.init(registry, codiPlugin, codiEntiat);
     }
 
     @Override

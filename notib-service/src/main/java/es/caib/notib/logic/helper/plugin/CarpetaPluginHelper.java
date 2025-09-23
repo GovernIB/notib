@@ -189,9 +189,9 @@ public class CarpetaPluginHelper extends AbstractPluginHelper<CarpetaPlugin> {
 			var configuracioEspecifica = configHelper.hasEntityGroupPropertiesModified(entitatCodi, getConfigGrup());
 			var propietats = configHelper.getAllEntityProperties(entitatCodi);
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (CarpetaPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class, String.class)
-                    .newInstance(propietats, configuracioEspecifica, entitatCodi);
-			plugin.init(meterRegistry, getCodiApp().name());
+			plugin = (CarpetaPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class)
+                    .newInstance(propietats, configuracioEspecifica);
+			plugin.init(meterRegistry, getCodiApp().name(), entitatCodi);
             pluginMap.put(entitatCodi, plugin);
 			return (CarpetaPlugin) plugin;
 		} catch (Exception ex) {

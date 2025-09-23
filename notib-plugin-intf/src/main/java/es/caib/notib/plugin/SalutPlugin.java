@@ -6,7 +6,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 
 public interface SalutPlugin {
 
-    void init(MeterRegistry registry, String codiPlugin);
+    void init(MeterRegistry registry, String codiPlugin, String codiEntitat);
     boolean teConfiguracioEspecifica();
 
     EstatSalut getEstatPlugin();

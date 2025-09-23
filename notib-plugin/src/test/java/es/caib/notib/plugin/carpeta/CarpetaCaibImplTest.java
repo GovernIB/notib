@@ -23,7 +23,7 @@ class CarpetaCaibImplTest {
         properties.setProperty("es.caib.notib.plugin.carpeta.url", "https://proves.caib.es/carpetaapi/interna");
         properties.setProperty("es.caib.notib.plugin.carpeta.usuari", "$notib_carpeta");
         properties.setProperty("es.caib.notib.plugin.carpeta.contrasenya", "notib_carpeta");
-        CarpetaCaibImpl carpetaCaibImpl = new CarpetaCaibImpl(properties, false, null);
+        CarpetaCaibImpl carpetaCaibImpl = new CarpetaCaibImpl(properties, false);
 
         // Act
         EstatSalut estatSalut = carpetaCaibImpl.getEstatPlugin();
@@ -44,7 +44,7 @@ class CarpetaCaibImplTest {
         properties.setProperty("es.caib.notib.plugin.carpeta.url", "https://fakeUrl/carpetaapi/interna");
         properties.setProperty("es.caib.notib.plugin.carpeta.usuari", "$notib_carpeta");
         properties.setProperty("es.caib.notib.plugin.carpeta.contrasenya", "notib_carpeta");
-        CarpetaCaibImpl carpetaCaibImpl = new CarpetaCaibImpl(properties, false, null);
+        CarpetaCaibImpl carpetaCaibImpl = new CarpetaCaibImpl(properties, false);
 
         // Act
         EstatSalut estatSalut = carpetaCaibImpl.getEstatPlugin();
