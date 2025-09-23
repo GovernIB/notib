@@ -38,15 +38,10 @@ public class RegistrePluginMockImpl extends AbstractSalutPlugin implements Regis
 		this.properties = properties;
 	}
 
-	public RegistrePluginMockImpl(Properties properties, boolean configuracioEspecifica, String codiEntitat) {
+	public RegistrePluginMockImpl(Properties properties, boolean configuracioEspecifica) {
 
 		this.properties = properties;
 		this.configuracioEspecifica = configuracioEspecifica;
-        this.codiEntitat = codiEntitat;
-        var entitat = "";
-        if (configuracioEspecifica && !Strings.isNullOrEmpty(codiEntitat)) {
-            entitat = codiEntitat;
-        }
         urlPlugin = properties.getProperty("es.caib.notib.plugin.registre.url");
 	}
 

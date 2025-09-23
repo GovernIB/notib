@@ -47,14 +47,9 @@ public class GestorContingutsAdministratiuPluginRolsac extends AbstractSalutPlug
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-	public GestorContingutsAdministratiuPluginRolsac(Properties properties, boolean configuracioEspecifica, String codiEntitat) {
+	public GestorContingutsAdministratiuPluginRolsac(Properties properties, boolean configuracioEspecifica) {
 		this.properties = properties;
 		this.configuracioEspecifica = configuracioEspecifica;
-        this.codiEntitat = codiEntitat;
-        var entitat = "";
-        if (configuracioEspecifica && !Strings.isNullOrEmpty(codiEntitat)) {
-            entitat = codiEntitat;
-        }
         urlPlugin = properties.getProperty("es.caib.notib.plugin.gesconadm.base.url");
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.ROLSAC")));
 	}

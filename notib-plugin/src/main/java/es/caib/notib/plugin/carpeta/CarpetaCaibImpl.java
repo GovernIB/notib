@@ -31,15 +31,10 @@ public class CarpetaCaibImpl extends AbstractSalutPlugin implements CarpetaPlugi
         logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.CARPETA")));
     }
 
-    public CarpetaCaibImpl(Properties properties, boolean configuracioEspecifica, String codiEntitat) {
+    public CarpetaCaibImpl(Properties properties, boolean configuracioEspecifica) {
 
         this.properties = properties;
         this.configuracioEspecifica = configuracioEspecifica;
-        this.codiEntitat = codiEntitat;
-        var entitat = "";
-        if (configuracioEspecifica && !Strings.isNullOrEmpty(codiEntitat)) {
-            entitat = codiEntitat;
-        }
         this.urlPlugin = properties.getProperty("es.caib.notib.plugin.carpeta.url");
         logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.CARPETA")));
     }

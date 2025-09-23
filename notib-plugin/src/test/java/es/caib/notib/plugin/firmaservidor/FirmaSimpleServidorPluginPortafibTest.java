@@ -20,7 +20,7 @@ class FirmaSimpleServidorPluginPortafibTest {
         properties.setProperty("es.caib.notib.plugin.firmaservidor.portafib.endpoint", "https://dev.caib.es/portafib/common/rest/apifirmaenservidorsimple/v1/");
         properties.setProperty("es.caib.notib.plugin.firmaservidor.portafib.auth.username", "$notib_portafib_dev");
         properties.setProperty("es.caib.notib.plugin.firmaservidor.portafib.auth.password", "notib_portafib_dev");
-        FirmaSimpleServidorPluginPortafib plugin = new FirmaSimpleServidorPluginPortafib(properties, false, null);
+        FirmaSimpleServidorPluginPortafib plugin = new FirmaSimpleServidorPluginPortafib(properties, false);
 
         // Act
         EstatSalut estatSalut = plugin.getEstatPlugin();
@@ -38,7 +38,7 @@ class FirmaSimpleServidorPluginPortafibTest {
         properties.setProperty("es.caib.notib.plugin.firmaservidor.portafib.endpoint", "http://fakeUrl");
         properties.setProperty("es.caib.notib.plugin.firmaservidor.portafib.auth.username", "user");
         properties.setProperty("es.caib.notib.plugin.firmaservidor.portafib.auth.password", "pass");
-        FirmaSimpleServidorPluginPortafib plugin = Mockito.spy(new FirmaSimpleServidorPluginPortafib(properties, false, null));
+        FirmaSimpleServidorPluginPortafib plugin = Mockito.spy(new FirmaSimpleServidorPluginPortafib(properties, false));
 
         // Act
         EstatSalut estatSalut = plugin.getEstatPlugin();

@@ -235,8 +235,8 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
     // Mètodes de SALUT
     // /////////////////////////////////////////////////////////////////////////////////////////////
     private AbstractSalutPlugin salutPluginComponent = new AbstractSalutPlugin();
-    public void init(MeterRegistry registry, String codiPlugin) {
-        salutPluginComponent.init(registry, codiPlugin);
+    public void init(MeterRegistry registry, String codiPlugin, String codiEntiat) {
+        salutPluginComponent.init(registry, codiPlugin, codiEntiat);
     }
 
     @Override

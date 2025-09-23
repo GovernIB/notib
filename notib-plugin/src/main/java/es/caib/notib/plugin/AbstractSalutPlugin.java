@@ -44,10 +44,11 @@ public class AbstractSalutPlugin implements SalutPlugin {
     private static final int DEGRADED_GT_PCT = 10; // >10% errors
     private static final int UP_LT_PCT = 5;      // <5% errors
 
-    public void init(MeterRegistry registry, String codiPlugin) {
+    public void init(MeterRegistry registry, String codiPlugin, String codiEntitat) {
 
         this.registry = registry;
         this.codiPlugin = codiPlugin;
+        this.codiEntitat = codiEntitat;
         var timerBuilder = Timer.builder("plugin." + codiPlugin)
                 .tag("result", "success")
                 .publishPercentiles(0.5, 0.75, 0.95, 0.99)

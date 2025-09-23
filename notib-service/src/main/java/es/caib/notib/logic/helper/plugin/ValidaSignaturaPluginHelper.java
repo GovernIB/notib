@@ -139,9 +139,9 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 			NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Endpoint " + endpoint, log, LoggingTipus.VALIDATE_SIGNATURE);
 			NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] Username " + username, log, LoggingTipus.VALIDATE_SIGNATURE);
 			NotibLogger.getInstance().info("[VALIDATE_SIGNATURE] TransformersTemplatesPath " + transformersPath, log, LoggingTipus.VALIDATE_SIGNATURE);
-			plugin = (ValidateSignaturePlugin) clazz.getDeclaredConstructor(String.class, Properties.class, boolean.class, String.class)
-                    .newInstance(ConfigDto.prefix + ".", properties, configuracioEspecifica, entitatCodi);
-            plugin.init(meterRegistry, getCodiApp().name());
+			plugin = (ValidateSignaturePlugin) clazz.getDeclaredConstructor(String.class, Properties.class, boolean.class)
+                    .newInstance(ConfigDto.prefix + ".", properties, configuracioEspecifica);
+            plugin.init(meterRegistry, getCodiApp().name(), entitatCodi);
 			pluginMap.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {

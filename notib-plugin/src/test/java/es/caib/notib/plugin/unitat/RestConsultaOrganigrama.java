@@ -36,7 +36,7 @@ public class RestConsultaOrganigrama {
 		properties.put("es.caib.notib.plugin.unitats.dir3.url", DIR3_URL);
 		properties.put("es.caib.notib.plugin.unitats.dir3.username", DIR3_USERNAME);
 		properties.put("es.caib.notib.plugin.unitats.dir3.password", DIR3_PASSWORD);
-		pluginDir3 = new UnitatsOrganitzativesPluginDir3(properties, false, null);
+		pluginDir3 = new UnitatsOrganitzativesPluginDir3(properties, false);
 	}
 
 	@Test

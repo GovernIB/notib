@@ -56,14 +56,9 @@ public class UnitatsOrganitzativesPluginDir3 extends AbstractSalutPlugin impleme
 
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
-	public UnitatsOrganitzativesPluginDir3(Properties properties, boolean configuracioEspecifica, String codiEntitat) {
+	public UnitatsOrganitzativesPluginDir3(Properties properties, boolean configuracioEspecifica) {
 		this.properties = properties;
 		this.configuracioEspecifica = configuracioEspecifica;
-        this.codiEntitat = codiEntitat;
-        var entitat = "";
-        if (configuracioEspecifica && !Strings.isNullOrEmpty(codiEntitat)) {
-            entitat = codiEntitat;
-        }
         urlPlugin = properties.getProperty("es.caib.notib.plugin.unitats.dir3.url");
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.UNITATS")));
 	}

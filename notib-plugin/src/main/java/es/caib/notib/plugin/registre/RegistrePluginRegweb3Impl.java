@@ -52,6 +52,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
 	public RegistrePluginRegweb3Impl(Properties properties, boolean configuracioEspecifica) {
+
 		super(properties);
 		salutPluginComponent.setConfiguracioEspecifica(configuracioEspecifica);
 		logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.REGISTRE")));
@@ -737,8 +738,8 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
     // Mètodes de SALUT
     // /////////////////////////////////////////////////////////////////////////////////////////////
     private AbstractSalutPlugin salutPluginComponent = new AbstractSalutPlugin();
-    public void init(MeterRegistry registry, String codiPlugin) {
-        salutPluginComponent.init(registry, codiPlugin);
+    public void init(MeterRegistry registry, String codiPlugin, String codiEntiat) {
+        salutPluginComponent.init(registry, codiPlugin, codiEntiat);
     }
 
     @Override

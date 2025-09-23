@@ -1066,7 +1066,9 @@ public class NotificacioValidator implements Validator {
 
     private Set<Character> validFormatCampEntregaPostal(String value) {
 
-        String CONTROL_CARACTERS = " 0123456789(),/_ªºÑÇñçÁÉÍÓÚÀÈÌÒÙáéíóúàèìòùüABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        String CONTROL_CARACTERS = " 0123456789(),/-_.;ªºÑÇñçÁÉÍÓÚÀÈÌÒÙáéíóúàèìòùüABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        var apostrofPermes = configHelper.getConfigAsBoolean("es.caib.notib.notifica.apostrof.permes");
+        CONTROL_CARACTERS += apostrofPermes ? "'" : "";
         Set<Character> charsNoValids = new HashSet<>();
         char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
 

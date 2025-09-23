@@ -20,7 +20,7 @@ class FirmaServidorPluginPortafibTest {
         properties.setProperty("es.caib.notib.plugin.firmaservidor.portafib.plugins.signatureserver.portafib.api_passarela_url", "https://proves.caib.es/portafib/ws/v1/PortaFIBPassarelaDeFirmaEnServidor");
         properties.setProperty("es.caib.notib.plugin.firmaservidor.portafib.plugins.signatureserver.portafib.api_passarela_username", "$notib_portafib_dev");
         properties.setProperty("es.caib.notib.plugin.firmaservidor.portafib.plugins.signatureserver.portafib.api_passarela_password", "notib_portafib_dev");
-        FirmaServidorPluginPortafib firmaServidorPlugin = new FirmaServidorPluginPortafib(properties, false, null);
+        FirmaServidorPluginPortafib firmaServidorPlugin = new FirmaServidorPluginPortafib(properties, false);
 
         // Act
         EstatSalut estatSalut = firmaServidorPlugin.getEstatPlugin();
@@ -37,7 +37,7 @@ class FirmaServidorPluginPortafibTest {
         properties.setProperty("es.caib.notib.plugin.firmaservidor.portafib.endpoint", "http://fakeUrl");
         properties.setProperty("es.caib.notib.plugin.firmaservidor.portafib.auth.username", "user");
         properties.setProperty("es.caib.notib.plugin.firmaservidor.portafib.auth.password", "pass");
-        FirmaServidorPluginPortafib firmaServidorPlugin = new FirmaServidorPluginPortafib(properties, false, null);
+        FirmaServidorPluginPortafib firmaServidorPlugin = new FirmaServidorPluginPortafib(properties, false);
 
         // Act
         EstatSalut estatSalut = firmaServidorPlugin.getEstatPlugin();
