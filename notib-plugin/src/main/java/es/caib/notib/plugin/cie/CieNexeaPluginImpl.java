@@ -65,10 +65,6 @@ public class CieNexeaPluginImpl extends AbstractSalutPlugin implements CiePlugin
         this.properties = properties;
         this.configuracioEspecifica = configuracioEspecifica;
         this.codiEntitat = codiEntitat;
-        var entitat = "";
-        if (configuracioEspecifica && !Strings.isNullOrEmpty(codiEntitat)) {
-            entitat = codiEntitat;
-        }
         urlPlugin = properties.getProperty("es.caib.notib.plugin.cie.url");
     }
 

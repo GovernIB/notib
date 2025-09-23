@@ -3,8 +3,10 @@
  */
 package es.caib.notib.plugin.firmaservidor;
 
+import com.google.common.base.Strings;
 import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
+import es.caib.notib.plugin.utils.NotibLoggerPlugin;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 
@@ -21,9 +23,21 @@ import java.util.logging.Logger;
 @Slf4j
 public class FirmaServidorPluginMock extends AbstractSalutPlugin implements FirmaServidorPlugin {
 
-	public FirmaServidorPluginMock(Properties properties) {
+    private final Properties properties;
+    private NotibLoggerPlugin logger = new NotibLoggerPlugin(log);
 
+	public FirmaServidorPluginMock(Properties properties) {
+        this.properties = properties;
 	}
+
+    public FirmaServidorPluginMock(Properties properties, boolean configuracioEspecifica, String codiEntitat) {
+
+        this.properties = properties;
+        this.configuracioEspecifica = configuracioEspecifica;
+        this.codiEntitat = codiEntitat;
+        urlPlugin = properties.getProperty("es.caib.notib.plugin.firmaservidor.portafib.endpoint");
+        logger.setMostrarLogs(Boolean.parseBoolean(properties.getProperty("es.caib.notib.log.tipus.plugin.FIRMA_SERVIDOR")));
+    }
 
 	@Override
 	public byte[] firmar(String nom, String motiu, byte[] contingut, TipusFirma tipusFirma, String idioma) throws SistemaExternException {

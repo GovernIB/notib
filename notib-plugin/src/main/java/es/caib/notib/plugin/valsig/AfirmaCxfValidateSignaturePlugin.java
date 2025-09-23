@@ -17,11 +17,7 @@ public class AfirmaCxfValidateSignaturePlugin extends org.fundaciobit.plugins.va
         super(propertyKeyBase, properties);
         salutPluginComponent.setConfiguracioEspecifica(configuracioEspecifica);
         salutPluginComponent.setCodiEntitat(codiEntitat);
-        var entitat = "";
-        if (configuracioEspecifica && !Strings.isNullOrEmpty(codiEntitat)) {
-            entitat = codiEntitat;
-        }
-        salutPluginComponent.setUrlPlugin(properties.getProperty("es.caib.notib. " + entitat + " .plugins.validatesignature.afirmacxf.endpoint"));
+        salutPluginComponent.setUrlPlugin(properties.getProperty("es.caib.notib.plugins.validatesignature.afirmacxf.endpoint"));
 
     }
 
