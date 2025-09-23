@@ -914,10 +914,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					entregaPostal.setPais(entregaPostalEntity.getDomiciliPaisCodiIso());
 					entregaPostal.setPoblacion(entregaPostalEntity.getDomiciliPoblacio());
 				} else {
-					var linea1 = !Strings.isNullOrEmpty(entregaPostalEntity.getDomiciliLinea1()) ?
-									entregaPostalEntity.getDomiciliLinea1().replace("'", "´") : null;
-					var linea2 = !Strings.isNullOrEmpty(entregaPostalEntity.getDomiciliLinea2()) ?
-							entregaPostalEntity.getDomiciliLinea2().replace("'", "´") : null;
+//					var linea1 = !Strings.isNullOrEmpty(entregaPostalEntity.getDomiciliLinea1()) ?
+//									entregaPostalEntity.getDomiciliLinea1().replace("'", "") : null;
+//					var linea2 = !Strings.isNullOrEmpty(entregaPostalEntity.getDomiciliLinea2()) ?
+//							entregaPostalEntity.getDomiciliLinea2().replace("'", " ") : null;
+                    var linea1 = entregaPostalEntity.getDomiciliLinea1();
+                    var linea2 = entregaPostalEntity.getDomiciliLinea2();
 					entregaPostal.setLinea1(linea1);
 					entregaPostal.setLinea2(linea2);
 					entregaPostal.setCodigoPostal(entregaPostalEntity.getDomiciliCodiPostal());
