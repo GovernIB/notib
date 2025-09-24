@@ -18,6 +18,7 @@ public class ProcSerFormDto extends AuditoriaDto implements Serializable{
 	private String nom;
 	private String entitatNom;
 	private String organGestor;
+	private String organGestorCodi;
 	private String organGestorNom;
 	private OrganGestorEstatEnum organGestorEstat;
 	private boolean agrupar;
@@ -49,8 +50,8 @@ public class ProcSerFormDto extends AuditoriaDto implements Serializable{
 	
 	public String getOrganGestorDesc() {
 		if (organGestorNom != null && !organGestorNom.isEmpty())
-			return organGestor + " - " + organGestorNom;
-		return organGestor;
+			return organGestorCodi + " - " + organGestorNom;
+		return organGestorCodi;
 	}
 
 	private static final long serialVersionUID = 6058789232924135932L;
