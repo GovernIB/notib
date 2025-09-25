@@ -26,6 +26,17 @@
         	<groupId>es.caib.dir3caib</groupId>
         	<version>${dir3caib.version}</version>
    		</dependency>
+
+        <dependency>
+            <artifactId>apimassivescanwebsimple-api</artifactId>
+            <groupId>org.fundaciobit.apisib.apimassivescanwebsimple</groupId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <artifactId>apimassivescanwebsimple-jersey</artifactId>
+            <groupId>org.fundaciobit.apisib.apimassivescanwebsimple</groupId>
+            <version>1.0.0</version>
+        </dependency>
 <!--    		<dependency> -->
 <!-- 			<groupId>es.caib.rolsac</groupId> -->
 <!-- 			<artifactId>rolsacAPI</artifactId> -->

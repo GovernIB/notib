@@ -48,10 +48,7 @@ public abstract class AbstractPluginHelper<T extends SalutPlugin> {
 //	protected IntegracioPeticions peticionsPlugin = IntegracioPeticions.builder().organOk(new HashMap<>()).organError(new HashMap<>()).build();
 	protected Map<String, T> pluginMap = new HashMap<>();
 
-	public AbstractPluginHelper(IntegracioHelper integracioHelper,
-								ConfigHelper configHelper,
-								EntitatRepository entitatRepository,
-                                MeterRegistry meterRegistry) {
+	public AbstractPluginHelper(IntegracioHelper integracioHelper, ConfigHelper configHelper, EntitatRepository entitatRepository, MeterRegistry meterRegistry) {
 
 		this.integracioHelper = integracioHelper;
 		this.configHelper = configHelper;

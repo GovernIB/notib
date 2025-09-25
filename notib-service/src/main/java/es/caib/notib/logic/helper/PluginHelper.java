@@ -5,6 +5,7 @@ import es.caib.notib.logic.helper.plugin.AbstractPluginHelper;
 import es.caib.notib.logic.helper.plugin.ArxiuPluginHelper;
 import es.caib.notib.logic.helper.plugin.CarpetaPluginHelper;
 import es.caib.notib.logic.helper.plugin.DadesUsuarisPluginHelper;
+import es.caib.notib.logic.helper.plugin.DigitalitzacioPluginHelper;
 import es.caib.notib.logic.helper.plugin.FirmaPluginHelper;
 import es.caib.notib.logic.helper.plugin.GestioDocumentalPluginHelper;
 import es.caib.notib.logic.helper.plugin.GestorDocumentalAdministratiuPluginHelper;
@@ -23,7 +24,11 @@ import es.caib.notib.logic.intf.dto.RegistreOrigenDtoEnum;
 import es.caib.notib.logic.intf.dto.RegistreTipusDocumentDtoEnum;
 import es.caib.notib.logic.intf.dto.RegistreTipusDocumentalDtoEnum;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
+import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.dto.accioMassiva.ResultatAccio;
+import es.caib.notib.logic.intf.dto.escaneig.DigitalitzacioPerfil;
+import es.caib.notib.logic.intf.dto.escaneig.DigitalitzacioResultat;
+import es.caib.notib.logic.intf.dto.escaneig.DigitalitzacioTransaccioResposta;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
@@ -101,10 +106,31 @@ public class PluginHelper {
 	private final ValidaSignaturaPluginHelper validaSignaturaPluginHelper;
 	private final CarpetaPluginHelper carpetaPluginHelper;
     private final CiePluginHelper ciePluginHelper;
+    private final DigitalitzacioPluginHelper digitalitzacioPluignHelper;
 
 	private final ConfigHelper configHelper;
 	private final OrganGestorRepository organGestorRepository;
 	private final EntitatRepository entitatRepository;
+
+
+    // DIGITALITZACIO
+	// /////////////////////////////////////////////////////////////////////////////////////
+
+    public List<DigitalitzacioPerfil> digitalitzacioPerfilsDisponibles() {
+        return digitalitzacioPluignHelper.digitalitzacioPerfilsDisponibles();
+    }
+
+    public DigitalitzacioTransaccioResposta digitalitzacioIniciarProces(String idioma, String codiPerfil, UsuariDto funcionari, String urlReturn) {
+        return digitalitzacioPluignHelper.digitalitzacioIniciarProces(idioma, codiPerfil, funcionari, urlReturn);
+    }
+
+    public DigitalitzacioResultat digitalitzacioRecuperarResultat(String idTransaccio, boolean returnScannedFile, boolean returnSignedFile) {
+        return digitalitzacioPluignHelper.digitalitzacioRecuperarResultat(idTransaccio, returnScannedFile, returnSignedFile);
+    }
+
+    public void digitalitzacioTancarTransaccio(String idTransaccio) {
+        digitalitzacioPluignHelper.digitalitzacioTancarTransaccio(idTransaccio);
+    }
 
 
 	// REGISTRE

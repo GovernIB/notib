@@ -25,5 +25,6 @@ public enum LoggingTipus {
     NOTIFICA_SOAP,
     ENTREGA_CIE,
     USUARIS,
-    COMANDA;
+    COMANDA,
+    DIGITALITZACIO;
 }

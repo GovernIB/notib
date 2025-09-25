@@ -54,7 +54,13 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 		return getDelegateService().findRolsUsuariActual();
 	}
 
-	@Override
+    @Override
+	@RolesAllowed("**")
+    public boolean usuariHasRol(String codi, String rol) {
+        return getDelegateService().usuariHasRol(codi, rol);
+    }
+
+    @Override
 	@RolesAllowed("**")
 	public UsuariDto findUsuariAmbCodi(String codi) {
 		return getDelegateService().findUsuariAmbCodi(codi);
@@ -154,7 +160,13 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 		getDelegateService().updateEntitatUsuariActual(entitat);
 	}
 
-	@Override
+    @Override
+	@RolesAllowed("**")
+    public String getBaseUrl() {
+        return getDelegateService().getBaseUrl();
+    }
+
+    @Override
     @PermitAll
 	public String getMetrics() {
 		return getDelegateService().getMetrics();

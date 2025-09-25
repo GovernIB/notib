@@ -1,11 +1,12 @@
 package es.caib.notib.logic.utils;
 
 import es.caib.notib.logic.objectes.StringEncriptat;
-import es.caib.notib.persist.repository.config.ConfigRepository;
 import lombok.Getter;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;

@@ -232,8 +232,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 	}
 
+    @Override
+    public String getBaseUrl() {
+        return configHelper.getConfig("es.caib.notib.app.base.url");
+    }
 
-	@Override
+
+    @Override
 	public UsuariDto getUsuariActual() {
 
 		var timer = metricsHelper.iniciMetrica();
@@ -273,6 +278,20 @@ public class AplicacioServiceImpl implements AplicacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+
+    @Transactional(readOnly = true)
+    @Override
+    public boolean usuariHasRol(String codi, String rol) {
+
+        var timer = metricsHelper.iniciMetrica();
+        try {
+            NotibLogger.getInstance().info("Comprovant si l'usuari amb codi (codi=" + codi + ") te el rol " + rol, log, LoggingTipus.USUARIS);
+            var rols = cacheHelper.findRolsUsuariAmbCodi(codi);
+            return rols != null && rols.contains(rol);
+        } finally {
+            metricsHelper.fiMetrica(timer);
+        }
+    }
 
 	@Transactional(readOnly = true)
 	@Override

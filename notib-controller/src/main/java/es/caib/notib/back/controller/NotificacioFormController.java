@@ -735,6 +735,8 @@ public class NotificacioFormController extends BaseUserController {
             }
         }
         model.addAttribute("document", notificacioCommand.getDocuments());
+        model.addAttribute("noFileScanned", "no s'ha seleccionat cap document");
+        model.addAttribute("isFuncionariHabilitatDigitalib", aplicacioService.usuariHasRol(getCodiUsuariActual(), "DIB_USER"));
         try {
             model.addAttribute("concepteSize", notificacioCommand.getConcepteDefaultSize() );
             model.addAttribute("descripcioSize", notificacioCommand.getDescripcioDefaultSize());

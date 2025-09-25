@@ -162,6 +162,11 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(AccioMassivaService.class);
 	}
 
+    @Bean
+    public LocalStatelessSessionProxyFactoryBean digitalitzacioService() {
+        return getLocalEjbFactoyBean(DigitalitzacioService.class);
+    }
+
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {
 		String jndiName = EJB_JNDI_PREFIX + serviceClass.getSimpleName() + EJB_JNDI_SUFFIX;
 		log.info("Creating EJB proxy for serviceClass with JNDI name " + jndiName);

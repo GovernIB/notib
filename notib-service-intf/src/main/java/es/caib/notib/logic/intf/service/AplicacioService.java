@@ -58,6 +58,9 @@ public interface AplicacioService {
 	
 	@PreAuthorize("isAuthenticated()")
 	List<String> findRolsUsuariActual();
+
+	@PreAuthorize("isAuthenticated()")
+    boolean usuariHasRol(String codi, String rol);
 	
 	/**
 	 * Consulta els usuaris donat un text.
@@ -159,8 +162,12 @@ public interface AplicacioService {
 	
 	@PreAuthorize("isAuthenticated()")
 	void updateRolUsuariActual(String rol);
+
 	@PreAuthorize("isAuthenticated()")
 	void updateEntitatUsuariActual(Long entitat);
+
+	@PreAuthorize("isAuthenticated()")
+    String getBaseUrl();
 	
 	/**
 	 * Recupera les mètriques de l'aplicació.

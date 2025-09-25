@@ -1284,6 +1284,51 @@
 				return false;
 			}
 		});
+
+        $('.start-scan-btn').on('click', function(){
+
+            let isFuncionariHabilitatDigitalib = ${isFuncionariHabilitatDigitalib};
+            if (!isFuncionariHabilitatDigitalib) {
+                $('#escaneig').empty();
+                $('#escaneig').append('<div id="contingut-missatges"><div class="alert alert-warning"><spring:message code="contingut.document.scanner.no.access"/></div></div>');
+                return;
+            }
+            $('#escaneig').find('.alert').remove();
+            $('.start-scan-btn').hide();
+            $("body").addClass("loading");
+
+            $.ajax({
+                type: 'GET',
+                url: "<c:url value='/digitalitzacio/perfils'/>",
+                success: function(perfils) {
+
+                    if (perfils[0].codi=='SERVER_ERROR') {
+                        $('#escaneig').empty();
+                        $('#escaneig').append('<div id="contingut-missatges"><div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>'+perfils[0].descripcio+'</div></div>');
+                    } else {
+                        for ( var i in perfils) {
+                            $('.scan-profile').append('<span class="btn btn-lg btn-block btn-default" id="' + perfils[i].codi + '"><small>' + perfils[i].nom + '</small></span>');
+                            $('.scan-profile').append('</br>');
+                        }
+
+                        if (perfils.length==1) {
+                            $('#'+perfils[0].codi).click();
+                        } else {
+                            removeLoading();
+                            $('.scan-profile').show();
+                            $('.scan-back-btn').removeClass('hidden');
+                            webutilModalAdjustHeight();
+                        }
+                    }
+                },
+                error: function(err) {
+                    console.log("Error tancant la transacció");
+                },
+                complete: function() {
+                    localStorage.removeItem('transaccioId');
+                }
+            });
+        });
 	});
 
 	function updateCaducitatDiesNaturals(data) {
@@ -2065,7 +2110,37 @@
 
 			<!-- DOCUMENT -->
 			<div class="container-fluid">
-				<div id="document1" class="dropzone" ondrop="dropHandler(event, 'arxiu[0]');" ondragover="dragOverHandler(event);" ondragleave="removeHighlight(event)" ondragenter="highlight(event)">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#fitxer" id="fitxerTab" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.document"/></a></li>
+                    <li role="presentation"><a href="#escaneig" id="escaneigTab" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.escaneig"/></a></li>
+                </ul>
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane" id="escaneig">
+                        <c:if test="${not empty noFileScanned}">
+                            <div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span><spring:message code="notificacio.form.document.camp.escaneig.buid"/></span></div>
+                        </c:if>
+                        <div class="steps">
+                            <div class="col-md-12 text-center">
+                                <span class="btn btn-default start-scan-btn btn-md"><spring:message code="notificacio.form.document.camp.escaneig.iniciar"/> <i class="fa fa-play"></i></span>
+                            </div>
+                            <div class="col-md-12 text-center scan-profile"></div>
+                            <div class="col-md-12 text-center scan-result">
+                                <c:if test="${not empty notificacioCommand.documents[0].arxiuNom && empty notificacioCommand.documents[0].id}">
+                                    <script>
+                                        $('.start-scan-btn').hide();
+                                    </script>
+                                    <a class="downloadLink" href="<c:url value="/digitalitzacio/descarregarResultat/${idTransaccio}"/>">${notificacioCommand.documents[0].arxiuNom}</a> <br>
+                                    <span class='btn btn-default scan-cancel-btn'><spring:message code="notificacio.form.document.camp.escaneig.cancelar"/></span>
+                                </c:if>
+                            </div>
+                            <div class="col-md-12 text-center scan-back-btn hidden">
+                                <span class="btn btn-default btn-lg"><spring:message code="notificacio.form.document.camp.escaneig.tornar"/> <i class="fa fa-back"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane active" id="fitxer">
+
+				        <div id="document1" class="dropzone" ondrop="dropHandler(event, 'arxiu[0]');" ondragover="dragOverHandler(event);" ondragleave="removeHighlight(event)" ondragenter="highlight(event)">
 					<div class="title">
 						<span class="fa fa-file"></span>
 						<label><spring:message code="notificacio.form.titol.document" /></label>
@@ -2146,6 +2221,7 @@
 					</div>
 					<hr/>
 				</div>
+                    </div>
 				<div id="docs-addicionals"<c:if test="${enviamentTipus != 'SIR'}"> class="hidden"</c:if>>
 					<!-- DOCUMENT 2 -->
 <%--					<div id="document2" class="row hidden">--%>
