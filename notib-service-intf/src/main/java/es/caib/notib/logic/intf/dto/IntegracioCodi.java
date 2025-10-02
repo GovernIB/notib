@@ -18,7 +18,8 @@ public enum IntegracioCodi {
     CARPETA,
     EMAIL,
     CIE,
-    EXPLOTACIO;
+    EXPLOTACIO,
+    COMANDA;
 
 //    private final String descripcio;
 //

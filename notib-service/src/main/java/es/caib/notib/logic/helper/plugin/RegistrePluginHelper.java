@@ -122,7 +122,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 														  Long notificacioId, String enviamentIds, boolean generarJustificant) {
 
 		long start = System.currentTimeMillis();
-		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "Enviament notificació a registre (SIR activat)", IntegracioAccioTipusEnumDto.ENVIAMENT,
+		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "    Enviament notificació a registre (SIR activat)", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Id de la notificacio", String.valueOf(notificacioId)),
 				new AccioParam("Ids dels enviaments", enviamentIds),
@@ -144,10 +144,11 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			resposta = getPlugin().salidaAsientoRegistral(codiDir3Entitat, arb, tipusOperacio, generarJustificant);
 			if (resposta.getErrorCodi() == null) {
 				integracioHelper.addAccioOk(info);
+			    SubsistemesHelper.addSuccessOperation(REG, System.currentTimeMillis() - start);
 			} else {
 				integracioHelper.addAccioError(info, resposta.getErrorDescripcio());
+			    SubsistemesHelper.addErrorOperation(REG);
 			}
-			SubsistemesHelper.addSuccessOperation(REG, System.currentTimeMillis() - start);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de registre";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);

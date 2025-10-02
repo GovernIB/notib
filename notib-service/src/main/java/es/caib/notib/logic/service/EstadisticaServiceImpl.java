@@ -495,7 +495,8 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     @Transactional
     public RegistresEstadistics consultaEstadistiques(LocalDate data) {
 
-        ExplotTempsEntity temps = explotTempsRepository.findFirstByData(data);
+        ExplotTempsEntity temps = explotTempsRepository.findFirstByDataAndExisteixenFets(data);
+        //TODO FALTA MIRAR SI HI HA FETS PER AQUEST TEMPS
         if (temps == null) {
             // Si no existeixen dades, les generam
             if (!data.isBefore(LocalDate.now())) {
@@ -534,8 +535,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         List<RegistresEstadistics> result = new ArrayList<>();
         // Si no existeixen dades, les generam
-        List<LocalDate> localDates = geMissingExplotTempsEntities(dataInici, dataFi);
-        if (!localDates.isEmpty()) {
+        //TODO FALTA MIRAR SI HI HA FETS PER AQUEST TEMPS
+//        List<LocalDate> localDates = geMissingExplotTempsEntities(dataInici, dataFi);
+        List<LocalDate> localDates = explotTempsRepository.findBetweenDatesAndExisteixenFets(dataInici, dataFi);
+        if (localDates.isEmpty()) {
             var localEnvInfoDate = getFirstInfoDate();
             if( localEnvInfoDate.isBefore(dataInici) ) {
                 generarDadesExplotacio(dataInici, dataFi);

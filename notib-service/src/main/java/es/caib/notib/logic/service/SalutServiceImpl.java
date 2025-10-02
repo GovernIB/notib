@@ -16,6 +16,7 @@ import es.caib.notib.logic.helper.plugin.AbstractPluginHelper;
 import es.caib.notib.logic.intf.service.SalutService;
 import es.caib.notib.logic.mapper.MissatgeSalutMapper;
 import es.caib.notib.logic.utils.CustomHealthIndicator;
+import es.caib.notib.logic.utils.MonitorHelper;
 import es.caib.notib.logic.utils.NotibBenchmark;
 import es.caib.notib.persist.repository.AvisRepository;
 import lombok.RequiredArgsConstructor;
@@ -251,16 +252,23 @@ public class SalutServiceImpl implements SalutService {
             // Informació sobre Memòria
             Mem memory = sigar.getMem();
             // Informació sobre Disc
-            var totalSpace = 0L;
-            var freeSpace = 0L;
-            FileSystem[] fileSystems = sigar.getFileSystemList();
-            for (FileSystem fs : fileSystems) {
-                if (fs.getDirName().equals("/")) {
-                    FileSystemUsage usage = sigar.getFileSystemUsage(fs.getDirName());
-                    totalSpace = usage.getTotal();
-                    freeSpace = usage.getFree();
-                    break;
-                }
+//            var totalSpace = 0L;
+//            var freeSpace = 0L;
+//            FileSystem[] fileSystems = sigar.getFileSystemList();
+//            for (FileSystem fs : fileSystems) {
+//                if (fs.getDirName().equals("/")) {
+//                    FileSystemUsage usage = sigar.getFileSystemUsage(fs.getDirName());
+//                    totalSpace = usage.getTotal();
+//                    freeSpace = usage.getFree();
+//                    break;
+//                }
+//            }
+
+            var totalSpace = "";
+            var freeSpace = "";
+            for (var root : File.listRoots()) {
+                totalSpace = MonitorHelper.humanReadableByteCount(root.getTotalSpace());
+                freeSpace = MonitorHelper.humanReadableByteCount(root.getFreeSpace());
             }
 
             System.out.println("CPU User Time: " + CpuPerc.format(cpu.getUser()));
@@ -268,14 +276,23 @@ public class SalutServiceImpl implements SalutService {
             System.out.println("CPU Idle Time: " + CpuPerc.format(cpu.getIdle()));
             System.out.println("CPU Combined: " + CpuPerc.format(cpu.getCombined()));
 
+//            return List.of(
+//                    DetallSalut.builder().codi("PRC").nom("Processadors").valor(String.valueOf(Runtime.getRuntime().availableProcessors())).build(),
+//                    DetallSalut.builder().codi("SCPU").nom("Càrrega del sistema").valor(systemCpuLoad).build(),
+//                    DetallSalut.builder().codi("PCPU").nom("Càrrega del procés").valor(processCpuLoad).build(),
+//                    DetallSalut.builder().codi("MED").nom("Memòria disponible").valor(humanReadableByteCount(memory.getFree())).build(),
+//                    DetallSalut.builder().codi("MET").nom("Memòria total").valor(humanReadableByteCount(memory.getTotal())).build(),
+//                    DetallSalut.builder().codi("EDT").nom("Espai de disc total").valor(humanReadableByteCount(totalSpace)).build(),
+//                    DetallSalut.builder().codi("EDL").nom("Espai de disc lliure").valor(humanReadableByteCount(freeSpace)).build(),
+//                    DetallSalut.builder().codi("SO").nom("Sistema operatiu").valor(os).build());
             return List.of(
                     DetallSalut.builder().codi("PRC").nom("Processadors").valor(String.valueOf(Runtime.getRuntime().availableProcessors())).build(),
-                    DetallSalut.builder().codi("SCPU").nom("Càrrega del sistema").valor(systemCpuLoad).build(),
+                    DetallSalut.builder().codi("SCPU").nom("Càrrega del sistema").valor(MonitorHelper.getCPULoad()).build(),
                     DetallSalut.builder().codi("PCPU").nom("Càrrega del procés").valor(processCpuLoad).build(),
-                    DetallSalut.builder().codi("MED").nom("Memòria disponible").valor(humanReadableByteCount(memory.getFree())).build(),
-                    DetallSalut.builder().codi("MET").nom("Memòria total").valor(humanReadableByteCount(memory.getTotal())).build(),
-                    DetallSalut.builder().codi("EDT").nom("Espai de disc total").valor(humanReadableByteCount(totalSpace)).build(),
-                    DetallSalut.builder().codi("EDL").nom("Espai de disc lliure").valor(humanReadableByteCount(freeSpace)).build(),
+                    DetallSalut.builder().codi("MED").nom("Memòria disponible").valor(MonitorHelper.humanReadableByteCount(Runtime.getRuntime().freeMemory())).build(),
+                    DetallSalut.builder().codi("MET").nom("Memòria total").valor(MonitorHelper.humanReadableByteCount(Runtime.getRuntime().totalMemory())).build(),
+                    DetallSalut.builder().codi("EDT").nom("Espai de disc total").valor(totalSpace).build(),
+                    DetallSalut.builder().codi("EDL").nom("Espai de disc lliure").valor(freeSpace).build(),
                     DetallSalut.builder().codi("SO").nom("Sistema operatiu").valor(os).build());
 
         } catch (Exception e) {
