@@ -74,7 +74,7 @@ public class ComandaListener {
             if (url == null) {
                 throw new Exception("La propietat \"es.caib.notib.plugin.comanda.url.base\" no pot ser null");
             }
-            url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/cues/avisos";
+            url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/jms/avisos";
             var httpHeaders = new HttpHeaders();
             httpHeaders.set("Content-Type", "application/json");
             var mapper = new ObjectMapper();
@@ -130,7 +130,7 @@ public class ComandaListener {
             if (url == null) {
                 throw new Exception("La propietat es.caib.notib.plugin.comanda.url.base no pot ser null");
             }
-            url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/cues/tasques";
+            url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/jms/tasques";
             info.addParam("url", url);
         } catch (Exception ex) {
             var msg = "Error al enviar la tasca a Commanda";
