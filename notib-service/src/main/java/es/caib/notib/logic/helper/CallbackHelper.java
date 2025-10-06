@@ -11,8 +11,9 @@ import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
-import es.caib.notib.logic.utils.DatesUtils;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -91,7 +92,7 @@ public class CallbackHelper {
 			if (isInterficieWeb(not)) {
 				return;
 			}
-			log.debug("[CALLBACK_CLIENT] Afegint callback per l'enviament " + env.getId());
+			NotibLogger.getInstance().info("[CALLBACK_CLIENT] Afegint callback per l'enviament " + env.getId(), log, LoggingTipus.CALLBACK);
 			var c = callbackRepository.findByEnviamentId(env.getId());
 			var usuari = env.getCreatedBy().orElse(env.getNotificacio().getCreatedBy().orElseThrow());
 			if (c == null) {
@@ -195,10 +196,9 @@ public class CallbackHelper {
 			}
 			return notificacio;
 		}
-		log.trace("[Callback] Consultant aplicacio de l'event. ");
+		NotibLogger.getInstance().info("[Callback] Consultant aplicacio de l'event. Notificacio id " + notificacio.getId() + "Enviament id " + env.getId(), log, LoggingTipus.CALLBACK);
 		int intents = callback.getIntents() + 1;
 		var aplicacio = getAplicacio(callback, env);
-
 		if (!aplicacio.isActiva()) {
 			var start = System.nanoTime();
 			var errorDescripcio = "Error notificant canvis al client: No està activa la aplicació " + aplicacio.getCallbackUrl() ;
@@ -207,7 +207,8 @@ public class CallbackHelper {
 			notificacio.updateLastCallbackError(true);
 			notificacioEventHelper.addCallbackEnviamentEvent(env, true, errorDescripcio, errorMaxReintents);
 			callback.update(CallbackEstatEnumDto.ERROR, intents, errorDescripcio, getIntentsPeriodeProperty());
-			log.info(String.format("[Callback] Fi intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]", intents, callback.getId(), notificacio.getId()));
+			log.info(String.format("[Callback] Fi intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d] enviament [Id: %d] numRegistre [%s] notificaId [%s]",
+                    intents, callback.getId(), notificacio.getId(), env.getId(), env.getRegistreNumeroFormatat(), env.getNotificaIdentificador()));
 			long elapsedTime = System.nanoTime() - start;
 			log.info("addCallbackEvent: "  + elapsedTime);
 			auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "CallbackHelper.notifica");
@@ -223,7 +224,8 @@ public class CallbackHelper {
 		info.addParam("Callback URL", aplicacio.getCallbackUrl());
 		info.setAplicacio(aplicacio != null ? aplicacio.getUsuariCodi() : "Sense aplicació");
 		info.setCodiEntitat(notificacio.getEntitat() != null ? notificacio.getEntitat().getCodi() : null);
-		log.info(String.format("[Callback] Intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]", intents, callback.getId(), notificacio.getId()));
+		log.info(String.format("[Callback] Intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d] enviament [Id: %d] numRegistre [%s] notificaId [%s]",
+        intents, callback.getId(), notificacio.getId(), env.getId(), env.getRegistreNumeroFormatat(), env.getNotificaIdentificador()));
 		var isError = false;
 		String errorDescripcio = null;
 		var errorMaxReintents = false;
@@ -250,7 +252,7 @@ public class CallbackHelper {
 			callback.update(CallbackEstatEnumDto.NOTIFICAT, intents, null, getIntentsPeriodeProperty());
 			notificacio.updateLastCallbackError(false);
 			integracioHelper.addAccioOk(info);
-			log.info(String.format("[Callback] Enviament del callback [Id: %d] de la notificacio [Id: %d] exitos", callback.getId(), notificacio.getId()));
+			log.info(String.format("[Callback] Enviament del callback [Id: %d] de la notificacio [Id: %d] enviament [Id: %d] exitos", callback.getId(), notificacio.getId(), env.getId()));
 			elapsedTime = System.nanoTime() - start;
 			log.info("marcar com a notificat: "  + elapsedTime);
 			if (accioMassivaId != null) {
@@ -277,9 +279,10 @@ public class CallbackHelper {
 		}
 		var start = System.nanoTime();
 		notificacioEventHelper.addCallbackEnviamentEvent(env, isError, errorDescripcio, errorMaxReintents);
-		log.info(String.format("[Callback] Fi intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]", intents, callback.getId(), notificacio.getId()));
+		log.info(String.format("[Callback] Fi intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d] enviament [Id: %d] numRegistre [%s] notificaId [%s]",
+                intents, callback.getId(), notificacio.getId(), env.getId(), env.getRegistreNumeroFormatat(), env.getNotificaIdentificador()));
 		long elapsedTime = System.nanoTime() - start;
-		log.info("addCallbackEvent: "  + elapsedTime);
+		log.info("Enviament id: " + env.getId() + " addCallbackEvent elapsedTime: "  + elapsedTime);
 		auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "CallbackHelper.notifica");
 		// Marcar per actualitzar
 		notificacioTableHelper.actualitzar(NotTableUpdate.builder().id(notificacio.getId()).build());
@@ -290,7 +293,6 @@ public class CallbackHelper {
 
 		long start = System.currentTimeMillis();
 		try {
-
 			var notificacioCanvi = new NotificacioCanviClient(enviament.getNotificacio().getReferencia(), enviament.getNotificaReferencia());
             // Completa la URL al mètode
 			var urlBase = aplicacio.getCallbackUrl();
@@ -331,7 +333,7 @@ public class CallbackHelper {
 			}
 		}
 		if (errorMessage != null) {
-			var info = new IntegracioInfo(IntegracioCodi.CALLBACK, "Enviament d'avís de canvi d'estat", IntegracioAccioTipusEnumDto.ENVIAMENT,
+			var info = new IntegracioInfo(IntegracioCodi.CALLBACK, "Error al enviar el de canvi d'estat", IntegracioAccioTipusEnumDto.ENVIAMENT,
 					new AccioParam("Identificador del callback", String.valueOf(callback.getId())),
 					new AccioParam("Codi aplicació", aplicacio != null ? aplicacio.getUsuariCodi() : ""),
 					new AccioParam("Identificador de la notificacio", String.valueOf(enviament.getNotificacio().getId()))

@@ -19,6 +19,7 @@ public enum IntegracioCodi {
     EMAIL,
     CIE,
     EXPLOTACIO,
+    COMANDA,
     DIGITALITZACIO;
 
 //    private final String descripcio;

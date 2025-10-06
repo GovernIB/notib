@@ -1,6 +1,7 @@
 package es.caib.notib.logic.intf.dto;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -10,6 +11,7 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@ToString
 @Data
 public class AvisDto implements Serializable {
 
