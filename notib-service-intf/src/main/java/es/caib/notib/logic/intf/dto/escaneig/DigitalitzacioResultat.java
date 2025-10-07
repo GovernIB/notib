@@ -2,9 +2,11 @@ package es.caib.notib.logic.intf.dto.escaneig;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 
+@ToString
 @Getter
 @Setter
 public class DigitalitzacioResultat implements Serializable {

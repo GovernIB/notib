@@ -435,7 +435,7 @@ public class GestorContingutsAdministratiuPluginRolsac extends AbstractSalutPlug
 
 						var ch = getNext();
 				        var resp = ch.handle(request);
-				        if (resp.getStatusInfo().getFamily() != Response.Status.Family.REDIRECTION) {
+				        if (resp.getClientResponseStatus().getFamily() != Response.Status.Family.REDIRECTION) {
 				            return resp;
 				        }
 						var redirectTarget = resp.getHeaders().getFirst("Location");

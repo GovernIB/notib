@@ -301,9 +301,9 @@ public class CallbackHelper {
 			var response = requestsHelper.callbackAplicacioNotificaCanvi(urlCallback, notificacioCanvi, headerCsrf);
 //			SubsistemesHelper.addSuccessOperation(CBK, System.currentTimeMillis() - start);
 			// Comprova que la resposta sigui 200 OK
-			if (ClientResponse.Status.OK.getStatusCode() != response.getStatusInfo().getStatusCode()) {
+			if (ClientResponse.Status.OK.getStatusCode() != response.getClientResponseStatus().getStatusCode()) {
 				log.error("Error al enviar callback per l'enviament " + enviament.getUuid() + " a la url " + urlBase);
-				throw new Exception("La resposta del client és: " + response.getStatusInfo().getStatusCode() + " - " + response.getStatusInfo().getReasonPhrase());
+				throw new Exception("La resposta del client és: " + response.getClientResponseStatus().getStatusCode() + " - " + response.getClientResponseStatus().getReasonPhrase());
 			}
 			return response.getEntity(String.class);
 		} catch (Exception e) {

@@ -1290,7 +1290,7 @@
             let isFuncionariHabilitatDigitalib = ${isFuncionariHabilitatDigitalib};
             if (!isFuncionariHabilitatDigitalib) {
                 $('#escaneig').empty();
-                $('#escaneig').append('<div id="contingut-missatges"><div class="alert alert-warning"><spring:message code="contingut.document.scanner.no.access"/></div></div>');
+                $('#escaneig').append('<div id="contingut-missatges"><div class="alert alert-warning"><spring:message code="notificacio.form.document.scanner.no.access"/></div></div>');
                 return;
             }
             $('#escaneig').find('.alert').remove();
@@ -1328,6 +1328,12 @@
                     localStorage.removeItem('transaccioId');
                 }
             });
+        });
+
+        $('.scan-back-btn').on('click', function(){
+            $('.start-scan-btn').show();
+            $('.scan-profile').empty().hide();
+            $('.scan-back-btn').addClass('hidden');
         });
 	});
 
@@ -1606,7 +1612,10 @@
 		}
 		return organ;
 	}
-
+    function removeLoading() {
+        $body = $("body");
+        $body.removeClass("loading");
+    }
 </script>
 <div class="loading">
 		<div class="loading-gif">

@@ -669,10 +669,9 @@ public class NotificacioFormController extends BaseUserController {
         model.addAttribute("validaFirmaWebEnabled", isValidaFirmaWebEnabled());
         model.addAttribute("isPermesComunicacionsSirPropiaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.comunicacions.sir.internes", FALSE));
         model.addAttribute("docMaxSize", Long.parseLong(aplicacioService.propertyGet("es.caib.notib.notificacio.document.size", "10485760")));
-
+        model.addAttribute("isFuncionariHabilitatDigitalib", aplicacioService.usuariHasRol(getCodiUsuariActual(), "DIB_USER"));
         long maxFileSize = Long.parseLong(aplicacioService.propertyGet("es.caib.notib.notificacio.document.size"));
         long maxFilesSize = Long.parseLong(aplicacioService.propertyGet("es.caib.notib.notificacio.document.total.size"));
-
         model.addAttribute("maxFileSize", maxFileSize/(1024*1024));
         model.addAttribute("maxFilesSize", maxFilesSize/(1024*1024));
     }

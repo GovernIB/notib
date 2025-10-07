@@ -19,7 +19,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -103,26 +102,26 @@ public class DigitalitzacioController extends BaseUserController {
         return "digitalitzacioIframeTancar";
     }
 
-    @RequestMapping(value = "/event/resultatScan/{dades}/{idTransaccio}", method = RequestMethod.GET,  produces = "text/plain")
-    @ResponseBody
-    public ResponseEntity<String> recuperarResultatScanEvent(HttpServletRequest request, @PathVariable String dades, @PathVariable String idTransaccio, Model model) {
-
-        // Autenticar un usuari simulat si és necessari
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || "anonymousUser".equals(auth.getName())) {
-            User user = new User("$portafib_ripea", "portafib_ripea", Collections.singletonList(new SimpleGrantedAuthority("tothom")));
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
-        String data = Utils.desencripta(dades, aplicacioService.propertyFindByNom("es.caib.ripea.encription.key"));
-        String[] dataSplri = data.split("#");
-        Long idExpedient = Long.parseLong(dataSplri[0]);
-        var resposta = recuperaResultatEscaneig(idTransaccio, true, true);
-        resposta.setUsuari(dataSplri[2]);
-//        ScanFinalitzatEvent sfe = new ScanFinalitzatEvent(idExpedient, resposta);
-//        eventService.notifyScanFinalitzat(sfe);
-        return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body("Escaneig finalitzat.");
-    }
+//    @RequestMapping(value = "/event/resultatScan/{dades}/{idTransaccio}", method = RequestMethod.GET,  produces = "text/plain")
+//    @ResponseBody
+//    public ResponseEntity<String> recuperarResultatScanEvent(HttpServletRequest request, @PathVariable String dades, @PathVariable String idTransaccio, Model model) {
+//
+//        // Autenticar un usuari simulat si és necessari
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        if (auth == null || "anonymousUser".equals(auth.getName())) {
+//            User user = new User("$portafib_ripea", "portafib_ripea", Collections.singletonList(new SimpleGrantedAuthority("tothom")));
+//            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+//            SecurityContextHolder.getContext().setAuthentication(authentication);
+//        }
+//        String data = Utils.desencripta(dades, aplicacioService.propertyFindByNom("es.caib.ripea.encription.key"));
+//        String[] dataSplri = data.split("#");
+//        Long idExpedient = Long.parseLong(dataSplri[0]);
+//        var resposta = recuperaResultatEscaneig(idTransaccio, true, true);
+//        resposta.setUsuari(dataSplri[2]);
+////        ScanFinalitzatEvent sfe = new ScanFinalitzatEvent(idExpedient, resposta);
+////        eventService.notifyScanFinalitzat(sfe);
+//        return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body("Escaneig finalitzat.");
+//    }
 
     @RequestMapping(value = "/recuperarResultat/{idTransaccio}", method = RequestMethod.GET)
     public String recuperarResultat(HttpServletRequest request, @PathVariable String idTransaccio, Model model) {
@@ -142,9 +141,6 @@ public class DigitalitzacioController extends BaseUserController {
     private DigitalitzacioResultat recuperaResultatEscaneig(String idTransaccio, boolean returnScannedFile, boolean returnSignedFile) {
 
         var resposta = digitalitzacioService.recuperarResultat(idTransaccio, returnScannedFile, returnSignedFile);
-        if (aplicacioService.propertyBooleanFindByKey(PropertyConfig.DIGITALITZACIO_PLUGIN_DEBUG, false)) {
-            log.info("Recuperar resultat scan: " + ToStringBuilder.reflectionToString(resposta));
-        }
         return resposta;
     }
 

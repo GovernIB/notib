@@ -1,7 +1,6 @@
 package es.caib.notib.logic.helper;
 
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.Statuses;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.dto.callback.NotificacioCanviClient;
 import es.caib.notib.persist.entity.AplicacioEntity;
@@ -50,7 +49,7 @@ public class CallbackHelperTest {
         enviamentMock.setCreatedBy(mockUser);
         Mockito.when(aplicacioRepository.findByUsuariCodiAndEntitatId(Mockito.anyString(), Mockito.anyLong())).thenReturn(aplicacio);
         var responseMock = Mockito.mock(ClientResponse.class);
-        Mockito.when(responseMock.getStatusInfo()).thenReturn(Statuses.from(200, "OK"));
+        Mockito.when(responseMock.getClientResponseStatus()).thenReturn(ClientResponse.Status.fromStatusCode((200)));
         Mockito.when(requestsHelper.callbackAplicacioNotificaCanvi(Mockito.anyString(), Mockito.any(NotificacioCanviClient.class), Mockito.anyBoolean())).thenReturn(responseMock);
         System.setProperty("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max", MAX_INTENTS_CALLBACK);
     }

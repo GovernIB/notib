@@ -17,14 +17,12 @@ import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.digitalitzacio.DigitalitzacioPlugin;
-import es.caib.notib.plugin.registre.RegistrePlugin;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -40,7 +38,7 @@ public class DigitalitzacioPluginHelper extends AbstractPluginHelper<Digitalitza
                                       ConfigHelper configHelper,
                                       EntitatRepository entitatRepository,
                                       MeterRegistry meterRegistry,
-                                      AplicacioService aplicacioService) {
+                                      @Lazy AplicacioService aplicacioService) {
 
         super(integracioHelper, configHelper, entitatRepository, meterRegistry);
         this.aplicacioService = aplicacioService;

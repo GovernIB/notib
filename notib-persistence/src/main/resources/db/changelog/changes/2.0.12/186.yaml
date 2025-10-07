@@ -3,4 +3,13 @@ databaseChangeLog:
       id: 1634114082437-1
       author: limit
       changes:
-        - sql: "INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.DIGITALITZACIO', 'false', 'Mostrar logs de la digitalitzacio', 'LOGS', 24, 0, 'BOOL', 0);"
+        - sql: "INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.DIGITALITZACIO', 'false', 'Mostrar logs de la digitalitzacio', 'LOGS', 24, 0, 'BOOL', 0);
+                INSERT INTO NOT_CONFIG_GROUP (CODE, PARENT_CODE, POSITION, DESCRIPTION) VALUES ('DIGITALITZACIO', 'PLUGINS', 13, 'Plugin de Digitalitzacio');
+                INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.digitalitzacio.encription.key', null, 'Clau per encriptar i desencriptar els documents digitalitzats.', 'DIGITALITZACIO', 0, 1, 'PASSWORD', 0);
+                INSERT INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('DIGITALITZACIO_CLASS', 'es.caib.notib.plugin.digitalitzacio.DigitalitzacioPluginDigitalIB');
+                INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.digitalitzacio.class', 'es.caib.notib.plugin.digitalitzacio.DigitalitzacioPluginDigitalIB','Classe del plugin', 'DIGITALITZACIO', 0, 0, 'DIGITALITZACIO_CLASS', 0);
+                INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.digitalitzacio.digitalib.username', null,'Nom d’’usuari de DigitalIB','DIGITALITZACIO', 1, 1, 'TEXT', 0);
+                INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.digitalitzacio.digitalib.password', null,'Contrasenya de DigitalIB','DIGITALITZACIO', 2, 1, 'PASSWORD', 0);
+                INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.digitalitzacio.digitalib.perfil', null,'Perfil de DigitalIB','DIGITALITZACIO', 3, 0, 'TEXT', 0);
+                INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.digitalitzacio.endpointName', null,'Nom del endpoint del plugin de digitalitzacio','DIGITALITZACIO', 4, 0, 'TEXT', 0);
+                INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.digitalitzacio.scanner.mock', 0,'Resultat de l''escanneig fictici','DIGITALITZACIO', 5, 0, 'BOOL', 0);"

@@ -252,8 +252,8 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 			var aplicacio = aplicacioRepository.findById(aplicacioId).orElseThrow();
 			var urlCallback = aplicacio.getCallbackUrl() + (aplicacio.getCallbackUrl().endsWith("/") ? "" : "/") +  CallbackHelper.NOTIFICACIO_CANVI;
 			var resposta = requestsHelper.callbackAplicacioNotificaCanvi(urlCallback, new NotificacioCanviClient(), aplicacio.isHeaderCsrf());
-			var ok = resposta != null && ClientResponse.Status.OK.getStatusCode() == resposta.getStatusInfo().getStatusCode();
-			var error = !ok && resposta != null ? resposta.getStatus() + " " + resposta.getStatusInfo() : null;
+			var ok = resposta != null && ClientResponse.Status.OK.getStatusCode() == resposta.getClientResponseStatus().getStatusCode();
+			var error = !ok && resposta != null ? resposta.getStatus() + " " + resposta.getClientResponseStatus() : null;
 			return RespostaTestAplicacio.builder().ok(ok).error(error).build();
 		} catch (Exception ex) {
 			var msg = "Error inesperat provant la aplicacio";
