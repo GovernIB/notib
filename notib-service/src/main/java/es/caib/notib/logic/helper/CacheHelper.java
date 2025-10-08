@@ -272,7 +272,17 @@ public class CacheHelper {
         //evictFindUsuarisAndRolsAmbPermis
     }
 
-	@CacheEvict(value = {"oficinesSIREntitat", "oficinesSIRUnitat"}, allEntries = true)
+    @CacheEvict(value = "findUsuarisAndRolsAmbPermis", key = "'*'.concat('-').concat(#codiOrgan)", allEntries = true)
+    public void evictFindUsuarisAndRolsAmbPermisByCodiOrgan(String codiOrgan) {
+        // Method to evict all cache entries by codiOrgan
+    }
+
+    @CacheEvict(value = "findUsuarisAndRolsAmbPermis", key = "#proprocedimentId.concat('-').concat('*')", allEntries = true)
+    public void evictFindUsuarisAndRolsAmbPermisByProcedimentId(String procedimentId) {
+        // Method to evict all cache entries by codiOrgan
+    }
+
+    @CacheEvict(value = {"oficinesSIREntitat", "oficinesSIRUnitat"}, allEntries = true)
 	public void evictCercaOficines() {
 		//evictCercaOficines
 	}

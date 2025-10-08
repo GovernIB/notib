@@ -1175,7 +1175,9 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			if (organGestor != null && !Strings.isNullOrEmpty(organGestor.getCodi())) {
 				cacheHelper.evictFindUsuarisAmbPermis(procediment.getId() + "", organGestor.getCodi());
 				cacheHelper.evictFindUsuarisAndRolsAmbPermis(procediment.getId() + "", organGestor.getCodi());
-			}
+			} else {
+                cacheHelper.evictFindUsuarisAndRolsAmbPermisByProcedimentId(procediment.getId() + "");
+            }
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1204,7 +1206,9 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			if (!Strings.isNullOrEmpty(organCodi)) {
 				cacheHelper.evictFindUsuarisAmbPermis(String.valueOf(procedimentId), organCodi);
 				cacheHelper.evictFindUsuarisAndRolsAmbPermis(String.valueOf(procedimentId), organCodi);
-			}
+			} else {
+                cacheHelper.evictFindUsuarisAndRolsAmbPermisByProcedimentId(procedimentId + "");
+            }
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

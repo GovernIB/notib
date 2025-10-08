@@ -1153,7 +1153,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			if (entitatId != null) {
 				entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			}
-			entityComprovarHelper.comprovarOrganGestor(entitat, id);
+			var organ = entityComprovarHelper.comprovarOrganGestor(entitat, id);
 			PermisDto permis = permisosHelper.findPermis(id, OrganGestorEntity.class, permisDto.getId());
 			if (permis != null && isAdminOrgan && ((permis.getId() == null && permis.isAdministrador()) ||
 					(permis.getId() != null && (permis.isAdministrador() != permisDto.isAdministrador())))) {
@@ -1168,7 +1168,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			cacheHelper.evictFindProcedimentServeisWithPermis();
 			cacheHelper.evictFindOrgansGestorWithPermis();
 			permisosCacheable.evictAllPermisosEntitatsUsuariActual();
-
+            cacheHelper.evictFindUsuarisAndRolsAmbPermisByCodiOrgan(organ.getCodi());
 			updateOrgansSessio();
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1187,7 +1187,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			if (entitatId != null) {
 				entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			}
-			entityComprovarHelper.comprovarOrganGestor(entitat, id);
+			var organ = entityComprovarHelper.comprovarOrganGestor(entitat, id);
 			permisosHelper.deletePermis(id, OrganGestorEntity.class, permisId);
 
 			permisosService.evictGetOrgansAmbPermis();
@@ -1196,7 +1196,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			cacheHelper.evictFindProcedimentServeisWithPermis();
 			cacheHelper.evictFindOrgansGestorWithPermis();
 			permisosCacheable.evictAllPermisosEntitatsUsuariActual();
-
+            cacheHelper.evictFindUsuarisAndRolsAmbPermisByCodiOrgan(organ.getCodi());
 			updateOrgansSessio();
 		} finally {
 			metricsHelper.fiMetrica(timer);
