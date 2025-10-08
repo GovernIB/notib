@@ -24,22 +24,15 @@
 		<jackson.version>2.14.1</jackson.version>
 		<regweb.version>3.2.5</regweb.version>
 		<dir3caib.version>1.0.15</dir3caib.version>
-		<!--		<rolsac.version>1.8.0</rolsac.version>-->
 		<slf4j.version>1.7.36</slf4j.version>
-<!--		<cxf.version>3.4.8</cxf.version>-->
 		<cxf.version>3.2.5.redhat-00001</cxf.version>
 		<wss4j.version>2.2.2.redhat-00002</wss4j.version>
 		<arxiu.api.version>2.0.26</arxiu.api.version>
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
-		<!--		<lombok.version>1.18.12</lombok.version>-->
-		<!--	  	<liquibase.version>4.4.3</liquibase.version>-->
-		<!--		<apache.poi.version>4.1.2</apache.poi.version>-->
 		<guava.version>30.1.1-jre</guava.version>
 		<xdocreport.version>2.0.4</xdocreport.version>
 		<itext.pdf.version>5.5.13.1</itext.pdf.version>
-<!--		<itext.pdf.version>5.4.3</itext.pdf.version>-->
 		<docker.image.prefix>280421</docker.image.prefix>
-		<!--		<docker.image.name>notib</docker.image.name>-->
 		<junit.jupiter.version>5.9.3</junit.jupiter.version>
 		<notib.context>notib</notib.context>
 		<implementation.vendor>Límit Tecnologies</implementation.vendor>
@@ -61,18 +54,18 @@
 		</dependencies>
 	</dependencyManagement>
 	<modules>
+		<module>notib-back</module>
 		<module>notib-api-interna</module>
 		<module>notib-api-externa</module>
-		<module>notib-back</module>
-		<module>notib-service</module>
 		<module>notib-service-intf</module>
+		<module>notib-service</module>
 		<module>notib-persistence</module>
 		<module>notib-plugin-intf</module>
 		<module>notib-plugin</module>
 		<module>notib-ejb</module>
 		<module>notib-ear</module>
 		<module>notib-client</module>
-        <module>notib-client-2</module>
+		<module>notib-client-2</module>
 		<module>notib-client-intf</module>
 	</modules>
 	<build>
@@ -96,9 +89,7 @@
 					<branch>refs/heads/gh-pages</branch>
 					<includes><include>**/*</include></includes>
 					<path>maven</path>
-          			<!-- github repo name -->
 					<repositoryName>maven</repositoryName>
-          			<!-- github username or organization  -->
 					<repositoryOwner>GovernIB</repositoryOwner>
 					<server>github_governib_maven</server>
 					<merge>true</merge>
