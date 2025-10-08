@@ -269,16 +269,16 @@ public class SubsistemesHelper {
                     break;
                 case ERROR:
                     if (isCritic) {
-                        anyDegraded = true;
-                    } else {
                         anyError = true;
+                    } else {
+                        anyWarn = true;
                     }
                     break;
                 case DOWN:
                     if (isCritic) {
                         anyDown = true;
                     } else {
-                        anyError = true;
+                        anyWarn = true;
                     }
                     break;
                 default:
