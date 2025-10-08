@@ -9,17 +9,6 @@
  	</parent>
  	<artifactId>notib-back</artifactId>
 	<packaging>war</packaging>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.keycloak.bom</groupId>
-				<artifactId>keycloak-adapter-bom</artifactId>
-				<version>${keycloak.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.keycloak</groupId>
@@ -85,12 +74,6 @@
 			<version>1.9.4</version>
 		</dependency>
 		<dependency>
-			<groupId>javax.ejb</groupId>
-			<artifactId>javax.ejb-api</artifactId>
-			<version>3.2.2</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.12.0</version>
@@ -104,12 +87,6 @@
 			<groupId>javax.mail</groupId>
 			<artifactId>javax.mail-api</artifactId>
 			<version>1.6.2</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>dev.akkinoc.spring.boot</groupId>
-			<artifactId>orika-spring-boot-starter</artifactId>
-			<version>${orika.starter.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -249,6 +226,10 @@
 					<artifactId>notib-service</artifactId>
 					<version>${project.version}</version>
 				</dependency>
+				<dependency>
+					<groupId>javax.ejb</groupId>
+					<artifactId>javax.ejb-api</artifactId>
+				</dependency>
 			</dependencies>
 			<build>
 				<plugins>
@@ -292,6 +273,11 @@
 							<artifactId>spring-context</artifactId>
 						</exclusion>
 					</exclusions>
+				</dependency>
+				<dependency>
+					<groupId>javax.ejb</groupId>
+					<artifactId>javax.ejb-api</artifactId>
+					<scope>provided</scope>
 				</dependency>
 				<dependency>
 					<groupId>org.apache.tomcat.embed</groupId>
@@ -338,25 +324,6 @@
 		</resources>
 		<plugins>
 			<plugin>
-				<groupId>pl.project13.maven</groupId>
-				<artifactId>git-commit-id-plugin</artifactId>
-				<version>4.9.10</version>
-				<executions>
-					<execution>
-						<id>get-the-git-infos</id>
-						<goals>
-							<goal>revision</goal>
-						</goals>
-						<phase>validate</phase>
-					</execution>
-				</executions>
-				<configuration>
-					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
-					<generateGitPropertiesFile>true</generateGitPropertiesFile>
-					<verbose>false</verbose>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>3.3.2</version>
@@ -364,10 +331,10 @@
 					<archive>
 						<manifestEntries>
 							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
-							<Implementation-Vendor>Límit Tecnologies</Implementation-Vendor>
+							<Implementation-Vendor>${implementation.vendor}</Implementation-Vendor>
 							<Implementation-Version>${project.version}</Implementation-Version>
-							<Implementation-SCM-Branch>${git.branch}</Implementation-SCM-Branch>
-							<Implementation-SCM-Revision>${git.commit.id}</Implementation-SCM-Revision>
+							<Implementation-SCM-Branch>${scmBranch}</Implementation-SCM-Branch>
+							<Implementation-SCM-Revision>${buildNumber}</Implementation-SCM-Revision>
 						</manifestEntries>
 					</archive>
 				</configuration>

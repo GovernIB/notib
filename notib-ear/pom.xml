@@ -100,7 +100,7 @@
 			</exclusions>
 		</dependency>-->
 	</dependencies>
-	
+	<!--
 	<profiles>
 		<profile>
 			<id>ejb_container</id>
@@ -110,9 +110,6 @@
 				</file>
 				<activeByDefault>true</activeByDefault>
 			</activation>
-<!-- 			<properties> -->
-<!-- 				<jboss.directory>/home/siona/Feina/Server/jboss-eap-5.2-dgtic/jboss-as/server/notib/deploycaib</jboss.directory> -->
-<!-- 			</properties> -->
 			<dependencies>
 				<dependency>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -130,7 +127,6 @@
 								<phase>package</phase>
 								<configuration>
 									<target>
-<!-- 										<copy file="${basedir}/target/notib.ear" tofile="${jboss.directory}/notib.ear" /> -->
 										<echo message=" " level="info" />
 										<echo message=" " level="info" />
 										<echo message="|      _____                      _ _          _     __                       _ ____   ____   _____ _____    |" level="info" />
@@ -203,8 +199,7 @@
 		    </repositories>
 		</profile>
 	</profiles>
-		
-	
+	-->
 	<build>
 		<plugins>
 			<plugin>
@@ -240,10 +235,10 @@
 					<archive>
 						<manifestEntries>
 							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
-							<Implementation-Vendor>Límit Tecnologies</Implementation-Vendor>
+							<Implementation-Vendor>${implementation.vendor}</Implementation-Vendor>
 							<Implementation-Version>${project.version}</Implementation-Version>
-							<Implementation-SCM-Branch>${git.branch}</Implementation-SCM-Branch>
-							<Implementation-SCM-Revision>${git.commit.id}</Implementation-SCM-Revision>
+							<Implementation-SCM-Branch>${scmBranch}</Implementation-SCM-Branch>
+							<Implementation-SCM-Revision>${buildNumber}</Implementation-SCM-Revision>
 						</manifestEntries>
 					</archive>
 					<modules>

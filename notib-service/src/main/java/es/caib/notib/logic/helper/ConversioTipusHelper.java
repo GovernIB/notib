@@ -144,17 +144,12 @@ public class ConversioTipusHelper {
 				.customize(new CustomMapper<>() {
 					@Override
 					public void mapAtoB(NotificacioEntity a, NotificacioInfoDto b, MappingContext context) {
-						/*DadesUsuari d = pluginHelper.dadesUsuariConsultarAmbCodi(a.getUsuariCodi());
-						if (d != null) {
-							b.setUsuariNom(d.getNomSencer());
-						}
 						var usuari = a.getCreatedBy().orElse(null);
 						if (usuari != null) {
 							var createdBy = convertir(usuari, UsuariDto.class);
 							b.setCreatedBy(createdBy);
 						}
-                        a.getCreatedDate().ifPresent(createdDate -> b.setCreatedDate(Date.from(createdDate.atZone(ZoneId.systemDefault()).toInstant())));*/
-
+                        a.getCreatedDate().ifPresent(createdDate -> b.setCreatedDate(Date.from(createdDate.atZone(ZoneId.systemDefault()).toInstant())));
                     }
 				}).byDefault().register();
 

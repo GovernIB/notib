@@ -82,6 +82,7 @@ import es.caib.notib.persist.repository.auditoria.NotificacioEnviamentAuditRepos
 import es.caib.notib.plugin.cie.TipusImpressio;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
+import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.plugins.arxiu.api.Document;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -624,6 +625,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			// Emplena els atributs registreLlibreNom i registreOficinaNom
 //			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
 			var dto = conversioTipusHelper.convertir(notificacio, NotificacioInfoDto.class);
+			DadesUsuari d = pluginHelper.dadesUsuariConsultarAmbCodi(notificacio.getUsuariCodi());
+			if (d != null) {
+				dto.setUsuariNom(d.getNomSencer());
+			}
 			var llindarDies = configHelper.getConfigAsInteger("es.caib.notib.llindar.dies.enviament.remeses");
 			dto.setNotificacioAntiga(DatesUtils.isNowAfterDate(notificacio.getCreatedDate().get(), llindarDies));
 			//CALLBACKS

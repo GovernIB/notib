@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * 
  * @author Límit Tecnologies
  */
-@SpringBootApplication
 @EnableAsync
+@SpringBootApplication
 @PropertySource(
 		ignoreResourceNotFound = true,
 		value = { "classpath:application.yaml" })

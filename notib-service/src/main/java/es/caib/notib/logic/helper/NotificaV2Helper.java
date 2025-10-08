@@ -84,7 +84,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CIE;
 import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.NOT;
 
 /**

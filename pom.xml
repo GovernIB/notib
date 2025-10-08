@@ -42,7 +42,24 @@
 		<!--		<docker.image.name>notib</docker.image.name>-->
 		<junit.jupiter.version>5.9.3</junit.jupiter.version>
 		<notib.context>notib</notib.context>
+		<implementation.vendor>Límit Tecnologies</implementation.vendor>
 	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.keycloak.bom</groupId>
+				<artifactId>keycloak-adapter-bom</artifactId>
+				<version>${keycloak.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.ejb</groupId>
+				<artifactId>javax.ejb-api</artifactId>
+				<version>3.2.2</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<modules>
 		<module>notib-api-interna</module>
 		<module>notib-api-externa</module>
@@ -102,21 +119,22 @@
 				<version>2.8.1</version>
 			</plugin>
 			<plugin>
-				<groupId>pl.project13.maven</groupId>
-				<artifactId>git-commit-id-plugin</artifactId>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>3.2.1</version>
 				<executions>
 					<execution>
-						<id>get-the-git-infos</id>
-						<goals>
-							<goal>revision</goal>
-						</goals>
 						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
 					</execution>
 				</executions>
 				<configuration>
-					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+					<doCheck>false</doCheck>
+					<doUpdate>false</doUpdate>
+					<ignoreEmptyScmUrl>true</ignoreEmptyScmUrl>
 				</configuration>
-				<version>2.2.0</version>
 			</plugin>
 		</plugins>
 		<finalName>notib</finalName>

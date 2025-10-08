@@ -104,13 +104,13 @@
                 <version>3.2.3</version>
                 <configuration>
                     <archive>
-                        <manifestEntries>
-                            <Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
-                            <Implementation-Vendor>Límit Tecnologies</Implementation-Vendor>
-                            <Implementation-Version>${project.version}</Implementation-Version>
-                            <Implementation-SCM-Branch>${git.branch}</Implementation-SCM-Branch>
-                            <Implementation-SCM-Revision>${git.commit.id}</Implementation-SCM-Revision>
-                        </manifestEntries>
+						<manifestEntries>
+							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
+							<Implementation-Vendor>${implementation.vendor}</Implementation-Vendor>
+							<Implementation-Version>${project.version}</Implementation-Version>
+							<Implementation-SCM-Branch>${scmBranch}</Implementation-SCM-Branch>
+							<Implementation-SCM-Revision>${buildNumber}</Implementation-SCM-Revision>
+						</manifestEntries>
                     </archive>
                 </configuration>
             </plugin>

@@ -103,7 +103,6 @@
 		<dependency>
 			<groupId>javax.ejb</groupId>
 			<artifactId>javax.ejb-api</artifactId>
-			<version>3.2.2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -333,6 +332,7 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
     </dependencies>
+	<!--
 	<profiles>
 		<profile>
 			<id>servlet_container</id>
@@ -352,11 +352,11 @@
 					<groupId>javax.ejb</groupId>
 					<artifactId>javax.ejb-api</artifactId>
 					<version>3.2.2</version>
-<!--					<scope>provided</scope>-->
 				</dependency>
 			</dependencies>
 		</profile>
 	</profiles>
+	-->
 	<build>
 		<pluginManagement>
 			<plugins>
