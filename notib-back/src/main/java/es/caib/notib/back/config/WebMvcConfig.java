@@ -21,10 +21,16 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Configuració de Spring web MVC.
@@ -98,14 +104,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		WebMvcConfigurer.super.addArgumentResolvers(resolvers);
 	}
 
-	/*@Bean
+	@Bean
 	public LocaleResolver localeResolver() {
 		var localeResolver = new CustomLocaleResolver(Arrays.asList(Locale.forLanguageTag("ca"), Locale.forLanguageTag("es")));
 		localeResolver.setDefaultLocale(Locale.forLanguageTag("ca"));
 		return localeResolver;
 	}
 
-	@Bean
+	/*@Bean
 	public ViewResolver internalResourceViewResolver() {
 		var bean = new InternalResourceViewResolver();
 		bean.setViewClass(JstlView.class);
@@ -190,6 +196,27 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				}
 				return pageable;
 			}
+		}
+	}
+
+	public static class CustomLocaleResolver extends SessionLocaleResolver {
+		private AcceptHeaderLocaleResolver acceptHeaderLocaleResolver;
+		public CustomLocaleResolver(List<Locale> supportedLocales) {
+			acceptHeaderLocaleResolver = new AcceptHeaderLocaleResolver();
+			acceptHeaderLocaleResolver.setSupportedLocales(supportedLocales);
+		}
+		@Override
+		protected Locale determineDefaultLocale(HttpServletRequest request) {
+
+			var acceptHeaderLocale = acceptHeaderLocaleResolver.resolveLocale(request);
+			if (acceptHeaderLocale != null) {
+				return acceptHeaderLocale;
+			}
+			Locale defaultLocale = getDefaultLocale();
+			if (defaultLocale == null) {
+				defaultLocale = request.getLocale();
+			}
+			return defaultLocale;
 		}
 	}
 

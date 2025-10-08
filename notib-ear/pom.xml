@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>es.caib.notib</groupId>
@@ -9,58 +8,12 @@
 	</parent>
 	<artifactId>notib-ear</artifactId>
 	<packaging>ear</packaging>
-
 	<properties>
-		<docker.base.image>${project.parent.artifactId}</docker.base.image>
-<!--		<docker.image.prefix>280421</docker.image.prefix>-->
-<!--		<docker.image.name>notib</docker.image.name>-->
+		<docker.image.name>${project.parent.artifactId}</docker.image.name>
+		<docker.image.from>280421/jboss-eap-caib-7.2</docker.image.from>
+		<docker.jboss.userhome>/home/jboss</docker.jboss.userhome>
 	</properties>
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-tomcat</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>notib-plugin</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>bcpkix-jdk15on</artifactId>
-					<groupId>org.bouncycastle</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>bcmail-jdk16</artifactId>
-					<groupId>org.bouncycastle</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>bcprov-jdk15on</artifactId>
-					<groupId>org.bouncycastle</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>notib-ejb</artifactId>
-			<version>${project.version}</version>
-			<type>ejb</type>
-			<exclusions>
-				<exclusion>
-					<groupId>org.liquibase</groupId>
-					<artifactId>liquibase-core</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>notib-back</artifactId>
@@ -79,196 +32,15 @@
 			<version>${project.version}</version>
 			<type>war</type>
 		</dependency>
-		<!--
-			 La següent dependència ja està inclosa a dins el .war. Només s'inclou aquí per a que l'ear
-			 contengui les seves dependències. Després s'haurà d'excloure el fitxer notib-controller*.jar
-			 de dins la carpeta lib per a evitar conflictes per classes duplicades.
-		-->
-		<!--<dependency>
+		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>notib-controller</artifactId>
+			<artifactId>notib-ejb</artifactId>
 			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.keycloak</groupId>
-					<artifactId>keycloak-core</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>-->
+			<type>ejb</type>
+		</dependency>
 	</dependencies>
-	<!--
-	<profiles>
-		<profile>
-			<id>ejb_container</id>
-			<activation>
-				<file>
-					<missing>../notib-back/appserv_tomcat</missing>
-				</file>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-antrun-plugin</artifactId>
-					<version>1.7</version>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>3.1.0</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<configuration>
-									<target>
-										<echo message=" " level="info" />
-										<echo message=" " level="info" />
-										<echo message="|      _____                      _ _          _     __                       _ ____   ____   _____ _____    |" level="info" />
-										<echo message="|     / ____|                    (_) |        | |   / _|                     | |  _ \ / __ \ / ____/ ____|   |" level="info" />
-										<echo message="|    | |     ___  _ __ ___  _ __  _| | ___  __| |  | |_ ___  _ __            | | |_) | |  | | (___| (___     |" level="info" />
-										<echo message="|    | |    / _ \| '_ ` _ \| '_ \| | |/ _ \/ _` |  |  _/ _ \| '__|       _   | |  _ -| |  | |\___ \\___ \    |" level="info" />
-										<echo message="|    | |___| (_) | | | | | | |_) | | |  __/ (_| |  | || (_) | |         | |__| | |_) | |__| |____) |___) |   |" level="info" />
-										<echo message="|     \_____\___/|_| |_| |_| .__/|_|_|\___|\__,_|  |_| \___/|_|          \____/|____/ \____/|_____/_____/    |" level="info" />
-										<echo message="|                          | |                                                                               |" level="info" />
-										<echo message="|                          |_|                                                                               |" level="info" />
-										<echo message=" " level="info" />
-									</target>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>servlet_container</id>
-			<activation>
-				<file>
-					<exists>../notib-back/appserv_tomcat</exists>
-				</file>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-antrun-plugin</artifactId>
-					<version>3.1.0</version>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.7</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<configuration>
-									<tasks>
-										<echo message=" " level="info"/>
-										<echo message=" " level="info"/>
-										<echo message="|      _____                      _ _          _     __                  _______ ____  __  __  _____       _______    |" level="info"/>
-										<echo message="|     / ____|                    (_) |        | |   / _|                |__   __/ __ \|  \/  |/ ____|   /\|__   __|   |" level="info"/>
-										<echo message="|    | |     ___  _ __ ___  _ __  _| | ___  __| |  | |_ ___  _ __          | | | |  | | \  / | |       /  \  | |      |" level="info"/>
-										<echo message="|    | |    / _ \| '_ ` _ \| '_ \| | |/ _ \/ _` |  |  _/ _ \| '__|         | | | |  | | |\/| | |      / /\ \ | |      |" level="info"/>
-										<echo message="|    | |___| (_) | | | | | | |_) | | |  __/ (_| |  | || (_) | |            | | | |__| | |  | | |____ / ____ \| |      |" level="info"/>
-										<echo message="|     \_____\___/|_| |_| |_| .__/|_|_|\___|\__,_|  |_| \___/|_|            |_|  \____/|_|  |_|\_____/_/    \_\_|      |" level="info"/>
-										<echo message="|                          | |                                                                                        |" level="info"/>
-										<echo message="|                          |_|                                                                                        |" level="info"/>
-										<echo message=" " level="info"/>
-									</tasks>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-			<repositories>
-		    </repositories>
-		</profile>
-	</profiles>
-	-->
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>pl.project13.maven</groupId>
-				<artifactId>git-commit-id-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>get-the-git-infos</id>
-						<goals>
-							<goal>revision</goal>
-						</goals>
-						<phase>validate</phase>
-					</execution>
-				</executions>
-				<configuration>
-					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
-					<generateGitPropertiesFile>true</generateGitPropertiesFile>
-					<verbose>false</verbose>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-ear-plugin</artifactId>
-				<version>3.2.0</version>
-				<configuration>
-					<finalName>notib</finalName>
-					<generateApplicationXml>true</generateApplicationXml>
-					<defaultLibBundleDir>/lib</defaultLibBundleDir>
-					<includeLibInApplicationXml>false</includeLibInApplicationXml>
-					<packagingExcludes>lib/es.caib.notib-notib-controller-*.jar</packagingExcludes>
-					<version>6</version>
-					<initializeInOrder>true</initializeInOrder>
-					<archive>
-						<manifestEntries>
-							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
-							<Implementation-Vendor>${implementation.vendor}</Implementation-Vendor>
-							<Implementation-Version>${project.version}</Implementation-Version>
-							<Implementation-SCM-Branch>${scmBranch}</Implementation-SCM-Branch>
-							<Implementation-SCM-Revision>${buildNumber}</Implementation-SCM-Revision>
-						</manifestEntries>
-					</archive>
-					<modules>
-						<ejbModule>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>notib-ejb</artifactId>
-							<bundleFileName>notib-ejb.jar</bundleFileName>
-						</ejbModule>
-						<webModule>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>notib-back</artifactId>
-							<contextRoot>/${notib.context}back</contextRoot>
-							<bundleFileName>notib-back.war</bundleFileName>
-						</webModule>
-						<webModule>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>notib-api-interna</artifactId>
-							<contextRoot>/${notib.context}api/interna</contextRoot>
-							<bundleFileName>notib-api-interna.war</bundleFileName>
-						</webModule>
-						<webModule>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>notib-api-externa</artifactId>
-							<contextRoot>/${notib.context}api/externa</contextRoot>
-							<bundleFileName>notib-api-externa.war</bundleFileName>
-						</webModule>
-					</modules>
-<!--					<defaultJavaBundleDir>lib/</defaultJavaBundleDir>-->
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
@@ -277,12 +49,14 @@
 					<verbose>true</verbose>
 					<images>
 						<image>
-<!--							<name>280421/%g</name>-->
-							<name>${docker.base.image}</name>
+							<name>${docker.image.name}</name>
 							<alias>${project.parent.artifactId}</alias>
 							<build>
-								<from>280421/jboss-eap-caib-7.2</from>
+								<from>${docker.image.from}</from>
 								<maintainer>limit@limit.es</maintainer>
+								<args>
+									<VITE_APP_VERSION>${project.version}</VITE_APP_VERSION>
+								</args>
 								<ports>
 									<port>8080</port>
 									<port>8787</port>
@@ -345,16 +119,62 @@
 							</build>
 							<run>
 								<ports>
-									<!-- Mapeig del port de debug -->
 									<port>8787:8787</port>
 								</ports>
 								<env>
-									<!-- Defineix les JAVA_OPTS per habilitar el debug -->
 									<JAVA_OPTS>-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n</JAVA_OPTS>
 								</env>
 							</run>
 						</image>
 					</images>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-ear-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<generateApplicationXml>true</generateApplicationXml>
+					<defaultLibBundleDir>/lib</defaultLibBundleDir>
+					<includeLibInApplicationXml>false</includeLibInApplicationXml>
+					<packagingExcludes>lib/es.caib.notib-notib-controller-*.jar</packagingExcludes>
+					<version>6</version>
+					<initializeInOrder>true</initializeInOrder>
+					<skinnyWars>true</skinnyWars>
+					<archive>
+						<manifestEntries>
+							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
+							<Implementation-Vendor>${implementation.vendor}</Implementation-Vendor>
+							<Implementation-Version>${project.version}</Implementation-Version>
+							<Implementation-SCM-Branch>${scmBranch}</Implementation-SCM-Branch>
+							<Implementation-SCM-Revision>${buildNumber}</Implementation-SCM-Revision>
+						</manifestEntries>
+					</archive>
+					<modules>
+						<ejbModule>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>notib-ejb</artifactId>
+							<bundleFileName>notib-ejb.jar</bundleFileName>
+						</ejbModule>
+						<webModule>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>notib-back</artifactId>
+							<contextRoot>/${notib.context}back</contextRoot>
+							<bundleFileName>notib-back.war</bundleFileName>
+						</webModule>
+						<webModule>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>notib-api-interna</artifactId>
+							<contextRoot>/${notib.context}api/interna</contextRoot>
+							<bundleFileName>notib-api-interna.war</bundleFileName>
+						</webModule>
+						<webModule>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>notib-api-externa</artifactId>
+							<contextRoot>/${notib.context}api/externa</contextRoot>
+							<bundleFileName>notib-api-externa.war</bundleFileName>
+						</webModule>
+					</modules>
 				</configuration>
 			</plugin>
 		</plugins>

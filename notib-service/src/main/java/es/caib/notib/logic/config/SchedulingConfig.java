@@ -320,7 +320,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
             String methodToExecute){
         try {
 //            Supplier<SchedulledService> schedulledServiceSupplier = () -> schedulledService;
-            log.info("[SCH] Iniciant tansca en segon pla: " + methodToExecute);
+            log.info("[SCH] Iniciant tasca en segon pla: " + methodToExecute);
             monitorTasquesService.inici(methodToExecute);
             method.accept(supplier);
             monitorTasquesService.fi(methodToExecute);

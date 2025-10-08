@@ -1,6 +1,9 @@
 package es.caib.notib.back.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
@@ -18,9 +21,18 @@ public class BaseWebSecurityConfig {
 	public static final String ROLE_PREFIX = "";
 	public static final String LOGOUT_URL = "/logout";
 
-	@Bean
+	@Value("${es.caib.notib.security.mappableRoles:NOT_SUPER,NOT_ADMIN,NOT_CARPETA,NOT_APL,tothom}")
+	protected String mappableRoles;
+
 	public GrantedAuthorityDefaults grantedAuthorityDefaults() {
 		return new GrantedAuthorityDefaults(ROLE_PREFIX);
+	}
+
+	@Bean
+	public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
+		DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
+		handler.setDefaultRolePrefix(ROLE_PREFIX);
+		return handler;
 	}
 
 	@Bean

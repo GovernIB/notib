@@ -28,7 +28,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -419,7 +418,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @PostMapping(value = "/{notificacioId}/processar")
     public String processarPost(HttpServletRequest request, @PathVariable Long notificacioId, @Valid MarcarProcessatCommand command,
-                                BindingResult bindingResult,Model model) throws MessagingException {
+                                BindingResult bindingResult,Model model) {
 
         try {
             if (bindingResult.hasErrors()) {
