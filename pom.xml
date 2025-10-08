@@ -14,12 +14,7 @@
 	<properties>
 		<keycloak.version>21.1.1</keycloak.version>
 		<orika.starter.version>2.4.6</orika.starter.version>
-		<sitemesh.version>2.5.0</sitemesh.version>
 		<openapi.version>1.6.15</openapi.version>
-		<java.compiler.version>11</java.compiler.version>
-		<maven.compiler.target>${java.compiler.version}</maven.compiler.target>
-		<maven.compiler.source>${java.compiler.version}</maven.compiler.source>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-boot.version>2.7.12</spring-boot.version>
 		<jackson.version>2.14.1</jackson.version>
 		<regweb.version>3.2.5</regweb.version>
@@ -36,6 +31,10 @@
 		<junit.jupiter.version>5.9.3</junit.jupiter.version>
 		<notib.context>notib</notib.context>
 		<implementation.vendor>Límit Tecnologies</implementation.vendor>
+		<java.compiler.version>11</java.compiler.version>
+		<maven.compiler.target>${java.compiler.version}</maven.compiler.target>
+		<maven.compiler.source>${java.compiler.version}</maven.compiler.source>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -45,6 +44,11 @@
 				<version>${keycloak.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>opensymphony</groupId>
+				<artifactId>sitemesh</artifactId>
+				<version>2.5.0</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.ejb</groupId>
@@ -128,7 +132,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<finalName>notib</finalName>
 	</build>
 	<distributionManagement>
 		<repository>

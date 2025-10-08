@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.representations.AccessToken.Access;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWarDeployment;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,10 +53,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Profile("!boot")
 @Slf4j
-@Configuration
-@EnableWebSecurity
+//@Configuration
+//@EnableWebSecurity
 public class SecurityConfig {
 
 	@Value("${es.caib.notib.security.mappableRoles:NOT_SUPER,NOT_ADMIN,NOT_CARPETA,NOT_APL,tothom}")

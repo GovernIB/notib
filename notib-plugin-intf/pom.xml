@@ -139,6 +139,10 @@
 					<artifactId>itext</artifactId>
 					<groupId>com.lowagie</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>xalan</artifactId>
+					<groupId>xalan</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>

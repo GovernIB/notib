@@ -54,7 +54,7 @@ public class NotibController implements ErrorController {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private ServletContext servletContext;
-	@Autowired
+	@Autowired(required = false)
 	private BuildProperties buildProperties;
 	@Autowired
 	private SessionScopedContext sessionScopedContext;
