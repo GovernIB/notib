@@ -1,3 +1,4 @@
+target/
 /config/
 /.classpath
 /.project
@@ -23,3 +24,4 @@
 /notib-war/notib-war.iml
 /notib-persistence/derby.log
 /transformers/
+/application.properties

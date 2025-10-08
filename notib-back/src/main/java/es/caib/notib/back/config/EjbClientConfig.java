@@ -5,6 +5,7 @@ package es.caib.notib.back.config;
 
 import es.caib.notib.logic.intf.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -18,6 +19,7 @@ import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
  */
 @Slf4j
 @Configuration
+@ConditionalOnWarDeployment
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class EjbClientConfig {
 

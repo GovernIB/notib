@@ -44,24 +44,19 @@
 		<notib.context>notib</notib.context>
 	</properties>
 	<modules>
-		<module>notib-boot</module>
+		<module>notib-api-interna</module>
+		<module>notib-api-externa</module>
 		<module>notib-back</module>
 		<module>notib-service</module>
 		<module>notib-service-intf</module>
 		<module>notib-persistence</module>
-		<module>notib-api-interna</module>
-        <module>notib-api-externa</module>
 		<module>notib-plugin-intf</module>
 		<module>notib-plugin</module>
 		<module>notib-ejb</module>
-
+		<module>notib-ear</module>
 		<module>notib-client</module>
         <module>notib-client-2</module>
 		<module>notib-client-intf</module>
-
-		<module>notib-ear</module>
-		<module>notib-controller</module>
-        <!--		<module>notib-lib-common</module>-->
 	</modules>
 	<build>
 		<plugins>

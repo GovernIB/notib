@@ -3,7 +3,7 @@ package es.caib.notib.logic.config;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("serviceTaskScheduler")
 public class TaskScheduler extends ThreadPoolTaskScheduler {
 
     public TaskScheduler() {

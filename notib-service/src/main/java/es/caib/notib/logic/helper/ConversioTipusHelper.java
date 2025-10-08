@@ -8,7 +8,6 @@ import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.Envios;
-import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
@@ -113,8 +112,6 @@ public class ConversioTipusHelper {
 
 	private MapperFactory mapperFactory;
 	@Autowired
-	private CacheBridge cacheBridge;
-	@Autowired
 	private MessageHelper messageHelper;
 	@Autowired
 	private CallbackRepository callbackRepository;
@@ -128,7 +125,6 @@ public class ConversioTipusHelper {
     private ConfigHelper configHelper;
 
 	public ConversioTipusHelper() {
-
 		MappingContext.Factory mappingContextFactory = new MappingContext.Factory();
 		mapperFactory= new DefaultMapperFactory.Builder().mappingContextFactory(mappingContextFactory).build();
 		mapperFactory.getConverterFactory().registerConverter(
@@ -148,7 +144,7 @@ public class ConversioTipusHelper {
 				.customize(new CustomMapper<>() {
 					@Override
 					public void mapAtoB(NotificacioEntity a, NotificacioInfoDto b, MappingContext context) {
-						DadesUsuari d = cacheBridge.findUsuariAmbCodi(a.getUsuariCodi());
+						/*DadesUsuari d = pluginHelper.dadesUsuariConsultarAmbCodi(a.getUsuariCodi());
 						if (d != null) {
 							b.setUsuariNom(d.getNomSencer());
 						}
@@ -157,7 +153,7 @@ public class ConversioTipusHelper {
 							var createdBy = convertir(usuari, UsuariDto.class);
 							b.setCreatedBy(createdBy);
 						}
-                        a.getCreatedDate().ifPresent(createdDate -> b.setCreatedDate(Date.from(createdDate.atZone(ZoneId.systemDefault()).toInstant())));
+                        a.getCreatedDate().ifPresent(createdDate -> b.setCreatedDate(Date.from(createdDate.atZone(ZoneId.systemDefault()).toInstant())));*/
 
                     }
 				}).byDefault().register();

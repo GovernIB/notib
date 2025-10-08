@@ -1,0 +1,241 @@
+/**
+ * 
+ */
+package es.caib.notib.back.helper;
+
+import es.caib.notib.back.command.*;
+import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.logic.intf.dto.AmpliacionPlazoDto;
+import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
+import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.logic.intf.dto.PersonaDto;
+import es.caib.notib.logic.intf.dto.notificacio.Document;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
+import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
+import ma.glasnost.orika.*;
+import ma.glasnost.orika.impl.DefaultMapperFactory;
+import ma.glasnost.orika.metadata.Type;
+import org.joda.time.DateTime;
+import org.springframework.stereotype.Component;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Helper per a convertir entre diferents formats de documents.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
+@Component("backConversioTipusHelper")
+public class ConversioTipusHelper {
+
+	private static MapperFactory mapperFactory;
+
+	public ConversioTipusHelper() {
+
+		mapperFactory = new DefaultMapperFactory.Builder().compilerStrategy(new CustomJavassistCompilerStrategy()).build();
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<DateTime, Date>() {
+					public Date convert(DateTime source, Type<? extends Date> destinationClass, MappingContext mappingContext) {
+						return source.toDate();
+					}
+				});
+		
+		mapperFactory.classMap(PersonaCommand.class, PersonaDto.class)
+		.byDefault()
+		.customize(new CustomMapper<PersonaCommand, PersonaDto>() {
+            @Override
+            public void mapAtoB(PersonaCommand personaCommand, PersonaDto personaDto, MappingContext context) {
+                if (InteressatTipus.JURIDICA.equals(personaCommand.getInteressatTipus())) {
+                	personaDto.setRaoSocial(personaCommand.getNom());
+                	personaDto.setNom(null);
+                }
+            }                   
+        }).register();
+		
+		mapperFactory.classMap(PersonaDto.class, PersonaCommand.class)
+		.byDefault()
+		.customize(new CustomMapper<PersonaDto, PersonaCommand>() {
+            @Override
+            public void mapAtoB(PersonaDto personaDto, PersonaCommand personaCommand, MappingContext context) {
+                if (InteressatTipus.JURIDICA.equals(personaDto.getInteressatTipus())) {
+                	personaCommand.setNom(personaDto.getRaoSocial() != null ? personaDto.getRaoSocial() : personaDto.getNomInput());
+                }
+            }                   
+        }).register();
+		
+		mapperFactory.classMap(EnviamentCommand.class, Enviament.class)
+			.fieldAToB("entregaPostal.activa", "entregaPostalActiva")
+			.field("entregaDeh.activa", "entregaDehActiva")
+			.byDefault()
+			.customize(new CustomMapper<EnviamentCommand, Enviament>() {
+				@Override
+				public void mapAtoB(EnviamentCommand command, Enviament dto, MappingContext context) {
+				}
+				@Override
+				public void mapBtoA(Enviament dto, EnviamentCommand command, MappingContext context) {
+					var epCommand = command.getEntregaPostal() == null ? new EntregapostalCommand() : command.getEntregaPostal();
+					epCommand.setActiva(dto.getEntregaPostal() != null);
+					command.setEntregaPostal(epCommand);
+				}
+			}).register();
+
+		mapperFactory.classMap(EnviamentCommand.class, NotificacioEnviamentDtoV2.class)
+				.fieldAToB("entregaPostal.activa", "entregaPostalActiva")
+				.field("entregaDeh.activa", "entregaDehActiva")
+				.byDefault()
+				.customize(new CustomMapper<EnviamentCommand, NotificacioEnviamentDtoV2>() {
+					@Override
+					public void mapAtoB(EnviamentCommand command, NotificacioEnviamentDtoV2 dto, MappingContext context) {
+					}
+					@Override
+					public void mapBtoA(NotificacioEnviamentDtoV2 dto, EnviamentCommand command, MappingContext context) {
+						var epCommand = command.getEntregaPostal() == null ? new EntregapostalCommand() : command.getEntregaPostal();
+						epCommand.setActiva(dto.getEntregaPostal() != null);
+						command.setEntregaPostal(epCommand);
+					}
+				}).register();
+
+		mapperFactory.classMap(NotificacioDtoV2.class, NotificacioCommand.class)
+				.byDefault()
+				.customize(new CustomMapper<>() {
+					@Override
+					public void mapAtoB(NotificacioDtoV2 notificacioDto, NotificacioCommand notificacioCommand, MappingContext context) {
+						// Documents
+						var documents = new DocumentCommand[5];
+						documents[0] = DocumentCommand.asCommand(notificacioDto.getDocument());
+						documents[1] = DocumentCommand.asCommand(notificacioDto.getDocument2());
+						documents[2] = DocumentCommand.asCommand(notificacioDto.getDocument3());
+						documents[3] = DocumentCommand.asCommand(notificacioDto.getDocument4());
+						documents[4] = DocumentCommand.asCommand(notificacioDto.getDocument5());
+						notificacioCommand.setDocuments(documents);
+					}
+					@Override
+					public void mapBtoA(NotificacioCommand notificacioCommand, NotificacioDtoV2 notificacioDto, MappingContext context) {
+						// Documents
+						List<Document> documents = new ArrayList<>();
+						var document = DocumentCommand.asDto(notificacioCommand.getDocuments()[0]);
+						if (document != null) {
+							documents.add(document);
+						}
+						var document2 = DocumentCommand.asDto(notificacioCommand.getDocuments()[1]);
+						if (document2 != null) {
+							documents.add(document2);
+						}
+						var document3 = DocumentCommand.asDto(notificacioCommand.getDocuments()[2]);
+						if (document3 != null) {
+							documents.add(document3);
+						}
+						var document4 = DocumentCommand.asDto(notificacioCommand.getDocuments()[3]);
+						if (document4 != null) {
+							documents.add(document4);
+						}
+						var document5 = DocumentCommand.asDto(notificacioCommand.getDocuments()[4]);
+						if (document5 != null) {
+							documents.add(document5);
+						}
+						notificacioDto.setDocument(!documents.isEmpty() ? documents.get(0) : null);
+						notificacioDto.setDocument2(documents.size() > 1 ? documents.get(1) : null);
+						notificacioDto.setDocument3(documents.size() > 2 ? documents.get(2) : null);
+						notificacioDto.setDocument4(documents.size() > 3 ? documents.get(3) : null);
+						notificacioDto.setDocument5(documents.size() > 4 ? documents.get(4) : null);
+					}
+				}).register();
+
+		mapperFactory.classMap(Notificacio.class, NotificacioCommand.class)
+				.byDefault()
+				.customize(new CustomMapper<>() {
+					@Override
+					public void mapAtoB(Notificacio notificacioDto, NotificacioCommand notificacioCommand, MappingContext context) {
+						// Documents
+						var documents = new DocumentCommand[5];
+						documents[0] = DocumentCommand.asCommand(notificacioDto.getDocument());
+						documents[1] = DocumentCommand.asCommand(notificacioDto.getDocument2());
+						documents[2] = DocumentCommand.asCommand(notificacioDto.getDocument3());
+						documents[3] = DocumentCommand.asCommand(notificacioDto.getDocument4());
+						documents[4] = DocumentCommand.asCommand(notificacioDto.getDocument5());
+						notificacioCommand.setDocuments(documents);
+					}
+					@Override
+					public void mapBtoA(NotificacioCommand notificacioCommand, Notificacio notificacioDto, MappingContext context) {
+						// Documents
+						List<Document> documents = new ArrayList<>();
+						var document = DocumentCommand.asDto(notificacioCommand.getDocuments()[0]);
+						if (document != null) {
+							documents.add(document);
+						}
+						var document2 = DocumentCommand.asDto(notificacioCommand.getDocuments()[1]);
+						if (document2 != null) {
+							documents.add(document2);
+						}
+						var document3 = DocumentCommand.asDto(notificacioCommand.getDocuments()[2]);
+						if (document3 != null) {
+							documents.add(document3);
+						}
+						var document4 = DocumentCommand.asDto(notificacioCommand.getDocuments()[3]);
+						if (document4 != null) {
+							documents.add(document4);
+						}
+						var document5 = DocumentCommand.asDto(notificacioCommand.getDocuments()[4]);
+						if (document5 != null) {
+							documents.add(document5);
+						}
+						notificacioDto.setDocument(!documents.isEmpty() ? documents.get(0) : null);
+						notificacioDto.setDocument2(documents.size() > 1 ? documents.get(1) : null);
+						notificacioDto.setDocument3(documents.size() > 2 ? documents.get(2) : null);
+						notificacioDto.setDocument4(documents.size() > 3 ? documents.get(3) : null);
+						notificacioDto.setDocument5(documents.size() > 4 ? documents.get(4) : null);
+					}
+				}).register();
+
+		mapperFactory.classMap(IntegracioFiltreCommand.class, IntegracioFiltreDto.class)
+				.exclude("dataInici")
+				.exclude("dataFi")
+				.byDefault()
+				.customize(new CustomMapper<IntegracioFiltreCommand, IntegracioFiltreDto>() {
+					@Override
+					public void mapAtoB(IntegracioFiltreCommand command, IntegracioFiltreDto dto, MappingContext context) {
+
+						var sf = new SimpleDateFormat("dd/MM/yyyy");
+						Date dataInici = null;
+						try {
+							dataInici = command.getDataInici() != null ? sf.parse(command.getDataInici()) : null;
+							dto.setDataInici(dataInici);
+						} catch (Exception ex) {
+						}
+						Date dataFi = null;
+						try {
+							dataFi = command.getDataFi() != null ? sf.parse(command.getDataFi()) : null;
+							dto.setDataFi(dataFi);
+						} catch (Exception ex) {
+						}
+					}
+				}).register();
+
+		mapperFactory.classMap(AmpliacionPlazoCommand.class, AmpliacionPlazoDto.class).byDefault().register();
+		mapperFactory.classMap(AmpliacionPlazoDto.class, AmpliacionPlazoCommand.class).byDefault().register();
+	}
+
+	
+	public static <T> T convertir(Object source, Class<T> targetType) {
+		return source != null ? getMapperFacade().map(source, targetType) : null;
+	}
+
+	public static <T> List<T> convertirList(List<?> items, Class<T> targetType) {
+		return items != null ? getMapperFacade().mapAsList(items, targetType) : null;
+	}
+
+	public static <T> Set<T> convertirSet(Set<?> items, Class<T> targetType) {
+		return items != null ? getMapperFacade().mapAsSet(items, targetType) : null;
+	}
+
+	private static MapperFacade getMapperFacade() {
+		return mapperFactory != null ? mapperFactory.getMapperFacade()
+			: new DefaultMapperFactory.Builder().compilerStrategy(new CustomJavassistCompilerStrategy()).build().getMapperFacade();
+	}
+
+}

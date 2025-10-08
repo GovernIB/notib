@@ -84,7 +84,7 @@
 			 contengui les seves dependències. Després s'haurà d'excloure el fitxer notib-controller*.jar
 			 de dins la carpeta lib per a evitar conflictes per classes duplicades.
 		-->
-		<dependency>
+		<!--<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>notib-controller</artifactId>
 			<version>${project.version}</version>
@@ -93,16 +93,12 @@
 					<groupId>commons-logging</groupId>
 					<artifactId>commons-logging</artifactId>
 				</exclusion>
-				<!--
-					Excloem la dependència de keycloak perquè si no ho feim ens dona errors en les classes
-					org.keycloak.* perquè estan carregades a dos classloaders diferents.
-				-->
 				<exclusion>
 					<groupId>org.keycloak</groupId>
 					<artifactId>keycloak-core</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
+		</dependency>-->
 	</dependencies>
 	
 	<profiles>
