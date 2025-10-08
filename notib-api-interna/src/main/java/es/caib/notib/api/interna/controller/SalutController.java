@@ -70,7 +70,7 @@ public class SalutController {
     @GetMapping("/salutPerformance")
     public Health healthCheck() {
 
-        return salutService.checkHealthIndicator();
+        return Health.up().build();
     }
 
     private ManifestInfo getManifestInfo() throws IOException {
