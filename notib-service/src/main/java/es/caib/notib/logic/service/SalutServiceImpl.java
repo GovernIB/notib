@@ -185,9 +185,9 @@ public class SalutServiceImpl implements SalutService {
                 restTemplate.getForObject(performanceUrl, String.class);
                 break;
             } catch (Exception e) {
-                if (i == MAX_CONNECTION_RETRY) {
-                    estat = EstatSalutEnum.DOWN; // After 3 connection failed attempts
-                }
+//                if (i == MAX_CONNECTION_RETRY) {
+//                    estat = EstatSalutEnum.DOWN; // After 3 connection failed attempts
+//                }
             }
         }
         Instant end = Instant.now();
@@ -287,7 +287,7 @@ public class SalutServiceImpl implements SalutService {
 //                    DetallSalut.builder().codi("SO").nom("Sistema operatiu").valor(os).build());
             return List.of(
                     DetallSalut.builder().codi("PRC").nom("Processadors").valor(String.valueOf(Runtime.getRuntime().availableProcessors())).build(),
-                    DetallSalut.builder().codi("SCPU").nom("Càrrega del sistema").valor(MonitorHelper.getCPULoad()).build(),
+                    DetallSalut.builder().codi("SCPU").nom("Càrrega del sistema").valor(MonitorHelper.getCPULoad()).build(), // TODO REVISAR AMB EL MONITOR DE SISTEMA
                     DetallSalut.builder().codi("PCPU").nom("Càrrega del procés").valor(processCpuLoad).build(),
                     DetallSalut.builder().codi("MED").nom("Memòria disponible").valor(MonitorHelper.humanReadableByteCount(Runtime.getRuntime().freeMemory())).build(),
                     DetallSalut.builder().codi("MET").nom("Memòria total").valor(MonitorHelper.humanReadableByteCount(Runtime.getRuntime().totalMemory())).build(),

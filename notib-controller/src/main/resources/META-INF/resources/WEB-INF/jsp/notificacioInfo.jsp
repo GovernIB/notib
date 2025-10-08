@@ -1252,8 +1252,8 @@ $(document).ready(function() {
 		</c:if>
 	</div>
 	<div id="modal-botons" class="text-right">
-<%--		<a href="<c:url value="/notificacio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar" /></a>--%>
-		<button class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar" /></button>
+		<a href="<c:url value="/notificacio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar" /></a>
+<%--		<button class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar" /></button>--%>
 	</div>
 </body>
 	</c:otherwise>

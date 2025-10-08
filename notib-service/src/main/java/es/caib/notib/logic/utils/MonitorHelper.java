@@ -110,8 +110,8 @@ public class MonitorHelper {
 	public static String getCPULoad() {
 
 		try {
-			result.upTime = rmBean.getUptime();
 			result.processCpuTime = getSunOSMBean().getProcessCpuTime();
+			result.upTime = rmBean.getUptime();
 			if (result.upTime > 0L && result.processCpuTime >= 0L) {
 				updateCPUInfo();
 			}
