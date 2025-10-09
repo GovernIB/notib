@@ -102,11 +102,11 @@ public class DigitalitzacioController extends BaseUserController {
         return "digitalitzacioIframeTancar";
     }
 
-//    @RequestMapping(value = "/event/resultatScan/{dades}/{idTransaccio}", method = RequestMethod.GET,  produces = "text/plain")
-//    @ResponseBody
-//    public ResponseEntity<String> recuperarResultatScanEvent(HttpServletRequest request, @PathVariable String dades, @PathVariable String idTransaccio, Model model) {
-//
-//        // Autenticar un usuari simulat si és necessari
+    @RequestMapping(value = "/event/resultatScan/{dades}/{idTransaccio}", method = RequestMethod.GET,  produces = "text/plain")
+    @ResponseBody
+    public ResponseEntity<String> recuperarResultatScanEvent(HttpServletRequest request, @PathVariable String dades, @PathVariable String idTransaccio, Model model) {
+
+        // Autenticar un usuari simulat si és necessari
 //        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 //        if (auth == null || "anonymousUser".equals(auth.getName())) {
 //            User user = new User("$portafib_ripea", "portafib_ripea", Collections.singletonList(new SimpleGrantedAuthority("tothom")));
@@ -118,10 +118,10 @@ public class DigitalitzacioController extends BaseUserController {
 //        Long idExpedient = Long.parseLong(dataSplri[0]);
 //        var resposta = recuperaResultatEscaneig(idTransaccio, true, true);
 //        resposta.setUsuari(dataSplri[2]);
-////        ScanFinalitzatEvent sfe = new ScanFinalitzatEvent(idExpedient, resposta);
-////        eventService.notifyScanFinalitzat(sfe);
-//        return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body("Escaneig finalitzat.");
-//    }
+//        ScanFinalitzatEvent sfe = new ScanFinalitzatEvent(idExpedient, resposta);
+//        eventService.notifyScanFinalitzat(sfe);
+        return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body("Escaneig finalitzat.");
+    }
 
     @RequestMapping(value = "/recuperarResultat/{idTransaccio}", method = RequestMethod.GET)
     public String recuperarResultat(HttpServletRequest request, @PathVariable String idTransaccio, Model model) {

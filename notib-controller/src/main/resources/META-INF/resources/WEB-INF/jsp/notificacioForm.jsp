@@ -1305,20 +1305,20 @@
                     if (perfils[0].codi=='SERVER_ERROR') {
                         $('#escaneig').empty();
                         $('#escaneig').append('<div id="contingut-missatges"><div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>'+perfils[0].descripcio+'</div></div>');
-                    } else {
-                        for ( var i in perfils) {
-                            $('.scan-profile').append('<span class="btn btn-lg btn-block btn-default" id="' + perfils[i].codi + '"><small>' + perfils[i].nom + '</small></span>');
-                            $('.scan-profile').append('</br>');
-                        }
+                        return;
+                    }
+                    for ( var i in perfils) {
+                        $('.scan-profile').append('<span class="btn btn-lg btn-block btn-default" id="' + perfils[i].codi + '"><small>' + perfils[i].nom + '</small></span>');
+                        $('.scan-profile').append('</br>');
+                    }
 
-                        if (perfils.length==1) {
-                            $('#'+perfils[0].codi).click();
-                        } else {
-                            removeLoading();
-                            $('.scan-profile').show();
-                            $('.scan-back-btn').removeClass('hidden');
-                            webutilModalAdjustHeight();
-                        }
+                    if (perfils.length==1) {
+                        $('#'+perfils[0].codi).click();
+                    } else {
+                        removeLoading();
+                        $('.scan-profile').show();
+                        $('.scan-back-btn').removeClass('hidden');
+                        webutilModalAdjustHeight();
                     }
                 },
                 error: function(err) {
@@ -1334,6 +1334,32 @@
             $('.start-scan-btn').show();
             $('.scan-profile').empty().hide();
             $('.scan-back-btn').addClass('hidden');
+        });
+
+        //Iniciar procés digitalització després de triar perfil
+        $('.scan-profile').on('click', function(){
+            $('.scan-profile').hide();
+            let codi_perfil = $('span', this).attr('id');
+            $(this).html('');
+            $.ajax({
+                type: 'GET',
+                url: "<c:url value='/digitalitzacio/iniciarDigitalitzacio/" + codi_perfil + "'/>",
+                success: function(transaccioResponse) {
+                    if (transaccioResponse != null) {
+                        localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
+                        var iframeScan = '<div class="iframe_container"><iframe onload="removeLoading()" class="iframe_content" width="100%" height="140%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>'
+                        $('.scan-result').append(iframeScan);
+                        $('.scan-back-btn').addClass('hidden');
+                        webutilModalAdjustHeight();
+                        $body = $("body");
+                        $body.addClass("loading");
+
+                    }
+                },
+                error: function(err) {
+                    console.log("Error tancant la transacció");
+                }
+            });
         });
 	});
 
