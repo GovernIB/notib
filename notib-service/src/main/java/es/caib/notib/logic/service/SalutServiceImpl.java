@@ -10,6 +10,7 @@ import es.caib.comanda.ms.salut.model.IntegracioSalut;
 import es.caib.comanda.ms.salut.model.Manual;
 import es.caib.comanda.ms.salut.model.MissatgeSalut;
 import es.caib.comanda.ms.salut.model.SalutInfo;
+import es.caib.comanda.ms.salut.model.SubsistemaInfo;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.helper.plugin.AbstractPluginHelper;
@@ -76,9 +77,9 @@ public class SalutServiceImpl implements SalutService {
     }
 
     @Override
-    public List<AppInfo> getSubsistemes() {
+    public List<SubsistemaInfo> getSubsistemes() {
         return Arrays.stream(SubsistemesHelper.SubsistemesEnum.values())
-                .map(subsistema -> AppInfo.builder().codi(subsistema.name()).nom(subsistema.getNom()).build())
+                .map(subsistema -> SubsistemaInfo.builder().codi(subsistema.name()).nom(subsistema.getNom()).build())
                 .collect(Collectors.toList());
     }
 
@@ -341,8 +342,7 @@ public class SalutServiceImpl implements SalutService {
                     missatges.add(missatgeSalutMapper.toMissatgeSalut(avis));
                 });
             }
-
-            return null;
+            return missatges;
         } catch (Exception e) {
             return null;
         }
