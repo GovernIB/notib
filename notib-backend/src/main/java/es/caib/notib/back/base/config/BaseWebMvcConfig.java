@@ -1,6 +1,6 @@
 package es.caib.notib.back.base.config;
 
-import es.limit.base.boot.logic.intf.base.model.UnpagedButSorted;
+import es.caib.notib.logic.intf.base.model.UnpagedButSorted;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;

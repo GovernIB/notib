@@ -47,11 +47,6 @@
 			<artifactId>spring-security-web</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>${openapi.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>opensymphony</groupId>
 			<artifactId>sitemesh</artifactId>
 		</dependency>
@@ -189,6 +184,11 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>notib-service-intf</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>notib-backend</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

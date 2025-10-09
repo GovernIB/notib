@@ -2,6 +2,7 @@
 package org.springframework.hateoas.mediatype.hal.forms;
 
 import org.springframework.context.MessageSourceResolvable;
+import org.springframework.hateoas.*;
 import org.springframework.hateoas.mediatype.MessageResolver;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;

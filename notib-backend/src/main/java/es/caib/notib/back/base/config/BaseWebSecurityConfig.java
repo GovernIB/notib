@@ -1,6 +1,6 @@
 package es.caib.notib.back.base.config;
 
-import es.limit.base.boot.logic.intf.base.config.BaseBootConfig;
+import es.caib.notib.logic.intf.base.config.BaseBootConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationDetailsSource;

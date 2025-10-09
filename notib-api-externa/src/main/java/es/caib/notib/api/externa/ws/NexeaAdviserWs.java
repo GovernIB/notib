@@ -1,6 +1,5 @@
 package es.caib.notib.api.externa.ws;
 
-
 import es.caib.notib.logic.intf.ws.adviser.nexea.common.Opciones;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.Acuse;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.Receptor;
@@ -19,7 +18,6 @@ import javax.xml.ws.Holder;
 import java.math.BigInteger;
 
 import static es.caib.notib.api.externa.config.ServiceInstancesConfig.getCieAdviserServiceInstance;
-
 
 /**
  * Implementació dels mètodes per al servei de recepció de
