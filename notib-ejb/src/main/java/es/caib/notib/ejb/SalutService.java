@@ -1,9 +1,9 @@
 package es.caib.notib.ejb;
 
-import es.caib.comanda.ms.salut.model.AppInfo;
 import es.caib.comanda.ms.salut.model.ContextInfo;
 import es.caib.comanda.ms.salut.model.IntegracioInfo;
 import es.caib.comanda.ms.salut.model.SalutInfo;
+import es.caib.comanda.ms.salut.model.SubsistemaInfo;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.context.annotation.Primary;
 
@@ -20,7 +20,7 @@ public class SalutService extends AbstractService<es.caib.notib.logic.intf.servi
     }
 
     @Override
-    public List<AppInfo> getSubsistemes() {
+    public List<SubsistemaInfo> getSubsistemes() {
         return getDelegateService().getSubsistemes();
     }
 
