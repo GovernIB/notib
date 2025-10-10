@@ -61,7 +61,6 @@ public class NotibController implements ErrorController {
 
 	@GetMapping(value = "/")
 	public String root(HttpServletRequest request) {
-
 		var rolActual = sessionScopedContext.getRolActual();
 		return RolHelper.ROLE_SUPER.equals(rolActual) ? "redirect:/integracio" :
 				RolHelper.ROLE_APLICACIO.equals(rolActual) ? "redirect:/api/rest" : "redirect:/notificacio";

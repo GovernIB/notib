@@ -1,25 +1,13 @@
 package es.caib.notib.back.config;
 
 import com.opensymphony.sitemesh.webapp.SiteMeshFilter;
+import es.caib.notib.back.base.config.BaseWebMvcConfig;
 import es.caib.notib.back.interceptor.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableArgumentResolver;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolverSupport;
-import org.springframework.data.web.SortArgumentResolver;
-import org.springframework.data.web.SortHandlerMethodArgumentResolver;
-import org.springframework.lang.Nullable;
-import org.springframework.web.bind.support.WebDataBinderFactory;
-import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.*;
@@ -39,7 +27,7 @@ import java.util.Locale;
  */
 @Configuration
 @Order
-public class WebMvcConfig implements WebMvcConfigurer {
+public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 
 	@Autowired
 	private NotibInterceptor notibInterceptor;
@@ -65,12 +53,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		return registrationBean;
 	}
 
-	/*@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry
-				.addResourceHandler("/reactapp/**")
-				.addResourceLocations("/reactapp/");
-	}*/
+	@Override
+	protected String getJsAppStaticFolder() {
+		return "/reactapp";
+	}
 
 	@Override
 	public void configureViewResolvers(ViewResolverRegistry registry) {
@@ -94,14 +80,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
 		multipartResolver.setMaxUploadSize(MAX_UPLOAD_SIZE);
 		return multipartResolver;
-	}
-
-	@Override
-	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-		CustomPageableHandlerMethodArgumentResolver resolver = new CustomPageableHandlerMethodArgumentResolver();
-		resolver.setFallbackPageable(Pageable.unpaged());
-		resolvers.add(resolver);
-		WebMvcConfigurer.super.addArgumentResolvers(resolvers);
 	}
 
 	@Bean
@@ -166,37 +144,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry.addInterceptor(accesUsuariInterceptor).addPathPatterns(USUARI_PATHS).excludePathPatterns(USUARI_EXCLUSIONS).order(4);
 		registry.addInterceptor(accesPagadorsInterceptor).addPathPatterns(PAGADORS_PATHS).order(5);
 //		registry.addInterceptor(new CsrfTokenInterceptor());
-	}
-
-	public static class CustomPageableHandlerMethodArgumentResolver extends PageableHandlerMethodArgumentResolverSupport implements PageableArgumentResolver {
-		private final SortArgumentResolver sortResolver = new SortHandlerMethodArgumentResolver();
-		@Override
-		public boolean supportsParameter(MethodParameter parameter) {
-			return Pageable.class.equals(parameter.getParameterType());
-		}
-		@Override
-		public Pageable resolveArgument(
-				MethodParameter methodParameter,
-				@Nullable ModelAndViewContainer mavContainer,
-				NativeWebRequest webRequest,
-				@Nullable WebDataBinderFactory binderFactory) {
-			String page = webRequest.getParameter(getParameterNameToUse(getPageParameterName(), methodParameter));
-			String pageSize = webRequest.getParameter(getParameterNameToUse(getSizeParameterName(), methodParameter));
-			Sort sort = sortResolver.resolveArgument(methodParameter, mavContainer, webRequest, binderFactory);
-			boolean withPageOrSort = page != null || pageSize != null || sort.isSorted();
-			if (!withPageOrSort) {
-				return null;
-			} else {
-				Pageable pageable = getPageable(
-						methodParameter,
-						page == null ? "0" : page,
-						pageSize == null || "0".equals(pageSize) ? "10" : pageSize);
-				if (sort.isSorted()) {
-					return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-				}
-				return pageable;
-			}
-		}
 	}
 
 	public static class CustomLocaleResolver extends SessionLocaleResolver {

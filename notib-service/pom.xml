@@ -38,6 +38,18 @@
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.turkraft</groupId>
+			<artifactId>spring-filter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.dynamicreports</groupId>
+			<artifactId>dynamicreports-core</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>dev.akkinoc.spring.boot</groupId>
 			<artifactId>orika-spring-boot-starter</artifactId>
 			<version>${orika.starter.version}</version>

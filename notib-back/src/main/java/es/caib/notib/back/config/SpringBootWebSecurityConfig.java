@@ -1,31 +1,24 @@
 package es.caib.notib.back.config;
 
-import com.nimbusds.jose.shaded.json.JSONArray;
-import com.nimbusds.jose.shaded.json.JSONObject;
-import com.nimbusds.jwt.JWT;
-import com.nimbusds.jwt.JWTParser;
+import es.caib.notib.back.base.config.BaseWebSecurityConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWarDeployment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import java.text.ParseException;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
+
+import static es.caib.notib.back.base.config.MethodSecurityConfig.DEFAULT_ROLE_PREFIX;
 
 /**
  * Configuració de Spring Security per a executar l'aplicació amb Spring Boot.
@@ -35,58 +28,64 @@ import java.util.stream.Collectors;
 @Slf4j
 @Configuration
 @ConditionalOnNotWarDeployment
-@EnableWebSecurity
 public class SpringBootWebSecurityConfig extends BaseWebSecurityConfig {
 
+	public static final String LOGOUT_URL = "/logout";
+
+	@Value("${es.caib.notib.security.mappableRoles:NOT_SUPER,NOT_ADMIN,NOT_CARPETA,NOT_APL,tothom}")
+	protected String mappableRoles;
+
 	@Bean
-	public SecurityFilterChain oauth2LoginSecurityFilterChain(HttpSecurity http) throws Exception {
-		http.oauth2Login().
-			userInfoEndpoint().userService(oauth2UserService());
-		http.logout().
-			invalidateHttpSession(true).
-			clearAuthentication(true).
-			deleteCookies("OAuth_Token_Request_State", "JSESSIONID").
-			//addLogoutHandler(oauth2LogoutHandler()).
-			logoutUrl(LOGOUT_URL).
-			logoutSuccessUrl("/");
-		http.authorizeRequests().
-				requestMatchers(publicRequestMatchers()).permitAll().
-				anyRequest().authenticated();
-		http.headers().frameOptions().sameOrigin();
-		http.csrf().disable();
-		http.cors();
-		return http.build();
+	public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
+		DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
+		handler.setDefaultRolePrefix(DEFAULT_ROLE_PREFIX);
+		return handler;
 	}
 
-	private OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
-		final DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-		return (userRequest) -> {
-			OAuth2User oauth2User = delegate.loadUser(userRequest);
-			OAuth2AccessToken accessToken = userRequest.getAccessToken();
-			Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
-			try {
-				JWT parsedJwt = JWTParser.parse(accessToken.getTokenValue());
-				JSONObject realmAccess = (JSONObject)parsedJwt.getJWTClaimsSet().getClaim("realm_access");
-				if (realmAccess != null) {
-					JSONArray roles = (JSONArray)realmAccess.get("roles");
-					if (roles != null) {
-						roles.stream().
-						map(r -> new SimpleGrantedAuthority((String)r)).
-						forEach(mappedAuthorities::add);
-					}
-				}
-			} catch (ParseException ex) {
-				log.warn("No s'han pogut obtenir els rols del token JWT", ex);
-			}
-			List<GrantedAuthority> allowedRoles = Arrays.stream(mappableRoles.split(",")).
-					map(r -> new SimpleGrantedAuthority(r.trim())).
-					collect(Collectors.toList());
-			mappedAuthorities.removeIf(a -> !allowedRoles.contains(a));
-			return new DefaultOAuth2User(
-					mappedAuthorities,
-					oauth2User.getAttributes(),
-					userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName());
+	@Override
+	protected void customHttpSecurityConfiguration(HttpSecurity http) throws Exception {
+		http.logout().
+				invalidateHttpSession(true).
+				clearAuthentication(true).
+				deleteCookies("OAuth_Token_Request_State", "JSESSIONID").
+				//addLogoutHandler(oauth2LogoutHandler()).
+				logoutUrl(LOGOUT_URL).
+				logoutSuccessUrl("/");
+		http.authorizeHttpRequests().
+				requestMatchers(publicRequestMatchers()).permitAll();
+		super.customHttpSecurityConfiguration(http);
+	}
+
+	protected RequestMatcher[] publicRequestMatchers() {
+		return new RequestMatcher[] {
+				new AntPathRequestMatcher("/swagger-resources/**"),
+				new AntPathRequestMatcher("/swagger-ui/**"),
+				new AntPathRequestMatcher("/api/rest"),
+				new AntPathRequestMatcher("/api/rest/**/*"),
+				new AntPathRequestMatcher("/api-docs"),
+				new AntPathRequestMatcher("/api-docs/**/*"),
+				new AntPathRequestMatcher("/css/**/*"),
+				new AntPathRequestMatcher("/fonts/**/*"),
+				new AntPathRequestMatcher("/img/**/*"),
+				new AntPathRequestMatcher("/js/**/*"),
+				new AntPathRequestMatcher("/webjars/**"),
 		};
+	}
+
+	@Override
+	protected boolean isOauth2ResourceServerActive() {
+		return false;
+	}
+	@Override
+	protected boolean isOauth2ClientActive() {
+		return true;
+	}
+
+	@Override
+	protected List<GrantedAuthority> getAllowedRoles() {
+		return Arrays.stream(mappableRoles.split(",")).
+				map(r -> new SimpleGrantedAuthority(r.trim())).
+				collect(Collectors.toList());
 	}
 
 }

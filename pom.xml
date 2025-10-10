@@ -54,6 +54,21 @@
 				<version>1.8.0</version>
 			</dependency>
 			<dependency>
+				<groupId>com.turkraft</groupId>
+				<artifactId>spring-filter</artifactId>
+				<version>2.1.6</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sf.jasperreports</groupId>
+				<artifactId>jasperreports</artifactId>
+				<version>6.21.4</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sourceforge.dynamicreports</groupId>
+				<artifactId>dynamicreports-core</artifactId>
+				<version>6.12.1</version>
+			</dependency>
+			<dependency>
 				<groupId>org.keycloak.bom</groupId>
 				<artifactId>keycloak-adapter-bom</artifactId>
 				<version>${keycloak.version}</version>
