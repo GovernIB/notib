@@ -1,6 +1,5 @@
 package es.caib.notib.logic.intf.dto.callback;
 
-import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
 import es.caib.notib.logic.intf.dto.SiNo;
 import lombok.AllArgsConstructor;
@@ -8,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -32,7 +32,7 @@ public class CallbackFiltre {
     private int maxReintents;
 
     public boolean usuariCodiNull() {
-        return Strings.isNullOrEmpty(usuariCodi);
+        return StringUtils.isEmpty(usuariCodi);
     }
 
     public boolean estatNull() {
@@ -40,23 +40,23 @@ public class CallbackFiltre {
     }
 
     public boolean referenciaRemesaNull() {
-        return Strings.isNullOrEmpty(referenciaRemesa);
+        return StringUtils.isEmpty(referenciaRemesa);
     }
 
     public boolean dataIniciNull() {
-        return Strings.isNullOrEmpty(dataInici);
+        return StringUtils.isEmpty(dataInici);
     }
 
     public boolean dataFiNull() {
-        return Strings.isNullOrEmpty(dataFi);
+        return StringUtils.isEmpty(dataFi);
     }
 
     public boolean dataIniciUltimIntentNull() {
-        return Strings.isNullOrEmpty(dataIniciUltimIntent);
+        return StringUtils.isEmpty(dataIniciUltimIntent);
     }
 
     public boolean dataFiUltimIntentNull() {
-        return Strings.isNullOrEmpty(dataFiUltimIntent);
+        return StringUtils.isEmpty(dataFiUltimIntent);
     }
 
     public boolean fiReintentsNull() {
@@ -69,7 +69,7 @@ public class CallbackFiltre {
 
     public Date dataIniciDate() {
 
-        if (Strings.isNullOrEmpty(dataInici)) {
+        if (StringUtils.isEmpty(dataInici)) {
             return null;
         }
         try {
@@ -89,7 +89,7 @@ public class CallbackFiltre {
 
     public Date dataFiDate() {
 
-        if (Strings.isNullOrEmpty(dataFi)) {
+        if (StringUtils.isEmpty(dataFi)) {
             return null;
         }
         try {
@@ -109,7 +109,7 @@ public class CallbackFiltre {
 
     public Date dataIniciUltimIntentDate() {
 
-        if (Strings.isNullOrEmpty(dataIniciUltimIntent)) {
+        if (StringUtils.isEmpty(dataIniciUltimIntent)) {
             return null;
         }
         try {
@@ -129,7 +129,7 @@ public class CallbackFiltre {
 
     public Date dataFiUltimIntentDate() {
 
-        if (Strings.isNullOrEmpty(dataFiUltimIntent)) {
+        if (StringUtils.isEmpty(dataFiUltimIntent)) {
             return null;
         }
         try {

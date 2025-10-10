@@ -1,9 +1,9 @@
 package es.caib.notib.back.controller;
 
-import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.missatges.MissatgeWs;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
@@ -51,7 +51,7 @@ public class WebSocketController extends BaseController {
     public void enviarMissatge(@Payload MissatgeWs missatge, @Headers MessageHeaders headers, Message message) throws JMSException {
 
         message.acknowledge();
-        if (Strings.isNullOrEmpty(missatge.getCodiUsuari()) || simpUserRegistry.getUser(missatge.getCodiUsuari()) == null) {
+        if (StringUtils.isEmpty(missatge.getCodiUsuari()) || simpUserRegistry.getUser(missatge.getCodiUsuari()) == null) {
             return;
         }
         template.convertAndSendToUser(missatge.getCodiUsuari(), "/notibws/missatge", missatge);

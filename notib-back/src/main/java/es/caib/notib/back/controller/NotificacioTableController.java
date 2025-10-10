@@ -1,6 +1,5 @@
 package es.caib.notib.back.controller;
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.command.*;
 import es.caib.notib.back.helper.*;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
@@ -17,6 +16,7 @@ import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -242,7 +242,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 filtre.setEntitatId(entitatActual.getId());
             }
             var organGestorCodi = filtre.getOrganGestor();
-            if (isAdminOrgan && entitatActual != null && Strings.isNullOrEmpty(organGestorCodi)) {
+            if (isAdminOrgan && entitatActual != null && StringUtils.isEmpty(organGestorCodi)) {
                 OrganGestorDto organGestorActual = getOrganGestorActual(request);
                 organGestorCodi = organGestorActual.getCodi();
             }
@@ -1200,7 +1200,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             var grup = grupService.findByCodi(notificacio.getGrupCodi(), entitatActual.getId());
             notificacio.setGrup(grup);
         }
-        if (!Strings.isNullOrEmpty(notificacio.getNotificaErrorDescripcio())) {
+        if (!StringUtils.isEmpty(notificacio.getNotificaErrorDescripcio())) {
             notificacio.setNotificaErrorDescripcio(notificacio.getNotificaErrorDescripcio());
         }
         model.addAttribute("pipellaActiva", pipellaActiva);

@@ -3,10 +3,10 @@
  */
 package es.caib.notib.back.validation;
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.command.UsuariCodiCommand;
 import es.caib.notib.back.helper.MessageHelper;
 import es.caib.notib.logic.intf.service.UsuariService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.ConstraintValidator;
@@ -32,20 +32,20 @@ public class UsuariExistsValidator implements ConstraintValidator<UsuariExists, 
 	public boolean isValid(UsuariCodiCommand command, ConstraintValidatorContext context) {
 
 		var valid = true;
-		if (Strings.isNullOrEmpty(command.getCodiNou())) {
+		if (StringUtils.isEmpty(command.getCodiNou())) {
 			context.disableDefaultConstraintViolation();
 			var msg = MessageHelper.getInstance().getMessage(anotacio.message() + ".not.null");
 			context.buildConstraintViolationWithTemplate(msg).addNode("codiNou").addConstraintViolation();
 			valid = false;
 		}
-		if (Strings.isNullOrEmpty(command.getCodiNou())) {
+		if (StringUtils.isEmpty(command.getCodiNou())) {
 			context.disableDefaultConstraintViolation();
 			var msg = MessageHelper.getInstance().getMessage(anotacio.message() + ".not.null");
 			context.buildConstraintViolationWithTemplate(msg).addNode("codiAntic").addConstraintViolation();
 			valid = false;
 		}
 		// comprova que el nom sigui únic
-		if (!Strings.isNullOrEmpty(command.getCodiAntic())) {
+		if (!StringUtils.isEmpty(command.getCodiAntic())) {
 			var usuari = usuariService.findByCodi(command.getCodiAntic());
 			if (usuari == null) {
 				context.disableDefaultConstraintViolation();

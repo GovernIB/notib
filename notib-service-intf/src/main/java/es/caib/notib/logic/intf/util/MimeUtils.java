@@ -1,6 +1,5 @@
 package es.caib.notib.logic.intf.util;
 
-import com.google.common.io.Files;
 import es.caib.notib.logic.intf.dto.mime.Mimes;
 import es.caib.notib.logic.intf.dto.notificacio.Document;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +10,7 @@ import org.apache.tika.mime.MimeTypes;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.zip.ZipFile;
 
 @Slf4j
@@ -73,7 +73,7 @@ public class MimeUtils {
         arxiuNom = Long.toString(System.nanoTime());
 //        }
         File tmp = File.createTempFile(arxiuNom, suffix);
-        Files.write(contingut, tmp);
+	    Files.write(tmp.toPath(), contingut);
         Tika tika = new Tika();
         String mimeType = tika.detect(tmp);
         FitxerUtils.esborrar(tmp);
@@ -130,7 +130,7 @@ public class MimeUtils {
         try {
             byte[] contingut = Base64.decodeBase64(base64);
             File tmp = File.createTempFile("zipSigned", ".zip" );
-            Files.write(contingut, tmp);
+            Files.write(tmp.toPath(), contingut);
             ZipFile zip = new ZipFile(tmp);
             zip.close();
             FitxerUtils.esborrar(tmp);

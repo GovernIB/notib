@@ -1,6 +1,5 @@
 package es.caib.notib.back.controller;
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.command.*;
 import es.caib.notib.back.helper.*;
 import es.caib.notib.client.domini.*;
@@ -14,6 +13,7 @@ import es.caib.notib.logic.intf.service.*;
 import es.caib.notib.logic.intf.util.MimeUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -190,8 +190,8 @@ public class NotificacioFormController extends BaseUserController {
             @RequestParam(value = "municipi", required = false) String municipi,
             Model model) {
 
-        var codiNull = Strings.isNullOrEmpty(codi);
-        var denominacioNull = Strings.isNullOrEmpty(denominacio);
+        var codiNull = StringUtils.isEmpty(codi);
+        var denominacioNull = StringUtils.isEmpty(denominacio);
         if (codiNull && denominacioNull) {
             return new ArrayList<>();
         }

@@ -3,7 +3,6 @@
  */
 package es.caib.notib.back.controller;
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.command.IntegracioFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
@@ -14,6 +13,7 @@ import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.service.MonitorIntegracioService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -47,7 +47,7 @@ public class IntegracioController extends BaseUserController {
 	@PostMapping
 	public String post(HttpServletRequest request, IntegracioFiltreCommand command, Model model) {
 		var codi = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
-		if (Strings.isNullOrEmpty(codi)) {
+		if (StringUtils.isEmpty(codi)) {
 			codi = "USUARIS";
 		}
 		return post(request, codi, command, model);

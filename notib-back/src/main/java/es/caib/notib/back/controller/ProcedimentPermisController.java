@@ -1,6 +1,5 @@
 package es.caib.notib.back.controller;
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.command.ProcSerPermisCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
@@ -11,6 +10,7 @@ import es.caib.notib.logic.intf.dto.TipusEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.service.*;
 import es.caib.notib.logic.intf.service.ProcedimentService.TipusPermis;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -120,7 +120,7 @@ public class ProcedimentPermisController extends BaseUserController{
 	public String save(HttpServletRequest request, @PathVariable Long procedimentId, @Valid ProcSerPermisCommand command, BindingResult bindingResult, Model model) {
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
-		if (bindingResult.hasErrors() || Strings.isNullOrEmpty(command.getOrgan())) {
+		if (bindingResult.hasErrors() || StringUtils.isEmpty(command.getOrgan())) {
 			model.addAttribute(PROCEDIMENT, procedimentService.findById(entitatActual.getId(), isAdministrador(request), procedimentId));
 			if (command.getOrgan() != null) {
 				model.addAttribute(ORGANS, getOrganismes(request));

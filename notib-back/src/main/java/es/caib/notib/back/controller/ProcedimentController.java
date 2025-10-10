@@ -1,6 +1,5 @@
 package es.caib.notib.back.controller;
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.command.ProcSerCommand;
 import es.caib.notib.back.command.ProcSerFiltreCommand;
 import es.caib.notib.back.helper.*;
@@ -16,6 +15,7 @@ import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -67,7 +67,7 @@ public class ProcedimentController extends BaseUserController {
 		this.currentFiltre = PROCEDIMENTS_FILTRE;
 		var filtre = getFiltreCommand(request);
 		var codi = request.getParameter("codi");
-		if (!Strings.isNullOrEmpty(codi)) {
+		if (!StringUtils.isEmpty(codi)) {
 			filtre.setCodi(codi);
 		}
         var usuari = sessionScopedContext.getUsuariActual();

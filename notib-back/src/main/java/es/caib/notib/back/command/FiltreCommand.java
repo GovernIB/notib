@@ -1,7 +1,7 @@
 package es.caib.notib.back.command;
 
-import com.google.common.base.Strings;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -18,7 +18,7 @@ public class FiltreCommand {
 
     public void validarData(String data, String atribut) {
 
-        if (Strings.isNullOrEmpty(data)) {
+        if (StringUtils.isEmpty(data)) {
             return;
         }
         try {

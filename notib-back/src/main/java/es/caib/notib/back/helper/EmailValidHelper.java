@@ -1,7 +1,7 @@
 package es.caib.notib.back.helper;
 
-import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -33,7 +33,7 @@ public class EmailValidHelper {
 
     public static boolean isEmailValid(String email) {
 
-        if (Strings.isNullOrEmpty(email)) {
+        if (StringUtils.isEmpty(email)) {
             return false;
         }
         try {

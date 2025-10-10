@@ -1,10 +1,10 @@
 package es.caib.notib.logic.intf.dto.accioMassiva;
 
-import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,7 +29,7 @@ public class AccioMassivaDetall {
     }
 
     public boolean isExecutadaOk() {
-        return data != null && Strings.isNullOrEmpty(errorDesc) && Strings.isNullOrEmpty(errorStacktrace);
+        return data != null && StringUtils.isEmpty(errorDesc) && StringUtils.isEmpty(errorStacktrace);
     }
 
     public boolean isPendent() {

@@ -1,12 +1,12 @@
 package es.caib.notib.back.command;
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.helper.ConversioTipusHelper;
 import es.caib.notib.logic.intf.dto.organisme.NumeroPermisos;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorFiltreDto;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
@@ -40,7 +40,7 @@ public class OrganGestorFiltreCommand {
 	}
 
 	public boolean isEmpty() {
-		return Strings.isNullOrEmpty(codi) && Strings.isNullOrEmpty(codiPare) && Strings.isNullOrEmpty(nom) && Strings.isNullOrEmpty(oficina) && estat == null;
+		return StringUtils.isEmpty(codi) && StringUtils.isEmpty(codiPare) && StringUtils.isEmpty(nom) && StringUtils.isEmpty(oficina) && estat == null;
 	}
 
 	@Override

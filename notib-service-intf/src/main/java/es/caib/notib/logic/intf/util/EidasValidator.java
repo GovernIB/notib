@@ -1,6 +1,6 @@
 package es.caib.notib.logic.intf.util;
 
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 public class EidasValidator {
 
@@ -12,10 +12,10 @@ public class EidasValidator {
 
     private static boolean validarPais(String pais) {
     //https://administracionelectronica.gob.es/pae_Home/pae_Estrategias/pae_Identidad_y_firmaelectronica/Nodo-eIDAS/Sistemas-de-identificacion-electronica-notificados.html
-        return !Strings.isNullOrEmpty(pais) && pais.length() == 2;
+        return !StringUtils.isEmpty(pais) && pais.length() == 2;
     }
 
     public static boolean isFormatEidas(String eidas) {
-        return !Strings.isNullOrEmpty(eidas) && eidas.split("/").length == 3;
+        return !StringUtils.isEmpty(eidas) && eidas.split("/").length == 3;
     }
 }

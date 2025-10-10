@@ -1,16 +1,15 @@
 package es.caib.notib.back.interceptor;
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.*;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
@@ -117,7 +116,7 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
         sessionScopedContext.setAdminOrgan(permisos.get(RolEnumDto.NOT_ADMIN_ORGAN));
 
         // Assignam l'idioma de l'usuari com a Locale
-        RequestContextUtils.getLocaleResolver(request).setLocale(request, response, StringUtils.parseLocaleString(sessionScopedContext.getIdiomaUsuari()));
+        RequestContextUtils.getLocaleResolver(request).setLocale(request, response, org.springframework.util.StringUtils.parseLocaleString(sessionScopedContext.getIdiomaUsuari()));
 
         var entitat = getEntitatActual();
         var capLogo = "";
@@ -132,10 +131,10 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
             capColor = aplicacioService.propertyGet("es.caib.notib." + codi + ".capsalera.color.lletra");
         }
         // Obtenim les propietats globals de capçalera i peu
-        sessionScopedContext.setCapLogo(!Strings.isNullOrEmpty(capLogo) ? capLogo : aplicacioService.propertyGet("es.caib.notib.capsalera.logo"));
-        sessionScopedContext.setPeuLogo(!Strings.isNullOrEmpty(peuLogo) ? peuLogo : aplicacioService.propertyGet("es.caib.notib.peu.logo"));
-        sessionScopedContext.setCapBackColor(!Strings.isNullOrEmpty(capBackColorLogo) ? capBackColorLogo : aplicacioService.propertyGet("es.caib.notib.capsalera.color.fons"));
-        sessionScopedContext.setCapColor(!Strings.isNullOrEmpty(capColor) ? capColor : aplicacioService.propertyGet("es.caib.notib.capsalera.color.lletra"));
+        sessionScopedContext.setCapLogo(!StringUtils.isEmpty(capLogo) ? capLogo : aplicacioService.propertyGet("es.caib.notib.capsalera.logo"));
+        sessionScopedContext.setPeuLogo(!StringUtils.isEmpty(peuLogo) ? peuLogo : aplicacioService.propertyGet("es.caib.notib.peu.logo"));
+        sessionScopedContext.setCapBackColor(!StringUtils.isEmpty(capBackColorLogo) ? capBackColorLogo : aplicacioService.propertyGet("es.caib.notib.capsalera.color.fons"));
+        sessionScopedContext.setCapColor(!StringUtils.isEmpty(capColor) ? capColor : aplicacioService.propertyGet("es.caib.notib.capsalera.color.lletra"));
     }
 
 
@@ -145,7 +144,7 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
 
         // Comprovam si s'està canviant el rol
         var nouRol = request.getParameter(RolHelper.REQUEST_PARAMETER_CANVI_ROL);
-        if (Strings.isNullOrEmpty(nouRol)) {
+        if (StringUtils.isEmpty(nouRol)) {
             return;
         }
         // Si es canvia el rol, i es tracta d'un rol vàlid
@@ -213,7 +212,7 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
 
         // Comprovam si s'està canviant l'entitat
         var novaEntitat = request.getParameter(RolHelper.REQUEST_PARAMETER_CANVI_ENTITAT);
-        if (Strings.isNullOrEmpty(novaEntitat)) {
+        if (StringUtils.isEmpty(novaEntitat)) {
             return;
         }
         // Si es canvia l'entitat, i es tracta d'una entitat accessible per l'usuari, s'assigna com a entitat actual
@@ -279,7 +278,7 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
         }
         // Comprovam si es produeix un canvi d'òrgan gestor
         var nouOrgan = request.getParameter(RolHelper.REQUEST_PARAMETER_CANVI_ORGAN);
-        if (Strings.isNullOrEmpty(nouOrgan)) {
+        if (StringUtils.isEmpty(nouOrgan)) {
             return;
         }
         try {
@@ -304,7 +303,7 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
             return;
         }
         // Es carregaran només si encara no s'han carregat, o si hi ha un canvi de rol
-        var canviRol = !Strings.isNullOrEmpty(request.getParameter(RolHelper.REQUEST_PARAMETER_CANVI_ROL));
+        var canviRol = !StringUtils.isEmpty(request.getParameter(RolHelper.REQUEST_PARAMETER_CANVI_ROL));
         var isNotSuper = RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
         if ((sessionScopedContext.getAvisos() != null || RequestSessionHelper.isError(request)) && !canviRol && !isNotSuper) {
             return;

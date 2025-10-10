@@ -1,9 +1,6 @@
 package es.caib.notib.logic.intf.util;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.PdfArray;
 import com.itextpdf.text.pdf.PdfDictionary;
 import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfObject;
@@ -18,6 +15,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -35,7 +33,7 @@ public class PdfUtils extends PdfReader {
     @Getter
     private boolean maxRightMarginOk;
 
-    private final List<String> fontsNexea = Lists.newArrayList("arial", "courier", "helvetica", "timesnewroman", "timesroman");
+    private final List<String> fontsNexea = new ArrayList<>(List.of("arial", "courier", "helvetica", "timesnewroman", "timesroman"));
 
     public PdfUtils(byte [] bytes) throws IOException {
 
@@ -234,7 +232,7 @@ public class PdfUtils extends PdfReader {
 
         var nPages = this.getNumberOfPages();
         var isDuplex = false;
-        if (!Strings.isNullOrEmpty(tipusImpresio) && tipusImpresio.equals("DUPLEX")) {
+        if (tipusImpresio != null && tipusImpresio.equals("DUPLEX")) {
             nPages = nPages*2;
             isDuplex = true;
         }

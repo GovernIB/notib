@@ -1,11 +1,11 @@
 package es.caib.notib.back.validation;
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.command.EntregapostalCommand;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.MessageHelper;
 import es.caib.notib.logic.intf.service.ConfigService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.ConstraintValidator;
@@ -103,7 +103,7 @@ public class ValidEntregaPostalValidator implements ConstraintValidator<ValidEnt
 				context.buildConstraintViolationWithTemplate(msg).addNode("poblacio").addConstraintViolation();
 			}
 		}
-		if (Strings.isNullOrEmpty(entregaPostal.getCodiPostal()) || entregaPostal.getCodiPostal().length() != 5) {
+		if (StringUtils.isEmpty(entregaPostal.getCodiPostal()) || entregaPostal.getCodiPostal().length() != 5) {
 			valid = false;
 			var msg = MessageHelper.getInstance().getMessage("entregapostal.form.valid.codi.postal.buit");
 			context.buildConstraintViolationWithTemplate(msg).addNode("codiPostal").addConstraintViolation();
@@ -152,7 +152,7 @@ public class ValidEntregaPostalValidator implements ConstraintValidator<ValidEnt
 				context.buildConstraintViolationWithTemplate(msg).addNode("poblacio").addConstraintViolation();
 			}
 		}
-		if (Strings.isNullOrEmpty(entregaPostal.getCodiPostal()) || entregaPostal.getCodiPostal().length() != 5) {
+		if (StringUtils.isEmpty(entregaPostal.getCodiPostal()) || entregaPostal.getCodiPostal().length() != 5) {
 			valid = false;
 			var msg = MessageHelper.getInstance().getMessage("entregapostal.form.valid.codi.postal.estranger.buit");
 			context.buildConstraintViolationWithTemplate(msg).addNode("codiPostal").addConstraintViolation();
@@ -187,7 +187,7 @@ public class ValidEntregaPostalValidator implements ConstraintValidator<ValidEnt
 				context.buildConstraintViolationWithTemplate(msg).addNode("poblacio").addConstraintViolation();
 			}
 		}
-		if (Strings.isNullOrEmpty(entregaPostal.getCodiPostal()) || entregaPostal.getCodiPostal().length() > 5) {
+		if (StringUtils.isEmpty(entregaPostal.getCodiPostal()) || entregaPostal.getCodiPostal().length() > 5) {
 			valid = false;
 			var msg = MessageHelper.getInstance().getMessage("entregapostal.form.valid.codi.postal.buit");
 			context.buildConstraintViolationWithTemplate(msg).addNode("codiPostal").addConstraintViolation();
@@ -221,7 +221,7 @@ public class ValidEntregaPostalValidator implements ConstraintValidator<ValidEnt
 				context.buildConstraintViolationWithTemplate(msg).addNode("linea1").addConstraintViolation();
 			}
 		}
-		if (Strings.isNullOrEmpty(entregaPostal.getCodiPostalNorm()) || entregaPostal.getCodiPostal().length() > 5) {
+		if (StringUtils.isEmpty(entregaPostal.getCodiPostalNorm()) || entregaPostal.getCodiPostal().length() > 5) {
 			valid = false;
 			var msg = MessageHelper.getInstance().getMessage("entregapostal.form.valid.codi.postal.buit");
 			context.buildConstraintViolationWithTemplate(msg).addNode("codiPostalNorm").addConstraintViolation();

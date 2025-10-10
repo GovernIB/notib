@@ -3,13 +3,13 @@
  */
 package es.caib.notib.back.controller;
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.command.PermisCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.service.EntitatService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -66,7 +66,7 @@ public class EntitatPermisController extends BaseController {
 	public boolean existeixPrincipal(HttpServletRequest request, @PathVariable Long entitatId, @PathVariable String principal, Model model) {
 
 //		System.out.println(principal);
-		if (Strings.isNullOrEmpty(principal)) {
+		if (StringUtils.isEmpty(principal)) {
 			return false;
 		}
 		try {

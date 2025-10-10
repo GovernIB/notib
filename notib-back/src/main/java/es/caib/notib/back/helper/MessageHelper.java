@@ -3,8 +3,8 @@
  */
 package es.caib.notib.back.helper;
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
@@ -72,7 +72,7 @@ public class MessageHelper implements MessageSourceAware {
 			return new Locale(ca);
 		}
 		var idioma = attr.getIdiomaUsuari();
-		return new Locale(Strings.isNullOrEmpty(idioma) ? idioma : ca);
+		return new Locale(StringUtils.isEmpty(idioma) ? idioma : ca);
 //		((SessionScopedContext)(((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getSession().getAttribute("scopedTarget.sessionScopedContext"))).getIdiomaUsuari();
 //		ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
 //		return attr.getRequest().getSession(true); // true == allow create

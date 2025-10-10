@@ -1,6 +1,5 @@
 package es.caib.notib.back.controller;
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.command.ConfigCommand;
 import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.EntitatDto;
@@ -11,6 +10,7 @@ import es.caib.notib.logic.intf.service.EntitatService;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -113,7 +113,7 @@ public class ConfigController extends BaseUserController{
 
         List<ConfigDto> confs = new ArrayList<>();
         for (var config: cGroup.getConfigs()) {
-            if (!Strings.isNullOrEmpty(config.getEntitatCodi())) {
+            if (!StringUtils.isEmpty(config.getEntitatCodi())) {
                 continue;
             }
             model.addAttribute("config_" + config.getKey().replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());

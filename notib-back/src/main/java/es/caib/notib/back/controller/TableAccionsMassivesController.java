@@ -1,6 +1,5 @@
 package es.caib.notib.back.controller;
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
@@ -62,7 +61,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
     public int select(HttpServletRequest request,  @PathVariable Map<String, String> pathVarsMap) {
 
         var id = pathVarsMap.get("notificacioId");
-        if (!Strings.isNullOrEmpty(id)) {
+        if (!StringUtils.isEmpty(id)) {
             try {
                 notMassivaId = Long.valueOf(id);
             } catch (Exception ex) {
@@ -351,7 +350,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
 
         var path = request.getServletPath().split("/");
         var seleccio = getIdsSeleccionats(request);
-        if ((seleccio == null || seleccio.isEmpty()) && (path.length == 0 || Strings.isNullOrEmpty(path[2]))) {
+        if ((seleccio == null || seleccio.isEmpty()) && (path.length == 0 || StringUtils.isEmpty(path[2]))) {
             MissatgesHelper.error(request, getMessage(request,"enviament.controller.enviar.callback.buida"));
             return REDIRECT + request.getHeader(REFERER);
         }

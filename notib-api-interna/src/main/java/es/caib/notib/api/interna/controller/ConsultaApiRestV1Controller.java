@@ -268,7 +268,7 @@ public class ConsultaApiRestV1Controller {
 		}
 		if (contingutJustificant != null) {
 			var contingutJustificantBasse64 = Base64.getEncoder().encodeToString(contingutJustificant);
-			justificant = Arxiu.builder().nom("Justificant").mediaType(com.google.common.net.MediaType.PDF.toString()).contingut(contingutJustificantBasse64).build();
+			justificant = Arxiu.builder().nom("Justificant").mediaType(MediaType.APPLICATION_PDF_VALUE).contingut(contingutJustificantBasse64).build();
 			return new ResponseEntity<>(justificant, status);
 		}
 		justificant = Arxiu.builder().error(true).missatgeError("No s'ha trobat el justificant.").build();

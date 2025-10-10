@@ -1,15 +1,13 @@
 package es.caib.notib.logic.intf.dto.accioMassiva;
 
-import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,11 +30,11 @@ public class AccioMassivaFiltre {
     private String estatString;
 
     public boolean dataIniciNull() {
-        return Strings.isNullOrEmpty(dataInici);
+        return StringUtils.isEmpty(dataInici);
     }
 
     public boolean dataFiNull() {
-        return Strings.isNullOrEmpty(dataFi);
+        return StringUtils.isEmpty(dataFi);
     }
 
     public boolean tipusNull() {
@@ -44,7 +42,7 @@ public class AccioMassivaFiltre {
     }
 
     public boolean usuariCodiNull() {
-        return Strings.isNullOrEmpty(usuariCodi);
+        return StringUtils.isEmpty(usuariCodi);
     }
 
     public boolean estatNull() {
@@ -54,7 +52,7 @@ public class AccioMassivaFiltre {
 
     public Date dataIniciDate() {
 
-        if (Strings.isNullOrEmpty(dataInici)) {
+        if (StringUtils.isEmpty(dataInici)) {
             return null;
         }
         try {
@@ -74,7 +72,7 @@ public class AccioMassivaFiltre {
 
     public Date dataFiDate() {
 
-        if (Strings.isNullOrEmpty(dataFi)) {
+        if (StringUtils.isEmpty(dataFi)) {
             return null;
         }
         try {

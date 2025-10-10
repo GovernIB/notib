@@ -1,6 +1,5 @@
 package es.caib.notib.back.controller;
 
-import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.consulta.Arxiu;
@@ -11,6 +10,7 @@ import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.util.CaseInsensitiveEnumEditor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
@@ -230,7 +230,7 @@ public class ConsultaApiRestV2Controller extends BaseController {
 			log.debug("No s'ha trobat el document per a la notificació amb identificador " + notificacioId);
 		}
 		if (arxiu != null && arxiu.getContingut() != null) {
-			if (arxiu.getContentType() == null && !Strings.isNullOrEmpty(arxiu.getNom())) {
+			if (arxiu.getContentType() == null && !StringUtils.isEmpty(arxiu.getNom())) {
 				if (arxiu.getNom().endsWith(".pdf")) {
 					arxiu.setContentType("application/pdf");
 				} else if (arxiu.getNom().endsWith(".zip")) {
@@ -290,7 +290,7 @@ public class ConsultaApiRestV2Controller extends BaseController {
 		}
 		if (contingutJustificant != null) {
 			var contingutJustificantBasse64 = Base64.encodeBase64String(contingutJustificant);
-			justificant = Arxiu.builder().nom("Justificant").mediaType(com.google.common.net.MediaType.PDF.toString()).contingut(contingutJustificantBasse64).build();
+			justificant = Arxiu.builder().nom("Justificant").mediaType(MediaType.APPLICATION_PDF_VALUE).contingut(contingutJustificantBasse64).build();
 			var r = new ResponseEntity<>(justificant, status);
 			logoutSession(request, response);
 			return r;

@@ -1,6 +1,5 @@
 package es.caib.notib.logic.intf.dto.accioMassiva;
 
-import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

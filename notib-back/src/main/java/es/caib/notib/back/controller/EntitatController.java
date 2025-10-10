@@ -3,7 +3,6 @@
  */
 package es.caib.notib.back.controller;
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.command.ConfigCommand;
 import es.caib.notib.back.command.EntitatCommand;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
@@ -18,6 +17,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -116,7 +116,7 @@ public class EntitatController extends BaseController {
 		model.addAttribute("config_groups", configGroups);
 		var entitat = entitatService.findById(entitatId);
 		model.addAttribute("entitatNom", entitat.getNom());
-		if (entitat == null || Strings.isNullOrEmpty(entitat.getCodi())) {
+		if (entitat == null || StringUtils.isEmpty(entitat.getCodi())) {
 			return CONFIG_ENTITAT;
 		}
 		for (var cGroup: configGroups) {
@@ -136,7 +136,7 @@ public class EntitatController extends BaseController {
 
 		List<ConfigDto> confs = new ArrayList<>();
 		for (var config: cGroup.getConfigs()) {
-			if (Strings.isNullOrEmpty(config.getEntitatCodi()) || !config.getEntitatCodi().equals(entiatCodi)) {
+			if (StringUtils.isEmpty(config.getEntitatCodi()) || !config.getEntitatCodi().equals(entiatCodi)) {
 				continue;
 			}
 			model.addAttribute("config_" + config.getKey().replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());

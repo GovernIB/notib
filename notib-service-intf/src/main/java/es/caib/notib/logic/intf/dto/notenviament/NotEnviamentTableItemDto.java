@@ -1,6 +1,5 @@
 package es.caib.notib.logic.intf.dto.notenviament;
 
-import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -8,6 +7,7 @@ import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -92,7 +92,7 @@ public class NotEnviamentTableItemDto implements Serializable {
 	}
 
 	public String getCsvUuid() {
-		return !Strings.isNullOrEmpty(csvUuid) ?  csvUuid.contains("null") ? csvUuid.replace("null", "") : csvUuid : "";
+		return !StringUtils.isEmpty(csvUuid) ?  csvUuid.contains("null") ? csvUuid.replace("null", "") : csvUuid : "";
 	}
 
 	public String getProcedimentCodiNom() {

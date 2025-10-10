@@ -224,7 +224,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 		}
 		if (contingutJustificant != null) {
 			var contingutJustificantBasse64 = Base64.encodeBase64String(contingutJustificant);
-			justificant = Arxiu.builder().nom("Justificant").mediaType(com.google.common.net.MediaType.PDF.toString()).contingut(contingutJustificantBasse64).build();
+			justificant = Arxiu.builder().nom("Justificant").mediaType(MediaType.APPLICATION_PDF_VALUE).contingut(contingutJustificantBasse64).build();
 			var r = new ResponseEntity<>(justificant, status);
 			logoutSession(request, response);
 			return r;

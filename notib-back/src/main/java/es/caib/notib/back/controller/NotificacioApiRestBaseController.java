@@ -3,12 +3,12 @@
  */
 package es.caib.notib.back.controller;
 
-import com.google.common.base.Strings;
 import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.NotificacioServiceWs;
 import es.caib.notib.logic.intf.util.UtilitatsNotib;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ejb.EJBAccessException;
@@ -36,7 +36,7 @@ public abstract class NotificacioApiRestBaseController extends BaseController {
 			return "L'usuari " + getCodiUsuariActual() + " no té els permisos necessaris: " + e.getMessage();
 		}
 		errorDescripcio = UtilitatsNotib.getMessageExceptionOrCauseInstanceOf(e, EJBAccessException.class);
-		return Strings.isNullOrEmpty(errorDescripcio) ? e.getMessage() : errorDescripcio;
+		return StringUtils.isEmpty(errorDescripcio) ? e.getMessage() : errorDescripcio;
 	}
 
 	protected String extractIdentificador(HttpServletRequest request) {

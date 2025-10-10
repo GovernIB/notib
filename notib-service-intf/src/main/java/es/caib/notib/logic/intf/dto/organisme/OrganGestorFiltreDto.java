@@ -1,6 +1,5 @@
 package es.caib.notib.logic.intf.dto.organisme;
 
-import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.ArbreNode;
 import es.caib.notib.logic.intf.dto.AuditoriaDto;
 import lombok.Getter;
@@ -39,10 +38,10 @@ public class OrganGestorFiltreDto extends AuditoriaDto implements Serializable {
 
 	public boolean filtresOk(OrganGestorDto organ) {
 
-		var nomOrgan = !Strings.isNullOrEmpty(organ.getNom()) ? StringUtils.stripAccents(organ.getNom()).toLowerCase() : organ.getNom();
+		var nomOrgan = !StringUtils.isEmpty(organ.getNom()) ? StringUtils.stripAccents(organ.getNom()).toLowerCase() : organ.getNom();
 
 		boolean ok = organ != null && (codi == null || codi.isEmpty() || organ.getCodi() != null &&  organ.getCodi().contains(codi.toUpperCase()))
-				&& (Strings.isNullOrEmpty(nom) || nomOrgan != null && nomOrgan.contains(StringUtils.stripAccents(nom).toLowerCase()))
+				&& (StringUtils.isEmpty(nom) || nomOrgan != null && nomOrgan.contains(StringUtils.stripAccents(nom).toLowerCase()))
 				&& (!entregaCie || organ.getCieId() != null)
 				&& (!permetreSir || organ.isPermetreSir())
 				&& (estat == null || estat.equals(organ.getEstat()))

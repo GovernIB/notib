@@ -15,21 +15,21 @@
             <secure-deployment name="notib-api-interna.war">
                 <auth-server-url>${env.JBOSS_AUTH_URL}</auth-server-url>
                 <realm>${env.JBOSS_AUTH_REALM}</realm>
-                <resource>${env.JBOSS_AUTH_CLIENTID_REST}</resource>
+                <resource>${env.JBOSS_AUTH_WS_CLIENTID}</resource>
                 <use-resource-role-mappings>false</use-resource-role-mappings>
                 <bearer-only>true</bearer-only>
                 <enable-basic-auth>true</enable-basic-auth>
                 <principal-attribute>preferred_username</principal-attribute>
-                <credential name="secret">${env.JBOSS_AUTH_SECRET}</credential>
+                <credential name="secret">${env.JBOSS_AUTH_CREDENTIAL_SECRET}</credential>
             </secure-deployment>
             <secure-deployment name="notib-api-externa.war">
                 <auth-server-url>${env.JBOSS_AUTH_URL}</auth-server-url>
                 <realm>${env.JBOSS_AUTH_REALM}</realm>
-                <resource>${env.JBOSS_AUTH_CLIENTID_REST}</resource>
+                <resource>${env.JBOSS_AUTH_WS_CLIENTID}</resource>
                 <use-resource-role-mappings>false</use-resource-role-mappings>
                 <bearer-only>true</bearer-only>
                 <enable-basic-auth>true</enable-basic-auth>
                 <principal-attribute>preferred_username</principal-attribute>
-                <credential name="secret">${env.JBOSS_AUTH_SECRET}</credential>
+                <credential name="secret">${env.JBOSS_AUTH_CREDENTIAL_SECRET}</credential>
             </secure-deployment>
         </subsystem>

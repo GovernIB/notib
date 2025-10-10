@@ -1,7 +1,5 @@
 package es.caib.notib.back.validation;
 
-
-import com.google.common.base.Strings;
 import es.caib.notib.back.command.NotificacioCommand;
 import es.caib.notib.back.command.PersonaCommand;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
@@ -13,6 +11,7 @@ import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.ConstraintValidator;
@@ -95,7 +94,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			var organ = organService.findByCodi(entitat.getId(), organCodi);
 			if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {
 				if (organ != null) {
-					valid = entitat.isOficinaEntitat() || organ.getOficina() != null && !Strings.isNullOrEmpty(organ.getOficina().getCodi());
+					valid = entitat.isOficinaEntitat() || organ.getOficina() != null && !StringUtils.isEmpty(organ.getOficina().getCodi());
 					if (!valid) {
 						var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.sense.oficina", null, locale);
 						context.buildConstraintViolationWithTemplate(msg).addNode("organGestor").addConstraintViolation();
@@ -301,7 +300,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 						// SI ES UNA PERSONA SENSE NIF I NO TÉ CAP DESTINATARI NI ENVIAMENT PER ENTREGA POSTAL ACTIVA -> EMAIL OBLIGATORI
 						if (InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) &&
 								(senseNif && (enviament.getEntregaPostal() == null || !enviament.getEntregaPostal().isActiva())
-										&& Strings.isNullOrEmpty(enviament.getTitular().getEmail()))) {
+										&& StringUtils.isEmpty(enviament.getTitular().getEmail()))) {
 
 								// Email obligatori si no té destinataris amb nif o enviament postal
 								valid = false;
@@ -309,7 +308,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 								context.buildConstraintViolationWithTemplate(msg).addNode("enviaments[" + envCount + "].titular.email").addConstraintViolation();
 						}
 
-						if (!Strings.isNullOrEmpty(enviament.getTitular().getNif()) && !InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+						if (!StringUtils.isEmpty(enviament.getTitular().getNif()) && !InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
 							String nif = enviament.getTitular().getNif().toLowerCase();
 							if (nifs.contains(nif)) {
 								valid = false;
@@ -342,14 +341,14 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					if (enviament.getDestinataris() != null) {
 						int destCount = 0;
 						for (var destinatari: enviament.getDestinataris()) {
-							if (!Strings.isNullOrEmpty(destinatari.getEmail()) && !EmailValidHelper.isEmailValid(destinatari.getEmail())) {
+							if (!StringUtils.isEmpty(destinatari.getEmail()) && !EmailValidHelper.isEmailValid(destinatari.getEmail())) {
 								valid = false;
 								var msg = MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale);
 								var node = "enviaments["+envCount+"].destinataris[" + destCount +"].email";
 								context.buildConstraintViolationWithTemplate(msg).addNode(node).addConstraintViolation();
 							}
 							String nif = destinatari.getNif();
-							if (!Strings.isNullOrEmpty(nif)) {
+							if (!StringUtils.isEmpty(nif)) {
 								nif = nif.toLowerCase();
 								if (nifs.contains(nif)) {
 									valid = false;

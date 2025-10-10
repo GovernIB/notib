@@ -1,9 +1,9 @@
 package es.caib.notib.logic.intf.dto.adviser;
 
-import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 @Getter
@@ -16,7 +16,7 @@ public class ResultatExecucio {
 
     public void setError(String errorDescripcio, Exception ex) {
 
-        if (!Strings.isNullOrEmpty(errorDescripcio)) {
+        if (!StringUtils.isEmpty(errorDescripcio)) {
             this.error = true;
         }
         this.errorDescripcio = errorDescripcio;
