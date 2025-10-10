@@ -915,6 +915,15 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return notificacioService.actualitzacioEnviamentsEstat();
     }
 
+    @GetMapping(value = "/{notificacioId}/anular")
+    public String anularGet(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
+
+        var anular = new AnularCommand();
+        anular.setNotificacioId(notificacioId);
+        model.addAttribute(anular);
+        return "anularForm";
+    }
+
 
     @GetMapping(value = "/{notificacioId}/ampliacion/plazo")
     public String ampliarPlazoOEGet(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
