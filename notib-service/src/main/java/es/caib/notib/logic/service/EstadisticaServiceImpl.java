@@ -766,6 +766,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Notificacions amb error a l'intentar registrar
         explotFetsRepository.getStatsRegEnviamentErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+
             statsMap.get(stat.getKey()).setTrRegEnviadesError(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setIntentsRegistre(stat.getIntentsMig().longValue());
         });

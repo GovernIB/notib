@@ -5,6 +5,7 @@ package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
 import com.sun.jersey.api.client.ClientResponse;
+import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.EmailNotificacioHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -28,8 +29,10 @@ import es.caib.notib.logic.intf.service.MonitorIntegracioService;
 import es.caib.notib.logic.intf.service.UsuariAplicacioService;
 import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.utils.DatesUtils;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.filtres.FiltreMonitorIntegracio;
 import es.caib.notib.persist.repository.AplicacioRepository;
@@ -90,8 +93,10 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
     private EntregaPostalRepository entregaPostalRepository;
     @Autowired
     private EstadisticaService estadisticaService;
+    @Autowired
+    private ComandaListener comandaListener;
 
-	@Override
+    @Override
 	@Transactional(readOnly = true)
 	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(IntegracioCodi codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) {
 
@@ -234,7 +239,9 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 //					var entrega = entregaPostalRepository.findTopByCieIdNotNullOrderByIdDesc().orElseThrow();
 //					enviament = enviamentRepository.findByCieId(entrega.getCieId());
 //					enviament.getNotificacio().getOrganGestor().getEntregaCie().getCie().getApiKey().salt not null;
+                    NotibLogger.getInstance().info("[Diagnostic CIE] Obtinguent ultim enviament ", log, LoggingTipus.ENTREGA_CIE);
 					var enviaments = enviamentRepository.getUltimEnviamentPostal();
+                    NotibLogger.getInstance().info("[Diagnostic CIE] Obtingut ultim enviament " + enviaments, log, LoggingTipus.ENTREGA_CIE);
 					if (enviaments == null || enviaments.isEmpty()) {
 						diagnostic.setCorrecte(false);
 						diagnostic.setErrMsg("No hi ha enviaments dirigits a cap CIE extern");
@@ -259,12 +266,21 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 						diagnostic.setErrMsg(e.getMessage());
 					}
 					break;
+                case COMANDA:
+                    try {
+                        comandaListener.diagnosticar();
+                        diagnostic.setCorrecte(true);
+                    } catch (Exception e) {
+                        diagnostic.setCorrecte(false);
+                        diagnostic.setErrMsg(e.getMessage());
+                    }
+                    break;
 			}
 			diagnostic.setDiagnosticsEntitat(diagnostics);
 			return diagnostic;
 		} catch (Exception ex) {
 			var error = "Error realitzant el diagnostic de la integracio: ";
-			log.error(error + codi);
+			log.error(error + codi, ex);
 			diagnostic.setCorrecte(false);
 			diagnostic.setErrMsg(ex.getMessage());
 			return diagnostic;
